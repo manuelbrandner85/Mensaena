@@ -140,14 +140,14 @@ export default function MatchingPage() {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition"
               aria-label="Aktualisieren"
             >
               <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
             </button>
             <button
               onClick={() => setShowPreferences(true)}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition"
               aria-label="Einstellungen"
             >
               <Settings className="w-4 h-4" />
@@ -220,7 +220,7 @@ export default function MatchingPage() {
 
           {/* No more items */}
           {!hasMore && matches.length > 0 && (
-            <p className="text-center text-xs text-ink-400 py-4">
+            <p className="text-center text-xs text-mn-mute py-4">
               Keine weiteren Matches
             </p>
           )}

@@ -113,7 +113,7 @@ export default function MobileSheet({
         ref={sheetRef}
         className={cn(
           'fixed bottom-0 left-0 right-0 z-50',
-          'bg-white rounded-t-3xl shadow-xl',
+          'bg-mn-elevated rounded-t-3xl shadow-xl',
           'flex flex-col',
           !isDragging && 'transition-all duration-300 ease-out',
           className
@@ -139,11 +139,11 @@ export default function MobileSheet({
 
         {/* Header */}
         {title && (
-          <div className="flex-shrink-0 flex items-center justify-between px-5 pb-3 border-b border-stone-100">
-            <h2 className="text-lg font-bold text-ink-900">{title}</h2>
+          <div className="flex-shrink-0 flex items-center justify-between px-5 pb-3 border-b border-white/5">
+            <h2 className="text-lg font-bold text-mn-ink">{title}</h2>
             <button
               onClick={onClose}
-              className="touch-target p-2 rounded-xl text-ink-400 hover:text-ink-700 hover:bg-stone-100 transition-colors"
+              className="touch-target p-2 rounded-xl text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated/5 transition-colors"
               aria-label="Schließen"
             >
               <X className="w-5 h-5" />

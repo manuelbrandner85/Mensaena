@@ -9,7 +9,7 @@ const variantStyles = {
   hover:   'card-hover',
   accent:  'card-accent',
   stat:    'stat-card',
-  flat:    'bg-white rounded-2xl border border-warm-100 overflow-hidden',
+  flat:    'bg-mn-elevated rounded-2xl border border-warm-100 overflow-hidden',
   glass:   'glass',
 } as const
 

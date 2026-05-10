@@ -31,15 +31,15 @@ export default function BotTipCard({ tipText }: BotTipCardProps) {
     <Card
       variant="flat"
       padding="md"
-      className="bg-gradient-to-br from-primary-50 to-primary-100/50 border-primary-200/50"
+      className="bg-gradient-to-br from-primary-50 to-primary-100/50 border-mn-amber/20/50"
     >
       {/* Header */}
       <div className="flex items-center gap-2">
         <div className="w-7 h-7 rounded-full bg-primary-200 flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-primary-700" />
+          <Sparkles className="w-4 h-4 text-mn-amber" />
         </div>
         <span className="text-sm font-semibold text-primary-800">MensaenaBot</span>
-        <Lightbulb className="w-4 h-4 text-primary-600 ml-auto" />
+        <Lightbulb className="w-4 h-4 text-mn-amber ml-auto" />
       </div>
 
       {/* Tip */}
@@ -51,13 +51,13 @@ export default function BotTipCard({ tipText }: BotTipCardProps) {
       <div className="flex justify-between items-center mt-3">
         <Link
           href="/dashboard/chat"
-          className="text-xs text-primary-700 hover:text-primary-900 font-medium transition-colors"
+          className="text-xs text-mn-amber hover:text-primary-900 font-medium transition-colors"
         >
           Chat mit Bot →
         </Link>
         <button
           onClick={handleNextTip}
-          className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-800 transition-colors"
+          className="flex items-center gap-1 text-xs text-mn-amber hover:text-primary-800 transition-colors"
         >
           <RefreshCw className="w-3 h-3" />
           Nächster Tipp

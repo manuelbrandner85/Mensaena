@@ -33,22 +33,22 @@ const ICON_MAP: Record<string, typeof Bell> = {
 
 const COLOR_MAP: Record<string, { bg: string; icon: string; dot: string }> = {
   blue:    { bg: 'bg-blue-50',    icon: 'bg-blue-100 text-blue-600',    dot: 'bg-blue-500' },
-  primary: { bg: 'bg-primary-50', icon: 'bg-primary-100 text-primary-600', dot: 'bg-primary-500' },
+  primary: { bg: 'bg-mn-amber/5', icon: 'bg-mn-amber/10 text-mn-amber', dot: 'bg-mn-amber' },
   amber:   { bg: 'bg-amber-50',   icon: 'bg-amber-100 text-amber-600',   dot: 'bg-amber-500' },
   purple:  { bg: 'bg-purple-50',  icon: 'bg-purple-100 text-purple-600',  dot: 'bg-purple-500' },
   indigo:  { bg: 'bg-indigo-50',  icon: 'bg-indigo-100 text-indigo-600',  dot: 'bg-indigo-500' },
-  gray:    { bg: 'bg-stone-50',   icon: 'bg-stone-100 text-ink-600',     dot: 'bg-stone-400' },
+  gray:    { bg: 'bg-mn-surface',   icon: 'bg-mn-elevated text-mn-ink-soft',     dot: 'bg-stone-400' },
   pink:    { bg: 'bg-pink-50',    icon: 'bg-pink-100 text-pink-600',     dot: 'bg-pink-500' },
   orange:  { bg: 'bg-orange-50',  icon: 'bg-orange-100 text-orange-600', dot: 'bg-orange-500' },
 }
 
 const BADGE_MAP: Record<string, string> = {
   blue:    'bg-blue-100 text-blue-700',
-  primary: 'bg-primary-100 text-primary-700',
+  primary: 'bg-mn-amber/10 text-mn-amber',
   amber:   'bg-amber-100 text-amber-700',
   purple:  'bg-purple-100 text-purple-700',
   indigo:  'bg-indigo-100 text-indigo-700',
-  gray:    'bg-stone-100 text-ink-600',
+  gray:    'bg-mn-elevated text-mn-ink-soft',
   pink:    'bg-pink-100 text-pink-700',
   orange:  'bg-orange-100 text-orange-700',
 }
@@ -68,7 +68,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: {
   if (done) return (
     <span className={cn(
       'inline-flex items-center gap-1 text-xs font-medium mt-2',
-      done === 'accepted' ? 'text-green-600' : 'text-ink-400',
+      done === 'accepted' ? 'text-green-600' : 'text-mn-mute',
     )}>
       {done === 'accepted' ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
       {done === 'accepted' ? 'Angenommen' : 'Abgelehnt'}
@@ -91,7 +91,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: {
       <button
         onClick={() => respond(true)}
         disabled={!!busy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-600 text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-mn-amber text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
       >
         <Check className="w-3.5 h-3.5" />
         {busy === 'accept' ? 'Wird angenommen…' : 'Annehmen'}
@@ -99,7 +99,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: {
       <button
         onClick={() => respond(false)}
         disabled={!!busy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 text-ink-600 text-xs font-medium hover:bg-stone-100 disabled:opacity-50 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/5 text-mn-ink-soft text-xs font-medium hover:bg-mn-elevated disabled:opacity-50 transition-colors"
       >
         <X className="w-3.5 h-3.5" />
         {busy === 'decline' ? 'Wird abgelehnt…' : 'Ablehnen'}
@@ -158,10 +158,10 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
   return (
     <div
       className={cn(
-        'group relative flex items-start gap-3 px-4 py-4 transition-all duration-200 border-b border-stone-100 last:border-0',
+        'group relative flex items-start gap-3 px-4 py-4 transition-all duration-200 border-b border-white/5 last:border-0',
         n.read
-          ? 'bg-white hover:bg-stone-50/80'
-          : 'bg-primary-50/30 hover:bg-primary-50/60',
+          ? 'bg-mn-elevated hover:bg-mn-surface/80'
+          : 'bg-mn-amber/5/30 hover:bg-mn-amber/5/60',
         n.link ? 'cursor-pointer' : 'cursor-default',
         deleting && 'opacity-40 pointer-events-none',
       )}
@@ -172,7 +172,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
     >
       {/* ── Unread stripe ── */}
       {!n.read && (
-        <div className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r bg-primary-500" />
+        <div className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r bg-mn-amber" />
       )}
 
       {/* ── Avatar or Icon ── */}
@@ -209,15 +209,15 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
           <div className="flex-1 min-w-0">
             <p className={cn(
               'text-sm leading-snug',
-              n.read ? 'text-ink-600' : 'text-ink-900 font-medium',
+              n.read ? 'text-mn-ink-soft' : 'text-mn-ink font-medium',
             )}>
               {n.actor_name && (
-                <span className="font-semibold text-ink-900">{n.actor_name} </span>
+                <span className="font-semibold text-mn-ink">{n.actor_name} </span>
               )}
               {n.title}
             </p>
             {n.content && (
-              <p className="text-sm text-ink-400 line-clamp-2 mt-0.5 leading-snug">{n.content}</p>
+              <p className="text-sm text-mn-mute line-clamp-2 mt-0.5 leading-snug">{n.content}</p>
             )}
           </div>
           {/* Unread dot */}
@@ -228,7 +228,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
 
         {/* ── Meta ── */}
         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-          <span className="text-xs text-ink-400 tabular-nums">
+          <span className="text-xs text-mn-mute tabular-nums">
             {formatRelativeTime(n.created_at)}
           </span>
           <span className={cn('text-xs font-medium px-1.5 py-0.5 rounded-full', badgeClass)}>
@@ -251,9 +251,9 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
         <button
           onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o) }}
           className={cn(
-            'p-1.5 rounded-lg text-ink-400 hover:bg-stone-100 hover:text-ink-600 transition-all',
+            'p-1.5 rounded-lg text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition-all',
             'opacity-0 group-hover:opacity-100 focus:opacity-100',
-            menuOpen && 'opacity-100 bg-stone-100',
+            menuOpen && 'opacity-100 bg-mn-elevated',
           )}
           aria-label="Optionen"
         >
@@ -261,22 +261,22 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-card border border-stone-100 py-1 z-30 animate-scale-in">
+          <div className="absolute right-0 top-full mt-1 w-52 bg-mn-elevated rounded-xl shadow-cinema-card border border-white/5 py-1 z-30 animate-scale-in">
             <button
               onClick={(e) => {
                 e.stopPropagation()
                 n.read ? onMarkAsUnread(n.id) : onMarkAsRead(n.id)
                 setMenuOpen(false)
               }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-ink-700 hover:bg-stone-50 transition-colors"
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-mn-ink-soft hover:bg-mn-surface transition-colors"
             >
               {n.read
-                ? <EyeOff className="w-4 h-4 text-ink-400" />
-                : <Eye className="w-4 h-4 text-ink-400" />
+                ? <EyeOff className="w-4 h-4 text-mn-mute" />
+                : <Eye className="w-4 h-4 text-mn-mute" />
               }
               {n.read ? 'Als ungelesen markieren' : 'Als gelesen markieren'}
             </button>
-            <div className="h-px bg-stone-100 mx-2 my-1" />
+            <div className="h-px bg-mn-elevated mx-2 my-1" />
             <button
               onClick={handleDelete}
               className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"

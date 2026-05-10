@@ -74,7 +74,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
   const slowCount   = stations.filter(s => getMaxPower(s) < 22).length
 
   return (
-    <div className={`relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-primary-50 border border-primary-200 rounded-2xl p-5 shadow-soft overflow-hidden ${className ?? ''}`}>
+    <div className={`relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-primary-50 border border-mn-amber/20 rounded-2xl p-5 shadow-soft overflow-hidden ${className ?? ''}`}>
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #16A34A, #16A34A33)' }}
@@ -82,29 +82,29 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
       <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
 
       <div className="relative flex items-center gap-2 mb-4">
-        <Zap className="w-5 h-5 text-primary-600 float-idle" />
-        <h3 className="font-bold text-primary-600">E-Ladesäulen in der Nähe</h3>
-        <span className="display-numeral ml-auto text-xs bg-primary-50 text-primary-600 px-2 py-0.5 rounded-full font-medium tabular-nums">
+        <Zap className="w-5 h-5 text-mn-amber float-idle" />
+        <h3 className="font-bold text-mn-amber">E-Ladesäulen in der Nähe</h3>
+        <span className="display-numeral ml-auto text-xs bg-mn-amber/5 text-mn-amber px-2 py-0.5 rounded-full font-medium tabular-nums">
           {stations.length}
         </span>
       </div>
 
       {/* Power breakdown */}
       <div className="relative grid grid-cols-3 gap-2 mb-4 text-center">
-        <div className="rounded-xl bg-white/70 border border-primary-200 py-2">
-          <p className="text-xs uppercase tracking-wider text-primary-600 font-semibold">Ultra</p>
-          <p className="display-numeral text-lg font-bold text-primary-600">{fastCount}</p>
-          <p className="text-xs text-ink-500">≥ 50 kW</p>
+        <div className="rounded-xl bg-mn-elevated/70 border border-mn-amber/20 py-2">
+          <p className="text-xs uppercase tracking-wider text-mn-amber font-semibold">Ultra</p>
+          <p className="display-numeral text-lg font-bold text-mn-amber">{fastCount}</p>
+          <p className="text-xs text-mn-mute">≥ 50 kW</p>
         </div>
-        <div className="rounded-xl bg-white/70 border border-amber-100 py-2">
+        <div className="rounded-xl bg-mn-elevated/70 border border-amber-100 py-2">
           <p className="text-xs uppercase tracking-wider text-amber-700 font-semibold">Schnell</p>
           <p className="display-numeral text-lg font-bold text-amber-700">{mediumCount}</p>
-          <p className="text-xs text-ink-500">22–50 kW</p>
+          <p className="text-xs text-mn-mute">22–50 kW</p>
         </div>
-        <div className="rounded-xl bg-white/70 border border-blue-100 py-2">
+        <div className="rounded-xl bg-mn-elevated/70 border border-blue-100 py-2">
           <p className="text-xs uppercase tracking-wider text-blue-700 font-semibold">Normal</p>
           <p className="display-numeral text-lg font-bold text-blue-700">{slowCount}</p>
-          <p className="text-xs text-ink-500">&lt; 22 kW</p>
+          <p className="text-xs text-mn-mute">&lt; 22 kW</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
               href={navUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-white rounded-xl p-3 border border-primary-200 shadow-soft hover:shadow-card transition-shadow"
+              className="flex items-center gap-3 bg-mn-elevated rounded-xl p-3 border border-mn-amber/20 shadow-soft hover:shadow-card transition-shadow"
             >
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
@@ -130,9 +130,9 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
                 <Battery className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-ink-900 truncate">{station.name}</p>
+                <p className="text-sm font-semibold text-mn-ink truncate">{station.name}</p>
                 {addr && (
-                  <p className="text-xs text-ink-500 truncate flex items-center gap-1">
+                  <p className="text-xs text-mn-mute truncate flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> {addr}
                   </p>
                 )}
@@ -144,7 +144,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
                 >
                   {maxKW > 0 ? `${maxKW} kW` : '?'}
                 </p>
-                <p className="text-xs text-ink-500">
+                <p className="text-xs text-mn-mute">
                   {station.connections.length} {station.connections.length === 1 ? 'Anschluss' : 'Anschlüsse'}
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function ChargingStationsWidget({ lat, lng, radiusKm = 15, classN
         })}
       </div>
 
-      <p className="relative text-xs text-primary-600/70 mt-3 text-center">
+      <p className="relative text-xs text-mn-amber/70 mt-3 text-center">
         Daten: OpenChargeMap · Tippe für Navigation
       </p>
     </div>

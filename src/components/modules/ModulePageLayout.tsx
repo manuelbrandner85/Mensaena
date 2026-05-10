@@ -21,7 +21,7 @@ export default function ModulePageLayout({
   features,
   createHref,
   createLabel = 'Neuen Eintrag erstellen',
-  accentColor = 'bg-primary-50 text-primary-700 border border-primary-100',
+  accentColor = 'bg-mn-amber/5 text-mn-amber border border-primary-100',
   index = '§',
 }: ModulePageProps) {
   return (
@@ -62,10 +62,10 @@ export default function ModulePageLayout({
             const body = (
               <>
                 <div className="text-2xl mb-3 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-4deg] origin-left">{feature.icon}</div>
-                <h3 className="font-display text-lg font-medium text-ink-800 mb-1.5 tracking-tight">{feature.title}</h3>
-                <p className="text-[13px] text-ink-500 leading-relaxed">{feature.desc}</p>
+                <h3 className="font-display text-lg font-medium text-mn-ink mb-1.5 tracking-tight">{feature.title}</h3>
+                <p className="text-[13px] text-mn-mute leading-relaxed">{feature.desc}</p>
                 {feature.href && (
-                  <div className="inline-flex items-center gap-1 text-xs tracking-[0.14em] uppercase text-primary-700 font-semibold mt-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                  <div className="inline-flex items-center gap-1 text-xs tracking-[0.14em] uppercase text-mn-amber font-semibold mt-4 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
                     Öffnen <ArrowRight className="w-3 h-3" />
                   </div>
                 )}
@@ -89,10 +89,10 @@ export default function ModulePageLayout({
       <section className="editorial-card spotlight p-12 md:p-16 text-center border-dashed">
         <div className="text-6xl mb-5 float-idle inline-block">{emoji}</div>
         <div className="meta-label meta-label--subtle justify-center mb-3">Noch leer</div>
-        <h3 className="font-display text-2xl md:text-3xl font-medium text-ink-800 mb-3 tracking-tight">
+        <h3 className="font-display text-2xl md:text-3xl font-medium text-mn-ink mb-3 tracking-tight">
           Sei der <span className="text-accent">Erste</span> in deiner Region
         </h3>
-        <p className="text-sm text-ink-500 mb-6 max-w-md mx-auto leading-relaxed">
+        <p className="text-sm text-mn-mute mb-6 max-w-md mx-auto leading-relaxed">
           Hier entsteht gerade etwas Neues. Erstelle den ersten Eintrag und setze den Ton für deine Nachbarschaft.
         </p>
         {createHref && (

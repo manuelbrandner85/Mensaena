@@ -54,9 +54,9 @@ export default function WeeklyChallengeHighlight() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-warm-200 bg-white p-5 animate-pulse">
-        <div className="h-4 w-48 bg-stone-200 rounded mb-3" />
-        <div className="h-3 w-64 bg-stone-100 rounded" />
+      <div className="rounded-2xl border border-warm-200 bg-mn-elevated p-5 animate-pulse">
+        <div className="h-4 w-48 bg-mn-raised rounded mb-3" />
+        <div className="h-3 w-64 bg-mn-elevated rounded" />
       </div>
     )
   }
@@ -71,24 +71,24 @@ export default function WeeklyChallengeHighlight() {
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-ink-900">Challenges dieser Woche</h3>
-            <p className="text-xs text-ink-500 mt-0.5">Drei wöchentliche Impulse zum Mitmachen.</p>
+            <h3 className="text-sm font-bold text-mn-ink">Challenges dieser Woche</h3>
+            <p className="text-xs text-mn-mute mt-0.5">Drei wöchentliche Impulse zum Mitmachen.</p>
           </div>
         </div>
         <Link
           href="/dashboard/challenges"
-          className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 hover:text-primary-800"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-mn-amber hover:text-primary-800"
         >
           Alle <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
       <ul className="space-y-2">
         {challenges.map(c => (
-          <li key={c.id} className="rounded-xl border border-stone-100 bg-white p-3">
+          <li key={c.id} className="rounded-xl border border-white/5 bg-mn-elevated p-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-ink-900 truncate">{c.title}</p>
-                {c.description && <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">{c.description}</p>}
+                <p className="text-sm font-semibold text-mn-ink truncate">{c.title}</p>
+                {c.description && <p className="text-xs text-mn-mute mt-0.5 line-clamp-2">{c.description}</p>}
               </div>
               <span className="inline-flex items-center gap-1 flex-shrink-0 px-2 py-0.5 text-[11px] font-semibold bg-amber-50 border border-amber-200 text-amber-800 rounded-full">
                 <Trophy className="w-3 h-3" /> {c.points}

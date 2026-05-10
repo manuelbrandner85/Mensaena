@@ -157,30 +157,30 @@ export default function OrganizationMembership({ organizationId, currentUserId }
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl border border-stone-100 p-5 animate-pulse">
-        <div className="h-4 w-36 bg-stone-200 rounded mb-3" />
-        <div className="h-10 bg-stone-100 rounded-lg" />
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 p-5 animate-pulse">
+        <div className="h-4 w-36 bg-mn-raised rounded mb-3" />
+        <div className="h-10 bg-mn-elevated rounded-lg" />
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-100 p-5">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-primary-50">
-            <Users className="w-4 h-4 text-primary-700" />
+          <div className="p-2 rounded-lg bg-mn-amber/5">
+            <Users className="w-4 h-4 text-mn-amber" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-ink-900">Mitglieder</h3>
-            <p className="text-xs text-ink-500">{members.length} {members.length === 1 ? 'Mitglied' : 'Mitglieder'}</p>
+            <h3 className="text-sm font-bold text-mn-ink">Mitglieder</h3>
+            <p className="text-xs text-mn-mute">{members.length} {members.length === 1 ? 'Mitglied' : 'Mitglieder'}</p>
           </div>
         </div>
         {isMember && !isAdmin && (
           <button
             type="button"
             onClick={leave}
-            className="inline-flex items-center gap-1 h-8 px-2.5 text-[11px] font-semibold border border-stone-200 text-ink-600 rounded-lg hover:bg-stone-50"
+            className="inline-flex items-center gap-1 h-8 px-2.5 text-[11px] font-semibold border border-white/5 text-mn-ink-soft rounded-lg hover:bg-mn-elevated/[0.02]"
           >
             <UserMinus className="w-3 h-3" /> Verlassen
           </button>
@@ -197,11 +197,11 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                 {m.profile?.avatar_url ? (
                   <img src={m.profile.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-stone-200 flex items-center justify-center text-[11px] font-semibold text-ink-600">
+                  <div className="w-7 h-7 rounded-full bg-mn-raised flex items-center justify-center text-[11px] font-semibold text-mn-ink-soft">
                     {name.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <span className="text-xs font-medium text-ink-800 truncate flex-1">{name}</span>
+                <span className="text-xs font-medium text-mn-ink truncate flex-1">{name}</span>
                 {m.role === 'admin' && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-full">
                     <Shield className="w-2.5 h-2.5" /> Admin
@@ -211,21 +211,21 @@ export default function OrganizationMembership({ organizationId, currentUserId }
             )
           })}
           {members.length > 8 && (
-            <li className="text-[11px] text-ink-400 text-center pt-1">+ {members.length - 8} weitere</li>
+            <li className="text-[11px] text-mn-mute text-center pt-1">+ {members.length - 8} weitere</li>
           )}
         </ul>
       )}
 
       {/* Non-member: redeem code OR claim ownership if no members yet */}
       {!isMember && currentUserId && (
-        <div className="border border-primary-100 rounded-xl p-3 bg-primary-50/40 mb-3">
+        <div className="border border-primary-100 rounded-xl p-3 bg-mn-amber/5/40 mb-3">
           <div className="flex items-center gap-2 mb-2">
-            <KeyRound className="w-3.5 h-3.5 text-primary-700" />
+            <KeyRound className="w-3.5 h-3.5 text-mn-amber" />
             <h4 className="text-xs font-bold text-primary-900">
               {hasNoMembers ? 'Organisation beanspruchen' : 'Einladungscode einlösen'}
             </h4>
           </div>
-          <p className="text-[11px] text-ink-600 mb-2">
+          <p className="text-[11px] text-mn-ink-soft mb-2">
             {hasNoMembers
               ? 'Wenn du diese Organisation vertrittst, kannst du sie mit einem Einladungs-Code beanspruchen. Den Code erhältst du vom Mensaena-Team.'
               : 'Du hast einen 8-stelligen Code erhalten? Hier einlösen:'}
@@ -237,14 +237,14 @@ export default function OrganizationMembership({ organizationId, currentUserId }
               onChange={e => setRedeemCode(e.target.value.toUpperCase())}
               placeholder="ABCDEFGH"
               maxLength={12}
-              className="flex-1 h-9 px-3 border border-stone-200 rounded-lg text-sm font-mono uppercase"
+              className="flex-1 h-9 px-3 border border-white/5 rounded-lg text-sm font-mono uppercase"
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); redeem() } }}
             />
             <button
               type="button"
               disabled={redeeming || redeemCode.trim().length < 6}
               onClick={redeem}
-              className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-60"
+              className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold bg-mn-amber text-white rounded-lg hover:bg-primary-700 disabled:opacity-60"
             >
               {redeeming && <Loader2 className="w-3 h-3 animate-spin" />}
               Einlösen
@@ -255,9 +255,9 @@ export default function OrganizationMembership({ organizationId, currentUserId }
 
       {/* Admin: create invite codes */}
       {isAdmin && (
-        <div className="border-t border-stone-100 pt-4">
+        <div className="border-t border-white/5 pt-4">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-xs font-bold text-ink-800 flex items-center gap-1">
+            <h4 className="text-xs font-bold text-mn-ink flex items-center gap-1">
               <KeyRound className="w-3.5 h-3.5" /> Einladungs-Codes
             </h4>
             <div className="flex gap-1">
@@ -265,7 +265,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                 type="button"
                 disabled={creating}
                 onClick={() => createInvite('member')}
-                className="inline-flex items-center gap-1 h-7 px-2 text-[11px] font-semibold border border-primary-200 text-primary-700 rounded-lg hover:bg-primary-50 disabled:opacity-60"
+                className="inline-flex items-center gap-1 h-7 px-2 text-[11px] font-semibold border border-mn-amber/20 text-mn-amber rounded-lg hover:bg-mn-amber/5 disabled:opacity-60"
               >
                 <Plus className="w-2.5 h-2.5" /> Mitglied
               </button>
@@ -280,16 +280,16 @@ export default function OrganizationMembership({ organizationId, currentUserId }
             </div>
           </div>
           {invites.length === 0 ? (
-            <p className="text-[11px] text-ink-400 italic">Noch keine aktiven Codes.</p>
+            <p className="text-[11px] text-mn-mute italic">Noch keine aktiven Codes.</p>
           ) : (
             <ul className="space-y-1">
               {invites.map(inv => {
                 const exp = new Date(inv.expires_at)
                 const isExpired = exp < new Date()
                 return (
-                  <li key={inv.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-stone-100 bg-stone-50/60">
-                    <code className="flex-1 text-xs font-mono text-ink-800 truncate">{inv.code}</code>
-                    <span className="text-xs text-ink-500">
+                  <li key={inv.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-white/5 bg-mn-surface/60">
+                    <code className="flex-1 text-xs font-mono text-mn-ink truncate">{inv.code}</code>
+                    <span className="text-xs text-mn-mute">
                       {inv.use_count}/{inv.max_uses}
                     </span>
                     {inv.role === 'admin' && (
@@ -301,7 +301,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                     <button
                       type="button"
                       onClick={() => copyCode(inv.code)}
-                      className="p-1 text-ink-400 hover:text-primary-700"
+                      className="p-1 text-mn-mute hover:text-mn-amber"
                       aria-label="Code kopieren"
                     >
                       {copied === inv.code ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
@@ -309,7 +309,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                     <button
                       type="button"
                       onClick={() => deleteInvite(inv.id)}
-                      className="p-1 text-ink-400 hover:text-red-600"
+                      className="p-1 text-mn-mute hover:text-red-600"
                       aria-label="Code löschen"
                     >
                       <Trash2 className="w-3 h-3" />

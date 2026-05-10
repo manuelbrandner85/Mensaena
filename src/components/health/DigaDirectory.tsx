@@ -37,7 +37,7 @@ function ShareBanner({ diga }: { diga: DiGA }) {
   return (
     <button
       onClick={handleShare}
-      className="flex items-center gap-1 text-xs text-ink-400 hover:text-primary-600 transition-colors"
+      className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
       title="Teilen"
     >
       <Share2 className="w-3 h-3" />
@@ -53,7 +53,7 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
   const color = cat.color
 
   return (
-    <div className="relative bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-shadow flex flex-col">
+    <div className="relative bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-shadow flex flex-col">
       {/* Top accent */}
       <div className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: `linear-gradient(90deg, ${color}, ${color}33)` }}
@@ -69,8 +69,8 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
               {cat.emoji}
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-ink-900 text-sm leading-tight">{diga.name}</h3>
-              <p className="text-[11px] text-ink-500 mt-0.5 truncate">{diga.manufacturer}</p>
+              <h3 className="font-bold text-mn-ink text-sm leading-tight">{diga.name}</h3>
+              <p className="text-[11px] text-mn-mute mt-0.5 truncate">{diga.manufacturer}</p>
             </div>
           </div>
           {hasApp(diga) && (
@@ -91,23 +91,23 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
         </div>
 
         {/* Description */}
-        <p className="text-xs text-ink-600 leading-relaxed line-clamp-3 flex-1">
+        <p className="text-xs text-mn-ink-soft leading-relaxed line-clamp-3 flex-1">
           {diga.description}
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-2 pt-1 border-t border-stone-100">
+        <div className="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
           <div className="flex items-center gap-2">
             {diga.playStoreUrl && (
               <a href={diga.playStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
+                className="text-xs text-mn-mute hover:text-mn-amber transition-colors underline underline-offset-2"
               >
                 Android
               </a>
             )}
             {diga.appStoreUrl && (
               <a href={diga.appStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-ink-400 hover:text-primary-600 transition-colors underline underline-offset-2"
+                className="text-xs text-mn-mute hover:text-mn-amber transition-colors underline underline-offset-2"
               >
                 iOS
               </a>
@@ -158,14 +158,14 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
   return (
     <div className={cn('space-y-4', className)}>
       {/* Info banner */}
-      <div className="relative flex items-start gap-3 bg-primary-50 border border-primary-200 rounded-2xl p-4 overflow-hidden">
+      <div className="relative flex items-start gap-3 bg-mn-amber/5 border border-mn-amber/20 rounded-2xl p-4 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 to-primary-200" />
-        <div className="w-8 h-8 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-          <Info className="w-4 h-4 text-primary-600" />
+        <div className="w-8 h-8 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+          <Info className="w-4 h-4 text-mn-amber" />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-primary-900">Gesundheits-Apps auf Rezept – kostenlos!</p>
-          <p className="text-xs text-primary-700 mt-0.5 leading-relaxed">
+          <p className="text-xs text-mn-amber mt-0.5 leading-relaxed">
             Digitale Gesundheitsanwendungen (DiGAs) sind vom BfArM zugelassene Apps, die du{' '}
             <strong>kostenlos über deine Krankenkasse</strong> bekommst – entweder per{' '}
             ärztlichem Rezept oder per Direktantrag bei deiner Kasse (§ 33a SGB V).
@@ -177,17 +177,17 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
         <>
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="DiGA suchen (z.B. Rücken, Depression, Tinnitus)…"
-              className="w-full pl-10 pr-9 py-2.5 text-sm border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white"
+              className="w-full pl-10 pr-9 py-2.5 text-sm border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-elevated"
             />
             {query && (
               <button
                 onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-mn-mute hover:text-mn-ink-soft"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -201,8 +201,8 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
               className={cn(
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                 activeCategory === 'all'
-                  ? 'bg-primary-600 text-white border-primary-600'
-                  : 'bg-white text-ink-600 border-stone-200 hover:border-primary-300',
+                  ? 'bg-mn-amber text-white border-primary-600'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300',
               )}
             >
               Alle ({DIGAS.length})
@@ -219,7 +219,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
                     'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                     isActive
                       ? 'text-white border-transparent'
-                      : 'bg-white text-ink-600 border-stone-200 hover:border-stone-300',
+                      : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-stone-300',
                   )}
                   style={isActive ? { background: meta.color, borderColor: meta.color } : {}}
                 >
@@ -234,10 +234,10 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
 
       {/* Grid */}
       {displayed.length === 0 ? (
-        <div className="text-center py-12 bg-white border border-stone-200 rounded-2xl">
-          <Heart className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-          <p className="text-sm font-medium text-ink-700">Keine DiGAs gefunden</p>
-          <p className="text-xs text-ink-400 mt-1">Versuche einen anderen Suchbegriff oder wähle „Alle".</p>
+        <div className="text-center py-12 bg-mn-elevated border border-white/5 rounded-2xl">
+          <Heart className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
+          <p className="text-sm font-medium text-mn-ink-soft">Keine DiGAs gefunden</p>
+          <p className="text-xs text-mn-mute mt-1">Versuche einen anderen Suchbegriff oder wähle „Alle".</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -249,13 +249,13 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
 
       {/* Count & BfArM link */}
       {!compact && (
-        <div className="flex items-center justify-between text-[11px] text-ink-400 px-1">
+        <div className="flex items-center justify-between text-[11px] text-mn-mute px-1">
           <span>{filtered.length} von {DIGAS.length} DiGAs angezeigt</span>
           <a
             href="https://diga.bfarm.de/de/verzeichnis"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 hover:text-primary-600 transition-colors"
+            className="flex items-center gap-1 hover:text-mn-amber transition-colors"
           >
             Vollständiges Verzeichnis auf bfarm.de <ExternalLink className="w-3 h-3" />
           </a>

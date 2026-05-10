@@ -122,7 +122,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
       <div className="flex items-start gap-5">
         {/* Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary-50 border-2 border-paper ring-1 ring-primary-200/60 shadow-glow-teal overflow-hidden flex items-center justify-center">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-mn-amber/5 border-2 border-paper ring-1 ring-primary-200/60 shadow-glow-teal overflow-hidden flex items-center justify-center">
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -133,7 +133,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
                 loading="eager"
               />
             ) : (
-              <span className="text-xl sm:text-2xl font-bold text-primary-700 select-none">
+              <span className="text-xl sm:text-2xl font-bold text-mn-amber select-none">
                 {initials || 'N'}
               </span>
             )}
@@ -151,9 +151,9 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
           </h1>
 
           {/* Meta row */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-ink-400 tracking-wide">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-mn-mute tracking-wide">
             {nickname && (
-              <span className="font-mono text-ink-500">@{nickname}</span>
+              <span className="font-mono text-mn-mute">@{nickname}</span>
             )}
             {profile?.location && (
               <span className="inline-flex items-center gap-1">
@@ -165,7 +165,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
               <Calendar className="w-3 h-3" />
               Dabei seit {memberSinceLabel(profile?.created_at)}
               {memberSinceDays >= 7 && (
-                <span className="ml-1 font-serif italic text-ink-700">
+                <span className="ml-1 font-serif italic text-mn-ink-soft">
                   · Tag <span className="tabular-nums">{memberSinceDays}</span>
                 </span>
               )}
@@ -174,7 +174,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
 
           {/* Bio */}
           {profile?.bio && profile.bio.trim().length > 0 && (
-            <p className="mt-3 text-sm text-ink-600 leading-relaxed line-clamp-2 max-w-lg">
+            <p className="mt-3 text-sm text-mn-ink-soft leading-relaxed line-clamp-2 max-w-lg">
               {profile.bio}
             </p>
           )}
@@ -184,14 +184,14 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
         <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 mt-1">
           <Link
             href="/dashboard/settings?tab=profile"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-paper border border-stone-200 text-xs font-medium text-ink-700 hover:bg-stone-50 hover:border-stone-300 transition-colors shadow-soft"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-mn-void border border-white/5 text-xs font-medium text-mn-ink-soft hover:bg-mn-surface hover:border-white/8 transition-colors shadow-cinema-card"
           >
             <Edit3 className="w-3.5 h-3.5" />
             Bearbeiten
           </Link>
           <Link
             href="/dashboard/profile"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-paper border border-stone-200 text-xs font-medium text-ink-500 hover:text-ink-700 hover:border-stone-300 transition-colors shadow-soft"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-mn-void border border-white/5 text-xs font-medium text-mn-mute hover:text-mn-ink-soft hover:border-white/8 transition-colors shadow-cinema-card"
           >
             Vollprofil
             <ArrowRight className="w-3 h-3" />
@@ -203,14 +203,14 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
       <div className="flex sm:hidden items-center gap-2 mt-4">
         <Link
           href="/dashboard/settings?tab=profile"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-paper border border-stone-200 text-xs font-medium text-ink-700 hover:bg-stone-50 transition-colors shadow-soft"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-mn-void border border-white/5 text-xs font-medium text-mn-ink-soft hover:bg-mn-surface transition-colors shadow-cinema-card"
         >
           <Edit3 className="w-3.5 h-3.5" />
           Bearbeiten
         </Link>
         <Link
           href="/dashboard/profile"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-paper border border-stone-200 text-xs font-medium text-ink-500 hover:text-ink-700 transition-colors shadow-soft"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-mn-void border border-white/5 text-xs font-medium text-mn-mute hover:text-mn-ink-soft transition-colors shadow-cinema-card"
         >
           Vollprofil
           <ArrowRight className="w-3 h-3" />
@@ -219,7 +219,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
 
       {/* Daily whisper */}
       {whisper && (
-        <p className="mt-5 font-serif italic text-[13px] sm:text-sm text-ink-500 leading-relaxed max-w-xl">
+        <p className="mt-5 font-serif italic text-[13px] sm:text-sm text-mn-mute leading-relaxed max-w-xl">
           „{whisper}"
         </p>
       )}

@@ -17,13 +17,13 @@ const FoodWarningFeed = dynamic(
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 overflow-hidden animate-pulse"
+            className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 overflow-hidden animate-pulse"
           >
-            <div className="aspect-[16/9] bg-stone-100 dark:bg-stone-800" />
+            <div className="aspect-[16/9] bg-mn-elevated dark:bg-stone-800" />
             <div className="p-4 space-y-2">
-              <div className="h-4 w-3/4 bg-stone-200 dark:bg-stone-700 rounded" />
-              <div className="h-3 w-1/2 bg-stone-200 dark:bg-stone-700 rounded" />
-              <div className="h-3 w-full bg-stone-200 dark:bg-stone-700 rounded" />
+              <div className="h-4 w-3/4 bg-mn-raised dark:bg-stone-700 rounded" />
+              <div className="h-3 w-1/2 bg-mn-raised dark:bg-stone-700 rounded" />
+              <div className="h-3 w-full bg-mn-raised dark:bg-stone-700 rounded" />
             </div>
           </div>
         ))}
@@ -38,7 +38,7 @@ export default function WarnungenPage() {
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 text-sm text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-sm text-mn-mute dark:text-mn-ghost hover:text-mn-ink-soft dark:hover:text-stone-200 transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           Zurück zum Dashboard
@@ -52,7 +52,7 @@ export default function WarnungenPage() {
             <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-50">
               Lebensmittel- &amp; Produktwarnungen
             </h1>
-            <p className="text-sm text-stone-600 dark:text-stone-300 mt-1">
+            <p className="text-sm text-mn-ink-soft dark:text-mn-ghost mt-1">
               Aktuelle Rückrufe und Warnungen aus dem offiziellen
               Verbraucherschutz-Portal der Bundesländer.
             </p>
@@ -68,7 +68,7 @@ export default function WarnungenPage() {
 
       <FoodWarningFeed initialLimit={5} loadMoreStep={10} />
 
-      <p className="mt-8 text-xs text-stone-400 dark:text-stone-500 text-center">
+      <p className="mt-8 text-xs text-mn-ghost dark:text-mn-mute text-center">
         Quelle: lebensmittelwarnung.de · Bayerisches Staatsministerium für Umwelt
         und Verbraucherschutz · Daten ohne Gewähr.
       </p>

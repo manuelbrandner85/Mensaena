@@ -82,18 +82,18 @@ export default function ProfileOfferSeekTags() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl border border-stone-100 p-5 animate-pulse">
-        <div className="h-4 w-40 bg-stone-200 rounded mb-3" />
-        <div className="h-10 bg-stone-100 rounded-xl" />
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 p-5 animate-pulse">
+        <div className="h-4 w-40 bg-mn-raised rounded mb-3" />
+        <div className="h-10 bg-mn-elevated rounded-xl" />
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-soft border border-stone-100 p-5">
+    <div className="bg-mn-elevated rounded-2xl shadow-soft border border-white/5 p-5">
       <div className="mb-4">
-        <h3 className="text-sm font-bold text-ink-900">Ich biete &amp; ich suche</h3>
-        <p className="text-xs text-ink-500 mt-0.5">
+        <h3 className="text-sm font-bold text-mn-ink">Ich biete &amp; ich suche</h3>
+        <p className="text-xs text-mn-mute mt-0.5">
           Pflege kurze Stichworte. Nachbarn mit passenden Angeboten/Gesuchen werden dir vorgeschlagen.
         </p>
       </div>
@@ -101,15 +101,15 @@ export default function ProfileOfferSeekTags() {
       {/* Offers */}
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-2">
-          <HandHelping className="w-4 h-4 text-primary-700" />
-          <h4 className="text-xs font-semibold tracking-wide uppercase text-ink-600">Ich biete</h4>
+          <HandHelping className="w-4 h-4 text-mn-amber" />
+          <h4 className="text-xs font-semibold tracking-wide uppercase text-mn-ink-soft">Ich biete</h4>
         </div>
         <div className="flex flex-wrap gap-2 mb-2 min-h-[28px]">
           {offers.length === 0 && (
-            <span className="text-xs text-ink-400 italic">Noch nichts eingetragen</span>
+            <span className="text-xs text-mn-mute italic">Noch nichts eingetragen</span>
           )}
           {offers.map(tag => (
-            <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50 border border-primary-100 text-primary-800 text-xs font-medium rounded-full">
+            <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-mn-amber/5 border border-primary-100 text-primary-800 text-xs font-medium rounded-full">
               {tag}
               <button type="button" onClick={() => removeTag('offer', tag)} className="hover:text-primary-900" aria-label={`${tag} entfernen`}>
                 <X className="w-3 h-3" />
@@ -124,12 +124,12 @@ export default function ProfileOfferSeekTags() {
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag('offer', offerDraft) } }}
             placeholder="z.B. Rasenmähen, Nachhilfe Mathe"
             maxLength={MAX_LEN}
-            className="flex-1 h-10 px-3 border border-stone-200 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="flex-1 h-10 px-3 border border-white/5 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
           <button
             type="button"
             onClick={() => addTag('offer', offerDraft)}
-            className="inline-flex items-center gap-1 h-10 px-3 border border-primary-200 text-primary-700 text-xs font-semibold rounded-xl hover:bg-primary-50 transition-colors"
+            className="inline-flex items-center gap-1 h-10 px-3 border border-mn-amber/20 text-mn-amber text-xs font-semibold rounded-xl hover:bg-mn-amber/5 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" /> Hinzu
           </button>
@@ -140,11 +140,11 @@ export default function ProfileOfferSeekTags() {
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-2">
           <SearchIcon className="w-4 h-4 text-rose-700" />
-          <h4 className="text-xs font-semibold tracking-wide uppercase text-ink-600">Ich suche</h4>
+          <h4 className="text-xs font-semibold tracking-wide uppercase text-mn-ink-soft">Ich suche</h4>
         </div>
         <div className="flex flex-wrap gap-2 mb-2 min-h-[28px]">
           {seeks.length === 0 && (
-            <span className="text-xs text-ink-400 italic">Noch nichts eingetragen</span>
+            <span className="text-xs text-mn-mute italic">Noch nichts eingetragen</span>
           )}
           {seeks.map(tag => (
             <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 border border-rose-100 text-rose-800 text-xs font-medium rounded-full">
@@ -162,7 +162,7 @@ export default function ProfileOfferSeekTags() {
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag('seek', seekDraft) } }}
             placeholder="z.B. Bohrmaschine leihen"
             maxLength={MAX_LEN}
-            className="flex-1 h-10 px-3 border border-stone-200 rounded-xl text-sm focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-100"
+            className="flex-1 h-10 px-3 border border-white/5 rounded-xl text-sm focus:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-100"
           />
           <button
             type="button"
@@ -179,7 +179,7 @@ export default function ProfileOfferSeekTags() {
           type="button"
           onClick={save}
           disabled={saving || !userId}
-          className="inline-flex items-center gap-2 px-4 h-10 bg-primary-600 text-white text-xs font-semibold rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-4 h-10 bg-mn-amber text-white text-xs font-semibold rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
         >
           {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
           Tags speichern

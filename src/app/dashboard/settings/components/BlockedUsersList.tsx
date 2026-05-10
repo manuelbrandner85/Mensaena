@@ -24,8 +24,8 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
   if (blockedUsers.length === 0) {
     return (
       <div className="text-center py-6">
-        <UserX className="w-8 h-8 text-stone-400 mx-auto mb-2" />
-        <p className="text-sm text-ink-500">{t('noBlocked')}</p>
+        <UserX className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
+        <p className="text-sm text-mn-mute">{t('noBlocked')}</p>
       </div>
     )
   }
@@ -35,18 +35,18 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
       {blockedUsers.map(block => (
         <div key={block.id} className="flex items-center justify-between p-3 rounded-xl bg-warm-50">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-mn-raised flex items-center justify-center overflow-hidden">
               {block.profiles?.avatar_url ? (
                 <img src={block.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
               ) : (
-                <UserX className="w-4 h-4 text-ink-400" />
+                <UserX className="w-4 h-4 text-mn-mute" />
               )}
             </div>
             <div>
-              <p className="text-sm font-medium text-ink-900">
+              <p className="text-sm font-medium text-mn-ink">
                 {block.profiles?.name ?? t('unknownUser')}
               </p>
-              <p className="text-xs text-ink-400">
+              <p className="text-xs text-mn-mute">
                 {t('blockedAt', { time: formatRelativeTime(block.created_at) })}
               </p>
             </div>

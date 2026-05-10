@@ -142,7 +142,7 @@ export function UnifiedWarningBanner({
           type="button"
           onClick={() => handleDismiss(primary)}
           aria-label="Warnung ausblenden"
-          className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-black/10 dark:hover:bg-white/10"
+          className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-black/10 dark:hover:bg-mn-elevated/10"
         >
           <X aria-hidden className="h-4 w-4" />
         </button>
@@ -154,7 +154,7 @@ export function UnifiedWarningBanner({
             type="button"
             onClick={() => setExpanded(e => !e)}
             aria-expanded={expanded}
-            className="flex w-full items-center justify-between rounded-md border border-current/20 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+            className="flex w-full items-center justify-between rounded-md border border-current/20 px-3 py-1.5 text-xs font-medium transition-colors hover:bg-black/5 dark:hover:bg-mn-elevated/5"
           >
             <span>{rest.length} weitere Warnung{rest.length === 1 ? '' : 'en'}</span>
             {expanded ? <ChevronUp aria-hidden className="h-3.5 w-3.5" /> : <ChevronDown aria-hidden className="h-3.5 w-3.5" />}
@@ -167,7 +167,7 @@ export function UnifiedWarningBanner({
                 return (
                   <li
                     key={w.id}
-                    className={`flex items-start gap-2 rounded-md border ${ws.border} bg-white/40 px-3 py-2 text-xs ${ws.text} dark:bg-black/20`}
+                    className={`flex items-start gap-2 rounded-md border ${ws.border} bg-mn-elevated/40 px-3 py-2 text-xs ${ws.text} dark:bg-black/20`}
                   >
                     <WIcon aria-hidden className={`mt-0.5 h-3.5 w-3.5 flex-shrink-0 ${ws.icon}`} />
                     <div className="flex-1 min-w-0">
@@ -180,7 +180,7 @@ export function UnifiedWarningBanner({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Details öffnen"
-                        className="rounded p-1 hover:bg-black/10 dark:hover:bg-white/10"
+                        className="rounded p-1 hover:bg-black/10 dark:hover:bg-mn-elevated/10"
                       >
                         <ExternalLink aria-hidden className="h-3 w-3" />
                       </a>
@@ -189,7 +189,7 @@ export function UnifiedWarningBanner({
                       type="button"
                       onClick={() => handleDismiss(w)}
                       aria-label="Diese Warnung ausblenden"
-                      className="rounded p-1 hover:bg-black/10 dark:hover:bg-white/10"
+                      className="rounded p-1 hover:bg-black/10 dark:hover:bg-mn-elevated/10"
                     >
                       <X aria-hidden className="h-3 w-3" />
                     </button>

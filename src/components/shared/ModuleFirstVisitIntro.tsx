@@ -63,26 +63,26 @@ export default function ModuleFirstVisitIntro({
   }
 
   return (
-    <div className="absolute inset-0 z-40 bg-white/95 backdrop-blur-sm flex items-center justify-center px-4 animate-fade-in">
+    <div className="absolute inset-0 z-40 bg-mn-elevated/95 backdrop-blur-sm flex items-center justify-center px-4 animate-fade-in">
       <div className="w-full max-w-md py-8">
         {/* Title */}
-        <h2 className="text-2xl font-bold text-ink-900 mb-1 text-center">{title}</h2>
-        <p className="text-sm text-stone-500 text-center mb-6">So funktioniert's:</p>
+        <h2 className="text-2xl font-bold text-mn-ink mb-1 text-center">{title}</h2>
+        <p className="text-sm text-mn-mute text-center mb-6">So funktioniert's:</p>
 
         {/* Steps */}
-        <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden mb-6">
+        <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden mb-6">
           {steps.map((step, i) => (
             <div
               key={i}
-              className="flex items-start gap-3 px-5 py-4 border-b last:border-0 border-stone-100 animate-fade-in"
+              className="flex items-start gap-3 px-5 py-4 border-b last:border-0 border-white/5 animate-fade-in"
               style={{ animationDelay: `${i * 150}ms` }}
             >
-              <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0 text-sm">
+              <div className="w-8 h-8 rounded-full bg-mn-amber/10 text-mn-amber font-bold flex items-center justify-center flex-shrink-0 text-sm">
                 {i + 1}
               </div>
               <div className="flex items-start gap-2 pt-0.5">
                 <span className="text-lg leading-none">{step.emoji}</span>
-                <span className="text-sm text-ink-700 leading-relaxed">{step.text}</span>
+                <span className="text-sm text-mn-ink-soft leading-relaxed">{step.text}</span>
               </div>
             </div>
           ))}
@@ -92,7 +92,7 @@ export default function ModuleFirstVisitIntro({
         <button
           type="button"
           onClick={handleDismiss}
-          className="w-full bg-primary-600 text-white rounded-xl px-8 py-3 text-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+          className="w-full bg-mn-amber text-white rounded-xl px-8 py-3 text-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
         >
           Los geht's →
         </button>

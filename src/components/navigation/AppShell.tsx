@@ -386,7 +386,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── LOADING STATE ──
   if (loading) {
     return (
-      <div className="min-h-dvh bg-paper relative flex items-center justify-center overflow-hidden">
+      <div className="min-h-dvh bg-mn-void relative flex items-center justify-center overflow-hidden">
         <div
           className="hero-orb-1 absolute pointer-events-none"
           style={{ top: '-20%', left: '-10%', width: '50vw', height: '50vw' }}
@@ -398,7 +398,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           aria-hidden="true"
         />
         <div className="relative text-center">
-          <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
           <p className="meta-label meta-label--subtle justify-center">{t('loading')}</p>
         </div>
       </div>
@@ -410,8 +410,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-dvh bg-paper relative overflow-x-hidden">
-      {/* ── Global cinematic ambient orbs — subtle teal depth behind all pages ── */}
+    <div className="min-h-dvh bg-mn-void text-mn-ink relative overflow-x-hidden">
+      {/* ── Cinema ambient orbs — warm amber night atmosphere ── */}
       <div
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
         aria-hidden="true"
@@ -421,7 +421,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           style={{
             top: '-20vh', left: '-15vw',
             width: '60vw', height: '60vw',
-            background: 'radial-gradient(circle, rgba(30,170,166,0.07) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)',
             filter: 'blur(80px)',
             animation: 'ambientBreath1 28s ease-in-out infinite',
           }}
@@ -431,7 +431,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           style={{
             bottom: '-15vh', right: '-10vw',
             width: '50vw', height: '50vw',
-            background: 'radial-gradient(circle, rgba(79,109,138,0.05) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(14,165,233,0.03) 0%, transparent 70%)',
             filter: 'blur(90px)',
             animation: 'ambientBreath2 34s ease-in-out infinite',
           }}
@@ -447,17 +447,23 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
+      {/* ── Mobile Top Bar — cinema dark ── */}
       {/* FEATURE: Safe-Area-Inset */}
       <div
-        className={cn('md:hidden fixed top-0 left-0 right-0 z-40 glass-nav nav-border-gradient safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        className={cn('md:hidden fixed top-0 left-0 right-0 z-40 safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          background: 'rgba(10,15,28,0.88)',
+          backdropFilter: 'blur(20px) saturate(1.4)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+          borderBottom: '1px solid rgba(245,158,11,0.10)',
+        }}
       >
         <div className="flex items-center justify-between px-3 h-14">
           <div className="flex items-center gap-2">
             <button
               onClick={() => { haptic.light(); setMobileOpen(true) }}
-              className="p-2 rounded-full hover:bg-stone-100 text-ink-800 transition-all touch-target"
+              className="p-2 rounded-full hover:bg-mn-elevated/5 text-mn-ink-soft transition-all touch-target"
               aria-label={t('openMenu')}
             >
               <Menu className="w-5 h-5" />
@@ -477,7 +483,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             {/* FEATURE: Mobile-Header komplett — Suche/CommandPalette */}
             <button
               onClick={() => { haptic.light(); openCommandPalette() }}
-              className="p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              className="p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-amber transition-all touch-target"
               aria-label={t('commandPalette')}
             >
               <Search className="w-5 h-5" />
@@ -487,7 +493,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/dashboard/notifications"
               onClick={() => haptic.light()}
-              className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              className="relative p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-amber transition-all touch-target"
               aria-label={t('notificationsAria')}
             >
               <Bell className="w-5 h-5" />
@@ -500,29 +506,29 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/dashboard/messages"
               onClick={() => haptic.light()}
-              className="relative p-2.5 rounded-full hover:bg-stone-100 text-ink-600 hover:text-primary-700 transition-all touch-target"
+              className="relative p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-amber transition-all touch-target"
               aria-label={t('messagesAria')}
             >
               <MessageCircle className="w-5 h-5" />
               {unreadMessages > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-primary-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-mn-amber text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
                   {unreadMessages > 99 ? '99+' : unreadMessages}
                 </span>
               )}
             </Link>
             <Link
               href="/dashboard/profile"
-              className="p-1 rounded-full hover:bg-stone-100 transition-all touch-target ml-0.5"
+              className="p-1 rounded-full hover:bg-mn-elevated/5 transition-all touch-target ml-0.5"
               aria-label={t('profileAria')}
             >
               {user.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
                   alt={user.displayName}
-                  className="w-7 h-7 rounded-full object-cover border border-stone-200"
+                  className="w-7 h-7 rounded-full object-cover border border-white/5"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-primary-100 border border-stone-200 flex items-center justify-center text-primary-700 text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-mn-amber/10 border border-white/5 flex items-center justify-center text-mn-amber text-xs font-bold">
                   {user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
               )}

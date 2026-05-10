@@ -45,13 +45,13 @@ export default function CookieBanner() {
       <div className="pointer-events-auto w-full max-w-2xl card-depth">
         <div className="flex items-start gap-4 p-5 md:p-6">
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] leading-relaxed text-ink-600">
-              <span className="font-semibold text-ink-800">Mensaena verwendet Cookies</span>{' '}
+            <p className="text-[13px] leading-relaxed text-mn-ink-soft">
+              <span className="font-semibold text-mn-ink">Mensaena verwendet Cookies</span>{' '}
               — ausschließlich notwendige für den Betrieb (Authentifizierung, Sitzung).
               Keine Tracking- oder Werbe-Cookies.{' '}
               <Link
                 href="/datenschutz"
-                className="text-primary-700 underline-offset-2 hover:underline"
+                className="text-mn-amber underline-offset-2 hover:underline"
               >
                 Datenschutzerklärung
               </Link>
@@ -68,7 +68,7 @@ export default function CookieBanner() {
               <button
                 type="button"
                 onClick={() => accept('necessary')}
-                className="inline-flex h-9 items-center rounded-full border border-stone-300 bg-transparent px-5 text-[12px] font-medium tracking-wide text-ink-700 transition-colors hover:border-stone-400 hover:bg-stone-50"
+                className="inline-flex h-9 items-center rounded-full border border-stone-300 bg-transparent px-5 text-[12px] font-medium tracking-wide text-mn-ink-soft transition-colors hover:border-stone-400 hover:bg-mn-elevated/[0.02]"
               >
                 Nur notwendige
               </button>
@@ -79,7 +79,7 @@ export default function CookieBanner() {
             type="button"
             onClick={() => accept('necessary')}
             aria-label="Schließen – nur notwendige Cookies"
-            className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full text-ink-400 transition-colors hover:bg-stone-100 hover:text-ink-700"
+            className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full text-mn-mute transition-colors hover:bg-mn-elevated/5 hover:text-mn-ink-soft"
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>

@@ -65,7 +65,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
       />
 
       {/* Modal */}
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl max-h-[90dvh] overflow-y-auto animate-slide-up z-10">
+      <div className="relative w-full sm:max-w-md bg-mn-elevated rounded-t-3xl sm:rounded-3xl max-h-[90dvh] overflow-y-auto animate-slide-up z-10">
         {/* Header */}
         <div className="sticky top-0 bg-red-600 px-4 py-4 sm:rounded-t-3xl z-10">
           <div className="flex items-center justify-between">
@@ -75,7 +75,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); onClose() }}
-              className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/40 active:bg-white/50 transition-colors touch-target"
+              className="w-9 h-9 rounded-full bg-mn-elevated/20 flex items-center justify-center hover:bg-mn-elevated/40 active:bg-mn-elevated/50 transition-colors touch-target"
               aria-label="Schließen"
             >
               <X className="w-5 h-5 text-white" strokeWidth={3} />
@@ -149,7 +149,7 @@ export default function SOSModal({ isOpen, onClose }: Props) {
           </div>
 
           {/* Disclaimer */}
-          <p className="text-xs text-ink-400 text-center px-4 pb-2">
+          <p className="text-xs text-mn-mute text-center px-4 pb-2">
             Bei akuter Lebensgefahr immer zuerst 112 anrufen!
           </p>
         </div>

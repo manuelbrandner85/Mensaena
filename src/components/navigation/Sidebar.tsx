@@ -60,8 +60,8 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
       <div className="group/nav relative mt-1">
         <button
           className={cn(
-            'w-full flex items-center justify-center p-2 rounded-lg text-ink-500 hover:bg-stone-100 transition-colors',
-            hasActiveChild && 'bg-primary-50 text-primary-600',
+            'w-full flex items-center justify-center p-2 rounded-lg text-mn-mute hover:bg-mn-elevated/5 transition-colors',
+            hasActiveChild && 'bg-mn-amber/5 text-mn-amber',
           )}
           aria-label={t(group.title as Parameters<typeof t>[0])}
         >
@@ -80,7 +80,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
             }}
           >
             {/* Group name */}
-            <div className="px-3 py-1 text-xs font-semibold text-ink-400 uppercase tracking-wider">
+            <div className="px-3 py-1 text-xs font-semibold text-mn-mute uppercase tracking-wider">
               {t(group.title as Parameters<typeof t>[0])}
             </div>
             {/* Child items */}
@@ -99,13 +99,13 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
                     active
                       ? isCrisis
                         ? 'bg-red-50 text-red-700 font-semibold'
-                        : 'bg-primary-50 text-primary-700 font-semibold'
-                      : 'text-ink-700 hover:bg-stone-50',
+                        : 'bg-mn-amber/5 text-mn-amber font-semibold'
+                      : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className={cn(
                     'w-4 h-4 flex-shrink-0',
-                    active ? (isCrisis ? 'text-red-600' : 'text-primary-600') : (isCrisis ? 'text-red-500' : 'text-ink-400'),
+                    active ? (isCrisis ? 'text-red-600' : 'text-mn-amber') : (isCrisis ? 'text-red-500' : 'text-mn-mute'),
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
@@ -130,24 +130,24 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
     <div className="mt-3">
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-stone-50 rounded-lg transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-mn-elevated/[0.02] rounded-lg transition-colors"
       >
         {GroupIcon && (
           <GroupIcon className={cn(
             'w-3.5 h-3.5 flex-shrink-0 transition-colors',
-            hasActiveChild ? 'text-primary-500' : 'text-ink-400 group-hover:text-ink-500',
+            hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
           )} />
         )}
         <span className={cn(
           'text-xs font-semibold uppercase tracking-wider select-none whitespace-nowrap transition-colors',
-          hasActiveChild ? 'text-primary-600' : 'text-ink-400 group-hover:text-ink-500',
+          hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
         )}>
           {t(group.title as Parameters<typeof t>[0])}
         </span>
         <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
         <ChevronDown
           className={cn(
-            'w-3 h-3 text-ink-400 transition-transform duration-200 flex-shrink-0',
+            'w-3 h-3 text-mn-mute transition-transform duration-200 flex-shrink-0',
             isOpen ? 'rotate-0' : '-rotate-90',
           )}
         />
@@ -222,14 +222,14 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-paper/95 backdrop-blur-md border-r border-stone-200',
+        'hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30 transition-all duration-300 ease-out bg-mn-void/95 backdrop-blur-md border-r border-white/5',
         sidebarCollapsed ? 'w-[68px]' : 'w-[260px]',
       )}
     >
       {/* ── Logo Header — editorial treatment ── */}
       <div
         className={cn(
-          'relative flex items-center flex-shrink-0 border-b border-stone-200 bg-paper',
+          'relative flex items-center flex-shrink-0 border-b border-white/5 bg-mn-void',
           sidebarCollapsed ? 'h-16 justify-center px-2' : 'h-16 px-4',
         )}
       >
@@ -260,8 +260,8 @@ export default function Sidebar({
                 className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
-              <span className="font-display text-[1.35rem] font-medium text-ink-800 tracking-tight group-hover:text-primary-700 transition-colors">
-                Mensaena<span className="text-primary-500">.</span>
+              <span className="font-display text-[1.35rem] font-medium text-mn-ink tracking-tight group-hover:text-mn-amber transition-colors">
+                Mensaena<span className="text-mn-amber">.</span>
               </span>
             </>
           )}
@@ -269,7 +269,7 @@ export default function Sidebar({
 
         <button
           onClick={toggleSidebar}
-          className="relative p-1.5 rounded-full hover:bg-stone-100 text-ink-400 hover:text-ink-800 transition-all flex-shrink-0 ml-2"
+          className="relative p-1.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-ink transition-all flex-shrink-0 ml-2"
           title={sidebarCollapsed ? t('sidebarExpand') : t('sidebarCollapse')}
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -278,9 +278,9 @@ export default function Sidebar({
 
       {/* ── SOS Strip — editorial ── */}
       {!sidebarCollapsed ? (
-        <div className="px-3 py-2.5 flex gap-2 border-b border-stone-200">
-          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-primary-50/60 border border-primary-100 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse flex-shrink-0" />
+        <div className="px-3 py-2.5 flex gap-2 border-b border-white/5">
+          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-mn-amber/5/60 border border-primary-100 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-mn-amber animate-pulse flex-shrink-0" />
             <span className="text-[11px] text-primary-800 font-medium tracking-wide">{t('online')}</span>
           </div>
           <Link
@@ -297,7 +297,7 @@ export default function Sidebar({
           </Link>
         </div>
       ) : (
-        <div className="px-2 py-2 border-b border-stone-200">
+        <div className="px-2 py-2 border-b border-white/5">
           <Link
             href="/dashboard/crisis"
             className="w-10 h-10 mx-auto flex items-center justify-center bg-emergency-50 border border-emergency-100 rounded-full hover:bg-emergency-100 transition-all group relative"
@@ -350,13 +350,13 @@ export default function Sidebar({
       </nav>
 
       {/* ── Bottom: App Download + Donate + Logout ── */}
-      <div className="flex-shrink-0 border-t border-stone-200 px-2 py-2 space-y-1">
+      <div className="flex-shrink-0 border-t border-white/5 px-2 py-2 space-y-1">
         {/* App herunterladen – versteckt in der nativen App */}
         <Link
           href="/app"
           title={sidebarCollapsed ? 'App herunterladen' : undefined}
           className={cn(
-            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-primary-600 hover:bg-primary-50 border border-transparent hover:border-primary-100 transition-all',
+            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-amber hover:bg-mn-amber/5 border border-transparent hover:border-primary-100 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >
@@ -378,7 +378,7 @@ export default function Sidebar({
           onClick={handleLogout}
           title={sidebarCollapsed ? t('logout') : undefined}
           className={cn(
-            'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-ink-400 hover:bg-emergency-50 hover:text-emergency-600 border border-transparent hover:border-emergency-100 transition-all',
+            'w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-mute hover:bg-emergency-50 hover:text-emergency-600 border border-transparent hover:border-emergency-100 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >

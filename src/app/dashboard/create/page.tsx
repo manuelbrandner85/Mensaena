@@ -493,7 +493,7 @@ function CreatePostForm() {
       <button
         type="button"
         onClick={() => router.back()}
-        className="sm:hidden flex items-center gap-1.5 mb-4 -ml-1 px-1 py-1.5 text-sm font-medium text-ink-600 hover:text-ink-900 active:text-ink-900 transition-colors"
+        className="sm:hidden flex items-center gap-1.5 mb-4 -ml-1 px-1 py-1.5 text-sm font-medium text-mn-ink-soft hover:text-mn-ink active:text-mn-ink transition-colors"
         aria-label="Zurück"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -505,8 +505,8 @@ function CreatePostForm() {
         <div className="meta-label meta-label--subtle mb-4">§ 04 / Erstellen</div>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <FilePlus className="w-6 h-6 text-primary-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <FilePlus className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">
@@ -519,7 +519,7 @@ function CreatePostForm() {
                 <button
                   type="button"
                   onClick={() => router.replace('/dashboard/create')}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-mn-amber hover:text-mn-amber hover:underline"
                 >
                   Alle Kategorien anzeigen
                 </button>
@@ -527,8 +527,8 @@ function CreatePostForm() {
             </div>
           </div>
           {draftSaved && !showDraftPrompt && (
-            <span className="flex items-center gap-1 text-[11px] text-ink-400 mt-2 whitespace-nowrap flex-shrink-0">
-              <Save className="w-3 h-3 text-primary-500" />
+            <span className="flex items-center gap-1 text-[11px] text-mn-mute mt-2 whitespace-nowrap flex-shrink-0">
+              <Save className="w-3 h-3 text-mn-amber" />
               {draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert'}
             </span>
           )}
@@ -553,7 +553,7 @@ function CreatePostForm() {
           <div className="flex gap-2 flex-shrink-0">
             <button
               onClick={handleDiscardDraft}
-              className="px-3 py-1.5 text-xs font-medium text-ink-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-xs font-medium text-mn-ink-soft hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               Verwerfen
             </button>
@@ -578,13 +578,13 @@ function CreatePostForm() {
             <div className="flex items-center gap-2">
               <div className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all',
-                step > n ? 'bg-primary-600 text-white' :
-                step === n ? 'bg-primary-600 text-white ring-4 ring-primary-100' :
-                'bg-warm-100 text-ink-400'
+                step > n ? 'bg-mn-amber text-white' :
+                step === n ? 'bg-mn-amber text-white ring-4 ring-primary-100' :
+                'bg-warm-100 text-mn-mute'
               )}>
                 {step > n ? <CheckCircle2 className="w-4 h-4" /> : n}
               </div>
-              <span className={cn('text-xs font-medium', step >= n ? 'text-primary-700' : 'text-ink-400')}>
+              <span className={cn('text-xs font-medium', step >= n ? 'text-mn-amber' : 'text-mn-mute')}>
                 {label}
               </span>
             </div>
@@ -593,7 +593,7 @@ function CreatePostForm() {
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-warm-200 p-6 shadow-sm">
+      <div className="bg-mn-elevated rounded-2xl border border-warm-200 p-6 shadow-sm">
 
         {/* ── Schritt 1: Art & Kategorie ── */}
         {step === 1 && (
@@ -607,11 +607,11 @@ function CreatePostForm() {
                     className={cn(
                       'p-3 rounded-xl border text-left transition-all hover:shadow-sm snap-start shrink-0 w-48 md:w-auto touch-target',
                       form.type === t.value
-                        ? 'bg-primary-50 border-primary-400 ring-1 ring-primary-300 shadow-sm'
-                        : 'bg-white border-warm-200 hover:border-primary-200'
+                        ? 'bg-mn-amber/5 border-primary-400 ring-1 ring-primary-300 shadow-sm'
+                        : 'bg-mn-elevated border-warm-200 hover:border-mn-amber/20'
                     )}>
-                    <div className="text-sm font-semibold text-ink-800">{t.label}</div>
-                    <div className="text-xs text-ink-500 mt-0.5">{t.desc}</div>
+                    <div className="text-sm font-semibold text-mn-ink">{t.label}</div>
+                    <div className="text-xs text-mn-mute mt-0.5">{t.desc}</div>
                   </button>
                 ))}
               </div>
@@ -619,7 +619,7 @@ function CreatePostForm() {
 
             <div>
               <label className="label text-base font-semibold">Kategorie *
-                <span className="text-xs font-normal text-primary-600 ml-2">→ automatisch gewählt</span>
+                <span className="text-xs font-normal text-mn-amber ml-2">→ automatisch gewählt</span>
               </label>
               <div className="flex gap-2 mt-2 overflow-x-auto snap-x pb-2 no-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none md:pb-0">
                 {availableCategories.map(c => (
@@ -627,8 +627,8 @@ function CreatePostForm() {
                     className={cn(
                       'px-3 py-2.5 rounded-xl border text-xs font-medium text-center transition-all whitespace-nowrap shrink-0 snap-start touch-target md:whitespace-normal md:shrink',
                       form.category === c.value
-                        ? 'bg-primary-600 text-white border-primary-600'
-                        : 'bg-white text-ink-700 border-warm-200 hover:border-primary-200'
+                        ? 'bg-mn-amber text-white border-primary-600'
+                        : 'bg-mn-elevated text-mn-ink-soft border-warm-200 hover:border-mn-amber/20'
                     )}>
                     {c.label}
                   </button>
@@ -640,13 +640,13 @@ function CreatePostForm() {
               <label className="label text-base font-semibold">Dringlichkeit</label>
               <div className="flex gap-2 mt-2">
                 {[
-                  { v: 'low', l: '🟦 Normal', active: 'bg-primary-600 text-white border-primary-600' },
+                  { v: 'low', l: '🟦 Normal', active: 'bg-mn-amber text-white border-primary-600' },
                   { v: 'medium', l: '🟧 Mittel', active: 'bg-orange-500 text-white border-orange-500' },
                   { v: 'high',   l: '🔴 Dringend', active: 'bg-red-600 text-white border-red-600' },
                 ].map(({ v, l, active }) => (
                   <button key={v} type="button" onClick={() => set('urgency', v)}
                     className={cn('flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all',
-                      form.urgency === v ? active : 'bg-white text-ink-600 border-warm-200 hover:border-primary-200')}>
+                      form.urgency === v ? active : 'bg-mn-elevated text-mn-ink-soft border-warm-200 hover:border-mn-amber/20')}>
                     {l}
                   </button>
                 ))}
@@ -664,9 +664,9 @@ function CreatePostForm() {
         {step === 2 && (
           <div className="space-y-5">
             {/* Type badge */}
-            <div className="flex items-center gap-2 p-3 bg-primary-50 rounded-xl border border-primary-200">
-              <span className="text-sm font-semibold text-primary-700">{selectedType?.label}</span>
-              <button onClick={() => setStep(1)} className="ml-auto text-xs text-primary-500 hover:underline">Ändern</button>
+            <div className="flex items-center gap-2 p-3 bg-mn-amber/5 rounded-xl border border-mn-amber/20">
+              <span className="text-sm font-semibold text-mn-amber">{selectedType?.label}</span>
+              <button onClick={() => setStep(1)} className="ml-auto text-xs text-mn-amber hover:underline">Ändern</button>
             </div>
 
             {/* Intent suggestion – switches type within the form when content mismatch detected */}
@@ -728,7 +728,7 @@ function CreatePostForm() {
                 {errors.title
                   ? <p className="text-xs text-red-500">{errors.title}</p>
                   : <span />}
-                <p className="text-xs text-ink-400">{form.title.length}/80</p>
+                <p className="text-xs text-mn-mute">{form.title.length}/80</p>
               </div>
             </div>
 
@@ -740,19 +740,19 @@ function CreatePostForm() {
                   label="Beschreibung"
                   onResult={t => set('description', form.description ? `${form.description} ${t}` : t)}
                 />
-                <span className="text-xs font-normal text-ink-400 ml-1">optional, aber empfohlen</span>
+                <span className="text-xs font-normal text-mn-mute ml-1">optional, aber empfohlen</span>
               </label>
               <textarea value={form.description} onChange={e => set('description', e.target.value)}
                 placeholder="Was genau benötigst du oder was bietest du an? Je mehr Details, desto besser."
                 rows={4} className="input resize-none" />
-              <p className="text-xs text-ink-400 mt-1">{form.description.length} Zeichen</p>
+              <p className="text-xs text-mn-mute mt-1">{form.description.length} Zeichen</p>
             </div>
 
             {/* Standort */}
             <div>
               <label className="label flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-ink-400" /> Standort / Ort
-                <span className="text-xs font-normal text-ink-400 ml-1">optional</span>
+                <MapPin className="w-4 h-4 text-mn-mute" /> Standort / Ort
+                <span className="text-xs font-normal text-mn-mute ml-1">optional</span>
               </label>
               <AddressAutocomplete
                 defaultValue={form.location}
@@ -767,14 +767,14 @@ function CreatePostForm() {
               />
               <div className="flex items-center gap-2 mt-2">
                 <button type="button" onClick={handleGetLocation} disabled={gettingLocation}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-primary-300 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-all">
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-primary-300 bg-mn-amber/5 text-mn-amber rounded-xl hover:bg-mn-amber/10 transition-all">
                   {gettingLocation
                     ? <span className="w-3.5 h-3.5 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
                     : <Locate className="w-3.5 h-3.5" />}
                   GPS-Standort
                 </button>
                 {userLat !== null && (
-                  <span className="text-xs text-primary-600 flex items-center gap-1">
+                  <span className="text-xs text-mn-amber flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> Koordinaten gesetzt
                   </span>
                 )}
@@ -784,8 +784,8 @@ function CreatePostForm() {
             {/* Bild-Upload */}
             <div>
               <label className="label flex items-center gap-1.5">
-                <ImagePlus className="w-4 h-4 text-ink-400" /> Bild
-                <span className="text-xs font-normal text-ink-400 ml-1">optional – max. 10 MB</span>
+                <ImagePlus className="w-4 h-4 text-mn-mute" /> Bild
+                <span className="text-xs font-normal text-mn-mute ml-1">optional – max. 10 MB</span>
               </label>
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageUpload} className="hidden" />
               {imagePreview ? (
@@ -797,13 +797,13 @@ function CreatePostForm() {
                     </div>
                   )}
                   <button type="button" onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
-                    className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-warm-200">
-                    <X className="w-3.5 h-3.5 text-ink-500" />
+                    className="absolute -top-2 -right-2 bg-mn-elevated rounded-full p-0.5 shadow border border-warm-200">
+                    <X className="w-3.5 h-3.5 text-mn-mute" />
                   </button>
                 </div>
               ) : (
                 <button type="button" onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-ink-600 border border-dashed border-warm-300 rounded-xl hover:bg-warm-50 transition mt-2">
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft border border-dashed border-warm-300 rounded-xl hover:bg-warm-50 transition mt-2">
                   <ImagePlus className="w-4 h-4" /> Bild hinzufügen
                 </button>
               )}
@@ -812,15 +812,15 @@ function CreatePostForm() {
             {/* Medien-URLs */}
             <div>
               <label className="label flex items-center gap-1.5">
-                <Link2 className="w-4 h-4 text-ink-400" /> Medien-Links
-                <span className="text-xs font-normal text-ink-400 ml-1">optional – max. 5</span>
+                <Link2 className="w-4 h-4 text-mn-mute" /> Medien-Links
+                <span className="text-xs font-normal text-mn-mute ml-1">optional – max. 5</span>
               </label>
               <div className="flex gap-2">
                 <input value={mediaUrlInput} onChange={e => setMediaUrlInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMediaUrl() } }}
                   placeholder="https://... (Video, Bild, etc.)" className="input flex-1 text-sm" disabled={mediaUrls.length >= 5} />
                 <button type="button" onClick={addMediaUrl} disabled={!mediaUrlInput.trim() || mediaUrls.length >= 5}
-                  className="px-3 py-2 bg-primary-600 text-white text-sm rounded-xl hover:bg-primary-700 disabled:opacity-40 transition-all">+</button>
+                  className="px-3 py-2 bg-mn-amber text-white text-sm rounded-xl hover:bg-primary-700 disabled:opacity-40 transition-all">+</button>
               </div>
               {mediaUrls.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -837,8 +837,8 @@ function CreatePostForm() {
             {/* Tags */}
             <div>
               <label className="label flex items-center gap-1.5">
-                <Tag className="w-4 h-4 text-ink-400" /> Tags
-                <span className="text-xs font-normal text-ink-400 ml-1">optional – max. 5</span>
+                <Tag className="w-4 h-4 text-mn-mute" /> Tags
+                <span className="text-xs font-normal text-mn-mute ml-1">optional – max. 5</span>
               </label>
               <div className="flex gap-2">
                 <input
@@ -875,18 +875,18 @@ function CreatePostForm() {
             </div>
 
             {/* Verfügbarkeit */}
-            <div className="bg-primary-50 p-4 rounded-xl border border-primary-200">
-              <label className="label text-xs text-primary-700 flex items-center gap-1 mb-2">
+            <div className="bg-mn-amber/5 p-4 rounded-xl border border-mn-amber/20">
+              <label className="label text-xs text-mn-amber flex items-center gap-1 mb-2">
                 <Calendar className="w-3.5 h-3.5" /> Verfügbarkeit
                 <span className="font-normal ml-1">Uhrzeit von – bis (optional)</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-primary-600 mb-0.5 block">Verfügbar ab</label>
+                  <label className="text-xs text-mn-amber mb-0.5 block">Verfügbar ab</label>
                   <input type="time" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs text-primary-600 mb-0.5 block">Verfügbar bis</label>
+                  <label className="text-xs text-mn-amber mb-0.5 block">Verfügbar bis</label>
                   <input type="time" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
                     className="input text-sm" />
                 </div>
@@ -928,20 +928,20 @@ function CreatePostForm() {
             {/* Anonym-Toggle (immer sichtbar in Schritt 2) */}
             <div onClick={() => set('is_anonymous', !form.is_anonymous)}
               className={cn('flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all select-none',
-                form.is_anonymous ? 'bg-cyan-50 border-cyan-300' : 'bg-white border-warm-200 hover:border-cyan-200')}>
+                form.is_anonymous ? 'bg-cyan-50 border-cyan-300' : 'bg-mn-elevated border-warm-200 hover:border-cyan-200')}>
               {form.is_anonymous
                 ? <EyeOff className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
-                : <Eye className="w-5 h-5 text-ink-400 flex-shrink-0 mt-0.5" />}
+                : <Eye className="w-5 h-5 text-mn-mute flex-shrink-0 mt-0.5" />}
               <div className="flex-1">
-                <p className="text-sm font-semibold text-ink-900">Anonym posten</p>
-                <p className="text-xs text-ink-500 mt-0.5">
+                <p className="text-sm font-semibold text-mn-ink">Anonym posten</p>
+                <p className="text-xs text-mn-mute mt-0.5">
                   {form.is_anonymous
                     ? 'Du wirst als "Anonym" angezeigt – kein Kontakt erforderlich'
                     : 'Dein Name und Kontaktdaten werden sichtbar sein'}
                 </p>
               </div>
               <div className={cn('w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 mt-0.5',
-                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-stone-300')}>
+                form.is_anonymous ? 'bg-cyan-500 border-cyan-500' : 'border-white/8')}>
                 {form.is_anonymous && <span className="text-white text-xs font-bold">✓</span>}
               </div>
             </div>
@@ -982,7 +982,7 @@ function CreatePostForm() {
 
                 <div>
                   <label className="label flex items-center gap-1.5">
-                    <Phone className="w-4 h-4 text-ink-400" /> Telefonnummer
+                    <Phone className="w-4 h-4 text-mn-mute" /> Telefonnummer
                   </label>
                   <input value={form.contact_phone} onChange={e => { set('contact_phone', e.target.value); setErrors(er => ({ ...er, contact: '' })) }}
                     placeholder="+43 660 123 4567" className={cn('input', errors.contact && 'border-red-400')} />
@@ -1005,8 +1005,8 @@ function CreatePostForm() {
                 {/* Anonym nachträglich */}
                 <div onClick={() => set('is_anonymous', !form.is_anonymous)}
                   className="flex items-center gap-3 p-3 rounded-xl border border-warm-200 cursor-pointer hover:border-cyan-200 transition-all select-none">
-                  <Eye className="w-4 h-4 text-ink-400" />
-                  <p className="text-sm text-ink-600 flex-1">Doch lieber anonym posten? <span className="text-cyan-600 font-medium">Aktivieren</span></p>
+                  <Eye className="w-4 h-4 text-mn-mute" />
+                  <p className="text-sm text-mn-ink-soft flex-1">Doch lieber anonym posten? <span className="text-cyan-600 font-medium">Aktivieren</span></p>
                 </div>
               </>
             )}
@@ -1017,32 +1017,32 @@ function CreatePostForm() {
               className={cn(
                 'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none',
                 acceptedNoTrade
-                  ? 'bg-primary-50 border-primary-300'
+                  ? 'bg-mn-amber/5 border-primary-300'
                   : 'bg-amber-50 border-amber-300'
               )}
             >
               <div className={cn(
                 'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
-                acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
+                acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
               )}>
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
-                <p className="text-xs text-ink-600 mt-0.5 leading-relaxed">
+                <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
+                <p className="text-xs text-mn-ink-soft mt-0.5 leading-relaxed">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                   Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
-                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">AGB §4</a> nicht erlaubt.
                 </p>
               </div>
             </div>
 
             {/* Zusammenfassung */}
-            <div className="p-4 bg-stone-50 rounded-xl border border-warm-200 space-y-2">
-              <p className="text-sm font-semibold text-ink-700 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-primary-600" /> Zusammenfassung
+            <div className="p-4 bg-mn-surface rounded-xl border border-warm-200 space-y-2">
+              <p className="text-sm font-semibold text-mn-ink-soft flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-mn-amber" /> Zusammenfassung
               </p>
-              <div className="text-xs text-ink-600 space-y-1.5">
+              <div className="text-xs text-mn-ink-soft space-y-1.5">
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Art:</span><span>{selectedType?.label}</span></div>
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Titel:</span><span className="line-clamp-2">{form.title}</span></div>
                 {form.location && <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Ort:</span><span>{form.location}</span></div>}
@@ -1056,7 +1056,7 @@ function CreatePostForm() {
                   <span className={cn('px-2 py-0.5 rounded-full text-xs font-semibold',
                     form.urgency === 'high' ? 'bg-red-100 text-red-700' :
                     form.urgency === 'medium' ? 'bg-orange-100 text-orange-700' :
-                    'bg-primary-100 text-primary-700')}>
+                    'bg-mn-amber/10 text-mn-amber')}>
                     {form.urgency === 'high' ? '🔴 Dringend' : form.urgency === 'medium' ? '🟧 Mittel' : '🟦 Normal'}
                   </span>
                 </div>
@@ -1067,7 +1067,7 @@ function CreatePostForm() {
                   </div>
                 )}
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Sichtbarkeit:</span>
-                  <span className={form.is_anonymous ? 'text-cyan-700 font-medium' : 'text-ink-600'}>
+                  <span className={form.is_anonymous ? 'text-cyan-700 font-medium' : 'text-mn-ink-soft'}>
                     {form.is_anonymous ? '🔒 Anonym' : '👤 Öffentlich (mit Name)'}
                   </span>
                 </div>

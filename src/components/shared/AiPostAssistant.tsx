@@ -62,7 +62,7 @@ export default function AiPostAssistant({
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder="Beschreibe kurz worum es geht (z.B. 'Einkaufshilfe für Rentnerin')"
-          className="flex-1 px-3 py-2 border border-violet-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-white"
+          className="flex-1 px-3 py-2 border border-violet-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-elevated"
           onKeyDown={e => e.key === 'Enter' && generate()}
         />
         <button
@@ -85,7 +85,7 @@ export default function AiPostAssistant({
                   <button
                     key={i}
                     onClick={() => { onSuggestTitle(t); toast.success('Titel übernommen') }}
-                    className="block w-full text-left text-xs text-violet-800 hover:bg-violet-100 px-2.5 py-1.5 rounded-lg transition-colors bg-white border border-violet-100"
+                    className="block w-full text-left text-xs text-violet-800 hover:bg-violet-100 px-2.5 py-1.5 rounded-lg transition-colors bg-mn-elevated border border-violet-100"
                   >
                     {t}
                   </button>
@@ -98,7 +98,7 @@ export default function AiPostAssistant({
           {suggestions.description && (
             <div>
               <p className="text-xs font-bold text-violet-700 mb-1">Vorgeschlagene Beschreibung:</p>
-              <div className="bg-white border border-violet-100 rounded-xl p-2.5 text-xs text-ink-700 leading-relaxed">
+              <div className="bg-mn-elevated border border-violet-100 rounded-xl p-2.5 text-xs text-mn-ink-soft leading-relaxed">
                 {suggestions.description}
               </div>
               <button

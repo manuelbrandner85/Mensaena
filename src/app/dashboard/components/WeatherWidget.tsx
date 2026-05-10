@@ -100,7 +100,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
   }, [lat, lng])
 
   if (weather === 'loading') {
-    return <div className="rounded-2xl bg-stone-100 animate-pulse h-28" />
+    return <div className="rounded-2xl bg-mn-elevated animate-pulse h-28" />
   }
 
   if (!weather) return null
@@ -110,23 +110,23 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
   const tip   = hint(weather, air)
 
   return (
-    <div className="bg-white rounded-2xl border border-stone-200 shadow-soft p-4">
+    <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card p-4">
       {/* Header row */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <span className="text-3xl leading-none" aria-hidden>{emoji}</span>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">
+            <p className="text-xs font-semibold uppercase tracking-wider text-mn-mute">
               Aktuelles Wetter
             </p>
-            <p className="text-base font-bold text-ink-800 leading-tight">
+            <p className="text-base font-bold text-mn-ink leading-tight">
               {Math.round(weather.temperature)} °C
-              <span className="ml-1.5 text-sm font-normal text-ink-500">{label}</span>
+              <span className="ml-1.5 text-sm font-normal text-mn-mute">{label}</span>
             </p>
           </div>
         </div>
 
-        <span className="text-xs text-ink-400 flex-shrink-0">DWD</span>
+        <span className="text-xs text-mn-mute flex-shrink-0">DWD</span>
       </div>
 
       {/* Air quality + sun times */}
@@ -143,11 +143,11 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
           )}
           {sun && (
             <>
-              <span className="inline-flex items-center gap-1 text-ink-500">
+              <span className="inline-flex items-center gap-1 text-mn-mute">
                 <Sunrise className="w-3 h-3 text-amber-500" />
                 {formatTime(sun.sunrise)}
               </span>
-              <span className="inline-flex items-center gap-1 text-ink-500">
+              <span className="inline-flex items-center gap-1 text-mn-mute">
                 <Sunset className="w-3 h-3 text-orange-500" />
                 {formatTime(sun.sunset)}
               </span>
@@ -158,7 +158,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
 
       {/* Contextual neighbour hint */}
       {tip && (
-        <p className="mt-3 text-xs text-ink-600 leading-relaxed bg-primary-50 rounded-xl px-3 py-2 border border-primary-100">
+        <p className="mt-3 text-xs text-mn-ink-soft leading-relaxed bg-mn-amber/5 rounded-xl px-3 py-2 border border-primary-100">
           {tip}
         </p>
       )}

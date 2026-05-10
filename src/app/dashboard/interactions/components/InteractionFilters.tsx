@@ -50,8 +50,8 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all',
                 filter.role === tab.value
-                  ? 'bg-primary-600 text-white shadow-sm'
-                  : 'bg-white text-ink-600 hover:bg-stone-50 border border-stone-200',
+                  ? 'bg-mn-amber text-white shadow-sm'
+                  : 'bg-mn-elevated text-mn-ink-soft hover:bg-mn-surface border border-white/5',
               )}
             >
               {Icon && <Icon className="w-4 h-4" />}
@@ -66,7 +66,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
         {/* Mobile filter toggle */}
         <button
           onClick={() => setShowMobileFilters(!showMobileFilters)}
-          className="sm:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-white border border-stone-200 text-ink-600"
+          className="sm:hidden flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-mn-elevated border border-white/5 text-mn-ink-soft"
         >
           <Filter className="w-4 h-4" /> Filter
         </button>
@@ -76,7 +76,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
             value={filter.status}
             onChange={e => onFilterChange({ status: e.target.value as any })}
             aria-label="Status filtern"
-            className="px-3 py-2 rounded-lg text-sm border border-stone-200 bg-white text-ink-700 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-3 py-2 rounded-lg text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30"
           >
             {STATUS_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -84,14 +84,14 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
           </select>
 
           <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
             <input
               type="text"
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               inputMode="search"
               placeholder="Post oder Partner suchen..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-stone-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-white/5 bg-mn-elevated focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30"
             />
           </div>
         </div>

@@ -255,7 +255,7 @@ function FlyerModal({
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 p-4" onClick={onClose}>
       <button
-        className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+        className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-mn-elevated/10 hover:bg-mn-elevated/20 text-white transition-colors"
         onClick={onClose}
         aria-label="Schließen"
       >
@@ -284,7 +284,7 @@ function FlyerModal({
         <button
           onClick={onDownloadPdf}
           disabled={busy !== null}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-mn-amber hover:bg-mn-amber text-white text-sm font-semibold transition-colors disabled:opacity-50"
         >
           <FileDown className="w-4 h-4" />
           {isPdfBusy ? 'Erstelle PDF…' : 'PDF herunterladen'}
@@ -294,7 +294,7 @@ function FlyerModal({
           <button
             onClick={onDownloadPng}
             disabled={busy !== null}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-semibold transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-mn-elevated/10 hover:bg-mn-elevated/20 text-white text-sm font-semibold transition-colors disabled:opacity-50"
           >
             <Download className="w-4 h-4" />
             {isPngBusy ? 'Erstelle PNG…' : 'Als PNG'}
@@ -413,7 +413,7 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
             return (
               <div key={flyer.key} className="flex flex-col gap-2">
                 <button
-                  className="relative border border-stone-200 rounded-xl overflow-hidden bg-stone-50 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 cursor-pointer"
+                  className="relative border border-white/5 rounded-xl overflow-hidden bg-mn-surface group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 cursor-pointer"
                   style={{ width: previewW, height: previewH }}
                   onClick={() => setOpenKey(flyer.key)}
                   aria-label={`${flyer.title} öffnen`}
@@ -436,21 +436,21 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
                     />
                   </div>
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-2 shadow-lg">
-                      <Eye className="w-4 h-4 text-ink-700" />
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-mn-elevated rounded-full p-2 shadow-lg">
+                      <Eye className="w-4 h-4 text-mn-ink-soft" />
                     </div>
                   </div>
                 </button>
 
                 <div>
-                  <p className="text-sm font-semibold text-ink-800">{flyer.title}</p>
-                  <p className="text-xs text-ink-400">{flyer.description}</p>
+                  <p className="text-sm font-semibold text-mn-ink">{flyer.title}</p>
+                  <p className="text-xs text-mn-mute">{flyer.description}</p>
                 </div>
 
                 <button
                   onClick={() => handleDownloadPdf(flyer.key)}
                   disabled={busy !== null}
-                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-mn-amber/5 hover:bg-mn-amber/10 border border-mn-amber/20 text-mn-amber text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FileDown className="w-3.5 h-3.5" />
                   {busy === `pdf-${flyer.key}` ? 'Lädt…' : 'PDF herunterladen'}
@@ -460,7 +460,7 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
                   <button
                     onClick={() => handleDownloadPng(flyer.key)}
                     disabled={busy !== null}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-stone-50 hover:bg-stone-100 border border-stone-200 text-ink-600 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-ink-soft text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download className="w-3.5 h-3.5" />
                     {busy === `png-${flyer.key}` ? 'Lädt…' : 'Als PNG'}
@@ -472,21 +472,21 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
         </div>
 
         {/* QR-Only download */}
-        <div className="mt-5 pt-5 border-t border-stone-100">
+        <div className="mt-5 pt-5 border-t border-white/5">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary-50 border border-primary-200 flex items-center justify-center flex-shrink-0">
-              <QrCode className="w-4 h-4 text-primary-600" />
+            <div className="w-9 h-9 rounded-xl bg-mn-amber/5 border border-mn-amber/20 flex items-center justify-center flex-shrink-0">
+              <QrCode className="w-4 h-4 text-mn-amber" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-ink-800">Nur QR-Code als PNG</p>
-              <p className="text-xs text-ink-500 mt-0.5">
+              <p className="text-sm font-semibold text-mn-ink">Nur QR-Code als PNG</p>
+              <p className="text-xs text-mn-mute mt-0.5">
                 Hochauflösendes QR-Code-Bild (1024×1024px) – ideal für eigenes Design oder Online-Profile
               </p>
             </div>
             <button
               onClick={handleDownloadQr}
               disabled={busy !== null || !qrDataUrl}
-              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 text-xs font-medium transition-colors disabled:opacity-50"
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-mn-amber/5 hover:bg-mn-amber/10 border border-mn-amber/20 text-mn-amber text-xs font-medium transition-colors disabled:opacity-50"
             >
               <Download className="w-3.5 h-3.5" />
               {busy === 'qr' ? 'Lädt…' : 'PNG'}
@@ -494,7 +494,7 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
           </div>
         </div>
 
-        <p className="text-xs text-ink-400 mt-4 text-center">
+        <p className="text-xs text-mn-mute mt-4 text-center">
           In der App und auf Smartphones öffnet sich das System-Teilen-Menü („Speichern in Downloads", „Per WhatsApp senden" …). Auf Desktop wird die Datei direkt heruntergeladen.
         </p>
       </Card>

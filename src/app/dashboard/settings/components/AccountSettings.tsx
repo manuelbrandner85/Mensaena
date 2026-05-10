@@ -77,46 +77,46 @@ export default function AccountSettings({
     <div className="space-y-5">
       {/* Account Info */}
       <SettingsSection
-        icon={<Settings className="w-4 h-4 text-primary-700" />}
+        icon={<Settings className="w-4 h-4 text-mn-amber" />}
         title={t('sectionAccountTitle')}
         description={t('sectionAccountDesc')}
       >
         <div className="space-y-1">
           <SettingRow label={t('email')} description={t('emailDesc')}>
-            <span className="text-sm text-ink-700">{settings.email}</span>
+            <span className="text-sm text-mn-ink-soft">{settings.email}</span>
           </SettingRow>
           <SettingRow label={t('memberSince')} description={t('memberSinceDesc')}>
-            <span className="text-sm text-ink-700">{settings.created_at ? formatDate(settings.created_at) : t('unknown')}</span>
+            <span className="text-sm text-mn-ink-soft">{settings.created_at ? formatDate(settings.created_at) : t('unknown')}</span>
           </SettingRow>
           <SettingRow label={t('lastUpdate')} description={t('lastUpdateDesc')}>
-            <span className="text-sm text-ink-700">{settings.updated_at ? formatDate(settings.updated_at) : t('never')}</span>
+            <span className="text-sm text-mn-ink-soft">{settings.updated_at ? formatDate(settings.updated_at) : t('never')}</span>
           </SettingRow>
           <SettingRow label={t('accountId')} description={t('accountIdDesc')}>
-            <span className="text-xs text-ink-400 font-mono">{userId.slice(0, 8)}...</span>
+            <span className="text-xs text-mn-mute font-mono">{userId.slice(0, 8)}...</span>
           </SettingRow>
         </div>
       </SettingsSection>
 
       {/* Onboarding Tour Replay */}
       <SettingsSection
-        icon={<Sparkles className="w-4 h-4 text-primary-700" />}
+        icon={<Sparkles className="w-4 h-4 text-mn-amber" />}
         title={t('sectionTourTitle')}
         description={t('sectionTourDesc')}
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-primary-50 border border-primary-200">
-          <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-primary-600" />
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-amber/5 border border-mn-amber/20">
+          <div className="w-10 h-10 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-mn-amber" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-ink-900">{t('tourReplay')}</p>
-            <p className="text-xs text-ink-500">{t('tourReplayDesc')}</p>
+            <p className="text-sm font-medium text-mn-ink">{t('tourReplay')}</p>
+            <p className="text-xs text-mn-mute">{t('tourReplayDesc')}</p>
           </div>
           <button
             onClick={() => {
               replayOnboarding()
               toast.success(t('toastTourStarted'), { icon: '✨' })
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all min-h-[44px]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all min-h-[44px]"
           >
             <PlayCircle className="w-4 h-4" />
             {t('tourStart')}
@@ -126,7 +126,7 @@ export default function AccountSettings({
 
       {/* Mentor Settings */}
       <SettingsSection
-        icon={<GraduationCap className="w-4 h-4 text-primary-700" />}
+        icon={<GraduationCap className="w-4 h-4 text-mn-amber" />}
         title={t('sectionMentorTitle')}
         description={t('sectionMentorDesc')}
       >
@@ -145,8 +145,8 @@ export default function AccountSettings({
                     onClick={() => toggleTopic(topic)}
                     className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all min-h-[36px] ${
                       mentorTopics.includes(topic)
-                        ? 'bg-primary-100 text-primary-700 border-primary-300'
-                        : 'bg-white text-ink-500 border-stone-200 hover:border-stone-300'
+                        ? 'bg-mn-amber/10 text-mn-amber border-primary-300'
+                        : 'bg-mn-elevated text-mn-mute border-white/5 hover:border-white/8'
                     }`}
                   >
                     {mentorTopics.includes(topic) && <Check className="w-3 h-3 inline mr-1" />}
@@ -161,7 +161,7 @@ export default function AccountSettings({
             <button
               onClick={handleSaveMentor}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {t('saveButton')}
@@ -172,22 +172,22 @@ export default function AccountSettings({
 
       {/* Data Export */}
       <SettingsSection
-        icon={<Download className="w-4 h-4 text-primary-700" />}
+        icon={<Download className="w-4 h-4 text-mn-amber" />}
         title={t('sectionExportTitle')}
         description={t('sectionExportDesc')}
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-primary-50 border border-primary-200">
-          <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-            <FileJson className="w-5 h-5 text-primary-600" />
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-amber/5 border border-mn-amber/20">
+          <div className="w-10 h-10 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <FileJson className="w-5 h-5 text-mn-amber" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-ink-900">{t('exportTitle')}</p>
-            <p className="text-xs text-ink-500">{t('exportDesc')}</p>
+            <p className="text-sm font-medium text-mn-ink">{t('exportTitle')}</p>
+            <p className="text-xs text-mn-mute">{t('exportDesc')}</p>
           </div>
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             {exporting ? t('exporting') : t('export')}
@@ -197,14 +197,14 @@ export default function AccountSettings({
 
       {/* Logout */}
       <SettingsSection
-        icon={<LogOut className="w-4 h-4 text-primary-700" />}
+        icon={<LogOut className="w-4 h-4 text-mn-amber" />}
         title={t('sectionLogoutTitle')}
         description={t('sectionLogoutDesc')}
       >
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-stone-200 text-ink-700 hover:bg-stone-50 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-white/5 text-mn-ink-soft hover:bg-mn-surface transition-all disabled:opacity-50 min-h-[44px]"
         >
           {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
           {t('logout')}
@@ -228,7 +228,7 @@ export default function AccountSettings({
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={() => onSave({ deletion_requested_at: null as unknown as string, deletion_confirmed: false }, t('deletionRevoked'))}
-                  className="text-xs px-3 py-1.5 rounded-lg font-medium bg-white text-amber-700 border border-amber-300 hover:bg-amber-100 transition-colors min-h-[36px]"
+                  className="text-xs px-3 py-1.5 rounded-lg font-medium bg-mn-elevated text-amber-700 border border-amber-300 hover:bg-amber-100 transition-colors min-h-[36px]"
                 >
                   {t('deletionRevoke')}
                 </button>
@@ -242,7 +242,7 @@ export default function AccountSettings({
             </div>
           ) : (
             <>
-              <p className="text-sm text-ink-600">{t('deletionInfo')}</p>
+              <p className="text-sm text-mn-ink-soft">{t('deletionInfo')}</p>
               <button
                 onClick={() => setShowDeleteModal(true)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-all min-h-[44px]"

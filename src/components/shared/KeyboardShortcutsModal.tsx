@@ -187,7 +187,7 @@ export default function KeyboardShortcutsModal() {
       {gotoArmed && !open && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[95] pointer-events-none animate-fade-in">
           <div className="px-4 py-2 rounded-full bg-ink-900/90 text-paper text-xs font-medium backdrop-blur-md shadow-lg flex items-center gap-2">
-            <kbd className="inline-flex items-center bg-white/15 rounded px-1.5 py-0.5 text-xs font-semibold">
+            <kbd className="inline-flex items-center bg-mn-elevated/15 rounded px-1.5 py-0.5 text-xs font-semibold">
               G
             </kbd>
             <span>Wohin? (D · M · C · N · P · S · E · K)</span>
@@ -211,24 +211,24 @@ export default function KeyboardShortcutsModal() {
           />
 
           {/* Panel */}
-          <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/40 bg-paper shadow-2xl animate-slide-up">
+          <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/40 bg-mn-void shadow-2xl animate-slide-up">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
               <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center">
+                <span className="w-9 h-9 rounded-xl bg-mn-amber/10 text-mn-amber flex items-center justify-center">
                   <Keyboard className="w-4 h-4" />
                 </span>
                 <div>
-                  <h2 id="shortcuts-title" className="font-display text-lg font-medium text-ink-900 tracking-tight">
+                  <h2 id="shortcuts-title" className="font-display text-lg font-medium text-mn-ink tracking-tight">
                     Tastaturkürzel
                   </h2>
-                  <p className="text-[11px] text-ink-500">Schnell durch Mensaena navigieren</p>
+                  <p className="text-[11px] text-mn-mute">Schnell durch Mensaena navigieren</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="p-1.5 rounded-full text-ink-500 hover:bg-stone-100 hover:text-ink-800 transition-colors"
+                className="p-1.5 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-ink transition-colors"
                 aria-label="Schließen"
               >
                 <X className="w-5 h-5" />
@@ -239,18 +239,18 @@ export default function KeyboardShortcutsModal() {
             <div className="max-h-[65vh] overflow-y-auto p-5 space-y-5">
               {groups.map((group) => (
                 <section key={group.title}>
-                  <h3 className="text-xs uppercase tracking-[0.14em] font-semibold text-ink-400 mb-2">
+                  <h3 className="text-xs uppercase tracking-[0.14em] font-semibold text-mn-mute mb-2">
                     {group.title}
                   </h3>
                   <ul className="divide-y divide-stone-100">
                     {group.items.map((item, i) => (
                       <li key={i} className="flex items-center justify-between py-2">
-                        <span className="text-sm text-ink-700">{item.label}</span>
+                        <span className="text-sm text-mn-ink-soft">{item.label}</span>
                         <span className="flex items-center gap-1">
                           {item.keys.map((k, idx) => (
                             <span key={idx} className="flex items-center gap-1">
-                              {idx > 0 && <span className="text-ink-300 text-xs">+</span>}
-                              <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-2 py-0.5 text-[11px] font-semibold text-ink-700 shadow-sm">
+                              {idx > 0 && <span className="text-mn-ghost text-xs">+</span>}
+                              <kbd className="inline-flex items-center bg-mn-elevated border border-white/5 rounded px-2 py-0.5 text-[11px] font-semibold text-mn-ink-soft shadow-sm">
                                 {k}
                               </kbd>
                             </span>
@@ -264,8 +264,8 @@ export default function KeyboardShortcutsModal() {
             </div>
 
             {/* Footer */}
-            <div className="px-5 py-3 border-t border-stone-200 bg-stone-50 flex items-center justify-between">
-              <p className="text-[11px] text-ink-500">
+            <div className="px-5 py-3 border-t border-white/5 bg-mn-surface flex items-center justify-between">
+              <p className="text-[11px] text-mn-mute">
                 Befehlspalette für noch mehr Aktionen:{' '}
                 <button
                   type="button"
@@ -273,12 +273,12 @@ export default function KeyboardShortcutsModal() {
                     setOpen(false)
                     setTimeout(openCommandPalette, 80)
                   }}
-                  className="font-semibold text-primary-700 hover:underline"
+                  className="font-semibold text-mn-amber hover:underline"
                 >
                   ⌘K öffnen
                 </button>
               </p>
-              <kbd className="inline-flex items-center bg-white border border-stone-200 rounded px-2 py-0.5 text-xs font-semibold text-ink-500">
+              <kbd className="inline-flex items-center bg-mn-elevated border border-white/5 rounded px-2 py-0.5 text-xs font-semibold text-mn-mute">
                 Esc
               </kbd>
             </div>

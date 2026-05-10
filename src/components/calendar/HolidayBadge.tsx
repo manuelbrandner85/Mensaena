@@ -216,11 +216,11 @@ function DefaultBadge({
         dark: 'dark:from-purple-900/30 dark:via-violet-900/30 dark:to-purple-900/30 dark:border-purple-800 dark:text-purple-100',
       }
     : {
-        bg: 'bg-stone-50',
-        border: 'border-stone-200',
-        iconBg: 'bg-stone-200 text-stone-700',
+        bg: 'bg-mn-surface',
+        border: 'border-white/5',
+        iconBg: 'bg-mn-raised text-stone-700',
         text: 'text-stone-900',
-        sub: 'text-stone-500',
+        sub: 'text-mn-mute',
         dark: 'dark:bg-stone-800/40 dark:border-stone-700 dark:text-stone-100',
       }
 
@@ -281,7 +281,7 @@ function DefaultBadge({
           href={actionHref}
           className={cn(
             'mt-3 sm:mt-4 group inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium',
-            'rounded-full px-3 py-1.5 bg-white/70 hover:bg-white border transition-colors',
+            'rounded-full px-3 py-1.5 bg-mn-elevated/70 hover:bg-mn-elevated border transition-colors',
             tone.border, tone.text,
             'dark:bg-stone-900/40 dark:hover:bg-stone-900/60',
           )}

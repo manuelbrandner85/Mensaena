@@ -27,11 +27,11 @@ const TYPE_ICONS: Record<CulturalItemType, React.ComponentType<{ className?: str
 
 function GallerySkeleton() {
   return (
-    <div className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-4 shadow-soft animate-pulse">
-      <div className="h-5 bg-stone-100 dark:bg-stone-800 rounded-lg w-2/3 mb-3" />
+    <div className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 p-4 shadow-soft animate-pulse">
+      <div className="h-5 bg-mn-elevated dark:bg-stone-800 rounded-lg w-2/3 mb-3" />
       <div className="flex gap-3 overflow-hidden">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="w-32 h-40 bg-stone-100 dark:bg-stone-800 rounded-xl flex-shrink-0" />
+          <div key={i} className="w-32 h-40 bg-mn-elevated dark:bg-stone-800 rounded-xl flex-shrink-0" />
         ))}
       </div>
     </div>
@@ -51,7 +51,7 @@ function GalleryCard({
   return (
     <button
       onClick={onClick}
-      className="group relative w-32 sm:w-36 flex-shrink-0 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 shadow-soft hover:shadow-card transition-all hover:scale-[1.02] active:scale-95 text-left"
+      className="group relative w-32 sm:w-36 flex-shrink-0 rounded-xl overflow-hidden bg-mn-elevated dark:bg-stone-800 border border-white/5 dark:border-stone-700 shadow-soft hover:shadow-card transition-all hover:scale-[1.02] active:scale-95 text-left"
       title={item.title}
     >
       <div className="aspect-[3/4] relative bg-gradient-to-br from-stone-200 to-stone-100 dark:from-stone-800 dark:to-stone-900">
@@ -66,7 +66,7 @@ function GalleryCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Icon className="w-8 h-8 text-stone-400" />
+            <Icon className="w-8 h-8 text-mn-ghost" />
           </div>
         )}
         {item.year && (
@@ -76,12 +76,12 @@ function GalleryCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-      <div className="p-2 bg-white dark:bg-stone-900">
-        <p className="text-xs font-semibold text-ink-900 dark:text-stone-100 line-clamp-2 leading-tight">
+      <div className="p-2 bg-mn-elevated dark:bg-stone-900">
+        <p className="text-xs font-semibold text-mn-ink dark:text-stone-100 line-clamp-2 leading-tight">
           {item.title}
         </p>
         {item.subtitle && (
-          <p className="text-xs text-ink-500 dark:text-stone-400 line-clamp-1 mt-0.5">
+          <p className="text-xs text-mn-mute dark:text-mn-ghost line-clamp-1 mt-0.5">
             {item.subtitle}
           </p>
         )}
@@ -126,7 +126,7 @@ function DetailModal({
       aria-label={item.title}
     >
       <div
-        className="bg-white dark:bg-stone-900 rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl animate-scale-in"
+        className="bg-mn-elevated dark:bg-stone-900 rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto shadow-2xl animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Image */}
@@ -140,7 +140,7 @@ function DetailModal({
               onError={e => { (e.currentTarget.style.display = 'none') }}
             />
           ) : (
-            <Library className="w-16 h-16 text-stone-500" />
+            <Library className="w-16 h-16 text-mn-mute" />
           )}
 
           {/* Close button */}
@@ -183,16 +183,16 @@ function DetailModal({
         {/* Meta */}
         <div className="p-5 space-y-3">
           <div>
-            <h3 className="text-lg font-bold text-ink-900 dark:text-stone-100 leading-tight">
+            <h3 className="text-lg font-bold text-mn-ink dark:text-stone-100 leading-tight">
               {item.title}
             </h3>
             {item.subtitle && (
-              <p className="text-sm text-ink-600 dark:text-stone-400 mt-1">{item.subtitle}</p>
+              <p className="text-sm text-mn-ink-soft dark:text-mn-ghost mt-1">{item.subtitle}</p>
             )}
           </div>
 
           <div className="flex items-center gap-2 flex-wrap pt-1">
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-xs font-medium capitalize">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-mn-amber/5 dark:bg-primary-900/30 text-mn-amber dark:text-primary-300 rounded-full text-xs font-medium capitalize">
               {item.type === 'image'    && '🖼️ Bild'}
               {item.type === 'document' && '📄 Dokument'}
               {item.type === 'audio'    && '🎵 Audio'}
@@ -201,7 +201,7 @@ function DetailModal({
               {item.type === 'unknown'  && '📦 Kulturgut'}
             </span>
             {item.year && (
-              <span className="text-xs text-ink-500 dark:text-stone-400 tabular-nums">
+              <span className="text-xs text-mn-mute dark:text-mn-ghost tabular-nums">
                 Jahr: <strong>{item.year}</strong>
               </span>
             )}
@@ -217,7 +217,7 @@ function DetailModal({
             Auf DDB ansehen
           </a>
 
-          <p className="text-xs text-ink-400 dark:text-stone-500 pt-2 border-t border-stone-100 dark:border-stone-800">
+          <p className="text-xs text-mn-mute dark:text-mn-mute pt-2 border-t border-white/5 dark:border-stone-800">
             Quelle: Deutsche Digitale Bibliothek
           </p>
         </div>
@@ -339,7 +339,7 @@ export default function HistoricalGallery({
   )
 
   return (
-    <div className={`relative bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-2xl shadow-soft overflow-hidden ${className ?? ''}`}>
+    <div className={`relative bg-mn-elevated dark:bg-stone-900 border border-white/5 dark:border-stone-700 rounded-2xl shadow-soft overflow-hidden ${className ?? ''}`}>
       <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 via-amber-400 to-amber-200" />
 
       <div className="p-4 space-y-3">
@@ -350,11 +350,11 @@ export default function HistoricalGallery({
               <Library className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h3 className="font-bold text-ink-900 dark:text-stone-100 leading-tight text-sm">
+              <h3 className="font-bold text-mn-ink dark:text-stone-100 leading-tight text-sm">
                 {headline}
               </h3>
               {!compact && (
-                <p className="text-[11px] text-ink-500 dark:text-stone-400 mt-0.5">
+                <p className="text-[11px] text-mn-mute dark:text-mn-ghost mt-0.5">
                   Historische Fotos & Kulturgüter aus der Deutschen Digitalen Bibliothek
                 </p>
               )}
@@ -364,7 +364,7 @@ export default function HistoricalGallery({
             href={`https://www.deutsche-digitale-bibliothek.de/searchresults?query=${encodeURIComponent(cityName)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-shrink-0 p-1.5 rounded-lg text-ink-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+            className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
             title="Mehr auf DDB"
           >
             <ExternalLink className="w-4 h-4" />
@@ -385,7 +385,7 @@ export default function HistoricalGallery({
         </div>
 
         {/* Attribution */}
-        <p className="text-xs text-ink-400 dark:text-stone-500 pt-1">
+        <p className="text-xs text-mn-mute dark:text-mn-mute pt-1">
           Quelle: Deutsche Digitale Bibliothek
         </p>
       </div>

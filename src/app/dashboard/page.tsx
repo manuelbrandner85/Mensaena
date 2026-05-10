@@ -20,7 +20,7 @@ import NinaWarningBanner from '@/components/dashboard/NinaWarningBanner'
 import FoodWarningBanner from '@/components/warnings/FoodWarningBanner'
 
 // ── Lazy-loaded components ─────────────────────────────────────────────────────
-const skeleton = <div className="rounded-2xl bg-stone-100 animate-pulse h-40" />
+const skeleton = <div className="rounded-2xl bg-mn-elevated animate-pulse h-40" />
 
 const WeeklyDigest             = dynamic(() => import('./components/WeeklyDigest'),                      { ssr: false, loading: () => null })
 const SmartMatchWidget         = dynamic(() => import('@/components/dashboard/SmartMatchWidget'),         { loading: () => skeleton })
@@ -38,7 +38,7 @@ const WeatherWidget            = dynamic(() => import('./components/WeatherWidge
 const HolidayBadge             = dynamic(() => import('@/components/calendar/HolidayBadge'),             { loading: () => null })
 const MiniMap = dynamic(() => import('./components/MiniMap'), {
   ssr: false,
-  loading: () => <div className="h-64 rounded-2xl bg-stone-100 animate-pulse" />,
+  loading: () => <div className="h-64 rounded-2xl bg-mn-elevated animate-pulse" />,
 })
 const RatingModal = dynamic(
   () => import('@/app/ratings/components/RatingModal'),

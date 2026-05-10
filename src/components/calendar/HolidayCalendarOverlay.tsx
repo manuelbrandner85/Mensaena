@@ -307,7 +307,7 @@ export function HolidayDetailDialog({
       {/* Dialog */}
       <div
         className={cn(
-          'relative w-full max-w-md bg-white dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden',
+          'relative w-full max-w-md bg-mn-elevated dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden',
           'animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-300',
         )}
       >
@@ -321,21 +321,21 @@ export function HolidayDetailDialog({
           <button
             onClick={onClose}
             aria-label="Schließen"
-            className="absolute top-3 right-3 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            className="absolute top-3 right-3 p-2 rounded-full hover:bg-black/5 dark:hover:bg-mn-elevated/10 transition-colors"
           >
-            <X className="w-4 h-4 text-stone-700 dark:text-stone-300" />
+            <X className="w-4 h-4 text-stone-700 dark:text-mn-ghost" />
           </button>
 
           <div className="text-6xl leading-none mb-3" aria-hidden="true">{emoji}</div>
           <h3 id="holiday-dialog-title" className="font-display text-2xl text-stone-900 dark:text-stone-100 leading-tight">
             {holiday.name}
           </h3>
-          <p className="text-sm text-stone-600 dark:text-stone-400 mt-1">{dateLabel}</p>
+          <p className="text-sm text-mn-ink-soft dark:text-mn-ghost mt-1">{dateLabel}</p>
         </div>
 
         {/* Body */}
         <div className="p-6 space-y-4">
-          <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed">
+          <p className="text-sm text-stone-700 dark:text-mn-ghost leading-relaxed">
             {description}
           </p>
 
@@ -350,13 +350,13 @@ export function HolidayDetailDialog({
               {holiday.isRegional ? 'Regional' : 'Bundesweit'}
             </span>
             {stateLabel && (
-              <span className="inline-flex items-center gap-1 text-[11px] text-stone-500 dark:text-stone-400 px-2 py-1">
+              <span className="inline-flex items-center gap-1 text-[11px] text-mn-mute dark:text-mn-ghost px-2 py-1">
                 <MapPin className="w-3 h-3" aria-hidden="true" />
                 {stateLabel}
               </span>
             )}
             {holiday.note && (
-              <span className="text-[11px] text-stone-500 dark:text-stone-400 px-2 py-1 italic">
+              <span className="text-[11px] text-mn-mute dark:text-mn-ghost px-2 py-1 italic">
                 {holiday.note}
               </span>
             )}
@@ -365,14 +365,14 @@ export function HolidayDetailDialog({
           {/* Suggestion CTA */}
           <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-800/50 rounded-2xl p-4">
             <div className="flex items-start gap-3 mb-3">
-              <div className="flex-shrink-0 w-9 h-9 rounded-full bg-white dark:bg-stone-800 border border-purple-200 dark:border-purple-700 flex items-center justify-center">
+              <div className="flex-shrink-0 w-9 h-9 rounded-full bg-mn-elevated dark:bg-stone-800 border border-purple-200 dark:border-purple-700 flex items-center justify-center">
                 <PartyPopper className="w-4 h-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 leading-tight mb-1">
                   Plane eine Nachbarschaftsaktion!
                 </p>
-                <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
+                <p className="text-xs text-mn-ink-soft dark:text-mn-ghost leading-relaxed">
                   Feiertage sind ideal für Begegnungen. Lade deine Nachbar:innen
                   zu einem Picknick, Brunch oder Spaziergang ein.
                 </p>

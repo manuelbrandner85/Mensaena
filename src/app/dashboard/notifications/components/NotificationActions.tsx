@@ -53,7 +53,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           onClick={handleMarkAllRead}
           disabled={unreadCount === 0 || markingRead}
           title="Alle als gelesen markieren"
-          className="p-2 rounded-xl text-ink-500 hover:bg-stone-100 hover:text-primary-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl text-mn-mute hover:bg-mn-elevated hover:text-mn-amber disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           aria-label="Alle als gelesen markieren"
         >
           <CheckCheck className="w-4 h-4" />
@@ -61,7 +61,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
         <button
           onClick={() => setConfirmDelete(true)}
           title="Alle löschen"
-          className="p-2 rounded-xl text-ink-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="p-2 rounded-xl text-mn-mute hover:bg-red-50 hover:text-red-600 transition-colors"
           aria-label="Alle löschen"
         >
           <Trash2 className="w-4 h-4" />
@@ -69,7 +69,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
         <button
           onClick={() => router.push('/dashboard/settings')}
           title="Einstellungen"
-          className="p-2 rounded-xl text-ink-500 hover:bg-stone-100 hover:text-ink-700 transition-colors"
+          className="p-2 rounded-xl text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition-colors"
           aria-label="Benachrichtigungs-Einstellungen"
         >
           <Settings className="w-4 h-4" />
@@ -85,7 +85,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           <div className="flex gap-2 justify-end">
             <button
               onClick={() => setConfirmDelete(false)}
-              className="px-4 py-2 text-sm font-medium text-ink-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
+              className="px-4 py-2 text-sm font-medium text-mn-ink-soft bg-mn-elevated hover:bg-mn-raised rounded-xl transition-colors"
             >
               Abbrechen
             </button>
@@ -98,7 +98,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           </div>
         }
       >
-        <p className="text-sm text-ink-600">
+        <p className="text-sm text-mn-ink-soft">
           {activeFilter !== 'all'
             ? `Möchtest du alle Benachrichtigungen in dieser Kategorie löschen?`
             : `Möchtest du wirklich alle Benachrichtigungen löschen?`

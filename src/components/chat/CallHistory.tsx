@@ -93,11 +93,11 @@ export default function CallHistory({ userId, onClose, onCall }: CallHistoryProp
       aria-modal="true"
       aria-label="Anrufhistorie"
     >
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col shadow-xl">
+      <div className="bg-mn-elevated rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[80vh] flex flex-col shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-primary-500" />
+            <Clock className="w-5 h-5 text-mn-amber" />
             Letzte Anrufe
           </h2>
           <button
@@ -113,7 +113,7 @@ export default function CallHistory({ userId, onClose, onCall }: CallHistoryProp
         <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-mn-amber border-t-transparent rounded-full animate-spin" />
             </div>
           ) : calls.length === 0 ? (
             <p className="text-center text-gray-400 py-12 text-sm">Noch keine Anrufe</p>
@@ -129,11 +129,11 @@ export default function CallHistory({ userId, onClose, onCall }: CallHistoryProp
               return (
                 <div key={call.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50">
                   {/* Avatar */}
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-primary-100 flex-shrink-0">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden bg-mn-amber/10 flex-shrink-0">
                     {call.partner_avatar ? (
                       <Image src={call.partner_avatar} alt="" fill className="object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-primary-600 font-semibold text-sm">
+                      <div className="w-full h-full flex items-center justify-center text-mn-amber font-semibold text-sm">
                         {call.partner_name.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -165,7 +165,7 @@ export default function CallHistory({ userId, onClose, onCall }: CallHistoryProp
                   {/* Anrufen-Button */}
                   <button
                     onClick={() => onCall(partnerId, call.call_type)}
-                    className="p-2.5 rounded-full text-primary-500 hover:bg-primary-50 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    className="p-2.5 rounded-full text-mn-amber hover:bg-mn-amber/5 min-w-[44px] min-h-[44px] flex items-center justify-center"
                     aria-label={`${call.partner_name} anrufen`}
                   >
                     <Phone className="w-5 h-5" />

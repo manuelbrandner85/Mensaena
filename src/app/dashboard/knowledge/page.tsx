@@ -72,7 +72,7 @@ function LatestGuidesWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-mn-elevated border border-white/5 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -84,8 +84,8 @@ function LatestGuidesWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-mn-ink tabular-nums">{s.value}</p>
+              <p className="text-xs text-mn-mute text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
@@ -93,7 +93,7 @@ function LatestGuidesWidget() {
 
       {/* Neueste Guides */}
       {guides.length > 0 ? (
-        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -103,21 +103,21 @@ function LatestGuidesWidget() {
           <div className="relative space-y-1.5">
             {guides.map(g => (
               <Link key={g.id} href={`/dashboard/posts/${g.id}`}
-                className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-primary-50 transition-all border border-primary-100 group shadow-soft">
+                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-mn-amber/5 transition-all border border-primary-100 group shadow-cinema-card">
                 <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{catEmoji[g.category] ?? '📄'}</span>
-                <p className="text-xs font-medium text-ink-800 truncate group-hover:text-primary-700 flex-1">{g.title}</p>
+                <p className="text-xs font-medium text-mn-ink truncate group-hover:text-mn-amber flex-1">{g.title}</p>
               </Link>
             ))}
           </div>
         </div>
       ) : (
-        <div className="relative text-center py-8 bg-gradient-to-br from-primary-50 to-cyan-50 border border-primary-200 rounded-2xl space-y-2 shadow-soft overflow-hidden">
+        <div className="relative text-center py-8 bg-gradient-to-br from-primary-50 to-cyan-50 border border-mn-amber/20 rounded-2xl space-y-2 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
           />
           <p className="text-sm font-medium text-primary-800">Noch keine Guides vorhanden</p>
-          <p className="text-xs text-primary-600">Teile dein Wissen – Anleitungen, Tipps und Guides sind wertvoll!</p>
+          <p className="text-xs text-mn-amber">Teile dein Wissen – Anleitungen, Tipps und Guides sind wertvoll!</p>
           <Link
             href="/dashboard/create?module=knowledge&type=community&category=knowledge"
             className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white text-sm font-semibold rounded-xl transition-all mt-1 shadow-glow-teal"
@@ -128,12 +128,12 @@ function LatestGuidesWidget() {
       )}
 
       {/* Wissens-Tipp */}
-      <div className="relative bg-white border border-primary-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+      <div className="relative bg-mn-elevated border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
-        <p className="text-xs text-ink-600">
+        <p className="text-xs text-mn-ink-soft">
           💡 <strong>Wissen teilen = Gemeinschaft stärken.</strong> Teile Guides, How-Tos oder Naturwissen.
           Biete Nachhilfe, Kurse oder Mentoring an – dein Wissen ist wertvoll!
         </p>
@@ -148,8 +148,8 @@ export default function KnowledgePage() {
       moduleKey="knowledge"
       sectionLabel="§ 19 / Bildung & Wissen"
       mood="scholarly"
-      iconBgClass="bg-primary-50 border-primary-100"
-      iconColorClass="text-primary-700"
+      iconBgClass="bg-mn-amber/5 border-primary-100"
+      iconColorClass="text-mn-amber"
       title="Bildung & Wissen"
       description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
       icon={<BookOpen className="w-6 h-6 text-white" />}

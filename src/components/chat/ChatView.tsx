@@ -18,7 +18,7 @@ const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
   loading: () => (
     <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-mn-amber border-t-transparent rounded-full animate-spin" />
         <p className="text-white/60 text-sm">Wird geladen…</p>
       </div>
     </div>
@@ -1784,7 +1784,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   : setUpgradeModal({ featureLabel: 'Ankündigungen posten', requiredTier: 3 })}
                 className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm relative',
                   canPostAnnouncement(donorTier, isAdmin)
-                    ? 'bg-primary-600 text-white hover:bg-primary-700'
+                    ? 'bg-mn-amber text-white hover:bg-primary-700'
                     : 'bg-gray-200 text-gray-400 hover:bg-gray-300')}>
                 {!canPostAnnouncement(donorTier, isAdmin) && <Lock className="w-3 h-3 absolute -top-1 -right-1 bg-gray-400 text-white rounded-full p-0.5" style={{ width: '14px', height: '14px', padding: '2px' }} />}
                 <Megaphone className="w-3.5 h-3.5" /> Ankündigung
@@ -1793,7 +1793,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 <button
                   onClick={() => communityRoom?.is_locked ? handleToggleLock() : setShowLockModal(true)}
                   className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm',
-                    communityRoom?.is_locked ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-red-600')}>
+                    communityRoom?.is_locked ? 'bg-mn-amber text-white hover:bg-primary-700' : 'bg-red-500 text-white hover:bg-red-600')}>
                   {communityRoom?.is_locked
                     ? <><Volume2 className="w-3.5 h-3.5" /> Freigeben</>
                     : <><VolumeX className="w-3.5 h-3.5" /> Sperren</>}
@@ -1835,7 +1835,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       <div className="flex gap-0.5 bg-gray-100/80 p-1 rounded-2xl mb-3 flex-shrink-0 border border-gray-200/50">
         <button onClick={() => { haptic.selection(); setTab('community'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
-            tab === 'community' ? 'bg-white shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50')}>
+            tab === 'community' ? 'bg-mn-elevated shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-mn-elevated/50')}>
           <Hash className="w-4 h-4" />
           <span className="hidden sm:inline">Community</span>
           <span className="sm:hidden">Kanäle</span>
@@ -1843,7 +1843,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         </button>
         <button onClick={() => { haptic.selection(); setTab('dm'); setShowSearch(false); setSearchQuery('') }}
           className={cn('flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-all',
-            tab === 'dm' ? 'bg-white shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50')}>
+            tab === 'dm' ? 'bg-mn-elevated shadow-sm text-gray-900 shadow-gray-200' : 'text-gray-500 hover:text-gray-700 hover:bg-mn-elevated/50')}>
           <Mail className="w-4 h-4" />
           <span className="hidden sm:inline">Nachrichten</span>
           <span className="sm:hidden">DMs</span>
@@ -1861,7 +1861,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
         <div className="flex-1 flex flex-col md:flex-row min-h-0 gap-3">
 
           {/* ─── Channel-Sidebar (Desktop) ─── */}
-          <div className="hidden md:flex flex-col w-52 flex-shrink-0 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="hidden md:flex flex-col w-52 flex-shrink-0 bg-mn-elevated rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-3 pt-3 pb-2 border-b border-gray-100">
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Kanäle</p>
             </div>
@@ -1885,7 +1885,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         className={cn(
                           'w-full flex items-center gap-2.5 px-3 py-2 mx-1 rounded-xl text-sm transition-all text-left',
                           activeChannelId === ch.id
-                            ? 'bg-primary-50 text-primary-700 font-semibold'
+                            ? 'bg-mn-amber/5 text-mn-amber font-semibold'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         )}
                         style={{ width: 'calc(100% - 8px)' }}
@@ -1908,7 +1908,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold transition-all',
                   canCreateChannel(donorTier, isAdmin)
-                    ? 'bg-primary-50 text-primary-600 hover:bg-primary-100 border border-primary-200'
+                    ? 'bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 border border-mn-amber/20'
                     : 'bg-gray-50 text-gray-400 border border-dashed border-gray-300 hover:bg-gray-100'
                 )}
                 title={canCreateChannel(donorTier, isAdmin) ? 'Neuen Kanal erstellen' : '🔒 Förderer-Funktion (Tier 2)'}>
@@ -1931,7 +1931,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0',
                   canCreateChannel(donorTier, isAdmin)
-                    ? 'bg-primary-600 text-white shadow-sm hover:bg-primary-700'
+                    ? 'bg-mn-amber text-white shadow-sm hover:bg-primary-700'
                     : 'bg-gray-100 text-gray-400 border border-dashed border-gray-300'
                 )}
                 title={canCreateChannel(donorTier, isAdmin) ? 'Neuen Kanal erstellen' : '🔒 Förderer-Funktion'}>
@@ -1950,8 +1950,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         className={cn(
                           'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0',
                           activeChannelId === ch.id
-                            ? 'bg-primary-600 text-white shadow-sm'
-                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                            ? 'bg-mn-amber text-white shadow-sm'
+                            : 'bg-mn-elevated text-gray-700 border border-gray-200 hover:bg-gray-50'
                         )}>
                         <span>{ch.emoji}</span>
                         <span>{ch.name}</span>
@@ -1967,7 +1967,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           {/* Chat-Bereich */}
           <div className="flex-1 card flex flex-col min-h-0 overflow-hidden">
             {/* Room Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100/80 flex-shrink-0 bg-white/90 backdrop-blur-xl">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100/80 flex-shrink-0 bg-mn-elevated/90 backdrop-blur-xl">
               <div className={cn('w-9 h-9 rounded-2xl flex items-center justify-center text-lg shadow-sm',
                 (activeChannel?.is_locked || communityRoom?.is_locked) ? 'bg-red-50 border border-red-100' : 'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-100')}>
                 {(activeChannel?.is_locked || communityRoom?.is_locked)
@@ -1996,7 +1996,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     : setUpgradeModal({ featureLabel: 'Umfragen erstellen', requiredTier: 2 })}
                   className={cn('p-2 rounded-xl transition-all relative',
                     canCreatePoll(donorTier, isAdmin)
-                      ? 'text-gray-400 hover:bg-gray-100 hover:text-primary-600'
+                      ? 'text-gray-400 hover:bg-gray-100 hover:text-mn-amber'
                       : 'text-gray-300 hover:bg-gray-50')}
                   title={canCreatePoll(donorTier, isAdmin) ? 'Abstimmung erstellen' : '🔒 Förderer-Funktion'}>
                   {!canCreatePoll(donorTier, isAdmin) && <Lock className="absolute bottom-0.5 right-0.5 text-gray-400" style={{ width: '9px', height: '9px' }} />}
@@ -2009,7 +2009,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     : setUpgradeModal({ featureLabel: 'Livestream-Events planen', requiredTier: 3 })}
                   className={cn('p-2 rounded-xl transition-all relative',
                     canScheduleEvent(donorTier, isAdmin)
-                      ? 'text-gray-400 hover:bg-gray-100 hover:text-primary-600'
+                      ? 'text-gray-400 hover:bg-gray-100 hover:text-mn-amber'
                       : 'text-gray-300 hover:bg-gray-50')}
                   title={canScheduleEvent(donorTier, isAdmin) ? 'Event / Livestream planen' : '🔒 Partner-Funktion'}>
                   {!canScheduleEvent(donorTier, isAdmin) && <Lock className="absolute bottom-0.5 right-0.5 text-gray-400" style={{ width: '9px', height: '9px' }} />}
@@ -2031,7 +2031,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 {/* Search Toggle */}
                 <button
                   onClick={() => { setShowSearch(s => !s); setSearchQuery('') }}
-                  className={cn('p-2 rounded-xl transition-all', showSearch ? 'bg-primary-50 text-primary-600' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700')}>
+                  className={cn('p-2 rounded-xl transition-all', showSearch ? 'bg-mn-amber/5 text-mn-amber' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700')}>
                   <Search className="w-4 h-4" />
                 </button>
                 {/* Live-Raum Button */}
@@ -2047,7 +2047,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   {liveRoomCount > 0 ? <Radio className="w-3.5 h-3.5" /> : <Video className="w-3.5 h-3.5" />}
                   <span>{liveRoomCount > 0 ? 'LIVE' : 'Live'}</span>
                   {liveRoomCount > 0 && (
-                    <span className="w-4 h-4 bg-white/25 rounded-full flex items-center justify-center text-[10px] font-bold">
+                    <span className="w-4 h-4 bg-mn-elevated/25 rounded-full flex items-center justify-center text-[10px] font-bold">
                       {liveRoomCount}
                     </span>
                   )}
@@ -2104,7 +2104,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 </div>
                 <div className="space-y-1.5 max-h-28 overflow-y-auto">
                   {pinnedMessages.map(pm => (
-                    <div key={pm.id} className="bg-white rounded-lg px-3 py-2 border border-amber-200">
+                    <div key={pm.id} className="bg-mn-elevated rounded-lg px-3 py-2 border border-amber-200">
                       <p className="text-[11px] font-semibold text-amber-700">{pm.profiles?.name ?? 'Nutzer'}</p>
                       <p className="text-xs text-gray-700 line-clamp-1">{pm.content}</p>
                     </div>
@@ -2176,9 +2176,9 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   const totalVotes = poll.votes?.length ?? 0
                   const myVote = poll.votes?.find(v => v.user_id === userId)
                   return (
-                    <div key={poll.id} className="px-3 py-2.5 bg-primary-50 border border-primary-200 rounded-xl">
+                    <div key={poll.id} className="px-3 py-2.5 bg-mn-amber/5 border border-mn-amber/20 rounded-xl">
                       <p className="text-xs font-bold text-primary-900 mb-2 flex items-center gap-1.5">
-                        <BarChart2 className="w-3.5 h-3.5 text-primary-600" /> {poll.question}
+                        <BarChart2 className="w-3.5 h-3.5 text-mn-amber" /> {poll.question}
                       </p>
                       <div className="space-y-1">
                         {poll.options.map((opt, idx) => {
@@ -2188,8 +2188,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                           return (
                             <button key={idx} onClick={() => votePoll(poll.id, idx)}
                               className={cn('w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium border relative overflow-hidden transition-all',
-                                voted ? 'border-primary-400 text-primary-900' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50')}>
-                              <div className="absolute inset-0 left-0 bg-primary-100 transition-all" style={{ width: `${pct}%` }} />
+                                voted ? 'border-primary-400 text-primary-900' : 'border-gray-200 bg-mn-elevated text-gray-700 hover:bg-gray-50')}>
+                              <div className="absolute inset-0 left-0 bg-mn-amber/10 transition-all" style={{ width: `${pct}%` }} />
                               <span className="relative flex justify-between">
                                 <span>{opt}</span>
                                 <span className="text-gray-500">{pct}%</span>
@@ -2210,12 +2210,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDropFile}
               data-no-pull-refresh="true"
               className={cn('flex-1 overflow-y-auto px-4 py-5 space-y-0.5 no-scrollbar relative transition-all bg-gray-50/50 chat-messages-container',
-                isDragging && 'ring-2 ring-inset ring-primary-400 bg-primary-50/40')}>
+                isDragging && 'ring-2 ring-inset ring-primary-400 bg-mn-amber/5/40')}>
               {isDragging && (
                 <div className="absolute inset-4 rounded-xl border-2 border-dashed border-primary-400 flex items-center justify-center pointer-events-none z-10">
                   <div className="text-center">
                     <ImageIcon className="w-8 h-8 text-primary-400 mx-auto mb-2" />
-                    <p className="text-sm font-semibold text-primary-600">Bild hier ablegen</p>
+                    <p className="text-sm font-semibold text-mn-amber">Bild hier ablegen</p>
                   </div>
                 </div>
               )}
@@ -2224,8 +2224,8 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   {generateSkeletonMessages(6).map(s => (
                     <div key={s.id} className={`flex ${s.isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                       <div className="animate-pulse flex gap-2">
-                        {!s.isOwnMessage && <div className="w-8 h-8 rounded-full bg-stone-200" />}
-                        <div className={`rounded-2xl bg-stone-200 h-10`} style={{ width: `${s.width}%`, minWidth: 120 }} />
+                        {!s.isOwnMessage && <div className="w-8 h-8 rounded-full bg-mn-raised" />}
+                        <div className={`rounded-2xl bg-mn-raised h-10`} style={{ width: `${s.width}%`, minWidth: 120 }} />
                       </div>
                     </div>
                   ))}
@@ -2234,7 +2234,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 <div className="flex flex-col items-center justify-center h-full py-12">
                   {searchQuery ? (
                     <>
-                      <Search className="w-10 h-10 text-stone-300 mb-3" />
+                      <Search className="w-10 h-10 text-mn-ghost mb-3" />
                       <p className="font-semibold text-gray-500">Keine Treffer für „{searchQuery}"</p>
                     </>
                   ) : (
@@ -2282,10 +2282,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
             {/* Reply Preview */}
             {replyTo && (
-              <div className="px-4 py-2 bg-primary-50/80 border-t border-primary-100 flex items-center gap-2.5 flex-shrink-0">
+              <div className="px-4 py-2 bg-mn-amber/5/80 border-t border-primary-100 flex items-center gap-2.5 flex-shrink-0">
                 <div className="w-0.5 h-8 bg-primary-400 rounded-full flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] text-primary-600 font-semibold">↩ {replyTo.profiles?.name ?? 'Nutzer'}</p>
+                  <p className="text-[11px] text-mn-amber font-semibold">↩ {replyTo.profiles?.name ?? 'Nutzer'}</p>
                   <p className="text-xs text-gray-500 truncate">{replyTo.content}</p>
                 </div>
                 <button onClick={() => setReplyTo(null)} aria-label="Antwort aufheben" className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all"><X className="w-3.5 h-3.5" /></button>
@@ -2295,15 +2295,15 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {/* Input */}
             {/* BUG-FIX: Input-Container fixiert — sticky bottom-0 + flex-shrink-0 verhindert Verschieben */}
             {/* data-bot-avoid: MensaenaBot misst dieses Element via ResizeObserver und positioniert sich darüber */}
-            <form data-bot-avoid="true" onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white relative chat-input-container">
+            <form data-bot-avoid="true" onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-mn-elevated relative chat-input-container">
               {/* @Mention Dropdown */}
               {showMentionMenu && mentionCandidates.length > 0 && (
-                <div className="absolute bottom-full left-4 right-4 mb-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
+                <div className="absolute bottom-full left-4 right-4 mb-1 bg-mn-elevated border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
                   {mentionCandidates.map(m => (
                     <button key={m.user_id} type="button"
                       onClick={() => selectMention(m.profiles?.name ?? m.profiles?.nickname ?? '')}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-primary-50 transition-all text-left">
-                      <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 overflow-hidden">
+                      className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-mn-amber/5 transition-all text-left">
+                      <div className="w-7 h-7 rounded-full bg-mn-amber/10 flex items-center justify-center text-xs font-bold text-mn-amber flex-shrink-0 overflow-hidden">
                         {m.profiles?.avatar_url
                           ? <Image src={m.profiles.avatar_url} alt="" width={28} height={28} className="w-full h-full object-cover" />
                           : (m.profiles?.name ?? '?')[0].toUpperCase()}
@@ -2318,14 +2318,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               )}
               {/* Image Preview */}
               {imagePreview && (
-                <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
+                <div className="mb-2 flex items-center gap-2 p-2 bg-mn-amber/5 rounded-xl border border-mn-amber/20">
                   <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                   <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
                   <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
                     <X className="w-4 h-4" />
                   </button>
                   <button type="button" onClick={handleSendImage} disabled={uploadingImage}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
+                    className="flex items-center gap-1 px-3 py-1.5 bg-mn-amber text-white text-xs font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
                     {uploadingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                     Senden
                   </button>
@@ -2338,7 +2338,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLocked || isBanned}
-                  className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
+                  className="p-1.5 text-gray-400 hover:text-mn-amber rounded-full transition-all flex-shrink-0 disabled:opacity-40"
                   title="Bild senden"
                 >
                   <ImageIcon className="w-4 h-4" />
@@ -2370,12 +2370,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {tab === 'dm' && (
         <div className="flex-1 flex gap-4 min-h-0">
           {/* Konversationsliste */}
-          <div className={cn('w-full lg:w-64 xl:w-72 flex-shrink-0 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden',
+          <div className={cn('w-full lg:w-64 xl:w-72 flex-shrink-0 flex flex-col bg-mn-elevated rounded-2xl border border-gray-200 shadow-sm overflow-hidden',
             mobileShowChat ? 'hidden lg:flex' : 'flex')}>
             <div className="px-4 py-3 border-b border-gray-100 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-primary-600" />
+                  <Mail className="w-4 h-4 text-mn-amber" />
                   <span className="font-semibold text-gray-900 text-sm">Nachrichten</span>
                   {totalUnread > 0 && (
                     <span className="w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -2386,13 +2386,13 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 {/* FEATURE: Anrufhistorie */}
                 <button
                   onClick={() => setShowCallHistory(true)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-primary-600 transition-all min-w-[32px] min-h-[32px] flex items-center justify-center"
+                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-mn-amber transition-all min-w-[32px] min-h-[32px] flex items-center justify-center"
                   aria-label="Anrufhistorie"
                 >
                   <Clock className="w-4 h-4" />
                 </button>
                 <button onClick={() => setShowNewChat(true)}
-                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-primary-600 transition-all">
+                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-mn-amber transition-all">
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
@@ -2404,7 +2404,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     value={convSearch}
                     onChange={e => setConvSearch(e.target.value)}
                     placeholder="Gespräche durchsuchen..."
-                    className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-primary-300 focus:ring-1 focus:ring-primary-200 outline-none transition-all placeholder:text-gray-400"
+                    className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-50 focus:bg-mn-elevated focus:border-primary-300 focus:ring-1 focus:ring-primary-200 outline-none transition-all placeholder:text-gray-400"
                     aria-label="Konversationen durchsuchen"
                   />
                   {convSearch && (
@@ -2434,7 +2434,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   Klicke bei einem Inserat auf „DM" oder starte eine neue Unterhaltung
                 </p>
                 <button onClick={() => setShowNewChat(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-sm">
+                  className="flex items-center gap-1.5 px-4 py-2 bg-mn-amber text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-sm">
                   <Plus className="w-4 h-4" /> Neue Nachricht
                 </button>
                 <p className="text-xs text-gray-400 mt-4">Tip: Über Beiträge kannst du direkt DMs senden</p>
@@ -2482,7 +2482,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   <button onClick={() => setMobileShowChat(false)} data-chat-back="true" aria-label="Zurück zur Chat-Übersicht" className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
                     <ArrowLeft className="w-4 h-4" />
                   </button>
-                  <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 overflow-hidden">
+                  <div className="w-9 h-9 rounded-full bg-mn-amber/10 flex items-center justify-center text-mn-amber text-sm font-bold flex-shrink-0 overflow-hidden">
                     {getConvAvatar(activeConv)
                       ? <Image src={getConvAvatar(activeConv)!} alt="" width={36} height={36} className="w-full h-full object-cover" />
                       : activeConv.type === 'group' ? <Users className="w-5 h-5" /> : getConvInitials(activeConv)}
@@ -2490,7 +2490,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 text-sm truncate">{getConvTitle(activeConv)}</p>
                     {activeConv.post_id
-                      ? <p className="text-xs text-primary-600">📋 Bezüglich einem Inserat</p>
+                      ? <p className="text-xs text-mn-amber">📋 Bezüglich einem Inserat</p>
                       : <p className="text-xs text-gray-400 flex items-center gap-1"><Lock className="w-2.5 h-2.5" /> Ende-zu-Ende privat</p>}
                   </div>
                   {/* FIX-19+22: Prominente Audio + Video Call-Buttons */}
@@ -2501,7 +2501,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       <button
                         onClick={() => setConfirmCall({ type: 'audio', partnerName: getConvTitle(activeConv) })}
                         disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
-                        className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        className="p-2.5 rounded-full bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Sprachanruf"
                       >
                         <Phone className="w-5 h-5" />
@@ -2511,7 +2511,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       <button
                         onClick={() => setConfirmCall({ type: 'video', partnerName: getConvTitle(activeConv) })}
                         disabled={isBanned || dmCallLoading || !!activeDMCall || !!outgoingCallState}
-                        className="p-2.5 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        className="p-2.5 rounded-full bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 active:scale-95 transition-all disabled:opacity-40 min-w-[44px] min-h-[44px] flex items-center justify-center"
                         aria-label="Videoanruf"
                       >
                         <Video className="w-5 h-5" />
@@ -2521,7 +2521,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                         onClick={() => dnd.enabled ? disableDnd() : enableDnd(60)}
                         className={[
                           'p-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors',
-                          dnd.enabled ? 'bg-amber-50 text-amber-600' : 'text-stone-400 hover:bg-stone-100',
+                          dnd.enabled ? 'bg-amber-50 text-amber-600' : 'text-mn-ghost hover:bg-mn-elevated/5',
                         ].join(' ')}
                         aria-label={dnd.enabled ? 'Nicht stören deaktivieren' : 'Nicht stören (1h)'}
                         title={dnd.enabled
@@ -2535,7 +2535,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   {/* DM Search */}
                   <button
                     onClick={() => { setShowSearch(s => !s); setSearchQuery('') }}
-                    className={cn('p-1.5 rounded-lg transition-all', showSearch ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100')}>
+                    className={cn('p-1.5 rounded-lg transition-all', showSearch ? 'bg-mn-amber/10 text-mn-amber' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100')}>
                     <Search className="w-4 h-4" />
                   </button>
                 </div>
@@ -2588,12 +2588,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     <div className="flex flex-col items-center justify-center h-full py-12">
                       {searchQuery ? (
                         <>
-                          <Search className="w-10 h-10 text-stone-300 mb-3" />
+                          <Search className="w-10 h-10 text-mn-ghost mb-3" />
                           <p className="font-semibold text-gray-500">Keine Treffer für „{searchQuery}"</p>
                         </>
                       ) : (
                         <>
-                          <div className="w-14 h-14 rounded-full bg-primary-50 flex items-center justify-center mb-3">
+                          <div className="w-14 h-14 rounded-full bg-mn-amber/5 flex items-center justify-center mb-3">
                             <Lock className="w-7 h-7 text-primary-300" />
                           </div>
                           <p className="font-semibold text-gray-600 mb-1">Neue Konversation</p>
@@ -2627,10 +2627,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 </div>
 
                 {replyTo && (
-                  <div className="px-4 py-2 bg-primary-50/80 border-t border-primary-100 flex items-center gap-2.5 flex-shrink-0">
+                  <div className="px-4 py-2 bg-mn-amber/5/80 border-t border-primary-100 flex items-center gap-2.5 flex-shrink-0">
                     <div className="w-0.5 h-8 bg-primary-400 rounded-full flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-primary-600 font-semibold">↩ {replyTo.profiles?.name ?? 'Nutzer'}</p>
+                      <p className="text-[11px] text-mn-amber font-semibold">↩ {replyTo.profiles?.name ?? 'Nutzer'}</p>
                       <p className="text-xs text-gray-500 truncate">{replyTo.content}</p>
                     </div>
                     <button onClick={() => setReplyTo(null)} aria-label="Antwort aufheben" className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all"><X className="w-3.5 h-3.5" /></button>
@@ -2639,16 +2639,16 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
                 {/* BUG-FIX: Input-Container fixiert — sticky bottom-0 + flex-shrink-0 verhindert Verschieben */}
                 {/* data-bot-avoid: MensaenaBot misst dieses Element und positioniert sich darüber */}
-                <form data-bot-avoid="true" onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-white/95 backdrop-blur-sm chat-input-container">
+                <form data-bot-avoid="true" onSubmit={sendMessage} className="px-4 py-3 border-t border-gray-100 flex-shrink-0 sticky bottom-0 bg-mn-elevated/95 backdrop-blur-sm chat-input-container">
                   {imagePreview && (
-                    <div className="mb-2 flex items-center gap-2 p-2 bg-primary-50 rounded-xl border border-primary-200">
+                    <div className="mb-2 flex items-center gap-2 p-2 bg-mn-amber/5 rounded-xl border border-mn-amber/20">
                       <Image src={imagePreview} alt="" width={48} height={48} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                       <span className="text-xs text-gray-600 flex-1 truncate">{imageFile?.name}</span>
                       <button type="button" onClick={cancelImage} className="text-gray-400 hover:text-red-500">
                         <X className="w-4 h-4" />
                       </button>
                       <button type="button" onClick={handleSendImage} disabled={uploadingImage}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
+                        className="flex items-center gap-1 px-3 py-1.5 bg-mn-amber text-white text-xs font-medium rounded-lg hover:bg-primary-700 disabled:opacity-50">
                         {uploadingImage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                         Senden
                       </button>
@@ -2659,7 +2659,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isBanned}
-                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
+                      className="p-1.5 text-gray-400 hover:text-mn-amber rounded-full transition-all flex-shrink-0 disabled:opacity-40"
                       title="Bild senden"
                     >
                       <ImageIcon className="w-4 h-4" />
@@ -2698,7 +2698,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     Wähle eine Konversation oder starte eine neue Unterhaltung – 100% privat
                   </p>
                   <button onClick={() => setShowNewChat(true)}
-                    className="shine flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-glow-teal mx-auto">
+                    className="shine flex items-center gap-2 px-5 py-2.5 bg-mn-amber text-white font-semibold rounded-xl hover:bg-primary-700 transition-all shadow-glow-teal mx-auto">
                     <Plus className="w-4 h-4" /> Neue Unterhaltung
                   </button>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-center">
@@ -2774,14 +2774,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* ── Forward Modal ── */}
       {forwardMsg && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-gray-900">Nachricht weiterleiten</h3>
               <button onClick={() => setForwardMsg(null)} className="text-gray-400 hover:text-gray-700" aria-label="Schließen">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="bg-stone-50 rounded-xl p-3 text-xs text-gray-600 line-clamp-3">{forwardMsg.content}</div>
+            <div className="bg-mn-surface rounded-xl p-3 text-xs text-gray-600 line-clamp-3">{forwardMsg.content}</div>
             <p className="text-xs text-gray-500">Wähle eine Konversation:</p>
             <div className="max-h-48 overflow-y-auto space-y-1">
               {conversations.filter(c => c.id !== activeConvId).map(c => {
@@ -2789,7 +2789,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 const name = c.title || other?.profiles?.name || 'Chat'
                 return (
                   <button key={c.id} onClick={() => handleForward(c.id)}
-                    className="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-primary-50 transition-colors truncate">
+                    className="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-mn-amber/5 transition-colors truncate">
                     {name}
                   </button>
                 )
@@ -2802,7 +2802,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* ── Lock Modal (Admin) ── */}
       {showLockModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
               <VolumeX className="w-5 h-5 text-red-500" /> Kanal sperren
             </h3>
@@ -2840,12 +2840,12 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* ── Announcement Modal ── */}
       {showAnnounceModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-blue-500" /> Ankündigungen verwalten
               </h3>
-              <button onClick={() => setShowAnnounceModal(false)} className="p-1.5 rounded-lg hover:bg-stone-100 text-gray-500">
+              <button onClick={() => setShowAnnounceModal(false)} className="p-1.5 rounded-lg hover:bg-mn-elevated/5 text-gray-500">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -2870,14 +2870,14 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               </div>
             )}
 
-            <div className="border-t border-stone-100 pt-3">
+            <div className="border-t border-white/5 pt-3">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Neue Ankündigung</p>
               <div className="space-y-3">
                 <div className="flex gap-2">
                   {(isAdmin ? ['info', 'warning', 'success', 'error'] as const : ['info', 'success'] as const).map(t => (
                     <button key={t} onClick={() => setAnnounceType(t)}
                       className={cn('flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all',
-                        announceType === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50')}>
+                        announceType === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-mn-elevated text-gray-600 border-gray-200 hover:bg-gray-50')}>
                       {announcementIcons[t]} {t}
                     </button>
                   ))}
@@ -2897,7 +2897,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             <div className="flex gap-3">
               <button onClick={() => setShowAnnounceModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={handleCreateAnnouncement} disabled={!announceTitle.trim() || !announceContent.trim()}
-                className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
+                className="flex-1 px-4 py-2.5 bg-mn-amber text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
                 Veröffentlichen
               </button>
             </div>
@@ -2908,10 +2908,10 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* ── Poll Modal ── */}
       {showPollModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                <BarChart2 className="w-5 h-5 text-primary-600" /> Abstimmung erstellen
+                <BarChart2 className="w-5 h-5 text-mn-amber" /> Abstimmung erstellen
               </h3>
               <button onClick={() => setShowPollModal(false)} className="text-gray-400 hover:text-gray-700"><X className="w-5 h-5" /></button>
             </div>
@@ -2930,7 +2930,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               ))}
               {pollOptions.length < 6 && (
                 <button type="button" onClick={() => setPollOptions(prev => [...prev, ''])}
-                  className="text-xs text-primary-600 hover:underline flex items-center gap-1">
+                  className="text-xs text-mn-amber hover:underline flex items-center gap-1">
                   <Plus className="w-3 h-3" /> Option hinzufügen
                 </button>
               )}
@@ -2938,7 +2938,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             <div className="flex gap-3">
               <button onClick={() => setShowPollModal(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={createPoll} disabled={creatingPoll || !pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2}
-                className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
+                className="flex-1 px-4 py-2.5 bg-mn-amber text-white rounded-xl font-semibold hover:bg-primary-700 disabled:opacity-40 transition-all text-sm">
                 {creatingPoll ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Erstellen'}
               </button>
             </div>
@@ -2949,7 +2949,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
       {/* ── Event Modal ── */}
       {showEventModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-gray-900 flex items-center gap-2">
                 <CalendarPlus className="w-5 h-5 text-violet-600" /> Live Room Event planen
@@ -3070,17 +3070,17 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
           aria-label="Anruf bestätigen"
           onClick={(e) => { if (e.target === e.currentTarget) setConfirmCall(null) }}
         >
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-scale-in">
+          <div className="bg-mn-elevated rounded-2xl p-6 max-w-sm w-full shadow-xl animate-scale-in">
             <p className="text-gray-900 font-semibold text-lg text-center mb-2">
               {confirmCall.partnerName} anrufen?
             </p>
-            <p className="text-stone-500 text-sm text-center mb-6">
+            <p className="text-mn-mute text-sm text-center mb-6">
               {confirmCall.type === 'video' ? '📹 Videoanruf' : '📞 Sprachanruf'}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmCall(null)}
-                className="flex-1 py-3 rounded-xl bg-stone-100 text-stone-600 font-medium active:scale-95 transition-transform min-h-[44px]"
+                className="flex-1 py-3 rounded-xl bg-mn-elevated text-mn-ink-soft font-medium active:scale-95 transition-transform min-h-[44px]"
               >
                 Abbrechen
               </button>
@@ -3096,7 +3096,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     setConfirmCall(null)
                   }
                 }}
-                className="flex-1 py-3 rounded-xl bg-primary-500 text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px]"
+                className="flex-1 py-3 rounded-xl bg-mn-amber text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px]"
               >
                 Anrufen
               </button>
@@ -3177,7 +3177,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
           const isOutgoing = msg.sender_id === userId
           return (
             <div key={msg.id} className="flex justify-center my-3 animate-fade-in">
-              <div className="bg-stone-100 rounded-2xl px-4 py-2.5 flex items-center gap-3 text-sm text-stone-600 shadow-soft max-w-xs">
+              <div className="bg-mn-elevated rounded-2xl px-4 py-2.5 flex items-center gap-3 text-sm text-mn-ink-soft shadow-soft max-w-xs">
                 {callMeta.type === 'missed' && (
                   <Phone className="w-4 h-4 text-red-500 flex-shrink-0" />
                 )}
@@ -3188,7 +3188,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                   <Phone className="w-4 h-4 text-green-500 flex-shrink-0" />
                 )}
                 {callMeta.type === 'cancelled' && (
-                  <PhoneOff className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                  <PhoneOff className="w-4 h-4 text-mn-ghost flex-shrink-0" />
                 )}
                 <span className="flex-1">
                   {callMeta.type === 'missed' ? 'Verpasster Anruf' :
@@ -3201,7 +3201,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                   <button
                     onClick={onCallBack}
                     disabled={(isBanned ?? false) || (dmCallLoading ?? false) || !!activeDMCall}
-                    className="text-primary-500 font-semibold hover:text-primary-600 text-sm whitespace-nowrap disabled:opacity-40"
+                    className="text-mn-amber font-semibold hover:text-mn-amber text-sm whitespace-nowrap disabled:opacity-40"
                   >
                     Zurückrufen
                   </button>
@@ -3259,7 +3259,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
               {/* Reply context */}
               {msg.reply_to && !isDeleted && (
                 <div className={cn('px-3 py-1.5 rounded-xl border-l-2 text-xs mb-0.5 max-w-full',
-                  isMe ? 'bg-primary-700/40 border-primary-200 text-primary-100' : 'bg-gray-100 border-gray-200 text-gray-500')}>
+                  isMe ? 'bg-primary-700/40 border-mn-amber/20 text-primary-100' : 'bg-gray-100 border-gray-200 text-gray-500')}>
                   <p className="font-semibold text-[11px]">{(msg.reply_to as any).profiles?.name ?? 'Nutzer'}</p>
                   <p className="truncate">{msg.reply_to.content}</p>
                 </div>
@@ -3268,24 +3268,24 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
               {/* Bubble */}
               <div className={cn('relative', isPinned && !isDeleted && 'ring-1 ring-amber-300 rounded-2xl')}>
                 {isEditing ? (
-                  <div className="flex flex-col gap-2 bg-white border border-primary-300 rounded-2xl p-3 shadow-md min-w-48">
+                  <div className="flex flex-col gap-2 bg-mn-elevated border border-primary-300 rounded-2xl p-3 shadow-md min-w-48">
                     <input
                       value={editContent}
                       onChange={e => setEditContent(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') onEditSubmit(msg.id); if (e.key === 'Escape') onEditCancel() }}
-                      className="text-sm text-gray-800 bg-transparent outline-none border-b border-stone-200 pb-1"
+                      className="text-sm text-gray-800 bg-transparent outline-none border-b border-white/5 pb-1"
                       autoFocus
                     />
                     <div className="flex gap-2 justify-end">
                       <button onClick={onEditCancel} className="text-xs text-gray-400 hover:text-gray-600">Abbrechen</button>
-                      <button onClick={() => onEditSubmit(msg.id)} className="text-xs text-primary-600 font-semibold hover:text-primary-800">Speichern</button>
+                      <button onClick={() => onEditSubmit(msg.id)} className="text-xs text-mn-amber font-semibold hover:text-primary-800">Speichern</button>
                     </div>
                   </div>
                 ) : (
                   <div className={cn('px-4 py-2.5 text-sm',
                     isDeleted ? 'bg-gray-100 text-gray-400 italic rounded-2xl shadow-sm'
                       : isMe ? cn('bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-md shadow-primary-500/20', isLast ? 'rounded-2xl rounded-br-sm' : 'rounded-2xl')
-                      : cn('bg-white border border-gray-100 text-gray-800 shadow-sm', isLast ? 'rounded-2xl rounded-bl-sm' : 'rounded-2xl'))}>
+                      : cn('bg-mn-elevated border border-gray-100 text-gray-800 shadow-sm', isLast ? 'rounded-2xl rounded-bl-sm' : 'rounded-2xl'))}>
                     {isDeleted
                       ? <p className="text-xs">🗑 Nachricht gelöscht</p>
                       : (() => {
@@ -3346,30 +3346,30 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                     isMe ? 'right-full mr-1' : 'left-full ml-1'
                   )}>
                     <button onClick={e => { e.stopPropagation(); onReply(msg) }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-primary-300 transition-all"
                       title="Antworten">
                       <Reply className="w-3 h-3" />
                     </button>
                     <button onClick={e => { e.stopPropagation(); onForward?.(msg) }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 text-gray-500 hover:text-primary-500 hover:border-primary-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-primary-300 transition-all"
                       title="Weiterleiten">
                       <Send className="w-3 h-3 rotate-45" />
                     </button>
                     <button onClick={e => { e.stopPropagation(); setShowEmojiFor(showEmojiFor === msg.id ? null : msg.id) }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 text-gray-500 hover:text-yellow-500 hover:border-yellow-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-yellow-500 hover:border-yellow-300 transition-all"
                       title="Reaktion">
                       <Smile className="w-3 h-3" />
                     </button>
                     {isMe && (
                       <button onClick={e => { e.stopPropagation(); onEdit(msg) }}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 text-gray-500 hover:text-blue-500 hover:border-blue-300 transition-all"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-blue-500 hover:border-blue-300 transition-all"
                         title="Bearbeiten">
                         <Edit2 className="w-3 h-3" />
                       </button>
                     )}
                     {(isMe || isAdmin) && (
                       <button onClick={e => { e.stopPropagation(); onDelete(msg.id, msg.sender_id) }}
-                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300 transition-all"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300 transition-all"
                         title="Löschen">
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -3380,13 +3380,13 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                         navigator.clipboard.writeText(link)
                         toast.success('Link kopiert')
                       }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border border-gray-200 text-gray-500 hover:text-primary-500 hover:border-primary-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-primary-300 transition-all"
                       title="Link kopieren">
                       <Link2 className="w-3 h-3" />
                     </button>
                     {isAdmin && (
                       <button onClick={e => { e.stopPropagation(); onPin(msg) }}
-                        className={cn('w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-md border transition-all',
+                        className={cn('w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border transition-all',
                           isPinned ? 'border-amber-300 text-amber-500 hover:text-amber-700' : 'border-gray-200 text-gray-500 hover:text-amber-500 hover:border-amber-300')}
                         title={isPinned ? 'Loslösen' : 'Anpinnen'}>
                         {isPinned ? <PinOff className="w-3 h-3" /> : <Pin className="w-3 h-3" />}
@@ -3398,14 +3398,14 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                 {/* Emoji Picker Popup */}
                 {showEmojiFor === msg.id && (
                   <div
-                    className={cn('absolute z-30 flex gap-1 p-2 bg-white rounded-2xl shadow-2xl border border-gray-200 bottom-full mb-2',
+                    className={cn('absolute z-30 flex gap-1 p-2 bg-mn-elevated rounded-2xl shadow-2xl border border-gray-200 bottom-full mb-2',
                       isMe ? 'right-0' : 'left-0')}
                     onClick={e => e.stopPropagation()}
                   >
                     {QUICK_EMOJIS.map(emoji => (
                       <button key={emoji} onClick={() => onReaction(msg.id, emoji)}
                         className={cn('w-8 h-8 rounded-xl text-base flex items-center justify-center hover:bg-gray-100 transition-all hover:scale-110',
-                          myReactions[emoji] ? 'bg-primary-100 ring-2 ring-primary-400' : '')}>
+                          myReactions[emoji] ? 'bg-mn-amber/10 ring-2 ring-primary-400' : '')}>
                         {emoji}
                       </button>
                     ))}
@@ -3421,8 +3421,8 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                       title={reactionUsers[emoji]?.join(', ') || ''}
                       className={cn('flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition-all hover:scale-105',
                         myReactions[emoji]
-                          ? 'bg-primary-100 border-primary-300 text-primary-700 shadow-sm'
-                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50')}>
+                          ? 'bg-mn-amber/10 border-primary-300 text-mn-amber shadow-sm'
+                          : 'bg-mn-elevated border-gray-200 text-gray-600 hover:bg-gray-50')}>
                       <span>{emoji}</span>
                       {count > 1 && <span className="font-semibold">{count}</span>}
                     </button>
@@ -3471,18 +3471,18 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       'relative group flex items-center gap-3 px-3 py-2.5 cursor-pointer',
       'transition-all duration-200',
       active
-        ? 'bg-primary-50 border-l-2 border-primary-500 shadow-[inset_3px_0_0_#1EAAA6]'
+        ? 'bg-mn-amber/5 border-l-2 border-mn-amber shadow-[inset_3px_0_0_#1EAAA6]'
         : 'hover:bg-gray-50 border-l-2 border-transparent hover:translate-x-0.5',
       unread > 0 && !active && 'bg-blue-50/50'
     )} onClick={onClick}>
       <div className="relative flex-shrink-0">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center text-primary-700 text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center text-mn-amber text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
           {avatarUrl ? <Image src={avatarUrl} alt="" width={40} height={40} className="w-full h-full object-cover" />
             : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
         </div>
         {isOnline && (
           <span
-            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-primary-500 border-2 border-white shadow-glow"
+            className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-mn-amber border-2 border-white shadow-glow"
             title="Online"
           />
         )}
@@ -3504,16 +3504,16 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
         {conv.last_message && <span className="text-xs text-gray-400">{formatRelativeTime(conv.last_message.created_at)}</span>}
         {isOnline ? (
-          <span className="text-[9px] font-semibold text-primary-600 uppercase tracking-wide">Online</span>
+          <span className="text-[9px] font-semibold text-mn-amber uppercase tracking-wide">Online</span>
         ) : lastSeenLabel ? (
           <span className="text-[9px] text-gray-400">{lastSeenLabel}</span>
-        ) : unread > 0 ? <span className="w-4 h-4 bg-primary-600 rounded-full" />
-          : conv.last_message?.sender_id === userId ? <Check className="w-3 h-3 text-stone-400" /> : null}
+        ) : unread > 0 ? <span className="w-4 h-4 bg-mn-amber rounded-full" />
+          : conv.last_message?.sender_id === userId ? <Check className="w-3 h-3 text-mn-ghost" /> : null}
       </div>
 
       {/* Delete button – visible on hover */}
       {confirmDelete ? (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-white rounded-lg shadow-md border border-red-200 px-2 py-1"
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-mn-elevated rounded-lg shadow-md border border-red-200 px-2 py-1"
           onClick={e => e.stopPropagation()}>
           <span className="text-xs text-red-600 font-semibold whitespace-nowrap">Löschen?</span>
           <button onClick={e => { e.stopPropagation(); onDelete(conv.id) }}
@@ -3525,7 +3525,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
         <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
           <button
             onClick={e => { e.stopPropagation(); setConfirmDelete(true) }}
-            className="w-6 h-6 flex items-center justify-center rounded-md text-stone-400 hover:text-red-500 hover:bg-red-50 transition-all"
+            className="w-6 h-6 flex items-center justify-center rounded-md text-mn-ghost hover:text-red-500 hover:bg-red-50 transition-all"
             title="Konversation löschen">
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -3596,7 +3596,7 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+      <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div>
             <h3 className="font-bold text-gray-900 text-lg">Neue Unterhaltung</h3>
@@ -3608,7 +3608,7 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
           {selected.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {selected.map(p => (
-                <span key={p.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
+                <span key={p.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-mn-amber/10 text-mn-amber rounded-full text-sm font-medium">
                   {p.name ?? p.email?.split('@')[0]}
                   <button onClick={() => toggle(p)}><X className="w-3.5 h-3.5" /></button>
                 </span>
@@ -3631,15 +3631,15 @@ function NewChatModal({ userId, onClose, onCreated }: { userId: string; onClose:
               return (
                 <button key={p.id} onClick={() => toggle(p)}
                   className={cn('w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left',
-                    isSel ? 'bg-primary-50 border border-primary-200' : 'hover:bg-gray-50 border border-transparent')}>
-                  <div className="w-9 h-9 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-bold flex-shrink-0 overflow-hidden">
+                    isSel ? 'bg-mn-amber/5 border border-mn-amber/20' : 'hover:bg-gray-50 border border-transparent')}>
+                  <div className="w-9 h-9 rounded-full bg-mn-amber/10 flex items-center justify-center text-mn-amber text-sm font-bold flex-shrink-0 overflow-hidden">
                     {p.avatar_url ? <Image src={p.avatar_url} alt="" width={36} height={36} className="w-full h-full rounded-full object-cover" /> : (p.name ?? p.email ?? '?')[0].toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">{p.name ?? p.email?.split('@')[0] ?? 'Unbekannt'}</p>
                     <p className="text-xs text-gray-500 truncate">{p.nickname ? '@' + p.nickname : p.email}</p>
                   </div>
-                  {isSel && <div className="w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
+                  {isSel && <div className="w-5 h-5 rounded-full bg-mn-amber flex items-center justify-center flex-shrink-0">
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   </div>}
                 </button>

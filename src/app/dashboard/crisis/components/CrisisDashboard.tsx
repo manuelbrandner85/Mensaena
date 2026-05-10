@@ -14,7 +14,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[0, 1, 2, 3].map(i => (
-          <div key={i} className="h-24 rounded-2xl animate-pulse bg-stone-100 border border-stone-200" />
+          <div key={i} className="h-24 rounded-2xl animate-pulse bg-mn-elevated border border-white/5" />
         ))}
       </div>
     )
@@ -37,10 +37,10 @@ export default function CrisisDashboard({ stats, loading }: Props) {
       label: 'Aktive Helfer',
       value: stats.total_active_helpers,
       icon: Users,
-      bg: 'bg-primary-50',
-      border: 'border-primary-200',
-      text: 'text-primary-700',
-      iconBg: 'bg-primary-100',
+      bg: 'bg-mn-amber/5',
+      border: 'border-mn-amber/20',
+      text: 'text-mn-amber',
+      iconBg: 'bg-mn-amber/10',
     },
     {
       label: 'Gelöst (30 Tage)',
@@ -83,7 +83,7 @@ export default function CrisisDashboard({ stats, loading }: Props) {
               )}
             </div>
             <p className={cn('text-2xl font-black', card.text)}>{card.value}</p>
-            <p className="text-xs text-ink-500 mt-0.5">{card.label}</p>
+            <p className="text-xs text-mn-mute mt-0.5">{card.label}</p>
           </div>
         )
       })}

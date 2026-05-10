@@ -140,7 +140,7 @@ export default function CreateGroupPage() {
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-ink-500 hover:text-ink-800 transition-colors mb-6"
+        className="flex items-center gap-2 text-sm text-mn-mute hover:text-mn-ink transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Zurück zu Gruppen
@@ -148,22 +148,22 @@ export default function CreateGroupPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* ── Form ─────────────────────────────────────────────── */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-soft overflow-hidden">
+        <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-stone-100">
-            <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
+            <div className="w-9 h-9 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
               <span className="text-xl leading-none">{selectedCat.emoji}</span>
             </div>
             <div>
-              <h1 className="text-base font-semibold text-ink-900">Neue Gruppe erstellen</h1>
-              <p className="text-xs text-ink-400 mt-0.5">Bringe deine Nachbarschaft zusammen</p>
+              <h1 className="text-base font-semibold text-mn-ink">Neue Gruppe erstellen</h1>
+              <p className="text-xs text-mn-mute mt-0.5">Bringe deine Nachbarschaft zusammen</p>
             </div>
           </div>
 
           <div className="p-6 space-y-4">
-            <div className="flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-xl px-3 py-2">
-              <Shield className="w-4 h-4 text-primary-500 flex-shrink-0" />
-              <p className="text-xs text-primary-700">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
+            <div className="flex items-center gap-2 bg-mn-amber/5 border border-mn-amber/20 rounded-xl px-3 py-2">
+              <Shield className="w-4 h-4 text-mn-amber flex-shrink-0" />
+              <p className="text-xs text-mn-amber">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
             </div>
 
             <div>
@@ -183,7 +183,7 @@ export default function CreateGroupPage() {
 
             <div>
               <label className="label">
-                Beschreibung <span className="font-normal text-ink-400">({description.length}/500)</span>
+                Beschreibung <span className="font-normal text-mn-mute">({description.length}/500)</span>
               </label>
               <textarea
                 value={description}
@@ -207,7 +207,7 @@ export default function CreateGroupPage() {
                       'flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium text-left transition-all',
                       category === c.value
                         ? 'border-transparent text-white'
-                        : 'bg-white text-ink-700 border-stone-200 hover:border-stone-300',
+                        : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-white/8',
                     )}
                     style={category === c.value ? { backgroundColor: c.accent, borderColor: c.accent } : undefined}
                   >
@@ -228,7 +228,7 @@ export default function CreateGroupPage() {
                 {avatarPreview ? (
                   <div className="relative w-20 h-20">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={avatarPreview} alt="" className="w-20 h-20 rounded-xl object-cover border border-stone-200" />
+                    <img src={avatarPreview} alt="" className="w-20 h-20 rounded-xl object-cover border border-white/5" />
                     <button type="button" onClick={() => { setAvatarFile(null); setAvatarPreview(null) }}
                       className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
                       <X className="w-3 h-3 text-white" />
@@ -236,7 +236,7 @@ export default function CreateGroupPage() {
                   </div>
                 ) : (
                   <button type="button" onClick={() => avatarInputRef.current?.click()}
-                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-xs text-ink-500 hover:text-primary-600 transition-colors">
+                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-white/8 hover:border-primary-400 rounded-xl text-xs text-mn-mute hover:text-mn-amber transition-colors">
                     <Camera className="w-3.5 h-3.5" /> Hochladen
                   </button>
                 )}
@@ -246,7 +246,7 @@ export default function CreateGroupPage() {
                 {bannerPreview ? (
                   <div className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={bannerPreview} alt="" className="w-full h-16 rounded-xl object-cover border border-stone-200" />
+                    <img src={bannerPreview} alt="" className="w-full h-16 rounded-xl object-cover border border-white/5" />
                     <button type="button" onClick={() => { setBannerFile(null); setBannerPreview(null) }}
                       className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-ink-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
                       <X className="w-3 h-3 text-white" />
@@ -254,7 +254,7 @@ export default function CreateGroupPage() {
                   </div>
                 ) : (
                   <button type="button" onClick={() => bannerInputRef.current?.click()}
-                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-xs text-ink-500 hover:text-primary-600 transition-colors w-full">
+                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-white/8 hover:border-primary-400 rounded-xl text-xs text-mn-mute hover:text-mn-amber transition-colors w-full">
                     <Camera className="w-3.5 h-3.5" /> Hochladen
                   </button>
                 )}
@@ -274,7 +274,7 @@ export default function CreateGroupPage() {
                 {isPrivate ? <Lock className="w-4 h-4" /> : <Globe className="w-4 h-4" />}
                 {isPrivate ? 'Privat' : 'Öffentlich'}
               </button>
-              <span className="text-xs text-ink-500">
+              <span className="text-xs text-mn-mute">
                 {isPrivate ? 'Nur auf Einladung' : 'Jeder kann beitreten'}
               </span>
             </div>
@@ -292,8 +292,8 @@ export default function CreateGroupPage() {
 
         {/* ── Live Preview ──────────────────────────────────────── */}
         <div className="sticky top-6">
-          <p className="text-xs font-bold uppercase tracking-widest text-ink-400 mb-3 px-1">Vorschau</p>
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-soft overflow-hidden">
+          <p className="text-xs font-bold uppercase tracking-widest text-mn-mute mb-3 px-1">Vorschau</p>
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
             {/* Card header */}
             <div className={cn('relative h-32 bg-gradient-to-br flex items-center justify-center overflow-hidden', selectedCat.color)}>
               {bannerPreview && (
@@ -322,23 +322,23 @@ export default function CreateGroupPage() {
 
             {/* Card body */}
             <div className="p-4">
-              <h3 className="font-bold text-ink-900 text-sm leading-snug line-clamp-1 mb-1">
-                {name.trim() || <span className="text-ink-300 font-normal italic">Gruppenname…</span>}
+              <h3 className="font-bold text-mn-ink text-sm leading-snug line-clamp-1 mb-1">
+                {name.trim() || <span className="text-mn-ghost font-normal italic">Gruppenname…</span>}
               </h3>
               {description.trim() ? (
-                <p className="text-xs text-ink-500 line-clamp-2 mb-3">{description}</p>
+                <p className="text-xs text-mn-mute line-clamp-2 mb-3">{description}</p>
               ) : (
-                <p className="text-xs text-ink-300 italic mb-3">Keine Beschreibung</p>
+                <p className="text-xs text-mn-ghost italic mb-3">Keine Beschreibung</p>
               )}
-              <div className="flex items-center gap-3 text-xs text-ink-400 mb-3">
+              <div className="flex items-center gap-3 text-xs text-mn-mute mb-3">
                 <span className="flex items-center gap-1">
                   <span style={{ color: selectedCat.accent }}>👥</span>
-                  <span className="font-semibold text-ink-700">1</span>
+                  <span className="font-semibold text-mn-ink-soft">1</span>
                   <span>Mitglied</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <span style={{ color: selectedCat.accent }}>💬</span>
-                  <span className="font-semibold text-ink-700">0</span>
+                  <span className="font-semibold text-mn-ink-soft">0</span>
                   <span>Beiträge</span>
                 </span>
               </div>
@@ -350,7 +350,7 @@ export default function CreateGroupPage() {
               </div>
             </div>
           </div>
-          <p className="text-[11px] text-ink-400 mt-2 px-1">So sieht deine Gruppe in der Übersicht aus.</p>
+          <p className="text-[11px] text-mn-mute mt-2 px-1">So sieht deine Gruppe in der Übersicht aus.</p>
         </div>
       </div>
     </div>

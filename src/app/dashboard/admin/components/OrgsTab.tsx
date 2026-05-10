@@ -166,16 +166,16 @@ export default function OrgsTab() {
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
           <input type="text" inputMode="search" value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Organisation suchen..."
-            className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+            className="w-full pl-9 pr-4 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
         <select value={verifiedFilter} onChange={e => { setVerified(e.target.value); setPage(0) }}
           aria-label="Verifiziert-Status filtern"
-          className="px-3 py-2.5 border border-stone-200 rounded-xl text-sm">
+          className="px-3 py-2.5 border border-white/5 rounded-xl text-sm">
           <option value="">Alle</option>
           <option value="true">Verifiziert</option>
           <option value="false">Nicht verifiziert</option>
@@ -188,54 +188,54 @@ export default function OrgsTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-primary-600 rounded-full animate-spin" />
         </div>
       ) : (
         <>
-          <p className="text-sm text-ink-500">{total} Organisationen</p>
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+          <p className="text-sm text-mn-mute">{total} Organisationen</p>
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-stone-50 border-b border-stone-100">
+                <thead className="bg-mn-surface border-b border-white/5">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Name</th>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Kategorie</th>
-                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Verifiziert</th>
-                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Erstellt</th>
-                    <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Name</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Kategorie</th>
+                    <th className="text-center px-4 py-3 font-semibold text-mn-ink-soft">Verifiziert</th>
+                    <th className="text-center px-4 py-3 font-semibold text-mn-ink-soft">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Erstellt</th>
+                    <th className="text-right px-4 py-3 font-semibold text-mn-ink-soft">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
                   {orgs.map(o => (
-                    <tr key={o.id} className="hover:bg-stone-50 transition-colors">
+                    <tr key={o.id} className="hover:bg-mn-surface transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4 text-teal-500 shrink-0" />
-                          <span className="font-medium text-ink-900 truncate max-w-48">{o.name}</span>
+                          <span className="font-medium text-mn-ink truncate max-w-48">{o.name}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-ink-600 text-xs">{o.category ? (CATEGORY_LABELS[o.category] ?? o.category) : '-'}</td>
+                      <td className="px-4 py-3 text-mn-ink-soft text-xs">{o.category ? (CATEGORY_LABELS[o.category] ?? o.category) : '-'}</td>
                       <td className="px-4 py-3 text-center">
                         <button onClick={() => handleToggleVerified(o.id, o.is_verified)}
                           className={`w-10 h-5 rounded-full transition-all relative ${o.is_verified ? 'bg-green-500' : 'bg-stone-300'}`}>
-                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${o.is_verified ? 'left-5' : 'left-0.5'}`} />
+                          <span className={`absolute top-0.5 w-4 h-4 bg-mn-elevated rounded-full shadow transition-all ${o.is_verified ? 'left-5' : 'left-0.5'}`} />
                         </button>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${o.is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600'}`}>
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${o.is_active ? 'bg-green-100 text-green-700' : 'bg-mn-elevated text-mn-ink-soft'}`}>
                           {o.is_active ? 'Aktiv' : 'Inaktiv'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-ink-500 text-xs">{new Date(o.created_at).toLocaleDateString('de-AT')}</td>
+                      <td className="px-4 py-3 text-mn-mute text-xs">{new Date(o.created_at).toLocaleDateString('de-AT')}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(o)}
-                            className="p-1.5 rounded-lg text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(o.id, o.name)}
-                            className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -243,7 +243,7 @@ export default function OrgsTab() {
                     </tr>
                   ))}
                   {orgs.length === 0 && (
-                    <tr><td colSpan={6} className="px-4 py-12 text-center text-ink-400">Keine Organisationen</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-12 text-center text-mn-mute">Keine Organisationen</td></tr>
                   )}
                 </tbody>
               </table>
@@ -252,12 +252,12 @@ export default function OrgsTab() {
 
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-mn-ink-soft hover:text-mn-ink disabled:opacity-40">
               <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
-            <span className="text-sm text-ink-500">Seite {page + 1}</span>
+            <span className="text-sm text-mn-mute">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={orgs.length < PAGE_SIZE}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-mn-ink-soft hover:text-mn-ink disabled:opacity-40">
               Weiter <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -266,28 +266,28 @@ export default function OrgsTab() {
       {/* ── Edit Modal ── */}
       {editOrg && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <input ref={logoInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleOrgImageUpload(f, 'logo_url'); e.target.value = '' }} />
             <input ref={coverInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleOrgImageUpload(f, 'cover_image_url'); e.target.value = '' }} />
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-ink-900 flex items-center gap-2">
+              <h3 className="font-bold text-mn-ink flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Organisation bearbeiten
               </h3>
-              <button onClick={() => setEditOrg(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setEditOrg(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
               </button>
             </div>
             {/* Image uploads */}
             <div className="flex gap-3">
               <div className="flex flex-col items-center gap-1">
-                <div className="relative w-16 h-16 rounded-xl border border-stone-200 bg-stone-50 overflow-hidden">
+                <div className="relative w-16 h-16 rounded-xl border border-white/5 bg-mn-surface overflow-hidden">
                   {(editOrg as AdminOrg & { logo_url?: string | null }).logo_url ? (
                     <img src={(editOrg as AdminOrg & { logo_url?: string | null }).logo_url!} alt="" className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   ) : (
-                    <Building2 className="w-7 h-7 text-stone-400 absolute inset-0 m-auto" />
+                    <Building2 className="w-7 h-7 text-mn-ghost absolute inset-0 m-auto" />
                   )}
                 </div>
                 <button type="button" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}
@@ -297,12 +297,12 @@ export default function OrgsTab() {
                 </button>
               </div>
               <div className="flex-1 flex flex-col gap-1">
-                <div className="relative w-full h-16 rounded-xl border border-stone-200 bg-stone-50 overflow-hidden">
+                <div className="relative w-full h-16 rounded-xl border border-white/5 bg-mn-surface overflow-hidden">
                   {(editOrg as AdminOrg & { cover_image_url?: string | null }).cover_image_url ? (
                     <img src={(editOrg as AdminOrg & { cover_image_url?: string | null }).cover_image_url!} alt="" className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = 'none' }} />
                   ) : (
-                    <span className="text-xs text-ink-400 absolute inset-0 flex items-center justify-center">Kein Titelbild</span>
+                    <span className="text-xs text-mn-mute absolute inset-0 flex items-center justify-center">Kein Titelbild</span>
                   )}
                 </div>
                 <button type="button" onClick={() => coverInputRef.current?.click()} disabled={coverUploading}
@@ -314,22 +314,22 @@ export default function OrgsTab() {
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-ink-500 mb-1">Name</label>
+                <label className="block text-xs font-semibold text-mn-mute mb-1">Name</label>
                 <input value={editName} onChange={e => setEditName(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
+                <label className="block text-xs font-semibold text-mn-mute mb-1">Kategorie</label>
                 <select value={editCategory} onChange={e => setEditCategory(e.target.value)}
                   aria-label="Kategorie"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="">— bitte wählen —</option>
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setEditOrg(null)} className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
+              <button onClick={() => setEditOrg(null)} className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft rounded-xl text-sm font-semibold hover:bg-mn-raised transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}
@@ -345,34 +345,34 @@ export default function OrgsTab() {
       {/* ── Create Modal ── */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-ink-900 flex items-center gap-2">
+              <h3 className="font-bold text-mn-ink flex items-center gap-2">
                 <PlusCircle className="w-5 h-5 text-green-500" /> Neue Organisation
               </h3>
-              <button onClick={() => setShowCreate(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setShowCreate(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-ink-500 mb-1">Name *</label>
+                <label className="block text-xs font-semibold text-mn-mute mb-1">Name *</label>
                 <input value={newName} onChange={e => setNewName(e.target.value)}
                   placeholder="Organisation Name"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink-500 mb-1">Kategorie</label>
+                <label className="block text-xs font-semibold text-mn-mute mb-1">Kategorie</label>
                 <select value={newCategory} onChange={e => setNewCategory(e.target.value)}
                   aria-label="Kategorie"
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="">— bitte wählen —</option>
                   {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
               </div>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
+              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft rounded-xl text-sm font-semibold hover:bg-mn-raised transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleCreate} disabled={creating}

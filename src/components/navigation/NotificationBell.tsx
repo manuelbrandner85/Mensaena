@@ -41,11 +41,11 @@ const ICON_MAP: Record<string, typeof Bell> = {
 
 const COLOR_MAP: Record<string, string> = {
   blue: 'bg-blue-100 text-blue-600',
-  primary: 'bg-primary-100 text-primary-600',
+  primary: 'bg-mn-amber/10 text-mn-amber',
   amber: 'bg-amber-100 text-amber-600',
   purple: 'bg-purple-100 text-purple-600',
   indigo: 'bg-indigo-100 text-indigo-600',
-  gray: 'bg-stone-100 text-ink-600',
+  gray: 'bg-mn-elevated text-mn-ink-soft',
   pink: 'bg-pink-100 text-pink-600',
   orange: 'bg-orange-100 text-orange-600',
   red: 'bg-red-100 text-red-600',
@@ -179,8 +179,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
       <button
         onClick={handleBellClick}
         className={cn(
-          'relative p-2 rounded-xl text-ink-500 hover:bg-warm-100 hover:text-ink-700 transition-colors',
-          open && 'bg-warm-100 text-ink-700',
+          'relative p-2 rounded-xl text-mn-mute hover:bg-warm-100 hover:text-mn-ink-soft transition-colors',
+          open && 'bg-warm-100 text-mn-ink-soft',
         )}
         title={t('buttonTitle')}
         aria-label={unread > 0 ? t('buttonAriaUnread', { count: unread }) : t('buttonTitle')}
@@ -198,7 +198,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
       {/* ── Desktop Notification Center Dropdown ── */}
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 w-[420px] bg-white rounded-2xl shadow-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in"
+          className="absolute right-0 top-full mt-2 w-[420px] bg-mn-elevated rounded-2xl shadow-cinema-card-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in"
           role="dialog"
           aria-label={t('center')}
         >
@@ -206,7 +206,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           <div className="px-4 py-3 border-b border-warm-100">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-ink-900 text-sm">{t('title')}</h3>
+                <h3 className="font-semibold text-mn-ink text-sm">{t('title')}</h3>
                 {unread > 0 && (
                   <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
                     {unread} {t('new')}
@@ -217,7 +217,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                 {unread > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium px-2 py-1 rounded-lg hover:bg-primary-50 transition-colors"
+                    className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium px-2 py-1 rounded-lg hover:bg-mn-amber/5 transition-colors"
                     title={t('markAllReadTitle')}
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
@@ -227,12 +227,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                 <Link
                   href="/dashboard/settings?tab=notifications"
                   onClick={() => setOpen(false)}
-                  className="p-1.5 rounded-lg text-ink-400 hover:text-ink-600 hover:bg-stone-50 transition-colors"
+                  className="p-1.5 rounded-lg text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated/[0.02] transition-colors"
                   title={t('settingsTitle')}
                 >
                   <Settings className="w-3.5 h-3.5" />
                 </Link>
-                <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-ink-400 hover:text-ink-600 hover:bg-stone-50 transition-colors">
+                <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated/[0.02] transition-colors">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -250,8 +250,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     className={cn(
                       'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
                       filter === tab.key
-                        ? 'bg-primary-100 text-primary-700 shadow-sm'
-                        : 'text-ink-500 hover:bg-stone-100 hover:text-ink-700',
+                        ? 'bg-mn-amber/10 text-mn-amber shadow-sm'
+                        : 'text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-ink-soft',
                     )}
                   >
                     <TabIcon className="w-3 h-3" />
@@ -271,14 +271,14 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           <div className="max-h-[420px] overflow-y-auto">
             {loading && filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
-                <div className="w-6 h-6 border-2 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-xs text-ink-400">{t('loading')}</p>
+                <div className="w-6 h-6 border-2 border-mn-amber/20 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
+                <p className="text-xs text-mn-mute">{t('loading')}</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
-                <Bell className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-                <p className="text-sm text-ink-400">{t('empty')}</p>
-                <p className="text-xs text-stone-400 mt-1">
+                <Bell className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
+                <p className="text-sm text-mn-mute">{t('empty')}</p>
+                <p className="text-xs text-mn-ghost mt-1">
                   {filter !== 'all' ? t('emptyCategory') : t('emptyUpToDate')}
                 </p>
               </div>
@@ -293,13 +293,13 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     key={n.id}
                     onClick={() => handleItemClick(n)}
                     className={cn(
-                      'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-stone-50 transition-colors border-b border-warm-50 last:border-0 group relative',
-                      !n.read && 'bg-primary-50/40',
+                      'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-mn-elevated/[0.02] transition-colors border-b border-warm-50 last:border-0 group relative',
+                      !n.read && 'bg-mn-amber/5/40',
                     )}
                   >
                     {/* Unread indicator bar */}
                     {!n.read && (
-                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-500 rounded-r" />
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-mn-amber rounded-r" />
                     )}
 
                     {/* Avatar or icon */}
@@ -323,18 +323,18 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     <div className="flex-1 min-w-0">
                       <p className={cn(
                         'text-sm leading-snug',
-                        n.read ? 'text-ink-600' : 'text-ink-900 font-medium',
+                        n.read ? 'text-mn-ink-soft' : 'text-mn-ink font-medium',
                       )}>
                         {n.actor_name && <span className="font-semibold">{n.actor_name} </span>}
                         {n.title || n.content}
                       </p>
                       {n.content && n.title && (
-                        <p className="text-xs text-ink-500 line-clamp-2 mt-0.5">{n.content}</p>
+                        <p className="text-xs text-mn-mute line-clamp-2 mt-0.5">{n.content}</p>
                       )}
                       <div className="flex items-center gap-2 mt-1">
-                        <p className="text-[11px] text-ink-400">{formatRelativeTime(n.created_at)}</p>
+                        <p className="text-[11px] text-mn-mute">{formatRelativeTime(n.created_at)}</p>
                         {!n.read && (
-                          <span className="text-xs font-semibold text-primary-600 bg-primary-100 px-1.5 py-0.5 rounded-full">
+                          <span className="text-xs font-semibold text-mn-amber bg-mn-amber/10 px-1.5 py-0.5 rounded-full">
                             {t('newBadge')}
                           </span>
                         )}
@@ -345,7 +345,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     <div className="flex flex-col items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => handleDelete(e, n)}
-                        className="p-1 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="p-1 rounded-lg text-mn-ghost hover:text-red-500 hover:bg-red-50 transition-colors"
                         title={t('delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -353,7 +353,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     </div>
 
                     {/* Unread dot (fallback) */}
-                    {!n.read && <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0 group-hover:hidden" />}
+                    {!n.read && <div className="w-2 h-2 bg-mn-amber rounded-full mt-2 flex-shrink-0 group-hover:hidden" />}
                   </button>
                 )
               })
@@ -361,15 +361,15 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2.5 border-t border-warm-100 flex items-center justify-between bg-stone-50/50">
+          <div className="px-4 py-2.5 border-t border-warm-100 flex items-center justify-between bg-mn-surface/50">
             <Link
               href="/dashboard/notifications"
               onClick={() => setOpen(false)}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium hover:underline"
+              className="text-sm text-mn-amber hover:text-mn-amber font-medium hover:underline"
             >
               {t('viewAll')}
             </Link>
-            <span className="text-xs text-ink-400">
+            <span className="text-xs text-mn-mute">
               {unread > 0
                 ? t('countOfUnread', { shown: filteredNotifications.length, total: unread })
                 : t('countOfAll', { shown: filteredNotifications.length })}

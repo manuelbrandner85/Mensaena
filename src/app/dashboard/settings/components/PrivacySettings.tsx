@@ -49,8 +49,8 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
   const visibilityColor = local.profile_visibility === 'public'
     ? 'text-blue-600 bg-blue-50 border-blue-200'
     : local.profile_visibility === 'neighbors'
-      ? 'text-primary-700 bg-primary-50 border-primary-200'
-      : 'text-ink-700 bg-stone-100 border-stone-300'
+      ? 'text-mn-amber bg-mn-amber/5 border-mn-amber/20'
+      : 'text-mn-ink-soft bg-mn-elevated border-white/8'
   const messagesLabel = local.allow_messages_from === 'everyone'
     ? t('messagesEveryone')
     : local.allow_messages_from === 'trusted' ? t('messagesTrusted') : t('messagesNobody')
@@ -61,8 +61,8 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
       {/* Datenschutz-Zentrum – Übersicht */}
       <div className="bg-gradient-to-br from-primary-50 to-stone-50 border border-primary-100 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <ShieldCheck className="w-5 h-5 text-primary-700" />
-          <h3 className="font-bold text-ink-800">{t('centerTitle')}</h3>
+          <ShieldCheck className="w-5 h-5 text-mn-amber" />
+          <h3 className="font-bold text-mn-ink">{t('centerTitle')}</h3>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           <div className={`rounded-xl border p-3 ${visibilityColor}`}>
@@ -72,38 +72,38 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
             </div>
             <p className="text-sm font-bold leading-tight">{visibilityLabel}</p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-white p-3">
+          <div className="rounded-xl border border-white/5 bg-mn-elevated p-3">
             <div className="flex items-center gap-1.5 mb-1">
-              <MessageCircle className="w-3.5 h-3.5 text-ink-500" />
-              <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t('centerMessages')}</span>
+              <MessageCircle className="w-3.5 h-3.5 text-mn-mute" />
+              <span className="text-xs font-semibold uppercase tracking-wide text-mn-mute">{t('centerMessages')}</span>
             </div>
-            <p className="text-sm font-bold leading-tight text-ink-800">{messagesLabel}</p>
+            <p className="text-sm font-bold leading-tight text-mn-ink">{messagesLabel}</p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-white p-3">
+          <div className="rounded-xl border border-white/5 bg-mn-elevated p-3">
             <div className="flex items-center gap-1.5 mb-1">
-              <Eye className="w-3.5 h-3.5 text-ink-500" />
-              <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t('centerOnline')}</span>
+              <Eye className="w-3.5 h-3.5 text-mn-mute" />
+              <span className="text-xs font-semibold uppercase tracking-wide text-mn-mute">{t('centerOnline')}</span>
             </div>
-            <p className="text-sm font-bold leading-tight text-ink-800">
+            <p className="text-sm font-bold leading-tight text-mn-ink">
               {local.show_online_status ? t('statusVisible') : t('statusHidden')}
             </p>
           </div>
-          <div className="rounded-xl border border-stone-200 bg-white p-3">
+          <div className="rounded-xl border border-white/5 bg-mn-elevated p-3">
             <div className="flex items-center gap-1.5 mb-1">
-              <UserX className="w-3.5 h-3.5 text-ink-500" />
-              <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t('centerBlocked')}</span>
+              <UserX className="w-3.5 h-3.5 text-mn-mute" />
+              <span className="text-xs font-semibold uppercase tracking-wide text-mn-mute">{t('centerBlocked')}</span>
             </div>
-            <p className="text-sm font-bold leading-tight text-ink-800">
+            <p className="text-sm font-bold leading-tight text-mn-ink">
               {t('blockedCountLabel', { count: blockedUsers.length })}
             </p>
           </div>
         </div>
-        <p className="text-xs text-ink-500 mt-3 leading-relaxed">{t('centerSummary')}</p>
+        <p className="text-xs text-mn-mute mt-3 leading-relaxed">{t('centerSummary')}</p>
       </div>
 
       {/* Profile Visibility */}
       <SettingsSection
-        icon={<Eye className="w-4 h-4 text-primary-700" />}
+        icon={<Eye className="w-4 h-4 text-mn-amber" />}
         title={t('sectionVisibilityTitle')}
         description={t('sectionVisibilityDesc')}
       >
@@ -146,7 +146,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Communication */}
       <SettingsSection
-        icon={<MessageCircle className="w-4 h-4 text-primary-700" />}
+        icon={<MessageCircle className="w-4 h-4 text-mn-amber" />}
         title={t('sectionCommTitle')}
         description={t('sectionCommDesc')}
       >
@@ -177,7 +177,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Blocked Users */}
       <SettingsSection
-        icon={<UserX className="w-4 h-4 text-primary-700" />}
+        icon={<UserX className="w-4 h-4 text-mn-amber" />}
         title={t('sectionBlockedTitle')}
         description={t('sectionBlockedDesc', { count: blockedUsers.length })}
       >
@@ -186,20 +186,20 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* GDPR Info */}
       <SettingsSection
-        icon={<Shield className="w-4 h-4 text-primary-700" />}
+        icon={<Shield className="w-4 h-4 text-mn-amber" />}
         title={t('sectionGdprTitle')}
         description={t('sectionGdprDesc')}
       >
-        <div className="space-y-3 text-sm text-ink-600">
+        <div className="space-y-3 text-sm text-mn-ink-soft">
           <p>{t('gdprIntro')}</p>
-          <ul className="list-disc list-inside space-y-1 text-xs text-ink-500">
+          <ul className="list-disc list-inside space-y-1 text-xs text-mn-mute">
             <li><strong>{t('gdprRight1')}</strong> {t('gdprRight1Desc')}</li>
             <li><strong>{t('gdprRight2')}</strong> {t('gdprRight2Desc')}</li>
             <li><strong>{t('gdprRight3')}</strong> {t('gdprRight3Desc')}</li>
             <li><strong>{t('gdprRight4')}</strong> {t('gdprRight4Desc')}</li>
             <li><strong>{t('gdprRight5')}</strong> {t('gdprRight5Desc')}</li>
           </ul>
-          <p className="text-xs text-ink-400">{t('gdprContact')}</p>
+          <p className="text-xs text-mn-mute">{t('gdprContact')}</p>
         </div>
       </SettingsSection>
 
@@ -208,7 +208,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {t('saveButton')}

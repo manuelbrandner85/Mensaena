@@ -191,7 +191,7 @@ function CrisisHotlinesWidget() {
   return (
     <div className="space-y-4">
       {/* Wichtiger Hinweis */}
-      <div className="relative bg-gradient-to-br from-cyan-50 via-cyan-50/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-soft overflow-hidden">
+      <div className="relative bg-gradient-to-br from-cyan-50 via-cyan-50/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
@@ -208,16 +208,16 @@ function CrisisHotlinesWidget() {
       </div>
 
       {/* Hotlines */}
-      <div className="relative bg-white border border-stone-100 rounded-2xl overflow-hidden shadow-soft">
+      <div className="relative bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-cinema-card">
         <div
           className="absolute top-0 left-0 right-0 h-[3px] z-10"
           style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
         />
         {/* Header + Länder-Tabs */}
-        <div className="px-4 pt-4 pb-3 border-b border-stone-100">
+        <div className="px-4 pt-4 pb-3 border-b border-white/5">
           <div className="flex items-center gap-2 mb-3">
             <Phone className="w-4 h-4 text-cyan-600 flex-shrink-0" />
-            <p className="text-sm font-bold text-ink-800">Professionelle Krisenhotlines</p>
+            <p className="text-sm font-bold text-mn-ink">Professionelle Krisenhotlines</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             {(['DE', 'AT', 'CH'] as const).map(c => (
@@ -228,7 +228,7 @@ function CrisisHotlinesWidget() {
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
                   country === c
                     ? 'bg-cyan-600 text-white border-cyan-600 shadow-sm'
-                    : 'bg-stone-50 text-ink-600 border-stone-200 hover:bg-stone-100'
+                    : 'bg-mn-surface text-mn-ink-soft border-white/5 hover:bg-mn-elevated'
                 )}
               >
                 {HOTLINES[c].flag} {HOTLINES[c].label}
@@ -253,7 +253,7 @@ function CrisisHotlinesWidget() {
                   href={h.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/80 hover:bg-white rounded-lg font-bold text-sm transition-all border border-current/10"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-mn-elevated/80 hover:bg-mn-elevated rounded-lg font-bold text-sm transition-all border border-current/10"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Online-Chat öffnen →
@@ -261,7 +261,7 @@ function CrisisHotlinesWidget() {
               ) : (
                 <a
                   href={`tel:${h.number.replace(/[\s\-()]/g, '')}`}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-white/80 hover:bg-white rounded-lg font-black text-base tracking-wide transition-all border border-current/10 active:scale-95"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-mn-elevated/80 hover:bg-mn-elevated rounded-lg font-black text-base tracking-wide transition-all border border-current/10 active:scale-95"
                 >
                   <Phone className="w-4 h-4" />
                   {h.number}
@@ -272,8 +272,8 @@ function CrisisHotlinesWidget() {
         </div>
 
         {/* Quelle */}
-        <div className="px-4 py-2 border-t border-stone-100 bg-stone-50/50">
-          <p className="text-xs text-ink-400">
+        <div className="px-4 py-2 border-t border-white/5 bg-mn-surface/50">
+          <p className="text-xs text-mn-mute">
             {country === 'DE'
               ? 'Quellen: telefonseelsorge.de, nummergegenkummer.de, hilfetelefon.de'
               : country === 'AT'
@@ -290,7 +290,7 @@ function CrisisHotlinesWidget() {
           { icon: Heart,         label: 'Einfühlsam',       desc: 'Community unterstützt einander',      color: 'bg-pink-50 text-pink-700' },
           { icon: Shield,        label: 'Sicher & diskret', desc: 'Kein Druck, keine Vorwürfe',          color: 'bg-blue-50 text-blue-700' },
         ].map(f => (
-          <div key={f.label} className={cn('relative p-3 rounded-2xl border border-current/10 shadow-soft hover:shadow-card transition-shadow overflow-hidden', f.color)}>
+          <div key={f.label} className={cn('relative p-3 rounded-2xl border border-current/10 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden', f.color)}>
             <f.icon className="w-5 h-5 mb-1.5" />
             <p className="text-xs font-bold">{f.label}</p>
             <p className="text-xs opacity-70 mt-0.5">{f.desc}</p>

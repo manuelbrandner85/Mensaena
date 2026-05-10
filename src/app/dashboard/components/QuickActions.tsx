@@ -101,7 +101,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
             <Link
               key={s.href}
               href={s.href}
-              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm border border-stone-200 bg-white text-ink-700 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 transition-all"
+              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft hover:bg-mn-amber/5 hover:border-primary-300 hover:text-mn-amber transition-all"
             >
               {s.label}
             </Link>

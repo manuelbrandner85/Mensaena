@@ -65,15 +65,15 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
     return (
       <button
         onClick={() => router.push(`/dashboard/events/${event.id}`)}
-        className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-primary-50/50 transition text-left group"
+        className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-mn-amber/5/50 transition text-left group"
       >
         <div
           className="w-2 h-2 rounded-full flex-shrink-0 group-hover:scale-125 transition-transform"
           style={{ backgroundColor: accent }}
         />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-ink-900 truncate">{event.title}</p>
-          <p className="text-xs text-ink-500">
+          <p className="text-sm font-medium text-mn-ink truncate">{event.title}</p>
+          <p className="text-xs text-mn-mute">
             {event.is_all_day ? 'Ganztägig' : startDate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
             {event.attendee_count > 0 && ` · ${event.attendee_count} Teilnehmer`}
           </p>
@@ -85,9 +85,9 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
   return (
     <div
       className={cn(
-        'hover-lift relative bg-white rounded-2xl border border-stone-100 overflow-hidden cursor-pointer',
+        'hover-lift relative bg-mn-elevated rounded-2xl border border-white/5 overflow-hidden cursor-pointer',
         'transition-all duration-300',
-        'shadow-soft hover:shadow-card',
+        'shadow-cinema-card hover:shadow-cinema-card',
       )}
       onClick={() => router.push(`/dashboard/events/${event.id}`)}
     >
@@ -99,7 +99,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
 
       {/* Event image (wenn vorhanden) */}
       {event.image_url && (
-        <div className="relative h-36 overflow-hidden bg-stone-100">
+        <div className="relative h-36 overflow-hidden bg-mn-elevated">
           <img
             src={event.image_url}
             alt={event.title}
@@ -109,7 +109,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40 pointer-events-none" />
           {isToday(startDate) && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold bg-mn-amber/10 text-mn-amber">
               Heute
             </span>
           )}
@@ -118,7 +118,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
 
       {/* Today ring (nur wenn kein Bild vorhanden) */}
       {isToday(startDate) && !event.image_url && (
-        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-700">
+        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-xs font-bold bg-mn-amber/10 text-mn-amber">
           Heute
         </div>
       )}
@@ -162,12 +162,12 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           </span>
 
           {/* Title */}
-          <h3 className="text-base font-semibold text-ink-900 mt-1.5 line-clamp-1 leading-snug">{event.title}</h3>
+          <h3 className="text-base font-semibold text-mn-ink mt-1.5 line-clamp-1 leading-snug">{event.title}</h3>
 
           {/* Time */}
           <div className="flex items-center gap-1.5 mt-1.5">
-            <Clock className="w-3.5 h-3.5 text-ink-400 flex-shrink-0" />
-            <span className="text-sm text-ink-600 truncate">
+            <Clock className="w-3.5 h-3.5 text-mn-mute flex-shrink-0" />
+            <span className="text-sm text-mn-ink-soft truncate">
               {formatEventDate(event.start_date, event.end_date, event.is_all_day)}
             </span>
           </div>
@@ -175,8 +175,8 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           {/* Location */}
           {event.location_name && (
             <div className="flex items-center gap-1.5 mt-0.5">
-              <MapPin className="w-3.5 h-3.5 text-ink-400 flex-shrink-0" />
-              <span className="text-sm text-ink-600 truncate">{event.location_name}</span>
+              <MapPin className="w-3.5 h-3.5 text-mn-mute flex-shrink-0" />
+              <span className="text-sm text-mn-ink-soft truncate">{event.location_name}</span>
             </div>
           )}
 
@@ -186,18 +186,18 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               {event.profiles?.avatar_url ? (
                 <img src={event.profiles.avatar_url} alt="" className="w-5 h-5 rounded-full object-cover ring-1 ring-stone-100" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-stone-200 flex items-center justify-center text-xs text-ink-600">
+                <div className="w-5 h-5 rounded-full bg-mn-raised flex items-center justify-center text-xs text-mn-ink-soft">
                   {(event.profiles?.display_name || event.profiles?.name || 'A').charAt(0).toUpperCase()}
                 </div>
               )}
-              <span className="text-xs text-ink-500 truncate max-w-[120px]">
+              <span className="text-xs text-mn-mute truncate max-w-[120px]">
                 {event.profiles?.display_name || event.profiles?.name || 'Anonym'}
               </span>
             </div>
 
             <div className="flex items-center gap-1">
-              <Users className="w-3.5 h-3.5 text-ink-400" />
-              <span className="text-xs text-ink-500">
+              <Users className="w-3.5 h-3.5 text-mn-mute" />
+              <span className="text-xs text-mn-mute">
                 {event.max_attendees
                   ? `${event.attendee_count} / ${event.max_attendees}`
                   : event.attendee_count}
@@ -221,8 +221,8 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               className={cn(
                 'shine px-3 py-1.5 rounded-xl text-sm font-medium transition-all',
                 isFull
-                  ? 'bg-stone-100 text-ink-400 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm hover:shadow-md',
+                  ? 'bg-mn-elevated text-mn-mute cursor-not-allowed'
+                  : 'bg-mn-amber text-white hover:bg-primary-700 shadow-sm hover:shadow-md',
               )}
             >
               {isFull ? 'Voll' : 'Teilnehmen'}
@@ -234,10 +234,10 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 className={cn(
                   'inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all',
                   event.my_attendance === 'going'
-                    ? 'text-primary-600 border-primary-300 bg-primary-50'
+                    ? 'text-mn-amber border-primary-300 bg-mn-amber/5'
                     : event.my_attendance === 'interested'
                       ? 'text-amber-600 border-amber-300 bg-amber-50'
-                      : 'text-ink-500 border-stone-300 bg-stone-50',
+                      : 'text-mn-mute border-white/8 bg-mn-surface',
                 )}
               >
                 {event.my_attendance === 'going' && <><Check className="w-3.5 h-3.5" /> Dabei</>}
@@ -247,23 +247,23 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               </button>
 
               {showMenu && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-card border border-stone-100 z-20 min-w-[160px] py-1">
+                <div className="absolute right-0 top-full mt-1 bg-mn-elevated rounded-xl shadow-cinema-card border border-white/5 z-20 min-w-[160px] py-1">
                   {event.my_attendance !== 'going' && (
-                    <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-primary-50 rounded-t-xl">
-                      <Check className="w-3.5 h-3.5 text-primary-600" /> Teilnehmen
+                    <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-amber/5 rounded-t-xl">
+                      <Check className="w-3.5 h-3.5 text-mn-amber" /> Teilnehmen
                     </button>
                   )}
                   {event.my_attendance !== 'interested' && (
-                    <button onClick={() => handleAttend('interested')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-amber-50">
+                    <button onClick={() => handleAttend('interested')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-amber-50">
                       <Star className="w-3.5 h-3.5 text-amber-600" /> Interessiert
                     </button>
                   )}
                   {event.my_attendance !== 'declined' && (
-                    <button onClick={() => handleAttend('declined')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-700 hover:bg-stone-50">
-                      <XIcon className="w-3.5 h-3.5 text-ink-500" /> Absagen
+                    <button onClick={() => handleAttend('declined')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-surface">
+                      <XIcon className="w-3.5 h-3.5 text-mn-mute" /> Absagen
                     </button>
                   )}
-                  <hr className="my-1 border-stone-100" />
+                  <hr className="my-1 border-white/5" />
                   <button onClick={handleRemove} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-xl">
                     <XIcon className="w-3.5 h-3.5" /> Abmelden
                   </button>
@@ -275,7 +275,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           {/* Cost */}
           <span className={cn(
             'text-xs font-semibold',
-            (!event.cost || event.cost === 'kostenlos') ? 'text-primary-600' : 'text-ink-700',
+            (!event.cost || event.cost === 'kostenlos') ? 'text-mn-amber' : 'text-mn-ink-soft',
           )}>
             {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
           </span>

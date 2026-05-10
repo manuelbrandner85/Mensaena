@@ -159,7 +159,7 @@ export default function FoodWarningBanner() {
             >
               {isRecall ? 'Produktrückruf' : 'Warnung'}
             </span>
-            <span className="text-[11px] text-stone-500 dark:text-stone-400">
+            <span className="text-[11px] text-mn-mute dark:text-mn-ghost">
               {formatRelative(warning.publishedDate)}
             </span>
           </div>
@@ -169,7 +169,7 @@ export default function FoodWarningBanner() {
           </p>
 
           {warning.manufacturer && warning.manufacturer !== 'Unbekannt' && (
-            <p className="text-xs text-stone-600 dark:text-stone-300 truncate">
+            <p className="text-xs text-mn-ink-soft dark:text-mn-ghost truncate">
               {warning.manufacturer}
             </p>
           )}
@@ -186,7 +186,7 @@ export default function FoodWarningBanner() {
                 href={warning.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-medium text-stone-600 hover:text-stone-800 dark:text-stone-300 dark:hover:text-stone-100 transition-colors"
+                className="inline-flex items-center gap-1 font-medium text-mn-ink-soft hover:text-stone-800 dark:text-mn-ghost dark:hover:text-stone-100 transition-colors"
               >
                 Details
                 <ExternalLink className="w-3 h-3" aria-hidden="true" />
@@ -199,7 +199,7 @@ export default function FoodWarningBanner() {
           type="button"
           onClick={handleDismiss}
           aria-label="Warnung schließen"
-          className="flex-shrink-0 p-1.5 rounded-lg text-stone-500 hover:bg-black/5 dark:text-stone-400 dark:hover:bg-white/10 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+          className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:bg-black/5 dark:text-mn-ghost dark:hover:bg-mn-elevated/10 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
         >
           <X className="w-4 h-4" aria-hidden="true" />
         </button>

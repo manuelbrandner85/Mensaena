@@ -22,7 +22,7 @@ const baseStyle = {
 export const showToast = {
   success: (message: string) =>
     toast.success(message, {
-      icon: <CheckCircle className="w-5 h-5 text-primary-600" />,
+      icon: <CheckCircle className="w-5 h-5 text-mn-amber" />,
       duration: 3000,
       style: {
         ...baseStyle,

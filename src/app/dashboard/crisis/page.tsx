@@ -24,7 +24,7 @@ import SOSButton from './components/SOSButton'
 const CrisisMap = dynamic(() => import('./components/CrisisMap'), {
   ssr: false,
   loading: () => (
-    <div className="h-[500px] rounded-2xl bg-stone-100 animate-pulse" />
+    <div className="h-[500px] rounded-2xl bg-mn-elevated animate-pulse" />
   ),
 })
 const SOSModal = dynamic(() => import('./components/SOSModal'), {
@@ -104,7 +104,7 @@ export default function CrisisPage() {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition"
               aria-label="Aktualisieren"
             >
               <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
@@ -132,14 +132,14 @@ export default function CrisisPage() {
         <div className="flex items-center gap-2 flex-1 w-full sm:w-auto">
           {/* Search */}
           <div className="relative flex-1 sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
             <input
               type="text"
               inputMode="search"
               value={filters.search}
               onChange={e => setFilters({ search: e.target.value })}
               placeholder="Krisen suchen..."
-              className="w-full pl-9 pr-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+              className="w-full pl-9 pr-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
               aria-label="Krisen durchsuchen"
             />
             {filters.search && (
@@ -148,7 +148,7 @@ export default function CrisisPage() {
                 className="absolute right-3 top-1/2 -translate-y-1/2"
                 aria-label="Suche leeren"
               >
-                <X className="w-4 h-4 text-ink-400" />
+                <X className="w-4 h-4 text-mn-mute" />
               </button>
             )}
           </div>
@@ -156,7 +156,7 @@ export default function CrisisPage() {
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
               'p-2 rounded-xl border transition-colors',
-              showFilters ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white border-stone-200 text-ink-600 hover:bg-stone-50',
+              showFilters ? 'bg-red-50 border-red-200 text-red-600' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface',
             )}
             aria-label="Filter anzeigen"
             aria-expanded={showFilters}
@@ -166,12 +166,12 @@ export default function CrisisPage() {
         </div>
 
         {/* View toggle */}
-        <div className="flex items-center bg-stone-100 rounded-xl p-0.5">
+        <div className="flex items-center bg-mn-elevated rounded-xl p-0.5">
           <button
             onClick={() => setView('list')}
             className={cn(
               'flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-              view === 'list' ? 'bg-white shadow-sm text-ink-900' : 'text-ink-500 hover:text-ink-700',
+              view === 'list' ? 'bg-mn-elevated shadow-sm text-mn-ink' : 'text-mn-mute hover:text-mn-ink-soft',
             )}
           >
             <List className="w-3 h-3" />
@@ -181,7 +181,7 @@ export default function CrisisPage() {
             onClick={() => setView('map')}
             className={cn(
               'flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-              view === 'map' ? 'bg-white shadow-sm text-ink-900' : 'text-ink-500 hover:text-ink-700',
+              view === 'map' ? 'bg-mn-elevated shadow-sm text-mn-ink' : 'text-mn-mute hover:text-mn-ink-soft',
             )}
           >
             <MapIcon className="w-3 h-3" />
@@ -192,15 +192,15 @@ export default function CrisisPage() {
 
       {/* Expanded filters */}
       {showFilters && (
-        <div className="bg-white border border-stone-200 rounded-2xl p-4 mb-4 animate-slide-up">
+        <div className="bg-mn-elevated border border-white/5 rounded-2xl p-4 mb-4 animate-slide-up">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Status filter */}
             <div>
-              <label className="text-xs font-semibold text-ink-600 mb-1 block">Status</label>
+              <label className="text-xs font-semibold text-mn-ink-soft mb-1 block">Status</label>
               <select
                 value={filters.status}
                 onChange={e => setFilters({ status: e.target.value as CrisisStatus | 'all' })}
-                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 aria-label="Status filtern"
               >
                 <option value="all">Alle aktiven</option>
@@ -212,11 +212,11 @@ export default function CrisisPage() {
 
             {/* Category filter */}
             <div>
-              <label className="text-xs font-semibold text-ink-600 mb-1 block">Kategorie</label>
+              <label className="text-xs font-semibold text-mn-ink-soft mb-1 block">Kategorie</label>
               <select
                 value={filters.category}
                 onChange={e => setFilters({ category: e.target.value as CrisisCategory | 'all' })}
-                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 aria-label="Kategorie filtern"
               >
                 <option value="all">Alle</option>
@@ -228,11 +228,11 @@ export default function CrisisPage() {
 
             {/* Urgency filter */}
             <div>
-              <label className="text-xs font-semibold text-ink-600 mb-1 block">Dringlichkeit</label>
+              <label className="text-xs font-semibold text-mn-ink-soft mb-1 block">Dringlichkeit</label>
               <select
                 value={filters.urgency}
                 onChange={e => setFilters({ urgency: e.target.value as CrisisUrgency | 'all' })}
-                className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
                 aria-label="Dringlichkeit filtern"
               >
                 <option value="all">Alle</option>
@@ -256,14 +256,14 @@ export default function CrisisPage() {
 
       {/* Active Crisis Alert Banner */}
       {!loading && crises.filter(c => c.status === 'active' || c.status === 'in_progress').length > 0 && (
-        <div className="relative mb-4 p-4 bg-gradient-to-r from-red-50 via-red-50/80 to-orange-50 border-2 border-red-300 rounded-2xl shadow-soft overflow-hidden animate-pulse-slow">
+        <div className="relative mb-4 p-4 bg-gradient-to-r from-red-50 via-red-50/80 to-orange-50 border-2 border-red-300 rounded-2xl shadow-cinema-card overflow-hidden animate-pulse-slow">
           <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
           />
           <div className="relative flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 shadow-soft ring-1 ring-red-200">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 shadow-cinema-card ring-1 ring-red-200">
               <Siren className="w-5 h-5 text-red-600 animate-bounce" />
             </div>
             <div className="flex-1 min-w-0">
@@ -298,7 +298,7 @@ export default function CrisisPage() {
           {/* Load more trigger */}
           {hasMore && (
             <div ref={loadMoreRef} className="py-4 text-center">
-              <div className="inline-flex items-center gap-2 text-sm text-ink-500">
+              <div className="inline-flex items-center gap-2 text-sm text-mn-mute">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Weitere Krisen laden...
               </div>
@@ -312,7 +312,7 @@ export default function CrisisPage() {
         <div className="lg:col-span-2">
           <Link
             href="/dashboard/crisis/resources"
-            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-primary-50 to-cyan-50 border border-primary-200 rounded-2xl shadow-soft hover:shadow-card transition-all overflow-hidden"
+            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-primary-50 to-cyan-50 border border-mn-amber/20 rounded-2xl shadow-cinema-card hover:shadow-cinema-card transition-all overflow-hidden"
           >
             <div
               className="absolute top-0 left-0 right-0 h-[3px]"
@@ -320,7 +320,7 @@ export default function CrisisPage() {
             />
             <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
             <h3 className="relative text-sm font-bold text-primary-800 mb-1">Ressourcen & Hilfsangebote</h3>
-            <p className="relative text-xs text-primary-600">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
+            <p className="relative text-xs text-mn-amber">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
           </Link>
         </div>
         <div>

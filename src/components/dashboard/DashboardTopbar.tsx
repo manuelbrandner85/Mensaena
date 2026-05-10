@@ -23,7 +23,7 @@ export default function DashboardTopbar({ user, onOpenWidgetSettings }: Dashboar
     .slice(0, 2)
 
   return (
-    <header className="hidden lg:flex items-center justify-between h-16 px-8 bg-white border-b border-warm-200 sticky top-0 z-20 shadow-soft">
+    <header className="hidden lg:flex items-center justify-between h-16 px-8 bg-mn-elevated border-b border-warm-200 sticky top-0 z-20 shadow-cinema-card">
       {/* Global Search — shared component, no duplicate placeholder */}
       <SearchBar />
 
@@ -33,7 +33,7 @@ export default function DashboardTopbar({ user, onOpenWidgetSettings }: Dashboar
         {onOpenWidgetSettings && (
           <button
             onClick={onOpenWidgetSettings}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-ink-600 hover:text-ink-900 hover:bg-stone-100 rounded-xl transition-colors border border-warm-200"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-mn-ink-soft hover:text-mn-ink hover:bg-mn-elevated/5 rounded-xl transition-colors border border-warm-200"
             title="Widgets anpassen"
           >
             <LayoutDashboard className="w-4 h-4" />
@@ -61,8 +61,8 @@ export default function DashboardTopbar({ user, onOpenWidgetSettings }: Dashboar
             {initials}
           </div>
           <div className="hidden xl:block">
-            <p className="text-sm font-medium text-ink-900 leading-none">{displayName}</p>
-            <p className="text-xs text-ink-500 mt-0.5">{user.email}</p>
+            <p className="text-sm font-medium text-mn-ink leading-none">{displayName}</p>
+            <p className="text-xs text-mn-mute mt-0.5">{user.email}</p>
           </div>
         </Link>
       </div>

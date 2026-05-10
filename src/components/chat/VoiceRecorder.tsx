@@ -204,7 +204,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         type="button"
         onClick={startRecording}
         disabled={disabled}
-        className="p-1.5 text-ink-400 hover:text-primary-600 rounded-full transition-all flex-shrink-0 disabled:opacity-40"
+        className="p-1.5 text-mn-mute hover:text-mn-amber rounded-full transition-all flex-shrink-0 disabled:opacity-40"
         aria-label="Sprachnachricht aufnehmen"
       >
         <Mic className="w-4 h-4" />
@@ -234,7 +234,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         type="button"
         onClick={cancelPreview}
         disabled={state === 'uploading'}
-        className="p-1.5 text-ink-400 hover:text-red-500 disabled:opacity-40"
+        className="p-1.5 text-mn-mute hover:text-red-500 disabled:opacity-40"
         aria-label="Verwerfen"
       >
         <X className="w-3.5 h-3.5" />
@@ -247,7 +247,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         onClick={sendVoice}
         disabled={state === 'uploading'}
         className={cn(
-          'flex items-center gap-1 px-2.5 py-1 bg-primary-600 text-white text-xs font-medium rounded-full disabled:opacity-50',
+          'flex items-center gap-1 px-2.5 py-1 bg-mn-amber text-white text-xs font-medium rounded-full disabled:opacity-50',
         )}
       >
         {state === 'uploading'

@@ -114,11 +114,11 @@ function ListingCard({
 
   return (
     <div className={cn(
-      'spotlight bg-white rounded-2xl border overflow-hidden group relative',
+      'spotlight bg-mn-elevated rounded-2xl border overflow-hidden group relative',
       'transition-all duration-300',
       isClaimed
-        ? 'border-stone-200 opacity-60'
-        : 'border-stone-100 shadow-soft hover:shadow-card hover:-translate-y-1',
+        ? 'border-white/5 opacity-60'
+        : 'border-white/5 shadow-cinema-card hover:shadow-cinema-card hover:-translate-y-1',
     )}>
       {/* Top accent line */}
       {!isClaimed && (
@@ -129,7 +129,7 @@ function ListingCard({
       <div className={cn(
         'h-40 relative flex items-center justify-center overflow-hidden bg-gradient-to-br',
         !hasPics && gradient,
-        hasPics && 'bg-stone-100',
+        hasPics && 'bg-mn-elevated',
       )}>
         {hasPics ? (
           <>
@@ -145,7 +145,7 @@ function ListingCard({
               }}
             />
             {/* Category emoji tag (small) */}
-            <span className="absolute top-3 left-3 text-lg bg-white/90 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center shadow-soft">
+            <span className="absolute top-3 left-3 text-lg bg-mn-elevated/90 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center shadow-cinema-card">
               {catEmoji[listing.category] || '📦'}
             </span>
             {/* Prev/Next + dot indicators (only if >1 image) */}
@@ -173,7 +173,7 @@ function ListingCard({
                       key={i}
                       className={cn(
                         'w-1.5 h-1.5 rounded-full transition-all',
-                        i === picIdx ? 'bg-white w-4' : 'bg-white/60',
+                        i === picIdx ? 'bg-mn-elevated w-4' : 'bg-mn-elevated/60',
                       )}
                     />
                   ))}
@@ -202,12 +202,12 @@ function ListingCard({
 
         {/* Price badge */}
         <div className={cn(
-          'absolute top-3 right-3 backdrop-blur-md rounded-full px-3 py-1.5 text-xs font-bold shadow-soft',
+          'absolute top-3 right-3 backdrop-blur-md rounded-full px-3 py-1.5 text-xs font-bold shadow-cinema-card',
           isFree
-            ? 'bg-primary-600/95 text-white'
+            ? 'bg-mn-amber/95 text-white'
             : isSwap
               ? 'bg-[#4F6D8A]/95 text-white'
-              : 'bg-white/95 text-orange-700',
+              : 'bg-mn-elevated/95 text-orange-700',
         )}>
           {isFree && '🎁 '}
           {isSwap && '🔄 '}
@@ -217,8 +217,8 @@ function ListingCard({
         {/* Claimed overlay */}
         {isClaimed && (
           <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-sm flex items-center justify-center">
-            <span className="bg-white text-stone-800 text-xs font-bold px-4 py-2 rounded-full flex items-center gap-1.5 shadow-card">
-              <CheckCircle2 className="w-3.5 h-3.5 text-primary-600" /> Vergeben
+            <span className="bg-mn-elevated text-stone-800 text-xs font-bold px-4 py-2 rounded-full flex items-center gap-1.5 shadow-cinema-card">
+              <CheckCircle2 className="w-3.5 h-3.5 text-mn-amber" /> Vergeben
             </span>
           </div>
         )}
@@ -226,12 +226,12 @@ function ListingCard({
 
       {/* Body */}
       <div className="p-3.5">
-        <h3 className="font-bold text-ink-900 text-sm truncate leading-snug">{listing.title}</h3>
+        <h3 className="font-bold text-mn-ink text-sm truncate leading-snug">{listing.title}</h3>
         {listing.description && (
-          <p className="text-xs text-ink-500 mt-1 line-clamp-2 leading-relaxed">{listing.description}</p>
+          <p className="text-xs text-mn-mute mt-1 line-clamp-2 leading-relaxed">{listing.description}</p>
         )}
 
-        <div className="flex items-center gap-2 mt-2.5 text-xs text-ink-500 flex-wrap">
+        <div className="flex items-center gap-2 mt-2.5 text-xs text-mn-mute flex-wrap">
           {listing.location_text && (
             <span className="inline-flex items-center gap-1">
               <MapPin className="w-3 h-3 text-orange-400" />
@@ -239,21 +239,21 @@ function ListingCard({
             </span>
           )}
           {cond && (
-            <span className="bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 font-medium text-xs uppercase tracking-wide">
+            <span className="bg-mn-elevated px-2 py-0.5 rounded-full text-mn-ink-soft font-medium text-xs uppercase tracking-wide">
               {cond}
             </span>
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-stone-100">
-          <span className="inline-flex items-center gap-1 text-[11px] text-ink-400">
+        <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-white/5">
+          <span className="inline-flex items-center gap-1 text-[11px] text-mn-mute">
             <Clock className="w-3 h-3" />
             {new Date(listing.created_at).toLocaleDateString('de-DE')}
           </span>
           {isOwner && !isClaimed && (
             <button
               onClick={() => onMarkClaimed(listing.id)}
-              className="text-[11px] font-semibold text-ink-500 hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-full transition-colors flex items-center gap-1"
+              className="text-[11px] font-semibold text-mn-mute hover:text-mn-amber hover:bg-mn-amber/5 px-2 py-1 rounded-full transition-colors flex items-center gap-1"
             >
               <CheckCircle2 className="w-3 h-3" /> Vergeben
             </button>
@@ -364,12 +364,12 @@ export default function MarketplacePage() {
             </div>
 
             {/* Stat pills */}
-            <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-ink-500 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-stone-200 shadow-soft">
-                <span className="display-numeral text-ink-900 tabular-nums font-semibold">{activeCount}</span>
-                <span className="text-ink-500">Anzeigen</span>
+            <div className="flex items-center gap-2 flex-shrink-0 text-xs tracking-wide text-mn-mute flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5 shadow-cinema-card">
+                <span className="display-numeral text-mn-ink tabular-nums font-semibold">{activeCount}</span>
+                <span className="text-mn-mute">Anzeigen</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-700">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-amber/5 border border-mn-amber/20 text-mn-amber">
                 <span className="display-numeral tabular-nums font-semibold">{freeCount}</span>
                 <span>gratis</span>
               </span>
@@ -379,8 +379,8 @@ export default function MarketplacePage() {
                   className={cn(
                     'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all',
                     showClaimed
-                      ? 'bg-primary-50 border-primary-200 text-primary-700 shadow-soft'
-                      : 'bg-white border-stone-200 text-ink-500 hover:bg-stone-50',
+                      ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber shadow-cinema-card'
+                      : 'bg-mn-elevated border-white/5 text-mn-mute hover:bg-mn-surface',
                   )}
                 >
                   <CheckCircle2 className="w-3 h-3" />
@@ -394,7 +394,7 @@ export default function MarketplacePage() {
       </header>
 
       {/* Filter Bar */}
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-soft p-4 mb-6">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card p-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
@@ -416,7 +416,7 @@ export default function MarketplacePage() {
           </select>
           <button
             onClick={() => router.push('/dashboard/marketplace/create')}
-            className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98] flex-shrink-0"
+            className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-cinema-card hover:shadow-cinema-card transition-all active:scale-[0.98] flex-shrink-0"
             style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
           >
             <Plus className="w-4 h-4" /> Anzeige erstellen
@@ -439,7 +439,7 @@ export default function MarketplacePage() {
           action={
             <button
               onClick={() => router.push('/dashboard/marketplace/create')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-soft hover:shadow-card transition-all active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-cinema-card hover:shadow-cinema-card transition-all active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" /> Erste Anzeige erstellen
             </button>

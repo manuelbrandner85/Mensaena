@@ -87,22 +87,22 @@ export default function IntentSuggestionBanner({
       role="status"
       className={cn(
         'flex items-start gap-2.5 p-3 rounded-xl border bg-gradient-to-r from-primary-50 to-blue-50',
-        'border-primary-200 shadow-sm animate-fade-in',
+        'border-mn-amber/20 shadow-sm animate-fade-in',
         className,
       )}
     >
-      <div className="w-7 h-7 rounded-lg bg-white border border-primary-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Sparkles className="w-4 h-4 text-primary-600" />
+      <div className="w-7 h-7 rounded-lg bg-mn-elevated border border-mn-amber/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Sparkles className="w-4 h-4 text-mn-amber" />
       </div>
 
       <div className="flex-1 min-w-0">
         <p className="text-xs text-stone-700 leading-snug">
           Klingt nach{' '}
-          <strong className="text-primary-700 whitespace-nowrap">
+          <strong className="text-mn-amber whitespace-nowrap">
             {INTENT_EMOJI[match.type]} {INTENT_LABELS[match.type]}
           </strong>
           {match.matchedKeywords.length > 0 && (
-            <span className="text-stone-400 hidden sm:inline">
+            <span className="text-mn-ghost hidden sm:inline">
               {' '}— erkannt: <em className="not-italic">{match.matchedKeywords.slice(0, 3).join(', ')}</em>
             </span>
           )}
@@ -111,7 +111,7 @@ export default function IntentSuggestionBanner({
           <button
             type="button"
             onClick={handleAccept}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-mn-amber text-white hover:bg-primary-700 transition-colors"
           >
             {navigateOnAccept ? 'Zur passenden Seite' : 'Wechseln'}
             <ArrowRight className="w-3 h-3" />
@@ -119,7 +119,7 @@ export default function IntentSuggestionBanner({
           <button
             type="button"
             onClick={handleDismiss}
-            className="text-[11px] font-medium text-stone-500 hover:text-stone-700 transition-colors"
+            className="text-[11px] font-medium text-mn-mute hover:text-mn-ink transition-colors"
           >
             Nein, weiter
           </button>
@@ -130,7 +130,7 @@ export default function IntentSuggestionBanner({
         type="button"
         onClick={handleDismiss}
         aria-label="Vorschlag schließen"
-        className="text-stone-400 hover:text-stone-600 flex-shrink-0 -mr-1 -mt-1 p-1"
+        className="text-mn-ghost hover:text-mn-ink-soft flex-shrink-0 -mr-1 -mt-1 p-1"
       >
         <X className="w-3.5 h-3.5" />
       </button>

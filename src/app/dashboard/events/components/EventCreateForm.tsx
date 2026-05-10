@@ -152,7 +152,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Title */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">
           Titel <span className="text-red-500">*</span>
         </label>
         <input
@@ -161,14 +161,14 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           onChange={(e) => setTitle(e.target.value.slice(0, 100))}
           placeholder="Wie heißt deine Veranstaltung?"
           className={cn(
-            'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
-            errors.title ? 'border-red-300' : 'border-stone-200',
+            'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent',
+            errors.title ? 'border-red-300' : 'border-white/5',
           )}
           required
         />
         <div className="flex justify-between mt-1">
           {errors.title && <span className="text-xs text-red-500">{errors.title}</span>}
-          <span className={cn('text-xs ml-auto', title.length > 90 ? 'text-red-500' : 'text-ink-400')}>
+          <span className={cn('text-xs ml-auto', title.length > 90 ? 'text-red-500' : 'text-mn-mute')}>
             {title.length}/100
           </span>
         </div>
@@ -176,22 +176,22 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
 
       {/* Description */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Beschreibung</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Beschreibung</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value.slice(0, 2000))}
           placeholder="Beschreibe was passiert, wer eingeladen ist und was die Teilnehmer erwartet..."
           rows={4}
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
-        <div className={cn('text-xs text-right mt-1', description.length > 1800 ? 'text-red-500' : 'text-ink-400')}>
+        <div className={cn('text-xs text-right mt-1', description.length > 1800 ? 'text-red-500' : 'text-mn-mute')}>
           {description.length}/2000
         </div>
       </div>
 
       {/* Category */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1.5 block">
+        <label className="text-sm font-medium text-mn-ink-soft mb-1.5 block">
           Kategorie <span className="text-red-500">*</span>
         </label>
         <div className="flex flex-wrap gap-2">
@@ -205,8 +205,8 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
                 className={cn(
                   'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
                   category === cat
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-stone-100 text-ink-600 hover:bg-stone-200',
+                    ? 'bg-mn-amber text-white'
+                    : 'bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised',
                 )}
               >
                 <span>{info.emoji}</span>
@@ -220,7 +220,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
       {/* Date & Time */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-ink-700">
+          <label className="text-sm font-medium text-mn-ink-soft">
             Datum & Uhrzeit <span className="text-red-500">*</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -228,23 +228,23 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
               type="checkbox"
               checked={isAllDay}
               onChange={(e) => setIsAllDay(e.target.checked)}
-              className="rounded text-primary-600 focus:ring-primary-500"
+              className="rounded text-mn-amber focus:ring-mn-amber"
             />
-            <span className="text-sm text-ink-600">Ganztägig</span>
+            <span className="text-sm text-mn-ink-soft">Ganztägig</span>
           </label>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-xs text-ink-500 mb-1 block">Startdatum</label>
+            <label className="text-xs text-mn-mute mb-1 block">Startdatum</label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               min={todayStr}
               className={cn(
-                'w-full rounded-lg border px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500',
-                errors.startDate ? 'border-red-300' : 'border-stone-200',
+                'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
+                errors.startDate ? 'border-red-300' : 'border-white/5',
               )}
               required
             />
@@ -252,14 +252,14 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           </div>
           {!isAllDay && (
             <div>
-              <label className="text-xs text-ink-500 mb-1 block">Startzeit</label>
+              <label className="text-xs text-mn-mute mb-1 block">Startzeit</label>
               <input
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 className={cn(
-                  'w-full rounded-lg border px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500',
-                  errors.startTime ? 'border-red-300' : 'border-stone-200',
+                  'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
+                  errors.startTime ? 'border-red-300' : 'border-white/5',
                 )}
                 required={!isAllDay}
               />
@@ -267,27 +267,27 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             </div>
           )}
           <div>
-            <label className="text-xs text-ink-500 mb-1 block">Enddatum (optional)</label>
+            <label className="text-xs text-mn-mute mb-1 block">Enddatum (optional)</label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               min={startDate || todayStr}
               className={cn(
-                'w-full rounded-lg border px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500',
-                errors.endDate ? 'border-red-300' : 'border-stone-200',
+                'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
+                errors.endDate ? 'border-red-300' : 'border-white/5',
               )}
             />
             {errors.endDate && <span className="text-xs text-red-500">{errors.endDate}</span>}
           </div>
           {!isAllDay && (
             <div>
-              <label className="text-xs text-ink-500 mb-1 block">Endzeit (optional)</label>
+              <label className="text-xs text-mn-mute mb-1 block">Endzeit (optional)</label>
               <input
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber"
               />
             </div>
           )}
@@ -301,23 +301,23 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             type="checkbox"
             checked={isOnline}
             onChange={(e) => setIsOnline(e.target.checked)}
-            className="rounded text-primary-600 focus:ring-primary-500"
+            className="rounded text-mn-amber focus:ring-mn-amber"
           />
-          <span className="text-sm font-medium text-ink-700 flex items-center gap-1.5">
+          <span className="text-sm font-medium text-mn-ink-soft flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-blue-500" /> Online-Veranstaltung / Hybrid
           </span>
         </label>
         {isOnline && (
           <div className="mt-3">
-            <label className="text-xs text-ink-500 mb-1 block">Meeting-Link (Zoom, Google Meet, etc.)</label>
+            <label className="text-xs text-mn-mute mb-1 block">Meeting-Link (Zoom, Google Meet, etc.)</label>
             <div className="relative">
-              <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+              <Video className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
               <input
                 type="url"
                 value={onlineUrl}
                 onChange={(e) => setOnlineUrl(e.target.value)}
                 placeholder="https://zoom.us/j/... oder https://meet.google.com/..."
-                className="w-full rounded-lg border border-stone-200 pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full rounded-lg border border-white/5 pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
               />
             </div>
           </div>
@@ -326,32 +326,32 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
 
       {/* Location */}
       <div className="space-y-3">
-        <label className="text-sm font-medium text-ink-700 block">Ort {isOnline ? '(optional bei Online-Events)' : ''}</label>
+        <label className="text-sm font-medium text-mn-ink-soft block">Ort {isOnline ? '(optional bei Online-Events)' : ''}</label>
         <input
           type="text"
           value={locationName}
           onChange={(e) => setLocationName(e.target.value)}
           placeholder="z.B. Gemeinschaftsgarten Friedrichshain"
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
         <input
           type="text"
           value={locationAddress}
           onChange={(e) => setLocationAddress(e.target.value)}
           placeholder="Straße, Hausnummer, PLZ, Ort"
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
         <div className="flex gap-2">
           <button
             type="button"
             onClick={handleLocation}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-ink-600 border border-stone-200 rounded-lg hover:bg-stone-50 transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-mn-ink-soft border border-white/5 rounded-lg hover:bg-mn-surface transition"
           >
             <Locate className="w-3.5 h-3.5" />
             Meinen Standort verwenden
           </button>
           {latitude && longitude && (
-            <span className="text-xs text-primary-600 self-center">
+            <span className="text-xs text-mn-amber self-center">
               <MapPin className="w-3 h-3 inline mr-0.5" />
               Koordinaten gesetzt
             </span>
@@ -361,11 +361,11 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
 
       {/* Image */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Bild (optional)</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Bild (optional)</label>
         <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
         {imagePreview ? (
           <div className="relative inline-block">
-            <img src={imagePreview} alt="Vorschau" className="h-24 w-24 object-cover rounded-lg border border-stone-200" />
+            <img src={imagePreview} alt="Vorschau" className="h-24 w-24 object-cover rounded-lg border border-white/5" />
             {uploading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg">
                 <LoaderCircle className="w-5 h-5 text-white animate-spin" />
@@ -374,16 +374,16 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             <button
               type="button"
               onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
-              className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-stone-200"
+              className="absolute -top-2 -right-2 bg-mn-elevated rounded-full p-0.5 shadow border border-white/5"
             >
-              <X className="w-3.5 h-3.5 text-ink-500" />
+              <X className="w-3.5 h-3.5 text-mn-mute" />
             </button>
           </div>
         ) : (
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-ink-600 border border-dashed border-stone-300 rounded-lg hover:bg-stone-50 transition"
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft border border-dashed border-white/8 rounded-lg hover:bg-mn-surface transition"
           >
             <ImagePlus className="w-4 h-4" />
             Bild hinzufügen (max. 5 MB)
@@ -393,17 +393,17 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
 
       {/* Max attendees */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Maximale Teilnehmer (optional)</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Maximale Teilnehmer (optional)</label>
         <input
           type="number"
           value={maxAttendees}
           onChange={(e) => setMaxAttendees(e.target.value)}
           placeholder="Unbegrenzt"
           min={2}
-          className="w-full sm:w-40 rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full sm:w-40 rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
         {maxAttendees && (
-          <p className="text-xs text-ink-500 mt-1">
+          <p className="text-xs text-mn-mute mt-1">
             Wenn die maximale Anzahl erreicht ist, können keine weiteren Teilnehmer mehr beitreten.
           </p>
         )}
@@ -411,37 +411,37 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
 
       {/* Cost */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Kosten</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Kosten</label>
         <input
           type="text"
           value={cost}
           onChange={(e) => setCost(e.target.value)}
           placeholder="kostenlos"
-          className="w-full sm:w-64 rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full sm:w-64 rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
       </div>
 
       {/* What to bring */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Was mitbringen? (optional)</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Was mitbringen? (optional)</label>
         <textarea
           value={whatToBring}
           onChange={(e) => setWhatToBring(e.target.value.slice(0, 500))}
           placeholder="z.B. Gute Laune, bequeme Schuhe, eine Kleinigkeit zum Teilen"
           rows={2}
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
       </div>
 
       {/* Contact */}
       <div>
-        <label className="text-sm font-medium text-ink-700 mb-1 block">Kontakt (optional)</label>
+        <label className="text-sm font-medium text-mn-ink-soft mb-1 block">Kontakt (optional)</label>
         <input
           type="text"
           value={contactInfo}
           onChange={(e) => setContactInfo(e.target.value)}
           placeholder="Telefon oder E-Mail für Rückfragen"
-          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
         />
       </div>
 
@@ -464,15 +464,15 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
         >
           <div className={cn(
             'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-            acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
+            acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
           )}>
             {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
           </div>
           <div>
-            <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
-            <p className="text-xs text-ink-500 mt-0.5">
+            <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
+            <p className="text-xs text-mn-mute mt-0.5">
               Ich bestätige, dass diese Veranstaltung <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">§4 AGB</a> geahndet.
+              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">§4 AGB</a> geahndet.
             </p>
           </div>
         </button>
@@ -482,7 +482,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
       <button
         type="submit"
         disabled={submitting || uploading || !title.trim() || !startDate || !acceptedNoTrade}
-        className="w-full py-3 rounded-lg bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+        className="w-full py-3 rounded-lg bg-mn-amber text-white font-medium text-sm hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
       >
         {submitting ? (
           <>

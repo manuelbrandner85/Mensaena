@@ -113,8 +113,8 @@ export default function BoardPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 03 / Aushänge</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Clipboard className="w-6 h-6 text-primary-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Clipboard className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Pinnwand</h1>
@@ -126,7 +126,7 @@ export default function BoardPage() {
             <button
               onClick={() => board.refresh()}
               disabled={board.refreshing}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition"
               title="Aktualisieren"
             >
               <RefreshCw className={cn('w-4 h-4', board.refreshing && 'animate-spin')} />
@@ -136,7 +136,7 @@ export default function BoardPage() {
               className={cn(
                 'magnetic shine inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-medium text-sm tracking-wide transition-colors',
                 (showCreate || editingPost)
-                  ? 'bg-stone-200 text-ink-700'
+                  ? 'bg-mn-raised text-mn-ink-soft'
                   : 'bg-ink-800 text-paper hover:bg-ink-700',
               )}
             >
@@ -176,8 +176,8 @@ export default function BoardPage() {
       {/* Pull-to-refresh indicator */}
       {board.refreshing && (
         <div className="flex items-center justify-center py-3 mb-4">
-          <RefreshCw className="w-4 h-4 animate-spin text-primary-600 mr-2" />
-          <span className="text-sm text-ink-500">Aktualisiere...</span>
+          <RefreshCw className="w-4 h-4 animate-spin text-mn-amber mr-2" />
+          <span className="text-sm text-mn-mute">Aktualisiere...</span>
         </div>
       )}
 
@@ -186,16 +186,16 @@ export default function BoardPage() {
         <BoardSkeleton />
       ) : board.posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="p-4 rounded-full bg-stone-100 mb-4">
-            <Inbox className="w-10 h-10 text-ink-400" />
+          <div className="p-4 rounded-full bg-mn-elevated mb-4">
+            <Inbox className="w-10 h-10 text-mn-mute" />
           </div>
-          <h3 className="text-lg font-semibold text-ink-700 mb-1">Noch keine Aushänge</h3>
-          <p className="text-sm text-ink-500 mb-4">
+          <h3 className="text-lg font-semibold text-mn-ink-soft mb-1">Noch keine Aushänge</h3>
+          <p className="text-sm text-mn-mute mb-4">
             Erstelle den ersten Aushang für deine Gemeinschaft!
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-600 text-white
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-mn-amber text-white
                        font-medium text-sm hover:bg-primary-700 transition"
           >
             <Plus className="w-4 h-4" />

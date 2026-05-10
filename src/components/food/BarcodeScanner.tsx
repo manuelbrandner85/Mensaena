@@ -323,7 +323,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       }}
     >
       <div
-        className="relative w-full sm:max-w-lg bg-white dark:bg-ink-900 sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full sm:h-auto sm:max-h-[95dvh]"
+        className="relative w-full sm:max-w-lg bg-mn-elevated dark:bg-ink-900 sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full sm:h-auto sm:max-h-[95dvh]"
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -331,19 +331,19 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
       >
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-stone-100 dark:border-ink-800 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/5 dark:border-ink-800 flex-shrink-0">
           <div>
-            <h2 className="font-bold text-ink-900 dark:text-white flex items-center gap-2">
-              <ScanLine className="w-5 h-5 text-primary-600" />
+            <h2 className="font-bold text-mn-ink dark:text-white flex items-center gap-2">
+              <ScanLine className="w-5 h-5 text-mn-amber" />
               Lebensmittel scannen
             </h2>
-            <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5">
+            <p className="text-xs text-mn-mute dark:text-mn-mute mt-0.5">
               {hasDetector ? 'Kamera oder manuelle Eingabe' : 'Barcode-Nummer eingeben'}
             </p>
           </div>
           <button
             onClick={dismiss}
-            className="w-10 h-10 rounded-full bg-stone-100 dark:bg-ink-800 flex items-center justify-center text-ink-700 hover:bg-stone-200 hover:text-ink-900 dark:hover:text-white transition-colors flex-shrink-0"
+            className="w-10 h-10 rounded-full bg-mn-elevated dark:bg-ink-800 flex items-center justify-center text-mn-ink-soft hover:bg-mn-raised hover:text-mn-ink dark:hover:text-white transition-colors flex-shrink-0"
             aria-label="Schließen"
           >
             <X className="w-5 h-5" />
@@ -372,17 +372,17 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
               {/* Overlay: idle */}
               {state === 'idle' && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-900">
-                  <div className="w-16 h-16 rounded-2xl bg-primary-600/20 border border-primary-500/30 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-mn-amber/20 border border-mn-amber/30 flex items-center justify-center">
                     <Camera className="w-8 h-8 text-primary-400" />
                   </div>
                   <button
                     onClick={startCamera}
-                    className="px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors active:scale-95"
+                    className="px-6 py-3 bg-mn-amber text-white rounded-xl font-semibold text-sm hover:bg-primary-700 transition-colors active:scale-95"
                   >
                     Kamera aktivieren
                   </button>
                   {hasDetector && (
-                    <p className="text-xs text-ink-500 text-center px-8">
+                    <p className="text-xs text-mn-mute text-center px-8">
                       Für den Scan benötigt die App kurz Zugriff auf die Kamera.
                     </p>
                   )}
@@ -393,7 +393,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
               {(state === 'requesting' || state === 'loading') && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-ink-900/90">
                   <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
-                  <p className="text-sm text-stone-400">
+                  <p className="text-sm text-mn-ghost">
                     {state === 'requesting' ? 'Kamera wird gestartet…' : statusMsg}
                   </p>
                 </div>
@@ -450,8 +450,8 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 <CameraOff className="w-8 h-8 text-red-500" />
               </div>
               <div>
-                <p className="font-semibold text-ink-900 dark:text-white mb-1">Kamera-Zugriff erforderlich</p>
-                <p className="text-sm text-ink-600 dark:text-ink-400">{error}</p>
+                <p className="font-semibold text-mn-ink dark:text-white mb-1">Kamera-Zugriff erforderlich</p>
+                <p className="text-sm text-mn-ink-soft dark:text-mn-mute">{error}</p>
               </div>
               {isAndroid ? (
                 /* Android: Primär-Button triggert den In-App-Permission-Dialog neu.
@@ -460,12 +460,12 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 <div className="w-full space-y-3">
                   <button
                     onClick={startCamera}
-                    className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
+                    className="w-full px-5 py-3 bg-mn-amber text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
                   >
                     Berechtigung erneut anfragen
                   </button>
                   <details className="w-full group">
-                    <summary className="text-xs text-ink-500 cursor-pointer hover:text-ink-700 text-center list-none">
+                    <summary className="text-xs text-mn-mute cursor-pointer hover:text-mn-ink-soft text-center list-none">
                       Immer noch gesperrt? Manuell aktivieren ▾
                     </summary>
                     <div className="mt-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-left">
@@ -481,14 +481,14 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
               ) : isNative ? (
                 <a
                   href="app-settings:"
-                  className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center block"
+                  className="w-full px-5 py-3 bg-mn-amber text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95 text-center block"
                 >
                   App-Einstellungen öffnen
                 </a>
               ) : (
                 <button
                   onClick={startCamera}
-                  className="w-full px-5 py-3 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
+                  className="w-full px-5 py-3 bg-mn-amber text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors active:scale-95"
                 >
                   Nochmal versuchen
                 </button>
@@ -497,11 +497,11 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
               {/* Diagnose-Block (sichtbar wenn Probleme auftreten – hilft beim Debuggen) */}
               {diagnostics.length > 0 && (
                 <details className="w-full">
-                  <summary className="text-xs text-ink-500 cursor-pointer hover:text-ink-700 text-center list-none">
+                  <summary className="text-xs text-mn-mute cursor-pointer hover:text-mn-ink-soft text-center list-none">
                     Diagnose-Info anzeigen ▾
                   </summary>
                   <div className="mt-2 px-3 py-2.5 bg-ink-50 dark:bg-ink-800 rounded-xl text-left">
-                    <pre className="text-xs text-ink-600 dark:text-ink-300 whitespace-pre-wrap font-mono leading-relaxed">
+                    <pre className="text-xs text-mn-ink-soft dark:text-mn-ghost whitespace-pre-wrap font-mono leading-relaxed">
                       {diagnostics.join('\n')}
                     </pre>
                   </div>
@@ -524,7 +524,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             {(state === 'idle' || state === 'scanning') && hasDetector && (
               <button
                 onClick={() => { stopCamera(); setState('manual') }}
-                className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="flex items-center gap-2 text-sm text-mn-amber hover:text-mn-amber font-medium"
               >
                 <Keyboard className="w-4 h-4" />
                 Barcode manuell eingeben
@@ -550,7 +550,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                 <button
                   type="submit"
                   disabled={!manualInput.trim() || isLoadingProduct}
-                  className="px-4 py-2.5 bg-primary-600 text-white rounded-xl font-semibold text-sm hover:bg-primary-700 disabled:opacity-50 transition-colors active:scale-95 flex items-center gap-1.5"
+                  className="px-4 py-2.5 bg-mn-amber text-white rounded-xl font-semibold text-sm hover:bg-primary-700 disabled:opacity-50 transition-colors active:scale-95 flex items-center gap-1.5"
                 >
                   {isLoadingProduct ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Suchen'}
                 </button>
@@ -561,7 +561,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             {showManual && (
               <button
                 onClick={() => setManualProductOpen(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-primary-600 hover:bg-primary-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Produkt selbst anlegen
@@ -572,7 +572,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             {showManual && hasDetector && (
               <button
                 onClick={() => { setError(null); setState('idle') }}
-                className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="flex items-center gap-2 text-sm text-mn-amber hover:text-mn-amber font-medium"
               >
                 <Camera className="w-4 h-4" />
                 Zurück zur Kamera
@@ -581,15 +581,15 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
 
             {/* Divider */}
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-stone-100 dark:bg-ink-800" />
-              <span className="text-xs text-ink-400">oder nach Produktnamen suchen</span>
-              <div className="flex-1 h-px bg-stone-100 dark:bg-ink-800" />
+              <div className="flex-1 h-px bg-mn-elevated dark:bg-ink-800" />
+              <span className="text-xs text-mn-mute">oder nach Produktnamen suchen</span>
+              <div className="flex-1 h-px bg-mn-elevated dark:bg-ink-800" />
             </div>
 
             {/* Product name search */}
             <form onSubmit={handleSearch} className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
                 <input
                   type="text"
                   value={searchInput}
@@ -615,16 +615,16 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                   <button
                     key={p.barcode}
                     onClick={() => onProduct(p)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 bg-stone-50 dark:bg-ink-800 rounded-xl hover:bg-primary-50 dark:hover:bg-ink-700 transition-colors text-left group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 bg-mn-surface dark:bg-ink-800 rounded-xl hover:bg-mn-amber/5 dark:hover:bg-ink-700 transition-colors text-left group"
                   >
                     {p.imageUrl ? (
-                      <img src={p.imageUrl} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0 bg-stone-100" />
+                      <img src={p.imageUrl} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0 bg-mn-elevated" />
                     ) : (
-                      <div className="w-10 h-10 rounded-lg bg-stone-200 dark:bg-ink-700 flex items-center justify-center flex-shrink-0 text-lg">🍽️</div>
+                      <div className="w-10 h-10 rounded-lg bg-mn-raised dark:bg-ink-700 flex items-center justify-center flex-shrink-0 text-lg">🍽️</div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-ink-900 dark:text-white truncate group-hover:text-primary-700">{p.name}</p>
-                      {p.brand && <p className="text-xs text-ink-500 truncate">{p.brand}</p>}
+                      <p className="text-sm font-semibold text-mn-ink dark:text-white truncate group-hover:text-mn-amber">{p.name}</p>
+                      {p.brand && <p className="text-xs text-mn-mute truncate">{p.brand}</p>}
                     </div>
                     {p.nutriScore && (
                       <span className="text-xs font-bold text-white px-1.5 py-0.5 rounded flex-shrink-0"

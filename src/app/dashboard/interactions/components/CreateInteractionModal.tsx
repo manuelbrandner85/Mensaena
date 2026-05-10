@@ -44,14 +44,14 @@ export default function CreateInteractionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+      <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-bold text-ink-900 text-lg">Hilfe anbieten</h3>
-            <p className="text-xs text-ink-500 mt-0.5 line-clamp-1">zu: {postTitle}</p>
+            <h3 className="font-bold text-mn-ink text-lg">Hilfe anbieten</h3>
+            <p className="text-xs text-mn-mute mt-0.5 line-clamp-1">zu: {postTitle}</p>
           </div>
-          <button onClick={onClose} aria-label="Schließen" className="text-ink-400 hover:text-ink-600 transition-colors p-1.5">
+          <button onClick={onClose} aria-label="Schließen" className="text-mn-mute hover:text-mn-ink-soft transition-colors p-1.5">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -63,8 +63,8 @@ export default function CreateInteractionModal({
             className={cn(
               'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all',
               iAmHelper
-                ? 'bg-primary-50 text-primary-700 border-primary-300'
-                : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
+                ? 'bg-mn-amber/5 text-mn-amber border-primary-300'
+                : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
             )}
           >
             <HandHeart className="w-4 h-4" /> Ich helfe
@@ -75,14 +75,14 @@ export default function CreateInteractionModal({
               'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all',
               !iAmHelper
                 ? 'bg-blue-50 text-blue-700 border-blue-300'
-                : 'bg-white text-ink-600 border-stone-200 hover:bg-stone-50',
+                : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
             )}
           >
             <HelpCircle className="w-4 h-4" /> Ich brauche Hilfe
           </button>
         </div>
 
-        <p className="text-xs text-ink-500">
+        <p className="text-xs text-mn-mute">
           {iAmHelper
             ? `Du bietest ${targetUserName} deine Hilfe an.`
             : `Du fragst ${targetUserName} um Hilfe.`
@@ -96,16 +96,16 @@ export default function CreateInteractionModal({
             onChange={e => setMessage(e.target.value.slice(0, maxLen))}
             placeholder="Beschreibe kurz, wie du helfen kannst oder was du brauchst..."
             rows={4}
-            className="w-full text-sm border border-stone-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+            className="w-full text-sm border border-white/5 rounded-xl px-4 py-3 focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30 resize-none"
           />
-          <p className="text-right text-xs text-ink-400">{message.length}/{maxLen}</p>
+          <p className="text-right text-xs text-mn-mute">{message.length}/{maxLen}</p>
         </div>
 
         {/* Submit */}
         <button
           onClick={handleCreate}
           disabled={sending || !message.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
         >
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           Anfrage senden

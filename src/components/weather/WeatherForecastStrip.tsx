@@ -21,15 +21,15 @@ function DayCard({ day, highlighted }: { day: DayForecast; highlighted?: boolean
       'flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors',
       highlighted
         ? 'bg-purple-50 border-purple-200'
-        : 'bg-white border-stone-100 hover:border-stone-200',
+        : 'bg-mn-elevated border-white/5 hover:border-white/5',
     )}>
-      <span className="text-[11px] font-semibold text-stone-500 uppercase tracking-wide">
+      <span className="text-[11px] font-semibold text-mn-mute uppercase tracking-wide">
         {dayLabel(day.date)}
       </span>
       <span className="text-2xl leading-none mt-0.5">{forecastIconEmoji(day.icon)}</span>
       <div className="flex items-center gap-1 mt-0.5">
-        <span className="text-sm font-bold text-ink-900">{day.tempHigh}°</span>
-        <span className="text-xs text-stone-400">{day.tempLow}°</span>
+        <span className="text-sm font-bold text-mn-ink">{day.tempHigh}°</span>
+        <span className="text-xs text-mn-ghost">{day.tempLow}°</span>
       </div>
       {day.precipitation > 0 && (
         <div className="flex items-center gap-0.5 text-xs text-blue-500">
@@ -88,7 +88,7 @@ export default function WeatherForecastStrip({
     return (
       <div className={cn('flex gap-2 overflow-x-auto no-scrollbar py-0.5', className)}>
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="flex-shrink-0 w-[68px] h-[92px] rounded-xl bg-stone-100 animate-pulse" />
+          <div key={i} className="flex-shrink-0 w-[68px] h-[92px] rounded-xl bg-mn-elevated animate-pulse" />
         ))}
       </div>
     )
@@ -98,7 +98,7 @@ export default function WeatherForecastStrip({
 
   return (
     <div className={cn('space-y-2', className)}>
-      <div className="flex items-center gap-1.5 text-xs text-stone-400">
+      <div className="flex items-center gap-1.5 text-xs text-mn-ghost">
         <Cloud className="w-3.5 h-3.5" />
         <span>7-Tage-Wettervorhersage · DWD</span>
       </div>

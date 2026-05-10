@@ -76,15 +76,15 @@ export default function BookCard({ book, variant, action, className }: BookCardP
   if (variant === 'compact') {
     return (
       <div className={cn(
-        'flex items-center gap-3 p-3 rounded-xl bg-white border border-stone-100 transition-colors',
+        'flex items-center gap-3 p-3 rounded-xl bg-mn-elevated border border-white/5 transition-colors',
         className,
       )}>
         <BookCover book={book} size="sm" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-ink-900 truncate leading-tight">{book.title}</p>
-          <p className="text-xs text-ink-500 truncate mt-0.5">{book.authors.join(', ')}</p>
+          <p className="text-sm font-semibold text-mn-ink truncate leading-tight">{book.title}</p>
+          <p className="text-xs text-mn-mute truncate mt-0.5">{book.authors.join(', ')}</p>
           {book.publishYear && (
-            <p className="text-[11px] text-ink-400 mt-0.5">{book.publishYear}</p>
+            <p className="text-[11px] text-mn-mute mt-0.5">{book.publishYear}</p>
           )}
         </div>
         {action && <div className="flex-shrink-0 ml-2">{action}</div>}
@@ -95,43 +95,43 @@ export default function BookCard({ book, variant, action, className }: BookCardP
   // ── Full variant ──────────────────────────────────────────────────────────
   return (
     <div className={cn(
-      'flex gap-4 p-4 rounded-2xl bg-white border border-stone-100 shadow-sm',
+      'flex gap-4 p-4 rounded-2xl bg-mn-elevated border border-white/5 shadow-sm',
       className,
     )}>
       <BookCover book={book} size="lg" />
 
       <div className="flex-1 min-w-0">
-        <h3 className="text-base font-bold text-ink-900 leading-snug">{book.title}</h3>
+        <h3 className="text-base font-bold text-mn-ink leading-snug">{book.title}</h3>
 
         <dl className="mt-2.5 space-y-1.5">
           {book.authors.length > 0 && (
             <div className="flex items-start gap-1.5">
-              <User className="w-3.5 h-3.5 text-stone-400 mt-0.5 flex-shrink-0" />
-              <dd className="text-sm text-ink-700 leading-snug">{book.authors.join(', ')}</dd>
+              <User className="w-3.5 h-3.5 text-mn-ghost mt-0.5 flex-shrink-0" />
+              <dd className="text-sm text-mn-ink-soft leading-snug">{book.authors.join(', ')}</dd>
             </div>
           )}
           {book.publishYear && (
             <div className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-sm text-ink-600">{book.publishYear}</dd>
+              <Calendar className="w-3.5 h-3.5 text-mn-ghost flex-shrink-0" />
+              <dd className="text-sm text-mn-ink-soft">{book.publishYear}</dd>
             </div>
           )}
           {book.publisher && (
             <div className="flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-sm text-ink-600 truncate">{book.publisher}</dd>
+              <Building2 className="w-3.5 h-3.5 text-mn-ghost flex-shrink-0" />
+              <dd className="text-sm text-mn-ink-soft truncate">{book.publisher}</dd>
             </div>
           )}
           {book.pageCount && (
             <div className="flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-sm text-ink-600">{book.pageCount} Seiten</dd>
+              <Layers className="w-3.5 h-3.5 text-mn-ghost flex-shrink-0" />
+              <dd className="text-sm text-mn-ink-soft">{book.pageCount} Seiten</dd>
             </div>
           )}
           {book.isbn && (
             <div className="flex items-center gap-1.5">
-              <Hash className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
-              <dd className="text-xs text-ink-400 font-mono">{book.isbn}</dd>
+              <Hash className="w-3.5 h-3.5 text-mn-ghost flex-shrink-0" />
+              <dd className="text-xs text-mn-mute font-mono">{book.isbn}</dd>
             </div>
           )}
         </dl>
@@ -141,7 +141,7 @@ export default function BookCard({ book, variant, action, className }: BookCardP
             {book.subjects.slice(0, 3).map((s) => (
               <span
                 key={s}
-                className="text-xs px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 border border-primary-100 font-medium"
+                className="text-xs px-2 py-0.5 rounded-full bg-mn-amber/5 text-mn-amber border border-primary-100 font-medium"
               >
                 {s}
               </span>

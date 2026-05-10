@@ -36,17 +36,17 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   if (allZero) {
     return (
       <div className="gradient-border rounded-2xl overflow-hidden">
-        <div className="bg-white p-5 text-center">
+        <div className="bg-mn-elevated p-5 text-center">
           <p className="text-2xl mb-2">🌱</p>
-          <p className="text-sm font-semibold text-ink-900">Dein Abenteuer beginnt!</p>
-          <p className="text-xs text-ink-500 mt-1">Erstelle einen Beitrag oder hilf jemandem, um deine Statistiken zu füllen.</p>
+          <p className="text-sm font-semibold text-mn-ink">Dein Abenteuer beginnt!</p>
+          <p className="text-xs text-mn-mute mt-1">Erstelle einen Beitrag oder hilf jemandem, um deine Statistiken zu füllen.</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div ref={ref} className="cinematic-stat-grid rounded-2xl shadow-soft overflow-hidden">
+    <div ref={ref} className="cinematic-stat-grid rounded-2xl shadow-cinema-card overflow-hidden">
       {cards.map((card, i) => {
         const Icon = card.icon
         return (
@@ -62,13 +62,13 @@ export default function StatsCards({ stats }: StatsCardsProps) {
             >
               <Icon className="w-3.5 h-3.5" style={{ color: card.accent }} />
             </div>
-            <div className="display-numeral text-2xl font-bold text-ink-900 leading-none">
+            <div className="display-numeral text-2xl font-bold text-mn-ink leading-none">
               {inView
                 ? <CountUp to={stats[card.key]} duration={900 + i * 120} />
                 : <span>0</span>
               }
             </div>
-            <p className="text-xs text-ink-500 mt-1.5 leading-snug">{card.label}</p>
+            <p className="text-xs text-mn-mute mt-1.5 leading-snug">{card.label}</p>
           </div>
         )
       })}

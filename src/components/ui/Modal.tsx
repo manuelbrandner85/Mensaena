@@ -112,12 +112,12 @@ export default function Modal({
           <div className="flex items-start justify-between p-5 pb-0">
             <div className="min-w-0">
               {title && (
-                <h2 id="modal-title" className="text-lg font-bold text-ink-900 tracking-tight">
+                <h2 id="modal-title" className="text-lg font-bold text-mn-ink tracking-tight">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id="modal-desc" className="text-sm text-ink-500 mt-0.5">
+                <p id="modal-desc" className="text-sm text-mn-mute mt-0.5">
                   {description}
                 </p>
               )}
@@ -125,7 +125,7 @@ export default function Modal({
             {showClose && (
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-xl hover:bg-stone-100 text-ink-400 hover:text-ink-600 transition-colors flex-shrink-0"
+                className="p-1.5 rounded-xl hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-ink-soft transition-colors flex-shrink-0"
                 aria-label="Schließen"
               >
                 <X className="w-5 h-5" />

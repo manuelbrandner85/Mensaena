@@ -122,7 +122,7 @@ export default function EventsPage() {
             <button
               onClick={() => events.refresh()}
               disabled={events.refreshing}
-              className="p-2.5 rounded-full text-ink-400 hover:bg-stone-100 hover:text-ink-700 transition disabled:opacity-50"
+              className="p-2.5 rounded-full text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition disabled:opacity-50"
               title="Aktualisieren"
             >
               <RefreshCw className={cn('w-4 h-4', events.refreshing && 'animate-spin')} />
@@ -145,7 +145,7 @@ export default function EventsPage() {
       {events.refreshing && (
         <div className="flex items-center justify-center py-2 mb-3">
           <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
-          <span className="ml-2 text-sm text-ink-500">Aktualisiere...</span>
+          <span className="ml-2 text-sm text-mn-mute">Aktualisiere...</span>
         </div>
       )}
 

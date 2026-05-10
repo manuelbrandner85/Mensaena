@@ -101,6 +101,7 @@ const config: Config = {
           surface:        '#162035',
           elevated:       '#1C2A42',
           raised:         '#243350',
+          overlay:        '#2B3D5E',
           amber:          '#F59E0B',
           'amber-warm':   '#FBBF24',
           'amber-soft':   '#FDE68A',
@@ -123,15 +124,21 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans:    ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-display)', 'ui-serif', 'Georgia', 'serif'],
-        mono:    ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans:    ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        body:    ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', '"DM Serif Display"', 'ui-serif', 'Georgia', 'serif'],
+        mono:    ['var(--font-mono)', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
         cinema:  ['var(--font-cinema)', '"DM Serif Display"', 'ui-serif', 'Georgia', 'serif'],
       },
       borderRadius: {
         xl: '0.875rem',
         '2xl': '1.25rem',
         '3xl': '1.75rem',
+        card:   '20px',
+        button: '14px',
+        input:  '12px',
+        pill:   '100px',
+        modal:  '24px',
       },
       boxShadow: {
         // High-end, restrained elevation. Slate-tinted, low opacity, wide blur.
@@ -147,10 +154,12 @@ const config: Config = {
         'amber-glow':   '0 4px 16px rgba(245,158,11,0.40), 0 0 40px rgba(245,158,11,0.15)',
         'amber-soft':   '0 0 30px rgba(245,158,11,0.08)',
         'herzrot-glow': '0 4px 16px rgba(239,68,68,0.40), 0 0 40px rgba(239,68,68,0.15)',
+        'teal-glow':         '0 4px 16px rgba(14,165,233,0.30), 0 0 30px rgba(14,165,233,0.10)',
         'cinema-card':       '0 8px 32px rgba(0,0,0,0.5)',
         'cinema-card-hover': '0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(245,158,11,0.08)',
         'cinema-raised':     '0 16px 48px rgba(0,0,0,0.6)',
         'inner-light':       'inset 0 1px 0 rgba(255,255,255,0.04)',
+        'input-focus':       '0 0 0 3px rgba(245,158,11,0.08)',
       },
       animation: {
         /* existing */

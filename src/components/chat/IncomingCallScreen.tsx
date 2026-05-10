@@ -213,7 +213,7 @@ export default function IncomingCallScreen({
           <span className="absolute inset-0 rounded-full bg-primary-400/30 animate-ping" style={{ animationDuration: '1.5s' }} />
           <span className="absolute inset-0 rounded-full bg-primary-400/20 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
           <span className="absolute inset-0 rounded-full bg-primary-400/10 animate-ping" style={{ animationDuration: '3.5s', animationDelay: '0.6s' }} />
-          <div className="relative w-36 h-36 rounded-full bg-white/15 backdrop-blur-md border-2 border-white/30 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
+          <div className="relative w-36 h-36 rounded-full bg-mn-elevated/15 backdrop-blur-md border-2 border-white/30 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
             {callerAvatar
               ? <img src={callerAvatar} alt={callerName} className="w-full h-full object-cover" />
               : <span>{initials}</span>}
@@ -232,7 +232,7 @@ export default function IncomingCallScreen({
         <div className="flex justify-center mb-8">
           <button
             onClick={() => setMuted(m => !m)}
-            className="p-3 rounded-full bg-white/15 backdrop-blur-md hover:bg-white/25 transition-all"
+            className="p-3 rounded-full bg-mn-elevated/15 backdrop-blur-md hover:bg-mn-elevated/25 transition-all"
             aria-label={muted ? 'Klingelton an' : 'Klingelton aus'}
           >
             {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}

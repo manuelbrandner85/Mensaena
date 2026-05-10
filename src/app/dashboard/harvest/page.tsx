@@ -33,32 +33,32 @@ function SeasonWidget() {
   const next = MONTHLY_HARVEST[(m + 1) % 12]
 
   return (
-    <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-lime-50 border border-primary-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+    <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-lime-50 border border-mn-amber/20 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
       />
       <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
       <div className="relative flex items-center gap-2 mb-3">
-        <Sprout className="w-5 h-5 text-primary-700 float-idle" />
+        <Sprout className="w-5 h-5 text-mn-amber float-idle" />
         <h3 className="font-bold text-primary-900">Was jetzt reif ist</h3>
         <span className="ml-auto text-2xl float-idle">{curr.emoji}</span>
       </div>
       <p className="relative text-sm font-semibold text-primary-800 mb-2">{curr.label} – aktuell erntbar:</p>
       <div className="relative flex flex-wrap gap-1.5 mb-4">
         {curr.crops.map(crop => (
-          <span key={crop} className="bg-white border border-primary-200 text-primary-800 text-xs font-medium px-2.5 py-1 rounded-full shadow-soft">
+          <span key={crop} className="bg-mn-elevated border border-mn-amber/20 text-primary-800 text-xs font-medium px-2.5 py-1 rounded-full shadow-cinema-card">
             🌿 {crop}
           </span>
         ))}
       </div>
-      <div className="relative border-t border-primary-200 pt-3">
-        <p className="text-xs text-primary-700 font-semibold mb-1">Nächsten Monat ({next.label}):</p>
+      <div className="relative border-t border-mn-amber/20 pt-3">
+        <p className="text-xs text-mn-amber font-semibold mb-1">Nächsten Monat ({next.label}):</p>
         <div className="flex flex-wrap gap-1">
           {next.crops.slice(0, 3).map(crop => (
-            <span key={crop} className="bg-primary-100 text-primary-600 text-xs px-2 py-0.5 rounded-full">{crop}</span>
+            <span key={crop} className="bg-mn-amber/10 text-mn-amber text-xs px-2 py-0.5 rounded-full">{crop}</span>
           ))}
-          {next.crops.length > 3 && <span className="text-xs text-primary-500">+{next.crops.length - 3} mehr</span>}
+          {next.crops.length > 3 && <span className="text-xs text-mn-amber">+{next.crops.length - 3} mehr</span>}
         </div>
       </div>
     </div>
@@ -100,33 +100,33 @@ function NearbyFarmsWidget() {
   }, [])
 
   return (
-    <div className="relative bg-white border border-warm-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+    <div className="relative bg-mn-elevated border border-warm-200 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
       />
       <div className="relative flex items-center gap-2 mb-3">
         <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
-        <h3 className="font-bold text-ink-900">Betriebe in der Nähe</h3>
-        <Link href="/dashboard/supply" className="ml-auto text-xs text-primary-600 hover:underline">Alle →</Link>
+        <h3 className="font-bold text-mn-ink">Betriebe in der Nähe</h3>
+        <Link href="/dashboard/supply" className="ml-auto text-xs text-mn-amber hover:underline">Alle →</Link>
       </div>
       {loading ? (
         <div className="space-y-2">
-          {[0,1,2].map(i => <div key={i} className="h-10 bg-stone-100 rounded-xl animate-pulse" />)}
+          {[0,1,2].map(i => <div key={i} className="h-10 bg-mn-elevated rounded-xl animate-pulse" />)}
         </div>
       ) : farms.length === 0 ? (
-        <p className="text-sm text-ink-400 text-center py-4">Keine Betriebe gefunden</p>
+        <p className="text-sm text-mn-mute text-center py-4">Keine Betriebe gefunden</p>
       ) : (
         <div className="space-y-2">
           {farms.map(f => (
             <Link key={f.id} href={`/dashboard/supply/farm/${f.slug}`}
-              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-all group shadow-soft border border-warm-100">
+              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-all group shadow-cinema-card border border-warm-100">
               <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 text-sm group-hover:scale-110 transition-transform">
                 {f.category === 'Biohof' ? '🌿' : f.category === 'Selbsternte' ? '🫑' : '🏡'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-ink-900 truncate group-hover:text-primary-700">{f.name}</p>
-                <p className="text-xs text-ink-500 flex items-center gap-1">
+                <p className="text-sm font-medium text-mn-ink truncate group-hover:text-mn-amber">{f.name}</p>
+                <p className="text-xs text-mn-mute flex items-center gap-1">
                   <MapPin className="w-2.5 h-2.5" /> {f.city}
                 </p>
               </div>
@@ -135,7 +135,7 @@ function NearbyFarmsWidget() {
         </div>
       )}
       <Link href="/dashboard/supply"
-        className="relative mt-3 flex items-center justify-center gap-2 p-2 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 rounded-xl text-xs font-medium text-amber-700 transition-all shadow-soft">
+        className="relative mt-3 flex items-center justify-center gap-2 p-2 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 rounded-xl text-xs font-medium text-amber-700 transition-all shadow-cinema-card">
         {totalCount > 0 ? `🗺️ Alle ${totalCount} Betriebe auf der Karte` : '🗺️ Alle Betriebe auf der Karte'}
       </Link>
     </div>
@@ -145,28 +145,28 @@ function NearbyFarmsWidget() {
 // ── Erntehilfe-Regeln ─────────────────────────────────────────
 function HarvestRulesWidget() {
   return (
-    <div className="relative bg-white border border-warm-200 rounded-2xl p-5 pt-6 shadow-soft overflow-hidden">
+    <div className="relative bg-mn-elevated border border-warm-200 rounded-2xl p-5 pt-6 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
       />
-      <h3 className="relative font-bold text-ink-900 mb-3 flex items-center gap-2">
+      <h3 className="relative font-bold text-mn-ink mb-3 flex items-center gap-2">
         <Wheat className="w-5 h-5 text-yellow-600 float-idle" />
         Wie funktioniert Erntehilfe?
       </h3>
       <div className="relative space-y-3">
         {[
-          { step: '1', title: 'Betrieb inseriert einen Einsatz', desc: 'Landwirte bieten Datum, Ort & was geerntet wird', color: 'bg-primary-100 text-primary-700' },
+          { step: '1', title: 'Betrieb inseriert einen Einsatz', desc: 'Landwirte bieten Datum, Ort & was geerntet wird', color: 'bg-mn-amber/10 text-mn-amber' },
           { step: '2', title: 'Du meldest dein Interesse', desc: 'Klick auf "Interesse" oder direkt per Kontakt', color: 'bg-blue-100 text-blue-700' },
           { step: '3', title: 'Gemeinsam ernten', desc: 'Du hilfst und bekommst Ernteanteile als Dankeschön', color: 'bg-amber-100 text-amber-700' },
         ].map(item => (
           <div key={item.step} className="flex gap-3">
-            <span className={`display-numeral w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-soft ${item.color}`}>
+            <span className={`display-numeral w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-cinema-card ${item.color}`}>
               {item.step}
             </span>
             <div>
-              <p className="text-sm font-semibold text-ink-800">{item.title}</p>
-              <p className="text-xs text-ink-500 mt-0.5">{item.desc}</p>
+              <p className="text-sm font-semibold text-mn-ink">{item.title}</p>
+              <p className="text-xs text-mn-mute mt-0.5">{item.desc}</p>
             </div>
           </div>
         ))}
@@ -219,14 +219,14 @@ function FoodScannerWidget() {
 
   return (
     <>
-      <div className="relative bg-white border border-primary-100 rounded-2xl p-5 shadow-soft overflow-hidden">
+      <div className="relative bg-mn-elevated border border-primary-100 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
         />
         <div className="relative flex items-center gap-2 mb-3">
-          <ScanBarcode className="w-5 h-5 text-primary-600 float-idle" />
-          <h3 className="font-bold text-ink-900">Lebensmittel scannen</h3>
+          <ScanBarcode className="w-5 h-5 text-mn-amber float-idle" />
+          <h3 className="font-bold text-mn-ink">Lebensmittel scannen</h3>
         </div>
 
         {scannedProduct ? (
@@ -240,12 +240,12 @@ function FoodScannerWidget() {
           </div>
         ) : (
           <>
-            <p className="text-sm text-ink-500 mb-3">
+            <p className="text-sm text-mn-mute mb-3">
               Barcode scannen und Produktinfos sofort abrufen – dann direkt als Foodsharing-Post anbieten.
             </p>
             <button
               onClick={() => setScannerOpen(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-amber hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-cinema-card"
             >
               <ScanBarcode className="w-4 h-4" />
               Barcode / Produkt scannen

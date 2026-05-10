@@ -15,7 +15,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {crisis.contact_name && !crisis.is_anonymous && (
-        <span className="inline-flex items-center gap-1 text-xs text-ink-600 bg-stone-50 px-2 py-1 rounded-lg border border-stone-100">
+        <span className="inline-flex items-center gap-1 text-xs text-mn-ink-soft bg-mn-surface px-2 py-1 rounded-lg border border-white/5">
           <User className="w-3 h-3" />
           {crisis.contact_name}
         </span>
@@ -24,7 +24,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
         <>
           <a
             href={`tel:${crisis.contact_phone.replace(/[\s\-()]/g, '')}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-primary-700 bg-primary-50 px-2 py-1 rounded-lg border border-primary-200 hover:bg-primary-100 transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-medium text-mn-amber bg-mn-amber/5 px-2 py-1 rounded-lg border border-mn-amber/20 hover:bg-mn-amber/10 transition-colors"
             aria-label={`Anrufen: ${crisis.contact_phone}`}
           >
             <Phone className="w-3 h-3" />
@@ -43,7 +43,7 @@ export default function CrisisContactBar({ crisis, className }: Props) {
         </>
       )}
       {crisis.location_text && (
-        <span className="inline-flex items-center gap-1 text-xs text-ink-500 bg-stone-50 px-2 py-1 rounded-lg border border-stone-100">
+        <span className="inline-flex items-center gap-1 text-xs text-mn-mute bg-mn-surface px-2 py-1 rounded-lg border border-white/5">
           <MapPin className="w-3 h-3" />
           {crisis.location_text}
         </span>

@@ -96,41 +96,41 @@ export default function BotFeedbackTab() {
     <div className="space-y-5">
       {/* ── Summary Cards ────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1.5 text-ink-400">
+        <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-1.5 text-mn-mute">
             <MessageSquare className="w-3.5 h-3.5" />
             <span className="text-xs font-black uppercase tracking-wider">Gesamt</span>
           </div>
-          <p className="text-2xl font-bold text-ink-900">{summary.total}</p>
-          <p className="text-[11px] text-ink-500 mt-0.5">geladen (max. 200)</p>
+          <p className="text-2xl font-bold text-mn-ink">{summary.total}</p>
+          <p className="text-[11px] text-mn-mute mt-0.5">geladen (max. 200)</p>
         </div>
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1.5 text-ink-400">
+        <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-1.5 text-mn-mute">
             <BarChart3 className="w-3.5 h-3.5" />
             <span className="text-xs font-black uppercase tracking-wider">7 Tage Ratio</span>
           </div>
-          <p className="text-2xl font-bold text-ink-900">
+          <p className="text-2xl font-bold text-mn-ink">
             {summary.ratio7 === null ? '—' : `${summary.ratio7}%`}
           </p>
-          <p className="text-[11px] text-ink-500 mt-0.5">
-            <span className="text-primary-700 font-semibold">{summary.up7} 👍</span>
+          <p className="text-[11px] text-mn-mute mt-0.5">
+            <span className="text-mn-amber font-semibold">{summary.up7} 👍</span>
             {' · '}
             <span className="text-red-600 font-semibold">{summary.down7} 👎</span>
           </p>
         </div>
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-1.5 text-ink-400">
+        <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-1.5 text-mn-mute">
             <span className="text-xs font-black uppercase tracking-wider">Top-Routen</span>
           </div>
           {summary.topRoutes.length === 0 ? (
-            <p className="text-sm text-ink-400">Noch keine Daten</p>
+            <p className="text-sm text-mn-mute">Noch keine Daten</p>
           ) : (
             <ul className="space-y-1">
               {summary.topRoutes.map(r => (
                 <li key={r.route} className="flex items-center justify-between text-[11px]">
-                  <span className="truncate text-ink-600 font-mono">{r.route}</span>
-                  <span className="text-ink-400 flex-shrink-0 ml-2">
-                    {r.total} <span className="text-primary-600">👍{r.up}</span>{' '}
+                  <span className="truncate text-mn-ink-soft font-mono">{r.route}</span>
+                  <span className="text-mn-mute flex-shrink-0 ml-2">
+                    {r.total} <span className="text-mn-amber">👍{r.up}</span>{' '}
                     <span className="text-red-500">👎{r.down}</span>
                   </span>
                 </li>
@@ -141,8 +141,8 @@ export default function BotFeedbackTab() {
       </div>
 
       {/* ── Filter + Table ───────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-stone-100">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/5">
           <div className="flex items-center gap-1.5">
             {(['all', 'up', 'down'] as const).map(k => (
               <button
@@ -150,8 +150,8 @@ export default function BotFeedbackTab() {
                 onClick={() => setFilter(k)}
                 className={`text-[11px] px-2.5 py-1 rounded-full font-medium transition-colors ${
                   filter === k
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-stone-50 text-ink-500 hover:bg-stone-100'
+                    ? 'bg-mn-amber text-white'
+                    : 'bg-mn-surface text-mn-mute hover:bg-mn-elevated'
                 }`}
               >
                 {k === 'all' ? 'Alle' : k === 'up' ? '👍 Positiv' : '👎 Negativ'}
@@ -160,7 +160,7 @@ export default function BotFeedbackTab() {
           </div>
           <button
             onClick={load}
-            className="text-[11px] text-ink-400 hover:text-primary-600 transition-colors"
+            className="text-[11px] text-mn-mute hover:text-mn-amber transition-colors"
           >
             Neu laden
           </button>
@@ -171,14 +171,14 @@ export default function BotFeedbackTab() {
             <Loader2 className="w-6 h-6 text-primary-400 animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-16 text-center text-sm text-ink-400">
+          <div className="py-16 text-center text-sm text-mn-mute">
             Noch kein Feedback vorhanden.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-50 border-b border-stone-100">
-                <tr className="text-xs font-black uppercase tracking-wider text-ink-400">
+              <thead className="bg-mn-surface border-b border-white/5">
+                <tr className="text-xs font-black uppercase tracking-wider text-mn-mute">
                   <th className="px-4 py-2.5 text-left">Zeit</th>
                   <th className="px-4 py-2.5 text-left">Route</th>
                   <th className="px-4 py-2.5 text-left">Frage</th>
@@ -188,22 +188,22 @@ export default function BotFeedbackTab() {
               </thead>
               <tbody className="divide-y divide-stone-100">
                 {filtered.map(r => (
-                  <tr key={r.id} className="hover:bg-stone-50/50 transition-colors">
-                    <td className="px-4 py-2.5 text-[11px] text-ink-500 whitespace-nowrap">
+                  <tr key={r.id} className="hover:bg-mn-surface/50 transition-colors">
+                    <td className="px-4 py-2.5 text-[11px] text-mn-mute whitespace-nowrap">
                       {formatDate(r.created_at)}
                     </td>
-                    <td className="px-4 py-2.5 text-[11px] text-ink-500 font-mono whitespace-nowrap">
+                    <td className="px-4 py-2.5 text-[11px] text-mn-mute font-mono whitespace-nowrap">
                       {r.route ?? '—'}
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-ink-700 max-w-[240px]">
-                      {truncate(r.question, 80) || <span className="text-stone-400">—</span>}
+                    <td className="px-4 py-2.5 text-xs text-mn-ink-soft max-w-[240px]">
+                      {truncate(r.question, 80) || <span className="text-mn-ghost">—</span>}
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-ink-500 max-w-[320px]">
-                      {truncate(r.answer, 120) || <span className="text-stone-400">—</span>}
+                    <td className="px-4 py-2.5 text-xs text-mn-mute max-w-[320px]">
+                      {truncate(r.answer, 120) || <span className="text-mn-ghost">—</span>}
                     </td>
                     <td className="px-4 py-2.5 text-center">
                       {r.rating === 'up' ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mn-amber/5 text-mn-amber text-[11px] font-semibold">
                           <ThumbsUp className="w-3 h-3" /> positiv
                         </span>
                       ) : (

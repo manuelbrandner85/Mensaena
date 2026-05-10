@@ -26,53 +26,53 @@ function ReviewCard({
   const isOwn = userId === review.user_id
 
   return (
-    <div className="bg-white rounded-xl border border-stone-100 p-4" role="article" aria-label="Bewertung">
+    <div className="bg-mn-elevated rounded-xl border border-white/5 p-4" role="article" aria-label="Bewertung">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
           {review.profiles?.avatar_url ? (
             <img src={review.profiles.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-              <span className="text-xs font-medium text-primary-700">
+            <div className="w-8 h-8 rounded-full bg-mn-amber/10 flex items-center justify-center">
+              <span className="text-xs font-medium text-mn-amber">
                 {(review.profiles?.name || 'A')[0].toUpperCase()}
               </span>
             </div>
           )}
           <div>
-            <p className="text-sm font-medium text-ink-900">
+            <p className="text-sm font-medium text-mn-ink">
               {review.profiles?.display_name || review.profiles?.name || 'Anonym'}
             </p>
-            <p className="text-xs text-ink-400">{formatRelativeTime(review.created_at)}</p>
+            <p className="text-xs text-mn-mute">{formatRelativeTime(review.created_at)}</p>
           </div>
         </div>
         <div className="flex items-center gap-0.5" aria-label={`${review.rating} Sterne`}>
           {[1, 2, 3, 4, 5].map(star => (
-            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300')} />
+            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-mn-ghost')} />
           ))}
         </div>
       </div>
 
-      {review.title && <h4 className="font-medium text-ink-900 text-sm mt-2">{review.title}</h4>}
-      <p className="text-sm text-ink-600 mt-1 leading-relaxed">{review.content}</p>
+      {review.title && <h4 className="font-medium text-mn-ink text-sm mt-2">{review.title}</h4>}
+      <p className="text-sm text-mn-ink-soft mt-1 leading-relaxed">{review.content}</p>
 
       {/* Admin response */}
       {review.admin_response && (
-        <div className="mt-3 p-3 bg-primary-50 rounded-lg border border-primary-100">
+        <div className="mt-3 p-3 bg-mn-amber/5 rounded-lg border border-primary-100">
           <div className="flex items-center gap-1.5 mb-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-primary-600" />
-            <span className="text-xs font-medium text-primary-700">Antwort der Organisation</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-mn-amber" />
+            <span className="text-xs font-medium text-mn-amber">Antwort der Organisation</span>
           </div>
           <p className="text-xs text-primary-800">{review.admin_response}</p>
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-stone-100">
+      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-white/5">
         <button
           onClick={() => onToggleHelpful(review.id)}
           className={cn(
             'flex items-center gap-1 text-xs transition-colors',
-            review.user_found_helpful ? 'text-primary-600 font-medium' : 'text-ink-400 hover:text-primary-600'
+            review.user_found_helpful ? 'text-mn-amber font-medium' : 'text-mn-mute hover:text-mn-amber'
           )}
           aria-label="Hilfreich markieren"
         >
@@ -82,10 +82,10 @@ function ReviewCard({
 
         {isOwn && (
           <>
-            <button onClick={() => onEdit(review)} className="text-xs text-ink-400 hover:text-blue-600 flex items-center gap-1">
+            <button onClick={() => onEdit(review)} className="text-xs text-mn-mute hover:text-blue-600 flex items-center gap-1">
               <Pencil className="w-3 h-3" /> Bearbeiten
             </button>
-            <button onClick={() => onDelete(review.id)} className="text-xs text-ink-400 hover:text-red-600 flex items-center gap-1">
+            <button onClick={() => onDelete(review.id)} className="text-xs text-mn-mute hover:text-red-600 flex items-center gap-1">
               <Trash2 className="w-3 h-3" /> Löschen
             </button>
           </>
@@ -94,7 +94,7 @@ function ReviewCard({
         {!isOwn && !review.is_reported && (
           <button
             onClick={() => setShowReport(s => !s)}
-            className="text-xs text-ink-400 hover:text-red-500 flex items-center gap-1 ml-auto"
+            className="text-xs text-mn-mute hover:text-red-500 flex items-center gap-1 ml-auto"
           >
             <Flag className="w-3 h-3" /> Melden
           </button>
@@ -124,7 +124,7 @@ function ReviewCard({
             >
               Absenden
             </button>
-            <button onClick={() => setShowReport(false)} className="text-xs text-ink-500">Abbrechen</button>
+            <button onClick={() => setShowReport(false)} className="text-xs text-mn-mute">Abbrechen</button>
           </div>
         </div>
       )}
@@ -159,8 +159,8 @@ function ReviewForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-stone-100 p-4">
-      <h3 className="font-semibold text-ink-900 text-sm mb-3">
+    <form onSubmit={handleSubmit} className="bg-mn-elevated rounded-xl border border-white/5 p-4">
+      <h3 className="font-semibold text-mn-ink text-sm mb-3">
         {existingReview ? 'Bewertung bearbeiten' : 'Bewertung schreiben'}
       </h3>
 
@@ -180,12 +180,12 @@ function ReviewForm({
               'w-6 h-6 transition-colors',
               star <= (hoverRating || rating)
                 ? 'text-yellow-400 fill-yellow-400'
-                : 'text-stone-300'
+                : 'text-mn-ghost'
             )} />
           </button>
         ))}
         {rating > 0 && (
-          <span className="text-xs text-ink-500 ml-2">{rating} / 5</span>
+          <span className="text-xs text-mn-mute ml-2">{rating} / 5</span>
         )}
       </div>
 
@@ -194,13 +194,13 @@ function ReviewForm({
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Titel (optional)"
-        className="w-full text-sm p-2.5 border border-stone-200 rounded-xl mb-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
+        className="w-full text-sm p-2.5 border border-white/5 rounded-xl mb-2 focus:outline-none focus:ring-2 focus:ring-primary-300"
       />
       <textarea
         value={content}
         onChange={e => setContent(e.target.value)}
         placeholder="Deine Erfahrung (mind. 10 Zeichen)..."
-        className="w-full text-sm p-2.5 border border-stone-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-300"
+        className="w-full text-sm p-2.5 border border-white/5 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-300"
         rows={3}
         required
         minLength={10}
@@ -210,13 +210,13 @@ function ReviewForm({
         <button
           type="submit"
           disabled={submitting || rating === 0 || content.length < 10}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-mn-amber text-white text-sm font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors"
         >
           <Send className="w-3.5 h-3.5" />
           {submitting ? 'Wird gesendet...' : existingReview ? 'Aktualisieren' : 'Bewertung absenden'}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="text-sm text-ink-500 hover:text-ink-700">
+          <button type="button" onClick={onCancel} className="text-sm text-mn-mute hover:text-mn-ink-soft">
             Abbrechen
           </button>
         )}
@@ -258,11 +258,11 @@ export default function OrganizationReviews({
   return (
     <section className="space-y-4" aria-label="Bewertungen">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-ink-900 text-lg flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-ink-400" />
+        <h2 className="font-semibold text-mn-ink text-lg flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-mn-mute" />
           Bewertungen
           {ratingCount > 0 && (
-            <span className="text-sm font-normal text-ink-500">
+            <span className="text-sm font-normal text-mn-mute">
               ({ratingCount})
             </span>
           )}
@@ -270,9 +270,9 @@ export default function OrganizationReviews({
         {ratingCount > 0 && (
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map(star => (
-              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300')} />
+              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-yellow-400 fill-yellow-400' : 'text-mn-ghost')} />
             ))}
-            <span className="text-sm text-ink-600 ml-1">{ratingAvg}</span>
+            <span className="text-sm text-mn-ink-soft ml-1">{ratingAvg}</span>
           </div>
         )}
       </div>
@@ -306,21 +306,21 @@ export default function OrganizationReviews({
       {loading && reviews.length === 0 ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-stone-100 p-4 animate-pulse">
+            <div key={i} className="bg-mn-elevated rounded-xl border border-white/5 p-4 animate-pulse">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-stone-100 rounded-full" />
-                <div className="h-3 bg-stone-100 rounded w-24" />
+                <div className="w-8 h-8 bg-mn-elevated rounded-full" />
+                <div className="h-3 bg-mn-elevated rounded w-24" />
               </div>
-              <div className="h-3 bg-stone-50 rounded w-full mb-1" />
-              <div className="h-3 bg-stone-50 rounded w-2/3" />
+              <div className="h-3 bg-mn-surface rounded w-full mb-1" />
+              <div className="h-3 bg-mn-surface rounded w-2/3" />
             </div>
           ))}
         </div>
       ) : reviews.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-xl border border-stone-100">
-          <MessageCircle className="w-8 h-8 text-stone-400 mx-auto mb-2" />
-          <p className="text-ink-500 text-sm">Noch keine Bewertungen vorhanden.</p>
-          {userId && <p className="text-ink-400 text-xs mt-1">Sei der Erste!</p>}
+        <div className="text-center py-8 bg-mn-elevated rounded-xl border border-white/5">
+          <MessageCircle className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
+          <p className="text-mn-mute text-sm">Noch keine Bewertungen vorhanden.</p>
+          {userId && <p className="text-mn-mute text-xs mt-1">Sei der Erste!</p>}
         </div>
       ) : (
         <div className="space-y-3">
@@ -342,7 +342,7 @@ export default function OrganizationReviews({
         <div className="flex justify-center">
           <button
             onClick={() => onLoadMore(orgId)}
-            className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 font-medium"
+            className="px-4 py-2 text-sm text-mn-amber hover:text-primary-800 font-medium"
           >
             Mehr Bewertungen laden
           </button>

@@ -135,25 +135,25 @@ export default function EmailBlockEditor({
       {/* Toolbar */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-bold text-ink-700 mr-1">Block hinzufügen:</span>
+          <span className="text-xs font-bold text-mn-ink-soft mr-1">Block hinzufügen:</span>
           {BLOCK_TEMPLATES.map(t => (
             <button
               key={t.type}
               onClick={() => addBlock(t.type)}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-stone-50 hover:bg-primary-50 border border-stone-200 hover:border-primary-200 rounded-lg text-xs text-ink-700 hover:text-primary-700 transition-all"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-mn-surface hover:bg-mn-amber/5 border border-white/5 hover:border-mn-amber/20 rounded-lg text-xs text-mn-ink-soft hover:text-mn-amber transition-all"
             >
               {t.icon} {t.label}
             </button>
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={() => setMode('edit')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'edit' ? 'bg-primary-500 text-white' : 'bg-stone-100 text-ink-600'}`}>
+          <button onClick={() => setMode('edit')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'edit' ? 'bg-mn-amber text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
             <Plus className="w-3 h-3 inline mr-1" />Editor
           </button>
-          <button onClick={() => setMode('preview')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'preview' ? 'bg-primary-500 text-white' : 'bg-stone-100 text-ink-600'}`}>
+          <button onClick={() => setMode('preview')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'preview' ? 'bg-mn-amber text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
             <Eye className="w-3 h-3 inline mr-1" />Vorschau
           </button>
-          <button onClick={() => setMode('code')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'code' ? 'bg-primary-500 text-white' : 'bg-stone-100 text-ink-600'}`}>
+          <button onClick={() => setMode('code')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'code' ? 'bg-mn-amber text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
             <Code className="w-3 h-3 inline mr-1" />HTML
           </button>
         </div>
@@ -161,24 +161,24 @@ export default function EmailBlockEditor({
 
       {/* Editor */}
       {mode === 'edit' && (
-        <div className="space-y-2 bg-stone-50 rounded-xl p-3 min-h-[300px]">
+        <div className="space-y-2 bg-mn-surface rounded-xl p-3 min-h-[300px]">
           {blocks.length === 0 && (
-            <p className="text-xs text-ink-400 text-center py-8 italic">Klicke oben auf einen Block-Typ um zu starten.</p>
+            <p className="text-xs text-mn-mute text-center py-8 italic">Klicke oben auf einen Block-Typ um zu starten.</p>
           )}
           {blocks.map((block, idx) => (
             <div
               key={block.id}
               onClick={() => setSelectedBlock(block.id)}
-              className={`bg-white rounded-xl border p-3 transition-all cursor-pointer ${
-                selectedBlock === block.id ? 'border-primary-400 ring-2 ring-primary-100' : 'border-stone-200 hover:border-stone-300'
+              className={`bg-mn-elevated rounded-xl border p-3 transition-all cursor-pointer ${
+                selectedBlock === block.id ? 'border-primary-400 ring-2 ring-primary-100' : 'border-white/5 hover:border-white/8'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-ink-400 font-medium uppercase">{block.type}</span>
+                <span className="text-xs text-mn-mute font-medium uppercase">{block.type}</span>
                 <div className="flex items-center gap-1">
-                  <button aria-label="Block nach oben verschieben" onClick={e => { e.stopPropagation(); moveBlock(block.id, 'up') }} disabled={idx === 0} className="p-1 text-ink-400 hover:text-ink-700 disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
-                  <button aria-label="Block nach unten verschieben" onClick={e => { e.stopPropagation(); moveBlock(block.id, 'down') }} disabled={idx === blocks.length - 1} className="p-1 text-ink-400 hover:text-ink-700 disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
-                  <button aria-label="Block löschen" onClick={e => { e.stopPropagation(); removeBlock(block.id) }} className="p-1 text-ink-400 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button aria-label="Block nach oben verschieben" onClick={e => { e.stopPropagation(); moveBlock(block.id, 'up') }} disabled={idx === 0} className="p-1 text-mn-mute hover:text-mn-ink-soft disabled:opacity-30"><ChevronUp className="w-3.5 h-3.5" /></button>
+                  <button aria-label="Block nach unten verschieben" onClick={e => { e.stopPropagation(); moveBlock(block.id, 'down') }} disabled={idx === blocks.length - 1} className="p-1 text-mn-mute hover:text-mn-ink-soft disabled:opacity-30"><ChevronDown className="w-3.5 h-3.5" /></button>
+                  <button aria-label="Block löschen" onClick={e => { e.stopPropagation(); removeBlock(block.id) }} className="p-1 text-mn-mute hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
 
@@ -186,7 +186,7 @@ export default function EmailBlockEditor({
                 <input
                   type="text" value={block.content}
                   onChange={e => updateBlock(block.id, { content: e.target.value })}
-                  className="w-full text-xl font-bold text-primary-700 bg-transparent border-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 rounded"
+                  className="w-full text-xl font-bold text-mn-amber bg-transparent border-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30 rounded"
                   placeholder="Überschrift..."
                 />
               )}
@@ -194,7 +194,7 @@ export default function EmailBlockEditor({
                 <textarea
                   value={block.content}
                   onChange={e => updateBlock(block.id, { content: e.target.value })}
-                  className="w-full text-sm text-ink-700 bg-transparent border-none outline-none resize-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 rounded"
+                  className="w-full text-sm text-mn-ink-soft bg-transparent border-none outline-none resize-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30 rounded"
                   rows={3}
                   placeholder="Text eingeben..."
                 />
@@ -203,7 +203,7 @@ export default function EmailBlockEditor({
                 <input
                   type="url" value={block.props.url}
                   onChange={e => updateBlock(block.id, { props: { ...block.props, url: e.target.value } })}
-                  className="w-full text-xs text-ink-600 bg-stone-50 rounded-lg px-2 py-1.5 border border-stone-200"
+                  className="w-full text-xs text-mn-ink-soft bg-mn-surface rounded-lg px-2 py-1.5 border border-white/5"
                   placeholder="Bild-URL..."
                 />
               )}
@@ -212,19 +212,19 @@ export default function EmailBlockEditor({
                   <input
                     type="text" value={block.content}
                     onChange={e => updateBlock(block.id, { content: e.target.value })}
-                    className="flex-1 text-sm bg-stone-50 rounded-lg px-2 py-1.5 border border-stone-200"
+                    className="flex-1 text-sm bg-mn-surface rounded-lg px-2 py-1.5 border border-white/5"
                     placeholder="Button-Text..."
                   />
                   <input
                     type="url" value={block.props.url}
                     onChange={e => updateBlock(block.id, { props: { ...block.props, url: e.target.value } })}
-                    className="flex-1 text-xs bg-stone-50 rounded-lg px-2 py-1.5 border border-stone-200"
+                    className="flex-1 text-xs bg-mn-surface rounded-lg px-2 py-1.5 border border-white/5"
                     placeholder="Link-URL..."
                   />
                 </div>
               )}
               {block.type === 'divider' && (
-                <hr className="border-t border-stone-200 my-1" />
+                <hr className="border-t border-white/5 my-1" />
               )}
             </div>
           ))}
@@ -233,8 +233,8 @@ export default function EmailBlockEditor({
 
       {/* Vorschau */}
       {mode === 'preview' && (
-        <div className="border border-stone-200 rounded-xl overflow-hidden bg-stone-50">
-          <iframe srcDoc={fullHtml} className="w-full h-[500px] bg-white" />
+        <div className="border border-white/5 rounded-xl overflow-hidden bg-mn-surface">
+          <iframe srcDoc={fullHtml} className="w-full h-[500px] bg-mn-elevated" />
         </div>
       )}
 
@@ -243,7 +243,7 @@ export default function EmailBlockEditor({
         <textarea
           value={fullHtml}
           readOnly
-          className="w-full px-3 py-2 border border-stone-200 rounded-xl text-xs font-mono bg-stone-50 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500"
+          className="w-full px-3 py-2 border border-white/5 rounded-xl text-xs font-mono bg-mn-surface focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30"
           rows={15}
         />
       )}
@@ -252,7 +252,7 @@ export default function EmailBlockEditor({
       <div className="flex justify-end">
         <button
           onClick={() => onSave(fullHtml)}
-          className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-xl text-sm font-medium shadow-sm transition-colors"
+          className="px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm transition-colors"
         >
           Als Kampagne übernehmen
         </button>

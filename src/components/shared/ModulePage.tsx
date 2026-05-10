@@ -91,7 +91,7 @@ export default function ModulePage({
   title, description, icon, color,
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = true, filterCategory, children,
-  sectionLabel, iconColorClass = 'text-primary-700', iconBgClass = 'bg-primary-50 border-primary-100',
+  sectionLabel, iconColorClass = 'text-mn-amber', iconBgClass = 'bg-mn-amber/5 border-primary-100',
   mood = 'neutral', examplePosts, infoTooltip, moduleKey, firstVisitIntro,
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
@@ -223,7 +223,7 @@ export default function ModulePage({
       <button
         type="button"
         onClick={() => router.back()}
-        className="sm:hidden flex items-center gap-1.5 -ml-1 px-1 py-1.5 text-sm font-medium text-ink-600 hover:text-ink-900 active:text-ink-900 transition-colors"
+        className="sm:hidden flex items-center gap-1.5 -ml-1 px-1 py-1.5 text-sm font-medium text-mn-ink-soft hover:text-mn-ink active:text-mn-ink transition-colors"
         aria-label="Zurück"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -273,9 +273,9 @@ export default function ModulePage({
                       type="button"
                       onClick={() => setTooltipOpen((o) => !o)}
                       aria-label="Mehr Informationen zu diesem Modul"
-                      className="p-0.5 rounded-full hover:bg-stone-100 transition-colors"
+                      className="p-0.5 rounded-full hover:bg-mn-elevated/5 transition-colors"
                     >
-                      <HelpCircle className="w-4 h-4 text-stone-400 cursor-pointer" />
+                      <HelpCircle className="w-4 h-4 text-mn-ghost cursor-pointer" />
                     </button>
                     {tooltipOpen && (
                       <div className="absolute left-0 top-full mt-2 z-50 animate-fade-in">
@@ -303,18 +303,18 @@ export default function ModulePage({
 
         {/* Live-Zähler: Suche / Biete */}
         {!loading && posts.length > 0 && (
-          <div className="flex gap-2 mt-5 flex-wrap text-xs tracking-wide text-ink-500">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+          <div className="flex gap-2 mt-5 flex-wrap text-xs tracking-wide text-mn-mute">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5">
               <HelpingHand className="w-3.5 h-3.5" />
-              <span className="font-serif italic text-ink-800 tabular-nums">{seekCount}</span> suchen
+              <span className="font-serif italic text-mn-ink tabular-nums">{seekCount}</span> suchen
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5">
               <HandHeart className="w-3.5 h-3.5" />
-              <span className="font-serif italic text-ink-800 tabular-nums">{offerCount}</span> bieten
+              <span className="font-serif italic text-mn-ink tabular-nums">{offerCount}</span> bieten
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 border border-stone-200">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-mn-elevated border border-white/5">
               <Users className="w-3.5 h-3.5" />
-              <span className="font-serif italic text-ink-800 tabular-nums">{posts.length}</span> gesamt
+              <span className="font-serif italic text-mn-ink tabular-nums">{posts.length}</span> gesamt
             </span>
           </div>
         )}
@@ -326,7 +326,7 @@ export default function ModulePage({
       {children}
 
       {/* Tabs: Alle / Suche Hilfe / Biete Hilfe */}
-      <div className="flex gap-1 p-1 rounded-2xl shadow-soft" style={{ background: 'rgba(255,255,255,0.70)', backdropFilter: 'blur(12px)', border: '1px solid rgba(208,245,243,0.60)' }}>
+      <div className="flex gap-1 p-1 rounded-2xl shadow-cinema-card" style={{ background: 'rgba(255,255,255,0.70)', backdropFilter: 'blur(12px)', border: '1px solid rgba(208,245,243,0.60)' }}>
         {([
           { key: 'alle',  label: '🔍 Alle Beiträge' },
           { key: 'suche', label: '🔴 Hilfe gesucht' },
@@ -336,8 +336,8 @@ export default function ModulePage({
             onClick={() => { haptic.selection(); setActiveTab(tab.key) }}
             className={cn('flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all',
               activeTab === tab.key
-                ? 'bg-white shadow-sm text-ink-900'
-                : 'text-ink-500 hover:text-ink-700')}>
+                ? 'bg-mn-elevated shadow-sm text-mn-ink'
+                : 'text-mn-mute hover:text-mn-ink-soft')}>
             {tab.label}
           </button>
         ))}
@@ -347,7 +347,7 @@ export default function ModulePage({
       <div className="card-depth p-4">
         <div className="flex gap-3 flex-wrap">
           <div className="relative flex-1 min-w-48">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
             <input
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
@@ -356,11 +356,11 @@ export default function ModulePage({
             />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="w-4 h-4 text-ink-400 flex-shrink-0" />
+            <Filter className="w-4 h-4 text-mn-mute flex-shrink-0" />
             <button
               onClick={() => { haptic.selection(); setFilterType('all') }}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                filterType === 'all' ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-ink-600 hover:bg-warm-50')}
+                filterType === 'all' ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-warm-200 text-mn-ink-soft hover:bg-warm-50')}
             >
               Alle
             </button>
@@ -369,7 +369,7 @@ export default function ModulePage({
                 key={t.value}
                 onClick={() => { haptic.selection(); setFilterType(t.value) }}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                  filterType === t.value ? 'bg-primary-600 text-white shadow-sm' : 'bg-white border border-warm-200 text-ink-600 hover:bg-warm-50')}
+                  filterType === t.value ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-warm-200 text-mn-ink-soft hover:bg-warm-50')}
               >
                 {t.label}
               </button>
@@ -386,7 +386,7 @@ export default function ModulePage({
       ) : filtered.length === 0 ? (
         examplePosts && examplePosts.length > 0 ? (
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-ink-500 text-center">
+            <p className="text-sm font-semibold text-mn-mute text-center">
               So könnte dein erster Beitrag aussehen:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,7 +395,7 @@ export default function ModulePage({
                   key={i}
                   type="button"
                   onClick={() => router.push(buildCreateUrl({ type: ex.type, category: ex.category, title: ex.title }))}
-                  className="relative text-left rounded-2xl border border-dashed border-primary-300 bg-primary-50/50 p-4 opacity-70 hover:opacity-100 hover:border-primary-500 hover:bg-primary-50 transition-all cursor-pointer"
+                  className="relative text-left rounded-2xl border border-dashed border-primary-300 bg-mn-amber/5/50 p-4 opacity-70 hover:opacity-100 hover:border-mn-amber hover:bg-mn-amber/5 transition-all cursor-pointer"
                 >
                   <span className="absolute top-2 right-2 bg-violet-100 text-violet-700 text-xs rounded-full px-2 py-0.5">
                     ✨ Beispiel
@@ -403,8 +403,8 @@ export default function ModulePage({
                   <div className="flex items-start gap-3 pr-16">
                     <span className="text-2xl flex-shrink-0">{ex.emoji}</span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-ink-800 text-sm leading-snug">{ex.title}</p>
-                      <p className="text-xs text-ink-500 mt-1 line-clamp-2">{ex.description}</p>
+                      <p className="font-semibold text-mn-ink text-sm leading-snug">{ex.title}</p>
+                      <p className="text-xs text-mn-mute mt-1 line-clamp-2">{ex.description}</p>
                     </div>
                   </div>
                 </button>
@@ -425,8 +425,8 @@ export default function ModulePage({
         ) : (
           <div className="text-center py-16 card-depth">
             <div className="text-5xl mb-4">🌿</div>
-            <p className="font-bold text-ink-800 text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
-            <p className="text-sm text-ink-500 mb-5">
+            <p className="font-bold text-mn-ink text-lg mb-1">{emptyText ?? 'Noch keine Beiträge'}</p>
+            <p className="text-sm text-mn-mute mb-5">
               {activeTab === 'suche' ? 'Noch niemand sucht Hilfe in diesem Bereich.'
                : activeTab === 'biete' ? 'Noch niemand bietet Hilfe an – sei der Erste!'
                : 'Sei der Erste – erstelle jetzt einen Beitrag!'}

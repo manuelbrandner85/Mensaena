@@ -439,18 +439,18 @@ export default function PostCard({
             {/* Avatar */}
             <div className={cn(
               'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden',
-              isAnonymous ? 'bg-stone-200' : 'bg-primary-100',
+              isAnonymous ? 'bg-mn-raised' : 'bg-mn-amber/10',
             )}>
               {isAnonymous
-                ? <span className="text-ink-500 text-sm font-bold">?</span>
+                ? <span className="text-mn-mute text-sm font-bold">?</span>
                 : post.profiles?.avatar_url
                   ? <Image src={post.profiles.avatar_url} alt={`Profilbild von ${post.profiles?.name || 'Nutzer'}`} width={32} height={32} className="w-full h-full object-cover" />
-                  : <User className="w-4 h-4 text-primary-600" />
+                  : <User className="w-4 h-4 text-mn-amber" />
               }
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1">
-                <p className="text-xs font-medium text-ink-700 truncate">
+                <p className="text-xs font-medium text-mn-ink-soft truncate">
                   {isAnonymous ? 'Anonym' : (post.profiles?.name ?? 'Nutzer')}
                 </p>
                 {/* Verification badges */}
@@ -472,7 +472,7 @@ export default function PostCard({
                   <TrustScoreBadge score={post.profiles.trust_score} count={post.profiles.trust_score_count} />
                 )}
               </div>
-              <div className="flex items-center gap-1 text-xs text-ink-400">
+              <div className="flex items-center gap-1 text-xs text-mn-mute">
                 <Clock className="w-3 h-3" />
                 {formatRelativeTime(post.created_at)}
                 {/* Urgency indicator */}
@@ -495,7 +495,7 @@ export default function PostCard({
             {availability && (
               <span className={cn(
                 'inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full',
-                availability.available ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-ink-600',
+                availability.available ? 'bg-green-100 text-green-700' : 'bg-mn-elevated text-mn-ink-soft',
               )}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', availability.available ? 'bg-green-500' : 'bg-stone-400')} />
                 {availability.available ? 'Jetzt verfügbar' : `Nächste Verfügbarkeit: ${availability.nextLabel}`}
@@ -514,17 +514,17 @@ export default function PostCard({
         {/* ── Title ──────────────────────────────────────────────────── */}
         {detailLink ? (
           <Link href={href} className="block group/title">
-            <h3 className="font-semibold text-ink-900 text-sm leading-snug group-hover/title:text-primary-700 transition-colors mb-1">
+            <h3 className="font-semibold text-mn-ink text-sm leading-snug group-hover/title:text-mn-amber transition-colors mb-1">
               {post.title}
             </h3>
           </Link>
         ) : (
-          <h3 className="font-semibold text-ink-900 text-sm leading-snug mb-1">{post.title}</h3>
+          <h3 className="font-semibold text-mn-ink text-sm leading-snug mb-1">{post.title}</h3>
         )}
 
         {/* ── Description ────────────────────────────────────────────── */}
         {!compact && post.description && (
-          <p className="text-sm text-ink-600 line-clamp-2 mb-3">
+          <p className="text-sm text-mn-ink-soft line-clamp-2 mb-3">
             {truncateText(post.description, 200)}
           </p>
         )}
@@ -533,7 +533,7 @@ export default function PostCard({
         {(post.location_text || (post.latitude && post.longitude)) && (
           <div className="flex items-center gap-2 mb-3 flex-wrap">
             {post.location_text && (
-              <div className="flex items-center gap-1 text-xs text-ink-500">
+              <div className="flex items-center gap-1 text-xs text-mn-mute">
                 <MapPin className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{post.location_text}</span>
               </div>
@@ -579,8 +579,8 @@ export default function PostCard({
                   className={cn(
                     'flex items-center gap-0.5 px-2 py-1 rounded-full text-xs transition-all',
                     isActive
-                      ? 'bg-primary-100 text-primary-800 ring-1 ring-primary-300 scale-105'
-                      : 'bg-warm-50 text-ink-500 hover:bg-warm-100',
+                      ? 'bg-mn-amber/10 text-primary-800 ring-1 ring-primary-300 scale-105'
+                      : 'bg-warm-50 text-mn-mute hover:bg-warm-100',
                   )}
                 >
                   <span>{r.emoji}</span>
@@ -602,7 +602,7 @@ export default function PostCard({
                     if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
                     setShowContactModal(true)
                   }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-200 transition-all active:scale-95 shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 border border-mn-amber/20 transition-all active:scale-95 shadow-sm"
                 >
                   <Send className="w-3.5 h-3.5" /> Interesse zeigen
                 </button>
@@ -652,14 +652,14 @@ export default function PostCard({
                   title="Hilfreich"
                   className={cn(
                     'p-1 rounded-lg transition-all',
-                    myVote === 1 ? 'text-green-600 bg-green-50' : 'text-ink-400 hover:bg-warm-100 hover:text-green-600',
+                    myVote === 1 ? 'text-green-600 bg-green-50' : 'text-mn-mute hover:bg-warm-100 hover:text-green-600',
                   )}
                 >
                   <ThumbsUp className="w-3.5 h-3.5" />
                 </button>
                 <span className={cn(
                   'text-xs font-semibold min-w-[18px] text-center tabular-nums',
-                  voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-ink-400',
+                  voteScore > 0 ? 'text-green-600' : voteScore < 0 ? 'text-red-500' : 'text-mn-mute',
                 )}>
                   {voteScore}
                 </span>
@@ -668,7 +668,7 @@ export default function PostCard({
                   title="Nicht hilfreich"
                   className={cn(
                     'p-1 rounded-lg transition-all',
-                    myVote === -1 ? 'text-red-500 bg-red-50' : 'text-ink-400 hover:bg-warm-100 hover:text-red-500',
+                    myVote === -1 ? 'text-red-500 bg-red-50' : 'text-mn-mute hover:bg-warm-100 hover:text-red-500',
                   )}
                 >
                   <ThumbsDown className="w-3.5 h-3.5" />
@@ -679,7 +679,7 @@ export default function PostCard({
               {detailLink && (
                 <Link
                   href={href}
-                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-warm-100 transition-colors text-ink-400 hover:text-primary-600"
+                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-warm-100 transition-colors text-mn-mute hover:text-mn-amber"
                   title={`${commentCount} Kommentare`}
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
@@ -695,8 +695,8 @@ export default function PostCard({
                 title={isSaved ? 'Gespeichert' : 'Speichern'}
               >
                 {isSaved
-                  ? <BookmarkCheck className="w-4 h-4 text-primary-600" />
-                  : <Bookmark className="w-4 h-4 text-ink-400" />
+                  ? <BookmarkCheck className="w-4 h-4 text-mn-amber" />
+                  : <Bookmark className="w-4 h-4 text-mn-mute" />
                 }
               </button>
 
@@ -717,7 +717,7 @@ export default function PostCard({
               {/* Detail link */}
               {detailLink && (
                 <Link href={href} className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors" title="Details">
-                  <ExternalLink className="w-4 h-4 text-ink-400" />
+                  <ExternalLink className="w-4 h-4 text-mn-mute" />
                 </Link>
               )}
             </div>
@@ -844,13 +844,13 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-3" onClick={e => e.stopPropagation()}>
+      <div className="bg-mn-elevated rounded-2xl shadow-cinema-card-2xl w-full max-w-sm p-5 space-y-3" onClick={e => e.stopPropagation()}>
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-bold text-ink-900">Interesse zeigen</p>
-            <p className="text-xs text-ink-500 mt-0.5 line-clamp-1">an: {postTitle}</p>
+            <p className="font-bold text-mn-ink">Interesse zeigen</p>
+            <p className="text-xs text-mn-mute mt-0.5 line-clamp-1">an: {postTitle}</p>
           </div>
-          <button onClick={onClose} className="text-ink-400 hover:text-ink-600 text-lg leading-none">{'✕'}</button>
+          <button onClick={onClose} className="text-mn-mute hover:text-mn-ink-soft text-lg leading-none">{'✕'}</button>
         </div>
         <div className="space-y-2">
           <textarea
@@ -860,11 +860,11 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
             rows={3}
             className="input resize-none text-sm w-full"
           />
-          <p className="text-right text-xs text-ink-400">{msg.length}/{maxLen}</p>
+          <p className="text-right text-xs text-mn-mute">{msg.length}/{maxLen}</p>
           <button
             onClick={handleSend}
             disabled={sending}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             Interesse melden
@@ -912,7 +912,7 @@ function ContextMenu({ x, y, isOwn, currentStatus, onAction }: {
   ownItems.push({ key: 'delete', label: '🗑️ Löschen' })
 
   return (
-    <div ref={menuRef} style={style} className="bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[180px]" onClick={e => e.stopPropagation()}>
+    <div ref={menuRef} style={style} className="bg-mn-elevated rounded-xl shadow-xl border border-white/5 py-1 min-w-[180px]" onClick={e => e.stopPropagation()}>
       {items.map(item => (
         <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-warm-50 transition-colors">
           {item.label}
@@ -920,7 +920,7 @@ function ContextMenu({ x, y, isOwn, currentStatus, onAction }: {
       ))}
       {isOwn && (
         <>
-          <div className="border-t border-stone-100 my-1" />
+          <div className="border-t border-white/5 my-1" />
           {ownItems.map(item => (
             <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-warm-50 transition-colors">
               {item.label}

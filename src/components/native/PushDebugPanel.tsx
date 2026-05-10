@@ -48,9 +48,9 @@ export default function PushDebugPanel() {
   const statusInfo = describe(state?.status ?? 'idle')
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 space-y-2">
+    <div className="rounded-xl border border-white/5 bg-mn-surface p-4 space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-ink-500">
+        <span className="text-xs font-semibold uppercase tracking-wider text-mn-mute">
           📱 Push-Status (APK)
         </span>
         <span
@@ -61,7 +61,7 @@ export default function PushDebugPanel() {
         </span>
       </div>
 
-      <p className="text-sm text-ink-700">{statusInfo.description}</p>
+      <p className="text-sm text-mn-ink-soft">{statusInfo.description}</p>
 
       {state?.error && (
         <details className="text-xs text-red-700">
@@ -75,19 +75,19 @@ export default function PushDebugPanel() {
       )}
 
       {state?.token && state?.status === 'token_saved' && (
-        <div className="text-[11px] font-mono text-ink-400 break-all">
+        <div className="text-[11px] font-mono text-mn-mute break-all">
           Token: {state.token}
         </div>
       )}
 
       {state?.updatedAt && (
-        <div className="text-xs text-ink-400">
+        <div className="text-xs text-mn-mute">
           Zuletzt aktualisiert: {new Date(state.updatedAt).toLocaleString('de-DE')}
         </div>
       )}
 
       {statusInfo.action && (
-        <div className="pt-2 border-t border-stone-200 text-xs text-ink-600">
+        <div className="pt-2 border-t border-white/5 text-xs text-mn-ink-soft">
           💡 {statusInfo.action}
         </div>
       )}
@@ -109,7 +109,7 @@ function describe(status: FcmStatus): {
         label: 'Noch nicht initialisiert',
         description:
           'Die Push-Registrierung startet automatisch nach dem Login.',
-        color: 'text-ink-400',
+        color: 'text-mn-mute',
       }
     case 'unsupported':
       return {
@@ -117,7 +117,7 @@ function describe(status: FcmStatus): {
         label: 'Nicht unterstützt',
         description:
           'Push läuft im Browser über Web Push (siehe Browser-Benachrichtigungen oben).',
-        color: 'text-ink-400',
+        color: 'text-mn-mute',
       }
     case 'requesting':
       return {
@@ -125,7 +125,7 @@ function describe(status: FcmStatus): {
         label: 'Berechtigung wird angefragt',
         description:
           'Android zeigt gleich den Dialog „Darf Mensaena Benachrichtigungen senden?".',
-        color: 'text-ink-500',
+        color: 'text-mn-mute',
       }
     case 'permission_denied':
       return {
@@ -142,7 +142,7 @@ function describe(status: FcmStatus): {
         icon: '⏳',
         label: 'Registriert bei Firebase...',
         description: 'FCM generiert gleich deinen Device-Token.',
-        color: 'text-primary-600',
+        color: 'text-mn-amber',
       }
     case 'registration_error':
       return {

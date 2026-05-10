@@ -97,7 +97,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
         action={
           <Link
             href="/dashboard/map"
-            className="text-primary-600 text-sm font-medium hover:text-primary-700 transition-colors flex items-center gap-1"
+            className="text-mn-amber text-sm font-medium hover:text-mn-amber transition-colors flex items-center gap-1"
           >
             Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -115,7 +115,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                 onClick={() => router.push(`/dashboard/posts/${post.id}`)}
                 className={cn(
                   'spotlight tilt snap-center min-w-[272px] max-w-[310px] flex-shrink-0 text-left',
-                  'bg-white rounded-2xl border border-stone-100 p-4',
+                  'bg-mn-elevated rounded-2xl border border-white/5 p-4',
                   'hover-lift cursor-pointer overflow-hidden relative',
                 )}
               >
@@ -140,29 +140,29 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                   >
                     {typeLabels[post.type] ?? post.type}
                   </Badge>
-                  <span className="text-xs text-ink-400 ml-auto">{formatTimeAgo(post.created_at)}</span>
+                  <span className="text-xs text-mn-mute ml-auto">{formatTimeAgo(post.created_at)}</span>
                 </div>
 
                 {/* Title */}
-                <p className="font-semibold text-sm line-clamp-2 mt-2.5 text-ink-900 leading-snug">
+                <p className="font-semibold text-sm line-clamp-2 mt-2.5 text-mn-ink leading-snug">
                   {post.title}
                 </p>
 
                 {/* Description */}
                 {post.description && (
-                  <p className="text-ink-500 text-xs line-clamp-2 mt-1.5 leading-relaxed">
+                  <p className="text-mn-mute text-xs line-clamp-2 mt-1.5 leading-relaxed">
                     {post.description}
                   </p>
                 )}
 
                 {/* Author + Distance */}
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-stone-100/80">
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5/80">
                   <Avatar
                     src={post.author_avatar}
                     name={post.author_name}
                     size="xs"
                   />
-                  <span className="text-xs text-ink-500 truncate flex-1">
+                  <span className="text-xs text-mn-mute truncate flex-1">
                     {post.author_name ?? 'Anonym'}
                   </span>
                   {post.distance_km !== null && (

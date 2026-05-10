@@ -64,9 +64,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Ernährung & Versorgung',
     icon: Utensils,
-    color: 'text-primary-700',
-    bgColor: 'bg-primary-50',
-    borderColor: 'border-primary-200',
+    color: 'text-mn-amber',
+    bgColor: 'bg-mn-amber/5',
+    borderColor: 'border-mn-amber/20',
     items: [
       { name: 'Tafeln', desc: 'tafel.de – Lebensmittelhilfe', url: 'https://www.tafel.de' },
       { name: 'Suppenküchen', desc: 'Lokale Angebote', url: '#' },
@@ -111,7 +111,7 @@ export default function CrisisResourcesPage() {
       <div className="mb-6">
         <Link
           href="/dashboard/crisis"
-          className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 mb-3"
+          className="inline-flex items-center gap-1 text-sm text-mn-mute hover:text-mn-ink-soft mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
           Zurück zur Krisenhilfe
@@ -122,8 +122,8 @@ export default function CrisisResourcesPage() {
             <Heart className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-ink-900">Ressourcen & Hilfsangebote</h1>
-            <p className="text-sm text-ink-500">Professionelle Anlaufstellen und Unterstützung</p>
+            <h1 className="text-xl font-black text-mn-ink">Ressourcen & Hilfsangebote</h1>
+            <p className="text-sm text-mn-mute">Professionelle Anlaufstellen und Unterstützung</p>
           </div>
         </div>
       </div>
@@ -145,9 +145,9 @@ export default function CrisisResourcesPage() {
               </div>
               <div className="space-y-2">
                 {cat.items.map(item => (
-                  <div key={item.name} className="bg-white rounded-xl p-3 border border-white/50">
-                    <p className="text-xs font-semibold text-ink-800">{item.name}</p>
-                    <p className="text-xs text-ink-500 mt-0.5">{item.desc}</p>
+                  <div key={item.name} className="bg-mn-elevated rounded-xl p-3 border border-white/50">
+                    <p className="text-xs font-semibold text-mn-ink">{item.name}</p>
+                    <p className="text-xs text-mn-mute mt-0.5">{item.desc}</p>
                     <div className="flex gap-2 mt-2">
                       {item.phone && (
                         <a
@@ -179,10 +179,10 @@ export default function CrisisResourcesPage() {
       </div>
 
       {/* Mensaena community link */}
-      <div className="bg-gradient-to-r from-primary-50 to-teal-50 border border-primary-200 rounded-2xl p-6 text-center">
-        <Users className="w-8 h-8 text-primary-600 mx-auto mb-3" />
+      <div className="bg-gradient-to-r from-primary-50 to-teal-50 border border-mn-amber/20 rounded-2xl p-6 text-center">
+        <Users className="w-8 h-8 text-mn-amber mx-auto mb-3" />
         <h3 className="text-base font-bold text-primary-800 mb-1">Mensaena Community</h3>
-        <p className="text-sm text-primary-600 mb-4">
+        <p className="text-sm text-mn-amber mb-4">
           Unsere Gemeinschaft hilft sich gegenseitig - auch in Krisenzeiten.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
@@ -194,13 +194,13 @@ export default function CrisisResourcesPage() {
           </Link>
           <Link
             href="/dashboard/organizations"
-            className="px-4 py-2 bg-white border border-primary-200 text-primary-700 rounded-xl text-sm font-semibold hover:bg-primary-50 transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-mn-amber/20 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-amber/5 transition-colors"
           >
             Hilfsorganisationen
           </Link>
           <Link
             href="/dashboard/mental-support"
-            className="px-4 py-2 bg-white border border-purple-200 text-purple-700 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-purple-200 text-purple-700 rounded-xl text-sm font-semibold hover:bg-purple-50 transition-colors"
           >
             Mentale Unterstützung
           </Link>

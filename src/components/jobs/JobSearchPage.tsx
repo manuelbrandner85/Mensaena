@@ -21,29 +21,29 @@ function JobCard({ job }: { job: JobOffer }) {
   const wt = WORKTIME_OPTIONS.find(o => o.key === job.worktime)?.label
 
   return (
-    <div className="bg-white rounded-2xl border border-warm-100 shadow-soft hover:shadow-card hover:border-stone-300 transition-all p-4 group">
+    <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft hover:shadow-card hover:border-stone-300 transition-all p-4 group">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0">
-          <Briefcase className="w-5 h-5 text-primary-600" />
+        <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0">
+          <Briefcase className="w-5 h-5 text-mn-amber" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-ink-900 text-sm leading-snug group-hover:text-primary-700 transition-colors">
+          <h3 className="font-semibold text-mn-ink text-sm leading-snug group-hover:text-mn-amber transition-colors">
             {job.title}
           </h3>
-          <p className="text-xs text-ink-600 mt-0.5 font-medium">{job.employer}</p>
+          <p className="text-xs text-mn-ink-soft mt-0.5 font-medium">{job.employer}</p>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
             {job.city && (
-              <span className="flex items-center gap-1 text-xs text-ink-500">
+              <span className="flex items-center gap-1 text-xs text-mn-mute">
                 <MapPin className="w-3 h-3" />{job.city}{job.plz ? ` (${job.plz})` : ''}
               </span>
             )}
             {job.startDate && (
-              <span className="flex items-center gap-1 text-xs text-ink-500">
+              <span className="flex items-center gap-1 text-xs text-mn-mute">
                 <Clock className="w-3 h-3" />ab {formatDate(job.startDate)}
               </span>
             )}
             {wt && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-100">
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-mn-amber/5 text-mn-amber border border-primary-100">
                 {wt}
               </span>
             )}
@@ -54,14 +54,14 @@ function JobCard({ job }: { job: JobOffer }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${job.title} bei ${job.employer} öffnen`}
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors whitespace-nowrap"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 transition-colors whitespace-nowrap"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Zur Stelle</span>
         </a>
       </div>
       {job.publishedDate && (
-        <p className="text-xs text-ink-400 mt-2 text-right">
+        <p className="text-xs text-mn-mute mt-2 text-right">
           veröffentlicht {formatDate(job.publishedDate)}
         </p>
       )}
@@ -73,12 +73,12 @@ function Skeleton() {
   return (
     <div className="space-y-3">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="animate-pulse bg-white rounded-2xl border border-warm-100 p-4 flex gap-3">
-          <div className="w-10 h-10 rounded-xl bg-stone-200 flex-shrink-0" />
+        <div key={i} className="animate-pulse bg-mn-elevated rounded-2xl border border-warm-100 p-4 flex gap-3">
+          <div className="w-10 h-10 rounded-xl bg-mn-raised flex-shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 bg-stone-200 rounded w-2/3" />
-            <div className="h-3 bg-stone-200 rounded w-1/3" />
-            <div className="h-3 bg-stone-200 rounded w-1/2" />
+            <div className="h-4 bg-mn-raised rounded w-2/3" />
+            <div className="h-3 bg-mn-raised rounded w-1/3" />
+            <div className="h-3 bg-mn-raised rounded w-1/2" />
           </div>
         </div>
       ))}
@@ -154,21 +154,21 @@ export default function JobSearchPage() {
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-ink-900 flex items-center gap-2">
-          <Briefcase className="w-6 h-6 text-primary-600" />
+        <h1 className="text-2xl font-bold text-mn-ink flex items-center gap-2">
+          <Briefcase className="w-6 h-6 text-mn-amber" />
           Jobs in der Nachbarschaft
         </h1>
-        <p className="text-sm text-ink-500 mt-0.5">
+        <p className="text-sm text-mn-mute mt-0.5">
           Stellenangebote der Bundesagentur für Arbeit in deiner Nähe
         </p>
       </div>
 
       {/* Search card */}
-      <div className="bg-white rounded-2xl border border-warm-100 shadow-soft p-4 space-y-3">
+      <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft p-4 space-y-3">
         {/* PLZ + Suchwort row */}
         <div className="flex gap-2">
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute pointer-events-none" />
             <input
               type="text"
               inputMode="numeric"
@@ -182,7 +182,7 @@ export default function JobSearchPage() {
             />
           </div>
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute pointer-events-none" />
             <input
               type="search"
               value={query}
@@ -213,14 +213,14 @@ export default function JobSearchPage() {
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
               showFilters || worktime.length
-                ? 'bg-primary-50 text-primary-700 border-primary-200'
-                : 'bg-white text-ink-600 border-stone-200 hover:bg-warm-50',
+                ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
+                : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-warm-50',
             )}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             Arbeitszeit
             {worktime.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-primary-600 text-white text-[9px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-mn-amber text-white text-[9px] font-bold flex items-center justify-center">
                 {worktime.length}
               </span>
             )}
@@ -229,7 +229,7 @@ export default function JobSearchPage() {
           <button
             onClick={() => doSearch(0)}
             disabled={!plz.trim() || loading}
-            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
+            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
             {loading
               ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -248,8 +248,8 @@ export default function JobSearchPage() {
                 className={cn(
                   'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border cursor-pointer transition-all select-none',
                   worktime.includes(o.key)
-                    ? 'bg-primary-50 text-primary-700 border-primary-300'
-                    : 'bg-white text-ink-600 border-stone-200 hover:border-primary-200',
+                    ? 'bg-mn-amber/5 text-mn-amber border-primary-300'
+                    : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
                 )}
               >
                 <input
@@ -273,15 +273,15 @@ export default function JobSearchPage() {
           {error}
         </div>
       ) : searched && jobs.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-warm-100 shadow-soft p-8 text-center">
-          <Briefcase className="w-10 h-10 text-stone-400 mx-auto mb-3" />
-          <p className="text-ink-600 font-medium">Keine Stellen gefunden</p>
-          <p className="text-sm text-ink-400 mt-1">Versuche einen größeren Umkreis oder andere Suchbegriffe.</p>
+        <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft p-8 text-center">
+          <Briefcase className="w-10 h-10 text-mn-ghost mx-auto mb-3" />
+          <p className="text-mn-ink-soft font-medium">Keine Stellen gefunden</p>
+          <p className="text-sm text-mn-mute mt-1">Versuche einen größeren Umkreis oder andere Suchbegriffe.</p>
         </div>
       ) : jobs.length > 0 ? (
         <>
-          <div className="flex items-center justify-between text-xs text-ink-500">
-            <span><strong className="text-ink-900">{total.toLocaleString('de-DE')}</strong> Stellen gefunden</span>
+          <div className="flex items-center justify-between text-xs text-mn-mute">
+            <span><strong className="text-mn-ink">{total.toLocaleString('de-DE')}</strong> Stellen gefunden</span>
             <span>Seite {page + 1} von {totalPages}</span>
           </div>
 
@@ -295,17 +295,17 @@ export default function JobSearchPage() {
               <button
                 onClick={() => doSearch(page - 1)}
                 disabled={page === 0 || loading}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-white text-ink-700 hover:bg-warm-50 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-mn-elevated text-mn-ink-soft hover:bg-warm-50 disabled:opacity-40 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" /> Zurück
               </button>
-              <span className="text-sm text-ink-500 tabular-nums">
+              <span className="text-sm text-mn-mute tabular-nums">
                 {page + 1} / {totalPages}
               </span>
               <button
                 onClick={() => doSearch(page + 1)}
                 disabled={page >= totalPages - 1 || loading}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-white text-ink-700 hover:bg-warm-50 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-mn-elevated text-mn-ink-soft hover:bg-warm-50 disabled:opacity-40 transition-colors"
               >
                 Weiter <ChevronRight className="w-4 h-4" />
               </button>

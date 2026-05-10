@@ -146,33 +146,33 @@ export default function EventCalendar({
     <div>
       {/* Navigation */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 rounded-lg hover:bg-stone-100 transition">
-          <ChevronLeft className="w-5 h-5 text-ink-600" />
+        <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 rounded-lg hover:bg-mn-elevated transition">
+          <ChevronLeft className="w-5 h-5 text-mn-ink-soft" />
         </button>
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-ink-900">{getEventMonth(activeMonth)}</h3>
+          <h3 className="text-lg font-semibold text-mn-ink">{getEventMonth(activeMonth)}</h3>
           {!checkIsToday(activeMonth) && (
-            <button onClick={goToday} className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+            <button onClick={goToday} className="text-sm text-mn-amber hover:text-mn-amber font-medium">
               Heute
             </button>
           )}
         </div>
-        <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 rounded-lg hover:bg-stone-100 transition">
-          <ChevronRight className="w-5 h-5 text-ink-600" />
+        <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 rounded-lg hover:bg-mn-elevated transition">
+          <ChevronRight className="w-5 h-5 text-mn-ink-soft" />
         </button>
       </div>
 
       {/* Weekday headers */}
       <div className="grid grid-cols-7 mb-1">
         {WEEKDAYS.map((day) => (
-          <div key={day} className="text-xs font-semibold text-ink-500 text-center py-2">
+          <div key={day} className="text-xs font-semibold text-mn-mute text-center py-2">
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 bg-stone-100 rounded-xl overflow-hidden gap-px">
+      <div className="grid grid-cols-7 bg-mn-elevated rounded-xl overflow-hidden gap-px">
         {calendarDays.map((date, i) => (
           <EventCalendarDay
             key={i}
@@ -204,12 +204,12 @@ export default function EventCalendar({
       {selectedDate && selectedEvents.length > 0 && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => onDateSelect(null)} />
-          <div className="relative w-full sm:max-w-md max-h-[70vh] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+          <div className="relative w-full sm:max-w-md max-h-[70vh] bg-mn-elevated rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex items-center justify-between p-4 border-b bg-purple-50">
-              <h3 className="font-semibold text-ink-900">
+              <h3 className="font-semibold text-mn-ink">
                 {selectedDate.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
               </h3>
-              <button onClick={() => onDateSelect(null)} className="text-sm text-ink-500 hover:text-ink-700">
+              <button onClick={() => onDateSelect(null)} className="text-sm text-mn-mute hover:text-mn-ink-soft">
                 Schließen
               </button>
             </div>

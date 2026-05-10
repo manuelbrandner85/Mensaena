@@ -35,23 +35,23 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
     <div className="space-y-3">
       {contacts.length === 0 && !adding && (
         <div className="text-center py-4">
-          <Heart className="w-8 h-8 text-stone-400 mx-auto mb-2" />
-          <p className="text-sm text-ink-500">{t('noContacts')}</p>
-          <p className="text-xs text-ink-400 mt-1">{t('noContactsDesc')}</p>
+          <Heart className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
+          <p className="text-sm text-mn-mute">{t('noContacts')}</p>
+          <p className="text-xs text-mn-mute mt-1">{t('noContactsDesc')}</p>
         </div>
       )}
 
       {contacts.map((contact, i) => (
-        <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-stone-50 border border-stone-200">
+        <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-mn-surface border border-white/5">
           <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
             <Phone className="w-4 h-4 text-red-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-ink-900 truncate">{contact.name}</p>
-            <p className="text-xs text-ink-500">{contact.phone}{contact.relationship ? ` · ${contact.relationship}` : ''}</p>
+            <p className="text-sm font-medium text-mn-ink truncate">{contact.name}</p>
+            <p className="text-xs text-mn-mute">{contact.phone}{contact.relationship ? ` · ${contact.relationship}` : ''}</p>
           </div>
           {!readOnly && (
-            <button onClick={() => handleRemove(i)} aria-label="Kontakt entfernen" className="p-1 rounded-lg hover:bg-red-50 text-ink-400 hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <button onClick={() => handleRemove(i)} aria-label="Kontakt entfernen" className="p-1 rounded-lg hover:bg-red-50 text-mn-mute hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -59,12 +59,12 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ))}
 
       {adding ? (
-        <div className="border border-primary-200 rounded-xl p-4 space-y-3 bg-primary-50/30">
+        <div className="border border-mn-amber/20 rounded-xl p-4 space-y-3 bg-mn-amber/5/30">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label">{t('labelName')}</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
                 <input
                   value={newContact.name}
                   onChange={e => setNewContact(p => ({ ...p, name: e.target.value }))}
@@ -76,7 +76,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
             <div>
               <label className="label">{t('labelPhone')}</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
                 <input
                   value={newContact.phone}
                   onChange={e => setNewContact(p => ({ ...p, phone: e.target.value }))}
@@ -100,10 +100,10 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
             </select>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleAdd} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all min-h-[36px]">
+            <button onClick={handleAdd} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all min-h-[36px]">
               {t('addButton')}
             </button>
-            <button onClick={() => setAdding(false)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-stone-100 text-ink-600 hover:bg-stone-200 transition-all min-h-[36px]">
+            <button onClick={() => setAdding(false)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised transition-all min-h-[36px]">
               {t('cancelButton')}
             </button>
           </div>
@@ -111,14 +111,14 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ) : !readOnly && contacts.length < 3 && (
         <button
           onClick={() => setAdding(true)}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-stone-200 text-ink-500 hover:border-primary-300 hover:text-primary-600 transition-colors min-h-[44px]"
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-white/5 text-mn-mute hover:border-primary-300 hover:text-mn-amber transition-colors min-h-[44px]"
         >
           <Plus className="w-4 h-4" /> {t('addContact')}
         </button>
       )}
 
       {contacts.length >= 3 && !readOnly && (
-        <p className="text-xs text-ink-400 text-center">{t('maxContacts')}</p>
+        <p className="text-xs text-mn-mute text-center">{t('maxContacts')}</p>
       )}
     </div>
   )

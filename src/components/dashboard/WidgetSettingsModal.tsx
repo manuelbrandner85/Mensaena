@@ -44,7 +44,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
     <div
       className={cn(
         'flex items-center gap-3 px-3 py-2.5 transition-colors',
-        isEnabled && !isCritical ? 'bg-primary-50/40' : 'bg-white',
+        isEnabled && !isCritical ? 'bg-mn-amber/5/40' : 'bg-mn-elevated',
       )}
     >
       {/* Emoji */}
@@ -52,7 +52,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
 
       {/* Title + desc */}
       <div className="flex-1 min-w-0">
-        <p className={cn('text-sm font-medium', isCritical ? 'text-red-800' : 'text-ink-900')}>
+        <p className={cn('text-sm font-medium', isCritical ? 'text-red-800' : 'text-mn-ink')}>
           {meta.title}
           {isCritical && (
             <span className="ml-1.5 text-xs font-semibold text-red-500 bg-red-100 px-1.5 py-0.5 rounded-full">
@@ -60,7 +60,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
             </span>
           )}
         </p>
-        <p className="text-[11px] text-ink-500 mt-0.5 line-clamp-1 leading-tight">
+        <p className="text-[11px] text-mn-mute mt-0.5 line-clamp-1 leading-tight">
           {meta.description}
         </p>
       </div>
@@ -71,7 +71,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           <button
             disabled={isFirst}
             onClick={() => moveWidget(id, 'up')}
-            className="p-0.5 rounded hover:bg-stone-200 disabled:opacity-25 disabled:cursor-not-allowed text-ink-500 transition-colors"
+            className="p-0.5 rounded hover:bg-mn-raised disabled:opacity-25 disabled:cursor-not-allowed text-mn-mute transition-colors"
             aria-label="Nach oben"
           >
             <ChevronUp className="w-3.5 h-3.5" />
@@ -79,7 +79,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           <button
             disabled={isLast}
             onClick={() => moveWidget(id, 'down')}
-            className="p-0.5 rounded hover:bg-stone-200 disabled:opacity-25 disabled:cursor-not-allowed text-ink-500 transition-colors"
+            className="p-0.5 rounded hover:bg-mn-raised disabled:opacity-25 disabled:cursor-not-allowed text-mn-mute transition-colors"
             aria-label="Nach unten"
           >
             <ChevronDown className="w-3.5 h-3.5" />
@@ -94,7 +94,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           className="flex-shrink-0 w-9 h-5 bg-red-400 rounded-full flex items-center justify-end pr-0.5 cursor-not-allowed opacity-80"
           title="Kann nicht deaktiviert werden"
         >
-          <span className="w-4 h-4 bg-white rounded-full shadow-sm" />
+          <span className="w-4 h-4 bg-mn-elevated rounded-full shadow-sm" />
         </div>
       ) : (
         <button
@@ -103,12 +103,12 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           onClick={() => toggleWidget(id)}
           className={cn(
             'relative flex-shrink-0 w-9 h-5 rounded-full transition-colors duration-200',
-            isEnabled ? 'bg-primary-500' : 'bg-stone-300',
+            isEnabled ? 'bg-mn-amber' : 'bg-stone-300',
           )}
         >
           <span
             className={cn(
-              'absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200',
+              'absolute top-0.5 w-4 h-4 bg-mn-elevated rounded-full shadow-sm transition-transform duration-200',
               isEnabled ? 'translate-x-4' : 'translate-x-0.5',
             )}
           />
@@ -132,8 +132,8 @@ function LayoutPreview() {
     .filter(Boolean)
 
   return (
-    <div className="bg-stone-50 border border-stone-200 rounded-2xl p-3 space-y-1.5">
-      <p className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2">
+    <div className="bg-mn-surface border border-white/5 rounded-2xl p-3 space-y-1.5">
+      <p className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2">
         Vorschau – Aktuelle Anordnung
       </p>
 
@@ -152,21 +152,21 @@ function LayoutPreview() {
         <div className="grid grid-cols-3 gap-1 mt-1">
           {othersEnabled.slice(0, 9).map(w => (
             <div key={w.id}
-              className="flex flex-col items-center gap-0.5 bg-white border border-stone-200 rounded-lg p-1.5 text-center">
+              className="flex flex-col items-center gap-0.5 bg-mn-elevated border border-white/5 rounded-lg p-1.5 text-center">
               <span className="text-sm">{w.emoji}</span>
-              <span className="text-[9px] text-ink-600 leading-tight line-clamp-2">{w.title}</span>
+              <span className="text-[9px] text-mn-ink-soft leading-tight line-clamp-2">{w.title}</span>
             </div>
           ))}
           {othersEnabled.length > 9 && (
-            <div className="flex items-center justify-center bg-stone-100 rounded-lg p-1.5">
-              <span className="text-xs text-ink-500">+{othersEnabled.length - 9}</span>
+            <div className="flex items-center justify-center bg-mn-elevated rounded-lg p-1.5">
+              <span className="text-xs text-mn-mute">+{othersEnabled.length - 9}</span>
             </div>
           )}
         </div>
       )}
 
       {othersEnabled.length === 0 && criticalEnabled.length === 0 && (
-        <p className="text-[11px] text-ink-400 text-center py-2">Keine Widgets aktiv</p>
+        <p className="text-[11px] text-mn-mute text-center py-2">Keine Widgets aktiv</p>
       )}
     </div>
   )
@@ -207,23 +207,23 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
       />
 
       {/* Panel */}
-      <div className="relative bg-white sm:rounded-3xl rounded-t-3xl w-full sm:max-w-lg max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="relative bg-mn-elevated sm:rounded-3xl rounded-t-3xl w-full sm:max-w-lg max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden">
         {/* Drag handle (mobile) */}
         <div className="sm:hidden flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 bg-stone-300 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-100">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
           <div>
-            <h2 className="font-bold text-ink-900">⚙️ Widgets anpassen</h2>
-            <p className="text-xs text-ink-500 mt-0.5">
+            <h2 className="font-bold text-mn-ink">⚙️ Widgets anpassen</h2>
+            <p className="text-xs text-mn-mute mt-0.5">
               Aktiviere, deaktiviere und ordne deine Dashboard-Widgets
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-xl hover:bg-stone-100 text-ink-400 hover:text-ink-600 transition-colors"
+            className="p-2 rounded-xl hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-ink-soft transition-colors"
             aria-label="Schließen"
           >
             <X className="w-4 h-4" />
@@ -243,11 +243,11 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
             return (
               <div key={tier}>
                 <div className="mb-2 px-1">
-                  <p className="text-xs font-bold text-ink-900">{TIER_LABEL[tier]}</p>
-                  <p className="text-[11px] text-ink-500 mt-0.5">{TIER_DESC[tier]}</p>
+                  <p className="text-xs font-bold text-mn-ink">{TIER_LABEL[tier]}</p>
+                  <p className="text-[11px] text-mn-mute mt-0.5">{TIER_DESC[tier]}</p>
                 </div>
 
-                <div className="border border-stone-200 rounded-2xl overflow-hidden divide-y divide-stone-100">
+                <div className="border border-white/5 rounded-2xl overflow-hidden divide-y divide-stone-100">
                   {ids.map(id => (
                     <WidgetRow
                       key={id}
@@ -263,19 +263,19 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-t border-stone-100 bg-stone-50/60">
+        <div className="flex items-center justify-between px-5 py-3.5 border-t border-white/5 bg-mn-surface/60">
           <button
             onClick={() => {
               resetToDefaults()
             }}
-            className="flex items-center gap-1.5 text-xs text-ink-500 hover:text-red-500 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-mn-mute hover:text-red-500 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Auf Standard zurücksetzen
           </button>
           <button
             onClick={handleClose}
-            className="px-5 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium rounded-xl transition-colors"
+            className="px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white text-sm font-medium rounded-xl transition-colors"
           >
             Fertig
           </button>

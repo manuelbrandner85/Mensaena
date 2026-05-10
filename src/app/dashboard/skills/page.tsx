@@ -62,7 +62,7 @@ function TopSkillsWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-mn-elevated border border-white/5 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -74,8 +74,8 @@ function TopSkillsWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-mn-ink tabular-nums">{s.value}</p>
+              <p className="text-xs text-mn-mute text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
@@ -83,7 +83,7 @@ function TopSkillsWidget() {
 
       {/* Aktuell angebotene Skills */}
       {topSkills.length > 0 ? (
-        <div className="relative bg-gradient-to-br from-purple-50 via-purple-50/80 to-violet-50 border border-purple-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div className="relative bg-gradient-to-br from-purple-50 via-purple-50/80 to-violet-50 border border-purple-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
@@ -93,14 +93,14 @@ function TopSkillsWidget() {
           <div className="relative flex flex-wrap gap-2">
             {topSkills.map(s => (
               <Link key={s.id} href={`/dashboard/posts/${s.id}`}
-                className="px-3 py-1.5 bg-white border border-purple-200 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 transition-all shadow-soft">
+                className="px-3 py-1.5 bg-mn-elevated border border-purple-200 rounded-full text-xs font-medium text-purple-700 hover:bg-purple-100 transition-all shadow-cinema-card">
                 {s.title}
               </Link>
             ))}
           </div>
         </div>
       ) : (
-        <div className="relative text-center py-8 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-2xl space-y-2 shadow-soft overflow-hidden">
+        <div className="relative text-center py-8 bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-2xl space-y-2 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
@@ -118,12 +118,12 @@ function TopSkillsWidget() {
       )}
 
       {/* Hinweis */}
-      <div className="relative bg-white border border-purple-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+      <div className="relative bg-mn-elevated border border-purple-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
         />
-        <p className="text-xs text-ink-600">
+        <p className="text-xs text-mn-ink-soft">
           💡 <strong>Skill-Netzwerk:</strong> Biete deine Fähigkeiten an – von Handwerk bis Digital.
           Finde Mentoren oder werde selbst einer. Skills verbinden Menschen und schaffen Gemeinschaft.
         </p>

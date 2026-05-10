@@ -88,7 +88,7 @@ export default function ProfileLocationSettings({
     <div className="space-y-5">
       {/* Profile Info */}
       <SettingsSection
-        icon={<User className="w-4 h-4 text-primary-700" />}
+        icon={<User className="w-4 h-4 text-mn-amber" />}
         title={t('sectionProfileTitle')}
         description={t('sectionProfileDesc')}
       >
@@ -102,14 +102,14 @@ export default function ProfileLocationSettings({
               className="input"
               maxLength={60}
             />
-            <p className="text-xs text-ink-400 mt-1">{t('displayNameHint')}</p>
+            <p className="text-xs text-mn-mute mt-1">{t('displayNameHint')}</p>
           </div>
 
           {/* Username with availability check */}
           <div>
             <label className="label">{t('username')}</label>
             <div className="relative">
-              <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+              <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
               <input
                 value={username}
                 onChange={e => {
@@ -123,10 +123,10 @@ export default function ProfileLocationSettings({
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
                 {checkingUsername && (
-                  <Loader2 className="w-4 h-4 text-ink-400 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-mn-mute animate-spin" />
                 )}
                 {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                  <Check className="w-4 h-4 text-primary-600" />
+                  <Check className="w-4 h-4 text-mn-amber" />
                 )}
                 {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                   <X className="w-4 h-4 text-red-500" />
@@ -134,18 +134,18 @@ export default function ProfileLocationSettings({
               </div>
             </div>
             <p className="text-xs mt-1">
-              {checkingUsername && <span className="text-ink-400">{t('usernameChecking')}</span>}
+              {checkingUsername && <span className="text-mn-mute">{t('usernameChecking')}</span>}
               {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                <span className="text-primary-600">{t('usernameAvailable')}</span>
+                <span className="text-mn-amber">{t('usernameAvailable')}</span>
               )}
               {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                 <span className="text-red-500">{t('usernameTaken')}</span>
               )}
               {!checkingUsername && usernameAvailable === null && username.length < 3 && username.length > 0 && (
-                <span className="text-ink-400">{t('usernameMinChars')}</span>
+                <span className="text-mn-mute">{t('usernameMinChars')}</span>
               )}
               {!checkingUsername && usernameAvailable === null && username.length === 0 && (
-                <span className="text-ink-400">{t('usernameHint')}</span>
+                <span className="text-mn-mute">{t('usernameHint')}</span>
               )}
             </p>
           </div>
@@ -160,14 +160,14 @@ export default function ProfileLocationSettings({
               rows={3}
               maxLength={300}
             />
-            <p className="text-xs text-ink-400 mt-1 text-right">{bio.length}/300</p>
+            <p className="text-xs text-mn-mute mt-1 text-right">{bio.length}/300</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="label">{t('phone')}</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
                 <input
                   value={phone}
                   onChange={e => { setPhone(e.target.value); markDirty() }}
@@ -180,7 +180,7 @@ export default function ProfileLocationSettings({
             <div>
               <label className="label">{t('homepage')}</label>
               <div className="relative">
-                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
                 <input
                   value={homepage}
                   onChange={e => { setHomepage(e.target.value); markDirty() }}
@@ -196,7 +196,7 @@ export default function ProfileLocationSettings({
 
       {/* Location */}
       <SettingsSection
-        icon={<MapPin className="w-4 h-4 text-primary-700" />}
+        icon={<MapPin className="w-4 h-4 text-mn-amber" />}
         title={t('sectionLocationTitle')}
         description={t('sectionLocationDesc')}
       >
@@ -213,11 +213,11 @@ export default function ProfileLocationSettings({
               placeholder={t('addressPlaceholder')}
             />
             {coordinates && (
-              <p className="text-xs text-primary-600 mt-1">
+              <p className="text-xs text-mn-amber mt-1">
                 {t('coordinates', { lat: coordinates.lat.toFixed(4), lng: coordinates.lng.toFixed(4) })}
               </p>
             )}
-            <p className="text-xs text-ink-400 mt-1">
+            <p className="text-xs text-mn-mute mt-1">
               {t('addressHint')}
             </p>
           </div>
@@ -230,9 +230,9 @@ export default function ProfileLocationSettings({
               max={150}
               value={radiusKm}
               onChange={e => { setRadiusKm(parseInt(e.target.value)); markDirty() }}
-              className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+              className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-primary-600"
             />
-            <div className="flex justify-between text-xs text-ink-400 mt-1">
+            <div className="flex justify-between text-xs text-mn-mute mt-1">
               <span>1 km</span>
               <span>25 km</span>
               <span>75 km</span>
@@ -247,7 +247,7 @@ export default function ProfileLocationSettings({
         <button
           onClick={handleSaveAll}
           disabled={saving || (checkingUsername ?? false)}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {t('saveButton')}

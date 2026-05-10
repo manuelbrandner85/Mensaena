@@ -122,8 +122,8 @@ export default function CalendarPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 28 / Kalender</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
-              <Calendar className="w-6 h-6 text-primary-700" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <Calendar className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
               <h1 className="page-title">Kalender</h1>
@@ -131,18 +131,18 @@ export default function CalendarPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <div className="flex bg-paper border border-stone-200 rounded-full overflow-hidden text-xs shadow-soft">
+            <div className="flex bg-mn-void border border-white/5 rounded-full overflow-hidden text-xs shadow-cinema-card">
               <button
                 onClick={() => setView('month')}
                 className={cn('px-4 py-2 font-medium tracking-wide transition-colors',
-                  view === 'month' ? 'bg-ink-800 text-paper' : 'text-ink-500 hover:text-ink-800')}
+                  view === 'month' ? 'bg-ink-800 text-paper' : 'text-mn-mute hover:text-mn-ink')}
               >
                 Monat
               </button>
               <button
                 onClick={() => setView('list')}
                 className={cn('px-4 py-2 font-medium tracking-wide transition-colors',
-                  view === 'list' ? 'bg-ink-800 text-paper' : 'text-ink-500 hover:text-ink-800')}
+                  view === 'list' ? 'bg-ink-800 text-paper' : 'text-mn-mute hover:text-mn-ink')}
               >
                 Liste
               </button>
@@ -158,18 +158,18 @@ export default function CalendarPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Calendar */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-warm-200 shadow-soft overflow-hidden">
+          <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-cinema-card overflow-hidden">
 
             {/* Month Navigation */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-warm-100">
               <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
-                <ChevronLeft className="w-5 h-5 text-ink-600" />
+                <ChevronLeft className="w-5 h-5 text-mn-ink-soft" />
               </button>
-              <h2 className="text-lg font-bold text-ink-900">
+              <h2 className="text-lg font-bold text-mn-ink">
                 {MONTHS_DE[month]} {year}
               </h2>
               <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
-                <ChevronRight className="w-5 h-5 text-ink-600" />
+                <ChevronRight className="w-5 h-5 text-mn-ink-soft" />
               </button>
             </div>
 
@@ -178,7 +178,7 @@ export default function CalendarPage() {
                 {/* Day headers */}
                 <div className="grid grid-cols-7 border-b border-warm-100">
                   {DAYS_DE.map(d => (
-                    <div key={d} className="py-2 text-center text-xs font-semibold text-ink-500">{d}</div>
+                    <div key={d} className="py-2 text-center text-xs font-semibold text-mn-mute">{d}</div>
                   ))}
                 </div>
 
@@ -195,8 +195,8 @@ export default function CalendarPage() {
                         onClick={() => day && setSelectedDay(isSelected ? null : day)}
                         className={cn(
                           'min-h-[80px] p-1.5 border-b border-r border-warm-100 last:border-r-0 transition-colors',
-                          day ? 'cursor-pointer hover:bg-primary-50/50' : 'bg-stone-50/50',
-                          isSelected && 'bg-primary-50',
+                          day ? 'cursor-pointer hover:bg-mn-amber/5/50' : 'bg-mn-surface/50',
+                          isSelected && 'bg-mn-amber/5',
                           isWeekend && day ? 'bg-warm-50/50' : '',
                         )}
                       >
@@ -204,7 +204,7 @@ export default function CalendarPage() {
                           <>
                             <div className={cn(
                               'w-7 h-7 flex items-center justify-center rounded-full text-sm font-medium mb-1',
-                              isToday ? 'bg-primary-600 text-white' : 'text-ink-700'
+                              isToday ? 'bg-mn-amber text-white' : 'text-mn-ink-soft'
                             )}>
                               {day}
                             </div>
@@ -216,14 +216,14 @@ export default function CalendarPage() {
                                   onClick={ev => ev.stopPropagation()}
                                   className={cn(
                                     'block text-xs font-medium truncate rounded px-1 py-0.5 border leading-tight',
-                                    TYPE_COLORS[e.type] ?? 'bg-stone-100 text-ink-600 border-stone-200'
+                                    TYPE_COLORS[e.type] ?? 'bg-mn-elevated text-mn-ink-soft border-white/5'
                                   )}
                                 >
                                   {e.event_time ? e.event_time.slice(0, 5) + ' ' : ''}{e.title}
                                 </Link>
                               ))}
                               {dayEvents.length > 2 && (
-                                <div className="text-xs text-ink-400 pl-1">+{dayEvents.length - 2} weitere</div>
+                                <div className="text-xs text-mn-mute pl-1">+{dayEvents.length - 2} weitere</div>
                               )}
                             </div>
                           </>
@@ -237,11 +237,11 @@ export default function CalendarPage() {
               /* List View */
               <div className="divide-y divide-warm-100">
                 {loading ? (
-                  <div className="py-8 text-center text-ink-400">Lädt…</div>
+                  <div className="py-8 text-center text-mn-mute">Lädt…</div>
                 ) : upcomingEvents.length === 0 ? (
                   <div className="py-12 text-center">
-                    <Calendar className="w-10 h-10 text-stone-300 mx-auto mb-3" />
-                    <p className="text-ink-500 font-medium">Keine Termine in diesem Monat</p>
+                    <Calendar className="w-10 h-10 text-mn-ghost mx-auto mb-3" />
+                    <p className="text-mn-mute font-medium">Keine Termine in diesem Monat</p>
                     <Link href="/dashboard/create?module=mobility&type=mobility" className="btn-primary text-sm mt-4 inline-flex items-center gap-1.5">
                       <Plus className="w-4 h-4" /> Termin erstellen
                     </Link>
@@ -249,25 +249,25 @@ export default function CalendarPage() {
                 ) : (
                   upcomingEvents.map(e => (
                     <Link key={e.id} href={`/dashboard/posts/${e.id}`}
-                      className="flex items-start gap-4 px-5 py-4 hover:bg-primary-50 transition-colors">
-                      <div className="text-center bg-primary-50 rounded-xl px-3 py-2 flex-shrink-0 border border-primary-100">
-                        <div className="text-lg font-bold text-primary-700">
+                      className="flex items-start gap-4 px-5 py-4 hover:bg-mn-amber/5 transition-colors">
+                      <div className="text-center bg-mn-amber/5 rounded-xl px-3 py-2 flex-shrink-0 border border-primary-100">
+                        <div className="text-lg font-bold text-mn-amber">
                           {new Date(e.event_date).getDate()}
                         </div>
-                        <div className="text-xs text-primary-500">
+                        <div className="text-xs text-mn-amber">
                           {MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-ink-900 truncate">{e.title}</p>
-                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-ink-500">
+                        <p className="font-semibold text-mn-ink truncate">{e.title}</p>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-mn-mute">
                           {e.event_time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{e.event_time.slice(0, 5)}</span>}
                           {e.location_text && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{e.location_text}</span>}
                           {e.duration_hours && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{e.duration_hours} Std.</span>}
                         </div>
                       </div>
                       <span className={cn('text-xs px-2 py-1 rounded-full border font-medium flex-shrink-0',
-                        TYPE_COLORS[e.type] ?? 'bg-stone-100 text-ink-600 border-stone-200')}>
+                        TYPE_COLORS[e.type] ?? 'bg-mn-elevated text-mn-ink-soft border-white/5')}>
                         {e.type === 'mobility' ? '🚗' : e.type === 'community' ? '🗳️' : '📅'}
                       </span>
                     </Link>
@@ -282,18 +282,18 @@ export default function CalendarPage() {
         <div className="space-y-4">
           {/* Selected day detail */}
           {selectedDay && (
-            <div className="bg-white rounded-2xl border border-warm-200 shadow-soft p-4">
-              <h3 className="font-semibold text-ink-900 mb-3">
+            <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-cinema-card p-4">
+              <h3 className="font-semibold text-mn-ink mb-3">
                 {selectedDay}. {MONTHS_DE[month]} {year}
               </h3>
               {selectedDayEvents.length === 0 ? (
-                <p className="text-sm text-ink-400">Keine Termine</p>
+                <p className="text-sm text-mn-mute">Keine Termine</p>
               ) : (
                 <div className="space-y-2">
                   {selectedDayEvents.map(e => (
                     <Link key={e.id} href={`/dashboard/posts/${e.id}`}
                       className={cn('block p-3 rounded-xl border text-sm hover:shadow-sm transition-all',
-                        TYPE_COLORS[e.type] ?? 'bg-stone-50 text-ink-700 border-stone-200')}>
+                        TYPE_COLORS[e.type] ?? 'bg-mn-surface text-mn-ink-soft border-white/5')}>
                       <div className="font-semibold truncate">{e.title}</div>
                       {e.event_time && <div className="text-xs mt-0.5 opacity-75">🕐 {e.event_time.slice(0, 5)}</div>}
                       {e.location_text && <div className="text-xs mt-0.5 opacity-75">📍 {e.location_text}</div>}
@@ -306,33 +306,33 @@ export default function CalendarPage() {
           )}
 
           {/* Upcoming this month */}
-          <div className="bg-white rounded-2xl border border-warm-200 shadow-soft p-4">
-            <h3 className="font-semibold text-ink-900 mb-3 flex items-center gap-2">
-              <Car className="w-4 h-4 text-primary-500" /> Nächste Termine
+          <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-cinema-card p-4">
+            <h3 className="font-semibold text-mn-ink mb-3 flex items-center gap-2">
+              <Car className="w-4 h-4 text-mn-amber" /> Nächste Termine
             </h3>
             {loading ? (
               <div className="space-y-2">
-                {[1,2,3].map(i => <div key={i} className="h-12 bg-stone-100 rounded-xl animate-pulse" />)}
+                {[1,2,3].map(i => <div key={i} className="h-12 bg-mn-elevated rounded-xl animate-pulse" />)}
               </div>
             ) : upcomingEvents.length === 0 ? (
-              <p className="text-sm text-ink-400">Keine Termine diesen Monat</p>
+              <p className="text-sm text-mn-mute">Keine Termine diesen Monat</p>
             ) : (
               <div className="space-y-2">
                 {upcomingEvents.slice(0, 5).map(e => (
                   <Link key={e.id} href={`/dashboard/posts/${e.id}`}
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-colors">
                     <div className="text-center flex-shrink-0">
-                      <div className="text-sm font-bold text-primary-700">{new Date(e.event_date).getDate()}</div>
-                      <div className="text-xs text-ink-400">{MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}</div>
+                      <div className="text-sm font-bold text-mn-amber">{new Date(e.event_date).getDate()}</div>
+                      <div className="text-xs text-mn-mute">{MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}</div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-ink-800 truncate">{e.title}</p>
-                      {e.event_time && <p className="text-xs text-ink-400">{e.event_time.slice(0, 5)} Uhr</p>}
+                      <p className="text-sm font-medium text-mn-ink truncate">{e.title}</p>
+                      {e.event_time && <p className="text-xs text-mn-mute">{e.event_time.slice(0, 5)} Uhr</p>}
                     </div>
                   </Link>
                 ))}
                 {upcomingEvents.length > 5 && (
-                  <button onClick={() => setView('list')} className="text-xs text-primary-600 hover:underline w-full text-center pt-1">
+                  <button onClick={() => setView('list')} className="text-xs text-mn-amber hover:underline w-full text-center pt-1">
                     Alle {upcomingEvents.length} Termine anzeigen →
                   </button>
                 )}
@@ -341,8 +341,8 @@ export default function CalendarPage() {
           </div>
 
           {/* Legend */}
-          <div className="bg-white rounded-2xl border border-warm-200 p-4">
-            <h3 className="text-xs font-semibold text-ink-500 uppercase tracking-wide mb-2">Legende</h3>
+          <div className="bg-mn-elevated rounded-2xl border border-warm-200 p-4">
+            <h3 className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2">Legende</h3>
             <div className="space-y-1.5">
               {[
                 { type: 'mobility', label: '🚗 Mobilität' },
@@ -353,7 +353,7 @@ export default function CalendarPage() {
               ].map(({ type, label }) => (
                 <div key={type} className="flex items-center gap-2">
                   <div className={cn('w-3 h-3 rounded-sm', TYPE_COLORS[type]?.split(' ')[0])} />
-                  <span className="text-xs text-ink-600">{label}</span>
+                  <span className="text-xs text-mn-ink-soft">{label}</span>
                 </div>
               ))}
             </div>

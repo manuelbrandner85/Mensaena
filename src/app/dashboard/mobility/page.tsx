@@ -81,7 +81,7 @@ function UpcomingRidesWidget() {
   }
 
   return (
-    <div className="relative bg-gradient-to-br from-indigo-50 via-indigo-50/80 to-blue-50 border border-indigo-200 rounded-2xl p-5 shadow-soft overflow-hidden">
+    <div className="relative bg-gradient-to-br from-indigo-50 via-indigo-50/80 to-blue-50 border border-indigo-200 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #6366F1, #6366F133)' }}
@@ -110,17 +110,17 @@ function UpcomingRidesWidget() {
               {items.map(r => {
                 const timeStr = (r as unknown as Record<string, unknown>).event_time as string | undefined
                 return (
-                  <div key={r.id} className="bg-white rounded-xl p-3 border border-indigo-100 flex items-center gap-3 shadow-soft hover:shadow-card transition-shadow">
+                  <div key={r.id} className="bg-mn-elevated rounded-xl p-3 border border-indigo-100 flex items-center gap-3 shadow-cinema-card hover:shadow-cinema-card transition-shadow">
                     <div className="text-center w-12 flex-shrink-0">
                       {timeStr ? (
                         <p className="display-numeral text-sm font-bold text-indigo-600">{timeStr.slice(0, 5)}</p>
                       ) : (
-                        <Clock className="w-5 h-5 text-stone-400 mx-auto" />
+                        <Clock className="w-5 h-5 text-mn-ghost mx-auto" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-ink-900 truncate">{r.title}</p>
-                      {r.location_text && <p className="text-xs text-ink-500 truncate">📍 {r.location_text}</p>}
+                      <p className="text-sm font-semibold text-mn-ink truncate">{r.title}</p>
+                      {r.location_text && <p className="text-xs text-mn-mute truncate">📍 {r.location_text}</p>}
                     </div>
                   </div>
                 )

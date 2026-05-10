@@ -14,19 +14,19 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
 
   return (
     <Card variant="flat" padding="md">
-      <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
-        <Shield className="w-4 h-4 text-primary-600" />
+      <div className="flex items-center gap-2 text-sm font-semibold text-mn-ink">
+        <Shield className="w-4 h-4 text-mn-amber" />
         Dein Vertrauen
       </div>
 
       {totalRatings === 0 ? (
         <div className="mt-3">
-          <p className="text-xs text-ink-500">
+          <p className="text-xs text-mn-mute">
             Noch keine Bewertungen. Hilf deinen Nachbarn und sammle Vertrauenspunkte!
           </p>
           <button
             onClick={() => toast('Hilf deinen Nachbarn – nach jeder Interaktion können sie dich bewerten. So baust du Vertrauen auf! ⭐', { icon: 'ℹ️', duration: 5000 })}
-            className="text-xs text-primary-600 hover:text-primary-700 font-medium mt-2 transition-colors"
+            className="text-xs text-mn-amber hover:text-mn-amber font-medium mt-2 transition-colors"
           >
             Wie funktioniert das?
           </button>
@@ -35,7 +35,7 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
         <div className="mt-3">
           <div className="flex items-center gap-3">
             {/* Big number */}
-            <span className="text-3xl font-bold text-ink-900">
+            <span className="text-3xl font-bold text-mn-ink">
               {average.toFixed(1)}
             </span>
 
@@ -47,14 +47,14 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
                   className={`w-4 h-4 ${
                     i <= Math.round(average)
                       ? 'text-amber-400 fill-amber-400'
-                      : 'text-stone-300'
+                      : 'text-mn-ghost'
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          <p className="text-xs text-ink-500 mt-1">
+          <p className="text-xs text-mn-mute mt-1">
             basierend auf {totalRatings} Bewertung{totalRatings !== 1 ? 'en' : ''}
           </p>
 
@@ -62,8 +62,8 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
           <div className="flex items-center gap-1 mt-2">
             {trend === 'up' && (
               <>
-                <TrendingUp className="w-3.5 h-3.5 text-primary-500" />
-                <span className="text-xs text-primary-600 font-medium">steigend</span>
+                <TrendingUp className="w-3.5 h-3.5 text-mn-amber" />
+                <span className="text-xs text-mn-amber font-medium">steigend</span>
               </>
             )}
             {trend === 'down' && (
@@ -74,8 +74,8 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
             )}
             {trend === 'stable' && (
               <>
-                <Minus className="w-3.5 h-3.5 text-ink-400" />
-                <span className="text-xs text-ink-500">stabil</span>
+                <Minus className="w-3.5 h-3.5 text-mn-mute" />
+                <span className="text-xs text-mn-mute">stabil</span>
               </>
             )}
           </div>

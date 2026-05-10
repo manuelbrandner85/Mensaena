@@ -84,16 +84,16 @@ export default function EventsTab() {
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
           <input type="text" inputMode="search" value={search}
             onChange={e => { setSearch(e.target.value); setPage(0) }}
             placeholder="Event suchen..."
-            className="w-full pl-9 pr-4 py-2.5 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+            className="w-full pl-9 pr-4 py-2.5 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
           />
         </div>
         <select value={statusFilter} onChange={e => { setStatus(e.target.value); setPage(0) }}
           aria-label="Status filtern"
-          className="px-3 py-2.5 border border-stone-200 rounded-xl text-sm">
+          className="px-3 py-2.5 border border-white/5 rounded-xl text-sm">
           <option value="">Alle Status</option>
           <option value="upcoming">Geplant</option>
           <option value="ongoing">Laufend</option>
@@ -104,56 +104,56 @@ export default function EventsTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-primary-600 rounded-full animate-spin" />
         </div>
       ) : (
         <>
-          <p className="text-sm text-ink-500">{total} Events</p>
-          <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
+          <p className="text-sm text-mn-mute">{total} Events</p>
+          <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-stone-50 border-b border-stone-100">
+                <thead className="bg-mn-surface border-b border-white/5">
                   <tr>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Titel</th>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Kategorie</th>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Datum</th>
-                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Teilnehmer</th>
-                    <th className="text-center px-4 py-3 font-semibold text-ink-700">Status</th>
-                    <th className="text-left px-4 py-3 font-semibold text-ink-700">Ersteller</th>
-                    <th className="text-right px-4 py-3 font-semibold text-ink-700">Aktionen</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Titel</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Kategorie</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Datum</th>
+                    <th className="text-center px-4 py-3 font-semibold text-mn-ink-soft">Teilnehmer</th>
+                    <th className="text-center px-4 py-3 font-semibold text-mn-ink-soft">Status</th>
+                    <th className="text-left px-4 py-3 font-semibold text-mn-ink-soft">Ersteller</th>
+                    <th className="text-right px-4 py-3 font-semibold text-mn-ink-soft">Aktionen</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
                   {events.map(ev => (
-                    <tr key={ev.id} className="hover:bg-stone-50 transition-colors">
-                      <td className="px-4 py-3 font-medium text-ink-900 max-w-48 truncate">
+                    <tr key={ev.id} className="hover:bg-mn-surface transition-colors">
+                      <td className="px-4 py-3 font-medium text-mn-ink max-w-48 truncate">
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-sky-500 shrink-0" />
                           {ev.title}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-ink-600 text-xs capitalize">{ev.category}</td>
-                      <td className="px-4 py-3 text-ink-500 text-xs">
+                      <td className="px-4 py-3 text-mn-ink-soft text-xs capitalize">{ev.category}</td>
+                      <td className="px-4 py-3 text-mn-mute text-xs">
                         {new Date(ev.start_date).toLocaleDateString('de-AT')}
                       </td>
-                      <td className="px-4 py-3 text-center text-ink-700 font-medium">{ev.attendee_count}</td>
+                      <td className="px-4 py-3 text-center text-mn-ink-soft font-medium">{ev.attendee_count}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                           ev.status === 'upcoming' ? 'bg-green-100 text-green-700' :
                           ev.status === 'ongoing' ? 'bg-blue-100 text-blue-700' :
-                          ev.status === 'completed' ? 'bg-stone-100 text-ink-600' :
+                          ev.status === 'completed' ? 'bg-mn-elevated text-mn-ink-soft' :
                           'bg-red-100 text-red-700'
                         }`}>{ev.status}</span>
                       </td>
-                      <td className="px-4 py-3 text-ink-500 text-xs">{(ev.profiles as any)?.name ?? '-'}</td>
+                      <td className="px-4 py-3 text-mn-mute text-xs">{(ev.profiles as any)?.name ?? '-'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center gap-1 justify-end">
                           <button onClick={() => openEdit(ev)}
-                            className="p-1.5 rounded-lg text-ink-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-blue-600 hover:bg-blue-50 transition-colors" title="Bearbeiten">
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(ev.id, ev.title)}
-                            className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
+                            className="p-1.5 rounded-lg text-mn-mute hover:text-red-600 hover:bg-red-50 transition-colors" title="Löschen">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -161,7 +161,7 @@ export default function EventsTab() {
                     </tr>
                   ))}
                   {events.length === 0 && (
-                    <tr><td colSpan={7} className="px-4 py-12 text-center text-ink-400">Keine Events gefunden</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-12 text-center text-mn-mute">Keine Events gefunden</td></tr>
                   )}
                 </tbody>
               </table>
@@ -170,12 +170,12 @@ export default function EventsTab() {
 
           <div className="flex items-center justify-between">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-mn-ink-soft hover:text-mn-ink disabled:opacity-40">
               <ChevronLeft className="w-4 h-4" /> Zurück
             </button>
-            <span className="text-sm text-ink-500">Seite {page + 1}</span>
+            <span className="text-sm text-mn-mute">Seite {page + 1}</span>
             <button onClick={() => setPage(p => p + 1)} disabled={events.length < PAGE_SIZE}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-ink-600 hover:text-ink-900 disabled:opacity-40">
+              className="flex items-center gap-1 px-3 py-2 text-sm text-mn-ink-soft hover:text-mn-ink disabled:opacity-40">
               Weiter <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -185,25 +185,25 @@ export default function EventsTab() {
       {/* ── Edit Modal ── */}
       {editEvent && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-ink-900 flex items-center gap-2">
+              <h3 className="font-bold text-mn-ink flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-blue-500" /> Event bearbeiten
               </h3>
-              <button onClick={() => setEditEvent(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-stone-100 text-ink-500">
+              <button onClick={() => setEditEvent(null)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-ink-500 mb-1">Titel</label>
+                <label className="block text-xs font-semibold text-mn-mute mb-1">Titel</label>
                 <input value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink-500 mb-1">Status</label>
+                <label className="block text-xs font-semibold text-mn-mute mb-1">Status</label>
                 <select value={editStatus} onChange={e => setEditStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
+                  className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300">
                   <option value="upcoming">Geplant</option>
                   <option value="ongoing">Laufend</option>
                   <option value="completed">Abgeschlossen</option>
@@ -212,7 +212,7 @@ export default function EventsTab() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setEditEvent(null)} className="flex-1 px-4 py-2.5 bg-stone-100 text-ink-700 rounded-xl text-sm font-semibold hover:bg-stone-200 transition-colors">
+              <button onClick={() => setEditEvent(null)} className="flex-1 px-4 py-2.5 bg-mn-elevated text-mn-ink-soft rounded-xl text-sm font-semibold hover:bg-mn-raised transition-colors">
                 Abbrechen
               </button>
               <button onClick={handleSaveEdit} disabled={editSaving}

@@ -100,11 +100,11 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
 
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-primary-100 text-primary-800 border-primary-300', emoji: '🌟' }
+  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-mn-amber/10 text-primary-800 border-primary-300', emoji: '🌟' }
   if (score >= 60) return { label: 'Vertrauenswürdig', color: 'bg-green-100 text-green-800 border-green-300', emoji: '✅' }
   if (score >= 40) return { label: 'Aufbauend', color: 'bg-blue-100 text-blue-800 border-blue-300', emoji: '💪' }
   if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }
-  return { label: 'Neu', color: 'bg-stone-100 text-ink-700 border-stone-300', emoji: '✨' }
+  return { label: 'Neu', color: 'bg-mn-elevated text-mn-ink-soft border-stone-300', emoji: '✨' }
 }
 
 const SKILL_SUGGESTIONS = [
@@ -187,7 +187,7 @@ function ScoreCircle({ score, color, label, size = 80 }: {
           {score}
         </text>
       </svg>
-      <span className="text-xs text-ink-500 font-medium">{label}</span>
+      <span className="text-xs text-mn-mute font-medium">{label}</span>
     </div>
   )
 }
@@ -232,14 +232,14 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
     return (
       <span className={cn('group/edit inline-flex items-center gap-1.5 cursor-pointer', className)}>
         <span onClick={() => { setEditValue(value); setEditing(true) }}>
-          {value || <span className="text-ink-400 italic">{placeholder}</span>}
+          {value || <span className="text-mn-mute italic">{placeholder}</span>}
         </span>
         <button
           onClick={() => { setEditValue(value); setEditing(true) }}
           className="opacity-0 group-hover/edit:opacity-100 transition-opacity p-0.5 rounded hover:bg-warm-100"
           title="Bearbeiten"
         >
-          <Edit3 className="w-3.5 h-3.5 text-ink-400" />
+          <Edit3 className="w-3.5 h-3.5 text-mn-mute" />
         </button>
       </span>
     )
@@ -259,7 +259,7 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
             placeholder={placeholder}
           />
           {maxLength && (
-            <p className="text-right text-xs text-ink-400 mt-0.5">{editValue.length}/{maxLength}</p>
+            <p className="text-right text-xs text-mn-mute mt-0.5">{editValue.length}/{maxLength}</p>
           )}
         </div>
       ) : (
@@ -273,10 +273,10 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
         />
       )}
       <button onClick={handleSave} disabled={saving} aria-label="Speichern"
-        className="p-1.5 rounded-lg bg-primary-100 text-primary-700 hover:bg-primary-200 transition-colors">
+        className="p-1.5 rounded-lg bg-mn-amber/10 text-mn-amber hover:bg-primary-200 transition-colors">
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
       </button>
-      <button onClick={handleCancel} aria-label="Abbrechen" className="p-1.5 rounded-lg bg-stone-100 text-ink-500 hover:bg-stone-200 transition-colors">
+      <button onClick={handleCancel} aria-label="Abbrechen" className="p-1.5 rounded-lg bg-mn-elevated text-mn-mute hover:bg-mn-raised transition-colors">
         <X className="w-3.5 h-3.5" />
       </button>
     </span>
@@ -509,18 +509,18 @@ export default function ProfileView({
       {!isOwnProfile && (
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 transition-colors mb-2"
+          className="flex items-center gap-1 text-sm text-mn-mute hover:text-mn-ink-soft transition-colors mb-2"
         >
           <ChevronLeft className="w-4 h-4" /> Zurück
         </button>
       )}
 
       {/* ── Profile Header ──────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-8 relative">
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-8 relative">
         {/* Top-right actions */}
         <div className="absolute top-4 right-4">
           {isOwnProfile ? (
-            <Link href="/dashboard/settings" className="flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-700 transition-colors">
+            <Link href="/dashboard/settings" className="flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-ink-soft transition-colors">
               <Settings className="w-4 h-4" /> Einstellungen
             </Link>
           ) : (
@@ -529,10 +529,10 @@ export default function ProfileView({
                 onClick={e => { e.stopPropagation(); setShowMoreMenu(!showMoreMenu) }}
                 className="p-2 rounded-lg hover:bg-warm-100 transition-colors"
               >
-                <MoreHorizontal className="w-5 h-5 text-ink-500" />
+                <MoreHorizontal className="w-5 h-5 text-mn-mute" />
               </button>
               {showMoreMenu && (
-                <div className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-stone-200 py-1 min-w-[200px] z-30" onClick={e => e.stopPropagation()}>
+                <div className="absolute right-0 top-10 bg-mn-elevated rounded-xl shadow-xl border border-white/5 py-1 min-w-[200px] z-30" onClick={e => e.stopPropagation()}>
                   <button onClick={handleDM} disabled={dmLoading}
                     className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2">
                     <MessageCircle className="w-4 h-4" /> Nachricht senden
@@ -557,13 +557,13 @@ export default function ProfileView({
             {/* Green online ring */}
             <div className="h-[128px] w-[128px] rounded-full p-1 bg-gradient-to-br from-green-400 to-green-500">
               <div className={cn(
-                'h-full w-full rounded-full flex items-center justify-center overflow-hidden bg-white',
+                'h-full w-full rounded-full flex items-center justify-center overflow-hidden bg-mn-elevated',
                 currentAvatarUrl ? '' : 'bg-primary-200',
               )}>
                 {currentAvatarUrl ? (
                   <img src={currentAvatarUrl} alt={displayName} className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-primary-700 text-3xl font-bold">{initials}</span>
+                  <span className="text-mn-amber text-3xl font-bold">{initials}</span>
                 )}
               </div>
             </div>
@@ -572,7 +572,7 @@ export default function ProfileView({
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="absolute bottom-1 right-1 w-9 h-9 bg-primary-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-all z-10"
+                  className="absolute bottom-1 right-1 w-9 h-9 bg-mn-amber text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-all z-10"
                   title="Profilbild ändern"
                 >
                   {avatarUploading
@@ -596,7 +596,7 @@ export default function ProfileView({
           {/* Name */}
           <div className="text-center mb-2">
             {isOwnProfile ? (
-              <h1 className="text-2xl font-bold text-ink-900">
+              <h1 className="text-2xl font-bold text-mn-ink">
                 <InlineEdit
                   value={currentName}
                   onSave={handleSaveName}
@@ -604,7 +604,7 @@ export default function ProfileView({
                 />
               </h1>
             ) : (
-              <h1 className="text-2xl font-bold text-ink-900">{displayName}</h1>
+              <h1 className="text-2xl font-bold text-mn-ink">{displayName}</h1>
             )}
           </div>
 
@@ -649,7 +649,7 @@ export default function ProfileView({
           </div>
 
           {/* Location */}
-          <div className="flex items-center gap-1 text-sm text-ink-500 mb-3">
+          <div className="flex items-center gap-1 text-sm text-mn-mute mb-3">
             <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
             {isOwnProfile ? (
               <InlineEdit
@@ -665,7 +665,7 @@ export default function ProfileView({
           {/* Bio */}
           <div className="text-center max-w-md mb-4">
             {isOwnProfile ? (
-              <div className="text-ink-600 italic text-sm">
+              <div className="text-mn-ink-soft italic text-sm">
                 <InlineEdit
                   value={currentBio}
                   onSave={handleSaveBio}
@@ -675,9 +675,9 @@ export default function ProfileView({
                 />
               </div>
             ) : currentBio ? (
-              <div className="text-ink-600 italic text-sm">
+              <div className="text-mn-ink-soft italic text-sm">
                 {!bioExpanded && currentBio.length > 100
-                  ? <>{truncateText(currentBio, 100)} <button onClick={() => setBioExpanded(true)} className="text-primary-600 not-italic font-medium">Mehr anzeigen</button></>
+                  ? <>{truncateText(currentBio, 100)} <button onClick={() => setBioExpanded(true)} className="text-mn-amber not-italic font-medium">Mehr anzeigen</button></>
                   : currentBio
                 }
               </div>
@@ -692,12 +692,12 @@ export default function ProfileView({
               <span className="text-sm font-bold text-amber-600">
                 &#x1F31F; {profile.karma_points ?? 0} Karma
               </span>
-              <span className="text-xs text-ink-500">{profile.points ?? 0} Punkte</span>
+              <span className="text-xs text-mn-mute">{profile.points ?? 0} Punkte</span>
             </div>
           </div>
 
           {/* Member since */}
-          <div className="flex items-center gap-1 text-sm text-ink-400">
+          <div className="flex items-center gap-1 text-sm text-mn-mute">
             <Calendar className="w-3.5 h-3.5" />
             Dabei seit {memberSince}
           </div>
@@ -710,14 +710,14 @@ export default function ProfileView({
           <button
             onClick={handleDM}
             disabled={dmLoading}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
           >
             {dmLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
             Nachricht senden
           </button>
           <button
             onClick={() => setShowQRCode(true)}
-            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-stone-200 text-ink-700 hover:bg-warm-50 transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-white/5 text-mn-ink-soft hover:bg-warm-50 transition-all"
           >
             <QrCode className="w-4 h-4" /> QR-Code
           </button>
@@ -725,12 +725,12 @@ export default function ProfileView({
       )}
 
       {/* ── Skills ─────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-ink-900">Fähigkeiten</h3>
+          <h3 className="font-bold text-mn-ink">Fähigkeiten</h3>
           {isOwnProfile && !skillEditing && (
             <button onClick={() => setSkillEditing(true)} aria-label="Fähigkeiten bearbeiten" className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors">
-              <Edit3 className="w-4 h-4 text-ink-400" />
+              <Edit3 className="w-4 h-4 text-mn-mute" />
             </button>
           )}
         </div>
@@ -739,7 +739,7 @@ export default function ProfileView({
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {currentSkills.map(skill => (
-                <span key={skill} className="inline-flex items-center gap-1 bg-primary-100 text-primary-700 rounded-full px-3 py-1 text-sm">
+                <span key={skill} className="inline-flex items-center gap-1 bg-mn-amber/10 text-mn-amber rounded-full px-3 py-1 text-sm">
                   {skill}
                   <button onClick={() => handleRemoveSkill(skill)} aria-label="Fähigkeit entfernen" className="ml-0.5 hover:text-red-600">
                     <X className="w-3 h-3" />
@@ -757,20 +757,20 @@ export default function ProfileView({
                 className="input text-sm w-full"
               />
               {showSuggestions && skillInput.length === 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-20 flex flex-wrap gap-1.5">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-mn-elevated rounded-xl shadow-xl border border-white/5 p-2 z-20 flex flex-wrap gap-1.5">
                   {SKILL_SUGGESTIONS.filter(s => !currentSkills.includes(s)).map(s => (
                     <button key={s} onClick={() => handleAddSkill(s)}
-                      className="text-xs bg-warm-50 hover:bg-warm-100 text-ink-600 px-2.5 py-1 rounded-full border border-warm-200 transition-colors">
+                      className="text-xs bg-warm-50 hover:bg-warm-100 text-mn-ink-soft px-2.5 py-1 rounded-full border border-warm-200 transition-colors">
                       <Plus className="w-2.5 h-2.5 inline mr-0.5" />{s}
                     </button>
                   ))}
                 </div>
               )}
               {showSuggestions && skillInput.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-20 flex flex-wrap gap-1.5">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-mn-elevated rounded-xl shadow-xl border border-white/5 p-2 z-20 flex flex-wrap gap-1.5">
                   {SKILL_SUGGESTIONS.filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !currentSkills.includes(s)).map(s => (
                     <button key={s} onClick={() => handleAddSkill(s)}
-                      className="text-xs bg-warm-50 hover:bg-warm-100 text-ink-600 px-2.5 py-1 rounded-full border border-warm-200 transition-colors">
+                      className="text-xs bg-warm-50 hover:bg-warm-100 text-mn-ink-soft px-2.5 py-1 rounded-full border border-warm-200 transition-colors">
                       {s}
                     </button>
                   ))}
@@ -779,11 +779,11 @@ export default function ProfileView({
             </div>
             <div className="flex gap-2">
               <button onClick={() => handleSaveSkills(currentSkills)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all">
                 <Check className="w-3.5 h-3.5" /> Speichern
               </button>
               <button onClick={() => { setSkillEditing(false); setCurrentSkills(profile.skills ?? []); setShowSuggestions(false) }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-stone-100 text-ink-600 hover:bg-stone-200 transition-all">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised transition-all">
                 <X className="w-3.5 h-3.5" /> Abbrechen
               </button>
             </div>
@@ -791,11 +791,11 @@ export default function ProfileView({
         ) : (
           <div className="flex flex-wrap gap-2">
             {currentSkills.length > 0 ? currentSkills.map(skill => (
-              <span key={skill} className="bg-primary-100 text-primary-700 rounded-full px-3 py-1 text-sm font-medium">
+              <span key={skill} className="bg-mn-amber/10 text-mn-amber rounded-full px-3 py-1 text-sm font-medium">
                 {skill}
               </span>
             )) : (
-              <p className="text-sm text-ink-400 italic">
+              <p className="text-sm text-mn-mute italic">
                 {isOwnProfile ? 'Noch keine Fähigkeiten. Klicke auf den Stift, um welche hinzuzufügen.' : 'Keine Fähigkeiten angegeben.'}
               </p>
             )}
@@ -804,28 +804,28 @@ export default function ProfileView({
       </div>
 
       {/* ── Statistics ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="font-bold text-ink-900 mb-4">Statistiken</h3>
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
+        <h3 className="font-bold text-mn-ink mb-4">Statistiken</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-blue-50 rounded-xl p-4 text-center">
             <FileText className="w-5 h-5 text-blue-600 mx-auto mb-1.5" />
-            <div className="text-2xl font-bold text-ink-900">{stats.total_posts}</div>
-            <div className="text-sm text-ink-500">Beiträge</div>
+            <div className="text-2xl font-bold text-mn-ink">{stats.total_posts}</div>
+            <div className="text-sm text-mn-mute">Beiträge</div>
           </div>
           <div className="bg-green-50 rounded-xl p-4 text-center">
             <Heart className="w-5 h-5 text-green-600 mx-auto mb-1.5" />
-            <div className="text-2xl font-bold text-ink-900">{stats.help_given}</div>
-            <div className="text-sm text-ink-500">Geholfen</div>
+            <div className="text-2xl font-bold text-mn-ink">{stats.help_given}</div>
+            <div className="text-sm text-mn-mute">Geholfen</div>
           </div>
           <div className="bg-purple-50 rounded-xl p-4 text-center">
             <MessageCircle className="w-5 h-5 text-purple-600 mx-auto mb-1.5" />
-            <div className="text-2xl font-bold text-ink-900">{stats.messages_count}</div>
-            <div className="text-sm text-ink-500">Nachrichten</div>
+            <div className="text-2xl font-bold text-mn-ink">{stats.messages_count}</div>
+            <div className="text-sm text-mn-mute">Nachrichten</div>
           </div>
           <div className="bg-amber-50 rounded-xl p-4 text-center">
             <Calendar className="w-5 h-5 text-amber-600 mx-auto mb-1.5" />
-            <div className="text-2xl font-bold text-ink-900">{stats.member_days}</div>
-            <div className="text-sm text-ink-500">Tage dabei</div>
+            <div className="text-2xl font-bold text-mn-ink">{stats.member_days}</div>
+            <div className="text-sm text-mn-mute">Tage dabei</div>
           </div>
         </div>
       </div>
@@ -836,7 +836,7 @@ export default function ProfileView({
       )}
 
       {/* ── Ratings List ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
         <RatingsList
           ratings={ratingsHook.ratings}
           loading={ratingsHook.loading}
@@ -850,33 +850,33 @@ export default function ProfileView({
       </div>
 
       {/* ── Achievements ────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="font-bold text-ink-900 mb-4">Erfolge</h3>
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
+        <h3 className="font-bold text-mn-ink mb-4">Erfolge</h3>
         <div className="space-y-3">
           {achievements.map(ach => {
             const Icon = ach.icon
             return (
               <div key={ach.id} className={cn(
                 'border rounded-xl p-4 transition-all',
-                ach.earned ? 'border-amber-200 bg-amber-50/50' : 'border-stone-200 opacity-60',
+                ach.earned ? 'border-amber-200 bg-amber-50/50' : 'border-white/5 opacity-60',
               )}>
                 <div className="flex items-start gap-3">
                   <div className={cn(
                     'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
-                    ach.earned ? 'bg-amber-100 text-amber-600' : 'bg-stone-100 text-ink-400',
+                    ach.earned ? 'bg-amber-100 text-amber-600' : 'bg-mn-elevated text-mn-mute',
                   )}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-ink-900">{ach.label}</p>
-                    <p className="text-xs text-ink-500 mb-2">{ach.desc}</p>
-                    <div className="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
+                    <p className="font-semibold text-sm text-mn-ink">{ach.label}</p>
+                    <p className="text-xs text-mn-mute mb-2">{ach.desc}</p>
+                    <div className="w-full h-2 bg-mn-raised rounded-full overflow-hidden">
                       <div
-                        className={cn('h-full rounded-full transition-all duration-500', ach.earned ? 'bg-amber-500' : 'bg-primary-500')}
+                        className={cn('h-full rounded-full transition-all duration-500', ach.earned ? 'bg-amber-500' : 'bg-mn-amber')}
                         style={{ width: `${Math.round(ach.progress * 100)}%` }}
                       />
                     </div>
-                    <p className="text-xs text-ink-400 mt-1">{ach.current}/{ach.target}</p>
+                    <p className="text-xs text-mn-mute mt-1">{ach.current}/{ach.target}</p>
                   </div>
                   {ach.earned && (
                     <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">
@@ -891,12 +891,12 @@ export default function ProfileView({
       </div>
 
       {/* ── Activity Heatmap ────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="font-bold text-ink-900 mb-4">Aktivität (letzte 30 Tage)</h3>
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
+        <h3 className="font-bold text-mn-ink mb-4">Aktivität (letzte 30 Tage)</h3>
         <div className="grid grid-cols-10 gap-1">
           {heatmapData.map((d) => {
             const intensity = d.count === 0 ? 0 : d.count <= 2 ? 1 : d.count <= 5 ? 2 : 3
-            const colors = ['bg-stone-100', 'bg-primary-200', 'bg-primary-400', 'bg-primary-600']
+            const colors = ['bg-mn-elevated', 'bg-primary-200', 'bg-primary-400', 'bg-mn-amber']
             return (
               <div
                 key={d.date}
@@ -907,19 +907,19 @@ export default function ProfileView({
           })}
         </div>
         {/* Legend */}
-        <div className="flex items-center gap-1.5 mt-3 text-xs text-ink-500">
+        <div className="flex items-center gap-1.5 mt-3 text-xs text-mn-mute">
           <span>Weniger</span>
-          <div className="w-3 h-3 rounded-sm bg-stone-100" />
+          <div className="w-3 h-3 rounded-sm bg-mn-elevated" />
           <div className="w-3 h-3 rounded-sm bg-primary-200" />
           <div className="w-3 h-3 rounded-sm bg-primary-400" />
-          <div className="w-3 h-3 rounded-sm bg-primary-600" />
+          <div className="w-3 h-3 rounded-sm bg-mn-amber" />
           <span>Mehr</span>
         </div>
       </div>
 
       {/* ── Posts ────────────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="font-bold text-ink-900 mb-4">Beiträge</h3>
+      <div className="bg-mn-elevated rounded-2xl shadow-sm p-6">
+        <h3 className="font-bold text-mn-ink mb-4">Beiträge</h3>
 
         {/* Tabs */}
         <div className="flex gap-1 mb-4 bg-warm-50 rounded-lg p-1">
@@ -927,7 +927,7 @@ export default function ProfileView({
             onClick={() => setActivePostTab('active')}
             className={cn(
               'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
-              activePostTab === 'active' ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-700',
+              activePostTab === 'active' ? 'bg-mn-elevated text-mn-ink shadow-sm' : 'text-mn-mute hover:text-mn-ink-soft',
             )}
           >
             Aktive ({activePosts.length})
@@ -936,7 +936,7 @@ export default function ProfileView({
             onClick={() => setActivePostTab('completed')}
             className={cn(
               'flex-1 py-2 rounded-lg text-sm font-medium transition-all',
-              activePostTab === 'completed' ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-700',
+              activePostTab === 'completed' ? 'bg-mn-elevated text-mn-ink shadow-sm' : 'text-mn-mute hover:text-mn-ink-soft',
             )}
           >
             Abgeschlossene ({completedPosts.length})
@@ -953,7 +953,7 @@ export default function ProfileView({
                 : 'Abgelaufen'
               const statusClass = post.status === 'active' ? 'bg-green-100 text-green-700'
                 : post.status === 'resolved' || post.status === 'fulfilled' ? 'bg-blue-100 text-blue-700'
-                : 'bg-stone-100 text-ink-500'
+                : 'bg-mn-elevated text-mn-mute'
               return (
                 <Link
                   key={post.id}
@@ -962,14 +962,14 @@ export default function ProfileView({
                 >
                   <span className="text-sm flex-shrink-0">{cfg.emoji}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-ink-900 truncate">{post.title}</p>
-                    <p className="text-xs text-ink-400">{formatDate(post.created_at)}</p>
+                    <p className="text-sm font-medium text-mn-ink truncate">{post.title}</p>
+                    <p className="text-xs text-mn-mute">{formatDate(post.created_at)}</p>
                   </div>
                   <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0', statusClass)}>
                     {statusLabel}
                   </span>
                   {(post.reaction_count ?? 0) > 0 && (
-                    <span className="text-xs text-ink-400 flex-shrink-0">
+                    <span className="text-xs text-mn-mute flex-shrink-0">
                       &#x2764;&#xFE0F; {post.reaction_count}
                     </span>
                   )}
@@ -979,17 +979,17 @@ export default function ProfileView({
           </div>
         ) : (
           <div className="text-center py-8 bg-warm-50 rounded-xl border border-warm-200">
-            <FileText className="w-10 h-10 text-stone-400 mx-auto mb-2" />
+            <FileText className="w-10 h-10 text-mn-ghost mx-auto mb-2" />
             {isOwnProfile ? (
               <>
-                <p className="text-sm text-ink-500">Du hast noch keinen Beitrag erstellt</p>
+                <p className="text-sm text-mn-mute">Du hast noch keinen Beitrag erstellt</p>
                 <Link href="/dashboard/create"
-                  className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors">
+                  className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-mn-amber hover:text-mn-amber transition-colors">
                   <Plus className="w-4 h-4" /> Ersten Beitrag erstellen
                 </Link>
               </>
             ) : (
-              <p className="text-sm text-ink-500">
+              <p className="text-sm text-mn-mute">
                 {displayName} hat gerade keine {activePostTab === 'active' ? 'aktiven' : 'abgeschlossenen'} Beiträge
               </p>
             )}
@@ -1000,8 +1000,8 @@ export default function ProfileView({
       {/* ── QR Code Modal ──────────────────────────────────────────── */}
       {showQRCode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowQRCode(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center" onClick={e => e.stopPropagation()}>
-            <h3 className="font-bold text-ink-900 text-lg mb-4">Profil QR-Code</h3>
+          <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center" onClick={e => e.stopPropagation()}>
+            <h3 className="font-bold text-mn-ink text-lg mb-4">Profil QR-Code</h3>
             <div className="flex justify-center mb-4">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(profileUrl)}&format=png`}
@@ -1010,7 +1010,7 @@ export default function ProfileView({
                 id="qr-code-img"
               />
             </div>
-            <p className="text-sm text-ink-500 mb-4">Scanne diesen Code um das Profil zu öffnen</p>
+            <p className="text-sm text-mn-mute mb-4">Scanne diesen Code um das Profil zu öffnen</p>
             <div className="flex gap-3">
               <button
                 onClick={() => {
@@ -1021,13 +1021,13 @@ export default function ProfileView({
                   link.download = `mensaena-profil-${profile.id}.png`
                   link.click()
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border border-stone-200 hover:bg-warm-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-warm-50 transition-colors"
               >
                 <Download className="w-4 h-4" /> Als Bild speichern
               </button>
               <button
                 onClick={() => setShowQRCode(false)}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-colors"
               >
                 Schließen
               </button>
@@ -1041,7 +1041,7 @@ export default function ProfileView({
         <div className="flex justify-center">
           <button
             onClick={() => setShowQRCode(true)}
-            className="flex items-center gap-2 text-sm text-ink-500 hover:text-ink-700 transition-colors"
+            className="flex items-center gap-2 text-sm text-mn-mute hover:text-mn-ink-soft transition-colors"
           >
             <QrCode className="w-4 h-4" /> Mein QR-Code anzeigen
           </button>

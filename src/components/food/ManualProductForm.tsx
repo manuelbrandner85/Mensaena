@@ -68,14 +68,14 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
-        className="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]"
+        className="relative w-full sm:max-w-md bg-mn-elevated rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-stone-100">
-          <h2 className="font-bold text-ink-900">Produkt selbst anlegen</h2>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-white/5">
+          <h2 className="font-bold text-mn-ink">Produkt selbst anlegen</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-ink-500 hover:text-ink-900"
+            className="w-8 h-8 rounded-full bg-mn-elevated flex items-center justify-center text-mn-mute hover:text-mn-ink"
             aria-label={t('done')}
           >
             <X className="w-4 h-4" />
@@ -83,12 +83,12 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          <p className="text-xs text-ink-500">
+          <p className="text-xs text-mn-mute">
             Dein Produkt ist nicht in der OpenFoodFacts-Datenbank. Du kannst es hier kurz selbst beschreiben — perfekt für regionale oder selbstgemachte Produkte.
           </p>
 
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-1.5">
               Produktname <span className="text-red-500">*</span>
             </label>
             <input
@@ -103,7 +103,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-1.5">
               Marke / Hersteller
             </label>
             <input
@@ -117,7 +117,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-1.5">
               Barcode
             </label>
             <input
@@ -132,7 +132,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-ink-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-mn-ink-soft uppercase tracking-wider mb-1.5">
               Foto
             </label>
             <input
@@ -160,7 +160,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-sm font-medium text-ink-600 hover:text-primary-600 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
               >
                 <Camera className="w-4 h-4" />
                 Foto aufnehmen
@@ -169,11 +169,11 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
           </div>
         </div>
 
-        <div className="px-5 py-4 border-t border-stone-100 bg-stone-50">
+        <div className="px-5 py-4 border-t border-white/5 bg-mn-surface">
           <button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-stone-300 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-amber hover:bg-primary-700 disabled:bg-stone-300 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
           >
             <Save className="w-4 h-4" />
             Produkt übernehmen

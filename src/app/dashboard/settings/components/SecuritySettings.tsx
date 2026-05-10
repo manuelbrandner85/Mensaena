@@ -68,14 +68,14 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
     if (/[^A-Za-z0-9]/.test(newPassword)) score++
     if (score <= 2) return { label: t('strengthWeak'), color: 'bg-red-500', width: '33%' }
     if (score <= 3) return { label: t('strengthFair'), color: 'bg-amber-500', width: '66%' }
-    return { label: t('strengthStrong'), color: 'bg-primary-500', width: '100%' }
+    return { label: t('strengthStrong'), color: 'bg-mn-amber', width: '100%' }
   })()
 
   return (
     <div className="space-y-5">
       {/* Password Change */}
       <SettingsSection
-        icon={<Key className="w-4 h-4 text-primary-700" />}
+        icon={<Key className="w-4 h-4 text-mn-amber" />}
         title={t('sectionPasswordTitle')}
         description={t('sectionPasswordDesc')}
       >
@@ -102,13 +102,13 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
             />
             {passwordStrength && (
               <div className="mt-2">
-                <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-mn-raised rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${passwordStrength.color}`}
                     style={{ width: passwordStrength.width }}
                   />
                 </div>
-                <p className="text-xs text-ink-500 mt-1">{t('strengthLabel', { label: passwordStrength.label })}</p>
+                <p className="text-xs text-mn-mute mt-1">{t('strengthLabel', { label: passwordStrength.label })}</p>
               </div>
             )}
           </div>
@@ -125,7 +125,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
               <p className="text-xs text-red-600 mt-1">{t('passwordMismatch')}</p>
             )}
             {confirmPassword && newPassword === confirmPassword && newPassword.length >= 8 && (
-              <p className="text-xs text-primary-600 mt-1 flex items-center gap-1">
+              <p className="text-xs text-mn-amber mt-1 flex items-center gap-1">
                 <Check className="w-3 h-3" /> {t('passwordMatch')}
               </p>
             )}
@@ -133,7 +133,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
           <button
             onClick={handlePasswordChange}
             disabled={changingPassword || !currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 8}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
             {t('changePasswordButton')}
@@ -143,14 +143,14 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
       {/* Verification Status */}
       <SettingsSection
-        icon={<Shield className="w-4 h-4 text-primary-700" />}
+        icon={<Shield className="w-4 h-4 text-mn-amber" />}
         title={t('sectionVerifyTitle')}
         description={t('sectionVerifyDesc')}
       >
         <div className="space-y-1">
           <SettingRow label={t('emailVerified')} description={settings.email}>
             <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-              settings.verified_email ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-500'
+              settings.verified_email ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-mute'
             }`}>
               {settings.verified_email ? <><Check className="w-3 h-3" /> {t('verified')}</> : t('pending')}
             </span>
@@ -158,7 +158,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
           <SettingRow label={t('phoneVerified')} description={settings.phone ? `${settings.phone.slice(0, 6)}...` : t('phoneNotSet')}>
             <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-              settings.verified_phone ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-500'
+              settings.verified_phone ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-mute'
             }`}>
               {settings.verified_phone ? <><Check className="w-3 h-3" /> {t('verified')}</> : t('pending')}
             </span>
@@ -166,7 +166,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
           <SettingRow label={t('communityVerified')} description={t('communityVerifiedDesc')}>
             <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-              settings.verified_community ? 'bg-primary-100 text-primary-700' : 'bg-stone-100 text-ink-500'
+              settings.verified_community ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-mute'
             }`}>
               {settings.verified_community ? <><Check className="w-3 h-3" /> {t('verified')}</> : t('pending')}
             </span>
@@ -181,7 +181,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
       {/* Emergency Contacts */}
       <SettingsSection
-        icon={<Smartphone className="w-4 h-4 text-primary-700" />}
+        icon={<Smartphone className="w-4 h-4 text-mn-amber" />}
         title={t('sectionEmergencyTitle')}
         description={t('sectionEmergencyDesc')}
       >
@@ -191,7 +191,7 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
             <button
               onClick={handleSaveEmergency}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {t('saveEmergencyButton')}
@@ -202,17 +202,17 @@ export default function SecuritySettings({ settings, onChangePassword, onSave, s
 
       {/* Active Sessions */}
       <SettingsSection
-        icon={<Lock className="w-4 h-4 text-primary-700" />}
+        icon={<Lock className="w-4 h-4 text-mn-amber" />}
         title={t('sectionSessionsTitle')}
         description={t('sectionSessionsDesc')}
       >
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-primary-50 border border-primary-200">
-          <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-            <Check className="w-4 h-4 text-primary-600" />
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-mn-amber/5 border border-mn-amber/20">
+          <div className="w-8 h-8 rounded-full bg-mn-amber/10 flex items-center justify-center">
+            <Check className="w-4 h-4 text-mn-amber" />
           </div>
           <div>
-            <p className="text-sm font-medium text-ink-900">{t('currentSession')}</p>
-            <p className="text-xs text-ink-500">{t('currentSessionDesc')}</p>
+            <p className="text-sm font-medium text-mn-ink">{t('currentSession')}</p>
+            <p className="text-xs text-mn-mute">{t('currentSessionDesc')}</p>
           </div>
         </div>
       </SettingsSection>

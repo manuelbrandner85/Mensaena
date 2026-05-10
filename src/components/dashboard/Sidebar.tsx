@@ -65,9 +65,9 @@ const navSections = [
         href: '/dashboard',
         label: 'Dashboard',
         icon: LayoutDashboard,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
@@ -83,27 +83,27 @@ const navSections = [
         href: '/dashboard/chat',
         label: 'Chat',
         icon: MessageCircle,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/calendar',
         label: 'Kalender',
         icon: CalendarDays,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/create',
         label: 'Beitrag erstellen',
         icon: FilePlus,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
         highlight: true,
       },
@@ -111,9 +111,9 @@ const navSections = [
         href: '/dashboard/posts',
         label: 'Alle Beiträge',
         icon: FileText,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
     ],
@@ -125,36 +125,36 @@ const navSections = [
         href: '/dashboard/supply',
         label: 'Regionale Versorgung',
         icon: Wheat,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/harvest',
         label: 'Erntehilfe',
         icon: Sprout,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/housing',
         label: 'Wohnen & Alltag',
         icon: Home,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/animals',
         label: 'Tiere',
         icon: PawPrint,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
@@ -175,36 +175,36 @@ const navSections = [
         href: '/dashboard/community',
         label: 'Community',
         icon: Users,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/skills',
         label: 'Skill-Netzwerk',
         icon: Wrench,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/timebank',
         label: 'Zeitbank',
         icon: Clock,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
         href: '/dashboard/sharing',
         label: 'Teilen & Tauschen',
         icon: Shuffle,
-        iconBg: 'bg-primary-500',
-        activeBg: 'bg-primary-50',
-        activeText: 'text-primary-700',
+        iconBg: 'bg-mn-amber',
+        activeBg: 'bg-mn-amber/5',
+        activeText: 'text-mn-amber',
         activeBorder: 'border-primary-400',
       },
       {
@@ -305,7 +305,7 @@ export default function Sidebar() {
         style={{ background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 40%, #0891b2 100%)' }}>
         <div className="flex items-center justify-between px-4 h-16">
           <Link href="/dashboard" className="flex items-center">
-            <div className="bg-white/95 rounded-xl px-2 py-1 shadow-sm">
+            <div className="bg-mn-elevated/95 rounded-xl px-2 py-1 shadow-sm">
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
@@ -318,18 +318,18 @@ export default function Sidebar() {
           </Link>
           <div className="flex items-center gap-1">
             {notifCount > 0 && (
-              <Link href="/dashboard/posts" className="relative p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all">
+              <Link href="/dashboard/posts" className="relative p-2 rounded-xl bg-mn-elevated/10 hover:bg-mn-elevated/20 text-white transition-all">
                 <Bell className="w-5 h-5" />
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">{notifCount > 9 ? '9+' : notifCount}</span>
               </Link>
             )}
             {dmUnreadCount > 0 && (
-              <Link href="/dashboard/chat" className="relative p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all">
+              <Link href="/dashboard/chat" className="relative p-2 rounded-xl bg-mn-elevated/10 hover:bg-mn-elevated/20 text-white transition-all">
                 <MessageCircle className="w-5 h-5" />
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow">{dmUnreadCount > 9 ? '9+' : dmUnreadCount}</span>
               </Link>
             )}
-            <button onClick={() => setMobileOpen(true)} className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all">
+            <button onClick={() => setMobileOpen(true)} className="p-2 rounded-xl bg-mn-elevated/10 hover:bg-mn-elevated/20 text-white transition-all">
               <Menu className="w-5 h-5" />
             </button>
           </div>
@@ -386,7 +386,7 @@ function SidebarInner({
   isAdmin?: boolean
 }) {
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-white border-r border-stone-100">
+    <div className="flex flex-col h-full overflow-hidden bg-mn-elevated border-r border-white/5">
 
       {/* ── Logo Header ── */}
       <div className={cn(
@@ -394,16 +394,16 @@ function SidebarInner({
         collapsed ? 'h-[72px] justify-center px-2' : 'h-[92px] px-5'
       )} style={{ background: 'linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #0891b2 100%)' }}>
         {/* Decorative shapes */}
-        <div className="absolute -top-8 -right-8 w-28 h-28 bg-white/8 rounded-full pointer-events-none" />
-        <div className="absolute -bottom-10 -left-6 w-24 h-24 bg-white/5 rounded-full pointer-events-none" />
+        <div className="absolute -top-8 -right-8 w-28 h-28 bg-mn-elevated/8 rounded-full pointer-events-none" />
+        <div className="absolute -bottom-10 -left-6 w-24 h-24 bg-mn-elevated/5 rounded-full pointer-events-none" />
 
         <Link href="/dashboard" className="relative flex items-center gap-2 flex-1 min-w-0">
           {collapsed ? (
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center border border-white/30 shadow-sm">
+            <div className="w-10 h-10 bg-mn-elevated/20 rounded-xl flex items-center justify-center border border-white/30 shadow-sm">
               <span className="text-white font-black text-base">M</span>
             </div>
           ) : (
-            <div className="bg-white/95 rounded-xl px-3 py-1.5 shadow-sm">
+            <div className="bg-mn-elevated/95 rounded-xl px-3 py-1.5 shadow-sm">
               <Image
                 src="/mensaena-logo.png"
                 alt="Mensaena"
@@ -417,12 +417,12 @@ function SidebarInner({
         </Link>
 
         {showClose && (
-          <button onClick={onClose} className="relative p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-all flex-shrink-0 ml-2">
+          <button onClick={onClose} className="relative p-1.5 rounded-lg bg-mn-elevated/15 hover:bg-mn-elevated/25 text-white transition-all flex-shrink-0 ml-2">
             <X className="w-4 h-4" />
           </button>
         )}
         {onToggleCollapse && (
-          <button onClick={onToggleCollapse} className="relative p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-all flex-shrink-0 ml-2">
+          <button onClick={onToggleCollapse} className="relative p-1.5 rounded-lg bg-mn-elevated/15 hover:bg-mn-elevated/25 text-white transition-all flex-shrink-0 ml-2">
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         )}
@@ -430,7 +430,7 @@ function SidebarInner({
 
       {/* ── Status / Action Strip ── */}
       {!collapsed && (
-        <div className="px-3 py-2 flex gap-2 bg-stone-50 border-b border-stone-100">
+        <div className="px-3 py-2 flex gap-2 bg-mn-surface border-b border-white/5">
           {notifCount > 0 ? (
             <Link href="/dashboard/posts"
               className="flex-1 flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition-all group">
@@ -441,9 +441,9 @@ function SidebarInner({
               </span>
             </Link>
           ) : (
-            <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-primary-50 border border-primary-100 rounded-xl">
+            <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-mn-amber/5 border border-primary-100 rounded-xl">
               <div className="w-2 h-2 rounded-full bg-primary-400 animate-pulse flex-shrink-0" />
-              <span className="text-xs text-primary-700 font-medium">Online & aktiv</span>
+              <span className="text-xs text-mn-amber font-medium">Online & aktiv</span>
             </div>
           )}
           <Link href="/dashboard/crisis"
@@ -461,11 +461,11 @@ function SidebarInner({
             {/* Section header */}
             {!collapsed ? (
               <div className="flex items-center gap-2 px-2 py-1 mb-0.5">
-                <span className="text-xs font-black uppercase tracking-wider text-ink-400 select-none">{section.label}</span>
+                <span className="text-xs font-black uppercase tracking-wider text-mn-mute select-none">{section.label}</span>
                 <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
               </div>
             ) : (
-              si > 0 && <div className="my-1.5 mx-2 h-px bg-stone-100" />
+              si > 0 && <div className="my-1.5 mx-2 h-px bg-mn-elevated" />
             )}
 
             {section.items.map((item: NavItem) => {
@@ -484,8 +484,8 @@ function SidebarInner({
                     active
                       ? cn('font-semibold', item.activeBg, item.activeText, 'border', item.activeBorder, 'shadow-sm')
                       : cn(
-                          'text-ink-600 border border-transparent hover:bg-stone-50 hover:text-ink-900',
-                          item.highlight && 'bg-gradient-to-r from-primary-50 to-teal-50 border-primary-200 hover:from-primary-100 hover:to-teal-100 text-primary-700 font-semibold'
+                          'text-mn-ink-soft border border-transparent hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
+                          item.highlight && 'bg-gradient-to-r from-primary-50 to-teal-50 border-mn-amber/20 hover:from-primary-100 hover:to-teal-100 text-mn-amber font-semibold'
                         ),
                   )}
                 >
@@ -505,12 +505,12 @@ function SidebarInner({
                     collapsed ? 'w-8 h-8' : 'w-7 h-7',
                     active
                       ? cn(item.iconBg, 'shadow-sm scale-110')
-                      : cn('bg-stone-100 group-hover:scale-105', 'group-hover:' + item.iconBg.replace('bg-', 'bg-'))
+                      : cn('bg-mn-elevated group-hover:scale-105', 'group-hover:' + item.iconBg.replace('bg-', 'bg-'))
                   )}>
                     <Icon className={cn(
                       'transition-all duration-200',
                       collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5',
-                      active ? 'text-white' : cn('text-ink-500', 'group-hover:text-white')
+                      active ? 'text-white' : cn('text-mn-mute', 'group-hover:text-white')
                     )} />
                   </div>
 
@@ -538,11 +538,11 @@ function SidebarInner({
           <div className="mt-2">
             {!collapsed ? (
               <div className="flex items-center gap-2 px-2 py-1 mb-0.5">
-                <span className="text-xs font-black uppercase tracking-wider text-ink-400 select-none">Administration</span>
+                <span className="text-xs font-black uppercase tracking-wider text-mn-mute select-none">Administration</span>
                 <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
               </div>
             ) : (
-              <div className="my-1.5 mx-2 h-px bg-stone-100" />
+              <div className="my-1.5 mx-2 h-px bg-mn-elevated" />
             )}
             <Link
               href="/dashboard/admin"
@@ -552,7 +552,7 @@ function SidebarInner({
                 collapsed ? 'h-10 w-10 mx-auto justify-center' : 'gap-3 px-2.5 py-2',
                 isActive('/dashboard/admin')
                   ? 'font-semibold bg-slate-50 text-slate-700 border border-slate-400 shadow-sm'
-                  : 'text-ink-600 border border-transparent hover:bg-stone-50 hover:text-ink-900',
+                  : 'text-mn-ink-soft border border-transparent hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
               )}
             >
               <div className={cn(
@@ -560,12 +560,12 @@ function SidebarInner({
                 collapsed ? 'w-8 h-8' : 'w-7 h-7',
                 isActive('/dashboard/admin')
                   ? 'bg-slate-500 shadow-sm scale-110'
-                  : 'bg-stone-100 group-hover:scale-105 group-hover:bg-slate-500'
+                  : 'bg-mn-elevated group-hover:scale-105 group-hover:bg-slate-500'
               )}>
                 <Settings className={cn(
                   'transition-all duration-200',
                   collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5',
-                  isActive('/dashboard/admin') ? 'text-white' : 'text-ink-500 group-hover:text-white'
+                  isActive('/dashboard/admin') ? 'text-white' : 'text-mn-mute group-hover:text-white'
                 )} />
               </div>
               {!collapsed && <span className="truncate flex-1 text-[13px] leading-tight">Admin-Bereich</span>}
@@ -575,7 +575,7 @@ function SidebarInner({
       </nav>
 
       {/* ── Bottom User Section ── */}
-      <div className="flex-shrink-0 border-t border-stone-100">
+      <div className="flex-shrink-0 border-t border-white/5">
         {!collapsed && (
           <div className="px-3 py-2">
             <Link href="/dashboard/profile"
@@ -584,8 +584,8 @@ function SidebarInner({
                 <User className="w-3.5 h-3.5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-ink-800 truncate group-hover:text-teal-700 transition-colors">Mein Profil</p>
-                <p className="text-xs text-ink-400">Profil anzeigen →</p>
+                <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-teal-700 transition-colors">Mein Profil</p>
+                <p className="text-xs text-mn-mute">Profil anzeigen →</p>
               </div>
             </Link>
           </div>
@@ -601,16 +601,16 @@ function SidebarInner({
           <Link href="/dashboard/settings"
             title={collapsed ? 'Einstellungen' : undefined}
             className={cn(
-              'flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-ink-500 hover:bg-stone-50 hover:text-ink-800 border border-transparent transition-all',
+              'flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-mn-mute hover:bg-mn-elevated/[0.02] hover:text-mn-ink border border-transparent transition-all',
               collapsed ? 'w-10 h-10 justify-center mx-auto' : 'px-3 py-2'
             )}>
-            <Settings className={cn('flex-shrink-0 text-ink-400', collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5')} />
+            <Settings className={cn('flex-shrink-0 text-mn-mute', collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5')} />
             {!collapsed && <span>Einstellungen</span>}
           </Link>
           <button onClick={onLogout}
             title={collapsed ? 'Abmelden' : undefined}
             className={cn(
-              'w-full flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-ink-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 transition-all',
+              'w-full flex items-center gap-2.5 rounded-xl text-[13px] font-medium text-mn-mute hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 transition-all',
               collapsed ? 'h-10 justify-center' : 'px-3 py-2'
             )}>
             <LogOut className={cn('flex-shrink-0', collapsed ? 'w-4 h-4' : 'w-3.5 h-3.5')} />

@@ -47,7 +47,7 @@ function AnimalStatusWidget() {
   if (loading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[0,1,2,3].map(i => <div key={i} className="h-20 bg-stone-100 rounded-2xl animate-pulse" />)}
+        {[0,1,2,3].map(i => <div key={i} className="h-20 bg-mn-elevated rounded-2xl animate-pulse" />)}
       </div>
     )
   }
@@ -68,7 +68,7 @@ function AnimalStatusWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-mn-elevated border border-white/5 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -80,8 +80,8 @@ function AnimalStatusWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-mn-ink tabular-nums">{s.value}</p>
+              <p className="text-xs text-mn-mute text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
@@ -89,7 +89,7 @@ function AnimalStatusWidget() {
 
       {/* Letzte Notfälle */}
       {recentLost.length > 0 && (
-        <div className="relative bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border border-red-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+        <div className="relative bg-gradient-to-br from-red-50 via-red-50/80 to-orange-50 border border-red-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}
@@ -101,12 +101,12 @@ function AnimalStatusWidget() {
           <div className="relative space-y-1.5">
             {recentLost.map(p => (
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
-                className="flex items-center gap-2 p-2.5 bg-white rounded-xl hover:bg-red-50 transition-all border border-red-100 group shadow-soft">
+                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-red-50 transition-all border border-red-100 group shadow-cinema-card">
                 <PawPrint className="w-4 h-4 text-red-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-ink-800 truncate group-hover:text-red-700">{p.title}</p>
+                  <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-red-700">{p.title}</p>
                   {p.location_text && (
-                    <p className="text-xs text-ink-500 flex items-center gap-1">
+                    <p className="text-xs text-mn-mute flex items-center gap-1">
                       <MapPin className="w-2.5 h-2.5" />{p.location_text}
                     </p>
                   )}

@@ -28,20 +28,20 @@ export default function AccessibilitySettings() {
           variant="flat"
           className={cn(
             'transition-colors duration-150',
-            active ? 'ring-2 ring-primary-500 bg-primary-50/40' : ''
+            active ? 'ring-2 ring-mn-amber bg-mn-amber/5/40' : ''
           )}
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <div className={cn(
                 'p-2 rounded-lg flex-shrink-0 mt-0.5',
-                active ? 'bg-primary-100 text-primary-600' : 'bg-stone-100 text-ink-400'
+                active ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-mute'
               )}>
                 <Icon className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-sm font-medium text-ink-900">{label}</p>
-                <p className="text-xs text-ink-500 mt-0.5">{desc}</p>
+                <p className="text-sm font-medium text-mn-ink">{label}</p>
+                <p className="text-xs text-mn-mute mt-0.5">{desc}</p>
               </div>
             </div>
             <Toggle checked={active} onChange={() => toggle()} size="md" />
@@ -49,7 +49,7 @@ export default function AccessibilitySettings() {
         </Card>
       ))}
 
-      <p className="text-xs text-ink-400 px-1">{t('storageInfo')}</p>
+      <p className="text-xs text-mn-mute px-1">{t('storageInfo')}</p>
     </div>
   )
 }

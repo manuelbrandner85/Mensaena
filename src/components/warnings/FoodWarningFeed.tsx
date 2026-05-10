@@ -39,13 +39,13 @@ function formatDate(iso: string): string {
 
 function FoodWarningCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 overflow-hidden animate-pulse">
-      <div className="aspect-[16/9] bg-stone-100 dark:bg-stone-800" />
+    <div className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 overflow-hidden animate-pulse">
+      <div className="aspect-[16/9] bg-mn-elevated dark:bg-stone-800" />
       <div className="p-4 space-y-2">
-        <div className="h-4 w-3/4 bg-stone-200 dark:bg-stone-700 rounded" />
-        <div className="h-3 w-1/2 bg-stone-200 dark:bg-stone-700 rounded" />
-        <div className="h-3 w-full bg-stone-200 dark:bg-stone-700 rounded" />
-        <div className="h-3 w-5/6 bg-stone-200 dark:bg-stone-700 rounded" />
+        <div className="h-4 w-3/4 bg-mn-raised dark:bg-stone-700 rounded" />
+        <div className="h-3 w-1/2 bg-mn-raised dark:bg-stone-700 rounded" />
+        <div className="h-3 w-full bg-mn-raised dark:bg-stone-700 rounded" />
+        <div className="h-3 w-5/6 bg-mn-raised dark:bg-stone-700 rounded" />
       </div>
     </div>
   )
@@ -60,13 +60,13 @@ function FoodWarningCard({ warning }: CardProps) {
       role="alert"
       aria-labelledby={`fw-title-${warning.id}`}
       className={cn(
-        'rounded-2xl border-2 overflow-hidden bg-white dark:bg-stone-900 shadow-sm hover:shadow-md transition-shadow flex flex-col',
+        'rounded-2xl border-2 overflow-hidden bg-mn-elevated dark:bg-stone-900 shadow-sm hover:shadow-md transition-shadow flex flex-col',
         isRecall
           ? 'border-red-300 dark:border-red-700/70'
           : 'border-orange-300 dark:border-orange-700/70',
       )}
     >
-      <div className="relative aspect-[16/9] bg-stone-100 dark:bg-stone-800">
+      <div className="relative aspect-[16/9] bg-mn-elevated dark:bg-stone-800">
         {warning.imageUrl && !imgError ? (
           <Image
             src={warning.imageUrl}
@@ -78,7 +78,7 @@ function FoodWarningCard({ warning }: CardProps) {
             unoptimized
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-stone-300 dark:text-stone-600">
+          <div className="w-full h-full flex items-center justify-center text-mn-ghost dark:text-mn-ink-soft">
             <ImageOff className="w-12 h-12" aria-hidden="true" />
           </div>
         )}
@@ -101,7 +101,7 @@ function FoodWarningCard({ warning }: CardProps) {
           {warning.productName || warning.title}
         </h3>
 
-        <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400 flex-wrap">
+        <div className="flex items-center gap-2 text-xs text-mn-mute dark:text-mn-ghost flex-wrap">
           {warning.manufacturer && warning.manufacturer !== 'Unbekannt' && (
             <span className="font-medium text-stone-700 dark:text-stone-200">
               {warning.manufacturer}
@@ -112,13 +112,13 @@ function FoodWarningCard({ warning }: CardProps) {
         </div>
 
         {warning.description && (
-          <p className="text-sm text-stone-600 dark:text-stone-300 leading-relaxed line-clamp-3">
+          <p className="text-sm text-mn-ink-soft dark:text-mn-ghost leading-relaxed line-clamp-3">
             {warning.description}
           </p>
         )}
 
         {warning.affectedStates.length > 0 && (
-          <div className="flex items-start gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+          <div className="flex items-start gap-1.5 text-xs text-mn-mute dark:text-mn-ghost">
             <MapPin className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span className="line-clamp-1">{warning.affectedStates.join(', ')}</span>
           </div>
@@ -129,7 +129,7 @@ function FoodWarningCard({ warning }: CardProps) {
             href={warning.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-auto inline-flex items-center gap-1 self-start text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+            className="mt-auto inline-flex items-center gap-1 self-start text-sm font-medium text-mn-amber dark:text-primary-400 hover:text-mn-amber dark:hover:text-primary-300 transition-colors"
           >
             Mehr erfahren
             <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
@@ -238,14 +238,14 @@ export default function FoodWarningFeed({
     return (
       <div
         role="alert"
-        className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-6 text-center"
+        className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 p-6 text-center"
       >
-        <AlertTriangle className="w-8 h-8 mx-auto text-stone-400 dark:text-stone-500 mb-2" aria-hidden="true" />
-        <p className="text-sm text-stone-600 dark:text-stone-300 mb-3">{error}</p>
+        <AlertTriangle className="w-8 h-8 mx-auto text-mn-ghost dark:text-mn-mute mb-2" aria-hidden="true" />
+        <p className="text-sm text-mn-ink-soft dark:text-mn-ghost mb-3">{error}</p>
         <button
           type="button"
           onClick={() => loadWarnings(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mn-amber hover:bg-primary-700 text-white text-sm font-medium transition-colors"
         >
           <RefreshCw className="w-4 h-4" aria-hidden="true" />
           Erneut versuchen
@@ -256,12 +256,12 @@ export default function FoodWarningFeed({
 
   if (warnings.length === 0) {
     return (
-      <div className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-8 text-center">
-        <ShieldAlert className="w-10 h-10 mx-auto text-primary-600 mb-3" aria-hidden="true" />
+      <div className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 p-8 text-center">
+        <ShieldAlert className="w-10 h-10 mx-auto text-mn-amber mb-3" aria-hidden="true" />
         <h3 className="font-semibold text-stone-900 dark:text-stone-50 mb-1">
           Keine aktuellen Warnungen
         </h3>
-        <p className="text-sm text-stone-600 dark:text-stone-300">
+        <p className="text-sm text-mn-ink-soft dark:text-mn-ghost">
           In den letzten 30 Tagen gab es keine Lebensmittel- oder Produktwarnungen.
         </p>
       </div>
@@ -272,10 +272,10 @@ export default function FoodWarningFeed({
     <section aria-label="Aktuelle Lebensmittel- und Produktwarnungen">
       {/* Header / Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-        <p className="text-sm text-stone-600 dark:text-stone-300">
+        <p className="text-sm text-mn-ink-soft dark:text-mn-ghost">
           {filtered.length} {filtered.length === 1 ? 'Warnung' : 'Warnungen'}
           {stateOnly && resolvedState && (
-            <span className="text-stone-400 dark:text-stone-500"> · gefiltert nach {resolvedState}</span>
+            <span className="text-mn-ghost dark:text-mn-mute"> · gefiltert nach {resolvedState}</span>
           )}
         </p>
 
@@ -285,14 +285,14 @@ export default function FoodWarningFeed({
             onClick={() => loadWarnings(true)}
             disabled={refreshing}
             aria-label="Warnungen aktualisieren"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-stone-700 dark:text-stone-200 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-700 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-stone-700 dark:text-stone-200 bg-mn-elevated dark:bg-stone-800 border border-white/5 dark:border-stone-700 hover:bg-mn-elevated/[0.02] dark:hover:bg-stone-700 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={cn('w-3.5 h-3.5', refreshing && 'animate-spin')} aria-hidden="true" />
             Aktualisieren
           </button>
 
           {resolvedState && (
-            <label className="inline-flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl text-xs font-medium bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-elevated dark:bg-stone-800 border border-white/5 dark:border-stone-700">
               <input
                 type="checkbox"
                 checked={stateOnly}
@@ -300,7 +300,7 @@ export default function FoodWarningFeed({
                   setStateOnly(e.target.checked)
                   setVisibleCount(initialLimit)
                 }}
-                className="w-3.5 h-3.5 rounded border-stone-300 dark:border-stone-600 text-primary-600 focus:ring-primary-500"
+                className="w-3.5 h-3.5 rounded border-stone-300 dark:border-stone-600 text-mn-amber focus:ring-mn-amber"
               />
               <span className="text-stone-700 dark:text-stone-200">Nur mein Bundesland</span>
             </label>
@@ -309,14 +309,14 @@ export default function FoodWarningFeed({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-6 text-center">
-          <p className="text-sm text-stone-600 dark:text-stone-300">
+        <div className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 p-6 text-center">
+          <p className="text-sm text-mn-ink-soft dark:text-mn-ghost">
             Keine Warnungen für dein Bundesland.
           </p>
           <button
             type="button"
             onClick={() => setStateOnly(false)}
-            className="mt-3 text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
+            className="mt-3 text-sm font-medium text-mn-amber dark:text-primary-400 hover:underline"
           >
             Alle Warnungen anzeigen
           </button>
@@ -334,7 +334,7 @@ export default function FoodWarningFeed({
               <button
                 type="button"
                 onClick={() => setVisibleCount(c => c + loadMoreStep)}
-                className="px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium transition-colors shadow-sm"
+                className="px-5 py-2.5 rounded-xl bg-mn-amber hover:bg-primary-700 text-white text-sm font-medium transition-colors shadow-sm"
               >
                 {visibleCount >= initialLimit + loadMoreStep ? 'Mehr laden' : 'Alle anzeigen'}
               </button>

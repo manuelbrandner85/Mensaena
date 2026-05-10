@@ -34,16 +34,16 @@ function StepIndicator({ step }: { step: number }) {
         <div key={n} className="flex items-center">
           <div className={cn(
             'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
-            step > n  ? 'bg-primary-500 text-white'                           :
-            step === n ? 'bg-primary-500 text-white ring-4 ring-primary-100'  :
-            'bg-stone-100 text-ink-400'
+            step > n  ? 'bg-mn-amber text-white'                           :
+            step === n ? 'bg-mn-amber text-white ring-4 ring-primary-100'  :
+            'bg-mn-elevated text-mn-mute'
           )}>
             {step > n ? <CheckCircle2 className="w-4 h-4" /> : n}
           </div>
           {i < 2 && (
             <div className={cn(
               'w-12 h-0.5 mx-1 transition-all duration-300',
-              step > n + 1 ? 'bg-primary-400' : step > n ? 'bg-primary-300' : 'bg-stone-200'
+              step > n + 1 ? 'bg-primary-400' : step > n ? 'bg-primary-300' : 'bg-mn-raised'
             )} />
           )}
         </div>
@@ -180,19 +180,19 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
     <div className="max-w-lg mx-auto">
       {/* Intro */}
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-ink-900">Dein erster Beitrag</h1>
-        <p className="text-ink-500 text-sm mt-1">Nur 3 kurze Schritte – wir führen dich durch.</p>
+        <h1 className="text-2xl font-bold text-mn-ink">Dein erster Beitrag</h1>
+        <p className="text-mn-mute text-sm mt-1">Nur 3 kurze Schritte – wir führen dich durch.</p>
       </div>
 
       <StepIndicator step={step} />
 
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-soft p-6 relative overflow-hidden">
+      <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card p-6 relative overflow-hidden">
 
         {/* ── Schritt 1: Was möchtest du tun? ── */}
         {step === 1 && (
           <StepWrap visible>
-            <h2 className="text-xl font-bold text-ink-900 mb-1">Was möchtest du tun?</h2>
-            <p className="text-sm text-ink-500 mb-5">Wähle aus, was am besten passt.</p>
+            <h2 className="text-xl font-bold text-mn-ink mb-1">Was möchtest du tun?</h2>
+            <p className="text-sm text-mn-mute mb-5">Wähle aus, was am besten passt.</p>
             <div className="grid grid-cols-2 gap-3">
               {TYPE_OPTIONS.map((opt) => (
                 <button
@@ -205,13 +205,13 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                     'rounded-2xl border p-5 text-left transition-all duration-200',
                     'hover:scale-[1.02] hover:shadow-lg hover:border-primary-300',
                     selected?.title === opt.title
-                      ? 'bg-primary-50 border-primary-400 ring-2 ring-primary-200'
-                      : 'bg-white border-stone-200'
+                      ? 'bg-mn-amber/5 border-primary-400 ring-2 ring-primary-200'
+                      : 'bg-mn-elevated border-white/5'
                   )}
                 >
                   <div className="text-3xl mb-2">{opt.emoji}</div>
-                  <p className="font-semibold text-sm text-ink-900">{opt.title}</p>
-                  <p className="text-xs text-ink-500 mt-1 leading-relaxed">{opt.desc}</p>
+                  <p className="font-semibold text-sm text-mn-ink">{opt.title}</p>
+                  <p className="text-xs text-mn-mute mt-1 leading-relaxed">{opt.desc}</p>
                 </button>
               ))}
             </div>
@@ -221,14 +221,14 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
         {/* ── Schritt 2: Beschreibe kurz ── */}
         {step === 2 && (
           <StepWrap visible>
-            <h2 className="text-xl font-bold text-ink-900 mb-1">Beschreibe kurz, worum es geht</h2>
-            <p className="text-sm text-ink-500 mb-5">
-              {selected?.emoji} <span className="font-medium text-ink-700">{selected?.title}</span>
+            <h2 className="text-xl font-bold text-mn-ink mb-1">Beschreibe kurz, worum es geht</h2>
+            <p className="text-sm text-mn-mute mb-5">
+              {selected?.emoji} <span className="font-medium text-mn-ink-soft">{selected?.title}</span>
             </p>
 
             {/* Titel */}
             <div className="space-y-1 mb-4">
-              <label className="text-sm font-medium text-ink-700">Titel *</label>
+              <label className="text-sm font-medium text-mn-ink-soft">Titel *</label>
               <input
                 value={title}
                 onChange={e => { setTitle(e.target.value); if (e.target.value.length >= 5) setTitleError('') }}
@@ -242,14 +242,14 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                   ? <p className="text-xs text-red-500">{titleError}</p>
                   : <span />
                 }
-                <p className="text-xs text-ink-400">{title.length}/80</p>
+                <p className="text-xs text-mn-mute">{title.length}/80</p>
               </div>
             </div>
 
             {/* Beschreibung */}
             <div className="space-y-1 mb-4">
-              <label className="text-sm font-medium text-ink-700">
-                Beschreibung <span className="font-normal text-ink-400">optional</span>
+              <label className="text-sm font-medium text-mn-ink-soft">
+                Beschreibung <span className="font-normal text-mn-mute">optional</span>
               </label>
               <textarea
                 value={description}
@@ -259,15 +259,15 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 maxLength={2000}
                 className="input resize-none"
               />
-              <p className="text-xs text-ink-400 text-right">{description.length}/2000</p>
+              <p className="text-xs text-mn-mute text-right">{description.length}/2000</p>
             </div>
 
             {/* Standort */}
             <div className="space-y-1 mb-6">
-              <label className="text-sm font-medium text-ink-700 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-ink-400" /> Standort
-                <span className="font-normal text-ink-400">optional</span>
-                {geoLoading && <Loader2 className="w-3 h-3 animate-spin text-primary-500 ml-1" />}
+              <label className="text-sm font-medium text-mn-ink-soft flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-mn-mute" /> Standort
+                <span className="font-normal text-mn-mute">optional</span>
+                {geoLoading && <Loader2 className="w-3 h-3 animate-spin text-mn-amber ml-1" />}
               </label>
               <input
                 value={location}
@@ -305,15 +305,15 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
         {/* ── Schritt 3: Foto + Veröffentlichen ── */}
         {step === 3 && (
           <StepWrap visible>
-            <h2 className="text-xl font-bold text-ink-900 mb-1">Fast fertig! Noch ein Foto?</h2>
-            <p className="text-sm text-ink-500 mb-5">Ein Bild sagt mehr als tausend Worte – ist aber optional.</p>
+            <h2 className="text-xl font-bold text-mn-ink mb-1">Fast fertig! Noch ein Foto?</h2>
+            <p className="text-sm text-mn-mute mb-5">Ein Bild sagt mehr als tausend Worte – ist aber optional.</p>
 
             {/* Bild-Upload */}
             <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageUpload} className="hidden" />
             <div className="mb-5">
               {imagePreview ? (
                 <div className="relative inline-block">
-                  <img src={imagePreview} alt="Vorschau" className="h-28 w-28 object-cover rounded-xl border border-stone-200" />
+                  <img src={imagePreview} alt="Vorschau" className="h-28 w-28 object-cover rounded-xl border border-white/5" />
                   {uploading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl">
                       <Loader2 className="w-5 h-5 text-white animate-spin" />
@@ -321,25 +321,25 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                   )}
                   <button
                     onClick={() => { setImageUrl(null); setImagePreview(null); if (fileRef.current) fileRef.current.value = '' }}
-                    className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow border border-stone-200"
+                    className="absolute -top-2 -right-2 bg-mn-elevated rounded-full p-0.5 shadow border border-white/5"
                   >
-                    <X className="w-3.5 h-3.5 text-ink-500" />
+                    <X className="w-3.5 h-3.5 text-mn-mute" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-3 text-sm text-ink-600 border-2 border-dashed border-stone-300 rounded-xl hover:bg-stone-50 hover:border-primary-300 transition w-full justify-center"
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-mn-ink-soft border-2 border-dashed border-white/8 rounded-xl hover:bg-mn-surface hover:border-primary-300 transition w-full justify-center"
                 >
-                  <ImagePlus className="w-5 h-5 text-ink-400" />
+                  <ImagePlus className="w-5 h-5 text-mn-mute" />
                   Foto hinzufügen (optional, max. 10 MB)
                 </button>
               )}
             </div>
 
             {/* Vorschau-Karte */}
-            <div className="bg-stone-50 rounded-xl border border-stone-200 p-4 mb-5">
-              <p className="text-xs font-semibold text-ink-400 uppercase tracking-wider mb-3">Vorschau</p>
+            <div className="bg-mn-surface rounded-xl border border-white/5 p-4 mb-5">
+              <p className="text-xs font-semibold text-mn-mute uppercase tracking-wider mb-3">Vorschau</p>
               <div className="flex gap-3">
                 {imagePreview && (
                   <img src={imagePreview} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
@@ -347,16 +347,16 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-base">{selected?.emoji}</span>
-                    <span className="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-medium text-mn-amber bg-mn-amber/5 px-2 py-0.5 rounded-full">
                       {selected?.title}
                     </span>
                   </div>
-                  <p className="font-semibold text-sm text-ink-900 truncate">{title}</p>
+                  <p className="font-semibold text-sm text-mn-ink truncate">{title}</p>
                   {description && (
-                    <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">{description}</p>
+                    <p className="text-xs text-mn-mute mt-0.5 line-clamp-2">{description}</p>
                   )}
                   {location && (
-                    <p className="text-xs text-ink-400 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-mn-mute mt-1 flex items-center gap-1">
                       <MapPin className="w-3 h-3" /> {location}
                     </p>
                   )}
@@ -370,22 +370,22 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               className={cn(
                 'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none mb-5',
                 acceptedNoTrade
-                  ? 'bg-primary-50 border-primary-300'
+                  ? 'bg-mn-amber/5 border-primary-300'
                   : 'bg-amber-50 border-amber-300'
               )}
             >
               <div className={cn(
                 'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
-                acceptedNoTrade ? 'bg-primary-500 border-primary-500' : 'border-amber-400 bg-white'
+                acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
               )}>
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-ink-900">Kein Handel / kein Geldgeschäft *</p>
-                <p className="text-xs text-ink-600 mt-0.5 leading-relaxed">
+                <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
+                <p className="text-xs text-mn-ink-soft mt-0.5 leading-relaxed">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                   Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
-                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">AGB §4</a> nicht erlaubt.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">AGB §4</a> nicht erlaubt.
                 </p>
               </div>
             </div>

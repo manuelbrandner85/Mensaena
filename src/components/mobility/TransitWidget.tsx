@@ -29,17 +29,17 @@ function DepartureRow({ dep }: { dep: TransitDeparture }) {
   const time  = formatTime(dep.when ?? dep.plannedWhen)
   return (
     <div className={cn(
-      'flex items-center gap-2.5 py-1.5 border-b border-stone-100 last:border-0',
+      'flex items-center gap-2.5 py-1.5 border-b border-white/5 last:border-0',
       dep.cancelled && 'opacity-40 line-through',
     )}>
       <LineBadge line={dep.line} color={dep.color} />
-      <span className="flex-1 text-sm text-ink-700 truncate">{dep.direction ?? '–'}</span>
+      <span className="flex-1 text-sm text-mn-ink-soft truncate">{dep.direction ?? '–'}</span>
       {dep.platform && (
-        <span className="text-[11px] text-stone-400 hidden sm:block">Gl. {dep.platform}</span>
+        <span className="text-[11px] text-mn-ghost hidden sm:block">Gl. {dep.platform}</span>
       )}
       <span className={cn(
         'text-sm font-semibold tabular-nums flex-shrink-0',
-        delay ? 'text-orange-600' : 'text-ink-900',
+        delay ? 'text-orange-600' : 'text-mn-ink',
       )}>
         {time}
       </span>
@@ -79,32 +79,32 @@ function StopPanel({
   const Icon = hasTransit ? Train : Bus
 
   return (
-    <div className="border border-stone-200 rounded-xl overflow-hidden">
+    <div className="border border-white/5 rounded-xl overflow-hidden">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-white hover:bg-stone-50 transition-colors text-left"
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 bg-mn-elevated hover:bg-mn-elevated/[0.02] transition-colors text-left"
       >
         <Icon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-ink-900 truncate">{stop.name}</p>
-          <p className="text-[11px] text-stone-400">{Math.round(stop.distance)} m entfernt</p>
+          <p className="text-sm font-semibold text-mn-ink truncate">{stop.name}</p>
+          <p className="text-[11px] text-mn-ghost">{Math.round(stop.distance)} m entfernt</p>
         </div>
         <ChevronRight className={cn(
-          'w-4 h-4 text-stone-400 transition-transform',
+          'w-4 h-4 text-mn-ghost transition-transform',
           expanded && 'rotate-90',
         )} />
       </button>
 
       {expanded && (
-        <div className="px-3 pb-3 pt-1 bg-stone-50/80">
+        <div className="px-3 pb-3 pt-1 bg-mn-surface/80">
           {loading ? (
-            <div className="flex items-center gap-2 py-2 text-xs text-stone-400">
+            <div className="flex items-center gap-2 py-2 text-xs text-mn-ghost">
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
               Abfahrten werden geladen…
             </div>
           ) : departures.length === 0 ? (
-            <p className="text-xs text-stone-400 py-2">Keine Abfahrten in den nächsten 60 Minuten</p>
+            <p className="text-xs text-mn-ghost py-2">Keine Abfahrten in den nächsten 60 Minuten</p>
           ) : (
             <div className="divide-y divide-stone-100">
               {departures.map((dep, i) => <DepartureRow key={`${dep.tripId}-${i}`} dep={dep} />)}
@@ -165,9 +165,9 @@ export default function TransitWidget() {
 
   if (error || stops.length === 0) {
     return (
-      <div className="flex items-center gap-2.5 p-4 rounded-xl bg-stone-50 border border-stone-200">
-        <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0" />
-        <p className="text-sm text-stone-500">Keine ÖPNV-Haltestellen in der Nähe gefunden.</p>
+      <div className="flex items-center gap-2.5 p-4 rounded-xl bg-mn-surface border border-white/5">
+        <AlertCircle className="w-4 h-4 text-mn-ghost flex-shrink-0" />
+        <p className="text-sm text-mn-mute">Keine ÖPNV-Haltestellen in der Nähe gefunden.</p>
       </div>
     )
   }

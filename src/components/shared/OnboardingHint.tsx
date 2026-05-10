@@ -60,11 +60,11 @@ export default function OnboardingHint({
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
           <Lightbulb className={`w-4 h-4 flex-shrink-0 ${c.icon}`} />
-          <p className="text-sm font-bold text-ink-900">{title}</p>
+          <p className="text-sm font-bold text-mn-ink">{title}</p>
         </div>
         <button
           onClick={dismiss}
-          className="text-ink-400 hover:text-ink-600 transition-colors flex-shrink-0 p-0.5"
+          className="text-mn-mute hover:text-mn-ink-soft transition-colors flex-shrink-0 p-0.5"
           aria-label="Schließen"
         >
           <X className="w-4 h-4" />
@@ -73,10 +73,10 @@ export default function OnboardingHint({
 
       <div className="grid grid-cols-3 gap-2 mb-3">
         {steps.map((step, i) => (
-          <div key={i} className="bg-white/80 rounded-xl p-2.5 text-center border border-white">
+          <div key={i} className="bg-mn-elevated/80 rounded-xl p-2.5 text-center border border-white">
             <div className="text-xl mb-1">{step.icon}</div>
-            <p className="text-xs font-semibold text-ink-800 leading-tight">{step.title}</p>
-            <p className="text-xs text-ink-500 mt-0.5 leading-tight">{step.text}</p>
+            <p className="text-xs font-semibold text-mn-ink leading-tight">{step.title}</p>
+            <p className="text-xs text-mn-mute mt-0.5 leading-tight">{step.text}</p>
           </div>
         ))}
       </div>

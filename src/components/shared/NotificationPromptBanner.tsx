@@ -23,7 +23,7 @@ function isNativeApp(): boolean {
 }
 
 const NOTIFICATION_EXAMPLES = [
-  { icon: Handshake, color: 'text-primary-600', text: 'Hilfsanfragen & Antworten' },
+  { icon: Handshake, color: 'text-mn-amber', text: 'Hilfsanfragen & Antworten' },
   { icon: MapPin,    color: 'text-purple-600',  text: 'Neue Beiträge in deiner Nähe' },
   { icon: MessageCircle, color: 'text-blue-600', text: 'Nachrichten von Nachbarn' },
 ]
@@ -74,26 +74,26 @@ export default function NotificationPromptBanner({ userId }: { userId: string })
                 <CheckCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-ink-900">Aktiviert!</p>
-                <p className="text-xs text-ink-500">Du bekommst jetzt Benachrichtigungen.</p>
+                <p className="text-sm font-semibold text-mn-ink">Aktiviert!</p>
+                <p className="text-xs text-mn-mute">Du bekommst jetzt Benachrichtigungen.</p>
               </div>
             </div>
           ) : (
             <>
               {/* Header */}
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center flex-shrink-0">
-                  <Bell className="w-5 h-5 text-primary-600" />
+                <div className="w-10 h-10 rounded-xl bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
+                  <Bell className="w-5 h-5 text-mn-amber" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-ink-900">Benachrichtigungen aktivieren</p>
-                  <p className="text-xs text-ink-500 mt-0.5 leading-relaxed">
+                  <p className="text-sm font-bold text-mn-ink">Benachrichtigungen aktivieren</p>
+                  <p className="text-xs text-mn-mute mt-0.5 leading-relaxed">
                     Verpasse keine Hilfsanfragen und Nachrichten von deinen Nachbarn.
                   </p>
                 </div>
                 <button
                   onClick={snooze}
-                  className="text-ink-400 hover:text-ink-600 flex-shrink-0 -mt-0.5 p-0.5"
+                  className="text-mn-mute hover:text-mn-ink-soft flex-shrink-0 -mt-0.5 p-0.5"
                   aria-label="Schließen"
                 >
                   <X className="w-4 h-4" />
@@ -105,7 +105,7 @@ export default function NotificationPromptBanner({ userId }: { userId: string })
                 {NOTIFICATION_EXAMPLES.map(({ icon: Icon, color, text }) => (
                   <div key={text} className="flex items-center gap-2">
                     <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${color}`} />
-                    <span className="text-xs text-ink-600">{text}</span>
+                    <span className="text-xs text-mn-ink-soft">{text}</span>
                   </div>
                 ))}
               </div>
@@ -121,7 +121,7 @@ export default function NotificationPromptBanner({ userId }: { userId: string })
                 </button>
                 <button
                   onClick={snooze}
-                  className="px-3 py-2 text-sm text-ink-500 hover:text-ink-700 hover:bg-stone-100 rounded-xl transition-colors"
+                  className="px-3 py-2 text-sm text-mn-mute hover:text-mn-ink-soft hover:bg-mn-elevated/5 rounded-xl transition-colors"
                 >
                   Später
                 </button>

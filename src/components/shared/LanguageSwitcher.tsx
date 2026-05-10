@@ -54,17 +54,17 @@ export default function LanguageSwitcher({ className, dropUp = false }: { classN
     <div ref={ref} className={cn('relative', className)}>
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-ink-700 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-mn-ink-soft hover:bg-mn-amber/5 hover:text-mn-amber transition-colors"
         aria-label={t('language_aria')}
         aria-expanded={isOpen}
       >
-        <Globe className="w-4 h-4 text-primary-500" />
+        <Globe className="w-4 h-4 text-mn-amber" />
         <span>{active.flag}</span>
         <span className="uppercase text-xs tracking-wide">{active.code}</span>
       </button>
 
       {isOpen && (
-        <div className={cn('absolute right-0 w-44 bg-white dark:bg-stone-900 rounded-xl shadow-card border border-stone-100 dark:border-stone-700 py-1 z-50', dropUp ? 'bottom-full mb-1' : 'mt-1')}>
+        <div className={cn('absolute right-0 w-44 bg-mn-elevated dark:bg-stone-900 rounded-xl shadow-cinema-card border border-white/5 dark:border-stone-700 py-1 z-50', dropUp ? 'bottom-full mb-1' : 'mt-1')}>
           {LOCALES.map((locale) => (
             <button
               key={locale.code}
@@ -72,14 +72,14 @@ export default function LanguageSwitcher({ className, dropUp = false }: { classN
               className={cn(
                 'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                 locale.code === currentLocale
-                  ? 'bg-primary-50 text-primary-700 font-semibold'
-                  : 'text-ink-700 hover:bg-stone-50'
+                  ? 'bg-mn-amber/5 text-mn-amber font-semibold'
+                  : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]'
               )}
             >
               <span className="text-base">{locale.flag}</span>
               <span>{locale.label}</span>
               {locale.code === currentLocale && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-mn-amber" />
               )}
             </button>
           ))}

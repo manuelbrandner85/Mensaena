@@ -49,7 +49,7 @@ function RescuedTodayWidget() {
     <div className="space-y-4">
       {/* Ablaufdatum-Warnung für Lebensmittel */}
       {oldFoodCount > 0 && (
-        <div className="relative flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50 via-amber-50/80 to-orange-50 border-2 border-amber-200 rounded-2xl shadow-soft overflow-hidden">
+        <div className="relative flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50 via-amber-50/80 to-orange-50 border-2 border-amber-200 rounded-2xl shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
@@ -79,7 +79,7 @@ function RescuedTodayWidget() {
           return (
             <div
               key={s.label}
-              className="relative flex flex-col items-center p-3 rounded-2xl bg-white border border-stone-100 shadow-soft hover:shadow-card transition-shadow overflow-hidden"
+              className="relative flex flex-col items-center p-3 rounded-2xl bg-mn-elevated border border-white/5 shadow-cinema-card hover:shadow-cinema-card transition-shadow overflow-hidden"
             >
               <div
                 className="absolute top-0 left-0 right-0 h-px opacity-60"
@@ -91,15 +91,15 @@ function RescuedTodayWidget() {
               >
                 <Icon className="w-4 h-4" style={{ color: s.accent }} />
               </div>
-              <p className="display-numeral text-xl font-bold text-ink-900 tabular-nums">{s.value}</p>
-              <p className="text-xs text-ink-500 text-center leading-tight">{s.label}</p>
+              <p className="display-numeral text-xl font-bold text-mn-ink tabular-nums">{s.value}</p>
+              <p className="text-xs text-mn-mute text-center leading-tight">{s.label}</p>
             </div>
           )
         })}
       </div>
 
       {/* Mission-Statement */}
-      <div className="relative bg-gradient-to-br from-orange-50 via-orange-50/80 to-amber-50 border border-orange-200 rounded-2xl p-4 shadow-soft overflow-hidden">
+      <div className="relative bg-gradient-to-br from-orange-50 via-orange-50/80 to-amber-50 border border-orange-200 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #F97316, #F9731633)' }}

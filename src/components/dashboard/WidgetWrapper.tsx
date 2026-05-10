@@ -87,20 +87,20 @@ export function WidgetWrapper({
   return (
     <section
       aria-label={title}
-      className={`overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
+      className={`overflow-hidden rounded-xl border border-white/5 bg-mn-elevated shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
     >
-      <header className="flex items-center justify-between border-b border-stone-100 px-3 py-2 dark:border-ink-700">
+      <header className="flex items-center justify-between border-b border-white/5 px-3 py-2 dark:border-ink-700">
         <div className="flex items-center gap-2">
           {draggable && (
             <button
               type="button"
               aria-label="Widget verschieben"
-              className="cursor-grab rounded p-1 text-ink-400 hover:bg-stone-100 active:cursor-grabbing dark:hover:bg-ink-700"
+              className="cursor-grab rounded p-1 text-mn-mute hover:bg-mn-elevated/5 active:cursor-grabbing dark:hover:bg-ink-700"
             >
               <GripVertical aria-hidden className="h-4 w-4" />
             </button>
           )}
-          <h2 className="text-sm font-semibold text-ink-900 dark:text-stone-100">
+          <h2 className="text-sm font-semibold text-mn-ink dark:text-stone-100">
             {title}
           </h2>
         </div>
@@ -110,7 +110,7 @@ export function WidgetWrapper({
           aria-expanded={!collapsed}
           aria-controls={`widget-${id}-content`}
           aria-label={collapsed ? 'Widget ausklappen' : 'Widget einklappen'}
-          className="rounded p-1 text-ink-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-ink-700"
+          className="rounded p-1 text-mn-mute hover:bg-mn-elevated/5 dark:text-mn-ghost dark:hover:bg-ink-700"
         >
           {collapsed ? <ChevronDown aria-hidden className="h-4 w-4" /> : <ChevronUp aria-hidden className="h-4 w-4" />}
         </button>

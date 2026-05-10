@@ -63,7 +63,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
           <img
             src={avatarUrl}
             alt={displayName}
-            className="w-8 h-8 rounded-full object-cover border-2 border-primary-200"
+            className="w-8 h-8 rounded-full object-cover border-2 border-mn-amber/20"
           />
         ) : (
           <div
@@ -74,17 +74,17 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
           </div>
         )}
         <div className="hidden xl:block text-left">
-          <p className="text-sm font-medium text-ink-900 leading-none">{displayName}</p>
-          <p className="text-xs text-ink-500 mt-0.5">{email}</p>
+          <p className="text-sm font-medium text-mn-ink leading-none">{displayName}</p>
+          <p className="text-xs text-mn-mute mt-0.5">{email}</p>
         </div>
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in">
+        <div className="absolute right-0 top-full mt-2 w-56 bg-mn-elevated rounded-2xl shadow-cinema-card-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in">
           {/* User info header */}
           <div className="px-4 py-3 border-b border-warm-100">
-            <p className="text-sm font-semibold text-ink-900 truncate">{displayName}</p>
-            <p className="text-xs text-ink-500 truncate">{email}</p>
+            <p className="text-sm font-semibold text-mn-ink truncate">{displayName}</p>
+            <p className="text-xs text-mn-mute truncate">{email}</p>
           </div>
 
           {/* Menu items */}
@@ -96,9 +96,9 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-ink-700 hover:bg-stone-50 hover:text-ink-900 transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-mn-ink-soft hover:bg-mn-elevated/[0.02] hover:text-mn-ink transition-colors"
                 >
-                  <Icon className="w-4 h-4 text-ink-400" />
+                  <Icon className="w-4 h-4 text-mn-mute" />
                   {item.label}
                 </Link>
               )

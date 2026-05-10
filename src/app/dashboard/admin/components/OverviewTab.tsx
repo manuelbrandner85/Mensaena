@@ -15,7 +15,7 @@ export default function OverviewTab({ stats }: Props) {
   const cards: { icon: React.ReactNode; label: string; value: number | string; bg: string; sub?: string }[] = [
     { icon: <Users className="w-5 h-5 text-blue-600" />, label: 'Nutzer gesamt', value: stats.total_users ?? 0, bg: 'bg-blue-50', sub: `${stats.active_users_30d ?? 0} aktiv (30d)` },
     { icon: <TrendingUp className="w-5 h-5 text-green-600" />, label: 'Neue Nutzer (7d)', value: stats.new_users_7d ?? 0, bg: 'bg-green-50' },
-    { icon: <FileText className="w-5 h-5 text-primary-600" />, label: 'Beiträge gesamt', value: stats.total_posts ?? 0, bg: 'bg-primary-50', sub: `${stats.active_posts ?? 0} aktiv` },
+    { icon: <FileText className="w-5 h-5 text-mn-amber" />, label: 'Beiträge gesamt', value: stats.total_posts ?? 0, bg: 'bg-mn-amber/5', sub: `${stats.active_posts ?? 0} aktiv` },
     { icon: <Activity className="w-5 h-5 text-amber-600" />, label: 'Neue Beiträge (7d)', value: stats.new_posts_7d ?? 0, bg: 'bg-amber-50' },
     { icon: <MessageCircle className="w-5 h-5 text-purple-600" />, label: 'Nachrichten', value: stats.total_messages ?? 0, bg: 'bg-purple-50', sub: `${stats.total_conversations ?? 0} Gespraeche` },
     { icon: <Shield className="w-5 h-5 text-indigo-600" />, label: 'Interaktionen', value: stats.total_interactions ?? 0, bg: 'bg-indigo-50', sub: `${stats.completed_interactions ?? 0} abgeschlossen` },
@@ -27,9 +27,9 @@ export default function OverviewTab({ stats }: Props) {
     { icon: <Star className="w-5 h-5 text-yellow-600" />, label: 'Bewertungen', value: stats.total_trust_ratings ?? 0, bg: 'bg-yellow-50', sub: `${typeof stats.avg_trust_score === 'number' ? stats.avg_trust_score.toFixed(1) : '0'} Avg` },
     { icon: <Bell className="w-5 h-5 text-pink-600" />, label: 'Benachrichtigungen', value: stats.total_notifications ?? 0, bg: 'bg-pink-50', sub: `${stats.unread_notifications ?? 0} ungelesen` },
     { icon: <MapPin className="w-5 h-5 text-cyan-600" />, label: 'Regionen', value: stats.total_regions ?? 0, bg: 'bg-cyan-50' },
-    { icon: <UsersRound className="w-5 h-5 text-primary-600" />, label: 'Gruppen', value: stats.total_groups ?? 0, bg: 'bg-primary-50', sub: `${stats.active_groups ?? 0} aktiv (30d)` },
+    { icon: <UsersRound className="w-5 h-5 text-mn-amber" />, label: 'Gruppen', value: stats.total_groups ?? 0, bg: 'bg-mn-amber/5', sub: `${stats.active_groups ?? 0} aktiv (30d)` },
     { icon: <Target className="w-5 h-5 text-violet-600" />, label: 'Challenges', value: stats.total_challenges ?? 0, bg: 'bg-violet-50', sub: `${stats.active_challenges ?? 0} aktiv` },
-    { icon: <Clock className="w-5 h-5 text-primary-600" />, label: 'Zeitbank-Stunden', value: `${Number(stats.total_timebank_hours ?? 0).toFixed(0)}h`, bg: 'bg-primary-50', sub: `${stats.total_timebank_entries ?? 0} Einträge` },
+    { icon: <Clock className="w-5 h-5 text-mn-amber" />, label: 'Zeitbank-Stunden', value: `${Number(stats.total_timebank_hours ?? 0).toFixed(0)}h`, bg: 'bg-mn-amber/5', sub: `${stats.total_timebank_entries ?? 0} Einträge` },
   ]
 
   return (
@@ -39,10 +39,10 @@ export default function OverviewTab({ stats }: Props) {
           <div key={label} className={`${bg} rounded-2xl p-4 border border-white/50`}>
             <div className="flex items-center gap-2 mb-2">
               {icon}
-              <span className="text-xs text-ink-500 font-medium truncate">{label}</span>
+              <span className="text-xs text-mn-mute font-medium truncate">{label}</span>
             </div>
-            <p className="text-2xl font-bold text-ink-900">{value}</p>
-            {sub && <p className="text-xs text-ink-500 mt-1">{sub}</p>}
+            <p className="text-2xl font-bold text-mn-ink">{value}</p>
+            {sub && <p className="text-xs text-mn-mute mt-1">{sub}</p>}
           </div>
         ))}
       </div>

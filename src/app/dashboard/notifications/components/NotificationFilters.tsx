@@ -55,8 +55,8 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
             className={cn(
               'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-150 flex-shrink-0',
               isActive
-                ? 'bg-primary-600 text-white shadow-sm'
-                : 'bg-white border border-stone-200 text-ink-600 hover:border-primary-300 hover:text-primary-700 hover:bg-primary-50',
+                ? 'bg-mn-amber text-white shadow-sm'
+                : 'bg-mn-elevated border border-white/5 text-mn-ink-soft hover:border-primary-300 hover:text-mn-amber hover:bg-mn-amber/5',
             )}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -65,7 +65,7 @@ export default function NotificationFilters({ activeFilter, unreadCounts, onFilt
               <span className={cn(
                 'text-[10px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center leading-none',
                 isActive
-                  ? 'bg-white/20 text-white'
+                  ? 'bg-mn-elevated/20 text-white'
                   : 'bg-red-500 text-white',
               )}>
                 {count > 99 ? '99+' : count}

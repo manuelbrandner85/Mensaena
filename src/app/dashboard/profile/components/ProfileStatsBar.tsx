@@ -39,8 +39,8 @@ export default function ProfileStatsBar({ stats }: Props) {
       sub: `${stats.hoursGiven}h gegeben · ${stats.hoursReceived}h erhalten`,
       href: '/dashboard/timebank',
       tint: 'from-primary-50 to-primary-100/40 border-primary-100',
-      iconBg: 'bg-primary-100',
-      iconColor: 'text-primary-700',
+      iconBg: 'bg-mn-amber/10',
+      iconColor: 'text-mn-amber',
     },
     {
       icon: Users,
@@ -87,7 +87,7 @@ export default function ProfileStatsBar({ stats }: Props) {
             href={c.href}
             className={cn(
               'spotlight hover-lift group relative overflow-hidden rounded-2xl border bg-gradient-to-br p-4 sm:p-5',
-              'shadow-soft hover:shadow-card transition-all',
+              'shadow-cinema-card hover:shadow-cinema-card transition-all',
               c.tint,
             )}
           >
@@ -99,19 +99,19 @@ export default function ProfileStatsBar({ stats }: Props) {
             <div className="flex items-start justify-between mb-3">
               <div
                 className={cn(
-                  'h-10 w-10 rounded-xl flex items-center justify-center shadow-soft',
+                  'h-10 w-10 rounded-xl flex items-center justify-center shadow-cinema-card',
                   c.iconBg,
                 )}
               >
                 <Icon className={cn('w-5 h-5', c.iconColor)} />
               </div>
             </div>
-            <div className="display-numeral text-2xl sm:text-3xl font-bold text-ink-900 leading-none tabular-nums">
+            <div className="display-numeral text-2xl sm:text-3xl font-bold text-mn-ink leading-none tabular-nums">
               {c.value}
             </div>
-            <div className="mt-1 text-xs font-medium text-ink-600">{c.label}</div>
+            <div className="mt-1 text-xs font-medium text-mn-ink-soft">{c.label}</div>
             {c.sub && (
-              <div className="mt-1.5 text-[11px] text-ink-500 leading-tight">
+              <div className="mt-1.5 text-[11px] text-mn-mute leading-tight">
                 {c.sub}
               </div>
             )}

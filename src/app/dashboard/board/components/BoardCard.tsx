@@ -27,7 +27,7 @@ function getExpiryBadge(expiresAt: string | null): { label: string; color: strin
   if (hoursLeft <= 24) return { label: `${Math.ceil(hoursLeft)} Std. übrig`, color: 'bg-orange-100 text-orange-700' }
   const daysLeft = Math.ceil(hoursLeft / 24)
   if (daysLeft <= 3) return { label: `${daysLeft} Tage übrig`, color: 'bg-yellow-100 text-yellow-700' }
-  return { label: `${daysLeft} Tage übrig`, color: 'bg-stone-100 text-ink-600' }
+  return { label: `${daysLeft} Tage übrig`, color: 'bg-mn-elevated text-mn-ink-soft' }
 }
 
 export default function BoardCard({
@@ -76,7 +76,7 @@ export default function BoardCard({
 
         {/* Pinned indicator */}
         {post.pinned && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-700">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-mn-amber/10 text-mn-amber">
             📌 Angepinnt
           </span>
         )}
@@ -91,7 +91,7 @@ export default function BoardCard({
               e.stopPropagation()
               onOpenDetail(post)
             }}
-            className="text-primary-600 hover:text-primary-700 font-medium ml-1"
+            className="text-mn-amber hover:text-mn-amber font-medium ml-1"
           >
             mehr lesen
           </button>
@@ -114,7 +114,7 @@ export default function BoardCard({
 
       {/* Contact */}
       {post.contact_info && (
-        <div className="text-xs text-ink-600 bg-white/60 rounded-lg px-2 py-1 mb-2">
+        <div className="text-xs text-mn-ink-soft bg-mn-elevated/60 rounded-lg px-2 py-1 mb-2">
           📞 {post.contact_info}
         </div>
       )}
@@ -130,13 +130,13 @@ export default function BoardCard({
               className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-stone-300 flex items-center justify-center text-xs text-ink-600">
+            <div className="w-6 h-6 rounded-full bg-stone-300 flex items-center justify-center text-xs text-mn-ink-soft">
               {profileName.charAt(0).toUpperCase()}
             </div>
           )}
-          <span className="text-xs text-ink-600 truncate">{profileName}</span>
+          <span className="text-xs text-mn-ink-soft truncate">{profileName}</span>
           {trustScore >= 70 && (
-            <Shield className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" aria-label="Vertrauenswürdig" />
+            <Shield className="w-3.5 h-3.5 text-mn-amber flex-shrink-0" aria-label="Vertrauenswürdig" />
           )}
         </div>
 
@@ -147,7 +147,7 @@ export default function BoardCard({
             onClick={() => onTogglePin(post.id)}
             className={cn(
               'flex items-center gap-1 text-xs transition',
-              isPinned ? 'text-primary-600 font-semibold' : 'text-ink-500 hover:text-primary-600',
+              isPinned ? 'text-mn-amber font-semibold' : 'text-mn-mute hover:text-mn-amber',
             )}
             title={isPinned ? 'Pin entfernen' : 'Anpinnen'}
           >
@@ -158,14 +158,14 @@ export default function BoardCard({
           {/* Comments */}
           <button
             onClick={() => onOpenDetail(post)}
-            className="flex items-center gap-1 text-xs text-ink-500 hover:text-primary-600 transition"
+            className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             {post.comment_count > 0 && <span>{post.comment_count}</span>}
           </button>
 
           {/* Time */}
-          <span className="text-xs text-ink-400">{formatRelativeTime(post.created_at)}</span>
+          <span className="text-xs text-mn-mute">{formatRelativeTime(post.created_at)}</span>
 
           {/* Own post menu */}
           {isOwn && (
@@ -175,16 +175,16 @@ export default function BoardCard({
                 aria-label="Optionen"
                 className="p-1.5 rounded-full hover:bg-black/10 transition"
               >
-                <MoreVertical className="w-4 h-4 text-ink-500" />
+                <MoreVertical className="w-4 h-4 text-mn-mute" />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-stone-200 z-20 min-w-[140px]">
+                <div className="absolute right-0 top-full mt-1 bg-mn-elevated rounded-lg shadow-lg border border-white/5 z-20 min-w-[140px]">
                   <button
                     onClick={() => {
                       setMenuOpen(false)
                       onEdit?.(post)
                     }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-ink-700 hover:bg-stone-50"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-surface"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     Bearbeiten
