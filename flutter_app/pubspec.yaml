@@ -5,7 +5,7 @@ publish_to: 'none'
 # wenn eine neue APK released werden soll (Pflicht-Update via [mandatory]
 # im Commit-Body, sonst optional). Patches gehen automatisch via Shorebird
 # auf die aktuelle Version-Linie.
-version: 2.0.0+20000
+version: 2.0.0+20001
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

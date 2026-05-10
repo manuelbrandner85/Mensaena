@@ -1,9 +1,13 @@
 name: 🚀 Shorebird OTA Patch
 
-# Pendant zu Weltenbibliothekapp/.github/workflows/shorebird_patch.yml.
-# Pusht einen Dart-only Patch auf das aktuelle Release (matched die
-# pubspec-Version) damit installierte 2.0.0+20000 User die Änderungen
+# Mensaena-Pendant zum Weltenbibliothek-Pattern (eigenes Repo, eigene
+# Secrets, eigene Tabelle). Pusht einen Dart-only Patch auf das aktuelle
+# Shorebird-Release damit installierte 2.0.0+20000-User die Änderungen
 # beim nächsten Launch automatisch holen.
+#
+# Wann benutzen:
+#   • Nach Dart-Code-Änderungen (lib/**) die KEINE neue native Lib brauchen
+#   • Dependencies/Plugins dürfen NICHT geändert werden (= neuer Release nötig)
 
 on:
   workflow_dispatch:
@@ -12,6 +16,8 @@ on:
         description: 'Branch mit dem zu patchenden Code'
         required: false
         default: 'main'
+  # Auto-Patch bei JEDEM Push auf main mit Dart-Änderung. Doppelte Patches
+  # (gleicher Code) sind harmlos — der Client ignoriert sie.
   push:
     branches:
       - main
@@ -21,6 +27,9 @@ on:
 permissions:
   contents: read
 
+# Patches dürfen NICHT parallel laufen — Shorebird nimmt den zuletzt
+# hochgeladenen Patch als aktiv. Pro Branch nur ein Patch gleichzeitig,
+# ältere laufende Jobs werden beim neuen Push gecancelt.
 concurrency:
   group: shorebird-patch-${{ github.ref }}
   cancel-in-progress: true
@@ -46,18 +55,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # Pinned wie Weltenbibliothek: ohne Pin driftet setup-shorebird@v1 auf
+      # die jeweils neueste CLI und damit auf einen anderen Flutter-Engine-
+      # Snapshot — Patches uploaden dann zwar erfolgreich, werden aber vom
+      # Client auf dem Gerät still verworfen weil die Engine-Bytes nicht zum
+      # registrierten Release passen.
       - name: 🐦 Shorebird
         uses: shorebirdtech/setup-shorebird@v1
-
-      # Shorebird-CLI bringt Flutter mit, aber das Native-Scaffolding (`flutter
-      # create --platforms=android`) braucht eine separate Flutter-Installation
-      # auf $PATH. Setze sie hier.
-      - name: 🐦 Setup Flutter
-        uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version: '3.27.x'
-          cache: true
+          shorebird-version: 1.6.92
 
       - name: 📋 Version lesen
         id: version
@@ -70,9 +76,52 @@ jobs:
           echo "build=$BUILD" >> $GITHUB_OUTPUT
           echo "App-Version: $FULL"
 
-      - name: 🩺 Shorebird-Status (vor Patch)
+      # ── Signing: Keystore aus Secrets wiederherstellen ───────────────────
+      # `shorebird patch android` baut intern eine AAB für Engine-Diffing.
+      # Ohne Release-Signing schlägt der AAB-Build fehl. android/app/
+      # build.gradle.kts ist im Repo und liest key.properties — wir füllen
+      # nur das key.properties + den Keystore-Pfad zur Laufzeit.
+      - name: 🔐 Validate Android signing secrets
+        env:
+          KS_B64:    ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          missing=0
+          for var in KS_B64 KS_PASS KEY_ALIAS KEY_PASS; do
+            if [ -z "${!var}" ]; then
+              echo "::error title=Missing secret::ANDROID_${var#KS_} fehlt"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: 🔐 Restore keystore from secret
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/signing"
+          python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); valid=d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 ist korrupt') if not valid else None"
+
+      - name: 🔐 Write key.properties
+        env:
+          KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${KS_PASS}
+          keyPassword=${KEY_PASS}
+          keyAlias=${KEY_ALIAS}
+          storeFile=${RUNNER_TEMP}/signing/mensaena.jks
+          EOF
+
+      - name: 🩺 Shorebird-Status + Release-Check
+        id: status
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+          FULL: ${{ steps.version.outputs.full }}
         run: |
           if [ -z "$SHOREBIRD_TOKEN" ]; then
             echo "::error::SHOREBIRD_TOKEN secret fehlt — kein Patch möglich"
@@ -80,75 +129,52 @@ jobs:
           fi
           echo "── shorebird --version ──"
           shorebird --version || true
-          echo "── shorebird releases list ──"
-          shorebird releases list 2>&1 || true
+          echo "── shorebird releases list --platforms=android ──"
+          RELEASES=$(shorebird releases list --platforms=android 2>&1 || true)
+          echo "$RELEASES"
 
-      # ── Generiert die Android-Scaffolding (kopiert aus flutter.yml) ───
-      # Nötig wenn flutter create --platforms=android nicht im Repo
-      # commited ist; sonst überspringt der Step.
-      - name: ⚙️ Generate native scaffolding (android/)
-        run: |
-          if [ -d android ]; then
-            echo "android/ existiert bereits — überspringe scaffold."
-            exit 0
+          # Wenn kein Release für die aktuelle pubspec-Version existiert, skippen.
+          # → Verhindert noisy Failure wenn Version-Bump (z.B. force-update auf
+          #   neue APK-Version) gepusht wird bevor shorebird_release.yml lief.
+          if ! echo "$RELEASES" | grep -q "$FULL"; then
+            echo "::warning::Kein Shorebird-Release für $FULL — skip patch."
+            echo "::warning::Trigger shorebird_release.yml einmalig für initiales Release."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
-          flutter create --project-name mensaena \
-                         --org de.mensaena \
-                         --platforms=android \
-                         --no-pub \
-                         .
-          # applicationId-Patch (siehe flutter.yml für Details)
-          for path in android/app/build.gradle.kts android/app/build.gradle; do
-            [ -f "$path" ] || continue
-            sed -i 's|applicationId "[^"]*"|applicationId "de.mensaena.app"|' "$path"
-            sed -i 's|namespace "[^"]*"|namespace "de.mensaena.app"|' "$path"
-          done
 
+      # ── Patch (kein hybrider release-or-patch) ──────────────────────────
+      # Weltenbibliothek-Pattern: Wenn das Release noch nicht existiert,
+      # läuft separate `shorebird_release.yml` (workflow_dispatch one-shot).
+      # Hier wird IMMER nur gepatcht.
       - name: 📡 Patch veröffentlichen
         id: patch
+        if: steps.status.outputs.skip != 'true'
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
-          set +e
-          echo "Patch für Release-Version: ${{ steps.version.outputs.full }}"
-          # Releases-Existenz checken — wenn Release fehlt, anlegen statt patchen
-          if shorebird releases list --json 2>/dev/null \
-               | grep -q "\"version\":\"${{ steps.version.outputs.full }}\""; then
-            echo "kind=patch" >> $GITHUB_OUTPUT
-            shorebird patch android \
-              --release-version="${{ steps.version.outputs.full }}" \
-              --no-confirm \
-              --allow-asset-diffs \
-              --allow-native-diffs \
-              -- \
-              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
-              --dart-define=API_BASE_URL=https://www.mensaena.de
-            rc=$?
-          else
-            echo "Kein Release für ${{ steps.version.outputs.full }} — erstelle initiales Release"
-            echo "kind=release" >> $GITHUB_OUTPUT
-            shorebird release android \
-              --no-confirm \
-              -- \
-              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
-              --dart-define=API_BASE_URL=https://www.mensaena.de
-            rc=$?
-          fi
-          if [ $rc -ne 0 ]; then
-            echo "::error::shorebird-Step failed mit Exit-Code $rc"
-          fi
-          exit $rc
+          set -euo pipefail
+          echo "Ziel-Release-Version: ${{ steps.version.outputs.full }}"
+          shorebird patch android \
+            --release-version="${{ steps.version.outputs.full }}" \
+            --no-confirm \
+            --allow-asset-diffs \
+            -- \
+            --target-platform=android-arm64,android-arm \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=API_BASE_URL=https://www.mensaena.de
+          echo "✅ Patch an Release ${{ steps.version.outputs.full }} gesendet"
 
-      # ── Changelog in app_releases-Tabelle schreiben ─────────────────────
-      # Pendant zum Weltenbibliothek-Pattern (patch_changelog +
-      # update_history). Bei Mensaena nutzen wir die existierende
-      # app_releases-Tabelle, die der Flutter-WhatsNewSheet ausliest.
+      # ── Changelog in app_releases-Tabelle (Mensaena-spezifisch) ─────────
+      # Pendant zu Weltenbibliothek's app_config + update_history. Mensaena
+      # konsolidiert beides in der app_releases-Tabelle, die der Flutter-
+      # WhatsNewSheet ausliest.
       - name: 📝 Changelog in app_releases schreiben
-        if: success()
+        if: success() && steps.status.outputs.skip != 'true'
         env:
           PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           REF: huaqldjkgyosefzfhjnf
-          KIND: ${{ steps.patch.outputs.kind }}
           FULL: ${{ steps.version.outputs.full }}
           BUILD: ${{ steps.version.outputs.build }}
         run: |
@@ -156,47 +182,23 @@ jobs:
             echo "::warning::SUPABASE_DB_PASSWORD nicht gesetzt — überspringe app_releases insert"
             exit 0
           fi
-          # Squash-merge Subject als Changelog-Titel
+          # Squash-Merge Subject als Changelog-Titel
           TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100 | tr '"' "'")
           BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ' | tr '"' "'")
 
-          # Pflicht-Update-Detection (Weltenbibliothek-Pattern):
-          # Wenn der Squash-Commit `[mandatory]`, `[force-update]`,
-          # `BREAKING:` oder `BREAKING CHANGE:` enthält → mandatory=true.
-          # Sonst optional Update.
-          if git log -1 --pretty=%B | grep -iqE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:'; then
-            MANDATORY=true
-            echo "🚨 Pflicht-Update markiert"
-          else
-            MANDATORY=false
-          fi
-
-          if [ "$KIND" = "release" ]; then
-            TAG="v${FULL//+/-}"
-            APK_URL="\"https://github.com/manuelbrandner85/Mensaena/releases/download/$TAG/mensaena-v${FULL}.apk\""
-            IS_PATCH=false
-            CL_TYPE="feature"
-          else
-            APK_URL='null'
-            IS_PATCH=true
-            # Patches sind nie mandatory — nur APK-Releases können force-update.
-            MANDATORY=false
-            CL_TYPE="improvement"
-          fi
-
+          # Patches sind nie mandatory — Force-Update läuft über separaten
+          # APK-Release (siehe flutter.yml + Force-Update-Detection dort).
           PGURL="postgresql://postgres.${REF}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
           psql "$PGURL" -v ON_ERROR_STOP=1 <<SQL
           insert into app_releases (
             version, build_number, mandatory, is_patch, apk_url, platform, changelog
           ) values (
-            '$FULL', $BUILD, $MANDATORY, $IS_PATCH, $APK_URL, 'android',
-            '{"entries":[{"type":"$CL_TYPE","title":"$TITLE","description":"$BODY"}]}'::jsonb
+            '$FULL', $BUILD, false, true, null, 'android',
+            '{"entries":[{"type":"improvement","title":"$TITLE","description":"$BODY"}]}'::jsonb
           )
           on conflict (version) do update set
             build_number = excluded.build_number,
-            mandatory    = excluded.mandatory,
-            is_patch     = excluded.is_patch,
-            apk_url      = coalesce(excluded.apk_url, app_releases.apk_url),
+            is_patch     = true,
             changelog    = excluded.changelog;
           SQL
-          echo "✅ app_releases-Eintrag für $FULL (kind=$KIND, mandatory=$MANDATORY) gespeichert."
+          echo "✅ app_releases-Eintrag für $FULL (Patch) gespeichert."
