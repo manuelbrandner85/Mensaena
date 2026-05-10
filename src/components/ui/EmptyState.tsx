@@ -22,14 +22,13 @@ export default function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center text-center py-12 px-6',
-        'bg-white rounded-2xl border border-warm-100',
+        'card-depth flex flex-col items-center justify-center text-center py-14 px-6',
         className,
       )}
       role="status"
     >
-      <div className="w-14 h-14 rounded-2xl bg-stone-50 flex items-center justify-center mb-4">
-        {icon || <Inbox className="w-7 h-7 text-stone-400" />}
+      <div className="icon-surface w-14 h-14 rounded-2xl flex items-center justify-center mb-5">
+        {icon || <Inbox className="w-7 h-7 text-primary-500" />}
       </div>
       <h3 className="text-sm font-semibold text-ink-900 mb-1">{title}</h3>
       {description && (
