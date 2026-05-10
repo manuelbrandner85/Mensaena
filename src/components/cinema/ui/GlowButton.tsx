@@ -24,12 +24,12 @@ type GlowButtonProps = ButtonProps | LinkProps
 const base = 'relative inline-flex items-center justify-center font-body font-medium tracking-wide transition-all duration-200 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void active:scale-[0.96] disabled:opacity-40 disabled:pointer-events-none overflow-hidden'
 
 const variants: Record<Variant, string> = {
-  primary:   'bg-gradient-to-br from-mn-amber to-mn-amber-warm text-mn-void shadow-amber-glow hover:shadow-[0_4px_24px_rgba(245,158,11,0.55),0_0_60px_rgba(245,158,11,0.20)]',
-  secondary: 'border border-mn-amber/40 text-mn-amber bg-transparent hover:bg-mn-amber/6',
-  ghost:     'text-mn-ink-soft bg-mn-elevated/5 hover:bg-mn-elevated/8 hover:text-mn-ink',
-  teal:      'bg-gradient-to-br from-mn-teal to-mn-teal-soft text-mn-void shadow-teal-glow hover:shadow-[0_4px_24px_rgba(14,165,233,0.50)]',
-  crisis:    'bg-gradient-to-br from-mn-herzrot to-mn-herzrot-warm text-white shadow-herzrot-glow animate-pulse hover:animate-none',
-  danger:    'border border-mn-herzrot/40 text-mn-herzrot bg-transparent hover:bg-mn-herzrot/8',
+  primary:   'glow-btn-cinema-primary',
+  secondary: 'border border-mn-amber/50 text-mn-amber bg-mn-amber/5 hover:bg-mn-amber/12 hover:border-mn-amber/70 hover:shadow-[0_0_24px_rgba(245,158,11,0.20)]',
+  ghost:     'text-mn-ink-soft bg-white/[0.04] border border-white/8 hover:bg-white/8 hover:text-mn-ink hover:border-white/15',
+  teal:      'bg-gradient-to-br from-mn-teal to-mn-teal-soft text-mn-void font-semibold shadow-[0_4px_18px_rgba(14,165,233,0.35),0_0_40px_rgba(14,165,233,0.12)] hover:shadow-[0_6px_24px_rgba(14,165,233,0.50),0_0_60px_rgba(14,165,233,0.22)]',
+  crisis:    'bg-gradient-to-br from-mn-herzrot to-mn-herzrot-warm text-white font-semibold shadow-[0_4px_18px_rgba(239,68,68,0.40),0_0_40px_rgba(239,68,68,0.15)] animate-pulse hover:animate-none',
+  danger:    'border border-mn-herzrot/50 text-mn-herzrot bg-mn-herzrot/5 hover:bg-mn-herzrot/12 hover:shadow-[0_0_24px_rgba(239,68,68,0.20)]',
 }
 
 const sizes: Record<Size, string> = {
