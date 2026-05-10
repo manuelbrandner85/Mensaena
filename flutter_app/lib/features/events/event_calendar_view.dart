@@ -59,13 +59,17 @@ class _EventCalendarViewState extends State<EventCalendarView> {
   String _key(DateTime d) => '${d.year}-${d.month}-${d.day}';
 
   void _prevMonth() {
-    setState(() => _activeMonth =
-        DateTime(_activeMonth.year, _activeMonth.month - 1, 1));
+    setState(
+      () => _activeMonth =
+          DateTime(_activeMonth.year, _activeMonth.month - 1, 1),
+    );
   }
 
   void _nextMonth() {
-    setState(() => _activeMonth =
-        DateTime(_activeMonth.year, _activeMonth.month + 1, 1));
+    setState(
+      () => _activeMonth =
+          DateTime(_activeMonth.year, _activeMonth.month + 1, 1),
+    );
   }
 
   void _goToday() {
@@ -165,8 +169,8 @@ class _EventCalendarViewState extends State<EventCalendarView> {
             ],
           ),
           const SizedBox(height: 4),
-          Row(
-            children: const [
+          const Row(
+            children: [
               _WeekdayCell('Mo'),
               _WeekdayCell('Di'),
               _WeekdayCell('Mi'),

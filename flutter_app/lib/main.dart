@@ -119,8 +119,11 @@ class _BootError extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                const Icon(Icons.error_outline,
-                    size: 48, color: Color(0xFFB91C1C)),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Color(0xFFB91C1C),
+                ),
                 const SizedBox(height: 12),
                 const Text(
                   'Mensaena konnte nicht starten',

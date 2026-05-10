@@ -596,7 +596,8 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(
-                foregroundColor: AppColors.emergency500),
+              foregroundColor: AppColors.emergency500,
+            ),
             child: const Text('Löschen'),
           ),
         ],
@@ -658,8 +659,11 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                     if (post.pinned)
                       Padding(
                         padding: const EdgeInsets.only(right: 4),
-                        child: Icon(Icons.push_pin,
-                            size: 16, color: colors.text),
+                        child: Icon(
+                          Icons.push_pin,
+                          size: 16,
+                          color: colors.text,
+                        ),
                       ),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
@@ -684,8 +688,10 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                             height: 100,
                             color: AppColors.stone100,
                             alignment: Alignment.center,
-                            child: const Icon(Icons.broken_image,
-                                color: AppColors.stone400),
+                            child: const Icon(
+                              Icons.broken_image,
+                              color: AppColors.stone400,
+                            ),
                           ),
                         ),
                       ),
@@ -709,8 +715,11 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.alternate_email,
-                                size: 16, color: AppColors.primary500),
+                            const Icon(
+                              Icons.alternate_email,
+                              size: 16,
+                              color: AppColors.primary500,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: SelectableText(
@@ -729,8 +738,11 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                     const SizedBox(height: 24),
                     Row(
                       children: [
-                        const Icon(Icons.person_outline,
-                            size: 14, color: AppColors.ink400),
+                        const Icon(
+                          Icons.person_outline,
+                          size: 14,
+                          color: AppColors.ink400,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -758,7 +770,8 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.emergency500,
                           side: const BorderSide(
-                              color: AppColors.emergency500),
+                            color: AppColors.emergency500,
+                          ),
                         ),
                         icon: _deleting
                             ? const SizedBox(
@@ -768,9 +781,9 @@ class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
                                     CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.delete_outline),
-                        label: Text(_deleting
-                            ? 'Lösche…'
-                            : 'Aushang löschen'),
+                        label: Text(
+                          _deleting ? 'Lösche…' : 'Aushang löschen',
+                        ),
                       ),
                     ],
                   ],

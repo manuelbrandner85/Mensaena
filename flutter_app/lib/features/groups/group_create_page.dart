@@ -334,7 +334,9 @@ class _GroupImageHeader extends StatelessWidget {
                           )
                         : Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 6),
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.4),
                               borderRadius: BorderRadius.circular(20),
@@ -342,8 +344,11 @@ class _GroupImageHeader extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.photo_camera_outlined,
-                                    color: Colors.white, size: 14),
+                                const Icon(
+                                  Icons.photo_camera_outlined,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   coverUrl == null
@@ -395,8 +400,11 @@ class _GroupImageHeader extends StatelessWidget {
                           ),
                         )
                       : avatarUrl == null
-                          ? const Icon(Icons.add_a_photo_outlined,
-                              color: AppColors.primary500, size: 24)
+                          ? const Icon(
+                              Icons.add_a_photo_outlined,
+                              color: AppColors.primary500,
+                              size: 24,
+                            )
                           : null,
                 ),
               ),

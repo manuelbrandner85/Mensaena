@@ -247,8 +247,11 @@ class _ArticleTile extends StatelessWidget {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.person_outline,
-                      size: 12, color: AppColors.ink400),
+                  const Icon(
+                    Icons.person_outline,
+                    size: 12,
+                    color: AppColors.ink400,
+                  ),
                   const SizedBox(width: 2),
                   Text(
                     authorName,

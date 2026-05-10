@@ -228,8 +228,10 @@ class _MarketplaceDetailPageState
                 PopupMenuItem(
                   value: _OwnerAction.markSold,
                   child: ListTile(
-                    leading: Icon(Icons.check_circle_outline,
-                        color: AppColors.primary500),
+                    leading: Icon(
+                      Icons.check_circle_outline,
+                      color: AppColors.primary500,
+                    ),
                     title: Text('Als verkauft markieren'),
                     contentPadding: EdgeInsets.zero,
                   ),
