@@ -22,12 +22,10 @@ import {
   Smartphone,
   ShieldCheck,
   RefreshCw,
-  ChevronDown,
 } from 'lucide-react'
 import {
   APK_URL,
   APK_FILENAME,
-  FDROID_DEEPLINK,
   APK_DOWNLOAD_ENABLED,
 } from '@/lib/app-download'
 import AppDownloadStatusModal from '@/components/shared/AppDownloadStatusModal'
@@ -206,42 +204,10 @@ export default function AppDownloadPage() {
               </ol>
             </section>
 
-            {/* F-Droid (advanced) */}
-            <details className="mt-6 group">
-              <summary className="cursor-pointer flex items-center justify-between gap-3 px-5 py-4 bg-stone-50 hover:bg-stone-100 rounded-xl transition-colors">
-                <span className="font-semibold text-ink-800 text-sm">
-                  Erweitert: Per F-Droid installieren (automatische Updates)
-                </span>
-                <ChevronDown className="w-4 h-4 text-ink-500 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="mt-4 px-5 py-4 bg-white border border-stone-200 rounded-xl text-sm text-ink-700 space-y-4">
-                <p>
-                  F-Droid ist ein freier App-Store. Damit erhältst du automatische
-                  Updates, ohne Google Play Konto.
-                </p>
-                <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li>
-                    <a
-                      href="https://f-droid.org"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary-700 underline"
-                    >
-                      F-Droid installieren
-                    </a>{' '}
-                    (kostenlos, sicher)
-                  </li>
-                  <li>Auf den Button unten tippen</li>
-                  <li>Repo bestätigen → Mensaena suchen → Installieren</li>
-                </ol>
-                <a
-                  href={FDROID_DEEPLINK}
-                  className="btn-outline w-full inline-flex items-center justify-center gap-2"
-                >
-                  📦 F-Droid Repo hinzufügen
-                </a>
-              </div>
-            </details>
+            {/* GitHub Release info */}
+            <div className="mt-6 px-5 py-4 bg-stone-50 border border-stone-200 rounded-xl text-sm text-ink-600 text-center">
+              Direkt von GitHub · Open Source · kein App-Store nötig
+            </div>
           </div>
         </div>
 

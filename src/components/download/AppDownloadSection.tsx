@@ -458,7 +458,7 @@ function DesktopView({
             Scanne diesen Code mit deinem Android-Handy
           </p>
           <p className="text-sm text-ink-500 mt-2">
-            F-Droid öffnet sich automatisch mit vorausgefülltem Repo –
+            Der Download der Flutter-App startet direkt –
             du musst nichts kopieren.
           </p>
         </div>
@@ -478,7 +478,7 @@ function DesktopView({
               APK direkt herunterladen
             </button>
             <p className="text-xs text-ink-400 max-w-sm mx-auto">
-              Nur empfohlen, wenn du genau weißt, was du tust. Empfehlung: QR-Code scannen.
+              QR-Code scannen startet den Download direkt auf deinem Gerät.
             </p>
           </>
         )}
@@ -533,11 +533,11 @@ function HowItWorksAccordion() {
         </span>
       </summary>
       <ol className="mt-4 px-5 py-4 bg-white border border-stone-200 rounded-xl space-y-4 text-sm text-ink-700">
-        <Step n={1} title="Tippe auf den Button oder scanne den QR-Code">
-          Dein Handy erkennt automatisch, dass du F-Droid verwenden möchtest.
+        <Step n={1} title="QR-Code scannen oder Button tippen">
+          Der Download der Mensaena Flutter-App startet direkt auf deinem Handy.
         </Step>
-        <Step n={2} title="F-Droid öffnet sich mit dem Mensaena-Repo">
-          Bestätige einmalig mit &quot;OK&quot; – das Repository wird hinzugefügt.
+        <Step n={2} title="&quot;Aus dieser Quelle erlauben&quot; antippen">
+          Android fragt einmalig nach der Erlaubnis – einfach bestätigen.
         </Step>
         <Step n={3} title="Installieren tippen – fertig!">
           Mensaena landet in deinem App-Drawer und bekommt automatisch Updates.
