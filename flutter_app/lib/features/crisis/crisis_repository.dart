@@ -153,4 +153,33 @@ class CrisisRepository {
       'status': 'cancelled',
     }).eq('id', crisisId);
   }
+
+  /// Aktualisiert eine bestehende Krise. Akzeptiert die gleichen Felder wie
+  /// `create()`, ohne creator_id zu ändern.
+  Future<void> updateCrisis({
+    required String crisisId,
+    required String title,
+    required String description,
+    required String category,
+    required CrisisUrgency urgency,
+    String? locationText,
+    double? radiusKm,
+    int? affectedCount,
+    int? neededHelpers,
+    String? contactPhone,
+    bool? isAnonymous,
+  }) async {
+    await _db.from('crisis_reports').update(<String, dynamic>{
+      'title': title,
+      'description': description,
+      'category': category,
+      'urgency': urgency.value,
+      if (locationText != null) 'location_text': locationText,
+      if (radiusKm != null) 'radius_km': radiusKm,
+      if (affectedCount != null) 'affected_count': affectedCount,
+      if (neededHelpers != null) 'needed_helpers': neededHelpers,
+      if (contactPhone != null) 'contact_phone': contactPhone,
+      if (isAnonymous != null) 'is_anonymous': isAnonymous,
+    }).eq('id', crisisId);
+  }
 }

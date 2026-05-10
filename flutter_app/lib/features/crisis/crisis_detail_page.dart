@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import 'crisis_create_page.dart';
 import 'crisis_repository.dart';
 import 'models.dart';
 
@@ -19,7 +20,7 @@ class CrisisDetailPage extends ConsumerStatefulWidget {
   ConsumerState<CrisisDetailPage> createState() => _CrisisDetailPageState();
 }
 
-enum _CrisisAction { resolve, cancel }
+enum _CrisisAction { resolve, edit, cancel }
 
 class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
   Crisis? _crisis;
@@ -161,6 +162,14 @@ class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
                     ),
                   ),
                 const PopupMenuItem(
+                  value: _CrisisAction.edit,
+                  child: ListTile(
+                    leading: Icon(Icons.edit_outlined),
+                    title: Text('Bearbeiten'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                const PopupMenuItem(
                   value: _CrisisAction.cancel,
                   child: ListTile(
                     leading: Icon(Icons.cancel_outlined,
@@ -196,6 +205,15 @@ class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
             await ref.read(crisisRepositoryProvider).markResolved(crisis.id);
           },
         );
+        break;
+      case _CrisisAction.edit:
+        if (!mounted) return;
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => CrisisCreatePage(editId: crisis.id),
+          ),
+        );
+        if (mounted) await _load();
         break;
       case _CrisisAction.cancel:
         await _confirmAndRun(

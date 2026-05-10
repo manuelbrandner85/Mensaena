@@ -9,7 +9,11 @@ import 'crisis_repository.dart';
 import 'models.dart';
 
 class CrisisCreatePage extends ConsumerStatefulWidget {
-  const CrisisCreatePage({super.key});
+  const CrisisCreatePage({super.key, this.editId});
+
+  /// Wenn gesetzt: Page läuft im Edit-Mode, lädt die bestehende Krise und
+  /// schreibt Änderungen via updateCrisis() statt Insert.
+  final String? editId;
 
   @override
   ConsumerState<CrisisCreatePage> createState() => _CrisisCreatePageState();
@@ -29,6 +33,44 @@ class _CrisisCreatePageState extends ConsumerState<CrisisCreatePage> {
   int _neededHelpers = 1;
   bool _isAnonymous = false;
   bool _submitting = false;
+  bool _loadingExisting = false;
+
+  bool get _isEdit => widget.editId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEdit) _loadExisting();
+  }
+
+  Future<void> _loadExisting() async {
+    setState(() => _loadingExisting = true);
+    try {
+      final crisis = await ref
+          .read(crisisRepositoryProvider)
+          .fetch(widget.editId!);
+      if (!mounted || crisis == null) return;
+      setState(() {
+        _title.text = crisis.title;
+        _description.text = crisis.description;
+        _location.text = crisis.locationText ?? '';
+        _phone.text = crisis.contactPhone ?? '';
+        _category = crisis.category;
+        _urgency = crisis.urgency;
+        _radiusKm = crisis.radiusKm;
+        _affectedCount = crisis.affectedCount;
+        _neededHelpers = crisis.neededHelpers;
+        _isAnonymous = crisis.isAnonymous;
+        _loadingExisting = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loadingExisting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Krise konnte nicht geladen werden: $e')),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -44,23 +86,46 @@ class _CrisisCreatePageState extends ConsumerState<CrisisCreatePage> {
     setState(() => _submitting = true);
     HapticFeedback.mediumImpact();
     try {
-      final id = await ref.read(crisisRepositoryProvider).create(
-            title: _title.text.trim(),
-            description: _description.text.trim(),
-            category: _category,
-            urgency: _urgency,
-            locationText: _location.text.trim(),
-            radiusKm: _radiusKm,
-            affectedCount: _affectedCount,
-            neededHelpers: _neededHelpers,
-            contactPhone: _phone.text.trim(),
-            isAnonymous: _isAnonymous,
-          );
+      final repo = ref.read(crisisRepositoryProvider);
+      final String resultId;
+      if (_isEdit) {
+        await repo.updateCrisis(
+          crisisId: widget.editId!,
+          title: _title.text.trim(),
+          description: _description.text.trim(),
+          category: _category,
+          urgency: _urgency,
+          locationText: _location.text.trim(),
+          radiusKm: _radiusKm,
+          affectedCount: _affectedCount,
+          neededHelpers: _neededHelpers,
+          contactPhone: _phone.text.trim(),
+          isAnonymous: _isAnonymous,
+        );
+        resultId = widget.editId!;
+      } else {
+        resultId = await repo.create(
+          title: _title.text.trim(),
+          description: _description.text.trim(),
+          category: _category,
+          urgency: _urgency,
+          locationText: _location.text.trim(),
+          radiusKm: _radiusKm,
+          affectedCount: _affectedCount,
+          neededHelpers: _neededHelpers,
+          contactPhone: _phone.text.trim(),
+          isAnonymous: _isAnonymous,
+        );
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Krisenbericht veröffentlicht')),
+        SnackBar(
+          content: Text(_isEdit
+              ? 'Änderungen gespeichert'
+              : 'Krisenbericht veröffentlicht'),
+        ),
       );
-      context.go('${Routes.dashboardCrisis}/$id');
+      context.go('${Routes.dashboardCrisis}/$resultId');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,13 +140,17 @@ class _CrisisCreatePageState extends ConsumerState<CrisisCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Krise melden')),
-      body: Form(
+      appBar: AppBar(
+        title: Text(_isEdit ? 'Krise bearbeiten' : 'Krise melden'),
+      ),
+      body: _loadingExisting
+          ? const Center(child: CircularProgressIndicator())
+          : Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const _Banner(),
+            if (!_isEdit) const _Banner(),
             const SizedBox(height: 16),
             const _Label('Kategorie *'),
             Wrap(
@@ -211,7 +280,11 @@ class _CrisisCreatePageState extends ConsumerState<CrisisCreatePage> {
                         ),
                       )
                     : const Icon(Icons.warning_amber_rounded),
-                label: Text(_submitting ? 'Veröffentliche…' : 'Veröffentlichen'),
+                label: Text(
+                  _submitting
+                      ? (_isEdit ? 'Speichere…' : 'Veröffentliche…')
+                      : (_isEdit ? 'Änderungen speichern' : 'Veröffentlichen'),
+                ),
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFB91C1C),
                 ),
