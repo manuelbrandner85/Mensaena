@@ -410,7 +410,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-dvh bg-mn-void text-mn-ink relative overflow-x-hidden">
+    <div className="cinema-app-shell min-h-dvh text-mn-ink relative overflow-x-hidden">
       {/* ── Cinema ambient orbs — warm amber night atmosphere ── */}
       <div
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
@@ -419,23 +419,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div
           className="absolute rounded-full"
           style={{
-            top: '-20vh', left: '-15vw',
-            width: '60vw', height: '60vw',
-            background: 'radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)',
-            filter: 'blur(80px)',
+            top: '-22vh', left: '-15vw',
+            width: '70vw', height: '70vw',
+            background: 'radial-gradient(circle, rgba(245,158,11,0.10) 0%, rgba(245,158,11,0.04) 35%, transparent 70%)',
+            filter: 'blur(70px)',
             animation: 'ambientBreath1 28s ease-in-out infinite',
           }}
         />
         <div
           className="absolute rounded-full"
           style={{
-            bottom: '-15vh', right: '-10vw',
-            width: '50vw', height: '50vw',
-            background: 'radial-gradient(circle, rgba(14,165,233,0.03) 0%, transparent 70%)',
+            bottom: '-18vh', right: '-10vw',
+            width: '60vw', height: '60vw',
+            background: 'radial-gradient(circle, rgba(125,211,252,0.07) 0%, rgba(125,211,252,0.025) 40%, transparent 75%)',
             filter: 'blur(90px)',
             animation: 'ambientBreath2 34s ease-in-out infinite',
           }}
         />
+        {/* Drifting amber light leak — top-right cinematic flare */}
+        <div className="cinema-light-leak" />
       </div>
       {/* ── Sidebar (Desktop + Mobile Drawer) — bei aktivem Anruf versteckt ── */}
       {!isInCall && (
