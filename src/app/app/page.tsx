@@ -46,18 +46,15 @@ export default function AppDownloadPage() {
       router.replace('/dashboard')
       return
     }
-    // Auf Android: Download sofort automatisch starten + Modal zeigen,
-    // damit der User direkt den "Öffnen"-Hinweis sieht.
+    // Auf Android: Modal sofort zeigen, dann nach kurzer Pause Download starten.
+    // window.location.href statt a.click() — Chrome blockt programmatische
+    // Downloads ohne User-Geste, behandelt aber .apk-Navigationen als Download.
     const ua = navigator.userAgent
     if (/Android/i.test(ua)) {
-      const a = document.createElement('a')
-      a.href = APK_URL
-      a.download = APK_FILENAME
-      a.rel = 'noopener'
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
       setShowStatus(true)
+      setTimeout(() => {
+        window.location.href = APK_URL
+      }, 800)
     }
   }, [router])
 
