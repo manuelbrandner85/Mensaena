@@ -38,10 +38,18 @@ export default function Tooltip({
         <div
           role="tooltip"
           className={cn(
-            'absolute z-tooltip px-2.5 py-1.5 text-xs font-medium text-white bg-ink-800 rounded-lg shadow-lg whitespace-nowrap pointer-events-none animate-fade-in',
+            'absolute z-tooltip px-3 py-2 text-xs font-medium text-paper rounded-xl whitespace-nowrap pointer-events-none animate-fade-in',
             positionStyles[position],
             className,
           )}
+          style={{
+            background: 'linear-gradient(150deg, rgba(14,26,25,0.96) 0%, rgba(11,30,29,0.98) 100%)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(8px) saturate(140%)',
+            WebkitBackdropFilter: 'blur(8px) saturate(140%)',
+            boxShadow:
+              '0 0 0 0.5px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.18), 0 0 24px rgba(30,170,166,0.12), inset 0 1px 0 rgba(255,255,255,0.08)',
+          }}
         >
           {content}
         </div>
