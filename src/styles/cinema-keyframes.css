@@ -77,6 +77,36 @@
   50%      { transform: translateY(-6px) rotate(0.6deg); }
 }
 
+/* Bodennebel driftet horizontal */
+@keyframes cinemaFogDrift {
+  0%   { transform: translateX(-2%); }
+  100% { transform: translateX(2%);  }
+}
+
+/* Glühwürmchen Lissajous-artige Bewegung — pure CSS */
+@keyframes cinemaFireflyDrift {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20%, 80% {
+    opacity: 0.65;
+  }
+  25% {
+    transform: translate(28px, -18px);
+  }
+  50% {
+    transform: translate(-22px, -32px);
+  }
+  75% {
+    transform: translate(34px, -12px);
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+}
+
 /* Reduced-motion: alles statisch (greift global via @media) */
 @media (prefers-reduced-motion: reduce) {
   .cinema-grain,
