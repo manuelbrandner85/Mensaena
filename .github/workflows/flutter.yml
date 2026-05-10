@@ -304,107 +304,72 @@ jobs:
           done
           exit $missing
 
-      - name: Restore keystore from secret
+      # Weltenbibliothek-Pattern: Keystore liegt in android/app/, key.properties
+      # referenziert relativ "app/mensaena.jks" → kein RUNNER_TEMP-Pfad nötig.
+      # build.gradle.kts (im Repo committed) liest key.properties via
+      # rootProject.file(...) und enabled signingConfigs.create("release") nur
+      # dann wenn storeFile-Property nicht leer ist.
+      - name: Restore keystore + write key.properties
         env:
-          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/signing"
-          python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open(os.path.join(os.environ['RUNNER_TEMP'],'signing','mensaena.jks'),'wb').write(d); valid=d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 ist korrupt') if not valid else None"
-
-      - name: Configure release signing in android/app/build.gradle(.kts)
-        env:
+          KS_B64:    ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KS_PASS:   ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASS:  ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          # key.properties wird vom Gradle-Build gelesen (Flutter-Standard-Pattern)
+          set -euo pipefail
+          # 1) Keystore dekodieren nach android/app/mensaena.jks
+          python3 -c "import os,base64,re,sys; raw=os.environ['KS_B64']; clean=re.sub(r'[^A-Za-z0-9+/=]','',raw).rstrip('='); d=base64.b64decode(clean+'='*(-len(clean)%4)); open('android/app/mensaena.jks','wb').write(d); valid=d[:4]==b'\xfe\xed\xfe\xed' or d[:2]==b'\x30\x82'; print('Keystore:',len(d),'bytes valid=',valid); sys.exit('Invalid keystore – ANDROID_KEYSTORE_BASE64 ist korrupt') if not valid else None"
+          # 2) key.properties mit RELATIVEM Pfad (rootProject.file() resolvt relativ zu android/)
           cat > android/key.properties <<EOF
+          storeFile=app/mensaena.jks
           storePassword=${KS_PASS}
-          keyPassword=${KEY_PASS}
           keyAlias=${KEY_ALIAS}
-          storeFile=${RUNNER_TEMP}/signing/mensaena.jks
+          keyPassword=${KEY_PASS}
           EOF
+          echo "✅ Release-Keystore + key.properties erstellt"
 
-          # build.gradle.kts (Kotlin DSL – Flutter 3.27 Default) patchen
-          if [ -f android/app/build.gradle.kts ] && ! grep -q "keystoreProperties" android/app/build.gradle.kts; then
-            python3 <<'PYEOF'
-          import re
-          path = "android/app/build.gradle.kts"
-          src = open(path).read()
-          # In Kotlin DSL müssen `import`-Statements ganz oben stehen (vor plugins {}),
-          # aber `val ...` und Funktionsaufrufe dürfen NICHT vor plugins {} kommen.
-          # Lösung: imports vor plugins, val-Block direkt vor `android {`.
-          imports = (
-              'import java.util.Properties\n'
-              'import java.io.FileInputStream\n'
-          )
-          src = imports + src
-          ks_block = (
-              'val keystoreProperties = Properties()\n'
-              'val keystorePropertiesFile = rootProject.file("key.properties")\n'
-              'if (keystorePropertiesFile.exists()) {\n'
-              '    keystoreProperties.load(FileInputStream(keystorePropertiesFile))\n'
-              '}\n\n'
-          )
-          src = re.sub(r'(\nandroid\s*\{)', '\n' + ks_block + r'\1', src, count=1)
-          signing_block = (
-              '\n    signingConfigs {\n'
-              '        create("release") {\n'
-              '            keyAlias = keystoreProperties["keyAlias"] as String?\n'
-              '            keyPassword = keystoreProperties["keyPassword"] as String?\n'
-              '            storeFile = keystoreProperties["storeFile"]?.let { file(it) }\n'
-              '            storePassword = keystoreProperties["storePassword"] as String?\n'
-              '        }\n'
-              '    }\n'
-          )
-          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing_block + r'\1', src, count=1)
-          src = src.replace(
-              'signingConfig = signingConfigs.getByName("debug")',
-              'signingConfig = signingConfigs.getByName("release")',
-          )
-          open(path, 'w').write(src)
-          print("✅ build.gradle.kts gepatcht für Release-Signing")
-          PYEOF
+      # ── Shorebird CLI (für Release-Build, gleiche Engine wie Patches) ──
+      # Weltenbibliothek-Pattern: APK wird via `shorebird release android
+      # --artifact=apk` gebaut, NICHT mehr `flutter build apk`. Damit wird
+      # das Release direkt bei Shorebird registriert (= shorebird_patch.yml
+      # findet es automatisch) und die Engine-Snapshots matchen zwischen
+      # Release-APK und späteren Patches.
+      # CLI-Version gepinnt auf 1.6.92 (= shorebird_patch.yml).
+      - name: 🐦 Shorebird
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: shorebirdtech/setup-shorebird@v1
+        with:
+          shorebird-version: 1.6.92
+
+      - name: 🏗️ Build signed Release APK (via Shorebird)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          shorebird release android \
+            --artifact=apk \
+            --no-confirm \
+            -- \
+            --target-platform=android-arm64,android-arm \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=API_BASE_URL=https://www.mensaena.de \
+            2>&1 | tee build.log
+          rc=${PIPESTATUS[0]}
+          # Exit-Code 70 = Release ist auf Shorebird-Server bereits registriert
+          # (z.B. nach Workflow-Re-Run nach partial fail). APK wurde trotzdem
+          # gebaut → wir fangen 70 ab und fahren fort.
+          if [ $rc -eq 70 ]; then
+            echo "⚠️  Shorebird: Release ist bereits registriert. APK gebaut → weiter."
+            rc=0
           fi
+          exit $rc
 
-          # build.gradle (Groovy) Fallback falls noch generiert
-          if [ -f android/app/build.gradle ] && ! grep -q "keystoreProperties" android/app/build.gradle; then
-            python3 <<'PYEOF'
-          import re
-          path = "android/app/build.gradle"
-          src = open(path).read()
-          # Groovy: def-Block muss NACH plugins {} stehen, sonst meckert Gradle:
-          # "only buildscript {}, pluginManagement {} and other plugins {} script
-          # blocks are allowed before plugins {} blocks". Also vor `android {` einfügen.
-          ks_block = (
-              "def keystoreProperties = new Properties()\n"
-              "def keystorePropertiesFile = rootProject.file('key.properties')\n"
-              "if (keystorePropertiesFile.exists()) {\n"
-              "    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n"
-              "}\n\n"
-          )
-          src = re.sub(r'(\nandroid\s*\{)', '\n' + ks_block + r'\1', src, count=1)
-          signing_block = (
-              "\n    signingConfigs {\n"
-              "        release {\n"
-              "            keyAlias keystoreProperties['keyAlias']\n"
-              "            keyPassword keystoreProperties['keyPassword']\n"
-              "            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null\n"
-              "            storePassword keystoreProperties['storePassword']\n"
-              "        }\n"
-              "    }\n"
-          )
-          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing_block + r'\1', src, count=1)
-          src = src.replace("signingConfig signingConfigs.debug", "signingConfig signingConfigs.release")
-          open(path, 'w').write(src)
-          print("✅ build.gradle gepatcht für Release-Signing")
-          PYEOF
-          fi
-
-          echo "── android/app/build.gradle(.kts) (komplett) ──"
-          cat android/app/build.gradle.kts 2>/dev/null || cat android/app/build.gradle 2>/dev/null || true
-
-      - name: Build signed Release APK
+      # PR-Builds (ohne SHOREBIRD_TOKEN) → klassischer flutter build apk
+      # damit PRs trotzdem CI-grün laufen ohne Shorebird-Release zu erzeugen.
+      - name: 🏗️ Build signed Release APK (PR)
+        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -413,9 +378,8 @@ jobs:
           flutter build apk --release \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de \
-            > build.log 2>&1
-          rc=$?
-          tail -200 build.log
+            2>&1 | tee build.log
+          rc=${PIPESTATUS[0]}
           if [ $rc -ne 0 ] && [ -n "$PR_NUMBER" ]; then
             {
               printf '## ❌ Build failed (run %s)\n\n' "$GITHUB_RUN_ID"
@@ -429,10 +393,6 @@ jobs:
               --body-file /tmp/pr_comment.md || true
           fi
           exit $rc
-
-      # Shorebird-OTA + app_releases-Insert läuft in `shorebird_patch.yml`
-      # (Pendant zu Weltenbibliothekapp). Dieser Workflow baut nur die APK
-      # und veröffentlicht das GitHub-Release.
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
