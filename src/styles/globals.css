@@ -173,19 +173,38 @@
     @apply inline-flex items-center justify-center gap-2 px-6 py-3
            text-white font-semibold text-sm
            rounded-xl
-           shadow-sm
            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2
            active:scale-95
            relative overflow-hidden;
-    background: linear-gradient(135deg, #1EAAA6 0%, #38a169 100%);
-    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
-                box-shadow 0.25s ease,
+    background: linear-gradient(135deg, #1EAAA6 0%, #147170 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 4px 12px rgba(30, 170, 166, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s ease,
                 filter 0.2s ease;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset-x: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.30) 50%, transparent 90%);
+    pointer-events: none;
   }
   .btn-primary:hover {
     transform: translateY(-2px) scale(1.015);
-    box-shadow: 0 0 22px rgba(30,170,166,0.45);
-    filter: brightness(1.06);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 4px 8px rgba(15, 23, 42, 0.08),
+      0 12px 32px rgba(30, 170, 166, 0.35),
+      0 0 48px rgba(30, 170, 166, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    filter: brightness(1.04);
   }
 
   .btn-secondary {
@@ -315,14 +334,26 @@
   /* ── Form Elements ──────────────────────────────────────────────────── */
   .input {
     @apply w-full px-4 py-3
-           bg-white dark:bg-stone-900 border border-warm-200 dark:border-stone-700
+           dark:bg-stone-900 dark:border-stone-700
            rounded-xl text-ink-900 dark:text-stone-100 text-sm
            placeholder:text-ink-400 dark:placeholder:text-stone-500
-           focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+           focus:outline-none;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%);
+    border: 1px solid rgba(228, 228, 219, 0.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .input:hover {
+    border-color: rgba(163, 234, 232, 0.75);
   }
   .input:focus {
-    box-shadow: 0 0 0 3px rgba(30,170,166,0.15), 0 1px 4px rgba(0,0,0,0.05);
+    border-color: rgba(30, 170, 166, 0.55);
+    box-shadow:
+      0 0 0 3px rgba(30, 170, 166, 0.15),
+      0 0 24px rgba(30, 170, 166, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
   }
 
   .input-error {
@@ -965,13 +996,29 @@
 
   /* ── Modal overlay ───────────────────────────────────────────────────── */
   .modal-overlay {
-    @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm
-           flex items-center justify-center p-4;
-    animation: fadeIn 0.2s ease;
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(14, 26, 25, 0.55) 0%,
+      rgba(11, 30, 29, 0.72) 100%
+    );
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    animation: fadeIn 0.25s ease;
   }
   .modal-panel {
-    @apply bg-white rounded-2xl shadow-2xl w-full max-w-md
-           max-h-[90dvh] overflow-y-auto;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%);
+    border: 1px solid rgba(208, 245, 243, 0.85);
+    border-radius: 1.5rem;
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.10),
+      0 4px 8px rgba(15, 23, 42, 0.06),
+      0 24px 48px rgba(15, 23, 42, 0.12),
+      0 48px 96px rgba(15, 23, 42, 0.18),
+      0 0 80px rgba(30, 170, 166, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    @apply w-full max-w-md max-h-[90dvh] overflow-y-auto;
     animation: scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
     will-change: transform, opacity;
   }
