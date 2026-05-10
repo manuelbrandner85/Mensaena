@@ -114,8 +114,8 @@ export default function SpendenClient() {
 
   return (
     <div className="min-h-dvh bg-paper">
-      {/* ─── Sticky Top Bar ───────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-paper/85 backdrop-blur-md border-b border-stone-200">
+      {/* ─── Sticky Top Bar — Premium Glass ──────────────────────── */}
+      <header className="sticky top-0 z-40 glass-nav nav-border-gradient">
         <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <Image src="/mensaena-logo.png" alt="Mensaena" width={36} height={36} className="h-8 w-auto object-contain" />
@@ -131,11 +131,27 @@ export default function SpendenClient() {
         </div>
       </header>
 
-      {/* ─── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative px-6 md:px-10 pt-20 md:pt-28 pb-16 md:pb-24 overflow-hidden">
+      {/* ─── Hero — Cinematic atmospheric depth ───────────────────── */}
+      <section className="relative px-6 md:px-10 pt-24 md:pt-32 pb-20 md:pb-28 overflow-hidden">
+        {/* Layered ambient orbs */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-50"
-          style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 0%, rgba(30,170,166,0.18), transparent 70%)' }}
+          className="hero-orb-1 absolute pointer-events-none"
+          style={{ top: '-20%', left: '-15%', width: '60vw', height: '60vw' }}
+          aria-hidden="true"
+        />
+        <div
+          className="hero-orb-2 absolute pointer-events-none"
+          style={{ top: '-10%', right: '-15%', width: '50vw', height: '50vw' }}
+          aria-hidden="true"
+        />
+        <div
+          className="hero-orb-3 absolute pointer-events-none"
+          style={{ bottom: '-15%', left: '30%', width: '45vw', height: '45vw' }}
+          aria-hidden="true"
+        />
+        {/* Depth grid */}
+        <div
+          className="absolute inset-0 depth-grid-overlay pointer-events-none opacity-50"
           aria-hidden="true"
         />
         <div className="relative max-w-4xl mx-auto text-center">
@@ -171,9 +187,9 @@ export default function SpendenClient() {
         </div>
       </section>
 
-      {/* ─── Amount Picker (centerpiece) ──────────────────────────── */}
+      {/* ─── Amount Picker (centerpiece) — Cinematic Premium ────── */}
       <section className="px-6 md:px-10 pb-20">
-        <div className="max-w-3xl mx-auto bg-white rounded-3xl border border-stone-200 shadow-card p-8 md:p-12">
+        <div className="max-w-3xl mx-auto card-depth rounded-3xl p-8 md:p-12">
           <div className="meta-label mb-3 text-ink-500">— 01 / Betrag wählen</div>
           <h2 className="font-display text-3xl md:text-4xl text-ink-800 leading-tight tracking-tight mb-8">
             Wie viel möchtest du geben?

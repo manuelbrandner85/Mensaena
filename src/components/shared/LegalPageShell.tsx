@@ -14,9 +14,8 @@ interface LegalPageShellProps {
  * LegalPageShell — editorial chrome for legal/static pages
  * (Impressum, Datenschutz, AGB, Nutzungsbedingungen, Kontakt, ...).
  *
- * Provides a paper background with aurora backdrop, a logo lockup, an
- * editorial header (meta label + Fraunces title + intro), and an
- * editorial-card wrapper for the prose content.
+ * Cinematic premium edition: layered ambient orbs, depth grid overlay,
+ * material card-depth surface for the prose container.
  */
 export default function LegalPageShell({
   index,
@@ -26,10 +25,39 @@ export default function LegalPageShell({
   children,
 }: LegalPageShellProps) {
   return (
-    <div className="min-h-dvh bg-paper aurora-bg relative overflow-hidden">
-      {/* Decorative mesh + grain */}
-      <div className="mesh-gradient" aria-hidden="true" />
+    <div className="min-h-dvh bg-paper relative overflow-hidden">
+      {/* ── Cinematic ambient depth ── */}
+      <div
+        className="hero-orb-1 absolute pointer-events-none"
+        style={{ top: '-15%', left: '-12%', width: '55vw', height: '55vw' }}
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb-2 absolute pointer-events-none"
+        style={{ top: '20%', right: '-15%', width: '45vw', height: '45vw' }}
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb-3 absolute pointer-events-none"
+        style={{ bottom: '-10%', left: '20%', width: '38vw', height: '38vw' }}
+        aria-hidden="true"
+      />
+
+      {/* ── Depth grid overlay ── */}
+      <div
+        className="absolute inset-0 depth-grid-overlay pointer-events-none opacity-60"
+        aria-hidden="true"
+      />
+
+      {/* ── Film grain ── */}
       <div className="mesh-grain absolute inset-0 pointer-events-none" aria-hidden="true" />
+
+      {/* ── Edge vignettes for cinematic framing ── */}
+      <div
+        className="absolute inset-x-0 top-0 h-40 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(250,250,247,0.85) 0%, transparent 100%)' }}
+        aria-hidden="true"
+      />
 
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-12 md:py-20">
         {/* Logo lockup */}
@@ -60,18 +88,24 @@ export default function LegalPageShell({
           {intro && (
             <p className="page-subtitle mt-4 max-w-2xl">{intro}</p>
           )}
-          <div className="mt-6 h-px bg-gradient-to-r from-stone-300 via-stone-200 to-transparent" />
+          <div
+            className="mt-7 h-px"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(30,170,166,0.35) 0%, rgba(30,170,166,0.12) 40%, transparent 100%)',
+            }}
+          />
         </header>
 
-        {/* Prose card */}
-        <article className="editorial-card spotlight p-6 md:p-10">
+        {/* Prose card — premium cinematic depth surface */}
+        <article className="card-depth p-7 md:p-12">
           <div className="prose prose-sm md:prose-base max-w-none text-ink-700 prose-headings:font-display prose-headings:font-medium prose-headings:text-ink-800 prose-headings:tracking-tight prose-a:text-primary-700 prose-a:no-underline hover:prose-a:text-primary-800 prose-strong:text-ink-800">
             {children}
           </div>
         </article>
 
         {/* Back link */}
-        <div className="mt-10 text-center">
+        <div className="mt-12 text-center">
           <Link
             href="/"
             className="link-sweep inline-flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase text-ink-400 hover:text-ink-700 transition-colors"
