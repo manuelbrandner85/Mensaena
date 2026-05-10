@@ -32,16 +32,37 @@ class PostsRepository {
     String? activeTag,
     int page = 0,
   }) async {
+    final cleanSearch = search.trim();
+
+    // Volltext-Suche → RPC (German tsvector + haversine wenn Geo verfügbar);
+    // RPC kann auch ohne lat/lng aufgerufen werden und liefert dann simple
+    // Volltextsuche-Ergebnisse. Fallback bei RPC-Fehler: bestehende
+    // ilike-Variante.
+    if (cleanSearch.isNotEmpty) {
+      try {
+        return await searchPostsRpc(
+          query: cleanSearch,
+          type: typeFilter == 'all' ? null : typeFilter,
+          limit: _pageSize,
+          offset: page * _pageSize,
+        );
+      } catch (_) {
+        // Fall through → ilike-Fallback unten.
+      }
+    }
+
     var query = _db
         .from('posts')
-        .select('*, profiles(name, avatar_url, trust_score, trust_score_count), tags')
+        .select(
+          '*, profiles(name, avatar_url, trust_score, trust_score_count), tags',
+        )
         .eq('status', 'active');
 
     if (typeFilter != 'all') {
       query = query.eq('type', typeFilter);
     }
-    if (search.trim().isNotEmpty) {
-      final safe = _escapeIlike(_sanitizeForOr(search));
+    if (cleanSearch.isNotEmpty) {
+      final safe = _escapeIlike(_sanitizeForOr(cleanSearch));
       if (safe.isNotEmpty) {
         query = query.or('title.ilike.%$safe%,description.ilike.%$safe%');
       }
@@ -143,23 +164,85 @@ class PostsRepository {
     int radiusKm = 100,
     int limit = 200,
   }) async {
-    // Fallback simple bbox filter (PostGIS RPC can't be assumed available)
-    // Approximate: ±radiusKm/111 deg
-    final dLat = radiusKm / 111.0;
-    final dLng = radiusKm / (111.0 * 0.7); // rough cos(lat)
-    final rows = await _db
-        .from('posts')
-        .select('*, profiles(name, avatar_url, trust_score, trust_score_count)')
-        .eq('status', 'active')
-        .not('latitude', 'is', null)
-        .not('longitude', 'is', null)
-        .gte('latitude', latitude - dLat)
-        .lte('latitude', latitude + dLat)
-        .gte('longitude', longitude - dLng)
-        .lte('longitude', longitude + dLng)
-        .order('created_at', ascending: false)
-        .limit(limit);
-    return rows.map(Post.fromJson).toList();
+    // Bevorzugt search_posts RPC: nutzt PostGIS-haversine + tsvector und liefert
+    // distance_km direkt im Result. Fallback bei Fehler: bbox-Filter.
+    try {
+      return await searchPostsRpc(
+        query: '',
+        latitude: latitude,
+        longitude: longitude,
+        radiusKm: radiusKm.toDouble(),
+        limit: limit,
+      );
+    } catch (_) {
+      final dLat = radiusKm / 111.0;
+      final dLng = radiusKm / (111.0 * 0.7);
+      final rows = await _db
+          .from('posts')
+          .select(
+            '*, profiles(name, avatar_url, trust_score, trust_score_count)',
+          )
+          .eq('status', 'active')
+          .not('latitude', 'is', null)
+          .not('longitude', 'is', null)
+          .gte('latitude', latitude - dLat)
+          .lte('latitude', latitude + dLat)
+          .gte('longitude', longitude - dLng)
+          .lte('longitude', longitude + dLng)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return rows.map(Post.fromJson).toList();
+    }
+  }
+
+  /// Direct-RPC-Wrapper für `public.search_posts(p_query, p_category, p_type,
+  /// p_urgency, p_lat, p_lng, p_radius_km, p_limit, p_offset)`.
+  ///
+  /// Liefert Posts inkl. distance_km (haversine) und tsvector-rank.
+  /// Wird von `nearby()` und der Such-Logik in `list()` benutzt.
+  Future<List<Post>> searchPostsRpc({
+    String? query,
+    String? type,
+    String? category,
+    String? urgency,
+    double? latitude,
+    double? longitude,
+    double? radiusKm,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    final rows = await _db.rpc<dynamic>(
+      'search_posts',
+      params: <String, dynamic>{
+        'p_query': query ?? '',
+        if (category != null) 'p_category': category,
+        if (type != null) 'p_type': type,
+        if (urgency != null) 'p_urgency': urgency,
+        if (latitude != null) 'p_lat': latitude,
+        if (longitude != null) 'p_lng': longitude,
+        if (radiusKm != null) 'p_radius_km': radiusKm,
+        'p_limit': limit,
+        'p_offset': offset,
+      },
+    );
+    final list = rows is List ? rows : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map((row) {
+          // RPC returns flat columns including author_name + author_avatar.
+          // Wir simulieren das `profiles` Join-Objekt damit Post.fromJson
+          // den Author korrekt lesen kann.
+          final merged = <String, dynamic>{
+            ...row,
+            'profiles': {
+              'id': row['user_id'],
+              'name': row['author_name'],
+              'avatar_url': row['author_avatar'],
+            },
+          };
+          return Post.fromJson(merged);
+        })
+        .toList();
   }
 
   // ── Saved Posts (Bookmark) ──────────────────────────────────────────────

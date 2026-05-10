@@ -95,12 +95,15 @@ class MessagesRepository {
   }
 
   /// Lädt die Nachrichten eines Conversations (chronologisch aufsteigend).
+  /// Joint reply_to-Message (id, content + Sender-Name) für Quote-Bubbles.
   Future<List<Message>> listMessages(String conversationId, {int limit = 100}) async {
     final rows = await sb
         .from('messages')
         .select(
           'id, conversation_id, sender_id, content, created_at, read_at, edited_at, '
-          'deleted_at, profiles:sender_id(id, name, avatar_url)',
+          'deleted_at, reply_to_id, '
+          'profiles:sender_id(id, name, avatar_url), '
+          'reply_to:reply_to_id(id, content, profiles:sender_id(name))',
         )
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true)
@@ -209,17 +212,20 @@ class MessagesRepository {
   }
 
   /// Sendet eine neue Nachricht. Realtime-Subscription informiert alle Member.
+  /// `replyToId` setzt die `reply_to_id` Spalte (Quote-Reply auf vorherige Nachricht).
   Future<Message> sendMessage({
     required String conversationId,
     required String senderId,
     required String content,
+    String? replyToId,
   }) async {
     final res = await sb.from('messages').insert({
       'conversation_id': conversationId,
       'sender_id': senderId,
       'content': content,
+      if (replyToId != null) 'reply_to_id': replyToId,
     }).select(
-      'id, conversation_id, sender_id, content, created_at, read_at, edited_at, deleted_at',
+      'id, conversation_id, sender_id, content, created_at, read_at, edited_at, deleted_at, reply_to_id',
     ).single();
     return Message.fromJson(res);
   }

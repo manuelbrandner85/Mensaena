@@ -43,6 +43,11 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
   // Edit-Mode
   String? _editingMessageId;
 
+  // Reply-Mode: ID + preview-text der Nachricht, auf die geantwortet wird.
+  String? _replyToId;
+  String? _replyToPreview;
+  String? _replyToSenderName;
+
   // Read-Receipts: zeitstempel des letzten "gelesen" vom Gegenüber.
   DateTime? _otherLastReadAt;
 
@@ -166,11 +171,20 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
         conversationId: widget.conversationId,
         senderId: user.id,
         content: text,
+        replyToId: _replyToId,
       );
       _input.clear();
       // Optimistic – auch Realtime liefert es zurück; doppelt fügen wir nicht ein.
       if (!_messages.any((m) => m.id == msg.id)) {
         setState(() => _messages.add(msg));
+      }
+      // Reply-Mode beenden nach erfolgreichem Send.
+      if (_replyToId != null) {
+        setState(() {
+          _replyToId = null;
+          _replyToPreview = null;
+          _replyToSenderName = null;
+        });
       }
       _scrollToBottom();
     } catch (e) {
@@ -232,6 +246,24 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
     });
   }
 
+  void _startReply(Message m) {
+    setState(() {
+      _replyToId = m.id;
+      // Bei Image-Bubble „📷 Bild" als Preview, sonst Content gekürzt.
+      _replyToPreview =
+          m.isImageMessage ? '📷 Bild' : m.content.replaceAll('\n', ' ');
+      _replyToSenderName = m.senderProfile?.displayName();
+    });
+  }
+
+  void _cancelReply() {
+    setState(() {
+      _replyToId = null;
+      _replyToPreview = null;
+      _replyToSenderName = null;
+    });
+  }
+
   Future<void> _deleteMessage(Message m) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -283,6 +315,15 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (!m.isDeleted)
+              ListTile(
+                leading: const Icon(Icons.reply_outlined),
+                title: const Text('Antworten'),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _startReply(m);
+                },
+              ),
             if (!m.isDeleted && !m.isImageMessage)
               ListTile(
                 leading: const Icon(Icons.copy_outlined),
@@ -485,6 +526,12 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
             _TypingIndicator(name: _otherTypingName!),
           if (_editingMessageId != null)
             _EditingBanner(onCancel: _cancelEdit),
+          if (_replyToId != null)
+            _ReplyingBanner(
+              senderName: _replyToSenderName,
+              preview: _replyToPreview,
+              onCancel: _cancelReply,
+            ),
           _Composer(
             controller: _input,
             sending: _sending,
@@ -563,6 +610,14 @@ class _Bubble extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (message.isReply && message.replyToContent != null) ...[
+                  _QuoteBlock(
+                    senderName: message.replyToSenderName,
+                    preview: message.replyToContent!,
+                    isOwn: isOwn,
+                  ),
+                  const SizedBox(height: 6),
+                ],
                 _bubbleContent(fg),
                 const SizedBox(height: 4),
                 Padding(
@@ -1001,6 +1056,125 @@ class _Composer extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Quote-Block in Bubble — zeigt zitierte Original-Message darüber.
+class _QuoteBlock extends StatelessWidget {
+  const _QuoteBlock({
+    required this.senderName,
+    required this.preview,
+    required this.isOwn,
+  });
+  final String? senderName;
+  final String preview;
+  final bool isOwn;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = isOwn ? Colors.white : AppColors.ink800;
+    final bg = isOwn
+        ? Colors.white.withValues(alpha: 0.15)
+        : AppColors.primary500.withValues(alpha: 0.08);
+    final accent = isOwn ? Colors.white : AppColors.primary500;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 6, 10, 6),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border(
+          left: BorderSide(color: accent, width: 3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            senderName ?? 'Antwort',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: accent,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            preview,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              color: fg.withValues(alpha: 0.85),
+              height: 1.25,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Banner über dem Composer im Reply-Mode — zeigt auf welche Message
+/// gerade geantwortet wird, mit Cancel-Button.
+class _ReplyingBanner extends StatelessWidget {
+  const _ReplyingBanner({
+    required this.senderName,
+    required this.preview,
+    required this.onCancel,
+  });
+  final String? senderName;
+  final String? preview;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.primary500.withValues(alpha: 0.08),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+        child: Row(
+          children: [
+            const Icon(Icons.reply_outlined,
+                size: 16, color: AppColors.primary500),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Antwort an ${senderName ?? "Nachricht"}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary500,
+                    ),
+                  ),
+                  if (preview != null && preview!.isNotEmpty)
+                    Text(
+                      preview!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.ink700,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 18),
+              color: AppColors.primary500,
+              onPressed: onCancel,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
             ),
           ],
         ),
