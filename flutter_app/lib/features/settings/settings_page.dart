@@ -1,11 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
+import 'blocked_users_page.dart';
 
 /// /dashboard/settings — sektionierte Einstellungen.
 /// Pendant zu src/app/dashboard/settings (Web).
@@ -20,6 +26,7 @@ class SettingsPage extends ConsumerStatefulWidget {
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   Map<String, dynamic> _profile = const {};
   bool _loading = true;
+  bool _exporting = false;
 
   @override
   void initState() {
@@ -229,6 +236,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ],
                   ),
                 ),
+                const Divider(height: 1),
+                _LinkRow(
+                  icon: Icons.person_off_outlined,
+                  label: 'Blockierte Personen',
+                  onTap: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute(
+                      builder: (_) => const BlockedUsersPage(),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -333,6 +350,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   label: 'Passwort ändern',
                   onTap: _changePassword,
                 ),
+                const Divider(height: 1),
+                _LinkRow(
+                  icon: Icons.download_outlined,
+                  label: _exporting
+                      ? 'Exportiere Daten…'
+                      : 'Meine Daten exportieren',
+                  onTap: _exporting ? () {} : _exportData,
+                ),
               ],
             ),
           ),
@@ -367,6 +392,69 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ],
       ),
     );
+  }
+
+  /// Lädt alle eigenen Daten aus Supabase, baut ein JSON, schreibt es ins
+  /// temporäre Download-Verzeichnis und teilt es via system share-sheet
+  /// (DSGVO-konformes Datenauskunfts-Export). Pendant zur Web-`DataExportButton`.
+  Future<void> _exportData() async {
+    if (_exporting) return;
+    setState(() => _exporting = true);
+    HapticFeedback.lightImpact();
+    try {
+      final db = ref.read(supabaseProvider);
+      final user = db.auth.currentUser;
+      if (user == null) return;
+      final userId = user.id;
+      final results = await Future.wait([
+        db.from('profiles').select('*').eq('id', userId).maybeSingle(),
+        db.from('posts').select('*').eq('user_id', userId).order(
+              'created_at',
+              ascending: false,
+            ),
+        db
+            .from('messages')
+            .select('id, content, created_at, conversation_id')
+            .eq('sender_id', userId)
+            .order('created_at', ascending: false),
+        db.from('saved_posts').select('*').eq('user_id', userId),
+        db
+            .from('notifications')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', ascending: false)
+            .limit(100),
+      ]);
+      final exportData = <String, dynamic>{
+        'exported_at': DateTime.now().toUtc().toIso8601String(),
+        'user': {'id': userId, 'email': user.email},
+        'profile': results[0] ?? {},
+        'posts': results[1],
+        'messages': results[2],
+        'saved_posts': results[3],
+        'notifications': results[4],
+      };
+      final json = const JsonEncoder.withIndent('  ').convert(exportData);
+      final dir = await getTemporaryDirectory();
+      final stamp = DateTime.now().toIso8601String().substring(0, 10);
+      final file = File('${dir.path}/mensaena-daten-export-$stamp.json');
+      await file.writeAsString(json);
+      if (!mounted) return;
+      final box = context.findRenderObject() as RenderBox?;
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'application/json')],
+        subject: 'Mein Mensaena Daten-Export',
+        sharePositionOrigin:
+            box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export fehlgeschlagen: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
   }
 
   Future<void> _changePassword() async {

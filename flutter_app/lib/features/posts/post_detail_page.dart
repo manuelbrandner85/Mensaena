@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/supabase.dart';
@@ -20,9 +21,13 @@ class PostDetailPage extends ConsumerStatefulWidget {
   ConsumerState<PostDetailPage> createState() => _PostDetailPageState();
 }
 
+enum _PostMenuAction { report }
+
 class _PostDetailPageState extends ConsumerState<PostDetailPage> {
   Post? _post;
   bool _loading = true;
+  bool _isSaved = false;
+  bool _saveBusy = false;
   String? _error;
 
   @override
@@ -33,7 +38,8 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
   Future<void> _load() async {
     try {
-      final p = await ref.read(postsRepositoryProvider).fetch(widget.postId);
+      final repo = ref.read(postsRepositoryProvider);
+      final p = await repo.fetch(widget.postId);
       if (!mounted) return;
       if (p == null) {
         setState(() {
@@ -42,8 +48,11 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         });
         return;
       }
+      final saved = await repo.savedPostIds();
+      if (!mounted) return;
       setState(() {
         _post = p;
+        _isSaved = saved.contains(p.id);
         _loading = false;
       });
     } catch (e) {
@@ -52,6 +61,136 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
         _error = '$e';
         _loading = false;
       });
+    }
+  }
+
+  Future<void> _toggleSave() async {
+    final post = _post;
+    if (post == null || _saveBusy) return;
+    setState(() => _saveBusy = true);
+    try {
+      final saved =
+          await ref.read(postsRepositoryProvider).toggleSavedPost(post.id);
+      if (!mounted) return;
+      setState(() => _isSaved = saved);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(saved ? 'Gemerkt' : 'Aus Merkliste entfernt'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Fehler: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _saveBusy = false);
+    }
+  }
+
+  Future<void> _sharePost() async {
+    final post = _post;
+    if (post == null) return;
+    final url = 'https://www.mensaena.de/dashboard/posts/${post.id}';
+    final box = context.findRenderObject() as RenderBox?;
+    await Share.share(
+      '${post.title}\n\n$url',
+      subject: post.title,
+      sharePositionOrigin:
+          box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+    );
+  }
+
+  Future<void> _reportPost() async {
+    final post = _post;
+    if (post == null) return;
+    final reason = await showDialog<String?>(
+      context: context,
+      builder: (ctx) {
+        final reasons = const [
+          'Spam',
+          'Beleidigung / Hass',
+          'Sexueller Inhalt',
+          'Falsche Informationen',
+          'Sonstiges',
+        ];
+        String? selected;
+        final controller = TextEditingController();
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) => AlertDialog(
+            title: const Text('Post melden'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final r in reasons)
+                    RadioListTile<String>(
+                      value: r,
+                      groupValue: selected,
+                      title: Text(r),
+                      onChanged: (v) => setSheetState(() => selected = v),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
+                  if (selected == 'Sonstiges')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: TextField(
+                        controller: controller,
+                        maxLines: 2,
+                        decoration: const InputDecoration(
+                          hintText: 'Was stört dich an dem Post?',
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Abbrechen'),
+              ),
+              FilledButton(
+                onPressed: selected == null
+                    ? null
+                    : () {
+                        final r = selected == 'Sonstiges'
+                            ? controller.text.trim().isEmpty
+                                ? 'Sonstiges'
+                                : controller.text.trim()
+                            : selected!;
+                        Navigator.pop(ctx, r);
+                      },
+                child: const Text('Melden'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (reason == null || !mounted) return;
+    try {
+      await ref.read(postsRepositoryProvider).reportPost(
+            postId: post.id,
+            reason: reason,
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Danke — die Moderatoren prüfen den Beitrag.'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      final msg = '$e'.contains('content_reports_unique')
+          ? 'Du hast diesen Post bereits gemeldet.'
+          : 'Melden fehlgeschlagen: $e';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
     }
   }
 
@@ -86,9 +225,48 @@ class _PostDetailPageState extends ConsumerState<PostDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final post = _post;
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Post')),
+      appBar: AppBar(
+        title: const Text('Post'),
+        actions: [
+          if (post != null) ...[
+            IconButton(
+              tooltip: _isSaved ? 'Aus Merkliste entfernen' : 'Merken',
+              icon: Icon(
+                _isSaved ? Icons.bookmark : Icons.bookmark_border,
+                color: _isSaved ? AppColors.primary500 : null,
+              ),
+              onPressed: _saveBusy ? null : _toggleSave,
+            ),
+            IconButton(
+              tooltip: 'Teilen',
+              icon: const Icon(Icons.share_outlined),
+              onPressed: _sharePost,
+            ),
+            PopupMenuButton<_PostMenuAction>(
+              tooltip: 'Mehr',
+              icon: const Icon(Icons.more_vert),
+              onSelected: (a) {
+                if (a == _PostMenuAction.report) _reportPost();
+              },
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: _PostMenuAction.report,
+                  child: ListTile(
+                    leading: Icon(Icons.flag_outlined,
+                        color: AppColors.emergency500),
+                    title: Text('Melden',
+                        style: TextStyle(color: AppColors.emergency500)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null

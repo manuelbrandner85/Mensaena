@@ -145,4 +145,12 @@ class CrisisRepository {
       'resolved_by': user.id,
     }).eq('id', crisisId);
   }
+
+  /// Setzt den Status zurück auf 'cancelled' (Soft-Delete-Pendant; das
+  /// Web-Pendant erlaubt Cancel ohne harten Row-Drop, behält Audit-Trail).
+  Future<void> cancelCrisis(String crisisId) async {
+    await _db.from('crisis_reports').update(<String, dynamic>{
+      'status': 'cancelled',
+    }).eq('id', crisisId);
+  }
 }

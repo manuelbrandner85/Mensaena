@@ -162,6 +162,82 @@ class PostsRepository {
     return rows.map(Post.fromJson).toList();
   }
 
+  // ── Saved Posts (Bookmark) ──────────────────────────────────────────────
+
+  /// IDs aller Posts, die der aktuelle User gespeichert hat.
+  Future<Set<String>> savedPostIds() async {
+    final userId = _db.auth.currentUser?.id;
+    if (userId == null) return const {};
+    final rows = await _db
+        .from('saved_posts')
+        .select('post_id')
+        .eq('user_id', userId);
+    return rows.map((r) => r['post_id'] as String).toSet();
+  }
+
+  /// Toggle: wenn schon gespeichert → entfernen, sonst → einfügen.
+  /// Liefert true wenn Post jetzt gespeichert ist.
+  Future<bool> toggleSavedPost(String postId) async {
+    final userId = _db.auth.currentUser?.id;
+    if (userId == null) throw Exception('Nicht eingeloggt');
+    final existing = await _db
+        .from('saved_posts')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('post_id', postId)
+        .maybeSingle();
+    if (existing != null) {
+      await _db
+          .from('saved_posts')
+          .delete()
+          .eq('user_id', userId)
+          .eq('post_id', postId);
+      return false;
+    }
+    await _db.from('saved_posts').insert({
+      'user_id': userId,
+      'post_id': postId,
+    });
+    return true;
+  }
+
+  /// Liste der vom User gespeicherten Posts (für "Gemerkt"-Tab).
+  Future<List<Post>> listSaved({int page = 0}) async {
+    final userId = _db.auth.currentUser?.id;
+    if (userId == null) return const [];
+    final from = page * _pageSize;
+    final to = from + _pageSize - 1;
+    final rows = await _db
+        .from('saved_posts')
+        .select(
+          'created_at, posts!inner(*, profiles(name, avatar_url, trust_score, trust_score_count), tags)',
+        )
+        .eq('user_id', userId)
+        .order('created_at', ascending: false)
+        .range(from, to);
+    return rows
+        .map((r) => Post.fromJson(r['posts'] as Map<String, dynamic>))
+        .toList();
+  }
+
+  // ── Reports ─────────────────────────────────────────────────────────────
+
+  /// Meldet einen Post bei den Moderatoren. Schreibt in `content_reports`.
+  /// Wirft bei Doppel-Meldung (UNIQUE-Constraint) — Aufrufer fängt das ab.
+  Future<void> reportPost({
+    required String postId,
+    required String reason,
+  }) async {
+    final userId = _db.auth.currentUser?.id;
+    if (userId == null) throw Exception('Nicht eingeloggt');
+    await _db.from('content_reports').insert({
+      'reporter_id': userId,
+      'content_type': 'post',
+      'content_id': postId,
+      'reason': reason,
+    });
+  }
+
   static String _sanitizeForOr(String value) =>
       value.replaceAll(RegExp(r'[,()"\\]'), ' ').trim();
 

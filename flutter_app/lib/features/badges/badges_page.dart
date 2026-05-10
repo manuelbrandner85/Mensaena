@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -86,19 +88,152 @@ class _BadgesPageState extends ConsumerState<BadgesPage> {
                 )
               : RefreshIndicator(
                   onRefresh: _load,
-                  child: GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 180,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.85,
-                    ),
-                    itemCount: _badges.length,
-                    itemBuilder: (_, i) => _BadgeCard(data: _badges[i]),
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _LevelHeader(badges: _badges),
+                      ),
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 180,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.85,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (_, i) => _BadgeCard(data: _badges[i]),
+                            childCount: _badges.length,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+    );
+  }
+}
+
+/// Berechnet Level aus Gesamt-Punktzahl. Klassische sqrt-Progression:
+/// Level 1 ab 0 P, Level 2 ab 50, Level 3 ab 200, Level 4 ab 450, …
+/// = `level = floor(sqrt(points / 50)) + 1`
+int _levelFor(int points) => (sqrt(points / 50)).floor() + 1;
+
+/// Schwelle (in Punkten) ab der `level` erreicht ist.
+int _thresholdForLevel(int level) => 50 * (level - 1) * (level - 1);
+
+class _LevelHeader extends StatelessWidget {
+  const _LevelHeader({required this.badges});
+  final List<Map<String, dynamic>> badges;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = badges.fold<int>(0, (sum, b) {
+      final pts = ((b['badges'] as Map<String, dynamic>?)?['points'] as num?)
+              ?.toInt() ??
+          0;
+      return sum + pts;
+    });
+    final level = _levelFor(total);
+    final currentThreshold = _thresholdForLevel(level);
+    final nextThreshold = _thresholdForLevel(level + 1);
+    final progress = nextThreshold == currentThreshold
+        ? 1.0
+        : ((total - currentThreshold) /
+                (nextThreshold - currentThreshold))
+            .clamp(0.0, 1.0);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.primary500, AppColors.primary700],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary500.withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '$level',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Level $level',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Text(
+                      '$total Punkte · ${badges.length} Badges',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: Colors.white.withValues(alpha: 0.25),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            level >= 50
+                ? 'Maximal-Level erreicht!'
+                : '${nextThreshold - total} Punkte bis Level ${level + 1}',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
