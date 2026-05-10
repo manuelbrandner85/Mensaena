@@ -358,12 +358,25 @@ jobs:
             2>&1 | tee build.log
           rc=${PIPESTATUS[0]}
           # Exit-Code 70 = Release ist auf Shorebird-Server bereits registriert
-          # (z.B. nach Workflow-Re-Run nach partial fail). APK wurde trotzdem
-          # gebaut → wir fangen 70 ab und fahren fort.
+          # (z.B. nach Workflow-Re-Run nach partial fail). In diesem Fall hat
+          # Shorebird KEINE APK gebaut → wir müssen mit `flutter build apk` nachholen.
           if [ $rc -eq 70 ]; then
-            echo "⚠️  Shorebird: Release ist bereits registriert. APK gebaut → weiter."
+            echo "⚠️  Shorebird: Release bereits registriert — baue APK direkt mit Flutter."
             rc=0
           fi
+          # Sicher gehen dass die APK an der erwarteten Stelle liegt. Wenn
+          # Shorebird sie nicht produziert hat (Skip-Path) bauen wir sie hier.
+          # `flutter build apk --release` ist idempotent — wenn der Build aus
+          # Shorebird gecacht ist, läuft er in Sekunden durch.
+          if [ ! -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            echo "ℹ️  APK nicht von Shorebird gebaut — fallback auf flutter build apk"
+            flutter build apk --release \
+              --target-platform=android-arm64,android-arm \
+              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+              --dart-define=API_BASE_URL=https://www.mensaena.de
+            rc=$?
+          fi
+          ls -la build/app/outputs/flutter-apk/ 2>/dev/null || echo "(no flutter-apk/ dir)"
           exit $rc
 
       # Non-Main-Builds (PR + Feature-Branch) → klassischer flutter build apk
