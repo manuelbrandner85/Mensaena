@@ -97,7 +97,7 @@ export default function LandingSupport() {
 
         <p
           className="reveal reveal-delay-4 mt-10 text-xs max-w-3xl leading-relaxed"
-          style={{ color: 'rgba(245,240,232,0.25)' }}
+          style={{ color: 'rgba(245,240,232,0.50)' }}
         >
           Mensaena ist derzeit nicht als gemeinnützig im Sinne der Abgabenordnung anerkannt.
           Spenden sind daher nicht steuerlich absetzbar &mdash; wir arbeiten daran.
@@ -123,7 +123,7 @@ function Fact({
       </div>
       <div className="min-w-0">
         <div className="text-sm font-semibold mb-1" style={{ color: '#F5F0E8' }}>{title}</div>
-        <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(245,240,232,0.45)' }}>{text}</p>
+        <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(245,240,232,0.75)' }}>{text}</p>
       </div>
     </li>
   )

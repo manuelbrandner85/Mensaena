@@ -28,6 +28,12 @@ const markers = [
   { lat: 50.9375, lng: 6.9603,  label: 'Köln' },
   { lat: 50.1109, lng: 8.6821,  label: 'Frankfurt' },
   { lat: 48.7758, lng: 9.1829,  label: 'Stuttgart' },
+  { lat: 51.2277, lng: 6.7735,  label: 'Düsseldorf' },
+  { lat: 51.3397, lng: 12.3731, label: 'Leipzig' },
+  { lat: 49.4521, lng: 11.0767, label: 'Nürnberg' },
+  { lat: 51.4556, lng: 7.0116,  label: 'Essen' },
+  { lat: 51.4818, lng: 7.2197,  label: 'Dortmund' },
+  { lat: 53.0793, lng: 8.8017,  label: 'Bremen' },
 ]
 
 export default function LandingMap() {
@@ -41,7 +47,6 @@ export default function LandingMap() {
   return (
     <CinemaSection
       id="map"
-
       index="07"
       label="Live in der Fläche"
       title={
@@ -60,7 +65,7 @@ export default function LandingMap() {
           left: '-10%',
           width: '40vw',
           height: '40vw',
-          background: 'radial-gradient(circle, rgba(30,170,166,0.10) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)',
           filter: 'blur(80px)',
           animation: 'ambientBreath2 24s ease-in-out infinite',
           zIndex: 0,
@@ -74,7 +79,7 @@ export default function LandingMap() {
           right: '-8%',
           width: '32vw',
           height: '32vw',
-          background: 'radial-gradient(circle, rgba(79,109,138,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(125,211,252,0.10) 0%, transparent 70%)',
           filter: 'blur(70px)',
           animation: 'ambientBreath3 20s ease-in-out 4s infinite',
           zIndex: 0,
@@ -82,22 +87,18 @@ export default function LandingMap() {
         aria-hidden="true"
       />
 
-      {/* ── Map frame — premium card depth ── */}
+      {/* ── Map frame — premium cinema card with amber edge glow ── */}
       <div
         ref={sectionRef}
-        className="reveal reveal-delay-2 relative card-depth overflow-hidden rounded-3xl"
+        className="reveal reveal-delay-2 relative overflow-hidden rounded-3xl border border-white/8"
+        style={{
+          background: 'linear-gradient(180deg, rgba(15,22,40,0.6) 0%, rgba(10,15,28,0.85) 100%)',
+          boxShadow:
+            '0 1px 0 rgba(245,158,11,0.08) inset, 0 16px 48px rgba(0,0,0,0.55), 0 32px 96px rgba(0,0,0,0.40), 0 0 80px rgba(245,158,11,0.06)',
+        }}
       >
-        {/* ── Inner radial vignette overlay (top edge) ── */}
-        <div
-          className="absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 100%)',
-          }}
-          aria-hidden="true"
-        />
-
         {showMap ? (
-          <div className="h-[460px] md:h-[560px]" aria-label="Kartenvorschau">
+          <div className="h-[460px] md:h-[560px] relative" aria-label="Kartenvorschau">
             <MapContainer
               center={[51.1657, 10.4515]}
               zoom={6}
@@ -106,50 +107,90 @@ export default function LandingMap() {
               zoomControl={false}
               attributionControl={false}
               className="h-full w-full z-0"
-              style={{ background: '#FAFAF7' }}
+              style={{ background: '#0A0F1C' }}
             >
+              {/* CartoDB Dark Matter — cinema-perfect dark basemap */}
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; OpenStreetMap &copy; CARTO'
+                subdomains="abcd"
+                maxZoom={19}
               />
               {markers.map((m, i) => (
                 <CircleMarker
                   key={i}
                   center={[m.lat, m.lng]}
-                  radius={11}
+                  radius={9}
                   pathOptions={{
-                    fillColor: '#1EAAA6',
-                    fillOpacity: 0.85,
-                    color: '#147170',
+                    fillColor: '#FBBF24',
+                    fillOpacity: 0.92,
+                    color: '#FEF3C7',
                     weight: 2,
+                    className: 'cinema-marker-pulse',
                   }}
                 />
               ))}
             </MapContainer>
+
+            {/* ── Radial vignette over map (cinema framing) ── */}
+            <div
+              className="absolute inset-0 pointer-events-none z-[400]"
+              aria-hidden="true"
+              style={{
+                background:
+                  'radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(10,15,28,0.55) 100%)',
+              }}
+            />
+            {/* ── Drifting lantern glow particles ── */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-[401]" aria-hidden>
+              {[
+                { top: '18%', left: '22%', size: 180, delay: '0s'   },
+                { top: '32%', left: '68%', size: 160, delay: '2s'   },
+                { top: '62%', left: '38%', size: 220, delay: '1s'   },
+                { top: '70%', left: '78%', size: 140, delay: '3s'   },
+                { top: '48%', left: '52%', size: 280, delay: '4.5s' },
+              ].map((l, i) => (
+                <div
+                  key={i}
+                  className="absolute rounded-full"
+                  style={{
+                    top: l.top,
+                    left: l.left,
+                    width: l.size,
+                    height: l.size,
+                    background: 'radial-gradient(circle, rgba(245,158,11,0.10) 0%, transparent 70%)',
+                    animation: `lanternDrift 14s ease-in-out ${l.delay} infinite`,
+                    filter: 'blur(2px)',
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                />
+              ))}
+            </div>
           </div>
         ) : (
-          <div className="h-[460px] md:h-[560px] animate-pulse" style={{ background: "rgba(245,240,232,0.05)" }} />
+          <div className="h-[460px] md:h-[560px] animate-pulse" style={{ background: 'rgba(15,22,40,0.6)' }} />
         )}
 
-        {/* ── Cinematic CTA overlay — refined glass-edged bar ── */}
+        {/* ── Cinematic CTA overlay — dark glass with amber edge ── */}
         <div
-          className="absolute bottom-0 inset-x-0 z-10 flex items-end px-6 md:px-10 pb-8 pt-24"
+          className="absolute bottom-0 inset-x-0 z-[500] flex items-center justify-center px-6 md:px-10 pb-8 pt-24"
           style={{
             background:
-              'linear-gradient(to top, rgba(250,250,247,1) 30%, rgba(250,250,247,0.92) 60%, transparent 100%)',
+              'linear-gradient(to top, rgba(10,15,28,0.95) 35%, rgba(10,15,28,0.75) 65%, transparent 100%)',
           }}
         >
-          {/* Top edge light line */}
+          {/* Top edge amber light line */}
           <div
             className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
             style={{
               background:
-                'linear-gradient(90deg, transparent 0%, rgba(30,170,166,0.18) 30%, rgba(30,170,166,0.35) 50%, rgba(30,170,166,0.18) 70%, transparent 100%)',
+                'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.20) 30%, rgba(245,158,11,0.50) 50%, rgba(245,158,11,0.20) 70%, transparent 100%)',
             }}
             aria-hidden="true"
           />
           <Link
             href="/auth?mode=register"
-            className="cta-cinema-ink group inline-flex items-center gap-3 text-paper px-7 py-3.5 rounded-full text-sm font-medium tracking-wide"
+            className="glow-btn-cinema-primary group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-sm font-medium tracking-wide"
           >
             Registrieren und Karte freischalten
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
