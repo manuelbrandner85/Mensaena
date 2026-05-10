@@ -5,6 +5,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cinema Keyframes (Nacht-Nachbarschaft) */
+@import './cinema-keyframes.css';
+
 /* ═══════════════════════════════════════════════════════════════════════
    VIEW  TRANSITIONS
    Cinematic cross-fade between routes. Browsers that don't support
