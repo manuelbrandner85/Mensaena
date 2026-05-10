@@ -1,12 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, MessageCircle, Map, Command, LayoutDashboard } from 'lucide-react'
+import { MessageCircle, Map, LayoutDashboard } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { useNavigation } from '@/hooks/useNavigation'
 import SearchBar from './SearchBar'
-import { openCommandPalette } from '@/components/shared/CommandPalette'
 import NotificationBell from './NotificationBell'
 import UserMenu from './UserMenu'
 import GlobalSOSButton from '@/app/dashboard/crisis/components/GlobalSOSButton'
@@ -63,19 +62,6 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           )}
         </div>
         <SearchBar />
-        <button
-          type="button"
-          onClick={() => openCommandPalette()}
-          className="hidden lg:inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-mn-mute bg-mn-surface border border-white/7 hover:border-mn-amber/25 hover:text-mn-amber transition-all"
-          aria-label={t('commandPalette')}
-          title={t('commandPaletteHint')}
-        >
-          <Command className="w-3.5 h-3.5" />
-          <span>{t('quickAccess')}</span>
-          <kbd className="inline-flex items-center bg-mn-elevated border border-white/5 rounded px-1.5 py-0.5 text-xs font-mono">
-            ⌘K
-          </kbd>
-        </button>
       </div>
 
       {/* Right: Actions */}
@@ -116,16 +102,6 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         <GlobalSOSButton />
 
         <div className="w-px h-5 mx-1" style={{ background: 'rgba(245,240,232,0.10)' }} />
-
-        {/* Quick Create — cinema amber pill */}
-        <Link
-          href="/dashboard/create"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 min-h-[36px] hover:shadow-amber-glow"
-          style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)', color: '#0A0F1C' }}
-        >
-          <Plus className="w-4 h-4" />
-          <span>{t('create')}</span>
-        </Link>
 
         {/* Language Switcher */}
         <LanguageSwitcher />
