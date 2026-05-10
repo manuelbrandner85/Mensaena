@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/holidays.dart';
 import '../../theme/app_colors.dart';
 import 'models.dart';
 
@@ -18,12 +19,17 @@ class EventCalendarView extends StatefulWidget {
     required this.onRemove,
     required this.attendances,
     required this.eventTileBuilder,
+    this.bundesland = BundeslandCode.national,
   });
 
   final List<EventItem> events;
   final Map<String, AttendeeStatus> attendances;
   final Future<bool> Function(String eventId, AttendeeStatus status) onAttend;
   final void Function(String eventId) onRemove;
+
+  /// Bundesland für Feiertags-Anzeige. Default: NATIONAL (zeigt nur
+  /// bundesweite Feiertage).
+  final BundeslandCode bundesland;
 
   /// Wir delegieren das Rendern einer Event-Zeile zurück an die Page,
   /// damit das Calendar-View nicht 1:1 die Detail-UI duplizieren muss.
@@ -37,12 +43,33 @@ class EventCalendarView extends StatefulWidget {
 class _EventCalendarViewState extends State<EventCalendarView> {
   late DateTime _activeMonth;
   DateTime? _selectedDate;
+  Map<String, Holiday> _holidaysByDate = const {};
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
     _activeMonth = DateTime(now.year, now.month, 1);
+    _loadHolidays();
+  }
+
+  @override
+  void didUpdateWidget(covariant EventCalendarView old) {
+    super.didUpdateWidget(old);
+    if (old.bundesland != widget.bundesland) _loadHolidays();
+  }
+
+  Future<void> _loadHolidays() async {
+    final list = await HolidayService.fetch(
+      year: _activeMonth.year,
+      state: widget.bundesland,
+    );
+    if (!mounted) return;
+    final map = <String, Holiday>{};
+    for (final h in list) {
+      map[_key(h.date)] = h;
+    }
+    setState(() => _holidaysByDate = map);
   }
 
   /// Map "YYYY-MM-DD" → Events an diesem Tag (lokale Zeit).
@@ -63,6 +90,7 @@ class _EventCalendarViewState extends State<EventCalendarView> {
       () => _activeMonth =
           DateTime(_activeMonth.year, _activeMonth.month - 1, 1),
     );
+    _loadHolidays();
   }
 
   void _nextMonth() {
@@ -70,6 +98,7 @@ class _EventCalendarViewState extends State<EventCalendarView> {
       () => _activeMonth =
           DateTime(_activeMonth.year, _activeMonth.month + 1, 1),
     );
+    _loadHolidays();
   }
 
   void _goToday() {
@@ -95,6 +124,39 @@ class _EventCalendarViewState extends State<EventCalendarView> {
     if (startOffset < 0) startOffset = 6;
     final start = firstOfMonth.subtract(Duration(days: startOffset));
     return List<DateTime>.generate(42, (i) => start.add(Duration(days: i)));
+  }
+
+  void _showHoliday(Holiday h) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(h.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(DateFormat('EEEE, d. MMMM yyyy', 'de').format(h.date)),
+            const SizedBox(height: 8),
+            Text(
+              h.isRegional
+                  ? 'Regionaler Feiertag (${h.state.label})'
+                  : 'Bundesweiter Feiertag',
+              style: const TextStyle(color: AppColors.ink400, fontSize: 12),
+            ),
+            if (h.note != null) ...[
+              const SizedBox(height: 8),
+              Text(h.note!, style: const TextStyle(fontSize: 12)),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Schließen'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onDayTap(DateTime date) {
@@ -195,6 +257,7 @@ class _EventCalendarViewState extends State<EventCalendarView> {
               itemBuilder: (_, i) {
                 final d = days[i];
                 final events = byDate[_key(d)] ?? const [];
+                final holiday = _holidaysByDate[_key(d)];
                 return _DayCell(
                   date: d,
                   isCurrentMonth: _isCurrentMonth(d),
@@ -202,7 +265,14 @@ class _EventCalendarViewState extends State<EventCalendarView> {
                   isSelected:
                       _selectedDate != null && _isSameDay(d, _selectedDate!),
                   events: events,
-                  onTap: () => _onDayTap(d),
+                  holiday: holiday,
+                  onTap: () {
+                    if (events.isNotEmpty) {
+                      _onDayTap(d);
+                    } else if (holiday != null) {
+                      _showHoliday(holiday);
+                    }
+                  },
                 );
               },
             ),
@@ -243,6 +313,7 @@ class _DayCell extends StatelessWidget {
     required this.isSelected,
     required this.events,
     required this.onTap,
+    this.holiday,
   });
 
   final DateTime date;
@@ -250,6 +321,7 @@ class _DayCell extends StatelessWidget {
   final bool isToday;
   final bool isSelected;
   final List<EventItem> events;
+  final Holiday? holiday;
   final VoidCallback onTap;
 
   @override
@@ -257,6 +329,10 @@ class _DayCell extends StatelessWidget {
     Color textColor = AppColors.ink800;
     if (!isCurrentMonth) textColor = AppColors.ink400;
     if (isSelected || isToday) textColor = AppColors.primary500;
+    // Feiertage in rot — auch in Light/Dark gut sichtbar.
+    if (holiday != null && isCurrentMonth && !isSelected && !isToday) {
+      textColor = const Color(0xFFC62828);
+    }
 
     Color? bg;
     Border? border;
@@ -265,6 +341,8 @@ class _DayCell extends StatelessWidget {
       border = Border.all(color: AppColors.primary500, width: 1.5);
     } else if (isToday) {
       border = Border.all(color: AppColors.primary500, width: 1);
+    } else if (holiday != null && isCurrentMonth) {
+      bg = const Color(0xFFC62828).withValues(alpha: 0.06);
     }
 
     return Material(
@@ -291,6 +369,17 @@ class _DayCell extends StatelessWidget {
                   fontWeight: isToday ? FontWeight.w800 : FontWeight.w500,
                 ),
               ),
+              if (holiday != null && isCurrentMonth)
+                Text(
+                  holiday!.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 8,
+                    color: Color(0xFFC62828),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               const SizedBox(height: 2),
               if (events.isNotEmpty)
                 Expanded(

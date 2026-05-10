@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/accessibility_store.dart';
+import 'core/crash_log.dart';
 import 'core/supabase.dart';
 import 'features/updates/update_gate.dart';
 import 'routing/app_router.dart';
@@ -37,6 +38,12 @@ void main() {
       FlutterError.onError = (details) {
         FlutterError.presentError(details);
         debugPrint('FlutterError: ${details.exceptionAsString()}');
+        unawaited(CrashLog.capture(
+          errorType: 'flutter_error',
+          error: details.exception,
+          stack: details.stack,
+          extraContext: details.library,
+        ),);
       };
 
       // Locale-Init darf nicht crashen
@@ -56,6 +63,11 @@ void main() {
         debugPrint('initSupabase failed: $e\n$st');
       }
 
+      // Nach erfolgreichem Supabase-Init: queued Crash-Reports flushen.
+      if (bootError == null) {
+        unawaited(CrashLog.flushPending());
+      }
+
       runApp(
         ProviderScope(
           child: bootError != null
@@ -66,6 +78,11 @@ void main() {
     },
     (error, stack) {
       debugPrint('Uncaught zone error: $error\n$stack');
+      unawaited(CrashLog.capture(
+        errorType: 'zone_error',
+        error: error,
+        stack: stack,
+      ),);
     },
   );
 }

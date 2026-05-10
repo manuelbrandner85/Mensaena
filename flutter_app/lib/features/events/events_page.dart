@@ -4,10 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/holidays.dart';
+import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
 import '../../widgets/realtime_feed.dart';
+import '../../widgets/weather_forecast_strip.dart';
 import 'event_calendar_view.dart';
 import 'event_map_view.dart';
 import 'events_repository.dart';
@@ -29,6 +32,9 @@ class _EventsPageState extends ConsumerState<EventsPage>
   bool _loading = true;
   String _category = 'all';
   _EventViewMode _viewMode = _EventViewMode.list;
+  double? _userLat;
+  double? _userLng;
+  BundeslandCode _bundesland = BundeslandCode.national;
 
   @override
   String get realtimeChannelName => 'events-feed-realtime';
@@ -64,7 +70,34 @@ class _EventsPageState extends ConsumerState<EventsPage>
   void initState() {
     super.initState();
     _load();
+    _loadUserGeo();
     subscribeRealtime();
+  }
+
+  Future<void> _loadUserGeo() async {
+    try {
+      final db = ref.read(supabaseProvider);
+      final user = db.auth.currentUser;
+      if (user == null) return;
+      final row = await db
+          .from('profiles')
+          .select('latitude, longitude, postal_code')
+          .eq('id', user.id)
+          .maybeSingle();
+      if (!mounted || row == null) return;
+      final lat = (row['latitude'] as num?)?.toDouble();
+      final lng = (row['longitude'] as num?)?.toDouble();
+      final plz = row['postal_code'] as String?;
+      setState(() {
+        _userLat = lat;
+        _userLng = lng;
+        if (plz != null && plz.isNotEmpty) {
+          _bundesland = plzToBundesland(plz);
+        } else if (lat != null && lng != null) {
+          _bundesland = coordsToBundesland(lat, lng);
+        }
+      });
+    } catch (_) {}
   }
 
   void _showNewItems() {
@@ -138,6 +171,13 @@ class _EventsPageState extends ConsumerState<EventsPage>
                 'Treffen, Workshops, Sport — finde was zu dir passt oder organisiere selbst.',
             icon: Icons.event,
           ),
+          if (_userLat != null && _userLng != null) ...[
+            WeatherForecastStrip(
+              latitude: _userLat,
+              longitude: _userLng,
+            ),
+            const SizedBox(height: 8),
+          ],
           SizedBox(
             height: 40,
             child: ListView(
@@ -212,6 +252,7 @@ class _EventsPageState extends ConsumerState<EventsPage>
         return EventCalendarView(
           events: _events,
           attendances: _attendances,
+          bundesland: _bundesland,
           onAttend: (id, status) async {
             // Calendar-Sheet hat eigene Buttons; Re-load nach Aktion.
             await _load();
