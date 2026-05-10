@@ -33,7 +33,7 @@ export default function BlockedUsersList({ blockedUsers, onUnblock }: Props) {
   return (
     <div className="space-y-2">
       {blockedUsers.map(block => (
-        <div key={block.id} className="flex items-center justify-between p-3 rounded-xl bg-warm-50">
+        <div key={block.id} className="flex items-center justify-between p-3 rounded-xl bg-mn-surface">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-mn-raised flex items-center justify-center overflow-hidden">
               {block.profiles?.avatar_url ? (

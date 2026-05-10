@@ -79,7 +79,7 @@ export default function ThankYouButton({
         className={cn(
           'flex items-center gap-1.5 rounded-lg transition-colors',
           compact
-            ? 'p-1.5 hover:bg-warm-100 text-rose-400 hover:text-rose-600'
+            ? 'p-1.5 hover:bg-mn-elevated text-rose-400 hover:text-rose-600'
             : 'px-3 py-2 text-xs font-medium bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200',
         )}
       >

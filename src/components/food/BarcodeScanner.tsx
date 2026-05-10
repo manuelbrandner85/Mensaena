@@ -408,7 +408,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
                       {/* corners */}
                       {(['tl','tr','bl','br'] as const).map(c => (
                         <span key={c} className={cn(
-                          'absolute w-8 h-8 border-primary-400',
+                          'absolute w-8 h-8 border-mn-amber/30',
                           c === 'tl' && 'top-0 left-0 border-t-[3px] border-l-[3px] rounded-tl-lg',
                           c === 'tr' && 'top-0 right-0 border-t-[3px] border-r-[3px] rounded-tr-lg',
                           c === 'bl' && 'bottom-0 left-0 border-b-[3px] border-l-[3px] rounded-bl-lg',
@@ -561,7 +561,7 @@ export default function BarcodeScanner({ onProduct, onClose, onBarcodeDetected }
             {showManual && (
               <button
                 onClick={() => setManualProductOpen(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-mn-amber/20 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Produkt selbst anlegen

@@ -129,7 +129,7 @@ export default function ZeitbankTab() {
     <div className="space-y-4">
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="bg-mn-amber/5 rounded-xl p-4 border border-primary-100">
+        <div className="bg-mn-amber/5 rounded-xl p-4 border border-white/8">
           <div className="flex items-center gap-2 mb-1">
             <Clock className="w-4 h-4 text-mn-amber" />
             <span className="text-xs font-medium text-mn-mute">Bestätigte Stunden</span>
@@ -164,7 +164,7 @@ export default function ZeitbankTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>

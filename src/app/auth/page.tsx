@@ -27,7 +27,7 @@ export default function AuthPageWrapper() {
             aria-hidden="true"
           />
           <div className="relative flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin" aria-hidden="true" />
+            <div className="w-10 h-10 border-[3px] border-white/10 border-t-mn-amber rounded-full animate-spin" aria-hidden="true" />
             <span className="sr-only">Loading…</span>
           </div>
         </div>

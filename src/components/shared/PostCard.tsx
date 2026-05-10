@@ -425,7 +425,7 @@ export default function PostCard({
         </div>
       )}
       {urgency === 2 && (
-        <div className="relative flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-semibold overflow-hidden">
+        <div className="relative flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 text-white text-xs font-semibold overflow-hidden">
           <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
           <span className="relative text-sm">&#x26A0;&#xFE0F;</span>
           <span className="relative">Dringend</span>
@@ -580,7 +580,7 @@ export default function PostCard({
                     'flex items-center gap-0.5 px-2 py-1 rounded-full text-xs transition-all',
                     isActive
                       ? 'bg-mn-amber/10 text-primary-800 ring-1 ring-primary-300 scale-105'
-                      : 'bg-warm-50 text-mn-mute hover:bg-warm-100',
+                      : 'bg-mn-surface text-mn-mute hover:bg-mn-elevated',
                   )}
                 >
                   <span>{r.emoji}</span>
@@ -593,7 +593,7 @@ export default function PostCard({
 
         {/* ── Actions bar ────────────────────────────────────────────── */}
         {showActions && (
-          <div className="flex items-center justify-between pt-3 border-t border-warm-100">
+          <div className="flex items-center justify-between pt-3 border-t border-white/8">
             <div className="flex items-center gap-1 flex-wrap">
               {/* Interest / Contact */}
               {!isOwn && post.user_id !== currentUserId && (
@@ -652,7 +652,7 @@ export default function PostCard({
                   title="Hilfreich"
                   className={cn(
                     'p-1 rounded-lg transition-all',
-                    myVote === 1 ? 'text-mn-leben bg-mn-surface' : 'text-mn-mute hover:bg-warm-100 hover:text-mn-leben',
+                    myVote === 1 ? 'text-mn-leben bg-mn-surface' : 'text-mn-mute hover:bg-mn-elevated hover:text-mn-leben',
                   )}
                 >
                   <ThumbsUp className="w-3.5 h-3.5" />
@@ -668,7 +668,7 @@ export default function PostCard({
                   title="Nicht hilfreich"
                   className={cn(
                     'p-1 rounded-lg transition-all',
-                    myVote === -1 ? 'text-mn-herzrot bg-mn-surface' : 'text-mn-mute hover:bg-warm-100 hover:text-mn-herzrot',
+                    myVote === -1 ? 'text-mn-herzrot bg-mn-surface' : 'text-mn-mute hover:bg-mn-elevated hover:text-mn-herzrot',
                   )}
                 >
                   <ThumbsDown className="w-3.5 h-3.5" />
@@ -679,7 +679,7 @@ export default function PostCard({
               {detailLink && (
                 <Link
                   href={href}
-                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-warm-100 transition-colors text-mn-mute hover:text-mn-amber"
+                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-mn-elevated transition-colors text-mn-mute hover:text-mn-amber"
                   title={`${commentCount} Kommentare`}
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
@@ -691,7 +691,7 @@ export default function PostCard({
               <button
                 onClick={handleSave}
                 disabled={savingLoading}
-                className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-mn-elevated transition-colors"
                 title={isSaved ? 'Gespeichert' : 'Speichern'}
               >
                 {isSaved
@@ -716,7 +716,7 @@ export default function PostCard({
 
               {/* Detail link */}
               {detailLink && (
-                <Link href={href} className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors" title="Details">
+                <Link href={href} className="p-1.5 rounded-lg hover:bg-mn-elevated transition-colors" title="Details">
                   <ExternalLink className="w-4 h-4 text-mn-mute" />
                 </Link>
               )}
@@ -761,7 +761,7 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
 
   if (count === 1) {
     return (
-      <Wrapper {...(wrapperProps as any)} className="block mb-3 overflow-hidden rounded-lg bg-warm-50">
+      <Wrapper {...(wrapperProps as any)} className="block mb-3 overflow-hidden rounded-lg bg-mn-surface">
         <div className="relative w-full h-40">
           <Image src={thumbUrl(urls[0])} alt="" fill className="object-cover" />
         </div>
@@ -773,7 +773,7 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
     return (
       <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg">
         {urls.slice(0, 2).map((u, i) => (
-          <div key={i} className="relative h-32 bg-warm-50">
+          <div key={i} className="relative h-32 bg-mn-surface">
             <Image src={thumbUrl(u)} alt="" fill className="object-cover" />
           </div>
         ))}
@@ -784,12 +784,12 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   if (count === 3) {
     return (
       <Wrapper {...(wrapperProps as any)} className="grid grid-cols-3 gap-1 mb-3 overflow-hidden rounded-lg">
-        <div className="relative col-span-2 h-32 bg-warm-50">
+        <div className="relative col-span-2 h-32 bg-mn-surface">
           <Image src={thumbUrl(urls[0])} alt="" fill className="object-cover" />
         </div>
         <div className="flex flex-col gap-1">
           {urls.slice(1, 3).map((u, i) => (
-            <div key={i} className="relative flex-1 bg-warm-50" style={{ minHeight: 'calc(50% - 2px)' }}>
+            <div key={i} className="relative flex-1 bg-mn-surface" style={{ minHeight: 'calc(50% - 2px)' }}>
               <Image src={thumbUrl(u)} alt="" fill className="object-cover" />
             </div>
           ))}
@@ -802,7 +802,7 @@ function ImagePreview({ urls, thumbUrl, href }: { urls: string[]; thumbUrl: (u: 
   return (
     <Wrapper {...(wrapperProps as any)} className="grid grid-cols-2 gap-1 mb-3 overflow-hidden rounded-lg relative">
       {urls.slice(0, 4).map((u, i) => (
-        <div key={i} className="relative h-24 bg-warm-50">
+        <div key={i} className="relative h-24 bg-mn-surface">
           <Image src={thumbUrl(u)} alt="" fill className="object-cover" />
         </div>
       ))}
@@ -914,7 +914,7 @@ function ContextMenu({ x, y, isOwn, currentStatus, onAction }: {
   return (
     <div ref={menuRef} style={style} className="bg-mn-elevated rounded-xl shadow-xl border border-white/5 py-1 min-w-[180px]" onClick={e => e.stopPropagation()}>
       {items.map(item => (
-        <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-warm-50 transition-colors">
+        <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-mn-surface transition-colors">
           {item.label}
         </button>
       ))}
@@ -922,7 +922,7 @@ function ContextMenu({ x, y, isOwn, currentStatus, onAction }: {
         <>
           <div className="border-t border-white/5 my-1" />
           {ownItems.map(item => (
-            <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-warm-50 transition-colors">
+            <button key={item.key} onClick={() => onAction(item.key)} className="w-full text-left px-4 py-2 text-sm hover:bg-mn-surface transition-colors">
               {item.label}
             </button>
           ))}

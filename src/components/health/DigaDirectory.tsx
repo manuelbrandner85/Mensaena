@@ -202,7 +202,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                 activeCategory === 'all'
                   ? 'bg-mn-amber text-white border-primary-600'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300',
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
               )}
             >
               Alle ({DIGAS.length})

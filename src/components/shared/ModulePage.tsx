@@ -42,7 +42,7 @@ const MOOD_GRADIENT: Record<ModuleMood, string> = {
   neutral:   'from-mn-amber/8 via-mn-amber/3 to-transparent',
   calm:      'from-mn-teal/10 via-mn-teal/4 to-transparent',
   warm:      'from-mn-amber/12 via-mn-herzrot/4 to-transparent',
-  fresh:     'from-mn-leven/10 via-mn-teal/4 to-transparent',
+  fresh:     'from-mn-leben/10 via-mn-teal/4 to-transparent',
   scholarly: 'from-mn-amber/8 via-mn-trust/4 to-transparent',
   sky:       'from-mn-teal/10 via-mn-teal-soft/4 to-transparent',
   gold:      'from-mn-amber/14 via-mn-amber-warm/5 to-transparent',
@@ -397,7 +397,7 @@ export default function ModulePage({
                   key={i}
                   type="button"
                   onClick={() => router.push(buildCreateUrl({ type: ex.type, category: ex.category, title: ex.title }))}
-                  className="relative text-left rounded-2xl border border-dashed border-primary-300 bg-mn-amber/5/50 p-4 opacity-70 hover:opacity-100 hover:border-mn-amber hover:bg-mn-amber/5 transition-all cursor-pointer"
+                  className="relative text-left rounded-2xl border border-dashed border-mn-amber/20 bg-mn-amber/5/50 p-4 opacity-70 hover:opacity-100 hover:border-mn-amber hover:bg-mn-amber/5 transition-all cursor-pointer"
                 >
                   <span className="absolute top-2 right-2 bg-mn-elevated text-mn-amber text-xs rounded-full px-2 py-0.5">
                     ✨ Beispiel

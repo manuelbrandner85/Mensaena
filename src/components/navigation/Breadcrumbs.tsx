@@ -11,7 +11,7 @@ export default function Breadcrumbs() {
 
   return (
     <nav
-      className="flex items-center gap-1 text-sm text-mn-mute px-8 py-2 bg-mn-elevated/60 border-b border-warm-100"
+      className="flex items-center gap-1 text-sm text-mn-mute px-8 py-2 bg-mn-elevated/60 border-b border-white/8"
       aria-label="Breadcrumb"
     >
       {breadcrumbs.map((crumb, i) => {

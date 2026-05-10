@@ -145,7 +145,7 @@ export default function AccountSettings({
                     onClick={() => toggleTopic(topic)}
                     className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all min-h-[36px] ${
                       mentorTopics.includes(topic)
-                        ? 'bg-mn-amber/10 text-mn-amber border-primary-300'
+                        ? 'bg-mn-amber/10 text-mn-amber border-mn-amber/20'
                         : 'bg-mn-elevated text-mn-mute border-white/5 hover:border-white/8'
                     }`}
                   >

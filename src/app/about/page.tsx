@@ -152,7 +152,7 @@ export default function AboutPage() {
           </Link>
           <Link
             href="/spenden"
-            className="inline-flex items-center gap-2.5 rounded-full border border-stone-300 px-6 py-3 text-sm font-medium tracking-wide text-ink-700 transition-colors hover:border-primary-300 hover:text-primary-700"
+            className="inline-flex items-center gap-2.5 rounded-full border border-stone-300 px-6 py-3 text-sm font-medium tracking-wide text-ink-700 transition-colors hover:border-mn-amber/20 hover:text-primary-700"
           >
             <Heart className="h-4 w-4 text-primary-500" aria-hidden="true" />
             Mensaena unterstützen

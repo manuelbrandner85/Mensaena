@@ -151,7 +151,7 @@ export default function GroupsTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>

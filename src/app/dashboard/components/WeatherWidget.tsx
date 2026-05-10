@@ -158,7 +158,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
 
       {/* Contextual neighbour hint */}
       {tip && (
-        <p className="mt-3 text-xs text-mn-ink-soft leading-relaxed bg-mn-amber/5 rounded-xl px-3 py-2 border border-primary-100">
+        <p className="mt-3 text-xs text-mn-ink-soft leading-relaxed bg-mn-amber/5 rounded-xl px-3 py-2 border border-white/8">
           {tip}
         </p>
       )}

@@ -122,7 +122,7 @@ export default function CalendarPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 28 / Kalender</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
               <Calendar className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
@@ -158,17 +158,17 @@ export default function CalendarPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Calendar */}
         <div className="lg:col-span-2">
-          <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-cinema-card overflow-hidden">
+          <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-cinema-card overflow-hidden">
 
             {/* Month Navigation */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-warm-100">
-              <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/8">
+              <button onClick={prevMonth} aria-label="Vorheriger Monat" className="p-2 hover:bg-mn-elevated rounded-xl transition-colors">
                 <ChevronLeft className="w-5 h-5 text-mn-ink-soft" />
               </button>
               <h2 className="text-lg font-bold text-mn-ink">
                 {MONTHS_DE[month]} {year}
               </h2>
-              <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 hover:bg-warm-100 rounded-xl transition-colors">
+              <button onClick={nextMonth} aria-label="Nächster Monat" className="p-2 hover:bg-mn-elevated rounded-xl transition-colors">
                 <ChevronRight className="w-5 h-5 text-mn-ink-soft" />
               </button>
             </div>
@@ -176,7 +176,7 @@ export default function CalendarPage() {
             {view === 'month' ? (
               <>
                 {/* Day headers */}
-                <div className="grid grid-cols-7 border-b border-warm-100">
+                <div className="grid grid-cols-7 border-b border-white/8">
                   {DAYS_DE.map(d => (
                     <div key={d} className="py-2 text-center text-xs font-semibold text-mn-mute">{d}</div>
                   ))}
@@ -194,10 +194,10 @@ export default function CalendarPage() {
                         key={idx}
                         onClick={() => day && setSelectedDay(isSelected ? null : day)}
                         className={cn(
-                          'min-h-[80px] p-1.5 border-b border-r border-warm-100 last:border-r-0 transition-colors',
+                          'min-h-[80px] p-1.5 border-b border-r border-white/8 last:border-r-0 transition-colors',
                           day ? 'cursor-pointer hover:bg-mn-amber/5/50' : 'bg-mn-surface/50',
                           isSelected && 'bg-mn-amber/5',
-                          isWeekend && day ? 'bg-warm-50/50' : '',
+                          isWeekend && day ? 'bg-mn-surface/50' : '',
                         )}
                       >
                         {day && (
@@ -250,7 +250,7 @@ export default function CalendarPage() {
                   upcomingEvents.map(e => (
                     <Link key={e.id} href={`/dashboard/posts/${e.id}`}
                       className="flex items-start gap-4 px-5 py-4 hover:bg-mn-amber/5 transition-colors">
-                      <div className="text-center bg-mn-amber/5 rounded-xl px-3 py-2 flex-shrink-0 border border-primary-100">
+                      <div className="text-center bg-mn-amber/5 rounded-xl px-3 py-2 flex-shrink-0 border border-white/8">
                         <div className="text-lg font-bold text-mn-amber">
                           {new Date(e.event_date).getDate()}
                         </div>
@@ -282,7 +282,7 @@ export default function CalendarPage() {
         <div className="space-y-4">
           {/* Selected day detail */}
           {selectedDay && (
-            <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-cinema-card p-4">
+            <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-cinema-card p-4">
               <h3 className="font-semibold text-mn-ink mb-3">
                 {selectedDay}. {MONTHS_DE[month]} {year}
               </h3>
@@ -306,7 +306,7 @@ export default function CalendarPage() {
           )}
 
           {/* Upcoming this month */}
-          <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-cinema-card p-4">
+          <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-cinema-card p-4">
             <h3 className="font-semibold text-mn-ink mb-3 flex items-center gap-2">
               <Car className="w-4 h-4 text-mn-amber" /> Nächste Termine
             </h3>
@@ -320,7 +320,7 @@ export default function CalendarPage() {
               <div className="space-y-2">
                 {upcomingEvents.slice(0, 5).map(e => (
                   <Link key={e.id} href={`/dashboard/posts/${e.id}`}
-                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-colors">
+                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-mn-surface transition-colors">
                     <div className="text-center flex-shrink-0">
                       <div className="text-sm font-bold text-mn-amber">{new Date(e.event_date).getDate()}</div>
                       <div className="text-xs text-mn-mute">{MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}</div>
@@ -341,7 +341,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Legend */}
-          <div className="bg-mn-elevated rounded-2xl border border-warm-200 p-4">
+          <div className="bg-mn-elevated rounded-2xl border border-white/8 p-4">
             <h3 className="text-xs font-semibold text-mn-mute uppercase tracking-wide mb-2">Legende</h3>
             <div className="space-y-1.5">
               {[

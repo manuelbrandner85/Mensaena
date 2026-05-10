@@ -109,7 +109,7 @@ export default function ProfileOfferSeekTags() {
             <span className="text-xs text-mn-mute italic">Noch nichts eingetragen</span>
           )}
           {offers.map(tag => (
-            <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-mn-amber/5 border border-primary-100 text-primary-800 text-xs font-medium rounded-full">
+            <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-mn-amber/5 border border-white/8 text-primary-800 text-xs font-medium rounded-full">
               {tag}
               <button type="button" onClick={() => removeTag('offer', tag)} className="hover:text-primary-900" aria-label={`${tag} entfernen`}>
                 <X className="w-3 h-3" />
@@ -124,7 +124,7 @@ export default function ProfileOfferSeekTags() {
             onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag('offer', offerDraft) } }}
             placeholder="z.B. Rasenmähen, Nachhilfe Mathe"
             maxLength={MAX_LEN}
-            className="flex-1 h-10 px-3 border border-white/5 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="flex-1 h-10 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
           <button
             type="button"

@@ -1969,7 +1969,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             {/* Room Header */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100/80 flex-shrink-0 bg-mn-elevated/90 backdrop-blur-xl">
               <div className={cn('w-9 h-9 rounded-2xl flex items-center justify-center text-lg shadow-sm',
-                (activeChannel?.is_locked || communityRoom?.is_locked) ? 'bg-mn-surface border border-mn-herzrot/20' : 'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-100')}>
+                (activeChannel?.is_locked || communityRoom?.is_locked) ? 'bg-mn-surface border border-mn-herzrot/20' : 'bg-gradient-to-br from-mn-amber/8 to-primary-100 border border-white/8')}>
                 {(activeChannel?.is_locked || communityRoom?.is_locked)
                   ? <Lock className="w-4 h-4 text-mn-herzrot" />
                   : <span className="leading-none">{activeChannel?.emoji ?? '💬'}</span>}
@@ -2188,7 +2188,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                           return (
                             <button key={idx} onClick={() => votePoll(poll.id, idx)}
                               className={cn('w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium border relative overflow-hidden transition-all',
-                                voted ? 'border-primary-400 text-primary-900' : 'border-gray-200 bg-mn-elevated text-gray-700 hover:bg-gray-50')}>
+                                voted ? 'border-mn-amber/30 text-primary-900' : 'border-gray-200 bg-mn-elevated text-gray-700 hover:bg-gray-50')}>
                               <div className="absolute inset-0 left-0 bg-mn-amber/10 transition-all" style={{ width: `${pct}%` }} />
                               <span className="relative flex justify-between">
                                 <span>{opt}</span>
@@ -2212,7 +2212,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               className={cn('flex-1 overflow-y-auto px-4 py-5 space-y-0.5 no-scrollbar relative transition-all bg-gray-50/50 chat-messages-container',
                 isDragging && 'ring-2 ring-inset ring-primary-400 bg-mn-amber/5/40')}>
               {isDragging && (
-                <div className="absolute inset-4 rounded-xl border-2 border-dashed border-primary-400 flex items-center justify-center pointer-events-none z-10">
+                <div className="absolute inset-4 rounded-xl border-2 border-dashed border-mn-amber/30 flex items-center justify-center pointer-events-none z-10">
                   <div className="text-center">
                     <ImageIcon className="w-8 h-8 text-primary-400 mx-auto mb-2" />
                     <p className="text-sm font-semibold text-mn-amber">Bild hier ablegen</p>
@@ -2282,7 +2282,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
 
             {/* Reply Preview */}
             {replyTo && (
-              <div className="px-4 py-2 bg-mn-amber/5/80 border-t border-primary-100 flex items-center gap-2.5 flex-shrink-0">
+              <div className="px-4 py-2 bg-mn-amber/5/80 border-t border-white/8 flex items-center gap-2.5 flex-shrink-0">
                 <div className="w-0.5 h-8 bg-primary-400 rounded-full flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] text-mn-amber font-semibold">↩ {replyTo.profiles?.name ?? 'Nutzer'}</p>
@@ -2331,7 +2331,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                   </button>
                 </div>
               )}
-              <div className="flex gap-2 items-center bg-gray-50 rounded-2xl px-3 py-1.5 border border-gray-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 shadow-sm transition-all">
+              <div className="flex gap-2 items-center bg-gray-50 rounded-2xl px-3 py-1.5 border border-gray-200 focus-within:border-mn-amber/30 focus-within:ring-2 focus-within:ring-primary-100 shadow-sm transition-all">
                 {/* Image upload button */}
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
                 <button
@@ -2404,7 +2404,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                     value={convSearch}
                     onChange={e => setConvSearch(e.target.value)}
                     placeholder="Gespräche durchsuchen..."
-                    className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-50 focus:bg-mn-elevated focus:border-primary-300 focus:ring-1 focus:ring-primary-200 outline-none transition-all placeholder:text-gray-400"
+                    className="w-full pl-8 pr-7 py-1.5 text-xs rounded-lg border border-gray-200 bg-gray-50 focus:bg-mn-elevated focus:border-mn-amber/20 focus:ring-1 focus:ring-primary-200 outline-none transition-all placeholder:text-gray-400"
                     aria-label="Konversationen durchsuchen"
                   />
                   {convSearch && (
@@ -2426,7 +2426,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
               </div>
             ) : conversations.length === 0 ? (
               <div className="flex flex-col items-center py-8 px-4 text-center flex-1">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-50 to-violet-50 flex items-center justify-center mb-4 border border-primary-100">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-mn-amber/8 to-violet-50 flex items-center justify-center mb-4 border border-white/8">
                   <span className="text-2xl">💌</span>
                 </div>
                 <p className="text-sm text-gray-700 font-semibold">Noch keine Nachrichten</p>
@@ -2627,7 +2627,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                 </div>
 
                 {replyTo && (
-                  <div className="px-4 py-2 bg-mn-amber/5/80 border-t border-primary-100 flex items-center gap-2.5 flex-shrink-0">
+                  <div className="px-4 py-2 bg-mn-amber/5/80 border-t border-white/8 flex items-center gap-2.5 flex-shrink-0">
                     <div className="w-0.5 h-8 bg-primary-400 rounded-full flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] text-mn-amber font-semibold">↩ {replyTo.profiles?.name ?? 'Nutzer'}</p>
@@ -2654,7 +2654,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
                       </button>
                     </div>
                   )}
-                  <div className="flex gap-2 items-center bg-gray-50 rounded-2xl px-3 py-1.5 border border-gray-200 focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 shadow-sm transition-all">
+                  <div className="flex gap-2 items-center bg-gray-50 rounded-2xl px-3 py-1.5 border border-gray-200 focus-within:border-mn-amber/30 focus-within:ring-2 focus-within:ring-primary-100 shadow-sm transition-all">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
@@ -2685,7 +2685,7 @@ export default function ChatView({ userId, initialConvId, initialTab, initialCal
             ) : (
               <div className="flex-1 flex items-center justify-center text-center px-6">
                 <div>
-                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-primary-50 via-violet-50 to-mn-teal-soft flex items-center justify-center mx-auto mb-5 border border-primary-100 shadow-glow-teal overflow-hidden">
+                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-mn-amber/8 via-mn-amber/3 to-mn-teal-soft flex items-center justify-center mx-auto mb-5 border border-white/8 shadow-glow-teal overflow-hidden">
                     <div className="bg-noise absolute inset-0 opacity-30 pointer-events-none" />
                     <div
                       className="absolute inset-0 pointer-events-none"
@@ -3218,7 +3218,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
           >
             {/* Avatar */}
             {!isMe && showHeader && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-200 to-primary-300 flex items-center justify-center text-xs font-bold text-primary-800 flex-shrink-0 mt-auto overflow-hidden relative ring-2 ring-white shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-mn-amber/15 to-primary-300 flex items-center justify-center text-xs font-bold text-primary-800 flex-shrink-0 mt-auto overflow-hidden relative ring-2 ring-white shadow-sm">
                 {msg.profiles?.avatar_url
                   ? <Image src={msg.profiles.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" />
                   : (msg.profiles?.name ?? '?')[0].toUpperCase()}
@@ -3268,7 +3268,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
               {/* Bubble */}
               <div className={cn('relative', isPinned && !isDeleted && 'ring-1 ring-amber-300 rounded-2xl')}>
                 {isEditing ? (
-                  <div className="flex flex-col gap-2 bg-mn-elevated border border-primary-300 rounded-2xl p-3 shadow-md min-w-48">
+                  <div className="flex flex-col gap-2 bg-mn-elevated border border-mn-amber/20 rounded-2xl p-3 shadow-md min-w-48">
                     <input
                       value={editContent}
                       onChange={e => setEditContent(e.target.value)}
@@ -3346,12 +3346,12 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                     isMe ? 'right-full mr-1' : 'left-full ml-1'
                   )}>
                     <button onClick={e => { e.stopPropagation(); onReply(msg) }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-primary-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-mn-amber/20 transition-all"
                       title="Antworten">
                       <Reply className="w-3 h-3" />
                     </button>
                     <button onClick={e => { e.stopPropagation(); onForward?.(msg) }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-primary-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-mn-amber/20 transition-all"
                       title="Weiterleiten">
                       <Send className="w-3 h-3 rotate-45" />
                     </button>
@@ -3380,7 +3380,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                         navigator.clipboard.writeText(link)
                         toast.success('Link kopiert')
                       }}
-                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-primary-300 transition-all"
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-mn-elevated shadow-md border border-gray-200 text-gray-500 hover:text-mn-amber hover:border-mn-amber/20 transition-all"
                       title="Link kopieren">
                       <Link2 className="w-3 h-3" />
                     </button>
@@ -3421,7 +3421,7 @@ function MessageGroup({ messages, userId, isAdmin, pinnedIds, onReply, onForward
                       title={reactionUsers[emoji]?.join(', ') || ''}
                       className={cn('flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border transition-all hover:scale-105',
                         myReactions[emoji]
-                          ? 'bg-mn-amber/10 border-primary-300 text-mn-amber shadow-sm'
+                          ? 'bg-mn-amber/10 border-mn-amber/20 text-mn-amber shadow-sm'
                           : 'bg-mn-elevated border-gray-200 text-gray-600 hover:bg-gray-50')}>
                       <span>{emoji}</span>
                       {count > 1 && <span className="font-semibold">{count}</span>}
@@ -3476,7 +3476,7 @@ function ConversationItem({ conv, active, title, initials, avatarUrl, onClick, o
       unread > 0 && !active && 'bg-mn-surface/50'
     )} onClick={onClick}>
       <div className="relative flex-shrink-0">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center text-mn-amber text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-mn-amber/10 to-primary-50 flex items-center justify-center text-mn-amber text-sm font-bold relative overflow-hidden transition-transform duration-200 group-hover:scale-105 shadow-soft ring-1 ring-primary-100/50">
           {avatarUrl ? <Image src={avatarUrl} alt="" width={40} height={40} className="w-full h-full object-cover" />
             : conv.type === 'group' ? <Users className="w-5 h-5" /> : initials}
         </div>

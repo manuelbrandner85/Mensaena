@@ -313,7 +313,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
       </div>
     )
   }
@@ -565,7 +565,7 @@ export default function PostDetailPage() {
             <div className="relative">
               <button
                 onClick={e => { e.stopPropagation(); setShowMoreMenu(!showMoreMenu) }}
-                className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg hover:bg-warm-100 transition-colors"
+                className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg hover:bg-mn-elevated transition-colors"
                 aria-label="Optionen"
               >
                 <MoreHorizontal className="w-5 h-5 text-mn-mute" />
@@ -577,21 +577,21 @@ export default function PostDetailPage() {
                 >
                   <button
                     onClick={() => { handleSave(); setShowMoreMenu(false) }}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                   >
                     {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                     {isSaved ? 'Gespeichert' : 'Speichern'}
                   </button>
                   <button
                     onClick={() => { setShowShareMenu(true); setShowMoreMenu(false) }}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                   >
                     <Share2 className="w-4 h-4" /> Teilen
                   </button>
                   {!isOwner && (
                     <button
                       onClick={() => { setShowReportModal(true); setShowMoreMenu(false) }}
-                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                     >
                       <Flag className="w-4 h-4" /> Melden
                     </button>
@@ -601,13 +601,13 @@ export default function PostDetailPage() {
                       <div className="border-t border-white/5 my-1" />
                       <button
                         onClick={() => { router.push(`/dashboard/posts/${post.id}?edit=1`); setShowMoreMenu(false) }}
-                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                       >
                         <Edit3 className="w-4 h-4" /> Bearbeiten
                       </button>
                       <button
                         onClick={handleMarkDone}
-                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2"
+                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2"
                       >
                         <CheckCircle className="w-4 h-4" /> Als erledigt markieren
                       </button>
@@ -761,7 +761,7 @@ export default function PostDetailPage() {
                   'flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all',
                   isActive
                     ? 'bg-mn-amber/10 text-primary-800 ring-2 ring-primary-300 scale-105'
-                    : 'bg-warm-50 text-mn-ink-soft hover:bg-warm-100',
+                    : 'bg-mn-surface text-mn-ink-soft hover:bg-mn-elevated',
                 )}
               >
                 <span className="text-lg">{r.emoji}</span>
@@ -773,7 +773,7 @@ export default function PostDetailPage() {
         <p className="text-xs text-mn-mute">{totalReactions} Reaktionen insgesamt</p>
 
         {/* Vote buttons */}
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-warm-100">
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/8">
           <span className="text-sm font-medium text-mn-ink-soft">Hilfreich?</span>
           <div className="flex items-center gap-2">
             <button
@@ -782,7 +782,7 @@ export default function PostDetailPage() {
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === 1
                   ? 'bg-mn-elevated text-mn-leben ring-1 ring-mn-leben/30'
-                  : 'bg-warm-50 text-mn-mute hover:bg-mn-surface hover:text-mn-leben',
+                  : 'bg-mn-surface text-mn-mute hover:bg-mn-surface hover:text-mn-leben',
               )}
             >
               <ThumbsUp className="w-4 h-4" />
@@ -794,7 +794,7 @@ export default function PostDetailPage() {
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 myVote === -1
                   ? 'bg-mn-elevated text-mn-herzrot ring-1 ring-mn-herzrot/30'
-                  : 'bg-warm-50 text-mn-mute hover:bg-mn-surface hover:text-mn-herzrot',
+                  : 'bg-mn-surface text-mn-mute hover:bg-mn-surface hover:text-mn-herzrot',
               )}
             >
               <ThumbsDown className="w-4 h-4" />
@@ -883,7 +883,7 @@ export default function PostDetailPage() {
                 if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
                 setShowContactModal(true)
               }}
-              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-primary-300 hover:bg-mn-amber/5/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-amber/20 hover:bg-mn-amber/5/30 transition-colors text-left"
             >
               <div className="w-10 h-10 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
                 <MessageCircle className="w-5 h-5 text-mn-amber" />
@@ -933,7 +933,7 @@ export default function PostDetailPage() {
             <button
               onClick={() => handleCall('video')}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-primary-300 hover:bg-mn-amber/5/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-amber/20 hover:bg-mn-amber/5/30 transition-colors text-left"
             >
               <div className="w-10 h-10 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
                 {dmLoading
@@ -998,7 +998,7 @@ export default function PostDetailPage() {
               )}
             </div>
             {interactions.length === 0 ? (
-              <div className="text-center py-8 bg-warm-50 rounded-xl border border-warm-200">
+              <div className="text-center py-8 bg-mn-surface rounded-xl border border-white/8">
                 <Users className="w-10 h-10 text-mn-ghost mx-auto mb-2" />
                 <p className="text-sm text-mn-mute">Noch keine Meldungen</p>
                 <p className="text-xs text-mn-mute mt-1">Andere Nutzer können ihr Interesse melden</p>
@@ -1224,10 +1224,10 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
       {/* Comment list */}
       {loading ? (
         <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-6 h-6 border-3 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
         </div>
       ) : comments.length === 0 ? (
-        <div className="text-center py-6 bg-warm-50 rounded-xl border border-warm-200">
+        <div className="text-center py-6 bg-mn-surface rounded-xl border border-white/8">
           <MessageCircle className="w-8 h-8 text-mn-ghost mx-auto mb-2" />
           <p className="text-sm text-mn-mute">Noch keine Kommentare</p>
           <p className="text-xs text-mn-mute mt-0.5">Sei der Erste!</p>
@@ -1257,7 +1257,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
               />
               {/* Replies */}
               {replies(comment.id).length > 0 && (
-                <div className="ml-8 mt-2 space-y-2 border-l-2 border-warm-200 pl-4">
+                <div className="ml-8 mt-2 space-y-2 border-l-2 border-white/8 pl-4">
                   {replies(comment.id).map(reply => (
                     <CommentItem
                       key={reply.id}
@@ -1641,7 +1641,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
         className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-warm-100">
+        <div className="flex items-center justify-between p-5 border-b border-white/8">
           <div>
             <h2 className="text-lg font-bold text-mn-ink">Interesse zeigen</h2>
             <p className="text-sm text-mn-mute mt-0.5 line-clamp-1">
@@ -1650,7 +1650,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-warm-100 text-mn-mute transition-colors"
+            className="p-2 rounded-xl hover:bg-mn-elevated text-mn-mute transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -1672,7 +1672,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
               <button
                 key={qm}
                 onClick={() => setMessage(qm)}
-                className="text-xs bg-warm-50 hover:bg-warm-100 text-mn-ink-soft px-3 py-1.5 rounded-full border border-warm-200 transition-colors"
+                className="text-xs bg-mn-surface hover:bg-mn-elevated text-mn-ink-soft px-3 py-1.5 rounded-full border border-white/8 transition-colors"
               >
                 {qm}
               </button>
@@ -1731,14 +1731,14 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
         </div>
 
         {showQr && (
-          <div className="flex flex-col items-center gap-3 p-4 bg-warm-50 rounded-xl border border-warm-200">
+          <div className="flex flex-col items-center gap-3 p-4 bg-mn-surface rounded-xl border border-white/8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrSrc}
               alt={`QR-Code für ${title}`}
               width={220}
               height={220}
-              className="rounded-lg bg-mn-elevated p-2 border border-warm-200"
+              className="rounded-lg bg-mn-elevated p-2 border border-white/8"
             />
             <p className="text-xs text-mn-mute text-center leading-relaxed">
               Mit der Handy-Kamera scannen, um diesen Beitrag zu öffnen.
@@ -1760,7 +1760,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
             toast.success('Link kopiert!')
             onClose()
           }}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors text-left"
         >
           <Copy className="w-5 h-5 text-mn-mute" />
           <span className="text-sm">Link kopieren</span>
@@ -1772,7 +1772,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => { trackShare('whatsapp'); onClose() }}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
+          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors"
         >
           <MessageCircle className="w-5 h-5 text-mn-leben" />
           <span className="text-sm">WhatsApp teilen</span>
@@ -1782,7 +1782,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
         <a
           href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent('Schau dir diesen Beitrag auf Mensaena an: ' + url)}`}
           onClick={() => { trackShare('email'); onClose() }}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
+          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors"
         >
           <Mail className="w-5 h-5 text-mn-teal-soft" />
           <span className="text-sm">Per E-Mail teilen</span>
@@ -1792,7 +1792,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
         {!showQr && (
           <button
             onClick={() => { setShowQr(true); trackShare('qr') }}
-            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors text-left"
           >
             <svg className="w-5 h-5 text-mn-mute" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM15 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zM3 16a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zM14 14h2m2 0h3m-5 4h3m-3 3h2m-4-7v7" />
@@ -1813,7 +1813,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
               trackShare('native')
               onClose()
             }}
-            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors text-left"
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors text-left"
           >
             <Share2 className="w-5 h-5 text-mn-mute" />
             <span className="text-sm">Teilen</span>
@@ -1865,9 +1865,9 @@ function ReportModal({ postId, currentUserId, onClose }: {
         className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-5 border-b border-warm-100">
+        <div className="flex items-center justify-between p-5 border-b border-white/8">
           <h2 className="text-lg font-bold text-mn-ink">Beitrag melden</h2>
-          <button onClick={onClose} className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-xl hover:bg-warm-100 text-mn-mute transition-colors">
+          <button onClick={onClose} className="p-3 min-w-11 min-h-11 inline-flex items-center justify-center rounded-xl hover:bg-mn-elevated text-mn-mute transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -1880,8 +1880,8 @@ function ReportModal({ postId, currentUserId, onClose }: {
                 className={cn(
                   'flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors',
                   reason === r
-                    ? 'border-primary-400 bg-mn-amber/5'
-                    : 'border-white/5 hover:bg-warm-50',
+                    ? 'border-mn-amber/30 bg-mn-amber/5'
+                    : 'border-white/5 hover:bg-mn-surface',
                 )}
               >
                 <input
@@ -1890,7 +1890,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
                   value={r}
                   checked={reason === r}
                   onChange={() => setReason(r)}
-                  className="accent-primary-600"
+                  className="accent-mn-amber"
                 />
                 <span className="text-sm text-mn-ink-soft">{r}</span>
               </label>
@@ -1908,7 +1908,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-warm-50 transition-colors"
+              className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-mn-surface transition-colors"
             >
               Abbrechen
             </button>
@@ -1952,7 +1952,7 @@ function DeleteConfirmModal({ onConfirm, onCancel }: {
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-warm-50 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-mn-surface transition-colors"
           >
             Abbrechen
           </button>
@@ -1978,7 +1978,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
   const router = useRouter()
 
   return (
-    <div className="flex items-start gap-3 p-4 bg-mn-elevated border border-warm-200 rounded-xl">
+    <div className="flex items-start gap-3 p-4 bg-mn-elevated border border-white/8 rounded-xl">
       {/* Avatar */}
       <Link href={`/dashboard/profile/${interaction.helper_id}`} className="flex-shrink-0">
         <div className="w-12 h-12 rounded-full bg-mn-amber/10 flex items-center justify-center overflow-hidden">
@@ -2000,7 +2000,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
           </Link>
           {/* Trust badge */}
           {interaction.profiles?.trust_score != null && (
-            <span className="text-xs bg-warm-100 text-mn-ink-soft px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-mn-elevated text-mn-ink-soft px-2 py-0.5 rounded-full">
               Vertrauen: {interaction.profiles.trust_score}
             </span>
           )}
@@ -2042,7 +2042,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
                     <button
                       key={r}
                       onClick={() => { onDecline(r); setShowDeclineMenu(false) }}
-                      className="w-full text-left px-4 py-2 text-xs hover:bg-warm-50 transition-colors"
+                      className="w-full text-left px-4 py-2 text-xs hover:bg-mn-surface transition-colors"
                     >
                       {r}
                     </button>

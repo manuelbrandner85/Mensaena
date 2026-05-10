@@ -94,8 +94,8 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       value: stats?.total_users ?? 0,
       sub: `${stats?.active_users_30d ?? 0} aktiv (30d)`,
       icon: Users,
-      gradient: 'from-mn-teal to-cyan-500',
-      bg: 'from-mn-teal to-cyan-50',
+      gradient: 'from-mn-teal to-mn-teal-soft/8',
+      bg: 'from-mn-teal to-mn-teal-soft/8',
     },
     {
       label: 'Neue Nutzer (7d)',
@@ -110,24 +110,24 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       value: stats?.active_groups ?? 0,
       sub: `von ${stats?.total_groups ?? 0} gesamt`,
       icon: UsersRound,
-      gradient: 'from-primary-500 to-teal-500',
-      bg: 'from-primary-50 to-teal-50',
+      gradient: 'from-primary-500 to-mn-teal-soft/8',
+      bg: 'from-mn-amber/8 to-mn-teal-soft/8',
     },
     {
       label: 'Aktive Challenges',
       value: stats?.active_challenges ?? 0,
       sub: `von ${stats?.total_challenges ?? 0} gesamt`,
       icon: Target,
-      gradient: 'from-violet-500 to-mn-amber-warm',
-      bg: 'from-violet-50 to-mn-amber-warm',
+      gradient: 'from-mn-amber/8 to-mn-amber-warm',
+      bg: 'from-mn-amber/8 to-mn-amber-warm',
     },
     {
       label: 'Zeitbank-Stunden',
       value: `${Number(stats?.total_timebank_hours ?? 0).toFixed(0)}h`,
       sub: `${stats?.total_timebank_entries ?? 0} Einträge`,
       icon: Clock,
-      gradient: 'from-amber-500 to-orange-500',
-      bg: 'from-amber-50 to-orange-50',
+      gradient: 'from-mn-amber/12 to-orange-500',
+      bg: 'from-mn-amber/12 to-orange-50',
     },
   ]
 
@@ -197,7 +197,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
           <div className="divide-y divide-stone-100">
             {loadingActivities ? (
               <div className="p-8 text-center">
-                <div className="w-6 h-6 border-2 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto" />
+                <div className="w-6 h-6 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto" />
               </div>
             ) : activities.length === 0 ? (
               <div className="p-8 text-center text-sm text-mn-mute">

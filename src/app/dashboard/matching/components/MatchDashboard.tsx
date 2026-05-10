@@ -34,7 +34,7 @@ const cards = [
     icon: CheckCircle2,
     color: 'text-mn-amber',
     bg: 'bg-mn-amber/5',
-    border: 'border-primary-100',
+    border: 'border-white/8',
   },
   {
     key: 'completed' as const,

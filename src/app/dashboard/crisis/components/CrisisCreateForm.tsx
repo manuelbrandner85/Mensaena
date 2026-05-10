@@ -305,7 +305,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs border transition-all',
                         selectedResources.includes(r)
-                          ? 'bg-mn-amber/10 border-primary-300 text-mn-amber'
+                          ? 'bg-mn-amber/10 border-mn-amber/20 text-mn-amber'
                           : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
                       )}
                     >

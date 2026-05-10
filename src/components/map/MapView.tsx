@@ -20,9 +20,9 @@ type AnyPost = Record<string, any>
 const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
   loading: () => (
-    <div className="flex-1 bg-warm-50 rounded-2xl md:rounded-2xl flex items-center justify-center min-h-[400px]">
+    <div className="flex-1 bg-mn-surface rounded-2xl md:rounded-2xl flex items-center justify-center min-h-[400px]">
       <div className="text-center">
-        <div className="w-12 h-12 border-3 border-primary-300 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-12 h-12 border-3 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
         <p className="text-sm text-mn-mute">Karte wird geladen…</p>
       </div>
     </div>
@@ -230,14 +230,14 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all touch-target',
               showFilters
-                ? 'bg-mn-amber/10 text-mn-amber border-primary-300'
-                : 'bg-mn-elevated text-mn-ink-soft border-warm-200 hover:bg-warm-50'
+                ? 'bg-mn-amber/10 text-mn-amber border-mn-amber/20'
+                : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:bg-mn-surface'
             )}
           >
             <Filter className="w-4 h-4" />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-elevated text-mn-ink-soft border border-warm-200 hover:bg-warm-50 transition-all touch-target">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-elevated text-mn-ink-soft border border-white/8 hover:bg-mn-surface transition-all touch-target">
             <Locate className="w-4 h-4" />
             Mein Standort
           </button>
@@ -246,7 +246,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
 
       {/* Desktop Filters */}
       {showFilters && (
-        <div className="hidden md:flex flex-wrap gap-2 p-4 bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft animate-slide-up">
+        <div className="hidden md:flex flex-wrap gap-2 p-4 bg-mn-elevated rounded-2xl border border-white/8 shadow-soft animate-slide-up">
           {filterTypes.map((f) => {
             const active = activeFilter === f.key
             return (
@@ -255,7 +255,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
                 onClick={() => setActiveFilter(f.key)}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all touch-target',
-                  active ? 'text-white shadow-soft' : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-warm-50',
+                  active ? 'text-white shadow-soft' : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
                 )}
                 style={active ? { background: f.color, borderColor: f.color } : undefined}
               >
@@ -289,7 +289,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
       <div className="flex gap-4 flex-1 min-h-0 md:min-h-[520px]">
         {/* Map */}
         <div className={cn(
-          'flex-1 min-h-0 overflow-hidden border border-warm-100 shadow-card relative',
+          'flex-1 min-h-0 overflow-hidden border border-white/8 shadow-card relative',
           'rounded-2xl',
           selectedPost ? 'lg:flex-[2]' : 'flex-1'
         )}>

@@ -16,7 +16,7 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
         aria-hidden="true"
       />
       <div className="relative text-center">
-        <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
         <p className="text-mn-mute text-sm">Karte wird geladen…</p>
       </div>
     </div>
@@ -151,14 +151,14 @@ export default function MapPage() {
             step={5}
             value={radiusKm}
             onChange={e => setRadiusKm(Number(e.target.value))}
-            className="relative flex-1 accent-primary-600"
+            className="relative flex-1 accent-mn-amber"
             aria-label="Radius in Kilometern"
           />
           <span className="relative display-numeral text-sm font-bold text-mn-amber tabular-nums min-w-[60px] text-right">
             {radiusKm} km
           </span>
           {loading && (
-            <div className="relative w-4 h-4 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+            <div className="relative w-4 h-4 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
           )}
           <span className="relative display-numeral text-[11px] text-mn-mute whitespace-nowrap hidden sm:inline tabular-nums">
             · {posts.length} Beiträge
@@ -166,9 +166,9 @@ export default function MapPage() {
         </div>
       )}
       {!initReady ? (
-        <div className="flex-1 flex items-center justify-center bg-warm-50 rounded-2xl">
+        <div className="flex-1 flex items-center justify-center bg-mn-surface rounded-2xl">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-primary-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <div className="w-10 h-10 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <p className="text-mn-mute text-sm">Standort wird geladen…</p>
           </div>
         </div>

@@ -1081,7 +1081,7 @@ export default function MensaenaBot() {
                 : undefined
           }
           className={cn(
-            'fixed z-30 bg-mn-elevated shadow-2xl border border-warm-200 flex flex-col overflow-hidden transition-all duration-300 rounded-2xl',
+            'fixed z-30 bg-mn-elevated shadow-2xl border border-white/8 flex flex-col overflow-hidden transition-all duration-300 rounded-2xl',
             // Mobile: Bottom-Sheet, max 75dvh + Cap bei 600px (Querformat)
             !minimized && 'left-2 right-2 top-auto h-[75dvh] max-h-[600px]',
             // Tablet (sm+): schmaler + rechtsbündig statt stretched
@@ -1239,7 +1239,7 @@ export default function MensaenaBot() {
                             'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
                             msg.role === 'user'
                               ? 'bg-mn-amber text-white rounded-br-sm'
-                              : 'bg-warm-100 text-mn-ink rounded-bl-sm',
+                              : 'bg-mn-elevated text-mn-ink rounded-bl-sm',
                           )}
                         >
                           {msg.content.length === 0 && msg.role === 'assistant' ? (
@@ -1311,7 +1311,7 @@ export default function MensaenaBot() {
                     <button
                       key={p}
                       onClick={() => sendMessage(p)}
-                      className="text-[11px] px-2.5 py-1 bg-mn-amber/5 text-mn-amber border border-mn-amber/20 rounded-full hover:bg-mn-amber/10 hover:border-primary-300 transition-all font-medium"
+                      className="text-[11px] px-2.5 py-1 bg-mn-amber/5 text-mn-amber border border-mn-amber/20 rounded-full hover:bg-mn-amber/10 hover:border-mn-amber/20 transition-all font-medium"
                     >
                       {p}
                     </button>
@@ -1319,7 +1319,7 @@ export default function MensaenaBot() {
                   {/* FIX-V6: Spezial-Quick-Prompt für App-Versions-Check (lokal, kein API-Call) */}
                   <button
                     onClick={handleVersionCheck}
-                    className="text-[11px] px-2.5 py-1 bg-warm-50 text-mn-ink-soft border border-warm-200 rounded-full hover:bg-warm-100 transition-all font-medium"
+                    className="text-[11px] px-2.5 py-1 bg-mn-surface text-mn-ink-soft border border-white/8 rounded-full hover:bg-mn-elevated transition-all font-medium"
                   >
                     {locale === 'en' ? '🔄 Is the app up to date?' : locale === 'it' ? '🔄 L’app è aggiornata?' : '🔄 Ist die App aktuell?'}
                   </button>
@@ -1329,7 +1329,7 @@ export default function MensaenaBot() {
               {/* Input */}
               <form
                 onSubmit={handleSubmit}
-                className="flex gap-2 items-center px-3 py-3 border-t border-warm-100 bg-mn-elevated flex-shrink-0"
+                className="flex gap-2 items-center px-3 py-3 border-t border-white/8 bg-mn-elevated flex-shrink-0"
               >
                 <button
                   type="button"
@@ -1340,7 +1340,7 @@ export default function MensaenaBot() {
                     'w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0 border',
                     listening
                       ? 'bg-red-500 text-white border-mn-herzrot/20 animate-pulse'
-                      : 'bg-warm-50 text-mn-mute border-warm-200 hover:bg-warm-100 hover:text-mn-amber',
+                      : 'bg-mn-surface text-mn-mute border-white/8 hover:bg-mn-elevated hover:text-mn-amber',
                   )}
                   aria-label="Spracheingabe"
                 >
@@ -1354,7 +1354,7 @@ export default function MensaenaBot() {
                   placeholder={listening ? 'Ich höre zu…' : 'Frage stellen…'}
                   disabled={loading}
                   maxLength={1000}
-                  className="flex-1 text-sm px-3 py-2.5 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-warm-50 disabled:opacity-50 transition-shadow"
+                  className="flex-1 text-sm px-3 py-2.5 border border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-surface disabled:opacity-50 transition-shadow"
                   autoComplete="off"
                 />
                 <button

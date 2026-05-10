@@ -91,7 +91,7 @@ export default function TrustScoreDetail({ data, className }: TrustScoreDetailPr
       </div>
 
       {/* Level + Progress to next level */}
-      <div className="border-t border-warm-100 pt-4">
+      <div className="border-t border-white/8 pt-4">
         <div className="flex items-center justify-between mb-2">
           <span className={cn('inline-flex items-center gap-1 text-sm font-semibold', levelInfo.color)}>
             <span>{levelInfo.icon}</span> Level {data.level}: {levelInfo.name}

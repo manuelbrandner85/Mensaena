@@ -72,16 +72,16 @@ const catEmoji: Record<string, string> = {
 
 // Category → gradient background for image placeholder
 const catGradient: Record<string, string> = {
-  moebel:     'from-amber-50 via-orange-50 to-rose-50',
+  moebel:     'from-mn-amber/12 via-mn-amber-warm/4 to-rose-50',
   elektronik: 'from-sky-50 via-blue-50 to-indigo-50',
-  kleidung:   'from-pink-50 via-rose-50 to-fuchsia-50',
-  sport:      'from-lime-50 via-primary-50 to-teal-50',
-  garten:     'from-mn-leben via-primary-50 to-teal-50',
-  kinder:     'from-yellow-50 via-amber-50 to-orange-50',
-  haushalt:   'from-stone-50 via-warm-50 to-amber-50',
-  buecher:    'from-violet-50 via-purple-50 to-indigo-50',
+  kleidung:   'from-pink-50 via-mn-herzrot/4 to-fuchsia-50',
+  sport:      'from-lime-50 via-mn-amber/4 to-mn-teal-soft/8',
+  garten:     'from-mn-leben via-mn-amber/4 to-mn-teal-soft/8',
+  kinder:     'from-mn-amber/12 via-mn-amber/4 to-orange-50',
+  haushalt:   'from-stone-50 via-warm-50 to-mn-amber-warm/8',
+  buecher:    'from-mn-amber/8 via-purple-50 to-indigo-50',
   handwerk:   'from-slate-50 via-stone-50 to-stone-50',
-  sonstiges:  'from-orange-50 via-amber-50 to-yellow-50',
+  sonstiges:  'from-mn-amber-warm/12 via-mn-amber/4 to-yellow-50',
 }
 
 // ── Listing Card ────────────────────────────────────────────────
@@ -122,7 +122,7 @@ function ListingCard({
     )}>
       {/* Top accent line */}
       {!isClaimed && (
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-400 via-amber-500 to-orange-400 z-10" />
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-mn-amber-warm/12 via-mn-amber/4 to-orange-400 z-10" />
       )}
 
       {/* Image / Placeholder area */}
@@ -352,7 +352,7 @@ export default function MarketplacePage() {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="flex items-start gap-4">
               <div
-                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-100 to-amber-50 border border-white/8/60 flex items-center justify-center flex-shrink-0 float-idle"
+                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-mn-amber-warm/12 to-mn-amber-warm/8 border border-white/8/60 flex items-center justify-center flex-shrink-0 float-idle"
                 style={{ boxShadow: '0 8px 24px -8px rgba(251,146,60,0.35)' }}
               >
                 <ShoppingBag className="w-6 h-6 text-mn-amber-warm" />
@@ -389,7 +389,7 @@ export default function MarketplacePage() {
               )}
             </div>
           </div>
-          <div className="mt-6 h-px bg-gradient-to-r from-orange-300/60 via-stone-200 to-transparent" />
+          <div className="mt-6 h-px bg-gradient-to-r from-mn-amber-warm/12/60 via-stone-200 to-transparent" />
         </div>
       </header>
 
@@ -416,7 +416,7 @@ export default function MarketplacePage() {
           </select>
           <button
             onClick={() => router.push('/dashboard/marketplace/create')}
-            className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-cinema-card hover:shadow-cinema-card transition-all active:scale-[0.98] flex-shrink-0"
+            className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 text-white rounded-xl text-sm font-semibold shadow-cinema-card hover:shadow-cinema-card transition-all active:scale-[0.98] flex-shrink-0"
             style={{ boxShadow: '0 4px 16px -4px rgba(251,146,60,0.45)' }}
           >
             <Plus className="w-4 h-4" /> Anzeige erstellen
@@ -439,7 +439,7 @@ export default function MarketplacePage() {
           action={
             <button
               onClick={() => router.push('/dashboard/marketplace/create')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl text-sm font-semibold shadow-cinema-card hover:shadow-cinema-card transition-all active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 text-white rounded-xl text-sm font-semibold shadow-cinema-card hover:shadow-cinema-card transition-all active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" /> Erste Anzeige erstellen
             </button>

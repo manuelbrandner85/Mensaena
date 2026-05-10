@@ -36,14 +36,14 @@ interface Group {
 const GROUP_CATEGORIES = [
   { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-mn-teal to-mn-teal-soft',     accent: '#3B82F6' },
   { value: 'hobby',         label: 'Hobby & Freizeit',         emoji: '🎨', color: 'from-pink-400 to-rose-500',     accent: '#EC4899' },
-  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-orange-400 to-orange-600', accent: '#F97316' },
-  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-yellow-400 to-amber-500',  accent: '#F59E0B' },
+  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-mn-amber-warm/12 to-orange-600', accent: '#F97316' },
+  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-mn-amber/12 to-mn-amber-warm/8',  accent: '#F59E0B' },
   { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-amber to-mn-amber-warm', accent: '#8B5CF6' },
   { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit',  emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
   { value: 'bildung',       label: 'Bildung & Lernen',         emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
-  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-amber-400 to-yellow-600',  accent: '#D97706' },
+  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-mn-amber/12 to-yellow-600',  accent: '#D97706' },
   { value: 'handwerk',      label: 'Handwerk & DIY',           emoji: '🔧', color: 'from-slate-400 to-slate-600',   accent: '#64748B' },
-  { value: 'sonstiges',     label: 'Sonstiges',                emoji: '💬', color: 'from-primary-400 to-teal-600',  accent: '#1EAAA6' },
+  { value: 'sonstiges',     label: 'Sonstiges',                emoji: '💬', color: 'from-primary-400 to-mn-teal-soft/8',  accent: '#1EAAA6' },
 ]
 
 function getCatConfig(category: string) {
@@ -166,7 +166,7 @@ function GroupCard({
           <div className="flex gap-2">
             <Link
               href={`/dashboard/groups/${group.id}`}
-              className="shine flex-1 text-center py-2 bg-mn-amber/5 text-mn-amber rounded-xl text-xs font-semibold hover:bg-mn-amber/10 transition-all border border-primary-100"
+              className="shine flex-1 text-center py-2 bg-mn-amber/5 text-mn-amber rounded-xl text-xs font-semibold hover:bg-mn-amber/10 transition-all border border-white/8"
             >
               Öffnen →
             </Link>
@@ -321,7 +321,7 @@ export default function GroupsPage() {
           <div className="meta-label meta-label--subtle mb-4">§ 04 / Gemeinschaft</div>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+              <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
                 <Users className="w-6 h-6 text-mn-amber" />
               </div>
               <div>
@@ -462,7 +462,7 @@ export default function GroupsPage() {
             ) : (
               <button
                 onClick={() => router.push('/dashboard/groups/create')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-teal-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-mn-teal-soft/8 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all"
               >
                 <Plus className="w-4 h-4" /> Erste Gruppe erstellen
               </button>

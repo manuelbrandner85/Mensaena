@@ -203,9 +203,9 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                   }}
                   className={cn(
                     'rounded-2xl border p-5 text-left transition-all duration-200',
-                    'hover:scale-[1.02] hover:shadow-lg hover:border-primary-300',
+                    'hover:scale-[1.02] hover:shadow-lg hover:border-mn-amber/20',
                     selected?.title === opt.title
-                      ? 'bg-mn-amber/5 border-primary-400 ring-2 ring-primary-200'
+                      ? 'bg-mn-amber/5 border-mn-amber/30 ring-2 ring-primary-200'
                       : 'bg-mn-elevated border-white/5'
                   )}
                 >
@@ -329,7 +329,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               ) : (
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-3 text-sm text-mn-ink-soft border-2 border-dashed border-white/8 rounded-xl hover:bg-mn-surface hover:border-primary-300 transition w-full justify-center"
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-mn-ink-soft border-2 border-dashed border-white/8 rounded-xl hover:bg-mn-surface hover:border-mn-amber/20 transition w-full justify-center"
                 >
                   <ImagePlus className="w-5 h-5 text-mn-mute" />
                   Foto hinzufügen (optional, max. 10 MB)
@@ -370,7 +370,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               className={cn(
                 'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none mb-5',
                 acceptedNoTrade
-                  ? 'bg-mn-amber/5 border-primary-300'
+                  ? 'bg-mn-amber/5 border-mn-amber/20'
                   : 'bg-amber-50 border-amber-300'
               )}
             >

@@ -311,7 +311,7 @@ export default function InvitePage() {
             placeholder="z.B. Komm, wir helfen uns gegenseitig in der Gartenstraße!"
             maxLength={120}
             rows={2}
-            className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 placeholder:text-mn-mute"
+            className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/20 placeholder:text-mn-mute"
           />
           <p className="text-xs text-mn-mute mt-1 text-right">{personalMsg.length}/120</p>
         </div>
@@ -325,7 +325,7 @@ export default function InvitePage() {
               'flex-shrink-0 p-1.5 rounded-lg transition-all',
               copied
                 ? 'bg-mn-elevated text-mn-leben'
-                : 'bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-amber hover:border-primary-300',
+                : 'bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-amber hover:border-mn-amber/20',
             )}
             aria-label="Link kopieren"
           >

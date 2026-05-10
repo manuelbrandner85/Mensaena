@@ -95,7 +95,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-warm-100">
+        <div className="flex items-center justify-between p-5 border-b border-white/8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden flex-shrink-0">
               {currentRating.partnerAvatar ? (
@@ -117,14 +117,14 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           </div>
           <button
             onClick={closeRatingModal}
-            className="p-2 rounded-xl hover:bg-warm-100 text-ink-500 transition-colors"
+            className="p-2 rounded-xl hover:bg-mn-elevated text-ink-500 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-2 px-5 py-3 bg-warm-50">
+        <div className="flex items-center gap-2 px-5 py-3 bg-mn-surface">
           {steps.map((label, i) => (
             <div key={label} className="flex items-center gap-2 flex-1">
               <div className={cn(
@@ -184,8 +184,8 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
                         categories.includes(cat.value as RatingCategory)
-                          ? 'bg-primary-100 text-primary-700 border-primary-300'
-                          : 'bg-white text-ink-600 border-stone-200 hover:bg-warm-50',
+                          ? 'bg-primary-100 text-primary-700 border-mn-amber/20'
+                          : 'bg-white text-ink-600 border-stone-200 hover:bg-mn-surface',
                       )}
                     >
                       <span>{cat.emoji}</span>
@@ -270,7 +270,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-5 border-t border-warm-100 bg-warm-50">
+        <div className="flex items-center justify-between p-5 border-t border-white/8 bg-mn-surface">
           <button
             type="button"
             onClick={() => step > 0 ? setStep(step - 1) : closeRatingModal()}

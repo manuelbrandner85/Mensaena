@@ -44,10 +44,10 @@ function dailyWhisper(): string {
 type TimeOfDay = 'morning' | 'day' | 'evening' | 'night'
 
 const TOD_AMBIENT: Record<TimeOfDay, string> = {
-  morning: 'from-amber-200/30 via-primary-100/20 to-transparent',
-  day: 'from-primary-200/25 via-primary-100/15 to-transparent',
-  evening: 'from-orange-200/25 via-primary-100/15 to-transparent',
-  night: 'from-indigo-300/25 via-primary-100/10 to-transparent',
+  morning: 'from-mn-amber/12/30 via-mn-amber/5/20 to-transparent',
+  day: 'from-mn-amber/15/25 via-mn-amber/5/15 to-transparent',
+  evening: 'from-mn-amber-warm/12/25 via-mn-amber/5/15 to-transparent',
+  night: 'from-indigo-300/25 via-mn-amber/5/10 to-transparent',
 }
 
 export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {

@@ -72,7 +72,7 @@ export default function NotificationsPage() {
       <header className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-50 border border-mn-amber/20/60 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-mn-amber/10 to-primary-50 border border-mn-amber/20/60 flex items-center justify-center flex-shrink-0 shadow-sm">
               <Bell className="w-5.5 h-5.5 text-mn-amber" />
             </div>
             <div>

@@ -64,7 +64,7 @@ export default function QuickReactions({
           onClick={() => handleReact(emoji)}
           className={`flex items-center gap-0.5 rounded-full border transition-all ${
             myReaction === emoji
-              ? 'bg-mn-amber/5 border-primary-300 text-mn-amber'
+              ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber'
               : 'bg-mn-surface border-white/5 text-mn-ink-soft hover:bg-mn-elevated/5'
           } ${isSmall ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-1 text-sm'}`}
         >
@@ -76,7 +76,7 @@ export default function QuickReactions({
       {/* Add-Button */}
       <button
         onClick={() => setShowPicker(p => !p)}
-        className={`rounded-full border border-dashed border-stone-300 text-mn-mute hover:border-primary-300 hover:text-mn-amber transition-all ${
+        className={`rounded-full border border-dashed border-stone-300 text-mn-mute hover:border-mn-amber/20 hover:text-mn-amber transition-all ${
           isSmall ? 'w-6 h-6 text-xs' : 'w-8 h-8 text-sm'
         } flex items-center justify-center`}
       >

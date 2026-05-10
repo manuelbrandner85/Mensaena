@@ -89,7 +89,7 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
           {/* Avatar */}
           <div className="relative flex-shrink-0">
             <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-mn-elevated p-1.5 shadow-glow-teal ring-2 ring-primary-100">
-              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center">
+              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-mn-amber/10 to-primary-50 flex items-center justify-center">
                 {profile.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

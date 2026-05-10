@@ -144,7 +144,7 @@ export default function EventsPage() {
       {/* Refresh indicator */}
       {events.refreshing && (
         <div className="flex items-center justify-center py-2 mb-3">
-          <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
           <span className="ml-2 text-sm text-mn-mute">Aktualisiere...</span>
         </div>
       )}

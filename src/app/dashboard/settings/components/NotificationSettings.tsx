@@ -286,7 +286,7 @@ export default function NotificationSettings({ settings, userId, onSave, saving,
             max={150}
             value={local.notification_radius_km}
             onChange={e => update('notification_radius_km', parseInt(e.target.value))}
-            className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-primary-600"
+            className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-mn-amber"
           />
           <div className="flex justify-between text-xs text-mn-mute mt-1">
             <span>1 km</span>

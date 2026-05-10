@@ -93,7 +93,7 @@ function LatestGuidesWidget() {
 
       {/* Neueste Guides */}
       {guides.length > 0 ? (
-        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-amber/8 via-mn-amber/4/80 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -103,7 +103,7 @@ function LatestGuidesWidget() {
           <div className="relative space-y-1.5">
             {guides.map(g => (
               <Link key={g.id} href={`/dashboard/posts/${g.id}`}
-                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-mn-amber/5 transition-all border border-primary-100 group shadow-cinema-card">
+                className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-mn-amber/5 transition-all border border-white/8 group shadow-cinema-card">
                 <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{catEmoji[g.category] ?? '📄'}</span>
                 <p className="text-xs font-medium text-mn-ink truncate group-hover:text-mn-amber flex-1">{g.title}</p>
               </Link>
@@ -111,7 +111,7 @@ function LatestGuidesWidget() {
           </div>
         </div>
       ) : (
-        <div className="relative text-center py-8 bg-gradient-to-br from-primary-50 to-cyan-50 border border-mn-amber/20 rounded-2xl space-y-2 shadow-cinema-card overflow-hidden">
+        <div className="relative text-center py-8 bg-gradient-to-br from-mn-amber/8 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl space-y-2 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -148,12 +148,12 @@ export default function KnowledgePage() {
       moduleKey="knowledge"
       sectionLabel="§ 19 / Bildung & Wissen"
       mood="scholarly"
-      iconBgClass="bg-mn-amber/5 border-primary-100"
+      iconBgClass="bg-mn-amber/5 border-white/8"
       iconColorClass="text-mn-amber"
       title="Bildung & Wissen"
       description="Guides, Tutorials, Naturwissen, Selbstversorgung – Wissen teilen und lernen"
       icon={<BookOpen className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-primary-500 to-teal-600"
+      color="bg-gradient-to-r from-primary-500 to-mn-teal-soft/8"
       postTypes={['community', 'sharing', 'rescue']}
       moduleFilter={[
         { type: 'community', categories: ['knowledge', 'skills', 'general', 'mental'] },

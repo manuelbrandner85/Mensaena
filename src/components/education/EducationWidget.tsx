@@ -336,7 +336,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-medium text-mn-amber hover:bg-mn-amber/5 border border-primary-100 transition-colors"
+                  className="flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-medium text-mn-amber hover:bg-mn-amber/5 border border-white/8 transition-colors"
                 >
                   Alle {total.toLocaleString('de-DE')} Angebote auf arbeitsagentur.de
                   <ExternalLink className="w-3 h-3" />

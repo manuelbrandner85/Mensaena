@@ -37,9 +37,9 @@ export default function Divider({
         className={cn('flex items-center gap-3', spacingStyles[spacing], className)}
         role="separator"
       >
-        <div className="flex-1 border-t border-warm-200" />
+        <div className="flex-1 border-t border-white/8" />
         <span className="text-xs font-medium text-mn-mute flex-shrink-0">{label}</span>
-        <div className="flex-1 border-t border-warm-200" />
+        <div className="flex-1 border-t border-white/8" />
       </div>
     )
   }

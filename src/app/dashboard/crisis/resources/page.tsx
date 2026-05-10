@@ -118,7 +118,7 @@ export default function CrisisResourcesPage() {
         </Link>
 
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-primary-200">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-mn-teal-soft/8 flex items-center justify-center shadow-lg shadow-primary-200">
             <Heart className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -179,7 +179,7 @@ export default function CrisisResourcesPage() {
       </div>
 
       {/* Mensaena community link */}
-      <div className="bg-gradient-to-r from-primary-50 to-teal-50 border border-mn-amber/20 rounded-2xl p-6 text-center">
+      <div className="bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-6 text-center">
         <Users className="w-8 h-8 text-mn-amber mx-auto mb-3" />
         <h3 className="text-base font-bold text-primary-800 mb-1">Mensaena Community</h3>
         <p className="text-sm text-mn-amber mb-4">

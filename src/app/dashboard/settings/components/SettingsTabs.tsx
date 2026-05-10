@@ -74,7 +74,7 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                     'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left mb-0.5',
                     'min-h-[44px]',
                     active
-                      ? 'bg-gradient-to-r from-primary-50 to-primary-50/50 text-mn-amber shadow-cinema-card ring-1 ring-primary-100'
+                      ? 'bg-gradient-to-r from-mn-amber/8 to-primary-50/50 text-mn-amber shadow-cinema-card ring-1 ring-primary-100'
                       : 'text-mn-ink-soft hover:bg-mn-surface hover:text-mn-ink',
                   )}
                 >

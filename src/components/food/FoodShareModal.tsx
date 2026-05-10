@@ -153,7 +153,7 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
                     'px-3 py-2 rounded-xl text-xs font-semibold transition-all border',
                     !customAmount && amount === opt
                       ? 'bg-mn-amber text-white border-primary-600 shadow-soft'
-                      : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300',
+                      : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
                   )}
                 >
                   {opt}
@@ -216,7 +216,7 @@ export default function FoodShareModal({ product, onShareToMensaena, onClose }: 
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-mn-amber/30 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
               >
                 <Camera className="w-4 h-4" />
                 Foto aufnehmen oder auswählen

@@ -160,7 +160,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-primary-400 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-mn-amber/30 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
               >
                 <Camera className="w-4 h-4" />
                 Foto aufnehmen

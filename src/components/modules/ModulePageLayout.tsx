@@ -21,7 +21,7 @@ export default function ModulePageLayout({
   features,
   createHref,
   createLabel = 'Neuen Eintrag erstellen',
-  accentColor = 'bg-mn-amber/5 text-mn-amber border border-primary-100',
+  accentColor = 'bg-mn-amber/5 text-mn-amber border border-white/8',
   index = '§',
 }: ModulePageProps) {
   return (

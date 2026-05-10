@@ -340,7 +340,7 @@ export default function HistoricalGallery({
 
   return (
     <div className={`relative bg-mn-elevated dark:bg-stone-900 border border-white/5 dark:border-stone-700 rounded-2xl shadow-soft overflow-hidden ${className ?? ''}`}>
-      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 via-amber-400 to-amber-200" />
+      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-mn-amber/12 via-mn-amber/4 to-mn-amber-warm/8" />
 
       <div className="p-4 space-y-3">
         {/* Header */}

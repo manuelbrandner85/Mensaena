@@ -48,7 +48,7 @@ export default function MarketplaceReservation({
     if (!currentUserId) return null
     if (reservedFor && !reservedByMe) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-800 rounded-full shadow-soft">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-gradient-to-r from-mn-amber/12 to-orange-50 border border-amber-200 text-amber-800 rounded-full shadow-soft">
           <Bookmark className="w-3 h-3" /> Reserviert
         </span>
       )
@@ -59,7 +59,7 @@ export default function MarketplaceReservation({
           type="button"
           disabled={busy}
           onClick={() => { update({ reserved_for: null }); toast.success('Reservierung zurückgezogen') }}
-          className="shine inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-300 text-amber-900 rounded-full hover:from-amber-200 hover:to-orange-200 transition-all shadow-soft hover:shadow-card"
+          className="shine inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-gradient-to-r from-mn-amber/12 to-orange-100 border border-amber-300 text-amber-900 rounded-full hover:from-mn-amber/12 hover:to-orange-200 transition-all shadow-soft hover:shadow-card"
         >
           {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />} Zurückziehen
         </button>
@@ -81,7 +81,7 @@ export default function MarketplaceReservation({
   if (!reservedFor) return null
   return (
     <div className="flex items-center gap-1.5">
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-800 rounded-full shadow-soft">
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-gradient-to-r from-mn-amber/12 to-orange-50 border border-amber-200 text-amber-800 rounded-full shadow-soft">
         <Bookmark className="w-3 h-3" /> Reserviert
       </span>
       <button

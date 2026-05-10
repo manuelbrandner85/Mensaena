@@ -141,7 +141,7 @@ export default function BookCard({ book, variant, action, className }: BookCardP
             {book.subjects.slice(0, 3).map((s) => (
               <span
                 key={s}
-                className="text-xs px-2 py-0.5 rounded-full bg-mn-amber/5 text-mn-amber border border-primary-100 font-medium"
+                className="text-xs px-2 py-0.5 rounded-full bg-mn-amber/5 text-mn-amber border border-white/8 font-medium"
               >
                 {s}
               </span>

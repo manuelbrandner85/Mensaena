@@ -987,7 +987,7 @@ function InnerRoom({ onClose, localAvatarUrl, viewerMode = false, roomName = '',
             min="0" max="2" step="0.05"
             value={volume}
             onChange={(e) => setVolume(parseFloat(e.target.value))}
-            className="w-full accent-primary-500"
+            className="w-full accent-mn-amber"
           />
           <p className="text-[10px] text-white/30 mt-1">Über 100%: Verstärkung via Web Audio</p>
         </div>

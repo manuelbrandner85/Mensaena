@@ -236,7 +236,7 @@ function ArticleCard({
   onVote?: (e: React.MouseEvent) => void
 }) {
   return (
-    <button onClick={onClick} className="spotlight hover-lift relative bg-mn-elevated rounded-2xl border border-warm-200 p-4 pt-5 shadow-cinema-card hover:shadow-cinema-card transition-all text-left w-full group overflow-hidden">
+    <button onClick={onClick} className="spotlight hover-lift relative bg-mn-elevated rounded-2xl border border-white/8 p-4 pt-5 shadow-cinema-card hover:shadow-cinema-card transition-all text-left w-full group overflow-hidden">
       {/* Top accent line */}
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
@@ -430,7 +430,7 @@ export default function WikiPage() {
         })()}
 
         {/* Search & Filter */}
-        <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
+        <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
@@ -455,7 +455,7 @@ export default function WikiPage() {
           {WIKI_CATEGORIES.filter(c => (catCounts[c.value] ?? 0) > 0).map(c => (
             <button key={c.value} onClick={() => setFilterCat(filterCat === c.value ? 'all' : c.value)}
               className={cn('px-3 py-1 rounded-full text-xs font-medium transition-all border',
-                filterCat === c.value ? 'bg-mn-elevated border-white/5 text-mn-teal-soft shadow-sm' : 'bg-mn-elevated border-warm-200 text-mn-ink-soft hover:bg-mn-surface')}>
+                filterCat === c.value ? 'bg-mn-elevated border-white/5 text-mn-teal-soft shadow-sm' : 'bg-mn-elevated border-white/8 text-mn-ink-soft hover:bg-mn-surface')}>
               {c.label} ({catCounts[c.value]})
             </button>
           ))}
@@ -464,10 +464,10 @@ export default function WikiPage() {
         {/* Articles */}
         {loading ? (
           <div className="space-y-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-mn-elevated rounded-2xl animate-pulse border border-warm-200" />)}
+            {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-mn-elevated rounded-2xl animate-pulse border border-white/8" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 bg-mn-elevated rounded-2xl border border-warm-200 shadow-sm">
+          <div className="text-center py-16 bg-mn-elevated rounded-2xl border border-white/8 shadow-sm">
             <BookOpen className="w-12 h-12 text-mn-ghost mx-auto mb-3" />
             <p className="text-mn-ink-soft font-bold text-lg">Keine Artikel gefunden</p>
             <p className="text-sm text-mn-mute mt-1 mb-4">Teile dein Wissen mit der Gemeinschaft</p>

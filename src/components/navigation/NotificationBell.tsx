@@ -179,8 +179,8 @@ export default function NotificationBell({ userId }: { userId?: string }) {
       <button
         onClick={handleBellClick}
         className={cn(
-          'relative p-2 rounded-xl text-mn-mute hover:bg-warm-100 hover:text-mn-ink-soft transition-colors',
-          open && 'bg-warm-100 text-mn-ink-soft',
+          'relative p-2 rounded-xl text-mn-mute hover:bg-mn-elevated hover:text-mn-ink-soft transition-colors',
+          open && 'bg-mn-elevated text-mn-ink-soft',
         )}
         title={t('buttonTitle')}
         aria-label={unread > 0 ? t('buttonAriaUnread', { count: unread }) : t('buttonTitle')}
@@ -198,12 +198,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
       {/* ── Desktop Notification Center Dropdown ── */}
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 w-[420px] bg-mn-elevated rounded-2xl shadow-cinema-card-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in"
+          className="absolute right-0 top-full mt-2 w-[420px] bg-mn-elevated rounded-2xl shadow-cinema-card-2xl border border-white/8 z-50 overflow-hidden animate-scale-in"
           role="dialog"
           aria-label={t('center')}
         >
           {/* Header */}
-          <div className="px-4 py-3 border-b border-warm-100">
+          <div className="px-4 py-3 border-b border-white/8">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-mn-ink text-sm">{t('title')}</h3>
@@ -271,7 +271,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           <div className="max-h-[420px] overflow-y-auto">
             {loading && filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
-                <div className="w-6 h-6 border-2 border-mn-amber/20 border-t-primary-500 rounded-full animate-spin mx-auto mb-2" />
+                <div className="w-6 h-6 border-2 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-2" />
                 <p className="text-xs text-mn-mute">{t('loading')}</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
@@ -293,7 +293,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     key={n.id}
                     onClick={() => handleItemClick(n)}
                     className={cn(
-                      'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-mn-elevated/[0.02] transition-colors border-b border-warm-50 last:border-0 group relative',
+                      'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-mn-elevated/[0.02] transition-colors border-b border-white/8 last:border-0 group relative',
                       !n.read && 'bg-mn-amber/5/40',
                     )}
                   >
@@ -361,7 +361,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-2.5 border-t border-warm-100 flex items-center justify-between bg-mn-surface/50">
+          <div className="px-4 py-2.5 border-t border-white/8 flex items-center justify-between bg-mn-surface/50">
             <Link
               href="/dashboard/notifications"
               onClick={() => setOpen(false)}

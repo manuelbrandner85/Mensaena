@@ -94,7 +94,7 @@ function WhyThisMatch({ breakdown, distanceKm }: { breakdown: ScoreBreakdown; di
   if (reasons.length === 0) return null
 
   return (
-    <div className="bg-mn-amber/5/60 border border-primary-100 rounded-xl p-3.5">
+    <div className="bg-mn-amber/5/60 border border-white/8 rounded-xl p-3.5">
       <div className="flex items-center gap-1.5 mb-2.5">
         <Sparkles className="w-3.5 h-3.5 text-mn-amber" />
         <span className="text-xs font-semibold text-mn-amber uppercase tracking-wide">Warum dieser Match?</span>
@@ -246,7 +246,7 @@ export default function MatchSuggestionDetail({
             <PostSection
               post={match.offer_post}
               label="Angebot"
-              colorClass="bg-mn-amber/5/50 border-primary-100"
+              colorClass="bg-mn-amber/5/50 border-white/8"
             />
             <PostSection
               post={match.request_post}

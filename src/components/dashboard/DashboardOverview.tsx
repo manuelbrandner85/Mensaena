@@ -103,7 +103,7 @@ export default function DashboardOverview({
                 className={`group flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-cinema-card
                   ${action.highlight
                     ? 'bg-mn-amber border-primary-700 text-white hover:bg-primary-700'
-                    : 'bg-mn-elevated border-warm-100 hover:border-mn-amber/20 hover:bg-mn-amber/5'
+                    : 'bg-mn-elevated border-white/8 hover:border-mn-amber/20 hover:bg-mn-amber/5'
                   }`}
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${action.highlight ? 'bg-mn-elevated/20' : action.color}`}>
@@ -156,7 +156,7 @@ export default function DashboardOverview({
           </div>
 
           {/* Interactions CTA */}
-          <div className="card p-5 bg-gradient-to-br from-primary-50 to-primary-100/50 border-mn-amber/20">
+          <div className="card p-5 bg-gradient-to-br from-mn-amber/8 to-primary-100/50 border-mn-amber/20">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-mn-amber flex items-center justify-center flex-shrink-0">
                 <Handshake className="w-5 h-5 text-white" />

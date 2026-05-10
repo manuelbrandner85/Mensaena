@@ -96,9 +96,9 @@ const TINT_BG: Record<Tint, string> = {
   teal: 'from-primary-500/25 via-primary-400/15 to-transparent',
   mint: 'from-primary-400/25 via-primary-300/15 to-transparent',
   sky: 'from-sky-400/25 via-blue-300/15 to-transparent',
-  sunrise: 'from-amber-400/25 via-orange-300/15 to-transparent',
+  sunrise: 'from-mn-amber/12/25 via-mn-amber-warm/4/15 to-transparent',
   forest: 'from-primary-600/25 via-primary-400/15 to-transparent',
-  violet: 'from-violet-500/25 via-purple-400/15 to-transparent',
+  violet: 'from-mn-amber/8/25 via-purple-400/15 to-transparent',
 }
 
 const TINT_ICON: Record<Tint, string> = {

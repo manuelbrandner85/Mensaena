@@ -122,11 +122,11 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className={cn(
-      'rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-primary-50/60 to-mn-teal-soft/30 overflow-hidden',
+      'rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-mn-amber/8/60 to-mn-teal-soft/30 overflow-hidden',
       className,
     )}>
       {/* Header */}
-      <div className="flex items-center gap-2.5 px-4 py-3 bg-mn-elevated/60 border-b border-primary-100">
+      <div className="flex items-center gap-2.5 px-4 py-3 bg-mn-elevated/60 border-b border-white/8">
         <div className="w-8 h-8 rounded-lg bg-mn-amber flex items-center justify-center flex-shrink-0">
           <BookOpen className="w-4 h-4 text-white" />
         </div>

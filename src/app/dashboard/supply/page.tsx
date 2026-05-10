@@ -24,7 +24,7 @@ const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
   loading: () => (
     <div className="flex items-center justify-center h-[500px] bg-mn-surface rounded-2xl border border-white/5">
       <div className="text-center">
-        <div className="w-10 h-10 border-4 border-mn-amber/20 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
         <p className="text-mn-leben text-sm font-medium">Karte wird geladen…</p>
       </div>
     </div>
@@ -80,7 +80,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
   const categoryIcon  = CATEGORY_ICONS[farm.category] ?? '🏡'
 
   return (
-    <div className="group bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card hover:shadow-cinema-card hover:border-primary-300 transition-all duration-200 overflow-hidden flex flex-col relative">
+    <div className="group bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card hover:shadow-cinema-card hover:border-mn-amber/20 transition-all duration-200 overflow-hidden flex flex-col relative">
       {/* Fav Button */}
       {onToggleFav && (
         <button

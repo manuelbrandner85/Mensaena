@@ -71,7 +71,7 @@ export default function InteractionsPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 06 / Interaktionen</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
               <Handshake className="w-6 h-6 text-mn-amber" />
             </div>
             <div>
@@ -104,7 +104,7 @@ export default function InteractionsPage() {
       </header>
 
       {/* Status-Flow Anzeige */}
-      <div className="relative bg-mn-elevated border border-warm-200 rounded-2xl px-4 pt-4 pb-3 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-mn-elevated border border-white/8 rounded-2xl px-4 pt-4 pb-3 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}

@@ -210,7 +210,7 @@ export default function AddressAutocomplete({
           id={listboxId}
           role="listbox"
           aria-label="Adressvorschläge"
-          className="absolute left-0 right-0 top-full z-50 bg-mn-elevated border border-warm-200 border-t-0 rounded-b-xl shadow-xl max-h-64 overflow-y-auto divide-y divide-warm-100"
+          className="absolute left-0 right-0 top-full z-50 bg-mn-elevated border border-white/8 border-t-0 rounded-b-xl shadow-xl max-h-64 overflow-y-auto divide-y divide-warm-100"
         >
           {results.map((result, idx) => (
             <li
@@ -227,7 +227,7 @@ export default function AddressAutocomplete({
                 'flex items-start gap-2.5 px-3 py-2.5 cursor-pointer transition-colors text-sm',
                 idx === activeIndex
                   ? 'bg-mn-amber/5 text-mn-ink'
-                  : 'text-mn-ink-soft hover:bg-warm-50',
+                  : 'text-mn-ink-soft hover:bg-mn-surface',
               )}
             >
               <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-primary-400" aria-hidden />

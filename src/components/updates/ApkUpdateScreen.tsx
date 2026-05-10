@@ -101,7 +101,7 @@ export default function ApkUpdateScreen({
           <div className="relative w-20 h-20">
             {/* Animierter Ring */}
             <div
-              className="absolute inset-[-6px] rounded-full border-4 border-mn-amber/20 dark:border-primary-800 border-t-primary-500 animate-spin"
+              className="absolute inset-[-6px] rounded-full border-4 border-mn-amber/20 dark:border-primary-800 border-t-mn-amber animate-spin"
               aria-hidden="true"
             />
             <div className="w-20 h-20 rounded-2xl ring-2 ring-primary-200 dark:ring-primary-800 overflow-hidden relative">

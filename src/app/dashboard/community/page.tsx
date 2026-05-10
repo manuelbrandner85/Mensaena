@@ -123,7 +123,7 @@ function CommunityPulseWidget() {
 
       {/* Neueste Community-Themen */}
       {topPosts.length > 0 && (
-        <div className="relative bg-gradient-to-br from-violet-50 to-violet-50/60 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-amber/8 to-violet-50/60 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
@@ -169,7 +169,7 @@ export default function CommunityPage() {
       title="Community & Abstimmung"
       description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
       icon={<Users className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-violet-500 to-mn-amber-warm"
+      color="bg-gradient-to-r from-mn-amber/8 to-mn-amber-warm"
       postTypes={['community']}
       moduleFilter={[
         { type: 'community', categories: ['general', 'everyday', 'knowledge', 'emergency'] },

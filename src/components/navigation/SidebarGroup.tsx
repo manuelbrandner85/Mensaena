@@ -152,7 +152,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                       : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
                     : cn(
                         'text-mn-ink-soft border border-transparent hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
-                        isHighlight && !active && 'bg-mn-amber/5/50 border-primary-100 hover:bg-mn-amber/5',
+                        isHighlight && !active && 'bg-mn-amber/5/50 border-white/8 hover:bg-mn-amber/5',
                       ),
                 )}
               >

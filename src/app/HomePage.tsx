@@ -113,7 +113,7 @@ function NativeSplash() {
           className="drop-shadow-[0_0_24px_rgba(30,170,166,0.45)]"
         />
         <div
-          className="w-8 h-8 border-[3px] border-primary-500/30 border-t-primary-400 rounded-full animate-spin"
+          className="w-8 h-8 border-[3px] border-mn-amber/50/30 border-t-primary-400 rounded-full animate-spin"
           aria-hidden="true"
         />
       </div>

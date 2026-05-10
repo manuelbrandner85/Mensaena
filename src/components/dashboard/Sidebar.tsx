@@ -68,7 +68,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/map',
@@ -86,7 +86,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/calendar',
@@ -95,7 +95,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/create',
@@ -104,7 +104,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
         highlight: true,
       },
       {
@@ -114,7 +114,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
     ],
   },
@@ -128,7 +128,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/harvest',
@@ -137,7 +137,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/housing',
@@ -146,7 +146,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/animals',
@@ -155,7 +155,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/mobility',
@@ -178,7 +178,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/skills',
@@ -187,7 +187,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/timebank',
@@ -196,7 +196,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/sharing',
@@ -205,7 +205,7 @@ const navSections = [
         iconBg: 'bg-mn-amber',
         activeBg: 'bg-mn-amber/5',
         activeText: 'text-mn-amber',
-        activeBorder: 'border-primary-400',
+        activeBorder: 'border-mn-amber/30',
       },
       {
         href: '/dashboard/knowledge',
@@ -441,7 +441,7 @@ function SidebarInner({
               </span>
             </Link>
           ) : (
-            <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-mn-amber/5 border border-primary-100 rounded-xl">
+            <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 bg-mn-amber/5 border border-white/8 rounded-xl">
               <div className="w-2 h-2 rounded-full bg-primary-400 animate-pulse flex-shrink-0" />
               <span className="text-xs text-mn-amber font-medium">Online & aktiv</span>
             </div>
@@ -485,7 +485,7 @@ function SidebarInner({
                       ? cn('font-semibold', item.activeBg, item.activeText, 'border', item.activeBorder, 'shadow-sm')
                       : cn(
                           'text-mn-ink-soft border border-transparent hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
-                          item.highlight && 'bg-gradient-to-r from-primary-50 to-teal-50 border-mn-amber/20 hover:from-primary-100 hover:to-teal-100 text-mn-amber font-semibold'
+                          item.highlight && 'bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft/8 border-mn-amber/20 hover:from-mn-amber/10 hover:to-mn-teal-soft/8 text-mn-amber font-semibold'
                         ),
                   )}
                 >
@@ -580,7 +580,7 @@ function SidebarInner({
           <div className="px-3 py-2">
             <Link href="/dashboard/profile"
               className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-mn-surface hover:border-white/5 border border-transparent transition-all group">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-mn-teal/10 to-mn-teal-soft/8 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <User className="w-3.5 h-3.5 text-white" />
               </div>
               <div className="flex-1 min-w-0">

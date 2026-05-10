@@ -111,7 +111,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
             type="time"
             value={start}
             onChange={e => setStart(e.target.value)}
-            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </label>
         <label className="text-xs">
@@ -120,7 +120,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
             type="time"
             value={end}
             onChange={e => setEnd(e.target.value)}
-            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </label>
       </div>

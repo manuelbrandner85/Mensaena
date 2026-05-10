@@ -111,7 +111,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ) : !readOnly && contacts.length < 3 && (
         <button
           onClick={() => setAdding(true)}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-white/5 text-mn-mute hover:border-primary-300 hover:text-mn-amber transition-colors min-h-[44px]"
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-white/5 text-mn-mute hover:border-mn-amber/20 hover:text-mn-amber transition-colors min-h-[44px]"
         >
           <Plus className="w-4 h-4" /> {t('addContact')}
         </button>

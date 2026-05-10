@@ -9,7 +9,7 @@ const variantStyles = {
   hover:   'card-hover',
   accent:  'card-accent',
   stat:    'stat-card',
-  flat:    'bg-mn-elevated rounded-2xl border border-warm-100 overflow-hidden',
+  flat:    'bg-mn-elevated rounded-2xl border border-white/8 overflow-hidden',
   glass:   'glass',
 } as const
 
@@ -38,11 +38,11 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         {...rest}
       >
         {header && (
-          <div className="pb-3 mb-3 border-b border-warm-100">{header}</div>
+          <div className="pb-3 mb-3 border-b border-white/8">{header}</div>
         )}
         {children}
         {footer && (
-          <div className="pt-3 mt-3 border-t border-warm-100">{footer}</div>
+          <div className="pt-3 mt-3 border-t border-white/8">{footer}</div>
         )}
       </div>
     )

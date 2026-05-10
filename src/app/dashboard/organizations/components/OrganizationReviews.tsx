@@ -57,7 +57,7 @@ function ReviewCard({
 
       {/* Admin response */}
       {review.admin_response && (
-        <div className="mt-3 p-3 bg-mn-amber/5 rounded-lg border border-primary-100">
+        <div className="mt-3 p-3 bg-mn-amber/5 rounded-lg border border-white/8">
           <div className="flex items-center gap-1.5 mb-1">
             <ShieldCheck className="w-3.5 h-3.5 text-mn-amber" />
             <span className="text-xs font-medium text-mn-amber">Antwort der Organisation</span>

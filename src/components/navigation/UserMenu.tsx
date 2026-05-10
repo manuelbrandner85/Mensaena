@@ -55,7 +55,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2.5 pl-3 border-l border-warm-200 hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2.5 pl-3 border-l border-white/8 hover:opacity-80 transition-opacity"
         aria-label={t('userMenu')}
         aria-expanded={open}
       >
@@ -80,9 +80,9 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-mn-elevated rounded-2xl shadow-cinema-card-2xl border border-warm-200 z-50 overflow-hidden animate-scale-in">
+        <div className="absolute right-0 top-full mt-2 w-56 bg-mn-elevated rounded-2xl shadow-cinema-card-2xl border border-white/8 z-50 overflow-hidden animate-scale-in">
           {/* User info header */}
-          <div className="px-4 py-3 border-b border-warm-100">
+          <div className="px-4 py-3 border-b border-white/8">
             <p className="text-sm font-semibold text-mn-ink truncate">{displayName}</p>
             <p className="text-xs text-mn-mute truncate">{email}</p>
           </div>
@@ -106,7 +106,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
           </div>
 
           {/* Logout */}
-          <div className="border-t border-warm-100 py-1">
+          <div className="border-t border-white/8 py-1">
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-mn-herzrot hover:bg-mn-surface transition-colors"

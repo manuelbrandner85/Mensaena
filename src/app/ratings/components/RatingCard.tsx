@@ -56,7 +56,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
   }
 
   return (
-    <div className="bg-white rounded-xl border border-warm-200 p-4 space-y-3">
+    <div className="bg-white rounded-xl border border-white/8 p-4 space-y-3">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-mn-elevated transition-colors"
           >
             <MoreHorizontal className="w-4 h-4 text-ink-400" />
           </button>
@@ -125,7 +125,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
           {categoryLabels.map(cat => cat && (
             <span
               key={cat.value}
-              className="inline-flex items-center gap-1 text-xs bg-warm-50 text-ink-600 px-2 py-0.5 rounded-full border border-warm-200"
+              className="inline-flex items-center gap-1 text-xs bg-mn-surface text-ink-600 px-2 py-0.5 rounded-full border border-white/8"
             >
               <span>{cat.emoji}</span> {cat.label}
             </span>
@@ -149,7 +149,7 @@ export default function RatingCard({ rating, currentUserId, isOwnProfile }: Rati
 
       {/* Response area */}
       {rating.response && (
-        <div className="ml-6 pl-4 border-l-2 border-primary-200 bg-primary-50/30 rounded-r-lg p-3">
+        <div className="ml-6 pl-4 border-l-2 border-white/10 bg-primary-50/30 rounded-r-lg p-3">
           <p className="text-xs font-semibold text-primary-700 mb-1">Antwort:</p>
           <p className="text-sm text-ink-700">{rating.response}</p>
           {rating.response_at && (

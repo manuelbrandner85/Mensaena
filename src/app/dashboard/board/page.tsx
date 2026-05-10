@@ -113,7 +113,7 @@ export default function BoardPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 03 / Aushänge</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 float-idle">
+            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
               <Clipboard className="w-6 h-6 text-mn-amber" />
             </div>
             <div>

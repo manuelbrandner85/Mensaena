@@ -92,7 +92,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
       {/* Header */}
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden mb-4">
         {org.cover_image_url && (
-          <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-50 overflow-hidden">
+          <div className="h-48 bg-gradient-to-br from-mn-amber/10 to-primary-50 overflow-hidden">
             <img src={org.cover_image_url} alt="" className="w-full h-full object-cover" />
           </div>
         )}

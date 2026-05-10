@@ -207,7 +207,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-primary-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
         </div>
       ) : (
         <>

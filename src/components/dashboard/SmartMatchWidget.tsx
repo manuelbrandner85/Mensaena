@@ -72,7 +72,7 @@ export default function SmartMatchWidget() {
   if (matches.length === 0) return null
 
   return (
-    <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-4 shadow-sm">
+    <div className="bg-gradient-to-br from-mn-amber/8 to-white border border-white/8 rounded-2xl p-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="w-4 h-4 text-mn-amber" />
         <h3 className="text-sm font-bold text-mn-ink">Passend für dich</h3>

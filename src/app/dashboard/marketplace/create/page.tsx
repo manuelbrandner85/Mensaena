@@ -287,7 +287,7 @@ export default function CreateListingPage() {
                 <button
                   type="button"
                   onClick={() => setScannerOpen(true)}
-                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
+                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-mn-amber/20 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
                 >
                   <ScanBarcode className="w-4 h-4" />
                   Produktinfos per Barcode laden
@@ -413,7 +413,7 @@ export default function CreateListingPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-xl border-2 border-dashed border-white/8 flex flex-col items-center justify-center gap-1 text-mn-ghost hover:text-mn-amber hover:border-primary-400 hover:bg-mn-amber/5/50 transition-all"
+                  className="aspect-square rounded-xl border-2 border-dashed border-white/8 flex flex-col items-center justify-center gap-1 text-mn-ghost hover:text-mn-amber hover:border-mn-amber/30 hover:bg-mn-amber/5/50 transition-all"
                 >
                   <ImagePlus className="w-5 h-5" />
                   <span className="text-xs font-medium">Bild</span>

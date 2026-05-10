@@ -230,7 +230,7 @@ export default function ProfileLocationSettings({
               max={150}
               value={radiusKm}
               onChange={e => { setRadiusKm(parseInt(e.target.value)); markDirty() }}
-              className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-primary-600"
+              className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-mn-amber"
             />
             <div className="flex justify-between text-xs text-mn-mute mt-1">
               <span>1 km</span>

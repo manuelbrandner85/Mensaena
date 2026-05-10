@@ -54,7 +54,7 @@ export default function WeeklyChallengeHighlight() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-warm-200 bg-mn-elevated p-5 animate-pulse">
+      <div className="rounded-2xl border border-white/8 bg-mn-elevated p-5 animate-pulse">
         <div className="h-4 w-48 bg-mn-raised rounded mb-3" />
         <div className="h-3 w-64 bg-mn-elevated rounded" />
       </div>
@@ -64,7 +64,7 @@ export default function WeeklyChallengeHighlight() {
   if (challenges.length === 0) return null
 
   return (
-    <section className="rounded-2xl border border-warm-200 bg-gradient-to-br from-amber-50 via-white to-primary-50/40 shadow-soft p-5">
+    <section className="rounded-2xl border border-white/8 bg-gradient-to-br from-mn-amber/12 via-white to-primary-50/40 shadow-soft p-5">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">

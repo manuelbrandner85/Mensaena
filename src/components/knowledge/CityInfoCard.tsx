@@ -163,7 +163,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
     <div className={`relative bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-soft ${className ?? ''}`}>
       {/* City image or coat-of-arms header */}
       {!compact && !imgError && (info.imageUrl || info.coatOfArmsUrl) && (
-        <div className="relative h-36 bg-gradient-to-br from-primary-50 to-stone-100 overflow-hidden">
+        <div className="relative h-36 bg-gradient-to-br from-mn-amber/8 to-stone-100 overflow-hidden">
           {info.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img

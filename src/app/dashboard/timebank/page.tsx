@@ -196,7 +196,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
       />
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-4 overflow-hidden">
+      <div className="relative bg-gradient-to-r from-mn-amber/12 to-yellow-500 px-6 py-4 overflow-hidden">
         <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -381,7 +381,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         <button
           type="submit"
           disabled={submitting || !receiver || !description.trim() || totalHours <= 0}
-          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 disabled:from-stone-100 disabled:to-stone-100 disabled:text-mn-mute text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
+          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-mn-amber/12 to-orange-500 hover:from-mn-amber/12 hover:to-orange-600 disabled:from-stone-100 disabled:to-stone-100 disabled:text-mn-mute text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
           style={submitting || !receiver || !description.trim() || totalHours <= 0 ? undefined : { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
         >
           {submitting

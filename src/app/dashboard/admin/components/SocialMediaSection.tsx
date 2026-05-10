@@ -445,7 +445,7 @@ function PostsView() {
   return (
     <div className="space-y-5">
       {/* KI-Generator */}
-      <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-5">
+      <div className="bg-gradient-to-br from-mn-amber/8 to-white border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-4 h-4 text-mn-amber" />
           <h3 className="text-sm font-bold text-mn-ink">KI-Content-Generator</h3>
@@ -463,7 +463,7 @@ function PostsView() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 selectedPlatforms.includes(key)
                   ? 'bg-mn-amber text-white border-mn-amber'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
               }`}
             >
               {label}
@@ -510,7 +510,7 @@ function PostsView() {
               className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                 imageMode === m.key
                   ? 'bg-mn-amber text-white border-mn-amber'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
               }`}
             >
               {m.icon} {m.label}
@@ -625,7 +625,7 @@ function PostsView() {
         {/* Upload */}
         {imageMode === 'upload' && (
           <div className="space-y-3">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/8 rounded-xl cursor-pointer hover:border-primary-400 hover:bg-mn-amber/5/30 transition-all">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/8 rounded-xl cursor-pointer hover:border-mn-amber/30 hover:bg-mn-amber/5/30 transition-all">
               <div className="flex flex-col items-center">
                 <span className="text-2xl mb-1">📁</span>
                 <span className="text-xs text-mn-mute font-medium">Klicke zum Hochladen</span>
@@ -858,7 +858,7 @@ function PostsView() {
                     type="checkbox"
                     checked={!!editScheduledAt}
                     onChange={e => setEditScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
-                    className="accent-primary-500"
+                    className="accent-mn-amber"
                   />
                   <span className="font-medium">Veröffentlichung planen</span>
                 </label>
@@ -1006,7 +1006,7 @@ function ChannelsView() {
   return (
     <div className="space-y-4">
       {/* Info */}
-      <div className="bg-mn-amber/5 border border-primary-100 rounded-2xl p-4">
+      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4">
         <p className="text-xs text-primary-800 leading-relaxed">
           Verbinde deine Social-Media-Kanäle mit API-Tokens. Klicke auf eine Plattform, um die Schritt-für-Schritt-Anleitung zu sehen und deinen Token einzugeben.
         </p>

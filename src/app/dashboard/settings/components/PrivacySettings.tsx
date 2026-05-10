@@ -59,7 +59,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
   return (
     <div className="space-y-5">
       {/* Datenschutz-Zentrum – Übersicht */}
-      <div className="bg-gradient-to-br from-primary-50 to-stone-50 border border-primary-100 rounded-2xl p-5">
+      <div className="bg-gradient-to-br from-mn-amber/8 to-stone-50 border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-4">
           <ShieldCheck className="w-5 h-5 text-mn-amber" />
           <h3 className="font-bold text-mn-ink">{t('centerTitle')}</h3>

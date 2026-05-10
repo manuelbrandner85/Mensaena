@@ -18,14 +18,14 @@ import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 const CAT_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
   nachbarschaft: { emoji: '🏘️', label: 'Nachbarschaft',       color: 'from-mn-teal to-mn-teal-soft' },
   hobby:         { emoji: '🎨', label: 'Hobby & Freizeit',    color: 'from-pink-400 to-rose-500' },
-  sport:         { emoji: '⚽', label: 'Sport & Fitness',     color: 'from-orange-400 to-orange-600' },
-  eltern:        { emoji: '👶', label: 'Eltern & Familie',    color: 'from-yellow-400 to-amber-500' },
+  sport:         { emoji: '⚽', label: 'Sport & Fitness',     color: 'from-mn-amber-warm/12 to-orange-600' },
+  eltern:        { emoji: '👶', label: 'Eltern & Familie',    color: 'from-mn-amber/12 to-mn-amber-warm/8' },
   senioren:      { emoji: '🧓', label: 'Senioren',            color: 'from-mn-amber to-mn-amber-warm' },
   umwelt:        { emoji: '🌿', label: 'Umwelt',              color: 'from-primary-400 to-primary-600' },
   bildung:       { emoji: '📚', label: 'Bildung & Lernen',    color: 'from-indigo-400 to-indigo-600' },
-  tiere:         { emoji: '🐾', label: 'Tiere',               color: 'from-amber-400 to-yellow-600' },
+  tiere:         { emoji: '🐾', label: 'Tiere',               color: 'from-mn-amber/12 to-yellow-600' },
   handwerk:      { emoji: '🔧', label: 'Handwerk & DIY',      color: 'from-slate-400 to-slate-600' },
-  sonstiges:     { emoji: '💬', label: 'Sonstiges',           color: 'from-primary-400 to-teal-600' },
+  sonstiges:     { emoji: '💬', label: 'Sonstiges',           color: 'from-primary-400 to-mn-teal-soft/8' },
 }
 
 function getCat(category: string) {
@@ -82,7 +82,7 @@ function Avatar({ name, avatarUrl, size = 'md' }: { name?: string | null; avatar
     )
   }
   return (
-    <div className={cn(sizeClass, 'rounded-full bg-gradient-to-br from-primary-400 to-teal-500 flex items-center justify-center font-bold text-white border-2 border-white')}>
+    <div className={cn(sizeClass, 'rounded-full bg-gradient-to-br from-primary-400 to-mn-teal-soft/8 flex items-center justify-center font-bold text-white border-2 border-white')}>
       {initials}
     </div>
   )
@@ -711,7 +711,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
             <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4">
               <div className="flex gap-3">
                 <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-mn-teal-soft/8 flex items-center justify-center text-white text-xs font-bold">
                     Du
                   </div>
                 </div>
@@ -768,7 +768,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               </div>
             </div>
           ) : (
-            <div className="bg-mn-amber/5 border border-primary-100 rounded-2xl p-4 text-center">
+            <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4 text-center">
               <p className="text-sm text-mn-amber font-medium mb-2">
                 Tritt der Gruppe bei, um Beiträge zu schreiben
               </p>
@@ -843,7 +843,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                   {g.items.map(post => {
                     const poster = post.profiles as { name?: string | null; avatar_url?: string | null } | undefined
                     return (
-                      <div key={post.id} className={cn('bg-mn-elevated rounded-2xl border shadow-sm p-4 hover:border-primary-100 transition-colors', post.is_pinned ? 'border-amber-200 bg-amber-50/30' : 'border-white/5')}>
+                      <div key={post.id} className={cn('bg-mn-elevated rounded-2xl border shadow-sm p-4 hover:border-white/8 transition-colors', post.is_pinned ? 'border-amber-200 bg-amber-50/30' : 'border-white/5')}>
                         {post.is_pinned && (
                           <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 mb-2">
                             📌 Angepinnt
@@ -897,7 +897,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 <textarea
                                   value={editContent}
                                   onChange={e => setEditContent(e.target.value)}
-                                  className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none outline-none focus:border-primary-300 focus:ring-1 focus:ring-mn-amber/10 leading-relaxed"
+                                  className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none outline-none focus:border-mn-amber/20 focus:ring-1 focus:ring-mn-amber/10 leading-relaxed"
                                   rows={3}
                                   maxLength={2000}
                                   autoFocus

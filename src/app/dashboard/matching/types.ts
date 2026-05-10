@@ -155,7 +155,7 @@ export const MATCH_STATUS_LABELS: Record<MatchStatus, string> = {
 export const MATCH_STATUS_COLORS: Record<MatchStatus, { text: string; bg: string; border: string }> = {
   suggested: { text: 'text-mn-teal-soft', bg: 'bg-mn-surface', border: 'border-white/5' },
   pending: { text: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
-  accepted: { text: 'text-primary-700', bg: 'bg-primary-50', border: 'border-primary-200' },
+  accepted: { text: 'text-primary-700', bg: 'bg-primary-50', border: 'border-white/10' },
   declined: { text: 'text-mn-herzrot', bg: 'bg-mn-surface', border: 'border-mn-herzrot/20' },
   expired: { text: 'text-ink-600', bg: 'bg-stone-50', border: 'border-stone-200' },
   completed: { text: 'text-mn-leben', bg: 'bg-mn-surface', border: 'border-white/5' },

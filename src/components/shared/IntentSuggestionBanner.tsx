@@ -86,7 +86,7 @@ export default function IntentSuggestionBanner({
     <div
       role="status"
       className={cn(
-        'flex items-start gap-2.5 p-3 rounded-xl border bg-gradient-to-r from-primary-50 to-mn-teal-soft',
+        'flex items-start gap-2.5 p-3 rounded-xl border bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft',
         'border-mn-amber/20 shadow-sm animate-fade-in',
         className,
       )}

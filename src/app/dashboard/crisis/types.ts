@@ -170,7 +170,7 @@ export const CRISIS_CATEGORY_CONFIG: Record<CrisisCategory, CategoryConfig> = {
   violence:        { label: 'Gewalt',          icon: ShieldAlert,         color: 'text-rose-700',    bgColor: 'bg-rose-50',    borderColor: 'border-rose-200',    emoji: '🛡️' },
   missing_person:  { label: 'Vermisst',        icon: Search,              color: 'text-indigo-700',  bgColor: 'bg-indigo-50',  borderColor: 'border-indigo-200',  emoji: '🔍' },
   infrastructure:  { label: 'Infrastruktur',   icon: Wrench,              color: 'text-ink-700',    bgColor: 'bg-stone-50',    borderColor: 'border-stone-200',    emoji: '🏗️' },
-  supply:          { label: 'Versorgung',      icon: Package,             color: 'text-primary-700', bgColor: 'bg-primary-50', borderColor: 'border-primary-200', emoji: '📦' },
+  supply:          { label: 'Versorgung',      icon: Package,             color: 'text-primary-700', bgColor: 'bg-primary-50', borderColor: 'border-white/10', emoji: '📦' },
   evacuation:      { label: 'Evakuierung',     icon: ArrowRightFromLine,  color: 'text-amber-700',   bgColor: 'bg-amber-50',   borderColor: 'border-amber-200',   emoji: '🚨' },
   other:           { label: 'Sonstiges',       icon: CircleHelp,          color: 'text-slate-700',   bgColor: 'bg-slate-50',   borderColor: 'border-slate-200',   emoji: '❓' },
 }

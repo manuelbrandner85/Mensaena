@@ -170,7 +170,7 @@ export default function EmailBlockEditor({
               key={block.id}
               onClick={() => setSelectedBlock(block.id)}
               className={`bg-mn-elevated rounded-xl border p-3 transition-all cursor-pointer ${
-                selectedBlock === block.id ? 'border-primary-400 ring-2 ring-primary-100' : 'border-white/5 hover:border-white/8'
+                selectedBlock === block.id ? 'border-mn-amber/30 ring-2 ring-primary-100' : 'border-white/5 hover:border-white/8'
               }`}
             >
               <div className="flex items-center justify-between mb-2">

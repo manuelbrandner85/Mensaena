@@ -27,7 +27,7 @@ const actions = [
     icon: Map,
     label: 'Karte öffnen',
     href: '/dashboard/map' as string | null,
-    gradient: 'from-primary-400 to-teal-500',
+    gradient: 'from-primary-400 to-mn-teal-soft/8',
     glow: 'rgba(30,170,166,0.25)',
     iconColor: 'text-white',
   },
@@ -101,7 +101,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
             <Link
               key={s.href}
               href={s.href}
-              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft hover:bg-mn-amber/5 hover:border-primary-300 hover:text-mn-amber transition-all"
+              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft hover:bg-mn-amber/5 hover:border-mn-amber/20 hover:text-mn-amber transition-all"
             >
               {s.label}
             </Link>
@@ -110,7 +110,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
       </div>
 
       {/* Right fade-out gradient */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-primary-50 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-mn-amber/8 to-transparent" />
     </div>
   )
 }

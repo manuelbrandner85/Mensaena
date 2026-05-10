@@ -276,7 +276,7 @@ export default function ProfilePage() {
   if (loading || !profile || !stats) {
     return (
       <div className="max-w-4xl mx-auto animate-pulse">
-        <div className="h-40 sm:h-56 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-200 to-primary-300" />
+        <div className="h-40 sm:h-56 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-mn-amber/15 to-primary-300" />
         <div className="px-4 sm:px-8 -mt-16 sm:-mt-20">
           <div className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-mn-raised ring-4 ring-white mx-auto sm:mx-0" />
           <div className="mt-4 h-6 w-48 bg-mn-raised rounded mx-auto sm:mx-0" />

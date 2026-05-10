@@ -28,7 +28,7 @@ function Skeleton() {
   return (
     <div className="space-y-3">
       {[1, 2, 3].map(i => (
-        <div key={i} className="animate-pulse flex gap-3 p-3 rounded-xl bg-warm-50">
+        <div key={i} className="animate-pulse flex gap-3 p-3 rounded-xl bg-mn-surface">
           <div className="w-9 h-9 rounded-lg bg-mn-raised flex-shrink-0" />
           <div className="flex-1 space-y-2">
             <div className="h-3.5 bg-mn-raised rounded w-3/4" />
@@ -84,9 +84,9 @@ export default function JobsNearbyWidget() {
   }
 
   return (
-    <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft overflow-hidden">
+    <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-soft overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
             <Briefcase className="w-4 h-4 text-mn-amber" />
@@ -112,7 +112,7 @@ export default function JobsNearbyWidget() {
                 'flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all',
                 filter === c.key
                   ? 'bg-mn-amber text-white border-primary-600'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300',
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
               )}
             >
               {c.label}
@@ -142,9 +142,9 @@ export default function JobsNearbyWidget() {
               href={job.url ?? `https://www.arbeitsagentur.de/jobsuche/suche?id=${job.refnr}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-warm-50 transition-colors group"
+              className="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-mn-surface transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-lg bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <Briefcase className="w-4 h-4 text-mn-amber" />
               </div>
               <div className="flex-1 min-w-0">
@@ -176,7 +176,7 @@ export default function JobsNearbyWidget() {
         <div className="px-4 pb-3">
           <Link
             href="/dashboard/jobs"
-            className="block text-center text-xs font-medium text-mn-amber hover:text-mn-amber py-2 rounded-xl hover:bg-mn-amber/5 transition-colors border border-primary-100"
+            className="block text-center text-xs font-medium text-mn-amber hover:text-mn-amber py-2 rounded-xl hover:bg-mn-amber/5 transition-colors border border-white/8"
           >
             Alle {total.toLocaleString('de-DE')} Stellen anzeigen →
           </Link>

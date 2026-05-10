@@ -49,7 +49,7 @@ function RescuedTodayWidget() {
     <div className="space-y-4">
       {/* Ablaufdatum-Warnung für Lebensmittel */}
       {oldFoodCount > 0 && (
-        <div className="relative flex items-start gap-3 p-4 bg-gradient-to-br from-amber-50 via-amber-50/80 to-orange-50 border-2 border-amber-200 rounded-2xl shadow-cinema-card overflow-hidden">
+        <div className="relative flex items-start gap-3 p-4 bg-gradient-to-br from-mn-amber/12 via-mn-amber/4/80 to-orange-50 border-2 border-amber-200 rounded-2xl shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
@@ -99,7 +99,7 @@ function RescuedTodayWidget() {
       </div>
 
       {/* Mission-Statement */}
-      <div className="relative bg-gradient-to-br from-orange-50 via-orange-50/80 to-amber-50 border border-white/8 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-gradient-to-br from-mn-amber-warm/12 via-mn-amber-warm/4/80 to-mn-amber-warm/8 border border-white/8 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #F97316, #F9731633)' }}
@@ -136,7 +136,7 @@ export default function RescuerPage() {
       title="Retter-System"
       description="Rette Ressourcen – Lebensmittel, Kleidung, Gegenstände sinnvoll weitergeben"
       icon={<ShieldAlert className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-orange-500 to-orange-700"
+      color="bg-gradient-to-r from-mn-amber-warm/12 to-orange-700"
       postTypes={['rescue', 'sharing']}
       moduleFilter={[
         { type: 'rescue',  categories: ['food', 'everyday', 'sharing', 'general'] }, // Ressourcen retten

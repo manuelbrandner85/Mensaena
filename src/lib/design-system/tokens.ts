@@ -99,7 +99,7 @@ export const colors = {
 /** Category-to-color mapping for post types */
 export const categoryColors: Record<string, { bg: string; text: string; border: string; dot: string }> = {
   help_needed:  { bg: 'bg-red-100',    text: 'text-mn-herzrot',    border: 'border-mn-herzrot/20',    dot: '#ef4444' },
-  help_offered: { bg: 'bg-primary-100', text: 'text-primary-700', border: 'border-primary-200', dot: '#10b981' },
+  help_offered: { bg: 'bg-primary-100', text: 'text-primary-700', border: 'border-white/10', dot: '#10b981' },
   crisis:       { bg: 'bg-red-100',    text: 'text-mn-herzrot',    border: 'border-mn-herzrot/20',    dot: '#dc2626' },
   animal:       { bg: 'bg-pink-100',   text: 'text-pink-700',   border: 'border-white/5',   dot: '#ec4899' },
   housing:      { bg: 'bg-blue-100',   text: 'text-mn-teal-soft',   border: 'border-white/5',   dot: '#3b82f6' },
@@ -238,8 +238,8 @@ export const gradients = {
 export const moduleThemes = {
   // Versorgung & Lebensmittel (warm-grün)
   harvest:        { gradientFrom: 'from-green-500',   gradientTo: 'to-primary-300', ringColor: 'ring-green-400' },
-  animals:        { gradientFrom: 'from-amber-500',   gradientTo: 'to-orange-400',  ringColor: 'ring-amber-400' },
-  housing:        { gradientFrom: 'from-blue-500',    gradientTo: 'to-cyan-400',    ringColor: 'ring-blue-400' },
+  animals:        { gradientFrom: 'from-mn-amber/12',   gradientTo: 'to-orange-400',  ringColor: 'ring-amber-400' },
+  housing:        { gradientFrom: 'from-blue-500',    gradientTo: 'to-mn-teal-soft/8',    ringColor: 'ring-blue-400' },
 
   // Wissen & Skills (kühl-blau)
   knowledge:      { gradientFrom: 'from-indigo-500',  gradientTo: 'to-violet-400',  ringColor: 'ring-indigo-400' },
@@ -247,14 +247,14 @@ export const moduleThemes = {
 
   // Mobilität & Teilen (sky-teal)
   mobility:       { gradientFrom: 'from-sky-500',     gradientTo: 'to-blue-400',    ringColor: 'ring-sky-400' },
-  sharing:        { gradientFrom: 'from-teal-500',    gradientTo: 'to-cyan-400',    ringColor: 'ring-teal-400' },
+  sharing:        { gradientFrom: 'from-mn-teal/10',    gradientTo: 'to-mn-teal-soft/8',    ringColor: 'ring-teal-400' },
 
   // Notfall & Rettung (warm-rot)
-  rescuer:        { gradientFrom: 'from-orange-500',  gradientTo: 'to-red-400',     ringColor: 'ring-orange-400' },
+  rescuer:        { gradientFrom: 'from-mn-amber-warm/12',  gradientTo: 'to-red-400',     ringColor: 'ring-orange-400' },
 
   // Gemeinschaft & Mental (sanft)
-  'mental-support': { gradientFrom: 'from-rose-400', gradientTo: 'to-pink-400',    ringColor: 'ring-rose-400' },
-  community:      { gradientFrom: 'from-violet-500',  gradientTo: 'to-purple-400',  ringColor: 'ring-violet-400' },
+  'mental-support': { gradientFrom: 'from-mn-herzrot/10', gradientTo: 'to-pink-400',    ringColor: 'ring-rose-400' },
+  community:      { gradientFrom: 'from-mn-amber/8',  gradientTo: 'to-purple-400',  ringColor: 'ring-violet-400' },
 } as const
 
 export type ModuleThemeKey = keyof typeof moduleThemes

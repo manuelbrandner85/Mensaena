@@ -21,7 +21,7 @@ export default function SuggestOrganizationPage() {
   return (
     <div className="min-h-dvh bg-mn-void">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-teal-500 px-4 pt-6 pb-8">
+      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-mn-teal-soft/8 px-4 pt-6 pb-8">
         <div className="max-w-2xl mx-auto">
           <Link
             href="/dashboard/organizations"

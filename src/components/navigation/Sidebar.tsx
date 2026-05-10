@@ -279,7 +279,7 @@ export default function Sidebar({
       {/* ── SOS Strip — editorial ── */}
       {!sidebarCollapsed ? (
         <div className="px-3 py-2.5 flex gap-2 border-b border-white/5">
-          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-mn-amber/5/60 border border-primary-100 rounded-full">
+          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-mn-amber/5/60 border border-white/8 rounded-full">
             <div className="w-1.5 h-1.5 rounded-full bg-mn-amber animate-pulse flex-shrink-0" />
             <span className="text-[11px] text-primary-800 font-medium tracking-wide">{t('online')}</span>
           </div>
@@ -356,7 +356,7 @@ export default function Sidebar({
           href="/app"
           title={sidebarCollapsed ? 'App herunterladen' : undefined}
           className={cn(
-            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-amber hover:bg-mn-amber/5 border border-transparent hover:border-primary-100 transition-all',
+            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-amber hover:bg-mn-amber/5 border border-transparent hover:border-white/8 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >

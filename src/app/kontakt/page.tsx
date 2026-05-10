@@ -31,7 +31,7 @@ export default function KontaktPage() {
         intro="Wir freuen uns über deine Nachricht – egal ob Frage, Feedback oder Lob."
       >
         <div className="not-prose space-y-4">
-          <div className="p-5 bg-primary-50/60 rounded-2xl border border-primary-100 spotlight">
+          <div className="p-5 bg-primary-50/60 rounded-2xl border border-white/8 spotlight">
             <div className="flex items-center gap-2 mb-2">
               <Mail className="w-4 h-4 text-primary-700" />
               <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">E-Mail</span>
@@ -59,7 +59,7 @@ export default function KontaktPage() {
             </p>
           </div>
 
-          <div className="p-5 bg-primary-50/40 rounded-2xl border border-primary-100">
+          <div className="p-5 bg-primary-50/40 rounded-2xl border border-white/8">
             <div className="flex items-center gap-2 mb-2">
               <Leaf className="w-4 h-4 text-primary-700" />
               <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">Community</span>

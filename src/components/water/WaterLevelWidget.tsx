@@ -177,10 +177,10 @@ export default function WaterLevelWidget() {
       'bg-mn-elevated rounded-2xl border shadow-soft overflow-hidden transition-all',
       hasWarning
         ? 'border-white/8 ring-2 ring-orange-100 animate-pulse-slow'
-        : 'border-warm-100',
+        : 'border-white/8',
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-warm-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
             <Waves className="w-4 h-4 text-mn-teal-soft" />

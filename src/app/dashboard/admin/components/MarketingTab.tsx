@@ -24,7 +24,7 @@ function StatCard({
   sub?: string
 }) {
   const colors = {
-    primary: 'bg-mn-amber/5 text-mn-amber border-primary-100',
+    primary: 'bg-mn-amber/5 text-mn-amber border-white/8',
     green:   'bg-mn-surface text-mn-leben border-white/5',
     gray:    'bg-mn-surface text-mn-ink-soft border-white/5',
     blue:    'bg-mn-surface text-mn-teal-soft border-white/5',
@@ -150,7 +150,7 @@ export default function MarketingTab() {
               onClick={() => setView('emails')}
               className="flex items-center gap-3 p-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm hover:shadow-md hover:border-mn-amber/20 transition-all text-left group"
             >
-              <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0">
                 <Mail className="w-5 h-5 text-mn-amber" />
               </div>
               <div className="min-w-0">

@@ -50,7 +50,7 @@ export default function AiPostAssistant({
   }
 
   return (
-    <div className="bg-gradient-to-br from-violet-50 to-primary-50 border border-white/5 rounded-2xl p-4 space-y-3">
+    <div className="bg-gradient-to-br from-mn-amber/8 to-primary-50 border border-white/5 rounded-2xl p-4 space-y-3">
       <div className="flex items-center gap-2">
         <Wand2 className="w-4 h-4 text-mn-amber" />
         <h4 className="text-xs font-bold text-mn-amber">KI-Beitrags-Assistent</h4>

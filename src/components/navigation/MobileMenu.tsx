@@ -234,7 +234,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-8 pr-3 py-2 text-sm bg-mn-surface border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 transition-all"
+              className="w-full pl-8 pr-3 py-2 text-sm bg-mn-surface border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/20 transition-all"
             />
             {searchQuery && (
               <button

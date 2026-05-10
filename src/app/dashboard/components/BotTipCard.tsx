@@ -31,7 +31,7 @@ export default function BotTipCard({ tipText }: BotTipCardProps) {
     <Card
       variant="flat"
       padding="md"
-      className="bg-gradient-to-br from-primary-50 to-primary-100/50 border-mn-amber/20/50"
+      className="bg-gradient-to-br from-mn-amber/8 to-primary-100/50 border-mn-amber/20/50"
     >
       {/* Header */}
       <div className="flex items-center gap-2">

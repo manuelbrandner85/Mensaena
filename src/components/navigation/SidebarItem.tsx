@@ -150,7 +150,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
           isComingSoon
             ? 'hover:bg-mn-elevated/[0.02] cursor-default'
             : 'hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
-          isHighlight && !isComingSoon && !active && 'bg-mn-amber/5/50 border-primary-100 hover:bg-mn-amber/5',
+          isHighlight && !isComingSoon && !active && 'bg-mn-amber/5/50 border-white/8 hover:bg-mn-amber/5',
         ),
   )
 

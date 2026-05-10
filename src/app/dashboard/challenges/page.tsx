@@ -294,7 +294,7 @@ function ChallengeCard({
   return (
     <div className={cn(
       'spotlight hover-lift relative bg-mn-elevated rounded-2xl border overflow-hidden shadow-cinema-card hover:shadow-cinema-card transition-all flex flex-col',
-      isExpired ? 'border-white/5 opacity-70' : 'border-warm-200',
+      isExpired ? 'border-white/5 opacity-70' : 'border-white/8',
     )}>
       {/* Top accent line */}
       <div
@@ -308,7 +308,7 @@ function ChallengeCard({
       {/* Top bar */}
       <div className={cn(
         'relative px-4 py-2 pt-3 flex items-center justify-between text-sm overflow-hidden',
-        isExpired ? 'bg-mn-surface' : 'bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50',
+        isExpired ? 'bg-mn-surface' : 'bg-gradient-to-r from-mn-amber/12 via-mn-amber-warm/4 to-mn-amber-warm/8',
       )}>
         {!isExpired && <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />}
         <span className="relative flex items-center gap-1.5">
@@ -363,7 +363,7 @@ function ChallengeCard({
                     ? 'bg-mn-amber/10 text-mn-amber cursor-default shadow-cinema-card'
                     : checkingIn
                       ? 'bg-amber-100 text-amber-600 cursor-wait'
-                      : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-md active:scale-95',
+                      : 'bg-gradient-to-r from-mn-amber/12 to-orange-500 text-white hover:shadow-md active:scale-95',
                 )}
                 style={!checkedInToday && !checkingIn ? { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' } : undefined}
               >
@@ -375,7 +375,7 @@ function ChallengeCard({
             ) : (
               <button
                 onClick={() => onJoin(challenge.id)}
-                className="shine w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-xs font-semibold hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                className="shine w-full py-2 bg-gradient-to-r from-mn-amber/12 to-orange-500 text-white rounded-xl text-xs font-semibold hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
                 style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
               >
                 <Zap className="w-3.5 h-3.5" /> Teilnehmen
@@ -677,7 +677,7 @@ export default function ChallengesPage() {
 
       <div>
         {/* Filter */}
-        <div className="bg-mn-elevated rounded-2xl border border-warm-200 shadow-sm p-4 mb-6">
+        <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-sm p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-mute" />
@@ -700,7 +700,7 @@ export default function ChallengesPage() {
             </select>
             <button
               onClick={() => router.push('/dashboard/challenges/create')}
-              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
+              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-amber/12 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
               style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
             >
               <Plus className="w-4 h-4" /> Neue Challenge
@@ -733,13 +733,13 @@ export default function ChallengesPage() {
             {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-mn-elevated rounded-2xl animate-pulse border" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 bg-mn-elevated rounded-2xl border border-warm-200 shadow-sm">
+          <div className="text-center py-16 bg-mn-elevated rounded-2xl border border-white/8 shadow-sm">
             <Trophy className="w-12 h-12 text-mn-ghost mx-auto mb-3" />
             <p className="text-mn-ink-soft font-bold text-lg">Keine Challenges gefunden</p>
             <p className="text-sm text-mn-mute mt-1 mb-4">Motiviere die Community mit einer Challenge</p>
             <button
               onClick={() => router.push('/dashboard/challenges/create')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-amber/12 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" /> Erste Challenge starten
             </button>

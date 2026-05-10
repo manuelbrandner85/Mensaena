@@ -112,7 +112,7 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
       </div>
 
       {showNew && (
-        <div className="mb-3 border border-primary-100 rounded-lg p-3 bg-mn-amber/5/40">
+        <div className="mb-3 border border-white/8 rounded-lg p-3 bg-mn-amber/5/40">
           <input
             type="text"
             value={title}

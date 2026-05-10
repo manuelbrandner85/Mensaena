@@ -144,7 +144,7 @@ function StatCard({
   color: 'primary' | 'green' | 'gray'
 }) {
   const colorMap = {
-    primary: 'bg-mn-amber/5 text-mn-amber border-primary-100',
+    primary: 'bg-mn-amber/5 text-mn-amber border-white/8',
     green:   'bg-mn-surface text-mn-leben border-white/5',
     gray:    'bg-mn-surface text-mn-ink-soft border-white/5',
   }
@@ -406,7 +406,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   return (
     <div className="space-y-5">
       {/* Bereich 1: Wochenrückblick (letzte 7 Tage) */}
-      <div className="bg-mn-amber/5 border border-primary-100 rounded-2xl p-4">
+      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">📊</span>
           <h3 className="text-sm font-bold text-mn-ink">Wochenrückblick generieren</h3>
@@ -650,7 +650,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
             <div className="p-5 space-y-4">
 
               {/* AI-Optimizer */}
-              <div className="bg-gradient-to-r from-primary-50 to-mn-teal-soft border border-primary-100 rounded-xl p-4">
+              <div className="bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft border border-white/8 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-mn-amber" />
@@ -687,7 +687,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                               const c = campaigns.find(x => x.id === sendCampaignId)
                               if (c) { c.subject = alt; toast.success('Betreff übernommen – bitte Kampagne speichern') }
                             }}
-                            className="block w-full text-left text-xs text-mn-amber hover:text-primary-900 bg-mn-elevated hover:bg-mn-amber/5 border border-primary-100 rounded-lg px-3 py-2 transition-colors"
+                            className="block w-full text-left text-xs text-mn-amber hover:text-primary-900 bg-mn-elevated hover:bg-mn-amber/5 border border-white/8 rounded-lg px-3 py-2 transition-colors"
                           >
                             {alt}
                           </button>
@@ -715,7 +715,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                       className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                         channels.includes(ch.id)
                           ? 'bg-mn-amber text-white border-mn-amber'
-                          : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300'
+                          : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
                       }`}
                     >
                       {ch.icon} {ch.label}
@@ -726,21 +726,21 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-mn-surface transition-colors">
-                  <input type="radio" name="sendMode" checked={sendMode === 'all'} onChange={() => setSendMode('all')} className="accent-primary-500" />
+                  <input type="radio" name="sendMode" checked={sendMode === 'all'} onChange={() => setSendMode('all')} className="accent-mn-amber" />
                   <div>
                     <p className="text-sm font-medium text-mn-ink">An alle Abonnenten</p>
                     <p className="text-xs text-mn-mute">Alle aktiven Subscriber</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-mn-surface transition-colors">
-                  <input type="radio" name="sendMode" checked={sendMode === 'segment'} onChange={() => setSendMode('segment')} className="accent-primary-500" />
+                  <input type="radio" name="sendMode" checked={sendMode === 'segment'} onChange={() => setSendMode('segment')} className="accent-mn-amber" />
                   <div>
                     <p className="text-sm font-medium text-mn-ink">An eine Gruppe</p>
                     <p className="text-xs text-mn-mute">Neue User, Inaktive oder nach Region</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-mn-surface transition-colors">
-                  <input type="radio" name="sendMode" checked={sendMode === 'specific'} onChange={() => setSendMode('specific')} className="accent-primary-500" />
+                  <input type="radio" name="sendMode" checked={sendMode === 'specific'} onChange={() => setSendMode('specific')} className="accent-mn-amber" />
                   <div>
                     <p className="text-sm font-medium text-mn-ink">An bestimmte Personen</p>
                     <p className="text-xs text-mn-mute">Manuelle E-Mail-Adressen eingeben</p>
@@ -813,7 +813,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     type="checkbox"
                     checked={!!scheduledAt}
                     onChange={e => setScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
-                    className="accent-primary-500"
+                    className="accent-mn-amber"
                   />
                   <span className="font-medium">Versand planen</span>
                 </label>
@@ -1154,7 +1154,7 @@ function WelcomeView() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-mn-amber/5 border border-primary-100 rounded-2xl p-5">
+      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-5">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-mn-elevated rounded-xl flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-5 h-5 text-mn-amber" />
@@ -1381,7 +1381,7 @@ function ComplianceView() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-mn-amber/5 border border-primary-100 rounded-2xl p-5">
+      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-3 mb-1">
           <ShieldCheck className="w-5 h-5 text-mn-amber" />
           <h3 className="text-sm font-bold text-mn-ink">DSGVO & Email-Compliance</h3>
@@ -1474,7 +1474,7 @@ function DripView() {
 
   return (
     <div className="space-y-5">
-      <div className="bg-mn-amber/5 border border-primary-100 rounded-2xl p-5">
+      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-1">
           <GitBranch className="w-4 h-4 text-mn-amber" />
           <h3 className="text-sm font-bold text-mn-ink">Drip-Kampagnen & Auto-Funnels</h3>

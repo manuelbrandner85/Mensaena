@@ -131,7 +131,7 @@ export default function FoodWarningBanner() {
       className={cn(
         'rounded-2xl border shadow-sm overflow-hidden mb-3',
         isRecall
-          ? 'border-white/8 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/40 dark:border-white/8/60'
+          ? 'border-white/8 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 dark:from-mn-amber-warm/12/40 dark:to-mn-amber-warm/8/40 dark:border-white/8/60'
           : 'border-amber-200 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-700/60',
       )}
     >

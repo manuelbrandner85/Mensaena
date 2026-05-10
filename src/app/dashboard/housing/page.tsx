@@ -57,7 +57,7 @@ function HousingSplitView() {
           <div key={i} className="space-y-3">
             <div className="h-8 bg-mn-elevated rounded-xl w-40 animate-pulse" />
             {[0,1,2].map(j => (
-              <div key={j} className="bg-mn-elevated rounded-2xl border border-warm-200 p-5 animate-pulse h-32" />
+              <div key={j} className="bg-mn-elevated rounded-2xl border border-white/8 p-5 animate-pulse h-32" />
             ))}
           </div>
         ))}
@@ -141,7 +141,7 @@ function HousingSplitView() {
             </span>
           </div>
           {available.length === 0 ? (
-            <div className="relative text-center py-10 bg-mn-elevated rounded-2xl border border-warm-200 space-y-3 shadow-cinema-card overflow-hidden">
+            <div className="relative text-center py-10 bg-mn-elevated rounded-2xl border border-white/8 space-y-3 shadow-cinema-card overflow-hidden">
               <div
                 className="absolute top-0 left-0 right-0 h-[3px]"
                 style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -177,7 +177,7 @@ function HousingSplitView() {
             </span>
           </div>
           {wanted.length === 0 ? (
-            <div className="relative text-center py-10 bg-mn-elevated rounded-2xl border border-warm-200 space-y-3 shadow-cinema-card overflow-hidden">
+            <div className="relative text-center py-10 bg-mn-elevated rounded-2xl border border-white/8 space-y-3 shadow-cinema-card overflow-hidden">
               <div
                 className="absolute top-0 left-0 right-0 h-[3px]"
                 style={{ background: 'linear-gradient(90deg, #C62828, #C6282833)' }}

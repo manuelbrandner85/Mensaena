@@ -125,7 +125,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
 
       {/* Form */}
       {showForm && (
-        <div className="mb-5 border border-primary-100 rounded-2xl p-4 bg-mn-amber/5/30">
+        <div className="mb-5 border border-white/8 rounded-2xl p-4 bg-mn-amber/5/30">
           {/* Role toggle */}
           <div className="flex items-center gap-2 mb-4">
             <button
@@ -134,7 +134,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               className={`flex-1 h-9 text-xs font-semibold rounded-xl border transition-all ${
                 role === 'offer'
                   ? 'bg-mn-amber text-white border-primary-600 shadow-soft'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
               }`}
             >
               Ich biete Sitze an
@@ -145,7 +145,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               className={`flex-1 h-9 text-xs font-semibold rounded-xl border transition-all ${
                 role === 'seek'
                   ? 'bg-mn-amber text-white border-primary-600 shadow-soft'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-primary-300'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
               }`}
             >
               Ich suche Mitfahrt
@@ -247,7 +247,7 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
 }) {
   const isOffer = variant === 'offer'
   return (
-    <div className={`rounded-2xl border p-3 ${isOffer ? 'bg-mn-amber/5/40 border-primary-100' : 'bg-[#4F6D8A]/5 border-[#4F6D8A]/20'}`}>
+    <div className={`rounded-2xl border p-3 ${isOffer ? 'bg-mn-amber/5/40 border-white/8' : 'bg-[#4F6D8A]/5 border-[#4F6D8A]/20'}`}>
       <h4 className="text-[11px] font-semibold uppercase tracking-wider text-mn-mute mb-3">
         {title} ({items.length})
       </h4>

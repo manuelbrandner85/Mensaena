@@ -218,7 +218,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
 
       {/* Non-member: redeem code OR claim ownership if no members yet */}
       {!isMember && currentUserId && (
-        <div className="border border-primary-100 rounded-xl p-3 bg-mn-amber/5/40 mb-3">
+        <div className="border border-white/8 rounded-xl p-3 bg-mn-amber/5/40 mb-3">
           <div className="flex items-center gap-2 mb-2">
             <KeyRound className="w-3.5 h-3.5 text-mn-amber" />
             <h4 className="text-xs font-bold text-primary-900">

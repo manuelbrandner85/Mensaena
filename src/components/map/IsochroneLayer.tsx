@@ -89,7 +89,7 @@ export default function IsochroneLayer({
         ].map(({ label, opacity }) => (
           <div key={label} className="flex items-center gap-2 text-[11px] text-mn-ink-soft dark:text-mn-ghost">
             <span
-              className="w-3 h-3 rounded-sm flex-shrink-0 border border-primary-400"
+              className="w-3 h-3 rounded-sm flex-shrink-0 border border-mn-amber/30"
               style={{ background: `rgba(30,170,166,${opacity})` }}
             />
             {label}

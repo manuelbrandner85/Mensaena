@@ -21,9 +21,9 @@ function JobCard({ job }: { job: JobOffer }) {
   const wt = WORKTIME_OPTIONS.find(o => o.key === job.worktime)?.label
 
   return (
-    <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft hover:shadow-card hover:border-stone-300 transition-all p-4 group">
+    <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-soft hover:shadow-card hover:border-stone-300 transition-all p-4 group">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-primary-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0">
           <Briefcase className="w-5 h-5 text-mn-amber" />
         </div>
         <div className="flex-1 min-w-0">
@@ -43,7 +43,7 @@ function JobCard({ job }: { job: JobOffer }) {
               </span>
             )}
             {wt && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-mn-amber/5 text-mn-amber border border-primary-100">
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-mn-amber/5 text-mn-amber border border-white/8">
                 {wt}
               </span>
             )}
@@ -73,7 +73,7 @@ function Skeleton() {
   return (
     <div className="space-y-3">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="animate-pulse bg-mn-elevated rounded-2xl border border-warm-100 p-4 flex gap-3">
+        <div key={i} className="animate-pulse bg-mn-elevated rounded-2xl border border-white/8 p-4 flex gap-3">
           <div className="w-10 h-10 rounded-xl bg-mn-raised flex-shrink-0" />
           <div className="flex-1 space-y-2">
             <div className="h-4 bg-mn-raised rounded w-2/3" />
@@ -164,7 +164,7 @@ export default function JobSearchPage() {
       </div>
 
       {/* Search card */}
-      <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft p-4 space-y-3">
+      <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-soft p-4 space-y-3">
         {/* PLZ + Suchwort row */}
         <div className="flex gap-2">
           <div className="relative">
@@ -214,7 +214,7 @@ export default function JobSearchPage() {
               'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
               showFilters || worktime.length
                 ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
-                : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-warm-50',
+                : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
             )}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -241,20 +241,20 @@ export default function JobSearchPage() {
 
         {/* Worktime filter checkboxes */}
         {showFilters && (
-          <div className="flex flex-wrap gap-2 pt-1 border-t border-warm-100">
+          <div className="flex flex-wrap gap-2 pt-1 border-t border-white/8">
             {WORKTIME_OPTIONS.map(o => (
               <label
                 key={o.key}
                 className={cn(
                   'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border cursor-pointer transition-all select-none',
                   worktime.includes(o.key)
-                    ? 'bg-mn-amber/5 text-mn-amber border-primary-300'
+                    ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
                     : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
                 )}
               >
                 <input
                   type="checkbox"
-                  className="w-3.5 h-3.5 accent-primary-600"
+                  className="w-3.5 h-3.5 accent-mn-amber"
                   checked={worktime.includes(o.key)}
                   onChange={() => toggleWorktime(o.key)}
                 />
@@ -273,7 +273,7 @@ export default function JobSearchPage() {
           {error}
         </div>
       ) : searched && jobs.length === 0 ? (
-        <div className="bg-mn-elevated rounded-2xl border border-warm-100 shadow-soft p-8 text-center">
+        <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-soft p-8 text-center">
           <Briefcase className="w-10 h-10 text-mn-ghost mx-auto mb-3" />
           <p className="text-mn-ink-soft font-medium">Keine Stellen gefunden</p>
           <p className="text-sm text-mn-mute mt-1">Versuche einen größeren Umkreis oder andere Suchbegriffe.</p>
@@ -295,7 +295,7 @@ export default function JobSearchPage() {
               <button
                 onClick={() => doSearch(page - 1)}
                 disabled={page === 0 || loading}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-mn-elevated text-mn-ink-soft hover:bg-warm-50 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-white/8 bg-mn-elevated text-mn-ink-soft hover:bg-mn-surface disabled:opacity-40 transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" /> Zurück
               </button>
@@ -305,7 +305,7 @@ export default function JobSearchPage() {
               <button
                 onClick={() => doSearch(page + 1)}
                 disabled={page >= totalPages - 1 || loading}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-warm-200 bg-mn-elevated text-mn-ink-soft hover:bg-warm-50 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium border border-white/8 bg-mn-elevated text-mn-ink-soft hover:bg-mn-surface disabled:opacity-40 transition-colors"
               >
                 Weiter <ChevronRight className="w-4 h-4" />
               </button>

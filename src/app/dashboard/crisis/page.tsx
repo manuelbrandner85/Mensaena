@@ -312,7 +312,7 @@ export default function CrisisPage() {
         <div className="lg:col-span-2">
           <Link
             href="/dashboard/crisis/resources"
-            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-primary-50 to-cyan-50 border border-mn-amber/20 rounded-2xl shadow-cinema-card hover:shadow-cinema-card transition-all overflow-hidden"
+            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl shadow-cinema-card hover:shadow-cinema-card transition-all overflow-hidden"
           >
             <div
               className="absolute top-0 left-0 right-0 h-[3px]"

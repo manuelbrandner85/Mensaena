@@ -50,7 +50,7 @@ function PillBadge({ href, className }: { href: string; className: string }) {
   return (
     <Link
       href={href}
-      className={`group inline-flex items-center gap-2 rounded-full border border-mn-amber/20 bg-mn-amber/5/70 px-3.5 py-1.5 text-[12px] font-medium tracking-wide text-mn-amber transition-all duration-300 hover:border-primary-300 hover:bg-mn-amber/5 hover:shadow-glow-teal ${className}`}
+      className={`group inline-flex items-center gap-2 rounded-full border border-mn-amber/20 bg-mn-amber/5/70 px-3.5 py-1.5 text-[12px] font-medium tracking-wide text-mn-amber transition-all duration-300 hover:border-mn-amber/20 hover:bg-mn-amber/5 hover:shadow-glow-teal ${className}`}
       aria-label="Mensaena unterstützen"
     >
       <Heart className="h-3.5 w-3.5 fill-primary-500/30 text-mn-amber transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />

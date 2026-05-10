@@ -100,7 +100,7 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
 
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-mn-amber/10 text-primary-800 border-primary-300', emoji: '🌟' }
+  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-mn-amber/10 text-primary-800 border-mn-amber/20', emoji: '🌟' }
   if (score >= 60) return { label: 'Vertrauenswürdig', color: 'bg-mn-elevated text-mn-leben border-white/5', emoji: '✅' }
   if (score >= 40) return { label: 'Aufbauend', color: 'bg-mn-elevated text-mn-teal-soft border-white/5', emoji: '💪' }
   if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }
@@ -236,7 +236,7 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
         </span>
         <button
           onClick={() => { setEditValue(value); setEditing(true) }}
-          className="opacity-0 group-hover/edit:opacity-100 transition-opacity p-0.5 rounded hover:bg-warm-100"
+          className="opacity-0 group-hover/edit:opacity-100 transition-opacity p-0.5 rounded hover:bg-mn-elevated"
           title="Bearbeiten"
         >
           <Edit3 className="w-3.5 h-3.5 text-mn-mute" />
@@ -527,18 +527,18 @@ export default function ProfileView({
             <div className="relative">
               <button
                 onClick={e => { e.stopPropagation(); setShowMoreMenu(!showMoreMenu) }}
-                className="p-2 rounded-lg hover:bg-warm-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-mn-elevated transition-colors"
               >
                 <MoreHorizontal className="w-5 h-5 text-mn-mute" />
               </button>
               {showMoreMenu && (
                 <div className="absolute right-0 top-10 bg-mn-elevated rounded-xl shadow-xl border border-white/5 py-1 min-w-[200px] z-30" onClick={e => e.stopPropagation()}>
                   <button onClick={handleDM} disabled={dmLoading}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2">
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2">
                     <MessageCircle className="w-4 h-4" /> Nachricht senden
                   </button>
                   <button onClick={handleBlock}
-                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-warm-50 transition-colors flex items-center gap-2">
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-mn-surface transition-colors flex items-center gap-2">
                     <Ban className="w-4 h-4" /> Blockieren
                   </button>
                   <button onClick={handleReport}
@@ -717,7 +717,7 @@ export default function ProfileView({
           </button>
           <button
             onClick={() => setShowQRCode(true)}
-            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-white/5 text-mn-ink-soft hover:bg-warm-50 transition-all"
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border border-white/5 text-mn-ink-soft hover:bg-mn-surface transition-all"
           >
             <QrCode className="w-4 h-4" /> QR-Code
           </button>
@@ -729,7 +729,7 @@ export default function ProfileView({
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-mn-ink">Fähigkeiten</h3>
           {isOwnProfile && !skillEditing && (
-            <button onClick={() => setSkillEditing(true)} aria-label="Fähigkeiten bearbeiten" className="p-1.5 rounded-lg hover:bg-warm-100 transition-colors">
+            <button onClick={() => setSkillEditing(true)} aria-label="Fähigkeiten bearbeiten" className="p-1.5 rounded-lg hover:bg-mn-elevated transition-colors">
               <Edit3 className="w-4 h-4 text-mn-mute" />
             </button>
           )}
@@ -760,7 +760,7 @@ export default function ProfileView({
                 <div className="absolute top-full left-0 right-0 mt-1 bg-mn-elevated rounded-xl shadow-xl border border-white/5 p-2 z-20 flex flex-wrap gap-1.5">
                   {SKILL_SUGGESTIONS.filter(s => !currentSkills.includes(s)).map(s => (
                     <button key={s} onClick={() => handleAddSkill(s)}
-                      className="text-xs bg-warm-50 hover:bg-warm-100 text-mn-ink-soft px-2.5 py-1 rounded-full border border-warm-200 transition-colors">
+                      className="text-xs bg-mn-surface hover:bg-mn-elevated text-mn-ink-soft px-2.5 py-1 rounded-full border border-white/8 transition-colors">
                       <Plus className="w-2.5 h-2.5 inline mr-0.5" />{s}
                     </button>
                   ))}
@@ -770,7 +770,7 @@ export default function ProfileView({
                 <div className="absolute top-full left-0 right-0 mt-1 bg-mn-elevated rounded-xl shadow-xl border border-white/5 p-2 z-20 flex flex-wrap gap-1.5">
                   {SKILL_SUGGESTIONS.filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !currentSkills.includes(s)).map(s => (
                     <button key={s} onClick={() => handleAddSkill(s)}
-                      className="text-xs bg-warm-50 hover:bg-warm-100 text-mn-ink-soft px-2.5 py-1 rounded-full border border-warm-200 transition-colors">
+                      className="text-xs bg-mn-surface hover:bg-mn-elevated text-mn-ink-soft px-2.5 py-1 rounded-full border border-white/8 transition-colors">
                       {s}
                     </button>
                   ))}
@@ -922,7 +922,7 @@ export default function ProfileView({
         <h3 className="font-bold text-mn-ink mb-4">Beiträge</h3>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-4 bg-warm-50 rounded-lg p-1">
+        <div className="flex gap-1 mb-4 bg-mn-surface rounded-lg p-1">
           <button
             onClick={() => setActivePostTab('active')}
             className={cn(
@@ -958,7 +958,7 @@ export default function ProfileView({
                 <Link
                   key={post.id}
                   href={`/dashboard/posts/${post.id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-warm-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-mn-surface transition-colors"
                 >
                   <span className="text-sm flex-shrink-0">{cfg.emoji}</span>
                   <div className="flex-1 min-w-0">
@@ -978,7 +978,7 @@ export default function ProfileView({
             })}
           </div>
         ) : (
-          <div className="text-center py-8 bg-warm-50 rounded-xl border border-warm-200">
+          <div className="text-center py-8 bg-mn-surface rounded-xl border border-white/8">
             <FileText className="w-10 h-10 text-mn-ghost mx-auto mb-2" />
             {isOwnProfile ? (
               <>
@@ -1021,7 +1021,7 @@ export default function ProfileView({
                   link.download = `mensaena-profil-${profile.id}.png`
                   link.click()
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-warm-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border border-white/5 hover:bg-mn-surface transition-colors"
               >
                 <Download className="w-4 h-4" /> Als Bild speichern
               </button>

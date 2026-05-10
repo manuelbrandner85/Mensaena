@@ -33,7 +33,7 @@ function SeasonWidget() {
   const next = MONTHLY_HARVEST[(m + 1) % 12]
 
   return (
-    <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-lime-50 border border-mn-amber/20 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
+    <div className="relative bg-gradient-to-br from-mn-amber/8 via-mn-amber/4/80 to-lime-50 border border-mn-amber/20 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -100,7 +100,7 @@ function NearbyFarmsWidget() {
   }, [])
 
   return (
-    <div className="relative bg-mn-elevated border border-warm-200 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
+    <div className="relative bg-mn-elevated border border-white/8 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
@@ -120,7 +120,7 @@ function NearbyFarmsWidget() {
         <div className="space-y-2">
           {farms.map(f => (
             <Link key={f.id} href={`/dashboard/supply/farm/${f.slug}`}
-              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-warm-50 transition-all group shadow-cinema-card border border-warm-100">
+              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-mn-surface transition-all group shadow-cinema-card border border-white/8">
               <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 text-sm group-hover:scale-110 transition-transform">
                 {f.category === 'Biohof' ? '🌿' : f.category === 'Selbsternte' ? '🫑' : '🏡'}
               </div>
@@ -135,7 +135,7 @@ function NearbyFarmsWidget() {
         </div>
       )}
       <Link href="/dashboard/supply"
-        className="relative mt-3 flex items-center justify-center gap-2 p-2 bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 rounded-xl text-xs font-medium text-amber-700 transition-all shadow-cinema-card">
+        className="relative mt-3 flex items-center justify-center gap-2 p-2 bg-gradient-to-r from-mn-amber/12 to-yellow-50 hover:from-mn-amber/12 hover:to-yellow-100 rounded-xl text-xs font-medium text-amber-700 transition-all shadow-cinema-card">
         {totalCount > 0 ? `🗺️ Alle ${totalCount} Betriebe auf der Karte` : '🗺️ Alle Betriebe auf der Karte'}
       </Link>
     </div>
@@ -145,7 +145,7 @@ function NearbyFarmsWidget() {
 // ── Erntehilfe-Regeln ─────────────────────────────────────────
 function HarvestRulesWidget() {
   return (
-    <div className="relative bg-mn-elevated border border-warm-200 rounded-2xl p-5 pt-6 shadow-cinema-card overflow-hidden">
+    <div className="relative bg-mn-elevated border border-white/8 rounded-2xl p-5 pt-6 shadow-cinema-card overflow-hidden">
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{ background: 'linear-gradient(90deg, #CA8A04, #CA8A0433)' }}
@@ -219,7 +219,7 @@ function FoodScannerWidget() {
 
   return (
     <>
-      <div className="relative bg-mn-elevated border border-primary-100 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-mn-elevated border border-white/8 rounded-2xl p-5 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}

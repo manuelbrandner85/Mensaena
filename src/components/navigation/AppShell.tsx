@@ -398,7 +398,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           aria-hidden="true"
         />
         <div className="relative text-center">
-          <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
           <p className="meta-label meta-label--subtle justify-center">{t('loading')}</p>
         </div>
       </div>

@@ -166,7 +166,7 @@ export default function SpendenClient() {
           </p>
 
           {costPerPerson && userCount && (
-            <div className="mt-10 inline-flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 bg-white border border-primary-200 rounded-2xl px-5 py-3 shadow-soft max-w-md">
+            <div className="mt-10 inline-flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 bg-white border border-white/10 rounded-2xl px-5 py-3 shadow-soft max-w-md">
               <span className="meta-label text-primary-700">Pro Person</span>
               <span className="text-sm text-ink-700">
                 Bei <strong>{userCount.toLocaleString('de-DE')}</strong> Nachbar:innen reichen{' '}
@@ -205,7 +205,7 @@ export default function SpendenClient() {
                   'relative py-4 md:py-5 rounded-2xl text-sm md:text-base font-bold transition-all border-2',
                   !isCustom && selectedAmount === amt
                     ? 'bg-ink-900 text-paper border-ink-900 shadow-md'
-                    : 'bg-stone-50 text-ink-700 border-stone-200 hover:border-primary-400 hover:bg-primary-50/50',
+                    : 'bg-stone-50 text-ink-700 border-stone-200 hover:border-mn-amber/30 hover:bg-primary-50/50',
                 )}
               >
                 {amt}&nbsp;€
@@ -232,7 +232,7 @@ export default function SpendenClient() {
               className={cn(
                 'w-full pl-9 pr-4 py-4 rounded-2xl border-2 text-base font-medium transition-all bg-stone-50',
                 isCustom && customAmount
-                  ? 'border-primary-500 ring-2 ring-primary-100 bg-white'
+                  ? 'border-mn-amber/50 ring-2 ring-primary-100 bg-white'
                   : 'border-stone-200 hover:border-stone-300',
               )}
             />
@@ -385,7 +385,7 @@ export default function SpendenClient() {
 
       {/* ─── Supporter Badge ──────────────────────────────────────── */}
       <section className="px-6 md:px-10 pb-24">
-        <div className="max-w-4xl mx-auto bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 border border-amber-200 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto bg-gradient-to-br from-mn-amber/12 via-mn-amber-warm/4 to-mn-amber-warm/8 border border-amber-200 rounded-3xl p-8 md:p-12 relative overflow-hidden">
           <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-200/40 blur-3xl pointer-events-none" aria-hidden="true" />
           <div className="relative flex flex-col md:flex-row items-center gap-8">
             <div className="flex-shrink-0 w-24 h-24 rounded-3xl bg-white border-2 border-amber-300 flex items-center justify-center shadow-amber-200 shadow-lg">
@@ -419,7 +419,7 @@ export default function SpendenClient() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {([
-              { tier: 1, emoji: '🤍', name: 'Unterstützer', threshold: '1 Spende oder ab 5 €', color: 'border-gray-200 bg-white', active: 'border-primary-300 bg-primary-50', features: [
+              { tier: 1, emoji: '🤍', name: 'Unterstützer', threshold: '1 Spende oder ab 5 €', color: 'border-gray-200 bg-white', active: 'border-mn-amber/20 bg-primary-50', features: [
                 { icon: MessageCircle, label: 'Spender-Badge im Chat' },
               ]},
               { tier: 2, emoji: '💛', name: 'Förderer', threshold: '3 Spenden oder ab 25 €', color: 'border-gray-200 bg-white', active: 'border-white/8 bg-mn-surface', features: [
@@ -440,7 +440,7 @@ export default function SpendenClient() {
               return (
                 <div key={tier} className={cn(
                   'rounded-2xl border-2 p-5 transition-all relative',
-                  isCurrent ? active : isDone ? 'border-primary-200 bg-primary-50/40' : color
+                  isCurrent ? active : isDone ? 'border-white/10 bg-primary-50/40' : color
                 )}>
                   {isCurrent && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-primary-600 text-white px-3 py-1 rounded-full">
@@ -666,7 +666,7 @@ function ReceiptRequestForm() {
   if (sent) {
     return (
       <div className="flex flex-col items-center gap-4 py-6 text-center">
-        <div className="w-14 h-14 rounded-full bg-primary-50 border border-primary-200 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-primary-50 border border-white/10 flex items-center justify-center">
           <Check className="w-7 h-7 text-primary-600" />
         </div>
         <div>

@@ -11,7 +11,7 @@ export default function HousingCreatePage() {
       moduleTitle="Neuer Wohn-Beitrag"
       moduleDescription="Biete Wohnraum an oder suche Unterstützung."
       gradientFrom="from-mn-teal"
-      gradientTo="to-cyan-400"
+      gradientTo="to-mn-teal-soft/8"
       ringColor="ring-mn-teal/30"
       iconComponent={<Home className="w-6 h-6" />}
       createTypes={[

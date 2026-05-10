@@ -101,7 +101,7 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
     <aside className="w-full lg:w-64 flex-shrink-0">
       <div className="sticky top-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="px-4 py-4 bg-gradient-to-br from-primary-500 to-teal-600 text-white">
+        <div className="px-4 py-4 bg-gradient-to-br from-primary-500 to-mn-teal-soft/8 text-white">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 bg-mn-elevated/20 rounded-xl flex items-center justify-center border border-white/30">
               <Settings className="w-4 h-4 text-white" />

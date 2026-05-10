@@ -208,12 +208,12 @@ function DefaultBadge({
       }
     : status.kind === 'tomorrow'
     ? {
-        bg: 'bg-gradient-to-br from-mn-amber via-violet-50 to-mn-amber-warm',
+        bg: 'bg-gradient-to-br from-mn-amber via-mn-amber/3 to-mn-amber-warm',
         border: 'border-white/5',
         iconBg: 'bg-purple-500 text-white',
         text: 'text-mn-amber',
         sub: 'text-mn-amber',
-        dark: 'dark:from-mn-amber/30 dark:via-violet-900/30 dark:to-mn-amber-warm/30 dark:border-white/5 dark:text-mn-amber',
+        dark: 'dark:from-mn-amber/30 dark:via-mn-amber/3/30 dark:to-mn-amber-warm/30 dark:border-white/5 dark:text-mn-amber',
       }
     : {
         bg: 'bg-mn-surface',

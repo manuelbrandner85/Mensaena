@@ -234,7 +234,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 className={cn(
                   'inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all',
                   event.my_attendance === 'going'
-                    ? 'text-mn-amber border-primary-300 bg-mn-amber/5'
+                    ? 'text-mn-amber border-mn-amber/20 bg-mn-amber/5'
                     : event.my_attendance === 'interested'
                       ? 'text-amber-600 border-amber-300 bg-amber-50'
                       : 'text-mn-mute border-white/8 bg-mn-surface',

@@ -73,7 +73,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
         </button>
 
         {/* Top: gradient header */}
-        <div className="bg-gradient-to-br from-primary-600 to-teal-700 text-white px-8 pt-10 pb-8 text-center">
+        <div className="bg-gradient-to-br from-primary-600 to-mn-teal-soft/8 text-white px-8 pt-10 pb-8 text-center">
           <div className="relative inline-flex items-center justify-center mb-4">
             <span className="absolute inset-0 rounded-full bg-mn-elevated/30 animate-ping" aria-hidden="true" />
             <span className="relative w-16 h-16 rounded-full bg-mn-elevated/20 flex items-center justify-center">

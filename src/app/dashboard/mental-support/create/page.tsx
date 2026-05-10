@@ -10,7 +10,7 @@ export default function MentalSupportCreatePage() {
       moduleKey="mental-support"
       moduleTitle="Neuer Beitrag – Mentale Unterstützung"
       moduleDescription="Teile Gedanken, suche Unterstützung oder biete Hilfe an. Anonym möglich."
-      gradientFrom="from-rose-400"
+      gradientFrom="from-mn-herzrot/10"
       gradientTo="to-pink-400"
       ringColor="ring-rose-400"
       iconComponent={<Heart className="w-6 h-6" />}

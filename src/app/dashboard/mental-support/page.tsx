@@ -191,7 +191,7 @@ function CrisisHotlinesWidget() {
   return (
     <div className="space-y-4">
       {/* Wichtiger Hinweis */}
-      <div className="relative bg-gradient-to-br from-cyan-50 via-cyan-50/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-gradient-to-br from-mn-teal/10 via-mn-teal/5/80 to-sky-50 border border-cyan-300 rounded-2xl p-4 flex items-start gap-3 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #06B6D4, #06B6D433)' }}
@@ -312,7 +312,7 @@ export default function MentalSupportPage() {
       title="Mentale Unterstützung"
       description="Gesprächspartner, anonyme Hilfe, naturbasierte Unterstützung – du bist nicht allein"
       icon={<Brain className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-cyan-500 to-sky-600"
+      color="bg-gradient-to-r from-mn-teal/10 to-sky-600"
       postTypes={['crisis', 'rescue']}
       moduleFilter={[
         { type: 'crisis', categories: ['mental', 'general', 'skills'] },    // Mentale Krisen + naturbasiert

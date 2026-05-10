@@ -83,7 +83,7 @@ function SharingStatsWidget() {
 
       {/* Aktuelle Angebote */}
       {recentItems.length > 0 && (
-        <div className="relative bg-gradient-to-br from-primary-50 via-primary-50/80 to-cyan-50 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-amber/8 via-mn-amber/4/80 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
@@ -97,7 +97,7 @@ function SharingStatsWidget() {
           <div className="relative flex flex-wrap gap-2">
             {recentItems.map(item => (
               <Link key={item.id} href={`/dashboard/posts/${item.id}`}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-elevated border border-primary-100 rounded-full text-xs font-medium text-mn-amber hover:bg-mn-amber/5 transition-all shadow-cinema-card">
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-elevated border border-white/8 rounded-full text-xs font-medium text-mn-amber hover:bg-mn-amber/5 transition-all shadow-cinema-card">
                 {catEmoji[item.category] ?? '🔄'} {item.title.length > 25 ? item.title.slice(0, 25) + '…' : item.title}
               </Link>
             ))}
@@ -131,7 +131,7 @@ export default function SharingPage() {
       title="Teilen & Tauschen"
       description="Geräte teilen, Kleidung & Bücher tauschen – gemeinsam statt neu kaufen"
       icon={<Shuffle className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-teal-500 to-primary-600"
+      color="bg-gradient-to-r from-mn-teal/10 to-primary-600"
       postTypes={['sharing', 'rescue']}
       moduleFilter={[
         { type: 'sharing', categories: ['sharing', 'everyday', 'knowledge', 'general'] },  // Teilen & Tauschen

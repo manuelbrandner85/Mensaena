@@ -100,7 +100,7 @@ export default function SearchBar() {
         onFocus={() => query.length >= 2 && setShowResults(true)}
         onKeyDown={handleKeyDown}
         placeholder="Beiträge, Nutzer, Kanäle suchen…"
-        className="w-full pl-9 pr-8 py-2 text-sm bg-warm-50 border border-warm-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-mn-elevated transition-all"
+        className="w-full pl-9 pr-8 py-2 text-sm bg-mn-surface border border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-mn-elevated transition-all"
         aria-label="Suche"
       />
       {query && (
@@ -113,7 +113,7 @@ export default function SearchBar() {
       )}
 
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-mn-elevated rounded-2xl border border-warm-200 shadow-2xl overflow-hidden z-50 animate-scale-in">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-mn-elevated rounded-2xl border border-white/8 shadow-2xl overflow-hidden z-50 animate-scale-in">
           {searching ? (
             <div className="py-4 text-center text-sm text-mn-mute">Suche…</div>
           ) : results.length === 0 ? (
@@ -145,7 +145,7 @@ export default function SearchBar() {
                   </div>
                 )
               })}
-              <div className="px-4 py-2 border-t border-warm-100">
+              <div className="px-4 py-2 border-t border-white/8">
                 <button
                   onClick={() => handleSelect(`/dashboard/posts?q=${encodeURIComponent(query)}`)}
                   className="text-xs text-mn-amber hover:underline"

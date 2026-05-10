@@ -63,7 +63,7 @@ export default function CreateInteractionModal({
             className={cn(
               'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all',
               iAmHelper
-                ? 'bg-mn-amber/5 text-mn-amber border-primary-300'
+                ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
                 : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
             )}
           >

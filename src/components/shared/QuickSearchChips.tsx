@@ -151,8 +151,8 @@ export default function QuickSearchChips({ onChipClick, activeChip, className }:
             className={cn(
               'px-4 py-2 rounded-full text-sm border transition-all cursor-pointer',
               activeChip === chip.label
-                ? 'bg-mn-amber/5 border-primary-300 text-mn-amber font-medium'
-                : 'bg-mn-elevated hover:bg-mn-amber/5 border-white/5 hover:border-primary-300 text-stone-700 hover:text-mn-amber',
+                ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber font-medium'
+                : 'bg-mn-elevated hover:bg-mn-amber/5 border-white/5 hover:border-mn-amber/20 text-stone-700 hover:text-mn-amber',
             )}
           >
             {chip.label}

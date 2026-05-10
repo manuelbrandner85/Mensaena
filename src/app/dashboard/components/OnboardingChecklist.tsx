@@ -22,7 +22,7 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
       <Card
         variant="flat"
         padding="md"
-        className="bg-gradient-to-br from-primary-50 to-teal-50 border-mn-amber/20"
+        className="bg-gradient-to-br from-mn-amber/8 to-mn-teal-soft/8 border-mn-amber/20"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export default function OnboardingChecklist({ progress }: OnboardingChecklistPro
     <Card
       variant="flat"
       padding="md"
-      className="bg-gradient-to-br from-primary-50 to-teal-50 border-mn-amber/20"
+      className="bg-gradient-to-br from-mn-amber/8 to-mn-teal-soft/8 border-mn-amber/20"
     >
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-mn-ink">Dein Profil vervollständigen</span>
