@@ -3,11 +3,13 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 
 /// Pendant zu /dashboard/wiki. Liest aus `knowledge_articles`.
 /// Markdown-Rendering via flutter_markdown.
@@ -18,13 +20,47 @@ class WikiPage extends ConsumerStatefulWidget {
   ConsumerState<WikiPage> createState() => _WikiPageState();
 }
 
-class _WikiPageState extends ConsumerState<WikiPage> {
+class _WikiPageState extends ConsumerState<WikiPage> with RealtimeFeedMixin {
   List<Map<String, dynamic>> _articles = const [];
   bool _loading = true;
 
   @override
+  String get realtimeChannelName => 'wiki-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'knowledge_articles',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'knowledge_articles',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  bool shouldBumpForInsert(Map<String, dynamic> row) {
+    if (row['status'] != 'published') return false;
+    final myId = ref.read(supabaseProvider).auth.currentUser?.id;
+    if (myId != null && row['author_id'] == myId) return false;
+    return true;
+  }
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -88,6 +124,13 @@ class _WikiPageState extends ConsumerState<WikiPage> {
             title: 'Wissen aus der Nachbarschaft',
             subtitle:
                 'Anleitungen, Rezepte, Tipps und Tutorials — geteilt von Menschen wie dir.',
+            icon: Icons.menu_book_outlined,
+          ),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Artikel',
+            pluralLabel: 'Artikel',
+            onTap: _showNewItems,
             icon: Icons.menu_book_outlined,
           ),
           Expanded(

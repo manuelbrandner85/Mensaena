@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 import 'crisis_dashboard.dart';
 import 'crisis_repository.dart';
 import 'models.dart';
@@ -17,15 +19,42 @@ class CrisisPage extends ConsumerStatefulWidget {
   ConsumerState<CrisisPage> createState() => _CrisisPageState();
 }
 
-class _CrisisPageState extends ConsumerState<CrisisPage> {
+class _CrisisPageState extends ConsumerState<CrisisPage>
+    with RealtimeFeedMixin {
   List<Crisis> _items = [];
   bool _loading = true;
   String _category = 'all';
   String _urgency = 'all';
 
   @override
+  String get realtimeChannelName => 'crisis-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'crises',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'crises',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -142,6 +171,14 @@ class _CrisisPageState extends ConsumerState<CrisisPage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Krise gemeldet',
+            pluralLabel: 'Krisen gemeldet',
+            onTap: _showNewItems,
+            icon: Icons.crisis_alert,
+            background: AppColors.emergency500,
+          ),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())

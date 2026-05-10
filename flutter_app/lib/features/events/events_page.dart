@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 import 'events_repository.dart';
 import 'models.dart';
 
@@ -16,15 +18,52 @@ class EventsPage extends ConsumerStatefulWidget {
   ConsumerState<EventsPage> createState() => _EventsPageState();
 }
 
-class _EventsPageState extends ConsumerState<EventsPage> {
+class _EventsPageState extends ConsumerState<EventsPage>
+    with RealtimeFeedMixin {
   List<EventItem> _events = [];
   Map<String, AttendeeStatus> _attendances = const {};
   bool _loading = true;
   String _category = 'all';
 
   @override
+  String get realtimeChannelName => 'events-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'events',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'events',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'event_attendees',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.delete,
+          table: 'event_attendees',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -104,6 +143,13 @@ class _EventsPageState extends ConsumerState<EventsPage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Event',
+            pluralLabel: 'Events',
+            onTap: _showNewItems,
+            icon: Icons.event,
+          ),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())

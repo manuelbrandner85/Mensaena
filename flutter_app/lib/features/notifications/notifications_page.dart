@@ -5,10 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 
 /// /dashboard/notifications — Pendant zum Web-Notification-Center.
 /// Filter-Chips nach category, Mark-as-read, Tap-to-link, Pull-to-refresh.
@@ -19,10 +21,36 @@ class NotificationsPage extends ConsumerStatefulWidget {
   ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState extends ConsumerState<NotificationsPage> {
+class _NotificationsPageState extends ConsumerState<NotificationsPage>
+    with RealtimeFeedMixin {
   List<Map<String, dynamic>> _items = const [];
   bool _loading = true;
   String _filter = 'all';
+
+  @override
+  String get realtimeChannelName => 'notifications-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'notifications',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+      ];
+
+  @override
+  bool shouldBumpForInsert(Map<String, dynamic> row) {
+    // Notifications gehören uns; nur wenn user_id == ich ist es relevant.
+    final myId = ref.read(supabaseProvider).auth.currentUser?.id;
+    if (myId == null) return false;
+    if (row['user_id'] != myId) return false;
+    if (_filter != 'all' && row['category'] != _filter) return false;
+    return true;
+  }
+
+  @override
+  Future<void> reloadFeed() => _load();
 
   static const _filters = [
     (value: 'all', label: 'Alle', icon: Icons.notifications_outlined),
@@ -37,6 +65,12 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -280,6 +314,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Benachrichtigung',
+            pluralLabel: 'Benachrichtigungen',
+            onTap: _showNewItems,
+            icon: Icons.notifications_active,
+          ),
           Expanded(
             child: _loading
                 ? const SkeletonList(count: 6)

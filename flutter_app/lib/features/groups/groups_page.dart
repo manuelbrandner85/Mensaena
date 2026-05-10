@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
+import '../../widgets/realtime_feed.dart';
 import 'groups_repository.dart';
 import 'models.dart';
 
@@ -16,7 +18,8 @@ class GroupsPage extends ConsumerStatefulWidget {
   ConsumerState<GroupsPage> createState() => _GroupsPageState();
 }
 
-class _GroupsPageState extends ConsumerState<GroupsPage> {
+class _GroupsPageState extends ConsumerState<GroupsPage>
+    with RealtimeFeedMixin {
   List<Group> _groups = [];
   Set<String> _mine = const {};
   bool _loading = true;
@@ -24,8 +27,44 @@ class _GroupsPageState extends ConsumerState<GroupsPage> {
   String? _busyId;
 
   @override
+  String get realtimeChannelName => 'groups-feed-realtime';
+
+  @override
+  List<FeedRealtimeRule> get realtimeRules => const [
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'groups',
+          action: FeedRealtimeAction.bumpNewCount,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.update,
+          table: 'groups',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.insert,
+          table: 'group_members',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+        FeedRealtimeRule(
+          event: PostgresChangeEvent.delete,
+          table: 'group_members',
+          action: FeedRealtimeAction.reloadImmediately,
+        ),
+      ];
+
+  @override
+  Future<void> reloadFeed() => _load();
+
+  @override
   void initState() {
     super.initState();
+    _load();
+    subscribeRealtime();
+  }
+
+  void _showNewItems() {
+    resetNewItemCount();
     _load();
   }
 
@@ -126,6 +165,13 @@ class _GroupsPageState extends ConsumerState<GroupsPage> {
             ),
           ),
           const Divider(height: 1),
+          NewItemsBanner(
+            count: newItemCount,
+            singularLabel: 'Gruppe',
+            pluralLabel: 'Gruppen',
+            onTap: _showNewItems,
+            icon: Icons.group_add_outlined,
+          ),
           Expanded(
             child: _loading
                 ? const SkeletonList(count: 4)
