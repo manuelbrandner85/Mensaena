@@ -5,6 +5,7 @@ import QRCode from 'qrcode'
 import {
   APK_URL,
   APK_FILENAME,
+  APP_DOWNLOAD_PAGE_URL,
 } from '@/lib/app-download'
 import DownloadProgressBar from './DownloadProgressBar'
 import ConfettiEffect from './ConfettiEffect'
@@ -50,12 +51,12 @@ export default function AppDownloadSection() {
   // QR-Code client-seitig generieren (in ALL-CAPS für kompakteren Code)
   useEffect(() => {
     let cancelled = false
-    QRCode.toString(APK_URL, {
+    QRCode.toString(APP_DOWNLOAD_PAGE_URL, {
       type: 'svg',
       margin: 1,
       width: 280,
       color: { dark: '#0E1A19', light: '#FFFFFF' },
-      errorCorrectionLevel: 'H',
+      errorCorrectionLevel: 'M',
     })
       .then((svg) => {
         if (!cancelled) setQrSvg(svg)
