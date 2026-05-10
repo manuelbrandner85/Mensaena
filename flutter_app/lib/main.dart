@@ -10,6 +10,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/accessibility_store.dart';
 import 'core/crash_log.dart';
 import 'core/i18n.dart';
+import 'core/push_notifications.dart';
 import 'core/supabase.dart';
 import 'features/updates/update_gate.dart';
 import 'routing/app_router.dart';
@@ -67,6 +68,12 @@ void main() {
       // Nach erfolgreichem Supabase-Init: queued Crash-Reports flushen.
       if (bootError == null) {
         unawaited(CrashLog.flushPending());
+        // Firebase + FCM-Token registrieren — Fehler darf nicht den Boot
+        // crashen, also async und gefangen.
+        unawaited(() async {
+          await PushNotifications.init();
+          await PushNotifications.registerToken();
+        }(),);
       }
 
       runApp(
