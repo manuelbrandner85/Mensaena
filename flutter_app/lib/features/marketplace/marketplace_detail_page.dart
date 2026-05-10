@@ -18,6 +18,8 @@ class MarketplaceDetailPage extends ConsumerStatefulWidget {
       _MarketplaceDetailPageState();
 }
 
+enum _OwnerAction { markSold, delete }
+
 class _MarketplaceDetailPageState
     extends ConsumerState<MarketplaceDetailPage> {
   Map<String, dynamic>? _listing;
@@ -86,6 +88,87 @@ class _MarketplaceDetailPageState
     }
   }
 
+  Future<void> _onOwnerAction(_OwnerAction action) async {
+    final l = _listing;
+    if (l == null) return;
+    final id = l['id'] as String?;
+    if (id == null) return;
+    switch (action) {
+      case _OwnerAction.markSold:
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Inserat als verkauft markieren?'),
+            content: const Text(
+              'Andere User sehen das Inserat nicht mehr in der Liste.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Zurück'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Verkauft'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+        try {
+          await ref.read(supabaseProvider).from('marketplace_listings').update(
+            <String, dynamic>{'status': 'sold'},
+          ).eq('id', id);
+          await _load();
+        } catch (e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Fehler: $e')),
+          );
+        }
+        break;
+      case _OwnerAction.delete:
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Inserat löschen?'),
+            content: const Text(
+              'Das Inserat wird unwiderruflich gelöscht.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Abbrechen'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.emergency500,
+                ),
+                child: const Text('Löschen'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+        try {
+          await ref
+              .read(supabaseProvider)
+              .from('marketplace_listings')
+              .delete()
+              .eq('id', id);
+          if (!mounted) return;
+          Navigator.of(context).pop();
+        } catch (e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Löschen fehlgeschlagen: $e')),
+          );
+        }
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -130,9 +213,67 @@ class _MarketplaceDetailPageState
     final reservedByMe = myId != null && reservedFor == myId;
     final reservedByOther = reservedFor != null && reservedFor != myId;
 
+    final status = l['status'] as String? ?? 'active';
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: Text(l['title'] as String? ?? 'Inserat')),
+      appBar: AppBar(
+        title: Text(l['title'] as String? ?? 'Inserat'),
+        actions: [
+          if (isMine && status == 'active')
+            PopupMenuButton<_OwnerAction>(
+              tooltip: 'Aktionen',
+              icon: const Icon(Icons.more_vert),
+              onSelected: _onOwnerAction,
+              itemBuilder: (_) => const [
+                PopupMenuItem(
+                  value: _OwnerAction.markSold,
+                  child: ListTile(
+                    leading: Icon(Icons.check_circle_outline,
+                        color: AppColors.primary500),
+                    title: Text('Als verkauft markieren'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _OwnerAction.delete,
+                  child: ListTile(
+                    leading: Icon(Icons.delete_outline,
+                        color: AppColors.emergency500),
+                    title: Text(
+                      'Inserat löschen',
+                      style: TextStyle(color: AppColors.emergency500),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          if (isMine && status != 'active')
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary500.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  status == 'sold'
+                      ? 'Verkauft'
+                      : status == 'reserved'
+                          ? 'Reserviert'
+                          : 'Inaktiv',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary500,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

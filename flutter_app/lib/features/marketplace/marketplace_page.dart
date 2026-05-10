@@ -22,6 +22,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
   List<Map<String, dynamic>> _listings = const [];
   bool _loading = true;
   String _filter = 'all';
+  String _conditionFilter = 'all';
 
   static const _filters = [
     (value: 'all', label: 'Alle'),
@@ -29,6 +30,14 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
     (value: 'rent', label: 'Miete'),
     (value: 'free', label: 'Verschenken'),
     (value: 'wanted', label: 'Suche'),
+  ];
+
+  static const _conditionFilters = [
+    (value: 'all', label: 'Alle Zustände'),
+    (value: 'neu', label: '✨ Neu'),
+    (value: 'wie_neu', label: '🆕 Wie neu'),
+    (value: 'gut', label: '👍 Gut'),
+    (value: 'akzeptabel', label: '👌 Akzeptabel'),
   ];
 
   @override
@@ -52,6 +61,10 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
   bool shouldBumpForInsert(Map<String, dynamic> row) {
     if (row['status'] != 'active') return false;
     if (_filter != 'all' && row['listing_type'] != _filter) return false;
+    if (_conditionFilter != 'all' &&
+        row['condition_state'] != _conditionFilter) {
+      return false;
+    }
     final myId = ref.read(supabaseProvider).auth.currentUser?.id;
     if (myId != null && row['user_id'] == myId) return false;
     return true;
@@ -83,6 +96,9 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
           )
           .eq('status', 'active');
       if (_filter != 'all') q = q.eq('listing_type', _filter);
+      if (_conditionFilter != 'all') {
+        q = q.eq('condition_state', _conditionFilter);
+      }
       final rows = await q.order('created_at', ascending: false).limit(50);
       if (!mounted) return;
       setState(() {
@@ -134,6 +150,33 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
                         selected: _filter == f.value,
                         onSelected: (_) {
                           setState(() => _filter = f.value);
+                          _load();
+                        },
+                        selectedColor:
+                            AppColors.primary500.withValues(alpha: 0.15),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: _conditionFilters
+                  .map(
+                    (f) => Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: ChoiceChip(
+                        label: Text(
+                          f.label,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        selected: _conditionFilter == f.value,
+                        onSelected: (_) {
+                          setState(() => _conditionFilter = f.value);
                           _load();
                         },
                         selectedColor:
