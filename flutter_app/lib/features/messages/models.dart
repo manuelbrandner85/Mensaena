@@ -74,6 +74,7 @@ class Message {
     required this.content,
     required this.createdAt,
     this.readAt,
+    this.editedAt,
     this.deletedAt,
     this.senderProfile,
   });
@@ -84,10 +85,40 @@ class Message {
   final String content;
   final DateTime createdAt;
   final DateTime? readAt;
+  final DateTime? editedAt;
   final DateTime? deletedAt;
   final Profile? senderProfile;
 
   bool get isDeleted => deletedAt != null;
+  bool get isEdited => editedAt != null;
+
+  /// Markdown-Bild-Pattern aus Web-ChatView (`![Bild](url)`).
+  /// Match-Group 1 ist die URL des Bildes; null wenn kein Bild.
+  static final RegExp _imagePattern = RegExp(r'^!\[[^\]]*\]\((.+)\)$');
+  String? get imageUrl {
+    final match = _imagePattern.firstMatch(content.trim());
+    return match?.group(1);
+  }
+
+  bool get isImageMessage => imageUrl != null;
+
+  Message copyWith({
+    String? content,
+    DateTime? readAt,
+    DateTime? editedAt,
+    DateTime? deletedAt,
+  }) =>
+      Message(
+        id: id,
+        conversationId: conversationId,
+        senderId: senderId,
+        content: content ?? this.content,
+        createdAt: createdAt,
+        readAt: readAt ?? this.readAt,
+        editedAt: editedAt ?? this.editedAt,
+        deletedAt: deletedAt ?? this.deletedAt,
+        senderProfile: senderProfile,
+      );
 
   factory Message.fromJson(Map<String, dynamic> json) {
     Profile? sender;
@@ -100,6 +131,8 @@ class Message {
       content: (json['content'] as String?) ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
       readAt: json['read_at'] != null ? DateTime.tryParse(json['read_at'] as String) : null,
+      editedAt:
+          json['edited_at'] != null ? DateTime.tryParse(json['edited_at'] as String) : null,
       deletedAt:
           json['deleted_at'] != null ? DateTime.tryParse(json['deleted_at'] as String) : null,
       senderProfile: sender,

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -97,14 +99,112 @@ class MessagesRepository {
     final rows = await sb
         .from('messages')
         .select(
-          'id, conversation_id, sender_id, content, created_at, read_at, deleted_at, '
-          'profiles:sender_id(id, name, avatar_url)',
+          'id, conversation_id, sender_id, content, created_at, read_at, edited_at, '
+          'deleted_at, profiles:sender_id(id, name, avatar_url)',
         )
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true)
         .limit(limit);
     return rows
         .map((r) => Message.fromJson(r))
+        .toList(growable: false);
+  }
+
+  /// Aktualisiert den Text einer eigenen Nachricht; setzt `edited_at = now()`.
+  Future<void> editMessage({
+    required String messageId,
+    required String newContent,
+  }) async {
+    await sb.from('messages').update({
+      'content': newContent,
+      'edited_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('id', messageId);
+  }
+
+  /// Soft-Delete: setzt `deleted_at = now()`. Web-ChatView blendet die
+  /// Bubble dann aus oder ersetzt durch "Nachricht gelöscht".
+  Future<void> softDeleteMessage(String messageId) async {
+    await sb.from('messages').update({
+      'deleted_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('id', messageId);
+  }
+
+  /// Lädt ein Bild ins `chat-images` Bucket hoch und sendet eine Markdown-
+  /// Bildnachricht (`![Bild](url)`) — gleiches Format wie die Web-ChatView,
+  /// damit beide Plattformen sich gegenseitig korrekt rendern.
+  Future<Message> sendImageMessage({
+    required String conversationId,
+    required String senderId,
+    required File file,
+  }) async {
+    final ext = file.path.split('.').last.toLowerCase();
+    final rand = Random().nextInt(1 << 32).toRadixString(36);
+    final filePath =
+        'chat/$senderId/${DateTime.now().millisecondsSinceEpoch}_$rand.$ext';
+    final bytes = await file.readAsBytes();
+
+    String? publicUrl;
+    for (final bucket in const ['chat-images', 'avatars']) {
+      try {
+        await sb.storage.from(bucket).uploadBinary(
+              filePath,
+              bytes,
+              fileOptions: FileOptions(
+                upsert: false,
+                contentType: 'image/$ext',
+              ),
+            );
+        publicUrl = sb.storage.from(bucket).getPublicUrl(filePath);
+        break;
+      } catch (_) {
+        // Bucket nicht verfügbar oder Policy-Fehler → nächsten probieren.
+      }
+    }
+    if (publicUrl == null) {
+      throw Exception('Bild-Upload fehlgeschlagen — kein verfügbarer Speicher');
+    }
+
+    return sendMessage(
+      conversationId: conversationId,
+      senderId: senderId,
+      content: '![Bild]($publicUrl)',
+    );
+  }
+
+  /// Sendet ein Typing-Broadcast-Event an alle Member der Conversation.
+  /// Nicht persistent — nur Live-Anzeige.
+  void broadcastTyping({
+    required RealtimeChannel channel,
+    required String userId,
+    required String name,
+  }) {
+    channel.sendBroadcastMessage(
+      event: 'typing',
+      payload: {'userId': userId, 'name': name},
+    );
+  }
+
+  /// Liefert den Typing-Channel für eine Conversation. Subscribed bei Bedarf.
+  /// Aufrufer ist verantwortlich, `removeChannel` in dispose aufzurufen.
+  RealtimeChannel typingChannel(String conversationId) {
+    return sb.channel('typing:$conversationId');
+  }
+
+  /// `last_read_at` aller Member einer Conversation außer mir selbst.
+  /// Wird benutzt um Doppel-Häkchen zu rendern: wenn der Andere zuletzt nach
+  /// dem `created_at` einer eigenen Nachricht gelesen hat → ✓✓.
+  Future<List<DateTime?>> otherMembersLastReadAt({
+    required String conversationId,
+    required String myUserId,
+  }) async {
+    final rows = await sb
+        .from('conversation_members')
+        .select('user_id, last_read_at')
+        .eq('conversation_id', conversationId)
+        .neq('user_id', myUserId);
+    return rows
+        .map((r) => r['last_read_at'] as String?)
+        .map((s) => s == null ? null : DateTime.tryParse(s))
         .toList(growable: false);
   }
 
@@ -118,7 +218,9 @@ class MessagesRepository {
       'conversation_id': conversationId,
       'sender_id': senderId,
       'content': content,
-    }).select('id, conversation_id, sender_id, content, created_at, read_at').single();
+    }).select(
+      'id, conversation_id, sender_id, content, created_at, read_at, edited_at, deleted_at',
+    ).single();
     return Message.fromJson(res);
   }
 
@@ -189,6 +291,27 @@ class MessagesRepository {
     };
     return controller.stream;
   }
+
+  /// Realtime-Stream für UPDATE-Events (Edit, Soft-Delete) in einer
+  /// Conversation. Web-Edits werden so unmittelbar im Mobile-Client sichtbar.
+  Stream<Message> messageUpdatesStream(String conversationId) {
+    final controller = StreamController<Message>.broadcast();
+    final channel = sb.channel('messages-updates:$conversationId');
+    channel.onPostgresChanges(
+      event: PostgresChangeEvent.update,
+      schema: 'public',
+      table: 'messages',
+      callback: (payload) {
+        final row = payload.newRecord;
+        if (row['conversation_id'] != conversationId) return;
+        controller.add(Message.fromJson(row));
+      },
+    ).subscribe();
+    controller.onCancel = () {
+      sb.removeChannel(channel);
+    };
+    return controller.stream;
+  }
 }
 
 final messagesRepositoryProvider = Provider<MessagesRepository>(
@@ -215,4 +338,11 @@ final conversationStreamProvider =
     StreamProvider.family<Message, String>((ref, conversationId) {
   final repo = ref.watch(messagesRepositoryProvider);
   return repo.messagesStream(conversationId);
+});
+
+/// Realtime-Stream für UPDATE-Events (Edits, Soft-Deletes) in einer Conv.
+final conversationUpdateStreamProvider =
+    StreamProvider.family<Message, String>((ref, conversationId) {
+  final repo = ref.watch(messagesRepositoryProvider);
+  return repo.messageUpdatesStream(conversationId);
 });
