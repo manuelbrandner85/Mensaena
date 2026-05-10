@@ -53,7 +53,7 @@ export default function LandingSection({
     <section
       id={id}
       className={cn(
-        'relative py-24 md:py-36 px-6 md:px-10 scroll-mt-24',
+        'relative py-24 md:py-36 px-6 md:px-10 scroll-mt-24 section-separator',
         bgMap[background],
         className,
       )}

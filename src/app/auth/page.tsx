@@ -15,8 +15,18 @@ export default function AuthPageWrapper() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center" role="status">
-          <div className="flex flex-col items-center gap-3">
+        <div className="min-h-dvh bg-paper relative flex items-center justify-center overflow-hidden" role="status">
+          <div
+            className="hero-orb-1 absolute pointer-events-none"
+            style={{ top: '-20%', left: '-10%', width: '50vw', height: '50vw' }}
+            aria-hidden="true"
+          />
+          <div
+            className="hero-orb-2 absolute pointer-events-none"
+            style={{ bottom: '-15%', right: '-10%', width: '45vw', height: '45vw' }}
+            aria-hidden="true"
+          />
+          <div className="relative flex flex-col items-center gap-3">
             <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin" aria-hidden="true" />
             <span className="sr-only">Loading…</span>
           </div>
@@ -297,8 +307,29 @@ function AuthPage() {
   const accent = (chunks: React.ReactNode) => <span className="text-accent">{chunks}</span>
 
   return (
-    <div className="min-h-dvh bg-paper aurora-bg relative flex items-start sm:items-center justify-center px-4 py-16 sm:py-12 md:py-16 safe-area-top safe-area-bottom overflow-y-auto">
-      <div className="mesh-gradient" aria-hidden="true" />
+    <div className="min-h-dvh bg-paper relative flex items-start sm:items-center justify-center px-4 py-16 sm:py-12 md:py-16 safe-area-top safe-area-bottom overflow-y-auto">
+      {/* ── Cinematic atmospheric depth — layered ambient orbs ── */}
+      <div
+        className="hero-orb-1 absolute pointer-events-none"
+        style={{ top: '-20%', left: '-15%', width: '60vw', height: '60vw' }}
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb-2 absolute pointer-events-none"
+        style={{ top: '10%', right: '-15%', width: '50vw', height: '50vw' }}
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb-3 absolute pointer-events-none"
+        style={{ bottom: '-15%', left: '25%', width: '42vw', height: '42vw' }}
+        aria-hidden="true"
+      />
+      {/* Depth grid overlay */}
+      <div
+        className="absolute inset-0 depth-grid-overlay pointer-events-none opacity-50"
+        aria-hidden="true"
+      />
+      {/* Film grain */}
       <div className="mesh-grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 
       <div className="relative w-full max-w-md">
@@ -320,7 +351,7 @@ function AuthPage() {
           </span>
         </Link>
 
-        <div className="editorial-card p-6 md:p-10 spotlight">
+        <div className="card-depth p-6 md:p-10 spotlight">
           <div className="mb-8">
             <div className="meta-label meta-label--subtle mb-5">{modeIndex} / {modeLabel}</div>
             <h1 className="font-display text-3xl md:text-[2.1rem] font-medium text-ink-800 leading-[1.08] tracking-tight mb-3">

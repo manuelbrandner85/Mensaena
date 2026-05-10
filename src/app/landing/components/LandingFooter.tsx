@@ -43,7 +43,44 @@ export default function LandingFooter() {
 
   return (
     <footer className="relative bg-ink-900 text-stone-300 overflow-hidden safe-area-bottom" role="contentinfo">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" aria-hidden="true" />
+      {/* ── Cinematic top light edge ── */}
+      <div className="absolute inset-x-0 top-0 pointer-events-none" aria-hidden="true">
+        <div className="h-px bg-gradient-to-r from-transparent via-primary-500/45 to-transparent" />
+        <div
+          className="h-40"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(30,170,166,0.05) 0%, transparent 100%)',
+          }}
+        />
+      </div>
+      {/* ── Ambient depth orbs ── */}
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          top: '-5%',
+          right: '-10%',
+          width: '45vw',
+          height: '45vw',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.12) 0%, transparent 70%)',
+          filter: 'blur(90px)',
+          animation: 'ambientBreath2 26s ease-in-out infinite',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          bottom: '15%',
+          left: '-8%',
+          width: '35vw',
+          height: '35vw',
+          background: 'radial-gradient(circle, rgba(79,109,138,0.10) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'ambientBreath3 20s ease-in-out 4s infinite',
+        }}
+        aria-hidden="true"
+      />
 
       <div className="max-w-7xl mx-auto px-6 md:px-10 pt-24 md:pt-32">
         <div className="flex items-center gap-4 mb-8">

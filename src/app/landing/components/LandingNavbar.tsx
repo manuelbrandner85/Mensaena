@@ -45,7 +45,9 @@ export default function LandingNavbar() {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 safe-area-top ${
-        scrolled ? 'bg-paper/80 backdrop-blur-md border-b border-stone-200' : 'bg-transparent'
+        scrolled
+          ? 'glass-nav nav-border-gradient shadow-[0_1px_0_rgba(228,228,219,0.5),0_4px_24px_rgba(15,23,42,0.05)]'
+          : 'bg-transparent'
       }`}
       role="banner"
     >

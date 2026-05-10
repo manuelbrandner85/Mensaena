@@ -65,7 +65,7 @@ function HeroBadge({ href, className }: { href: string; className: string }) {
   return (
     <Link
       href={href}
-      className={`group inline-flex max-w-full items-center gap-2.5 rounded-full border border-stone-200 bg-white/80 px-4 py-1.5 text-[12px] font-medium tracking-wide text-ink-700 shadow-soft backdrop-blur-sm transition-all duration-300 hover:border-primary-300 hover:bg-white hover:shadow-card ${className}`}
+      className={`donation-badge-hero group inline-flex max-w-full items-center gap-2.5 rounded-full px-4 py-2 text-[12px] font-medium tracking-wide text-ink-700 transition-all duration-400 ${className}`}
       aria-label="Mehr über die Spendenfinanzierung von Mensaena"
     >
       <span className="relative flex h-2 w-2 flex-shrink-0">
@@ -136,7 +136,7 @@ function FloatingBadge({
       role="complementary"
       aria-label={label ?? 'Mensaena unterstützen'}
     >
-      <div className="pointer-events-auto group relative flex items-center gap-2 rounded-full border border-stone-200 bg-white/95 py-1.5 pr-1.5 pl-4 shadow-card backdrop-blur-md transition-all duration-300 hover:border-primary-300 hover:shadow-glow-teal">
+      <div className="donation-badge-floating pointer-events-auto group relative flex items-center gap-2 rounded-full py-1.5 pr-1.5 pl-4 transition-all duration-400">
         <span className="relative flex h-2 w-2 flex-shrink-0" aria-hidden="true">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-500" />
