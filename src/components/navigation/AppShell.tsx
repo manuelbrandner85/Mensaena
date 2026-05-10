@@ -410,7 +410,33 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-dvh bg-paper relative">
+    <div className="min-h-dvh bg-paper relative overflow-x-hidden">
+      {/* ── Global cinematic ambient orbs — subtle teal depth behind all pages ── */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute rounded-full"
+          style={{
+            top: '-20vh', left: '-15vw',
+            width: '60vw', height: '60vw',
+            background: 'radial-gradient(circle, rgba(30,170,166,0.07) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+            animation: 'ambientBreath1 28s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            bottom: '-15vh', right: '-10vw',
+            width: '50vw', height: '50vw',
+            background: 'radial-gradient(circle, rgba(79,109,138,0.05) 0%, transparent 70%)',
+            filter: 'blur(90px)',
+            animation: 'ambientBreath2 34s ease-in-out infinite',
+          }}
+        />
+      </div>
       {/* ── Sidebar (Desktop + Mobile Drawer) — bei aktivem Anruf versteckt ── */}
       {!isInCall && (
         <DashboardSidebar
