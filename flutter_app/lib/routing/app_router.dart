@@ -35,6 +35,7 @@ import '../features/marketplace/marketplace_create_page.dart';
 import '../features/marketplace/marketplace_detail_page.dart';
 import '../features/marketplace/marketplace_page.dart';
 import '../features/notifications/notifications_page.dart';
+import '../features/onboarding/onboarding_page.dart';
 import '../features/profile/profile_page.dart';
 import '../features/profile/public_profile_page.dart';
 import '../features/settings/settings_page.dart';
@@ -97,6 +98,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: Routes.login, redirect: (_, __) => '${Routes.auth}?mode=login'),
       GoRoute(path: Routes.register, redirect: (_, __) => '${Routes.auth}?mode=register'),
+      GoRoute(path: Routes.onboarding, builder: (_, __) => const OnboardingPage()),
       GoRoute(path: Routes.download, builder: (_, __) => const StubPage(title: 'Download')),
       GoRoute(path: Routes.search, builder: (_, __) => const SearchPage()),
       GoRoute(path: Routes.spenden, builder: (_, __) => const StubPage(title: 'Spenden')),

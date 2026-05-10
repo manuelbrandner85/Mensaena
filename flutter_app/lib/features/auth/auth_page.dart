@@ -86,6 +86,27 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     });
   }
 
+  /// Entscheidet nach erfolgreichem Sign-In, wo der User landet:
+  /// - profile.onboarding_completed=false → /onboarding
+  /// - sonst → /dashboard
+  /// Bei Fehler (Profile noch nicht da, Network-Issue): Default = Dashboard.
+  Future<void> _routeAfterAuth() async {
+    try {
+      final user = sb.auth.currentUser;
+      if (user == null) return;
+      final row = await sb
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .maybeSingle();
+      if (!mounted) return;
+      final completed = (row?['onboarding_completed'] as bool?) ?? false;
+      context.go(completed ? Routes.dashboard : Routes.onboarding);
+    } catch (_) {
+      if (mounted) context.go(Routes.dashboard);
+    }
+  }
+
   Future<void> _submit() async {
     if (_isLogin) return _handleLogin();
     if (_isRegister) return _handleRegister();
@@ -112,7 +133,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       if (!mounted) return;
       if (res.session != null) {
         HapticFeedback.lightImpact();
-        context.go(Routes.dashboard);
+        await _routeAfterAuth();
       } else {
         setState(() => _error = 'Anmeldung fehlgeschlagen.');
       }
@@ -193,7 +214,8 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       if (res.session != null) {
         HapticFeedback.lightImpact();
         if (!mounted) return;
-        context.go(Routes.dashboard);
+        // Frische Sign-Ups gehen direkt in den Onboarding-Wizard.
+        context.go(Routes.onboarding);
         return;
       }
       // Kein Session zurück → E-Mail-Confirm aktiv
