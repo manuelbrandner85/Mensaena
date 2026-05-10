@@ -103,6 +103,43 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
 
         {/* Install steps */}
         <div className="px-8 py-6">
+          {/* Chrome download bar mockup – animated hint */}
+          <div className="mb-5 rounded-2xl overflow-hidden border border-stone-200 shadow-sm">
+            {/* Bar label */}
+            <div className="bg-stone-100 px-3 py-1.5 flex items-center gap-2 border-b border-stone-200">
+              <div className="flex gap-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
+              </div>
+              <span className="text-[10px] text-stone-500 font-medium tracking-wide">Chrome Download-Leiste</span>
+            </div>
+            {/* Simulated download bar at bottom */}
+            <div className="bg-[#3c4043] px-4 py-2.5 flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] text-white/90 font-medium truncate">{APK_FILENAME}</p>
+                <div className="mt-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#8ab4f8] rounded-full animate-[downloadBar_2s_ease-in-out_infinite]" style={{ width: '100%', transformOrigin: 'left' }} />
+                </div>
+              </div>
+              {/* Pulsing "Öffnen" button */}
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-hidden="true"
+                className="flex-shrink-0 px-3 py-1.5 bg-[#8ab4f8] text-[#202124] text-xs font-bold rounded animate-pulse"
+              >
+                Öffnen
+              </button>
+            </div>
+            <div className="bg-primary-50 px-4 py-2.5 flex items-center gap-2">
+              <span className="text-primary-600 text-base leading-none" aria-hidden="true">👆</span>
+              <p className="text-xs text-primary-800 font-semibold">
+                Tippe unten auf <strong>„Öffnen"</strong> sobald der Download fertig ist
+              </p>
+            </div>
+          </div>
+
           {/* Unbekannte Quellen Hinweis */}
           <div className="mb-5 flex gap-3 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3">
             <span className="text-amber-500 text-lg leading-none mt-0.5" aria-hidden="true">⚠️</span>
@@ -121,7 +158,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
               APK wird heruntergeladen
             </StepItem>
             <StepItem number={2}>
-              In den Downloads auf <em>{APK_FILENAME}</em> tippen
+              Unten in der Leiste auf <strong>„Öffnen"</strong> tippen
             </StepItem>
             <StepItem number={3}>
               Bei Nachfrage <q>Aus dieser Quelle erlauben</q> antippen
