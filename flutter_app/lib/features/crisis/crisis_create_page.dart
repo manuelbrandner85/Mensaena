@@ -120,9 +120,11 @@ class _CrisisCreatePageState extends ConsumerState<CrisisCreatePage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isEdit
-              ? 'Änderungen gespeichert'
-              : 'Krisenbericht veröffentlicht'),
+          content: Text(
+            _isEdit
+                ? 'Änderungen gespeichert'
+                : 'Krisenbericht veröffentlicht',
+          ),
         ),
       );
       context.go('${Routes.dashboardCrisis}/$resultId');

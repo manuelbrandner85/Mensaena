@@ -155,8 +155,10 @@ class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
                   const PopupMenuItem(
                     value: _CrisisAction.resolve,
                     child: ListTile(
-                      leading: Icon(Icons.check_circle_outline,
-                          color: AppColors.primary500),
+                      leading: Icon(
+                        Icons.check_circle_outline,
+                        color: AppColors.primary500,
+                      ),
                       title: Text('Als gelöst markieren'),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -172,10 +174,14 @@ class _CrisisDetailPageState extends ConsumerState<CrisisDetailPage> {
                 const PopupMenuItem(
                   value: _CrisisAction.cancel,
                   child: ListTile(
-                    leading: Icon(Icons.cancel_outlined,
-                        color: AppColors.emergency500),
-                    title: Text('Krise löschen / abbrechen',
-                        style: TextStyle(color: AppColors.emergency500)),
+                    leading: Icon(
+                      Icons.cancel_outlined,
+                      color: AppColors.emergency500,
+                    ),
+                    title: Text(
+                      'Krise löschen / abbrechen',
+                      style: TextStyle(color: AppColors.emergency500),
+                    ),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),

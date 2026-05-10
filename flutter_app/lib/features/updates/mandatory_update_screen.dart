@@ -152,7 +152,7 @@ class _MandatoryUpdateScreenState
         return;
       }
       await OpenFilex.open(_filePath!,
-          type: 'application/vnd.android.package-archive');
+          type: 'application/vnd.android.package-archive',);
       return;
     }
     await _runUpdate();

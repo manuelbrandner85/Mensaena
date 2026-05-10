@@ -82,7 +82,7 @@ class WarnungenFoodPage extends StatelessWidget {
             child: const Row(
               children: [
                 Icon(Icons.info_outline,
-                    color: Color(0xFFD97706), size: 20),
+                    color: Color(0xFFD97706), size: 20,),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(

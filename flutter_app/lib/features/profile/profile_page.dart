@@ -106,7 +106,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         kind: _ActivityKind.post,
         title: (m['title'] as String?) ?? 'Beitrag',
         when: ts,
-      ));
+      ),);
     }
     for (final g in results[1]) {
       final m = g as Map<String, dynamic>;
@@ -117,7 +117,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         kind: _ActivityKind.group,
         title: (group?['name'] as String?) ?? 'Gruppe',
         when: ts,
-      ));
+      ),);
     }
     for (final c in results[2]) {
       final m = c as Map<String, dynamic>;
@@ -131,7 +131,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         kind: _ActivityKind.challenge,
         title: name,
         when: ts,
-      ));
+      ),);
     }
     items.sort((a, b) => b.when.compareTo(a.when));
     if (!mounted) return;
@@ -809,7 +809,7 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
                                     ),
                                   )
                                 : const Icon(Icons.camera_alt,
-                                    color: Colors.white, size: 14),
+                                    color: Colors.white, size: 14,),
                           ),
                         ),
                       ),
@@ -968,7 +968,7 @@ class _CoverPickerCard extends StatelessWidget {
                 )
               : Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 8),
+                      horizontal: 12, vertical: 8,),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(20),
@@ -977,7 +977,7 @@ class _CoverPickerCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.camera_alt,
-                          color: Colors.white, size: 14),
+                          color: Colors.white, size: 14,),
                       const SizedBox(width: 6),
                       Text(
                         coverUrl == null ? 'Cover wählen' : 'Cover ändern',

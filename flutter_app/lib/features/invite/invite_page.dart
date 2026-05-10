@@ -466,9 +466,9 @@ class _LeaderboardCard extends StatelessWidget {
   final List<_LeaderEntry> entries;
 
   static const _ranks = [
-    (medal: "🥇", bg: Color(0xFFFEF3C7), border: Color(0xFFFDE68A), text: Color(0xFFB45309)),
-    (medal: "🥈", bg: Color(0xFFF5F5F4), border: Color(0xFFE7E5E4), text: Color(0xFF57534E)),
-    (medal: "🥉", bg: Color(0xFFFFEDD5), border: Color(0xFFFED7AA), text: Color(0xFFC2410C)),
+    (medal: '🥇', bg: Color(0xFFFEF3C7), border: Color(0xFFFDE68A), text: Color(0xFFB45309)),
+    (medal: '🥈', bg: Color(0xFFF5F5F4), border: Color(0xFFE7E5E4), text: Color(0xFF57534E)),
+    (medal: '🥉', bg: Color(0xFFFFEDD5), border: Color(0xFFFED7AA), text: Color(0xFFC2410C)),
   ];
 
   @override
@@ -483,17 +483,20 @@ class _LeaderboardCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.emoji_events_outlined,
-                  size: 18, color: AppColors.primary500),
-              const SizedBox(width: 8),
-              const Expanded(
+              Icon(
+                Icons.emoji_events_outlined,
+                size: 18,
+                color: AppColors.primary500,
+              ),
+              SizedBox(width: 8),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Botschafter-Bestenliste",
+                      'Botschafter-Bestenliste',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -501,7 +504,7 @@ class _LeaderboardCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "Die aktivsten Nachbarschafts-Botschafter",
+                      'Die aktivsten Nachbarschafts-Botschafter',
                       style: TextStyle(
                         fontSize: 11,
                         color: AppColors.ink400,
@@ -519,7 +522,7 @@ class _LeaderboardCard extends StatelessWidget {
             final rank = i < _ranks.length
                 ? _ranks[i]
                 : (
-                    medal: "${i + 1}",
+                    medal: '${i + 1}',
                     bg: const Color(0xFFFAFAF9),
                     border: AppColors.stone200,
                     text: AppColors.ink400
@@ -556,7 +559,7 @@ class _LeaderboardCard extends StatelessWidget {
                           : null,
                       child: entry.avatarUrl == null
                           ? Text(
-                              (entry.name ?? "?").characters.first.toUpperCase(),
+                              (entry.name ?? '?').characters.first.toUpperCase(),
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -568,7 +571,7 @@ class _LeaderboardCard extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "${entry.name ?? "Nachbar:in"}${entry.isMe ? " (Du)" : ""}",
+                        '${entry.name ?? 'Nachbar:in'}${entry.isMe ? ' (Du)' : ''}',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 13,
@@ -578,7 +581,7 @@ class _LeaderboardCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${entry.count} ${entry.count == 1 ? "Einladung" : "Einladungen"}",
+                      '${entry.count} ${entry.count == 1 ? 'Einladung' : 'Einladungen'}',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,

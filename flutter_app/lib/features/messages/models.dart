@@ -76,6 +76,9 @@ class Message {
     this.readAt,
     this.editedAt,
     this.deletedAt,
+    this.replyToId,
+    this.replyToContent,
+    this.replyToSenderName,
     this.senderProfile,
   });
 
@@ -87,10 +90,16 @@ class Message {
   final DateTime? readAt;
   final DateTime? editedAt;
   final DateTime? deletedAt;
+
+  /// ID der Nachricht, auf die geantwortet wird (NULL wenn keine Antwort).
+  final String? replyToId;
+  final String? replyToContent;
+  final String? replyToSenderName;
   final Profile? senderProfile;
 
   bool get isDeleted => deletedAt != null;
   bool get isEdited => editedAt != null;
+  bool get isReply => replyToId != null;
 
   /// Markdown-Bild-Pattern aus Web-ChatView (`![Bild](url)`).
   /// Match-Group 1 ist die URL des Bildes; null wenn kein Bild.
@@ -117,6 +126,9 @@ class Message {
         readAt: readAt ?? this.readAt,
         editedAt: editedAt ?? this.editedAt,
         deletedAt: deletedAt ?? this.deletedAt,
+        replyToId: replyToId,
+        replyToContent: replyToContent,
+        replyToSenderName: replyToSenderName,
         senderProfile: senderProfile,
       );
 
@@ -124,6 +136,16 @@ class Message {
     Profile? sender;
     final p = json['profiles'] ?? json['sender'];
     if (p is Map<String, dynamic>) sender = Profile.fromJson(p);
+    final replyTo = json['reply_to'];
+    String? replyContent;
+    String? replyName;
+    if (replyTo is Map<String, dynamic>) {
+      replyContent = replyTo['content'] as String?;
+      final replyProfile = replyTo['profiles'] ?? replyTo['sender'];
+      if (replyProfile is Map<String, dynamic>) {
+        replyName = replyProfile['name'] as String?;
+      }
+    }
     return Message(
       id: json['id'] as String,
       conversationId: json['conversation_id'] as String,
@@ -135,6 +157,9 @@ class Message {
           json['edited_at'] != null ? DateTime.tryParse(json['edited_at'] as String) : null,
       deletedAt:
           json['deleted_at'] != null ? DateTime.tryParse(json['deleted_at'] as String) : null,
+      replyToId: json['reply_to_id'] as String?,
+      replyToContent: replyContent,
+      replyToSenderName: replyName,
       senderProfile: sender,
     );
   }

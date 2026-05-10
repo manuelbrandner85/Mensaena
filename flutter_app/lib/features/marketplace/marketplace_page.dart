@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -23,6 +24,11 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
   bool _loading = true;
   String _filter = 'all';
   String _conditionFilter = 'all';
+  int? _radiusKm; // null = bundesweit
+  Position? _userLocation;
+  bool _resolvingLocation = false;
+
+  static const _radiusOptions = [5, 10, 25, 50, 100];
 
   static const _filters = [
     (value: 'all', label: 'Alle'),
@@ -85,6 +91,54 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
     _load();
   }
 
+  /// Holt die User-Location falls noch nicht vorhanden. Permission wird
+  /// einmalig angefragt; bei Denial bleibt _userLocation = null und der
+  /// Radius-Filter ist deaktiviert.
+  Future<bool> _ensureLocation() async {
+    if (_userLocation != null) return true;
+    setState(() => _resolvingLocation = true);
+    try {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Standort-Zugriff verweigert — Radius nicht möglich.'),
+            ),
+          );
+        }
+        return false;
+      }
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 8),
+      ).timeout(const Duration(seconds: 10));
+      if (!mounted) return false;
+      setState(() => _userLocation = pos);
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      if (mounted) setState(() => _resolvingLocation = false);
+    }
+  }
+
+  Future<void> _setRadius(int? km) async {
+    if (km == null) {
+      setState(() => _radiusKm = null);
+      _load();
+      return;
+    }
+    final ok = await _ensureLocation();
+    if (!ok) return;
+    setState(() => _radiusKm = km);
+    _load();
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
@@ -98,6 +152,20 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
       if (_filter != 'all') q = q.eq('listing_type', _filter);
       if (_conditionFilter != 'all') {
         q = q.eq('condition_state', _conditionFilter);
+      }
+      final loc = _userLocation;
+      final radius = _radiusKm;
+      if (loc != null && radius != null) {
+        // Approximate bbox: 1° lat ≈ 111 km, lng ≈ 111 * cos(lat)
+        final dLat = radius / 111.0;
+        final dLng = radius / (111.0 * 0.7);
+        q = q
+            .not('latitude', 'is', null)
+            .not('longitude', 'is', null)
+            .gte('latitude', loc.latitude - dLat)
+            .lte('latitude', loc.latitude + dLat)
+            .gte('longitude', loc.longitude - dLng)
+            .lte('longitude', loc.longitude + dLng);
       }
       final rows = await q.order('created_at', ascending: false).limit(50);
       if (!mounted) return;
@@ -185,6 +253,64 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage>
                     ),
                   )
                   .toList(),
+            ),
+          ),
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    avatar: _resolvingLocation
+                        ? const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(
+                            Icons.public,
+                            size: 14,
+                            color: _radiusKm == null
+                                ? AppColors.primary500
+                                : AppColors.ink400,
+                          ),
+                    label: const Text(
+                      'Bundesweit',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    selected: _radiusKm == null,
+                    onSelected: (_) => _setRadius(null),
+                    selectedColor:
+                        AppColors.primary500.withValues(alpha: 0.15),
+                  ),
+                ),
+                ..._radiusOptions.map(
+                  (km) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      avatar: Icon(
+                        Icons.near_me,
+                        size: 14,
+                        color: _radiusKm == km
+                            ? AppColors.primary500
+                            : AppColors.ink400,
+                      ),
+                      label: Text(
+                        '$km km',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      selected: _radiusKm == km,
+                      onSelected: (_) => _setRadius(km),
+                      selectedColor:
+                          AppColors.primary500.withValues(alpha: 0.15),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const Divider(height: 1),

@@ -62,7 +62,7 @@ class _SkillsPageState extends ConsumerState<SkillsPage> {
         // Mentor-Heuristik: tag enthält "mentor"
         if (tags is List &&
             tags.any((t) =>
-                t is String && t.toLowerCase().contains('mentor'))) {
+                t is String && t.toLowerCase().contains('mentor'),)) {
           mentors++;
         }
       }

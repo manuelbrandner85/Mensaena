@@ -207,7 +207,7 @@ class _Empty extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.person_off_outlined,
-                size: 48, color: AppColors.stone400),
+                size: 48, color: AppColors.stone400,),
             SizedBox(height: 12),
             Text(
               'Niemand blockiert',
