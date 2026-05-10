@@ -366,10 +366,10 @@ jobs:
           fi
           exit $rc
 
-      # PR-Builds (ohne SHOREBIRD_TOKEN) → klassischer flutter build apk
-      # damit PRs trotzdem CI-grün laufen ohne Shorebird-Release zu erzeugen.
-      - name: 🏗️ Build signed Release APK (PR)
-        if: github.event_name == 'pull_request'
+      # Non-Main-Builds (PR + Feature-Branch) → klassischer flutter build apk
+      # damit Branch-Pushes/PRs CI-grün laufen ohne Shorebird-Release zu erzeugen.
+      - name: 🏗️ Build signed Release APK (Branch/PR)
+        if: github.event_name != 'push' || github.ref != 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
