@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/supabase.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
 import '../../widgets/realtime_feed.dart';
@@ -69,6 +70,18 @@ class _BoardPageState extends ConsumerState<BoardPage>
   void _showNewItems() {
     resetNewItemCount();
     _load();
+  }
+
+  Future<void> _openDetail(BoardPost post) async {
+    final didChange = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _BoardDetailSheet(post: post),
+    );
+    if (didChange == true) {
+      _load();
+    }
   }
 
   /// Client-seitig gefilterte Liste basierend auf _search + _sortBy.
@@ -281,7 +294,10 @@ class _BoardPageState extends ConsumerState<BoardPage>
                             childAspectRatio: 0.85,
                           ),
                           itemCount: _posts.length,
-                          itemBuilder: (_, i) => _PinCard(post: _posts[i]),
+                          itemBuilder: (_, i) => _PinCard(
+                            post: _posts[i],
+                            onTap: () => _openDetail(_posts[i]),
+                          ),
                         ),
                       ),
           ),
@@ -309,29 +325,35 @@ class _Chip extends StatelessWidget {
 }
 
 class _PinCard extends StatelessWidget {
-  const _PinCard({required this.post});
+  const _PinCard({required this.post, required this.onTap});
   final BoardPost post;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colors = BoardColors.forName(post.color);
     final cat = post.categoryConfig;
     final time = DateFormat('d. MMM', 'de').format(post.createdAt);
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.bg,
+    return Material(
+      color: colors.bg,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.border),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colors.border),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x14000000),
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
+          padding: const EdgeInsets.all(12),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -403,6 +425,8 @@ class _PinCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+        ),
       ),
     );
   }
@@ -540,6 +564,221 @@ class _NewPostSheetState extends State<_NewPostSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Bottom-Sheet mit dem vollen Aushang-Inhalt: Bild, Text, Kontakt-Info,
+/// Author, plus Delete-Aktion wenn der User der Autor ist.
+class _BoardDetailSheet extends ConsumerStatefulWidget {
+  const _BoardDetailSheet({required this.post});
+  final BoardPost post;
+
+  @override
+  ConsumerState<_BoardDetailSheet> createState() => _BoardDetailSheetState();
+}
+
+class _BoardDetailSheetState extends ConsumerState<_BoardDetailSheet> {
+  bool _deleting = false;
+
+  Future<void> _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Aushang löschen?'),
+        content: const Text('Andere User sehen den Aushang nicht mehr.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+                foregroundColor: AppColors.emergency500),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _deleting = true);
+    HapticFeedback.mediumImpact();
+    try {
+      await ref.read(boardRepositoryProvider).delete(widget.post.id);
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Löschen fehlgeschlagen: $e')),
+      );
+      setState(() => _deleting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final post = widget.post;
+    final colors = BoardColors.forName(post.color);
+    final cat = post.categoryConfig;
+    final myId = sb.auth.currentUser?.id;
+    final isMine = myId != null && myId == post.authorId;
+    final fullDate =
+        DateFormat('d. MMMM yyyy · HH:mm', 'de').format(post.createdAt);
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (_, scrollController) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              Container(
+                color: colors.bg,
+                padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+                child: Row(
+                  children: [
+                    Text(cat.emoji, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        cat.label,
+                        style: TextStyle(
+                          color: colors.text,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    if (post.pinned)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Icon(Icons.push_pin,
+                            size: 16, color: colors.text),
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      color: colors.text,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    if (post.imageUrl != null) ...[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          post.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            height: 100,
+                            color: AppColors.stone100,
+                            alignment: Alignment.center,
+                            child: const Icon(Icons.broken_image,
+                                color: AppColors.stone400),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    Text(
+                      post.content,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        height: 1.5,
+                        color: AppColors.ink800,
+                      ),
+                    ),
+                    if (post.contactInfo != null) ...[
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary500.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.alternate_email,
+                                size: 16, color: AppColors.primary500),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: SelectableText(
+                                post.contactInfo!,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline,
+                            size: 14, color: AppColors.ink400),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            post.authorName ?? 'Unbekannt',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink700,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          fullDate,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.ink400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isMine) ...[
+                      const SizedBox(height: 24),
+                      OutlinedButton.icon(
+                        onPressed: _deleting ? null : _delete,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.emergency500,
+                          side: const BorderSide(
+                              color: AppColors.emergency500),
+                        ),
+                        icon: _deleting
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.delete_outline),
+                        label: Text(_deleting
+                            ? 'Lösche…'
+                            : 'Aushang löschen'),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
