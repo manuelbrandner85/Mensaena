@@ -111,13 +111,16 @@ class _ConversationPageState extends ConsumerState<ConversationPage> {
             List<Map<String, dynamic>>.from(_reactions[event.messageId] ?? []);
         if (event.isInsert) {
           // Doppelte vermeiden.
-          if (!list.any((r) =>
-              r['user_id'] == event.userId && r['emoji'] == event.emoji)) {
+          if (!list.any(
+            (r) =>
+                r['user_id'] == event.userId && r['emoji'] == event.emoji,
+          )) {
             list.add({'emoji': event.emoji, 'user_id': event.userId});
           }
         } else {
-          list.removeWhere((r) =>
-              r['user_id'] == event.userId && r['emoji'] == event.emoji);
+          list.removeWhere(
+            (r) => r['user_id'] == event.userId && r['emoji'] == event.emoji,
+          );
         }
         _reactions = {..._reactions, event.messageId: list};
       });

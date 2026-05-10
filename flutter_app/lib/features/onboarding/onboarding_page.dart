@@ -324,8 +324,11 @@ class _StepName extends StatelessWidget {
                   backgroundImage:
                       avatarUrl != null ? NetworkImage(avatarUrl!) : null,
                   child: avatarUrl == null
-                      ? const Icon(Icons.person_outline,
-                          size: 36, color: AppColors.primary500)
+                      ? const Icon(
+                          Icons.person_outline,
+                          size: 36,
+                          color: AppColors.primary500,
+                        )
                       : null,
                 ),
                 Material(
@@ -345,8 +348,11 @@ class _StepName extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Icon(Icons.camera_alt,
-                              color: Colors.white, size: 14),
+                          : const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 14,
+                            ),
                     ),
                   ),
                 ),

@@ -364,7 +364,7 @@ class MessagesRepository {
         emoji: row['emoji'] as String,
         userId: row['user_id'] as String,
         isInsert: isInsert,
-      ));
+      ),);
     }
 
     channel.onPostgresChanges(

@@ -190,14 +190,18 @@ class _EmergencyContactsPageState extends ConsumerState<EmergencyContactsPage> {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.phone_outlined,
-                                  color: AppColors.primary500),
+                              icon: const Icon(
+                                Icons.phone_outlined,
+                                color: AppColors.primary500,
+                              ),
                               tooltip: 'Anrufen',
                               onPressed: () => _dial(c.phone),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.close,
-                                  color: AppColors.emergency500),
+                              icon: const Icon(
+                                Icons.close,
+                                color: AppColors.emergency500,
+                              ),
                               tooltip: 'Entfernen',
                               onPressed: _saving ? null : () => _removeContact(i),
                             ),
@@ -247,8 +251,11 @@ class _Empty extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.favorite_outline,
-                size: 48, color: AppColors.stone400),
+            const Icon(
+              Icons.favorite_outline,
+              size: 48,
+              color: AppColors.stone400,
+            ),
             const SizedBox(height: 12),
             const Text(
               'Keine Notfallkontakte',
@@ -300,7 +307,7 @@ class _AddContactSheetState extends State<_AddContactSheet> {
       name: name,
       phone: phone,
       relationship: _relationship ?? '',
-    ));
+    ),);
   }
 
   @override
