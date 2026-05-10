@@ -22,12 +22,10 @@ import {
   Smartphone,
   ShieldCheck,
   RefreshCw,
-  ChevronDown,
 } from 'lucide-react'
 import {
   APK_URL,
   APK_FILENAME,
-  FDROID_DEEPLINK,
   APK_DOWNLOAD_ENABLED,
 } from '@/lib/app-download'
 import AppDownloadStatusModal from '@/components/shared/AppDownloadStatusModal'
@@ -86,8 +84,14 @@ export default function AppDownloadPage() {
   }
 
   return (
-    <main className="cta-app-download min-h-dvh bg-gradient-to-br from-primary-50 via-white to-teal-50 py-8 sm:py-16 px-4">
-      <div className="max-w-3xl mx-auto">
+    <main className="cta-app-download relative min-h-dvh py-8 sm:py-16 px-4 overflow-hidden" style={{ background: 'linear-gradient(180deg, #EEF9F9 0%, #F4FEFE 60%, #FAFAF7 100%)' }}>
+      {/* Ambient orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute rounded-full" style={{ top: '-15%', left: '-10%', width: '55vw', height: '55vw', background: 'radial-gradient(circle, rgba(30,170,166,0.18) 0%, transparent 70%)', filter: 'blur(80px)', animation: 'ambientBreath1 24s ease-in-out infinite' }} />
+        <div className="absolute rounded-full" style={{ bottom: '-10%', right: '-10%', width: '45vw', height: '45vw', background: 'radial-gradient(circle, rgba(79,109,138,0.10) 0%, transparent 70%)', filter: 'blur(90px)', animation: 'ambientBreath2 30s ease-in-out infinite' }} />
+      </div>
+
+      <div className="relative max-w-3xl mx-auto">
         {/* Back link */}
         <Link
           href="/"
@@ -96,25 +100,35 @@ export default function AppDownloadPage() {
           ← Zur Startseite
         </Link>
 
-        <div className="bg-white rounded-3xl shadow-glow-teal/30 border border-primary-100/50 overflow-hidden">
+        <div
+          className="rounded-3xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%)',
+            border: '1px solid rgba(208,245,243,0.85)',
+            boxShadow: '0 0 0 0.5px rgba(30,170,166,0.12), 0 8px 16px rgba(15,23,42,0.08), 0 32px 80px rgba(15,23,42,0.14), 0 0 64px rgba(30,170,166,0.12), inset 0 1px 0 rgba(255,255,255,1)',
+          }}
+        >
           {/* Hero */}
-          <div className="bg-gradient-to-br from-primary-600 to-teal-700 text-white px-6 sm:px-10 py-10 sm:py-14 text-center">
-            <div className="inline-block bg-white/15 backdrop-blur-sm rounded-3xl p-3 mb-4">
-              <Image
-                src="/icons/icon-512x512.png"
-                alt="Mensaena App Icon"
-                width={88}
-                height={88}
-                className="rounded-2xl"
-                priority
-              />
+          <div className="relative overflow-hidden px-6 sm:px-10 py-10 sm:py-14 text-center" style={{ background: 'linear-gradient(135deg, #147170 0%, #1EAAA6 50%, #0e8f8b 100%)' }}>
+            <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 60%)' }} aria-hidden="true" />
+            <div className="relative">
+              <div className="inline-block bg-white/15 backdrop-blur-sm rounded-3xl p-3 mb-4 shadow-[0_0_40px_rgba(255,255,255,0.15)]">
+                <Image
+                  src="/icons/icon-512x512.png"
+                  alt="Mensaena App Icon"
+                  width={88}
+                  height={88}
+                  className="rounded-2xl"
+                  priority
+                />
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+                Mensaena als App
+              </h1>
+              <p className="mt-3 text-white/85 text-base sm:text-lg max-w-md mx-auto">
+                Nachbarschaftshilfe direkt am Handy – kostenlos für Android
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-              Mensaena als App
-            </h1>
-            <p className="mt-3 text-white/90 text-base sm:text-lg max-w-md mx-auto">
-              Nachbarschaftshilfe direkt am Handy – kostenlos für Android
-            </p>
           </div>
 
           {/* Body */}
@@ -206,42 +220,10 @@ export default function AppDownloadPage() {
               </ol>
             </section>
 
-            {/* F-Droid (advanced) */}
-            <details className="mt-6 group">
-              <summary className="cursor-pointer flex items-center justify-between gap-3 px-5 py-4 bg-stone-50 hover:bg-stone-100 rounded-xl transition-colors">
-                <span className="font-semibold text-ink-800 text-sm">
-                  Erweitert: Per F-Droid installieren (automatische Updates)
-                </span>
-                <ChevronDown className="w-4 h-4 text-ink-500 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="mt-4 px-5 py-4 bg-white border border-stone-200 rounded-xl text-sm text-ink-700 space-y-4">
-                <p>
-                  F-Droid ist ein freier App-Store. Damit erhältst du automatische
-                  Updates, ohne Google Play Konto.
-                </p>
-                <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li>
-                    <a
-                      href="https://f-droid.org"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary-700 underline"
-                    >
-                      F-Droid installieren
-                    </a>{' '}
-                    (kostenlos, sicher)
-                  </li>
-                  <li>Auf den Button unten tippen</li>
-                  <li>Repo bestätigen → Mensaena suchen → Installieren</li>
-                </ol>
-                <a
-                  href={FDROID_DEEPLINK}
-                  className="btn-outline w-full inline-flex items-center justify-center gap-2"
-                >
-                  📦 F-Droid Repo hinzufügen
-                </a>
-              </div>
-            </details>
+            {/* GitHub Release info */}
+            <div className="mt-6 px-5 py-4 bg-stone-50 border border-stone-200 rounded-xl text-sm text-ink-600 text-center">
+              Direkt von GitHub · Open Source · kein App-Store nötig
+            </div>
           </div>
         </div>
 

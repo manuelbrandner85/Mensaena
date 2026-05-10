@@ -30,16 +30,16 @@ function SettingsSkeleton() {
       <div className="flex flex-col md:flex-row gap-6">
         {/* Tabs skeleton */}
         <div className="hidden md:block w-[200px] flex-shrink-0">
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-2 space-y-1">
+          <div className="card-depth p-2 space-y-1">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-11 bg-stone-100 rounded-xl" />
+              <div key={i} className="h-11 skeleton rounded-xl" />
             ))}
           </div>
         </div>
         {/* Content skeleton */}
         <div className="flex-1 space-y-5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
+            <div key={i} className="card-depth p-6">
               <div className="mb-5">
                 <div className="h-5 w-40 bg-stone-200 rounded mb-1" />
                 <div className="h-3 w-64 bg-stone-100 rounded" />
