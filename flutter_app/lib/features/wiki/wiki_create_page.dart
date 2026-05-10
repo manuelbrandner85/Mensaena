@@ -126,6 +126,7 @@ class _WikiCreatePageState extends ConsumerState<WikiCreatePage> {
             ),
             const SizedBox(height: 12),
             const _Label('Inhalt *  (Markdown unterstützt)'),
+            _MarkdownToolbar(controller: _content),
             TextFormField(
               controller: _content,
               maxLines: 14,
@@ -211,6 +212,115 @@ class _WikiCreatePageState extends ConsumerState<WikiCreatePage> {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       );
+}
+
+/// Mini-Markdown-Toolbar — Buttons fügen Markdown-Snippets in den Editor ein
+/// und positionieren den Cursor sinnvoll. Pendant zur Web-`ArticleEditor`-
+/// Toolbar (Bold/Italic/H2/H3/Liste/Code/Link).
+class _MarkdownToolbar extends StatelessWidget {
+  const _MarkdownToolbar({required this.controller});
+  final TextEditingController controller;
+
+  void _wrap(String left, String right) {
+    final sel = controller.selection;
+    final text = controller.text;
+    if (!sel.isValid) {
+      controller.text = '$text$left$right';
+      controller.selection = TextSelection.collapsed(
+        offset: controller.text.length - right.length,
+      );
+      return;
+    }
+    final selected = sel.textInside(text);
+    final replaced = '$left$selected$right';
+    final newText = sel.textBefore(text) + replaced + sel.textAfter(text);
+    final newCursor = sel.start + left.length + selected.length;
+    controller.text = newText;
+    controller.selection = TextSelection.collapsed(offset: newCursor);
+  }
+
+  void _prefixLine(String prefix) {
+    final sel = controller.selection;
+    final text = controller.text;
+    final start = sel.isValid ? sel.start : text.length;
+    // Find start of current line
+    var lineStart = start;
+    while (lineStart > 0 && text[lineStart - 1] != '\n') {
+      lineStart--;
+    }
+    final newText = text.substring(0, lineStart) +
+        prefix +
+        text.substring(lineStart);
+    controller.text = newText;
+    controller.selection =
+        TextSelection.collapsed(offset: start + prefix.length);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            _btn(Icons.format_bold, 'Bold', () => _wrap('**', '**')),
+            _btn(
+              Icons.format_italic,
+              'Italic',
+              () => _wrap('*', '*'),
+            ),
+            _btn(
+              Icons.title,
+              'Überschrift',
+              () => _prefixLine('## '),
+            ),
+            _btn(
+              Icons.format_list_bulleted,
+              'Liste',
+              () => _prefixLine('- '),
+            ),
+            _btn(
+              Icons.format_quote,
+              'Zitat',
+              () => _prefixLine('> '),
+            ),
+            _btn(
+              Icons.code,
+              'Code',
+              () => _wrap('`', '`'),
+            ),
+            _btn(
+              Icons.link,
+              'Link',
+              () => _wrap('[', '](https://)'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _btn(IconData icon, String tip, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: Material(
+        color: AppColors.stone100,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Tooltip(
+            message: tip,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Icon(icon, size: 18, color: AppColors.ink700),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _Label extends StatelessWidget {

@@ -8,8 +8,12 @@ import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/page_chrome.dart';
 import '../../widgets/realtime_feed.dart';
+import 'event_calendar_view.dart';
+import 'event_map_view.dart';
 import 'events_repository.dart';
 import 'models.dart';
+
+enum _EventViewMode { list, calendar, map }
 
 class EventsPage extends ConsumerStatefulWidget {
   const EventsPage({super.key});
@@ -24,6 +28,7 @@ class _EventsPageState extends ConsumerState<EventsPage>
   Map<String, AttendeeStatus> _attendances = const {};
   bool _loading = true;
   String _category = 'all';
+  _EventViewMode _viewMode = _EventViewMode.list;
 
   @override
   String get realtimeChannelName => 'events-feed-realtime';
@@ -95,6 +100,28 @@ class _EventsPageState extends ConsumerState<EventsPage>
       appBar: AppBar(
         title: const Text('Veranstaltungen'),
         actions: [
+          PopupMenuButton<_EventViewMode>(
+            tooltip: 'Ansicht wechseln',
+            icon: Icon(_viewIcon(_viewMode)),
+            onSelected: (m) => setState(() => _viewMode = m),
+            itemBuilder: (_) => [
+              CheckedPopupMenuItem(
+                value: _EventViewMode.list,
+                checked: _viewMode == _EventViewMode.list,
+                child: const Text('Liste'),
+              ),
+              CheckedPopupMenuItem(
+                value: _EventViewMode.calendar,
+                checked: _viewMode == _EventViewMode.calendar,
+                child: const Text('Kalender'),
+              ),
+              CheckedPopupMenuItem(
+                value: _EventViewMode.map,
+                checked: _viewMode == _EventViewMode.map,
+                child: const Text('Karte'),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Event erstellen',
@@ -153,27 +180,63 @@ class _EventsPageState extends ConsumerState<EventsPage>
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
-                : _events.isEmpty
-                    ? const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text(
-                            'Keine bevorstehenden Events',
-                            style: TextStyle(color: AppColors.ink400),
-                          ),
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _load,
-                        child: _GroupedList(
-                          events: _events,
-                          attendances: _attendances,
-                        ),
-                      ),
+                : _buildBody(),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildBody() {
+    if (_events.isEmpty && _viewMode == _EventViewMode.list) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Text(
+            'Keine bevorstehenden Events',
+            style: TextStyle(color: AppColors.ink400),
+          ),
+        ),
+      );
+    }
+    switch (_viewMode) {
+      case _EventViewMode.list:
+        return RefreshIndicator(
+          onRefresh: _load,
+          child: _GroupedList(
+            events: _events,
+            attendances: _attendances,
+          ),
+        );
+      case _EventViewMode.calendar:
+        return EventCalendarView(
+          events: _events,
+          attendances: _attendances,
+          onAttend: (id, status) async {
+            // Calendar-Sheet hat eigene Buttons; Re-load nach Aktion.
+            await _load();
+            return true;
+          },
+          onRemove: (id) {
+            _load();
+          },
+          eventTileBuilder: (event, my) =>
+              _EventTile(event: event, myStatus: my),
+        );
+      case _EventViewMode.map:
+        return EventMapView(events: _events);
+    }
+  }
+
+  IconData _viewIcon(_EventViewMode mode) {
+    switch (mode) {
+      case _EventViewMode.list:
+        return Icons.list_alt;
+      case _EventViewMode.calendar:
+        return Icons.calendar_month_outlined;
+      case _EventViewMode.map:
+        return Icons.map_outlined;
+    }
   }
 }
 

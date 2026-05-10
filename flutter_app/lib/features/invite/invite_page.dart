@@ -26,6 +26,7 @@ class _InvitePageState extends ConsumerState<InvitePage> {
   bool _renderingFlyer = false;
   FlyerTemplate _flyer = FlyerTemplate.classic;
   final _flyerBoundaryKey = GlobalKey();
+  List<_LeaderEntry> _leaderboard = const [];
 
   @override
   void initState() {
@@ -70,6 +71,37 @@ class _InvitePageState extends ConsumerState<InvitePage> {
           .eq('inviter_id', user.id)
           .eq('status', 'accepted');
 
+      // Leaderboard (Top-5 Botschafter — client-seitige Aggregation,
+      // identisch zur Web-Implementierung in invite/page.tsx).
+      final boardRows = await db
+          .from('referrals')
+          .select(
+            'inviter_id, inviter:profiles!referrals_inviter_id_fkey(name, avatar_url)',
+          )
+          .eq('status', 'accepted')
+          .limit(500);
+      final inviterMap = <String, _LeaderEntry>{};
+      for (final r in boardRows) {
+        final id = r['inviter_id'] as String?;
+        if (id == null) continue;
+        final inviter = r['inviter'] as Map<String, dynamic>?;
+        final existing = inviterMap[id];
+        if (existing == null) {
+          inviterMap[id] = _LeaderEntry(
+            id: id,
+            name: inviter?['name'] as String?,
+            avatarUrl: inviter?['avatar_url'] as String?,
+            count: 1,
+            isMe: id == user.id,
+          );
+        } else {
+          inviterMap[id] = existing.copyWith(count: existing.count + 1);
+        }
+      }
+      final leaderboard = inviterMap.values.toList()
+        ..sort((a, b) => b.count.compareTo(a.count));
+      final topFive = leaderboard.take(5).toList(growable: false);
+
       // Eigener Name (für Flyer-Personalisierung)
       String? userName;
       try {
@@ -86,6 +118,7 @@ class _InvitePageState extends ConsumerState<InvitePage> {
         _code = code;
         _userName = userName;
         _accepted = acceptedRows.length;
+        _leaderboard = topFive;
         _loading = false;
       });
     } catch (e) {
@@ -301,6 +334,10 @@ class _InvitePageState extends ConsumerState<InvitePage> {
                 ),
                 const SizedBox(height: 24),
                 _buildFlyerSection(),
+                if (_leaderboard.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  _LeaderboardCard(entries: _leaderboard),
+                ],
               ],
             ),
     );
@@ -396,6 +433,165 @@ class _InvitePageState extends ConsumerState<InvitePage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+class _LeaderEntry {
+  const _LeaderEntry({
+    required this.id,
+    required this.name,
+    required this.avatarUrl,
+    required this.count,
+    required this.isMe,
+  });
+  final String id;
+  final String? name;
+  final String? avatarUrl;
+  final int count;
+  final bool isMe;
+
+  _LeaderEntry copyWith({int? count}) => _LeaderEntry(
+        id: id,
+        name: name,
+        avatarUrl: avatarUrl,
+        count: count ?? this.count,
+        isMe: isMe,
+      );
+}
+
+class _LeaderboardCard extends StatelessWidget {
+  const _LeaderboardCard({required this.entries});
+  final List<_LeaderEntry> entries;
+
+  static const _ranks = [
+    (medal: "🥇", bg: Color(0xFFFEF3C7), border: Color(0xFFFDE68A), text: Color(0xFFB45309)),
+    (medal: "🥈", bg: Color(0xFFF5F5F4), border: Color(0xFFE7E5E4), text: Color(0xFF57534E)),
+    (medal: "🥉", bg: Color(0xFFFFEDD5), border: Color(0xFFFED7AA), text: Color(0xFFC2410C)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.stone200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.emoji_events_outlined,
+                  size: 18, color: AppColors.primary500),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Botschafter-Bestenliste",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink800,
+                      ),
+                    ),
+                    Text(
+                      "Die aktivsten Nachbarschafts-Botschafter",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.ink400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...entries.asMap().entries.map((e) {
+            final i = e.key;
+            final entry = e.value;
+            final rank = i < _ranks.length
+                ? _ranks[i]
+                : (
+                    medal: "${i + 1}",
+                    bg: const Color(0xFFFAFAF9),
+                    border: AppColors.stone200,
+                    text: AppColors.ink400
+                  );
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: rank.bg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: entry.isMe ? AppColors.primary500 : rank.border,
+                    width: entry.isMe ? 2 : 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 28,
+                      child: Center(
+                        child: Text(
+                          rank.medal,
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    CircleAvatar(
+                      radius: 14,
+                      backgroundColor: AppColors.stone200,
+                      backgroundImage: entry.avatarUrl != null
+                          ? NetworkImage(entry.avatarUrl!)
+                          : null,
+                      child: entry.avatarUrl == null
+                          ? Text(
+                              (entry.name ?? "?").characters.first.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.ink400,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "${entry.name ?? "Nachbar:in"}${entry.isMe ? " (Du)" : ""}",
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.ink800,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      "${entry.count} ${entry.count == 1 ? "Einladung" : "Einladungen"}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: rank.text,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 }

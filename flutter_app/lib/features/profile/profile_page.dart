@@ -21,6 +21,7 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   Map<String, dynamic>? _profile;
   _ProfileStats _stats = const _ProfileStats();
+  List<_ActivityItem> _activity = const [];
   bool _loading = true;
 
   @override
@@ -48,12 +49,93 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         _profile = row;
         _loading = false;
       });
-      // Stats parallel laden, ohne UI zu blockieren
+      // Stats + Activity parallel laden, ohne UI zu blockieren
       unawaited(_loadStats(user.id));
+      unawaited(_loadActivity(user.id));
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
     }
+  }
+
+  /// Lädt einen kompakten Activity-Feed (Posts, Group-Joins, Challenges)
+  /// und merged ihn nach Zeit absteigend. Pendant zum Web-`ProfileActivityFeed`.
+  Future<void> _loadActivity(String userId) async {
+    final db = ref.read(supabaseProvider);
+    Future<List<dynamic>> safeQuery(Future<List<dynamic>> Function() q) async {
+      try {
+        return await q();
+      } catch (_) {
+        return const [];
+      }
+    }
+
+    final results = await Future.wait([
+      safeQuery(
+        () async => db
+            .from('posts')
+            .select('id, title, created_at, type')
+            .eq('user_id', userId)
+            .order('created_at', ascending: false)
+            .limit(10),
+      ),
+      safeQuery(
+        () async => db
+            .from('group_members')
+            .select('joined_at, group_id, groups(name)')
+            .eq('user_id', userId)
+            .order('joined_at', ascending: false)
+            .limit(10),
+      ),
+      safeQuery(
+        () async => db
+            .from('challenge_participants')
+            .select('joined_at, challenge_id, challenges(name, title)')
+            .eq('user_id', userId)
+            .order('joined_at', ascending: false)
+            .limit(10),
+      ),
+    ]);
+
+    final items = <_ActivityItem>[];
+    for (final p in results[0]) {
+      final m = p as Map<String, dynamic>;
+      final ts = DateTime.tryParse(m['created_at'] as String? ?? '');
+      if (ts == null) continue;
+      items.add(_ActivityItem(
+        kind: _ActivityKind.post,
+        title: (m['title'] as String?) ?? 'Beitrag',
+        when: ts,
+      ));
+    }
+    for (final g in results[1]) {
+      final m = g as Map<String, dynamic>;
+      final ts = DateTime.tryParse(m['joined_at'] as String? ?? '');
+      if (ts == null) continue;
+      final group = m['groups'] as Map<String, dynamic>?;
+      items.add(_ActivityItem(
+        kind: _ActivityKind.group,
+        title: (group?['name'] as String?) ?? 'Gruppe',
+        when: ts,
+      ));
+    }
+    for (final c in results[2]) {
+      final m = c as Map<String, dynamic>;
+      final ts = DateTime.tryParse(m['joined_at'] as String? ?? '');
+      if (ts == null) continue;
+      final challenge = m['challenges'] as Map<String, dynamic>?;
+      final name = (challenge?['title'] as String?) ??
+          (challenge?['name'] as String?) ??
+          'Challenge';
+      items.add(_ActivityItem(
+        kind: _ActivityKind.challenge,
+        title: name,
+        when: ts,
+      ));
+    }
+    items.sort((a, b) => b.when.compareTo(a.when));
+    if (!mounted) return;
+    setState(() => _activity = items.take(10).toList(growable: false));
   }
 
   Future<void> _loadStats(String userId) async {
@@ -101,6 +183,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           initialBio: p['bio'] as String? ?? '',
           initialCity: p['city'] as String? ?? '',
           initialAvatarUrl: p['avatar_url'] as String?,
+          initialCoverUrl: p['cover_url'] as String?,
+          initialPhone: p['phone'] as String? ?? '',
+          initialHomepage: p['homepage'] as String? ?? '',
+          initialShowPhone: (p['show_phone'] as bool?) ?? false,
           scrollController: scroll,
         ),
       ),
@@ -296,6 +382,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ],
             const SizedBox(height: 20),
             _StatsRow(stats: _stats),
+            if (_activity.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              _ActivityFeed(items: _activity),
+            ],
             const SizedBox(height: 24),
             _ActionTile(
               icon: Icons.edit_outlined,
@@ -496,6 +586,10 @@ class _EditSheet extends ConsumerStatefulWidget {
     required this.initialBio,
     required this.initialCity,
     required this.initialAvatarUrl,
+    required this.initialCoverUrl,
+    required this.initialPhone,
+    required this.initialHomepage,
+    required this.initialShowPhone,
     required this.scrollController,
   });
 
@@ -503,6 +597,10 @@ class _EditSheet extends ConsumerStatefulWidget {
   final String initialBio;
   final String initialCity;
   final String? initialAvatarUrl;
+  final String? initialCoverUrl;
+  final String initialPhone;
+  final String initialHomepage;
+  final bool initialShowPhone;
   final ScrollController scrollController;
 
   @override
@@ -513,14 +611,20 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
   late final _name = TextEditingController(text: widget.initialName);
   late final _bio = TextEditingController(text: widget.initialBio);
   late final _city = TextEditingController(text: widget.initialCity);
+  late final _phone = TextEditingController(text: widget.initialPhone);
+  late final _homepage = TextEditingController(text: widget.initialHomepage);
   String? _avatarUrl;
+  String? _coverUrl;
+  late bool _showPhone = widget.initialShowPhone;
   bool _saving = false;
   bool _uploadingAvatar = false;
+  bool _uploadingCover = false;
 
   @override
   void initState() {
     super.initState();
     _avatarUrl = widget.initialAvatarUrl;
+    _coverUrl = widget.initialCoverUrl;
   }
 
   @override
@@ -528,7 +632,45 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
     _name.dispose();
     _bio.dispose();
     _city.dispose();
+    _phone.dispose();
+    _homepage.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickCover() async {
+    if (_uploadingCover) return;
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 2048,
+      imageQuality: 80,
+    );
+    if (picked == null) return;
+    setState(() => _uploadingCover = true);
+    try {
+      final db = ref.read(supabaseProvider);
+      final user = db.auth.currentUser;
+      if (user == null) return;
+      final ext = picked.name.split('.').last.toLowerCase();
+      final path =
+          '${user.id}/cover-${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final bytes = await picked.readAsBytes();
+      await db.storage.from('avatars').uploadBinary(
+            path,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+      final url = db.storage.from('avatars').getPublicUrl(path);
+      if (!mounted) return;
+      setState(() => _coverUrl = url);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cover-Upload fehlgeschlagen: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingCover = false);
+    }
   }
 
   Future<void> _pickAvatar() async {
@@ -577,7 +719,11 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
         'name': _name.text.trim(),
         'bio': _bio.text.trim(),
         'city': _city.text.trim(),
+        'phone': _phone.text.trim(),
+        'homepage': _homepage.text.trim(),
+        'show_phone': _showPhone,
         if (_avatarUrl != null) 'avatar_url': _avatarUrl,
+        if (_coverUrl != null) 'cover_url': _coverUrl,
         'updated_at': DateTime.now().toIso8601String(),
       };
       await db.from('profiles').update(updates).eq('id', user.id);
@@ -693,6 +839,40 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
                   textCapitalization: TextCapitalization.words,
                   decoration: _deco('z. B. Wien'),
                 ),
+                const SizedBox(height: 12),
+                const _Label('Telefon'),
+                TextField(
+                  controller: _phone,
+                  keyboardType: TextInputType.phone,
+                  decoration: _deco('+43 660 …'),
+                ),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Telefonnummer im Profil zeigen',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Andere Nachbarn sehen deine Nummer in deinem öffentlichen Profil.',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                  value: _showPhone,
+                  onChanged: (v) => setState(() => _showPhone = v),
+                ),
+                const SizedBox(height: 4),
+                const _Label('Webseite'),
+                TextField(
+                  controller: _homepage,
+                  keyboardType: TextInputType.url,
+                  decoration: _deco('https://…'),
+                ),
+                const SizedBox(height: 16),
+                const _Label('Cover-Bild'),
+                _CoverPickerCard(
+                  coverUrl: _coverUrl,
+                  uploading: _uploadingCover,
+                  onTap: _uploadingCover ? null : _pickCover,
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   height: 48,
@@ -740,6 +920,80 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       );
+}
+
+class _CoverPickerCard extends StatelessWidget {
+  const _CoverPickerCard({
+    required this.coverUrl,
+    required this.uploading,
+    required this.onTap,
+  });
+
+  final String? coverUrl;
+  final bool uploading;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: BorderRadius.circular(12),
+      clipBehavior: Clip.antiAlias,
+      color: AppColors.primary500.withValues(alpha: 0.1),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          height: 110,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary500, AppColors.primary700],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            image: coverUrl != null
+                ? DecorationImage(
+                    image: NetworkImage(coverUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: uploading
+              ? const SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.camera_alt,
+                          color: Colors.white, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        coverUrl == null ? 'Cover wählen' : 'Cover ändern',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
 }
 
 class _Label extends StatelessWidget {
@@ -820,6 +1074,146 @@ class _TagsBlock extends StatelessWidget {
                 )
                 .toList(),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _ActivityKind { post, group, challenge }
+
+class _ActivityItem {
+  const _ActivityItem({
+    required this.kind,
+    required this.title,
+    required this.when,
+  });
+  final _ActivityKind kind;
+  final String title;
+  final DateTime when;
+}
+
+class _ActivityFeed extends StatelessWidget {
+  const _ActivityFeed({required this.items});
+  final List<_ActivityItem> items;
+
+  String _relative(DateTime t) {
+    final delta = DateTime.now().difference(t);
+    if (delta.inDays >= 30) {
+      return '${(delta.inDays / 30).floor()} Monaten';
+    }
+    if (delta.inDays >= 1) return 'vor ${delta.inDays} Tagen';
+    if (delta.inHours >= 1) return 'vor ${delta.inHours} Std.';
+    if (delta.inMinutes >= 1) return 'vor ${delta.inMinutes} Min.';
+    return 'gerade eben';
+  }
+
+  ({IconData icon, Color color, String label}) _meta(_ActivityKind k) {
+    switch (k) {
+      case _ActivityKind.post:
+        return (
+          icon: Icons.article_outlined,
+          color: AppColors.primary500,
+          label: 'Beitrag',
+        );
+      case _ActivityKind.group:
+        return (
+          icon: Icons.group_outlined,
+          color: const Color(0xFF8B5CF6),
+          label: 'Gruppe beigetreten',
+        );
+      case _ActivityKind.challenge:
+        return (
+          icon: Icons.emoji_events_outlined,
+          color: const Color(0xFFD97706),
+          label: 'Challenge gestartet',
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.stone200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.history, size: 16, color: AppColors.primary500),
+              SizedBox(width: 8),
+              Text(
+                'Letzte Aktivitäten',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...items.map((it) {
+            final m = _meta(it.kind);
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: m.color.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(m.icon, size: 14, color: m.color),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          m.label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: m.color,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                        Text(
+                          it.title,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink800,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _relative(it.when),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.ink400,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );

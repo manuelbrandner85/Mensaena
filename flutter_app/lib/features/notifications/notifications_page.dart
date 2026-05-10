@@ -281,6 +281,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage>
       ),
       body: Column(
         children: [
+          const HeroHeader(
+            metaLabel: 'Benachrichtigungen',
+            title: 'Alles, was du nicht verpassen willst',
+            subtitle:
+                'Neue Nachrichten, Reaktionen auf deine Posts, akzeptierte Hilfsanfragen und mehr.',
+            icon: Icons.notifications_active_outlined,
+          ),
           SizedBox(
             height: 40,
             child: ListView.separated(

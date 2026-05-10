@@ -148,7 +148,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="inline-flex h-11 items-center gap-2.5 rounded-full bg-ink-900 px-7 text-sm font-medium tracking-wide text-paper transition-colors hover:bg-ink-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="cta-cinema-ink inline-flex h-11 items-center gap-2.5 rounded-full px-7 text-sm font-medium tracking-wide text-paper disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {status === 'sending' ? (
           <>

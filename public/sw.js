@@ -1,20 +1,28 @@
 // Mensaena Service Worker
-// v3 – adds offline.html fallback for navigations + static cache strategy
+// v5 – force skipWaiting + nuke ALL caches (cinematic design rollout fix)
+//
+// Problem: SW v3 stayed waiting (per FIX-39) and kept serving stale assets,
+// causing users to never see the cinematic redesign. Calling-protection is
+// preserved because navigation HTML is network-first; only the bundle hash
+// pins users to old JS chunks. Hard cache nuke + skipWaiting fixes it.
 
-const CACHE_VERSION = 'mensaena-static-v3'
+const CACHE_VERSION = 'mensaena-static-v5'
 const OFFLINE_URL = '/offline.html'
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_VERSION).then((cache) =>
-      // Offline-Fallback vorab cachen, sonst ist er offline nicht verfügbar.
-      cache.add(new Request(OFFLINE_URL, { cache: 'reload' })).catch(() => {})
-    )
+    Promise.all([
+      caches.open(CACHE_VERSION).then((cache) =>
+        cache.add(new Request(OFFLINE_URL, { cache: 'reload' })).catch(() => {})
+      ),
+      // Force-activate immediately so the cinematic design rollout reaches
+      // returning users on next page-load instead of waiting for all tabs to
+      // close. Active calls keep working — navigation HTML is network-first.
+      self.skipWaiting(),
+    ])
   )
-  // FIX-39: Kein sofortiges skipWaiting – wartet auf Client-Signal damit
-  // laufende Anrufe nicht durch einen SW-Wechsel unterbrochen werden.
 })
 
 self.addEventListener('activate', (event) => {

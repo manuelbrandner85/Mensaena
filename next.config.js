@@ -93,7 +93,7 @@ const nextConfig = {
       {
         source: '/(datenschutz|impressum|nutzungsbedingungen|haftungsausschluss|agb)',
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=604800' },
+          { key: 'Cache-Control', value: 'public, max-age=300, stale-while-revalidate=86400' },
         ],
       },
       // Dashboard pages are user-specific — never cache at CDN level.

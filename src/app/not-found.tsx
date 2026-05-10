@@ -9,8 +9,18 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center px-4">
-      <div className="max-w-md w-full text-center">
+    <div className="min-h-dvh bg-paper relative flex items-center justify-center px-4 overflow-hidden">
+      <div
+        className="hero-orb-1 absolute pointer-events-none"
+        style={{ top: '-20%', left: '-10%', width: '50vw', height: '50vw' }}
+        aria-hidden="true"
+      />
+      <div
+        className="hero-orb-2 absolute pointer-events-none"
+        style={{ bottom: '-15%', right: '-10%', width: '45vw', height: '45vw' }}
+        aria-hidden="true"
+      />
+      <div className="relative max-w-md w-full text-center">
         <Link href="/" className="inline-block mb-8" aria-label="Zurück zur Startseite">
           <Image
             src="/mensaena-logo.png"
@@ -37,7 +47,7 @@ export default function NotFound() {
         <div className="flex gap-3 justify-center">
           <Link
             href="/"
-            className="inline-flex items-center h-10 px-6 rounded-full bg-ink-900 hover:bg-ink-700 text-paper text-sm font-medium tracking-wide transition-colors"
+            className="cta-cinema-ink inline-flex items-center h-10 px-6 rounded-full text-paper text-sm font-medium tracking-wide"
           >
             Zur Startseite
           </Link>

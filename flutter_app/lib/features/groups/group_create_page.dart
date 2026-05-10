@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/supabase.dart';
 import '../../theme/app_colors.dart';
@@ -22,6 +24,10 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
   String _category = 'other';
   bool _isPrivate = false;
   bool _saving = false;
+  String? _coverUrl;
+  String? _avatarUrl;
+  bool _uploadingCover = false;
+  bool _uploadingAvatar = false;
 
   static const _categories = [
     (value: 'neighborhood', emoji: '🏘️', label: 'Nachbarschaft'),
@@ -54,6 +60,62 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
         .replaceAll(RegExp(r'^-+|-+$'), '');
   }
 
+  Future<String?> _pickAndUpload({required bool isCover}) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: isCover ? 2048 : 1024,
+      imageQuality: isCover ? 80 : 85,
+    );
+    if (picked == null) return null;
+    final db = ref.read(supabaseProvider);
+    final user = db.auth.currentUser;
+    if (user == null) return null;
+    final ext = picked.name.split('.').last.toLowerCase();
+    final kind = isCover ? 'cover' : 'avatar';
+    final path =
+        '${user.id}/group-$kind-${DateTime.now().millisecondsSinceEpoch}.$ext';
+    final bytes = await picked.readAsBytes();
+    await db.storage.from('avatars').uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(upsert: true),
+        );
+    return db.storage.from('avatars').getPublicUrl(path);
+  }
+
+  Future<void> _pickCover() async {
+    if (_uploadingCover) return;
+    setState(() => _uploadingCover = true);
+    try {
+      final url = await _pickAndUpload(isCover: true);
+      if (url != null && mounted) setState(() => _coverUrl = url);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cover-Upload fehlgeschlagen: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingCover = false);
+    }
+  }
+
+  Future<void> _pickAvatar() async {
+    if (_uploadingAvatar) return;
+    setState(() => _uploadingAvatar = true);
+    try {
+      final url = await _pickAndUpload(isCover: false);
+      if (url != null && mounted) setState(() => _avatarUrl = url);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Avatar-Upload fehlgeschlagen: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _uploadingAvatar = false);
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() || _saving) return;
     setState(() => _saving = true);
@@ -72,6 +134,8 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
         if (_description.text.trim().isNotEmpty)
           'description': _description.text.trim(),
         'is_private': _isPrivate,
+        if (_coverUrl != null) 'banner_url': _coverUrl,
+        if (_avatarUrl != null) 'avatar_url': _avatarUrl,
       }).select('id').single();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,6 +162,15 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            _GroupImageHeader(
+              coverUrl: _coverUrl,
+              avatarUrl: _avatarUrl,
+              uploadingCover: _uploadingCover,
+              uploadingAvatar: _uploadingAvatar,
+              onPickCover: _pickCover,
+              onPickAvatar: _pickAvatar,
+            ),
+            const SizedBox(height: 16),
             const _Label('Name *'),
             TextFormField(
               controller: _name,
@@ -198,6 +271,141 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       );
+}
+
+class _GroupImageHeader extends StatelessWidget {
+  const _GroupImageHeader({
+    required this.coverUrl,
+    required this.avatarUrl,
+    required this.uploadingCover,
+    required this.uploadingAvatar,
+    required this.onPickCover,
+    required this.onPickAvatar,
+  });
+
+  final String? coverUrl;
+  final String? avatarUrl;
+  final bool uploadingCover;
+  final bool uploadingAvatar;
+  final VoidCallback onPickCover;
+  final VoidCallback onPickAvatar;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 160,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Cover
+          Positioned.fill(
+            bottom: 28,
+            child: Material(
+              borderRadius: BorderRadius.circular(12),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: uploadingCover ? null : onPickCover,
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        AppColors.primary500,
+                        AppColors.primary700,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    image: coverUrl != null
+                        ? DecorationImage(
+                            image: NetworkImage(coverUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: Center(
+                    child: uploadingCover
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.4),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.photo_camera_outlined,
+                                    color: Colors.white, size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  coverUrl == null
+                                      ? 'Cover wählen'
+                                      : 'Cover ändern',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Avatar
+          Positioned(
+            left: 16,
+            bottom: 0,
+            child: Material(
+              shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: uploadingAvatar ? null : onPickAvatar,
+                customBorder: const CircleBorder(),
+                child: Ink(
+                  height: 64,
+                  width: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary500.withValues(alpha: 0.2),
+                    image: avatarUrl != null
+                        ? DecorationImage(
+                            image: NetworkImage(avatarUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: uploadingAvatar
+                      ? const Center(
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : avatarUrl == null
+                          ? const Icon(Icons.add_a_photo_outlined,
+                              color: AppColors.primary500, size: 24)
+                          : null,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _Label extends StatelessWidget {

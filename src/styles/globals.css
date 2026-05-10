@@ -173,39 +173,68 @@
     @apply inline-flex items-center justify-center gap-2 px-6 py-3
            text-white font-semibold text-sm
            rounded-xl
-           shadow-sm
            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2
            active:scale-95
            relative overflow-hidden;
-    background: linear-gradient(135deg, #1EAAA6 0%, #38a169 100%);
-    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
-                box-shadow 0.25s ease,
+    background: linear-gradient(135deg, #1EAAA6 0%, #147170 100%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 1px 2px rgba(15, 23, 42, 0.05),
+      0 4px 12px rgba(30, 170, 166, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s ease,
                 filter 0.2s ease;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset-x: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.30) 50%, transparent 90%);
+    pointer-events: none;
   }
   .btn-primary:hover {
     transform: translateY(-2px) scale(1.015);
-    box-shadow: 0 0 22px rgba(30,170,166,0.45);
-    filter: brightness(1.06);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 4px 8px rgba(15, 23, 42, 0.08),
+      0 12px 32px rgba(30, 170, 166, 0.35),
+      0 0 48px rgba(30, 170, 166, 0.30),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    filter: brightness(1.04);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3
-           bg-white
            font-semibold text-sm
-           border rounded-xl
-           shadow-sm hover:shadow-md
+           rounded-xl
            focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2
            active:scale-95;
     color: #178d8a;
-    border-color: #a3eae8;
-    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
-                box-shadow 0.2s ease,
-                background-color 0.15s ease;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(239,252,251,0.95) 100%);
+    border: 1px solid rgba(163, 234, 232, 0.7);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.05),
+      0 1px 2px rgba(15, 23, 42, 0.03),
+      0 4px 12px rgba(30, 170, 166, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
   }
   .btn-secondary:hover {
     transform: translateY(-2px) scale(1.01);
-    background-color: #effcfb;
-    border-color: #6ddad7;
+    border-color: rgba(56, 196, 192, 0.85);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.10),
+      0 2px 4px rgba(15, 23, 42, 0.04),
+      0 8px 24px rgba(30, 170, 166, 0.18),
+      0 0 32px rgba(30, 170, 166, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
   }
 
   .btn-outline {
@@ -278,18 +307,33 @@
 
   /* ── Cards — editorial paper + stone border treatment ─────────────────── */
   .card {
-    @apply bg-paper dark:bg-[var(--card-bg)] rounded-2xl shadow-soft border border-stone-200 dark:border-[var(--border-color)] overflow-hidden;
-    transition: box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    @apply dark:bg-[var(--card-bg)] dark:border-[var(--border-color)] rounded-2xl overflow-hidden;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%);
+    border: 1px solid rgba(228, 228, 219, 0.85);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.04),
+      0 1px 2px rgba(15, 23, 42, 0.03),
+      0 4px 12px rgba(15, 23, 42, 0.04),
+      0 12px 32px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    transition: box-shadow 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
                 border-color 0.3s ease,
-                transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+                transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
   .card-hover {
     @apply card cursor-pointer;
   }
   .card-hover:hover {
-    @apply shadow-card border-stone-300;
-    transform: translateY(-2px);
+    border-color: rgba(163, 234, 232, 0.80);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.10),
+      0 2px 4px rgba(15, 23, 42, 0.04),
+      0 8px 24px rgba(15, 23, 42, 0.07),
+      0 24px 56px rgba(15, 23, 42, 0.09),
+      0 0 48px rgba(30, 170, 166, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    transform: translateY(-3px);
   }
   .card-hover:active {
     transform: translateY(0);
@@ -315,14 +359,26 @@
   /* ── Form Elements ──────────────────────────────────────────────────── */
   .input {
     @apply w-full px-4 py-3
-           bg-white dark:bg-stone-900 border border-warm-200 dark:border-stone-700
+           dark:bg-stone-900 dark:border-stone-700
            rounded-xl text-ink-900 dark:text-stone-100 text-sm
            placeholder:text-ink-400 dark:placeholder:text-stone-500
-           focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+           focus:outline-none;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%);
+    border: 1px solid rgba(228, 228, 219, 0.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .input:hover {
+    border-color: rgba(163, 234, 232, 0.75);
   }
   .input:focus {
-    box-shadow: 0 0 0 3px rgba(30,170,166,0.15), 0 1px 4px rgba(0,0,0,0.05);
+    border-color: rgba(30, 170, 166, 0.55);
+    box-shadow:
+      0 0 0 3px rgba(30, 170, 166, 0.15),
+      0 0 24px rgba(30, 170, 166, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
   }
 
   .input-error {
@@ -443,20 +499,35 @@
     margin-top: 0.75rem;
   }
 
-  /* Editorial card — replaces default card aesthetic on new surfaces */
+  /* Editorial card — cinematic premium material surface */
   .editorial-card {
-    @apply bg-white rounded-2xl border border-stone-200 shadow-soft overflow-hidden;
+    @apply rounded-2xl overflow-hidden;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%);
+    border: 1px solid rgba(228, 228, 219, 0.85);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.04),
+      0 1px 2px rgba(15, 23, 42, 0.03),
+      0 4px 12px rgba(15, 23, 42, 0.04),
+      0 16px 40px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
     transition:
-      box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+      box-shadow 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
       border-color 0.45s ease,
-      transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+      transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   .editorial-card-hover {
     @apply editorial-card cursor-pointer;
   }
   .editorial-card-hover:hover {
-    @apply shadow-card border-stone-300;
-    transform: translateY(-2px);
+    border-color: rgba(163, 234, 232, 0.80);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.10),
+      0 2px 4px rgba(15, 23, 42, 0.04),
+      0 12px 32px rgba(15, 23, 42, 0.07),
+      0 32px 64px rgba(15, 23, 42, 0.09),
+      0 0 56px rgba(30, 170, 166, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    transform: translateY(-3px);
   }
 
   /* Editorial mesh backdrop — subtle teal/ink glow behind hero sections */
@@ -965,13 +1036,29 @@
 
   /* ── Modal overlay ───────────────────────────────────────────────────── */
   .modal-overlay {
-    @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm
-           flex items-center justify-center p-4;
-    animation: fadeIn 0.2s ease;
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(14, 26, 25, 0.55) 0%,
+      rgba(11, 30, 29, 0.72) 100%
+    );
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    animation: fadeIn 0.25s ease;
   }
   .modal-panel {
-    @apply bg-white rounded-2xl shadow-2xl w-full max-w-md
-           max-h-[90dvh] overflow-y-auto;
+    background: linear-gradient(150deg, rgba(255,255,255,1) 0%, rgba(250,250,247,0.97) 100%);
+    border: 1px solid rgba(208, 245, 243, 0.85);
+    border-radius: 1.5rem;
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.10),
+      0 4px 8px rgba(15, 23, 42, 0.06),
+      0 24px 48px rgba(15, 23, 42, 0.12),
+      0 48px 96px rgba(15, 23, 42, 0.18),
+      0 0 80px rgba(30, 170, 166, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    @apply w-full max-w-md max-h-[90dvh] overflow-y-auto;
     animation: scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
     will-change: transform, opacity;
   }
@@ -1273,37 +1360,39 @@
     -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.02);
   }
 
-  /* ── Cinematic depth card surface ───────────────────────────────────── */
-  /* Replaces flat border-t list items with a material-depth card. */
+  /* ── Cinematic depth card surface — premium material with strong depth */
   .card-depth {
     background: linear-gradient(
       150deg,
-      rgba(255, 255, 255, 0.99) 0%,
-      rgba(250, 250, 247, 0.96) 100%
+      rgba(255, 255, 255, 1) 0%,
+      rgba(250, 250, 247, 0.97) 100%
     );
-    border: 1px solid rgba(228, 228, 219, 0.80);
-    border-radius: 1.25rem;
-    box-shadow:
-      0 0 0 0.5px rgba(30, 170, 166, 0.04),
-      0 1px 2px  rgba(15, 23, 42, 0.03),
-      0 4px 12px rgba(15, 23, 42, 0.04),
-      0 16px 40px rgba(15, 23, 42, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.02);
-    transition:
-      transform   0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
-      box-shadow  0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-  .card-depth:hover {
-    transform: translateY(-5px) scale(1.004);
+    border: 1px solid rgba(208, 245, 243, 0.85);
+    border-radius: 1.5rem;
     box-shadow:
       0 0 0 0.5px rgba(30, 170, 166, 0.10),
-      0 2px 4px   rgba(15, 23, 42, 0.04),
-      0 12px 32px rgba(15, 23, 42, 0.07),
-      0 32px 64px rgba(15, 23, 42, 0.09),
-      0 0 56px    rgba(30, 170, 166, 0.07),
+      0 2px 4px   rgba(15, 23, 42, 0.05),
+      0 8px 24px  rgba(15, 23, 42, 0.07),
+      0 24px 56px rgba(15, 23, 42, 0.10),
+      0 0 32px    rgba(30, 170, 166, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    transition:
+      transform   0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+      box-shadow  0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+      border-color 0.55s ease;
+  }
+  .card-depth:hover {
+    transform: translateY(-6px) scale(1.005);
+    border-color: rgba(163, 234, 232, 0.90);
+    box-shadow:
+      0 0 0 0.5px rgba(30, 170, 166, 0.18),
+      0 4px 8px   rgba(15, 23, 42, 0.06),
+      0 16px 40px rgba(15, 23, 42, 0.10),
+      0 40px 80px rgba(15, 23, 42, 0.13),
+      0 0 80px    rgba(30, 170, 166, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03);
   }
 
   /* ── Icon surface — premium frosted icon container ──────────────────── */
@@ -1472,56 +1561,62 @@
     z-index: -1;
   }
 
-  /* ── Dark section premium orbs ──────────────────────────────────────── */
+  /* ── Dark section premium orbs — high-visibility cinematic edition ──── */
   .cta-orb-1 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.26) 0%, transparent 70%);
-    filter: blur(90px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.55) 0%, rgba(30, 170, 166, 0.18) 40%, transparent 70%);
+    filter: blur(95px);
     pointer-events: none;
     animation: ambientBreath1 22s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .cta-orb-2 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 109, 138, 0.20) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(79, 109, 138, 0.42) 0%, rgba(79, 109, 138, 0.15) 40%, transparent 70%);
     filter: blur(110px);
     pointer-events: none;
     animation: ambientBreath2 28s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .cta-orb-3 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.14) 0%, transparent 70%);
-    filter: blur(70px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.32) 0%, rgba(30, 170, 166, 0.10) 40%, transparent 70%);
+    filter: blur(75px);
     pointer-events: none;
     animation: ambientBreath3 18s ease-in-out 4s infinite;
+    will-change: transform, opacity;
   }
 
-  /* ── Hero ambient orbs ──────────────────────────────────────────────── */
+  /* ── Hero ambient orbs — high-visibility cinematic edition ──────────── */
   .hero-orb-1 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.16) 0%, rgba(30, 170, 166, 0.06) 40%, transparent 70%);
-    filter: blur(72px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.40) 0%, rgba(30, 170, 166, 0.16) 40%, transparent 70%);
+    filter: blur(80px);
     pointer-events: none;
     animation: ambientBreath1 22s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .hero-orb-2 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 109, 138, 0.12) 0%, rgba(79, 109, 138, 0.04) 40%, transparent 70%);
-    filter: blur(95px);
+    background: radial-gradient(circle, rgba(79, 109, 138, 0.32) 0%, rgba(79, 109, 138, 0.12) 40%, transparent 70%);
+    filter: blur(100px);
     pointer-events: none;
     animation: ambientBreath2 28s ease-in-out infinite;
+    will-change: transform, opacity;
   }
   .hero-orb-3 {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(30, 170, 166, 0.09) 0%, transparent 65%);
-    filter: blur(65px);
+    background: radial-gradient(circle, rgba(30, 170, 166, 0.26) 0%, rgba(30, 170, 166, 0.10) 40%, transparent 65%);
+    filter: blur(70px);
     pointer-events: none;
     animation: ambientBreath3 19s ease-in-out 5s infinite;
+    will-change: transform, opacity;
   }
 
   /* ── Premium navbar gradient border ────────────────────────────────── */
@@ -1541,6 +1636,51 @@
       transparent 100%
     );
     pointer-events: none;
+  }
+
+  /* ── Premium donation badge — hero variant ──────────────────────────── */
+  .donation-badge-hero {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(228, 228, 219, 0.85);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 4px 16px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  .donation-badge-hero:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(163, 234, 232, 0.7);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 8px 24px rgba(15, 23, 42, 0.06),
+      0 0 24px rgba(30, 170, 166, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+  }
+
+  /* ── Premium donation badge — floating variant ──────────────────────── */
+  .donation-badge-floating {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(228, 228, 219, 0.9);
+    backdrop-filter: blur(20px) saturate(170%);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 4px 12px rgba(15, 23, 42, 0.06),
+      0 16px 40px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  .donation-badge-floating:hover {
+    border-color: rgba(163, 234, 232, 0.75);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 4px 12px rgba(15, 23, 42, 0.06),
+      0 24px 56px rgba(15, 23, 42, 0.10),
+      0 0 32px rgba(30, 170, 166, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
   }
 
   /* ── Cinematic category row hover state ─────────────────────────────── */

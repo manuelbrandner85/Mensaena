@@ -384,8 +384,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ── LOADING STATE ──
   if (loading) {
     return (
-      <div className="min-h-dvh bg-paper aurora-bg flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-dvh bg-paper relative flex items-center justify-center overflow-hidden">
+        <div
+          className="hero-orb-1 absolute pointer-events-none"
+          style={{ top: '-20%', left: '-10%', width: '50vw', height: '50vw' }}
+          aria-hidden="true"
+        />
+        <div
+          className="hero-orb-2 absolute pointer-events-none"
+          style={{ bottom: '-15%', right: '-10%', width: '45vw', height: '45vw' }}
+          aria-hidden="true"
+        />
+        <div className="relative text-center">
           <div className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
           <p className="meta-label meta-label--subtle justify-center">{t('loading')}</p>
         </div>
@@ -398,7 +408,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   // ── FULL APP SHELL ──
   return (
-    <div className="min-h-dvh bg-paper relative aurora-bg">
+    <div className="min-h-dvh bg-paper relative">
       {/* ── Sidebar (Desktop + Mobile Drawer) — bei aktivem Anruf versteckt ── */}
       {!isInCall && (
         <DashboardSidebar
@@ -412,7 +422,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* ── Mobile Top Bar — editorial paper/ink treatment ── */}
       {/* FEATURE: Safe-Area-Inset */}
       <div
-        className={cn('md:hidden fixed top-0 left-0 right-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200 safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}
+        className={cn('md:hidden fixed top-0 left-0 right-0 z-40 glass-nav nav-border-gradient safe-area-top transition-transform duration-300', isInCall && '-translate-y-full')}
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="flex items-center justify-between px-3 h-14">

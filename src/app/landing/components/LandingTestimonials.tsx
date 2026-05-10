@@ -183,7 +183,54 @@ export default function LandingTestimonials() {
       label="Stimmen aus der Gemeinschaft"
       title={<>Was unsere <span className="text-accent">Nachbarn</span> erzählen.</>}
     >
-      <div className="space-y-24 md:space-y-32">
+      {/* ── Cinematic ambient background — subtle teal depth ── */}
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          top: '15%',
+          right: '-15%',
+          width: '50vw',
+          height: '50vw',
+          background: 'radial-gradient(circle, rgba(30,170,166,0.07) 0%, transparent 70%)',
+          filter: 'blur(90px)',
+          animation: 'ambientBreath2 28s ease-in-out infinite',
+          zIndex: 0,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute pointer-events-none rounded-full"
+        style={{
+          bottom: '10%',
+          left: '-12%',
+          width: '42vw',
+          height: '42vw',
+          background: 'radial-gradient(circle, rgba(79,109,138,0.06) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          animation: 'ambientBreath3 22s ease-in-out 5s infinite',
+          zIndex: 0,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* ── Giant atmospheric quotation mark — film-like background detail ── */}
+      <div
+        className="absolute pointer-events-none select-none font-display text-primary-500/[0.04]"
+        style={{
+          top: '8%',
+          left: '5%',
+          fontSize: 'clamp(20rem, 30vw, 40rem)',
+          lineHeight: 1,
+          fontStyle: 'italic',
+          fontWeight: 500,
+          zIndex: 0,
+        }}
+        aria-hidden="true"
+      >
+        „
+      </div>
+
+      <div className="relative space-y-24 md:space-y-32">
         {testimonials.map((t, i) => (
           <figure
             key={i}
