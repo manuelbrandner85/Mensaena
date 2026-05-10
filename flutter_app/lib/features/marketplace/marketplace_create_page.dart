@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -286,11 +287,16 @@ class _MarketplaceCreatePageState
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              url,
+                            child: CachedNetworkImage(
+                              imageUrl: url,
                               width: 80,
                               height: 80,
                               fit: BoxFit.cover,
+                              placeholder: (_, __) => const ColoredBox(
+                                color: Color(0xFFF5F5F4),
+                              ),
+                              errorWidget: (_, __, ___) =>
+                                  const Icon(Icons.broken_image),
                             ),
                           ),
                           Positioned(
