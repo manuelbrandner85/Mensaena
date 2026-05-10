@@ -61,13 +61,14 @@ export default function HomePage() {
   // Web – Loading-State während Auth initialisiert
   if (!initialized || loading) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-paper" role="status">
+      <div className="min-h-dvh flex items-center justify-center bg-mn-void" role="status">
         <div className="flex flex-col items-center gap-4">
           <div
-            className="w-10 h-10 border-[3px] border-primary-200 border-t-primary-600 rounded-full animate-spin"
+            className="w-10 h-10 border-[3px] rounded-full animate-spin"
+            style={{ borderColor: 'rgba(245,158,11,0.20)', borderTopColor: 'rgba(245,158,11,0.75)' }}
             aria-hidden="true"
           />
-          <p className="text-sm text-ink-500 animate-pulse">{t('loading')}</p>
+          <p className="text-sm animate-pulse" style={{ color: 'rgba(245,240,232,0.35)' }}>{t('loading')}</p>
           <span className="sr-only">{t('loadingPage')}</span>
         </div>
       </div>

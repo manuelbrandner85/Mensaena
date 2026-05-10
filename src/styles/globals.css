@@ -824,8 +824,14 @@
 
   /* ── Footer link (used in the statement footer) ──────────────────── */
   .footer-link {
-    @apply inline-block text-sm text-stone-400 hover:text-primary-400 transition-colors duration-300;
+    display: inline-block;
+    font-size: 0.875rem;
+    color: rgba(245, 240, 232, 0.38);
+    transition: color 0.3s ease;
     font-feature-settings: 'ss01';
+  }
+  .footer-link:hover {
+    color: rgba(245, 158, 11, 0.75);
   }
 
   /* ── Sticky editorial section indicator (landing sidebar) ─────────── */
