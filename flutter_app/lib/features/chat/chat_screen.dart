@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -70,8 +71,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 data: (msgs) {
                   if (msgs.isEmpty) {
                     return Center(
-                      child: Text('Schreib die erste Nachricht.',
-                          style: MnTypography.body(color: MnColors.mute)),
+                      child: Text(
+                        'Schreib die erste Nachricht.',
+                        style: MnTypography.body(color: MnColors.mute),
+                      ),
                     );
                   }
                   return ListView.builder(

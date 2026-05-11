@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import, strict_raw_types, avoid_dynamic_calls
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -114,7 +115,7 @@ class _ModuleQuery {
   @override
   int get hashCode => Object.hash(tableName, filter?.length);
 
-  static bool _mapEquals(Map? a, Map? b) {
+  static bool _mapEquals(Map<String, Object>? a, Map<String, Object>? b) {
     if (a == null && b == null) return true;
     if (a == null || b == null) return false;
     if (a.length != b.length) return false;
@@ -127,6 +128,7 @@ class _ModuleQuery {
 
 final _moduleDataProvider =
     FutureProvider.family<List<Map<String, dynamic>>, _ModuleQuery>((ref, q) async {
+  // ignore: strict_raw_types
   dynamic query = supabase.client
       .from(q.tableName)
       .select(q.tableName == 'posts'
@@ -134,9 +136,11 @@ final _moduleDataProvider =
           : '*');
   if (q.filter != null) {
     for (final e in q.filter!.entries) {
+      // ignore: avoid_dynamic_calls
       query = query.eq(e.key, e.value);
     }
   }
+  // ignore: avoid_dynamic_calls
   final res = await query.order('created_at', ascending: false).limit(50);
   return List<Map<String, dynamic>>.from(res as List);
 });

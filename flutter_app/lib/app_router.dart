@@ -7,10 +7,15 @@ import 'core/atmosphere/cinema_scaffold.dart';
 import 'core/theme/colors.dart';
 import 'core/theme/typography.dart';
 import 'core/transitions/cinema_page_route.dart';
+import 'features/admin/admin_screen.dart';
 import 'features/auth/auth_screen.dart';
+import 'features/board/board_screen.dart';
 import 'features/chat/chat_screen.dart' as chat_view;
 import 'features/chat/conversations_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/error/offline_screen.dart';
+import 'features/legal/datenschutz_screen.dart';
+import 'features/legal/impressum_screen.dart';
 import 'features/map/map_screen.dart';
 import 'features/modules/all_modules.dart';
 import 'features/modules/detail_screens.dart';
@@ -159,7 +164,13 @@ List<RouteBase> _buildRoutes() => [
           state: state,
         ),
       ),
-      _stub('/board', 'Schwarzes Brett'),
+      GoRoute(
+        path: '/board',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const BoardScreen(),
+          state: state,
+        ),
+      ),
 
       // 13 Module + Detail-Routen
       _moduleRoute('/modules/tiere', const TiereModule()),
@@ -211,10 +222,34 @@ List<RouteBase> _buildRoutes() => [
       _moduleRoute('/modules/zeitbank', const ZeitbankModule()),
       _moduleRoute('/modules/skills', const SkillsModule()),
 
-      _stub('/admin', 'Admin'),
-      _stub('/datenschutz', 'Datenschutz'),
-      _stub('/impressum', 'Impressum'),
-      _stub('/offline', 'Offline'),
+      GoRoute(
+        path: '/admin',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const AdminScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/datenschutz',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const DatenschutzScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/impressum',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const ImpressumScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/offline',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const OfflineScreen(),
+          state: state,
+        ),
+      ),
     ];
 
 GoRoute _stub(String path, String title) => GoRoute(
