@@ -32,18 +32,22 @@ dependencies:
   dio: ^5.4.3+1
 
   # UI / Design-System
-  google_fonts: ^6.2.1          # Inter + Display-Font
+  google_fonts: ^6.2.1          # Inter, DM Serif Display, JetBrains Mono
   cached_network_image: ^3.3.1
   flutter_svg: ^2.0.10+1
   shimmer: ^3.0.0
   fluttertoast: ^8.2.6          # Pendant zu react-hot-toast
   flutter_hooks: ^0.20.5
+  flutter_animate: ^4.5.0       # Cinema 3.0 — orchestrierte Micro-Animationen
+  lucide_icons: ^0.257.0        # Cinema 3.0 — Icons identisch zur Webseite
 
   # Karte (Pendant zu Leaflet + MarkerCluster)
   flutter_map: ^7.0.1
   flutter_map_marker_cluster: ^1.3.6
   latlong2: ^0.9.1
   geolocator: ^12.0.0           # @capacitor/geolocation Pendant
+  geocoding: ^3.0.0             # Cinema 3.0 — Reverse-Geocoding fuer Standort-Anzeige
+  connectivity_plus: ^6.0.5     # Cinema 3.0 — Offline-Detection
 
   # Native-Plugins (Pendants zu Capacitor)
   # Push-Notifications via Firebase Cloud Messaging — braucht
@@ -52,6 +56,7 @@ dependencies:
   firebase_messaging: ^15.1.3
   flutter_local_notifications: ^17.2.3
   image_picker: ^1.1.2          # @capacitor/camera
+  image_cropper: ^7.1.0         # Cinema 3.0 — Avatar/Post-Image Crop
   flutter_sound: ^9.27.5        # Voice-Recording + Playback (single package)
   share_plus: ^10.0.0           # @capacitor/share (kompatibel mit firebase_messaging_web + Kotlin 1.9)
   path_provider: ^2.1.3         # @capacitor/filesystem
@@ -111,4 +116,11 @@ flutter:
     - assets/i18n/
     - shorebird.yaml
 
-  # Inter + Playfair Display via google_fonts package – kein lokaler Asset nötig
+  # Cinema 3.0 — Fragment-Shader fuer Atmosphaere (FBM-Nebel, Wet-Asphalt, Film-Grain).
+  # Werden via ui.FragmentProgram.fromAsset() geladen und vom ShaderLayer-Widget gerendert.
+  shaders:
+    - shaders/atmosphere.frag
+    - shaders/wet_reflection.frag
+    - shaders/film_grain.frag
+
+  # Inter + DM Serif Display + JetBrains Mono via google_fonts (CDN, kein lokales Asset).
