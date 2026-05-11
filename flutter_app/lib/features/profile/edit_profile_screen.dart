@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/atmosphere/cinema_scaffold.dart';
-import '../../core/theme/colors.dart';
 import '../../core/widgets/cinema_appbar.dart';
 import '../../core/widgets/cinema_input.dart';
 import '../../core/widgets/cinema_select.dart';

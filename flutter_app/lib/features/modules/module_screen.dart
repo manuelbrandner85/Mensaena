@@ -45,22 +45,26 @@ class ModuleScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final data = ref.watch(_moduleDataProvider(
-      _ModuleQuery(tableName: tableName, filter: filter),
-    ));
+    final data = ref.watch(
+      _moduleDataProvider(
+        _ModuleQuery(tableName: tableName, filter: filter),
+      ),
+    );
 
     return CinemaScaffold(
       appBar: CinemaAppBar(title: title.toUpperCase()),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(child: _Header(
-              title: title,
-              description: description,
-              icon: icon,
-              accent: accent,
-              onCreate: () => GoRouter.of(context).push(createRoute),
-            )),
+            SliverToBoxAdapter(
+              child: _Header(
+                title: title,
+                description: description,
+                icon: icon,
+                accent: accent,
+                onCreate: () => GoRouter.of(context).push(createRoute),
+              ),
+            ),
             if (extraHeader != null) SliverToBoxAdapter(child: extraHeader!),
             data.when(
               loading: () => const SliverToBoxAdapter(
@@ -127,11 +131,11 @@ class _ModuleQuery {
 
 final _moduleDataProvider =
     FutureProvider.family<List<Map<String, dynamic>>, _ModuleQuery>((ref, q) async {
-  dynamic query = supabase.client
-      .from(q.tableName)
-      .select(q.tableName == 'posts'
-          ? '*, profiles!posts_user_id_fkey(id, full_name, avatar_url)'
-          : '*');
+  dynamic query = supabase.client.from(q.tableName).select(
+        q.tableName == 'posts'
+            ? '*, profiles!posts_user_id_fkey(id, full_name, avatar_url)'
+            : '*',
+      );
   if (q.filter != null) {
     for (final e in q.filter!.entries) {
       query = query.eq(e.key, e.value);

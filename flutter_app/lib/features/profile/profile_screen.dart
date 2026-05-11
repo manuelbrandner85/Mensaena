@@ -83,8 +83,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 data: (p) {
                   if (p == null) {
                     return Center(
-                      child: Text('Profil nicht gefunden.',
-                          style: MnTypography.body(color: MnColors.mute)),
+                      child: Text(
+                        'Profil nicht gefunden.',
+                        style: MnTypography.body(color: MnColors.mute),
+                      ),
                     );
                   }
                   return Column(

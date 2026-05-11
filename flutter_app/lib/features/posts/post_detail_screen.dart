@@ -83,8 +83,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                     loading: () => const CinemaLoadingSkeleton(),
                     error: (e, _) => Text('$e'),
                     data: (p) => p == null
-                        ? Text('Beitrag nicht gefunden.',
-                            style: MnTypography.body())
+                        ? Text(
+                            'Beitrag nicht gefunden.',
+                            style: MnTypography.body(),
+                          )
                         : _PostHeader(post: p),
                   ),
                   const SizedBox(height: 24),
