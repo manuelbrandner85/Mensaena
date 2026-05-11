@@ -5,7 +5,7 @@ publish_to: 'none'
 # wenn eine neue APK released werden soll (Pflicht-Update via [mandatory]
 # im Commit-Body, sonst optional). Patches gehen automatisch via Shorebird
 # auf die aktuelle Version-Linie.
-version: 2.0.0+20002
+version: 2.0.0+20003
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -46,12 +46,14 @@ dependencies:
   geolocator: ^12.0.0           # @capacitor/geolocation Pendant
 
   # Native-Plugins (Pendants zu Capacitor)
-  # Hinweis: mobile_scanner, firebase_core, firebase_messaging,
-  # flutter_local_notifications werden in Phase 8 (Native Features)
-  # ergänzt, wenn android/ commited ist + google-services.json vorhanden.
+  # Push-Notifications via Firebase Cloud Messaging — braucht
+  # google-services.json (in CI via GOOGLE_SERVICES_JSON Secret).
+  firebase_core: ^3.6.0
+  firebase_messaging: ^15.1.3
+  flutter_local_notifications: ^17.2.3
   image_picker: ^1.1.2          # @capacitor/camera
   flutter_sound: ^9.27.5        # Voice-Recording + Playback (single package)
-  share_plus: ^9.0.0            # @capacitor/share
+  share_plus: ^10.0.0           # @capacitor/share (kompatibel mit firebase_messaging_web + Kotlin 1.9)
   path_provider: ^2.1.3         # @capacitor/filesystem
   permission_handler: ^11.3.1
   url_launcher: ^6.3.0
@@ -64,7 +66,7 @@ dependencies:
   flutter_form_builder: ^9.3.0
 
   # Utilities
-  intl: ^0.19.0                 # i18n + Datum/Zahl-Formatierung
+  intl: '>=0.19.0 <1.0.0'       # i18n + Datum/Zahl-Formatierung (flexibel für Firebase-Konflikte)
   collection: ^1.18.0
   uuid: ^4.4.0
   shared_preferences: ^2.2.3    # localStorage Pendant

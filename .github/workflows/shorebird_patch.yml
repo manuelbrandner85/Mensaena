@@ -117,6 +117,19 @@ jobs:
           storeFile=${RUNNER_TEMP}/signing/mensaena.jks
           EOF
 
+      - name: 🔥 Restore google-services.json (Firebase / FCM)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::error::GOOGLE_SERVICES_JSON secret fehlt — FCM-Build schlägt fehl"
+            exit 1
+          fi
+          mkdir -p android/app
+          printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          python3 -c "import json; json.load(open('android/app/google-services.json'))" \
+            && echo "google-services.json OK"
+
       - name: 🩺 Shorebird-Status + Release-Check
         id: status
         env:
