@@ -8,7 +8,17 @@ import 'core/theme/colors.dart';
 import 'core/theme/typography.dart';
 import 'core/transitions/cinema_page_route.dart';
 import 'features/auth/auth_screen.dart';
+import 'features/chat/chat_screen.dart' as chat_view;
+import 'features/chat/conversations_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/map/map_screen.dart';
+import 'features/notifications/notifications_screen.dart';
+import 'features/posts/post_create_screen.dart';
+import 'features/posts/post_detail_screen.dart';
+import 'features/profile/edit_profile_screen.dart';
+import 'features/profile/profile_screen.dart';
+import 'features/search/search_screen.dart';
+import 'features/settings/settings_screen.dart';
 import 'features/splash/splash_screen.dart';
 import 'providers/auth_provider.dart';
 
@@ -72,16 +82,81 @@ List<RouteBase> _buildRoutes() => [
           state: state,
         ),
       ),
-      _stub('/map', 'Karte'),
-      _stub('/posts/new', 'Beitrag erstellen'),
-      _stub('/posts/:id', 'Beitrag-Detail'),
-      _stub('/chat', 'Chat'),
-      _stub('/chat/:conversationId', 'Konversation'),
-      _stub('/profile/:id', 'Profil'),
-      _stub('/profile/:id/edit', 'Profil bearbeiten'),
-      _stub('/notifications', 'Benachrichtigungen'),
-      _stub('/search', 'Suche'),
-      _stub('/settings', 'Einstellungen'),
+      GoRoute(
+        path: '/map',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const MapScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/posts/new',
+        pageBuilder: (ctx, state) {
+          final cat = state.uri.queryParameters['category'];
+          return CinemaPageTransition.build(
+            child: PostCreateScreen(prefilledCategory: cat),
+            state: state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/posts/:id',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: PostDetailScreen(postId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/chat',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const ConversationsScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/chat/:conversationId',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: chat_view.ChatScreen(
+            conversationId: state.pathParameters['conversationId']!,
+          ),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/profile/:id',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: ProfileScreen(userId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/profile/:id/edit',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: EditProfileScreen(userId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/notifications',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const NotificationsScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/search',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const SearchScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/settings',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const SettingsScreen(),
+          state: state,
+        ),
+      ),
       _stub('/board', 'Schwarzes Brett'),
 
       // 13 Module + Detail-Routen
