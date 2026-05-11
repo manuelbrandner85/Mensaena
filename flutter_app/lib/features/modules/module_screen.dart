@@ -128,7 +128,6 @@ class _ModuleQuery {
 
 final _moduleDataProvider =
     FutureProvider.family<List<Map<String, dynamic>>, _ModuleQuery>((ref, q) async {
-  // ignore: strict_raw_types
   dynamic query = supabase.client
       .from(q.tableName)
       .select(q.tableName == 'posts'
@@ -136,11 +135,9 @@ final _moduleDataProvider =
           : '*');
   if (q.filter != null) {
     for (final e in q.filter!.entries) {
-      // ignore: avoid_dynamic_calls
       query = query.eq(e.key, e.value);
     }
   }
-  // ignore: avoid_dynamic_calls
   final res = await query.order('created_at', ascending: false).limit(50);
   return List<Map<String, dynamic>>.from(res as List);
 });
