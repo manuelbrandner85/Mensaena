@@ -8,6 +8,7 @@ import 'core/theme/colors.dart';
 import 'core/theme/typography.dart';
 import 'core/transitions/cinema_page_route.dart';
 import 'features/auth/auth_screen.dart';
+import 'features/dashboard/dashboard_screen.dart';
 import 'features/splash/splash_screen.dart';
 import 'providers/auth_provider.dart';
 
@@ -64,7 +65,13 @@ List<RouteBase> _buildRoutes() => [
           state: state,
         ),
       ),
-      _stub('/dashboard', 'Dashboard'),
+      GoRoute(
+        path: '/dashboard',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const DashboardScreen(),
+          state: state,
+        ),
+      ),
       _stub('/map', 'Karte'),
       _stub('/posts/new', 'Beitrag erstellen'),
       _stub('/posts/:id', 'Beitrag-Detail'),
