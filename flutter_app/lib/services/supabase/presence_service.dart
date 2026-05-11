@@ -49,7 +49,6 @@ class PresenceService {
 }
 
 class _PresenceController {
-  final List<Set<String>> _queue = [];
   Set<String>? _last;
   final List<void Function(Set<String>)> _listeners = [];
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'colors.dart';
 
 /// Cinematic Shadow-Praesets. Jedes Praeset hat einen "Glow"-Layer
 /// (grosser Blur, niedrige Opazitaet) plus einen kompakten Drop-Shadow.

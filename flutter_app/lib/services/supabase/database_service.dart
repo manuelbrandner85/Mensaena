@@ -34,9 +34,7 @@ class DatabaseService {
       q = q.inFilter('type', typeFilter);
     }
     if (regionId != null) q = q.eq('region_id', regionId);
-    return (await q
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1)) as List<Map<String, dynamic>>;
+    return await q.order('created_at', ascending: false).range(offset, offset + limit - 1);
   }
 
   Future<Map<String, dynamic>?> getPost(String id) {
@@ -83,27 +81,27 @@ class DatabaseService {
 
   // ── CONVERSATIONS / MESSAGES ────────────────────────────────────────
   Future<List<Map<String, dynamic>>> listConversations(String userId) async {
-    return (await _c
+    return await _c
         .from('conversation_members')
         .select('conversation_id, conversations!inner(*)')
         .eq('user_id', userId)
-        .order('conversations(updated_at)', ascending: false)) as List<Map<String, dynamic>>;
+        .order('conversations(updated_at)', ascending: false);
   }
 
   Future<List<Map<String, dynamic>>> listMessages(String conversationId, {int limit = 50}) async {
-    return (await _c
+    return await _c
         .from('messages')
         .select('*, profiles(id, full_name, avatar_url)')
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: false)
-        .limit(limit)) as List<Map<String, dynamic>>;
+        .limit(limit);
   }
 
   // ── NOTIFICATIONS ───────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> listNotifications(String userId, {bool unreadOnly = false}) async {
     var q = _c.from('notifications').select().eq('user_id', userId);
     if (unreadOnly) q = q.eq('read', false);
-    return (await q.order('created_at', ascending: false).limit(50)) as List<Map<String, dynamic>>;
+    return await q.order('created_at', ascending: false).limit(50);
   }
 
   Future<void> markAllRead(String userId) {

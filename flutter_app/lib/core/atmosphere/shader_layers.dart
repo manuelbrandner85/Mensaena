@@ -26,7 +26,6 @@ class ShaderLayer extends StatefulWidget {
 
 class _ShaderLayerState extends State<ShaderLayer>
     with SingleTickerProviderStateMixin {
-  ui.FragmentProgram? _program;
   ui.FragmentShader? _shader;
   late final AnimationController _ctrl;
   late final Stopwatch _stopwatch;
@@ -46,10 +45,7 @@ class _ShaderLayerState extends State<ShaderLayer>
     try {
       final program = await ui.FragmentProgram.fromAsset(widget.assetPath);
       if (!mounted) return;
-      setState(() {
-        _program = program;
-        _shader = program.fragmentShader();
-      });
+      setState(() => _shader = program.fragmentShader());
     } catch (_) {
       // Stiller Fallback (kein GPU / Web ohne Impeller / fehlendes Asset).
     }
