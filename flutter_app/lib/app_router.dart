@@ -12,6 +12,8 @@ import 'features/chat/chat_screen.dart' as chat_view;
 import 'features/chat/conversations_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
 import 'features/map/map_screen.dart';
+import 'features/modules/all_modules.dart';
+import 'features/modules/detail_screens.dart';
 import 'features/notifications/notifications_screen.dart';
 import 'features/posts/post_create_screen.dart';
 import 'features/posts/post_detail_screen.dart';
@@ -160,24 +162,54 @@ List<RouteBase> _buildRoutes() => [
       _stub('/board', 'Schwarzes Brett'),
 
       // 13 Module + Detail-Routen
-      _stub('/modules/tiere', 'Tiere'),
-      _stub('/modules/wohnen', 'Wohnen'),
-      _stub('/modules/mobilitaet', 'Mobilitaet'),
-      _stub('/modules/ernte', 'Ernte'),
-      _stub('/modules/community', 'Community'),
-      _stub('/modules/wissen', 'Wissen / Wiki'),
-      _stub('/modules/wissen/:articleId', 'Wiki-Artikel'),
-      _stub('/modules/events', 'Veranstaltungen'),
-      _stub('/modules/events/:eventId', 'Event-Detail'),
-      _stub('/modules/gruppen', 'Gruppen'),
-      _stub('/modules/gruppen/:groupId', 'Gruppen-Detail'),
-      _stub('/modules/marktplatz', 'Marktplatz'),
-      _stub('/modules/marktplatz/:id', 'Listing-Detail'),
-      _stub('/modules/challenges', 'Challenges'),
-      _stub('/modules/challenges/:id', 'Challenge-Detail'),
-      _stub('/modules/badges', 'Badges'),
-      _stub('/modules/zeitbank', 'Zeitbank'),
-      _stub('/modules/skills', 'Skills'),
+      _moduleRoute('/modules/tiere', const TiereModule()),
+      _moduleRoute('/modules/wohnen', const WohnenModule()),
+      _moduleRoute('/modules/mobilitaet', const MobilitaetModule()),
+      _moduleRoute('/modules/ernte', const ErnteModule()),
+      _moduleRoute('/modules/community', const CommunityModule()),
+      _moduleRoute('/modules/wissen', const WissenModule()),
+      GoRoute(
+        path: '/modules/wissen/:articleId',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: WikiArticleScreen(articleId: state.pathParameters['articleId']!),
+          state: state,
+        ),
+      ),
+      _moduleRoute('/modules/events', const EventsModule()),
+      GoRoute(
+        path: '/modules/events/:eventId',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: EventDetailScreen(eventId: state.pathParameters['eventId']!),
+          state: state,
+        ),
+      ),
+      _moduleRoute('/modules/gruppen', const GruppenModule()),
+      GoRoute(
+        path: '/modules/gruppen/:groupId',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: GroupDetailScreen(groupId: state.pathParameters['groupId']!),
+          state: state,
+        ),
+      ),
+      _moduleRoute('/modules/marktplatz', const MarktplatzModule()),
+      GoRoute(
+        path: '/modules/marktplatz/:id',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: MarketplaceListingScreen(listingId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      _moduleRoute('/modules/challenges', const ChallengesModule()),
+      GoRoute(
+        path: '/modules/challenges/:id',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: ChallengeDetailScreen(challengeId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      _moduleRoute('/modules/badges', const BadgesModule()),
+      _moduleRoute('/modules/zeitbank', const ZeitbankModule()),
+      _moduleRoute('/modules/skills', const SkillsModule()),
 
       _stub('/admin', 'Admin'),
       _stub('/datenschutz', 'Datenschutz'),
@@ -191,6 +223,12 @@ GoRoute _stub(String path, String title) => GoRoute(
         child: _StubScreen(title: title, path: path),
         state: state,
       ),
+    );
+
+GoRoute _moduleRoute(String path, Widget screen) => GoRoute(
+      path: path,
+      pageBuilder: (ctx, state) =>
+          CinemaPageTransition.build(child: screen, state: state),
     );
 
 /// Platzhalter-Screen bis Phase 5+ jede Route mit einem echten Screen
