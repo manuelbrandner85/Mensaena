@@ -31,9 +31,11 @@ class _ResetSheetState extends State<ResetSheet> {
       await authService.sendPasswordReset(_email.text);
       if (!mounted) return;
       Navigator.of(context).maybePop();
-      CinemaToast.show(context,
-          variant: ToastVariant.success,
-          message: 'Reset-Link an ${_email.text} gesendet.');
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.success,
+        message: 'Reset-Link an ${_email.text} gesendet.',
+      );
     } catch (e) {
       if (!mounted) return;
       CinemaToast.show(context, variant: ToastVariant.error, message: e.toString());

@@ -47,9 +47,11 @@ class _LoginFormState extends State<LoginForm> {
       GoRouter.of(context).go('/dashboard');
     } catch (e) {
       if (!mounted) return;
-      CinemaToast.show(context,
-          variant: ToastVariant.error,
-          message: 'Anmeldung fehlgeschlagen. ${_friendly(e)}');
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.error,
+        message: 'Anmeldung fehlgeschlagen. ${_friendly(e)}',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -64,9 +66,11 @@ class _LoginFormState extends State<LoginForm> {
     try {
       await authService.signInWithMagicLink(_email.text);
       if (!mounted) return;
-      CinemaToast.show(context,
-          variant: ToastVariant.success,
-          message: 'Magic Link an ${_email.text} gesendet.');
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.success,
+        message: 'Magic Link an ${_email.text} gesendet.',
+      );
     } catch (e) {
       if (!mounted) return;
       CinemaToast.show(context, variant: ToastVariant.error, message: _friendly(e));
@@ -76,7 +80,11 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void _openReset() {
-    CinemaSheet.show(context, child: const ResetSheet(), initialSize: 0.45);
+    CinemaSheet.show<void>(
+      context,
+      child: const ResetSheet(),
+      initialSize: 0.45,
+    );
   }
 
   String _friendly(Object e) {
@@ -112,8 +120,10 @@ class _LoginFormState extends State<LoginForm> {
           children: [
             CinemaToggle(value: _stayLoggedIn, onChanged: (v) => setState(() => _stayLoggedIn = v)),
             const SizedBox(width: 10),
-            Text('Angemeldet bleiben',
-                style: MnTypography.body(color: MnColors.inkSoft, size: 13)),
+            Text(
+              'Angemeldet bleiben',
+              style: MnTypography.body(color: MnColors.inkSoft, size: 13),
+            ),
           ],
         ),
         const SizedBox(height: 20),
@@ -129,8 +139,10 @@ class _LoginFormState extends State<LoginForm> {
             const Expanded(child: Divider(color: MnColors.line)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text('oder',
-                  style: MnTypography.body(color: MnColors.ghost, size: 12)),
+              child: Text(
+                'oder',
+                style: MnTypography.body(color: MnColors.ghost, size: 12),
+              ),
             ),
             const Expanded(child: Divider(color: MnColors.line)),
           ],
@@ -146,8 +158,10 @@ class _LoginFormState extends State<LoginForm> {
         Center(
           child: TextButton(
             onPressed: _busy ? null : _openReset,
-            child: Text('Passwort vergessen?',
-                style: MnTypography.body(color: MnColors.teal, size: 13)),
+            child: Text(
+              'Passwort vergessen?',
+              style: MnTypography.body(color: MnColors.teal, size: 13),
+            ),
           ),
         ),
       ],

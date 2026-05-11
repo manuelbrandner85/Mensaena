@@ -84,9 +84,11 @@ class _RegisterFormState extends State<RegisterForm> {
         fullName: _name.text.trim(),
       );
       if (!mounted) return;
-      CinemaToast.show(context,
-          variant: ToastVariant.success,
-          message: 'Willkommen! Bitte bestaetige deine E-Mail.');
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.success,
+        message: 'Willkommen! Bitte bestaetige deine E-Mail.',
+      );
       GoRouter.of(context).go('/dashboard');
     } catch (e) {
       if (!mounted) return;
