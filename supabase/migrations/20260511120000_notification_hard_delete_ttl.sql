@@ -42,8 +42,17 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ── pg_cron: Benachrichtigungen nach 14 Tagen auto-löschen ──────────
 -- Läuft täglich um 03:00 UTC.
-SELECT cron.schedule(
-  'cleanup-old-notifications',
-  '0 3 * * *',
-  $$DELETE FROM public.notifications WHERE created_at < NOW() - INTERVAL '14 days'$$
-);
+-- Conditional: läuft nur wenn pg_cron Extension aktiv ist (nicht auf Preview-Branches).
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
+  ) THEN
+    PERFORM cron.schedule(
+      'cleanup-old-notifications',
+      '0 3 * * *',
+      'DELETE FROM public.notifications WHERE created_at < NOW() - INTERVAL ''14 days'''
+    );
+  END IF;
+END;
+$$;
