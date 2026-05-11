@@ -31,7 +31,8 @@ class CinemaSelect<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selected = options.where((o) => o.value == value).cast<CinemaSelectOption<T>?>().firstOrNull;
+    final matches = options.where((o) => o.value == value);
+    final selected = matches.isEmpty ? null : matches.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,6 +97,3 @@ class CinemaSelect<T> extends StatelessWidget {
   }
 }
 
-extension _FirstOrNull<T> on Iterable<T> {
-  T? get firstOrNull => isEmpty ? null : first;
-}

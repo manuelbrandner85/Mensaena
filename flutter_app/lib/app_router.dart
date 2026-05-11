@@ -7,6 +7,8 @@ import 'core/atmosphere/cinema_scaffold.dart';
 import 'core/theme/colors.dart';
 import 'core/theme/typography.dart';
 import 'core/transitions/cinema_page_route.dart';
+import 'features/auth/auth_screen.dart';
+import 'features/splash/splash_screen.dart';
 import 'providers/auth_provider.dart';
 
 /// Provider fuer den globalen GoRouter. Wird einmalig im ProviderScope
@@ -48,8 +50,20 @@ class _AuthRefreshNotifier extends ChangeNotifier {
 
 List<RouteBase> _buildRoutes() => [
       _stub('/', 'Landing'),
-      _stub('/splash', 'Splash'),
-      _stub('/auth', 'Auth'),
+      GoRoute(
+        path: '/splash',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const SplashScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/auth',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const AuthScreen(),
+          state: state,
+        ),
+      ),
       _stub('/dashboard', 'Dashboard'),
       _stub('/map', 'Karte'),
       _stub('/posts/new', 'Beitrag erstellen'),
@@ -165,8 +179,10 @@ class _NotFoundScreen extends StatelessWidget {
               const SizedBox(height: 24),
               TextButton(
                 onPressed: () => GoRouter.of(context).go('/dashboard'),
-                child: Text('Zur Startseite',
-                    style: MnTypography.body(color: MnColors.amber)),
+                child: Text(
+                  'Zur Startseite',
+                  style: MnTypography.body(color: MnColors.amber),
+                ),
               ),
             ],
           ),

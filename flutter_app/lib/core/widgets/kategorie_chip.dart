@@ -27,13 +27,13 @@ class _KatStyle {
 
 const Map<PostKategorie, _KatStyle> _styles = {
   PostKategorie.hilfeAnbieten: _KatStyle(MnColors.amber, LucideIcons.heart, 'Hilfe anbieten'),
-  PostKategorie.hilfeSuchen: _KatStyle(MnColors.teal, LucideIcons.handHelping, 'Hilfe suchen'),
+  PostKategorie.hilfeSuchen: _KatStyle(MnColors.teal, LucideIcons.helpingHand, 'Hilfe suchen'),
   PostKategorie.werkzeug: _KatStyle(MnColors.trust, LucideIcons.wrench, 'Werkzeug'),
   PostKategorie.veranstaltung: _KatStyle(MnColors.tealSoft, LucideIcons.calendar, 'Veranstaltung'),
   PostKategorie.tausch: _KatStyle(MnColors.amberSoft, LucideIcons.gift, 'Tausch'),
   PostKategorie.mitfahrt: _KatStyle(MnColors.inkSoft, LucideIcons.car, 'Mitfahrt'),
   PostKategorie.krisenhilfe: _KatStyle(MnColors.herzrot, LucideIcons.alertTriangle, 'Krisenhilfe'),
-  PostKategorie.tierisches: _KatStyle(MnColors.amberWarm, LucideIcons.pawPrint, 'Tiere'),
+  PostKategorie.tierisches: _KatStyle(MnColors.amberWarm, LucideIcons.dog, 'Tiere'),
   PostKategorie.wohnungsmarkt: _KatStyle(MnColors.teal, LucideIcons.home, 'Wohnen'),
   PostKategorie.allgemein: _KatStyle(MnColors.mute, LucideIcons.messageCircle, 'Allgemein'),
 };

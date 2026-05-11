@@ -41,7 +41,7 @@ class CinemaBottomNav extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: MnColors.voidColor.withValues(alpha: 0.85),
-                    border: Border(top: BorderSide(color: MnColors.line)),
+                    border: const Border(top: BorderSide(color: MnColors.line)),
                   ),
                 ),
               ),
