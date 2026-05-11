@@ -22,6 +22,7 @@ import 'features/modules/detail_screens.dart';
 import 'features/notifications/notifications_screen.dart';
 import 'features/posts/post_create_screen.dart';
 import 'features/posts/post_detail_screen.dart';
+import 'features/posts/post_edit_screen.dart';
 import 'features/profile/edit_profile_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/search/search_screen.dart';
@@ -110,6 +111,13 @@ List<RouteBase> _buildRoutes() => [
         path: '/posts/:id',
         pageBuilder: (ctx, state) => CinemaPageTransition.build(
           child: PostDetailScreen(postId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/posts/:id/edit',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: PostEditScreen(postId: state.pathParameters['id']!),
           state: state,
         ),
       ),
