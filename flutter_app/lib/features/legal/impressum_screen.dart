@@ -37,8 +37,10 @@ class ImpressumScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text('Uwe Vetter', style: MnTypography.body(weight: FontWeight.w600)),
-                    Text('Via d\'Ascoli 25\n92021 Aragona AG\nItalien',
-                        style: MnTypography.body(color: MnColors.inkSoft)),
+                    Text(
+                      'Via d\'Ascoli 25\n92021 Aragona AG\nItalien',
+                      style: MnTypography.body(color: MnColors.inkSoft),
+                    ),
                     const SizedBox(height: 12),
                     Text('Manuel Brandner', style: MnTypography.body(weight: FontWeight.w600)),
                     Text('Im Wahlsberg 10\n55543 Bad Kreuznach\nDeutschland',

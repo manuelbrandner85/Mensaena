@@ -161,8 +161,8 @@ class _Bubble extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!isMine) ...[
-              Row(
-                children: const [
+              const Row(
+                children: [
                   CinemaAvatar(size: AvatarSize.xs),
                   SizedBox(width: 8),
                 ],

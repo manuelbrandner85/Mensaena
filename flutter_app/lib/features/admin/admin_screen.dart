@@ -14,7 +14,6 @@ import '../../core/widgets/cinema_loading_skeleton.dart';
 import '../../core/widgets/cinema_stat.dart';
 import '../../core/widgets/cinema_tabs.dart';
 import '../../core/widgets/glow_button.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../services/supabase/supabase_service.dart';
 
@@ -99,8 +98,16 @@ class _AdminScreenState extends ConsumerState<AdminScreen>
 }
 
 final _adminStatsProvider = FutureProvider<Map<String, int>>((ref) async {
-  final tables = ['profiles', 'posts', 'events', 'conversations', 'messages',
-      'notifications', 'content_reports', 'crises'];
+  final tables = [
+    'profiles',
+    'posts',
+    'events',
+    'conversations',
+    'messages',
+    'notifications',
+    'content_reports',
+    'crises',
+  ];
   final result = <String, int>{};
   for (final t in tables) {
     try {

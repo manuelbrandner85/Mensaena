@@ -21,7 +21,7 @@ class OfflineScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(LucideIcons.wifiOff, size: 48, color: MnColors.mute),
+                const Icon(LucideIcons.wifiOff, size: 48, color: MnColors.mute),
                 const SizedBox(height: 16),
                 Text('Du bist offline', style: MnTypography.display(size: 28)),
                 const SizedBox(height: 8),
