@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -151,7 +150,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   void _openDetail(Map<String, dynamic> post) {
-    final author = (post['profiles'] as Map?) ?? const {};
+    final author = (post['profiles'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
     CinemaSheet.show<void>(
       context,
       initialSize: 0.55,

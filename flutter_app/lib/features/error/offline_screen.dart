@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, require_trailing_commas
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 

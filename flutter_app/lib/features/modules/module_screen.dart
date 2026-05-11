@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import, strict_raw_types, avoid_dynamic_calls
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -195,7 +194,7 @@ class _DefaultPostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final author = (post['profiles'] as Map?) ?? const {};
+    final author = (post['profiles'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
     final kat = PostKategorie.values
         .where((k) => k.name == (post['type'] as String?))
         .firstOrNull;
