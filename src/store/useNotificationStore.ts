@@ -265,7 +265,7 @@ export const useNotificationStore = create<NotificationState & NotificationActio
       return affected
     },
 
-    // ── Delete single ──────────────────────────────────────────────
+    // ── Delete single (permanent) ──────────────────────────────────
     deleteNotification: async (notificationId) => {
       const userId = get()._userId
       if (!userId) return
@@ -283,22 +283,22 @@ export const useNotificationStore = create<NotificationState & NotificationActio
 
       const supabase = createClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase.from('notifications') as any)
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', notificationId)
-        .eq('user_id', userId)
+      const { error } = await (supabase as any).rpc('delete_notification', {
+        p_id: notificationId,
+        p_user_id: userId,
+      })
 
       if (error) {
-        // Rollback — restore the notification in its original position
-        set({ notifications: snapshot, unreadCount: wasUnread
-          ? get().unreadCount + 1
-          : get().unreadCount,
+        // Rollback
+        set({
+          notifications: snapshot,
+          unreadCount: wasUnread ? get().unreadCount + 1 : get().unreadCount,
         })
         throw new Error('Benachrichtigung konnte nicht gelöscht werden')
       }
     },
 
-    // ── Delete all ─────────────────────────────────────────────────
+    // ── Delete all (permanent) ─────────────────────────────────────
     deleteAll: async (category) => {
       const userId = get()._userId
       if (!userId) return 0
@@ -331,7 +331,7 @@ export const useNotificationStore = create<NotificationState & NotificationActio
 
       const supabase = createClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).rpc('soft_delete_all_notifications', {
+      const { data, error } = await (supabase as any).rpc('delete_all_notifications', {
         p_user_id: userId,
         p_category: category || null,
       })
@@ -444,37 +444,48 @@ export const useNotificationStore = create<NotificationState & NotificationActio
           (payload) => {
             const old = payload.old as Record<string, unknown>
             const updated = payload.new as Record<string, unknown>
-            const wasSoftDeleted = updated.deleted_at != null && old.deleted_at == null
             const wasUnread = old.read === false
             const nowRead = (updated.read as boolean) === true
+            const shouldDecrement = wasUnread && nowRead
+            const shouldIncrement = !wasUnread && old.read === true && !(updated.read as boolean)
+
+            set((s) => ({
+              notifications: s.notifications.map((n) =>
+                n.id === updated.id ? { ...n, read: updated.read as boolean } : n,
+              ),
+              unreadCount: shouldDecrement
+                ? Math.max(0, s.unreadCount - 1)
+                : shouldIncrement
+                  ? s.unreadCount + 1
+                  : s.unreadCount,
+            }))
+
+            get().loadUnreadCounts()
+          },
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            // payload.old contains the deleted row (requires REPLICA IDENTITY FULL on the table)
+            const deleted = payload.old as Record<string, unknown>
+            const deletedId = deleted.id as string | undefined
+            if (!deletedId) return
 
             set((s) => {
-              // Remove from list on soft-delete; otherwise update read flag
-              const notifications = wasSoftDeleted
-                ? s.notifications.filter((n) => n.id !== (updated.id as string))
-                : s.notifications.map((n) =>
-                    n.id === updated.id
-                      ? { ...n, read: updated.read as boolean }
-                      : n,
-                  )
-
-              // Decrement if an unread notification was read or soft-deleted
-              const shouldDecrement = wasUnread && (nowRead || wasSoftDeleted)
-              // Increment if a read notification was marked unread again
-              const shouldIncrement = !wasUnread && old.read === true && !(updated.read as boolean)
-
+              const found = s.notifications.find((n) => n.id === deletedId)
+              const wasUnread = found && !found.read
               return {
-                notifications,
-                unreadCount: shouldDecrement
-                  ? Math.max(0, s.unreadCount - 1)
-                  : shouldIncrement
-                    ? s.unreadCount + 1
-                    : s.unreadCount,
+                notifications: s.notifications.filter((n) => n.id !== deletedId),
+                unreadCount: wasUnread ? Math.max(0, s.unreadCount - 1) : s.unreadCount,
               }
             })
 
-            // Reconcile with DB after any update — covers bulk RPCs (markAllAsRead, deleteAll)
-            // where many events fire at once. loadUnreadCounts fetches the authoritative count.
             get().loadUnreadCounts()
           },
         )
