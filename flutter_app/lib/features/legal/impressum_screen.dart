@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas
 import 'package:flutter/material.dart';
 
 import '../../core/atmosphere/cinema_scaffold.dart';
@@ -38,17 +37,23 @@ class ImpressumScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text('Uwe Vetter', style: MnTypography.body(weight: FontWeight.w600)),
-                    Text('Via d\'Ascoli 25\n92021 Aragona AG\nItalien',
-                        style: MnTypography.body(color: MnColors.inkSoft)),
+                    Text(
+                      'Via d\'Ascoli 25\n92021 Aragona AG\nItalien',
+                      style: MnTypography.body(color: MnColors.inkSoft),
+                    ),
                     const SizedBox(height: 12),
                     Text('Manuel Brandner', style: MnTypography.body(weight: FontWeight.w600)),
-                    Text('Im Wahlsberg 10\n55543 Bad Kreuznach\nDeutschland',
-                        style: MnTypography.body(color: MnColors.inkSoft)),
+                    Text(
+                      'Im Wahlsberg 10\n55543 Bad Kreuznach\nDeutschland',
+                      style: MnTypography.body(color: MnColors.inkSoft),
+                    ),
                     const SizedBox(height: 24),
                     Text('Kontakt', style: MnTypography.display(size: 20)),
                     const SizedBox(height: 8),
-                    Text('info@mensaena.de',
-                        style: MnTypography.body(color: MnColors.amber)),
+                    Text(
+                      'info@mensaena.de',
+                      style: MnTypography.body(color: MnColors.amber),
+                    ),
                     const SizedBox(height: 24),
                     Text('Haftungsausschluss', style: MnTypography.display(size: 20)),
                     const SizedBox(height: 8),

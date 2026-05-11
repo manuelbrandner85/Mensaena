@@ -1,11 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/atmosphere/cinema_scaffold.dart';
 import '../../core/painters/neighborhood_pulse.dart';
@@ -125,7 +123,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final lng = (post['lng'] as num?)?.toDouble();
     final kat = _parseKategorie(post['type'] as String?);
     if (lat == null || lng == null) {
-      return Marker(point: const LatLng(0, 0), child: const SizedBox.shrink());
+      return const Marker(point: LatLng(0, 0), child: SizedBox.shrink());
     }
     return Marker(
       point: LatLng(lat, lng),
@@ -151,7 +149,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   void _openDetail(Map<String, dynamic> post) {
-    final author = (post['profiles'] as Map?) ?? const {};
+    final author = (post['profiles'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
     CinemaSheet.show<void>(
       context,
       initialSize: 0.55,

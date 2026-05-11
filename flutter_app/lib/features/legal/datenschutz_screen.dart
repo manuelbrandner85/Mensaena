@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas
 import 'package:flutter/material.dart';
 
 import '../../core/atmosphere/cinema_scaffold.dart';
@@ -31,28 +30,44 @@ class DatenschutzScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Datenschutzerklaerung',
-                        style: MnTypography.display(size: 28)),
+                    Text(
+                      'Datenschutzerklaerung',
+                      style: MnTypography.display(size: 28),
+                    ),
                     const SizedBox(height: 24),
-                    _section('1. Verantwortliche',
-                        'Uwe Vetter, Via d\'Ascoli 25, 92021 Aragona AG (Italien)\n'
-                            'Manuel Brandner, Im Wahlsberg 10, 55543 Bad Kreuznach (Deutschland)\n\n'
-                            'Kontakt: info@mensaena.de'),
-                    _section('2. Datenerhebung',
-                        'Wir erheben nur die Daten, die fuer den Betrieb der App notwendig sind: '
-                        'Profilinformationen, Beitraege, Nachrichten und Standort (nur wenn freigegeben).'),
-                    _section('3. Supabase (EU-Server)',
-                        'Daten werden in der EU bei Supabase gehostet, gesichert durch Row-Level-Security.'),
-                    _section('4. Cookies & lokale Speicherung',
-                        'Wir verwenden lokale Speicherung fuer Auth-Sessions und Praeferenzen. Keine Tracking-Cookies.'),
-                    _section('5. Cloudflare',
-                        'Statische Inhalte werden ueber Cloudflare bereitgestellt. Standard-Web-Logs.'),
-                    _section('6. Deine Rechte',
-                        'Du hast jederzeit Anspruch auf Auskunft, Berichtigung und Loeschung. '
-                        'Sende uns dafuer eine Nachricht an info@mensaena.de.'),
+                    _section(
+                      '1. Verantwortliche',
+                      'Uwe Vetter, Via d\'Ascoli 25, 92021 Aragona AG (Italien)\n'
+                          'Manuel Brandner, Im Wahlsberg 10, 55543 Bad Kreuznach (Deutschland)\n\n'
+                          'Kontakt: info@mensaena.de',
+                    ),
+                    _section(
+                      '2. Datenerhebung',
+                      'Wir erheben nur die Daten, die fuer den Betrieb der App notwendig sind: '
+                      'Profilinformationen, Beitraege, Nachrichten und Standort (nur wenn freigegeben).',
+                    ),
+                    _section(
+                      '3. Supabase (EU-Server)',
+                      'Daten werden in der EU bei Supabase gehostet, gesichert durch Row-Level-Security.',
+                    ),
+                    _section(
+                      '4. Cookies & lokale Speicherung',
+                      'Wir verwenden lokale Speicherung fuer Auth-Sessions und Praeferenzen. Keine Tracking-Cookies.',
+                    ),
+                    _section(
+                      '5. Cloudflare',
+                      'Statische Inhalte werden ueber Cloudflare bereitgestellt. Standard-Web-Logs.',
+                    ),
+                    _section(
+                      '6. Deine Rechte',
+                      'Du hast jederzeit Anspruch auf Auskunft, Berichtigung und Loeschung. '
+                      'Sende uns dafuer eine Nachricht an info@mensaena.de.',
+                    ),
                     const SizedBox(height: 16),
-                    Text('Stand: April 2026',
-                        style: MnTypography.mono(size: 12, color: MnColors.mute)),
+                    Text(
+                      'Stand: April 2026',
+                      style: MnTypography.mono(size: 12, color: MnColors.mute),
+                    ),
                   ],
                 ),
               ),

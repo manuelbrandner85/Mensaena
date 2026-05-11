@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -84,8 +83,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                     loading: () => const CinemaLoadingSkeleton(),
                     error: (e, _) => Text('$e'),
                     data: (p) => p == null
-                        ? Text('Beitrag nicht gefunden.',
-                            style: MnTypography.body())
+                        ? Text(
+                            'Beitrag nicht gefunden.',
+                            style: MnTypography.body(),
+                          )
                         : _PostHeader(post: p),
                   ),
                   const SizedBox(height: 24),
@@ -140,7 +141,7 @@ class _PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final author = (post['profiles'] as Map?) ?? const {};
+    final author = (post['profiles'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
     final kat = PostKategorie.values
         .where((k) => k.name == (post['type'] as String?))
         .firstOrNull;

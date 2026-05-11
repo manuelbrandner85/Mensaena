@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas, unused_import
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -190,7 +189,7 @@ class _PostTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final author = (post['profiles'] as Map?) ?? const {};
+    final author = (post['profiles'] as Map<String, dynamic>?) ?? const <String, dynamic>{};
     final kategorie = _parseKategorie(post['type'] as String?);
     return NachbarschaftCard(
       kategorie: kategorie,
