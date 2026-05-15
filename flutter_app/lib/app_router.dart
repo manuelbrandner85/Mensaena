@@ -10,6 +10,7 @@ import 'core/transitions/cinema_page_route.dart';
 import 'features/admin/admin_screen.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/board/board_screen.dart';
+import 'features/chat/channels_screen.dart';
 import 'features/chat/chat_screen.dart' as chat_view;
 import 'features/chat/conversations_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
@@ -19,9 +20,13 @@ import 'features/legal/impressum_screen.dart';
 import 'features/map/map_screen.dart';
 import 'features/modules/all_modules.dart';
 import 'features/modules/detail_screens.dart';
+import 'features/modules/mental_support_screen.dart';
+import 'features/modules/timebank_screen.dart';
+import 'features/modules/warnungen_screen.dart';
 import 'features/notifications/notifications_screen.dart';
 import 'features/posts/post_create_screen.dart';
 import 'features/posts/post_detail_screen.dart';
+import 'features/posts/post_edit_screen.dart';
 import 'features/profile/edit_profile_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/search/search_screen.dart';
@@ -114,9 +119,23 @@ List<RouteBase> _buildRoutes() => [
         ),
       ),
       GoRoute(
+        path: '/posts/:id/edit',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: PostEditScreen(postId: state.pathParameters['id']!),
+          state: state,
+        ),
+      ),
+      GoRoute(
         path: '/chat',
         pageBuilder: (ctx, state) => CinemaPageTransition.build(
           child: const ConversationsScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/chat/channels',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const ChannelsScreen(),
           state: state,
         ),
       ),
@@ -186,6 +205,13 @@ List<RouteBase> _buildRoutes() => [
           state: state,
         ),
       ),
+      GoRoute(
+        path: '/modules/wissen/:articleId/edit',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: WikiArticleEditScreen(articleId: state.pathParameters['articleId']!),
+          state: state,
+        ),
+      ),
       _moduleRoute('/modules/events', const EventsModule()),
       GoRoute(
         path: '/modules/events/:eventId',
@@ -219,8 +245,10 @@ List<RouteBase> _buildRoutes() => [
         ),
       ),
       _moduleRoute('/modules/badges', const BadgesModule()),
-      _moduleRoute('/modules/zeitbank', const ZeitbankModule()),
+      _moduleRoute('/modules/zeitbank', const TimebankScreen()),
       _moduleRoute('/modules/skills', const SkillsModule()),
+      _moduleRoute('/modules/mental-support', const MentalSupportScreen()),
+      _moduleRoute('/modules/warnungen', const WarnungenScreen()),
 
       GoRoute(
         path: '/admin',

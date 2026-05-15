@@ -17,6 +17,7 @@ import '../../core/widgets/kategorie_chip.dart';
 import '../../core/widgets/nachbarschaft_card.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/supabase/database_service.dart';
+import '../../services/supabase/storage_service.dart';
 
 class PostCreateScreen extends ConsumerStatefulWidget {
   final String? prefilledCategory;
@@ -35,6 +36,7 @@ class _PostCreateScreenState extends ConsumerState<PostCreateScreen> {
   final _tags = TextEditingController();
   String? _imageUrl;
   bool _submitting = false;
+  bool _uploading = false;
 
   @override
   void initState() {
@@ -79,10 +81,33 @@ class _PostCreateScreenState extends ConsumerState<PostCreateScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
+    final picked =
+        await picker.pickImage(source: ImageSource.gallery, maxWidth: 1600);
     if (picked == null) return;
-    // TODO: Upload via StorageService und URL persistieren.
-    setState(() => _imageUrl = picked.path);
+    final user = ref.read(currentUserProvider);
+    if (user == null) return;
+    setState(() => _uploading = true);
+    try {
+      final bytes = await picked.readAsBytes();
+      final path =
+          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final url = await storage.uploadBytes(
+        bucket: StorageService.postImagesBucket,
+        path: path,
+        bytes: bytes,
+      );
+      if (!mounted) return;
+      setState(() => _imageUrl = url);
+    } catch (e) {
+      if (!mounted) return;
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.error,
+        message: 'Upload fehlgeschlagen: $e',
+      );
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
   }
 
   Future<void> _publish() async {
@@ -149,6 +174,7 @@ class _PostCreateScreenState extends ConsumerState<PostCreateScreen> {
                   _StepMedia(
                     imageUrl: _imageUrl,
                     onPick: _pickImage,
+                    uploading: _uploading,
                   ),
                   _StepPreview(
                     kategorie: _kategorie,
@@ -322,8 +348,13 @@ class _StepContent extends StatelessWidget {
 class _StepMedia extends StatelessWidget {
   final String? imageUrl;
   final VoidCallback onPick;
+  final bool uploading;
 
-  const _StepMedia({required this.imageUrl, required this.onPick});
+  const _StepMedia({
+    required this.imageUrl,
+    required this.onPick,
+    required this.uploading,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +366,7 @@ class _StepMedia extends StatelessWidget {
           Text('Bild & Standort', style: MnTypography.display(size: 22)),
           const SizedBox(height: 16),
           GestureDetector(
-            onTap: onPick,
+            onTap: uploading ? null : onPick,
             child: Container(
               height: 200,
               decoration: BoxDecoration(
@@ -345,23 +376,42 @@ class _StepMedia extends StatelessWidget {
                   color: MnColors.amber.withValues(alpha: 0.2),
                   width: 1.5,
                 ),
+                image: (imageUrl != null && imageUrl!.startsWith('http'))
+                    ? DecorationImage(
+                        image: NetworkImage(imageUrl!),
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withValues(alpha: 0.35),
+                          BlendMode.darken,
+                        ),
+                      )
+                    : null,
               ),
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      imageUrl == null ? LucideIcons.imagePlus : LucideIcons.check,
-                      size: 32,
-                      color: MnColors.amber,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      imageUrl == null ? 'Bild auswaehlen' : 'Bild ausgewaehlt',
-                      style: MnTypography.body(color: MnColors.inkSoft),
-                    ),
-                  ],
-                ),
+                child: uploading
+                    ? const SizedBox(
+                        width: 180,
+                        child: CinemaProgress(value: 0.6, label: 'Upload...'),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            imageUrl == null
+                                ? LucideIcons.imagePlus
+                                : LucideIcons.check,
+                            size: 32,
+                            color: MnColors.amber,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            imageUrl == null
+                                ? 'Bild auswaehlen'
+                                : 'Bild ausgewaehlt',
+                            style: MnTypography.body(color: MnColors.inkSoft),
+                          ),
+                        ],
+                      ),
               ),
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../core/atmosphere/cinema_scaffold.dart';
@@ -69,9 +70,30 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   Widget build(BuildContext context) {
     final post = ref.watch(postDetailProvider(widget.postId));
     final comments = ref.watch(postCommentsProvider(widget.postId));
+    final currentUser = ref.watch(currentUserProvider);
+    final postData = post.asData?.value;
+    final isOwn = postData != null &&
+        currentUser != null &&
+        postData['user_id'] == currentUser.id;
 
     return CinemaScaffold(
-      appBar: const CinemaAppBar(title: 'BEITRAG'),
+      appBar: CinemaAppBar(
+        title: 'BEITRAG',
+        actions: isOwn
+            ? [
+                IconButton(
+                  tooltip: 'Bearbeiten',
+                  icon: const Icon(
+                    LucideIcons.pencil,
+                    color: MnColors.amber,
+                    size: 18,
+                  ),
+                  onPressed: () => GoRouter.of(context)
+                      .push('/posts/${widget.postId}/edit'),
+                ),
+              ]
+            : null,
+      ),
       body: SafeArea(
         child: Column(
           children: [

@@ -13,7 +13,10 @@ import '../../core/widgets/cinema_modal.dart';
 import '../../core/widgets/cinema_toast.dart';
 import '../../core/widgets/cinema_toggle.dart';
 import '../../core/widgets/glow_button.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../services/supabase/auth_service.dart';
+import '../../services/supabase/database_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -27,6 +30,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _publicProfile = true;
   bool _onlineStatus = true;
   bool _shareLocation = true;
+  bool _loaded = false;
   String _version = '';
 
   @override
@@ -37,8 +41,43 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     });
   }
 
+  void _hydrateFromProfile(Map<String, dynamic>? p) {
+    if (_loaded || p == null) return;
+    _loaded = true;
+    final visibility = (p['profile_visibility'] as String?) ?? 'public';
+    _publicProfile = visibility == 'public';
+    _onlineStatus = (p['show_online_status'] as bool?) ?? true;
+    _shareLocation = (p['show_location'] as bool?) ?? true;
+  }
+
+  Future<void> _patchProfile(Map<String, dynamic> patch, String successMsg) async {
+    final me = ref.read(currentUserProvider);
+    if (me == null) return;
+    try {
+      await db.updateProfile(me.id, patch);
+      ref.invalidate(currentProfileProvider);
+      if (!mounted) return;
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.success,
+        message: successMsg,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      CinemaToast.show(
+        context,
+        variant: ToastVariant.error,
+        message: 'Fehler: $e',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Pre-load aktueller Werte aus currentProfileProvider.
+    final profileAsync = ref.watch(currentProfileProvider);
+    _hydrateFromProfile(profileAsync.asData?.value);
+
     return CinemaScaffold(
       level: AtmosphereLevel.focus,
       appBar: const CinemaAppBar(title: 'EINSTELLUNGEN'),
@@ -54,7 +93,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 trailing: const Icon(LucideIcons.chevronRight, color: MnColors.mute),
                 onTap: () => GoRouter.of(context).push('/profile/me/edit'),
               ),
-            ]),
+            ],),
             _Section(title: 'Benachrichtigungen', children: [
               _SettingRow(
                 icon: LucideIcons.bell,
@@ -65,7 +104,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onChanged: (v) => setState(() => _pushEnabled = v),
                 ),
               ),
-            ]),
+            ],),
             _Section(title: 'Datenschutz', children: [
               _SettingRow(
                 icon: LucideIcons.shield,
@@ -73,7 +112,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 description: 'Andere koennen dein Profil sehen',
                 trailing: CinemaToggle(
                   value: _publicProfile,
-                  onChanged: (v) => setState(() => _publicProfile = v),
+                  onChanged: (v) {
+                    setState(() => _publicProfile = v);
+                    _patchProfile(
+                      {'profile_visibility': v ? 'public' : 'private'},
+                      v ? 'Profil ist jetzt oeffentlich.' : 'Profil ist jetzt privat.',
+                    );
+                  },
                 ),
               ),
               _SettingRow(
@@ -82,7 +127,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 description: 'Andere sehen wann du aktiv bist',
                 trailing: CinemaToggle(
                   value: _onlineStatus,
-                  onChanged: (v) => setState(() => _onlineStatus = v),
+                  onChanged: (v) {
+                    setState(() => _onlineStatus = v);
+                    _patchProfile(
+                      {'show_online_status': v},
+                      v ? 'Online-Status sichtbar.' : 'Online-Status versteckt.',
+                    );
+                  },
                 ),
               ),
               _SettingRow(
@@ -91,11 +142,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 description: 'Erlaubt Geo-Suche und Karte',
                 trailing: CinemaToggle(
                   value: _shareLocation,
-                  onChanged: (v) => setState(() => _shareLocation = v),
+                  onChanged: (v) {
+                    setState(() => _shareLocation = v);
+                    _patchProfile(
+                      {'show_location': v},
+                      v ? 'Standort wird geteilt.' : 'Standort versteckt.',
+                    );
+                  },
                 ),
               ),
-            ]),
+            ],),
             _Section(title: 'Konto', children: [
+              _SettingRow(
+                icon: LucideIcons.userX,
+                label: 'Blockierte Nutzer',
+                description: 'Personen entsperren, die du blockiert hast',
+                trailing: const Icon(LucideIcons.chevronRight, color: MnColors.mute),
+                onTap: () => GoRouter.of(context).push('/settings/blocked'),
+              ),
               _SettingRow(
                 icon: LucideIcons.logOut,
                 label: 'Abmelden',
@@ -109,7 +173,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 onTap: _deleteAccount,
                 accent: MnColors.herzrot,
               ),
-            ]),
+            ],),
             _Section(title: 'Ueber Mensaena', children: [
               _SettingRow(
                 icon: LucideIcons.info,
@@ -126,7 +190,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 label: 'Impressum',
                 onTap: () => GoRouter.of(context).push('/impressum'),
               ),
-            ]),
+            ],),
             const SizedBox(height: 24),
             Center(
               child: Text(
