@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from 'next'
-import { Instrument_Serif, Geist, Geist_Mono, Fraunces } from 'next/font/google'
+import { Instrument_Serif, Inter, JetBrains_Mono, Fraunces } from 'next/font/google'
 import '@/styles/globals.css'
 
 // next/font self-hosts Google Fonts at build time and swap-loads them to
 // improve LCP. Single CSS file, preload hints, and correct subset pruning
 // replace ~10 @fontsource CSS imports.
-const geist = Geist({
+const inter = Inter({
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
   preload: true,
@@ -20,8 +21,9 @@ const fraunces = Fraunces({
   preload: true,
 })
 
-const geistMono = Geist_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
+  weight: ['400', '500'],
   variable: '--font-mono',
   display: 'swap',
   preload: false,
@@ -168,7 +170,7 @@ export default async function RootLayout({
   return (
     <html
       lang="de"
-      className={`${geist.variable} ${fraunces.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
+      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}
     >
       <head>
         {/* ── Favicon & Icons ── */}
