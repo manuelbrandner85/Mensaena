@@ -36,7 +36,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         background: 'rgba(10,15,28,0.82)',
         backdropFilter: 'blur(20px) saturate(1.4)',
         WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
-        borderBottom: '1px solid rgba(245,158,11,0.10)',
+        borderBottom: '1px solid rgba(199,147,99,0.15)',
       }}
     >
       {/* Left: Page title + Search */}
@@ -53,7 +53,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
               {breadcrumbs.slice(0, -1).map((crumb, i) => (
                 <span key={crumb.href} className="flex items-center gap-1">
                   {i > 0 && <span className="text-mn-ghost">·</span>}
-                  <Link href={crumb.href} className="hover:text-mn-amber transition-colors truncate max-w-[80px]">
+                  <Link href={crumb.href} className="hover:text-mn-bronze transition-colors truncate max-w-[80px]">
                     {crumb.label}
                   </Link>
                 </span>
@@ -69,7 +69,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         <div className="flex items-center gap-1">
           <Link
             href="/dashboard/map"
-            className="p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-amber transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+            className="p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-bronze transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             title={t('openMap')}
             aria-label={t('openMap')}
           >
@@ -77,7 +77,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
           </Link>
           <Link
             href="/dashboard/messages"
-            className="relative p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-amber transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+            className="relative p-2 rounded-full text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-bronze transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             title={t('chat')}
             aria-label={unreadMessages > 0 ? `${t('chat')} (${unreadMessages} ungelesen)` : t('chat')}
           >
@@ -93,7 +93,7 @@ export default function Topbar({ userId, displayName, email, avatarUrl, isAdmin,
         {isDashboardHome && (
           <button
             onClick={openWidgetSettings}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-mn-mute hover:text-mn-amber bg-mn-surface border border-white/7 hover:border-mn-amber/20 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-mn-mute hover:text-mn-bronze bg-mn-surface border border-white/7 hover:border-mn-bronze/20 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             title="Dashboard-Widgets anpassen"
             aria-label="Dashboard-Widgets anpassen"
           >
