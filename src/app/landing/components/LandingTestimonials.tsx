@@ -154,16 +154,16 @@ export default function LandingTestimonials() {
         id="testimonials"
         index="06"
         label="Stimmen aus der Gemeinschaft"
-        title={<>Was unsere <span style={{ color: 'rgba(245,158,11,0.85)', fontStyle: 'italic' }}>Nachbarn</span> erzählen.</>}
+        title={<>Was unsere <span style={{ color: 'rgba(199,147,99,0.85)', fontStyle: 'italic' }}>Nachbarn</span> erzählen.</>}
       >
         <div className="space-y-24 md:space-y-32">
           {[1, 2, 3].map((i) => (
             <div key={i} className="max-w-3xl space-y-4 animate-pulse">
-              <div className="h-7 rounded w-full" style={{ background: 'rgba(245,240,232,0.08)' }} />
-              <div className="h-7 rounded w-4/5" style={{ background: 'rgba(245,240,232,0.06)' }} />
+              <div className="h-7 rounded w-full" style={{ background: 'rgba(236,229,214,0.08)' }} />
+              <div className="h-7 rounded w-4/5" style={{ background: 'rgba(236,229,214,0.06)' }} />
               <div className="flex items-center gap-3 mt-8">
-                <div className="h-px w-10" style={{ background: 'rgba(245,240,232,0.15)' }} />
-                <div className="h-4 rounded w-28" style={{ background: 'rgba(245,240,232,0.06)' }} />
+                <div className="h-px w-10" style={{ background: 'rgba(236,229,214,0.15)' }} />
+                <div className="h-4 rounded w-28" style={{ background: 'rgba(236,229,214,0.06)' }} />
               </div>
             </div>
           ))}
@@ -179,7 +179,7 @@ export default function LandingTestimonials() {
       id="testimonials"
       index="06"
       label="Stimmen aus der Gemeinschaft"
-      title={<>Was unsere <span style={{ color: 'rgba(245,158,11,0.85)', fontStyle: 'italic' }}>Nachbarn</span> erzählen.</>}
+      title={<>Was unsere <span style={{ color: 'rgba(199,147,99,0.85)', fontStyle: 'italic' }}>Nachbarn</span> erzählen.</>}
     >
       {/* Giant atmospheric quotation mark */}
       <div
@@ -189,7 +189,7 @@ export default function LandingTestimonials() {
           fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
           fontSize: 'clamp(20rem, 30vw, 40rem)',
           lineHeight: 1, fontStyle: 'italic', fontWeight: 400,
-          color: 'rgba(245,158,11,0.04)',
+          color: 'rgba(199,147,99,0.04)',
           zIndex: 0,
         }}
         aria-hidden="true"
@@ -210,28 +210,28 @@ export default function LandingTestimonials() {
               style={{
                 fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
                 fontSize: 'clamp(1.75rem, 4vw, 3rem)',
-                color: '#F5F0E8',
+                color: '#ece5d6',
               }}
             >
-              <span style={{ color: 'rgba(245,158,11,0.70)' }}>„</span>
+              <span style={{ color: 'rgba(199,147,99,0.70)' }}>„</span>
               {t.quote}
-              <span style={{ color: 'rgba(245,158,11,0.70)' }}>"</span>
+              <span style={{ color: 'rgba(199,147,99,0.70)' }}>"</span>
             </blockquote>
 
             <figcaption className={`mt-10 flex items-center gap-4 ${i % 2 === 1 ? 'md:justify-end' : ''}`}>
-              <span className="block h-px w-10" style={{ background: 'rgba(245,158,11,0.30)' }} aria-hidden="true" />
+              <span className="block h-px w-10" style={{ background: 'rgba(199,147,99,0.30)' }} aria-hidden="true" />
               <div>
                 <div className={`flex items-center gap-2 ${i % 2 === 1 ? 'md:justify-end' : ''}`}>
                   <span
                     style={{
                       fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
                       fontSize: '1.1rem',
-                      color: '#F5F0E8',
+                      color: '#ece5d6',
                     }}
                   >{t.name}</span>
                   {stage === 'db' && t.memberIndex != null && (
                     <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-mono font-semibold leading-none"
-                      style={{ background: 'rgba(245,158,11,0.10)', color: 'rgba(245,158,11,0.80)', border: '1px solid rgba(245,158,11,0.20)' }}>
+                      style={{ background: 'rgba(199,147,99,0.10)', color: 'rgba(199,147,99,0.80)', border: '1px solid rgba(199,147,99,0.20)' }}>
                       Mitglied #{t.memberIndex}
                     </span>
                   )}

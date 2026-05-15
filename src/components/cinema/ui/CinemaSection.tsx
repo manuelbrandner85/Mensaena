@@ -26,9 +26,9 @@ export default function CinemaSection({
     fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
     fontWeight: 400,
     fontSize: 'clamp(2.25rem, 5vw, 3.75rem)',
-    lineHeight: 1.05,
+    lineHeight: 1.02,
     letterSpacing: '-0.025em',
-    color: '#F5F0E8',
+    color: '#ece5d6',
   } as React.CSSProperties
 
   return (
@@ -60,7 +60,7 @@ export default function CinemaSection({
             {subtitle && (
               <p
                 className="reveal reveal-delay-2 mt-6 text-lg leading-relaxed"
-                style={{ color: 'rgba(245,240,232,0.50)' }}
+                style={{ color: 'rgba(205, 196, 177, 0.70)' }}
               >
                 {subtitle}
               </p>

@@ -25,7 +25,14 @@ export default function LandingFeatures() {
       label={t('featuresLabel')}
       title={t('featuresTitle')}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+      <div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        style={{
+          gap: '1px',
+          background: 'rgba(199,147,99,0.10)',
+          border: '1px solid rgba(199,147,99,0.10)',
+        }}
+      >
         {features.map((feature, i) => (
           <FeatureItem key={i} {...feature} index={i} />
         ))}
@@ -47,27 +54,33 @@ function FeatureItem({
 }) {
   const num = String(index + 1).padStart(2, '0')
   return (
-    <article className={`reveal reveal-delay-${Math.min(index + 1, 5)}`}>
-      <div className="cinema-card p-8 md:p-10 h-full flex flex-col">
-        <div className="flex items-start justify-between mb-7">
-          <div className="cinema-meta-label cinema-meta-label--subtle">{num}</div>
-          <div className="cinema-icon-surface w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Icon className="w-5 h-5 text-mn-amber" aria-hidden="true" />
-          </div>
-        </div>
+    <article
+      className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col justify-between p-10 md:p-11 min-h-[320px] transition-colors duration-300`}
+      style={{ background: 'linear-gradient(180deg, rgba(13,26,41,0.55), rgba(7,13,22,0.55))' }}
+    >
+      <div className="flex items-start justify-between mb-14">
+        <div className="cinema-meta-label cinema-meta-label--subtle">{num}</div>
+        <span
+          aria-hidden="true"
+          className="w-2 h-2 rounded-full"
+          style={{ background: '#c79363', boxShadow: '0 0 12px rgba(199,147,99,0.5)' }}
+        />
+      </div>
 
+      <div>
         <h3
-          className="leading-[1.12] tracking-tight mb-4"
+          className="leading-[1.06] tracking-tight mb-4"
           style={{
             fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
-            fontSize: 'clamp(1.25rem, 2vw, 1.65rem)',
-            color: '#F5F0E8',
+            fontSize: 'clamp(1.35rem, 2.2vw, 1.9rem)',
+            color: '#ece5d6',
+            fontWeight: 400,
           }}
         >
           {title}
         </h3>
 
-        <p className="text-[0.94rem] leading-relaxed mt-auto" style={{ color: 'rgba(245,240,232,0.50)' }}>
+        <p className="text-[0.875rem] leading-relaxed" style={{ color: 'rgba(205,196,177,0.70)', maxWidth: '34ch' }}>
           {description}
         </p>
       </div>

@@ -32,7 +32,7 @@ export default function LandingHowItWorks() {
                     fontSize: 'clamp(5.5rem, 10vw, 6.5rem)',
                     lineHeight: 1,
                     letterSpacing: '-0.04em',
-                    color: 'rgba(245,158,11,0.65)',
+                    color: 'rgba(199,147,99,0.65)',
                     display: 'block',
                   }}
                 >
@@ -45,13 +45,13 @@ export default function LandingHowItWorks() {
                 style={{
                   fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
                   fontSize: 'clamp(1.25rem, 2vw, 1.6rem)',
-                  color: '#F5F0E8',
+                  color: '#ece5d6',
                 }}
               >
                 {step.title}
               </h3>
 
-              <p className="text-[0.94rem] leading-relaxed mt-auto" style={{ color: 'rgba(245,240,232,0.50)' }}>
+              <p className="text-[0.94rem] leading-relaxed mt-auto" style={{ color: 'rgba(236,229,214,0.50)' }}>
                 {step.description}
               </p>
             </div>

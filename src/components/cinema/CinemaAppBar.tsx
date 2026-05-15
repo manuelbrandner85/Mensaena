@@ -53,7 +53,7 @@ export default function CinemaAppBar({
           className="font-sans font-bold text-mn-ink tracking-[5px] text-sm sm:text-base"
           style={{
             textShadow:
-              '0 0 20px rgba(245,158,11,0.30), 0 0 60px rgba(245,158,11,0.10)',
+              '0 0 20px rgba(199,147,99,0.30), 0 0 60px rgba(199,147,99,0.10)',
           }}
         >
           MENSAENA
@@ -75,7 +75,7 @@ export default function CinemaAppBar({
         {/* CTA */}
         <Link
           href={ctaHref}
-          className="text-sm font-medium px-4 py-2 rounded-full text-mn-ink border border-white/10 hover:border-mn-amber/40 hover:text-mn-amber transition-colors"
+          className="text-sm font-medium px-4 py-2 rounded-full text-mn-ink border border-white/10 hover:border-mn-bronze/40 hover:text-mn-bronze transition-colors"
         >
           {ctaLabel}
         </Link>
@@ -86,7 +86,7 @@ export default function CinemaAppBar({
           className="absolute left-0 right-0 bottom-0 h-px"
           style={{
             background:
-              'linear-gradient(to right, transparent, rgba(245,158,11,0.20), transparent)',
+              'linear-gradient(to right, transparent, rgba(199,147,99,0.20), transparent)',
             opacity: scrolled ? 1 : 0.4,
             transition: 'opacity 0.3s ease',
           }}

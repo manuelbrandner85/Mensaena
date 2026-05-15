@@ -18,7 +18,7 @@ export default function LandingCTA() {
         className="absolute rounded-full pointer-events-none"
         style={{
           top: '-20%', left: '-10%', width: '65vw', height: '65vw',
-          background: 'radial-gradient(circle, rgba(245,158,11,0.22) 0%, rgba(245,158,11,0.07) 40%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(199,147,99,0.22) 0%, rgba(199,147,99,0.07) 40%, transparent 70%)',
           filter: 'blur(95px)',
           animation: 'breathe 22s ease-in-out infinite',
         }}
@@ -28,7 +28,7 @@ export default function LandingCTA() {
         className="absolute rounded-full pointer-events-none"
         style={{
           bottom: '-15%', right: '-15%', width: '55vw', height: '55vw',
-          background: 'radial-gradient(circle, rgba(14,165,233,0.10) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(43,86,99,0.10) 0%, transparent 70%)',
           filter: 'blur(110px)',
           animation: 'breathe 28s ease-in-out 6s infinite',
         }}
@@ -39,7 +39,7 @@ export default function LandingCTA() {
         className="absolute inset-0 pointer-events-none opacity-25"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(245,158,11,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.07) 1px, transparent 1px)',
+            'linear-gradient(rgba(199,147,99,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(199,147,99,0.07) 1px, transparent 1px)',
           backgroundSize: '64px 64px',
           maskImage: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,0,0,0.5) 20%, transparent 80%)',
           WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,0,0,0.5) 20%, transparent 80%)',
@@ -59,7 +59,7 @@ export default function LandingCTA() {
             fontSize: 'clamp(2.75rem, 7vw, 5.75rem)',
             lineHeight: 1.02,
             letterSpacing: '-0.035em',
-            color: '#F5F0E8',
+            color: '#ece5d6',
           }}
         >
           {t('ctaTitle')}
@@ -67,7 +67,7 @@ export default function LandingCTA() {
 
         <p
           className="reveal reveal-delay-2 mt-10 max-w-xl text-lg md:text-xl leading-relaxed"
-          style={{ color: 'rgba(245,240,232,0.50)' }}
+          style={{ color: 'rgba(236,229,214,0.50)' }}
         >
           {t('ctaText')}
         </p>

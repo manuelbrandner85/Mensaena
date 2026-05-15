@@ -50,10 +50,10 @@ function PillBadge({ href, className }: { href: string; className: string }) {
   return (
     <Link
       href={href}
-      className={`group inline-flex items-center gap-2 rounded-full border border-mn-amber/20 bg-mn-amber/5/70 px-3.5 py-1.5 text-[12px] font-medium tracking-wide text-mn-amber transition-all duration-300 hover:border-mn-amber/20 hover:bg-mn-amber/5 hover:shadow-glow-teal ${className}`}
+      className={`group inline-flex items-center gap-2 rounded-full border border-mn-bronze/20 bg-mn-bronze/5/70 px-3.5 py-1.5 text-[12px] font-medium tracking-wide text-mn-bronze transition-all duration-300 hover:border-mn-bronze/20 hover:bg-mn-bronze/5 hover:shadow-glow-teal ${className}`}
       aria-label="Mensaena unterstützen"
     >
-      <Heart className="h-3.5 w-3.5 fill-primary-500/30 text-mn-amber transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+      <Heart className="h-3.5 w-3.5 fill-primary-500/30 text-mn-bronze transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
       <span>Spenden</span>
     </Link>
   )
@@ -70,14 +70,14 @@ function HeroBadge({ href, className }: { href: string; className: string }) {
     >
       <span className="relative flex h-2 w-2 flex-shrink-0">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75" aria-hidden="true" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-mn-amber" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-mn-bronze" />
       </span>
       <span className="truncate">
         <span className="text-mn-ink">Spendenfinanziert</span>
         <span className="mx-1.5 text-mn-ghost" aria-hidden="true">·</span>
         <span className="text-mn-mute">100&nbsp;%&nbsp;werbefrei</span>
       </span>
-      <ArrowRight className="hidden h-3 w-3 flex-shrink-0 text-mn-amber transition-transform duration-300 group-hover:translate-x-0.5 sm:inline" aria-hidden="true" />
+      <ArrowRight className="hidden h-3 w-3 flex-shrink-0 text-mn-bronze transition-transform duration-300 group-hover:translate-x-0.5 sm:inline" aria-hidden="true" />
     </Link>
   )
 }
@@ -139,7 +139,7 @@ function FloatingBadge({
       <div className="donation-badge-floating pointer-events-auto group relative flex items-center gap-2 rounded-full py-1.5 pr-1.5 pl-4 transition-all duration-400">
         <span className="relative flex h-2 w-2 flex-shrink-0" aria-hidden="true">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-mn-amber" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-mn-bronze" />
         </span>
         <Link
           href={href}

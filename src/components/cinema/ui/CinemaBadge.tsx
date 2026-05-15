@@ -3,7 +3,7 @@ import { cn } from '@/lib/design-system'
 type BadgeVariant = 'amber' | 'teal' | 'herzrot' | 'leben' | 'trust' | 'mute'
 
 const styles: Record<BadgeVariant, string> = {
-  amber:  'bg-mn-amber/10  text-mn-amber       border-mn-amber/20',
+  amber:  'bg-mn-bronze/10  text-mn-bronze       border-mn-bronze/20',
   teal:   'bg-mn-teal/10   text-mn-teal-soft   border-mn-teal/20',
   herzrot:'bg-mn-herzrot/10 text-mn-herzrot-warm border-mn-herzrot/20',
   leben:  'bg-mn-leben/10  text-mn-leben-soft  border-mn-leben/20',

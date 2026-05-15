@@ -26,8 +26,8 @@ export default function CinemaToggle({ checked, onChange, label, description, di
         className={cn(
           'relative inline-flex shrink-0 h-6 w-11 rounded-full border-2 border-transparent',
           'transition-colors duration-200 ease-in-out cursor-pointer',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void',
-          checked ? 'bg-mn-amber' : 'bg-mn-surface',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void',
+          checked ? 'bg-mn-bronze' : 'bg-mn-surface',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
       >

@@ -65,7 +65,7 @@ export default function LandingMap() {
           left: '-10%',
           width: '40vw',
           height: '40vw',
-          background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(199,147,99,0.12) 0%, transparent 70%)',
           filter: 'blur(80px)',
           animation: 'ambientBreath2 24s ease-in-out infinite',
           zIndex: 0,
@@ -94,7 +94,7 @@ export default function LandingMap() {
         style={{
           background: 'linear-gradient(180deg, rgba(15,22,40,0.6) 0%, rgba(10,15,28,0.85) 100%)',
           boxShadow:
-            '0 1px 0 rgba(245,158,11,0.08) inset, 0 16px 48px rgba(0,0,0,0.55), 0 32px 96px rgba(0,0,0,0.40), 0 0 80px rgba(245,158,11,0.06)',
+            '0 1px 0 rgba(199,147,99,0.08) inset, 0 16px 48px rgba(0,0,0,0.55), 0 32px 96px rgba(0,0,0,0.40), 0 0 80px rgba(199,147,99,0.06)',
         }}
       >
         {showMap ? (
@@ -122,7 +122,7 @@ export default function LandingMap() {
                   center={[m.lat, m.lng]}
                   radius={9}
                   pathOptions={{
-                    fillColor: '#FBBF24',
+                    fillColor: '#c79363',
                     fillOpacity: 0.92,
                     color: '#FEF3C7',
                     weight: 2,
@@ -158,7 +158,7 @@ export default function LandingMap() {
                     left: l.left,
                     width: l.size,
                     height: l.size,
-                    background: 'radial-gradient(circle, rgba(245,158,11,0.10) 0%, transparent 70%)',
+                    background: 'radial-gradient(circle, rgba(199,147,99,0.10) 0%, transparent 70%)',
                     animation: `lanternDrift 14s ease-in-out ${l.delay} infinite`,
                     filter: 'blur(2px)',
                     transform: 'translate(-50%, -50%)',
@@ -184,7 +184,7 @@ export default function LandingMap() {
             className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
             style={{
               background:
-                'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.20) 30%, rgba(245,158,11,0.50) 50%, rgba(245,158,11,0.20) 70%, transparent 100%)',
+                'linear-gradient(90deg, transparent 0%, rgba(199,147,99,0.20) 30%, rgba(199,147,99,0.50) 50%, rgba(199,147,99,0.20) 70%, transparent 100%)',
             }}
             aria-hidden="true"
           />

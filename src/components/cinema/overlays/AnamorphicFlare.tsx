@@ -41,9 +41,9 @@ export default function AnamorphicFlare({
         width: '45vw',
         height: '1px',
         filter: 'blur(3px)',
-        boxShadow: '0 0 20px rgba(245,158,11,0.10)',
+        boxShadow: '0 0 20px rgba(199,147,99,0.10)',
         background:
-          'linear-gradient(90deg, transparent, rgba(245,158,11,0.12) 30%, rgba(245,158,11,0.20) 50%, rgba(245,158,11,0.12) 70%, transparent)',
+          'linear-gradient(90deg, transparent, rgba(199,147,99,0.12) 30%, rgba(199,147,99,0.20) 50%, rgba(199,147,99,0.12) 70%, transparent)',
         animation: `anamorphicFlare ${duration}ms ease-in-out forwards`,
       }}
     />

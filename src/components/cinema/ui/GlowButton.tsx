@@ -21,11 +21,11 @@ interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 type GlowButtonProps = ButtonProps | LinkProps
 
-const base = 'relative inline-flex items-center justify-center font-body font-medium tracking-wide transition-all duration-200 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void active:scale-[0.96] disabled:opacity-40 disabled:pointer-events-none overflow-hidden'
+const base = 'relative inline-flex items-center justify-center font-body font-medium tracking-wide transition-all duration-200 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void active:scale-[0.96] disabled:opacity-40 disabled:pointer-events-none overflow-hidden'
 
 const variants: Record<Variant, string> = {
   primary:   'glow-btn-cinema-primary',
-  secondary: 'border border-mn-amber/50 text-mn-amber bg-mn-amber/5 hover:bg-mn-amber/12 hover:border-mn-amber/70 hover:shadow-[0_0_24px_rgba(245,158,11,0.20)]',
+  secondary: 'border border-mn-bronze/50 text-mn-bronze bg-mn-bronze/5 hover:bg-mn-bronze/12 hover:border-mn-bronze/70 hover:shadow-[0_0_24px_rgba(199,147,99,0.20)]',
   ghost:     'text-mn-ink-soft bg-white/[0.04] border border-white/8 hover:bg-white/8 hover:text-mn-ink hover:border-white/15',
   teal:      'bg-gradient-to-br from-mn-teal to-mn-teal-soft text-mn-void font-semibold shadow-[0_4px_18px_rgba(14,165,233,0.35),0_0_40px_rgba(14,165,233,0.12)] hover:shadow-[0_6px_24px_rgba(14,165,233,0.50),0_0_60px_rgba(14,165,233,0.22)]',
   crisis:    'bg-gradient-to-br from-mn-herzrot to-mn-herzrot-warm text-white font-semibold shadow-[0_4px_18px_rgba(239,68,68,0.40),0_0_40px_rgba(239,68,68,0.15)] animate-pulse hover:animate-none',

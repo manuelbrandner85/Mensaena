@@ -38,7 +38,7 @@ export default function CinemaTabs({ tabs, active, onChange, className }: Cinema
     <div ref={containerRef} className={cn('relative flex border-b border-white/5', className)}>
       {/* Sliding amber indicator */}
       <div
-        className="absolute bottom-0 h-0.5 bg-mn-amber rounded-full transition-all duration-300"
+        className="absolute bottom-0 h-0.5 bg-mn-bronze rounded-full transition-all duration-300"
         style={{ left: indicator.left, width: indicator.width }}
         aria-hidden
       />
@@ -49,8 +49,8 @@ export default function CinemaTabs({ tabs, active, onChange, className }: Cinema
           onClick={() => onChange(tab.id)}
           className={cn(
             'relative flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors duration-200',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-inset',
-            active === tab.id ? 'text-mn-amber' : 'text-mn-mute hover:text-mn-ink-soft',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-inset',
+            active === tab.id ? 'text-mn-bronze' : 'text-mn-mute hover:text-mn-ink-soft',
           )}
         >
           {tab.icon}

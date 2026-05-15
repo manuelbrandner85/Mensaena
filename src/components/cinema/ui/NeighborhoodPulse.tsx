@@ -6,7 +6,7 @@ interface NeighborhoodPulseProps {
 }
 
 const colors = {
-  amber:  'rgba(245,158,11,0.15)',
+  amber:  'rgba(199,147,99,0.15)',
   herzrot:'rgba(239,68,68,0.15)',
   teal:   'rgba(14,165,233,0.12)',
 }

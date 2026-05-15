@@ -14,14 +14,14 @@ const sizeMap: Record<OrbSize, { px: number; ring: string; dot: string; text: st
 
 const ringColors: Record<OnlineStatus, string> = {
   online:    'ring-mn-leben shadow-[0_0_12px_rgba(34,197,94,0.45)]',
-  available: 'ring-mn-amber shadow-[0_0_12px_rgba(245,158,11,0.35)]',
+  available: 'ring-mn-bronze shadow-[0_0_12px_rgba(199,147,99,0.35)]',
   offline:   'ring-white/10',
   none:      '',
 }
 
 const dotColors: Record<OnlineStatus, string> = {
   online:    'bg-mn-leben',
-  available: 'bg-mn-amber',
+  available: 'bg-mn-bronze',
   offline:   'bg-mn-mute',
   none:      'hidden',
 }

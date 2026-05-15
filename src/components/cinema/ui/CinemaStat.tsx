@@ -45,7 +45,7 @@ export default function CinemaStat({ value, label, suffix, prefix, icon, classNa
     <div ref={ref} className={cn('flex flex-col items-center gap-1 p-5 bg-mn-surface rounded-card border border-white/5 shadow-cinema-card', className)}>
       {icon && <div className="text-mn-teal mb-1">{icon}</div>}
       <div
-        className="font-mono text-3xl font-semibold text-mn-amber leading-none"
+        className="font-mono text-3xl font-semibold text-mn-bronze leading-none"
         aria-live="polite"
       >
         {prefix}{current.toLocaleString('de-DE')}{suffix}

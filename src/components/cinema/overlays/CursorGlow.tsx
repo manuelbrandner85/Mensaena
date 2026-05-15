@@ -38,7 +38,7 @@ export default function CursorGlow() {
         width:  '300px',
         height: '300px',
         background:
-          'radial-gradient(circle, rgba(245,158,11,0.04), transparent 70%)',
+          'radial-gradient(circle, rgba(199,147,99,0.04), transparent 70%)',
         transition: 'left 0.15s ease-out, top 0.15s ease-out',
         left: '-300px',
         top:  '-300px',
