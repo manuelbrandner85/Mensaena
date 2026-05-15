@@ -31,10 +31,10 @@ export default function KontaktPage() {
         intro="Wir freuen uns über deine Nachricht – egal ob Frage, Feedback oder Lob."
       >
         <div className="not-prose space-y-4">
-          <div className="p-5 bg-primary-50/60 rounded-2xl border border-white/8 spotlight">
+          <div className="p-5 rounded-2xl spotlight" style={{ background: 'rgba(22,32,53,0.80)', border: '1px solid rgba(199,147,99,0.15)' }}>
             <div className="flex items-center gap-2 mb-2">
-              <Mail className="w-4 h-4 text-mn-amber" />
-              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">E-Mail</span>
+              <Mail className="w-4 h-4" style={{ color: '#c79363' }} />
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold" style={{ color: '#c79363' }}>E-Mail</span>
             </div>
             <a
               href="mailto:info@mensaena.de"
@@ -59,10 +59,10 @@ export default function KontaktPage() {
             </p>
           </div>
 
-          <div className="p-5 bg-primary-50/40 rounded-2xl border border-white/8">
+          <div className="p-5 rounded-2xl" style={{ background: 'rgba(22,32,53,0.65)', border: '1px solid rgba(199,147,99,0.12)' }}>
             <div className="flex items-center gap-2 mb-2">
-              <Leaf className="w-4 h-4 text-mn-amber" />
-              <span className="text-xs tracking-[0.14em] uppercase font-semibold text-primary-800">Community</span>
+              <Leaf className="w-4 h-4" style={{ color: '#c79363' }} />
+              <span className="text-xs tracking-[0.14em] uppercase font-semibold" style={{ color: '#c79363' }}>Community</span>
             </div>
             <p className="text-mn-ink-soft text-xs leading-relaxed">
               Als registrierter Nutzer kannst du den Community-Chat nutzen,

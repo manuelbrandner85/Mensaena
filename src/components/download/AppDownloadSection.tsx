@@ -127,13 +127,10 @@ if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
       className="relative py-24 md:py-36 px-4 overflow-hidden cta-app-download"
       aria-labelledby="app-download-heading"
     >
-      {/* ── Cinematic gradient base ── */}
+      {/* ── Dark cinema base ── */}
       <div
         className="absolute inset-0 -z-10"
-        style={{
-          background:
-            'linear-gradient(180deg, #FAFAF7 0%, #EEF9F9 35%, #F4FEFE 100%)',
-        }}
+        style={{ background: '#0a1420' }}
         aria-hidden="true"
       />
 
@@ -145,7 +142,7 @@ if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
           left: '-10%',
           width: '55vw',
           height: '55vw',
-          background: 'radial-gradient(circle, rgba(30,170,166,0.16) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(199,147,99,0.12) 0%, transparent 70%)',
           filter: 'blur(80px)',
           animation: 'ambientBreath1 22s ease-in-out infinite',
         }}
@@ -158,7 +155,7 @@ if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
           right: '-12%',
           width: '50vw',
           height: '50vw',
-          background: 'radial-gradient(circle, rgba(79,109,138,0.10) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(43,86,99,0.18) 0%, transparent 70%)',
           filter: 'blur(95px)',
           animation: 'ambientBreath2 26s ease-in-out infinite',
         }}
@@ -171,7 +168,7 @@ if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
           right: '15%',
           width: '24vw',
           height: '24vw',
-          background: 'radial-gradient(circle, rgba(30,170,166,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(199,147,99,0.08) 0%, transparent 70%)',
           filter: 'blur(60px)',
           animation: 'ambientBreath3 18s ease-in-out 4s infinite',
         }}
@@ -201,8 +198,8 @@ if (apkIntervalRef.current) clearInterval(apkIntervalRef.current)
 
             <h2
               id="app-download-heading"
-              className="font-display text-3xl md:text-5xl font-medium tracking-tight bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 bg-clip-text text-transparent"
-              style={{ paddingBottom: '0.15em' }}
+              className="text-3xl md:text-5xl font-medium tracking-tight"
+              style={{ fontFamily: 'var(--font-cinema), serif', color: '#ece5d6', paddingBottom: '0.15em' }}
             >
               Mensaena App herunterladen
             </h2>
@@ -360,9 +357,9 @@ function AndroidView({
 
       {/* Unbekannte Quellen Hinweis */}
       {downloadState !== 'idle' && (
-        <div className="flex gap-3 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3">
-          <span className="text-amber-500 text-lg leading-none mt-0.5" aria-hidden="true">⚠️</span>
-          <p className="text-xs text-amber-800 leading-relaxed">
+        <div className="flex gap-3 rounded-2xl px-4 py-3" style={{ background: 'rgba(199,147,99,0.08)', border: '1px solid rgba(199,147,99,0.20)' }}>
+          <span className="text-lg leading-none mt-0.5" style={{ color: '#c79363' }} aria-hidden="true">⚠️</span>
+          <p className="text-xs leading-relaxed" style={{ color: '#ece5d6' }}>
             <strong>Kurzer Hinweis:</strong> Android fragt beim ersten Mal nach der Erlaubnis,
             Apps aus unbekannten Quellen zu installieren. Einfach{' '}
             <strong>„Aus dieser Quelle erlauben"</strong> antippen – das ist normal und sicher.
@@ -392,8 +389,8 @@ function AndroidView({
 function IosView({ qrSvg, qrSize }: { qrSvg: string | null; qrSize: number }) {
   return (
     <div className="space-y-6">
-      <div className="bg-trust-50 border border-trust-200 rounded-2xl p-6 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-trust-100 text-trust-500 mb-3" aria-hidden="true">
+      <div className="rounded-2xl p-6 text-center" style={{ background: 'rgba(22,32,53,0.80)', border: '1px solid rgba(199,147,99,0.15)' }}>
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-3" style={{ background: 'rgba(199,147,99,0.12)', border: '1px solid rgba(199,147,99,0.20)' }} aria-hidden="true">
           ℹ️
         </div>
         <h3 className="font-display text-xl text-mn-ink mb-2">

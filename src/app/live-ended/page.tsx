@@ -43,14 +43,14 @@ export default function LiveEndedPage() {
   }, [router])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EEF9F9]">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a1420', color: '#ece5d6' }}>
       <div className="text-center space-y-5 px-8">
-        <div className="w-16 h-16 rounded-2xl bg-primary-50 border border-white/8 flex items-center justify-center mx-auto shadow-soft">
-          <Video className="w-8 h-8 text-primary-400" />
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto" style={{ background: 'rgba(22,32,53,0.85)', border: '1px solid rgba(199,147,99,0.20)' }}>
+          <Video className="w-8 h-8" style={{ color: '#c79363' }} />
         </div>
         <div>
-          <p className="text-lg font-bold text-ink-900">Live-Raum beendet</p>
-          <p className="text-sm text-ink-500 mt-1">
+          <p className="text-lg font-bold" style={{ color: '#ece5d6' }}>Live-Raum beendet</p>
+          <p className="text-sm mt-1" style={{ color: '#94A3B8' }}>
             Weiterleitung in {countdown}…
           </p>
         </div>
