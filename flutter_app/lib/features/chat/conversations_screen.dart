@@ -68,11 +68,13 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen>
         actions: [
           if (isAdmin)
             IconButton(
-              icon: const Icon(LucideIcons.settings,
-                  size: 20, color: MnColors.amber),
+              icon: const Icon(
+                LucideIcons.settings,
+                size: 20,
+                color: MnColors.amber,
+              ),
               tooltip: 'Channels verwalten',
-              onPressed: () =>
-                  GoRouter.of(context).push('/chat/channels'),
+              onPressed: () => GoRouter.of(context).push('/chat/channels'),
             ),
         ],
       ),

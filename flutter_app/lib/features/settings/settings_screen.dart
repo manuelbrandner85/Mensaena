@@ -93,7 +93,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 trailing: const Icon(LucideIcons.chevronRight, color: MnColors.mute),
                 onTap: () => GoRouter.of(context).push('/profile/me/edit'),
               ),
-            ]),
+            ],),
             _Section(title: 'Benachrichtigungen', children: [
               _SettingRow(
                 icon: LucideIcons.bell,
@@ -104,7 +104,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onChanged: (v) => setState(() => _pushEnabled = v),
                 ),
               ),
-            ]),
+            ],),
             _Section(title: 'Datenschutz', children: [
               _SettingRow(
                 icon: LucideIcons.shield,
@@ -151,7 +151,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   },
                 ),
               ),
-            ]),
+            ],),
             _Section(title: 'Konto', children: [
               _SettingRow(
                 icon: LucideIcons.userX,
@@ -173,7 +173,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 onTap: _deleteAccount,
                 accent: MnColors.herzrot,
               ),
-            ]),
+            ],),
             _Section(title: 'Ueber Mensaena', children: [
               _SettingRow(
                 icon: LucideIcons.info,
@@ -190,7 +190,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 label: 'Impressum',
                 onTap: () => GoRouter.of(context).push('/impressum'),
               ),
-            ]),
+            ],),
             const SizedBox(height: 24),
             Center(
               child: Text(

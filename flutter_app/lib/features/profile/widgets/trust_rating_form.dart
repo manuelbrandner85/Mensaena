@@ -8,7 +8,6 @@ import '../../../core/widgets/cinema_input.dart';
 import '../../../core/widgets/cinema_toast.dart';
 import '../../../core/widgets/glow_button.dart';
 import '../../../providers/auth_provider.dart';
-import '../../../providers/user_provider.dart';
 import '../../../services/supabase/database_service.dart';
 
 /// Sheet-Inhalt zum Abgeben einer Trust-Bewertung fuer ein anderes Profil.
