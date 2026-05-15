@@ -1,73 +1,64 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import CinemaSection from '@/components/cinema/ui/CinemaSection'
+import type { ReactNode } from 'react'
+
+type Step = {
+  num: string
+  title: ReactNode
+  descKey: 'step1Desc' | 'step2Desc' | 'step3Desc'
+  d: string
+}
 
 export default function LandingHowItWorks() {
   const t = useTranslations('landing')
 
-  const steps = [
-    { num: '01', title: t('step1Title'), description: t('step1Desc') },
-    { num: '02', title: t('step2Title'), description: t('step2Desc') },
-    { num: '03', title: t('step3Title'), description: t('step3Desc') },
+  const steps: Step[] = [
+    { num: '01', title: <em>Registrieren.</em>, descKey: 'step1Desc', d: '' },
+    {
+      num: '02',
+      title: (
+        <>
+          Standort <em>einstellen.</em>
+        </>
+      ),
+      descKey: 'step2Desc',
+      d: 'd1',
+    },
+    { num: '03', title: <em>Loslegen.</em>, descKey: 'step3Desc', d: 'd2' },
   ]
 
   return (
-    <CinemaSection
-      id="how-it-works"
-      index="04"
-      label={t('howLabel')}
-      title={t('howTitle')}
-    >
-      <ol className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-        {steps.map((step, i) => (
-          <li key={step.num} className={`reveal reveal-delay-${i + 1}`}>
-            <div className="cinema-card p-8 md:p-10 h-full flex flex-col">
-              <div className="cinema-numeral-glow mb-6">
-                <span
-                  style={{
-                    fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
-                    fontSize: 'clamp(5.5rem, 10vw, 6.5rem)',
-                    lineHeight: 1,
-                    letterSpacing: '-0.04em',
-                    color: 'rgba(199,147,99,0.65)',
-                    display: 'block',
-                  }}
-                >
-                  {step.num}
-                </span>
-              </div>
+    <section className="cin-wrap cin-section" id="how">
+      <div className="cin-section-head">
+        <div className="num">
+          <b>— 04</b>
+          <br />
+          So beginnt es
+        </div>
+        <h2>
+          Drei Schritte zur <em>aktiven</em> Nachbarschaft.
+        </h2>
+      </div>
 
-              <h3
-                className="tracking-tight leading-[1.12] mb-3"
-                style={{
-                  fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
-                  fontSize: 'clamp(1.25rem, 2vw, 1.6rem)',
-                  color: '#ece5d6',
-                }}
-              >
-                {step.title}
-              </h3>
-
-              <p className="text-[0.94rem] leading-relaxed mt-auto" style={{ color: 'rgba(236,229,214,0.50)' }}>
-                {step.description}
-              </p>
+      <div className="cin-steps-grid cin-section-end">
+        {steps.map((s) => (
+          <article key={s.num} className={`cin-step reveal ${s.d}`}>
+            <div className="big">{s.num}</div>
+            <div>
+              <h3>{s.title}</h3>
+              <p>{t(s.descKey)}</p>
             </div>
-          </li>
+          </article>
         ))}
-      </ol>
+      </div>
 
-      <div className="reveal reveal-delay-4 mt-12 flex justify-start">
-        <Link
-          href="/auth?mode=register"
-          className="cta-cinema-amber group inline-flex items-center gap-3 text-mn-void px-8 py-4 rounded-full text-sm font-medium tracking-wide"
-        >
-          {t('howCta')}
-          <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+      <div className="reveal d3" style={{ marginTop: 8, paddingBottom: 140 }}>
+        <Link className="cin-btn primary" href="/auth?mode=register">
+          {t('howCta')} <span className="arrow">→</span>
         </Link>
       </div>
-    </CinemaSection>
+    </section>
   )
 }

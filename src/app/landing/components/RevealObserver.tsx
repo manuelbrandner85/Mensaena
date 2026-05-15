@@ -24,7 +24,10 @@ export default function RevealObserver() {
     if (prefersReduced) {
       document
         .querySelectorAll<HTMLElement>('.reveal')
-        .forEach((el) => el.classList.add('is-visible'))
+        .forEach((el) => {
+          el.classList.add('is-visible')
+          el.classList.add('in')
+        })
       return
     }
 
@@ -33,6 +36,7 @@ export default function RevealObserver() {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible')
+            entry.target.classList.add('in')
             observer.unobserve(entry.target)
           }
         }
