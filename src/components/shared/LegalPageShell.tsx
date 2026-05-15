@@ -52,10 +52,10 @@ export default function LegalPageShell({
       {/* ── Film grain ── */}
       <div className="mesh-grain absolute inset-0 pointer-events-none" aria-hidden="true" />
 
-      {/* ── Edge vignettes for cinematic framing ── */}
+      {/* ── Edge vignette (dark fade for cinematic framing) ── */}
       <div
         className="absolute inset-x-0 top-0 h-40 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, rgba(250,250,247,0.85) 0%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(to bottom, rgba(10,20,32,0.60) 0%, transparent 100%)' }}
         aria-hidden="true"
       />
 

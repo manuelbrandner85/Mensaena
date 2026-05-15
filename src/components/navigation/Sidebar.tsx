@@ -61,7 +61,7 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
         <button
           className={cn(
             'w-full flex items-center justify-center p-2 rounded-lg text-mn-mute hover:bg-mn-elevated/5 transition-colors',
-            hasActiveChild && 'bg-mn-amber/5 text-mn-amber',
+            hasActiveChild && 'bg-mn-bronze/5 text-mn-bronze',
           )}
           aria-label={t(group.title as Parameters<typeof t>[0])}
         >
@@ -97,13 +97,13 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
                     active
                       ? isCrisis
                         ? 'bg-mn-surface text-mn-herzrot font-semibold'
-                        : 'bg-mn-amber/5 text-mn-amber font-semibold'
+                        : 'bg-mn-bronze/5 text-mn-bronze font-semibold'
                       : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className={cn(
                     'w-4 h-4 flex-shrink-0',
-                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
+                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-bronze') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
@@ -133,21 +133,21 @@ function NavGroup({ group, isCollapsed, getBadge }: NavGroupProps) {
         onClick={() => setIsOpen((o) => !o)}
         aria-expanded={isOpen}
         aria-controls={`navgroup-${group.id ?? group.title}`}
-        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-mn-elevated/[0.02] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber/40"
+        className="w-full flex items-center gap-2 px-3 py-1.5 group hover:bg-mn-elevated/[0.02] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze/40"
       >
         {GroupIcon && (
           <GroupIcon className={cn(
             'w-3.5 h-3.5 flex-shrink-0 transition-colors',
-            hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
+            hasActiveChild ? 'text-mn-bronze' : 'text-mn-mute group-hover:text-mn-mute',
           )} />
         )}
         <span className={cn(
           'text-xs font-semibold uppercase tracking-wider select-none whitespace-nowrap transition-colors',
-          hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
+          hasActiveChild ? 'text-mn-bronze' : 'text-mn-mute group-hover:text-mn-mute',
         )}>
           {t(group.title as Parameters<typeof t>[0])}
         </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-mn-amber/20 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-mn-bronze/20 to-transparent" />
         <ChevronDown
           className={cn(
             'w-3 h-3 text-mn-mute transition-transform duration-200 flex-shrink-0',
@@ -265,8 +265,8 @@ export default function Sidebar({
                 className="h-11 w-auto object-contain transition-transform duration-500 group-hover:rotate-[-4deg]"
                 priority
               />
-              <span className="font-display text-[1.35rem] font-medium text-mn-ink tracking-tight group-hover:text-mn-amber transition-colors">
-                Mensaena<span className="text-mn-amber">.</span>
+              <span className="font-display text-[1.35rem] font-medium text-mn-ink tracking-tight group-hover:text-mn-bronze transition-colors">
+                Mensaena<span className="text-mn-bronze">.</span>
               </span>
             </>
           )}
@@ -284,8 +284,8 @@ export default function Sidebar({
       {/* ── SOS Strip — editorial ── */}
       {!sidebarCollapsed ? (
         <div className="px-3 py-2.5 flex gap-2 border-b border-white/5">
-          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-mn-amber/5/60 border border-white/8 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-mn-amber animate-pulse flex-shrink-0" />
+          <div className="flex-1 flex items-center gap-2 px-3 py-1.5 bg-mn-bronze/5/60 border border-white/8 rounded-full">
+            <div className="w-1.5 h-1.5 rounded-full bg-mn-bronze animate-pulse flex-shrink-0" />
             <span className="text-[11px] text-primary-800 font-medium tracking-wide">{t('online')}</span>
           </div>
           <Link
@@ -361,7 +361,7 @@ export default function Sidebar({
           href="/app"
           title={sidebarCollapsed ? 'App herunterladen' : undefined}
           className={cn(
-            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-amber hover:bg-mn-amber/5 border border-transparent hover:border-white/8 transition-all',
+            'cta-app-download w-full flex items-center gap-2.5 rounded-full text-[13px] font-medium text-mn-bronze hover:bg-mn-bronze/5 border border-transparent hover:border-white/8 transition-all',
             sidebarCollapsed ? 'h-10 justify-center' : 'px-3 py-2',
           )}
         >

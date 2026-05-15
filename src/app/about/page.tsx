@@ -101,27 +101,27 @@ export default function AboutPage() {
         {/* Team */}
         <h2>Wer steckt dahinter</h2>
         <div className="not-prose my-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="flex items-start gap-5 rounded-2xl border border-stone-200 bg-stone-50 p-6">
-            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-100 text-2xl font-display font-semibold text-primary-700">
+          <div className="flex items-start gap-5 rounded-2xl p-6" style={{ background: 'rgba(22,32,53,0.80)', border: '1px solid rgba(199,147,99,0.15)' }}>
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl text-2xl font-semibold" style={{ fontFamily: 'var(--font-cinema), serif', background: 'rgba(199,147,99,0.15)', border: '1px solid rgba(199,147,99,0.25)', color: '#c79363' }}>
               MB
             </div>
             <div>
-              <div className="font-semibold text-ink-800 text-base">Manuel Brandner</div>
-              <div className="text-[11px] tracking-[0.12em] uppercase text-ink-400 mt-0.5 mb-3">Gründer & Entwickler · Bad Kreuznach</div>
-              <p className="text-sm text-ink-600 leading-relaxed">
+              <div className="font-semibold text-base" style={{ color: '#ece5d6' }}>Manuel Brandner</div>
+              <div className="text-[11px] tracking-[0.12em] uppercase mt-0.5 mb-3" style={{ color: '#64748B' }}>Gründer & Entwickler · Bad Kreuznach</div>
+              <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>
                 Mensaena ist ein Herzensprojekt – gegründet 2024, weil Nachbarschaften wieder
                 lebendiger werden sollten. Alles, was du auf Mensaena siehst, entsteht in meiner Freizeit.
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-5 rounded-2xl border border-stone-200 bg-stone-50 p-6">
-            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-trust-100 text-2xl font-display font-semibold text-trust-600">
+          <div className="flex items-start gap-5 rounded-2xl p-6" style={{ background: 'rgba(22,32,53,0.80)', border: '1px solid rgba(43,86,99,0.30)' }}>
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl text-2xl font-semibold" style={{ fontFamily: 'var(--font-cinema), serif', background: 'rgba(43,86,99,0.25)', border: '1px solid rgba(43,86,99,0.40)', color: '#7ab8c4' }}>
               UV
             </div>
             <div>
-              <div className="font-semibold text-ink-800 text-base">Uwe Vetter</div>
-              <div className="text-[11px] tracking-[0.12em] uppercase text-ink-400 mt-0.5 mb-3">Mitgründer · Aragona, Italien</div>
-              <p className="text-sm text-ink-600 leading-relaxed">
+              <div className="font-semibold text-base" style={{ color: '#ece5d6' }}>Uwe Vetter</div>
+              <div className="text-[11px] tracking-[0.12em] uppercase mt-0.5 mb-3" style={{ color: '#64748B' }}>Mitgründer · Aragona, Italien</div>
+              <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>
                 Uwe bringt Erfahrung in Community-Building und ist mitverantwortlich für die
                 rechtliche und organisatorische Seite von Mensaena.
               </p>
@@ -145,21 +145,24 @@ export default function AboutPage() {
         <div className="not-prose mt-10 flex flex-wrap gap-3">
           <Link
             href="/auth?mode=register"
-            className="inline-flex items-center gap-2.5 rounded-full bg-ink-900 px-6 py-3 text-sm font-medium tracking-wide text-paper transition-colors hover:bg-ink-700"
+            className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #c79363 0%, #d4a472 50%, #c79363 100%)', color: '#0a1420' }}
           >
             Jetzt kostenlos mitmachen
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             href="/spenden"
-            className="inline-flex items-center gap-2.5 rounded-full border border-stone-300 px-6 py-3 text-sm font-medium tracking-wide text-ink-700 transition-colors hover:border-mn-amber/20 hover:text-primary-700"
+            className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all hover:opacity-80"
+            style={{ background: 'rgba(22,32,53,0.70)', border: '1px solid rgba(199,147,99,0.28)', color: '#c79363' }}
           >
-            <Heart className="h-4 w-4 text-primary-500" aria-hidden="true" />
+            <Heart className="h-4 w-4" style={{ color: '#c79363' }} aria-hidden="true" />
             Mensaena unterstützen
           </Link>
           <Link
             href="/kontakt"
-            className="inline-flex items-center gap-2.5 rounded-full border border-stone-200 px-6 py-3 text-sm font-medium tracking-wide text-ink-500 transition-colors hover:border-stone-300 hover:text-ink-700"
+            className="inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all hover:opacity-80"
+            style={{ background: 'rgba(22,32,53,0.50)', border: '1px solid rgba(255,255,255,0.08)', color: '#94A3B8' }}
           >
             Kontakt aufnehmen
           </Link>
@@ -180,14 +183,16 @@ function ValueCard({
   title: string
   text: string
 }) {
-  const ico = color === 'primary' ? 'icon-surface text-primary-600' : 'bg-stone-100 border border-stone-200 text-ink-600'
+  const icoStyle = color === 'primary'
+    ? { background: 'rgba(199,147,99,0.12)', border: '1px solid rgba(199,147,99,0.22)', color: '#c79363' }
+    : { background: 'rgba(43,86,99,0.20)', border: '1px solid rgba(43,86,99,0.35)', color: '#7ab8c4' }
   return (
-    <div className="card-depth p-5">
-      <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${ico}`}>
+    <div className="p-5 rounded-2xl" style={{ background: 'rgba(22,32,53,0.75)', border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl" style={icoStyle}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
-      <div className="font-semibold text-ink-800 text-sm mb-1.5">{title}</div>
-      <p className="text-[13px] text-ink-500 leading-relaxed">{text}</p>
+      <div className="font-semibold text-sm mb-1.5" style={{ color: '#ece5d6' }}>{title}</div>
+      <p className="text-[13px] leading-relaxed" style={{ color: '#94A3B8' }}>{text}</p>
     </div>
   )
 }

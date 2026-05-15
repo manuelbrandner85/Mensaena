@@ -45,7 +45,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
     <>
       {/* Left accent bar */}
       {active && !collapsed && (
-        <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-mn-amber animate-[scaleIn_0.2s_ease-out]" />
+        <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-mn-bronze animate-[scaleIn_0.2s_ease-out]" />
       )}
 
       {/* Icon */}
@@ -56,9 +56,9 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
           active
             ? isCrisis
               ? 'bg-mn-herzrot shadow-sm'
-              : 'bg-mn-amber shadow-amber-soft'
+              : 'bg-mn-bronze shadow-bronze-soft'
             : isHighlight && !isComingSoon
-              ? 'bg-mn-amber/10 group-hover:bg-primary-200'
+              ? 'bg-mn-bronze/10 group-hover:bg-mn-bronze/15'
               : 'bg-mn-elevated group-hover:bg-mn-raised',
         )}
       >
@@ -71,7 +71,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
               : isCrisis
                 ? 'text-mn-herzrot group-hover:text-mn-herzrot'
                 : isHighlight && !isComingSoon
-                  ? 'text-mn-amber'
+                  ? 'text-mn-bronze'
                   : 'text-mn-mute group-hover:text-mn-ink-soft',
           )}
         />
@@ -130,7 +130,7 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
     >
       <div
         className="px-2.5 py-1.5 bg-mn-elevated text-mn-ink text-xs font-medium rounded-lg whitespace-nowrap border border-white/5"
-        style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.50), 0 0 24px rgba(245,158,11,0.08)' }}
+        style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.50), 0 0 24px rgba(199,147,99,0.10)' }}
       >
         {label}
         {badge !== undefined && badge > 0 && (
@@ -146,18 +146,18 @@ export default function SidebarItem({ item, active, collapsed, badge, onClick, o
 
   const className = cn(
     'group relative flex items-center rounded-xl transition-all duration-200 select-none',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-1 focus-visible:ring-offset-mn-void',
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-1 focus-visible:ring-offset-mn-void',
     collapsed ? 'h-10 w-10 mx-auto justify-center' : 'gap-2.5 px-3 py-2',
     active
       ? isCrisis
         ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
-        : 'bg-mn-amber/10 text-mn-amber font-semibold border border-mn-amber/20'
+        : 'bg-mn-bronze/10 text-mn-bronze font-semibold border border-mn-bronze/20'
       : cn(
           'text-mn-ink-soft border border-transparent',
           isComingSoon
             ? 'hover:bg-mn-elevated/[0.02] cursor-default'
             : 'hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
-          isHighlight && !isComingSoon && !active && 'bg-mn-amber/5 border-white/5 hover:bg-mn-amber/10',
+          isHighlight && !isComingSoon && !active && 'bg-mn-bronze/5 border-white/5 hover:bg-mn-bronze/10',
         ),
   )
 
