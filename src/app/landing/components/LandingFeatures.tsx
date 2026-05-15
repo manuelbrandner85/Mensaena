@@ -1,89 +1,97 @@
 'use client'
 
-import { MapPin, HandHeart, Shield, MessageCircle, Heart, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import CinemaSection from '@/components/cinema/ui/CinemaSection'
+import type { ReactNode } from 'react'
 
-const ICONS = [MapPin, HandHeart, Shield, MessageCircle, Heart, Zap]
+type DescKey = 'f1Desc' | 'f2Desc' | 'f3Desc' | 'f4Desc' | 'f5Desc' | 'f6Desc'
+
+type Feat = {
+  num: string
+  title: ReactNode
+  descKey: DescKey
+  d: string
+}
 
 export default function LandingFeatures() {
   const t = useTranslations('landing')
 
-  const features = [
-    { Icon: ICONS[0], title: t('f1Title'), description: t('f1Desc') },
-    { Icon: ICONS[1], title: t('f2Title'), description: t('f2Desc') },
-    { Icon: ICONS[2], title: t('f3Title'), description: t('f3Desc') },
-    { Icon: ICONS[3], title: t('f4Title'), description: t('f4Desc') },
-    { Icon: ICONS[4], title: t('f5Title'), description: t('f5Desc') },
-    { Icon: ICONS[5], title: t('f6Title'), description: t('f6Desc') },
+  // Italic accents hard-coded to match the reference design.
+  const feats: Feat[] = [
+    { num: '01', title: <em>Hyperlokal.</em>, descKey: 'f1Desc', d: '' },
+    {
+      num: '02',
+      title: (
+        <>
+          Hilfe geben <em>&amp; nehmen.</em>
+        </>
+      ),
+      descKey: 'f2Desc',
+      d: 'd1',
+    },
+    {
+      num: '03',
+      title: (
+        <>
+          Vertrauen &amp; <em>Sicherheit.</em>
+        </>
+      ),
+      descKey: 'f3Desc',
+      d: 'd2',
+    },
+    {
+      num: '04',
+      title: (
+        <>
+          Direkter <em>Kontakt.</em>
+        </>
+      ),
+      descKey: 'f4Desc',
+      d: '',
+    },
+    { num: '05', title: <em>Gemeinnützig.</em>, descKey: 'f5Desc', d: 'd1' },
+    { num: '06', title: <em>Krisenhilfe.</em>, descKey: 'f6Desc', d: 'd2' },
   ]
 
+  const titleText = t('featuresTitle')
+  const hasGemeinschaft = titleText.includes('Gemeinschaft')
+
   return (
-    <CinemaSection
-      id="features"
-      index="03"
-      label={t('featuresLabel')}
-      title={t('featuresTitle')}
-    >
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-        style={{
-          gap: '1px',
-          background: 'rgba(199,147,99,0.10)',
-          border: '1px solid rgba(199,147,99,0.10)',
-        }}
-      >
-        {features.map((feature, i) => (
-          <FeatureItem key={i} {...feature} index={i} />
+    <section className="cin-wrap cin-section" id="features">
+      <div className="cin-section-head">
+        <div className="num">
+          <b>— 03</b>
+          <br />
+          Was Mensaena
+          <br />
+          auszeichnet
+        </div>
+        <h2>
+          {hasGemeinschaft ? (
+            <>
+              {titleText.split('Gemeinschaft')[0]}
+              <em>Gemeinschaft</em>
+              {titleText.split('Gemeinschaft')[1]}
+            </>
+          ) : (
+            titleText
+          )}
+        </h2>
+      </div>
+
+      <div className="cin-features-grid cin-section-end">
+        {feats.map((f) => (
+          <article key={f.num} className={`cin-feat reveal ${f.d}`}>
+            <div className="top">
+              <span className="num">{f.num}</span>
+              <span className="dot" />
+            </div>
+            <div>
+              <h3>{f.title}</h3>
+              <p>{t(f.descKey)}</p>
+            </div>
+          </article>
         ))}
       </div>
-    </CinemaSection>
-  )
-}
-
-function FeatureItem({
-  Icon,
-  title,
-  description,
-  index,
-}: {
-  Icon: React.ComponentType<{ className?: string }>
-  title: string
-  description: string
-  index: number
-}) {
-  const num = String(index + 1).padStart(2, '0')
-  return (
-    <article
-      className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col justify-between p-10 md:p-11 min-h-[320px] transition-colors duration-300`}
-      style={{ background: 'linear-gradient(180deg, rgba(13,26,41,0.55), rgba(7,13,22,0.55))' }}
-    >
-      <div className="flex items-start justify-between mb-14">
-        <div className="cinema-meta-label cinema-meta-label--subtle">{num}</div>
-        <span
-          aria-hidden="true"
-          className="w-2 h-2 rounded-full"
-          style={{ background: '#c79363', boxShadow: '0 0 12px rgba(199,147,99,0.5)' }}
-        />
-      </div>
-
-      <div>
-        <h3
-          className="leading-[1.06] tracking-tight mb-4"
-          style={{
-            fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
-            fontSize: 'clamp(1.35rem, 2.2vw, 1.9rem)',
-            color: '#ece5d6',
-            fontWeight: 400,
-          }}
-        >
-          {title}
-        </h3>
-
-        <p className="text-[0.875rem] leading-relaxed" style={{ color: 'rgba(205,196,177,0.70)', maxWidth: '34ch' }}>
-          {description}
-        </p>
-      </div>
-    </article>
+    </section>
   )
 }

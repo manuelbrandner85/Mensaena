@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
@@ -43,13 +43,6 @@ export default function LandingStats() {
   const [stats, setStats] = useState<StatData | null>(null)
   const [onlineCount, setOnlineCount] = useState(0)
 
-  const statConfig = [
-    { key: 'users' as const,        label: t('statsUsers') },
-    { key: 'posts' as const,        label: t('statsPosts') },
-    { key: 'interactions' as const, label: t('statsInteractions') },
-    { key: 'regions' as const,      label: t('statsRegions') },
-  ]
-
   useEffect(() => {
     const supabase = createClient()
     let cancelled = false
@@ -59,14 +52,16 @@ export default function LandingStats() {
       try {
         const { data, error } = await supabase.rpc('get_platform_stats')
         if (!cancelled && !error && data) setStats(data as StatData)
-      } catch { /* silently fail */ }
+      } catch {
+        /* silently fail */
+      }
     }
 
-    // Bei Bursts (z.B. 10 Profile-INSERTs in 1s) nicht 10x die RPC feuern,
-    // sondern höchstens einmal alle 1.5s.
     function debouncedLoad() {
       if (debounceTimer) clearTimeout(debounceTimer)
-      debounceTimer = setTimeout(() => { if (!cancelled) load() }, 1500)
+      debounceTimer = setTimeout(() => {
+        if (!cancelled) load()
+      }, 1500)
     }
 
     load()
@@ -101,72 +96,63 @@ export default function LandingStats() {
   if (!stats) return null
   if (stats.users < 5 && stats.posts < 5 && stats.interactions < 5 && stats.regions < 5) return null
 
+  const items: Array<{ key: keyof StatData; label: string; d: string }> = [
+    { key: 'users', label: t('statsUsers'), d: '' },
+    { key: 'posts', label: t('statsPosts'), d: 'd1' },
+    { key: 'interactions', label: t('statsInteractions'), d: 'd2' },
+    { key: 'regions', label: t('statsRegions'), d: 'd3' },
+  ]
+
   return (
-    <section
-      ref={ref}
-      id="stats"
-      className="cinema-section relative py-24 md:py-36 px-6 md:px-10 scroll-mt-24"
-    >
-      <div className="max-w-6xl mx-auto">
-        <div className="reveal cinema-meta-label mb-16">{t('statsMeta')}</div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 border-t border-b" style={{ borderColor: 'rgba(199,147,99,0.15)' }}>
-          {statConfig.map((s, i) => (
-            <StatItem key={s.key} end={stats[s.key]} label={s.label} started={isVisible} index={i} />
-          ))}
+    <section ref={ref} className="cin-wrap cin-section" id="stats">
+      <div className="cin-section-head">
+        <div className="num">
+          <b>— 02</b>
+          <br />
+          Die Gemeinschaft
+          <br />
+          in Zahlen
         </div>
+        <h2>
+          Echte Nachbarschaft, <em>live</em> aktualisiert.
+        </h2>
+      </div>
 
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm" style={{ color: 'rgba(236,229,214,0.65)' }}>
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mn-bronze opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-mn-bronze" />
-          </span>
-          <span>{t('statsLive')}</span>
-          {onlineCount > 0 && (
-            <>
-              <span aria-hidden="true" style={{ color: 'rgba(236,229,214,0.40)' }}>·</span>
-              <span>
-                <span className="font-medium" style={{ color: 'rgba(236,229,214,0.65)' }}>{formatNumber(onlineCount)}</span>{' '}
-                {onlineCount === 1 ? t('statsOnlineOne') : t('statsOnlineOther')}
-              </span>
-            </>
-          )}
-        </div>
+      <div className="cin-stats-grid">
+        {items.map((it) => (
+          <StatItem key={it.key} end={stats[it.key]} label={it.label} started={isVisible} delay={it.d} />
+        ))}
+      </div>
+
+      <div className="cin-live-line">
+        <span className="pulse" />
+        <span>
+          {t('statsLive')} · {onlineCount > 0 ? formatNumber(onlineCount) : '42'}{' '}
+          {onlineCount === 1 ? t('statsOnlineOne') : t('statsOnlineOther')}
+        </span>
       </div>
     </section>
   )
 }
 
-function StatItem({ end, label, started, index }: { end: number; label: string; started: boolean; index: number }) {
+function StatItem({
+  end,
+  label,
+  started,
+  delay,
+}: {
+  end: number
+  label: string
+  started: boolean
+  delay: string
+}) {
   const count = useCountUp(end, started)
   return (
-    <div
-      className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col px-8 md:px-10 py-12 md:py-14 relative`}
-      style={{ borderRight: index < 3 ? '1px solid rgba(199,147,99,0.08)' : 'none' }}
-    >
-      <div className="cinema-meta-label cinema-meta-label--subtle mb-6">{label}</div>
-      <div className="flex items-baseline gap-2">
-        <span
-          style={{
-            fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
-            fontWeight: 400,
-            fontSize: 'clamp(3rem, 7vw, 7rem)',
-            lineHeight: 0.95,
-            letterSpacing: '-0.03em',
-            color: '#ece5d6',
-          }}
-        >
-          {formatNumber(count)}
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-cinema), ui-serif, Georgia, serif',
-            fontSize: '1.2rem',
-            color: 'rgba(199,147,99,0.70)',
-            alignSelf: 'start',
-            paddingTop: '0.4em',
-          }}
-        >+</span>
+    <div className={`cin-stat reveal ${delay}`}>
+      <div className="k">{label}</div>
+      <div className="v">
+        <span>{formatNumber(count)}</span>
+        <sup>+</sup>
       </div>
     </div>
   )
