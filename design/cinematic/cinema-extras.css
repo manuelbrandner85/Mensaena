@@ -1,0 +1,249 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   HYPERREALISTIC CINEMA · extras layered on top of cinema.css
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* film palette tokens (Tweak-able via JS) */
+:root{
+  --halation: rgba(255,170,90,0.45);
+  --frame-bg-1:#10202f;
+  --frame-bg-2:#0a1623;
+  --frame-bg-3:#091420;
+  --scratch:0.06;
+  --bars-h: 56px;
+}
+
+/* anamorphic letterbox bars over the whole page */
+.letterbox{position:fixed;left:0;right:0;height:var(--bars-h);background:#040810;z-index:120;pointer-events:none;
+  box-shadow:0 0 0 1px rgba(0,0,0,0.6), 0 18px 40px rgba(0,0,0,0.6)}
+.letterbox.top{top:0}
+.letterbox.bot{bottom:0}
+.letterbox .lab{position:absolute;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(236,229,214,0.55);top:50%;transform:translateY(-50%)}
+.letterbox.top .lab.l{left:24px}
+.letterbox.top .lab.r{right:24px;display:flex;align-items:center;gap:10px}
+.letterbox.bot .lab.l{left:24px;display:flex;align-items:center;gap:10px}
+.letterbox.bot .lab.r{right:24px}
+.letterbox .dot{width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.6s steps(2) infinite}
+.letterbox .tc{color:var(--paper)}
+body{padding-top:var(--bars-h);padding-bottom:var(--bars-h)}
+
+/* color bars test card (top of the page, behind nav) */
+.colorbars{position:fixed;top:var(--bars-h);left:0;right:0;height:6px;z-index:110;pointer-events:none;
+  background:linear-gradient(90deg,
+    #c0c0c0 0 14.28%, #c0c000 14.28% 28.57%, #00c0c0 28.57% 42.85%,
+    #00c000 42.85% 57.14%, #c000c0 57.14% 71.42%, #c00000 71.42% 85.71%,
+    #0000c0 85.71% 100%);
+  opacity:0.55;mix-blend-mode:screen}
+
+/* hairline scratches & dust */
+.scratches{position:fixed;inset:0;pointer-events:none;z-index:85;opacity:var(--scratch);mix-blend-mode:screen;
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 320px, rgba(255,255,255,0.7) 320px 321px, transparent 321px 380px),
+    repeating-linear-gradient(90deg, transparent 0 540px, rgba(255,255,255,0.5) 540px 541px, transparent 541px 720px),
+    radial-gradient(2px 2px at 14% 22%, rgba(255,255,255,0.7) 0 50%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 78% 64%, rgba(255,255,255,0.6) 0 50%, transparent 60%),
+    radial-gradient(2px 2px at 41% 88%, rgba(255,255,255,0.5) 0 50%, transparent 60%);
+  animation:scratch 1.4s steps(2) infinite}
+@keyframes scratch{0%{transform:translate(0,0)}50%{transform:translate(-1px,2px)}100%{transform:translate(1px,-1px)}}
+
+/* light leak on the right edge */
+.leak{position:fixed;top:0;right:0;bottom:0;width:22vw;pointer-events:none;z-index:84;mix-blend-mode:screen;opacity:0.45;
+  background:radial-gradient(60% 80% at 100% 30%, rgba(255,180,90,0.55), transparent 70%),
+             radial-gradient(40% 60% at 100% 80%, rgba(220,80,40,0.35), transparent 70%)}
+
+/* nav extras */
+.nav .lang{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.24em;color:var(--paper-dim);display:flex;gap:8px}
+.nav .lang b{color:var(--paper);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:22px}
+@media (max-width:880px){.nav-right .lang{display:none}}
+
+/* HERO frame composition */
+.hero-frame{position:absolute;inset:140px 56px 120px 56px;border:1px solid rgba(236,229,214,0.18);overflow:hidden;z-index:1;
+  background:
+    radial-gradient(60% 50% at 78% 36%, rgba(199,147,99,0.55), transparent 60%),
+    radial-gradient(48% 60% at 14% 76%, rgba(43,86,99,0.65), transparent 60%),
+    radial-gradient(140% 80% at 50% 110%, rgba(0,0,0,0.7), transparent 70%),
+    linear-gradient(180deg,#0c1a2a 0%,#0a1624 45%,#070f1a 100%)}
+@media (max-width:780px){.hero-frame{inset:120px 24px 100px 24px}}
+.hero-frame::before{content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,rgba(236,229,214,0.35) 0 1px,transparent 1px 4px);
+  opacity:0.08;mix-blend-mode:overlay}
+.hero-frame::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(60% 50% at 78% 36%, var(--halation), transparent 60%);
+  opacity:0.45;mix-blend-mode:screen;filter:blur(20px)}
+
+/* big lens flare over hero */
+.flare{position:absolute;top:24%;right:18%;width:240px;height:240px;pointer-events:none;z-index:2;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,220,170,0.55), transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(255,180,110,0.25), transparent 70%);
+  filter:blur(4px);mix-blend-mode:screen;animation:flareBreath 6s ease-in-out infinite}
+.flare::before{content:"";position:absolute;top:50%;left:50%;width:520px;height:6px;transform:translate(-50%,-50%) rotate(-12deg);
+  background:linear-gradient(90deg,transparent,rgba(255,220,170,0.5),transparent);filter:blur(2px)}
+.flare::after{content:"";position:absolute;top:50%;left:-180px;width:140px;height:140px;transform:translateY(-50%);border-radius:50%;
+  background:radial-gradient(circle, rgba(120,180,200,0.35), transparent 60%);filter:blur(3px)}
+@keyframes flareBreath{0%,100%{opacity:0.85}50%{opacity:1}}
+
+/* tighter inner crop on hero with cue marks */
+.crop{position:absolute;inset:24px;border:1px dashed rgba(236,229,214,0.18);pointer-events:none}
+.crop .frame-id{position:absolute;left:-1px;top:-22px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase;background:var(--ink);padding:0 8px}
+.crop .frame-id b{color:var(--bronze)}
+
+/* film perforations bar (above hero bottom) */
+.perfs{position:absolute;left:24px;right:24px;bottom:24px;height:36px;display:flex;align-items:center;gap:10px;pointer-events:none;z-index:3}
+.perfs .strip{flex:1;height:18px;display:flex;gap:6px;background:#050a12;border-top:1px solid rgba(236,229,214,0.18);border-bottom:1px solid rgba(236,229,214,0.18);padding:3px 4px}
+.perfs .strip i{width:14px;background:linear-gradient(180deg,#1d2c3f,#0a1420);border:1px solid rgba(236,229,214,0.18);border-radius:1px;flex-shrink:0}
+.perfs .tc{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.18em;color:var(--paper-dim);text-transform:uppercase}
+
+/* CLAPPER (slate) — replaces upper-right text slate */
+.clapper{position:absolute;top:120px;right:56px;z-index:4;width:280px;color:var(--paper)}
+@media (max-width:880px){.clapper{display:none}}
+.clapper .top{height:18px;background:repeating-linear-gradient(135deg,#0a1420 0 14px,#ece5d6 14px 28px);border:1px solid rgba(236,229,214,0.4);border-bottom:none;transform-origin:left bottom;transform:rotate(-2deg);margin-bottom:-2px}
+.clapper .body{background:#0a1420;border:1px solid rgba(236,229,214,0.4);padding:14px 16px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;line-height:1.7}
+.clapper .body .row{display:flex;justify-content:space-between;gap:18px;border-bottom:1px dashed rgba(236,229,214,0.18);padding:4px 0}
+.clapper .body .row:last-child{border:none;padding-top:8px}
+.clapper .body .v{color:var(--bronze)}
+.clapper .body .title{font-family:"Instrument Serif",serif;text-transform:none;letter-spacing:-0.01em;font-size:18px;color:var(--paper);padding-bottom:8px;border-bottom:1px solid rgba(236,229,214,0.25);margin-bottom:8px}
+
+/* hero hint to scroll */
+.scroll-cue{position:absolute;left:50%;bottom:-46px;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.24em;color:var(--paper-dim);text-transform:uppercase}
+.scroll-cue .line{width:1px;height:44px;background:linear-gradient(180deg,rgba(199,147,99,0.7),transparent);animation:flareBreath 2.4s ease-in-out infinite}
+
+/* film strip marquee — perforations included */
+.filmstrip{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:#050a12;overflow:hidden;position:relative;z-index:2}
+.filmstrip .perf{height:14px;background:repeating-linear-gradient(90deg, transparent 0 22px, rgba(236,229,214,0.2) 22px 32px, transparent 32px 54px)}
+.filmstrip .track{display:flex;gap:0;padding:0;animation:march 70s linear infinite;white-space:nowrap;width:max-content}
+.filmstrip .cell{flex-shrink:0;width:280px;height:160px;border-right:1px solid rgba(236,229,214,0.12);position:relative;background:linear-gradient(180deg,var(--frame-bg-1),var(--frame-bg-2));overflow:hidden}
+.filmstrip .cell::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(60% 60% at 70% 30%, rgba(199,147,99,0.45), transparent 60%),
+  radial-gradient(45% 55% at 18% 78%, rgba(43,86,99,0.55), transparent 60%)}
+.filmstrip .cell::after{content:"";position:absolute;inset:0;opacity:0.08;background-image:repeating-linear-gradient(135deg,rgba(236,229,214,0.7) 0 1px,transparent 1px 14px)}
+.filmstrip .cell .lab{position:absolute;left:12px;bottom:10px;font-family:"Geist Mono",monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim);z-index:2}
+.filmstrip .cell .lab::before{content:"●";color:var(--red);margin-right:6px;display:inline-block;transform:translateY(-1px)}
+.filmstrip .cell .num{position:absolute;right:10px;top:8px;font-family:"Geist Mono",monospace;font-size:9px;letter-spacing:0.22em;color:var(--paper-dim);z-index:2}
+
+/* chapter card — splits major sections */
+.chapter{padding:80px 0 0;position:relative;z-index:2}
+.chapter .bar{display:grid;grid-template-columns:200px 1fr auto;gap:48px;align-items:center;border-top:1px solid var(--rule-strong);padding-top:24px}
+.chapter .num{font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:0.24em;color:var(--paper-dim);text-transform:uppercase}
+.chapter .num b{color:var(--bronze)}
+.chapter .nm{font-family:"Instrument Serif",serif;font-size:22px;color:var(--paper)}
+.chapter .nm em{color:var(--bronze)}
+.chapter .meta{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase;text-align:right}
+@media (max-width:780px){.chapter .bar{grid-template-columns:1fr;gap:8px}.chapter .meta{text-align:left}}
+
+/* MANIFEST / opening monologue */
+.manifest h2{font-family:"Instrument Serif",serif;font-size:clamp(38px,5.6vw,78px);line-height:0.98;letter-spacing:-0.02em;max-width:18ch;color:var(--paper);font-weight:400;margin-bottom:40px}
+.manifest h2 em{color:var(--bronze)}
+
+/* CINEMA REEL — categories as a horizontal reel of film stills */
+.reel{position:relative;padding-bottom:160px;z-index:2}
+.reel .row{display:grid;grid-template-columns:repeat(7,minmax(280px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);overflow-x:auto;scroll-snap-type:x mandatory}
+.reel .row::-webkit-scrollbar{height:8px}
+.reel .row::-webkit-scrollbar-thumb{background:var(--bronze-deep)}
+.reel .scene{background:linear-gradient(180deg,var(--frame-bg-1),var(--frame-bg-2));position:relative;min-height:380px;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;scroll-snap-align:start;overflow:hidden}
+.reel .scene::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(60% 60% at 70% 30%, rgba(199,147,99,0.42), transparent 60%),
+  radial-gradient(45% 55% at 18% 78%, rgba(43,86,99,0.55), transparent 60%)}
+.reel .scene::after{content:"";position:absolute;inset:0;opacity:0.08;background-image:repeating-linear-gradient(135deg,rgba(236,229,214,0.7) 0 1px,transparent 1px 14px)}
+.reel .scene .id{position:absolute;top:14px;left:14px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim)}
+.reel .scene .id::before{content:"●";color:var(--red);margin-right:6px;display:inline-block;transform:translateY(-1px)}
+.reel .scene .tc{position:absolute;top:14px;right:14px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim)}
+.reel .scene h3{font-family:"Instrument Serif",serif;font-size:30px;line-height:1.04;color:var(--paper);position:relative;z-index:2;font-weight:400;margin-bottom:8px}
+.reel .scene h3 em{color:var(--bronze)}
+.reel .scene p{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--paper-dim);position:relative;z-index:2}
+
+/* CAST roster */
+.cast{padding-bottom:160px;position:relative;z-index:2}
+.cast .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+@media (max-width:980px){.cast .grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.cast .grid{grid-template-columns:1fr}}
+.cast .card{background:linear-gradient(180deg,rgba(13,26,41,0.6),rgba(7,13,22,0.6));border:1px solid var(--rule);padding:0}
+.cast .portrait{aspect-ratio:3/4;position:relative;overflow:hidden}
+.cast .portrait::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(35% 30% at 50% 32%, rgba(236,229,214,0.22), transparent 70%),
+  radial-gradient(60% 50% at 84% 18%, rgba(199,147,99,0.42), transparent 70%),
+  radial-gradient(50% 60% at 18% 84%, rgba(43,86,99,0.55), transparent 70%)}
+.cast .portrait::after{content:"";position:absolute;inset:0;opacity:0.08;background-image:repeating-linear-gradient(135deg,rgba(236,229,214,0.7) 0 1px,transparent 1px 14px)}
+.cast .portrait .lab{position:absolute;left:12px;bottom:12px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim);z-index:2}
+.cast .portrait .lab::before{content:"●";color:var(--red);margin-right:6px;display:inline-block;transform:translateY(-1px)}
+.cast .portrait .frame-no{position:absolute;right:12px;top:12px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);z-index:2}
+.cast .meta{padding:22px 22px 26px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--rule)}
+.cast h4{font-family:"Instrument Serif",serif;font-size:22px;line-height:1.05;color:var(--paper);font-weight:400}
+.cast .role{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase}
+.cast .quote{font-family:"Instrument Serif",serif;font-style:italic;font-size:15px;color:var(--paper-dim);line-height:1.45;margin-top:10px;border-left:1px solid var(--bronze);padding-left:12px}
+
+/* numbers / dashboard */
+.numbers{padding-bottom:160px;position:relative;z-index:2}
+.numbers .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+@media (max-width:980px){.numbers .grid{grid-template-columns:repeat(2,1fr)}}
+.numbers .stat{border:1px solid var(--rule);padding:32px 28px 36px;background:linear-gradient(180deg,rgba(13,26,41,0.45),rgba(7,13,22,0.45));position:relative;min-height:220px;display:flex;flex-direction:column;justify-content:space-between}
+.numbers .stat .k{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase}
+.numbers .stat .v{font-family:"Instrument Serif",serif;font-size:clamp(56px,5vw,76px);line-height:0.95;color:var(--paper);letter-spacing:-0.02em;display:flex;align-items:baseline;gap:6px}
+.numbers .stat .v sup{font-family:"Instrument Serif",serif;color:var(--bronze);font-size:0.32em;align-self:start;letter-spacing:0;position:relative;top:0.6em}
+.numbers .stat .bar{height:3px;background:var(--rule);position:relative;overflow:hidden}
+.numbers .stat .bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--bronze),var(--bronze-deep))}
+.numbers .live{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:36px;font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase}
+.numbers .live .dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red);animation:blink 1.6s steps(2) infinite}
+
+/* CRITICS quotes */
+.critics{padding-bottom:160px;position:relative;z-index:2}
+.critics .gq{position:absolute;font-family:"Instrument Serif",serif;font-style:italic;font-size:clamp(20rem,28vw,38rem);line-height:1;color:rgba(199,147,99,0.05);top:120px;left:0;pointer-events:none;z-index:0}
+.critics .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;position:relative;z-index:1}
+@media (max-width:980px){.critics .grid{grid-template-columns:1fr}}
+.critics .q{border-top:1px solid var(--rule-strong);padding:28px 0 0}
+.critics .q .stars{font-family:"Geist Mono",monospace;color:var(--bronze);letter-spacing:0.18em;font-size:11px;margin-bottom:18px}
+.critics .q blockquote{font-family:"Instrument Serif",serif;font-size:26px;line-height:1.22;color:var(--paper);font-weight:400}
+.critics .q blockquote em{color:var(--bronze)}
+.critics .q .who{margin-top:24px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase;display:flex;justify-content:space-between;gap:18px}
+.critics .q .who b{color:var(--paper);font-weight:500}
+
+/* MAP region card */
+.region-card{display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:stretch;padding-bottom:160px;position:relative;z-index:2}
+@media (max-width:980px){.region-card{grid-template-columns:1fr;gap:32px}}
+.region-card .frame{aspect-ratio:5/4;position:relative;overflow:hidden;border:1px solid var(--rule);background:linear-gradient(180deg,#0e1c2e,#0a1420)}
+.region-card .frame::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(60% 50% at 30% 40%, rgba(199,147,99,0.32), transparent 60%),
+  radial-gradient(55% 50% at 80% 70%, rgba(43,86,99,0.55), transparent 60%)}
+.region-card .frame .map{position:absolute;inset:18px;border:1px solid rgba(236,229,214,0.18);background-image:
+  linear-gradient(rgba(236,229,214,0.10) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(236,229,214,0.10) 1px, transparent 1px);
+  background-size:36px 36px}
+.region-card .frame .pin{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--bronze);box-shadow:0 0 0 6px rgba(199,147,99,0.18), 0 0 12px var(--bronze)}
+.region-card .frame .pin.a{top:32%;left:28%}
+.region-card .frame .pin.b{top:54%;left:46%}
+.region-card .frame .pin.c{top:42%;left:62%}
+.region-card .frame .pin.d{top:68%;left:72%}
+.region-card .frame .pin.e{top:24%;left:56%}
+.region-card .frame .pin.f{top:78%;left:36%}
+.region-card .frame .lab{position:absolute;left:16px;top:16px;font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase}
+.region-card .frame .lab::before{content:"●";color:var(--red);margin-right:6px;display:inline-block;transform:translateY(-1px)}
+.region-card .frame .scale{position:absolute;right:16px;bottom:16px;font-family:"Geist Mono",monospace;font-size:9px;letter-spacing:0.22em;color:var(--paper-dim);text-transform:uppercase;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.region-card .frame .scale i{display:block;width:60px;height:1px;background:var(--paper-dim)}
+.region-card .panel{display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.region-card .panel h3{font-family:"Instrument Serif",serif;font-size:clamp(36px,4.5vw,58px);line-height:1.0;color:var(--paper);font-weight:400}
+.region-card .panel h3 em{color:var(--bronze)}
+.region-card .panel p{font-size:15px;color:var(--paper-dim);line-height:1.65;max-width:42ch}
+.region-card .panel .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-top:1px solid var(--rule);padding-top:24px}
+.region-card .panel .stats > div{display:flex;flex-direction:column;gap:6px}
+.region-card .panel .stats .k{font-family:"Geist Mono",monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim)}
+.region-card .panel .stats .v{font-family:"Instrument Serif",serif;font-size:24px;color:var(--paper)}
+
+/* TWEAKS panel */
+#tweaks{position:fixed;right:24px;bottom:calc(var(--bars-h) + 24px);width:280px;background:rgba(7,13,22,0.92);border:1px solid var(--rule-strong);backdrop-filter:blur(10px);padding:18px;z-index:130;display:none;font-family:"Geist Mono",monospace;color:var(--paper);font-size:11px;letter-spacing:0.06em}
+#tweaks.on{display:block}
+#tweaks h5{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+#tweaks h5 button{background:none;border:1px solid var(--rule-strong);color:var(--paper);padding:4px 8px;cursor:pointer;font-family:inherit;font-size:9px;letter-spacing:0.18em}
+#tweaks .grp{margin-bottom:14px}
+#tweaks .lbl{display:block;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:var(--paper-dim);margin-bottom:8px}
+#tweaks .swatches{display:flex;gap:6px}
+#tweaks .swatches button{flex:1;height:28px;border:1px solid var(--rule-strong);cursor:pointer;background:none;padding:2px}
+#tweaks .swatches button.on{border-color:var(--paper)}
+#tweaks .swatches button i{display:block;height:100%;width:100%;display:grid;grid-template-columns:1fr 1fr 1fr}
+#tweaks .swatches button i span{display:block;height:100%}
+#tweaks input[type=range]{width:100%;accent-color:var(--bronze)}
+#tweaks .seg{display:flex;border:1px solid var(--rule-strong)}
+#tweaks .seg button{flex:1;background:none;border:none;color:var(--paper-dim);padding:8px;cursor:pointer;font-family:inherit;font-size:9px;letter-spacing:0.18em;text-transform:uppercase}
+#tweaks .seg button.on{background:var(--paper);color:var(--ink)}
+
+/* fix marquee speed with css var */
+.marquee .track{animation-duration:var(--marquee-dur, 60s)}

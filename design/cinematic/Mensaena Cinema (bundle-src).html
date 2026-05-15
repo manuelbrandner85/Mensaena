@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mensaena — Die Gemeinwohl-Plattform</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="cinema.css">
+<link rel="stylesheet" href="cinema-extras.css">
+
+<template id="__bundler_thumbnail" data-bg-color="#0a1420">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0a1420"/>
+    <rect x="0" y="0" width="1200" height="56" fill="#040810"/>
+    <rect x="0" y="744" width="1200" height="56" fill="#040810"/>
+    <circle cx="32" cy="28" r="5" fill="#e25c4a"/>
+    <rect x="80" y="240" width="640" height="14" fill="#ece5d6" opacity="0.85"/>
+    <rect x="80" y="280" width="540" height="14" fill="#c79363"/>
+    <rect x="80" y="340" width="320" height="6" fill="#ece5d6" opacity="0.5"/>
+    <rect x="900" y="180" width="220" height="220" fill="none" stroke="#ece5d6" stroke-width="2" opacity="0.4"/>
+    <circle cx="1010" cy="290" r="60" fill="#c79363" opacity="0.35"/>
+    <text x="80" y="520" font-family="monospace" font-size="14" fill="#cdc4b1" letter-spacing="4">MENSAENA · CINEMA</text>
+  </svg>
+</template>
+
+</head>
+<body>
+
+<!-- ─── ATMOSPHERE LAYERS (global) ──────────────────────────────────── -->
+<div class="letterbox top" aria-hidden="true">
+  <div class="lab l">MENSAENA · 35MM · ANAMORPHIC 2.39:1</div>
+  <div class="lab r"><span class="dot"></span><span class="tc" id="tc">00:00:00:00</span> · REC</div>
+</div>
+<div class="colorbars" aria-hidden="true"></div>
+<div class="haze" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="scratches" aria-hidden="true"></div>
+<div class="leak" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="letterbox bot" aria-hidden="true">
+  <div class="lab l"><span class="dot"></span>SCENE 01 · TAKE 14 · INT. NACHBARSCHAFT · DAY</div>
+  <div class="lab r">© MMXXVI MENSAENA — GEMEINWOHL E.V.</div>
+</div>
+
+<!-- ─── NAV ─────────────────────────────────────────────────────────── -->
+<header class="nav">
+  <div class="brand">
+    <div class="mark">Mensaena<em>.</em></div>
+    <div class="tag">Gemeinwohl · seit MMXXV</div>
+  </div>
+  <ul>
+    <li><a href="#manifest">Idee</a></li>
+    <li><a href="#approach">Akte</a></li>
+    <li><a href="#reel">Module</a></li>
+    <li><a href="#cast">Gemeinschaft</a></li>
+    <li><a href="#numbers">Bilanz</a></li>
+    <li><a href="#map">Karte</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang"><b>DE</b><span>·</span><span>EN</span></div>
+    <a class="cta" href="#cta">Mitmachen ↗</a>
+  </div>
+</header>
+
+<!-- ─── HERO — anamorphic establishing shot ─────────────────────────── -->
+<section class="hero">
+  <div class="hero-frame">
+    <div class="crop">
+      <div class="frame-id"><b>FRM 0001/2412</b> &nbsp; · &nbsp; LENS 32MM &nbsp;·&nbsp; T2.8 &nbsp;·&nbsp; ISO 400 &nbsp;·&nbsp; ASA 5219</div>
+    </div>
+    <div class="flare" aria-hidden="true"></div>
+    <div class="perfs" aria-hidden="true">
+      <span class="tc">A.CAM</span>
+      <div class="strip">
+        <script>for(let i=0;i<60;i++)document.write('<i></i>')</script>
+      </div>
+      <span class="tc">01:14:22:09</span>
+    </div>
+  </div>
+
+  <!-- slate -->
+  <aside class="clapper" aria-hidden="true">
+    <div class="top"></div>
+    <div class="body">
+      <div class="title">Mensaena · ein Dorf in der Stadt</div>
+      <div class="row"><span>Produktion</span><span class="v">Gemeinwohl e.V.</span></div>
+      <div class="row"><span>Regie</span><span class="v">Die Nachbarschaft</span></div>
+      <div class="row"><span>Drehort</span><span class="v">DE · AT · CH</span></div>
+      <div class="row"><span>Szene</span><span class="v">01 — Hilfe</span></div>
+      <div class="row"><span>Take</span><span class="v">14</span></div>
+      <div class="row"><span>Datum</span><span class="v" id="today"></span></div>
+    </div>
+  </aside>
+
+  <!-- ticks -->
+  <div class="ticks" aria-hidden="true"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span></div>
+
+  <div class="wrap" style="position:relative;z-index:3;padding-top:160px;padding-bottom:120px">
+    <div class="eyebrow reveal" style="margin-bottom:32px">○ &nbsp;Akt I · die Welt, in der wir leben</div>
+    <h1 class="display" style="font-size:clamp(64px,12vw,200px);max-width:14ch">
+      Eine Nachbarschaft,<br/>
+      <span class="em" style="color:var(--bronze);font-style:italic">die wirklich</span><br/>
+      da ist.
+    </h1>
+    <p class="hero-lede reveal d2" style="margin-top:48px;max-width:36ch">
+      Mensaena ist kein Feed, kein Marktplatz, kein weiteres Portal.<br/>
+      Es ist das, was die Tür wieder aufgehen lässt: <em style="color:var(--bronze);font-family:'Instrument Serif',serif;font-style:italic">echte Hilfe, einen Block entfernt.</em>
+    </p>
+
+    <div class="hero-meta reveal d3">
+      <div>
+        <span class="k">Format</span>
+        <span class="v">2.39 : 1</span>
+      </div>
+      <div>
+        <span class="k">Sprache</span>
+        <span class="v">Deutsch · EN · FR</span>
+      </div>
+      <div>
+        <span class="k">Mitwirkende</span>
+        <span class="v">12 408 Nachbar:innen</span>
+      </div>
+      <div>
+        <span class="k">Werbung</span>
+        <span class="v">keine</span>
+      </div>
+    </div>
+
+    <div style="margin-top:64px;display:flex;gap:14px;flex-wrap:wrap" class="reveal d3">
+      <a class="btn primary" href="#cta">Beitreten <span class="arrow">→</span></a>
+      <a class="btn ghost" href="#approach">Wie es funktioniert</a>
+    </div>
+  </div>
+
+  <div class="cue" aria-hidden="true"><span class="line"></span><span>Scroll · Akt II folgt</span></div>
+</section>
+
+<!-- ─── FILMSTRIP MARQUEE ───────────────────────────────────────────── -->
+<section class="filmstrip" aria-hidden="true">
+  <div class="perf"></div>
+  <div class="track" id="strip"></div>
+  <div class="perf"></div>
+</section>
+
+<!-- ─── CHAPTER 01 · MANIFEST ──────────────────────────────────────── -->
+<section class="wrap chapter" id="manifest">
+  <div class="bar">
+    <div class="num"><b>Kapitel 01</b> · 00 : 02 : 12</div>
+    <div class="nm">Ein <em>Manifest</em> in 90 Sekunden.</div>
+    <div class="meta">SCN · 02 / 12 &nbsp;·&nbsp; INT. KÜCHE — TAG</div>
+  </div>
+</section>
+
+<section class="wrap manifest" style="padding-top:64px">
+  <h2 class="reveal">Die Stadt ist laut. <em>Die Tür gegenüber</em> war es nie.</h2>
+  <div class="side reveal d1">
+    <p>Wir leben fünf Meter auseinander und kennen uns nicht. Mensaena ist die kleine, beharrliche Idee, dass das wieder anders sein darf. Eine Plattform für alles, was zwischen <em>guten Morgen</em> und <em>brauche Hilfe</em> passieren kann.</p>
+    <p>Kein Algorithmus, der dich an die Stange bindet. Keine Werbung, die deine Aufmerksamkeit verkauft. Nur Menschen, ein Hof, ein Garten, ein Kinderwagen, ein Werkzeugkasten, ein Rezept — geteilt mit denen, die fünf Türen weiter wohnen.</p>
+    <div class="pull">„Wir bauen nicht das nächste Netzwerk. Wir bauen die Kantine, in die alle hineinpassen."</div>
+  </div>
+</section>
+
+<!-- ─── CHAPTER 02 · APPROACH (Akte) ──────────────────────────────── -->
+<section class="wrap chapter" id="approach">
+  <div class="bar">
+    <div class="num"><b>Kapitel 02</b> · 00 : 04 : 41</div>
+    <div class="nm">Drei <em>Akte</em>. Mehr nicht.</div>
+    <div class="meta">SCN · 04 / 12 &nbsp;·&nbsp; EXT. STRASSE — DÄMMERUNG</div>
+  </div>
+</section>
+
+<section class="wrap approach" style="padding-top:40px">
+  <div class="acts">
+    <div class="act reveal">
+      <div class="badge">AKT I · BEOBACHTEN</div>
+      <div class="lens" aria-hidden="true"></div>
+      <h3>Anschauen, <em>wer da ist</em>.</h3>
+      <p>Karte aufmachen. Nachbar:innen sehen, Beiträge lesen, Tiere finden, Höfe in der Nähe entdecken — bevor du selber etwas sagst.</p>
+    </div>
+    <div class="act reveal d1">
+      <div class="badge">AKT II · ANBIETEN</div>
+      <div class="lens" aria-hidden="true"></div>
+      <h3>Anbieten, <em>was du hast</em>.</h3>
+      <p>Werkzeug, Zeit, ein Bett, ein Rezept, eine Mitfahrgelegenheit, ein Notruf. Zehn Beitragstypen — kein Schwarmverhalten nötig.</p>
+    </div>
+    <div class="act reveal d2">
+      <div class="badge">AKT III · ANFANGEN</div>
+      <div class="lens" aria-hidden="true"></div>
+      <h3>Anfangen — <em>vor der Tür</em>.</h3>
+      <p>Die Plattform endet, sobald ihr euch gegenübersteht. Vereinbart Zeit, Ort, Vertrauen — Mensaena bleibt im Hintergrund. So soll es sein.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CHAPTER 03 · REEL (Modules) ──────────────────────────────── -->
+<section class="wrap chapter" id="reel">
+  <div class="bar">
+    <div class="num"><b>Kapitel 03</b> · 00 : 09 : 03</div>
+    <div class="nm">Die <em>Module</em>, sieben Szenen lang.</div>
+    <div class="meta">SCN · 06 / 12 &nbsp;·&nbsp; MONTAGE</div>
+  </div>
+</section>
+
+<section class="wrap reel" style="padding-top:48px">
+  <div class="row" id="reel">
+    <article class="scene">
+      <span class="id">TAKE 01 · NACHBARSCHAFT</span>
+      <span class="tc">A 14:08</span>
+      <h3>Hilfe, einen<br/><em>Block entfernt.</em></h3>
+      <p>Werkzeug · Garten · Kinderbetreuung</p>
+    </article>
+    <article class="scene">
+      <span class="id">TAKE 02 · TIERE</span>
+      <span class="tc">B 14:11</span>
+      <h3>Hunde,<br/><em>Höfe, Heimat.</em></h3>
+      <p>Vermisst · Adoption · Pflegestelle</p>
+    </article>
+    <article class="scene">
+      <span class="id">TAKE 03 · WOHNEN</span>
+      <span class="tc">C 14:17</span>
+      <h3>Ein Bett<br/><em>für eine Nacht.</em></h3>
+      <p>Couch · WG · Notunterkunft</p>
+    </article>
+    <article class="scene">
+      <span class="id">TAKE 04 · MOBILITÄT</span>
+      <span class="tc">D 14:22</span>
+      <h3>Mitfahren,<br/><em>nicht mitlaufen.</em></h3>
+      <p>Tour · Lift · Lastenrad</p>
+    </article>
+    <article class="scene">
+      <span class="id">TAKE 05 · ERNTE</span>
+      <span class="tc">E 14:26</span>
+      <h3>Höfe, die<br/><em>wir kennen.</em></h3>
+      <p>Hofläden · CSA · Direktbezug</p>
+    </article>
+    <article class="scene">
+      <span class="id">TAKE 06 · WISSEN</span>
+      <span class="tc">F 14:31</span>
+      <h3>Lernen,<br/><em>weitergeben.</em></h3>
+      <p>Skills · Tausch · Wiki</p>
+    </article>
+    <article class="scene">
+      <span class="id">TAKE 07 · KRISE</span>
+      <span class="tc">G 14:39</span>
+      <h3>Wenn es<br/><em>ernst wird.</em></h3>
+      <p>Notruf · Sammelstelle · Koordination</p>
+    </article>
+  </div>
+</section>
+
+<!-- ─── CHAPTER 04 · CAST ─────────────────────────────────────────── -->
+<section class="wrap chapter" id="cast">
+  <div class="bar">
+    <div class="num"><b>Kapitel 04</b> · 00 : 18 : 14</div>
+    <div class="nm">Die <em>Besetzung</em>.</div>
+    <div class="meta">SCN · 08 / 12 &nbsp;·&nbsp; INT. WOHNZIMMER — ABEND</div>
+  </div>
+</section>
+
+<section class="wrap cast" style="padding-top:48px">
+  <div class="grid">
+    <article class="card reveal">
+      <div class="portrait">
+        <span class="lab">FRM 014 · PORTRAIT</span>
+        <span class="frame-no">A07/24</span>
+      </div>
+      <div class="meta">
+        <h4>Anna K.</h4>
+        <div class="role">Berlin · seit 192 Tagen</div>
+        <div class="quote">„Letzte Woche hat Herr Müller im Garten geholfen — einfach so."</div>
+      </div>
+    </article>
+    <article class="card reveal d1">
+      <div class="portrait">
+        <span class="lab">FRM 015 · PORTRAIT</span>
+        <span class="frame-no">A11/24</span>
+      </div>
+      <div class="meta">
+        <h4>Sarah M.</h4>
+        <div class="role">München · seit 84 Tagen</div>
+        <div class="quote">„Als alleinerziehende Mutter ein Segen — real, nicht nur digital."</div>
+      </div>
+    </article>
+    <article class="card reveal d2">
+      <div class="portrait">
+        <span class="lab">FRM 016 · PORTRAIT</span>
+        <span class="frame-no">A14/24</span>
+      </div>
+      <div class="meta">
+        <h4>Helmut B.</h4>
+        <div class="role">Hamburg · seit 318 Tagen</div>
+        <div class="quote">„Bin 72. Mensaena ist einfach genug. Jetzt helfe ich anderen."</div>
+      </div>
+    </article>
+    <article class="card reveal d3">
+      <div class="portrait">
+        <span class="lab">FRM 017 · PORTRAIT</span>
+        <span class="frame-no">A19/24</span>
+      </div>
+      <div class="meta">
+        <h4>Yusuf D.</h4>
+        <div class="role">Köln · seit 47 Tagen</div>
+        <div class="quote">„Erst skeptisch. Dann ein Lastenrad gefunden. Dann Freunde."</div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ─── CHAPTER 05 · CRITICS ──────────────────────────────────────── -->
+<section class="wrap chapter">
+  <div class="bar">
+    <div class="num"><b>Kapitel 05</b> · 00 : 24 : 02</div>
+    <div class="nm">Was die <em>Presse</em> nicht sagt.</div>
+    <div class="meta">SCN · 09 / 12 &nbsp;·&nbsp; STIMMEN AUS DEM SAAL</div>
+  </div>
+</section>
+
+<section class="wrap critics" style="padding-top:32px">
+  <div class="gq" aria-hidden="true">"</div>
+  <div class="grid">
+    <div class="q reveal">
+      <div class="stars">★ ★ ★ ★ ★</div>
+      <blockquote>„Die <em>leiseste</em> App auf meinem Telefon. Tut nichts, bis sie etwas tut. Dann tut sie genau das Richtige."</blockquote>
+      <div class="who"><b>L. Maier</b><span>Bonn · 04.2026</span></div>
+    </div>
+    <div class="q reveal d1">
+      <div class="stars">★ ★ ★ ★ ★</div>
+      <blockquote>„Wir haben aus der Nachbarschaft eine <em>Genossenschaft</em> gemacht — der Anfang lag hier."</blockquote>
+      <div class="who"><b>J. Becker</b><span>Leipzig · 03.2026</span></div>
+    </div>
+    <div class="q reveal d2">
+      <div class="stars">★ ★ ★ ★ ★</div>
+      <blockquote>„Ich dachte, das Internet hätte das vergessen. Hat es nicht. <em>Hier nicht.</em>"</blockquote>
+      <div class="who"><b>P. Sonnberger</b><span>Wien · 02.2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CHAPTER 06 · NUMBERS ──────────────────────────────────────── -->
+<section class="wrap chapter" id="numbers">
+  <div class="bar">
+    <div class="num"><b>Kapitel 06</b> · 00 : 31 : 26</div>
+    <div class="nm">Die <em>Bilanz</em>, Stand heute.</div>
+    <div class="meta">SCN · 10 / 12 &nbsp;·&nbsp; DASHBOARD · LIVE</div>
+  </div>
+</section>
+
+<section class="wrap numbers" style="padding-top:48px">
+  <div class="grid">
+    <div class="stat reveal">
+      <div class="k">Nachbar:innen</div>
+      <div class="v"><span id="n-users">12 408</span><sup>+</sup></div>
+      <div class="bar"><i style="width:72%"></i></div>
+    </div>
+    <div class="stat reveal d1">
+      <div class="k">Beiträge</div>
+      <div class="v"><span id="n-posts">38 217</span><sup>+</sup></div>
+      <div class="bar"><i style="width:84%"></i></div>
+    </div>
+    <div class="stat reveal d2">
+      <div class="k">Interaktionen</div>
+      <div class="v"><span id="n-inter">214 392</span><sup>+</sup></div>
+      <div class="bar"><i style="width:96%"></i></div>
+    </div>
+    <div class="stat reveal d3">
+      <div class="k">Regionen</div>
+      <div class="v"><span id="n-reg">186</span><sup>+</sup></div>
+      <div class="bar"><i style="width:48%"></i></div>
+    </div>
+  </div>
+  <div class="live"><span class="dot"></span> Live aus der Plattform · <span id="n-online">42</span> gerade online</div>
+</section>
+
+<!-- ─── CHAPTER 07 · MAP ──────────────────────────────────────────── -->
+<section class="wrap chapter" id="map">
+  <div class="bar">
+    <div class="num"><b>Kapitel 07</b> · 00 : 36 : 09</div>
+    <div class="nm">Wir <em>kartografieren</em> das Nahe.</div>
+    <div class="meta">SCN · 11 / 12 &nbsp;·&nbsp; AERIAL · 1:20 000</div>
+  </div>
+</section>
+
+<section class="wrap region-card" style="padding-top:48px">
+  <div class="frame">
+    <div class="map" aria-hidden="true">
+      <span class="pin a"></span><span class="pin b"></span><span class="pin c"></span>
+      <span class="pin d"></span><span class="pin e"></span><span class="pin f"></span>
+    </div>
+    <div class="lab">AERIAL · DE · 1:20 000</div>
+    <div class="scale">500 m<i></i></div>
+  </div>
+  <div class="panel">
+    <div>
+      <div class="eyebrow" style="margin-bottom:18px">Reichweite</div>
+      <h3>Eine Karte, die <em>handeln lässt</em>.</h3>
+      <p>Geo-getaggte Beiträge, gefilterte Cluster, Echtzeit-Updates. Wer Hilfe sucht oder gibt, sieht die Nachbarschaft als das, was sie ist: <em style="color:var(--bronze);font-family:'Instrument Serif',serif;font-style:italic">eine Karte mit Klingelschildern.</em></p>
+    </div>
+    <div class="stats">
+      <div><span class="k">Pins · 24h</span><span class="v">1 842</span></div>
+      <div><span class="k">Höfe</span><span class="v">312</span></div>
+      <div><span class="k">Krisen-Hubs</span><span class="v">9</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─────────────────────────────────────────────────────── -->
+<section class="wrap cta-sec" id="cta">
+  <div class="eyebrow reveal" style="text-align:center">○ &nbsp;Akt V · Abspann beginnt mit dir</div>
+  <h2 class="reveal d1" style="margin-top:24px">Komm ins <em>Bild</em>.<br/>Die Tür ist offen.</h2>
+  <p class="sub reveal d2">Kostenlos. Werbefrei. Open-Source-getragen. Mensaena gehört der Gemeinschaft, die sie benutzt — und niemandem sonst.</p>
+  <div class="cta-actions reveal d3">
+    <a class="btn primary" href="https://www.mensaena.de">Konto anlegen <span class="arrow">→</span></a>
+    <a class="btn ghost" href="https://www.mensaena.de/spenden">Mensaena unterstützen</a>
+  </div>
+
+  <div class="contact">
+    <div><div class="k">Schreib uns</div><div class="v">info@mensaena.de</div></div>
+    <div><div class="k">Mitwirken</div><div class="v">github.com/manuelbrandner85<br/>/Mensaena</div></div>
+    <div><div class="k">Postanschrift</div><div class="v">Gemeinwohl e.V.<br/>D-10115 Berlin</div></div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ───────────────────────────────────────────────────── -->
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <div>
+        <div class="brand" style="margin-bottom:18px">
+          <div class="mark">Mensaena<em>.</em></div>
+        </div>
+        <p class="dim" style="font-size:14px;max-width:36ch;line-height:1.6">Die Gemeinwohl-Plattform. Gemeinsam stärker, lokal vernetzt. Eine kleine Idee, die nicht aufhören will.</p>
+      </div>
+      <div>
+        <h5>Plattform</h5>
+        <ul>
+          <li><a href="#manifest">Idee</a></li>
+          <li><a href="#approach">Wie es funktioniert</a></li>
+          <li><a href="#reel">Module</a></li>
+          <li><a href="#map">Karte</a></li>
+          <li><a href="https://www.mensaena.de/spenden">Spenden</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Recht</h5>
+        <ul>
+          <li><a href="#">AGB</a></li>
+          <li><a href="#">Datenschutz</a></li>
+          <li><a href="#">Impressum</a></li>
+          <li><a href="#">Haftungsausschluss</a></li>
+          <li><a href="#">Community-Richtlinien</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Kontakt</h5>
+        <ul>
+          <li><a href="mailto:info@mensaena.de">info@mensaena.de</a></li>
+          <li><a href="#">Feedback</a></li>
+          <li><a href="#">Bug-Report</a></li>
+          <li><a href="https://github.com/manuelbrandner85/Mensaena">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bot">
+      <span>© MMXXVI MENSAENA · GEMEINWOHL E.V. · BERLIN</span>
+      <span>VERSION 1.0.0-BETA · BUILD 2026-05-14</span>
+      <span>↑ Zurück nach oben</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── TWEAKS ──────────────────────────────────────────────────── -->
+<div id="tweaks" aria-hidden="true">
+  <h5>Tweaks <button id="tw-close">×</button></h5>
+  <div class="grp">
+    <span class="lbl">Color stock</span>
+    <div class="swatches" id="tw-palette">
+      <button data-pal="bronze-teal" class="on" title="Bronze · Teal"><i><span style="background:#c79363"></span><span style="background:#2b5663"></span><span style="background:#ece5d6"></span></i></button>
+      <button data-pal="crimson-steel" title="Crimson · Steel"><i><span style="background:#c45a4a"></span><span style="background:#3b5364"></span><span style="background:#e8e1cf"></span></i></button>
+      <button data-pal="sodium-cyan" title="Sodium · Cyan"><i><span style="background:#e8a44a"></span><span style="background:#1e6473"></span><span style="background:#efe7d3"></span></i></button>
+      <button data-pal="silver-arc" title="Silver Arc"><i><span style="background:#9aa5b8"></span><span style="background:#404856"></span><span style="background:#e6e4dc"></span></i></button>
+    </div>
+  </div>
+  <div class="grp">
+    <span class="lbl">Letterbox</span>
+    <div class="seg" id="tw-bars">
+      <button data-bars="36">2.20</button>
+      <button data-bars="56" class="on">2.39</button>
+      <button data-bars="84">2.76</button>
+    </div>
+  </div>
+  <div class="grp">
+    <span class="lbl">Korn · Schichten</span>
+    <input type="range" id="tw-grain" min="0" max="100" value="32">
+  </div>
+  <div class="grp">
+    <span class="lbl">Scratches · Dust</span>
+    <input type="range" id="tw-scratch" min="0" max="100" value="6">
+  </div>
+  <div class="grp">
+    <span class="lbl">Reel speed</span>
+    <input type="range" id="tw-reel" min="20" max="120" value="60">
+  </div>
+</div>
+
+<script>
+/* ─── TWEAK STATE (persisted) ──────────────────────────────────── */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "bronze-teal",
+  "bars": 56,
+  "grain": 32,
+  "scratch": 6,
+  "reelSpeed": 60
+}/*EDITMODE-END*/;
+
+const palettes = {
+  "bronze-teal":   { ink:"#0a1420", ink2:"#0d1a29", paper:"#ece5d6", paperDim:"#cdc4b1", bronze:"#c79363", bronzeDeep:"#8a5a2f", teal:"#2b5663", halation:"rgba(255,170,90,0.45)", fb1:"#10202f", fb2:"#0a1623" },
+  "crimson-steel": { ink:"#0c1018", ink2:"#0f141d", paper:"#e8e1cf", paperDim:"#c8bfa8", bronze:"#c45a4a", bronzeDeep:"#7a3025", teal:"#3b5364", halation:"rgba(220,90,70,0.45)", fb1:"#1a2128", fb2:"#0e1318" },
+  "sodium-cyan":   { ink:"#091418", ink2:"#0c1a1f", paper:"#efe7d3", paperDim:"#cfc6ad", bronze:"#e8a44a", bronzeDeep:"#9a6420", teal:"#1e6473", halation:"rgba(255,200,90,0.55)", fb1:"#0e2128", fb2:"#091619" },
+  "silver-arc":    { ink:"#0c1117", ink2:"#11171f", paper:"#e6e4dc", paperDim:"#bdbcb1", bronze:"#9aa5b8", bronzeDeep:"#525c6b", teal:"#404856", halation:"rgba(180,200,220,0.42)", fb1:"#1a2129", fb2:"#0e131a" }
+};
+
+function applyTweaks(t){
+  const p = palettes[t.palette] || palettes["bronze-teal"];
+  const r = document.documentElement.style;
+  r.setProperty('--ink', p.ink);
+  r.setProperty('--ink-2', p.ink2);
+  r.setProperty('--paper', p.paper);
+  r.setProperty('--paper-dim', p.paperDim);
+  r.setProperty('--bronze', p.bronze);
+  r.setProperty('--bronze-deep', p.bronzeDeep);
+  r.setProperty('--teal', p.teal);
+  r.setProperty('--halation', p.halation);
+  r.setProperty('--frame-bg-1', p.fb1);
+  r.setProperty('--frame-bg-2', p.fb2);
+  r.setProperty('--bars-h', t.bars + 'px');
+  r.setProperty('--scratch', (t.scratch/100).toFixed(3));
+  r.setProperty('--marquee-dur', t.reelSpeed + 's');
+  document.querySelector('.grain').style.opacity = (t.grain/100).toFixed(3);
+}
+
+let TWEAKS = { ...TWEAK_DEFAULTS };
+applyTweaks(TWEAKS);
+
+/* edit-mode integration */
+window.addEventListener('message', (e) => {
+  if (e.data?.type === '__activate_edit_mode')   document.getElementById('tweaks').classList.add('on');
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('on');
+});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+document.getElementById('tw-close').onclick = () => {
+  document.getElementById('tweaks').classList.remove('on');
+  window.parent.postMessage({type:'__edit_mode_dismissed'},'*');
+};
+
+function persist(patch){
+  Object.assign(TWEAKS, patch);
+  applyTweaks(TWEAKS);
+  window.parent.postMessage({type:'__edit_mode_set_keys', edits: patch}, '*');
+}
+
+/* swatches */
+document.querySelectorAll('#tw-palette button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tw-palette button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  persist({ palette: b.dataset.pal });
+});
+document.querySelectorAll('#tw-bars button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tw-bars button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  persist({ bars: +b.dataset.bars });
+});
+document.getElementById('tw-grain').oninput   = (e) => persist({ grain: +e.target.value });
+document.getElementById('tw-scratch').oninput = (e) => persist({ scratch: +e.target.value });
+document.getElementById('tw-reel').oninput    = (e) => persist({ reelSpeed: +e.target.value });
+
+/* ─── timecode in top bar ──────────────────────────────────────── */
+const tc = document.getElementById('tc');
+const start = performance.now();
+function tick(){
+  const ms = performance.now() - start;
+  const t = ms/1000;
+  const hh = String(Math.floor(t/3600)).padStart(2,'0');
+  const mm = String(Math.floor(t/60)%60).padStart(2,'0');
+  const ss = String(Math.floor(t)%60).padStart(2,'0');
+  const ff = String(Math.floor((t*24)%24)).padStart(2,'0');
+  tc.textContent = `${hh}:${mm}:${ss}:${ff}`;
+  requestAnimationFrame(tick);
+}
+tick();
+
+/* today */
+const d = new Date();
+document.getElementById('today').textContent = d.toLocaleDateString('de-DE');
+
+/* ─── filmstrip cells ──────────────────────────────────────────── */
+const labels = [
+  ["KIEZHILFE",   "A 12:04"], ["TIERE",      "B 12:08"], ["WOHNEN",   "C 12:14"],
+  ["MOBILITÄT",   "D 12:21"], ["ERNTE",      "E 12:29"], ["WISSEN",   "F 12:34"],
+  ["KRISE",       "G 12:39"], ["MARKT",      "H 12:42"], ["COMMUNITY","I 12:47"],
+  ["EHRENAMT",    "J 12:52"], ["GRUPPEN",    "K 12:59"], ["WIKI",     "L 13:04"],
+];
+const strip = document.getElementById('strip');
+const cells = labels.concat(labels);
+strip.innerHTML = cells.map(([n,tc],i)=>`
+  <div class="cell"><span class="lab">${n}</span><span class="num">${tc}</span></div>
+`).join('');
+
+/* ─── reveal observer ──────────────────────────────────────────── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ─── live count ticker (numbers / online) ─────────────────────── */
+const ids = ['n-users','n-posts','n-inter','n-reg'];
+let base = [12408, 38217, 214392, 186];
+setInterval(() => {
+  base = base.map((v, i) => v + (Math.random() < 0.6 ? Math.floor(Math.random()*[3,5,9,1][i]+1) : 0));
+  ids.forEach((id, i) => document.getElementById(id).textContent = base[i].toLocaleString('de-DE'));
+  document.getElementById('n-online').textContent = 30 + Math.floor(Math.random()*40);
+}, 1400);
+
+/* ─── smooth-scroll for in-page anchors ────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) { e.preventDefault(); window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 60, behavior:'smooth' }); }
+  });
+});
+</script>
+
+</body>
+</html>

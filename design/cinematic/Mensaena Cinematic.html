@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mensaena — Nachbarschaftshilfe, neu gedacht.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="cinema.css">
+<link rel="stylesheet" href="cinematic.css">
+</head>
+<body>
+
+<!-- atmospheric layers — calm, no film artifacts -->
+<div class="haze" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ─── NAV ──────────────────────────────────────────────────── -->
+<header class="nav">
+  <div class="brand">
+    <div class="mark">Mensaena<em>.</em></div>
+    <div class="tag">Die Gemeinwohl-Plattform</div>
+  </div>
+  <ul>
+    <li><a href="#features">Funktionen</a></li>
+    <li><a href="#how">Ablauf</a></li>
+    <li><a href="#categories">Kategorien</a></li>
+    <li><a href="#map">Karte</a></li>
+    <li><a href="#support">Spenden</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang"><b>DE</b><span>·</span><span>EN</span></div>
+    <a class="cta" href="#cta">Starten ↗</a>
+  </div>
+</header>
+
+<!-- ─── HERO ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bloom"><span class="b1"></span><span class="b2"></span></div>
+  <div class="hero-grid"></div>
+
+  <div class="wrap">
+    <div class="eyebrow reveal">— 01 / Deine Nachbarschaft</div>
+    <h1 class="reveal d1">
+      Nachbarschaft,<br/>
+      <em>neu gedacht.</em>
+    </h1>
+    <p class="lede reveal d2">
+      Hilfe anbieten. Hilfe finden. Menschen in deiner Nähe kennenlernen.<br/>
+      <em>Kostenlos, gemeinnützig, von der Gemeinschaft getragen.</em>
+    </p>
+    <div class="actions reveal d3">
+      <a class="btn primary" href="#cta">Kostenlos starten <span class="arrow">→</span></a>
+      <a class="btn ghost" href="#features">Mehr erfahren</a>
+    </div>
+    <div class="facts reveal d3">
+      <div>
+        <div class="k">Preis</div>
+        <div class="v">Kostenlos</div>
+      </div>
+      <div>
+        <div class="k">Datenschutz</div>
+        <div class="v">DSGVO-konform</div>
+      </div>
+      <div>
+        <div class="k">Organisation</div>
+        <div class="v">Gemeinnützig</div>
+      </div>
+      <div>
+        <div class="k">Werbung</div>
+        <div class="v">keine</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true"><span>Scroll</span><i></i></div>
+</section>
+
+<!-- ─── 02 · STATS ────────────────────────────────────────── -->
+<section class="wrap section" id="stats">
+  <div class="section-head">
+    <div class="num"><b>— 02</b><br/>Die Gemeinschaft<br/>in Zahlen</div>
+    <h2>Echte Nachbarschaft, <em>live</em> aktualisiert.</h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat reveal">
+      <div class="k">Aktive Nachbarn</div>
+      <div class="v"><span id="n-users">12 408</span><sup>+</sup></div>
+    </div>
+    <div class="stat reveal d1">
+      <div class="k">Hilfsangebote</div>
+      <div class="v"><span id="n-posts">38 217</span><sup>+</sup></div>
+    </div>
+    <div class="stat reveal d2">
+      <div class="k">Interaktionen</div>
+      <div class="v"><span id="n-inter">214 392</span><sup>+</sup></div>
+    </div>
+    <div class="stat reveal d3">
+      <div class="k">Nachbarschaften</div>
+      <div class="v"><span id="n-reg">186</span><sup>+</sup></div>
+    </div>
+  </div>
+  <div class="live-line"><span class="pulse"></span>Live aktualisiert · <span id="n-online">42</span> Nachbarn gerade online</div>
+</section>
+
+<!-- ─── 03 · FEATURES ─────────────────────────────────────── -->
+<section class="wrap section" id="features">
+  <div class="section-head">
+    <div class="num"><b>— 03</b><br/>Was Mensaena<br/>auszeichnet</div>
+    <h2>Sechs Prinzipien, die den Unterschied zwischen Plattform und <em>Gemeinschaft</em> machen.</h2>
+  </div>
+  <div class="features-grid section-end">
+    <article class="feat reveal">
+      <div class="top"><span class="num">01</span><span class="dot"></span></div>
+      <div>
+        <h3><em>Hyperlokal.</em></h3>
+        <p>Finde Hilfe und Angebote direkt in deiner Straße. Mit der interaktiven Karte siehst du auf einen Blick, was in deiner Nachbarschaft passiert.</p>
+      </div>
+    </article>
+    <article class="feat reveal d1">
+      <div class="top"><span class="num">02</span><span class="dot"></span></div>
+      <div>
+        <h3>Hilfe geben <em>&amp; nehmen.</em></h3>
+        <p>Einkaufshilfe, Werkzeug leihen oder Nachhilfe — biete an, was du kannst, und finde Unterstützung, wenn du sie brauchst.</p>
+      </div>
+    </article>
+    <article class="feat reveal d2">
+      <div class="top"><span class="num">03</span><span class="dot"></span></div>
+      <div>
+        <h3>Vertrauen &amp; <em>Sicherheit.</em></h3>
+        <p>Unser Bewertungssystem hilft dir, vertrauenswürdige Nachbarn zu erkennen. Melde- und Blockier-Funktionen sorgen für ein sicheres Miteinander.</p>
+      </div>
+    </article>
+    <article class="feat reveal">
+      <div class="top"><span class="num">04</span><span class="dot"></span></div>
+      <div>
+        <h3>Direkter <em>Kontakt.</em></h3>
+        <p>Schreib deinen Nachbarn direkt über unseren Chat. Privat, sicher und ohne deine Telefonnummer teilen zu müssen.</p>
+      </div>
+    </article>
+    <article class="feat reveal d1">
+      <div class="top"><span class="num">05</span><span class="dot"></span></div>
+      <div>
+        <h3><em>Gemeinnützig.</em></h3>
+        <p>Mensaena ist kostenlos, werbefrei und gehört der Gemeinschaft. Keine versteckten Kosten, keine Datenverkäufe, kein Profit.</p>
+      </div>
+    </article>
+    <article class="feat reveal d2">
+      <div class="top"><span class="num">06</span><span class="dot"></span></div>
+      <div>
+        <h3><em>Krisenhilfe.</em></h3>
+        <p>Bei Naturkatastrophen, Stromausfällen oder anderen Krisen aktiviert Mensaena den Krisenmodus für schnelle Nachbarschaftshilfe.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ─── 04 · HOW IT WORKS ─────────────────────────────────── -->
+<section class="wrap section" id="how">
+  <div class="section-head">
+    <div class="num"><b>— 04</b><br/>So beginnt es</div>
+    <h2>Drei Schritte zur <em>aktiven</em> Nachbarschaft.</h2>
+  </div>
+  <div class="steps-grid section-end">
+    <article class="step reveal">
+      <div class="big">01</div>
+      <div>
+        <h3><em>Registrieren.</em></h3>
+        <p>Kostenloses Konto in 30 Sekunden. Kein Abo, keine Kreditkarte, keine versteckten Kosten.</p>
+      </div>
+    </article>
+    <article class="step reveal d1">
+      <div class="big">02</div>
+      <div>
+        <h3>Standort <em>einstellen.</em></h3>
+        <p>Hinterlege deinen Standort und wähle einen Radius. So findest du Nachbarn in direkter Umgebung.</p>
+      </div>
+    </article>
+    <article class="step reveal d2">
+      <div class="big">03</div>
+      <div>
+        <h3><em>Loslegen.</em></h3>
+        <p>Biete Hilfe an, suche Unterstützung oder lerne einfach deine Nachbarn kennen. Die Gemeinschaft wächst mit jedem Beitrag.</p>
+      </div>
+    </article>
+  </div>
+  <div class="reveal d3" style="margin-top:8px">
+    <a class="btn primary" href="#cta">Jetzt kostenlos starten <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<!-- ─── 05 · CATEGORIES ───────────────────────────────────── -->
+<section class="wrap section" id="categories">
+  <div class="section-head">
+    <div class="num"><b>— 05</b><br/>Kategorien</div>
+    <h2>Für jede Situation die passende <em>Form der Hilfe</em>.</h2>
+  </div>
+  <div class="cats section-end">
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">01</span>
+      <span class="lbl">Hilfe anbieten</span>
+      <span class="ex">„Ich kann beim Einkaufen helfen."</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">02</span>
+      <span class="lbl">Hilfe suchen</span>
+      <span class="ex">„Wer kann mir beim Umzug helfen?"</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">03</span>
+      <span class="lbl">Werkzeug leihen</span>
+      <span class="ex">„Bohrmaschine für zwei Tage."</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">04</span>
+      <span class="lbl">Veranstaltungen</span>
+      <span class="ex">„Straßenfest am Samstag."</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">05</span>
+      <span class="lbl">Tausch &amp; Schenk</span>
+      <span class="ex">„Kinderbücher zu verschenken."</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">06</span>
+      <span class="lbl">Mitfahrgelegenheit</span>
+      <span class="ex">„Fahre Freitag nach München."</span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="cat-row reveal" href="#cta">
+      <span class="num">07</span>
+      <span class="lbl">Krisenhilfe</span>
+      <span class="ex">„Hochwasser — Sandsäcke nötig."</span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<!-- ─── 06 · TESTIMONIALS ─────────────────────────────────── -->
+<section class="wrap section" id="testimonials">
+  <div class="section-head">
+    <div class="num"><b>— 06</b><br/>Stimmen aus der<br/>Gemeinschaft</div>
+    <h2>Was unsere <em>Nachbarn</em> erzählen.</h2>
+  </div>
+  <div class="testimonials section-end">
+    <div class="big-quote" aria-hidden="true">"</div>
+    <div class="grid">
+      <figure class="testimonial reveal">
+        <blockquote><span class="q">„</span>Durch Mensaena habe ich endlich meine Nachbarn kennengelernt. Letzte Woche hat mir Herr Müller bei der <em>Gartenarbeit</em> geholfen — einfach so.<span class="q">"</span></blockquote>
+        <figcaption class="who">
+          <span class="line"></span>
+          <span class="name">Anna K.</span>
+          <span class="loc">Berlin-Kreuzberg</span>
+        </figcaption>
+      </figure>
+      <figure class="testimonial reveal d1">
+        <blockquote><span class="q">„</span>Als alleinerziehende Mutter ist Mensaena ein Segen. Die Nachbarschaft hilft sich hier wirklich gegenseitig — nicht nur digital, sondern <em>ganz real</em>.<span class="q">"</span></blockquote>
+        <figcaption class="who">
+          <span class="line"></span>
+          <span class="name">Sarah M.</span>
+          <span class="loc">München-Schwabing</span>
+        </figcaption>
+      </figure>
+      <figure class="testimonial reveal d2">
+        <blockquote><span class="q">„</span>Ich bin 72 und nicht so fit mit Technik. Aber Mensaena ist so <em>einfach</em>, dass sogar ich es kann. Jetzt helfe ich anderen beim Kochen.<span class="q">"</span></blockquote>
+        <figcaption class="who">
+          <span class="line"></span>
+          <span class="name">Helmut B.</span>
+          <span class="loc">Hamburg-Eppendorf</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 07 · MAP ──────────────────────────────────────────── -->
+<section class="wrap section" id="map">
+  <div class="section-head">
+    <div class="num"><b>— 07</b><br/>Live in der Fläche</div>
+    <h2>Echte Nachbarschaften, <em>verbunden</em> in Echtzeit.</h2>
+  </div>
+  <div class="region section-end">
+    <div class="frame">
+      <div class="map" aria-hidden="true">
+        <span class="pin a"></span><span class="pin b"></span><span class="pin c"></span>
+        <span class="pin d"></span><span class="pin e"></span><span class="pin f"></span>
+      </div>
+    </div>
+    <div class="panel">
+      <div>
+        <div class="eyebrow" style="margin-bottom:20px">07 / Live in der Fläche</div>
+        <h3>Eine Karte, die <em>handeln lässt</em>.</h3>
+        <p style="margin-top:24px">Geo-getaggte Beiträge, gefilterte Cluster, Echtzeit-Updates. Wer Hilfe sucht oder gibt, sieht die Nachbarschaft als das, was sie ist: <em>eine Karte mit Klingelschildern.</em></p>
+      </div>
+      <div class="stats">
+        <div><span class="k">Pins · 24h</span><span class="v">1 842</span></div>
+        <div><span class="k">Städte</span><span class="v">186</span></div>
+        <div><span class="k">Krisen-Hubs</span><span class="v">9</span></div>
+      </div>
+      <a class="btn primary" href="#cta" style="align-self:flex-start">Registrieren und Karte freischalten <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 08 · SUPPORT ──────────────────────────────────────── -->
+<section class="wrap section" id="support">
+  <div class="section-head">
+    <div class="num"><b>— 08</b><br/>Unterstützung</div>
+    <h2>Werbefrei. Spendenfinanziert. <em>Für immer.</em></h2>
+  </div>
+  <p class="reveal" style="font-size:17px;line-height:1.6;color:var(--paper-dim);max-width:54ch;margin-bottom:48px">
+    Mensaena hat keine Werbung, keine Investoren und keine bezahlten Mitarbeiter:innen. Damit das so bleibt, finanzieren wir uns ausschließlich durch Menschen wie dich.
+  </p>
+  <div class="support-card reveal d1 section-end">
+    <div class="main">
+      <div class="heart-row">
+        <span class="heart">♥</span>
+        <span class="lbl">Goldenes Herz für Spender:innen</span>
+      </div>
+      <h3>Drei Euro halten Mensaena einen <em>Monat lang am Laufen</em> — pro 60 Nachbar:innen.</h3>
+      <p class="body">Server, Domain, SMS-Verifikation, Kartenservice. Alles, was du auf Mensaena nutzt, läuft im Hintergrund und kostet jeden Monat Geld. <em>Deine Spende deckt diese Kosten direkt</em> — transparent und ohne Umweg.</p>
+      <div class="acts">
+        <a class="btn primary" href="https://www.mensaena.de/spenden">Mensaena unterstützen <span class="arrow">→</span></a>
+        <a class="btn ghost" href="https://www.mensaena.de/spenden#transparenz">Wo das Geld hingeht</a>
+      </div>
+      <p class="footnote">Mensaena ist derzeit nicht als gemeinnützig im Sinne der Abgabenordnung anerkannt. Spenden sind daher nicht steuerlich absetzbar — wir arbeiten daran.</p>
+    </div>
+    <div class="aside">
+      <span class="lbl">In 30 Sekunden</span>
+      <ul class="facts">
+        <li>
+          <span class="ico">QR</span>
+          <div>
+            <div class="tit">Banking-App scannen</div>
+            <div class="des">QR-Code öffnen, scannen, bestätigen. Funktioniert mit allen deutschen, österreichischen und schweizerischen Banking-Apps.</div>
+          </div>
+        </li>
+        <li>
+          <span class="ico">DE</span>
+          <div>
+            <div class="tit">SEPA-Überweisung</div>
+            <div class="des">IBAN kopieren, klassische Überweisung. Mit oder ohne Spendenbescheinigung.</div>
+          </div>
+        </li>
+        <li>
+          <span class="ico">100</span>
+          <div>
+            <div class="tit">100 % transparent</div>
+            <div class="des">Wir veröffentlichen unsere Kosten. Jeder Cent fließt in den Betrieb der Plattform.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 09 · CTA ──────────────────────────────────────────── -->
+<section class="wrap cta-final" id="cta">
+  <div class="eyebrow reveal">— 09 / Bereit?</div>
+  <h2 class="reveal d1">Deine Nachbarschaft<br/><em>wartet auf dich.</em></h2>
+  <p class="sub reveal d2">Schließ dich einer wachsenden Gemeinschaft an, die zeigt, dass Nachbarschaftshilfe mehr ist als nur ein Wort.</p>
+  <div class="actions reveal d3">
+    <a class="btn primary" href="https://www.mensaena.de/auth?mode=register">Jetzt kostenlos starten <span class="arrow">→</span></a>
+    <a class="btn ghost" href="https://www.mensaena.de/auth?mode=login">Bereits dabei? Anmelden</a>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────── -->
+<footer>
+  <div class="wrap">
+    <div class="wordmark">Mensaena<em>.</em></div>
+    <div class="wordmark-sub">Nachbarschaftshilfe, neu gedacht. Kostenlos, gemeinnützig, von der Gemeinschaft getragen.</div>
+
+    <div class="row">
+      <div>
+        <h5>Plattform</h5>
+        <ul>
+          <li><a href="#features">Funktionen</a></li>
+          <li><a href="#how">Ablauf</a></li>
+          <li><a href="#categories">Kategorien</a></li>
+          <li><a href="#map">Karte</a></li>
+          <li><a href="#support">Spenden</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Rechtliches</h5>
+        <ul>
+          <li><a href="#">AGB</a></li>
+          <li><a href="#">Nutzungsbedingungen</a></li>
+          <li><a href="#">Datenschutz</a></li>
+          <li><a href="#">Impressum</a></li>
+          <li><a href="#">Haftungsausschluss</a></li>
+          <li><a href="#">Community-Richtlinien</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Kontakt</h5>
+        <ul>
+          <li><a href="mailto:info@mensaena.de">info@mensaena.de</a></li>
+          <li><a href="mailto:info@mensaena.de?subject=Feedback">Feedback geben</a></li>
+          <li><a href="mailto:info@mensaena.de?subject=Bug-Report">Fehler melden</a></li>
+          <li><a href="https://github.com/manuelbrandner85/Mensaena">GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Folge uns</h5>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Mastodon</a></li>
+          <li><a href="#">Bluesky</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <a class="donate-pill" href="https://www.mensaena.de/spenden">
+      <span class="h">♥</span>
+      <span>Werbefrei dank Spender:innen — Mensaena unterstützen</span>
+    </a>
+
+    <div class="bot">
+      <span>© 2026 Mensaena · Mit Sorgfalt der Gemeinschaft.</span>
+      <span>Version 1.0.0-beta · Werbefrei · DSGVO-konform</span>
+      <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false">↑ Nach oben</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── TWEAKS ───────────────────────────────────────────── -->
+<div id="tweaks" aria-hidden="true">
+  <h5>Tweaks <button id="tw-close">×</button></h5>
+  <div class="grp">
+    <span class="lbl">Color stock</span>
+    <div class="swatches" id="tw-palette">
+      <button data-pal="bronze-teal" class="on" title="Bronze · Teal"><i><span style="background:#c79363"></span><span style="background:#2b5663"></span><span style="background:#ece5d6"></span></i></button>
+      <button data-pal="crimson-steel" title="Crimson · Steel"><i><span style="background:#c45a4a"></span><span style="background:#3b5364"></span><span style="background:#e8e1cf"></span></i></button>
+      <button data-pal="sodium-cyan" title="Sodium · Cyan"><i><span style="background:#e8a44a"></span><span style="background:#1e6473"></span><span style="background:#efe7d3"></span></i></button>
+      <button data-pal="silver-arc" title="Silver Arc"><i><span style="background:#9aa5b8"></span><span style="background:#404856"></span><span style="background:#e6e4dc"></span></i></button>
+    </div>
+  </div>
+  <div class="grp">
+    <span class="lbl">Atmosphäre · Korn</span>
+    <input type="range" id="tw-grain" min="0" max="40" value="12">
+  </div>
+  <div class="grp">
+    <span class="lbl">Atmosphäre · Bloom</span>
+    <input type="range" id="tw-haze" min="0" max="100" value="35">
+  </div>
+</div>
+
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "sodium-cyan",
+  "grain": 21,
+  "haze": 55
+}/*EDITMODE-END*/;
+
+const palettes = {
+  "bronze-teal":   { ink:"#0a1420", ink2:"#0d1a29", paper:"#ece5d6", paperDim:"#cdc4b1", bronze:"#c79363", bronzeDeep:"#8a5a2f", teal:"#2b5663" },
+  "crimson-steel": { ink:"#0c1018", ink2:"#0f141d", paper:"#e8e1cf", paperDim:"#c8bfa8", bronze:"#c45a4a", bronzeDeep:"#7a3025", teal:"#3b5364" },
+  "sodium-cyan":   { ink:"#091418", ink2:"#0c1a1f", paper:"#efe7d3", paperDim:"#cfc6ad", bronze:"#e8a44a", bronzeDeep:"#9a6420", teal:"#1e6473" },
+  "silver-arc":    { ink:"#0c1117", ink2:"#11171f", paper:"#e6e4dc", paperDim:"#bdbcb1", bronze:"#9aa5b8", bronzeDeep:"#525c6b", teal:"#404856" }
+};
+
+function applyTweaks(t){
+  const p = palettes[t.palette] || palettes["bronze-teal"];
+  const r = document.documentElement.style;
+  r.setProperty('--ink', p.ink); r.setProperty('--ink-2', p.ink2);
+  r.setProperty('--paper', p.paper); r.setProperty('--paper-dim', p.paperDim);
+  r.setProperty('--bronze', p.bronze); r.setProperty('--bronze-deep', p.bronzeDeep);
+  r.setProperty('--teal', p.teal);
+  document.querySelector('.grain').style.opacity = (t.grain/100).toFixed(3);
+  document.querySelectorAll('.haze i').forEach(i => i.style.opacity = (t.haze/100).toFixed(3));
+}
+
+let TWEAKS = { ...TWEAK_DEFAULTS };
+applyTweaks(TWEAKS);
+
+window.addEventListener('message', (e) => {
+  if (e.data?.type === '__activate_edit_mode')   document.getElementById('tweaks').classList.add('on');
+  if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('on');
+});
+window.parent.postMessage({type:'__edit_mode_available'},'*');
+document.getElementById('tw-close').onclick = () => {
+  document.getElementById('tweaks').classList.remove('on');
+  window.parent.postMessage({type:'__edit_mode_dismissed'},'*');
+};
+function persist(patch){
+  Object.assign(TWEAKS, patch); applyTweaks(TWEAKS);
+  window.parent.postMessage({type:'__edit_mode_set_keys', edits: patch}, '*');
+}
+document.querySelectorAll('#tw-palette button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tw-palette button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); persist({ palette: b.dataset.pal });
+});
+document.getElementById('tw-grain').oninput = (e) => persist({ grain: +e.target.value });
+document.getElementById('tw-haze').oninput  = (e) => persist({ haze: +e.target.value });
+
+/* reveal */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* live counters */
+const ids = ['n-users','n-posts','n-inter','n-reg'];
+let base = [12408, 38217, 214392, 186];
+setInterval(() => {
+  base = base.map((v, i) => v + (Math.random() < 0.6 ? Math.floor(Math.random()*[3,5,9,1][i]+1) : 0));
+  ids.forEach((id, i) => document.getElementById(id).textContent = base[i].toLocaleString('de-DE'));
+  document.getElementById('n-online').textContent = 30 + Math.floor(Math.random()*40);
+}, 1400);
+
+/* smooth scroll */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) { e.preventDefault(); window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 40, behavior:'smooth' }); }
+  });
+});
+</script>
+
+</body>
+</html>
