@@ -113,17 +113,30 @@ export default function SpendenClient() {
   }
 
   return (
-    <div className="min-h-dvh bg-paper">
-      {/* ─── Sticky Top Bar — Premium Glass ──────────────────────── */}
-      <header className="sticky top-0 z-40 glass-nav nav-border-gradient">
+    <div className="min-h-dvh" style={{ background: '#0a1420', color: '#ece5d6' }}>
+      {/* ─── Sticky Top Bar — Cinema glass ───────────────────────── */}
+      <header
+        className="sticky top-0 z-40"
+        style={{
+          background: 'rgba(10,20,32,0.85)',
+          backdropFilter: 'blur(20px) saturate(1.4)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+          borderBottom: '1px solid rgba(199,147,99,0.10)',
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <Image src="/mensaena-logo.png" alt="Mensaena" width={36} height={36} className="h-8 w-auto object-contain" />
-            <span className="font-display text-lg text-ink-800">Mensaena<span className="text-primary-500">.</span></span>
+            <span
+              className="text-lg font-medium tracking-tight"
+              style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F1F5F9' }}
+            >
+              Mensaena<span style={{ color: '#c79363' }}>.</span>
+            </span>
           </Link>
           <Link
             href="/"
-            className="meta-label meta-label--subtle hover:text-primary-700 transition-colors inline-flex items-center gap-1.5"
+            className="meta-label meta-label--subtle transition-colors inline-flex items-center gap-1.5 hover:text-mn-paper"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Zurück
@@ -155,28 +168,42 @@ export default function SpendenClient() {
           aria-hidden="true"
         />
         <div className="relative max-w-4xl mx-auto text-center">
-          <div className="meta-label mb-7 text-primary-700">— Unterstütze Mensaena</div>
-          <h1 className="display-xl mb-8 text-balance">
+          <div className="meta-label mb-7" style={{ color: '#c79363' }}>— Unterstütze Mensaena</div>
+          <h1
+            className="mb-8 text-balance"
+            style={{
+              fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
+              fontWeight: 400,
+              fontSize: 'clamp(2.25rem, 6vw, 4.5rem)',
+              lineHeight: 1.05,
+              letterSpacing: '-0.025em',
+              color: '#F8FAFC',
+            }}
+          >
             Damit Nachbarschaft{' '}
-            <span className="text-primary-600">möglich bleibt.</span>
+            <em style={{ fontStyle: 'italic', color: '#c79363' }}>möglich bleibt.</em>
           </h1>
-          <p className="text-lg md:text-xl text-ink-500 leading-relaxed max-w-2xl mx-auto">
-            Mensaena ist <strong className="text-ink-800">100&nbsp;%&nbsp;werbefrei</strong> und für alle kostenlos.
+          <p className="text-lg md:text-xl leading-relaxed max-w-2xl mx-auto" style={{ color: '#94A3B8' }}>
+            Mensaena ist <strong style={{ color: '#ece5d6' }}>100&nbsp;%&nbsp;werbefrei</strong> und für alle kostenlos.
             Damit das so bleibt, finanzieren wir uns ausschließlich durch Spenden.
           </p>
 
           {costPerPerson && userCount && (
-            <div className="mt-10 inline-flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 bg-white border border-white/10 rounded-2xl px-5 py-3 shadow-soft max-w-md">
-              <span className="meta-label text-primary-700">Pro Person</span>
-              <span className="text-sm text-ink-700">
-                Bei <strong>{userCount.toLocaleString('de-DE')}</strong> Nachbar:innen reichen{' '}
-                <strong className="text-primary-700">{costPerPerson}&nbsp;€</strong>/Monat.
+            <div
+              className="mt-10 inline-flex flex-wrap justify-center items-center gap-x-3 gap-y-1.5 rounded-2xl px-5 py-3 max-w-md"
+              style={{ background: 'rgba(22,32,53,0.80)', border: '1px solid rgba(199,147,99,0.15)' }}
+            >
+              <span className="meta-label" style={{ color: '#c79363' }}>Pro Person</span>
+              <span className="text-sm" style={{ color: '#94A3B8' }}>
+                Bei <strong style={{ color: '#ece5d6' }}>{userCount.toLocaleString('de-DE')}</strong> Nachbar:innen reichen{' '}
+                <strong style={{ color: '#c79363' }}>{costPerPerson}&nbsp;€</strong>/Monat.
               </span>
             </div>
           )}
 
           <ul
-            className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[12px] text-ink-500"
+            className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[12px]"
+            style={{ color: '#64748B' }}
             aria-label="Vertrauenswürdigkeit der Spendenseite"
           >
             <TrustItem Icon={Lock} label="SEPA-Standard" />
@@ -187,11 +214,21 @@ export default function SpendenClient() {
         </div>
       </section>
 
-      {/* ─── Amount Picker (centerpiece) — Cinematic Premium ────── */}
+      {/* ─── Amount Picker ────────────────────────────────────────── */}
       <section className="px-6 md:px-10 pb-20">
-        <div className="max-w-3xl mx-auto card-depth rounded-3xl p-8 md:p-12">
-          <div className="meta-label mb-3 text-ink-500">— 01 / Betrag wählen</div>
-          <h2 className="font-display text-3xl md:text-4xl text-ink-800 leading-tight tracking-tight mb-8">
+        <div
+          className="max-w-3xl mx-auto rounded-3xl p-8 md:p-12"
+          style={{
+            background: 'linear-gradient(150deg, rgba(22,32,53,0.82) 0%, rgba(15,22,40,0.92) 100%)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.40)',
+          }}
+        >
+          <div className="meta-label mb-3 meta-label--subtle">— 01 / Betrag wählen</div>
+          <h2
+            className="text-3xl md:text-4xl leading-tight tracking-tight mb-8"
+            style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+          >
             Wie viel möchtest du geben?
           </h2>
 
@@ -201,16 +238,28 @@ export default function SpendenClient() {
               <button
                 key={amt}
                 onClick={() => { setSelectedAmount(amt); setIsCustom(false) }}
-                className={cn(
-                  'relative py-4 md:py-5 rounded-2xl text-sm md:text-base font-bold transition-all border-2',
+                className="relative py-4 md:py-5 rounded-2xl text-sm md:text-base font-bold transition-all"
+                style={
                   !isCustom && selectedAmount === amt
-                    ? 'bg-ink-900 text-paper border-ink-900 shadow-md'
-                    : 'bg-stone-50 text-ink-700 border-stone-200 hover:border-mn-amber/30 hover:bg-primary-50/50',
-                )}
+                    ? {
+                        background: 'linear-gradient(135deg, #c79363 0%, #d4a472 100%)',
+                        color: '#0a1420',
+                        border: '1px solid rgba(212,164,114,0.40)',
+                        boxShadow: '0 4px 16px rgba(199,147,99,0.30)',
+                      }
+                    : {
+                        background: 'rgba(15,22,40,0.60)',
+                        color: '#94A3B8',
+                        border: '1px solid rgba(255,255,255,0.07)',
+                      }
+                }
               >
                 {amt}&nbsp;€
                 {amt === 3 && (
-                  <span className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider font-semibold bg-primary-500 text-white px-2 py-0.5 rounded-full">
+                  <span
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full"
+                    style={{ background: '#c79363', color: '#0a1420' }}
+                  >
                     Beliebt
                   </span>
                 )}
@@ -220,7 +269,12 @@ export default function SpendenClient() {
 
           {/* Custom amount */}
           <div className="relative mb-8">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-400 font-semibold text-sm pointer-events-none">€</span>
+            <span
+              className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-sm pointer-events-none"
+              style={{ color: '#64748B' }}
+            >
+              €
+            </span>
             <input
               type="number"
               min="0.50"
@@ -229,12 +283,14 @@ export default function SpendenClient() {
               placeholder="Eigener Betrag"
               onChange={e => { setCustomAmount(e.target.value); setIsCustom(true) }}
               onFocus={() => setIsCustom(true)}
-              className={cn(
-                'w-full pl-9 pr-4 py-4 rounded-2xl border-2 text-base font-medium transition-all bg-stone-50',
-                isCustom && customAmount
-                  ? 'border-mn-amber/50 ring-2 ring-primary-100 bg-white'
-                  : 'border-stone-200 hover:border-stone-300',
-              )}
+              className="w-full pl-9 pr-4 py-4 rounded-2xl text-base font-medium transition-all"
+              style={{
+                background: 'rgba(15,22,40,0.65)',
+                border: isCustom && customAmount ? '1px solid rgba(199,147,99,0.45)' : '1px solid rgba(255,255,255,0.07)',
+                color: '#F8FAFC',
+                boxShadow: isCustom && customAmount ? '0 0 0 3px rgba(199,147,99,0.10)' : 'none',
+                outline: 'none',
+              }}
             />
           </div>
 
@@ -244,34 +300,56 @@ export default function SpendenClient() {
       </section>
 
       {/* ─── Payment Options ──────────────────────────────────────── */}
-      <section className="px-6 md:px-10 pb-20 bg-stone-100">
+      <section
+        className="px-6 md:px-10 pb-20"
+        style={{ background: 'rgba(10,15,28,0.60)' }}
+      >
         <div className="max-w-6xl mx-auto pt-20">
           <div className="text-center mb-12">
-            <div className="meta-label mb-3 text-ink-500">— 02 / Zahlungsweg wählen</div>
-            <h2 className="display-lg">
+            <div className="meta-label mb-3 meta-label--subtle">— 02 / Zahlungsweg wählen</div>
+            <h2
+              className="text-3xl md:text-4xl font-medium leading-tight tracking-tight"
+              style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+            >
               Auf welchem Weg möchtest du spenden?
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* QR-Code */}
-            <div className="bg-white rounded-3xl border border-stone-200 shadow-card p-8 md:p-10">
+            <div
+              className="rounded-3xl p-8 md:p-10"
+              style={{
+                background: 'linear-gradient(150deg, rgba(22,32,53,0.82) 0%, rgba(15,22,40,0.92) 100%)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.40)',
+              }}
+            >
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-2xl bg-primary-500 text-white flex items-center justify-center">
-                  <Smartphone className="w-5 h-5" />
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                  style={{ background: 'rgba(199,147,99,0.15)', border: '1px solid rgba(199,147,99,0.25)' }}
+                >
+                  <Smartphone className="w-5 h-5" style={{ color: '#c79363' }} />
                 </div>
-                <span className="meta-label text-primary-700">Empfohlen</span>
+                <span className="meta-label" style={{ color: '#c79363' }}>Empfohlen</span>
               </div>
-              <h3 className="font-display text-2xl text-ink-800 leading-tight mt-4 mb-2">
+              <h3
+                className="text-2xl leading-tight mt-4 mb-2"
+                style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+              >
                 Mit Banking-App scannen
               </h3>
-              <p className="text-sm text-ink-500 leading-relaxed mb-6">
+              <p className="text-sm leading-relaxed mb-6" style={{ color: '#64748B' }}>
                 Öffne deine Banking-App (Sparkasse, Volksbank, ING, DKB, N26, comdirect …),
-                wähle &bdquo;QR-Code&ldquo; oder &bdquo;Foto&ldquo; und scanne &mdash; alles ist vorausgefüllt.
+                wähle „QR-Code" oder „Foto" und scanne — alles ist vorausgefüllt.
               </p>
 
               <div className="flex flex-col items-center">
-                <div className="bg-white rounded-3xl border-2 border-stone-100 p-4 shadow-soft">
+                <div
+                  className="rounded-2xl p-4"
+                  style={{ background: 'rgba(15,22,40,0.80)', border: '1px solid rgba(199,147,99,0.15)' }}
+                >
                   {qrDataUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
@@ -280,69 +358,83 @@ export default function SpendenClient() {
                       className="w-56 h-56 md:w-64 md:h-64"
                     />
                   ) : (
-                    <div className="w-56 h-56 md:w-64 md:h-64 flex items-center justify-center text-stone-300">
+                    <div className="w-56 h-56 md:w-64 md:h-64 flex items-center justify-center" style={{ color: '#64748B' }}>
                       <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
                   )}
                 </div>
                 {finalAmount > 0 && (
-                  <p className="mt-4 text-sm text-ink-500">
-                    Betrag: <strong className="text-ink-800">{finalAmount.toFixed(2).replace('.', ',')}&nbsp;€</strong>
+                  <p className="mt-4 text-sm" style={{ color: '#64748B' }}>
+                    Betrag: <strong style={{ color: '#ece5d6' }}>{finalAmount.toFixed(2).replace('.', ',')}&nbsp;€</strong>
                   </p>
                 )}
               </div>
-              <p className="text-[11px] text-ink-400 text-center mt-4">
+              <p className="text-[11px] text-center mt-4" style={{ color: '#64748B' }}>
                 SEPA-QR-Standard (EPC069-12) · funktioniert in&nbsp;DE&nbsp;/&nbsp;AT&nbsp;/&nbsp;CH
               </p>
             </div>
 
             {/* IBAN */}
-            <div className="bg-white rounded-3xl border border-stone-200 shadow-card p-8 md:p-10">
+            <div
+              className="rounded-3xl p-8 md:p-10"
+              style={{
+                background: 'linear-gradient(150deg, rgba(22,32,53,0.82) 0%, rgba(15,22,40,0.92) 100%)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.40)',
+              }}
+            >
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-2xl bg-ink-800 text-paper flex items-center justify-center">
-                  <Building2 className="w-5 h-5" />
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                  style={{ background: 'rgba(22,32,53,0.85)', border: '1px solid rgba(255,255,255,0.08)' }}
+                >
+                  <Building2 className="w-5 h-5" style={{ color: '#94A3B8' }} />
                 </div>
-                <span className="meta-label text-ink-500">Klassisch</span>
+                <span className="meta-label meta-label--subtle">Klassisch</span>
               </div>
-              <h3 className="font-display text-2xl text-ink-800 leading-tight mt-4 mb-2">
+              <h3
+                className="text-2xl leading-tight mt-4 mb-2"
+                style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+              >
                 Banküberweisung
               </h3>
-              <p className="text-sm text-ink-500 leading-relaxed mb-6">
-                Online-Banking, Sparkassen-App oder Beleg &mdash; einmal kopieren, fertig.
+              <p className="text-sm leading-relaxed mb-6" style={{ color: '#64748B' }}>
+                Online-Banking, Sparkassen-App oder Beleg — einmal kopieren, fertig.
               </p>
 
               <dl className="space-y-3 text-sm">
                 <Row label="Empfänger">
-                  <span className="text-ink-800">{RECIPIENT}</span>
+                  <span style={{ color: '#ece5d6' }}>{RECIPIENT}</span>
                 </Row>
                 <Row label="IBAN">
                   <div className="flex items-center gap-2">
-                    <code className="font-mono text-ink-800 text-[13px]">{IBAN}</code>
+                    <code className="font-mono text-[13px]" style={{ color: '#ece5d6' }}>{IBAN}</code>
                     <button
                       onClick={handleCopyIBAN}
-                      className="p-1.5 rounded-lg hover:bg-stone-100 transition-colors"
+                      className="p-1.5 rounded-lg transition-colors"
+                      style={{ background: 'rgba(22,32,53,0.60)' }}
                       aria-label="IBAN kopieren"
                     >
                       {copied
-                        ? <Check className="w-3.5 h-3.5 text-primary-600" />
-                        : <Copy className="w-3.5 h-3.5 text-ink-400" />}
+                        ? <Check className="w-3.5 h-3.5" style={{ color: '#c79363' }} />
+                        : <Copy className="w-3.5 h-3.5" style={{ color: '#64748B' }} />}
                     </button>
                   </div>
                 </Row>
                 <Row label="BIC">
-                  <code className="font-mono text-ink-800 text-[13px]">{BIC}</code>
+                  <code className="font-mono text-[13px]" style={{ color: '#ece5d6' }}>{BIC}</code>
                 </Row>
                 <Row label="Zweck">
-                  <span className="text-ink-800">Spende Mensaena</span>
+                  <span style={{ color: '#ece5d6' }}>Spende Mensaena</span>
                 </Row>
                 {finalAmount > 0 && (
                   <Row label="Betrag">
-                    <span className="text-ink-800 font-semibold">{finalAmount.toFixed(2).replace('.', ',')}&nbsp;€</span>
+                    <span className="font-semibold" style={{ color: '#c79363' }}>{finalAmount.toFixed(2).replace('.', ',')}&nbsp;€</span>
                   </Row>
                 )}
               </dl>
 
-              <p className="text-[11px] text-ink-400 mt-6">
+              <p className="text-[11px] mt-6" style={{ color: '#64748B' }}>
                 Bank: Revolut Bank UAB · keine Bearbeitungsgebühr für Mensaena
               </p>
             </div>
@@ -354,11 +446,14 @@ export default function SpendenClient() {
       <section id="transparenz" className="px-6 md:px-10 py-24 md:py-32 scroll-mt-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <div className="meta-label mb-3 text-ink-500">— 03 / Transparenz</div>
-            <h2 className="display-lg mb-5">
+            <div className="meta-label mb-3 meta-label--subtle">— 03 / Transparenz</div>
+            <h2
+              className="mb-5 text-3xl md:text-4xl font-medium leading-tight tracking-tight"
+              style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+            >
               Wo dein Geld wirklich landet.
             </h2>
-            <p className="text-ink-500 max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto" style={{ color: '#64748B' }}>
               Mensaena hat keine Werbung, keine Investoren, keine bezahlten Mitarbeiter:innen.
               Jeder Cent fließt direkt in den Betrieb.
             </p>
@@ -366,15 +461,18 @@ export default function SpendenClient() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
             {COSTS.map(({ label, value, icon: Icon }, i) => (
-              <article key={label} className="border-t border-stone-300 pt-8">
+              <article key={label} className="pt-8" style={{ borderTop: '1px solid rgba(199,147,99,0.15)' }}>
                 <div className="flex items-baseline justify-between mb-5">
                   <span className="meta-label meta-label--subtle">{String(i + 1).padStart(2, '0')}</span>
-                  <Icon className="w-5 h-5 text-primary-600" aria-hidden="true" />
+                  <Icon className="w-5 h-5" style={{ color: '#c79363' }} aria-hidden="true" />
                 </div>
-                <h3 className="font-display text-2xl text-ink-800 leading-tight mb-2">
+                <h3
+                  className="text-2xl leading-tight mb-2"
+                  style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+                >
                   {label}
                 </h3>
-                <p className="text-ink-500 text-sm">
+                <p className="text-sm" style={{ color: '#64748B' }}>
                   {value}
                 </p>
               </article>
@@ -385,19 +483,36 @@ export default function SpendenClient() {
 
       {/* ─── Supporter Badge ──────────────────────────────────────── */}
       <section className="px-6 md:px-10 pb-24">
-        <div className="max-w-4xl mx-auto bg-gradient-to-br from-mn-amber/12 via-mn-amber-warm/4 to-mn-amber-warm/8 border border-amber-200 rounded-3xl p-8 md:p-12 relative overflow-hidden">
-          <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-200/40 blur-3xl pointer-events-none" aria-hidden="true" />
+        <div
+          className="max-w-4xl mx-auto rounded-3xl p-8 md:p-12 relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, rgba(199,147,99,0.08) 0%, rgba(22,32,53,0.85) 60%)',
+            border: '1px solid rgba(199,147,99,0.20)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.40)',
+          }}
+        >
+          <div
+            className="absolute -top-12 -right-12 w-48 h-48 rounded-full pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(199,147,99,0.15) 0%, transparent 70%)', filter: 'blur(30px)' }}
+            aria-hidden="true"
+          />
           <div className="relative flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-shrink-0 w-24 h-24 rounded-3xl bg-white border-2 border-amber-300 flex items-center justify-center shadow-amber-200 shadow-lg">
-              <Heart className="w-10 h-10 text-amber-500 fill-amber-400" />
+            <div
+              className="flex-shrink-0 w-24 h-24 rounded-3xl flex items-center justify-center"
+              style={{ background: 'rgba(199,147,99,0.10)', border: '2px solid rgba(199,147,99,0.30)' }}
+            >
+              <Heart className="w-10 h-10" style={{ color: '#c79363', fill: 'rgba(199,147,99,0.30)' }} />
             </div>
             <div className="flex-1 text-center md:text-left">
-              <div className="meta-label text-amber-700 mb-2">— Dankeschön</div>
-              <h3 className="font-display text-2xl md:text-3xl text-ink-800 leading-tight mb-3">
+              <div className="meta-label mb-2" style={{ color: '#c79363' }}>— Dankeschön</div>
+              <h3
+                className="text-2xl md:text-3xl leading-tight mb-3"
+                style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+              >
                 Das goldene Herz für Unterstützer:innen
               </h3>
-              <p className="text-ink-600 leading-relaxed text-sm md:text-base">
-                Spender:innen erhalten ein <strong>goldenes Herz-Badge</strong> im Profil &mdash;
+              <p className="leading-relaxed text-sm md:text-base" style={{ color: '#94A3B8' }}>
+                Spender:innen erhalten ein <strong style={{ color: '#ece5d6' }}>goldenes Herz-Badge</strong> im Profil —
                 ein dezent leuchtendes Dankeschön von der gesamten Community.
                 Sichtbar nach Anforderung der Spendenbescheinigung.
               </p>
@@ -410,55 +525,78 @@ export default function SpendenClient() {
       <section className="px-6 md:px-10 pb-24">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <div className="meta-label mb-3 text-primary-700">— Dankeschön-Stufen</div>
-            <h2 className="display-lg mb-4">Was du mit deiner Spende freischaltest.</h2>
-            <p className="text-ink-500 text-sm max-w-xl mx-auto">
+            <div className="meta-label mb-3" style={{ color: '#c79363' }}>— Dankeschön-Stufen</div>
+            <h2
+              className="mb-4 text-3xl md:text-4xl font-medium leading-tight tracking-tight"
+              style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+            >
+              Was du mit deiner Spende freischaltest.
+            </h2>
+            <p className="text-sm max-w-xl mx-auto" style={{ color: '#64748B' }}>
               Jede Spende hilft Mensaena – und schaltet stufenweise Community-Funktionen im Chat frei.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {([
-              { tier: 1, emoji: '🤍', name: 'Unterstützer', threshold: '1 Spende oder ab 5 €', color: 'border-gray-200 bg-white', active: 'border-mn-amber/20 bg-primary-50', features: [
+              { tier: 1, emoji: '🤍', name: 'Unterstützer', threshold: '1 Spende oder ab 5 €', features: [
                 { icon: MessageCircle, label: 'Spender-Badge im Chat' },
               ]},
-              { tier: 2, emoji: '💛', name: 'Förderer', threshold: '3 Spenden oder ab 25 €', color: 'border-gray-200 bg-white', active: 'border-white/8 bg-mn-surface', features: [
+              { tier: 2, emoji: '💛', name: 'Förderer', threshold: '3 Spenden oder ab 25 €', features: [
                 { icon: BarChart2, label: 'Umfragen erstellen' },
                 { icon: MessageCircle, label: 'Eigenen Kanal anlegen' },
               ]},
-              { tier: 3, emoji: '🧡', name: 'Partner', threshold: '5 Spenden oder ab 50 €', color: 'border-gray-200 bg-white', active: 'border-white/8 bg-mn-surface', features: [
+              { tier: 3, emoji: '🧡', name: 'Partner', threshold: '5 Spenden oder ab 50 €', features: [
                 { icon: Radio, label: 'Livestream-Events planen' },
                 { icon: Megaphone, label: 'Ankündigungen posten' },
               ]},
-              { tier: 4, emoji: '❤️', name: 'Botschafter', threshold: '10 Spenden oder ab 100 €', color: 'border-gray-200 bg-white', active: 'border-mn-herzrot/20 bg-mn-surface', features: [
+              { tier: 4, emoji: '❤️', name: 'Botschafter', threshold: '10 Spenden oder ab 100 €', features: [
                 { icon: Star, label: 'Post-Boost' },
                 { icon: Users, label: 'Profil-Banner' },
               ]},
-            ] as const).map(({ tier, emoji, name, threshold, color, active, features }) => {
+            ] as const).map(({ tier, emoji, name, threshold, features }) => {
               const isCurrent = myTier === tier
               const isDone    = myTier > tier
               return (
-                <div key={tier} className={cn(
-                  'rounded-2xl border-2 p-5 transition-all relative',
-                  isCurrent ? active : isDone ? 'border-white/10 bg-primary-50/40' : color
-                )}>
+                <div
+                  key={tier}
+                  className="rounded-2xl p-5 transition-all relative"
+                  style={{
+                    background: isCurrent
+                      ? 'linear-gradient(150deg, rgba(199,147,99,0.12) 0%, rgba(22,32,53,0.85) 100%)'
+                      : isDone
+                        ? 'rgba(22,32,53,0.60)'
+                        : 'rgba(22,32,53,0.80)',
+                    border: isCurrent
+                      ? '2px solid rgba(199,147,99,0.35)'
+                      : isDone
+                        ? '1px solid rgba(255,255,255,0.06)'
+                        : '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
                   {isCurrent && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-primary-600 text-white px-3 py-1 rounded-full">
+                    <span
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+                      style={{ background: '#c79363', color: '#0a1420' }}
+                    >
                       Deine Stufe
                     </span>
                   )}
                   {isDone && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-gray-400 text-white px-3 py-1 rounded-full">
+                    <span
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+                      style={{ background: 'rgba(100,116,139,0.40)', color: '#94A3B8', border: '1px solid rgba(255,255,255,0.08)' }}
+                    >
                       Erreicht ✓
                     </span>
                   )}
                   <div className="text-3xl mb-2">{emoji}</div>
-                  <p className="font-bold text-ink-900 text-sm mb-1">{name}</p>
-                  <p className="text-[11px] text-ink-400 mb-3">{threshold}</p>
+                  <p className="font-bold text-sm mb-1" style={{ color: '#F8FAFC' }}>{name}</p>
+                  <p className="text-[11px] mb-3" style={{ color: '#64748B' }}>{threshold}</p>
                   <ul className="space-y-1.5">
                     {features.map(({ icon: Icon, label }) => (
-                      <li key={label} className="flex items-center gap-2 text-xs text-ink-600">
-                        <Icon className="w-3.5 h-3.5 text-primary-500 flex-shrink-0" />
+                      <li key={label} className="flex items-center gap-2 text-xs" style={{ color: '#94A3B8' }}>
+                        <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#c79363' }} />
                         {label}
                       </li>
                     ))}
@@ -475,17 +613,25 @@ export default function SpendenClient() {
             const neededTotal = myTier + 1 === 1 ? 5 : myTier + 1 === 2 ? 25 : myTier + 1 === 3 ? 50 : 100
             const progress = Math.min(myCount / neededCount, 1)
             return (
-              <div className="bg-white border border-stone-200 rounded-2xl p-5 max-w-lg mx-auto text-center">
-                <p className="text-sm text-ink-600 mb-3">
-                  Noch <strong>{Math.max(neededCount - myCount, 0)} Spenden</strong> oder{' '}
-                  <strong>{Math.max(neededTotal - myTotal, 0).toFixed(0)} €</strong> bis{' '}
-                  {next.emoji} <strong>{next.name}</strong>
+              <div
+                className="rounded-2xl p-5 max-w-lg mx-auto text-center"
+                style={{
+                  background: 'rgba(22,32,53,0.80)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <p className="text-sm mb-3" style={{ color: '#94A3B8' }}>
+                  Noch <strong style={{ color: '#ece5d6' }}>{Math.max(neededCount - myCount, 0)} Spenden</strong> oder{' '}
+                  <strong style={{ color: '#ece5d6' }}>{Math.max(neededTotal - myTotal, 0).toFixed(0)} €</strong> bis{' '}
+                  {next.emoji} <strong style={{ color: '#c79363' }}>{next.name}</strong>
                 </p>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
-                  <div className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all"
-                    style={{ width: `${progress * 100}%` }} />
+                <div className="h-1.5 rounded-full overflow-hidden mb-1" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${progress * 100}%`, background: 'linear-gradient(90deg, #c79363, #d4a472)' }}
+                  />
                 </div>
-                <p className="text-[11px] text-ink-400">{myCount}/{neededCount} Spenden</p>
+                <p className="text-[11px]" style={{ color: '#64748B' }}>{myCount}/{neededCount} Spenden</p>
               </div>
             )
           })()}
@@ -502,16 +648,16 @@ export default function SpendenClient() {
       {/* ─── Footer Note ──────────────────────────────────────────── */}
       <footer className="px-6 md:px-10 pb-20">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-[13px] text-ink-400 leading-relaxed">
+          <p className="text-[13px] leading-relaxed" style={{ color: '#64748B' }}>
             Mensaena ist derzeit nicht als gemeinnützig im Sinne der Abgabenordnung anerkannt.
-            Spenden sind daher <strong>nicht</strong> steuerlich absetzbar &mdash; wir arbeiten daran.
+            Spenden sind daher <strong style={{ color: '#94A3B8' }}>nicht</strong> steuerlich absetzbar — wir arbeiten daran.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-4 text-xs text-ink-400">
-            <Link href="/impressum" className="hover:text-primary-700 transition-colors">Impressum</Link>
+          <div className="mt-8 flex items-center justify-center gap-4 text-xs" style={{ color: '#64748B' }}>
+            <Link href="/impressum" className="transition-colors hover:text-mn-paper">Impressum</Link>
             <span aria-hidden="true">·</span>
-            <Link href="/datenschutz" className="hover:text-primary-700 transition-colors">Datenschutz</Link>
+            <Link href="/datenschutz" className="transition-colors hover:text-mn-paper">Datenschutz</Link>
             <span aria-hidden="true">·</span>
-            <a href="mailto:info@mensaena.de" className="hover:text-primary-700 transition-colors">info@mensaena.de</a>
+            <a href="mailto:info@mensaena.de" className="transition-colors hover:text-mn-paper">info@mensaena.de</a>
           </div>
         </div>
       </footer>
@@ -536,20 +682,32 @@ function TierPreview({ amount }: { amount: number }) {
   const Icon = tier.icon
 
   return (
-    <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 flex items-start gap-4">
-      <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-white border border-stone-200 flex items-center justify-center">
-        <Icon className="w-5 h-5 text-primary-600" />
+    <div
+      className="rounded-2xl p-5 flex items-start gap-4"
+      style={{
+        background: 'rgba(22,32,53,0.70)',
+        border: '1px solid rgba(199,147,99,0.15)',
+      }}
+    >
+      <div
+        className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
+        style={{ background: 'rgba(199,147,99,0.10)', border: '1px solid rgba(199,147,99,0.20)' }}
+      >
+        <Icon className="w-5 h-5" style={{ color: '#c79363' }} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="font-semibold text-ink-800 text-sm">{tier.label}</span>
+          <span className="font-semibold text-sm" style={{ color: '#F8FAFC' }}>{tier.label}</span>
           {tier.popular && (
-            <span className="text-xs uppercase tracking-wider font-semibold bg-primary-500 text-white px-2 py-0.5 rounded-full">
+            <span
+              className="text-xs uppercase tracking-wider font-bold px-2 py-0.5 rounded-full"
+              style={{ background: '#c79363', color: '#0a1420' }}
+            >
               Beliebt
             </span>
           )}
         </div>
-        <p className="text-sm text-ink-500 leading-relaxed">{tier.impact}</p>
+        <p className="text-sm leading-relaxed" style={{ color: '#64748B' }}>{tier.impact}</p>
       </div>
     </div>
   )
@@ -564,7 +722,7 @@ function TrustItem({
 }) {
   return (
     <li className="inline-flex items-center gap-1.5">
-      <Icon className="h-3.5 w-3.5 text-primary-600" aria-hidden="true" />
+      <Icon className="h-3.5 w-3.5" style={{ color: '#c79363' }} aria-hidden="true" />
       <span className="font-medium tracking-wide">{label}</span>
     </li>
   )
@@ -572,7 +730,7 @@ function TrustItem({
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex justify-between items-center py-2.5 border-b border-stone-100 last:border-0">
+    <div className="flex justify-between items-center py-2.5 last:border-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       <dt className="meta-label meta-label--subtle">{label}</dt>
       <dd>{children}</dd>
     </div>
@@ -587,30 +745,44 @@ function ReceiptRequestSection() {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="bg-white rounded-3xl border border-stone-200 shadow-soft overflow-hidden">
+    <div
+      className="rounded-3xl overflow-hidden"
+      style={{
+        background: 'linear-gradient(150deg, rgba(22,32,53,0.82) 0%, rgba(15,22,40,0.92) 100%)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.35)',
+      }}
+    >
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between gap-4 p-6 md:p-8 text-left hover:bg-stone-50 transition-colors"
+        className="w-full flex items-center justify-between gap-4 p-6 md:p-8 text-left transition-colors"
+        style={{ background: 'transparent' }}
         aria-expanded={open}
       >
         <div className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-2xl bg-stone-100 flex items-center justify-center">
-            <FileText className="w-5 h-5 text-ink-700" />
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(100,116,139,0.15)', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <FileText className="w-5 h-5" style={{ color: '#94A3B8' }} />
           </div>
           <div>
-            <h3 className="font-display text-xl text-ink-800 leading-tight">
+            <h3
+              className="text-xl leading-tight"
+              style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F8FAFC' }}
+            >
               Spendenbescheinigung anfordern
             </h3>
-            <p className="text-xs text-ink-500 mt-0.5">
-              Per E-Mail &mdash; als Zahlungsnachweis (nicht steuerlich absetzbar)
+            <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>
+              Per E-Mail — als Zahlungsnachweis (nicht steuerlich absetzbar)
             </p>
           </div>
         </div>
-        <ChevronDown className={cn('w-5 h-5 text-ink-400 transition-transform flex-shrink-0', open && 'rotate-180')} />
+        <ChevronDown className={cn('w-5 h-5 transition-transform flex-shrink-0', open && 'rotate-180')} style={{ color: '#64748B' }} />
       </button>
 
       {open && (
-        <div className="border-t border-stone-200 p-6 md:p-8">
+        <div className="p-6 md:p-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <ReceiptRequestForm />
         </div>
       )}
@@ -666,16 +838,20 @@ function ReceiptRequestForm() {
   if (sent) {
     return (
       <div className="flex flex-col items-center gap-4 py-6 text-center">
-        <div className="w-14 h-14 rounded-full bg-primary-50 border border-white/10 flex items-center justify-center">
-          <Check className="w-7 h-7 text-primary-600" />
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(199,147,99,0.10)', border: '1px solid rgba(199,147,99,0.25)' }}
+        >
+          <Check className="w-7 h-7" style={{ color: '#c79363' }} />
         </div>
         <div>
-          <p className="font-semibold text-ink-800">Bescheinigung wurde versendet!</p>
-          <p className="text-sm text-ink-500 mt-1">Bitte prüfe dein Postfach (auch Spam).</p>
+          <p className="font-semibold" style={{ color: '#F8FAFC' }}>Bescheinigung wurde versendet!</p>
+          <p className="text-sm mt-1" style={{ color: '#64748B' }}>Bitte prüfe dein Postfach (auch Spam).</p>
         </div>
         <button
           onClick={() => { setSent(false); setName(''); setEmail(''); setAmount(''); setAddress('') }}
-          className="text-sm text-primary-700 hover:underline mt-2"
+          className="text-sm hover:underline mt-2 transition-colors"
+          style={{ color: '#c79363' }}
         >
           Weitere Anfrage stellen
         </button>
@@ -746,7 +922,13 @@ function ReceiptRequestForm() {
       <button
         type="submit"
         disabled={sending || !name.trim() || !email.trim() || !amount}
-        className="group w-full inline-flex items-center justify-center gap-2 bg-ink-900 hover:bg-ink-800 disabled:opacity-50 disabled:pointer-events-none text-paper px-6 py-3.5 rounded-full text-sm font-medium tracking-wide transition-colors"
+        className="group w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-medium tracking-wide transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, #c79363 0%, #d4a472 50%, #c79363 100%)',
+          color: '#0a1420',
+          border: '1px solid rgba(212,164,114,0.40)',
+          boxShadow: '0 4px 16px rgba(199,147,99,0.28)',
+        }}
       >
         {sending
           ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -765,8 +947,8 @@ function Field({
     <label className="block">
       <span className="meta-label meta-label--subtle mb-1.5 block">
         {label}
-        {required && <span className="text-primary-600 ml-1">*</span>}
-        {optional && <span className="text-ink-400 ml-1 normal-case tracking-normal">(optional)</span>}
+        {required && <span className="ml-1" style={{ color: '#c79363' }}>*</span>}
+        {optional && <span className="ml-1 normal-case tracking-normal" style={{ color: '#64748B' }}>(optional)</span>}
       </span>
       {children}
     </label>
