@@ -210,8 +210,10 @@ class _ChannelsList extends StatelessWidget {
         final filtered = query.isEmpty
             ? list
             : list
-                .where((c) =>
-                    ((c['name'] as String?) ?? '').toLowerCase().contains(query))
+                .where(
+                  (c) =>
+                      ((c['name'] as String?) ?? '').toLowerCase().contains(query),
+                )
                 .toList();
         return ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 16),

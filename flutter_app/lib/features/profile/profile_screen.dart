@@ -332,9 +332,9 @@ class _Header extends StatelessWidget {
               onPressed: onRate,
             ),
           const SizedBox(height: 16),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [
+            children: [
               CinemaStat(value: 0, label: 'Beitraege'),
               CinemaStat(value: 0, label: 'Geholfen'),
               CinemaStat(value: 0, label: 'Erhalten'),
@@ -673,7 +673,7 @@ class _ActivityTab extends ConsumerWidget {
                         color: MnColors.amber.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(LucideIcons.handshake, color: MnColors.amber, size: 18),
+                      child: const Icon(LucideIcons.gift, color: MnColors.amber, size: 18),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
