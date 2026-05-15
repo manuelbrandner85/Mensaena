@@ -20,6 +20,9 @@ import 'features/legal/impressum_screen.dart';
 import 'features/map/map_screen.dart';
 import 'features/modules/all_modules.dart';
 import 'features/modules/detail_screens.dart';
+import 'features/modules/mental_support_screen.dart';
+import 'features/modules/timebank_screen.dart';
+import 'features/modules/warnungen_screen.dart';
 import 'features/notifications/notifications_screen.dart';
 import 'features/posts/post_create_screen.dart';
 import 'features/posts/post_detail_screen.dart';
@@ -242,8 +245,10 @@ List<RouteBase> _buildRoutes() => [
         ),
       ),
       _moduleRoute('/modules/badges', const BadgesModule()),
-      _moduleRoute('/modules/zeitbank', const ZeitbankModule()),
+      _moduleRoute('/modules/zeitbank', const TimebankScreen()),
       _moduleRoute('/modules/skills', const SkillsModule()),
+      _moduleRoute('/modules/mental-support', const MentalSupportScreen()),
+      _moduleRoute('/modules/warnungen', const WarnungenScreen()),
 
       GoRoute(
         path: '/admin',
