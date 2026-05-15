@@ -12,7 +12,6 @@ import '../../core/widgets/cinema_input.dart';
 import '../../core/widgets/cinema_loading_skeleton.dart';
 import '../../core/widgets/cinema_select.dart';
 import '../../core/widgets/cinema_sheet.dart';
-import '../../core/widgets/cinema_stat.dart';
 import '../../core/widgets/cinema_toast.dart';
 import '../../core/widgets/glow_button.dart';
 import '../../providers/auth_provider.dart';
