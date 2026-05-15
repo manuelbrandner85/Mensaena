@@ -10,6 +10,7 @@ import 'core/transitions/cinema_page_route.dart';
 import 'features/admin/admin_screen.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/board/board_screen.dart';
+import 'features/chat/channels_screen.dart';
 import 'features/chat/chat_screen.dart' as chat_view;
 import 'features/chat/conversations_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
@@ -129,6 +130,13 @@ List<RouteBase> _buildRoutes() => [
         ),
       ),
       GoRoute(
+        path: '/chat/channels',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: const ChannelsScreen(),
+          state: state,
+        ),
+      ),
+      GoRoute(
         path: '/chat/:conversationId',
         pageBuilder: (ctx, state) => CinemaPageTransition.build(
           child: chat_view.ChatScreen(
@@ -191,6 +199,13 @@ List<RouteBase> _buildRoutes() => [
         path: '/modules/wissen/:articleId',
         pageBuilder: (ctx, state) => CinemaPageTransition.build(
           child: WikiArticleScreen(articleId: state.pathParameters['articleId']!),
+          state: state,
+        ),
+      ),
+      GoRoute(
+        path: '/modules/wissen/:articleId/edit',
+        pageBuilder: (ctx, state) => CinemaPageTransition.build(
+          child: WikiArticleEditScreen(articleId: state.pathParameters['articleId']!),
           state: state,
         ),
       ),
