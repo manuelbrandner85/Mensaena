@@ -58,7 +58,7 @@ export default function CinemaLayout({
 
   return (
     <SmoothScroll>
-      <div className="relative min-h-screen bg-mn-void text-mn-ink font-sans antialiased selection:bg-mn-amber/20">
+      <div className="relative min-h-screen bg-mn-void text-mn-ink font-sans antialiased selection:bg-mn-bronze/20">
         {/* Three.js atmosphere — lazy, only when motion is OK */}
         {!reducedMotion && (
           <AtmosphericCanvas fireflies={fireflies} asphalt={asphalt} />
@@ -71,7 +71,7 @@ export default function CinemaLayout({
             className="pointer-events-none fixed inset-0 z-0"
             style={{
               background: `
-                radial-gradient(circle at 30% 20%, rgba(245,158,11,0.05), transparent 55%),
+                radial-gradient(circle at 30% 20%, rgba(199,147,99,0.05), transparent 55%),
                 radial-gradient(circle at 70% 80%, rgba(14,165,233,0.04), transparent 55%),
                 #0A0F1C
               `,

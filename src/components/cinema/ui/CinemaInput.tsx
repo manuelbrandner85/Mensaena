@@ -48,7 +48,7 @@ export const CinemaInput = forwardRef<HTMLInputElement, InputProps>(function Cin
             'w-full bg-mn-surface border rounded-input text-mn-ink placeholder:text-mn-ghost',
             'px-4 py-2.5 text-sm',
             'transition-all duration-150',
-            'focus:outline-none focus:border-mn-amber/30 focus:shadow-input-focus',
+            'focus:outline-none focus:border-mn-bronze/30 focus:shadow-input-focus',
             error ? 'border-mn-herzrot/40 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.08)]' : 'border-white/7',
             (leadingIcon || isSearch) && 'pl-10',
             (trailingIcon || isPassword) && 'pr-10',
@@ -106,7 +106,7 @@ export const CinemaTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(fun
           'w-full bg-mn-surface border rounded-input text-mn-ink placeholder:text-mn-ghost',
           'px-4 py-3 text-sm resize-none',
           'transition-all duration-150',
-          'focus:outline-none focus:border-mn-amber/30 focus:shadow-input-focus',
+          'focus:outline-none focus:border-mn-bronze/30 focus:shadow-input-focus',
           error ? 'border-mn-herzrot/40' : 'border-white/7',
           className,
         )}

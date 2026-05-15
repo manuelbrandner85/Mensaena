@@ -31,7 +31,7 @@ export default function LandingHero() {
           maxWidth: '900px',
           maxHeight: '900px',
           background:
-            'radial-gradient(circle, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0.08) 30%, transparent 65%)',
+            'radial-gradient(circle, rgba(199,147,99,0.18) 0%, rgba(199,147,99,0.08) 30%, transparent 65%)',
           filter: 'blur(60px)',
           animation: 'ambientBreath1 32s ease-in-out infinite',
           zIndex: 0,
@@ -49,7 +49,7 @@ export default function LandingHero() {
           maxWidth: '800px',
           maxHeight: '800px',
           background:
-            'radial-gradient(circle, rgba(125,211,252,0.12) 0%, rgba(125,211,252,0.04) 35%, transparent 70%)',
+            'radial-gradient(circle, rgba(43,86,99,0.12) 0%, rgba(43,86,99,0.04) 35%, transparent 70%)',
           filter: 'blur(80px)',
           animation: 'ambientBreath2 38s ease-in-out 6s infinite',
           zIndex: 0,
@@ -61,7 +61,7 @@ export default function LandingHero() {
         aria-hidden="true"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(245,158,11,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.08) 1px, transparent 1px)',
+            'linear-gradient(rgba(199,147,99,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(199,147,99,0.08) 1px, transparent 1px)',
           backgroundSize: '64px 64px',
           maskImage:
             'radial-gradient(ellipse 75% 65% at 30% 42%, rgba(0,0,0,0.6) 15%, rgba(0,0,0,0.18) 55%, transparent 100%)',
@@ -87,8 +87,8 @@ export default function LandingHero() {
               left: f.left,
               width: f.size,
               height: f.size,
-              background: '#FBBF24',
-              boxShadow: `0 0 ${f.size * 4}px rgba(251,191,36,0.85), 0 0 ${f.size * 8}px rgba(251,191,36,0.40)`,
+              background: '#c79363',
+              boxShadow: `0 0 ${f.size * 4}px rgba(199,147,99,0.75), 0 0 ${f.size * 8}px rgba(199,147,99,0.35)`,
               animation: `firefly 8s ease-in-out ${f.delay} infinite`,
             }}
           />
@@ -121,7 +121,7 @@ export default function LandingHero() {
             fontSize: 'clamp(2.75rem, 7vw, 5.75rem)',
             lineHeight: 1.02,
             letterSpacing: '-0.035em',
-            color: '#F5F0E8',
+            color: '#ece5d6',
           }}
         >
           {t('heroHeadline')}
@@ -129,7 +129,7 @@ export default function LandingHero() {
 
         {/* Subtext */}
         <p className="reveal reveal-delay-2 mt-10 max-w-lg text-lg md:text-xl leading-relaxed"
-          style={{ color: 'rgba(245,240,232,0.82)' }}>
+          style={{ color: 'rgba(236,229,214,0.82)' }}>
           {t('heroText')}
         </p>
 
@@ -137,7 +137,7 @@ export default function LandingHero() {
         <div className="reveal reveal-delay-3 mt-14 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
           <Link
             href="/auth?mode=register"
-            className="cta-cinema-amber group inline-flex items-center gap-3 text-mn-void px-8 py-4 rounded-full text-sm font-medium tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+            className="cta-cinema-amber group inline-flex items-center gap-3 text-mn-void px-8 py-4 rounded-full text-sm font-medium tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
           >
             {t('heroCtaPrimary')}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -146,7 +146,7 @@ export default function LandingHero() {
           {APK_DOWNLOAD_ENABLED && (
             <button
               onClick={() => smoothScroll('app-download')}
-              className="cta-cinema-ghost group inline-flex items-center gap-3 px-8 py-4 rounded-full text-sm font-medium tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+              className="cta-cinema-ghost group inline-flex items-center gap-3 px-8 py-4 rounded-full text-sm font-medium tracking-wide focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             >
               <span aria-hidden="true">📱</span>
               App holen
@@ -156,8 +156,8 @@ export default function LandingHero() {
 
           <button
             onClick={() => smoothScroll('features')}
-            className="text-sm font-medium transition-colors duration-400 inline-flex items-center gap-2.5 hover:text-mn-amber focus:outline-none focus-visible:text-mn-amber rounded"
-            style={{ color: 'rgba(245,240,232,0.65)' }}
+            className="text-sm font-medium transition-colors duration-400 inline-flex items-center gap-2.5 hover:text-mn-bronze focus:outline-none focus-visible:text-mn-bronze rounded"
+            style={{ color: 'rgba(236,229,214,0.65)' }}
           >
             <span
               className="inline-block h-px bg-current opacity-40"
@@ -169,7 +169,7 @@ export default function LandingHero() {
 
         {/* Hero stats strip */}
         <div className="reveal reveal-delay-4 mt-24 md:mt-32 grid grid-cols-1 sm:grid-cols-3 max-w-2xl border-t pt-8"
-          style={{ borderColor: 'rgba(245,158,11,0.15)' }}>
+          style={{ borderColor: 'rgba(199,147,99,0.15)' }}>
           <HeroFact label={t('heroFactLabel1')} value={t('heroFactValue1')} />
           <HeroFact label={t('heroFactLabel2')} value={t('heroFactValue2')} />
           <HeroFact label={t('heroFactLabel3')} value={t('heroFactValue3')} last />
@@ -180,7 +180,7 @@ export default function LandingHero() {
       <div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2.5"
         aria-hidden="true"
-        style={{ color: 'rgba(245,240,232,0.50)' }}
+        style={{ color: 'rgba(236,229,214,0.50)' }}
       >
         <span
           className="font-mono text-[0.62rem] tracking-[0.22em] uppercase"
@@ -188,7 +188,7 @@ export default function LandingHero() {
         <span
           className="block w-px h-12"
           style={{
-            background: 'linear-gradient(to bottom, rgba(245,158,11,0.45), transparent)',
+            background: 'linear-gradient(to bottom, rgba(199,147,99,0.45), transparent)',
             animation: 'pulse 2.8s ease-in-out infinite',
           }}
         />
@@ -208,14 +208,14 @@ function HeroFact({
 }) {
   return (
     <div className={`cinema-hero-fact-item py-6 sm:py-0 sm:px-7 first:pl-0 last:pr-0 ${last ? '' : 'border-b sm:border-b-0'}`}
-      style={{ borderColor: 'rgba(245,158,11,0.12)' }}
+      style={{ borderColor: 'rgba(199,147,99,0.12)' }}
     >
       <div className="cinema-meta-label cinema-meta-label--subtle mb-2.5">{label}</div>
       <div
         style={{
           fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
           fontSize: 'clamp(1.25rem, 2vw, 1.5rem)',
-          color: '#F5F0E8',
+          color: '#ece5d6',
           letterSpacing: '-0.02em',
         }}
       >{value}</div>

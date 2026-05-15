@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Fraunces, JetBrains_Mono, DM_Serif_Display } from 'next/font/google'
+import { Instrument_Serif, Geist, Geist_Mono, Fraunces } from 'next/font/google'
 import '@/styles/globals.css'
 
 // next/font self-hosts Google Fonts at build time and swap-loads them to
 // improve LCP. Single CSS file, preload hints, and correct subset pruning
 // replace ~10 @fontsource CSS imports.
-const inter = Inter({
+const geist = Geist({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
   preload: true,
@@ -21,18 +20,18 @@ const fraunces = Fraunces({
   preload: true,
 })
 
-const jetbrainsMono = JetBrains_Mono({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '500'],
   variable: '--font-mono',
   display: 'swap',
   preload: false,
 })
 
-// Cinema display serif (Nacht-Nachbarschaft / Landing-Hero).
-const dmSerifDisplay = DM_Serif_Display({
+// Cinematic editorial serif — Instrument Serif for landing / editorial.
+const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: ['400'],
+  style: ['normal', 'italic'],
   variable: '--font-cinema',
   display: 'swap',
   preload: true,
@@ -169,7 +168,7 @@ export default async function RootLayout({
   return (
     <html
       lang="de"
-      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable} ${dmSerifDisplay.variable}`}
+      className={`${geist.variable} ${fraunces.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
     >
       <head>
         {/* ── Favicon & Icons ── */}

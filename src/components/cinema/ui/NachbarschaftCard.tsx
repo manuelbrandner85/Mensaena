@@ -52,7 +52,7 @@ export default function NachbarschaftCard({ post, onLike, compact, className }: 
       ref={ref}
       className={cn(
         'group relative bg-mn-elevated rounded-card border border-white/5 shadow-cinema-card',
-        'hover:border-mn-amber/15 hover:shadow-cinema-card-hover hover:scale-[1.003]',
+        'hover:border-mn-bronze/15 hover:shadow-cinema-card-hover hover:scale-[1.003]',
         'transition-all duration-300 overflow-hidden',
         className,
       )}
@@ -62,7 +62,7 @@ export default function NachbarschaftCard({ post, onLike, compact, className }: 
       <div
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{
-          background: 'radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(245,158,11,0.04) 0%, transparent 60%)',
+          background: 'radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(199,147,99,0.04) 0%, transparent 60%)',
         }}
         aria-hidden
       />
@@ -77,7 +77,7 @@ export default function NachbarschaftCard({ post, onLike, compact, className }: 
               </CinemaBadge>
             )}
             {post.pinned && (
-              <span className="text-[10px] font-mono text-mn-amber uppercase tracking-wide">Gepinnt</span>
+              <span className="text-[10px] font-mono text-mn-bronze uppercase tracking-wide">Gepinnt</span>
             )}
           </div>
           <button className="p-1 rounded-lg text-mn-ghost hover:text-mn-ink-soft hover:bg-mn-elevated/5 transition-colors" aria-label="Mehr Optionen">
@@ -99,7 +99,7 @@ export default function NachbarschaftCard({ post, onLike, compact, className }: 
         {/* Content */}
         <Link href={`/posts/${post.id}`} className="block group/link">
           {post.title && (
-            <h3 className="text-base font-semibold text-mn-ink mb-1.5 group-hover/link:text-mn-amber transition-colors duration-200">
+            <h3 className="text-base font-semibold text-mn-ink mb-1.5 group-hover/link:text-mn-bronze transition-colors duration-200">
               {post.title}
             </h3>
           )}

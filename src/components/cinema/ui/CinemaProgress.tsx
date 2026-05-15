@@ -14,7 +14,7 @@ interface CinemaProgressProps {
 }
 
 const fills = {
-  amber:  'from-mn-amber to-mn-amber-warm',
+  amber:  'from-mn-bronze to-mn-bronze-warm',
   teal:   'from-mn-teal to-mn-teal-soft',
   herzrot:'from-mn-herzrot to-mn-herzrot-warm',
   leben:  'from-mn-leben to-mn-leben-soft',
@@ -48,7 +48,7 @@ export default function CinemaProgress({
       {(label || showValue) && (
         <div className="flex justify-between mb-1.5 text-xs text-mn-mute">
           {label && <span>{label}</span>}
-          {showValue && <span className="font-mono text-mn-amber">{Math.round((value / max) * 100)}%</span>}
+          {showValue && <span className="font-mono text-mn-bronze">{Math.round((value / max) * 100)}%</span>}
         </div>
       )}
       <div className="h-2 bg-mn-surface rounded-full overflow-hidden">

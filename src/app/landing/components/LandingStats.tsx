@@ -110,23 +110,23 @@ export default function LandingStats() {
       <div className="max-w-6xl mx-auto">
         <div className="reveal cinema-meta-label mb-16">{t('statsMeta')}</div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-20 md:gap-y-28">
+        <div className="grid grid-cols-2 md:grid-cols-4 border-t border-b" style={{ borderColor: 'rgba(199,147,99,0.15)' }}>
           {statConfig.map((s, i) => (
             <StatItem key={s.key} end={stats[s.key]} label={s.label} started={isVisible} index={i} />
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-2 mt-6 text-sm" style={{ color: 'rgba(245,240,232,0.65)' }}>
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm" style={{ color: 'rgba(236,229,214,0.65)' }}>
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mn-amber opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-mn-amber" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mn-bronze opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-mn-bronze" />
           </span>
           <span>{t('statsLive')}</span>
           {onlineCount > 0 && (
             <>
-              <span aria-hidden="true" style={{ color: 'rgba(245,240,232,0.40)' }}>·</span>
+              <span aria-hidden="true" style={{ color: 'rgba(236,229,214,0.40)' }}>·</span>
               <span>
-                <span className="font-medium" style={{ color: 'rgba(245,240,232,0.65)' }}>{formatNumber(onlineCount)}</span>{' '}
+                <span className="font-medium" style={{ color: 'rgba(236,229,214,0.65)' }}>{formatNumber(onlineCount)}</span>{' '}
                 {onlineCount === 1 ? t('statsOnlineOne') : t('statsOnlineOther')}
               </span>
             </>
@@ -140,16 +140,20 @@ export default function LandingStats() {
 function StatItem({ end, label, started, index }: { end: number; label: string; started: boolean; index: number }) {
   const count = useCountUp(end, started)
   return (
-    <div className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col group`}>
-      <div className="flex items-baseline gap-3 pb-6 relative" style={{ borderBottom: '1px solid rgba(245,158,11,0.15)' }}>
+    <div
+      className={`reveal reveal-delay-${Math.min(index + 1, 5)} flex flex-col px-8 md:px-10 py-12 md:py-14 relative`}
+      style={{ borderRight: index < 3 ? '1px solid rgba(199,147,99,0.08)' : 'none' }}
+    >
+      <div className="cinema-meta-label cinema-meta-label--subtle mb-6">{label}</div>
+      <div className="flex items-baseline gap-2">
         <span
           style={{
             fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif',
             fontWeight: 400,
-            fontSize: 'clamp(4rem, 11vw, 9rem)',
-            lineHeight: 0.9,
-            letterSpacing: '-0.04em',
-            color: '#F5F0E8',
+            fontSize: 'clamp(3rem, 7vw, 7rem)',
+            lineHeight: 0.95,
+            letterSpacing: '-0.03em',
+            color: '#ece5d6',
           }}
         >
           {formatNumber(count)}
@@ -157,21 +161,13 @@ function StatItem({ end, label, started, index }: { end: number; label: string; 
         <span
           style={{
             fontFamily: 'var(--font-cinema), ui-serif, Georgia, serif',
-            fontSize: '1.5rem',
-            color: 'rgba(245,158,11,0.70)',
-            transform: 'translateY(-4px)',
-            display: 'inline-block',
+            fontSize: '1.2rem',
+            color: 'rgba(199,147,99,0.70)',
+            alignSelf: 'start',
+            paddingTop: '0.4em',
           }}
         >+</span>
-        <div
-          className="absolute bottom-0 left-0 right-0 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background:
-              'linear-gradient(90deg, rgba(245,158,11,0.45) 0%, rgba(245,158,11,0.12) 70%, transparent 100%)',
-          }}
-        />
       </div>
-      <div className="mt-6 cinema-meta-label cinema-meta-label--subtle">{label}</div>
     </div>
   )
 }

@@ -477,8 +477,8 @@
     letter-spacing: -0.04em;
     font-feature-settings: 'lnum', 'tnum';
     font-variation-settings: 'SOFT' 20, 'opsz' 144;
-    color: #FBBF24;
-    text-shadow: 0 2px 24px rgba(245,158,11,0.25);
+    color: #c79363;
+    text-shadow: 0 2px 24px rgba(199,147,99,0.25);
   }
 
   /* ── Editorial page title (dashboard + module pages) — cinema dark ── */
@@ -492,7 +492,7 @@
     font-optical-sizing: auto;
     font-variation-settings: 'SOFT' 25, 'opsz' 96;
     color: #F8FAFC;
-    text-shadow: 0 2px 24px rgba(245,158,11,0.15);
+    text-shadow: 0 2px 24px rgba(199,147,99,0.15);
   }
   .page-subtitle {
     font-family: var(--font-inter), system-ui, sans-serif;
@@ -722,7 +722,7 @@
     font-size: 0.72rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #FBBF24; /* mn-amber-warm */
+    color: #c79363; /* mn-bronze */
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
@@ -741,16 +741,15 @@
 
   /* ── Gradient word accent — warm amber for cinema dark theme ─────────── */
   .text-accent {
-    background: linear-gradient(140deg, #FBBF24 0%, #F59E0B 60%, #FCD34D 100%);
+    background: linear-gradient(140deg, #d4a472 0%, #c79363 60%, #e8c8a0 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
     font-style: italic;
-    font-weight: 500;
-    font-family: var(--font-display), ui-serif, Georgia, serif;
-    font-variation-settings: 'SOFT' 100, 'opsz' 144;
-    text-shadow: 0 0 32px rgba(245,158,11,0.25);
+    font-weight: 400;
+    font-family: var(--font-cinema, var(--font-display)), ui-serif, Georgia, serif;
+    text-shadow: none;
   }
 
   /* ── Section Titles (legacy helpers retained; new system above) ───── */
@@ -828,12 +827,12 @@
   .footer-link {
     display: inline-block;
     font-size: 0.875rem;
-    color: rgba(245, 240, 232, 0.38);
+    color: rgba(205, 196, 177, 0.45);
     transition: color 0.3s ease;
     font-feature-settings: 'ss01';
   }
   .footer-link:hover {
-    color: rgba(245, 158, 11, 0.75);
+    color: rgba(199, 147, 99, 0.85);
   }
 
   /* ── Sticky editorial section indicator (landing sidebar) ─────────── */
@@ -858,7 +857,7 @@
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    color: rgba(245, 240, 232, 0.28);
+    color: rgba(205, 196, 177, 0.35);
     transition: color 0.4s ease, opacity 0.4s ease;
     opacity: 1;
   }
@@ -871,7 +870,7 @@
   }
   .editorial-rail a:hover,
   .editorial-rail a.is-active {
-    color: rgba(245, 158, 11, 0.80);
+    color: rgba(199, 147, 99, 0.90);
     opacity: 1;
   }
   .editorial-rail a.is-active::before {
@@ -1703,15 +1702,15 @@
      wrapped in CinemaLayout (dark bg from AtmosphericCanvas / bg-mn-void)
      ════════════════════════════════════════════════════════════════════ */
 
-  /* Dark glass card — amber-rimmed depth surface */
+  /* Dark glass card — bronze-rimmed depth surface */
   .cinema-card {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(245, 158, 11, 0.14);
+    border: 1px solid rgba(199, 147, 99, 0.14);
     border-radius: 1.5rem;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow:
-      0 0 0 0.5px rgba(245, 158, 11, 0.07),
+      0 0 0 0.5px rgba(199, 147, 99, 0.07),
       0 2px 8px  rgba(0, 0, 0, 0.25),
       0 16px 40px rgba(0, 0, 0, 0.30),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -1722,23 +1721,23 @@
   }
   .cinema-card:hover {
     transform: translateY(-5px) scale(1.005);
-    border-color: rgba(245, 158, 11, 0.30);
+    border-color: rgba(199, 147, 99, 0.30);
     box-shadow:
-      0 0 0 0.5px rgba(245, 158, 11, 0.18),
+      0 0 0 0.5px rgba(199, 147, 99, 0.18),
       0 4px 16px  rgba(0, 0, 0, 0.30),
       0 24px 56px rgba(0, 0, 0, 0.40),
-      0 0 60px    rgba(245, 158, 11, 0.10),
+      0 0 60px    rgba(199, 147, 99, 0.10),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
-  /* Amber meta label — cinema version of .meta-label */
+  /* Bronze meta label — cinema version of .meta-label */
   .cinema-meta-label {
     font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
     font-weight: 500;
     font-size: 0.72rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: rgba(245, 158, 11, 0.80);
+    color: rgba(199, 147, 99, 0.80);
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
@@ -1748,13 +1747,13 @@
     display: inline-block;
     width: 2rem;
     height: 1px;
-    background: rgba(245, 158, 11, 0.50);
+    background: rgba(199, 147, 99, 0.50);
   }
   .cinema-meta-label--subtle {
-    color: rgba(245, 222, 179, 0.45);
+    color: rgba(205, 196, 177, 0.55);
   }
   .cinema-meta-label--subtle::before {
-    background: rgba(245, 222, 179, 0.25);
+    background: rgba(205, 196, 177, 0.30);
   }
 
   /* Cinema section — replaces LandingSection / section-separator on dark bg */
@@ -1771,19 +1770,22 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(245, 158, 11, 0.10) 15%,
-      rgba(245, 158, 11, 0.28) 50%,
-      rgba(245, 158, 11, 0.10) 85%,
+      rgba(199, 147, 99, 0.10) 15%,
+      rgba(199, 147, 99, 0.28) 50%,
+      rgba(199, 147, 99, 0.10) 85%,
       transparent 100%
     );
     pointer-events: none;
   }
 
-  /* Amber glow CTA — cinema primary action */
+  /* Bronze CTA — cinema primary action */
   .cta-cinema-amber {
     position: relative;
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    background: linear-gradient(135deg, #c79363 0%, #a07040 100%);
     border: 1px solid rgba(255, 255, 255, 0.16);
+    font-family: var(--font-mono), ui-monospace, monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     overflow: hidden;
     transition:
       box-shadow 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
@@ -1800,29 +1802,34 @@
   }
   .cta-cinema-amber:hover {
     box-shadow:
-      0 0 52px rgba(245, 158, 11, 0.55),
-      0 8px 32px rgba(245, 158, 11, 0.30);
+      0 0 52px rgba(199, 147, 99, 0.50),
+      0 8px 32px rgba(199, 147, 99, 0.28);
     transform: translateY(-2px) scale(1.01);
   }
 
   /* Ghost CTA for dark bg */
   .cta-cinema-ghost {
-    border: 1px solid rgba(245, 158, 11, 0.28);
-    color: rgba(245, 158, 11, 0.85);
+    border: 1px solid rgba(236, 229, 214, 0.32);
+    color: rgba(236, 229, 214, 0.80);
+    font-family: var(--font-mono), ui-monospace, monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     transition:
       border-color 0.3s ease,
       color 0.3s ease,
+      background-color 0.3s ease,
       box-shadow 0.4s ease,
       transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .cta-cinema-ghost:hover {
-    border-color: rgba(245, 158, 11, 0.55);
-    color: rgba(245, 158, 11, 1);
-    box-shadow: 0 0 24px rgba(245, 158, 11, 0.18);
+    border-color: rgba(236, 229, 214, 0.80);
+    background-color: rgba(236, 229, 214, 0.08);
+    color: rgba(236, 229, 214, 1);
+    box-shadow: 0 0 24px rgba(199, 147, 99, 0.12);
     transform: translateY(-2px) scale(1.01);
   }
 
-  /* Amber numeral glow — cinema version of .numeral-glow */
+  /* Bronze numeral glow — cinema version of .numeral-glow */
   .cinema-numeral-glow {
     position: relative;
   }
@@ -1832,21 +1839,21 @@
     inset: -20% -10%;
     background: radial-gradient(
       ellipse 70% 60% at 50% 60%,
-      rgba(245, 158, 11, 0.14) 0%,
+      rgba(199, 147, 99, 0.14) 0%,
       transparent 70%
     );
     pointer-events: none;
     z-index: -1;
   }
 
-  /* Cinema amber icon surface */
+  /* Cinema bronze icon surface */
   .cinema-icon-surface {
-    background: rgba(245, 158, 11, 0.10);
-    border: 1px solid rgba(245, 158, 11, 0.20);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.10);
+    background: rgba(199, 147, 99, 0.10);
+    border: 1px solid rgba(199, 147, 99, 0.22);
+    box-shadow: 0 2px 8px rgba(199, 147, 99, 0.10);
   }
 
-  /* Cinema category row hover — amber left-edge accent */
+  /* Cinema category row hover — bronze left-edge accent */
   .cinema-category-row {
     position: relative;
     transition: background-color 0.4s ease;
@@ -1858,7 +1865,7 @@
     top: 20%;
     bottom: 20%;
     width: 2px;
-    background: linear-gradient(to bottom, transparent, rgba(245,158,11,0.7), transparent);
+    background: linear-gradient(to bottom, transparent, rgba(199,147,99,0.7), transparent);
     transform: scaleY(0);
     transform-origin: center;
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -1868,7 +1875,7 @@
     transform: scaleY(1);
   }
   .cinema-category-row:hover {
-    background-color: rgba(245, 158, 11, 0.04);
+    background-color: rgba(199, 147, 99, 0.04);
   }
 
   /* Cinema hero fact divider */
@@ -1882,7 +1889,7 @@
     top: 15%;
     bottom: 15%;
     width: 1px;
-    background: linear-gradient(to bottom, transparent, rgba(245,158,11,0.25) 30%, rgba(245,158,11,0.25) 70%, transparent);
+    background: linear-gradient(to bottom, transparent, rgba(199,147,99,0.25) 30%, rgba(199,147,99,0.25) 70%, transparent);
   }
 
   /* ── Premium donation badge — floating variant ──────────────────────── */
@@ -1994,10 +2001,10 @@
   100% { transform: translateY(0);     opacity: 1; }
 }
 @keyframes boardNewPost {
-  0%   { transform: scale(0.95); opacity: 0; box-shadow: 0 0 0 0 rgba(251,191,36,0.6); }
-  30%  { transform: scale(1.02); opacity: 1; box-shadow: 0 0 20px 4px rgba(251,191,36,0.4); }
-  60%  { transform: scale(1); box-shadow: 0 0 12px 2px rgba(251,191,36,0.2); }
-  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+  0%   { transform: scale(0.95); opacity: 0; box-shadow: 0 0 0 0 rgba(199,147,99,0.6); }
+  30%  { transform: scale(1.02); opacity: 1; box-shadow: 0 0 20px 4px rgba(199,147,99,0.4); }
+  60%  { transform: scale(1); box-shadow: 0 0 12px 2px rgba(199,147,99,0.2); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(199,147,99,0); }
 }
 @keyframes bounceIn {
   0%   { transform: scale(0.3);  opacity: 0; }
@@ -2458,7 +2465,7 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
 /* ── Cinema sidebar glow ─────────────────────────────────────────────────── */
 @keyframes sidebarGlow {
   from { box-shadow: none; }
-  to   { box-shadow: inset 2px 0 8px rgba(245,158,11,0.08); }
+  to   { box-shadow: inset 2px 0 8px rgba(199,147,99,0.08); }
 }
 
 /* ── App layout helpers ──────────────────────────────────────────────────── */
@@ -2479,11 +2486,11 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
 .cinema-main-content::-webkit-scrollbar { width: 6px; }
 .cinema-main-content::-webkit-scrollbar-track { background: transparent; }
 .cinema-main-content::-webkit-scrollbar-thumb {
-  background: rgba(245,158,11,0.12);
+  background: rgba(199,147,99,0.15);
   border-radius: 3px;
 }
 .cinema-main-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(245,158,11,0.22);
+  background: rgba(199,147,99,0.28);
 }
 
 /* ── Micro-interaction: like burst ───────────────────────────────────────── */
@@ -2506,10 +2513,10 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
 /* ── Global ambient — subtle warm bloom on body ──────────────────────────── */
 .cinema-app-shell {
   background:
-    radial-gradient(ellipse 80% 60% at 18% 8%,  rgba(245,158,11,0.045) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 82% 92%, rgba(125,211,252,0.030) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(245,158,11,0.012) 0%, transparent 70%),
-    #0A0F1C;
+    radial-gradient(ellipse 80% 60% at 18% 8%,  rgba(199,147,99,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 82% 92%, rgba(43,86,99,0.025) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(199,147,99,0.010) 0%, transparent 70%),
+    #0a1420;
   background-attachment: fixed;
 }
 
@@ -2565,7 +2572,7 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   height: 60%;
   pointer-events: none;
   z-index: 1;
-  background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(199,147,99,0.08) 0%, transparent 60%);
   filter: blur(40px);
   animation: lightLeakDrift 24s ease-in-out infinite;
 }
@@ -2595,13 +2602,13 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
 }
 .card-cinema-max:hover {
   transform: translateY(-2px);
-  border-color: rgba(245, 158, 11, 0.22);
+  border-color: rgba(199, 147, 99, 0.22);
   box-shadow:
-    0 1px 0 rgba(245,158,11,0.10) inset,
-    0 0 0 1px rgba(245,158,11,0.10),
+    0 1px 0 rgba(199,147,99,0.10) inset,
+    0 0 0 1px rgba(199,147,99,0.10),
     0 16px 40px rgba(0,0,0,0.55),
     0 32px 80px rgba(0,0,0,0.35),
-    0 0 60px rgba(245,158,11,0.08);
+    0 0 60px rgba(199,147,99,0.08);
 }
 
 /* Override default `.card-depth` (used in many places) → cinema treatment */
@@ -2617,19 +2624,19 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   -webkit-backdrop-filter: blur(8px) saturate(1.1);
 }
 
-/* ── GlowButton primary — dramatic amber pulse ──────────────────────────── */
+/* ── GlowButton primary — bronze pulse ──────────────────────────────────── */
 .glow-btn-cinema-primary {
   position: relative;
-  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 50%, #F59E0B 100%);
-  color: #0A0F1C;
+  background: linear-gradient(135deg, #c79363 0%, #d4a472 50%, #c79363 100%);
+  color: #0a1420;
   font-weight: 600;
   letter-spacing: 0.01em;
-  border: 1px solid rgba(254, 240, 138, 0.40);
+  border: 1px solid rgba(212, 164, 114, 0.40);
   box-shadow:
     0 0 0 1px rgba(0,0,0,0.20) inset,
     0 1px 0 rgba(255,255,255,0.30) inset,
-    0 6px 16px rgba(245,158,11,0.30),
-    0 12px 32px rgba(245,158,11,0.18);
+    0 6px 16px rgba(199,147,99,0.30),
+    0 12px 32px rgba(199,147,99,0.18);
   transition:
     transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
     box-shadow 0.35s cubic-bezier(0.22,0.61,0.36,1);
@@ -2649,9 +2656,9 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   box-shadow:
     0 0 0 1px rgba(0,0,0,0.20) inset,
     0 1px 0 rgba(255,255,255,0.40) inset,
-    0 8px 20px rgba(245,158,11,0.42),
-    0 16px 48px rgba(245,158,11,0.28),
-    0 0 80px rgba(245,158,11,0.16);
+    0 8px 20px rgba(199,147,99,0.42),
+    0 16px 48px rgba(199,147,99,0.28),
+    0 0 80px rgba(199,147,99,0.16);
 }
 .glow-btn-cinema-primary:hover::before { opacity: 1; }
 .glow-btn-cinema-primary:active { transform: translateY(0); }
@@ -2662,18 +2669,18 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1.05;
-  background: linear-gradient(180deg, #F8FAFC 0%, #FEF3C7 80%, #FBBF24 100%);
+  background: linear-gradient(180deg, #ece5d6 0%, #d4a472 80%, #c79363 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 24px rgba(245,158,11,0.18);
+  text-shadow: none;
 }
 
 /* ── Module page hero gets warmer ambient spotlight ──────────────────────── */
 .hero-orb-1 {
   position: absolute;
   z-index: 0;
-  background: radial-gradient(ellipse, rgba(245,158,11,0.15) 0%, transparent 65%);
+  background: radial-gradient(ellipse, rgba(199,147,99,0.15) 0%, transparent 65%);
   filter: blur(8px);
   pointer-events: none;
 }
@@ -2686,7 +2693,7 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   line-height: 1.1;
   letter-spacing: -0.02em;
   color: #F8FAFC;
-  text-shadow: 0 1px 20px rgba(245,158,11,0.10);
+  text-shadow: 0 1px 20px rgba(199,147,99,0.10);
 }
 @media (min-width: 640px) {
   .page-title { font-size: 2.75rem; }
@@ -2701,7 +2708,7 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
 
 /* Accent text inside subtitle — warm amber */
 .text-accent {
-  color: #FBBF24;
+  color: #c79363;
   font-weight: 500;
 }
 
@@ -2713,14 +2720,14 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #FBBF24;
+  color: #c79363;
 }
 .meta-label--subtle { color: #94A3B8; }
 
 /* ── Selection (text highlight) ──────────────────────────────────────────── */
 ::selection {
-  background: rgba(245, 158, 11, 0.30);
-  color: #FEF3C7;
+  background: rgba(199, 147, 99, 0.30);
+  color: #ece5d6;
 }
 
 /* ── Anchor underline sweep (cinema link-style) ──────────────────────────── */
@@ -2735,7 +2742,7 @@ html.is-native .app-topbar { padding-top: env(safe-area-inset-top); }
   bottom: -2px;
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, #F59E0B 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, #c79363 50%, transparent 100%);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -2762,22 +2769,22 @@ textarea.input {
 input.input:focus,
 textarea.input:focus {
   outline: none;
-  border-color: rgba(245, 158, 11, 0.45);
+  border-color: rgba(199, 147, 99, 0.45);
   background: rgba(15, 22, 40, 0.75);
   box-shadow:
-    0 0 0 3px rgba(245, 158, 11, 0.10),
-    0 0 24px rgba(245, 158, 11, 0.10);
+    0 0 0 3px rgba(199, 147, 99, 0.10),
+    0 0 24px rgba(199, 147, 99, 0.10);
 }
 
 /* ── Cinema map markers — pulsing amber lantern dots ─────────────────────── */
 @keyframes cinemaMarkerPulse {
   0%, 100% {
     fill-opacity: 0.92;
-    filter: drop-shadow(0 0 4px rgba(245,158,11,0.45)) drop-shadow(0 0 12px rgba(245,158,11,0.25));
+    filter: drop-shadow(0 0 4px rgba(199,147,99,0.45)) drop-shadow(0 0 12px rgba(199,147,99,0.25));
   }
   50% {
     fill-opacity: 1;
-    filter: drop-shadow(0 0 8px rgba(245,158,11,0.70)) drop-shadow(0 0 20px rgba(245,158,11,0.40));
+    filter: drop-shadow(0 0 8px rgba(199,147,99,0.70)) drop-shadow(0 0 20px rgba(199,147,99,0.40));
   }
 }
 .cinema-marker-pulse {

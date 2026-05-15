@@ -37,8 +37,8 @@ export default function AtmosphericCanvas({
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse 100% 50% at 50% 100%, rgba(245,158,11,0.08), transparent 60%),
-            radial-gradient(ellipse 80% 60% at 30% 30%, rgba(14,165,233,0.04), transparent 60%),
+            radial-gradient(ellipse 100% 50% at 50% 100%, rgba(199,147,99,0.08), transparent 60%),
+            radial-gradient(ellipse 80% 60% at 30% 30%, rgba(43,86,99,0.04), transparent 60%),
             #0A0F1C
           `,
         }}
@@ -101,7 +101,7 @@ export default function AtmosphericCanvas({
         flies.map((f, i) => (
           <span
             key={`f-${i}`}
-            className="absolute rounded-full bg-mn-amber-soft"
+            className="absolute rounded-full bg-mn-bronze-soft"
             style={{
               left:  `${f.x}%`,
               top:   `${f.y}%`,
@@ -122,7 +122,7 @@ export default function AtmosphericCanvas({
           style={{
             height: '12%',
             background: `
-              radial-gradient(ellipse 60% 100% at 50% 100%, rgba(245,158,11,0.10) 0%, rgba(245,158,11,0.04) 50%, transparent 100%)
+              radial-gradient(ellipse 60% 100% at 50% 100%, rgba(199,147,99,0.10) 0%, rgba(199,147,99,0.04) 50%, transparent 100%)
             `,
             filter: 'blur(2px)',
             mixBlendMode: 'screen',
@@ -136,8 +136,8 @@ export default function AtmosphericCanvas({
 /* ─── Lantern + Firefly generators ─────────────────────────────────────── */
 
 const LANTERN_COLORS = [
-  'rgba(245,158,11,0.55)',  // amber
-  'rgba(251,191,36,0.55)',  // amber-warm
+  'rgba(199,147,99,0.55)',  // amber
+  'rgba(199,147,99,0.55)',  // amber-warm
   'rgba(253,230,138,0.55)', // amber-soft
   'rgba(212,160,84,0.55)',  // trust
 ]

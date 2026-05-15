@@ -14,7 +14,7 @@ export function CinemaSkeleton({ className }: { className?: string }) {
       <div
         className="absolute inset-0 -translate-x-full"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.04) 40%, rgba(28,42,66,0.8) 60%, transparent 100%)',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(199,147,99,0.04) 40%, rgba(28,42,66,0.8) 60%, transparent 100%)',
           animation: 'shimmer 1.8s linear infinite',
         }}
       />

@@ -1,39 +1,44 @@
 {
-  "webVersion": "1.6.3",
-  "webBuildId": "native-incoming-call-fcm-v1.6.3",
-  "apkVersion": "1.6.3",
-  "apkBuildCode": 10008,
+  "webVersion": "1.6.4",
+  "webBuildId": "cinema-3-notification-fix-v1.6.4",
+  "apkVersion": "3.0.0",
+  "apkBuildCode": 30000,
   "apkUrl": "https://github.com/manuelbrandner85/Mensaena/releases/latest/download/mensaena-release.apk",
-  "apkSize": "~35 MB",
+  "apkSize": "~38 MB",
   "apkRequired": true,
-  "apkMinVersion": "1.6.3",
-  "releasedAt": "2026-05-02T17:55:00Z",
+  "apkMinVersion": "3.0.0",
+  "releasedAt": "2026-05-11T02:00:00Z",
   "releaseNotes": {
-    "headline": "Anrufe wenn App geschlossen — wie WhatsApp",
-    "subtitle": "Endgültiger Stabilitäts-Fix für Android 14+",
+    "headline": "Cinema 3.0 — Die Nachbarschaft bei Nacht",
+    "subtitle": "Komplett neues App-Design + Benachrichtigungs-Fix",
     "features": [
       {
-        "emoji": "📞",
-        "title": "Anrufe wecken die App auf",
-        "description": "Bei eingehendem Anruf klingelt das Handy mit Vollbild-Anrufscreen — auch wenn die App geschlossen ist."
+        "emoji": "🎬",
+        "title": "Cinema 3.0 Design",
+        "description": "Atmosphärisches Dark-Cinema-Design mit Laternenlicht, Glassmorphism und cineastischen Animationen."
       },
       {
-        "emoji": "🚀",
-        "title": "Annehmen aus geschlossener App",
-        "description": "Tippe Annehmen → App öffnet sich direkt im Anruf, kein Splash-Loop."
+        "emoji": "🔔",
+        "title": "Benachrichtigungen dauerhaft löschbar",
+        "description": "Gelöschte Benachrichtigungen kommen nicht mehr zurück und synchronisieren sich sofort auf alle Geräte."
       },
       {
-        "emoji": "🛡️",
-        "title": "Stabile Verbindung",
-        "description": "Caller und Callee verbinden sich GARANTIERT. Auflegen beendet beide Seiten."
+        "emoji": "🧹",
+        "title": "Auto-Bereinigung nach 14 Tagen",
+        "description": "Alte Benachrichtigungen werden automatisch gelöscht — kein manuelles Aufräumen nötig."
+      },
+      {
+        "emoji": "✨",
+        "title": "Neuer Splash-Screen",
+        "description": "Cineastischer Intro mit Laternen-Choreographie beim App-Start."
       }
     ],
     "footer": "Danke, dass du Teil der Mensaena-Gemeinschaft bist! 💚"
   },
   "apkReleaseNotes": {
-    "headline": "Pflicht-Update: Native Anrufe (FCM + Vollbild)",
-    "subtitle": "WebRTC-Direktverbindung + 12 Auth-Bugfixes",
-    "reason": "Eingehende Anrufe funktionieren jetzt auch bei geschlossener App. Native Vollbild-Anrufscreen wie WhatsApp.",
+    "headline": "Pflicht-Update: Cinema 3.0 + Fixes",
+    "subtitle": "Neues App-Design · Benachrichtigungs-Fix · 14-Tage Bereinigung",
+    "reason": "Dieses Update bringt das komplett überarbeitete Cinema-3.0-Design und behebt einen Fehler, bei dem gelöschte Benachrichtigungen nach einem Neustart zurückkamen.",
     "steps": [
       "Tippe auf Jetzt herunterladen",
       "Warte bis der Download in der Notification fertig ist",

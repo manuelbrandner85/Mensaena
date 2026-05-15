@@ -8,10 +8,10 @@
  */
 
 const lanterns = [
-  { top: '12%', left: '18%', size: 220, hue: 'rgba(245,158,11,0.10)', delay: '0s'   },
-  { top: '38%', left: '72%', size: 180, hue: 'rgba(245,158,11,0.08)', delay: '1.6s' },
+  { top: '12%', left: '18%', size: 220, hue: 'rgba(199,147,99,0.10)', delay: '0s'   },
+  { top: '38%', left: '72%', size: 180, hue: 'rgba(199,147,99,0.08)', delay: '1.6s' },
   { top: '68%', left: '28%', size: 260, hue: 'rgba(125,211,252,0.07)', delay: '0.8s' },
-  { top: '78%', left: '78%', size: 200, hue: 'rgba(245,158,11,0.09)', delay: '2.4s' },
+  { top: '78%', left: '78%', size: 200, hue: 'rgba(199,147,99,0.09)', delay: '2.4s' },
   { top: '52%', left: '46%', size: 320, hue: 'rgba(125,211,252,0.05)', delay: '3.2s' },
 ]
 

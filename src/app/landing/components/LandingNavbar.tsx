@@ -168,7 +168,7 @@ export default function LandingNavbar() {
               <Link
                 href="/spenden"
                 onClick={() => setMobileOpen(false)}
-                className="flex w-full items-center justify-center gap-2 py-4 rounded-full border border-mn-amber/20 bg-primary-50 text-primary-700 text-sm font-medium tracking-wide hover:bg-primary-100 transition-colors"
+                className="flex w-full items-center justify-center gap-2 py-4 rounded-full border border-mn-bronze/20 bg-primary-50 text-primary-700 text-sm font-medium tracking-wide hover:bg-primary-100 transition-colors"
               >
                 <Heart className="w-4 h-4" aria-hidden="true" />
                 Mensaena unterstützen

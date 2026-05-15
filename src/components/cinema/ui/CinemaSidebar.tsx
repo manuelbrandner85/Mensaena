@@ -51,14 +51,14 @@ export default function CinemaSidebar({ groups, user, collapsed = false }: Cinem
                       href={item.href}
                       className={cn(
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
-                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-inset',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-inset',
                         active
-                          ? 'text-mn-amber bg-mn-amber/5 border-l-2 border-mn-amber'
+                          ? 'text-mn-bronze bg-mn-bronze/5 border-l-2 border-mn-bronze'
                           : 'text-mn-ink-soft hover:text-mn-ink hover:bg-mn-elevated/[0.02] border-l-2 border-transparent',
                         collapsed && 'justify-center px-0',
                       )}
                     >
-                      <span className={cn('shrink-0', active ? 'text-mn-amber' : 'text-mn-mute')}>
+                      <span className={cn('shrink-0', active ? 'text-mn-bronze' : 'text-mn-mute')}>
                         {item.icon}
                       </span>
                       {!collapsed && (
