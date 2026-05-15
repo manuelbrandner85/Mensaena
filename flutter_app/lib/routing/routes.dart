@@ -29,6 +29,7 @@ class Routes {
   // Dashboard
   static const onboarding = '/onboarding';
   static const dashboard = '/dashboard';
+  static const dashboardLiveRoom = '/dashboard/live';
   static const dashboardCreate = '/dashboard/create';
   static const dashboardNotifications = '/dashboard/notifications';
   static const dashboardMessages = '/dashboard/messages';

@@ -13,6 +13,8 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Firebase Cloud Messaging — wendet google-services.json an.
+    id("com.google.gms.google-services")
 }
 
 // Release-Keystore laden (persistenter Key für APK-Updates ohne Deinstallation).
@@ -29,11 +31,16 @@ val hasReleaseKeystore = keystoreProps.getProperty("storeFile")?.isNotBlank() ==
 android {
     namespace = "de.mensaena.app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Plugins (geolocator, image_picker, livekit, firebase_messaging, …) verlangen
+    // NDK 27.0.12077973 — flutter.ndkVersion-Default reicht nicht.
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications braucht core library desugaring
+        // (java.time API auf minSdk 24).
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -84,4 +91,10 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Pendant zur isCoreLibraryDesugaringEnabled-Flag — liefert die java.time-
+    // Implementierung für minSdk 24 nach. Pflicht für flutter_local_notifications.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

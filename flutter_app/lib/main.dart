@@ -7,13 +7,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'app_router.dart' as cinema_router;
 import 'core/accessibility_store.dart';
 import 'core/crash_log.dart';
+import 'core/i18n.dart';
+import 'core/push_notifications.dart';
 import 'core/supabase.dart';
+import 'core/theme/mensaena_theme.dart';
 import 'features/updates/update_gate.dart';
-import 'routing/app_router.dart';
-import 'theme/app_colors.dart';
-import 'theme/app_theme.dart';
 
 /// Entry-Point der Mensaena-Flutter-App.
 ///
@@ -26,12 +27,13 @@ void main() {
   runZonedGuarded<Future<void>>(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+      // Cinema 3.0 — dark Status- und NavBar.
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
-          statusBarColor: AppColors.background,
-          statusBarIconBrightness: Brightness.dark,
-          systemNavigationBarColor: AppColors.paper,
-          systemNavigationBarIconBrightness: Brightness.dark,
+          statusBarColor: Color(0xFF0A0F1C), // MnColors.voidColor
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: Color(0xFF0A0F1C),
+          systemNavigationBarIconBrightness: Brightness.light,
         ),
       );
 
@@ -66,6 +68,12 @@ void main() {
       // Nach erfolgreichem Supabase-Init: queued Crash-Reports flushen.
       if (bootError == null) {
         unawaited(CrashLog.flushPending());
+        // Firebase + FCM-Token registrieren — Fehler darf nicht den Boot
+        // crashen, also async und gefangen.
+        unawaited(() async {
+          await PushNotifications.init();
+          await PushNotifications.registerToken();
+        }(),);
       }
 
       runApp(
@@ -99,14 +107,16 @@ class MensaenaApp extends ConsumerWidget {
 class _RouterApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = ref.watch(goRouterProvider);
+    // Cinema 3.0 — dark-only, neuer GoRouter aus lib/app_router.dart.
+    final router = ref.watch(cinema_router.appRouterProvider);
     final a11y = ref.watch(accessibilityProvider);
+    final locale = ref.watch(localeProvider);
     return MaterialApp.router(
       title: 'Mensaena',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: a11y.themeMode,
+      theme: MensaenaTheme.dark,
+      darkTheme: MensaenaTheme.dark,
+      themeMode: ThemeMode.dark,
       builder: (context, child) {
         // Wendet die User-Schriftgrößen-Skalierung global an, ohne die
         // System-Skalierung komplett zu ignorieren — Multiplikation.
@@ -122,8 +132,15 @@ class _RouterApp extends ConsumerWidget {
         );
       },
       routerConfig: router,
-      locale: const Locale('de', 'DE'),
-      supportedLocales: const [Locale('de'), Locale('en')],
+      locale: locale,
+      supportedLocales: const [
+        Locale('de'),
+        Locale('en'),
+        Locale('it'),
+        Locale('tr'),
+        Locale('uk'),
+        Locale('ar'),
+      ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -146,7 +163,7 @@ class _BootError extends StatelessWidget {
       title: 'Mensaena',
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: const Color(0xFF0A0F1C),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24),

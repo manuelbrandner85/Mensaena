@@ -3,12 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/supabase.dart';
+import '../../routing/routes.dart';
 import '../../theme/app_colors.dart';
 import 'chat_repository.dart';
 import 'models.dart';
+import 'polls_repository.dart';
+import 'polls_widget.dart';
 
 const _quickEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '✅'];
 
@@ -89,6 +93,32 @@ class _ChatPageState extends ConsumerState<ChatPage> {
       appBar: AppBar(
         title: Text('${_active?.emoji ?? ''} ${_active?.name ?? 'Chat'}'),
         actions: [
+          if (_active != null)
+            IconButton(
+              icon: const Icon(Icons.poll_outlined),
+              tooltip: 'Umfrage starten',
+              onPressed: () async {
+                final created = await CreatePollSheet.show(
+                  context,
+                  channelId: _active!.id,
+                );
+                if (created != null && mounted) {
+                  setState(() {});
+                }
+              },
+            ),
+          if (_active != null)
+            IconButton(
+              icon: const Icon(Icons.podcasts, color: Color(0xFFDC2626)),
+              tooltip: 'Live-Room starten',
+              onPressed: () {
+                final ch = _active!;
+                context.go(
+                  '${Routes.dashboardLiveRoom}/community-${ch.id}'
+                  '?title=${Uri.encodeComponent('${ch.emoji} ${ch.name}')}',
+                );
+              },
+            ),
           PopupMenuButton<ChatChannel>(
             icon: const Icon(Icons.tag),
             tooltip: 'Kanal wechseln',
@@ -347,6 +377,8 @@ class _MessageThreadState extends ConsumerState<_MessageThread> {
             ],
           ),
         ),
+        // Aktive Polls in diesem Channel (oben fixiert).
+        _PollsStrip(channelId: widget.channel.id),
         // Messages
         Expanded(
           child: _loading
@@ -695,6 +727,102 @@ class _InputBar extends StatelessWidget {
                   color: AppColors.primary500,
                   onPressed: locked ? null : onSend,
                 ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Strip aktiver Polls oberhalb des Message-Threads. Lädt einmalig beim
+/// Mount; refresh manuell durch Tap auf Header oder Re-Open des Channels.
+class _PollsStrip extends ConsumerStatefulWidget {
+  const _PollsStrip({required this.channelId});
+  final String channelId;
+
+  @override
+  ConsumerState<_PollsStrip> createState() => _PollsStripState();
+}
+
+class _PollsStripState extends ConsumerState<_PollsStrip> {
+  List<ChannelPoll> _polls = const [];
+  bool _loading = true;
+  bool _expanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PollsStrip old) {
+    super.didUpdateWidget(old);
+    if (old.channelId != widget.channelId) _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final list = await ref
+          .read(pollsRepositoryProvider)
+          .listForChannel(widget.channelId);
+      if (!mounted) return;
+      setState(() {
+        _polls = list;
+        _loading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading || _polls.isEmpty) return const SizedBox.shrink();
+    final active = _polls.where((p) => !p.isExpired).toList();
+    final visible = active.isEmpty ? _polls.take(1).toList() : active;
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+      ),
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 8,),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.poll_outlined,
+                      size: 16,
+                      color: AppColors.primary500,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${visible.length} aktive Umfrage${visible.length == 1 ? '' : 'n'}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary500,
+                      ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      _expanded ? Icons.expand_less : Icons.expand_more,
+                      size: 18,
+                      color: AppColors.ink400,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (_expanded)
+            ...visible.map((p) => PollCard(poll: p)),
+          const SizedBox(height: 4),
         ],
       ),
     );
