@@ -18,12 +18,12 @@ import ConfirmDialog from '@/app/dashboard/admin/components/ConfirmDialog'
 const CAT_CONFIG: Record<string, { emoji: string; label: string; color: string }> = {
   nachbarschaft: { emoji: '🏘️', label: 'Nachbarschaft',       color: 'from-mn-teal to-mn-teal-soft' },
   hobby:         { emoji: '🎨', label: 'Hobby & Freizeit',    color: 'from-pink-400 to-rose-500' },
-  sport:         { emoji: '⚽', label: 'Sport & Fitness',     color: 'from-mn-amber-warm/12 to-orange-600' },
-  eltern:        { emoji: '👶', label: 'Eltern & Familie',    color: 'from-mn-amber/12 to-mn-amber-warm/8' },
-  senioren:      { emoji: '🧓', label: 'Senioren',            color: 'from-mn-amber to-mn-amber-warm' },
+  sport:         { emoji: '⚽', label: 'Sport & Fitness',     color: 'from-mn-bronze-warm/12 to-orange-600' },
+  eltern:        { emoji: '👶', label: 'Eltern & Familie',    color: 'from-mn-bronze/12 to-mn-bronze-warm/8' },
+  senioren:      { emoji: '🧓', label: 'Senioren',            color: 'from-mn-bronze to-mn-bronze-warm' },
   umwelt:        { emoji: '🌿', label: 'Umwelt',              color: 'from-primary-400 to-primary-600' },
   bildung:       { emoji: '📚', label: 'Bildung & Lernen',    color: 'from-indigo-400 to-indigo-600' },
-  tiere:         { emoji: '🐾', label: 'Tiere',               color: 'from-mn-amber/12 to-yellow-600' },
+  tiere:         { emoji: '🐾', label: 'Tiere',               color: 'from-mn-bronze/12 to-yellow-600' },
   handwerk:      { emoji: '🔧', label: 'Handwerk & DIY',      color: 'from-slate-400 to-slate-600' },
   sonstiges:     { emoji: '💬', label: 'Sonstiges',           color: 'from-primary-400 to-mn-teal-soft/8' },
 }
@@ -512,7 +512,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
       <div className="text-center py-24">
         <div className="text-5xl mb-4">🔍</div>
         <p className="text-mn-ink-soft font-bold text-lg">Gruppe nicht gefunden</p>
-        <Link href="/dashboard/groups" className="mt-3 inline-block text-sm text-mn-amber hover:text-mn-amber font-medium">
+        <Link href="/dashboard/groups" className="mt-3 inline-block text-sm text-mn-bronze hover:text-mn-bronze font-medium">
           ← Zurück zu allen Gruppen
         </Link>
       </div>
@@ -527,7 +527,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
   return (
     <div className="max-w-5xl mx-auto">
       {/* Back link */}
-      <Link href="/dashboard/groups" className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-amber transition-colors mb-4 font-medium">
+      <Link href="/dashboard/groups" className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-bronze transition-colors mb-4 font-medium">
         <ArrowLeft className="w-4 h-4" /> Alle Gruppen
       </Link>
 
@@ -665,7 +665,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                 <button
                   onClick={handleJoin}
                   disabled={joining}
-                  className="shine flex items-center gap-2 px-5 py-2.5 bg-mn-elevated text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-amber/5 transition-all shadow-lg disabled:opacity-60 active:scale-95"
+                  className="shine flex items-center gap-2 px-5 py-2.5 bg-mn-elevated text-mn-bronze rounded-xl text-sm font-semibold hover:bg-mn-bronze/5 transition-all shadow-lg disabled:opacity-60 active:scale-95"
                 >
                   {joining ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                   {joining ? 'Beitreten...' : 'Gruppe beitreten'}
@@ -721,7 +721,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     onChange={e => setNewPost(e.target.value)}
                     placeholder="Schreibe einen Beitrag für die Gruppe..."
                     rows={3}
-                    className="w-full px-0 py-1 text-sm text-mn-ink-soft placeholder-ink-400 bg-transparent border-none resize-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30 leading-relaxed"
+                    className="w-full px-0 py-1 text-sm text-mn-ink-soft placeholder-ink-400 bg-transparent border-none resize-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-bronze/30 leading-relaxed"
                     maxLength={2000}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && (newPost.trim() || newPostImage)) {
@@ -746,7 +746,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                       <button
                         onClick={() => postImageInputRef.current?.click()}
                         disabled={posting}
-                        className="p-1.5 rounded-lg text-mn-mute hover:text-mn-amber hover:bg-mn-amber/5 transition-colors"
+                        className="p-1.5 rounded-lg text-mn-mute hover:text-mn-bronze hover:bg-mn-bronze/5 transition-colors"
                         title="Bild hinzufügen"
                       >
                         {postImageUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
@@ -758,7 +758,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                     <button
                       onClick={handleCreatePost}
                       disabled={posting || (!newPost.trim() && !newPostImage)}
-                      className="flex items-center gap-1.5 px-4 py-1.5 bg-mn-amber text-white rounded-xl text-xs font-semibold hover:bg-primary-700 disabled:opacity-50 transition-all active:scale-95"
+                      className="flex items-center gap-1.5 px-4 py-1.5 bg-mn-bronze text-white rounded-xl text-xs font-semibold hover:bg-primary-700 disabled:opacity-50 transition-all active:scale-95"
                     >
                       {posting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                       Posten
@@ -768,14 +768,14 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
               </div>
             </div>
           ) : (
-            <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4 text-center">
-              <p className="text-sm text-mn-amber font-medium mb-2">
+            <div className="bg-mn-bronze/5 border border-white/8 rounded-2xl p-4 text-center">
+              <p className="text-sm text-mn-bronze font-medium mb-2">
                 Tritt der Gruppe bei, um Beiträge zu schreiben
               </p>
               <button
                 onClick={handleJoin}
                 disabled={joining}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-mn-amber text-white rounded-xl text-xs font-semibold hover:bg-primary-700 transition-all disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-mn-bronze text-white rounded-xl text-xs font-semibold hover:bg-primary-700 transition-all disabled:opacity-60"
               >
                 {joining ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
                 Jetzt beitreten
@@ -875,7 +875,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 {post.user_id === userId && editingPostId !== post.id && (
                                   <button
                                     onClick={() => handleStartEdit(post)}
-                                    className="p-1.5 hover:bg-mn-amber/5 rounded-lg text-mn-ghost hover:text-mn-amber transition-colors"
+                                    className="p-1.5 hover:bg-mn-bronze/5 rounded-lg text-mn-ghost hover:text-mn-bronze transition-colors"
                                     title="Bearbeiten"
                                   >
                                     <Pencil className="w-3.5 h-3.5" />
@@ -897,7 +897,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                 <textarea
                                   value={editContent}
                                   onChange={e => setEditContent(e.target.value)}
-                                  className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none outline-none focus:border-mn-amber/20 focus:ring-1 focus:ring-mn-amber/10 leading-relaxed"
+                                  className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none outline-none focus:border-mn-bronze/20 focus:ring-1 focus:ring-mn-bronze/10 leading-relaxed"
                                   rows={3}
                                   maxLength={2000}
                                   autoFocus
@@ -913,7 +913,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                   <button
                                     onClick={() => handleSaveEdit(post.id)}
                                     disabled={editSaving || !editContent.trim()}
-                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
+                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-mn-bronze text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
                                   >
                                     {editSaving && <Loader2 className="w-3 h-3 animate-spin" />}
                                     Speichern
@@ -940,7 +940,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
                                         className={cn(
                                           'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all border',
                                           active
-                                            ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber font-semibold'
+                                            ? 'bg-mn-bronze/5 border-mn-bronze/20 text-mn-bronze font-semibold'
                                             : 'bg-mn-surface border-white/5 text-mn-mute hover:border-white/8 hover:bg-mn-elevated',
                                         )}
                                       >
@@ -969,7 +969,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ groupId:
           {/* Members Card */}
           <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-4">
             <h3 className="font-bold text-mn-ink text-sm mb-3 flex items-center gap-2">
-              <Users className="w-4 h-4 text-mn-amber" />
+              <Users className="w-4 h-4 text-mn-bronze" />
               Mitglieder
               <span className="ml-auto text-xs font-normal text-mn-mute">{members.length}</span>
             </h3>

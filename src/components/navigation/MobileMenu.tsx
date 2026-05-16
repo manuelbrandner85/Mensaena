@@ -172,7 +172,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
             <img
               src={avatarUrl}
               alt={displayName}
-              className="w-10 h-10 rounded-full object-cover border-2 border-mn-amber/20 shadow-sm"
+              className="w-10 h-10 rounded-full object-cover border-2 border-mn-bronze/20 shadow-sm"
             />
           ) : (
             <div
@@ -206,10 +206,10 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               <Link
                 href="/dashboard/notifications"
                 onClick={closeMobileMenu}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-amber/5 border border-mn-amber/20 rounded-lg hover:bg-mn-amber/10 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-bronze/5 border border-mn-bronze/20 rounded-lg hover:bg-mn-bronze/10 transition-all"
               >
-                <Bell className="w-3.5 h-3.5 text-mn-amber" />
-                <span className="text-[11px] font-semibold text-mn-amber">{unreadNotifications}</span>
+                <Bell className="w-3.5 h-3.5 text-mn-bronze" />
+                <span className="text-[11px] font-semibold text-mn-bronze">{unreadNotifications}</span>
               </Link>
             )}
             {activeCrises > 0 && (
@@ -234,7 +234,7 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-8 pr-3 py-2 text-sm bg-mn-surface border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/20 transition-all"
+              className="w-full pl-8 pr-3 py-2 text-sm bg-mn-surface border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-bronze/20 transition-all"
             />
             {searchQuery && (
               <button
@@ -293,11 +293,11 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                         className={cn(
                           'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
                           active
-                            ? 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
+                            ? 'bg-mn-bronze/5 text-primary-800 font-semibold border border-mn-bronze/20'
                             : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02] border border-transparent',
                         )}
                       >
-                        <Icon className={cn('w-5 h-5', active ? 'text-mn-amber' : 'text-mn-mute')} />
+                        <Icon className={cn('w-5 h-5', active ? 'text-mn-bronze' : 'text-mn-mute')} />
                         <div className="flex-1 min-w-0">
                           <span className="text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                           {item.group && <p className="text-xs text-mn-mute">{t(item.group as Parameters<typeof t>[0])}</p>}
@@ -325,11 +325,11 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                       className={cn(
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
                         active
-                          ? 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
+                          ? 'bg-mn-bronze/5 text-primary-800 font-semibold border border-mn-bronze/20'
                           : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02] border border-transparent',
                       )}
                     >
-                      <Icon className={cn('w-5 h-5', active ? 'text-mn-amber' : 'text-mn-mute')} />
+                      <Icon className={cn('w-5 h-5', active ? 'text-mn-bronze' : 'text-mn-mute')} />
                       <span className="flex-1 text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                       {badge !== undefined && badge > 0 && (
                         <span className="min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
@@ -397,14 +397,14 @@ export default function MobileMenu({ unreadMessages, unreadNotifications, active
                                   active
                                     ? isCrisis
                                       ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
-                                      : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
+                                      : 'bg-mn-bronze/5 text-primary-800 font-semibold border border-mn-bronze/20'
                                     : cn(
                                         'text-mn-ink-soft hover:bg-mn-elevated/[0.02] border border-transparent',
                                         isCrisis && 'text-mn-herzrot',
                                       ),
                                 )}
                               >
-                                <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : isCrisis ? 'text-mn-herzrot' : 'text-mn-mute')} />
+                                <Icon className={cn('w-5 h-5', active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-bronze') : isCrisis ? 'text-mn-herzrot' : 'text-mn-mute')} />
                                 <span className="flex-1 text-sm">{t(item.label as Parameters<typeof t>[0])}</span>
                                 {badge !== undefined && badge > 0 && (
                                   <span className={cn(

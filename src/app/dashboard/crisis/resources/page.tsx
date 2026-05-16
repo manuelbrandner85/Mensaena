@@ -16,7 +16,7 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Psychologische Hilfe',
     icon: Brain,
-    color: 'text-mn-amber',
+    color: 'text-mn-bronze',
     bgColor: 'bg-mn-surface',
     borderColor: 'border-white/5',
     items: [
@@ -64,9 +64,9 @@ const RESOURCE_CATEGORIES = [
   {
     title: 'Ernährung & Versorgung',
     icon: Utensils,
-    color: 'text-mn-amber',
-    bgColor: 'bg-mn-amber/5',
-    borderColor: 'border-mn-amber/20',
+    color: 'text-mn-bronze',
+    bgColor: 'bg-mn-bronze/5',
+    borderColor: 'border-mn-bronze/20',
     items: [
       { name: 'Tafeln', desc: 'tafel.de – Lebensmittelhilfe', url: 'https://www.tafel.de' },
       { name: 'Suppenküchen', desc: 'Lokale Angebote', url: '#' },
@@ -179,10 +179,10 @@ export default function CrisisResourcesPage() {
       </div>
 
       {/* Mensaena community link */}
-      <div className="bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-6 text-center">
-        <Users className="w-8 h-8 text-mn-amber mx-auto mb-3" />
+      <div className="bg-gradient-to-r from-mn-bronze/8 to-mn-teal-soft/8 border border-mn-bronze/20 rounded-2xl p-6 text-center">
+        <Users className="w-8 h-8 text-mn-bronze mx-auto mb-3" />
         <h3 className="text-base font-bold text-primary-800 mb-1">Mensaena Community</h3>
-        <p className="text-sm text-mn-amber mb-4">
+        <p className="text-sm text-mn-bronze mb-4">
           Unsere Gemeinschaft hilft sich gegenseitig - auch in Krisenzeiten.
         </p>
         <div className="flex flex-wrap justify-center gap-2">
@@ -194,13 +194,13 @@ export default function CrisisResourcesPage() {
           </Link>
           <Link
             href="/dashboard/organizations"
-            className="px-4 py-2 bg-mn-elevated border border-mn-amber/20 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-amber/5 transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-mn-bronze/20 text-mn-bronze rounded-xl text-sm font-semibold hover:bg-mn-bronze/5 transition-colors"
           >
             Hilfsorganisationen
           </Link>
           <Link
             href="/dashboard/mental-support"
-            className="px-4 py-2 bg-mn-elevated border border-white/5 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-surface transition-colors"
+            className="px-4 py-2 bg-mn-elevated border border-white/5 text-mn-bronze rounded-xl text-sm font-semibold hover:bg-mn-surface transition-colors"
           >
             Mentale Unterstützung
           </Link>

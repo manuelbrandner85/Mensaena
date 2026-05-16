@@ -74,17 +74,17 @@ export default function AdminSidebar({ activeTab, onTabChange, userRole, openRep
         onClick={() => onTabChange(item.key)}
         className={`w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
           active
-            ? 'bg-mn-amber/5 text-mn-amber border border-mn-amber/20 shadow-sm'
+            ? 'bg-mn-bronze/5 text-mn-bronze border border-mn-bronze/20 shadow-sm'
             : 'text-mn-ink-soft border border-transparent hover:bg-mn-surface hover:text-mn-ink'
         }`}
       >
         <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
           active
-            ? 'bg-mn-amber shadow-sm'
-            : 'bg-mn-elevated group-hover:bg-mn-amber/10'
+            ? 'bg-mn-bronze shadow-sm'
+            : 'bg-mn-elevated group-hover:bg-mn-bronze/10'
         }`}>
           <Icon className={`w-4 h-4 transition-colors ${
-            active ? 'text-white' : 'text-mn-mute group-hover:text-mn-amber'
+            active ? 'text-white' : 'text-mn-mute group-hover:text-mn-bronze'
           }`} />
         </div>
         <span className="flex-1 text-left truncate">{item.label}</span>

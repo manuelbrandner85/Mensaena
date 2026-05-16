@@ -158,7 +158,7 @@ export default function EventDetailPage() {
         <p className="text-sm text-mn-mute mb-4">Diese Veranstaltung existiert nicht mehr oder wurde gelöscht.</p>
         <button
           onClick={() => router.push('/dashboard/events')}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mn-amber text-white text-sm font-medium hover:bg-primary-700 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mn-bronze text-white text-sm font-medium hover:bg-primary-700 transition"
         >
           Zurück zu Veranstaltungen
         </button>
@@ -273,8 +273,8 @@ export default function EventDetailPage() {
 
             {/* Attendees */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-mn-amber/5 flex-shrink-0 mt-0.5">
-                <Users className="w-4 h-4 text-mn-amber" />
+              <div className="p-2 rounded-xl bg-mn-bronze/5 flex-shrink-0 mt-0.5">
+                <Users className="w-4 h-4 text-mn-bronze" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-mn-ink">
@@ -290,7 +290,7 @@ export default function EventDetailPage() {
                 <Wallet className="w-4 h-4 text-amber-600" />
               </div>
               <p className={cn('text-sm font-semibold mt-1',
-                (!event.cost || event.cost === 'kostenlos') ? 'text-mn-amber' : 'text-mn-ink',
+                (!event.cost || event.cost === 'kostenlos') ? 'text-mn-bronze' : 'text-mn-ink',
               )}>
                 {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
               </p>
@@ -300,7 +300,7 @@ export default function EventDetailPage() {
             {event.what_to_bring && (
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-xl bg-mn-surface flex-shrink-0 mt-0.5">
-                  <Package className="w-4 h-4 text-mn-amber-warm" />
+                  <Package className="w-4 h-4 text-mn-bronze-warm" />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-mn-mute mb-0.5">Mitbringen</p>
@@ -362,7 +362,7 @@ export default function EventDetailPage() {
                       'shine inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all',
                       isFull
                         ? 'bg-mn-elevated text-mn-mute cursor-not-allowed'
-                        : 'bg-mn-amber text-white hover:bg-primary-700 shadow-cinema-card hover:shadow-cinema-card',
+                        : 'bg-mn-bronze text-white hover:bg-primary-700 shadow-cinema-card hover:shadow-cinema-card',
                     )}
                   >
                     {attending ? <LoaderCircle className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -375,7 +375,7 @@ export default function EventDetailPage() {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all',
                         event.my_attendance === 'going'
-                          ? 'text-mn-amber border-mn-amber/20 bg-mn-amber/5'
+                          ? 'text-mn-bronze border-mn-bronze/20 bg-mn-bronze/5'
                           : event.my_attendance === 'interested'
                             ? 'text-amber-600 border-amber-300 bg-amber-50'
                             : 'text-mn-mute border-white/8 bg-mn-surface',
@@ -392,8 +392,8 @@ export default function EventDetailPage() {
                         <div className="fixed inset-0 z-10" onClick={() => setShowAttMenu(false)} />
                         <div className="absolute left-0 top-full mt-1 bg-mn-elevated rounded-xl shadow-cinema-card border border-white/5 z-20 min-w-[170px] py-1">
                           {event.my_attendance !== 'going' && (
-                            <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-amber/5">
-                              <Check className="w-3.5 h-3.5 text-mn-amber" /> Teilnehmen
+                            <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-bronze/5">
+                              <Check className="w-3.5 h-3.5 text-mn-bronze" /> Teilnehmen
                             </button>
                           )}
                           {event.my_attendance !== 'interested' && (

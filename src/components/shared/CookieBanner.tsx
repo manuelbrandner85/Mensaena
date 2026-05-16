@@ -51,7 +51,7 @@ export default function CookieBanner() {
               Keine Tracking- oder Werbe-Cookies.{' '}
               <Link
                 href="/datenschutz"
-                className="text-mn-amber underline-offset-2 hover:underline"
+                className="text-mn-bronze underline-offset-2 hover:underline"
               >
                 Datenschutzerklärung
               </Link>

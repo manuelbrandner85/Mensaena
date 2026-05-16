@@ -180,7 +180,7 @@ export default function ZeitbankConfirmationBanner() {
                   </span>
                 </div>
                 <p className="text-sm font-semibold text-mn-ink leading-snug">
-                  <span className="text-mn-amber">{giverName}</span>{' '}
+                  <span className="text-mn-bronze">{giverName}</span>{' '}
                   hat{' '}
                   <span className="font-bold">{hours} Std.</span>{' '}
                   Hilfe eingetragen
@@ -194,7 +194,7 @@ export default function ZeitbankConfirmationBanner() {
                   <button
                     onClick={() => handleAction(banner, 'confirm')}
                     disabled={banner.loading}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-mn-amber hover:bg-mn-amber active:bg-primary-700 text-white text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-mn-bronze hover:bg-mn-bronze active:bg-primary-700 text-white text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
                     Bestätigen

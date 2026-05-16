@@ -11,7 +11,7 @@ const variantStyles = {
   orange: 'badge-orange',
   gray:   'badge-gray',
   purple: 'badge-purple',
-  primary:'badge bg-mn-amber/10 text-primary-800',
+  primary:'badge bg-mn-bronze/10 text-primary-800',
   success:'badge bg-mn-elevated text-mn-leben',
   warning:'badge bg-amber-100 text-amber-700',
   danger: 'badge bg-mn-elevated text-mn-herzrot',

@@ -63,7 +63,7 @@ export default function UserMenu({ displayName, email, avatarUrl, isAdmin }: Use
           <img
             src={avatarUrl}
             alt={displayName}
-            className="w-8 h-8 rounded-full object-cover border-2 border-mn-amber/20"
+            className="w-8 h-8 rounded-full object-cover border-2 border-mn-bronze/20"
           />
         ) : (
           <div

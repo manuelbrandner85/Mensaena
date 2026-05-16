@@ -199,7 +199,7 @@ export default function PreferencesModal({ preferences, onSave, onClose }: Prefe
               {/* Max matches per day */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-mn-amber" />
+                  <Sparkles className="w-4 h-4 text-mn-bronze" />
                   <span className="text-sm font-medium text-mn-ink">Max. Matches pro Tag</span>
                   <span className="ml-auto text-sm font-semibold text-mn-teal-soft">{maxPerDay}</span>
                 </div>

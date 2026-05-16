@@ -353,7 +353,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               className="relative group"
             >
               <div className="h-28 w-28 rounded-full bg-mn-elevated p-1.5 shadow-cinema-card ring-1 ring-stone-100">
-                <div className="h-full w-full overflow-hidden rounded-full bg-mn-amber/10 flex items-center justify-center">
+                <div className="h-full w-full overflow-hidden rounded-full bg-mn-bronze/10 flex items-center justify-center">
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -362,7 +362,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <span className="text-2xl font-bold text-mn-amber">
+                    <span className="text-2xl font-bold text-mn-bronze">
                       {initials}
                     </span>
                   )}
@@ -380,7 +380,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                   <Camera className="w-6 h-6 text-white" />
                 )}
               </div>
-              <div className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-mn-amber text-white flex items-center justify-center shadow-lg ring-2 ring-white">
+              <div className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-mn-bronze text-white flex items-center justify-center shadow-lg ring-2 ring-white">
                 {avatarUploading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
@@ -496,7 +496,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               className={cn(
                 'w-full flex items-start gap-3 p-3 rounded-xl border text-left transition-all',
                 privacyPublic
-                  ? 'bg-mn-amber/5 border-mn-amber/20 hover:bg-mn-amber/10/60'
+                  ? 'bg-mn-bronze/5 border-mn-bronze/20 hover:bg-mn-bronze/10/60'
                   : 'bg-mn-surface border-white/5 hover:bg-mn-elevated',
               )}
               aria-pressed={privacyPublic}
@@ -504,7 +504,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
               <span
                 className={cn(
                   'mt-0.5 flex-shrink-0 w-10 h-6 rounded-full p-0.5 transition-colors',
-                  privacyPublic ? 'bg-mn-amber' : 'bg-stone-300',
+                  privacyPublic ? 'bg-mn-bronze' : 'bg-stone-300',
                 )}
                 aria-hidden="true"
               >
@@ -547,7 +547,7 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
                     if (url) router.push(url)
                   }}
                   disabled={!canSave}
-                  className="w-full py-3.5 text-sm font-semibold text-mn-amber hover:bg-mn-amber/5 transition-colors border-b border-white/5 disabled:opacity-50"
+                  className="w-full py-3.5 text-sm font-semibold text-mn-bronze hover:bg-mn-bronze/5 transition-colors border-b border-white/5 disabled:opacity-50"
                 >
                   Speichern & Schließen
                 </button>
@@ -588,9 +588,9 @@ export default function ProfileEditModal({ profile, onClose, onSaved }: Props) {
             disabled={!canSave}
             className={cn(
               'inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold',
-              'bg-mn-amber text-white shadow-sm',
+              'bg-mn-bronze text-white shadow-sm',
               'hover:bg-primary-700 active:scale-95 transition-all',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-mn-amber disabled:active:scale-100',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-mn-bronze disabled:active:scale-100',
             )}
           >
             {saving ? (

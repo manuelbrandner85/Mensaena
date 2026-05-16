@@ -54,11 +54,11 @@ export default function LanguageSwitcher({ className, dropUp = false }: { classN
     <div ref={ref} className={cn('relative', className)}>
       <button
         onClick={() => setIsOpen((o) => !o)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-mn-ink-soft hover:bg-mn-amber/5 hover:text-mn-amber transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-mn-ink-soft hover:bg-mn-bronze/5 hover:text-mn-bronze transition-colors"
         aria-label={t('language_aria')}
         aria-expanded={isOpen}
       >
-        <Globe className="w-4 h-4 text-mn-amber" />
+        <Globe className="w-4 h-4 text-mn-bronze" />
         <span>{active.flag}</span>
         <span className="uppercase text-xs tracking-wide">{active.code}</span>
       </button>
@@ -72,14 +72,14 @@ export default function LanguageSwitcher({ className, dropUp = false }: { classN
               className={cn(
                 'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors',
                 locale.code === currentLocale
-                  ? 'bg-mn-amber/5 text-mn-amber font-semibold'
+                  ? 'bg-mn-bronze/5 text-mn-bronze font-semibold'
                   : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]'
               )}
             >
               <span className="text-base">{locale.flag}</span>
               <span>{locale.label}</span>
               {locale.code === currentLocale && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-mn-amber" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-mn-bronze" />
               )}
             </button>
           ))}

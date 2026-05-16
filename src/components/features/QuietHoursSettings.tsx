@@ -92,7 +92,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
           aria-checked={enabled}
           onClick={() => setEnabled(v => !v)}
           className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-            enabled ? 'bg-mn-amber' : 'bg-mn-raised'
+            enabled ? 'bg-mn-bronze' : 'bg-mn-raised'
           }`}
         >
           <span className="sr-only">Ruhezeiten aktivieren</span>
@@ -111,7 +111,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
             type="time"
             value={start}
             onChange={e => setStart(e.target.value)}
-            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-bronze/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </label>
         <label className="text-xs">
@@ -120,7 +120,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
             type="time"
             value={end}
             onChange={e => setEnd(e.target.value)}
-            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
+            className="w-full h-11 px-3 border border-white/5 rounded-xl text-sm focus:border-mn-bronze/30 focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </label>
       </div>
@@ -130,7 +130,7 @@ export default function QuietHoursSettings({ userId }: { userId: string }) {
           type="button"
           onClick={save}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 h-11 bg-mn-amber text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-4 h-11 bg-mn-bronze text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Speichern

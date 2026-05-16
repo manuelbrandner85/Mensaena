@@ -72,14 +72,14 @@ export default function NotificationsPage() {
       <header className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-mn-amber/10 to-primary-50 border border-mn-amber/20/60 flex items-center justify-center flex-shrink-0 shadow-sm">
-              <Bell className="w-5.5 h-5.5 text-mn-amber" />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-mn-bronze/10 to-primary-50 border border-mn-bronze/20/60 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Bell className="w-5.5 h-5.5 text-mn-bronze" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-mn-ink flex items-center gap-2.5 leading-tight">
                 Benachrichtigungen
                 {unreadCount > 0 && (
-                  <span className="inline-flex items-center justify-center text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1.5 bg-mn-amber text-white tabular-nums">
+                  <span className="inline-flex items-center justify-center text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1.5 bg-mn-bronze text-white tabular-nums">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
@@ -133,7 +133,7 @@ export default function NotificationsPage() {
           {activeFilter === 'all' && (
             <Link
               href="/dashboard/map"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-mn-amber text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-mn-bronze text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors shadow-sm"
             >
               <MapPin className="w-4 h-4" />
               Karte erkunden

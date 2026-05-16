@@ -41,13 +41,13 @@ const ICON_MAP: Record<string, typeof Bell> = {
 
 const COLOR_MAP: Record<string, string> = {
   blue: 'bg-mn-elevated text-mn-teal-soft',
-  primary: 'bg-mn-amber/10 text-mn-amber',
+  primary: 'bg-mn-bronze/10 text-mn-bronze',
   amber: 'bg-amber-100 text-amber-600',
-  purple: 'bg-mn-elevated text-mn-amber',
+  purple: 'bg-mn-elevated text-mn-bronze',
   indigo: 'bg-mn-elevated text-mn-teal-soft',
   gray: 'bg-mn-elevated text-mn-ink-soft',
   pink: 'bg-mn-elevated text-mn-herzrot-warm',
-  orange: 'bg-mn-elevated text-mn-amber-warm',
+  orange: 'bg-mn-elevated text-mn-bronze-warm',
   red: 'bg-mn-elevated text-mn-herzrot',
 }
 
@@ -217,7 +217,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                 {unread > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium px-2 py-1 rounded-lg hover:bg-mn-amber/5 transition-colors"
+                    className="flex items-center gap-1 text-xs text-mn-bronze hover:text-mn-bronze font-medium px-2 py-1 rounded-lg hover:bg-mn-bronze/5 transition-colors"
                     title={t('markAllReadTitle')}
                   >
                     <CheckCheck className="w-3.5 h-3.5" />
@@ -250,7 +250,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     className={cn(
                       'flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
                       filter === tab.key
-                        ? 'bg-mn-amber/10 text-mn-amber shadow-sm'
+                        ? 'bg-mn-bronze/10 text-mn-bronze shadow-sm'
                         : 'text-mn-mute hover:bg-mn-elevated/5 hover:text-mn-ink-soft',
                     )}
                   >
@@ -271,7 +271,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
           <div className="max-h-[420px] overflow-y-auto">
             {loading && filteredNotifications.length === 0 ? (
               <div className="py-10 text-center">
-                <div className="w-6 h-6 border-2 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-2" />
+                <div className="w-6 h-6 border-2 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin mx-auto mb-2" />
                 <p className="text-xs text-mn-mute">{t('loading')}</p>
               </div>
             ) : filteredNotifications.length === 0 ? (
@@ -294,12 +294,12 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     onClick={() => handleItemClick(n)}
                     className={cn(
                       'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-mn-elevated/[0.02] transition-colors border-b border-white/8 last:border-0 group relative',
-                      !n.read && 'bg-mn-amber/5/40',
+                      !n.read && 'bg-mn-bronze/5/40',
                     )}
                   >
                     {/* Unread indicator bar */}
                     {!n.read && (
-                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-mn-amber rounded-r" />
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-mn-bronze rounded-r" />
                     )}
 
                     {/* Avatar or icon */}
@@ -334,7 +334,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-[11px] text-mn-mute">{formatRelativeTime(n.created_at)}</p>
                         {!n.read && (
-                          <span className="text-xs font-semibold text-mn-amber bg-mn-amber/10 px-1.5 py-0.5 rounded-full">
+                          <span className="text-xs font-semibold text-mn-bronze bg-mn-bronze/10 px-1.5 py-0.5 rounded-full">
                             {t('newBadge')}
                           </span>
                         )}
@@ -353,7 +353,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
                     </div>
 
                     {/* Unread dot (fallback) */}
-                    {!n.read && <div className="w-2 h-2 bg-mn-amber rounded-full mt-2 flex-shrink-0 group-hover:hidden" />}
+                    {!n.read && <div className="w-2 h-2 bg-mn-bronze rounded-full mt-2 flex-shrink-0 group-hover:hidden" />}
                   </button>
                 )
               })
@@ -365,7 +365,7 @@ export default function NotificationBell({ userId }: { userId?: string }) {
             <Link
               href="/dashboard/notifications"
               onClick={() => setOpen(false)}
-              className="text-sm text-mn-amber hover:text-mn-amber font-medium hover:underline"
+              className="text-sm text-mn-bronze hover:text-mn-bronze font-medium hover:underline"
             >
               {t('viewAll')}
             </Link>

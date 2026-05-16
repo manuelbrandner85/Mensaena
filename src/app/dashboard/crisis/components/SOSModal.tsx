@@ -124,8 +124,8 @@ export default function SOSModal({ isOpen, onClose }: Props) {
               <AlertTriangle className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm font-bold text-mn-amber-warm">Krise melden</p>
-              <p className="text-xs text-mn-amber-warm">Nachbarn mobilisieren und Hilfe koordinieren</p>
+              <p className="text-sm font-bold text-mn-bronze-warm">Krise melden</p>
+              <p className="text-xs text-mn-bronze-warm">Nachbarn mobilisieren und Hilfe koordinieren</p>
             </div>
           </Link>
 

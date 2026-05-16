@@ -144,7 +144,7 @@ export default function CrisisDetail({
           <CrisisCategoryBadge category={crisis.category} size="md" />
           <CrisisStatusBadge status={crisis.status} size="md" />
           {crisis.is_verified && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-mn-amber/5 border border-mn-amber/20 rounded-full text-sm text-mn-amber font-semibold">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-mn-bronze/5 border border-mn-bronze/20 rounded-full text-sm text-mn-bronze font-semibold">
               <ShieldCheck className="w-4 h-4" /> Verifiziert
             </span>
           )}
@@ -221,7 +221,7 @@ export default function CrisisDetail({
                 <button
                   onClick={() => handleAction('in_progress', () => onUpdateStatus(crisis.id, 'in_progress', userId))}
                   disabled={actionLoading === 'in_progress'}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-amber-warm border border-white/8 rounded-xl text-xs font-semibold hover:bg-mn-amber/10 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-mn-elevated text-mn-bronze-warm border border-white/8 rounded-xl text-xs font-semibold hover:bg-mn-bronze/10 transition-colors"
                 >
                   {actionLoading === 'in_progress' ? <Loader2 className="w-3 h-3 animate-spin" /> : <AlertTriangle className="w-3 h-3" />}
                   In Bearbeitung
@@ -249,7 +249,7 @@ export default function CrisisDetail({
             <button
               onClick={() => handleAction('verify', () => onVerify(crisis.id, userId))}
               disabled={actionLoading === 'verify'}
-              className="flex items-center gap-1.5 px-4 py-2 bg-mn-amber/10 text-mn-amber border border-mn-amber/20 rounded-xl text-xs font-semibold hover:bg-primary-200 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 bg-mn-bronze/10 text-mn-bronze border border-mn-bronze/20 rounded-xl text-xs font-semibold hover:bg-primary-200 transition-colors"
             >
               {actionLoading === 'verify' ? <Loader2 className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3 h-3" />}
               Verifizieren

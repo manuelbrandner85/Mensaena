@@ -44,7 +44,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
     <div
       className={cn(
         'flex items-center gap-3 px-3 py-2.5 transition-colors',
-        isEnabled && !isCritical ? 'bg-mn-amber/5/40' : 'bg-mn-elevated',
+        isEnabled && !isCritical ? 'bg-mn-bronze/5/40' : 'bg-mn-elevated',
       )}
     >
       {/* Emoji */}
@@ -103,7 +103,7 @@ function WidgetRow({ id, moveableIdx, moveableTotal }: WidgetRowProps) {
           onClick={() => toggleWidget(id)}
           className={cn(
             'relative flex-shrink-0 w-9 h-5 rounded-full transition-colors duration-200',
-            isEnabled ? 'bg-mn-amber' : 'bg-stone-300',
+            isEnabled ? 'bg-mn-bronze' : 'bg-stone-300',
           )}
         >
           <span
@@ -275,7 +275,7 @@ export default function WidgetSettingsModal({ onClose }: WidgetSettingsModalProp
           </button>
           <button
             onClick={handleClose}
-            className="px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white text-sm font-medium rounded-xl transition-colors"
+            className="px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white text-sm font-medium rounded-xl transition-colors"
           >
             Fertig
           </button>

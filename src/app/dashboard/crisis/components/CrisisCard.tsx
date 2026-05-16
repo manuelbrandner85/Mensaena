@@ -99,7 +99,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
         <CrisisCategoryBadge category={crisis.category} size="sm" />
         <CrisisStatusBadge status={crisis.status} size="sm" />
         {crisis.is_verified && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-mn-amber/5 border border-mn-amber/20 rounded-full text-xs text-mn-amber font-semibold">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-mn-bronze/5 border border-mn-bronze/20 rounded-full text-xs text-mn-bronze font-semibold">
             Verifiziert
           </span>
         )}
@@ -160,7 +160,7 @@ export default function CrisisCard({ crisis, userId }: Props) {
             className={cn(
               'shine flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-all',
               helped
-                ? 'bg-mn-amber/10 text-mn-amber cursor-default shadow-cinema-card'
+                ? 'bg-mn-bronze/10 text-mn-bronze cursor-default shadow-cinema-card'
                 : 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-glow-teal active:scale-95',
             )}
           >

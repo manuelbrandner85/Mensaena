@@ -152,7 +152,7 @@ export default function EventCalendar({
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-mn-ink">{getEventMonth(activeMonth)}</h3>
           {!checkIsToday(activeMonth) && (
-            <button onClick={goToday} className="text-sm text-mn-amber hover:text-mn-amber font-medium">
+            <button onClick={goToday} className="text-sm text-mn-bronze hover:text-mn-bronze font-medium">
               Heute
             </button>
           )}

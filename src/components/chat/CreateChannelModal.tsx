@@ -81,7 +81,7 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
                 <button key={e} type="button" onClick={() => setEmoji(e)}
                   className={cn(
                     'w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all',
-                    emoji === e ? 'bg-mn-amber/10 ring-2 ring-primary-400 shadow-sm' : 'hover:bg-gray-100'
+                    emoji === e ? 'bg-mn-bronze/10 ring-2 ring-primary-400 shadow-sm' : 'hover:bg-gray-100'
                   )}>
                   {e}
                 </button>

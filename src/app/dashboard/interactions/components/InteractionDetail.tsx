@@ -76,7 +76,7 @@ export default function InteractionDetailView({
                 <h3 className="text-sm font-semibold text-mn-ink">Beitrag</h3>
                 <Link
                   href={`/dashboard/posts/${i.post.id}`}
-                  className="text-xs text-mn-amber hover:text-mn-amber flex items-center gap-1"
+                  className="text-xs text-mn-bronze hover:text-mn-bronze flex items-center gap-1"
                 >
                   Zum Beitrag <ExternalLink className="w-3 h-3" />
                 </Link>
@@ -109,7 +109,7 @@ export default function InteractionDetailView({
                 <p className="font-medium text-mn-ink">{i.partner.name ?? 'Nutzer'}</p>
                 {i.partner.trust_score != null && i.partner.trust_score > 0 && (
                   <div className="flex items-center gap-1 text-xs text-mn-mute mt-0.5">
-                    <CheckCircle2 className="w-3 h-3 text-mn-amber" />
+                    <CheckCircle2 className="w-3 h-3 text-mn-bronze" />
                     Vertrauenswert: {i.partner.trust_score}
                     {i.partner.trust_count != null && i.partner.trust_count > 0 && (
                       <span>({i.partner.trust_count} Bewertungen)</span>

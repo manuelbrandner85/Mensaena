@@ -97,14 +97,14 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
     <div className="bg-mn-elevated rounded-xl border border-white/5 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-mn-amber" />
+          <MessageCircle className="w-4 h-4 text-mn-bronze" />
           <h3 className="text-sm font-bold text-mn-ink">Private Threads</h3>
         </div>
         {!showNew && (
           <button
             type="button"
             onClick={() => setShowNew(true)}
-            className="inline-flex items-center gap-1 h-8 px-2.5 text-[11px] font-semibold border border-mn-amber/20 text-mn-amber rounded-lg hover:bg-mn-amber/5 transition-colors"
+            className="inline-flex items-center gap-1 h-8 px-2.5 text-[11px] font-semibold border border-mn-bronze/20 text-mn-bronze rounded-lg hover:bg-mn-bronze/5 transition-colors"
           >
             <Plus className="w-3 h-3" /> Neu
           </button>
@@ -112,7 +112,7 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
       </div>
 
       {showNew && (
-        <div className="mb-3 border border-white/8 rounded-lg p-3 bg-mn-amber/5/40">
+        <div className="mb-3 border border-white/8 rounded-lg p-3 bg-mn-bronze/5/40">
           <input
             type="text"
             value={title}
@@ -134,7 +134,7 @@ export default function GroupPrivateThreads({ groupId, currentUserId, isMember }
               type="button"
               disabled={creating || title.trim().length < 3}
               onClick={create}
-              className="inline-flex items-center gap-1 h-8 px-3 text-xs font-semibold bg-mn-amber text-white rounded-lg hover:bg-primary-700 disabled:opacity-60"
+              className="inline-flex items-center gap-1 h-8 px-3 text-xs font-semibold bg-mn-bronze text-white rounded-lg hover:bg-primary-700 disabled:opacity-60"
             >
               {creating && <Loader2 className="w-3 h-3 animate-spin" />}
               Erstellen

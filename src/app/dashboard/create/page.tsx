@@ -505,8 +505,8 @@ function CreatePostForm() {
         <div className="meta-label meta-label--subtle mb-4">§ 04 / Erstellen</div>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
-              <FilePlus className="w-6 h-6 text-mn-amber" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+              <FilePlus className="w-6 h-6 text-mn-bronze" />
             </div>
             <div>
               <h1 className="page-title">
@@ -519,7 +519,7 @@ function CreatePostForm() {
                 <button
                   type="button"
                   onClick={() => router.replace('/dashboard/create')}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-mn-amber hover:text-mn-amber hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-mn-bronze hover:text-mn-bronze hover:underline"
                 >
                   Alle Kategorien anzeigen
                 </button>
@@ -528,7 +528,7 @@ function CreatePostForm() {
           </div>
           {draftSaved && !showDraftPrompt && (
             <span className="flex items-center gap-1 text-[11px] text-mn-mute mt-2 whitespace-nowrap flex-shrink-0">
-              <Save className="w-3 h-3 text-mn-amber" />
+              <Save className="w-3 h-3 text-mn-bronze" />
               {draftRestored ? 'Wiederhergestellt' : 'Entwurf gespeichert'}
             </span>
           )}
@@ -539,12 +539,12 @@ function CreatePostForm() {
       {/* Draft restore prompt */}
       {showDraftPrompt && pendingDraft && (
         <div className="mb-6 p-4 bg-mn-surface border border-white/5 rounded-2xl flex items-start gap-3 animate-slide-up">
-          <RotateCcw className="w-5 h-5 text-mn-amber flex-shrink-0 mt-0.5" />
+          <RotateCcw className="w-5 h-5 text-mn-bronze flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-mn-amber">
+            <p className="text-sm font-semibold text-mn-bronze">
               Entwurf gefunden
             </p>
-            <p className="text-xs text-mn-amber mt-0.5 line-clamp-2">
+            <p className="text-xs text-mn-bronze mt-0.5 line-clamp-2">
               {(pendingDraft.form.title as string)?.trim() || 'Unbenannter Entwurf'}
               {' · '}
               vor {Math.max(1, Math.round((Date.now() - pendingDraft.savedAt) / 60000))} Min
@@ -578,13 +578,13 @@ function CreatePostForm() {
             <div className="flex items-center gap-2">
               <div className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all',
-                step > n ? 'bg-mn-amber text-white' :
-                step === n ? 'bg-mn-amber text-white ring-4 ring-primary-100' :
+                step > n ? 'bg-mn-bronze text-white' :
+                step === n ? 'bg-mn-bronze text-white ring-4 ring-primary-100' :
                 'bg-mn-elevated text-mn-mute'
               )}>
                 {step > n ? <CheckCircle2 className="w-4 h-4" /> : n}
               </div>
-              <span className={cn('text-xs font-medium', step >= n ? 'text-mn-amber' : 'text-mn-mute')}>
+              <span className={cn('text-xs font-medium', step >= n ? 'text-mn-bronze' : 'text-mn-mute')}>
                 {label}
               </span>
             </div>
@@ -607,8 +607,8 @@ function CreatePostForm() {
                     className={cn(
                       'p-3 rounded-xl border text-left transition-all hover:shadow-sm snap-start shrink-0 w-48 md:w-auto touch-target',
                       form.type === t.value
-                        ? 'bg-mn-amber/5 border-mn-amber/30 ring-1 ring-primary-300 shadow-sm'
-                        : 'bg-mn-elevated border-white/8 hover:border-mn-amber/20'
+                        ? 'bg-mn-bronze/5 border-mn-bronze/30 ring-1 ring-primary-300 shadow-sm'
+                        : 'bg-mn-elevated border-white/8 hover:border-mn-bronze/20'
                     )}>
                     <div className="text-sm font-semibold text-mn-ink">{t.label}</div>
                     <div className="text-xs text-mn-mute mt-0.5">{t.desc}</div>
@@ -619,7 +619,7 @@ function CreatePostForm() {
 
             <div>
               <label className="label text-base font-semibold">Kategorie *
-                <span className="text-xs font-normal text-mn-amber ml-2">→ automatisch gewählt</span>
+                <span className="text-xs font-normal text-mn-bronze ml-2">→ automatisch gewählt</span>
               </label>
               <div className="flex gap-2 mt-2 overflow-x-auto snap-x pb-2 no-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none md:pb-0">
                 {availableCategories.map(c => (
@@ -627,8 +627,8 @@ function CreatePostForm() {
                     className={cn(
                       'px-3 py-2.5 rounded-xl border text-xs font-medium text-center transition-all whitespace-nowrap shrink-0 snap-start touch-target md:whitespace-normal md:shrink',
                       form.category === c.value
-                        ? 'bg-mn-amber text-white border-primary-600'
-                        : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-amber/20'
+                        ? 'bg-mn-bronze text-white border-primary-600'
+                        : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-bronze/20'
                     )}>
                     {c.label}
                   </button>
@@ -640,13 +640,13 @@ function CreatePostForm() {
               <label className="label text-base font-semibold">Dringlichkeit</label>
               <div className="flex gap-2 mt-2">
                 {[
-                  { v: 'low', l: '🟦 Normal', active: 'bg-mn-amber text-white border-primary-600' },
+                  { v: 'low', l: '🟦 Normal', active: 'bg-mn-bronze text-white border-primary-600' },
                   { v: 'medium', l: '🟧 Mittel', active: 'bg-orange-500 text-white border-white/8' },
                   { v: 'high',   l: '🔴 Dringend', active: 'bg-red-600 text-white border-mn-herzrot/20' },
                 ].map(({ v, l, active }) => (
                   <button key={v} type="button" onClick={() => set('urgency', v)}
                     className={cn('flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all',
-                      form.urgency === v ? active : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-amber/20')}>
+                      form.urgency === v ? active : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-bronze/20')}>
                     {l}
                   </button>
                 ))}
@@ -664,9 +664,9 @@ function CreatePostForm() {
         {step === 2 && (
           <div className="space-y-5">
             {/* Type badge */}
-            <div className="flex items-center gap-2 p-3 bg-mn-amber/5 rounded-xl border border-mn-amber/20">
-              <span className="text-sm font-semibold text-mn-amber">{selectedType?.label}</span>
-              <button onClick={() => setStep(1)} className="ml-auto text-xs text-mn-amber hover:underline">Ändern</button>
+            <div className="flex items-center gap-2 p-3 bg-mn-bronze/5 rounded-xl border border-mn-bronze/20">
+              <span className="text-sm font-semibold text-mn-bronze">{selectedType?.label}</span>
+              <button onClick={() => setStep(1)} className="ml-auto text-xs text-mn-bronze hover:underline">Ändern</button>
             </div>
 
             {/* Intent suggestion – switches type within the form when content mismatch detected */}
@@ -705,17 +705,17 @@ function CreatePostForm() {
                   />
                 </label>
                 <button type="button" onClick={() => setShowSuggestions(s => !s)}
-                  className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium">
+                  className="flex items-center gap-1 text-xs text-mn-bronze hover:text-mn-bronze font-medium">
                   <Sparkles className="w-3.5 h-3.5" /> Vorschläge
                 </button>
               </div>
               {showSuggestions && suggestions.length > 0 && (
                 <div className="mb-2 p-3 bg-mn-surface border border-white/5 rounded-xl space-y-1.5">
-                  <p className="text-xs text-mn-amber font-semibold mb-2">Tipp: Klicke auf einen Vorschlag</p>
+                  <p className="text-xs text-mn-bronze font-semibold mb-2">Tipp: Klicke auf einen Vorschlag</p>
                   {suggestions.map(s => (
                     <button key={s} type="button"
                       onClick={() => { set('title', s); setShowSuggestions(false) }}
-                      className="block w-full text-left text-xs text-mn-amber hover:bg-mn-elevated px-2 py-1.5 rounded-lg transition-colors">
+                      className="block w-full text-left text-xs text-mn-bronze hover:bg-mn-elevated px-2 py-1.5 rounded-lg transition-colors">
                       {s}
                     </button>
                   ))}
@@ -767,14 +767,14 @@ function CreatePostForm() {
               />
               <div className="flex items-center gap-2 mt-2">
                 <button type="button" onClick={handleGetLocation} disabled={gettingLocation}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-mn-amber/20 bg-mn-amber/5 text-mn-amber rounded-xl hover:bg-mn-amber/10 transition-all">
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-mn-bronze/20 bg-mn-bronze/5 text-mn-bronze rounded-xl hover:bg-mn-bronze/10 transition-all">
                   {gettingLocation
-                    ? <span className="w-3.5 h-3.5 border-2 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+                    ? <span className="w-3.5 h-3.5 border-2 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
                     : <Locate className="w-3.5 h-3.5" />}
                   GPS-Standort
                 </button>
                 {userLat !== null && (
-                  <span className="text-xs text-mn-amber flex items-center gap-1">
+                  <span className="text-xs text-mn-bronze flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> Koordinaten gesetzt
                   </span>
                 )}
@@ -820,7 +820,7 @@ function CreatePostForm() {
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addMediaUrl() } }}
                   placeholder="https://... (Video, Bild, etc.)" className="input flex-1 text-sm" disabled={mediaUrls.length >= 5} />
                 <button type="button" onClick={addMediaUrl} disabled={!mediaUrlInput.trim() || mediaUrls.length >= 5}
-                  className="px-3 py-2 bg-mn-amber text-white text-sm rounded-xl hover:bg-primary-700 disabled:opacity-40 transition-all">+</button>
+                  className="px-3 py-2 bg-mn-bronze text-white text-sm rounded-xl hover:bg-primary-700 disabled:opacity-40 transition-all">+</button>
               </div>
               {mediaUrls.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -862,7 +862,7 @@ function CreatePostForm() {
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {tags.map(tag => (
-                    <span key={tag} className="flex items-center gap-1 bg-mn-elevated text-mn-amber px-2.5 py-1 rounded-full text-xs font-medium">
+                    <span key={tag} className="flex items-center gap-1 bg-mn-elevated text-mn-bronze px-2.5 py-1 rounded-full text-xs font-medium">
                       #{tag}
                       <button type="button" onClick={() => setTags(t => t.filter(x => x !== tag))}
                         className="hover:text-mn-herzrot transition-colors">
@@ -875,18 +875,18 @@ function CreatePostForm() {
             </div>
 
             {/* Verfügbarkeit */}
-            <div className="bg-mn-amber/5 p-4 rounded-xl border border-mn-amber/20">
-              <label className="label text-xs text-mn-amber flex items-center gap-1 mb-2">
+            <div className="bg-mn-bronze/5 p-4 rounded-xl border border-mn-bronze/20">
+              <label className="label text-xs text-mn-bronze flex items-center gap-1 mb-2">
                 <Calendar className="w-3.5 h-3.5" /> Verfügbarkeit
                 <span className="font-normal ml-1">Uhrzeit von – bis (optional)</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-mn-amber mb-0.5 block">Verfügbar ab</label>
+                  <label className="text-xs text-mn-bronze mb-0.5 block">Verfügbar ab</label>
                   <input type="time" value={form.availability_start} onChange={e => set('availability_start', e.target.value)} className="input text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs text-mn-amber mb-0.5 block">Verfügbar bis</label>
+                  <label className="text-xs text-mn-bronze mb-0.5 block">Verfügbar bis</label>
                   <input type="time" value={form.availability_end} onChange={e => set('availability_end', e.target.value)}
                     className="input text-sm" />
                 </div>
@@ -1017,13 +1017,13 @@ function CreatePostForm() {
               className={cn(
                 'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none',
                 acceptedNoTrade
-                  ? 'bg-mn-amber/5 border-mn-amber/20'
+                  ? 'bg-mn-bronze/5 border-mn-bronze/20'
                   : 'bg-amber-50 border-amber-300'
               )}
             >
               <div className={cn(
                 'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
-                acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
+                acceptedNoTrade ? 'bg-mn-bronze border-mn-bronze' : 'border-amber-400 bg-mn-elevated'
               )}>
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>
@@ -1032,7 +1032,7 @@ function CreatePostForm() {
                 <p className="text-xs text-mn-ink-soft mt-0.5 leading-relaxed">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                   Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
-                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">AGB §4</a> nicht erlaubt.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-bronze underline">AGB §4</a> nicht erlaubt.
                 </p>
               </div>
             </div>
@@ -1040,7 +1040,7 @@ function CreatePostForm() {
             {/* Zusammenfassung */}
             <div className="p-4 bg-mn-surface rounded-xl border border-white/8 space-y-2">
               <p className="text-sm font-semibold text-mn-ink-soft flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-mn-amber" /> Zusammenfassung
+                <CheckCircle2 className="w-4 h-4 text-mn-bronze" /> Zusammenfassung
               </p>
               <div className="text-xs text-mn-ink-soft space-y-1.5">
                 <div className="flex gap-2"><span className="font-medium w-20 flex-shrink-0">Art:</span><span>{selectedType?.label}</span></div>
@@ -1055,8 +1055,8 @@ function CreatePostForm() {
                   <span className="font-medium w-20 flex-shrink-0">Dringlichkeit:</span>
                   <span className={cn('px-2 py-0.5 rounded-full text-xs font-semibold',
                     form.urgency === 'high' ? 'bg-mn-elevated text-mn-herzrot' :
-                    form.urgency === 'medium' ? 'bg-mn-elevated text-mn-amber-warm' :
-                    'bg-mn-amber/10 text-mn-amber')}>
+                    form.urgency === 'medium' ? 'bg-mn-elevated text-mn-bronze-warm' :
+                    'bg-mn-bronze/10 text-mn-bronze')}>
                     {form.urgency === 'high' ? '🔴 Dringend' : form.urgency === 'medium' ? '🟧 Mittel' : '🟦 Normal'}
                   </span>
                 </div>
@@ -1113,7 +1113,7 @@ function CreatePostContent() {
   if (postsCreated === null) {
     return (
       <div className="flex justify-center py-16">
-        <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
       </div>
     )
   }
@@ -1129,7 +1129,7 @@ export default function CreatePage() {
   return (
     <Suspense fallback={
       <div className="flex justify-center py-16">
-        <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
       </div>
     }>
       <CreatePostContent />

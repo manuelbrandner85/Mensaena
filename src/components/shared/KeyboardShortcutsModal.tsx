@@ -215,7 +215,7 @@ export default function KeyboardShortcutsModal() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
               <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-xl bg-mn-amber/10 text-mn-amber flex items-center justify-center">
+                <span className="w-9 h-9 rounded-xl bg-mn-bronze/10 text-mn-bronze flex items-center justify-center">
                   <Keyboard className="w-4 h-4" />
                 </span>
                 <div>
@@ -273,7 +273,7 @@ export default function KeyboardShortcutsModal() {
                     setOpen(false)
                     setTimeout(openCommandPalette, 80)
                   }}
-                  className="font-semibold text-mn-amber hover:underline"
+                  className="font-semibold text-mn-bronze hover:underline"
                 >
                   ⌘K öffnen
                 </button>

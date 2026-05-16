@@ -44,13 +44,13 @@ export default function CrisisHelperList({
     <div className="bg-mn-elevated border border-white/5 rounded-2xl shadow-sm overflow-hidden">
       <div className="px-4 pt-4 pb-3 border-b border-white/5 flex items-center justify-between">
         <h4 className="text-sm font-bold text-mn-ink flex items-center gap-2">
-          <Users className="w-4 h-4 text-mn-amber" />
+          <Users className="w-4 h-4 text-mn-bronze" />
           Helfer ({activeHelpers.length})
         </h4>
         {!myHelper && onOfferHelp && (
           <button
             onClick={() => setShowForm(true)}
-            className="px-3 py-1.5 bg-mn-amber text-white rounded-lg text-xs font-semibold hover:bg-primary-700 transition-colors flex items-center gap-1"
+            className="px-3 py-1.5 bg-mn-bronze text-white rounded-lg text-xs font-semibold hover:bg-primary-700 transition-colors flex items-center gap-1"
           >
             <HandHelping className="w-3 h-3" />
             Ich helfe!
@@ -70,21 +70,21 @@ export default function CrisisHelperList({
 
       {/* Offer form */}
       {showForm && (
-        <div className="px-4 py-3 border-b border-white/5 bg-mn-amber/5/50">
+        <div className="px-4 py-3 border-b border-white/5 bg-mn-bronze/5/50">
           <p className="text-xs font-semibold text-primary-800 mb-2">Hilfe anbieten:</p>
           <input
             type="text"
             value={message}
             onChange={e => setMessage(e.target.value)}
             placeholder="Nachricht (optional): z.B. Bin in 10 Min. da"
-            className="w-full px-3 py-2 bg-mn-elevated border border-mn-amber/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-200 mb-2"
+            className="w-full px-3 py-2 bg-mn-elevated border border-mn-bronze/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-200 mb-2"
             aria-label="Nachricht an Hilfesuchende"
           />
           <div className="flex gap-2">
             <button
               onClick={handleOffer}
               disabled={submitting}
-              className="px-4 py-2 bg-mn-amber text-white rounded-xl text-xs font-semibold hover:bg-primary-700 disabled:opacity-50 flex items-center gap-1"
+              className="px-4 py-2 bg-mn-bronze text-white rounded-xl text-xs font-semibold hover:bg-primary-700 disabled:opacity-50 flex items-center gap-1"
             >
               {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <HandHelping className="w-3 h-3" />}
               Hilfe bestätigen
@@ -159,7 +159,7 @@ export default function CrisisHelperList({
                         {h.status === 'offered' && (
                           <button
                             onClick={() => onUpdateStatus(h.id, 'accepted')}
-                            className="px-2 py-0.5 bg-mn-amber/10 text-mn-amber rounded text-xs hover:bg-primary-200"
+                            className="px-2 py-0.5 bg-mn-bronze/10 text-mn-bronze rounded text-xs hover:bg-primary-200"
                           >
                             Akzeptieren
                           </button>

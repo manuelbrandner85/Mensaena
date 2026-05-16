@@ -71,12 +71,12 @@ export default function EventReminder({
 
   return (
     <div className="flex items-center gap-2">
-      <Bell className="w-4 h-4 text-mn-amber" />
+      <Bell className="w-4 h-4 text-mn-bronze" />
       <select
         value={reminderMinutes}
         onChange={(e) => handleChange(Number(e.target.value))}
         disabled={saving}
-        className="text-sm border border-white/5 rounded-lg px-2 py-1 bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber/30 disabled:opacity-50"
+        className="text-sm border border-white/5 rounded-lg px-2 py-1 bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze/30 disabled:opacity-50"
       >
         {REMINDER_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>

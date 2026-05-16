@@ -38,10 +38,10 @@ interface ReferralRow {
 const BASE_URL = 'https://www.mensaena.de'
 
 const BADGE_LEVELS = [
-  { min: 3,  key: 'bronze',  label: 'Bronze',   emoji: '🥉', color: 'text-mn-amber-warm', bg: 'bg-mn-surface', border: 'border-white/8' },
+  { min: 3,  key: 'bronze',  label: 'Bronze',   emoji: '🥉', color: 'text-mn-bronze-warm', bg: 'bg-mn-surface', border: 'border-white/8' },
   { min: 10, key: 'silver',  label: 'Silber',   emoji: '🥈', color: 'text-mn-ink-soft',  bg: 'bg-mn-surface',  border: 'border-white/5'  },
   { min: 25, key: 'gold',    label: 'Gold',     emoji: '🥇', color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200'  },
-  { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-mn-amber', bg: 'bg-mn-surface', border: 'border-white/5' },
+  { min: 50, key: 'legend',  label: 'Legende',  emoji: '👑', color: 'text-mn-bronze', bg: 'bg-mn-surface', border: 'border-white/5' },
 ]
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -218,7 +218,7 @@ export default function InvitePage() {
 
       {/* Header */}
       <div>
-        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-amber transition-colors mb-4">
+        <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-bronze transition-colors mb-4">
           <ArrowLeft className="w-4 h-4" />
           Zurück zum Dashboard
         </Link>
@@ -229,7 +229,7 @@ export default function InvitePage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { value: sentCount,     label: 'Versendet',     color: 'text-mn-amber' },
+          { value: sentCount,     label: 'Versendet',     color: 'text-mn-bronze' },
           { value: acceptedCount, label: 'Angenommen',    color: 'text-mn-leben'   },
           { value: neighborCount || '–', label: 'In deiner PLZ', color: 'text-mn-teal-soft' },
         ].map(({ value, label, color }) => (
@@ -311,7 +311,7 @@ export default function InvitePage() {
             placeholder="z.B. Komm, wir helfen uns gegenseitig in der Gartenstraße!"
             maxLength={120}
             rows={2}
-            className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/20 placeholder:text-mn-mute"
+            className="w-full text-sm text-mn-ink-soft bg-mn-surface border border-white/5 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-bronze/20 placeholder:text-mn-mute"
           />
           <p className="text-xs text-mn-mute mt-1 text-right">{personalMsg.length}/120</p>
         </div>
@@ -325,7 +325,7 @@ export default function InvitePage() {
               'flex-shrink-0 p-1.5 rounded-lg transition-all',
               copied
                 ? 'bg-mn-elevated text-mn-leben'
-                : 'bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-amber hover:border-mn-amber/20',
+                : 'bg-mn-elevated border border-white/5 text-mn-mute hover:text-mn-bronze hover:border-mn-bronze/20',
             )}
             aria-label="Link kopieren"
           >
@@ -352,7 +352,7 @@ export default function InvitePage() {
           </a>
           <a
             href={`sms:?body=${shareText}`}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-amber transition-colors"
+            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-mn-surface hover:bg-mn-elevated border border-white/5 text-mn-bronze transition-colors"
           >
             <Smartphone className="w-5 h-5" />
             <span className="text-xs font-medium">SMS</span>

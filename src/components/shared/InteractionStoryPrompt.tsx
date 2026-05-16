@@ -79,8 +79,8 @@ export default function InteractionStoryPrompt({
           <>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-                  <BookHeart className="w-4 h-4 text-mn-amber" />
+                <div className="w-9 h-9 rounded-xl bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+                  <BookHeart className="w-4 h-4 text-mn-bronze" />
                 </div>
                 <div>
                   <p className="font-bold text-mn-ink leading-tight">Geschichte teilen?</p>
@@ -168,7 +168,7 @@ export default function InteractionStoryPrompt({
                 disabled={step === 'sending'}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all',
-                  'bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-60',
+                  'bg-mn-bronze text-white hover:bg-primary-700 disabled:opacity-60',
                 )}
               >
                 {step === 'sending'

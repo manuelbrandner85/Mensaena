@@ -48,14 +48,14 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
   if (success) {
     return (
       <div className="text-center py-12 bg-mn-elevated rounded-2xl border border-white/5">
-        <CheckCircle className="w-12 h-12 text-mn-amber mx-auto mb-3" />
+        <CheckCircle className="w-12 h-12 text-mn-bronze mx-auto mb-3" />
         <h2 className="text-lg font-bold text-mn-ink mb-1">Vielen Dank!</h2>
         <p className="text-mn-ink-soft text-sm mb-4">
           Dein Vorschlag wurde eingereicht und wird von unserem Team geprüft.
         </p>
         <button
           onClick={() => setSuccess(false)}
-          className="px-4 py-2 bg-mn-amber/5 text-mn-amber rounded-xl text-sm font-medium hover:bg-mn-amber/10 transition-colors"
+          className="px-4 py-2 bg-mn-bronze/5 text-mn-bronze rounded-xl text-sm font-medium hover:bg-mn-bronze/10 transition-colors"
         >
           Weiteren Vorschlag einreichen
         </button>
@@ -226,7 +226,7 @@ export default function SuggestionForm({ userId, onSubmit, submitting }: Props) 
       <button
         type="submit"
         disabled={submitting || !form.name.trim()}
-        className="flex items-center gap-2 px-6 py-3 bg-mn-amber text-white font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors text-sm"
+        className="flex items-center gap-2 px-6 py-3 bg-mn-bronze text-white font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors text-sm"
       >
         <Send className="w-4 h-4" />
         {submitting ? 'Wird eingereicht...' : 'Vorschlag einreichen'}

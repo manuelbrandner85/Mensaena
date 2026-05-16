@@ -76,7 +76,7 @@ export function LocationDisplay({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Adresse auf Karte öffnen: ${label}`}
-        className={`inline-flex items-center gap-1.5 text-sm text-mn-ink-soft hover:text-mn-amber dark:text-mn-ghost dark:hover:text-primary-400 ${className}`}
+        className={`inline-flex items-center gap-1.5 text-sm text-mn-ink-soft hover:text-mn-bronze dark:text-mn-ghost dark:hover:text-primary-400 ${className}`}
       >
         {content}
       </a>

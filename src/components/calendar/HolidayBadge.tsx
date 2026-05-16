@@ -154,8 +154,8 @@ function CompactBadge({
     <div
       className={cn(
         'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium',
-        'bg-mn-surface border border-white/5 text-mn-amber',
-        'dark:bg-purple-900/30 dark:border-white/5 dark:text-mn-amber',
+        'bg-mn-surface border border-white/5 text-mn-bronze',
+        'dark:bg-purple-900/30 dark:border-white/5 dark:text-mn-bronze',
         className,
       )}
       role="status"
@@ -208,12 +208,12 @@ function DefaultBadge({
       }
     : status.kind === 'tomorrow'
     ? {
-        bg: 'bg-gradient-to-br from-mn-amber via-mn-amber/3 to-mn-amber-warm',
+        bg: 'bg-gradient-to-br from-mn-bronze via-mn-bronze/3 to-mn-bronze-warm',
         border: 'border-white/5',
         iconBg: 'bg-purple-500 text-white',
-        text: 'text-mn-amber',
-        sub: 'text-mn-amber',
-        dark: 'dark:from-mn-amber/30 dark:via-mn-amber/3/30 dark:to-mn-amber-warm/30 dark:border-white/5 dark:text-mn-amber',
+        text: 'text-mn-bronze',
+        sub: 'text-mn-bronze',
+        dark: 'dark:from-mn-bronze/30 dark:via-mn-bronze/3/30 dark:to-mn-bronze-warm/30 dark:border-white/5 dark:text-mn-bronze',
       }
     : {
         bg: 'bg-mn-surface',

@@ -14,7 +14,7 @@ const sizeStyles = {
 const variantStyles = {
   ghost:   'icon-btn',
   subtle:  'text-mn-mute hover:text-mn-ink hover:bg-mn-elevated/5 transition-all',
-  primary: 'text-mn-amber hover:text-primary-800 hover:bg-mn-amber/5 transition-all',
+  primary: 'text-mn-bronze hover:text-primary-800 hover:bg-mn-bronze/5 transition-all',
   danger:  'text-mn-mute hover:text-mn-herzrot hover:bg-mn-surface transition-all',
 } as const
 

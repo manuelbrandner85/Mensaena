@@ -50,7 +50,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all',
                 filter.role === tab.value
-                  ? 'bg-mn-amber text-white shadow-sm'
+                  ? 'bg-mn-bronze text-white shadow-sm'
                   : 'bg-mn-elevated text-mn-ink-soft hover:bg-mn-surface border border-white/5',
               )}
             >
@@ -76,7 +76,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
             value={filter.status}
             onChange={e => onFilterChange({ status: e.target.value as any })}
             aria-label="Status filtern"
-            className="px-3 py-2 rounded-lg text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30"
+            className="px-3 py-2 rounded-lg text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft focus:ring-2 focus:ring-mn-bronze focus:border-mn-bronze/30"
           >
             {STATUS_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -91,7 +91,7 @@ export default function InteractionFilters({ filter, onFilterChange }: Props) {
               onChange={e => setSearchInput(e.target.value)}
               inputMode="search"
               placeholder="Post oder Partner suchen..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-white/5 bg-mn-elevated focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30"
+              className="w-full pl-9 pr-3 py-2 rounded-lg text-sm border border-white/5 bg-mn-elevated focus:ring-2 focus:ring-mn-bronze focus:border-mn-bronze/30"
             />
           </div>
         </div>

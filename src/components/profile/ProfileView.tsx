@@ -100,7 +100,7 @@ const LEVEL_MAP: Record<number | string, { emoji: string; name: string }> = {
 
 // Trust level tier based on trust_score (0-100 scale)
 function getTrustTier(score: number): { label: string; color: string; emoji: string } {
-  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-mn-amber/10 text-primary-800 border-mn-amber/20', emoji: '🌟' }
+  if (score >= 80) return { label: 'Vorbildlich', color: 'bg-mn-bronze/10 text-primary-800 border-mn-bronze/20', emoji: '🌟' }
   if (score >= 60) return { label: 'Vertrauenswürdig', color: 'bg-mn-elevated text-mn-leben border-white/5', emoji: '✅' }
   if (score >= 40) return { label: 'Aufbauend', color: 'bg-mn-elevated text-mn-teal-soft border-white/5', emoji: '💪' }
   if (score >= 20) return { label: 'Einsteiger', color: 'bg-amber-100 text-amber-800 border-amber-300', emoji: '🌱' }
@@ -273,7 +273,7 @@ function InlineEdit({ value, onSave, type = 'text', maxLength, placeholder, clas
         />
       )}
       <button onClick={handleSave} disabled={saving} aria-label="Speichern"
-        className="p-1.5 rounded-lg bg-mn-amber/10 text-mn-amber hover:bg-primary-200 transition-colors">
+        className="p-1.5 rounded-lg bg-mn-bronze/10 text-mn-bronze hover:bg-primary-200 transition-colors">
         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
       </button>
       <button onClick={handleCancel} aria-label="Abbrechen" className="p-1.5 rounded-lg bg-mn-elevated text-mn-mute hover:bg-mn-raised transition-colors">
@@ -563,7 +563,7 @@ export default function ProfileView({
                 {currentAvatarUrl ? (
                   <img src={currentAvatarUrl} alt={displayName} className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <span className="text-mn-amber text-3xl font-bold">{initials}</span>
+                  <span className="text-mn-bronze text-3xl font-bold">{initials}</span>
                 )}
               </div>
             </div>
@@ -572,7 +572,7 @@ export default function ProfileView({
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="absolute bottom-1 right-1 w-9 h-9 bg-mn-amber text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-all z-10"
+                  className="absolute bottom-1 right-1 w-9 h-9 bg-mn-bronze text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-700 transition-all z-10"
                   title="Profilbild ändern"
                 >
                   {avatarUploading
@@ -621,7 +621,7 @@ export default function ProfileView({
               </span>
             )}
             {profile.verified_community && (
-              <span title="Community verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-mn-surface text-mn-amber px-2 py-0.5 rounded-full border border-white/5">
+              <span title="Community verifiziert" className="inline-flex items-center gap-0.5 text-xs bg-mn-surface text-mn-bronze px-2 py-0.5 rounded-full border border-white/5">
                 &#x1F91D; Community
               </span>
             )}
@@ -642,7 +642,7 @@ export default function ProfileView({
               </>
             )}
             {(profile.impact_score ?? 0) >= 50 && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-mn-elevated text-mn-amber-warm border border-white/8">
+              <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-mn-elevated text-mn-bronze-warm border border-white/8">
                 🔥 Impact-Held
               </span>
             )}
@@ -677,7 +677,7 @@ export default function ProfileView({
             ) : currentBio ? (
               <div className="text-mn-ink-soft italic text-sm">
                 {!bioExpanded && currentBio.length > 100
-                  ? <>{truncateText(currentBio, 100)} <button onClick={() => setBioExpanded(true)} className="text-mn-amber not-italic font-medium">Mehr anzeigen</button></>
+                  ? <>{truncateText(currentBio, 100)} <button onClick={() => setBioExpanded(true)} className="text-mn-bronze not-italic font-medium">Mehr anzeigen</button></>
                   : currentBio
                 }
               </div>
@@ -710,7 +710,7 @@ export default function ProfileView({
           <button
             onClick={handleDM}
             disabled={dmLoading}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50"
           >
             {dmLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
             Nachricht senden
@@ -739,7 +739,7 @@ export default function ProfileView({
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               {currentSkills.map(skill => (
-                <span key={skill} className="inline-flex items-center gap-1 bg-mn-amber/10 text-mn-amber rounded-full px-3 py-1 text-sm">
+                <span key={skill} className="inline-flex items-center gap-1 bg-mn-bronze/10 text-mn-bronze rounded-full px-3 py-1 text-sm">
                   {skill}
                   <button onClick={() => handleRemoveSkill(skill)} aria-label="Fähigkeit entfernen" className="ml-0.5 hover:text-mn-herzrot">
                     <X className="w-3 h-3" />
@@ -779,7 +779,7 @@ export default function ProfileView({
             </div>
             <div className="flex gap-2">
               <button onClick={() => handleSaveSkills(currentSkills)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all">
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all">
                 <Check className="w-3.5 h-3.5" /> Speichern
               </button>
               <button onClick={() => { setSkillEditing(false); setCurrentSkills(profile.skills ?? []); setShowSuggestions(false) }}
@@ -791,7 +791,7 @@ export default function ProfileView({
         ) : (
           <div className="flex flex-wrap gap-2">
             {currentSkills.length > 0 ? currentSkills.map(skill => (
-              <span key={skill} className="bg-mn-amber/10 text-mn-amber rounded-full px-3 py-1 text-sm font-medium">
+              <span key={skill} className="bg-mn-bronze/10 text-mn-bronze rounded-full px-3 py-1 text-sm font-medium">
                 {skill}
               </span>
             )) : (
@@ -818,7 +818,7 @@ export default function ProfileView({
             <div className="text-sm text-mn-mute">Geholfen</div>
           </div>
           <div className="bg-mn-surface rounded-xl p-4 text-center">
-            <MessageCircle className="w-5 h-5 text-mn-amber mx-auto mb-1.5" />
+            <MessageCircle className="w-5 h-5 text-mn-bronze mx-auto mb-1.5" />
             <div className="text-2xl font-bold text-mn-ink">{stats.messages_count}</div>
             <div className="text-sm text-mn-mute">Nachrichten</div>
           </div>
@@ -872,7 +872,7 @@ export default function ProfileView({
                     <p className="text-xs text-mn-mute mb-2">{ach.desc}</p>
                     <div className="w-full h-2 bg-mn-raised rounded-full overflow-hidden">
                       <div
-                        className={cn('h-full rounded-full transition-all duration-500', ach.earned ? 'bg-amber-500' : 'bg-mn-amber')}
+                        className={cn('h-full rounded-full transition-all duration-500', ach.earned ? 'bg-amber-500' : 'bg-mn-bronze')}
                         style={{ width: `${Math.round(ach.progress * 100)}%` }}
                       />
                     </div>
@@ -896,7 +896,7 @@ export default function ProfileView({
         <div className="grid grid-cols-10 gap-1">
           {heatmapData.map((d) => {
             const intensity = d.count === 0 ? 0 : d.count <= 2 ? 1 : d.count <= 5 ? 2 : 3
-            const colors = ['bg-mn-elevated', 'bg-primary-200', 'bg-primary-400', 'bg-mn-amber']
+            const colors = ['bg-mn-elevated', 'bg-primary-200', 'bg-primary-400', 'bg-mn-bronze']
             return (
               <div
                 key={d.date}
@@ -912,7 +912,7 @@ export default function ProfileView({
           <div className="w-3 h-3 rounded-sm bg-mn-elevated" />
           <div className="w-3 h-3 rounded-sm bg-primary-200" />
           <div className="w-3 h-3 rounded-sm bg-primary-400" />
-          <div className="w-3 h-3 rounded-sm bg-mn-amber" />
+          <div className="w-3 h-3 rounded-sm bg-mn-bronze" />
           <span>Mehr</span>
         </div>
       </div>
@@ -984,7 +984,7 @@ export default function ProfileView({
               <>
                 <p className="text-sm text-mn-mute">Du hast noch keinen Beitrag erstellt</p>
                 <Link href="/dashboard/create"
-                  className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-mn-amber hover:text-mn-amber transition-colors">
+                  className="inline-flex items-center gap-1.5 mt-3 text-sm font-medium text-mn-bronze hover:text-mn-bronze transition-colors">
                   <Plus className="w-4 h-4" /> Ersten Beitrag erstellen
                 </Link>
               </>
@@ -1027,7 +1027,7 @@ export default function ProfileView({
               </button>
               <button
                 onClick={() => setShowQRCode(false)}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-colors"
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-colors"
               >
                 Schließen
               </button>

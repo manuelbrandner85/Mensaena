@@ -59,7 +59,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ))}
 
       {adding ? (
-        <div className="border border-mn-amber/20 rounded-xl p-4 space-y-3 bg-mn-amber/5/30">
+        <div className="border border-mn-bronze/20 rounded-xl p-4 space-y-3 bg-mn-bronze/5/30">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="label">{t('labelName')}</label>
@@ -100,7 +100,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
             </select>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleAdd} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all min-h-[36px]">
+            <button onClick={handleAdd} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all min-h-[36px]">
               {t('addButton')}
             </button>
             <button onClick={() => setAdding(false)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised transition-all min-h-[36px]">
@@ -111,7 +111,7 @@ export default function EmergencyContacts({ contacts, onChange, readOnly = false
       ) : !readOnly && contacts.length < 3 && (
         <button
           onClick={() => setAdding(true)}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-white/5 text-mn-mute hover:border-mn-amber/20 hover:text-mn-amber transition-colors min-h-[44px]"
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium border-2 border-dashed border-white/5 text-mn-mute hover:border-mn-bronze/20 hover:text-mn-bronze transition-colors min-h-[44px]"
         >
           <Plus className="w-4 h-4" /> {t('addContact')}
         </button>

@@ -15,7 +15,7 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
   return (
     <Card variant="flat" padding="md">
       <div className="flex items-center gap-2 text-sm font-semibold text-mn-ink">
-        <Shield className="w-4 h-4 text-mn-amber" />
+        <Shield className="w-4 h-4 text-mn-bronze" />
         Dein Vertrauen
       </div>
 
@@ -26,7 +26,7 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
           </p>
           <button
             onClick={() => toast('Hilf deinen Nachbarn – nach jeder Interaktion können sie dich bewerten. So baust du Vertrauen auf! ⭐', { icon: 'ℹ️', duration: 5000 })}
-            className="text-xs text-mn-amber hover:text-mn-amber font-medium mt-2 transition-colors"
+            className="text-xs text-mn-bronze hover:text-mn-bronze font-medium mt-2 transition-colors"
           >
             Wie funktioniert das?
           </button>
@@ -62,8 +62,8 @@ export default function TrustScoreCard({ trustScore }: TrustScoreCardProps) {
           <div className="flex items-center gap-1 mt-2">
             {trend === 'up' && (
               <>
-                <TrendingUp className="w-3.5 h-3.5 text-mn-amber" />
-                <span className="text-xs text-mn-amber font-medium">steigend</span>
+                <TrendingUp className="w-3.5 h-3.5 text-mn-bronze" />
+                <span className="text-xs text-mn-bronze font-medium">steigend</span>
               </>
             )}
             {trend === 'down' && (

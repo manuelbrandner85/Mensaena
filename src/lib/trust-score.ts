@@ -55,7 +55,7 @@ const TRUST_LEVELS: TrustLevelInfo[] = [
   {
     level: 4,
     name: 'Mentor',
-    color: 'text-mn-amber',
+    color: 'text-mn-bronze',
     bgColor: 'bg-mn-surface',
     borderColor: 'border-white/5',
     icon: '💫',

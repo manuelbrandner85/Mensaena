@@ -50,7 +50,7 @@ export default function ActivityFeedItem({
   return (
     <button
       onClick={() => router.push(activity.linkTo)}
-      className="w-full flex gap-0 text-left group hover:bg-mn-amber/5/40 transition-colors duration-200"
+      className="w-full flex gap-0 text-left group hover:bg-mn-bronze/5/40 transition-colors duration-200"
     >
       {/* Timeline node column */}
       <div className="flex flex-col items-center w-10 flex-shrink-0 pt-4 pb-0">

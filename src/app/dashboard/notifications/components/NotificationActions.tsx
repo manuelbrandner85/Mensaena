@@ -53,7 +53,7 @@ export default function NotificationActions({ activeFilter, unreadCount, onMarkA
           onClick={handleMarkAllRead}
           disabled={unreadCount === 0 || markingRead}
           title="Alle als gelesen markieren"
-          className="p-2 rounded-xl text-mn-mute hover:bg-mn-elevated hover:text-mn-amber disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 rounded-xl text-mn-mute hover:bg-mn-elevated hover:text-mn-bronze disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           aria-label="Alle als gelesen markieren"
         >
           <CheckCheck className="w-4 h-4" />

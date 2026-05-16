@@ -37,7 +37,7 @@ export default function PublicFooter() {
               Ressourcen nachhaltig teilen &ndash; lokal und persoenlich.
             </p>
             <div className="flex items-center gap-2 text-sm text-mn-mute mb-5">
-              <Heart className="w-4 h-4 text-mn-amber" />
+              <Heart className="w-4 h-4 text-mn-bronze" />
               <span>Made with care for the community</span>
             </div>
             {/* Social Media */}
@@ -92,7 +92,7 @@ export default function PublicFooter() {
             </h3>
             <div className="p-3 bg-ink-800 rounded-xl mb-4">
               <div className="flex items-center gap-2 mb-1">
-                <Mail className="w-4 h-4 text-mn-amber" />
+                <Mail className="w-4 h-4 text-mn-bronze" />
                 <span className="text-xs font-medium text-white">E-Mail</span>
               </div>
               <a

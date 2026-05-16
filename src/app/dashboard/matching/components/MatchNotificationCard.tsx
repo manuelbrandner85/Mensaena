@@ -29,8 +29,8 @@ const typeConfig: Record<MatchNotificationType, {
   },
   match_both_accepted: {
     icon: Users,
-    color: 'text-mn-amber',
-    bg: 'bg-mn-amber/5',
+    color: 'text-mn-bronze',
+    bg: 'bg-mn-bronze/5',
   },
   match_expiring: {
     icon: Clock,

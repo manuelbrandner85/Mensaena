@@ -122,7 +122,7 @@ export default function ThankYouButton({
                   className={cn(
                     'flex-1 aspect-square rounded-xl text-3xl transition-all',
                     emoji === e
-                      ? 'bg-mn-amber/5 ring-2 ring-primary-400 scale-110'
+                      ? 'bg-mn-bronze/5 ring-2 ring-primary-400 scale-110'
                       : 'bg-mn-surface hover:bg-mn-elevated/5 hover:scale-105',
                   )}
                   aria-pressed={emoji === e}
@@ -155,7 +155,7 @@ export default function ThankYouButton({
                 'w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all',
                 sent
                   ? 'bg-green-500 text-white'
-                  : 'bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-60',
+                  : 'bg-mn-bronze text-white hover:bg-primary-700 disabled:opacity-60',
               )}
             >
               {sending && <Loader2 className="w-4 h-4 animate-spin" />}

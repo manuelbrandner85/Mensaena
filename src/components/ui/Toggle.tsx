@@ -53,7 +53,7 @@ export default function Toggle({
         className={cn(
           'relative inline-flex flex-shrink-0 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2',
           trackSize[size],
-          checked ? 'bg-mn-amber' : 'bg-mn-raised',
+          checked ? 'bg-mn-bronze' : 'bg-mn-raised',
         )}
       >
         <span

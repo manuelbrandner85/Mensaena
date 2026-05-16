@@ -166,7 +166,7 @@ export default function AdminDashboard() {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-mn-mute">Prüfe Berechtigung...</p>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function AdminDashboard() {
         <p className="text-mn-mute text-sm max-w-sm">
           Dieses Dashboard ist nur für Administratoren und Moderatoren zugänglich.
         </p>
-        <Link href="/dashboard" className="px-4 py-2 bg-mn-amber text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors">
+        <Link href="/dashboard" className="px-4 py-2 bg-mn-bronze text-white rounded-xl text-sm font-medium hover:bg-primary-700 transition-colors">
           Zurück zum Dashboard
         </Link>
       </div>
@@ -209,8 +209,8 @@ export default function AdminDashboard() {
           <div className="meta-label meta-label--subtle mb-3">§ 99 / Admin</div>
           <div className="flex items-end justify-between flex-wrap gap-4">
             <div className="flex items-start gap-4 min-w-0">
-              <div className="w-12 h-12 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
-                <ShieldCheck className="w-5 h-5 text-mn-amber" />
+              <div className="w-12 h-12 rounded-2xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+                <ShieldCheck className="w-5 h-5 text-mn-bronze" />
               </div>
               <div className="min-w-0">
                 <h1 className="page-title truncate">{currentTitle.title}</h1>
@@ -232,7 +232,7 @@ export default function AdminDashboard() {
         {/* Tab Content */}
         {loading && tab === 'overview' ? (
           <div className="flex items-center justify-center min-h-48 bg-mn-elevated rounded-2xl border border-white/5">
-            <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <>

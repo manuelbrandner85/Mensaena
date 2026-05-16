@@ -229,7 +229,7 @@ export default function FoodProductCard({
                     'text-xs font-semibold px-2.5 py-1 rounded-full',
                     isWarning
                       ? 'bg-mn-elevated text-mn-herzrot dark:bg-red-900/40 dark:text-mn-herzrot ring-1 ring-mn-herzrot/30'
-                      : 'bg-mn-surface text-mn-amber-warm dark:bg-orange-900/30 dark:text-mn-amber-warm',
+                      : 'bg-mn-surface text-mn-bronze-warm dark:bg-orange-900/30 dark:text-mn-bronze-warm',
                   )}
                 >
                   {isWarning && '⚠️ '}
@@ -272,7 +272,7 @@ export default function FoodProductCard({
               if (onShareToMensaena) setShareOpen(true)
               else onUse?.()
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-amber hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-bronze hover:bg-primary-700 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
           >
             <Share2 className="w-4 h-4" />
             {shareLabel}

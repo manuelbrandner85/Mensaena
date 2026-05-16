@@ -80,7 +80,7 @@ export function Toggle({ value, onChange, disabled }: {
         'relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200',
         'focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2',
         'min-w-[44px] min-h-[44px] p-[8.5px]',
-        value ? 'bg-mn-amber' : 'bg-mn-raised',
+        value ? 'bg-mn-bronze' : 'bg-mn-raised',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
       style={{ minWidth: 44, minHeight: 44 }}

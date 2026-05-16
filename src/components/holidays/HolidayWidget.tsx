@@ -128,7 +128,7 @@ export function HolidayWidget({
       aria-label="Feiertage"
     >
       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-mn-ink dark:text-stone-100">
-        <Calendar aria-hidden className="h-4 w-4 text-mn-amber" />
+        <Calendar aria-hidden className="h-4 w-4 text-mn-bronze" />
         Feiertage
       </h3>
       <ul className="space-y-1.5">

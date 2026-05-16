@@ -133,7 +133,7 @@ export default function SearchBar() {
                       <button
                         key={r.id}
                         onClick={() => handleSelect(r.url)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-mn-amber/5 text-left transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-mn-bronze/5 text-left transition-colors"
                       >
                         <span className="text-lg flex-shrink-0">{r.emoji}</span>
                         <div className="min-w-0">
@@ -148,7 +148,7 @@ export default function SearchBar() {
               <div className="px-4 py-2 border-t border-white/8">
                 <button
                   onClick={() => handleSelect(`/dashboard/posts?q=${encodeURIComponent(query)}`)}
-                  className="text-xs text-mn-amber hover:underline"
+                  className="text-xs text-mn-bronze hover:underline"
                 >
                   Alle Ergebnisse für „{query}" anzeigen →
                 </button>

@@ -50,9 +50,9 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 
 const RARITY_COLORS: Record<string, { bg: string; border: string; text: string; glow: string }> = {
   common:    { bg: 'bg-mn-surface',   border: 'border-white/5',  text: 'text-mn-ink-soft',   glow: '' },
-  uncommon:  { bg: 'bg-mn-amber/5', border: 'border-mn-amber/20', text: 'text-mn-amber', glow: '' },
+  uncommon:  { bg: 'bg-mn-bronze/5', border: 'border-mn-bronze/20', text: 'text-mn-bronze', glow: '' },
   rare:      { bg: 'bg-mn-surface',   border: 'border-white/5',  text: 'text-mn-teal-soft',   glow: 'shadow-blue-100' },
-  epic:      { bg: 'bg-mn-surface', border: 'border-white/5',text: 'text-mn-amber', glow: 'shadow-purple-100' },
+  epic:      { bg: 'bg-mn-surface', border: 'border-white/5',text: 'text-mn-bronze', glow: 'shadow-purple-100' },
   legendary: { bg: 'bg-amber-50',  border: 'border-amber-300', text: 'text-amber-600',  glow: 'shadow-amber-200 shadow-lg' },
 }
 
@@ -104,7 +104,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
     common:    { from: '#CBD5E1', to: '#94A3B8', ribbon: '#64748B', shine: '#E2E8F0', ring: 'ring-stone-300' },
     uncommon:  { from: '#5EEAD4', to: '#1EAAA6', ribbon: '#147170', shine: '#CCFBF1', ring: 'ring-primary-300' },
     rare:      { from: '#93C5FD', to: '#3B82F6', ribbon: '#1D4ED8', shine: '#DBEAFE', ring: 'ring-mn-teal/30' },
-    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-mn-amber/30' },
+    epic:      { from: '#C4B5FD', to: '#8B5CF6', ribbon: '#6D28D9', shine: '#EDE9FE', ring: 'ring-mn-bronze/30' },
     legendary: { from: '#FDE68A', to: '#F59E0B', ribbon: '#B45309', shine: '#FEF3C7', ring: 'ring-amber-400' },
   }
   const colors = accentMap[badge.rarity] ?? accentMap.common
@@ -196,7 +196,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
 
       {/* Erhalten-Datum */}
       {earned && earnedAt && (
-        <p className="text-xs text-mn-amber mt-2 font-medium">
+        <p className="text-xs text-mn-bronze mt-2 font-medium">
           Erhalten am {new Date(earnedAt).toLocaleDateString('de-DE')}
         </p>
       )}
@@ -341,7 +341,7 @@ export default function BadgesPage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
-              <Award className="w-6 h-6 text-mn-amber" />
+              <Award className="w-6 h-6 text-mn-bronze" />
             </div>
             <div>
               <h1 className="page-title">Badges & Erfolge</h1>
@@ -462,13 +462,13 @@ export default function BadgesPage() {
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setFilterCat('all')}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                filterCat === 'all' ? 'bg-mn-elevated border-white/5 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
+                filterCat === 'all' ? 'bg-mn-elevated border-white/5 text-mn-bronze' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
               Alle ({badges.length})
             </button>
             {categories.map(cat => (
               <button key={cat} onClick={() => setFilterCat(filterCat === cat ? 'all' : cat)}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all border',
-                  filterCat === cat ? 'bg-mn-elevated border-white/5 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
+                  filterCat === cat ? 'bg-mn-elevated border-white/5 text-mn-bronze' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface')}>
                 {CATEGORY_LABELS[cat] ?? cat} ({badges.filter(b => b.category === cat).length})
               </button>
             ))}

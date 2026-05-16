@@ -129,12 +129,12 @@ export default function ZeitbankTab() {
     <div className="space-y-4">
       {/* Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="bg-mn-amber/5 rounded-xl p-4 border border-white/8">
+        <div className="bg-mn-bronze/5 rounded-xl p-4 border border-white/8">
           <div className="flex items-center gap-2 mb-1">
-            <Clock className="w-4 h-4 text-mn-amber" />
+            <Clock className="w-4 h-4 text-mn-bronze" />
             <span className="text-xs font-medium text-mn-mute">Bestätigte Stunden</span>
           </div>
-          <p className="text-2xl font-bold text-mn-amber">{totalHours.toFixed(1)}h</p>
+          <p className="text-2xl font-bold text-mn-bronze">{totalHours.toFixed(1)}h</p>
         </div>
         <div className="bg-mn-surface rounded-xl p-4 border border-white/5">
           <div className="flex items-center gap-2 mb-1">
@@ -164,7 +164,7 @@ export default function ZeitbankTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>
@@ -198,7 +198,7 @@ export default function ZeitbankTab() {
                           {e.description}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className="inline-flex items-center gap-1 text-sm font-bold text-mn-amber">
+                          <span className="inline-flex items-center gap-1 text-sm font-bold text-mn-bronze">
                             <Clock className="w-3.5 h-3.5" />
                             {Number(e.hours).toFixed(1)}h
                           </span>

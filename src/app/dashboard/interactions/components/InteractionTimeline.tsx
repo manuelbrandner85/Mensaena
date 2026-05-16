@@ -11,12 +11,12 @@ import { UPDATE_TYPE_LABELS, type InteractionUpdate } from '../types'
 
 const UPDATE_ICONS: Record<string, { icon: typeof UserPlus; color: string }> = {
   created:       { icon: UserPlus,      color: 'bg-mn-elevated text-mn-teal-soft' },
-  accepted:      { icon: CheckCircle,   color: 'bg-mn-amber/10 text-mn-amber' },
+  accepted:      { icon: CheckCircle,   color: 'bg-mn-bronze/10 text-mn-bronze' },
   declined:      { icon: XCircle,       color: 'bg-mn-elevated text-mn-herzrot' },
   in_progress:   { icon: Play,          color: 'bg-amber-100 text-amber-600' },
   completed:     { icon: Flag,          color: 'bg-mn-elevated text-mn-leben' },
   cancelled:     { icon: Ban,           color: 'bg-mn-elevated text-mn-herzrot' },
-  disputed:      { icon: AlertTriangle, color: 'bg-mn-elevated text-mn-amber-warm' },
+  disputed:      { icon: AlertTriangle, color: 'bg-mn-elevated text-mn-bronze-warm' },
   resolved:      { icon: Scale,         color: 'bg-mn-elevated text-mn-ink-soft' },
   message:       { icon: MessageCircle, color: 'bg-mn-elevated text-mn-ink-soft' },
   status_change: { icon: RefreshCw,     color: 'bg-mn-elevated text-mn-teal-soft' },
@@ -96,21 +96,21 @@ export default function InteractionTimeline({ updates, loading, canAddNote, onAd
       {/* Add note input */}
       {canAddNote && (
         <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
-          <div className="w-7 h-7 rounded-full bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-            <User className="w-3.5 h-3.5 text-mn-amber" />
+          <div className="w-7 h-7 rounded-full bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 text-mn-bronze" />
           </div>
           <input
             type="text"
             value={note}
             onChange={e => setNote(e.target.value)}
             placeholder="Notiz hinzufuegen..."
-            className="flex-1 text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30"
+            className="flex-1 text-sm border border-white/5 rounded-lg px-3 py-2 focus:ring-2 focus:ring-mn-bronze focus:border-mn-bronze/30"
             onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
           <button
             onClick={handleSend}
             disabled={!note.trim() || sending}
-            className="p-2 rounded-lg bg-mn-amber text-white hover:bg-primary-700 transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-mn-bronze text-white hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
           </button>

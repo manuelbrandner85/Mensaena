@@ -161,7 +161,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           onChange={(e) => setTitle(e.target.value.slice(0, 100))}
           placeholder="Wie heißt deine Veranstaltung?"
           className={cn(
-            'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent',
+            'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent',
             errors.title ? 'border-mn-herzrot/20' : 'border-white/5',
           )}
           required
@@ -182,7 +182,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           onChange={(e) => setDescription(e.target.value.slice(0, 2000))}
           placeholder="Beschreibe was passiert, wer eingeladen ist und was die Teilnehmer erwartet..."
           rows={4}
-          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
         <div className={cn('text-xs text-right mt-1', description.length > 1800 ? 'text-mn-herzrot' : 'text-mn-mute')}>
           {description.length}/2000
@@ -205,7 +205,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
                 className={cn(
                   'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
                   category === cat
-                    ? 'bg-mn-amber text-white'
+                    ? 'bg-mn-bronze text-white'
                     : 'bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised',
                 )}
               >
@@ -228,7 +228,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
               type="checkbox"
               checked={isAllDay}
               onChange={(e) => setIsAllDay(e.target.checked)}
-              className="rounded text-mn-amber focus:ring-mn-amber"
+              className="rounded text-mn-bronze focus:ring-mn-bronze"
             />
             <span className="text-sm text-mn-ink-soft">Ganztägig</span>
           </label>
@@ -243,7 +243,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
               onChange={(e) => setStartDate(e.target.value)}
               min={todayStr}
               className={cn(
-                'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
+                'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze',
                 errors.startDate ? 'border-mn-herzrot/20' : 'border-white/5',
               )}
               required
@@ -258,7 +258,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 className={cn(
-                  'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
+                  'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze',
                   errors.startTime ? 'border-mn-herzrot/20' : 'border-white/5',
                 )}
                 required={!isAllDay}
@@ -274,7 +274,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
               onChange={(e) => setEndDate(e.target.value)}
               min={startDate || todayStr}
               className={cn(
-                'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber',
+                'w-full rounded-lg border px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze',
                 errors.endDate ? 'border-mn-herzrot/20' : 'border-white/5',
               )}
             />
@@ -287,7 +287,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber"
+                className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze"
               />
             </div>
           )}
@@ -301,7 +301,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             type="checkbox"
             checked={isOnline}
             onChange={(e) => setIsOnline(e.target.checked)}
-            className="rounded text-mn-amber focus:ring-mn-amber"
+            className="rounded text-mn-bronze focus:ring-mn-bronze"
           />
           <span className="text-sm font-medium text-mn-ink-soft flex items-center gap-1.5">
             <Globe className="w-4 h-4 text-mn-teal-soft" /> Online-Veranstaltung / Hybrid
@@ -317,7 +317,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
                 value={onlineUrl}
                 onChange={(e) => setOnlineUrl(e.target.value)}
                 placeholder="https://zoom.us/j/... oder https://meet.google.com/..."
-                className="w-full rounded-lg border border-white/5 pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+                className="w-full rounded-lg border border-white/5 pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
               />
             </div>
           </div>
@@ -332,14 +332,14 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           value={locationName}
           onChange={(e) => setLocationName(e.target.value)}
           placeholder="z.B. Gemeinschaftsgarten Friedrichshain"
-          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
         <input
           type="text"
           value={locationAddress}
           onChange={(e) => setLocationAddress(e.target.value)}
           placeholder="Straße, Hausnummer, PLZ, Ort"
-          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
         <div className="flex gap-2">
           <button
@@ -351,7 +351,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             Meinen Standort verwenden
           </button>
           {latitude && longitude && (
-            <span className="text-xs text-mn-amber self-center">
+            <span className="text-xs text-mn-bronze self-center">
               <MapPin className="w-3 h-3 inline mr-0.5" />
               Koordinaten gesetzt
             </span>
@@ -400,7 +400,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           onChange={(e) => setMaxAttendees(e.target.value)}
           placeholder="Unbegrenzt"
           min={2}
-          className="w-full sm:w-40 rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full sm:w-40 rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
         {maxAttendees && (
           <p className="text-xs text-mn-mute mt-1">
@@ -417,7 +417,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           value={cost}
           onChange={(e) => setCost(e.target.value)}
           placeholder="kostenlos"
-          className="w-full sm:w-64 rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full sm:w-64 rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
       </div>
 
@@ -429,7 +429,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           onChange={(e) => setWhatToBring(e.target.value.slice(0, 500))}
           placeholder="z.B. Gute Laune, bequeme Schuhe, eine Kleinigkeit zum Teilen"
           rows={2}
-          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
       </div>
 
@@ -441,7 +441,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
           value={contactInfo}
           onChange={(e) => setContactInfo(e.target.value)}
           placeholder="Telefon oder E-Mail für Rückfragen"
-          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent"
+          className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent"
         />
       </div>
 
@@ -464,7 +464,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
         >
           <div className={cn(
             'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-            acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
+            acceptedNoTrade ? 'bg-mn-bronze border-mn-bronze' : 'border-amber-400 bg-mn-elevated'
           )}>
             {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
           </div>
@@ -472,7 +472,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
             <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
             <p className="text-xs text-mn-mute mt-0.5">
               Ich bestätige, dass diese Veranstaltung <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">§4 AGB</a> geahndet.
+              Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-bronze underline">§4 AGB</a> geahndet.
             </p>
           </div>
         </button>
@@ -482,7 +482,7 @@ export default function EventCreateForm({ onSubmit, onUploadImage }: EventCreate
       <button
         type="submit"
         disabled={submitting || uploading || !title.trim() || !startDate || !acceptedNoTrade}
-        className="w-full py-3 rounded-lg bg-mn-amber text-white font-medium text-sm hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+        className="w-full py-3 rounded-lg bg-mn-bronze text-white font-medium text-sm hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
       >
         {submitting ? (
           <>

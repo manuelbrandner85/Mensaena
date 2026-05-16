@@ -127,14 +127,14 @@ export default function MatchSuggestionCard({
           className={cn(
             'pointer-events-none absolute inset-0 z-10 flex items-center px-6',
             swipeDirection === 'accept' ? 'justify-start' : 'justify-end',
-            swipeDirection === 'accept' ? 'bg-mn-amber/10' : 'bg-red-500/10',
+            swipeDirection === 'accept' ? 'bg-mn-bronze/10' : 'bg-red-500/10',
           )}
           style={{ opacity: swipeProgress }}
         >
           <div
             className={cn(
               'rounded-full p-3 text-white shadow-lg',
-              swipeDirection === 'accept' ? 'bg-mn-amber' : 'bg-red-500',
+              swipeDirection === 'accept' ? 'bg-mn-bronze' : 'bg-red-500',
             )}
             style={{ transform: `scale(${0.7 + swipeProgress * 0.5})` }}
           >
@@ -308,7 +308,7 @@ export default function MatchSuggestionCard({
               <button
                 onClick={handleAccept}
                 disabled={isResponding}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-amber text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-bronze text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

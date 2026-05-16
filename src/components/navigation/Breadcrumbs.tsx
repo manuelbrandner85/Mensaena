@@ -28,7 +28,7 @@ export default function Breadcrumbs() {
             ) : (
               <Link
                 href={crumb.href}
-                className="flex items-center gap-1 text-mn-mute hover:text-mn-amber transition-colors truncate max-w-[150px]"
+                className="flex items-center gap-1 text-mn-mute hover:text-mn-bronze transition-colors truncate max-w-[150px]"
               >
                 {isFirst && <Home className="w-3 h-3 flex-shrink-0" />}
                 {crumb.label}

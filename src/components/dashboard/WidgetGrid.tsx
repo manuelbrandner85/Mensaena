@@ -270,7 +270,7 @@ export default function WidgetGrid({ profile, onOpenSettings, className }: Widge
         <p className="text-sm font-medium text-mn-ink-soft">Keine Widgets aktiviert</p>
         <button
           onClick={handleOpenSettings}
-          className="mt-1.5 text-xs text-mn-amber hover:underline"
+          className="mt-1.5 text-xs text-mn-bronze hover:underline"
         >
           Widgets anpassen →
         </button>

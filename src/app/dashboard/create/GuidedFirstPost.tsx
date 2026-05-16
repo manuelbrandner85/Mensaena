@@ -34,8 +34,8 @@ function StepIndicator({ step }: { step: number }) {
         <div key={n} className="flex items-center">
           <div className={cn(
             'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
-            step > n  ? 'bg-mn-amber text-white'                           :
-            step === n ? 'bg-mn-amber text-white ring-4 ring-primary-100'  :
+            step > n  ? 'bg-mn-bronze text-white'                           :
+            step === n ? 'bg-mn-bronze text-white ring-4 ring-primary-100'  :
             'bg-mn-elevated text-mn-mute'
           )}>
             {step > n ? <CheckCircle2 className="w-4 h-4" /> : n}
@@ -203,9 +203,9 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                   }}
                   className={cn(
                     'rounded-2xl border p-5 text-left transition-all duration-200',
-                    'hover:scale-[1.02] hover:shadow-lg hover:border-mn-amber/20',
+                    'hover:scale-[1.02] hover:shadow-lg hover:border-mn-bronze/20',
                     selected?.title === opt.title
-                      ? 'bg-mn-amber/5 border-mn-amber/30 ring-2 ring-primary-200'
+                      ? 'bg-mn-bronze/5 border-mn-bronze/30 ring-2 ring-primary-200'
                       : 'bg-mn-elevated border-white/5'
                   )}
                 >
@@ -267,7 +267,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               <label className="text-sm font-medium text-mn-ink-soft flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-mn-mute" /> Standort
                 <span className="font-normal text-mn-mute">optional</span>
-                {geoLoading && <Loader2 className="w-3 h-3 animate-spin text-mn-amber ml-1" />}
+                {geoLoading && <Loader2 className="w-3 h-3 animate-spin text-mn-bronze ml-1" />}
               </label>
               <input
                 value={location}
@@ -329,7 +329,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               ) : (
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-3 text-sm text-mn-ink-soft border-2 border-dashed border-white/8 rounded-xl hover:bg-mn-surface hover:border-mn-amber/20 transition w-full justify-center"
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-mn-ink-soft border-2 border-dashed border-white/8 rounded-xl hover:bg-mn-surface hover:border-mn-bronze/20 transition w-full justify-center"
                 >
                   <ImagePlus className="w-5 h-5 text-mn-mute" />
                   Foto hinzufügen (optional, max. 10 MB)
@@ -347,7 +347,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-base">{selected?.emoji}</span>
-                    <span className="text-xs font-medium text-mn-amber bg-mn-amber/5 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-medium text-mn-bronze bg-mn-bronze/5 px-2 py-0.5 rounded-full">
                       {selected?.title}
                     </span>
                   </div>
@@ -370,13 +370,13 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
               className={cn(
                 'flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all select-none mb-5',
                 acceptedNoTrade
-                  ? 'bg-mn-amber/5 border-mn-amber/20'
+                  ? 'bg-mn-bronze/5 border-mn-bronze/20'
                   : 'bg-amber-50 border-amber-300'
               )}
             >
               <div className={cn(
                 'w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors',
-                acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
+                acceptedNoTrade ? 'bg-mn-bronze border-mn-bronze' : 'border-amber-400 bg-mn-elevated'
               )}>
                 {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
               </div>
@@ -385,7 +385,7 @@ export default function GuidedFirstPost({ userId }: { userId: string }) {
                 <p className="text-xs text-mn-ink-soft mt-0.5 leading-relaxed">
                   Ich bestätige, dass dieser Beitrag <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
                   Mensaena ist eine gemeinnützige Plattform für kostenlose Nachbarschaftshilfe.
-                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">AGB §4</a> nicht erlaubt.
+                  Kommerzielle Angebote sind laut <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-bronze underline">AGB §4</a> nicht erlaubt.
                 </p>
               </div>
             </div>

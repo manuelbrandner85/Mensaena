@@ -11,12 +11,12 @@ import type { Post, UserProfile } from '@/types'
 
 const quickActions = [
   { href: '/dashboard/map', icon: Map, label: 'Karte öffnen', color: 'bg-trust-100 text-trust-400' },
-  { href: '/dashboard/create', icon: FilePlus, label: 'Beitrag erstellen', color: 'bg-mn-amber/10 text-mn-amber', highlight: true },
-  { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-mn-elevated text-mn-amber' },
-  { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-mn-elevated text-mn-amber-warm' },
+  { href: '/dashboard/create', icon: FilePlus, label: 'Beitrag erstellen', color: 'bg-mn-bronze/10 text-mn-bronze', highlight: true },
+  { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-mn-elevated text-mn-bronze' },
+  { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-mn-elevated text-mn-bronze-warm' },
   { href: '/dashboard/animals', icon: PawPrint, label: 'Tiere', color: 'bg-mn-elevated text-mn-herzrot-warm' },
   { href: '/dashboard/housing', icon: Home, label: 'Wohnen', color: 'bg-mn-elevated text-mn-teal-soft' },
-  { href: '/dashboard/supply', icon: Wheat, label: 'Versorgung', color: 'bg-mn-elevated text-mn-amber' },
+  { href: '/dashboard/supply', icon: Wheat, label: 'Versorgung', color: 'bg-mn-elevated text-mn-bronze' },
   { href: '/dashboard/community', icon: Users, label: 'Community', color: 'bg-mn-elevated text-mn-teal-soft' },
   { href: '/dashboard/crisis', icon: Siren, label: 'Notfall', color: 'bg-mn-elevated text-mn-herzrot' },
 ]
@@ -65,7 +65,7 @@ export default function DashboardOverview({
           label="Aktive Beiträge"
           value={activePostsCount.toString()}
           sub="in der Community"
-          color="bg-mn-amber/10 text-mn-amber"
+          color="bg-mn-bronze/10 text-mn-bronze"
         />
         <StatCard
           icon={<FilePlus className="w-5 h-5" />}
@@ -102,8 +102,8 @@ export default function DashboardOverview({
                 href={action.href}
                 className={`group flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-cinema-card
                   ${action.highlight
-                    ? 'bg-mn-amber border-primary-700 text-white hover:bg-primary-700'
-                    : 'bg-mn-elevated border-white/8 hover:border-mn-amber/20 hover:bg-mn-amber/5'
+                    ? 'bg-mn-bronze border-primary-700 text-white hover:bg-primary-700'
+                    : 'bg-mn-elevated border-white/8 hover:border-mn-bronze/20 hover:bg-mn-bronze/5'
                   }`}
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${action.highlight ? 'bg-mn-elevated/20' : action.color}`}>
@@ -124,7 +124,7 @@ export default function DashboardOverview({
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-mn-ink">Aktuelle Beiträge</h2>
-            <Link href="/dashboard/posts" className="text-sm text-mn-amber hover:text-mn-amber font-medium flex items-center gap-1">
+            <Link href="/dashboard/posts" className="text-sm text-mn-bronze hover:text-mn-bronze font-medium flex items-center gap-1">
               Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -156,15 +156,15 @@ export default function DashboardOverview({
           </div>
 
           {/* Interactions CTA */}
-          <div className="card p-5 bg-gradient-to-br from-mn-amber/8 to-primary-100/50 border-mn-amber/20">
+          <div className="card p-5 bg-gradient-to-br from-mn-bronze/8 to-primary-100/50 border-mn-bronze/20">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-mn-amber flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-mn-bronze flex items-center justify-center flex-shrink-0">
                 <Handshake className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-mn-ink text-sm mb-1">Interaktionen</h3>
                 <p className="text-xs text-mn-ink-soft mb-3">Verwalte deine Hilfsanfragen und laufenden Interaktionen.</p>
-                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-mn-amber hover:text-mn-amber">
+                <Link href="/dashboard/interactions" className="inline-flex items-center gap-1 text-xs font-medium text-mn-bronze hover:text-mn-bronze">
                   Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
@@ -183,7 +183,7 @@ export default function DashboardOverview({
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2.5">
                   <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold
-                    ${item.done ? 'bg-mn-amber text-white' : 'border-2 border-white/5'}`}>
+                    ${item.done ? 'bg-mn-bronze text-white' : 'border-2 border-white/5'}`}>
                     {item.done && '✓'}
                   </div>
                   <span className={`text-xs ${item.done ? 'text-mn-mute line-through' : 'text-mn-ink-soft'}`}>

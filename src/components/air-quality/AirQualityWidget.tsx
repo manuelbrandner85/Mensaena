@@ -109,7 +109,7 @@ export function AirQualityWidget({
       aria-label="Luftqualität"
     >
       <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-mn-ink dark:text-stone-100">
-        <Wind aria-hidden className="h-4 w-4 text-mn-amber" />
+        <Wind aria-hidden className="h-4 w-4 text-mn-bronze" />
         Luftqualität
       </h3>
 

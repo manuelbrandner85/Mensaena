@@ -44,10 +44,10 @@ function dailyWhisper(): string {
 type TimeOfDay = 'morning' | 'day' | 'evening' | 'night'
 
 const TOD_AMBIENT: Record<TimeOfDay, string> = {
-  morning: 'from-mn-amber/20 via-mn-amber-warm/10 to-transparent',
-  day:     'from-mn-amber/15 via-mn-teal-soft/8 to-transparent',
-  evening: 'from-mn-amber-warm/22 via-mn-herzrot/8 to-transparent',
-  night:   'from-indigo-400/20 via-mn-amber/8 to-transparent',
+  morning: 'from-mn-bronze/20 via-mn-bronze-warm/10 to-transparent',
+  day:     'from-mn-bronze/15 via-mn-teal-soft/8 to-transparent',
+  evening: 'from-mn-bronze-warm/22 via-mn-herzrot/8 to-transparent',
+  night:   'from-indigo-400/20 via-mn-bronze/8 to-transparent',
 }
 
 const TOD_SPOTLIGHT: Record<TimeOfDay, string> = {
@@ -149,7 +149,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
         {/* Avatar */}
         <div className="relative flex-shrink-0">
           <div
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-mn-amber/5 border-2 border-mn-elevated overflow-hidden flex items-center justify-center"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-mn-bronze/5 border-2 border-mn-elevated overflow-hidden flex items-center justify-center"
             style={{ boxShadow: '0 0 24px rgba(245,158,11,0.25), 0 0 0 1px rgba(245,158,11,0.30) inset' }}
           >
             {profile?.avatar_url ? (
@@ -162,7 +162,7 @@ export default function DashboardHeroCard({ profile, memberSinceDays }: Props) {
                 loading="eager"
               />
             ) : (
-              <span className="text-xl sm:text-2xl font-bold text-mn-amber select-none">
+              <span className="text-xl sm:text-2xl font-bold text-mn-bronze select-none">
                 {initials || 'N'}
               </span>
             )}

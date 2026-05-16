@@ -48,7 +48,7 @@ export default function MiniMap({ posts, userLat, userLng }: MiniMapProps) {
         </p>
         <Link
           href="/dashboard/settings"
-          className="text-sm text-mn-amber hover:text-mn-amber font-medium inline-flex items-center gap-1"
+          className="text-sm text-mn-bronze hover:text-mn-bronze font-medium inline-flex items-center gap-1"
         >
           Einstellungen <ArrowRight className="w-3.5 h-3.5" />
         </Link>

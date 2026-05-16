@@ -122,17 +122,17 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className={cn(
-      'rounded-2xl border border-mn-amber/20 bg-gradient-to-br from-mn-amber/8/60 to-mn-teal-soft/30 overflow-hidden',
+      'rounded-2xl border border-mn-bronze/20 bg-gradient-to-br from-mn-bronze/8/60 to-mn-teal-soft/30 overflow-hidden',
       className,
     )}>
       {/* Header */}
       <div className="flex items-center gap-2.5 px-4 py-3 bg-mn-elevated/60 border-b border-white/8">
-        <div className="w-8 h-8 rounded-lg bg-mn-amber flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-mn-bronze flex items-center justify-center flex-shrink-0">
           <BookOpen className="w-4 h-4 text-white" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-primary-900 leading-tight">Buchinfo automatisch laden</p>
-          <p className="text-[11px] text-mn-amber mt-0.5">Open Library · kein Account nötig</p>
+          <p className="text-[11px] text-mn-bronze mt-0.5">Open Library · kein Account nötig</p>
         </div>
       </div>
 
@@ -141,7 +141,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
         {/* ── Book confirmed ── */}
         {selected ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-mn-amber bg-mn-amber/5 border border-mn-amber/20 rounded-lg px-3 py-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-mn-bronze bg-mn-bronze/5 border border-mn-bronze/20 rounded-lg px-3 py-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
               Buch gefunden – Formulardaten werden vorausgefüllt
             </div>
@@ -152,7 +152,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-mn-amber text-white text-sm font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all shadow-sm"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-mn-bronze text-white text-sm font-semibold hover:bg-primary-700 active:scale-[0.98] transition-all shadow-sm"
               >
                 Dieses Buch anbieten
                 <ArrowRight className="w-4 h-4" />
@@ -183,7 +183,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
                   className={cn(
                     'flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all',
                     mode === id
-                      ? 'bg-mn-amber text-white shadow-sm'
+                      ? 'bg-mn-bronze text-white shadow-sm'
                       : 'text-mn-mute hover:text-stone-800 hover:bg-mn-elevated/[0.02]',
                   )}
                 >
@@ -242,7 +242,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-ghost pointer-events-none" />
                   {loading && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-amber animate-spin" />
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mn-bronze animate-spin" />
                   )}
                   <input
                     type="text"
@@ -263,7 +263,7 @@ export default function BookLookup({ onBookSelect, className }: BookLookupProps)
                         key={`${book.isbn ?? book.title}-${i}`}
                         type="button"
                         onClick={() => { setSelected(book); setResults([]) }}
-                        className="w-full text-left hover:bg-mn-amber/5 transition-colors focus-visible:outline-none focus-visible:bg-mn-amber/5"
+                        className="w-full text-left hover:bg-mn-bronze/5 transition-colors focus-visible:outline-none focus-visible:bg-mn-bronze/5"
                       >
                         <BookCard book={book} variant="compact" />
                       </button>

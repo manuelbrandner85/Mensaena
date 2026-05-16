@@ -97,7 +97,7 @@ function ChatPageInner() {
   if (acceptPending) return (
     <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
         <p className="text-white/80 text-base">Verbindung wird hergestellt…</p>
       </div>
     </div>
@@ -127,12 +127,12 @@ function ChatPageInner() {
     // ist bevor /api/dm-calls/answer zurückkommt.
     if (callAction === 'accept' && callId) return (
       <div className="fixed inset-0 z-[200] bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-white">
-        <div className="w-12 h-12 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
       </div>
     )
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -153,7 +153,7 @@ export default function ChatPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <ChatPageInner />

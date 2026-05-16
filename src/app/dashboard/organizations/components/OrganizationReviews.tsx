@@ -32,8 +32,8 @@ function ReviewCard({
           {review.profiles?.avatar_url ? (
             <img src={review.profiles.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-mn-amber/10 flex items-center justify-center">
-              <span className="text-xs font-medium text-mn-amber">
+            <div className="w-8 h-8 rounded-full bg-mn-bronze/10 flex items-center justify-center">
+              <span className="text-xs font-medium text-mn-bronze">
                 {(review.profiles?.name || 'A')[0].toUpperCase()}
               </span>
             </div>
@@ -47,7 +47,7 @@ function ReviewCard({
         </div>
         <div className="flex items-center gap-0.5" aria-label={`${review.rating} Sterne`}>
           {[1, 2, 3, 4, 5].map(star => (
-            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost')} />
+            <Star key={star} className={cn('w-3.5 h-3.5', star <= review.rating ? 'text-mn-bronze fill-yellow-400' : 'text-mn-ghost')} />
           ))}
         </div>
       </div>
@@ -57,10 +57,10 @@ function ReviewCard({
 
       {/* Admin response */}
       {review.admin_response && (
-        <div className="mt-3 p-3 bg-mn-amber/5 rounded-lg border border-white/8">
+        <div className="mt-3 p-3 bg-mn-bronze/5 rounded-lg border border-white/8">
           <div className="flex items-center gap-1.5 mb-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-mn-amber" />
-            <span className="text-xs font-medium text-mn-amber">Antwort der Organisation</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-mn-bronze" />
+            <span className="text-xs font-medium text-mn-bronze">Antwort der Organisation</span>
           </div>
           <p className="text-xs text-primary-800">{review.admin_response}</p>
         </div>
@@ -72,7 +72,7 @@ function ReviewCard({
           onClick={() => onToggleHelpful(review.id)}
           className={cn(
             'flex items-center gap-1 text-xs transition-colors',
-            review.user_found_helpful ? 'text-mn-amber font-medium' : 'text-mn-mute hover:text-mn-amber'
+            review.user_found_helpful ? 'text-mn-bronze font-medium' : 'text-mn-mute hover:text-mn-bronze'
           )}
           aria-label="Hilfreich markieren"
         >
@@ -179,7 +179,7 @@ function ReviewForm({
             <Star className={cn(
               'w-6 h-6 transition-colors',
               star <= (hoverRating || rating)
-                ? 'text-mn-amber fill-yellow-400'
+                ? 'text-mn-bronze fill-yellow-400'
                 : 'text-mn-ghost'
             )} />
           </button>
@@ -210,7 +210,7 @@ function ReviewForm({
         <button
           type="submit"
           disabled={submitting || rating === 0 || content.length < 10}
-          className="flex items-center gap-1.5 px-4 py-2 bg-mn-amber text-white text-sm font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-mn-bronze text-white text-sm font-medium rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-colors"
         >
           <Send className="w-3.5 h-3.5" />
           {submitting ? 'Wird gesendet...' : existingReview ? 'Aktualisieren' : 'Bewertung absenden'}
@@ -270,7 +270,7 @@ export default function OrganizationReviews({
         {ratingCount > 0 && (
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map(star => (
-              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost')} />
+              <Star key={star} className={cn('w-4 h-4', star <= Math.round(ratingAvg) ? 'text-mn-bronze fill-yellow-400' : 'text-mn-ghost')} />
             ))}
             <span className="text-sm text-mn-ink-soft ml-1">{ratingAvg}</span>
           </div>
@@ -342,7 +342,7 @@ export default function OrganizationReviews({
         <div className="flex justify-center">
           <button
             onClick={() => onLoadMore(orgId)}
-            className="px-4 py-2 text-sm text-mn-amber hover:text-primary-800 font-medium"
+            className="px-4 py-2 text-sm text-mn-bronze hover:text-primary-800 font-medium"
           >
             Mehr Bewertungen laden
           </button>

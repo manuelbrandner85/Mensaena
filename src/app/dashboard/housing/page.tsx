@@ -102,7 +102,7 @@ function HousingSplitView() {
           onClick={() => setMobileTab('available')}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm border transition-all shadow-cinema-card ${
             mobileTab === 'available'
-              ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white border-mn-amber shadow-glow-teal'
+              ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white border-mn-bronze shadow-glow-teal'
               : 'bg-mn-elevated text-mn-ink-soft border-white/5'
           }`}
         >
@@ -132,11 +132,11 @@ function HousingSplitView() {
         {/* Wohnungen verfügbar */}
         <div className={mobileTab === 'wanted' ? 'hidden lg:block' : ''}>
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 bg-mn-amber/10 rounded-lg flex items-center justify-center shadow-cinema-card">
-              <Building2 className="w-4 h-4 text-mn-amber" />
+            <div className="w-7 h-7 bg-mn-bronze/10 rounded-lg flex items-center justify-center shadow-cinema-card">
+              <Building2 className="w-4 h-4 text-mn-bronze" />
             </div>
             <h3 className="font-bold text-mn-ink">Wohnungen verfügbar</h3>
-            <span className="display-numeral ml-auto text-xs bg-mn-amber/10 text-mn-amber px-2 py-0.5 rounded-full font-medium tabular-nums">
+            <span className="display-numeral ml-auto text-xs bg-mn-bronze/10 text-mn-bronze px-2 py-0.5 rounded-full font-medium tabular-nums">
               {available.length}
             </span>
           </div>

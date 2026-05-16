@@ -58,7 +58,7 @@ export default function EventCalendarDay({
               : isHoliday && isCurrentMonth
                 ? holiday?.isRegional
                   ? 'text-mn-herzrot-warm font-semibold'
-                  : 'text-mn-amber font-semibold'
+                  : 'text-mn-bronze font-semibold'
                 : isCurrentMonth
                   ? 'text-mn-ink font-medium'
                   : 'text-mn-ghost',
@@ -74,7 +74,7 @@ export default function EventCalendarDay({
           <span
             className={cn(
               'text-xs leading-tight truncate block',
-              holiday?.isRegional ? 'text-mn-herzrot-warm' : 'text-mn-amber',
+              holiday?.isRegional ? 'text-mn-herzrot-warm' : 'text-mn-bronze',
             )}
           >
             {holiday?.name}

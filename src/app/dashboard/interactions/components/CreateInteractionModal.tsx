@@ -63,7 +63,7 @@ export default function CreateInteractionModal({
             className={cn(
               'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all',
               iAmHelper
-                ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
+                ? 'bg-mn-bronze/5 text-mn-bronze border-mn-bronze/20'
                 : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
             )}
           >
@@ -96,7 +96,7 @@ export default function CreateInteractionModal({
             onChange={e => setMessage(e.target.value.slice(0, maxLen))}
             placeholder="Beschreibe kurz, wie du helfen kannst oder was du brauchst..."
             rows={4}
-            className="w-full text-sm border border-white/5 rounded-xl px-4 py-3 focus:ring-2 focus:ring-mn-amber focus:border-mn-amber/30 resize-none"
+            className="w-full text-sm border border-white/5 rounded-xl px-4 py-3 focus:ring-2 focus:ring-mn-bronze focus:border-mn-bronze/30 resize-none"
           />
           <p className="text-right text-xs text-mn-mute">{message.length}/{maxLen}</p>
         </div>
@@ -105,7 +105,7 @@ export default function CreateInteractionModal({
         <button
           onClick={handleCreate}
           disabled={sending || !message.trim()}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50"
         >
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           Anfrage senden

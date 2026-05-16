@@ -151,7 +151,7 @@ export default function GroupsTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>
@@ -177,7 +177,7 @@ export default function GroupsTab() {
                           <div className="flex items-center gap-2">
                             {g.is_private
                               ? <Lock className="w-3.5 h-3.5 text-mn-mute shrink-0" />
-                              : <Globe className="w-3.5 h-3.5 text-mn-amber shrink-0" />}
+                              : <Globe className="w-3.5 h-3.5 text-mn-bronze shrink-0" />}
                             <div>
                               <p className="font-medium text-mn-ink">{g.name}</p>
                               <p className="text-xs text-mn-mute">/{g.slug}</p>
@@ -189,7 +189,7 @@ export default function GroupsTab() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-mn-ink-soft">
-                            <Users className="w-3 h-3 text-mn-amber" />
+                            <Users className="w-3 h-3 text-mn-bronze" />
                             {g.member_count}
                           </span>
                         </td>
@@ -202,7 +202,7 @@ export default function GroupsTab() {
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center gap-1 justify-end">
                             <button onClick={() => toggleExpand(g.id)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-amber hover:bg-mn-amber/5 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-bronze hover:bg-mn-bronze/5 transition-colors"
                               title="Mitglieder anzeigen">
                               {expanded === g.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
@@ -240,7 +240,7 @@ export default function GroupsTab() {
                                     <div key={m.id} className="flex items-center gap-1.5 bg-mn-elevated border border-white/5 rounded-lg px-2.5 py-1 text-xs">
                                       <span className="font-medium text-mn-ink-soft">{mName ?? m.user_id.slice(0, 8)}</span>
                                       {m.role !== 'member' && (
-                                        <span className="bg-mn-amber/10 text-mn-amber px-1.5 rounded-full text-xs">{m.role}</span>
+                                        <span className="bg-mn-bronze/10 text-mn-bronze px-1.5 rounded-full text-xs">{m.role}</span>
                                       )}
                                       <button
                                         onClick={() => handleRemoveMember(g.id, m.id, mName ?? null)}

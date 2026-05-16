@@ -161,7 +161,7 @@ function AuditLogViewer() {
     <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-mn-ink flex items-center gap-2">
-          <ScrollText className="w-5 h-5 text-mn-amber" /> Audit-Log
+          <ScrollText className="w-5 h-5 text-mn-bronze" /> Audit-Log
         </h3>
         <button onClick={load} className="text-xs text-mn-mute hover:text-mn-ink-soft flex items-center gap-1">
           <RefreshCw className="w-3 h-3" /> Aktualisieren
@@ -179,7 +179,7 @@ function AuditLogViewer() {
           {logs.map(log => (
             <div key={log.id} className="flex items-start gap-3 px-3 py-2.5 bg-mn-surface rounded-xl text-xs">
               <div className="flex-shrink-0 w-8 h-8 bg-mn-elevated rounded-full flex items-center justify-center">
-                <ScrollText className="w-3.5 h-3.5 text-mn-amber" />
+                <ScrollText className="w-3.5 h-3.5 text-mn-bronze" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-mn-ink">

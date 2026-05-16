@@ -204,7 +204,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         type="button"
         onClick={startRecording}
         disabled={disabled}
-        className="p-1.5 text-mn-mute hover:text-mn-amber rounded-full transition-all flex-shrink-0 disabled:opacity-40"
+        className="p-1.5 text-mn-mute hover:text-mn-bronze rounded-full transition-all flex-shrink-0 disabled:opacity-40"
         aria-label="Sprachnachricht aufnehmen"
       >
         <Mic className="w-4 h-4" />
@@ -247,7 +247,7 @@ export default function VoiceRecorder({ userId, conversationId, disabled, onSent
         onClick={sendVoice}
         disabled={state === 'uploading'}
         className={cn(
-          'flex items-center gap-1 px-2.5 py-1 bg-mn-amber text-white text-xs font-medium rounded-full disabled:opacity-50',
+          'flex items-center gap-1 px-2.5 py-1 bg-mn-bronze text-white text-xs font-medium rounded-full disabled:opacity-50',
         )}
       >
         {state === 'uploading'

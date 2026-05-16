@@ -36,12 +36,12 @@ interface Group {
 const GROUP_CATEGORIES = [
   { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-mn-teal to-mn-teal-soft',     accent: '#3B82F6' },
   { value: 'hobby',         label: 'Hobby & Freizeit',         emoji: '🎨', color: 'from-pink-400 to-rose-500',     accent: '#EC4899' },
-  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-mn-amber-warm/12 to-orange-600', accent: '#F97316' },
-  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-mn-amber/12 to-mn-amber-warm/8',  accent: '#F59E0B' },
-  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-amber to-mn-amber-warm', accent: '#8B5CF6' },
+  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-mn-bronze-warm/12 to-orange-600', accent: '#F97316' },
+  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-mn-bronze/12 to-mn-bronze-warm/8',  accent: '#F59E0B' },
+  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-bronze to-mn-bronze-warm', accent: '#8B5CF6' },
   { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit',  emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
   { value: 'bildung',       label: 'Bildung & Lernen',         emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
-  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-mn-amber/12 to-yellow-600',  accent: '#D97706' },
+  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-mn-bronze/12 to-yellow-600',  accent: '#D97706' },
   { value: 'handwerk',      label: 'Handwerk & DIY',           emoji: '🔧', color: 'from-slate-400 to-slate-600',   accent: '#64748B' },
   { value: 'sonstiges',     label: 'Sonstiges',                emoji: '💬', color: 'from-primary-400 to-mn-teal-soft/8',  accent: '#1EAAA6' },
 ]
@@ -130,7 +130,7 @@ function GroupCard({
           {cat.emoji} {cat.label}
         </span>
         {isMember && (
-          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 px-1.5 py-0.5 bg-mn-amber/80 backdrop-blur-sm rounded-full text-xs font-semibold text-white">
+          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 px-1.5 py-0.5 bg-mn-bronze/80 backdrop-blur-sm rounded-full text-xs font-semibold text-white">
             ✓
           </span>
         )}
@@ -166,7 +166,7 @@ function GroupCard({
           <div className="flex gap-2">
             <Link
               href={`/dashboard/groups/${group.id}`}
-              className="shine flex-1 text-center py-2 bg-mn-amber/5 text-mn-amber rounded-xl text-xs font-semibold hover:bg-mn-amber/10 transition-all border border-white/8"
+              className="shine flex-1 text-center py-2 bg-mn-bronze/5 text-mn-bronze rounded-xl text-xs font-semibold hover:bg-mn-bronze/10 transition-all border border-white/8"
             >
               Öffnen →
             </Link>
@@ -321,8 +321,8 @@ export default function GroupsPage() {
           <div className="meta-label meta-label--subtle mb-4">§ 04 / Gemeinschaft</div>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
-                <Users className="w-6 h-6 text-mn-amber" />
+              <div className="w-14 h-14 rounded-2xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+                <Users className="w-6 h-6 text-mn-bronze" />
               </div>
               <div>
                 <h1 className="page-title">Gruppen</h1>
@@ -413,14 +413,14 @@ export default function GroupsPage() {
                 className={cn(
                   'flex-1 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5',
                   tab === t.key
-                    ? 'bg-mn-elevated text-mn-amber shadow-sm'
+                    ? 'bg-mn-elevated text-mn-bronze shadow-sm'
                     : 'text-mn-mute hover:text-mn-ink-soft'
                 )}
               >
                 {t.label}
                 <span className={cn(
                   'inline-flex items-center justify-center min-w-[18px] h-[18px] rounded-full text-xs font-bold px-1',
-                  tab === t.key ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-raised text-mn-mute'
+                  tab === t.key ? 'bg-mn-bronze/10 text-mn-bronze' : 'bg-mn-raised text-mn-mute'
                 )}>
                   {t.count}
                 </span>
@@ -455,7 +455,7 @@ export default function GroupsPage() {
             {tab === 'mine' ? (
               <button
                 onClick={() => setTab('all')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-mn-amber/5 text-mn-amber rounded-xl text-sm font-semibold hover:bg-mn-amber/10 transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-mn-bronze/5 text-mn-bronze rounded-xl text-sm font-semibold hover:bg-mn-bronze/10 transition-all"
               >
                 Alle Gruppen entdecken
               </button>

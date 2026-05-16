@@ -13,7 +13,7 @@ export default function DownloadProgressBar({ progress, status, label, sublabel 
   const trackColor =
     status === 'success' ? 'bg-mn-elevated' :
     status === 'error'   ? 'bg-amber-100' :
-    'bg-mn-amber/10'
+    'bg-mn-bronze/10'
 
   const barColor =
     status === 'success'
@@ -31,7 +31,7 @@ export default function DownloadProgressBar({ progress, status, label, sublabel 
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           {status === 'loading' && (
-            <span className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-mn-amber border-t-transparent animate-spin" aria-hidden="true" />
+            <span className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-mn-bronze border-t-transparent animate-spin" aria-hidden="true" />
           )}
           {status === 'success' && (
             <span className="flex-shrink-0 text-mn-leben" aria-hidden="true">✓</span>

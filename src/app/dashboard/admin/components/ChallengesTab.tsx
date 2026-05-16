@@ -199,14 +199,14 @@ export default function ChallengesTab() {
           {Object.entries(STATUS_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
         </select>
         <button onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-mn-amber text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors">
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-mn-bronze text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors">
           <Plus className="w-4 h-4" /> Neue Challenge
         </button>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <>
@@ -245,7 +245,7 @@ export default function ChallengesTab() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className="inline-flex items-center gap-1 text-xs font-medium text-mn-ink-soft">
-                            <Users className="w-3 h-3 text-mn-amber" />
+                            <Users className="w-3 h-3 text-mn-bronze" />
                             {c.participant_count}
                             {c.max_participants ? `/${c.max_participants}` : ''}
                           </span>
@@ -256,7 +256,7 @@ export default function ChallengesTab() {
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center gap-1 justify-end">
                             <button onClick={() => toggleExpand(c.id)}
-                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-amber hover:bg-mn-amber/5 transition-colors"
+                              className="p-1.5 rounded-lg text-mn-mute hover:text-mn-bronze hover:bg-mn-bronze/5 transition-colors"
                               title="Teilnehmer anzeigen">
                               {expanded === c.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
@@ -331,7 +331,7 @@ export default function ChallengesTab() {
           <div className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink flex items-center gap-2">
-                <Target className="w-5 h-5 text-mn-amber" /> Neue Challenge
+                <Target className="w-5 h-5 text-mn-bronze" /> Neue Challenge
               </h3>
               <button onClick={() => setShowCreate(false)} aria-label="Schließen" className="p-1.5 rounded-lg hover:bg-mn-elevated text-mn-mute">
                 <X className="w-4 h-4" />
@@ -387,7 +387,7 @@ export default function ChallengesTab() {
                 Abbrechen
               </button>
               <button onClick={handleCreate} disabled={creating || !newTitle.trim() || !newEndDate}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-mn-amber text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50">
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-mn-bronze text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50">
                 {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 Erstellen
               </button>

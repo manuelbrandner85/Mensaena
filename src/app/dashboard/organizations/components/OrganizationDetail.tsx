@@ -31,7 +31,7 @@ function OpeningHoursTable({ hours }: { hours: OpeningHours }) {
           const dayIndex = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(day)
           const isToday = today === dayIndex
           return (
-            <tr key={day} className={cn(isToday && 'bg-mn-amber/5 font-semibold')}>
+            <tr key={day} className={cn(isToday && 'bg-mn-bronze/5 font-semibold')}>
               <td className="py-1.5 pr-4 text-mn-ink-soft">{DAYS_MAP[day]}</td>
               <td className="py-1.5 text-mn-ink">
                 {d?.closed ? (
@@ -83,7 +83,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
       {/* Back button */}
       <Link
         href="/dashboard/organizations"
-        className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-amber mb-4 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-mn-mute hover:text-mn-bronze mb-4 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Zurück zur Übersicht
@@ -92,7 +92,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
       {/* Header */}
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden mb-4">
         {org.cover_image_url && (
-          <div className="h-48 bg-gradient-to-br from-mn-amber/10 to-primary-50 overflow-hidden">
+          <div className="h-48 bg-gradient-to-br from-mn-bronze/10 to-primary-50 overflow-hidden">
             <img src={org.cover_image_url} alt="" className="w-full h-full object-cover" />
           </div>
         )}
@@ -137,7 +137,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               {org.rating_count > 0 && (
                 <div className="flex items-center gap-1 mt-2" aria-label={`Bewertung: ${org.rating_avg} von 5`}>
                   {[1, 2, 3, 4, 5].map(star => (
-                    <Star key={star} className={cn('w-4 h-4', star <= Math.round(org.rating_avg) ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost')} />
+                    <Star key={star} className={cn('w-4 h-4', star <= Math.round(org.rating_avg) ? 'text-mn-bronze fill-yellow-400' : 'text-mn-ghost')} />
                   ))}
                   <span className="text-sm text-mn-ink-soft ml-1">{org.rating_avg} ({org.rating_count} Bewertungen)</span>
                 </div>
@@ -165,14 +165,14 @@ export default function OrganizationDetail({ organization: org }: Props) {
               <h2 className="font-semibold text-mn-ink mb-3">Angebote & Leistungen</h2>
               <div className="flex flex-wrap gap-2">
                 {(showAllServices ? serviceLabels : serviceLabels.slice(0, 8)).map(s => (
-                  <span key={s} className="text-xs bg-mn-amber/5 text-mn-amber px-3 py-1.5 rounded-full font-medium">
+                  <span key={s} className="text-xs bg-mn-bronze/5 text-mn-bronze px-3 py-1.5 rounded-full font-medium">
                     {s}
                   </span>
                 ))}
                 {serviceLabels.length > 8 && !showAllServices && (
                   <button
                     onClick={() => setShowAllServices(true)}
-                    className="text-xs text-mn-amber hover:text-primary-800 px-2 py-1"
+                    className="text-xs text-mn-bronze hover:text-primary-800 px-2 py-1"
                   >
                     +{serviceLabels.length - 8} weitere
                   </button>
@@ -205,7 +205,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               </h2>
               <div className="flex flex-wrap gap-2">
                 {org.languages.map(l => (
-                  <span key={l} className="text-xs bg-mn-surface text-mn-amber px-3 py-1.5 rounded-full font-medium">
+                  <span key={l} className="text-xs bg-mn-surface text-mn-bronze px-3 py-1.5 rounded-full font-medium">
                     {l}
                   </span>
                 ))}
@@ -245,13 +245,13 @@ export default function OrganizationDetail({ organization: org }: Props) {
                   href={mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-2 text-sm text-mn-ink-soft hover:text-mn-amber transition-colors group"
+                  className="flex items-start gap-2 text-sm text-mn-ink-soft hover:text-mn-bronze transition-colors group"
                 >
-                  <MapPin className="w-4 h-4 mt-0.5 text-mn-mute group-hover:text-mn-amber flex-shrink-0" />
+                  <MapPin className="w-4 h-4 mt-0.5 text-mn-mute group-hover:text-mn-bronze flex-shrink-0" />
                   <div>
                     {org.address && <p>{org.address}</p>}
                     <p>{org.zip_code} {org.city}</p>
-                    <p className="text-xs text-mn-amber flex items-center gap-0.5 mt-0.5">
+                    <p className="text-xs text-mn-bronze flex items-center gap-0.5 mt-0.5">
                       <Navigation className="w-3 h-3" /> In Maps öffnen
                     </p>
                   </div>
@@ -279,7 +279,7 @@ export default function OrganizationDetail({ organization: org }: Props) {
               )}
               {org.website && (
                 <a href={org.website} target="_blank" rel="noopener noreferrer"
-                   className="flex items-center gap-2 text-sm text-mn-ink-soft hover:text-mn-amber transition-colors">
+                   className="flex items-center gap-2 text-sm text-mn-ink-soft hover:text-mn-bronze transition-colors">
                   <Globe className="w-4 h-4 text-mn-mute" />
                   Website besuchen
                   <ExternalLink className="w-3 h-3" />

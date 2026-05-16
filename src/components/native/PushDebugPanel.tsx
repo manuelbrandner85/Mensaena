@@ -142,7 +142,7 @@ function describe(status: FcmStatus): {
         icon: '⏳',
         label: 'Registriert bei Firebase...',
         description: 'FCM generiert gleich deinen Device-Token.',
-        color: 'text-mn-amber',
+        color: 'text-mn-bronze',
       }
     case 'registration_error':
       return {

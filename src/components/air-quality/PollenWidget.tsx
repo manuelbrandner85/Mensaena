@@ -112,7 +112,7 @@ export function PollenWidget({
 
       {data.dominantPollen !== 'Keiner' && (
         <p className="mb-3 flex items-center gap-2 text-xs text-mn-ink-soft dark:text-mn-ghost">
-          <TreeDeciduous aria-hidden className="h-3.5 w-3.5 text-mn-amber" />
+          <TreeDeciduous aria-hidden className="h-3.5 w-3.5 text-mn-bronze" />
           Dominant: <span className="font-semibold">{data.dominantPollen}</span>
           <span className="opacity-60">· {data.label_de}</span>
         </p>

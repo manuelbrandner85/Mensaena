@@ -60,21 +60,21 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
   if (!userHasLocation) {
     return (
       <div
-        className="relative bg-mn-elevated border border-mn-amber/20 rounded-2xl p-4 flex items-start gap-3 overflow-hidden"
+        className="relative bg-mn-elevated border border-mn-bronze/20 rounded-2xl p-4 flex items-start gap-3 overflow-hidden"
         style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.4), 0 0 32px rgba(245,158,11,0.08) inset' }}
       >
         <div className="absolute top-0 left-[10%] right-[10%] h-px pointer-events-none"
           style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.40), transparent)' }}
           aria-hidden="true"
         />
-        <MapPin className="w-5 h-5 text-mn-amber flex-shrink-0 mt-0.5" />
+        <MapPin className="w-5 h-5 text-mn-bronze flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-sm font-medium text-mn-ink">
             Hinterlege deinen Standort um Beiträge in deiner Nähe zu sehen
           </p>
           <Link
             href="/dashboard/settings"
-            className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-mn-amber hover:text-mn-amber-warm transition-colors focus:outline-none focus-visible:underline rounded"
+            className="inline-flex items-center gap-1 mt-2 text-sm font-medium text-mn-bronze hover:text-mn-bronze-warm transition-colors focus:outline-none focus-visible:underline rounded"
           >
             Standort einstellen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -104,7 +104,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
         action={
           <Link
             href="/dashboard/map"
-            className="text-mn-amber text-sm font-medium hover:text-mn-amber transition-colors flex items-center gap-1"
+            className="text-mn-bronze text-sm font-medium hover:text-mn-bronze transition-colors flex items-center gap-1"
           >
             Alle anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -126,7 +126,7 @@ export default function NearbyPosts({ posts, userHasLocation }: NearbyPostsProps
                   'bg-mn-elevated rounded-2xl border border-white/5 p-4',
                   'hover-lift cursor-pointer overflow-hidden relative',
                   'transition-all duration-300 hover:border-white/10',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void',
                 )}
                 style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.04) inset' }}
               >

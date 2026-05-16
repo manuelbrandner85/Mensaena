@@ -282,7 +282,7 @@ export default function OutgoingCallScreen({
         <div className="relative">
           <span className="absolute inset-0 rounded-full bg-primary-400/20 animate-ping" style={{ animationDuration: '2s' }} />
           <span className="absolute inset-0 rounded-full bg-primary-400/10 animate-ping" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
-          <div className="relative w-32 h-32 rounded-full bg-mn-elevated/10 backdrop-blur-md border-2 border-mn-amber/30/40 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
+          <div className="relative w-32 h-32 rounded-full bg-mn-elevated/10 backdrop-blur-md border-2 border-mn-bronze/30/40 flex items-center justify-center text-5xl font-bold overflow-hidden shadow-2xl">
             {calleeAvatar
               ? <img src={calleeAvatar} alt={calleeName} className="w-full h-full object-cover" />
               : <span>{initials}</span>}

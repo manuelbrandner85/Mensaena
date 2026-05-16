@@ -64,7 +64,7 @@ export default function WeeklyChallengeHighlight() {
   if (challenges.length === 0) return null
 
   return (
-    <section className="rounded-2xl border border-white/8 bg-gradient-to-br from-mn-amber/12 via-white to-primary-50/40 shadow-soft p-5">
+    <section className="rounded-2xl border border-white/8 bg-gradient-to-br from-mn-bronze/12 via-white to-primary-50/40 shadow-soft p-5">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
@@ -77,7 +77,7 @@ export default function WeeklyChallengeHighlight() {
         </div>
         <Link
           href="/dashboard/challenges"
-          className="inline-flex items-center gap-1 text-[11px] font-semibold text-mn-amber hover:text-primary-800"
+          className="inline-flex items-center gap-1 text-[11px] font-semibold text-mn-bronze hover:text-primary-800"
         >
           Alle <ArrowRight className="w-3 h-3" />
         </Link>

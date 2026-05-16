@@ -35,7 +35,7 @@ export default function UnreadMessages({ messages }: UnreadMessagesProps) {
               {totalUnread}
             </Badge>
           )}
-          <Link href="/dashboard/chat" className="text-mn-amber text-xs font-medium hover:text-mn-amber">
+          <Link href="/dashboard/chat" className="text-mn-bronze text-xs font-medium hover:text-mn-bronze">
             Alle →
           </Link>
         </div>

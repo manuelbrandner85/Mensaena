@@ -207,7 +207,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
         </div>
       ) : (
         <>
@@ -292,7 +292,7 @@ export default function UsersTab({ userRole = 'moderator' }: { userRole?: string
                                       setConfirmBanUser(u)
                                     }
                                   }}
-                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-mn-amber hover:text-mn-amber hover:bg-mn-amber/5' : 'text-mn-mute hover:text-mn-amber-warm hover:bg-mn-surface'}`}
+                                  className={`p-1.5 rounded-lg transition-colors ${u.is_banned ? 'text-mn-bronze hover:text-mn-bronze hover:bg-mn-bronze/5' : 'text-mn-mute hover:text-mn-bronze-warm hover:bg-mn-surface'}`}
                                   title={u.is_banned ? 'Nutzer entsperren' : 'Nutzer sperren'}
                                 >
                                   {u.is_banned ? <CheckCircle2 className="w-4 h-4" /> : <Ban className="w-4 h-4" />}

@@ -142,10 +142,10 @@ export default function AddFarmPage() {
 
   if (success) {
     return (
-      <div className="min-h-dvh flex items-center justify-center bg-mn-amber/5">
+      <div className="min-h-dvh flex items-center justify-center bg-mn-bronze/5">
         <div className="text-center p-8">
-          <div className="w-16 h-16 bg-mn-amber/10 border border-mn-amber/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="font-display text-2xl font-medium text-mn-amber" aria-hidden="true">✓</span>
+          <div className="w-16 h-16 bg-mn-bronze/10 border border-mn-bronze/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="font-display text-2xl font-medium text-mn-bronze" aria-hidden="true">✓</span>
           </div>
           <h2 className="font-display text-2xl font-medium text-mn-ink mb-2">Betrieb eingetragen!</h2>
           <p className="text-mn-ink-soft mb-1">Dein Eintrag wird nach Prüfung freigeschaltet.</p>
@@ -359,7 +359,7 @@ export default function AddFarmPage() {
           {/* Services & Lieferung */}
           <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6 space-y-4">
             <h2 className="font-bold text-mn-ink text-lg flex items-center gap-2">
-              <Truck className="w-5 h-5 text-mn-amber" /> Dienstleistungen & Lieferung
+              <Truck className="w-5 h-5 text-mn-bronze" /> Dienstleistungen & Lieferung
             </h2>
             <div>
               <label className="text-sm font-medium text-mn-ink-soft mb-1.5 block">Angebote (kommagetrennt)</label>

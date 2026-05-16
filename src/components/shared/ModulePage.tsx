@@ -39,13 +39,13 @@ export type ModuleMood =
   | 'urgent'     // (reserved) crisis – gentle red pulse
 
 const MOOD_GRADIENT: Record<ModuleMood, string> = {
-  neutral:   'from-mn-amber/8 via-mn-amber/3 to-transparent',
+  neutral:   'from-mn-bronze/8 via-mn-bronze/3 to-transparent',
   calm:      'from-mn-teal/10 via-mn-teal/4 to-transparent',
-  warm:      'from-mn-amber/12 via-mn-herzrot/4 to-transparent',
+  warm:      'from-mn-bronze/12 via-mn-herzrot/4 to-transparent',
   fresh:     'from-mn-leben/10 via-mn-teal/4 to-transparent',
-  scholarly: 'from-mn-amber/8 via-mn-trust/4 to-transparent',
+  scholarly: 'from-mn-bronze/8 via-mn-trust/4 to-transparent',
   sky:       'from-mn-teal/10 via-mn-teal-soft/4 to-transparent',
-  gold:      'from-mn-amber/14 via-mn-amber-warm/5 to-transparent',
+  gold:      'from-mn-bronze/14 via-mn-bronze-warm/5 to-transparent',
   urgent:    'from-mn-herzrot/12 via-mn-herzrot/4 to-transparent',
 }
 
@@ -91,7 +91,7 @@ export default function ModulePage({
   title, description, icon, color,
   postTypes, moduleFilter, createTypes, categories,
   emptyText, allowAnonymous = true, filterCategory, children,
-  sectionLabel, iconColorClass = 'text-mn-amber', iconBgClass = 'bg-mn-amber/5 border-white/8',
+  sectionLabel, iconColorClass = 'text-mn-bronze', iconBgClass = 'bg-mn-bronze/5 border-white/8',
   mood = 'neutral', examplePosts, infoTooltip, moduleKey, firstVisitIntro,
 }: ModulePageProps) {
   // color is intentionally unused in the editorial design (kept for API compatibility)
@@ -361,7 +361,7 @@ export default function ModulePage({
             <button
               onClick={() => { haptic.selection(); setFilterType('all') }}
               className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                filterType === 'all' ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-white/8 text-mn-ink-soft hover:bg-white/5')}
+                filterType === 'all' ? 'bg-mn-bronze text-white shadow-sm' : 'bg-mn-elevated border border-white/8 text-mn-ink-soft hover:bg-white/5')}
             >
               Alle
             </button>
@@ -370,7 +370,7 @@ export default function ModulePage({
                 key={t.value}
                 onClick={() => { haptic.selection(); setFilterType(t.value) }}
                 className={cn('px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
-                  filterType === t.value ? 'bg-mn-amber text-white shadow-sm' : 'bg-mn-elevated border border-white/8 text-mn-ink-soft hover:bg-white/5')}
+                  filterType === t.value ? 'bg-mn-bronze text-white shadow-sm' : 'bg-mn-elevated border border-white/8 text-mn-ink-soft hover:bg-white/5')}
               >
                 {t.label}
               </button>
@@ -397,9 +397,9 @@ export default function ModulePage({
                   key={i}
                   type="button"
                   onClick={() => router.push(buildCreateUrl({ type: ex.type, category: ex.category, title: ex.title }))}
-                  className="relative text-left rounded-2xl border border-dashed border-mn-amber/20 bg-mn-amber/5/50 p-4 opacity-70 hover:opacity-100 hover:border-mn-amber hover:bg-mn-amber/5 transition-all cursor-pointer"
+                  className="relative text-left rounded-2xl border border-dashed border-mn-bronze/20 bg-mn-bronze/5/50 p-4 opacity-70 hover:opacity-100 hover:border-mn-bronze hover:bg-mn-bronze/5 transition-all cursor-pointer"
                 >
-                  <span className="absolute top-2 right-2 bg-mn-elevated text-mn-amber text-xs rounded-full px-2 py-0.5">
+                  <span className="absolute top-2 right-2 bg-mn-elevated text-mn-bronze text-xs rounded-full px-2 py-0.5">
                     ✨ Beispiel
                   </span>
                   <div className="flex items-start gap-3 pr-16">

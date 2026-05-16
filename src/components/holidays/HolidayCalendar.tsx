@@ -111,7 +111,7 @@ export function HolidayCalendar({
           <ChevronLeft aria-hidden className="h-4 w-4" />
         </button>
         <h3 className="flex items-center gap-2 text-sm font-semibold text-mn-ink dark:text-stone-100">
-          <Calendar aria-hidden className="h-4 w-4 text-mn-amber" />
+          <Calendar aria-hidden className="h-4 w-4 text-mn-bronze" />
           {MONTHS[month]} {year}
         </h3>
         <button
@@ -148,7 +148,7 @@ export function HolidayCalendar({
           const isWeekend = dt === 0 || dt === 6
           const baseCls = 'aspect-square rounded-lg text-center text-xs flex flex-col items-center justify-center transition-colors'
           const classes = holiday
-            ? 'bg-mn-amber/5 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100 hover:bg-mn-amber/10 dark:hover:bg-primary-900/50 cursor-pointer'
+            ? 'bg-mn-bronze/5 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100 hover:bg-mn-bronze/10 dark:hover:bg-primary-900/50 cursor-pointer'
             : isToday
               ? 'bg-mn-surface dark:bg-blue-900/30 text-mn-teal-soft dark:text-mn-teal-soft ring-1 ring-mn-teal/30 dark:ring-mn-teal/30'
               : isWeekend
@@ -171,7 +171,7 @@ export function HolidayCalendar({
             >
               <span className="font-medium">{day}</span>
               {holiday && (
-                <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-mn-amber" aria-hidden />
+                <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-mn-bronze" aria-hidden />
               )}
             </button>
           )

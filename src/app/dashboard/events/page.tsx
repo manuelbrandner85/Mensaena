@@ -111,7 +111,7 @@ export default function EventsPage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-2xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0 float-idle">
-              <CalendarDays className="w-6 h-6 text-mn-amber" />
+              <CalendarDays className="w-6 h-6 text-mn-bronze" />
             </div>
             <div>
               <h1 className="page-title">Veranstaltungen</h1>
@@ -144,7 +144,7 @@ export default function EventsPage() {
       {/* Refresh indicator */}
       {events.refreshing && (
         <div className="flex items-center justify-center py-2 mb-3">
-          <div className="w-5 h-5 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
           <span className="ml-2 text-sm text-mn-mute">Aktualisiere...</span>
         </div>
       )}

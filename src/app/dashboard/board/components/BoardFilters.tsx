@@ -36,7 +36,7 @@ export default function BoardFilters({ value, onChange }: BoardFiltersProps) {
             className={cn(
               'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
               isActive
-                ? 'bg-mn-amber text-white shadow-sm'
+                ? 'bg-mn-bronze text-white shadow-sm'
                 : 'bg-mn-elevated text-mn-ink-soft border border-white/5 hover:bg-mn-surface hover:border-white/8',
             )}
           >

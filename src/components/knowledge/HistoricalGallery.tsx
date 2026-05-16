@@ -349,8 +349,8 @@ export default function HistoricalGallery({
     return (
       <div className={`bg-mn-elevated border border-white/5 rounded-2xl p-4 shadow-soft ${className ?? ''}`}>
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-9 h-9 rounded-xl bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
-            <Library className="w-4 h-4 text-mn-amber" />
+          <div className="w-9 h-9 rounded-xl bg-mn-bronze/5 flex items-center justify-center flex-shrink-0">
+            <Library className="w-4 h-4 text-mn-bronze" />
           </div>
           <h3 className="text-sm font-bold text-mn-ink">
             {titleProp ?? `Historisches${cityName ? ` aus ${cityName}` : ''}`}
@@ -364,7 +364,7 @@ export default function HistoricalGallery({
               href={`https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(cityName + ' historisch')}&title=Special:MediaSearch&ns6=1`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-mn-amber hover:underline flex items-center gap-1"
+              className="text-xs text-mn-bronze hover:underline flex items-center gap-1"
             >
               Auf Wikimedia suchen <ExternalLink className="w-3 h-3" />
             </a>
@@ -378,13 +378,13 @@ export default function HistoricalGallery({
 
   return (
     <div className={`relative bg-mn-elevated border border-white/5 rounded-2xl shadow-soft overflow-hidden ${className ?? ''}`}>
-      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-mn-amber/12 via-mn-amber/4 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-mn-bronze/12 via-mn-bronze/4 to-transparent" />
 
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
-              <Library className="w-4 h-4 text-mn-amber" />
+            <div className="w-9 h-9 rounded-xl bg-mn-bronze/5 flex items-center justify-center flex-shrink-0">
+              <Library className="w-4 h-4 text-mn-bronze" />
             </div>
             <div>
               <h3 className="font-bold text-mn-ink leading-tight text-sm">{headline}</h3>
@@ -400,7 +400,7 @@ export default function HistoricalGallery({
               href={`https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(cityName + ' historisch')}&title=Special:MediaSearch&ns6=1`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:text-mn-amber transition-colors"
+              className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:text-mn-bronze transition-colors"
               title="Mehr auf Wikimedia Commons"
             >
               <ExternalLink className="w-4 h-4" />

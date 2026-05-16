@@ -83,21 +83,21 @@ function SharingStatsWidget() {
 
       {/* Aktuelle Angebote */}
       {recentItems.length > 0 && (
-        <div className="relative bg-gradient-to-br from-mn-amber/8 via-mn-amber/4/80 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-bronze/8 via-mn-bronze/4/80 to-mn-teal-soft/8 border border-mn-bronze/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
           <div className="relative flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-mn-amber float-idle" />
+            <TrendingUp className="w-4 h-4 text-mn-bronze float-idle" />
             <p className="text-sm font-bold text-primary-800">Aktuelle Tausch-Angebote</p>
-            <span className="display-numeral ml-auto text-xs bg-mn-amber/10 text-mn-amber px-2 py-0.5 rounded-full tabular-nums">{total} gesamt</span>
+            <span className="display-numeral ml-auto text-xs bg-mn-bronze/10 text-mn-bronze px-2 py-0.5 rounded-full tabular-nums">{total} gesamt</span>
           </div>
           <div className="relative flex flex-wrap gap-2">
             {recentItems.map(item => (
               <Link key={item.id} href={`/dashboard/posts/${item.id}`}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-elevated border border-white/8 rounded-full text-xs font-medium text-mn-amber hover:bg-mn-amber/5 transition-all shadow-cinema-card">
+                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-mn-elevated border border-white/8 rounded-full text-xs font-medium text-mn-bronze hover:bg-mn-bronze/5 transition-all shadow-cinema-card">
                 {catEmoji[item.category] ?? '🔄'} {item.title.length > 25 ? item.title.slice(0, 25) + '…' : item.title}
               </Link>
             ))}
@@ -106,7 +106,7 @@ function SharingStatsWidget() {
       )}
 
       {/* Prinzip */}
-      <div className="relative bg-mn-elevated border border-mn-amber/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+      <div className="relative bg-mn-elevated border border-mn-bronze/20 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}

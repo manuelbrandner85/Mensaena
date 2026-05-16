@@ -63,7 +63,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
             <div className="flex items-start justify-between gap-2">
               <Link
                 href={`/dashboard/organizations/${org.slug || org.id}`}
-                className="font-semibold text-mn-ink text-sm leading-snug line-clamp-2 hover:text-mn-amber transition-colors"
+                className="font-semibold text-mn-ink text-sm leading-snug line-clamp-2 hover:text-mn-bronze transition-colors"
               >
                 {org.name}
               </Link>
@@ -88,7 +88,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                 href={mapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-mn-mute flex items-center gap-0.5 hover:text-mn-amber hover:underline transition-colors"
+                className="text-xs text-mn-mute flex items-center gap-0.5 hover:text-mn-bronze hover:underline transition-colors"
                 title="In Google Maps öffnen"
               >
                 <MapPin className="w-3 h-3" />
@@ -118,7 +118,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                       key={star}
                       className={cn(
                         'w-3 h-3',
-                        star <= Math.round(org.rating_avg) ? 'text-mn-amber fill-yellow-400' : 'text-mn-ghost'
+                        star <= Math.round(org.rating_avg) ? 'text-mn-bronze fill-yellow-400' : 'text-mn-ghost'
                       )}
                     />
                   ))}
@@ -187,7 +187,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
           {onShowOnMap && org.latitude && org.longitude && (
             <button
               onClick={() => onShowOnMap(org)}
-              className="flex items-center gap-1 text-xs bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 px-2.5 py-1 rounded-full transition-colors"
+              className="flex items-center gap-1 text-xs bg-mn-bronze/5 text-mn-bronze hover:bg-mn-bronze/10 px-2.5 py-1 rounded-full transition-colors"
             >
               <Navigation className="w-3 h-3" />
               Karte
@@ -195,7 +195,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
           )}
           <Link
             href={`/dashboard/organizations/${org.slug || org.id}`}
-            className="flex items-center gap-1 text-xs text-mn-amber hover:text-primary-800 px-2 py-1 rounded-full ml-auto transition-colors font-medium"
+            className="flex items-center gap-1 text-xs text-mn-bronze hover:text-primary-800 px-2 py-1 rounded-full ml-auto transition-colors font-medium"
           >
             Details
             <ExternalLink className="w-3 h-3" />
@@ -224,7 +224,7 @@ export default function OrganizationCard({ org, onShowOnMap }: Props) {
                 }
                 <div className="flex gap-3 mt-1">
                   <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
-                     className="text-mn-amber hover:underline flex items-center gap-0.5">
+                     className="text-mn-bronze hover:underline flex items-center gap-0.5">
                     <Navigation className="w-3 h-3" /> Google Maps
                   </a>
                 </div>

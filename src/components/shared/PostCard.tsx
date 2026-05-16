@@ -425,7 +425,7 @@ export default function PostCard({
         </div>
       )}
       {urgency === 2 && (
-        <div className="relative flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 text-white text-xs font-semibold overflow-hidden">
+        <div className="relative flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mn-bronze-warm/12 to-mn-bronze-warm/8 text-white text-xs font-semibold overflow-hidden">
           <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
           <span className="relative text-sm">&#x26A0;&#xFE0F;</span>
           <span className="relative">Dringend</span>
@@ -439,13 +439,13 @@ export default function PostCard({
             {/* Avatar */}
             <div className={cn(
               'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden',
-              isAnonymous ? 'bg-mn-raised' : 'bg-mn-amber/10',
+              isAnonymous ? 'bg-mn-raised' : 'bg-mn-bronze/10',
             )}>
               {isAnonymous
                 ? <span className="text-mn-mute text-sm font-bold">?</span>
                 : post.profiles?.avatar_url
                   ? <Image src={post.profiles.avatar_url} alt={`Profilbild von ${post.profiles?.name || 'Nutzer'}`} width={32} height={32} className="w-full h-full object-cover" />
-                  : <User className="w-4 h-4 text-mn-amber" />
+                  : <User className="w-4 h-4 text-mn-bronze" />
               }
             </div>
             <div className="min-w-0">
@@ -514,7 +514,7 @@ export default function PostCard({
         {/* ── Title ──────────────────────────────────────────────────── */}
         {detailLink ? (
           <Link href={href} className="block group/title">
-            <h3 className="font-semibold text-mn-ink text-sm leading-snug group-hover/title:text-mn-amber transition-colors mb-1">
+            <h3 className="font-semibold text-mn-ink text-sm leading-snug group-hover/title:text-mn-bronze transition-colors mb-1">
               {post.title}
             </h3>
           </Link>
@@ -579,7 +579,7 @@ export default function PostCard({
                   className={cn(
                     'flex items-center gap-0.5 px-2 py-1 rounded-full text-xs transition-all',
                     isActive
-                      ? 'bg-mn-amber/10 text-primary-800 ring-1 ring-primary-300 scale-105'
+                      ? 'bg-mn-bronze/10 text-primary-800 ring-1 ring-primary-300 scale-105'
                       : 'bg-mn-surface text-mn-mute hover:bg-mn-elevated',
                   )}
                 >
@@ -602,7 +602,7 @@ export default function PostCard({
                     if (!currentUserId) { toast.error('Bitte zuerst anmelden', { id: 'auth-required' }); return }
                     setShowContactModal(true)
                   }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 border border-mn-amber/20 transition-all active:scale-95 shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-bronze/5 text-mn-bronze hover:bg-mn-bronze/10 border border-mn-bronze/20 transition-all active:scale-95 shadow-sm"
                 >
                   <Send className="w-3.5 h-3.5" /> Interesse zeigen
                 </button>
@@ -614,7 +614,7 @@ export default function PostCard({
                   onClick={handleDM}
                   disabled={dmLoading}
                   title="Direkte Nachricht senden"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-surface text-mn-amber hover:bg-mn-elevated border border-white/5 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-mn-surface text-mn-bronze hover:bg-mn-elevated border border-white/5 transition-all"
                 >
                   {dmLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MessageCircle className="w-3.5 h-3.5" />}
                   DM
@@ -679,7 +679,7 @@ export default function PostCard({
               {detailLink && (
                 <Link
                   href={href}
-                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-mn-elevated transition-colors text-mn-mute hover:text-mn-amber"
+                  className="flex items-center gap-1 p-1.5 rounded-lg hover:bg-mn-elevated transition-colors text-mn-mute hover:text-mn-bronze"
                   title={`${commentCount} Kommentare`}
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
@@ -695,7 +695,7 @@ export default function PostCard({
                 title={isSaved ? 'Gespeichert' : 'Speichern'}
               >
                 {isSaved
-                  ? <BookmarkCheck className="w-4 h-4 text-mn-amber" />
+                  ? <BookmarkCheck className="w-4 h-4 text-mn-bronze" />
                   : <Bookmark className="w-4 h-4 text-mn-mute" />
                 }
               </button>
@@ -864,7 +864,7 @@ function MiniContactModal({ postTitle, postId, currentUserId, onClose }: {
           <button
             onClick={handleSend}
             disabled={sending}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50"
           >
             {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             Interesse melden

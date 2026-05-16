@@ -48,8 +48,8 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="flex items-start gap-4 rounded-2xl border border-mn-amber/20 bg-mn-amber/5/60 p-6">
-        <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-mn-amber" aria-hidden="true" />
+      <div className="flex items-start gap-4 rounded-2xl border border-mn-bronze/20 bg-mn-bronze/5/60 p-6">
+        <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-mn-bronze" aria-hidden="true" />
         <div>
           <p className="font-semibold text-mn-ink">Nachricht erhalten!</p>
           <p className="mt-1 text-sm text-mn-mute leading-relaxed">
@@ -78,7 +78,7 @@ export default function ContactForm() {
             placeholder="Dein Name"
             required
             maxLength={100}
-            className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm"
+            className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-bronze/30 focus:ring-2 focus:ring-mn-bronze/10 transition-all text-sm"
           />
         </div>
 
@@ -95,7 +95,7 @@ export default function ContactForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="deine@email.de"
             required
-            className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm"
+            className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-bronze/30 focus:ring-2 focus:ring-mn-bronze/10 transition-all text-sm"
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function ContactForm() {
           id="cf-subject"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
-          className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm appearance-none cursor-pointer"
+          className="w-full h-12 px-4 bg-mn-void border border-white/5 rounded-xl text-mn-ink focus:outline-none focus:border-mn-bronze/30 focus:ring-2 focus:ring-mn-bronze/10 transition-all text-sm appearance-none cursor-pointer"
         >
           {SUBJECTS.map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -131,7 +131,7 @@ export default function ContactForm() {
           minLength={10}
           maxLength={5000}
           rows={5}
-          className="w-full px-4 py-3 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-amber/30 focus:ring-2 focus:ring-mn-amber/10 transition-all text-sm resize-none"
+          className="w-full px-4 py-3 bg-mn-void border border-white/5 rounded-xl text-mn-ink placeholder:text-mn-mute/70 focus:outline-none focus:border-mn-bronze/30 focus:ring-2 focus:ring-mn-bronze/10 transition-all text-sm resize-none"
         />
         <div className="mt-1 text-right text-xs text-mn-mute">
           {message.length}/5000

@@ -10,9 +10,9 @@ export default function SkillsCreatePage() {
       moduleKey="skills"
       moduleTitle="Neuer Skill-Beitrag"
       moduleDescription="Teile deine Fähigkeiten, suche Mentoren oder biete Workshops an."
-      gradientFrom="from-mn-amber"
+      gradientFrom="from-mn-bronze"
       gradientTo="to-violet-400"
-      ringColor="ring-mn-amber/30"
+      ringColor="ring-mn-bronze/30"
       iconComponent={<Wrench className="w-6 h-6" />}
       createTypes={[
         { value: 'sharing',   label: '⭐ Skill anbieten', cat: 'skills' },

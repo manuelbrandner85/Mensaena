@@ -114,7 +114,7 @@ export default function VideoPreviewModal({
           <button
             onClick={handleConfirm}
             disabled={!!error}
-            className="flex-1 py-3 rounded-xl bg-mn-amber text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-mn-bronze text-white font-semibold shadow-glow active:scale-95 transition-transform min-h-[44px] disabled:opacity-40 flex items-center justify-center gap-2"
           >
             <Video className="w-4 h-4" />
             Anrufen

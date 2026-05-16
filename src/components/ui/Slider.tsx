@@ -35,7 +35,7 @@ export default function Slider({
         <div className="flex items-center justify-between mb-2">
           {label && <label className="text-sm font-medium text-mn-ink-soft">{label}</label>}
           {showValue && (
-            <span className="text-sm font-semibold text-mn-amber">
+            <span className="text-sm font-semibold text-mn-bronze">
               {value}{suffix}
             </span>
           )}
@@ -55,12 +55,12 @@ export default function Slider({
             'bg-mn-raised outline-none',
             '[&::-webkit-slider-thumb]:appearance-none',
             '[&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5',
-            '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-mn-amber',
+            '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-mn-bronze',
             '[&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:cursor-pointer',
             '[&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:duration-150',
             '[&::-webkit-slider-thumb]:hover:scale-110',
             '[&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5',
-            '[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-mn-amber',
+            '[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-mn-bronze',
             '[&::-moz-range-thumb]:border-none [&::-moz-range-thumb]:cursor-pointer',
             disabled && 'opacity-50 pointer-events-none',
           )}

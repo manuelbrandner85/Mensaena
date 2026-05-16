@@ -28,7 +28,7 @@ export default function EventRecurring({
           onClick={() => onToggle(!enabled)}
           className={cn(
             'relative w-10 h-5 rounded-full transition-colors',
-            enabled ? 'bg-mn-amber' : 'bg-stone-300',
+            enabled ? 'bg-mn-bronze' : 'bg-stone-300',
           )}
         >
           <span
@@ -51,7 +51,7 @@ export default function EventRecurring({
             <select
               value={frequency}
               onChange={(e) => onFrequencyChange(e.target.value)}
-              className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber"
+              className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze"
             >
               <option value="weekly">Wöchentlich</option>
               <option value="biweekly">Alle 2 Wochen</option>
@@ -66,7 +66,7 @@ export default function EventRecurring({
               value={until}
               onChange={(e) => onUntilChange(e.target.value)}
               min={minUntil.toISOString().split('T')[0]}
-              className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-amber"
+              className="w-full rounded-lg border border-white/5 px-3 py-2 text-sm bg-mn-elevated focus:outline-none focus:ring-2 focus:ring-mn-bronze"
             />
           </div>
         </div>

@@ -40,7 +40,7 @@ function StatTile({
 }) {
   return (
     <div className="bg-mn-surface border border-white/5 rounded-xl p-3 flex items-start gap-2.5">
-      <span className="text-mn-amber flex-shrink-0 mt-0.5">{icon}</span>
+      <span className="text-mn-bronze flex-shrink-0 mt-0.5">{icon}</span>
       <div className="min-w-0">
         <p className="text-xs uppercase tracking-wider text-mn-mute font-semibold leading-none mb-1">
           {label}
@@ -163,7 +163,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
     <div className={`relative bg-mn-elevated border border-white/5 rounded-2xl overflow-hidden shadow-soft ${className ?? ''}`}>
       {/* City image or coat-of-arms header */}
       {!compact && !imgError && (info.imageUrl || info.coatOfArmsUrl) && (
-        <div className="relative h-36 bg-gradient-to-br from-mn-amber/8 to-stone-100 overflow-hidden">
+        <div className="relative h-36 bg-gradient-to-br from-mn-bronze/8 to-stone-100 overflow-hidden">
           {info.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -195,7 +195,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2.5">
             {(compact || (!info.imageUrl && info.coatOfArmsUrl)) && (
-              <div className="w-10 h-10 bg-mn-amber/5 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-mn-bronze/5 rounded-xl flex items-center justify-center flex-shrink-0">
                 {info.coatOfArmsUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -205,7 +205,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
                     onError={() => {/* ignore */}}
                   />
                 ) : (
-                  <Landmark className="w-5 h-5 text-mn-amber" />
+                  <Landmark className="w-5 h-5 text-mn-bronze" />
                 )}
               </div>
             )}
@@ -224,7 +224,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
               href={info.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:text-mn-amber hover:bg-mn-amber/5 transition-colors"
+              className="flex-shrink-0 p-1.5 rounded-lg text-mn-mute hover:text-mn-bronze hover:bg-mn-bronze/5 transition-colors"
               title="Offizielle Website"
             >
               <Globe className="w-4 h-4" />
@@ -249,7 +249,7 @@ export default function CityInfoCard({ cityName: cityNameProp, className, compac
               href={info.wikidataUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
+              className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-bronze transition-colors"
             >
               <ExternalLink className="w-3 h-3" /> Mehr auf Wikidata
             </a>

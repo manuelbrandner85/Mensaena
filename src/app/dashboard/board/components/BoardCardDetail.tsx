@@ -98,7 +98,7 @@ export default function BoardCardDetail({
             <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium', colors.badge)}>
               {CATEGORY_ICONS[post.category]} {CATEGORY_LABELS[post.category]}
             </span>
-            {post.pinned && <span className="text-xs text-mn-amber font-medium">📌 Angepinnt</span>}
+            {post.pinned && <span className="text-xs text-mn-bronze font-medium">📌 Angepinnt</span>}
           </div>
           <button onClick={onClose} aria-label="Schließen" className="p-1.5 rounded-full hover:bg-black/10 transition">
             <X className="w-5 h-5 text-mn-ink-soft" />
@@ -153,7 +153,7 @@ export default function BoardCardDetail({
               )}
               <span>{profileName}</span>
               {(post.profiles?.trust_score ?? 0) >= 70 && (
-                <Shield className="w-3 h-3 text-mn-amber" aria-label="Vertrauenswürdig" />
+                <Shield className="w-3 h-3 text-mn-bronze" aria-label="Vertrauenswürdig" />
               )}
             </div>
             <span>·</span>
@@ -167,7 +167,7 @@ export default function BoardCardDetail({
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition',
                 isPinned
-                  ? 'bg-mn-amber/10 text-mn-amber'
+                  ? 'bg-mn-bronze/10 text-mn-bronze'
                   : 'bg-mn-elevated text-mn-ink-soft hover:bg-mn-raised',
               )}
             >
@@ -260,12 +260,12 @@ export default function BoardCardDetail({
                 }
               }}
               className="flex-1 rounded-full border border-white/5 px-3 py-2 text-sm
-                         focus:outline-none focus:ring-2 focus:ring-mn-amber"
+                         focus:outline-none focus:ring-2 focus:ring-mn-bronze"
             />
             <button
               onClick={handleSendComment}
               disabled={!newComment.trim() || sending}
-              className="p-2 rounded-full bg-mn-amber text-white disabled:opacity-40 hover:bg-primary-700 transition"
+              className="p-2 rounded-full bg-mn-bronze text-white disabled:opacity-40 hover:bg-primary-700 transition"
             >
               {sending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

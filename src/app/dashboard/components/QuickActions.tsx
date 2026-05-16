@@ -18,7 +18,7 @@ const actions = [
     icon: PlusCircle,
     label: 'Beitrag erstellen',
     href: '/dashboard/create' as string | null,
-    gradient: 'from-mn-amber to-mn-amber-warm',
+    gradient: 'from-mn-bronze to-mn-bronze-warm',
     glow: 'rgba(245,158,11,0.40)',
     iconColor: 'text-mn-deep',
   },
@@ -101,7 +101,7 @@ function SuggestionBar({ crisisActive }: { crisisActive?: boolean }) {
             <Link
               key={s.href}
               href={s.href}
-              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft hover:bg-mn-amber/5 hover:border-mn-amber/20 hover:text-mn-amber transition-all"
+              className="snap-start flex-shrink-0 inline-flex items-center px-4 py-2 rounded-full text-sm border border-white/5 bg-mn-elevated text-mn-ink-soft hover:bg-mn-bronze/5 hover:border-mn-bronze/20 hover:text-mn-bronze transition-all"
             >
               {s.label}
             </Link>
@@ -182,7 +182,7 @@ export default function QuickActions({ unreadCount, crisisActive }: QuickActions
                 key={action.id}
                 href={action.href}
                 aria-label={action.label}
-                className="rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+                className="rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
               >
                 {inner}
               </Link>
@@ -194,7 +194,7 @@ export default function QuickActions({ unreadCount, crisisActive }: QuickActions
               key={action.id}
               onClick={openCommandPalette}
               aria-label={action.label}
-              className="text-left rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
+              className="text-left rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-void"
             >
               {inner}
             </button>

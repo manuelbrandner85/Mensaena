@@ -92,7 +92,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
         {/* Rotating motivational message */}
         <div
           aria-live="polite"
-          className="px-8 py-7 min-h-[84px] flex items-center justify-center text-center bg-mn-amber/5/60"
+          className="px-8 py-7 min-h-[84px] flex items-center justify-center text-center bg-mn-bronze/5/60"
         >
           <p
             className={`text-base sm:text-lg font-medium text-primary-900 transition-opacity duration-200 ${fade ? 'opacity-100' : 'opacity-0'}`}
@@ -132,8 +132,8 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
                 Öffnen
               </button>
             </div>
-            <div className="bg-mn-amber/5 px-4 py-2.5 flex items-center gap-2">
-              <span className="text-mn-amber text-base leading-none" aria-hidden="true">👆</span>
+            <div className="bg-mn-bronze/5 px-4 py-2.5 flex items-center gap-2">
+              <span className="text-mn-bronze text-base leading-none" aria-hidden="true">👆</span>
               <p className="text-xs text-primary-800 font-semibold">
                 Tippe unten auf <strong>„Öffnen"</strong> sobald der Download fertig ist
               </p>
@@ -180,7 +180,7 @@ export default function AppDownloadStatusModal({ onClose }: Props) {
               href={APK_URL}
               download={APK_FILENAME}
               rel="noopener"
-              className="text-center text-xs text-mn-mute hover:text-mn-amber underline py-2"
+              className="text-center text-xs text-mn-mute hover:text-mn-bronze underline py-2"
               onClick={() => setDownloadStarted(true)}
             >
               Download startet nicht? APK direkt laden
@@ -199,7 +199,7 @@ function StepItem({ number, done, children }: StepProps) {
       <span
         className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
           done
-            ? 'bg-mn-amber text-white'
+            ? 'bg-mn-bronze text-white'
             : 'bg-mn-elevated text-mn-mute'
         }`}
         aria-hidden="true"

@@ -113,8 +113,8 @@ export default function BoardPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 03 / Aushänge</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
-              <Clipboard className="w-6 h-6 text-mn-amber" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+              <Clipboard className="w-6 h-6 text-mn-bronze" />
             </div>
             <div>
               <h1 className="page-title">Pinnwand</h1>
@@ -176,7 +176,7 @@ export default function BoardPage() {
       {/* Pull-to-refresh indicator */}
       {board.refreshing && (
         <div className="flex items-center justify-center py-3 mb-4">
-          <RefreshCw className="w-4 h-4 animate-spin text-mn-amber mr-2" />
+          <RefreshCw className="w-4 h-4 animate-spin text-mn-bronze mr-2" />
           <span className="text-sm text-mn-mute">Aktualisiere...</span>
         </div>
       )}
@@ -195,7 +195,7 @@ export default function BoardPage() {
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-mn-amber text-white
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-mn-bronze text-white
                        font-medium text-sm hover:bg-primary-700 transition"
           >
             <Plus className="w-4 h-4" />

@@ -47,11 +47,11 @@ export default function OnboardingHint({
 
   const colors: Record<string, { bg: string; border: string; icon: string; btn: string }> = {
     amber:  { bg: 'bg-amber-50',   border: 'border-amber-200',  icon: 'text-amber-500',  btn: 'bg-amber-500 hover:bg-amber-600'  },
-    violet: { bg: 'bg-mn-surface',  border: 'border-white/5', icon: 'text-mn-amber', btn: 'bg-violet-500 hover:bg-violet-600' },
+    violet: { bg: 'bg-mn-surface',  border: 'border-white/5', icon: 'text-mn-bronze', btn: 'bg-violet-500 hover:bg-violet-600' },
     teal:   { bg: 'bg-mn-surface',    border: 'border-white/5',   icon: 'text-mn-teal',   btn: 'bg-teal-500 hover:bg-teal-600'    },
     blue:   { bg: 'bg-mn-surface',    border: 'border-white/5',   icon: 'text-mn-teal-soft',   btn: 'bg-blue-500 hover:bg-mn-teal/8'    },
     green:  { bg: 'bg-mn-surface',   border: 'border-white/5',  icon: 'text-mn-leben',  btn: 'bg-green-500 hover:bg-mn-leben/8'  },
-    purple: { bg: 'bg-mn-surface',  border: 'border-white/5', icon: 'text-mn-amber', btn: 'bg-purple-500 hover:bg-mn-amber/8' },
+    purple: { bg: 'bg-mn-surface',  border: 'border-white/5', icon: 'text-mn-bronze', btn: 'bg-purple-500 hover:bg-mn-bronze/8' },
   }
   const c = colors[accentColor] ?? colors.amber
 
