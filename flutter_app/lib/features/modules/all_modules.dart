@@ -290,11 +290,79 @@ class CrisisListModule extends StatelessWidget {
   const CrisisListModule({super.key});
   @override
   Widget build(BuildContext context) => const ModuleScreen(
-        title: 'Krise',
-        description: 'Aktive Krisen in deiner Region.',
+        title: 'Krisenmeldungen',
+        description: 'Aktive Krisen und Meldungen in deiner Region.',
         icon: LucideIcons.alertTriangle,
         accent: MnColors.herzrot,
-        tableName: 'crises',
+        tableName: 'crisis_reports',
         currentRoute: '/crisis',
+      );
+}
+
+class HarvestModule extends StatelessWidget {
+  const HarvestModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Ernte',
+        description: 'Solidarische Landwirtschaft und Hof-Listings.',
+        icon: LucideIcons.leaf,
+        accent: MnColors.leben,
+        tableName: 'farm_listings',
+        currentRoute: '/harvest',
+      );
+}
+
+class HousingModule extends StatelessWidget {
+  const HousingModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Wohnen',
+        description: 'WG-Suche, Untermiete und Wohngemeinschaften.',
+        icon: LucideIcons.home,
+        accent: MnColors.teal,
+        tableName: 'posts',
+        filter: {'type': 'wohnungsmarkt'},
+        currentRoute: '/housing',
+      );
+}
+
+class MobilityModule extends StatelessWidget {
+  const MobilityModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Mobilitaet',
+        description: 'Mitfahren, Mitnehmen, Fahrrad teilen.',
+        icon: LucideIcons.car,
+        accent: MnColors.tealSoft,
+        tableName: 'posts',
+        filter: {'type': 'mitfahrt'},
+        currentRoute: '/mobility',
+      );
+}
+
+class AnimalsModule extends StatelessWidget {
+  const AnimalsModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Tiere',
+        description: 'Tiersitting, Fundtiere und Adoption.',
+        icon: LucideIcons.dog,
+        accent: MnColors.amberWarm,
+        tableName: 'posts',
+        filter: {'type': 'tierisches'},
+        currentRoute: '/modules/tiere',
+      );
+}
+
+class RescuerHelpersModule extends StatelessWidget {
+  const RescuerHelpersModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Retter',
+        description: 'Erste-Hilfe-Profis und Notfall-Helfer in der Naehe.',
+        icon: LucideIcons.lifeBuoy,
+        accent: MnColors.leben,
+        tableName: 'crisis_helpers',
+        currentRoute: '/rescuer',
       );
 }
