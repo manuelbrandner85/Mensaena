@@ -91,25 +91,25 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
       onClick={closeRatingModal}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-slide-up overflow-hidden"
+        className="bg-mn-surface rounded-2xl shadow-2xl w-full max-w-md animate-slide-up overflow-hidden border border-white/8"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-white/8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-mn-elevated flex items-center justify-center overflow-hidden flex-shrink-0">
               {currentRating.partnerAvatar ? (
                 <img src={currentRating.partnerAvatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-5 h-5 text-primary-600" />
+                <User className="w-5 h-5 text-mn-bronze" />
               )}
             </div>
             <div>
-              <p className="font-bold text-ink-900 text-sm">
+              <p className="font-bold text-mn-ink text-sm">
                 {currentRating.partnerName || 'Nutzer'} bewerten
               </p>
               {currentRating.postTitle && (
-                <p className="text-xs text-ink-500 line-clamp-1">
+                <p className="text-xs text-mn-mute line-clamp-1">
                   {currentRating.postTitle}
                 </p>
               )}
@@ -117,7 +117,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           </div>
           <button
             onClick={closeRatingModal}
-            className="p-2 rounded-xl hover:bg-mn-elevated text-ink-500 transition-colors"
+            className="p-2 rounded-xl hover:bg-mn-elevated text-mn-mute transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -129,18 +129,18 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
             <div key={label} className="flex items-center gap-2 flex-1">
               <div className={cn(
                 'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
-                i === step ? 'bg-primary-600 text-white' : i < step ? 'bg-primary-200 text-primary-700' : 'bg-stone-200 text-ink-400',
+                i === step ? 'bg-mn-bronze text-mn-void' : i < step ? 'bg-mn-bronze/30 text-mn-bronze' : 'bg-white/10 text-mn-mute',
               )}>
                 {i + 1}
               </div>
               <span className={cn(
                 'text-xs font-medium hidden sm:block',
-                i === step ? 'text-ink-900' : 'text-ink-400',
+                i === step ? 'text-mn-ink' : 'text-mn-mute',
               )}>
                 {label}
               </span>
               {i < steps.length - 1 && (
-                <div className={cn('flex-1 h-0.5 rounded', i < step ? 'bg-primary-300' : 'bg-stone-200')} />
+                <div className={cn('flex-1 h-0.5 rounded', i < step ? 'bg-mn-bronze/40' : 'bg-white/10')} />
               )}
             </div>
           ))}
@@ -151,7 +151,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {/* Step 0: Stars */}
           {step === 0 && (
             <div className="flex flex-col items-center gap-6 py-4">
-              <p className="text-lg font-semibold text-ink-900 text-center">
+              <p className="text-lg font-semibold text-mn-ink text-center">
                 Wie war die Zusammenarbeit?
               </p>
               <RatingStars
@@ -161,7 +161,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 showLabel
               />
               {rating > 0 && (
-                <p className="text-sm text-ink-500 animate-fade-in">
+                <p className="text-sm text-mn-mute animate-fade-in">
                   {rating} von 5 Sternen
                 </p>
               )}
@@ -172,7 +172,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <p className="text-sm font-semibold text-ink-900 mb-3">
+                <p className="text-sm font-semibold text-mn-ink mb-3">
                   Was trifft zu? (optional)
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -184,8 +184,8 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
                         categories.includes(cat.value as RatingCategory)
-                          ? 'bg-primary-100 text-primary-700 border-mn-bronze/20'
-                          : 'bg-white text-ink-600 border-stone-200 hover:bg-mn-surface',
+                          ? 'bg-mn-bronze/10 text-mn-bronze border-mn-bronze/20'
+                          : 'border-white/8 hover:bg-mn-elevated text-mn-mute',
                       )}
                     >
                       <span>{cat.emoji}</span>
@@ -197,14 +197,14 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-ink-700">War die Hilfe hilfreich?</span>
+                  <span className="text-sm text-mn-paper">War die Hilfe hilfreich?</span>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setHelpful(helpful === true ? null : true)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        helpful === true ? 'bg-mn-elevated text-mn-leben border-white/5' : 'bg-white text-ink-500 border-stone-200',
+                        helpful === true ? 'bg-mn-elevated text-mn-leben border-white/5' : 'bg-mn-surface text-mn-mute border-white/8',
                       )}
                     >
                       Ja
@@ -214,7 +214,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setHelpful(helpful === false ? null : false)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        helpful === false ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20' : 'bg-white text-ink-500 border-stone-200',
+                        helpful === false ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20' : 'bg-mn-surface text-mn-mute border-white/8',
                       )}
                     >
                       Nein
@@ -223,14 +223,14 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-ink-700">Wuerdest du weiterempfehlen?</span>
+                  <span className="text-sm text-mn-paper">Wuerdest du weiterempfehlen?</span>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setWouldRecommend(wouldRecommend === true ? null : true)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        wouldRecommend === true ? 'bg-mn-elevated text-mn-leben border-white/5' : 'bg-white text-ink-500 border-stone-200',
+                        wouldRecommend === true ? 'bg-mn-elevated text-mn-leben border-white/5' : 'bg-mn-surface text-mn-mute border-white/8',
                       )}
                     >
                       Ja
@@ -240,7 +240,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       onClick={() => setWouldRecommend(wouldRecommend === false ? null : false)}
                       className={cn(
                         'px-3 py-1 rounded-lg text-sm font-medium border transition-all',
-                        wouldRecommend === false ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20' : 'bg-white text-ink-500 border-stone-200',
+                        wouldRecommend === false ? 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20' : 'bg-mn-surface text-mn-mute border-white/8',
                       )}
                     >
                       Nein
@@ -254,7 +254,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           {/* Step 2: Comment */}
           {step === 2 && (
             <div className="space-y-4">
-              <p className="text-sm font-semibold text-ink-900">
+              <p className="text-sm font-semibold text-mn-ink">
                 Möchtest du noch etwas schreiben? (optional)
               </p>
               <textarea
@@ -264,7 +264,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                 rows={4}
                 className="input resize-none w-full text-sm"
               />
-              <p className="text-right text-xs text-ink-400">{comment.length}/500</p>
+              <p className="text-right text-xs text-mn-mute">{comment.length}/500</p>
             </div>
           )}
         </div>
@@ -274,7 +274,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
           <button
             type="button"
             onClick={() => step > 0 ? setStep(step - 1) : closeRatingModal()}
-            className="flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 transition-colors"
+            className="flex items-center gap-1 text-sm text-mn-mute hover:text-mn-paper transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             {step > 0 ? 'Zurück' : 'Abbrechen'}
@@ -285,7 +285,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
               type="button"
               onClick={handleSubmit}
               disabled={loading || rating === 0}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider bg-mn-bronze text-mn-void hover:bg-mn-bronze/90 transition-all disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -298,7 +298,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
               type="button"
               onClick={() => setStep(step + 1)}
               disabled={!canNext}
-              className="flex items-center gap-1 px-5 py-2.5 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+              className="flex items-center gap-1 px-5 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wider bg-mn-bronze text-mn-void hover:bg-mn-bronze/90 transition-all disabled:opacity-50"
             >
               Weiter
               <ChevronRight className="w-4 h-4" />

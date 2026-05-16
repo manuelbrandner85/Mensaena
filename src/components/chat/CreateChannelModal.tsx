@@ -62,12 +62,12 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div role="dialog" aria-modal="true" aria-labelledby="create-channel-title" className="bg-mn-elevated rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/8">
           <div>
-            <h3 id="create-channel-title" className="font-bold text-gray-900 text-lg">Kanal erstellen</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Förderer-Feature – für alle sichtbar</p>
+            <h3 id="create-channel-title" className="font-bold text-mn-ink text-lg">Kanal erstellen</h3>
+            <p className="text-xs text-mn-mute mt-0.5">Förderer-Feature – für alle sichtbar</p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-all">
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-mn-elevated text-mn-mute transition-all">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -75,13 +75,13 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
         <div className="px-6 py-5 space-y-4">
           {/* Emoji */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Emoji</p>
+            <p className="text-xs font-semibold text-mn-mute mb-2 uppercase tracking-wide">Emoji</p>
             <div className="flex flex-wrap gap-2">
               {CHANNEL_EMOJIS.map(e => (
                 <button key={e} type="button" onClick={() => setEmoji(e)}
                   className={cn(
                     'w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all',
-                    emoji === e ? 'bg-mn-bronze/10 ring-2 ring-primary-400 shadow-sm' : 'hover:bg-gray-100'
+                    emoji === e ? 'bg-mn-bronze/10 ring-2 ring-primary-400 shadow-sm' : 'hover:bg-mn-elevated'
                   )}>
                   {e}
                 </button>
@@ -91,28 +91,28 @@ export default function CreateChannelModal({ userId, onClose, onCreated }: Props
 
           {/* Name */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Kanalname *</label>
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide">Kanalname *</label>
             <div className="relative mt-1.5">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-mn-mute pointer-events-none" />
               <input
                 value={name}
                 onChange={e => setName(e.target.value)}
                 maxLength={40}
                 placeholder="mein-kanal"
-                className="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-gray-50 placeholder-gray-400"
+                className="w-full pl-8 pr-3 py-2.5 text-sm border border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-elevated placeholder-mn-mute"
               />
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Beschreibung (optional)</label>
+            <label className="text-xs font-semibold text-mn-mute uppercase tracking-wide">Beschreibung (optional)</label>
             <input
               value={description}
               onChange={e => setDescription(e.target.value)}
               maxLength={120}
               placeholder="Worum geht es in diesem Kanal?"
-              className="mt-1.5 w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-gray-50 placeholder-gray-400"
+              className="mt-1.5 w-full px-3 py-2.5 text-sm border border-white/8 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 bg-mn-elevated placeholder-mn-mute"
             />
           </div>
 
