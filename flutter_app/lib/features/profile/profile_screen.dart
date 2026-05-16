@@ -3,13 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
 import '../../core/widgets/cinema_avatar.dart';
-import '../../core/widgets/cinema_bottom_nav.dart';
 import '../../core/widgets/cinema_empty_state.dart';
 import '../../core/widgets/cinema_input.dart';
 import '../../core/widgets/cinema_loading_skeleton.dart';
@@ -75,69 +73,47 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         : ref.watch(profileByIdProvider(resolvedId));
     final isMe = me?.id == resolvedId;
 
-    return CinemaScaffold(
-      appBar: CinemaAppBar(
-        title: 'PROFIL',
-        actions: [
-          if (!isMe && resolvedId != null && me != null)
-            PopupMenuButton<String>(
-              icon: const Icon(LucideIcons.moreVertical, color: MnColors.inkSoft),
-              color: MnColors.raised,
-              onSelected: (v) {
-                final p = profile?.asData?.value;
-                final name = (p?['name'] as String?) ?? 'Nachbar*in';
-                if (v == 'report') {
-                  _openReportSheet(resolvedId, name);
-                } else if (v == 'block') {
-                  _openBlockConfirm(resolvedId, name);
-                }
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  value: 'report',
-                  child: Row(
-                    children: [
-                      const Icon(LucideIcons.flag, size: 16, color: MnColors.amber),
-                      const SizedBox(width: 8),
-                      Text('Melden', style: MnTypography.body(color: MnColors.ink)),
-                    ],
-                  ),
+    return CinemaAppShell(
+      currentRoute: '/profile/me',
+      title: 'PROFIL',
+      appBarActions: [
+        if (!isMe && resolvedId != null && me != null)
+          PopupMenuButton<String>(
+            icon: const Icon(LucideIcons.moreVertical, color: MnColors.inkSoft),
+            color: MnColors.raised,
+            onSelected: (v) {
+              final p = profile?.asData?.value;
+              final name = (p?['name'] as String?) ?? 'Nachbar*in';
+              if (v == 'report') {
+                _openReportSheet(resolvedId, name);
+              } else if (v == 'block') {
+                _openBlockConfirm(resolvedId, name);
+              }
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'report',
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.flag, size: 16, color: MnColors.amber),
+                    const SizedBox(width: 8),
+                    Text('Melden', style: MnTypography.body(color: MnColors.ink)),
+                  ],
                 ),
-                PopupMenuItem(
-                  value: 'block',
-                  child: Row(
-                    children: [
-                      const Icon(LucideIcons.userX, size: 16, color: MnColors.herzrot),
-                      const SizedBox(width: 8),
-                      Text('Blockieren', style: MnTypography.body(color: MnColors.ink)),
-                    ],
-                  ),
+              ),
+              PopupMenuItem(
+                value: 'block',
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.userX, size: 16, color: MnColors.herzrot),
+                    const SizedBox(width: 8),
+                    Text('Blockieren', style: MnTypography.body(color: MnColors.ink)),
+                  ],
                 ),
-              ],
-            ),
-        ],
-      ),
-      bottomNavigationBar: CinemaBottomNav(
-        currentIndex: 4,
-        onTap: (i) {
-          switch (i) {
-            case 0:
-              GoRouter.of(context).go('/dashboard');
-              break;
-            case 1:
-              GoRouter.of(context).go('/map');
-              break;
-            case 2:
-              GoRouter.of(context).push('/posts/new');
-              break;
-            case 3:
-              GoRouter.of(context).go('/chat');
-              break;
-            case 4:
-              break;
-          }
-        },
-      ),
+              ),
+            ],
+          ),
+      ],
       body: SafeArea(
         child: profile == null
             ? const Center(child: Text('Kein Profil.'))

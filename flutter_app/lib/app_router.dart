@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/atmosphere/cinema_scaffold.dart';
@@ -21,6 +22,7 @@ import 'features/map/map_screen.dart';
 import 'features/modules/all_modules.dart';
 import 'features/modules/detail_screens.dart';
 import 'features/modules/mental_support_screen.dart';
+import 'features/modules/placeholder_screen.dart';
 import 'features/modules/timebank_screen.dart';
 import 'features/modules/warnungen_screen.dart';
 import 'features/notifications/notifications_screen.dart';
@@ -250,6 +252,24 @@ List<RouteBase> _buildRoutes() => [
       _moduleRoute('/modules/mental-support', const MentalSupportScreen()),
       _moduleRoute('/modules/warnungen', const WarnungenScreen()),
 
+      // ── Web-Sidebar 1:1: Stub-Routes fuer Module die noch nicht
+      // ausimplementiert sind. Navigation bleibt konsistent, Inhalt
+      // folgt in 3.3.0.
+      _placeholderRoute('/messages', 'Nachrichten', LucideIcons.mail),
+      _placeholderRoute('/matching', 'Matching', LucideIcons.sparkles),
+      _placeholderRoute('/organizations', 'Organisationen', LucideIcons.building),
+      _placeholderRoute('/interactions', 'Interaktionen', LucideIcons.activity),
+      _placeholderRoute('/crisis', 'Krisenhilfe', LucideIcons.alertTriangle),
+      _placeholderRoute('/sharing', 'Sharing', LucideIcons.share2),
+      _placeholderRoute('/supply', 'Supply', LucideIcons.package),
+      _placeholderRoute('/rescuer', 'Retter', LucideIcons.shieldCheck),
+      _placeholderRoute('/jobs', 'Jobs', LucideIcons.briefcase),
+      _placeholderRoute('/invite', 'Einladen', LucideIcons.userPlus),
+      _placeholderRoute('/calendar', 'Kalender', LucideIcons.calendarDays),
+      _placeholderRoute('/knowledge', 'Wissen', LucideIcons.lightbulb),
+      _placeholderRoute('/posts', 'Beitraege', LucideIcons.fileText),
+      _placeholderRoute('/settings/blocked', 'Blockierte Nutzer', LucideIcons.userX),
+
       GoRoute(
         path: '/admin',
         pageBuilder: (ctx, state) => CinemaPageTransition.build(
@@ -292,6 +312,18 @@ GoRoute _moduleRoute(String path, Widget screen) => GoRoute(
       path: path,
       pageBuilder: (ctx, state) =>
           CinemaPageTransition.build(child: screen, state: state),
+    );
+
+GoRoute _placeholderRoute(String path, String title, IconData icon) => GoRoute(
+      path: path,
+      pageBuilder: (ctx, state) => CinemaPageTransition.build(
+        child: PlaceholderScreen(
+          currentRoute: path,
+          title: title,
+          icon: icon,
+        ),
+        state: state,
+      ),
     );
 
 /// Platzhalter-Screen bis Phase 5+ jede Route mit einem echten Screen

@@ -4,11 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
 import '../../core/widgets/cinema_modal.dart';
 import '../../core/widgets/cinema_toast.dart';
 import '../../core/widgets/cinema_toggle.dart';
@@ -78,9 +77,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final profileAsync = ref.watch(currentProfileProvider);
     _hydrateFromProfile(profileAsync.asData?.value);
 
-    return CinemaScaffold(
-      level: AtmosphereLevel.focus,
-      appBar: const CinemaAppBar(title: 'EINSTELLUNGEN'),
+    return CinemaAppShell(
+      currentRoute: '/settings',
+      title: 'EINSTELLUNGEN',
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),

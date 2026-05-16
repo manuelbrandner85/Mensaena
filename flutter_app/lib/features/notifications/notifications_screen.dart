@@ -3,11 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
 import '../../core/widgets/cinema_avatar.dart';
 import '../../core/widgets/cinema_empty_state.dart';
 import '../../core/widgets/cinema_loading_skeleton.dart';
@@ -37,25 +36,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final list = ref.watch(notificationsProvider(_unreadOnly));
     final user = ref.watch(currentUserProvider);
 
-    return CinemaScaffold(
-      appBar: CinemaAppBar(
-        title: 'BENACHRICHTIGUNGEN',
-        actions: [
-          if (user != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: GlowButton(
-                label: 'Alle gelesen',
-                variant: GlowVariant.ghost,
-                compact: true,
-                onPressed: () async {
-                  await db.markAllRead(user.id);
-                  ref.invalidate(notificationsProvider);
-                },
-              ),
+    return CinemaAppShell(
+      currentRoute: '/notifications',
+      title: 'BENACHRICHTIGUNGEN',
+      appBarActions: [
+        if (user != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GlowButton(
+              label: 'Alle gelesen',
+              variant: GlowVariant.ghost,
+              compact: true,
+              onPressed: () async {
+                await db.markAllRead(user.id);
+                ref.invalidate(notificationsProvider);
+              },
             ),
-        ],
-      ),
+          ),
+      ],
       body: SafeArea(
         child: Column(
           children: [
