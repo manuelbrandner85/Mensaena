@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, require_trailing_commas
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/colors.dart';
 import '../theme/dimensions.dart';
 import '../theme/typography.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../services/supabase/auth_service.dart';
 
