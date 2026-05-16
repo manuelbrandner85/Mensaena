@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/atmosphere/cinema_scaffold.dart';
@@ -19,8 +20,11 @@ import 'features/legal/datenschutz_screen.dart';
 import 'features/legal/impressum_screen.dart';
 import 'features/map/map_screen.dart';
 import 'features/modules/all_modules.dart';
+import 'features/modules/calendar_screen.dart';
 import 'features/modules/detail_screens.dart';
+import 'features/modules/invite_screen.dart';
 import 'features/modules/mental_support_screen.dart';
+import 'features/modules/placeholder_screen.dart';
 import 'features/modules/timebank_screen.dart';
 import 'features/modules/warnungen_screen.dart';
 import 'features/notifications/notifications_screen.dart';
@@ -250,6 +254,26 @@ List<RouteBase> _buildRoutes() => [
       _moduleRoute('/modules/mental-support', const MentalSupportScreen()),
       _moduleRoute('/modules/warnungen', const WarnungenScreen()),
 
+      // ── Web-Sidebar 1:1: alle Routen verdrahtet ─────────────────────
+      // /messages: Inbox-Redirect auf /chat (Direkt-Tab)
+      GoRoute(
+        path: '/messages',
+        redirect: (_, __) => '/chat',
+      ),
+      _moduleRoute('/matching', const MatchingModule()),
+      _moduleRoute('/organizations', const OrganizationsModule()),
+      _moduleRoute('/interactions', const InteractionsModule()),
+      _moduleRoute('/crisis', const CrisisListModule()),
+      _moduleRoute('/sharing', const SharingModule()),
+      _moduleRoute('/supply', const SupplyModule()),
+      _moduleRoute('/rescuer', const RescuerModule()),
+      _moduleRoute('/jobs', const JobsModule()),
+      _moduleRoute('/knowledge', const KnowledgeModule()),
+      _moduleRoute('/posts', const PostsModule()),
+      _moduleRoute('/invite', const InviteScreen()),
+      _moduleRoute('/calendar', const CalendarScreen()),
+      _placeholderRoute('/settings/blocked', 'Blockierte Nutzer', LucideIcons.userX),
+
       GoRoute(
         path: '/admin',
         pageBuilder: (ctx, state) => CinemaPageTransition.build(
@@ -292,6 +316,18 @@ GoRoute _moduleRoute(String path, Widget screen) => GoRoute(
       path: path,
       pageBuilder: (ctx, state) =>
           CinemaPageTransition.build(child: screen, state: state),
+    );
+
+GoRoute _placeholderRoute(String path, String title, IconData icon) => GoRoute(
+      path: path,
+      pageBuilder: (ctx, state) => CinemaPageTransition.build(
+        child: PlaceholderScreen(
+          currentRoute: path,
+          title: title,
+          icon: icon,
+        ),
+        state: state,
+      ),
     );
 
 /// Platzhalter-Screen bis Phase 5+ jede Route mit einem echten Screen

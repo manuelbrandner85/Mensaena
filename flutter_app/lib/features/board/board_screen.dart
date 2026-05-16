@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
 import '../../core/widgets/cinema_avatar.dart';
 import '../../core/widgets/cinema_empty_state.dart';
 import '../../core/widgets/cinema_input.dart';
@@ -51,8 +50,9 @@ class BoardScreen extends ConsumerWidget {
     final profile = ref.watch(currentProfileProvider).asData?.value;
     final isAdmin = profile?['is_admin'] == true;
 
-    return CinemaScaffold(
-      appBar: const CinemaAppBar(title: 'SCHWARZES BRETT'),
+    return CinemaAppShell(
+      currentRoute: '/board',
+      title: 'SCHWARZES BRETT',
       floatingActionButton: FloatingActionButton(
         backgroundColor: MnColors.amber,
         foregroundColor: MnColors.voidColor,

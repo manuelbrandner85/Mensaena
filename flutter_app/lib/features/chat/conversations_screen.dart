@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/widgets/cinema_avatar.dart';
-import '../../core/widgets/cinema_bottom_nav.dart';
 import '../../core/widgets/cinema_empty_state.dart';
 import '../../core/widgets/cinema_input.dart';
 import '../../core/widgets/cinema_loading_skeleton.dart';
@@ -62,43 +60,21 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen>
     final channels = ref.watch(allChannelsProvider);
     final isAdmin = ref.watch(_isAdminProvider).asData?.value ?? false;
 
-    return CinemaScaffold(
-      appBar: CinemaAppBar(
-        title: 'CHAT',
-        actions: [
-          if (isAdmin)
-            IconButton(
-              icon: const Icon(
-                LucideIcons.settings,
-                size: 20,
-                color: MnColors.amber,
-              ),
-              tooltip: 'Channels verwalten',
-              onPressed: () => GoRouter.of(context).push('/chat/channels'),
+    return CinemaAppShell(
+      currentRoute: '/chat',
+      title: 'CHAT',
+      appBarActions: [
+        if (isAdmin)
+          IconButton(
+            icon: const Icon(
+              LucideIcons.settings,
+              size: 20,
+              color: MnColors.amber,
             ),
-        ],
-      ),
-      bottomNavigationBar: CinemaBottomNav(
-        currentIndex: 3,
-        onTap: (i) {
-          switch (i) {
-            case 0:
-              GoRouter.of(context).go('/dashboard');
-              break;
-            case 1:
-              GoRouter.of(context).go('/map');
-              break;
-            case 2:
-              GoRouter.of(context).push('/posts/new');
-              break;
-            case 3:
-              break;
-            case 4:
-              GoRouter.of(context).go('/profile/me');
-              break;
-          }
-        },
-      ),
+            tooltip: 'Channels verwalten',
+            onPressed: () => GoRouter.of(context).push('/chat/channels'),
+          ),
+      ],
       body: SafeArea(
         child: Column(
           children: [

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/shadows.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
 import '../../core/widgets/cinema_empty_state.dart';
 import '../../core/widgets/cinema_loading_skeleton.dart';
 import '../../core/widgets/glow_button.dart';
@@ -29,6 +28,7 @@ class ModuleScreen extends ConsumerWidget {
   final Widget? extraHeader;
   final Widget Function(Map<String, dynamic> row)? itemBuilder;
   final String createRoute;
+  final String? currentRoute;
 
   const ModuleScreen({
     super.key,
@@ -41,6 +41,7 @@ class ModuleScreen extends ConsumerWidget {
     this.extraHeader,
     this.itemBuilder,
     this.createRoute = '/posts/new',
+    this.currentRoute,
   });
 
   @override
@@ -51,8 +52,9 @@ class ModuleScreen extends ConsumerWidget {
       ),
     );
 
-    return CinemaScaffold(
-      appBar: CinemaAppBar(title: title.toUpperCase()),
+    return CinemaAppShell(
+      currentRoute: currentRoute ?? '/modules/${title.toLowerCase()}',
+      title: title.toUpperCase(),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

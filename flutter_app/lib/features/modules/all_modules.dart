@@ -164,3 +164,137 @@ class SkillsModule extends StatelessWidget {
         tableName: 'skill_offers',
       );
 }
+
+class SharingModule extends StatelessWidget {
+  const SharingModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Sharing',
+        description: 'Teile Werkzeuge, Gegenstaende, Zeit.',
+        icon: LucideIcons.share2,
+        accent: MnColors.amberSoft,
+        tableName: 'posts',
+        filter: {'type': 'tausch'},
+        currentRoute: '/sharing',
+      );
+}
+
+class SupplyModule extends StatelessWidget {
+  const SupplyModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Supply',
+        description: 'Versorgung & Lager fuer Krisenfaelle.',
+        icon: LucideIcons.package,
+        accent: MnColors.teal,
+        tableName: 'posts',
+        filter: {'type': 'werkzeug'},
+        currentRoute: '/supply',
+      );
+}
+
+class RescuerModule extends StatelessWidget {
+  const RescuerModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Retter',
+        description: 'Erste-Hilfe-Profis und Helfer in der Naehe.',
+        icon: LucideIcons.shieldCheck,
+        accent: MnColors.leben,
+        tableName: 'posts',
+        filter: {'type': 'krisenhilfe'},
+        currentRoute: '/rescuer',
+      );
+}
+
+class JobsModule extends StatelessWidget {
+  const JobsModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Jobs',
+        description: 'Mini-Jobs und kleine Auftraege in der Nachbarschaft.',
+        icon: LucideIcons.briefcase,
+        accent: MnColors.amberWarm,
+        tableName: 'posts',
+        filter: {'type': 'hilfeSuchen'},
+        currentRoute: '/jobs',
+      );
+}
+
+class KnowledgeModule extends StatelessWidget {
+  const KnowledgeModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Wissen',
+        description: 'Knowledge-Base und Anleitungen.',
+        icon: LucideIcons.lightbulb,
+        accent: MnColors.trust,
+        tableName: 'knowledge_articles',
+        currentRoute: '/knowledge',
+      );
+}
+
+class PostsModule extends StatelessWidget {
+  const PostsModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Beitraege',
+        description: 'Alle Beitraege deiner Nachbarschaft.',
+        icon: LucideIcons.fileText,
+        accent: MnColors.amber,
+        tableName: 'posts',
+        currentRoute: '/posts',
+      );
+}
+
+class OrganizationsModule extends StatelessWidget {
+  const OrganizationsModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Organisationen',
+        description: 'Vereine, NGOs und Initiativen in deiner Naehe.',
+        icon: LucideIcons.building,
+        accent: MnColors.teal,
+        tableName: 'organizations',
+        currentRoute: '/organizations',
+      );
+}
+
+class InteractionsModule extends StatelessWidget {
+  const InteractionsModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Interaktionen',
+        description: 'Deine Interaktionen mit anderen Nachbarn.',
+        icon: LucideIcons.activity,
+        accent: MnColors.tealSoft,
+        tableName: 'interactions',
+        currentRoute: '/interactions',
+      );
+}
+
+class MatchingModule extends StatelessWidget {
+  const MatchingModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Matching',
+        description: 'Treffer zwischen Angeboten und Anfragen.',
+        icon: LucideIcons.sparkles,
+        accent: MnColors.amber,
+        tableName: 'matches',
+        currentRoute: '/matching',
+      );
+}
+
+class CrisisListModule extends StatelessWidget {
+  const CrisisListModule({super.key});
+  @override
+  Widget build(BuildContext context) => const ModuleScreen(
+        title: 'Krise',
+        description: 'Aktive Krisen in deiner Region.',
+        icon: LucideIcons.alertTriangle,
+        accent: MnColors.herzrot,
+        tableName: 'crises',
+        currentRoute: '/crisis',
+      );
+}

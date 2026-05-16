@@ -3,18 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/typography.dart';
 import '../../core/transitions/cascade_animation.dart';
-import '../../core/widgets/cinema_appbar.dart';
-import '../../core/widgets/cinema_bottom_nav.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/widgets/cinema_empty_state.dart';
 import '../../core/widgets/cinema_loading_skeleton.dart';
 import '../../core/widgets/cinema_stat.dart';
 import '../../core/widgets/kategorie_chip.dart';
 import '../../core/widgets/nachbarschaft_card.dart';
-import '../../providers/crisis_provider.dart';
 import '../../providers/user_provider.dart';
 import 'providers/dashboard_providers.dart';
 import 'widgets/greeting_header.dart';
@@ -24,19 +21,14 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isCrisis = ref.watch(isCrisisActiveProvider);
     final name = ref.watch(currentDisplayNameProvider);
     final feed = ref.watch(dashboardFeedProvider);
     final stats = ref.watch(dashboardStatsProvider);
 
-    return CinemaScaffold(
-      level: isCrisis ? AtmosphereLevel.crisis : AtmosphereLevel.app,
-      isCrisis: isCrisis,
-      appBar: const CinemaAppBar(),
-      bottomNavigationBar: CinemaBottomNav(
-        currentIndex: 0,
-        onTap: (i) => _onTabTap(context, i),
-      ),
+    // isCrisis wird vom CinemaAppShell intern beobachtet (Atmosphaere-Shift).
+    return CinemaAppShell(
+      currentRoute: '/dashboard',
+      title: 'DASHBOARD',
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(dashboardFeedProvider),
         color: MnColors.amber,
@@ -85,25 +77,6 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  void _onTabTap(BuildContext context, int i) {
-    switch (i) {
-      case 0:
-        break;
-      case 1:
-        GoRouter.of(context).go('/map');
-        break;
-      case 2:
-        GoRouter.of(context).push('/posts/new');
-        break;
-      case 3:
-        GoRouter.of(context).go('/chat');
-        break;
-      case 4:
-        // TODO: bessere Aufloesung sobald currentUser.id Provider stabil
-        GoRouter.of(context).go('/profile/me');
-        break;
-    }
-  }
 }
 
 class _StatsRow extends StatelessWidget {

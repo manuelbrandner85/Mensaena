@@ -5,16 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../core/atmosphere/cinema_scaffold.dart';
 import '../../core/painters/neighborhood_pulse.dart';
 import '../../core/theme/colors.dart';
 import '../../core/theme/typography.dart';
-import '../../core/widgets/cinema_appbar.dart';
-import '../../core/widgets/cinema_bottom_nav.dart';
+import '../../core/widgets/cinema_app_shell.dart';
 import '../../core/widgets/cinema_sheet.dart';
 import '../../core/widgets/kategorie_chip.dart';
 import '../../core/widgets/nachbarschaft_card.dart';
-import '../../providers/crisis_provider.dart';
 import 'providers/map_providers.dart';
 
 /// Interaktive Karte mit Post-Markern, Filter-Bar und Standort-Pulse.
@@ -31,18 +28,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isCrisis = ref.watch(isCrisisActiveProvider);
     final markers = ref.watch(mapMarkersProvider);
     final userPos = ref.watch(userPositionProvider).asData?.value;
 
-    return CinemaScaffold(
-      level: isCrisis ? AtmosphereLevel.crisis : AtmosphereLevel.app,
-      isCrisis: isCrisis,
-      appBar: const CinemaAppBar(title: 'KARTE'),
-      bottomNavigationBar: CinemaBottomNav(
-        currentIndex: 1,
-        onTap: (i) => _onTabTap(context, i),
-      ),
+    return CinemaAppShell(
+      currentRoute: '/map',
+      title: 'KARTE',
       body: Stack(
         children: [
           FlutterMap(
@@ -188,24 +179,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  void _onTabTap(BuildContext context, int i) {
-    switch (i) {
-      case 0:
-        GoRouter.of(context).go('/dashboard');
-        break;
-      case 1:
-        break;
-      case 2:
-        GoRouter.of(context).push('/posts/new');
-        break;
-      case 3:
-        GoRouter.of(context).go('/chat');
-        break;
-      case 4:
-        GoRouter.of(context).go('/profile/me');
-        break;
-    }
-  }
 }
 
 class _FilterBar extends StatelessWidget {
