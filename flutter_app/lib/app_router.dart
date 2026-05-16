@@ -255,18 +255,20 @@ List<RouteBase> _buildRoutes() => [
       _moduleRoute('/modules/warnungen', const WarnungenScreen()),
 
       // ── Web-Sidebar 1:1: alle Routen verdrahtet ─────────────────────
-      // /messages: Inbox-Redirect auf /chat (Direkt-Tab)
-      GoRoute(
-        path: '/messages',
-        redirect: (_, __) => '/chat',
-      ),
+      // /messages: Direct-Messages (Web: /dashboard/messages) -> Chat-Inbox.
+      GoRoute(path: '/messages', redirect: (_, __) => '/chat'),
+      // /community-chat: Community-Chat (Web: /dashboard/chat) -> Channels-Tab.
+      GoRoute(path: '/community-chat', redirect: (_, __) => '/chat'),
       _moduleRoute('/matching', const MatchingModule()),
       _moduleRoute('/organizations', const OrganizationsModule()),
       _moduleRoute('/interactions', const InteractionsModule()),
       _moduleRoute('/crisis', const CrisisListModule()),
       _moduleRoute('/sharing', const SharingModule()),
       _moduleRoute('/supply', const SupplyModule()),
-      _moduleRoute('/rescuer', const RescuerModule()),
+      _moduleRoute('/harvest', const HarvestModule()),
+      _moduleRoute('/rescuer', const RescuerHelpersModule()),
+      _moduleRoute('/housing', const HousingModule()),
+      _moduleRoute('/mobility', const MobilityModule()),
       _moduleRoute('/jobs', const JobsModule()),
       _moduleRoute('/knowledge', const KnowledgeModule()),
       _moduleRoute('/posts', const PostsModule()),

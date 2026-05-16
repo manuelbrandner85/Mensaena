@@ -11,14 +11,20 @@ import '../theme/typography.dart';
 import '../../providers/user_provider.dart';
 import '../../services/supabase/auth_service.dart';
 
-/// 1:1 Web-Sidebar fuer die Flutter-App.
+/// 1:1-Spiegelung von `src/components/navigation/navigationConfig.ts`.
 ///
-/// Struktur identisch zu `src/components/navigation/navigationConfig.ts`:
-///   - 3 Main-Items (Dashboard, Create, Notifications)
-///   - 7 Gruppen: KOMMUNIKATION, HELFEN+FINDEN, NOTFALL+SICHERHEIT,
-///     GEMEINSCHAFT, TEILEN+RESSOURCEN, WISSEN+SKILLS, MEIN BEREICH
-///   - Admin-Gruppe (nur fuer Admins)
-///   - Bottom: App-Download, Donate, Logout
+/// - 2 Main-Items (Dashboard, Benachrichtigungen) — Web hat `Erstellen` in PR
+///   #574 explizit aus der globalen Navigation entfernt.
+/// - 7 Gruppen in genau der Web-Reihenfolge:
+///     1. Kommunikation
+///     2. Helfen & Finden
+///     3. Notfall & Sicherheit
+///     4. Gemeinschaft
+///     5. Teilen & Ressourcen
+///     6. Wissen & Skills
+///     7. Mein Bereich
+/// - Admin-Gruppe nur wenn `profiles.is_admin = true`.
+/// - Bottom-Actions: App-Download, Spenden, Abmelden.
 ///
 /// Auf Tablet/Desktop (>=720px) persistent. Auf Mobile als Drawer.
 class CinemaSidebar extends ConsumerStatefulWidget {
@@ -40,10 +46,7 @@ class CinemaSidebar extends ConsumerStatefulWidget {
 }
 
 class _CinemaSidebarState extends ConsumerState<CinemaSidebar> {
-  final Set<String> _expandedGroups = {
-    'kommunikation',
-    'mein-bereich',
-  };
+  final Set<String> _expandedGroups = {'communication', 'personal'};
 
   @override
   Widget build(BuildContext context) {
@@ -65,21 +68,13 @@ class _CinemaSidebarState extends ConsumerState<CinemaSidebar> {
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
               children: [
+                // ── MAIN (2 Items, kein Header) ─────────────────────
                 _NavItem(
                   icon: LucideIcons.layoutDashboard,
                   label: 'Dashboard',
                   route: '/dashboard',
                   current: widget.currentRoute,
                   collapsed: isCollapsed,
-                  onTap: widget.onItemTap,
-                ),
-                _NavItem(
-                  icon: LucideIcons.plusCircle,
-                  label: 'Erstellen',
-                  route: '/posts/new',
-                  current: widget.currentRoute,
-                  collapsed: isCollapsed,
-                  highlight: true,
                   onTap: widget.onItemTap,
                 ),
                 _NavItem(
@@ -91,124 +86,138 @@ class _CinemaSidebarState extends ConsumerState<CinemaSidebar> {
                   onTap: widget.onItemTap,
                 ),
 
+                // ── 1. KOMMUNIKATION ────────────────────────────────
                 _Group(
-                  id: 'kommunikation',
+                  id: 'communication',
                   label: 'Kommunikation',
                   icon: LucideIcons.messageCircle,
-                  expanded: _expandedGroups.contains('kommunikation'),
+                  expanded: _expandedGroups.contains('communication'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
-                    _SubItem('/messages', 'Nachrichten', LucideIcons.mail),
-                    _SubItem('/chat', 'Chat', LucideIcons.messageCircle),
+                    _SubItem('/chat', 'Nachrichten', LucideIcons.mail),
+                    _SubItem('/community-chat', 'Community-Chat', LucideIcons.messageCircle),
                     _SubItem('/matching', 'Matching', LucideIcons.sparkles),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
+
+                // ── 2. HELFEN & FINDEN ──────────────────────────────
                 _Group(
-                  id: 'helfen-finden',
+                  id: 'help',
                   label: 'Helfen & Finden',
                   icon: LucideIcons.heart,
-                  expanded: _expandedGroups.contains('helfen-finden'),
+                  expanded: _expandedGroups.contains('help'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
-                    _SubItem('/map', 'Karte', LucideIcons.mapPin),
+                    _SubItem('/map', 'Karte', LucideIcons.map),
                     _SubItem('/posts', 'Beitraege', LucideIcons.fileText),
                     _SubItem('/organizations', 'Organisationen', LucideIcons.building),
-                    _SubItem('/interactions', 'Interaktionen', LucideIcons.activity),
+                    _SubItem('/interactions', 'Interaktionen', LucideIcons.users),
                     _SubItem('/modules/tiere', 'Tiere', LucideIcons.dog),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
+
+                // ── 3. NOTFALL & SICHERHEIT ─────────────────────────
                 _Group(
-                  id: 'notfall',
+                  id: 'emergency',
                   label: 'Notfall & Sicherheit',
                   icon: LucideIcons.alertTriangle,
                   accent: MnColors.herzrot,
-                  expanded: _expandedGroups.contains('notfall'),
+                  expanded: _expandedGroups.contains('emergency'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
-                    _SubItem('/crisis', 'Krise', LucideIcons.alertCircle, accent: MnColors.herzrot),
+                    _SubItem('/crisis', 'Krisenmeldungen', LucideIcons.alertCircle, accent: MnColors.herzrot),
                     _SubItem('/modules/mental-support', 'Mental Support', LucideIcons.heart),
                     _SubItem('/modules/warnungen', 'Warnungen', LucideIcons.shieldAlert),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
+
+                // ── 4. GEMEINSCHAFT ─────────────────────────────────
                 _Group(
-                  id: 'gemeinschaft',
+                  id: 'community',
                   label: 'Gemeinschaft',
                   icon: LucideIcons.users,
-                  expanded: _expandedGroups.contains('gemeinschaft'),
+                  expanded: _expandedGroups.contains('community'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
                     _SubItem('/modules/gruppen', 'Gruppen', LucideIcons.users),
-                    _SubItem('/modules/events', 'Events', LucideIcons.calendar),
-                    _SubItem('/board', 'Schwarzes Brett', LucideIcons.fileText),
+                    _SubItem('/modules/events', 'Veranstaltungen', LucideIcons.calendar),
+                    _SubItem('/board', 'Pinnwand', LucideIcons.fileText),
                     _SubItem('/modules/challenges', 'Challenges', LucideIcons.trophy),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
+
+                // ── 5. TEILEN & RESSOURCEN ──────────────────────────
                 _Group(
-                  id: 'teilen',
+                  id: 'sharing',
                   label: 'Teilen & Ressourcen',
                   icon: LucideIcons.repeat,
-                  expanded: _expandedGroups.contains('teilen'),
+                  expanded: _expandedGroups.contains('sharing'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
-                    _SubItem('/sharing', 'Sharing', LucideIcons.share2),
+                    _SubItem('/sharing', 'Sharing', LucideIcons.repeat),
                     _SubItem('/modules/zeitbank', 'Zeitbank', LucideIcons.clock),
-                    _SubItem('/modules/marktplatz', 'Marktplatz', LucideIcons.shoppingBag),
-                    _SubItem('/supply', 'Supply', LucideIcons.package),
-                    _SubItem('/modules/ernte', 'Ernte', LucideIcons.leaf),
-                    _SubItem('/rescuer', 'Retter', LucideIcons.shieldCheck),
-                    _SubItem('/modules/wohnen', 'Wohnen', LucideIcons.home),
-                    _SubItem('/modules/mobilitaet', 'Mobilitaet', LucideIcons.car),
+                    _SubItem('/modules/marktplatz', 'Marktplatz', LucideIcons.store),
+                    _SubItem('/supply', 'Versorgung', LucideIcons.package),
+                    _SubItem('/harvest', 'Ernte', LucideIcons.leaf),
+                    _SubItem('/rescuer', 'Retter', LucideIcons.lifeBuoy),
+                    _SubItem('/housing', 'Wohnen', LucideIcons.home),
+                    _SubItem('/mobility', 'Mobilitaet', LucideIcons.car),
                     _SubItem('/jobs', 'Jobs', LucideIcons.briefcase),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
+
+                // ── 6. WISSEN & SKILLS ──────────────────────────────
                 _Group(
-                  id: 'wissen',
+                  id: 'knowledge',
                   label: 'Wissen & Skills',
                   icon: LucideIcons.bookOpen,
-                  expanded: _expandedGroups.contains('wissen'),
+                  expanded: _expandedGroups.contains('knowledge'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
                     _SubItem('/modules/wissen', 'Wiki', LucideIcons.bookOpen),
-                    _SubItem('/knowledge', 'Wissen', LucideIcons.lightbulb),
-                    _SubItem('/modules/skills', 'Skills', LucideIcons.award),
+                    _SubItem('/knowledge', 'Wissen', LucideIcons.book),
+                    _SubItem('/modules/skills', 'Skills', LucideIcons.wrench),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
+
+                // ── 7. MEIN BEREICH ─────────────────────────────────
                 _Group(
-                  id: 'mein-bereich',
+                  id: 'personal',
                   label: 'Mein Bereich',
                   icon: LucideIcons.userCircle,
-                  expanded: _expandedGroups.contains('mein-bereich'),
+                  expanded: _expandedGroups.contains('personal'),
                   collapsed: isCollapsed,
                   onToggle: _toggleGroup,
                   children: [
                     _SubItem('/profile/me', 'Profil', LucideIcons.user),
-                    _SubItem('/invite', 'Einladen', LucideIcons.userPlus),
+                    _SubItem('/invite', 'Nachbarn einladen', LucideIcons.share2, accent: MnColors.amber),
                     _SubItem('/modules/badges', 'Badges', LucideIcons.award),
-                    _SubItem('/calendar', 'Kalender', LucideIcons.calendarDays),
+                    _SubItem('/calendar', 'Kalender', LucideIcons.calendar),
                     _SubItem('/settings', 'Einstellungen', LucideIcons.settings),
                   ],
                   current: widget.currentRoute,
                   onTap: widget.onItemTap,
                 ),
 
+                // ── ADMIN (nur fuer is_admin) ───────────────────────
                 if (isAdmin) ...[
                   const _GroupDivider(label: 'Admin'),
                   _NavItem(
@@ -268,10 +277,7 @@ class _Header extends StatelessWidget {
           if (!collapsed) ...[
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                'MENSAENA',
-                style: MnTypography.appBarTitle(),
-              ),
+              child: Text('MENSAENA', style: MnTypography.appBarTitle()),
             ),
           ],
           if (onToggle != null)
@@ -348,7 +354,6 @@ class _NavItem extends StatelessWidget {
   final String route;
   final String current;
   final bool collapsed;
-  final bool highlight;
   final Color? accent;
   final VoidCallback? onTap;
 
@@ -358,7 +363,6 @@ class _NavItem extends StatelessWidget {
     required this.route,
     required this.current,
     required this.collapsed,
-    this.highlight = false,
     this.accent,
     this.onTap,
   });
@@ -366,7 +370,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final active = _isActive(current, route);
-    final color = accent ?? (active || highlight ? MnColors.amber : MnColors.inkSoft);
+    final color = accent ?? (active ? MnColors.amber : MnColors.inkSoft);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
       child: InkWell(
@@ -455,9 +459,7 @@ class _Group extends StatelessWidget {
                     Expanded(
                       child: Text(
                         label,
-                        style: MnTypography.label(
-                          color: accent ?? MnColors.mute,
-                        ),
+                        style: MnTypography.label(color: accent ?? MnColors.mute),
                       ),
                     ),
                     AnimatedRotation(
@@ -477,11 +479,7 @@ class _Group extends StatelessWidget {
         ),
         if (expanded && !collapsed)
           ...children.map(
-            (s) => _SubItemTile(
-              item: s,
-              current: current,
-              onTap: onTap,
-            ),
+            (s) => _SubItemTile(item: s, current: current, onTap: onTap),
           ),
       ],
     );
