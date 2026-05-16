@@ -15,7 +15,7 @@ export default function AuthPageWrapper() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-dvh bg-paper relative flex items-center justify-center overflow-hidden" role="status">
+        <div className="min-h-dvh bg-mn-void relative flex items-center justify-center overflow-hidden" role="status">
           <div
             className="hero-orb-1 absolute pointer-events-none"
             style={{ top: '-20%', left: '-10%', width: '50vw', height: '50vw' }}
@@ -290,7 +290,7 @@ function AuthPage() {
         <div className="flex flex-col items-center gap-4">
           <div
             className="w-10 h-10 border-[3px] rounded-full animate-spin"
-            style={{ borderColor: 'rgba(245,158,11,0.20)', borderTopColor: 'rgba(245,158,11,0.75)' }}
+            style={{ borderColor: 'rgba(199,147,99,0.20)', borderTopColor: 'rgba(199,147,99,0.80)' }}
             aria-hidden="true"
           />
           <span className="sr-only">{t('loadingAria')}</span>
@@ -308,14 +308,14 @@ function AuthPage() {
     mode === 'forgot'   ? t('modeForgot') :
     t('modeReset')
 
-  const accent = (chunks: React.ReactNode) => <span style={{ color: 'rgba(245,158,11,0.85)' }}>{chunks}</span>
+  const accent = (chunks: React.ReactNode) => <span style={{ color: '#c79363' }}>{chunks}</span>
 
   return (
     <div className="min-h-dvh bg-mn-void relative flex items-start sm:items-center justify-center px-4 py-16 sm:py-12 md:py-16 safe-area-top safe-area-bottom overflow-y-auto">
       {/* Atmospheric orbs */}
       <div
         className="absolute pointer-events-none rounded-full"
-        style={{ top: '-15%', left: '-12%', width: '55vw', height: '55vw', background: 'radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 70%)', filter: 'blur(80px)' }}
+        style={{ top: '-15%', left: '-12%', width: '55vw', height: '55vw', background: 'radial-gradient(circle, rgba(199,147,99,0.07) 0%, transparent 70%)', filter: 'blur(80px)' }}
         aria-hidden="true"
       />
       <div
@@ -330,7 +330,7 @@ function AuthPage() {
           className="absolute pointer-events-none rounded-full"
           style={{
             width: 3 + (i % 3), height: 3 + (i % 3),
-            background: 'rgba(253,230,138,0.6)',
+            background: 'rgba(199,147,99,0.50)',
             top: `${15 + i * 13}%`,
             left: `${8 + i * 14}%`,
             animation: `float ${7 + i * 2}s ease-in-out ${i * 1.2}s infinite`,
@@ -352,14 +352,14 @@ function AuthPage() {
             alt="Mensaena Logo"
             width={90}
             height={60}
-            className="h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_0_16px_rgba(245,158,11,0.30)]"
+            className="h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_0_16px_rgba(199,147,99,0.30)]"
             priority
           />
           <span
             className="text-3xl font-medium tracking-tight"
             style={{ fontFamily: 'var(--font-cinema), var(--font-display), ui-serif, Georgia, serif', color: '#F1F5F9' }}
           >
-            Mensaena<span style={{ color: 'rgba(245,158,11,0.80)' }}>.</span>
+            Mensaena<span style={{ color: '#c79363' }}>.</span>
           </span>
         </Link>
 
@@ -461,7 +461,7 @@ function AuthPage() {
                     {mode === 'reset' ? t('passwordNewLabel') : t('passwordLabel')}
                   </label>
                   {mode === 'login' && (
-                    <Link href="/auth?mode=forgot" className="text-xs font-medium text-mn-teal-soft hover:text-mn-teal transition-colors">
+                    <Link href="/auth?mode=forgot" className="text-xs font-medium text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                       {t('forgotLink')}
                     </Link>
                   )}
@@ -495,7 +495,7 @@ function AuthPage() {
                           className="h-full rounded-full transition-all duration-500 ease-out"
                           style={{
                             width: `${(pwScore / 4) * 100}%`,
-                            backgroundColor: pwScore <= 1 ? '#EF4444' : pwScore <= 2 ? '#F59E0B' : pwScore <= 3 ? '#0EA5E9' : '#22C55E',
+                            backgroundColor: pwScore <= 1 ? '#f87171' : pwScore <= 2 ? '#c79363' : pwScore <= 3 ? '#60a5fa' : '#4ade80',
                           }}
                         />
                       </div>
@@ -549,11 +549,11 @@ function AuthPage() {
                 />
                 <span className="text-[11px] text-mn-mute leading-relaxed">
                   {t('agreePrefix')}{' '}
-                  <Link href="/nutzungsbedingungen" className="text-mn-teal-soft hover:text-mn-teal transition-colors">
+                  <Link href="/nutzungsbedingungen" className="text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                     {t('termsLinkText')}
                   </Link>{' '}
                   {t('agreeMiddle')}{' '}
-                  <Link href="/datenschutz" className="text-mn-teal-soft hover:text-mn-teal transition-colors">
+                  <Link href="/datenschutz" className="text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                     {t('privacyLinkText')}
                   </Link>{' '}
                   {t('agreeSuffix')}
@@ -574,9 +574,9 @@ function AuthPage() {
               disabled={loading || (mode === 'forgot' && resetSent) || (!!lockUntil && Date.now() < lockUntil)}
               className="group w-full flex items-center justify-center gap-2 h-12 rounded-button text-sm font-medium tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze"
               style={{
-                background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
+                background: 'linear-gradient(135deg, #c79363 0%, #d4a472 50%, #c79363 100%)',
                 color: '#0A0F1C',
-                boxShadow: '0 4px 16px rgba(245,158,11,0.35), 0 0 40px rgba(245,158,11,0.12)',
+                boxShadow: '0 4px 16px rgba(199,147,99,0.35), 0 0 40px rgba(199,147,99,0.12)',
               }}
             >
               {loading ? (
@@ -605,7 +605,7 @@ function AuthPage() {
               {mode === 'login' && (
                 <>
                   {t('noAccountYet')}{' '}
-                  <Link href="/auth?mode=register" className="font-semibold text-mn-teal-soft hover:text-mn-teal transition-colors">
+                  <Link href="/auth?mode=register" className="font-semibold text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                     {t('registerNow')}
                   </Link>
                 </>
@@ -613,7 +613,7 @@ function AuthPage() {
               {mode === 'register' && (
                 <>
                   {t('alreadyRegistered')}{' '}
-                  <Link href="/auth?mode=login" className="font-semibold text-mn-teal-soft hover:text-mn-teal transition-colors">
+                  <Link href="/auth?mode=login" className="font-semibold text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                     {t('login')}
                   </Link>
                 </>
@@ -621,16 +621,16 @@ function AuthPage() {
               {mode === 'forgot' && (
                 <>
                   {t('rememberPassword')}{' '}
-                  <Link href="/auth?mode=login" className="font-semibold text-mn-teal-soft hover:text-mn-teal transition-colors">
+                  <Link href="/auth?mode=login" className="font-semibold text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                     {t('backToLogin')}
                   </Link>
                 </>
               )}
               {mode === 'reset' && !recoverySession && (
-                <span style={{ color: 'rgba(245,158,11,0.65)' }}>{t('resetLinkHint')}</span>
+                <span style={{ color: 'rgba(199,147,99,0.65)' }}>{t('resetLinkHint')}</span>
               )}
               {mode === 'reset' && recoverySession && (
-                <Link href="/auth?mode=login" className="font-semibold text-mn-teal-soft hover:text-mn-teal transition-colors">
+                <Link href="/auth?mode=login" className="font-semibold text-mn-bronze hover:text-mn-bronze/80 transition-colors">
                   {t('cancelReset')}
                 </Link>
               )}
