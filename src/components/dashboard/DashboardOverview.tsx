@@ -11,7 +11,6 @@ import type { Post, UserProfile } from '@/types'
 
 const quickActions = [
   { href: '/dashboard/map', icon: Map, label: 'Karte öffnen', color: 'bg-trust-100 text-trust-400' },
-  { href: '/dashboard/create', icon: FilePlus, label: 'Beitrag erstellen', color: 'bg-mn-bronze/10 text-mn-bronze', highlight: true },
   { href: '/dashboard/chat', icon: MessageCircle, label: 'Nachrichten', color: 'bg-mn-elevated text-mn-bronze' },
   { href: '/dashboard/rescuer', icon: ShieldAlert, label: 'Retter-System', color: 'bg-mn-elevated text-mn-bronze-warm' },
   { href: '/dashboard/animals', icon: PawPrint, label: 'Tiere', color: 'bg-mn-elevated text-mn-herzrot-warm' },

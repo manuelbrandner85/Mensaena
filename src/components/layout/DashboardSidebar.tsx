@@ -256,19 +256,6 @@ export default function DashboardSidebar({
         </button>
       </div>
 
-      {/* Create button */}
-      <div className="px-3 py-3 flex-shrink-0">
-        <Link
-          href="/dashboard/create"
-          onClick={() => setMobileOpen(false)}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold transition-all shadow-amber-glow hover:shadow-[0_4px_24px_rgba(245,158,11,0.50)]"
-          style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)', color: '#0A0F1C' }}
-        >
-          <Plus className="w-4 h-4" />
-          Beitrag erstellen
-        </Link>
-      </div>
-
       {/* Groups */}
       <nav className="flex-1 overflow-y-auto py-2 px-2 no-scrollbar">
         {groups.map((group) => (
