@@ -20,7 +20,9 @@ import 'features/legal/datenschutz_screen.dart';
 import 'features/legal/impressum_screen.dart';
 import 'features/map/map_screen.dart';
 import 'features/modules/all_modules.dart';
+import 'features/modules/calendar_screen.dart';
 import 'features/modules/detail_screens.dart';
+import 'features/modules/invite_screen.dart';
 import 'features/modules/mental_support_screen.dart';
 import 'features/modules/placeholder_screen.dart';
 import 'features/modules/timebank_screen.dart';
@@ -252,22 +254,24 @@ List<RouteBase> _buildRoutes() => [
       _moduleRoute('/modules/mental-support', const MentalSupportScreen()),
       _moduleRoute('/modules/warnungen', const WarnungenScreen()),
 
-      // ── Web-Sidebar 1:1: Stub-Routes fuer Module die noch nicht
-      // ausimplementiert sind. Navigation bleibt konsistent, Inhalt
-      // folgt in 3.3.0.
-      _placeholderRoute('/messages', 'Nachrichten', LucideIcons.mail),
-      _placeholderRoute('/matching', 'Matching', LucideIcons.sparkles),
-      _placeholderRoute('/organizations', 'Organisationen', LucideIcons.building),
-      _placeholderRoute('/interactions', 'Interaktionen', LucideIcons.activity),
-      _placeholderRoute('/crisis', 'Krisenhilfe', LucideIcons.alertTriangle),
-      _placeholderRoute('/sharing', 'Sharing', LucideIcons.share2),
-      _placeholderRoute('/supply', 'Supply', LucideIcons.package),
-      _placeholderRoute('/rescuer', 'Retter', LucideIcons.shieldCheck),
-      _placeholderRoute('/jobs', 'Jobs', LucideIcons.briefcase),
-      _placeholderRoute('/invite', 'Einladen', LucideIcons.userPlus),
-      _placeholderRoute('/calendar', 'Kalender', LucideIcons.calendarDays),
-      _placeholderRoute('/knowledge', 'Wissen', LucideIcons.lightbulb),
-      _placeholderRoute('/posts', 'Beitraege', LucideIcons.fileText),
+      // ── Web-Sidebar 1:1: alle Routen verdrahtet ─────────────────────
+      // /messages: Inbox-Redirect auf /chat (Direkt-Tab)
+      GoRoute(
+        path: '/messages',
+        redirect: (_, __) => '/chat',
+      ),
+      _moduleRoute('/matching', const MatchingModule()),
+      _moduleRoute('/organizations', const OrganizationsModule()),
+      _moduleRoute('/interactions', const InteractionsModule()),
+      _moduleRoute('/crisis', const CrisisListModule()),
+      _moduleRoute('/sharing', const SharingModule()),
+      _moduleRoute('/supply', const SupplyModule()),
+      _moduleRoute('/rescuer', const RescuerModule()),
+      _moduleRoute('/jobs', const JobsModule()),
+      _moduleRoute('/knowledge', const KnowledgeModule()),
+      _moduleRoute('/posts', const PostsModule()),
+      _moduleRoute('/invite', const InviteScreen()),
+      _moduleRoute('/calendar', const CalendarScreen()),
       _placeholderRoute('/settings/blocked', 'Blockierte Nutzer', LucideIcons.userX),
 
       GoRoute(
