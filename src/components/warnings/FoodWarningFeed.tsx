@@ -129,7 +129,7 @@ function FoodWarningCard({ warning }: CardProps) {
             href={warning.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-auto inline-flex items-center gap-1 self-start text-sm font-medium text-mn-amber dark:text-primary-400 hover:text-mn-amber dark:hover:text-primary-300 transition-colors"
+            className="mt-auto inline-flex items-center gap-1 self-start text-sm font-medium text-mn-bronze dark:text-primary-400 hover:text-mn-bronze dark:hover:text-primary-300 transition-colors"
           >
             Mehr erfahren
             <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
@@ -245,7 +245,7 @@ export default function FoodWarningFeed({
         <button
           type="button"
           onClick={() => loadWarnings(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mn-amber hover:bg-primary-700 text-white text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-mn-bronze hover:bg-primary-700 text-white text-sm font-medium transition-colors"
         >
           <RefreshCw className="w-4 h-4" aria-hidden="true" />
           Erneut versuchen
@@ -257,7 +257,7 @@ export default function FoodWarningFeed({
   if (warnings.length === 0) {
     return (
       <div className="rounded-2xl border border-white/5 dark:border-stone-700 bg-mn-elevated dark:bg-stone-900 p-8 text-center">
-        <ShieldAlert className="w-10 h-10 mx-auto text-mn-amber mb-3" aria-hidden="true" />
+        <ShieldAlert className="w-10 h-10 mx-auto text-mn-bronze mb-3" aria-hidden="true" />
         <h3 className="font-semibold text-stone-900 dark:text-stone-50 mb-1">
           Keine aktuellen Warnungen
         </h3>
@@ -300,7 +300,7 @@ export default function FoodWarningFeed({
                   setStateOnly(e.target.checked)
                   setVisibleCount(initialLimit)
                 }}
-                className="w-3.5 h-3.5 rounded border-stone-300 dark:border-stone-600 text-mn-amber focus:ring-mn-amber"
+                className="w-3.5 h-3.5 rounded border-stone-300 dark:border-stone-600 text-mn-bronze focus:ring-mn-bronze"
               />
               <span className="text-stone-700 dark:text-stone-200">Nur mein Bundesland</span>
             </label>
@@ -316,7 +316,7 @@ export default function FoodWarningFeed({
           <button
             type="button"
             onClick={() => setStateOnly(false)}
-            className="mt-3 text-sm font-medium text-mn-amber dark:text-primary-400 hover:underline"
+            className="mt-3 text-sm font-medium text-mn-bronze dark:text-primary-400 hover:underline"
           >
             Alle Warnungen anzeigen
           </button>
@@ -334,7 +334,7 @@ export default function FoodWarningFeed({
               <button
                 type="button"
                 onClick={() => setVisibleCount(c => c + loadMoreStep)}
-                className="px-5 py-2.5 rounded-xl bg-mn-amber hover:bg-primary-700 text-white text-sm font-medium transition-colors shadow-sm"
+                className="px-5 py-2.5 rounded-xl bg-mn-bronze hover:bg-primary-700 text-white text-sm font-medium transition-colors shadow-sm"
               >
                 {visibleCount >= initialLimit + loadMoreStep ? 'Mehr laden' : 'Alle anzeigen'}
               </button>

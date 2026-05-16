@@ -153,7 +153,7 @@ export function WidgetSettingsModalV2({
       >
         <header className="flex items-center justify-between border-b border-white/5 px-4 py-3 dark:border-ink-700">
           <h2 className="flex items-center gap-2 text-base font-semibold text-mn-ink dark:text-stone-100">
-            <Settings aria-hidden className="h-5 w-5 text-mn-amber" />
+            <Settings aria-hidden className="h-5 w-5 text-mn-bronze" />
             Widgets anpassen
           </h2>
           <button
@@ -219,7 +219,7 @@ export function WidgetSettingsModalV2({
                         checked={w.enabled && available}
                         disabled={!available}
                         onChange={() => toggleWidget(w.id)}
-                        className="h-4 w-4 rounded border-stone-300 text-mn-amber focus:ring-mn-amber"
+                        className="h-4 w-4 rounded border-stone-300 text-mn-bronze focus:ring-mn-bronze"
                         aria-label={`${meta.title} aktivieren`}
                       />
                     </label>
@@ -240,7 +240,7 @@ export function WidgetSettingsModalV2({
                               aria-label={`Größe ${opt.label}`}
                               className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${
                                 active
-                                  ? 'bg-mn-elevated text-mn-amber shadow-sm dark:bg-ink-900 dark:text-primary-300'
+                                  ? 'bg-mn-elevated text-mn-bronze shadow-sm dark:bg-ink-900 dark:text-primary-300'
                                   : 'text-mn-ink-soft dark:text-mn-ghost'
                               }`}
                             >
@@ -262,7 +262,7 @@ export function WidgetSettingsModalV2({
                               aria-pressed={active}
                               className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${
                                 active
-                                  ? 'bg-mn-elevated text-mn-amber shadow-sm dark:bg-ink-900 dark:text-primary-300'
+                                  ? 'bg-mn-elevated text-mn-bronze shadow-sm dark:bg-ink-900 dark:text-primary-300'
                                   : 'text-mn-ink-soft dark:text-mn-ghost'
                               }`}
                             >
@@ -300,7 +300,7 @@ export function WidgetSettingsModalV2({
             <button
               type="button"
               onClick={handleSave}
-              className="rounded-lg bg-mn-amber px-3 py-1.5 text-xs font-medium text-white hover:bg-mn-amber"
+              className="rounded-lg bg-mn-bronze px-3 py-1.5 text-xs font-medium text-white hover:bg-mn-bronze"
             >
               Speichern
             </button>

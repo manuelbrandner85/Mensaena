@@ -17,7 +17,7 @@ export interface LeaderboardEntry {
 const RANK_STYLES = [
   { medal: '🥇', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' },
   { medal: '🥈', bg: 'bg-mn-surface', border: 'border-white/5', text: 'text-mn-ink-soft' },
-  { medal: '🥉', bg: 'bg-mn-surface', border: 'border-white/8', text: 'text-mn-amber-warm' },
+  { medal: '🥉', bg: 'bg-mn-surface', border: 'border-white/8', text: 'text-mn-bronze-warm' },
 ]
 
 export default function LeaderboardCard({ entries }: { entries: LeaderboardEntry[] }) {
@@ -50,7 +50,7 @@ export default function LeaderboardCard({ entries }: { entries: LeaderboardEntry
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-mn-ink truncate">
                   {entry.display_name ?? 'Nachbar:in'}
-                  {entry.isCurrentUser && <span className="ml-1.5 text-xs text-mn-amber font-normal">(Du)</span>}
+                  {entry.isCurrentUser && <span className="ml-1.5 text-xs text-mn-bronze font-normal">(Du)</span>}
                 </p>
               </div>
               <div className={cn('text-sm font-bold tabular-nums flex-shrink-0', style.text)}>

@@ -189,7 +189,7 @@ export default function AddressAutocomplete({
 
         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
           {loading && (
-            <Loader2 className="w-4 h-4 text-mn-amber animate-spin" aria-label="Suche läuft…" />
+            <Loader2 className="w-4 h-4 text-mn-bronze animate-spin" aria-label="Suche läuft…" />
           )}
           {!loading && inputValue && (
             <button
@@ -226,7 +226,7 @@ export default function AddressAutocomplete({
               className={cn(
                 'flex items-start gap-2.5 px-3 py-2.5 cursor-pointer transition-colors text-sm',
                 idx === activeIndex
-                  ? 'bg-mn-amber/5 text-mn-ink'
+                  ? 'bg-mn-bronze/5 text-mn-ink'
                   : 'text-mn-ink-soft hover:bg-mn-surface',
               )}
             >

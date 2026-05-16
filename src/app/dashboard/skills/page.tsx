@@ -83,33 +83,33 @@ function TopSkillsWidget() {
 
       {/* Aktuell angebotene Skills */}
       {topSkills.length > 0 ? (
-        <div className="relative bg-gradient-to-br from-mn-amber via-purple-50/80 to-violet-50 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-bronze via-purple-50/80 to-violet-50 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
-          <p className="relative text-sm font-bold text-mn-amber mb-2">⭐ Aktuell verfügbare Skills</p>
+          <p className="relative text-sm font-bold text-mn-bronze mb-2">⭐ Aktuell verfügbare Skills</p>
           <div className="relative flex flex-wrap gap-2">
             {topSkills.map(s => (
               <Link key={s.id} href={`/dashboard/posts/${s.id}`}
-                className="px-3 py-1.5 bg-mn-elevated border border-white/5 rounded-full text-xs font-medium text-mn-amber hover:bg-mn-elevated transition-all shadow-cinema-card">
+                className="px-3 py-1.5 bg-mn-elevated border border-white/5 rounded-full text-xs font-medium text-mn-bronze hover:bg-mn-elevated transition-all shadow-cinema-card">
                 {s.title}
               </Link>
             ))}
           </div>
         </div>
       ) : (
-        <div className="relative text-center py-8 bg-gradient-to-br from-mn-amber to-violet-50 border border-white/5 rounded-2xl space-y-2 shadow-cinema-card overflow-hidden">
+        <div className="relative text-center py-8 bg-gradient-to-br from-mn-bronze to-violet-50 border border-white/5 rounded-2xl space-y-2 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
           />
-          <p className="text-sm font-medium text-mn-amber">Noch keine Skills geteilt</p>
-          <p className="text-xs text-mn-amber">Sei der Erste – teile eine Fähigkeit mit deiner Community!</p>
+          <p className="text-sm font-medium text-mn-bronze">Noch keine Skills geteilt</p>
+          <p className="text-xs text-mn-bronze">Sei der Erste – teile eine Fähigkeit mit deiner Community!</p>
           <Link
             href="/dashboard/create?module=skills&type=sharing&category=skills"
-            className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-mn-amber to-violet-600 hover:from-mn-amber hover:to-violet-700 text-white text-sm font-semibold rounded-xl transition-all mt-1"
+            className="shine inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-mn-bronze to-violet-600 hover:from-mn-bronze hover:to-violet-700 text-white text-sm font-semibold rounded-xl transition-all mt-1"
             style={{ boxShadow: '0 4px 16px -4px rgba(139,92,246,0.5)' }}
           >
             <Plus className="w-4 h-4" /> Skill anbieten
@@ -139,11 +139,11 @@ export default function SkillsPage() {
       sectionLabel="§ 24 / Skills"
       mood="scholarly"
       iconBgClass="bg-mn-surface border-white/5"
-      iconColorClass="text-mn-amber"
+      iconColorClass="text-mn-bronze"
       title="Skill-Netzwerk"
       description="Fähigkeiten anbieten, voneinander lernen, Mentoring – gemeinsam wachsen"
       icon={<Wrench className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-mn-amber to-violet-600"
+      color="bg-gradient-to-r from-mn-bronze to-violet-600"
       postTypes={['sharing', 'rescue', 'community']}
       moduleFilter={[
         { type: 'sharing',   categories: ['skills', 'knowledge', 'general', 'mental'] },

@@ -23,8 +23,8 @@ interface CalendarPost {
 
 const TYPE_COLORS: Record<string, string> = {
   mobility:     'bg-mn-elevated text-mn-teal-soft border-white/5',
-  community:    'bg-mn-elevated text-mn-amber border-white/5',
-  skill:        'bg-mn-elevated text-mn-amber border-white/5',
+  community:    'bg-mn-elevated text-mn-bronze border-white/5',
+  skill:        'bg-mn-elevated text-mn-bronze border-white/5',
   help_request: 'bg-mn-elevated text-mn-herzrot border-mn-herzrot/20',
   help_offered: 'bg-mn-elevated text-mn-leben border-white/5',
   crisis:       'bg-red-200 text-mn-herzrot border-mn-herzrot/20',
@@ -122,8 +122,8 @@ export default function CalendarPage() {
         <div className="meta-label meta-label--subtle mb-4">§ 28 / Kalender</div>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
-              <Calendar className="w-6 h-6 text-mn-amber" />
+            <div className="w-14 h-14 rounded-2xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0 float-idle">
+              <Calendar className="w-6 h-6 text-mn-bronze" />
             </div>
             <div>
               <h1 className="page-title">Kalender</h1>
@@ -195,8 +195,8 @@ export default function CalendarPage() {
                         onClick={() => day && setSelectedDay(isSelected ? null : day)}
                         className={cn(
                           'min-h-[80px] p-1.5 border-b border-r border-white/8 last:border-r-0 transition-colors',
-                          day ? 'cursor-pointer hover:bg-mn-amber/5/50' : 'bg-mn-surface/50',
-                          isSelected && 'bg-mn-amber/5',
+                          day ? 'cursor-pointer hover:bg-mn-bronze/5/50' : 'bg-mn-surface/50',
+                          isSelected && 'bg-mn-bronze/5',
                           isWeekend && day ? 'bg-mn-surface/50' : '',
                         )}
                       >
@@ -204,7 +204,7 @@ export default function CalendarPage() {
                           <>
                             <div className={cn(
                               'w-7 h-7 flex items-center justify-center rounded-full text-sm font-medium mb-1',
-                              isToday ? 'bg-mn-amber text-white' : 'text-mn-ink-soft'
+                              isToday ? 'bg-mn-bronze text-white' : 'text-mn-ink-soft'
                             )}>
                               {day}
                             </div>
@@ -249,12 +249,12 @@ export default function CalendarPage() {
                 ) : (
                   upcomingEvents.map(e => (
                     <Link key={e.id} href={`/dashboard/posts/${e.id}`}
-                      className="flex items-start gap-4 px-5 py-4 hover:bg-mn-amber/5 transition-colors">
-                      <div className="text-center bg-mn-amber/5 rounded-xl px-3 py-2 flex-shrink-0 border border-white/8">
-                        <div className="text-lg font-bold text-mn-amber">
+                      className="flex items-start gap-4 px-5 py-4 hover:bg-mn-bronze/5 transition-colors">
+                      <div className="text-center bg-mn-bronze/5 rounded-xl px-3 py-2 flex-shrink-0 border border-white/8">
+                        <div className="text-lg font-bold text-mn-bronze">
                           {new Date(e.event_date).getDate()}
                         </div>
-                        <div className="text-xs text-mn-amber">
+                        <div className="text-xs text-mn-bronze">
                           {MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}
                         </div>
                       </div>
@@ -308,7 +308,7 @@ export default function CalendarPage() {
           {/* Upcoming this month */}
           <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-cinema-card p-4">
             <h3 className="font-semibold text-mn-ink mb-3 flex items-center gap-2">
-              <Car className="w-4 h-4 text-mn-amber" /> Nächste Termine
+              <Car className="w-4 h-4 text-mn-bronze" /> Nächste Termine
             </h3>
             {loading ? (
               <div className="space-y-2">
@@ -322,7 +322,7 @@ export default function CalendarPage() {
                   <Link key={e.id} href={`/dashboard/posts/${e.id}`}
                     className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-mn-surface transition-colors">
                     <div className="text-center flex-shrink-0">
-                      <div className="text-sm font-bold text-mn-amber">{new Date(e.event_date).getDate()}</div>
+                      <div className="text-sm font-bold text-mn-bronze">{new Date(e.event_date).getDate()}</div>
                       <div className="text-xs text-mn-mute">{MONTHS_DE[new Date(e.event_date).getMonth()].slice(0, 3)}</div>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -332,7 +332,7 @@ export default function CalendarPage() {
                   </Link>
                 ))}
                 {upcomingEvents.length > 5 && (
-                  <button onClick={() => setView('list')} className="text-xs text-mn-amber hover:underline w-full text-center pt-1">
+                  <button onClick={() => setView('list')} className="text-xs text-mn-bronze hover:underline w-full text-center pt-1">
                     Alle {upcomingEvents.length} Termine anzeigen →
                   </button>
                 )}

@@ -11,12 +11,12 @@ import { checkRateLimit } from '@/lib/rate-limit'
 const GROUP_CATEGORIES = [
   { value: 'nachbarschaft', label: 'Nachbarschaft',            emoji: '🏘️', color: 'from-mn-teal to-mn-teal-soft',     accent: '#3B82F6' },
   { value: 'hobby',         label: 'Hobby & Freizeit',         emoji: '🎨', color: 'from-pink-400 to-rose-500',     accent: '#EC4899' },
-  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-mn-amber-warm/12 to-orange-600', accent: '#F97316' },
-  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-mn-amber/12 to-mn-amber-warm/8',  accent: '#F59E0B' },
-  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-amber to-mn-amber-warm', accent: '#8B5CF6' },
+  { value: 'sport',         label: 'Sport & Fitness',          emoji: '⚽', color: 'from-mn-bronze-warm/12 to-orange-600', accent: '#F97316' },
+  { value: 'eltern',        label: 'Eltern & Familie',         emoji: '👶', color: 'from-mn-bronze/12 to-mn-bronze-warm/8',  accent: '#F59E0B' },
+  { value: 'senioren',      label: 'Senioren',                 emoji: '🧓', color: 'from-mn-bronze to-mn-bronze-warm', accent: '#8B5CF6' },
   { value: 'umwelt',        label: 'Umwelt & Nachhaltigkeit',  emoji: '🌿', color: 'from-primary-400 to-primary-600', accent: '#10B981' },
   { value: 'bildung',       label: 'Bildung & Lernen',         emoji: '📚', color: 'from-indigo-400 to-indigo-600', accent: '#6366F1' },
-  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-mn-amber/12 to-yellow-600',  accent: '#D97706' },
+  { value: 'tiere',         label: 'Tiere',                    emoji: '🐾', color: 'from-mn-bronze/12 to-yellow-600',  accent: '#D97706' },
   { value: 'handwerk',      label: 'Handwerk & DIY',           emoji: '🔧', color: 'from-slate-400 to-slate-600',   accent: '#64748B' },
   { value: 'sonstiges',     label: 'Sonstiges',                emoji: '💬', color: 'from-primary-400 to-mn-teal-soft/8',  accent: '#1EAAA6' },
 ]
@@ -151,7 +151,7 @@ export default function CreateGroupPage() {
         <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
-            <div className="w-9 h-9 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
               <span className="text-xl leading-none">{selectedCat.emoji}</span>
             </div>
             <div>
@@ -161,9 +161,9 @@ export default function CreateGroupPage() {
           </div>
 
           <div className="p-6 space-y-4">
-            <div className="flex items-center gap-2 bg-mn-amber/5 border border-mn-amber/20 rounded-xl px-3 py-2">
-              <Shield className="w-4 h-4 text-mn-amber flex-shrink-0" />
-              <p className="text-xs text-mn-amber">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
+            <div className="flex items-center gap-2 bg-mn-bronze/5 border border-mn-bronze/20 rounded-xl px-3 py-2">
+              <Shield className="w-4 h-4 text-mn-bronze flex-shrink-0" />
+              <p className="text-xs text-mn-bronze">Max. <strong>2 Gruppen pro Stunde</strong> – Gruppen werden sofort sichtbar.</p>
             </div>
 
             <div>
@@ -236,7 +236,7 @@ export default function CreateGroupPage() {
                   </div>
                 ) : (
                   <button type="button" onClick={() => avatarInputRef.current?.click()}
-                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-white/8 hover:border-mn-amber/30 rounded-xl text-xs text-mn-mute hover:text-mn-amber transition-colors">
+                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-white/8 hover:border-mn-bronze/30 rounded-xl text-xs text-mn-mute hover:text-mn-bronze transition-colors">
                     <Camera className="w-3.5 h-3.5" /> Hochladen
                   </button>
                 )}
@@ -254,7 +254,7 @@ export default function CreateGroupPage() {
                   </div>
                 ) : (
                   <button type="button" onClick={() => bannerInputRef.current?.click()}
-                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-white/8 hover:border-mn-amber/30 rounded-xl text-xs text-mn-mute hover:text-mn-amber transition-colors w-full">
+                    className="flex items-center gap-1.5 px-3 py-2 border border-dashed border-white/8 hover:border-mn-bronze/30 rounded-xl text-xs text-mn-mute hover:text-mn-bronze transition-colors w-full">
                     <Camera className="w-3.5 h-3.5" /> Hochladen
                   </button>
                 )}

@@ -28,8 +28,8 @@ const KIND_CONFIG: Record<
 > = {
   timebank: {
     icon: Clock,
-    iconBg: 'bg-mn-amber/10',
-    iconColor: 'text-mn-amber',
+    iconBg: 'bg-mn-bronze/10',
+    iconColor: 'text-mn-bronze',
     label: 'Zeitbank',
   },
   group: {
@@ -47,7 +47,7 @@ const KIND_CONFIG: Record<
   post: {
     icon: FileText,
     iconBg: 'bg-mn-elevated',
-    iconColor: 'text-mn-amber',
+    iconColor: 'text-mn-bronze',
     label: 'Beitrag',
   },
 }
@@ -68,7 +68,7 @@ export default function ProfileActivityFeed({ items }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <div className="text-center py-12 bg-[#EEF9F9]/60 rounded-xl border border-dashed border-mn-amber/20">
+        <div className="text-center py-12 bg-[#EEF9F9]/60 rounded-xl border border-dashed border-mn-bronze/20">
           <Sparkles className="w-10 h-10 text-primary-400 mx-auto mb-3" />
           <p className="text-sm text-mn-ink-soft font-medium">
             Noch keine Aktivität
@@ -80,7 +80,7 @@ export default function ProfileActivityFeed({ items }: Props) {
       ) : (
         <ol className="relative">
           {/* Vertikale Timeline-Linie */}
-          <div className="absolute left-5 top-2 bottom-2 w-px bg-gradient-to-b from-mn-amber/15 via-stone-200 to-transparent" />
+          <div className="absolute left-5 top-2 bottom-2 w-px bg-gradient-to-b from-mn-bronze/15 via-stone-200 to-transparent" />
 
           {items.map((item) => {
             const cfg = KIND_CONFIG[item.kind]

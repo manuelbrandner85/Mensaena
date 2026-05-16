@@ -25,8 +25,8 @@ const SEVERITY_STYLE: Record<
   UnifiedWarning['severity'],
   { bg: string; border: string; text: string; icon: string; label: string; pulse?: boolean }
 > = {
-  minor:    { bg: 'bg-mn-surface dark:bg-yellow-950/40',  border: 'border-white/8 dark:border-white/8',  text: 'text-mn-amber dark:text-mn-amber',   icon: 'text-mn-amber dark:text-mn-amber',   label: 'Hinweis' },
-  moderate: { bg: 'bg-mn-surface dark:bg-orange-950/40', border: 'border-white/8 dark:border-white/8', text: 'text-mn-amber-warm dark:text-mn-amber-warm', icon: 'text-mn-amber-warm dark:text-mn-amber-warm', label: 'Warnung' },
+  minor:    { bg: 'bg-mn-surface dark:bg-yellow-950/40',  border: 'border-white/8 dark:border-white/8',  text: 'text-mn-bronze dark:text-mn-bronze',   icon: 'text-mn-bronze dark:text-mn-bronze',   label: 'Hinweis' },
+  moderate: { bg: 'bg-mn-surface dark:bg-orange-950/40', border: 'border-white/8 dark:border-white/8', text: 'text-mn-bronze-warm dark:text-mn-bronze-warm', icon: 'text-mn-bronze-warm dark:text-mn-bronze-warm', label: 'Warnung' },
   severe:   { bg: 'bg-mn-surface dark:bg-red-950/40',       border: 'border-mn-herzrot/20 dark:border-mn-herzrot/20',       text: 'text-mn-herzrot dark:text-mn-herzrot',         icon: 'text-mn-herzrot dark:text-mn-herzrot',         label: 'Schwere Warnung' },
   extreme:  { bg: 'bg-mn-elevated dark:bg-red-950/60',      border: 'border-mn-herzrot/20 dark:border-mn-herzrot/20',       text: 'text-mn-herzrot dark:text-mn-herzrot',         icon: 'text-mn-herzrot dark:text-mn-herzrot',         label: 'Extreme Gefahr', pulse: true },
 }

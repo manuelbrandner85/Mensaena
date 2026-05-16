@@ -269,7 +269,7 @@ function QrCodeFrame({ qrSvg, size }: { qrSvg: string | null; size: number }) {
   return (
     <div className="flex flex-col items-center">
       <div
-        className="bg-mn-elevated rounded-2xl border-2 border-mn-amber/20 p-4 shadow-soft flex items-center justify-center"
+        className="bg-mn-elevated rounded-2xl border-2 border-mn-bronze/20 p-4 shadow-soft flex items-center justify-center"
         style={{ width: size, height: size }}
       >
         {qrSvg ? (
@@ -326,7 +326,7 @@ function AndroidView({
         {isDownloadingApk && (
           <div className="w-full max-w-md">
             <div className="flex items-center justify-center mb-3">
-              <ArrowDownIcon className="w-6 h-6 text-mn-amber animate-arrow-bounce" />
+              <ArrowDownIcon className="w-6 h-6 text-mn-bronze animate-arrow-bounce" />
             </div>
             <DownloadProgressBar
               progress={progress}
@@ -347,7 +347,7 @@ function AndroidView({
             />
             <button
               onClick={onReset}
-              className="mt-4 w-full text-sm text-mn-amber hover:text-primary-800 underline"
+              className="mt-4 w-full text-sm text-mn-bronze hover:text-primary-800 underline"
             >
               Zurück
             </button>
@@ -470,7 +470,7 @@ function DesktopView({
             </p>
             <button
               onClick={onApkDownload}
-              className="text-sm text-mn-amber hover:text-primary-800 underline underline-offset-4 inline-flex items-center gap-2"
+              className="text-sm text-mn-bronze hover:text-primary-800 underline underline-offset-4 inline-flex items-center gap-2"
             >
               <DownloadIcon className="w-4 h-4" />
               APK direkt herunterladen
@@ -484,7 +484,7 @@ function DesktopView({
         {isDownloadingApk && (
           <div className="w-full max-w-md mx-auto">
             <div className="flex items-center justify-center mb-3">
-              <ArrowDownIcon className="w-6 h-6 text-mn-amber animate-arrow-bounce" />
+              <ArrowDownIcon className="w-6 h-6 text-mn-bronze animate-arrow-bounce" />
             </div>
             <DownloadProgressBar
               progress={progress}
@@ -504,7 +504,7 @@ function DesktopView({
             />
             <button
               onClick={onReset}
-              className="mt-4 text-sm text-mn-amber hover:text-primary-800 underline"
+              className="mt-4 text-sm text-mn-bronze hover:text-primary-800 underline"
             >
               Zurück
             </button>
@@ -556,7 +556,7 @@ function Step({
 }) {
   return (
     <li className="flex gap-3">
-      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-mn-amber text-white text-xs font-bold flex items-center justify-center">
+      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-mn-bronze text-white text-xs font-bold flex items-center justify-center">
         {n}
       </span>
       <div className="flex-1">

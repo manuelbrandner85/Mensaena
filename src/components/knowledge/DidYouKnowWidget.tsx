@@ -90,7 +90,7 @@ export default function DidYouKnowWidget() {
     return (
       <div className="relative bg-mn-elevated border border-white/5 rounded-2xl p-4 shadow-soft animate-pulse">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-mn-amber/5 flex-shrink-0" />
+          <div className="w-9 h-9 rounded-xl bg-mn-bronze/5 flex-shrink-0" />
           <div className="flex-1 space-y-2 pt-1">
             <div className="h-3 bg-mn-raised rounded w-1/3" />
             <div className="h-4 bg-mn-raised rounded w-full" />
@@ -107,8 +107,8 @@ export default function DidYouKnowWidget() {
     <div className="relative bg-mn-elevated border border-white/5 rounded-2xl p-4 shadow-soft overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 to-primary-200" />
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-xl bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
-          <Lightbulb className="w-4 h-4 text-mn-amber" />
+        <div className="w-9 h-9 rounded-xl bg-mn-bronze/5 flex items-center justify-center flex-shrink-0">
+          <Lightbulb className="w-4 h-4 text-mn-bronze" />
         </div>
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-wider text-mn-mute font-semibold mb-1">

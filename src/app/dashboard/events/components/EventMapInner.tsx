@@ -102,7 +102,7 @@ export default function EventMapInner({ events }: EventMapInnerProps) {
                   )}
                   <button
                     onClick={() => router.push(`/dashboard/events/${event.id}`)}
-                    className="text-xs font-medium text-mn-amber hover:text-mn-amber"
+                    className="text-xs font-medium text-mn-bronze hover:text-mn-bronze"
                   >
                     Details anzeigen &rarr;
                   </button>

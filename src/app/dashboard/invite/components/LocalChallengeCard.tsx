@@ -26,8 +26,8 @@ export default function LocalChallengeCard({
   return (
     <Card variant="default">
       <div className="flex items-start gap-3 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-mn-amber/5 border border-mn-amber/20 flex items-center justify-center flex-shrink-0">
-          <MapPin className="w-4 h-4 text-mn-amber" />
+        <div className="w-9 h-9 rounded-xl bg-mn-bronze/5 border border-mn-bronze/20 flex items-center justify-center flex-shrink-0">
+          <MapPin className="w-4 h-4 text-mn-bronze" />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-mn-ink">
@@ -40,7 +40,7 @@ export default function LocalChallengeCard({
           </p>
         </div>
         {reached && (
-          <div className="flex-shrink-0 text-sm font-bold text-mn-amber bg-mn-amber/5 border border-mn-amber/20 rounded-lg px-2.5 py-1">
+          <div className="flex-shrink-0 text-sm font-bold text-mn-bronze bg-mn-bronze/5 border border-mn-bronze/20 rounded-lg px-2.5 py-1">
             ✓ Geschafft
           </div>
         )}
@@ -68,7 +68,7 @@ export default function LocalChallengeCard({
       </div>
 
       {reached && (
-        <div className="mt-3 px-3 py-2 rounded-lg bg-mn-amber/5 border border-mn-amber/20 text-xs text-mn-amber font-medium">
+        <div className="mt-3 px-3 py-2 rounded-lg bg-mn-bronze/5 border border-mn-bronze/20 text-xs text-mn-bronze font-medium">
           🏘️ Dein Gebiet hat ein starkes Netzwerk! Lade weitere Nachbarn ein um die Gemeinschaft zu stärken.
         </div>
       )}

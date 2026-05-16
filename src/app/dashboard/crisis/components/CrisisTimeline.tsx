@@ -8,12 +8,12 @@ import type { CrisisUpdate, UpdateType } from '../types'
 
 const UPDATE_TYPE_CONFIG: Record<UpdateType, { icon: typeof Info; color: string; label: string }> = {
   info:            { icon: Info,          color: 'text-mn-teal-soft bg-mn-elevated',     label: 'Info' },
-  status_change:   { icon: AlertTriangle, color: 'text-mn-amber-warm bg-mn-elevated', label: 'Status' },
-  resource_update: { icon: Package,       color: 'text-mn-amber bg-mn-amber/10', label: 'Ressourcen' },
+  status_change:   { icon: AlertTriangle, color: 'text-mn-bronze-warm bg-mn-elevated', label: 'Status' },
+  resource_update: { icon: Package,       color: 'text-mn-bronze bg-mn-bronze/10', label: 'Ressourcen' },
   helper_update:   { icon: Users,         color: 'text-mn-teal-soft bg-mn-elevated', label: 'Helfer' },
   resolution:      { icon: CheckCircle2,  color: 'text-mn-leben bg-mn-elevated',   label: 'Lösung' },
   warning:         { icon: AlertTriangle, color: 'text-mn-herzrot bg-mn-elevated',       label: 'Warnung' },
-  official:        { icon: Megaphone,     color: 'text-mn-amber bg-mn-elevated', label: 'Offiziell' },
+  official:        { icon: Megaphone,     color: 'text-mn-bronze bg-mn-elevated', label: 'Offiziell' },
 }
 
 interface Props {

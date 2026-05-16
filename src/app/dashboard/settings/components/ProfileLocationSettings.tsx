@@ -88,7 +88,7 @@ export default function ProfileLocationSettings({
     <div className="space-y-5">
       {/* Profile Info */}
       <SettingsSection
-        icon={<User className="w-4 h-4 text-mn-amber" />}
+        icon={<User className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionProfileTitle')}
         description={t('sectionProfileDesc')}
       >
@@ -126,7 +126,7 @@ export default function ProfileLocationSettings({
                   <Loader2 className="w-4 h-4 text-mn-mute animate-spin" />
                 )}
                 {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                  <Check className="w-4 h-4 text-mn-amber" />
+                  <Check className="w-4 h-4 text-mn-bronze" />
                 )}
                 {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                   <X className="w-4 h-4 text-mn-herzrot" />
@@ -136,7 +136,7 @@ export default function ProfileLocationSettings({
             <p className="text-xs mt-1">
               {checkingUsername && <span className="text-mn-mute">{t('usernameChecking')}</span>}
               {!checkingUsername && usernameAvailable === true && username.length >= 3 && (
-                <span className="text-mn-amber">{t('usernameAvailable')}</span>
+                <span className="text-mn-bronze">{t('usernameAvailable')}</span>
               )}
               {!checkingUsername && usernameAvailable === false && username.length >= 3 && (
                 <span className="text-mn-herzrot">{t('usernameTaken')}</span>
@@ -196,7 +196,7 @@ export default function ProfileLocationSettings({
 
       {/* Location */}
       <SettingsSection
-        icon={<MapPin className="w-4 h-4 text-mn-amber" />}
+        icon={<MapPin className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionLocationTitle')}
         description={t('sectionLocationDesc')}
       >
@@ -213,7 +213,7 @@ export default function ProfileLocationSettings({
               placeholder={t('addressPlaceholder')}
             />
             {coordinates && (
-              <p className="text-xs text-mn-amber mt-1">
+              <p className="text-xs text-mn-bronze mt-1">
                 {t('coordinates', { lat: coordinates.lat.toFixed(4), lng: coordinates.lng.toFixed(4) })}
               </p>
             )}
@@ -230,7 +230,7 @@ export default function ProfileLocationSettings({
               max={150}
               value={radiusKm}
               onChange={e => { setRadiusKm(parseInt(e.target.value)); markDirty() }}
-              className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-mn-amber"
+              className="w-full h-2 bg-mn-raised rounded-lg appearance-none cursor-pointer accent-mn-bronze"
             />
             <div className="flex justify-between text-xs text-mn-mute mt-1">
               <span>1 km</span>
@@ -247,7 +247,7 @@ export default function ProfileLocationSettings({
         <button
           onClick={handleSaveAll}
           disabled={saving || (checkingUsername ?? false)}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {t('saveButton')}

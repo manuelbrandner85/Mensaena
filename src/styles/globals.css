@@ -3815,3 +3815,272 @@ code.break-all {
   --paper: #ece5d6;
   --paper-dim: #cdc4b1;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CINEMA DARK OVERRIDE — Converts remaining light-mode Tailwind utilities
+   to dark cinematic equivalents inside .cinema-app-shell.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Background: pure white → dark surface ────────────────────────────── */
+.cinema-app-shell .bg-white { background-color: rgba(22,32,53,0.85) !important; }
+
+/* ── Background: neutral/gray scales → dark cinema ───────────────────── */
+.cinema-app-shell .bg-gray-50,
+.cinema-app-shell .bg-stone-50,
+.cinema-app-shell .bg-slate-50,
+.cinema-app-shell .bg-neutral-50,
+.cinema-app-shell .bg-zinc-50 { background-color: rgba(15,22,40,0.55) !important; }
+
+.cinema-app-shell .bg-gray-100,
+.cinema-app-shell .bg-stone-100,
+.cinema-app-shell .bg-slate-100,
+.cinema-app-shell .bg-neutral-100,
+.cinema-app-shell .bg-zinc-100 { background-color: rgba(15,22,40,0.75) !important; }
+
+.cinema-app-shell .bg-gray-200,
+.cinema-app-shell .bg-stone-200,
+.cinema-app-shell .bg-slate-200,
+.cinema-app-shell .bg-neutral-200 { background-color: rgba(22,32,53,0.90) !important; }
+
+.cinema-app-shell .bg-gray-300,
+.cinema-app-shell .bg-stone-300,
+.cinema-app-shell .bg-slate-300 { background-color: rgba(30,45,70,0.90) !important; }
+
+/* ── Background: colored light tints → dark with color hue ───────────── */
+.cinema-app-shell .bg-primary-50  { background-color: rgba(30,170,166,0.07) !important; }
+.cinema-app-shell .bg-primary-100 { background-color: rgba(30,170,166,0.12) !important; }
+.cinema-app-shell .bg-primary-200 { background-color: rgba(30,170,166,0.18) !important; }
+
+.cinema-app-shell .bg-red-50   { background-color: rgba(239,68,68,0.07) !important; }
+.cinema-app-shell .bg-red-100  { background-color: rgba(239,68,68,0.12) !important; }
+.cinema-app-shell .bg-red-200  { background-color: rgba(239,68,68,0.20) !important; }
+
+.cinema-app-shell .bg-rose-50  { background-color: rgba(244,63,94,0.07) !important; }
+.cinema-app-shell .bg-rose-100 { background-color: rgba(244,63,94,0.12) !important; }
+
+.cinema-app-shell .bg-orange-50  { background-color: rgba(249,115,22,0.07) !important; }
+.cinema-app-shell .bg-orange-100 { background-color: rgba(249,115,22,0.12) !important; }
+
+.cinema-app-shell .bg-amber-50  { background-color: rgba(245,158,11,0.07) !important; }
+.cinema-app-shell .bg-amber-100 { background-color: rgba(245,158,11,0.12) !important; }
+
+.cinema-app-shell .bg-yellow-50  { background-color: rgba(234,179,8,0.07) !important; }
+.cinema-app-shell .bg-yellow-100 { background-color: rgba(234,179,8,0.12) !important; }
+
+.cinema-app-shell .bg-green-50  { background-color: rgba(34,197,94,0.07) !important; }
+.cinema-app-shell .bg-green-100 { background-color: rgba(34,197,94,0.12) !important; }
+
+.cinema-app-shell .bg-emerald-50  { background-color: rgba(16,185,129,0.07) !important; }
+.cinema-app-shell .bg-emerald-100 { background-color: rgba(16,185,129,0.12) !important; }
+
+.cinema-app-shell .bg-teal-50  { background-color: rgba(20,184,166,0.07) !important; }
+.cinema-app-shell .bg-teal-100 { background-color: rgba(20,184,166,0.12) !important; }
+
+.cinema-app-shell .bg-cyan-50  { background-color: rgba(6,182,212,0.07) !important; }
+.cinema-app-shell .bg-cyan-100 { background-color: rgba(6,182,212,0.12) !important; }
+
+.cinema-app-shell .bg-sky-50  { background-color: rgba(14,165,233,0.07) !important; }
+.cinema-app-shell .bg-sky-100 { background-color: rgba(14,165,233,0.12) !important; }
+
+.cinema-app-shell .bg-blue-50  { background-color: rgba(59,130,246,0.07) !important; }
+.cinema-app-shell .bg-blue-100 { background-color: rgba(59,130,246,0.12) !important; }
+
+.cinema-app-shell .bg-indigo-50  { background-color: rgba(99,102,241,0.07) !important; }
+.cinema-app-shell .bg-indigo-100 { background-color: rgba(99,102,241,0.12) !important; }
+
+.cinema-app-shell .bg-violet-50  { background-color: rgba(139,92,246,0.07) !important; }
+.cinema-app-shell .bg-violet-100 { background-color: rgba(139,92,246,0.12) !important; }
+
+.cinema-app-shell .bg-purple-50  { background-color: rgba(168,85,247,0.07) !important; }
+.cinema-app-shell .bg-purple-100 { background-color: rgba(168,85,247,0.12) !important; }
+
+.cinema-app-shell .bg-fuchsia-50  { background-color: rgba(217,70,239,0.07) !important; }
+.cinema-app-shell .bg-fuchsia-100 { background-color: rgba(217,70,239,0.12) !important; }
+
+.cinema-app-shell .bg-pink-50  { background-color: rgba(236,72,153,0.07) !important; }
+.cinema-app-shell .bg-pink-100 { background-color: rgba(236,72,153,0.12) !important; }
+
+/* ── Border colors: light → subtle dark ───────────────────────────────── */
+.cinema-app-shell .border-gray-100,
+.cinema-app-shell .border-gray-200,
+.cinema-app-shell .border-gray-300,
+.cinema-app-shell .border-stone-100,
+.cinema-app-shell .border-stone-200,
+.cinema-app-shell .border-stone-300,
+.cinema-app-shell .border-slate-100,
+.cinema-app-shell .border-slate-200,
+.cinema-app-shell .border-slate-300,
+.cinema-app-shell .border-neutral-100,
+.cinema-app-shell .border-neutral-200,
+.cinema-app-shell .border-zinc-100,
+.cinema-app-shell .border-zinc-200 { border-color: rgba(255,255,255,0.08) !important; }
+
+.cinema-app-shell .border-primary-100,
+.cinema-app-shell .border-primary-200,
+.cinema-app-shell .border-primary-300 { border-color: rgba(30,170,166,0.22) !important; }
+
+.cinema-app-shell .border-red-100,
+.cinema-app-shell .border-red-200,
+.cinema-app-shell .border-red-300    { border-color: rgba(239,68,68,0.25) !important; }
+.cinema-app-shell .border-rose-100,
+.cinema-app-shell .border-rose-200   { border-color: rgba(244,63,94,0.25) !important; }
+.cinema-app-shell .border-orange-100,
+.cinema-app-shell .border-orange-200 { border-color: rgba(249,115,22,0.25) !important; }
+.cinema-app-shell .border-amber-100,
+.cinema-app-shell .border-amber-200  { border-color: rgba(245,158,11,0.25) !important; }
+.cinema-app-shell .border-yellow-100,
+.cinema-app-shell .border-yellow-200 { border-color: rgba(234,179,8,0.25) !important; }
+.cinema-app-shell .border-green-100,
+.cinema-app-shell .border-green-200  { border-color: rgba(34,197,94,0.25) !important; }
+.cinema-app-shell .border-blue-100,
+.cinema-app-shell .border-blue-200   { border-color: rgba(59,130,246,0.25) !important; }
+.cinema-app-shell .border-indigo-100,
+.cinema-app-shell .border-indigo-200 { border-color: rgba(99,102,241,0.25) !important; }
+.cinema-app-shell .border-purple-100,
+.cinema-app-shell .border-purple-200 { border-color: rgba(168,85,247,0.25) !important; }
+.cinema-app-shell .border-pink-100,
+.cinema-app-shell .border-pink-200   { border-color: rgba(236,72,153,0.25) !important; }
+
+/* Dividers */
+.cinema-app-shell .divide-gray-100 > * + *,
+.cinema-app-shell .divide-gray-200 > * + *,
+.cinema-app-shell .divide-stone-100 > * + *,
+.cinema-app-shell .divide-stone-200 > * + * { border-color: rgba(255,255,255,0.06) !important; }
+
+/* ── Text: dark-on-light → light-on-dark ─────────────────────────────── */
+.cinema-app-shell .text-gray-900,
+.cinema-app-shell .text-stone-900,
+.cinema-app-shell .text-slate-900,
+.cinema-app-shell .text-neutral-900,
+.cinema-app-shell .text-zinc-900 { color: #ece5d6 !important; }
+
+.cinema-app-shell .text-gray-800,
+.cinema-app-shell .text-stone-800,
+.cinema-app-shell .text-slate-800,
+.cinema-app-shell .text-neutral-800 { color: #d4c9b5 !important; }
+
+.cinema-app-shell .text-gray-700,
+.cinema-app-shell .text-stone-700,
+.cinema-app-shell .text-slate-700,
+.cinema-app-shell .text-neutral-700 { color: #a0a8b0 !important; }
+
+.cinema-app-shell .text-gray-600,
+.cinema-app-shell .text-stone-600,
+.cinema-app-shell .text-slate-600,
+.cinema-app-shell .text-neutral-600 { color: #94A3B8 !important; }
+
+.cinema-app-shell .text-gray-500,
+.cinema-app-shell .text-stone-500,
+.cinema-app-shell .text-slate-500,
+.cinema-app-shell .text-neutral-500 { color: #64748B !important; }
+
+.cinema-app-shell .text-gray-400,
+.cinema-app-shell .text-stone-400,
+.cinema-app-shell .text-slate-400,
+.cinema-app-shell .text-neutral-400 { color: #475569 !important; }
+
+/* Primary text → bronze */
+.cinema-app-shell .text-primary-500,
+.cinema-app-shell .text-primary-600,
+.cinema-app-shell .text-primary-700,
+.cinema-app-shell .text-primary-800 { color: #c79363 !important; }
+
+/* Colored text: dark variants → lighter for dark backgrounds */
+.cinema-app-shell .text-red-600,
+.cinema-app-shell .text-red-700    { color: #f87171 !important; }
+.cinema-app-shell .text-rose-600,
+.cinema-app-shell .text-rose-700   { color: #fb7185 !important; }
+.cinema-app-shell .text-orange-600,
+.cinema-app-shell .text-orange-700 { color: #fb923c !important; }
+.cinema-app-shell .text-amber-600,
+.cinema-app-shell .text-amber-700  { color: #fbbf24 !important; }
+.cinema-app-shell .text-yellow-600,
+.cinema-app-shell .text-yellow-700 { color: #facc15 !important; }
+.cinema-app-shell .text-green-600,
+.cinema-app-shell .text-green-700  { color: #4ade80 !important; }
+.cinema-app-shell .text-emerald-600,
+.cinema-app-shell .text-emerald-700 { color: #34d399 !important; }
+.cinema-app-shell .text-teal-600,
+.cinema-app-shell .text-teal-700   { color: #2dd4bf !important; }
+.cinema-app-shell .text-cyan-600,
+.cinema-app-shell .text-cyan-700   { color: #22d3ee !important; }
+.cinema-app-shell .text-sky-600,
+.cinema-app-shell .text-sky-700    { color: #38bdf8 !important; }
+.cinema-app-shell .text-blue-600,
+.cinema-app-shell .text-blue-700   { color: #60a5fa !important; }
+.cinema-app-shell .text-indigo-600,
+.cinema-app-shell .text-indigo-700 { color: #818cf8 !important; }
+.cinema-app-shell .text-violet-600,
+.cinema-app-shell .text-violet-700 { color: #a78bfa !important; }
+.cinema-app-shell .text-purple-600,
+.cinema-app-shell .text-purple-700 { color: #c084fc !important; }
+.cinema-app-shell .text-fuchsia-600,
+.cinema-app-shell .text-fuchsia-700 { color: #e879f9 !important; }
+.cinema-app-shell .text-pink-600,
+.cinema-app-shell .text-pink-700   { color: #f472b6 !important; }
+
+/* Custom ink text → adapted */
+.cinema-app-shell .text-ink-700 { color: #94A3B8 !important; }
+.cinema-app-shell .text-ink-600 { color: #64748B !important; }
+
+/* ── Placeholder colors ────────────────────────────────────────────────── */
+.cinema-app-shell input::placeholder,
+.cinema-app-shell textarea::placeholder { color: #475569 !important; }
+
+/* ── Ring/focus colors ─────────────────────────────────────────────────── */
+.cinema-app-shell .focus\:ring-primary-500:focus,
+.cinema-app-shell .focus-visible\:ring-primary-500:focus-visible {
+  --tw-ring-color: rgba(199,147,99,0.50) !important;
+}
+
+/* ── Skeleton/pulse loading states ────────────────────────────────────── */
+.cinema-app-shell .bg-gray-200.animate-pulse,
+.cinema-app-shell .bg-stone-200.animate-pulse,
+.cinema-app-shell .bg-gray-300.animate-pulse {
+  background-color: rgba(30,45,70,0.80) !important;
+}
+
+/* ── Hover state overrides for light hover colors ─────────────────────── */
+.cinema-app-shell .hover\:bg-gray-50:hover,
+.cinema-app-shell .hover\:bg-stone-50:hover,
+.cinema-app-shell .hover\:bg-slate-50:hover { background-color: rgba(22,32,53,0.60) !important; }
+
+.cinema-app-shell .hover\:bg-gray-100:hover,
+.cinema-app-shell .hover\:bg-stone-100:hover,
+.cinema-app-shell .hover\:bg-slate-100:hover { background-color: rgba(22,32,53,0.80) !important; }
+
+.cinema-app-shell .hover\:bg-primary-50:hover { background-color: rgba(199,147,99,0.08) !important; }
+.cinema-app-shell .hover\:bg-primary-100:hover { background-color: rgba(199,147,99,0.12) !important; }
+
+/* ── Stripe/zebra row overrides ────────────────────────────────────────── */
+.cinema-app-shell .even\:bg-gray-50:nth-child(even),
+.cinema-app-shell .odd\:bg-gray-50:nth-child(odd) { background-color: rgba(15,22,40,0.40) !important; }
+
+/* ── Primary action backgrounds → bronze ──────────────────────────────── */
+.cinema-app-shell .bg-primary-500 { background-color: #c79363 !important; }
+.cinema-app-shell .bg-primary-600 { background-color: #c79363 !important; }
+.cinema-app-shell .bg-primary-700 { background-color: #b07840 !important; }
+.cinema-app-shell .hover\:bg-primary-600:hover { background-color: #c79363 !important; }
+.cinema-app-shell .hover\:bg-primary-700:hover { background-color: #b07840 !important; }
+
+/* ── Ring: primary → bronze ───────────────────────────────────────────── */
+.cinema-app-shell .ring-primary-100,
+.cinema-app-shell .ring-primary-200 { --tw-ring-color: rgba(199,147,99,0.15) !important; }
+.cinema-app-shell .ring-primary-300 { --tw-ring-color: rgba(199,147,99,0.25) !important; }
+.cinema-app-shell .ring-primary-500 { --tw-ring-color: rgba(199,147,99,0.50) !important; }
+.cinema-app-shell .focus\:ring-primary-300:focus { --tw-ring-color: rgba(199,147,99,0.25) !important; }
+.cinema-app-shell .focus\:ring-primary-500:focus { --tw-ring-color: rgba(199,147,99,0.50) !important; }
+
+/* Border: primary darker shades */
+.cinema-app-shell .border-primary-300 { border-color: rgba(199,147,99,0.30) !important; }
+.cinema-app-shell .border-primary-500,
+.cinema-app-shell .border-primary-600 { border-color: rgba(199,147,99,0.50) !important; }
+
+/* Step connector lines */
+.cinema-app-shell .bg-primary-300 { background-color: rgba(199,147,99,0.35) !important; }
+
+/* ── Shadow: light box-shadows → dark-friendly ────────────────────────── */
+.cinema-app-shell .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.35) !important; }
+.cinema-app-shell .shadow    { box-shadow: 0 2px 8px rgba(0,0,0,0.40) !important; }
+.cinema-app-shell .shadow-md { box-shadow: 0 4px 16px rgba(0,0,0,0.45) !important; }
+.cinema-app-shell .shadow-lg { box-shadow: 0 8px 24px rgba(0,0,0,0.50) !important; }

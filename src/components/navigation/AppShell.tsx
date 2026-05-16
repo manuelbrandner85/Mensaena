@@ -398,7 +398,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           aria-hidden="true"
         />
         <div className="relative text-center">
-          <div className="w-10 h-10 border-[3px] border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-[3px] border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin mx-auto mb-3" />
           <p className="meta-label meta-label--subtle justify-center">{t('loading')}</p>
         </div>
       </div>
@@ -485,7 +485,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             {/* FEATURE: Mobile-Header komplett — Suche/CommandPalette */}
             <button
               onClick={() => { haptic.light(); openCommandPalette() }}
-              className="p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-amber transition-all touch-target"
+              className="p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-bronze transition-all touch-target"
               aria-label={t('commandPalette')}
             >
               <Search className="w-5 h-5" />
@@ -495,7 +495,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/dashboard/notifications"
               onClick={() => haptic.light()}
-              className="relative p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-amber transition-all touch-target"
+              className="relative p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-bronze transition-all touch-target"
               aria-label={t('notificationsAria')}
             >
               <Bell className="w-5 h-5" />
@@ -508,12 +508,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               href="/dashboard/messages"
               onClick={() => haptic.light()}
-              className="relative p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-amber transition-all touch-target"
+              className="relative p-2.5 rounded-full hover:bg-mn-elevated/5 text-mn-mute hover:text-mn-bronze transition-all touch-target"
               aria-label={t('messagesAria')}
             >
               <MessageCircle className="w-5 h-5" />
               {unreadMessages > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-mn-amber text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-mn-bronze text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 shadow animate-badge-pop">
                   {unreadMessages > 99 ? '99+' : unreadMessages}
                 </span>
               )}
@@ -530,7 +530,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   className="w-7 h-7 rounded-full object-cover border border-white/5"
                 />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-mn-amber/10 border border-white/5 flex items-center justify-center text-mn-amber text-xs font-bold">
+                <div className="w-7 h-7 rounded-full bg-mn-bronze/10 border border-white/5 flex items-center justify-center text-mn-bronze text-xs font-bold">
                   {user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
               )}

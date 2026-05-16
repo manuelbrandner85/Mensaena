@@ -20,7 +20,7 @@ const FarmDetailMap = dynamic(() => import('@/components/supply/FarmDetailMap'),
   ssr: false,
   loading: () => (
     <div className="h-64 bg-mn-surface rounded-2xl flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
     </div>
   ),
 })
@@ -241,7 +241,7 @@ export default function FarmDetailPage() {
     return (
       <div className="min-h-dvh flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-mn-mute">Betrieb wird geladen…</p>
         </div>
       </div>
@@ -303,10 +303,10 @@ export default function FarmDetailPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Hero Card */}
         <div className="bg-mn-elevated rounded-3xl shadow-sm border border-white/5 overflow-hidden">
-          <div className="bg-gradient-to-r from-mn-amber/12 to-mn-amber-warm/8 h-3" />
+          <div className="bg-gradient-to-r from-mn-bronze/12 to-mn-bronze-warm/8 h-3" />
           <div className="p-6 md:p-8">
             <div className="flex items-start gap-5">
-              <div className="w-16 h-16 bg-gradient-to-br from-mn-amber/12 to-yellow-100 rounded-2xl flex items-center justify-center text-3xl shrink-0 border border-amber-200">
+              <div className="w-16 h-16 bg-gradient-to-br from-mn-bronze/12 to-yellow-100 rounded-2xl flex items-center justify-center text-3xl shrink-0 border border-amber-200">
                 {categoryIcon}
               </div>
               <div className="flex-1 min-w-0">
@@ -325,7 +325,7 @@ export default function FarmDetailPage() {
                     </span>
                   )}
                   {farm.is_seasonal && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-mn-elevated text-mn-amber-warm">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-mn-elevated text-mn-bronze-warm">
                       🍂 Saisonal
                     </span>
                   )}
@@ -425,7 +425,7 @@ export default function FarmDetailPage() {
             {farm.delivery_options.length > 0 && (
               <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-6">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-mn-ink mb-4">
-                  <Truck className="w-5 h-5 text-mn-amber" /> Liefer- & Abholoptionen
+                  <Truck className="w-5 h-5 text-mn-bronze" /> Liefer- & Abholoptionen
                 </h2>
                 <div className="space-y-2">
                   {farm.delivery_options.map((d) => (

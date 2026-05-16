@@ -76,7 +76,7 @@ const CHALLENGE_CATEGORIES = [
 
 const DIFFICULTIES = [
   { value: 'leicht', label: '🟢 Leicht', color: 'bg-mn-elevated text-mn-leben' },
-  { value: 'mittel', label: '🟡 Mittel', color: 'bg-mn-elevated text-mn-amber' },
+  { value: 'mittel', label: '🟡 Mittel', color: 'bg-mn-elevated text-mn-bronze' },
   { value: 'schwer', label: '🔴 Schwer', color: 'bg-mn-elevated text-mn-herzrot' },
 ]
 
@@ -308,7 +308,7 @@ function ChallengeCard({
       {/* Top bar */}
       <div className={cn(
         'relative px-4 py-2 pt-3 flex items-center justify-between text-sm overflow-hidden',
-        isExpired ? 'bg-mn-surface' : 'bg-gradient-to-r from-mn-amber/12 via-mn-amber-warm/4 to-mn-amber-warm/8',
+        isExpired ? 'bg-mn-surface' : 'bg-gradient-to-r from-mn-bronze/12 via-mn-bronze-warm/4 to-mn-bronze-warm/8',
       )}>
         {!isExpired && <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />}
         <span className="relative flex items-center gap-1.5">
@@ -360,10 +360,10 @@ function ChallengeCard({
                 className={cn(
                   'shine w-full py-2 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5',
                   checkedInToday
-                    ? 'bg-mn-amber/10 text-mn-amber cursor-default shadow-cinema-card'
+                    ? 'bg-mn-bronze/10 text-mn-bronze cursor-default shadow-cinema-card'
                     : checkingIn
                       ? 'bg-amber-100 text-amber-600 cursor-wait'
-                      : 'bg-gradient-to-r from-mn-amber/12 to-orange-500 text-white hover:shadow-md active:scale-95',
+                      : 'bg-gradient-to-r from-mn-bronze/12 to-orange-500 text-white hover:shadow-md active:scale-95',
                 )}
                 style={!checkedInToday && !checkingIn ? { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' } : undefined}
               >
@@ -375,7 +375,7 @@ function ChallengeCard({
             ) : (
               <button
                 onClick={() => onJoin(challenge.id)}
-                className="shine w-full py-2 bg-gradient-to-r from-mn-amber/12 to-orange-500 text-white rounded-xl text-xs font-semibold hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                className="shine w-full py-2 bg-gradient-to-r from-mn-bronze/12 to-orange-500 text-white rounded-xl text-xs font-semibold hover:shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
                 style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
               >
                 <Zap className="w-3.5 h-3.5" /> Teilnehmen
@@ -391,7 +391,7 @@ function ChallengeCard({
               <span>{progressStats.checkinCount} von {totalDays} Tagen</span>
               <div className="flex items-center gap-2">
                 {progressStats.streak > 0 && (
-                  <span className="text-mn-amber-warm font-medium">🔥 {progressStats.streak} Tage in Folge</span>
+                  <span className="text-mn-bronze-warm font-medium">🔥 {progressStats.streak} Tage in Folge</span>
                 )}
                 {progressStats.verifiedCount > 0 && (
                   <span className="text-mn-leben font-medium">{progressStats.verifiedCount} verifiziert</span>
@@ -700,7 +700,7 @@ export default function ChallengesPage() {
             </select>
             <button
               onClick={() => router.push('/dashboard/challenges/create')}
-              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-amber/12 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
+              className="shine flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-bronze/12 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95 flex-shrink-0"
               style={{ boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
             >
               <Plus className="w-4 h-4" /> Neue Challenge
@@ -739,7 +739,7 @@ export default function ChallengesPage() {
             <p className="text-sm text-mn-mute mt-1 mb-4">Motiviere die Community mit einer Challenge</p>
             <button
               onClick={() => router.push('/dashboard/challenges/create')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-amber/12 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-mn-bronze/12 to-orange-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
             >
               <Plus className="w-4 h-4" /> Erste Challenge starten
             </button>

@@ -49,7 +49,7 @@ export default function EventFilters({
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all',
                 activeView === key
-                  ? 'bg-mn-amber/10 text-mn-amber'
+                  ? 'bg-mn-bronze/10 text-mn-bronze'
                   : 'text-mn-ink-soft hover:bg-mn-elevated',
               )}
               title={label}
@@ -70,7 +70,7 @@ export default function EventFilters({
             onChange={(e) => setLocalSearch(e.target.value)}
             inputMode="search"
             placeholder="Events suchen..."
-            className="w-full pl-9 pr-8 py-2 rounded-lg border border-white/5 bg-mn-elevated text-sm placeholder:text-mn-mute focus:outline-none focus:ring-2 focus:ring-mn-amber focus:border-transparent transition"
+            className="w-full pl-9 pr-8 py-2 rounded-lg border border-white/5 bg-mn-elevated text-sm placeholder:text-mn-mute focus:outline-none focus:ring-2 focus:ring-mn-bronze focus:border-transparent transition"
           />
           {localSearch && (
             <button
@@ -95,7 +95,7 @@ export default function EventFilters({
               className={cn(
                 'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
                 active
-                  ? 'bg-mn-amber text-white shadow-sm'
+                  ? 'bg-mn-bronze text-white shadow-sm'
                   : 'bg-mn-elevated text-mn-ink-soft border border-white/5 hover:bg-mn-surface hover:border-white/8',
               )}
             >

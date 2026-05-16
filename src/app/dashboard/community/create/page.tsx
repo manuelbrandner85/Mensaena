@@ -10,8 +10,8 @@ export default function CommunityCreatePage() {
       moduleKey="community"
       moduleTitle="Neuer Community-Beitrag"
       moduleDescription="Starte eine Diskussion, teile eine Idee oder stelle eine Frage."
-      gradientFrom="from-mn-amber/8"
-      gradientTo="to-mn-amber-warm"
+      gradientFrom="from-mn-bronze/8"
+      gradientTo="to-mn-bronze-warm"
       ringColor="ring-violet-400"
       iconComponent={<Users className="w-6 h-6" />}
       createTypes={[

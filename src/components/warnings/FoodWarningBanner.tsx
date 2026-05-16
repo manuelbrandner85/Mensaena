@@ -131,7 +131,7 @@ export default function FoodWarningBanner() {
       className={cn(
         'rounded-2xl border shadow-sm overflow-hidden mb-3',
         isRecall
-          ? 'border-white/8 bg-gradient-to-r from-mn-amber-warm/12 to-mn-amber-warm/8 dark:from-mn-amber-warm/12/40 dark:to-mn-amber-warm/8/40 dark:border-white/8/60'
+          ? 'border-white/8 bg-gradient-to-r from-mn-bronze-warm/12 to-mn-bronze-warm/8 dark:from-mn-bronze-warm/12/40 dark:to-mn-bronze-warm/8/40 dark:border-white/8/60'
           : 'border-amber-200 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-700/60',
       )}
     >
@@ -140,7 +140,7 @@ export default function FoodWarningBanner() {
           className={cn(
             'flex-shrink-0 mt-0.5 rounded-lg p-2',
             isRecall
-              ? 'bg-mn-elevated text-mn-amber-warm dark:bg-orange-900/60 dark:text-mn-amber-warm'
+              ? 'bg-mn-elevated text-mn-bronze-warm dark:bg-orange-900/60 dark:text-mn-bronze-warm'
               : 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-200',
           )}
         >
@@ -177,7 +177,7 @@ export default function FoodWarningBanner() {
           <div className="mt-2 flex items-center gap-3 text-xs">
             <a
               href="/dashboard/warnungen"
-              className="font-medium text-mn-amber-warm hover:text-mn-amber-warm dark:text-mn-amber-warm dark:hover:text-mn-amber-warm transition-colors"
+              className="font-medium text-mn-bronze-warm hover:text-mn-bronze-warm dark:text-mn-bronze-warm dark:hover:text-mn-bronze-warm transition-colors"
             >
               Mehr Warnungen
             </a>

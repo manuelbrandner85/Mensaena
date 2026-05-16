@@ -68,7 +68,7 @@ const MapView = dynamic(() => import('@/components/map/MapView'), {
       />
       <div className="relative text-center z-10">
         <div className="relative w-14 h-14 mx-auto mb-4">
-          <div className="absolute inset-0 border-[3px] border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+          <div className="absolute inset-0 border-[3px] border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
           <div
             className="absolute inset-2 border-[2px] border-mn-teal-soft/15 border-b-mn-teal-soft rounded-full"
             style={{ animation: 'spin 1.6s linear reverse infinite' }}
@@ -198,7 +198,7 @@ export default function MapPage() {
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #1EAAA6, #1EAAA633)' }}
           />
-          <Target className="relative w-4 h-4 text-mn-amber flex-shrink-0 float-idle" />
+          <Target className="relative w-4 h-4 text-mn-bronze flex-shrink-0 float-idle" />
           <label htmlFor="radius-slider" className="relative text-xs font-medium text-mn-ink-soft whitespace-nowrap">
             Umkreis
           </label>
@@ -210,14 +210,14 @@ export default function MapPage() {
             step={5}
             value={radiusKm}
             onChange={e => setRadiusKm(Number(e.target.value))}
-            className="relative flex-1 accent-mn-amber"
+            className="relative flex-1 accent-mn-bronze"
             aria-label="Radius in Kilometern"
           />
-          <span className="relative display-numeral text-sm font-bold text-mn-amber tabular-nums min-w-[60px] text-right">
+          <span className="relative display-numeral text-sm font-bold text-mn-bronze tabular-nums min-w-[60px] text-right">
             {radiusKm} km
           </span>
           {loading && (
-            <div className="relative w-4 h-4 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+            <div className="relative w-4 h-4 border-2 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
           )}
           <span className="relative display-numeral text-[11px] text-mn-mute whitespace-nowrap hidden sm:inline tabular-nums">
             · {posts.length} Beiträge
@@ -227,7 +227,7 @@ export default function MapPage() {
       {!initReady ? (
         <div className="flex-1 flex items-center justify-center bg-mn-surface rounded-2xl">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <div className="w-10 h-10 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <p className="text-mn-mute text-sm">Standort wird geladen…</p>
           </div>
         </div>

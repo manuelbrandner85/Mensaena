@@ -254,12 +254,12 @@ export default function CommandPalette() {
                         onClick={() => runCommand(cmd)}
                         onMouseEnter={() => setActiveIndex(runningIndex)}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                          active ? 'bg-mn-amber/5' : 'hover:bg-mn-elevated/[0.02]'
+                          active ? 'bg-mn-bronze/5' : 'hover:bg-mn-elevated/[0.02]'
                         }`}
                       >
                         <span
                           className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                            active ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-ink-soft'
+                            active ? 'bg-mn-bronze/10 text-mn-bronze' : 'bg-mn-elevated text-mn-ink-soft'
                           }`}
                         >
                           <Icon className="w-4 h-4" />

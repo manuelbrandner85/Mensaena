@@ -26,10 +26,10 @@ function newId() { return Math.random().toString(36).slice(2, 10) }
 
 function defaultBlock(type: Block['type']): Block {
   switch (type) {
-    case 'header': return { id: newId(), type, content: 'Deine Überschrift hier', props: { size: '24', color: '#1EAAA6' } }
+    case 'header': return { id: newId(), type, content: 'Deine Überschrift hier', props: { size: '24', color: '#ece5d6' } }
     case 'text':   return { id: newId(), type, content: 'Hier steht dein Text. Du kannst ihn frei bearbeiten und formatieren.', props: {} }
     case 'image':  return { id: newId(), type, content: '', props: { url: 'https://via.placeholder.com/600x200/1EAAA6/ffffff?text=Mensaena', alt: 'Bild' } }
-    case 'button': return { id: newId(), type, content: 'Jetzt entdecken →', props: { url: 'https://www.mensaena.de/dashboard', color: '#1EAAA6' } }
+    case 'button': return { id: newId(), type, content: 'Jetzt entdecken →', props: { url: 'https://www.mensaena.de/dashboard', color: '#c79363' } }
     case 'divider': return { id: newId(), type, content: '', props: {} }
     case 'spacer': return { id: newId(), type, content: '', props: { height: '20' } }
   }
@@ -39,15 +39,15 @@ function defaultBlock(type: Block['type']): Block {
 function blockToHtml(block: Block): string {
   switch (block.type) {
     case 'header':
-      return `<h1 style="margin:0 0 16px;color:${block.props.color || '#1EAAA6'};font-size:${block.props.size || '24'}px;font-weight:800;">${block.content}</h1>`
+      return `<h1 style="margin:0 0 16px;color:${block.props.color || '#ece5d6'};font-size:${block.props.size || '24'}px;font-weight:400;font-family:Georgia,'Times New Roman',serif;">${block.content}</h1>`
     case 'text':
-      return `<p style="margin:0 0 16px;color:#374151;font-size:15px;line-height:1.75;">${block.content}</p>`
+      return `<p style="margin:0 0 16px;color:#4B5563;font-size:15px;line-height:1.75;">${block.content}</p>`
     case 'image':
       return `<img src="${block.props.url}" alt="${block.props.alt || ''}" style="width:100%;max-width:600px;border-radius:12px;margin:0 0 16px;" />`
     case 'button':
-      return `<div style="text-align:center;margin:24px 0;"><a href="${block.props.url}" style="display:inline-block;background:linear-gradient(135deg,${block.props.color || '#1EAAA6'} 0%,#147170 100%);color:#ffffff;text-decoration:none;padding:15px 40px;border-radius:13px;font-size:15px;font-weight:700;box-shadow:0 5px 18px rgba(30,170,166,0.35);">${block.content}</a></div>`
+      return `<div style="text-align:center;margin:24px 0;"><a href="${block.props.url}" style="display:inline-block;background:linear-gradient(135deg,${block.props.color || '#c79363'} 0%,#d4a472 50%,${block.props.color || '#c79363'} 100%);color:#0a1420;text-decoration:none;padding:15px 40px;border-radius:50px;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;box-shadow:0 5px 18px rgba(199,147,99,0.35);">${block.content}</a></div>`
     case 'divider':
-      return '<hr style="border:none;border-top:1px solid #E5F7F7;margin:24px 0;" />'
+      return '<hr style="border:none;border-top:1px solid rgba(199,147,99,0.15);margin:24px 0;" />'
     case 'spacer':
       return `<div style="height:${block.props.height || '20'}px;"></div>`
   }
@@ -58,28 +58,28 @@ function blocksToFullHtml(blocks: Block[]): string {
   return `<!DOCTYPE html>
 <html lang="de">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#EEF9F9;font-family:Arial,Helvetica,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#EEF9F9;padding:40px 16px;">
+<body style="margin:0;padding:0;background:#0a1420;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a1420;padding:40px 16px;">
 <tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 6px 30px rgba(30,170,166,0.12);">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#0d1a29;border-radius:20px;overflow:hidden;box-shadow:0 6px 30px rgba(0,0,0,0.40);border:1px solid rgba(199,147,99,0.12);">
   <tr><td>
-    <div style="background:linear-gradient(135deg,#1EAAA6 0%,#147170 100%);padding:36px 48px;text-align:center;">
-      <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:16px;padding:10px 20px;">
-        <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px;">Mensaena</span>
+    <div style="background:linear-gradient(135deg,rgba(199,147,99,0.18) 0%,rgba(43,86,99,0.20) 100%);border-bottom:1px solid rgba(199,147,99,0.15);padding:36px 48px;text-align:center;">
+      <div style="display:inline-block;background:rgba(199,147,99,0.12);border:1px solid rgba(199,147,99,0.25);border-radius:16px;padding:10px 20px;">
+        <span style="color:#c79363;font-size:28px;font-weight:800;letter-spacing:-1px;">Mensaena</span>
       </div>
     </div>
   </td></tr>
   <tr><td style="padding:40px 48px;">
     ${bodyHtml}
   </td></tr>
-  <tr><td style="padding:0 48px;"><hr style="border:none;border-top:1px solid #E5F7F7;margin:0;"></td></tr>
-  <tr><td style="background:#f8fffe;padding:24px 48px;border-radius:0 0 20px 20px;text-align:center;">
-    <p style="margin:0;color:#9CA3AF;font-size:11px;">
-      <a href="UNSUBSCRIBE_URL" style="color:#6B7280;text-decoration:underline;">E-Mails abbestellen</a>
+  <tr><td style="padding:0 48px;"><hr style="border:none;border-top:1px solid rgba(199,147,99,0.12);margin:0;"></td></tr>
+  <tr><td style="background:rgba(10,15,28,0.50);padding:24px 48px;border-radius:0 0 20px 20px;text-align:center;">
+    <p style="margin:0;color:#64748B;font-size:11px;">
+      <a href="UNSUBSCRIBE_URL" style="color:#94A3B8;text-decoration:underline;">E-Mails abbestellen</a>
       &nbsp;·&nbsp;
-      <a href="https://www.mensaena.de/impressum" style="color:#6B7280;text-decoration:none;">Impressum</a>
+      <a href="https://www.mensaena.de/impressum" style="color:#94A3B8;text-decoration:none;">Impressum</a>
       &nbsp;·&nbsp;
-      <a href="https://www.mensaena.de/datenschutz" style="color:#6B7280;text-decoration:none;">Datenschutz</a>
+      <a href="https://www.mensaena.de/datenschutz" style="color:#94A3B8;text-decoration:none;">Datenschutz</a>
     </p>
   </td></tr>
 </table>
@@ -140,20 +140,20 @@ export default function EmailBlockEditor({
             <button
               key={t.type}
               onClick={() => addBlock(t.type)}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-mn-surface hover:bg-mn-amber/5 border border-white/5 hover:border-mn-amber/20 rounded-lg text-xs text-mn-ink-soft hover:text-mn-amber transition-all"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-mn-surface hover:bg-mn-bronze/5 border border-white/5 hover:border-mn-bronze/20 rounded-lg text-xs text-mn-ink-soft hover:text-mn-bronze transition-all"
             >
               {t.icon} {t.label}
             </button>
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={() => setMode('edit')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'edit' ? 'bg-mn-amber text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
+          <button onClick={() => setMode('edit')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'edit' ? 'bg-mn-bronze text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
             <Plus className="w-3 h-3 inline mr-1" />Editor
           </button>
-          <button onClick={() => setMode('preview')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'preview' ? 'bg-mn-amber text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
+          <button onClick={() => setMode('preview')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'preview' ? 'bg-mn-bronze text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
             <Eye className="w-3 h-3 inline mr-1" />Vorschau
           </button>
-          <button onClick={() => setMode('code')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'code' ? 'bg-mn-amber text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
+          <button onClick={() => setMode('code')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${mode === 'code' ? 'bg-mn-bronze text-white' : 'bg-mn-elevated text-mn-ink-soft'}`}>
             <Code className="w-3 h-3 inline mr-1" />HTML
           </button>
         </div>
@@ -170,7 +170,7 @@ export default function EmailBlockEditor({
               key={block.id}
               onClick={() => setSelectedBlock(block.id)}
               className={`bg-mn-elevated rounded-xl border p-3 transition-all cursor-pointer ${
-                selectedBlock === block.id ? 'border-mn-amber/30 ring-2 ring-primary-100' : 'border-white/5 hover:border-white/8'
+                selectedBlock === block.id ? 'border-mn-bronze/30 ring-2 ring-primary-100' : 'border-white/5 hover:border-white/8'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -186,7 +186,7 @@ export default function EmailBlockEditor({
                 <input
                   type="text" value={block.content}
                   onChange={e => updateBlock(block.id, { content: e.target.value })}
-                  className="w-full text-xl font-bold text-mn-amber bg-transparent border-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30 rounded"
+                  className="w-full text-xl font-bold text-mn-bronze bg-transparent border-none outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-bronze/30 rounded"
                   placeholder="Überschrift..."
                 />
               )}
@@ -194,7 +194,7 @@ export default function EmailBlockEditor({
                 <textarea
                   value={block.content}
                   onChange={e => updateBlock(block.id, { content: e.target.value })}
-                  className="w-full text-sm text-mn-ink-soft bg-transparent border-none outline-none resize-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30 rounded"
+                  className="w-full text-sm text-mn-ink-soft bg-transparent border-none outline-none resize-none focus:ring-2 focus:ring-primary-300 focus:border-mn-bronze/30 rounded"
                   rows={3}
                   placeholder="Text eingeben..."
                 />
@@ -243,7 +243,7 @@ export default function EmailBlockEditor({
         <textarea
           value={fullHtml}
           readOnly
-          className="w-full px-3 py-2 border border-white/5 rounded-xl text-xs font-mono bg-mn-surface focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-amber/30"
+          className="w-full px-3 py-2 border border-white/5 rounded-xl text-xs font-mono bg-mn-surface focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-mn-bronze/30"
           rows={15}
         />
       )}
@@ -252,7 +252,7 @@ export default function EmailBlockEditor({
       <div className="flex justify-end">
         <button
           onClick={() => onSave(fullHtml)}
-          className="px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm transition-colors"
+          className="px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium shadow-sm transition-colors"
         >
           Als Kampagne übernehmen
         </button>

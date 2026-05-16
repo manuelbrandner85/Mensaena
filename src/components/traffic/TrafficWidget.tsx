@@ -27,7 +27,7 @@ const TYPE_META: Record<WarningType, { icon: React.ReactNode; label: string; col
   jam:      { icon: <Car className="w-4 h-4" />,           label: 'Stau',      color: 'text-mn-herzrot',       bg: 'bg-mn-surface border-mn-herzrot/20' },
   closure:  { icon: <ShieldAlert className="w-4 h-4" />,   label: 'Sperrung',  color: 'text-rose-700',      bg: 'bg-rose-50 border-rose-200' },
   roadwork: { icon: <Construction className="w-4 h-4" />,  label: 'Baustelle', color: 'text-amber-600',     bg: 'bg-amber-50 border-amber-200' },
-  hazard:   { icon: <AlertTriangle className="w-4 h-4" />, label: 'Gefahr',    color: 'text-mn-amber-warm',    bg: 'bg-mn-surface border-white/8' },
+  hazard:   { icon: <AlertTriangle className="w-4 h-4" />, label: 'Gefahr',    color: 'text-mn-bronze-warm',    bg: 'bg-mn-surface border-white/8' },
   other:    { icon: <AlertTriangle className="w-4 h-4" />, label: 'Hinweis',   color: 'text-mn-mute',      bg: 'bg-mn-surface border-white/5' },
 }
 
@@ -138,7 +138,7 @@ function RoadSelector({
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 text-xs text-mn-amber hover:text-mn-amber font-medium"
+        className="flex items-center gap-1 text-xs text-mn-bronze hover:text-mn-bronze font-medium"
       >
         <Plus className="w-3.5 h-3.5" /> Autobahn hinzufügen
       </button>
@@ -315,7 +315,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
               <button
                 type="button"
                 onClick={() => setEditMode(e => !e)}
-                className={cn('p-1.5 rounded-lg transition-colors', editMode ? 'bg-mn-amber/10 text-mn-amber' : 'text-mn-mute hover:bg-mn-elevated/5')}
+                className={cn('p-1.5 rounded-lg transition-colors', editMode ? 'bg-mn-bronze/10 text-mn-bronze' : 'text-mn-mute hover:bg-mn-elevated/5')}
                 title="Autobahnen bearbeiten"
               >
                 <Settings2 className="w-4 h-4" />
@@ -338,7 +338,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
             onClick={handleToggle}
             className={cn(
               'relative inline-flex h-5 w-9 items-center rounded-full border-2 transition-colors',
-              enabled ? 'bg-mn-amber border-mn-amber' : 'bg-mn-raised border-white/5',
+              enabled ? 'bg-mn-bronze border-mn-bronze' : 'bg-mn-raised border-white/5',
             )}
             title={enabled ? 'Pendler-Modus deaktivieren' : 'Pendler-Modus aktivieren'}
           >
@@ -363,7 +363,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
             <div className="space-y-2 pb-2 border-b border-white/5">
               <div className="flex flex-wrap gap-1.5">
                 {roads.map(r => (
-                  <span key={r} className="inline-flex items-center gap-1 bg-mn-amber/5 text-mn-amber text-xs font-bold px-2.5 py-1 rounded-full">
+                  <span key={r} className="inline-flex items-center gap-1 bg-mn-bronze/5 text-mn-bronze text-xs font-bold px-2.5 py-1 rounded-full">
                     {r}
                     <button type="button" onClick={() => handleRemoveRoad(r)} className="hover:text-mn-herzrot transition-colors">
                       <X className="w-3 h-3" />
@@ -381,7 +381,7 @@ export default function TrafficWidget({ className }: { className?: string }) {
               {[
                 { count: closureCount,  label: 'Sperrungen', color: 'text-rose-600',   bg: 'bg-rose-50'   },
                 { count: jamCount,      label: 'Staus',      color: 'text-mn-herzrot',    bg: 'bg-mn-surface'    },
-                { count: hazardCount,   label: 'Gefahren',   color: 'text-mn-amber-warm', bg: 'bg-mn-surface' },
+                { count: hazardCount,   label: 'Gefahren',   color: 'text-mn-bronze-warm', bg: 'bg-mn-surface' },
                 { count: roadworkCount, label: 'Baustellen', color: 'text-amber-600',  bg: 'bg-amber-50'  },
               ].map(s => (
                 <div key={s.label} className={cn('rounded-xl py-1.5', s.bg)}>

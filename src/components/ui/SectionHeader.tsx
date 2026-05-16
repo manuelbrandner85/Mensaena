@@ -30,7 +30,7 @@ export default function SectionHeader({
     <div className={cn('section-header', className)}>
       <div className="flex items-center gap-2">
         {icon && (
-          <span className="flex-shrink-0 text-mn-amber" aria-hidden="true">
+          <span className="flex-shrink-0 text-mn-bronze" aria-hidden="true">
             {icon}
           </span>
         )}

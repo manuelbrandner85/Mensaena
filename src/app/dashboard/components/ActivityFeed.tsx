@@ -56,7 +56,7 @@ export default function ActivityFeed({ activities, onRefresh, refreshing }: Acti
             {hasMore && (
               <button
                 onClick={() => setShowCount((c) => c + 5)}
-                className="w-full py-3.5 text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors border-t border-white/5"
+                className="w-full py-3.5 text-sm font-medium text-mn-bronze hover:bg-mn-bronze/5 transition-colors border-t border-white/5"
               >
                 Mehr anzeigen
               </button>

@@ -305,7 +305,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                       className={cn(
                         'px-2.5 py-1 rounded-full text-xs border transition-all',
                         selectedResources.includes(r)
-                          ? 'bg-mn-amber/10 border-mn-amber/20 text-mn-amber'
+                          ? 'bg-mn-bronze/10 border-mn-bronze/20 text-mn-bronze'
                           : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
                       )}
                     >
@@ -358,7 +358,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                 >
                   <div className={cn(
                     'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                    acceptedNoTrade ? 'bg-mn-amber border-mn-amber' : 'border-amber-400 bg-mn-elevated'
+                    acceptedNoTrade ? 'bg-mn-bronze border-mn-bronze' : 'border-amber-400 bg-mn-elevated'
                   )}>
                     {acceptedNoTrade && <span className="text-white text-xs font-bold">✓</span>}
                   </div>
@@ -366,7 +366,7 @@ export default function CrisisCreateForm({ onSubmit, onUploadImage }: Props) {
                     <p className="text-sm font-semibold text-mn-ink">Kein Handel / kein Geldgeschäft *</p>
                     <p className="text-xs text-mn-mute mt-0.5">
                       Ich bestätige, dass diese Meldung <strong>keinen kommerziellen Handel, Verkauf oder Geldgeschäfte</strong> beinhaltet.
-                      Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-amber underline">§4 AGB</a> geahndet.
+                      Verstöße werden gemäß <a href="/nutzungsbedingungen" target="_blank" rel="noopener noreferrer" className="text-mn-bronze underline">§4 AGB</a> geahndet.
                     </p>
                   </div>
                 </button>

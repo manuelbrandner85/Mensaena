@@ -313,7 +313,7 @@ export default function PostDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
       </div>
     )
   }
@@ -681,7 +681,7 @@ export default function PostDetailPage() {
             {isOwner && pendingCount > 0 && (
               <button
                 onClick={() => interactionsSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex items-center gap-1 bg-mn-elevated text-mn-amber-warm px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-mn-amber/10 transition-colors"
+                className="flex items-center gap-1 bg-mn-elevated text-mn-bronze-warm px-2.5 py-0.5 rounded-full text-xs font-medium hover:bg-mn-bronze/10 transition-colors"
               >
                 <Users className="w-3 h-3" /> {pendingCount} Interessenten
               </button>
@@ -696,7 +696,7 @@ export default function PostDetailPage() {
                   const params = new URLSearchParams({ route: '1', toLat: String(post.latitude), toLon: String(post.longitude) })
                   router.push(`/dashboard/map?${params}`)
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-amber/5 text-mn-amber border border-mn-amber/20 hover:bg-mn-amber/10 transition-colors active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-bronze/5 text-mn-bronze border border-mn-bronze/20 hover:bg-mn-bronze/10 transition-colors active:scale-95"
               >
                 <Navigation className="w-3.5 h-3.5" />
                 Route hierhin
@@ -727,7 +727,7 @@ export default function PostDetailPage() {
           {post.description.length > 500 && (
             <button
               onClick={() => setDescExpanded(!descExpanded)}
-              className="mt-2 text-sm text-mn-amber hover:text-mn-amber font-medium"
+              className="mt-2 text-sm text-mn-bronze hover:text-mn-bronze font-medium"
             >
               {descExpanded ? 'Weniger anzeigen' : 'Mehr anzeigen'}
             </button>
@@ -760,7 +760,7 @@ export default function PostDetailPage() {
                 className={cn(
                   'flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-mn-amber/10 text-primary-800 ring-2 ring-primary-300 scale-105'
+                    ? 'bg-mn-bronze/10 text-primary-800 ring-2 ring-primary-300 scale-105'
                     : 'bg-mn-surface text-mn-ink-soft hover:bg-mn-elevated',
                 )}
               >
@@ -816,13 +816,13 @@ export default function PostDetailPage() {
           {/* Avatar */}
           <div className={cn(
             'w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0',
-            isAnonymous ? 'bg-mn-raised' : 'bg-mn-amber/10',
+            isAnonymous ? 'bg-mn-raised' : 'bg-mn-bronze/10',
           )}>
             {isAnonymous
               ? <span className="text-mn-mute text-2xl font-bold">?</span>
               : post.profiles?.avatar_url
                 ? <Image src={post.profiles.avatar_url} alt="" width={64} height={64} className="w-full h-full object-cover" />
-                : <User className="w-8 h-8 text-mn-amber" />
+                : <User className="w-8 h-8 text-mn-bronze" />
             }
           </div>
           <div className="flex-1 min-w-0">
@@ -853,7 +853,7 @@ export default function PostDetailPage() {
             {!isAnonymous && (
               <Link
                 href={`/dashboard/profile/${post.user_id}`}
-                className="text-sm text-mn-amber hover:text-mn-amber font-medium mt-1 inline-block"
+                className="text-sm text-mn-bronze hover:text-mn-bronze font-medium mt-1 inline-block"
               >
                 Profil anzeigen
               </Link>
@@ -865,7 +865,7 @@ export default function PostDetailPage() {
           )}
           {/* Owner badge */}
           {isOwner && (
-            <span className="text-xs bg-mn-amber/10 text-mn-amber px-3 py-1 rounded-full font-medium flex-shrink-0">
+            <span className="text-xs bg-mn-bronze/10 text-mn-bronze px-3 py-1 rounded-full font-medium flex-shrink-0">
               Dein Beitrag
             </span>
           )}
@@ -883,10 +883,10 @@ export default function PostDetailPage() {
                 if (!currentUserId) { toast.error('Bitte zuerst anmelden'); return }
                 setShowContactModal(true)
               }}
-              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-amber/20 hover:bg-mn-amber/5/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-bronze/20 hover:bg-mn-bronze/5/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-                <MessageCircle className="w-5 h-5 text-mn-amber" />
+              <div className="w-10 h-10 rounded-lg bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+                <MessageCircle className="w-5 h-5 text-mn-bronze" />
               </div>
               <div>
                 <p className="font-semibold text-mn-ink">Interesse zeigen</p>
@@ -902,8 +902,8 @@ export default function PostDetailPage() {
             >
               <div className="w-10 h-10 rounded-lg bg-mn-elevated flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-mn-amber animate-spin" />
-                  : <MessageSquare className="w-5 h-5 text-mn-amber" />
+                  ? <Loader2 className="w-5 h-5 text-mn-bronze animate-spin" />
+                  : <MessageSquare className="w-5 h-5 text-mn-bronze" />
                 }
               </div>
               <div>
@@ -933,12 +933,12 @@ export default function PostDetailPage() {
             <button
               onClick={() => handleCall('video')}
               disabled={dmLoading}
-              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-amber/20 hover:bg-mn-amber/5/30 transition-colors text-left"
+              className="w-full flex items-start gap-4 p-4 border border-white/5 rounded-xl hover:border-mn-bronze/20 hover:bg-mn-bronze/5/30 transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
                 {dmLoading
-                  ? <Loader2 className="w-5 h-5 text-mn-amber animate-spin" />
-                  : <Video className="w-5 h-5 text-mn-amber" />}
+                  ? <Loader2 className="w-5 h-5 text-mn-bronze animate-spin" />
+                  : <Video className="w-5 h-5 text-mn-bronze" />}
               </div>
               <div>
                 <p className="font-semibold text-mn-ink">Videoanruf starten</p>
@@ -992,7 +992,7 @@ export default function PostDetailPage() {
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-mn-ink">Interessenten ({interactions.length})</h3>
               {pendingCount > 0 && (
-                <span className="text-xs bg-mn-elevated text-mn-amber-warm px-2.5 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-mn-elevated text-mn-bronze-warm px-2.5 py-0.5 rounded-full font-medium">
                   {pendingCount} offen
                 </span>
               )}
@@ -1036,7 +1036,7 @@ export default function PostDetailPage() {
           </div>
           <Link
             href="/dashboard/posts"
-            className="flex items-center gap-1 text-sm text-mn-amber hover:text-mn-amber font-medium mt-4"
+            className="flex items-center gap-1 text-sm text-mn-bronze hover:text-mn-bronze font-medium mt-4"
           >
             Alle Beiträge anzeigen <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -1190,7 +1190,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
     <div className="bg-mn-elevated rounded-2xl shadow-sm p-6 space-y-5">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-mn-ink flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-mn-amber" />
+          <MessageCircle className="w-5 h-5 text-mn-bronze" />
           Kommentare ({comments.length})
         </h3>
       </div>
@@ -1210,7 +1210,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
             <button
               onClick={() => handleSubmit(null)}
               disabled={sending || !newComment.trim()}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50"
             >
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               Kommentieren
@@ -1224,7 +1224,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
       {/* Comment list */}
       {loading ? (
         <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-3 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+          <div className="w-6 h-6 border-3 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
         </div>
       ) : comments.length === 0 ? (
         <div className="text-center py-6 bg-mn-surface rounded-xl border border-white/8">
@@ -1285,7 +1285,7 @@ function CommentsSection({ postId, currentUserId, postOwnerId }: {
           {topLevel.length > 5 && !showAll && (
             <button
               onClick={() => setShowAll(true)}
-              className="w-full text-center text-sm text-mn-amber hover:text-mn-amber font-medium py-2"
+              className="w-full text-center text-sm text-mn-bronze hover:text-mn-bronze font-medium py-2"
             >
               Alle {topLevel.length} Kommentare anzeigen
             </button>
@@ -1336,12 +1336,12 @@ function CommentItem({
       {/* Avatar */}
       <Link href={`/dashboard/profile/${comment.user_id}`} className="flex-shrink-0">
         <div className={cn(
-          'rounded-full bg-mn-amber/10 flex items-center justify-center overflow-hidden',
+          'rounded-full bg-mn-bronze/10 flex items-center justify-center overflow-hidden',
           isReply ? 'w-8 h-8' : 'w-10 h-10',
         )}>
           {comment.profiles?.avatar_url
             ? <Image src={comment.profiles.avatar_url} alt="" width={40} height={40} className="w-full h-full object-cover" />
-            : <User className={cn('text-mn-amber', isReply ? 'w-4 h-4' : 'w-5 h-5')} />
+            : <User className={cn('text-mn-bronze', isReply ? 'w-4 h-4' : 'w-5 h-5')} />
           }
         </div>
       </Link>
@@ -1351,12 +1351,12 @@ function CommentItem({
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <Link
             href={`/dashboard/profile/${comment.user_id}`}
-            className="text-sm font-semibold text-mn-ink hover:text-mn-amber transition-colors"
+            className="text-sm font-semibold text-mn-ink hover:text-mn-bronze transition-colors"
           >
             {comment.profiles?.name ?? 'Nutzer'}
           </Link>
           {comment.user_id === postOwnerId && (
-            <span className="text-xs bg-mn-amber/10 text-mn-amber px-1.5 py-0.5 rounded-full font-medium">
+            <span className="text-xs bg-mn-bronze/10 text-mn-bronze px-1.5 py-0.5 rounded-full font-medium">
               Autor
             </span>
           )}
@@ -1377,7 +1377,7 @@ function CommentItem({
             <div className="flex gap-2">
               <button
                 onClick={onEditSubmit}
-                className="text-xs px-3 py-1 bg-mn-amber text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="text-xs px-3 py-1 bg-mn-bronze text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Speichern
               </button>
@@ -1401,7 +1401,7 @@ function CommentItem({
             {!isReply && onReply && currentUserId && (
               <button
                 onClick={onReply}
-                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
+                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-bronze transition-colors"
               >
                 <Reply className="w-3.5 h-3.5" /> Antworten
               </button>
@@ -1409,7 +1409,7 @@ function CommentItem({
             {isOwn && (
               <button
                 onClick={onEdit}
-                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
+                className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-bronze transition-colors"
               >
                 <Edit3 className="w-3.5 h-3.5" /> Bearbeiten
               </button>
@@ -1442,7 +1442,7 @@ function CommentItem({
               <button
                 onClick={onReplySubmit}
                 disabled={sending || !(replyText?.trim())}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-mn-bronze text-white hover:bg-primary-700 disabled:opacity-50 transition-all"
               >
                 {sending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 Senden
@@ -1681,7 +1681,7 @@ function ContactModal({ postId, postTitle, currentUserId, onClose, onSent }: {
           <button
             onClick={handleSend}
             disabled={sending}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50"
           >
             {sending
               ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -1745,7 +1745,7 @@ function ShareMenu({ url, title, description, postId, userId, shareCount, onClos
             </p>
             <button
               onClick={() => setShowQr(false)}
-              className="text-xs text-mn-amber hover:underline font-medium"
+              className="text-xs text-mn-bronze hover:underline font-medium"
             >
               QR-Code ausblenden
             </button>
@@ -1880,7 +1880,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
                 className={cn(
                   'flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors',
                   reason === r
-                    ? 'border-mn-amber/30 bg-mn-amber/5'
+                    ? 'border-mn-bronze/30 bg-mn-bronze/5'
                     : 'border-white/5 hover:bg-mn-surface',
                 )}
               >
@@ -1890,7 +1890,7 @@ function ReportModal({ postId, currentUserId, onClose }: {
                   value={r}
                   checked={reason === r}
                   onChange={() => setReason(r)}
-                  className="accent-mn-amber"
+                  className="accent-mn-bronze"
                 />
                 <span className="text-sm text-mn-ink-soft">{r}</span>
               </label>
@@ -1981,10 +1981,10 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
     <div className="flex items-start gap-3 p-4 bg-mn-elevated border border-white/8 rounded-xl">
       {/* Avatar */}
       <Link href={`/dashboard/profile/${interaction.helper_id}`} className="flex-shrink-0">
-        <div className="w-12 h-12 rounded-full bg-mn-amber/10 flex items-center justify-center overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-mn-bronze/10 flex items-center justify-center overflow-hidden">
           {interaction.profiles?.avatar_url
             ? <Image src={interaction.profiles.avatar_url} alt="" width={48} height={48} className="w-full h-full object-cover" />
-            : <User className="w-6 h-6 text-mn-amber" />
+            : <User className="w-6 h-6 text-mn-bronze" />
           }
         </div>
       </Link>
@@ -1994,7 +1994,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
         <div className="flex items-center gap-2 flex-wrap mb-1">
           <Link
             href={`/dashboard/profile/${interaction.helper_id}`}
-            className="font-semibold text-sm text-mn-ink hover:text-mn-amber transition-colors"
+            className="font-semibold text-sm text-mn-ink hover:text-mn-bronze transition-colors"
           >
             {interaction.profiles?.name ?? 'Nutzer'}
           </Link>
@@ -2059,7 +2059,7 @@ function InteractionRow({ interaction, onAccept, onDecline }: {
             </span>
             <button
               onClick={() => router.push('/dashboard/chat')}
-              className="text-xs text-mn-amber hover:text-mn-amber font-medium block"
+              className="text-xs text-mn-bronze hover:text-mn-bronze font-medium block"
             >
               Chat öffnen
             </button>

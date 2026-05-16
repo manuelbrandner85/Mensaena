@@ -17,7 +17,7 @@ const LiveRoomModal = dynamic(() => import('./LiveRoomModal'), {
   loading: () => (
     <div className="fixed inset-0 z-[9999] bg-gray-900 flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-mn-amber border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-mn-bronze border-t-transparent rounded-full animate-spin" />
         <p className="text-white/60 text-sm">Wird geladen…</p>
       </div>
     </div>

@@ -201,7 +201,7 @@ const PLATFORMS = [
   {
     key: 'mastodon' as const,
     label: 'Mastodon',
-    color: 'bg-mn-surface text-mn-amber border-white/5',
+    color: 'bg-mn-surface text-mn-bronze border-white/5',
     icon: '🐘',
     fields: ['access_token', 'page_id'] as const,
     helpUrl: 'https://docs.joinmastodon.org/client/token/',
@@ -255,7 +255,7 @@ export default function SocialMediaSection() {
         <button
           onClick={() => setView('posts')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            view === 'posts' ? 'bg-mn-amber/10 text-mn-amber' : 'text-mn-mute hover:bg-mn-elevated'
+            view === 'posts' ? 'bg-mn-bronze/10 text-mn-bronze' : 'text-mn-mute hover:bg-mn-elevated'
           }`}
         >
           <FileText className="w-3.5 h-3.5" /> Beiträge
@@ -263,7 +263,7 @@ export default function SocialMediaSection() {
         <button
           onClick={() => setView('channels')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-            view === 'channels' ? 'bg-mn-amber/10 text-mn-amber' : 'text-mn-mute hover:bg-mn-elevated'
+            view === 'channels' ? 'bg-mn-bronze/10 text-mn-bronze' : 'text-mn-mute hover:bg-mn-elevated'
           }`}
         >
           <Settings className="w-3.5 h-3.5" /> Kanäle verbinden
@@ -445,9 +445,9 @@ function PostsView() {
   return (
     <div className="space-y-5">
       {/* KI-Generator */}
-      <div className="bg-gradient-to-br from-mn-amber/8 to-white border border-white/8 rounded-2xl p-5">
+      <div className="bg-gradient-to-br from-mn-bronze/8 to-white border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="w-4 h-4 text-mn-amber" />
+          <Sparkles className="w-4 h-4 text-mn-bronze" />
           <h3 className="text-sm font-bold text-mn-ink">KI-Content-Generator</h3>
         </div>
         <p className="text-xs text-mn-ink-soft mb-4">
@@ -462,8 +462,8 @@ function PostsView() {
               onClick={() => togglePlatform(key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                 selectedPlatforms.includes(key)
-                  ? 'bg-mn-amber text-white border-mn-amber'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
+                  ? 'bg-mn-bronze text-white border-mn-bronze'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20'
               }`}
             >
               {label}
@@ -483,7 +483,7 @@ function PostsView() {
           <button
             onClick={handleGenerate}
             disabled={generating}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
           >
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Generieren
@@ -509,8 +509,8 @@ function PostsView() {
               onClick={() => setImageMode(imageMode === m.key ? 'none' : m.key)}
               className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                 imageMode === m.key
-                  ? 'bg-mn-amber text-white border-mn-amber'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
+                  ? 'bg-mn-bronze text-white border-mn-bronze'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20'
               }`}
             >
               {m.icon} {m.label}
@@ -550,7 +550,7 @@ function PostsView() {
                   }
                 }}
                 disabled={generatingImage}
-                className="px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
+                className="px-4 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
               >
                 {generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : '🎨 Generieren'}
               </button>
@@ -594,7 +594,7 @@ function PostsView() {
                   }
                 }}
                 disabled={searchingPhotos}
-                className="px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
+                className="px-4 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-xs font-medium disabled:opacity-50 whitespace-nowrap"
               >
                 {searchingPhotos ? <Loader2 className="w-4 h-4 animate-spin" /> : '🔍 Suchen'}
               </button>
@@ -606,12 +606,12 @@ function PostsView() {
                     key={photo.id}
                     onClick={() => setSelectedImageUrl(photo.url)}
                     className={`relative rounded-xl overflow-hidden border-2 transition-all ${
-                      selectedImageUrl === photo.url ? 'border-mn-amber ring-2 ring-primary-200' : 'border-transparent hover:border-white/8'
+                      selectedImageUrl === photo.url ? 'border-mn-bronze ring-2 ring-primary-200' : 'border-transparent hover:border-white/8'
                     }`}
                   >
                     <img src={photo.thumb} alt={`Stock-Foto von ${photo.author}`} className="w-full aspect-square object-cover" />
                     {selectedImageUrl === photo.url && (
-                      <div className="absolute inset-0 bg-mn-amber/20 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-mn-bronze/20 flex items-center justify-center">
                         <CheckCircle2 className="w-6 h-6 text-white drop-shadow-lg" />
                       </div>
                     )}
@@ -625,7 +625,7 @@ function PostsView() {
         {/* Upload */}
         {imageMode === 'upload' && (
           <div className="space-y-3">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/8 rounded-xl cursor-pointer hover:border-mn-amber/30 hover:bg-mn-amber/5/30 transition-all">
+            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/8 rounded-xl cursor-pointer hover:border-mn-bronze/30 hover:bg-mn-bronze/5/30 transition-all">
               <div className="flex flex-col items-center">
                 <span className="text-2xl mb-1">📁</span>
                 <span className="text-xs text-mn-mute font-medium">Klicke zum Hochladen</span>
@@ -702,7 +702,7 @@ function PostsView() {
                         <span key={p} className="text-xs text-mn-mute">{platformLabel[p] || p}</span>
                       ))}
                       {post.auto_generated && (
-                        <span className="text-xs text-mn-amber flex items-center gap-0.5">
+                        <span className="text-xs text-mn-bronze flex items-center gap-0.5">
                           <Sparkles className="w-3 h-3" /> KI
                         </span>
                       )}
@@ -716,7 +716,7 @@ function PostsView() {
                       </div>
                     )}
                     {post.hashtags?.length > 0 && (
-                      <p className="text-xs text-mn-amber mt-2">
+                      <p className="text-xs text-mn-bronze mt-2">
                         {post.hashtags.map(h => `#${h.replace(/^#/, '')}`).join(' ')}
                       </p>
                     )}
@@ -732,7 +732,7 @@ function PostsView() {
                     <button
                       onClick={() => handlePublish(post.id)}
                       disabled={publishing === post.id}
-                      className="p-2 text-mn-amber hover:text-mn-amber hover:bg-mn-amber/5 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-2 text-mn-bronze hover:text-mn-bronze hover:bg-mn-bronze/5 rounded-lg transition-colors disabled:opacity-50"
                       title="Jetzt posten"
                     >
                       {publishing === post.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -837,7 +837,7 @@ function PostsView() {
                       finally { setSuggestingHashtags(false) }
                     }}
                     disabled={suggestingHashtags}
-                    className="text-xs text-mn-amber hover:underline flex items-center gap-1"
+                    className="text-xs text-mn-bronze hover:underline flex items-center gap-1"
                   >
                     {suggestingHashtags ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                     KI-Vorschlag
@@ -858,7 +858,7 @@ function PostsView() {
                     type="checkbox"
                     checked={!!editScheduledAt}
                     onChange={e => setEditScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
-                    className="accent-mn-amber"
+                    className="accent-mn-bronze"
                   />
                   <span className="font-medium">Veröffentlichung planen</span>
                 </label>
@@ -875,7 +875,7 @@ function PostsView() {
             </div>
             <div className="p-5 border-t border-white/5 flex justify-end gap-2">
               <button onClick={() => setEditPost(null)} className="px-4 py-2 text-mn-ink-soft hover:bg-mn-elevated rounded-xl text-sm">Abbrechen</button>
-              <button onClick={handleSaveEdit} className="px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm">
+              <button onClick={handleSaveEdit} className="px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium shadow-sm">
                 {editScheduledAt ? 'Planen' : 'Speichern'}
               </button>
             </div>
@@ -998,7 +998,7 @@ function ChannelsView() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-6 h-6 text-mn-amber animate-spin" />
+        <Loader2 className="w-6 h-6 text-mn-bronze animate-spin" />
       </div>
     )
   }
@@ -1006,7 +1006,7 @@ function ChannelsView() {
   return (
     <div className="space-y-4">
       {/* Info */}
-      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4">
+      <div className="bg-mn-bronze/5 border border-white/8 rounded-2xl p-4">
         <p className="text-xs text-primary-800 leading-relaxed">
           Verbinde deine Social-Media-Kanäle mit API-Tokens. Klicke auf eine Plattform, um die Schritt-für-Schritt-Anleitung zu sehen und deinen Token einzugeben.
         </p>
@@ -1064,7 +1064,7 @@ function ChannelsView() {
                   <ol className="space-y-2">
                     {platform.helpSteps.map((step, i) => (
                       <li key={i} className="text-xs text-mn-ink-soft flex gap-2.5 leading-relaxed">
-                        <span className="w-5 h-5 rounded-full bg-mn-amber/10 text-mn-amber font-bold flex items-center justify-center flex-shrink-0 text-xs">{i + 1}</span>
+                        <span className="w-5 h-5 rounded-full bg-mn-bronze/10 text-mn-bronze font-bold flex items-center justify-center flex-shrink-0 text-xs">{i + 1}</span>
                         <span>{step}</span>
                       </li>
                     ))}
@@ -1080,7 +1080,7 @@ function ChannelsView() {
                     href={platform.helpUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-mn-amber hover:underline mt-3 font-medium"
+                    className="inline-flex items-center gap-1 text-xs text-mn-bronze hover:underline mt-3 font-medium"
                   >
                     <ExternalLink className="w-3 h-3" /> Offizielle Dokumentation
                   </a>
@@ -1114,7 +1114,7 @@ function ChannelsView() {
                   <button
                     onClick={() => handleSave(platform.key)}
                     disabled={saving === platform.key}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
                   >
                     {saving === platform.key ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                     Speichern

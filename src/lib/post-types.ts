@@ -23,7 +23,7 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
   // Legacy fallbacks
   help_request: { label: 'Hilfe gesucht',    emoji: '🆘', color: 'text-mn-herzrot',    bg: 'bg-red-50 border-red-200',       dot: 'bg-red-500'     },
   help_offered: { label: 'Hilfe angeboten',  emoji: '💚', color: 'text-mn-leben',  bg: 'bg-green-50 border-green-200',   dot: 'bg-green-500'   },
-  skill:        { label: 'Skill',            emoji: '🎯', color: 'text-mn-amber', bg: 'bg-purple-50 border-purple-200', dot: 'bg-purple-500'  },
+  skill:        { label: 'Skill',            emoji: '🎯', color: 'text-mn-bronze', bg: 'bg-purple-50 border-purple-200', dot: 'bg-purple-500'  },
   knowledge:    { label: 'Wissen',           emoji: '📚', color: 'text-primary-700',bg: 'bg-primary-50 border-white/10',dot:'bg-primary-500'  },
   mental:       { label: 'Mentale Hilfe',    emoji: '🧠', color: 'text-cyan-700',   bg: 'bg-cyan-50 border-cyan-200',     dot: 'bg-cyan-500'    },
 }

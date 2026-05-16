@@ -29,11 +29,11 @@ export default function EventCountdown({ startDate, status }: EventCountdownProp
   if (status !== 'upcoming' || diff <= 0 || days > 7) return null
 
   const boxClass = isNear
-    ? 'bg-mn-amber/5 text-mn-amber'
-    : 'bg-mn-surface text-mn-amber'
+    ? 'bg-mn-bronze/5 text-mn-bronze'
+    : 'bg-mn-surface text-mn-bronze'
 
-  const labelClass = isNear ? 'text-mn-amber' : 'text-mn-amber'
-  const numClass = isNear ? 'text-mn-amber' : 'text-mn-amber'
+  const labelClass = isNear ? 'text-mn-bronze' : 'text-mn-bronze'
+  const numClass = isNear ? 'text-mn-bronze' : 'text-mn-bronze'
 
   return (
     <div className="flex items-center gap-3">

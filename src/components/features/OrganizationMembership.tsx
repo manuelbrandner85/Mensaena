@@ -168,8 +168,8 @@ export default function OrganizationMembership({ organizationId, currentUserId }
     <div className="bg-mn-elevated rounded-2xl border border-white/5 p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-mn-amber/5">
-            <Users className="w-4 h-4 text-mn-amber" />
+          <div className="p-2 rounded-lg bg-mn-bronze/5">
+            <Users className="w-4 h-4 text-mn-bronze" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-mn-ink">Mitglieder</h3>
@@ -218,9 +218,9 @@ export default function OrganizationMembership({ organizationId, currentUserId }
 
       {/* Non-member: redeem code OR claim ownership if no members yet */}
       {!isMember && currentUserId && (
-        <div className="border border-white/8 rounded-xl p-3 bg-mn-amber/5/40 mb-3">
+        <div className="border border-white/8 rounded-xl p-3 bg-mn-bronze/5/40 mb-3">
           <div className="flex items-center gap-2 mb-2">
-            <KeyRound className="w-3.5 h-3.5 text-mn-amber" />
+            <KeyRound className="w-3.5 h-3.5 text-mn-bronze" />
             <h4 className="text-xs font-bold text-primary-900">
               {hasNoMembers ? 'Organisation beanspruchen' : 'Einladungscode einlösen'}
             </h4>
@@ -244,7 +244,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
               type="button"
               disabled={redeeming || redeemCode.trim().length < 6}
               onClick={redeem}
-              className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold bg-mn-amber text-white rounded-lg hover:bg-primary-700 disabled:opacity-60"
+              className="inline-flex items-center gap-1 h-9 px-3 text-xs font-semibold bg-mn-bronze text-white rounded-lg hover:bg-primary-700 disabled:opacity-60"
             >
               {redeeming && <Loader2 className="w-3 h-3 animate-spin" />}
               Einlösen
@@ -265,7 +265,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                 type="button"
                 disabled={creating}
                 onClick={() => createInvite('member')}
-                className="inline-flex items-center gap-1 h-7 px-2 text-[11px] font-semibold border border-mn-amber/20 text-mn-amber rounded-lg hover:bg-mn-amber/5 disabled:opacity-60"
+                className="inline-flex items-center gap-1 h-7 px-2 text-[11px] font-semibold border border-mn-bronze/20 text-mn-bronze rounded-lg hover:bg-mn-bronze/5 disabled:opacity-60"
               >
                 <Plus className="w-2.5 h-2.5" /> Mitglied
               </button>
@@ -301,7 +301,7 @@ export default function OrganizationMembership({ organizationId, currentUserId }
                     <button
                       type="button"
                       onClick={() => copyCode(inv.code)}
-                      className="p-1 text-mn-mute hover:text-mn-amber"
+                      className="p-1 text-mn-mute hover:text-mn-bronze"
                       aria-label="Code kopieren"
                     >
                       {copied === inv.code ? <Check className="w-3 h-3 text-mn-leben" /> : <Copy className="w-3 h-3" />}

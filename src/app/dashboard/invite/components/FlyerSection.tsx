@@ -284,7 +284,7 @@ function FlyerModal({
         <button
           onClick={onDownloadPdf}
           disabled={busy !== null}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-mn-amber hover:bg-mn-amber text-white text-sm font-semibold transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-mn-bronze hover:bg-mn-bronze text-white text-sm font-semibold transition-colors disabled:opacity-50"
         >
           <FileDown className="w-4 h-4" />
           {isPdfBusy ? 'Erstelle PDF…' : 'PDF herunterladen'}
@@ -450,7 +450,7 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
                 <button
                   onClick={() => handleDownloadPdf(flyer.key)}
                   disabled={busy !== null}
-                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-mn-amber/5 hover:bg-mn-amber/10 border border-mn-amber/20 text-mn-amber text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-mn-bronze/5 hover:bg-mn-bronze/10 border border-mn-bronze/20 text-mn-bronze text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FileDown className="w-3.5 h-3.5" />
                   {busy === `pdf-${flyer.key}` ? 'Lädt…' : 'PDF herunterladen'}
@@ -474,8 +474,8 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
         {/* QR-Only download */}
         <div className="mt-5 pt-5 border-t border-white/5">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-mn-amber/5 border border-mn-amber/20 flex items-center justify-center flex-shrink-0">
-              <QrCode className="w-4 h-4 text-mn-amber" />
+            <div className="w-9 h-9 rounded-xl bg-mn-bronze/5 border border-mn-bronze/20 flex items-center justify-center flex-shrink-0">
+              <QrCode className="w-4 h-4 text-mn-bronze" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-mn-ink">Nur QR-Code als PNG</p>
@@ -486,7 +486,7 @@ export default function FlyerSection({ inviteUrl, userName, city = '' }: FlyerSe
             <button
               onClick={handleDownloadQr}
               disabled={busy !== null || !qrDataUrl}
-              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-mn-amber/5 hover:bg-mn-amber/10 border border-mn-amber/20 text-mn-amber text-xs font-medium transition-colors disabled:opacity-50"
+              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-mn-bronze/5 hover:bg-mn-bronze/10 border border-mn-bronze/20 text-mn-bronze text-xs font-medium transition-colors disabled:opacity-50"
             >
               <Download className="w-3.5 h-3.5" />
               {busy === 'qr' ? 'Lädt…' : 'PNG'}

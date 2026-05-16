@@ -16,7 +16,7 @@ export default function Loading() {
       />
       <div className="relative flex flex-col items-center gap-4">
         <div
-          className="w-10 h-10 border-[3px] border-white/10 border-t-mn-amber rounded-full animate-spin"
+          className="w-10 h-10 border-[3px] border-white/10 border-t-mn-bronze rounded-full animate-spin"
           aria-hidden="true"
         />
         <p className="text-sm text-ink-400 animate-pulse">Laden…</p>

@@ -38,7 +38,7 @@ export default function KontaktPage() {
             </div>
             <a
               href="mailto:info@mensaena.de"
-              className="font-display text-2xl text-mn-ink hover:text-mn-amber transition-colors link-sweep"
+              className="font-display text-2xl text-mn-ink hover:text-mn-bronze transition-colors link-sweep"
             >
               info@mensaena.de
             </a>
@@ -70,7 +70,7 @@ export default function KontaktPage() {
             </p>
             <Link
               href="/auth?mode=login"
-              className="link-sweep inline-block mt-3 text-xs font-semibold tracking-[0.14em] uppercase text-mn-amber hover:text-primary-800"
+              className="link-sweep inline-block mt-3 text-xs font-semibold tracking-[0.14em] uppercase text-mn-bronze hover:text-primary-800"
             >
               Jetzt anmelden →
             </Link>

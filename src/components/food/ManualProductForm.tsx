@@ -160,7 +160,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-mn-amber/30 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-amber transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-stone-300 hover:border-mn-bronze/30 rounded-xl text-sm font-medium text-mn-ink-soft hover:text-mn-bronze transition-colors"
               >
                 <Camera className="w-4 h-4" />
                 Foto aufnehmen
@@ -173,7 +173,7 @@ export default function ManualProductForm({ initialBarcode = '', onSave, onClose
           <button
             onClick={handleSave}
             disabled={!name.trim()}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-amber hover:bg-primary-700 disabled:bg-stone-300 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-mn-bronze hover:bg-primary-700 disabled:bg-stone-300 text-white rounded-xl font-semibold text-sm transition-all active:scale-[0.98] shadow-soft"
           >
             <Save className="w-4 h-4" />
             Produkt übernehmen

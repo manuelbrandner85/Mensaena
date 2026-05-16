@@ -24,7 +24,7 @@ function StatCard({
   sub?: string
 }) {
   const colors = {
-    primary: 'bg-mn-amber/5 text-mn-amber border-white/8',
+    primary: 'bg-mn-bronze/5 text-mn-bronze border-white/8',
     green:   'bg-mn-surface text-mn-leben border-white/5',
     gray:    'bg-mn-surface text-mn-ink-soft border-white/5',
     blue:    'bg-mn-surface text-mn-teal-soft border-white/5',
@@ -103,7 +103,7 @@ export default function MarketingTab() {
             onClick={() => setView(t.key)}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
               view === t.key
-                ? 'bg-mn-amber text-white shadow-sm'
+                ? 'bg-mn-bronze text-white shadow-sm'
                 : 'text-mn-ink-soft hover:bg-mn-elevated bg-mn-elevated border border-white/5'
             }`}
           >
@@ -119,7 +119,7 @@ export default function MarketingTab() {
           {/* E-Mail Stats */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Mail className="w-4 h-4 text-mn-amber" />
+              <Mail className="w-4 h-4 text-mn-bronze" />
               <h3 className="text-sm font-bold text-mn-ink">E-Mail-Marketing</h3>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -133,7 +133,7 @@ export default function MarketingTab() {
           {/* Social Media Stats */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Share2 className="w-4 h-4 text-mn-amber" />
+              <Share2 className="w-4 h-4 text-mn-bronze" />
               <h3 className="text-sm font-bold text-mn-ink">Social Media</h3>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -148,20 +148,20 @@ export default function MarketingTab() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               onClick={() => setView('emails')}
-              className="flex items-center gap-3 p-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm hover:shadow-md hover:border-mn-amber/20 transition-all text-left group"
+              className="flex items-center gap-3 p-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm hover:shadow-md hover:border-mn-bronze/20 transition-all text-left group"
             >
-              <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0">
-                <Mail className="w-5 h-5 text-mn-amber" />
+              <div className="w-10 h-10 rounded-xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-mn-bronze" />
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-mn-ink">E-Mail-Kampagnen</p>
                 <p className="text-xs text-mn-mute">Newsletter, Willkommensmail, Abonnenten</p>
               </div>
-              <span className="ml-auto text-mn-ghost group-hover:text-mn-amber transition-colors">→</span>
+              <span className="ml-auto text-mn-ghost group-hover:text-mn-bronze transition-colors">→</span>
             </button>
             <button
               onClick={() => setView('social')}
-              className="flex items-center gap-3 p-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm hover:shadow-md hover:border-mn-amber/20 transition-all text-left group"
+              className="flex items-center gap-3 p-4 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm hover:shadow-md hover:border-mn-bronze/20 transition-all text-left group"
             >
               <div className="w-10 h-10 rounded-xl bg-mn-surface border border-white/5 flex items-center justify-center flex-shrink-0">
                 <Share2 className="w-5 h-5 text-mn-teal-soft" />
@@ -245,7 +245,7 @@ function CalendarView() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-mn-ink flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-mn-amber" /> Content-Kalender
+          <Calendar className="w-4 h-4 text-mn-bronze" /> Content-Kalender
         </h3>
         <input
           type="month"
@@ -275,14 +275,14 @@ function CalendarView() {
               const dayItems = getItemsForDay(day)
               const isToday = new Date().getDate() === day && new Date().getMonth() + 1 === mon && new Date().getFullYear() === year
               return (
-                <div key={day} className={`min-h-[60px] border-b border-r border-white/5 p-1 ${isToday ? 'bg-mn-amber/5' : ''}`}>
-                  <p className={`text-xs font-medium mb-0.5 ${isToday ? 'text-mn-amber font-bold' : 'text-mn-mute'}`}>{day}</p>
+                <div key={day} className={`min-h-[60px] border-b border-r border-white/5 p-1 ${isToday ? 'bg-mn-bronze/5' : ''}`}>
+                  <p className={`text-xs font-medium mb-0.5 ${isToday ? 'text-mn-bronze font-bold' : 'text-mn-mute'}`}>{day}</p>
                   {dayItems.map(item => (
                     <div
                       key={item.id}
                       className={`text-xs leading-tight px-1 py-0.5 rounded mb-0.5 flex items-center gap-0.5 group ${
                         item.channel === 'email'
-                          ? 'bg-mn-amber/10 text-mn-amber'
+                          ? 'bg-mn-bronze/10 text-mn-bronze'
                           : 'bg-mn-elevated text-mn-teal-soft'
                       }`}
                       title={`${item.title}\nKlicke ✕ zum Löschen`}
@@ -302,7 +302,7 @@ function CalendarView() {
             })}
           </div>
           <div className="p-3 flex items-center gap-4 text-xs text-mn-mute">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-mn-amber/10" /> E-Mail</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-mn-bronze/10" /> E-Mail</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-mn-elevated" /> Social Media</span>
           </div>
         </div>
@@ -357,7 +357,7 @@ function AnalyticsView() {
   return (
     <div className="space-y-5">
       <h3 className="text-sm font-bold text-mn-ink flex items-center gap-2">
-        <TrendingUp className="w-4 h-4 text-mn-amber" /> Marketing Analytics
+        <TrendingUp className="w-4 h-4 text-mn-bronze" /> Marketing Analytics
       </h3>
 
       {/* E-Mail Analytics */}
@@ -377,7 +377,7 @@ function AnalyticsView() {
             <p className="text-xs text-mn-mute">Öffnungen</p>
           </div>
           <div className="bg-mn-elevated rounded-xl border border-white/5 p-3">
-            <p className="text-2xl font-bold text-mn-amber">{openRate}%</p>
+            <p className="text-2xl font-bold text-mn-bronze">{openRate}%</p>
             <p className="text-xs text-mn-mute">Öffnungsrate</p>
           </div>
         </div>
@@ -420,7 +420,7 @@ function AnalyticsView() {
                     <p className="text-xs text-mn-mute">{c.sent_at ? new Date(c.sent_at).toLocaleDateString('de-DE') : ''} · {c.recipient_count} Empfänger</p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-3">
-                    <p className="text-sm font-bold text-mn-amber">{rate}%</p>
+                    <p className="text-sm font-bold text-mn-bronze">{rate}%</p>
                     <p className="text-xs text-mn-mute">geöffnet</p>
                   </div>
                 </div>

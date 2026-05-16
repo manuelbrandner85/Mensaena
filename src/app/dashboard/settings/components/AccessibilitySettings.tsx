@@ -28,14 +28,14 @@ export default function AccessibilitySettings() {
           variant="flat"
           className={cn(
             'transition-colors duration-150',
-            active ? 'ring-2 ring-mn-amber bg-mn-amber/5/40' : ''
+            active ? 'ring-2 ring-mn-bronze bg-mn-bronze/5/40' : ''
           )}
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <div className={cn(
                 'p-2 rounded-lg flex-shrink-0 mt-0.5',
-                active ? 'bg-mn-amber/10 text-mn-amber' : 'bg-mn-elevated text-mn-mute'
+                active ? 'bg-mn-bronze/10 text-mn-bronze' : 'bg-mn-elevated text-mn-mute'
               )}>
                 <Icon className="w-4 h-4" />
               </div>

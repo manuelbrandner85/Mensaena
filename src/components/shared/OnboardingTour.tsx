@@ -96,18 +96,18 @@ const TINT_BG: Record<Tint, string> = {
   teal: 'from-primary-500/25 via-primary-400/15 to-transparent',
   mint: 'from-primary-400/25 via-primary-300/15 to-transparent',
   sky: 'from-sky-400/25 via-blue-300/15 to-transparent',
-  sunrise: 'from-mn-amber/12/25 via-mn-amber-warm/4/15 to-transparent',
+  sunrise: 'from-mn-bronze/12/25 via-mn-bronze-warm/4/15 to-transparent',
   forest: 'from-primary-600/25 via-primary-400/15 to-transparent',
-  violet: 'from-mn-amber/8/25 via-purple-400/15 to-transparent',
+  violet: 'from-mn-bronze/8/25 via-purple-400/15 to-transparent',
 }
 
 const TINT_ICON: Record<Tint, string> = {
-  teal: 'bg-mn-amber/15 text-mn-amber ring-mn-amber/30',
-  mint: 'bg-mn-amber/15 text-mn-amber ring-mn-amber/30',
+  teal: 'bg-mn-bronze/15 text-mn-bronze ring-mn-bronze/30',
+  mint: 'bg-mn-bronze/15 text-mn-bronze ring-mn-bronze/30',
   sky: 'bg-sky-500/15 text-mn-teal-soft ring-sky-500/30',
   sunrise: 'bg-amber-500/15 text-amber-700 ring-amber-500/30',
-  forest: 'bg-mn-amber/15 text-primary-800 ring-primary-600/30',
-  violet: 'bg-violet-500/15 text-mn-amber ring-violet-500/30',
+  forest: 'bg-mn-bronze/15 text-primary-800 ring-primary-600/30',
+  violet: 'bg-violet-500/15 text-mn-bronze ring-violet-500/30',
 }
 
 /** Trigger the onboarding tour again from anywhere in the app. */
@@ -270,7 +270,7 @@ export default function OnboardingTour() {
           </div>
 
           {/* Eyebrow */}
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-mn-amber/80 mb-2">
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-mn-bronze/80 mb-2">
             {step.eyebrow} · {index + 1}/{STEPS.length}
           </p>
 
@@ -297,7 +297,7 @@ export default function OnboardingTour() {
                 aria-label={`Zu Schritt ${i + 1} springen`}
                 className={`h-1.5 rounded-full transition-all ${
                   i === index
-                    ? 'w-8 bg-mn-amber'
+                    ? 'w-8 bg-mn-bronze'
                     : i < index
                       ? 'w-1.5 bg-primary-400'
                       : 'w-1.5 bg-stone-300 hover:bg-stone-400'
@@ -329,7 +329,7 @@ export default function OnboardingTour() {
               <button
                 type="button"
                 onClick={next}
-                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all shadow-sm min-h-[44px]"
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all shadow-sm min-h-[44px]"
               >
                 {isLast ? 'Los geht\u2019s' : 'Weiter'}
                 {!isLast && <ArrowRight className="w-4 h-4" />}

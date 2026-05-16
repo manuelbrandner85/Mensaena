@@ -24,7 +24,7 @@ const FarmsMapView = dynamic(() => import('@/components/supply/FarmsMapView'), {
   loading: () => (
     <div className="flex items-center justify-center h-[500px] bg-mn-surface rounded-2xl border border-white/5">
       <div className="text-center">
-        <div className="w-10 h-10 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-10 h-10 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin mx-auto mb-3" />
         <p className="text-mn-leben text-sm font-medium">Karte wird geladen…</p>
       </div>
     </div>
@@ -80,7 +80,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
   const categoryIcon  = CATEGORY_ICONS[farm.category] ?? '🏡'
 
   return (
-    <div className="group bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card hover:shadow-cinema-card hover:border-mn-amber/20 transition-all duration-200 overflow-hidden flex flex-col relative">
+    <div className="group bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card hover:shadow-cinema-card hover:border-mn-bronze/20 transition-all duration-200 overflow-hidden flex flex-col relative">
       {/* Fav Button */}
       {onToggleFav && (
         <button
@@ -146,7 +146,7 @@ function FarmCard({ farm, isFav, onToggleFav }: { farm: FarmListing; isFav?: boo
             </div>
           )}
           {farm.delivery_options && farm.delivery_options.length > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-mn-amber">
+            <div className="flex items-center gap-1.5 text-xs text-mn-bronze">
               <Truck className="w-3.5 h-3.5" />
               <span>{farm.delivery_options.slice(0, 2).join(' · ')}</span>
             </div>
@@ -402,7 +402,7 @@ function FilterPanel({
                 {filters.delivery && <span className="text-white text-xs">✓</span>}
               </div>
               <span className="text-sm text-mn-ink-soft flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-mn-amber" /> Mit Lieferung
+                <Truck className="w-4 h-4 text-mn-bronze" /> Mit Lieferung
               </span>
             </label>
           </div>

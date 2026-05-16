@@ -105,18 +105,18 @@ export const EVENT_CATEGORIES: Record<EventCategory, { label: string; emoji: str
 
 export function getCategoryBadgeClasses(cat: EventCategory): string {
   const map: Record<string, string> = {
-    purple:  'bg-purple-100 text-purple-700',
-    blue:    'bg-blue-100 text-blue-700',
-    primary: 'bg-primary-100 text-primary-700',
-    orange:  'bg-orange-100 text-orange-700',
-    amber:   'bg-amber-100 text-amber-700',
-    pink:    'bg-pink-100 text-pink-700',
-    cyan:    'bg-cyan-100 text-cyan-700',
-    rose:    'bg-rose-100 text-rose-700',
-    green:   'bg-green-100 text-green-700',
-    gray:    'bg-stone-100 text-ink-700',
+    purple:  'bg-purple-900/30 text-purple-300 border border-purple-500/20',
+    blue:    'bg-blue-900/30 text-blue-300 border border-blue-500/20',
+    primary: 'bg-mn-bronze/10 text-mn-bronze border border-mn-bronze/20',
+    orange:  'bg-orange-900/30 text-orange-300 border border-orange-500/20',
+    amber:   'bg-amber-900/30 text-amber-300 border border-amber-500/20',
+    pink:    'bg-pink-900/30 text-pink-300 border border-pink-500/20',
+    cyan:    'bg-cyan-900/30 text-cyan-300 border border-cyan-500/20',
+    rose:    'bg-rose-900/30 text-rose-300 border border-rose-500/20',
+    green:   'bg-green-900/30 text-green-300 border border-green-500/20',
+    gray:    'bg-mn-surface text-mn-ink-soft border border-white/8',
   }
-  return map[EVENT_CATEGORIES[cat]?.color ?? 'gray'] || 'bg-stone-100 text-ink-700'
+  return map[EVENT_CATEGORIES[cat]?.color ?? 'gray'] || 'bg-mn-surface text-mn-ink-soft border border-white/8'
 }
 
 export function getCategoryDotColor(cat: EventCategory): string {

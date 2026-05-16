@@ -88,14 +88,14 @@ export default function JobsNearbyWidget() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-            <Briefcase className="w-4 h-4 text-mn-amber" />
+          <div className="w-7 h-7 rounded-lg bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+            <Briefcase className="w-4 h-4 text-mn-bronze" />
           </div>
           <h2 className="text-sm font-semibold text-mn-ink">Jobs in deiner Nähe</h2>
         </div>
         <Link
           href="/dashboard/jobs"
-          className="flex items-center gap-0.5 text-xs font-medium text-mn-amber hover:text-mn-amber transition-colors"
+          className="flex items-center gap-0.5 text-xs font-medium text-mn-bronze hover:text-mn-bronze transition-colors"
         >
           Alle <ChevronRight className="w-3.5 h-3.5" />
         </Link>
@@ -111,8 +111,8 @@ export default function JobsNearbyWidget() {
               className={cn(
                 'flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all',
                 filter === c.key
-                  ? 'bg-mn-amber text-white border-primary-600'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
+                  ? 'bg-mn-bronze text-white border-primary-600'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20',
               )}
             >
               {c.label}
@@ -144,11 +144,11 @@ export default function JobsNearbyWidget() {
               rel="noopener noreferrer"
               className="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-mn-surface transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Briefcase className="w-4 h-4 text-mn-amber" />
+              <div className="w-8 h-8 rounded-lg bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Briefcase className="w-4 h-4 text-mn-bronze" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-mn-amber transition-colors">
+                <p className="text-xs font-semibold text-mn-ink truncate group-hover:text-mn-bronze transition-colors">
                   {job.title}
                 </p>
                 <p className="text-[11px] text-mn-ink-soft truncate">{job.employer}</p>
@@ -159,7 +159,7 @@ export default function JobsNearbyWidget() {
                     </span>
                   )}
                   {worktimeLabel(job.worktime) && (
-                    <span className="text-xs text-mn-amber font-medium">
+                    <span className="text-xs text-mn-bronze font-medium">
                       {worktimeLabel(job.worktime)}
                     </span>
                   )}
@@ -176,7 +176,7 @@ export default function JobsNearbyWidget() {
         <div className="px-4 pb-3">
           <Link
             href="/dashboard/jobs"
-            className="block text-center text-xs font-medium text-mn-amber hover:text-mn-amber py-2 rounded-xl hover:bg-mn-amber/5 transition-colors border border-white/8"
+            className="block text-center text-xs font-medium text-mn-bronze hover:text-mn-bronze py-2 rounded-xl hover:bg-mn-bronze/5 transition-colors border border-white/8"
           >
             Alle {total.toLocaleString('de-DE')} Stellen anzeigen →
           </Link>

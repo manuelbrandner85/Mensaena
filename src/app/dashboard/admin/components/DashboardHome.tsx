@@ -24,8 +24,8 @@ interface RecentActivity {
 
 const ACTION_LABELS: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
   delete_user:    { label: 'Benutzer gelöscht',     icon: Users,       color: 'text-mn-herzrot bg-mn-surface' },
-  change_role:    { label: 'Rolle geändert',        icon: ShieldCheck, color: 'text-mn-amber bg-mn-surface' },
-  ban_user:       { label: 'Benutzer gesperrt',     icon: AlertCircle, color: 'text-mn-amber-warm bg-mn-surface' },
+  change_role:    { label: 'Rolle geändert',        icon: ShieldCheck, color: 'text-mn-bronze bg-mn-surface' },
+  ban_user:       { label: 'Benutzer gesperrt',     icon: AlertCircle, color: 'text-mn-bronze-warm bg-mn-surface' },
   unban_user:     { label: 'Sperre aufgehoben',     icon: CheckCircle2,color: 'text-mn-leben bg-mn-surface' },
   delete_post:    { label: 'Beitrag gelöscht',      icon: FileText,    color: 'text-mn-herzrot bg-mn-surface' },
   delete_group:   { label: 'Gruppe gelöscht',       icon: UsersRound,  color: 'text-mn-herzrot bg-mn-surface' },
@@ -111,30 +111,30 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       sub: `von ${stats?.total_groups ?? 0} gesamt`,
       icon: UsersRound,
       gradient: 'from-primary-500 to-mn-teal-soft/8',
-      bg: 'from-mn-amber/8 to-mn-teal-soft/8',
+      bg: 'from-mn-bronze/8 to-mn-teal-soft/8',
     },
     {
       label: 'Aktive Challenges',
       value: stats?.active_challenges ?? 0,
       sub: `von ${stats?.total_challenges ?? 0} gesamt`,
       icon: Target,
-      gradient: 'from-mn-amber/8 to-mn-amber-warm',
-      bg: 'from-mn-amber/8 to-mn-amber-warm',
+      gradient: 'from-mn-bronze/8 to-mn-bronze-warm',
+      bg: 'from-mn-bronze/8 to-mn-bronze-warm',
     },
     {
       label: 'Zeitbank-Stunden',
       value: `${Number(stats?.total_timebank_hours ?? 0).toFixed(0)}h`,
       sub: `${stats?.total_timebank_entries ?? 0} Einträge`,
       icon: Clock,
-      gradient: 'from-mn-amber/12 to-orange-500',
-      bg: 'from-mn-amber/12 to-orange-50',
+      gradient: 'from-mn-bronze/12 to-orange-500',
+      bg: 'from-mn-bronze/12 to-orange-50',
     },
   ]
 
   const quickActions: { label: string; icon: React.ComponentType<{ className?: string }>; color: string; tab: AdminTab }[] = [
     { label: 'Benutzer verwalten',    icon: UserPlus,    color: 'bg-blue-500 hover:bg-mn-teal/8',       tab: 'users' },
     { label: 'Challenge erstellen',   icon: Target,      color: 'bg-violet-500 hover:bg-violet-600',   tab: 'challenges' },
-    { label: 'Gruppe verwalten',      icon: UsersRound,  color: 'bg-mn-amber hover:bg-mn-amber', tab: 'groups' },
+    { label: 'Gruppe verwalten',      icon: UsersRound,  color: 'bg-mn-bronze hover:bg-mn-bronze', tab: 'groups' },
     { label: 'Zeitbank prüfen',       icon: Clock,       color: 'bg-amber-500 hover:bg-amber-600',     tab: 'zeitbank' },
   ]
 
@@ -184,12 +184,12 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
         <div className="lg:col-span-2 bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-mn-amber" />
+              <Activity className="w-4 h-4 text-mn-bronze" />
               <h3 className="text-sm font-semibold text-mn-ink">Letzte Aktivitäten</h3>
             </div>
             <button
               onClick={() => onNavigate('system')}
-              className="text-xs text-mn-amber hover:text-mn-amber font-medium flex items-center gap-1"
+              className="text-xs text-mn-bronze hover:text-mn-bronze font-medium flex items-center gap-1"
             >
               Alle anzeigen <ArrowRight className="w-3 h-3" />
             </button>
@@ -197,7 +197,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
           <div className="divide-y divide-stone-100">
             {loadingActivities ? (
               <div className="p-8 text-center">
-                <div className="w-6 h-6 border-2 border-mn-amber/30 border-t-transparent rounded-full animate-spin mx-auto" />
+                <div className="w-6 h-6 border-2 border-mn-bronze/30 border-t-transparent rounded-full animate-spin mx-auto" />
               </div>
             ) : activities.length === 0 ? (
               <div className="p-8 text-center text-sm text-mn-mute">
@@ -236,7 +236,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
         {/* Quick Actions */}
         <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-white/5 flex items-center gap-2">
-            <PlusCircle className="w-4 h-4 text-mn-amber" />
+            <PlusCircle className="w-4 h-4 text-mn-bronze" />
             <h3 className="text-sm font-semibold text-mn-ink">Schnellaktionen</h3>
           </div>
           <div className="p-3 space-y-2">
@@ -260,7 +260,7 @@ export default function DashboardHome({ stats, onNavigate }: Props) {
       {/* Secondary Stats Grid */}
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-sm p-5">
         <h3 className="text-sm font-semibold text-mn-ink mb-4 flex items-center gap-2">
-          <FileText className="w-4 h-4 text-mn-amber" />
+          <FileText className="w-4 h-4 text-mn-bronze" />
           Plattform-Übersicht
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">

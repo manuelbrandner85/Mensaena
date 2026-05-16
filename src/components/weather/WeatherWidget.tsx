@@ -102,7 +102,7 @@ export function WeatherWidget({
         className={`flex items-center gap-3 rounded-xl border border-white/5 bg-mn-elevated px-4 py-2 shadow-sm dark:border-ink-700 dark:bg-ink-800 ${className}`}
         aria-label={`Aktuelles Wetter: ${current.description}, ${Math.round(current.temperature)} Grad`}
       >
-        <Icon aria-hidden className="h-6 w-6 text-mn-amber" />
+        <Icon aria-hidden className="h-6 w-6 text-mn-bronze" />
         <div className="flex flex-col leading-tight">
           <span className="text-base font-semibold text-mn-ink dark:text-stone-100">
             {Math.round(current.temperature)}°C
@@ -125,7 +125,7 @@ export function WeatherWidget({
       {/* Aktuell */}
       <div className="mb-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Icon aria-hidden className="h-12 w-12 text-mn-amber" />
+          <Icon aria-hidden className="h-12 w-12 text-mn-bronze" />
           <div>
             <div className="text-3xl font-bold text-mn-ink dark:text-stone-100">
               {Math.round(current.temperature)}°C
@@ -159,12 +159,12 @@ export function WeatherWidget({
             Sonnenaufgang {formatTime(today.sunrise)}
           </span>
           <span className="flex items-center gap-1">
-            <Sunset aria-hidden className="h-3 w-3 text-mn-amber-warm" />
+            <Sunset aria-hidden className="h-3 w-3 text-mn-bronze-warm" />
             Sonnenuntergang {formatTime(today.sunset)}
           </span>
           <span className="hidden sm:flex items-center gap-1">
             {current.isDay ? (
-              <Sun aria-hidden className="h-3 w-3 text-mn-amber" />
+              <Sun aria-hidden className="h-3 w-3 text-mn-bronze" />
             ) : (
               <Moon aria-hidden className="h-3 w-3 text-mn-teal-soft" />
             )}

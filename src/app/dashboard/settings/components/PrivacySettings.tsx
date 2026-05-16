@@ -49,7 +49,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
   const visibilityColor = local.profile_visibility === 'public'
     ? 'text-mn-teal-soft bg-mn-surface border-white/5'
     : local.profile_visibility === 'neighbors'
-      ? 'text-mn-amber bg-mn-amber/5 border-mn-amber/20'
+      ? 'text-mn-bronze bg-mn-bronze/5 border-mn-bronze/20'
       : 'text-mn-ink-soft bg-mn-elevated border-white/8'
   const messagesLabel = local.allow_messages_from === 'everyone'
     ? t('messagesEveryone')
@@ -59,9 +59,9 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
   return (
     <div className="space-y-5">
       {/* Datenschutz-Zentrum – Übersicht */}
-      <div className="bg-gradient-to-br from-mn-amber/8 to-stone-50 border border-white/8 rounded-2xl p-5">
+      <div className="bg-gradient-to-br from-mn-bronze/8 to-stone-50 border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <ShieldCheck className="w-5 h-5 text-mn-amber" />
+          <ShieldCheck className="w-5 h-5 text-mn-bronze" />
           <h3 className="font-bold text-mn-ink">{t('centerTitle')}</h3>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -103,7 +103,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Profile Visibility */}
       <SettingsSection
-        icon={<Eye className="w-4 h-4 text-mn-amber" />}
+        icon={<Eye className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionVisibilityTitle')}
         description={t('sectionVisibilityDesc')}
       >
@@ -146,7 +146,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Communication */}
       <SettingsSection
-        icon={<MessageCircle className="w-4 h-4 text-mn-amber" />}
+        icon={<MessageCircle className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionCommTitle')}
         description={t('sectionCommDesc')}
       >
@@ -177,7 +177,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* Blocked Users */}
       <SettingsSection
-        icon={<UserX className="w-4 h-4 text-mn-amber" />}
+        icon={<UserX className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionBlockedTitle')}
         description={t('sectionBlockedDesc', { count: blockedUsers.length })}
       >
@@ -186,7 +186,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
 
       {/* GDPR Info */}
       <SettingsSection
-        icon={<Shield className="w-4 h-4 text-mn-amber" />}
+        icon={<Shield className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionGdprTitle')}
         description={t('sectionGdprDesc')}
       >
@@ -208,7 +208,7 @@ export default function PrivacySettings({ settings, blockedUsers, onSave, onUnbl
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {t('saveButton')}

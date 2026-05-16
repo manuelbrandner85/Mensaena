@@ -96,7 +96,7 @@ export default function InteractionCard({
             {/* Requested & I'm receiver → accept/decline */}
             {isNewRequest && (
               <>
-                <button onClick={() => onAccept?.(i.id)} aria-label="Annehmen" className="p-1.5 rounded-lg bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 transition-colors">
+                <button onClick={() => onAccept?.(i.id)} aria-label="Annehmen" className="p-1.5 rounded-lg bg-mn-bronze/5 text-mn-bronze hover:bg-mn-bronze/10 transition-colors">
                   <Check className="w-4 h-4" />
                 </button>
                 <button onClick={() => onDecline?.(i.id)} aria-label="Ablehnen" className="p-1.5 rounded-lg bg-mn-surface text-mn-herzrot hover:bg-mn-elevated transition-colors">
@@ -118,7 +118,7 @@ export default function InteractionCard({
             )}
             {/* Completed & can rate */}
             {canRate && (
-              <button onClick={() => onRate?.(i.id)} aria-label="Bewerten" className="p-1.5 rounded-lg bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 transition-colors">
+              <button onClick={() => onRate?.(i.id)} aria-label="Bewerten" className="p-1.5 rounded-lg bg-mn-bronze/5 text-mn-bronze hover:bg-mn-bronze/10 transition-colors">
                 <Star className="w-4 h-4" />
               </button>
             )}

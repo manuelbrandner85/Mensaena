@@ -22,7 +22,7 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   loading: () => (
     <div className="flex-1 bg-mn-surface rounded-2xl md:rounded-2xl flex items-center justify-center min-h-[400px]">
       <div className="text-center">
-        <div className="w-12 h-12 border-3 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin mx-auto mb-3" />
+        <div className="w-12 h-12 border-3 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin mx-auto mb-3" />
         <p className="text-sm text-mn-mute">Karte wird geladen…</p>
       </div>
     </div>
@@ -230,7 +230,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all touch-target',
               showFilters
-                ? 'bg-mn-amber/10 text-mn-amber border-mn-amber/20'
+                ? 'bg-mn-bronze/10 text-mn-bronze border-mn-bronze/20'
                 : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:bg-mn-surface'
             )}
           >
@@ -393,7 +393,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
         </button>
         {/* Locate FAB */}
         <button
-          className="w-12 h-12 rounded-full bg-mn-amber shadow-lg flex items-center justify-center text-white active:scale-90 transition-transform"
+          className="w-12 h-12 rounded-full bg-mn-bronze shadow-lg flex items-center justify-center text-white active:scale-90 transition-transform"
           aria-label="Mein Standort"
         >
           <Locate className="w-5 h-5" />
@@ -484,8 +484,8 @@ function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void
     <div className="md:card md:p-5 md:h-full overflow-y-auto">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-mn-amber" />
-          <span className="text-xs font-medium text-mn-amber">Details</span>
+          <MapPin className="w-4 h-4 text-mn-bronze" />
+          <span className="text-xs font-medium text-mn-bronze">Details</span>
         </div>
         <button onClick={onClose} className="hidden md:block text-mn-mute hover:text-mn-ink-soft text-lg leading-none">×</button>
       </div>
@@ -496,7 +496,7 @@ function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void
       <div className="space-y-2">
         {post.contact_phone && (
           <a href={`tel:${post.contact_phone}`}
-            className="flex items-center gap-2 w-full p-3 bg-mn-amber/5 text-mn-amber rounded-xl text-sm font-medium hover:bg-mn-amber/10 transition-colors touch-target">
+            className="flex items-center gap-2 w-full p-3 bg-mn-bronze/5 text-mn-bronze rounded-xl text-sm font-medium hover:bg-mn-bronze/10 transition-colors touch-target">
             📞 Anrufen: {post.contact_phone}
           </a>
         )}

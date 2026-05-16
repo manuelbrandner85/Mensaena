@@ -44,7 +44,7 @@ export default function OrganizationFilters({
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all border',
               filters.country === c
-                ? 'bg-mn-amber text-white border-primary-600 shadow-sm'
+                ? 'bg-mn-bronze text-white border-primary-600 shadow-sm'
                 : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface'
             )}
           >
@@ -59,14 +59,14 @@ export default function OrganizationFilters({
           onClick={() => { setShowCategories(s => !s); setShowSort(false) }}
           className={cn(
             'flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl border transition-all',
-            showCategories ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
+            showCategories ? 'bg-mn-bronze/5 border-mn-bronze/20 text-mn-bronze' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
           )}
           aria-expanded={showCategories}
         >
           <Filter className="w-4 h-4" />
           Kategorie
           {filters.category !== 'all' && (
-            <span className="bg-mn-amber text-white text-xs px-1.5 py-0.5 rounded-full">
+            <span className="bg-mn-bronze text-white text-xs px-1.5 py-0.5 rounded-full">
               {ORGANIZATION_CATEGORY_CONFIG.find(c => c.value === filters.category)?.label}
             </span>
           )}
@@ -77,7 +77,7 @@ export default function OrganizationFilters({
           onClick={() => { setShowSort(s => !s); setShowCategories(false) }}
           className={cn(
             'flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl border transition-all',
-            showSort ? 'bg-mn-amber/5 border-mn-amber/20 text-mn-amber' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
+            showSort ? 'bg-mn-bronze/5 border-mn-bronze/20 text-mn-bronze' : 'bg-mn-elevated border-white/5 text-mn-ink-soft hover:bg-mn-surface'
           )}
           aria-expanded={showSort}
         >
@@ -89,7 +89,7 @@ export default function OrganizationFilters({
         {hasActiveFilter && (
           <button
             onClick={onReset}
-            className="flex items-center gap-1 text-xs text-mn-amber hover:text-primary-800 px-2 py-1"
+            className="flex items-center gap-1 text-xs text-mn-bronze hover:text-primary-800 px-2 py-1"
           >
             <RefreshCw className="w-3 h-3" />
             Zurücksetzen
@@ -144,7 +144,7 @@ export default function OrganizationFilters({
               onClick={() => { onSetFilters({ sort_by: opt.value }); setShowSort(false) }}
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-                filters.sort_by === opt.value ? 'bg-mn-amber/10 text-mn-amber' : 'hover:bg-mn-surface text-mn-ink-soft'
+                filters.sort_by === opt.value ? 'bg-mn-bronze/10 text-mn-bronze' : 'hover:bg-mn-surface text-mn-ink-soft'
               )}
             >
               {opt.label}
@@ -160,7 +160,7 @@ export default function OrganizationFilters({
             onClick={() => onViewModeChange('list')}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all',
-              viewMode === 'list' ? 'bg-mn-amber text-white' : 'text-mn-ink-soft hover:bg-mn-surface'
+              viewMode === 'list' ? 'bg-mn-bronze text-white' : 'text-mn-ink-soft hover:bg-mn-surface'
             )}
             aria-label="Listenansicht"
           >
@@ -171,7 +171,7 @@ export default function OrganizationFilters({
             onClick={() => onViewModeChange('map')}
             className={cn(
               'flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-all',
-              viewMode === 'map' ? 'bg-mn-amber text-white' : 'text-mn-ink-soft hover:bg-mn-surface'
+              viewMode === 'map' ? 'bg-mn-bronze text-white' : 'text-mn-ink-soft hover:bg-mn-surface'
             )}
             aria-label="Kartenansicht"
           >
@@ -180,7 +180,7 @@ export default function OrganizationFilters({
             {mapCount > 0 && (
               <span className={cn(
                 'text-xs px-1.5 py-0.5 rounded-full font-semibold',
-                viewMode === 'map' ? 'bg-mn-elevated/20 text-white' : 'bg-mn-amber/10 text-mn-amber'
+                viewMode === 'map' ? 'bg-mn-elevated/20 text-white' : 'bg-mn-bronze/10 text-mn-bronze'
               )}>
                 {mapCount}
               </span>

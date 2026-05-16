@@ -323,7 +323,7 @@ export default function CrisisPage() {
         <div className="lg:col-span-2">
           <Link
             href="/dashboard/crisis/resources"
-            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft/8 border border-mn-amber/20 rounded-2xl shadow-cinema-card hover:shadow-cinema-card transition-all overflow-hidden"
+            className="spotlight hover-lift relative block p-4 bg-gradient-to-r from-mn-bronze/8 to-mn-teal-soft/8 border border-mn-bronze/20 rounded-2xl shadow-cinema-card hover:shadow-cinema-card transition-all overflow-hidden"
           >
             <div
               className="absolute top-0 left-0 right-0 h-[3px]"
@@ -331,7 +331,7 @@ export default function CrisisPage() {
             />
             <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
             <h3 className="relative text-sm font-bold text-primary-800 mb-1">Ressourcen & Hilfsangebote</h3>
-            <p className="relative text-xs text-mn-amber">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
+            <p className="relative text-xs text-mn-bronze">Professionelle Hilfsangebote, Anlaufstellen und Ressourcen in deiner Nähe</p>
           </Link>
         </div>
         <div>

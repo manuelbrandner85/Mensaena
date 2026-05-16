@@ -115,7 +115,7 @@ const HOTLINES: Record<string, {
         name: 'PSD Wien – Sozialpsychiatrischer Notdienst',
         number: '01 31330',
         desc: 'Psychiatrische Krisenintervention, 24/7 – psd-wien.at',
-        color: 'bg-mn-surface border-white/5 text-mn-amber',
+        color: 'bg-mn-surface border-white/5 text-mn-bronze',
         dot: 'bg-purple-400',
       },
       {

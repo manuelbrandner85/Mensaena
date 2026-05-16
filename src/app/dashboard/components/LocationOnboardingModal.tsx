@@ -177,7 +177,7 @@ export default function LocationOnboardingModal({
                 disabled={loading}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all',
-                  'bg-mn-amber text-white hover:bg-mn-amber active:scale-[0.98]',
+                  'bg-mn-bronze text-white hover:bg-mn-bronze active:scale-[0.98]',
                   loading && 'opacity-60 cursor-not-allowed'
                 )}
               >
@@ -263,7 +263,7 @@ export default function LocationOnboardingModal({
                 disabled={loading || !plz.trim()}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-medium text-sm transition-all',
-                  'bg-mn-amber text-white hover:bg-mn-amber active:scale-[0.98]',
+                  'bg-mn-bronze text-white hover:bg-mn-bronze active:scale-[0.98]',
                   (loading || !plz.trim()) && 'opacity-60 cursor-not-allowed'
                 )}
               >

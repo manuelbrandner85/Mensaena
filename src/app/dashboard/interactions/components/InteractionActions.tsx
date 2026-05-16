@@ -54,7 +54,7 @@ export default function InteractionActions({
       {i.conversation_id && (
         <button
           onClick={() => router.push(`/dashboard/chat?conv=${i.conversation_id}`)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-surface text-mn-amber border border-white/5 hover:bg-mn-elevated transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-surface text-mn-bronze border border-white/5 hover:bg-mn-elevated transition-all"
         >
           <MessageCircle className="w-4 h-4" /> Zum Chat
         </button>
@@ -65,7 +65,7 @@ export default function InteractionActions({
         <button
           disabled={!!actionLoading}
           onClick={() => wrap('accept', () => onAccept(i.id, true))}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50"
         >
           {actionLoading === 'accept' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
           Annehmen
@@ -162,7 +162,7 @@ export default function InteractionActions({
       {canRate && (
         <button
           onClick={() => router.push(`/dashboard/interactions/${i.id}?rate=1`)}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-amber/5 text-mn-amber border border-mn-amber/20 hover:bg-mn-amber/10 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium bg-mn-bronze/5 text-mn-bronze border border-mn-bronze/20 hover:bg-mn-bronze/10 transition-all"
         >
           <Star className="w-4 h-4" /> Bewerten
         </button>
@@ -209,7 +209,7 @@ export default function InteractionActions({
       {canDispute && !showDisputeInput && (
         <button
           onClick={() => setShowDisputeInput(true)}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-mn-mute hover:text-mn-amber-warm hover:bg-mn-surface transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-mn-mute hover:text-mn-bronze-warm hover:bg-mn-surface transition-all"
         >
           <AlertTriangle className="w-3.5 h-3.5" /> Problem melden
         </button>
@@ -231,7 +231,7 @@ export default function InteractionActions({
                 setShowDisputeInput(false)
                 setInputValue('')
               })}
-              className="flex-1 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white hover:bg-mn-amber/10 disabled:opacity-50"
+              className="flex-1 py-2 rounded-lg text-sm font-medium bg-orange-600 text-white hover:bg-mn-bronze/10 disabled:opacity-50"
             >
               {actionLoading === 'dispute' ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Melden'}
             </button>

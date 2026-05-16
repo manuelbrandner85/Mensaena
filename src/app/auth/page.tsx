@@ -27,7 +27,7 @@ export default function AuthPageWrapper() {
             aria-hidden="true"
           />
           <div className="relative flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-[3px] border-white/10 border-t-mn-amber rounded-full animate-spin" aria-hidden="true" />
+            <div className="w-10 h-10 border-[3px] border-white/10 border-t-mn-bronze rounded-full animate-spin" aria-hidden="true" />
             <span className="sr-only">Loading…</span>
           </div>
         </div>
@@ -424,7 +424,7 @@ function AuthPage() {
                     placeholder={t('namePlaceholder')}
                     required
                     autoComplete="name"
-                    className="w-full h-11 pl-10 pr-4 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-amber/30 focus:shadow-input-focus transition-all"
+                    className="w-full h-11 pl-10 pr-4 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-bronze/30 focus:shadow-input-focus transition-all"
                   />
                 </div>
               </div>
@@ -447,7 +447,7 @@ function AuthPage() {
                     required
                     autoComplete="email"
                     disabled={mode === 'forgot' && resetSent}
-                    className="w-full h-11 pl-10 pr-4 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-amber/30 focus:shadow-input-focus transition-all disabled:opacity-50"
+                    className="w-full h-11 pl-10 pr-4 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-bronze/30 focus:shadow-input-focus transition-all disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -476,7 +476,7 @@ function AuthPage() {
                     placeholder={mode === 'login' ? t('passwordPlaceholder') : t('passwordNewPlaceholder')}
                     required
                     autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    className="w-full h-11 pl-10 pr-11 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-amber/30 focus:shadow-input-focus transition-all"
+                    className="w-full h-11 pl-10 pr-11 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-bronze/30 focus:shadow-input-focus transition-all"
                   />
                   <button
                     type="button"
@@ -532,7 +532,7 @@ function AuthPage() {
                     placeholder={t('passwordConfirmPlaceholder')}
                     required
                     autoComplete="new-password"
-                    className="w-full h-11 pl-10 pr-4 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-amber/30 focus:shadow-input-focus transition-all"
+                    className="w-full h-11 pl-10 pr-4 bg-mn-surface border border-white/7 rounded-input text-mn-ink placeholder:text-mn-ghost text-sm focus:outline-none focus:border-mn-bronze/30 focus:shadow-input-focus transition-all"
                   />
                 </div>
               </div>
@@ -545,7 +545,7 @@ function AuthPage() {
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-white/20 bg-mn-surface accent-mn-amber focus:ring-mn-amber"
+                  className="mt-0.5 w-4 h-4 rounded border-white/20 bg-mn-surface accent-mn-bronze focus:ring-mn-bronze"
                 />
                 <span className="text-[11px] text-mn-mute leading-relaxed">
                   {t('agreePrefix')}{' '}
@@ -572,7 +572,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading || (mode === 'forgot' && resetSent) || (!!lockUntil && Date.now() < lockUntil)}
-              className="group w-full flex items-center justify-center gap-2 h-12 rounded-button text-sm font-medium tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber"
+              className="group w-full flex items-center justify-center gap-2 h-12 rounded-button text-sm font-medium tracking-wide transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze"
               style={{
                 background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
                 color: '#0A0F1C',

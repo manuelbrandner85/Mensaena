@@ -99,7 +99,7 @@ export default function ContactMessagesTab() {
       {/* List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin text-mn-amber" />
+          <Loader2 className="w-6 h-6 animate-spin text-mn-bronze" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-mn-mute">
@@ -112,7 +112,7 @@ export default function ContactMessagesTab() {
             <div
               key={m.id}
               className={`bg-mn-elevated rounded-2xl border shadow-sm overflow-hidden transition-all ${
-                m.read ? 'border-white/5' : 'border-mn-amber/20 bg-mn-amber/5/30'
+                m.read ? 'border-white/5' : 'border-mn-bronze/20 bg-mn-bronze/5/30'
               }`}
             >
               <div
@@ -126,7 +126,7 @@ export default function ContactMessagesTab() {
                 >
                   {m.read
                     ? <CheckCircle2 className="w-4 h-4 text-mn-ghost hover:text-mn-ghost transition-colors" />
-                    : <Circle className="w-4 h-4 text-mn-amber hover:text-mn-amber transition-colors" />
+                    : <Circle className="w-4 h-4 text-mn-bronze hover:text-mn-bronze transition-colors" />
                   }
                 </button>
                 <div className="min-w-0 flex-1">
@@ -137,7 +137,7 @@ export default function ContactMessagesTab() {
                     <a
                       href={`mailto:${m.email}`}
                       onClick={e => e.stopPropagation()}
-                      className="text-xs text-mn-amber hover:underline flex items-center gap-0.5"
+                      className="text-xs text-mn-bronze hover:underline flex items-center gap-0.5"
                     >
                       {m.email}
                       <ExternalLink className="w-2.5 h-2.5" />
@@ -154,7 +154,7 @@ export default function ContactMessagesTab() {
                   <p className="text-sm text-mn-ink-soft whitespace-pre-wrap leading-relaxed">{m.message}</p>
                   <a
                     href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.subject)}`}
-                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-mn-amber hover:text-mn-amber"
+                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-mn-bronze hover:text-mn-bronze"
                   >
                     <Mail className="w-3 h-3" />
                     Antworten per E-Mail

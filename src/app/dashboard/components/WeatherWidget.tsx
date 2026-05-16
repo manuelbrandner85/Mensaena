@@ -57,7 +57,7 @@ const AIR_COLOR: Record<AirLevel, string> = {
   good:           'text-mn-leben bg-mn-surface border-white/5',
   fair:           'text-lime-700 bg-lime-50 border-lime-200',
   moderate:       'text-amber-700 bg-amber-50 border-amber-200',
-  poor:           'text-mn-amber-warm bg-mn-surface border-white/8',
+  poor:           'text-mn-bronze-warm bg-mn-surface border-white/8',
   very_poor:      'text-mn-herzrot bg-mn-surface border-mn-herzrot/20',
   extremely_poor: 'text-mn-herzrot bg-mn-elevated border-mn-herzrot/20',
 }
@@ -148,7 +148,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
                 {formatTime(sun.sunrise)}
               </span>
               <span className="inline-flex items-center gap-1 text-mn-mute">
-                <Sunset className="w-3 h-3 text-mn-amber-warm" />
+                <Sunset className="w-3 h-3 text-mn-bronze-warm" />
                 {formatTime(sun.sunset)}
               </span>
             </>
@@ -158,7 +158,7 @@ export default function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
 
       {/* Contextual neighbour hint */}
       {tip && (
-        <p className="mt-3 text-xs text-mn-ink-soft leading-relaxed bg-mn-amber/5 rounded-xl px-3 py-2 border border-white/8">
+        <p className="mt-3 text-xs text-mn-ink-soft leading-relaxed bg-mn-bronze/5 rounded-xl px-3 py-2 border border-white/8">
           {tip}
         </p>
       )}

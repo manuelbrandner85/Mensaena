@@ -213,21 +213,21 @@ export interface CategoryConfig {
 }
 
 export const ORGANIZATION_CATEGORY_CONFIG: CategoryConfig[] = [
-  { value: 'tierheim',         label: 'Tierheime',           icon: Cat,           color: 'text-orange-600', bg: 'bg-orange-100', markerColor: '#EA580C' },
-  { value: 'tierschutz',      label: 'Tierschutz',          icon: Heart,         color: 'text-mn-herzrot',    bg: 'bg-red-100',    markerColor: '#EF4444' },
-  { value: 'suppenkueche',    label: 'Suppenkuechen',       icon: Soup,          color: 'text-yellow-600', bg: 'bg-yellow-100', markerColor: '#CA8A04' },
-  { value: 'obdachlosenhilfe',label: 'Obdachlosenhilfe',    icon: Home,          color: 'text-mn-teal-soft',   bg: 'bg-blue-100',   markerColor: '#2563EB' },
-  { value: 'tafel',           label: 'Tafeln',              icon: ShoppingBag,   color: 'text-mn-leben',  bg: 'bg-green-100',  markerColor: '#16A34A' },
-  { value: 'kleiderkammer',   label: 'Kleiderkammern',      icon: Shirt,         color: 'text-mn-amber', bg: 'bg-purple-100', markerColor: '#9333EA' },
-  { value: 'sozialkaufhaus',  label: 'Sozialkaufhaeuser',   icon: Store,         color: 'text-indigo-600', bg: 'bg-indigo-100', markerColor: '#4F46E5' },
-  { value: 'krisentelefon',   label: 'Krisentelefone',      icon: PhoneCall,     color: 'text-rose-600',   bg: 'bg-rose-100',   markerColor: '#E11D48' },
-  { value: 'notschlafstelle', label: 'Notschlafstellen',    icon: Moon,          color: 'text-slate-600',  bg: 'bg-slate-100',  markerColor: '#475569' },
-  { value: 'jugend',          label: 'Jugendhilfe',         icon: Users,         color: 'text-sky-600',    bg: 'bg-sky-100',    markerColor: '#0284C7' },
-  { value: 'senioren',        label: 'Seniorenhilfe',       icon: HandHeart,     color: 'text-pink-500',   bg: 'bg-pink-100',   markerColor: '#EC4899' },
-  { value: 'behinderung',     label: 'Behindertenhilfe',    icon: Accessibility, color: 'text-cyan-600',   bg: 'bg-cyan-100',   markerColor: '#0891B2' },
-  { value: 'sucht',           label: 'Suchthilfe',          icon: Stethoscope,   color: 'text-amber-600',  bg: 'bg-amber-100',  markerColor: '#D97706' },
-  { value: 'fluechtlingshilfe',label: 'Fluechtlingshilfe',  icon: ShieldCheck,   color: 'text-teal-600',   bg: 'bg-teal-100',   markerColor: '#0D9488' },
-  { value: 'allgemein',       label: 'Allgemeine Hilfe',    icon: BookOpen,      color: 'text-ink-600',   bg: 'bg-stone-100',   markerColor: '#4B5563' },
+  { value: 'tierheim',         label: 'Tierheime',           icon: Cat,           color: 'text-orange-400', bg: 'bg-orange-900/30', markerColor: '#EA580C' },
+  { value: 'tierschutz',      label: 'Tierschutz',          icon: Heart,         color: 'text-mn-herzrot',  bg: 'bg-red-900/30',    markerColor: '#EF4444' },
+  { value: 'suppenkueche',    label: 'Suppenkuechen',       icon: Soup,          color: 'text-yellow-400', bg: 'bg-yellow-900/30', markerColor: '#CA8A04' },
+  { value: 'obdachlosenhilfe',label: 'Obdachlosenhilfe',    icon: Home,          color: 'text-mn-teal-soft', bg: 'bg-blue-900/30',  markerColor: '#2563EB' },
+  { value: 'tafel',           label: 'Tafeln',              icon: ShoppingBag,   color: 'text-mn-leben',    bg: 'bg-green-900/30',  markerColor: '#16A34A' },
+  { value: 'kleiderkammer',   label: 'Kleiderkammern',      icon: Shirt,         color: 'text-purple-400',  bg: 'bg-purple-900/30', markerColor: '#9333EA' },
+  { value: 'sozialkaufhaus',  label: 'Sozialkaufhaeuser',   icon: Store,         color: 'text-indigo-400',  bg: 'bg-indigo-900/30', markerColor: '#4F46E5' },
+  { value: 'krisentelefon',   label: 'Krisentelefone',      icon: PhoneCall,     color: 'text-rose-400',    bg: 'bg-rose-900/30',   markerColor: '#E11D48' },
+  { value: 'notschlafstelle', label: 'Notschlafstellen',    icon: Moon,          color: 'text-mn-mute',     bg: 'bg-mn-surface',    markerColor: '#475569' },
+  { value: 'jugend',          label: 'Jugendhilfe',         icon: Users,         color: 'text-sky-400',     bg: 'bg-sky-900/30',    markerColor: '#0284C7' },
+  { value: 'senioren',        label: 'Seniorenhilfe',       icon: HandHeart,     color: 'text-pink-400',    bg: 'bg-pink-900/30',   markerColor: '#EC4899' },
+  { value: 'behinderung',     label: 'Behindertenhilfe',    icon: Accessibility, color: 'text-cyan-400',    bg: 'bg-cyan-900/30',   markerColor: '#0891B2' },
+  { value: 'sucht',           label: 'Suchthilfe',          icon: Stethoscope,   color: 'text-amber-400',   bg: 'bg-amber-900/30',  markerColor: '#D97706' },
+  { value: 'fluechtlingshilfe',label: 'Fluechtlingshilfe',  icon: ShieldCheck,   color: 'text-teal-400',    bg: 'bg-teal-900/30',   markerColor: '#0D9488' },
+  { value: 'allgemein',       label: 'Allgemeine Hilfe',    icon: BookOpen,      color: 'text-mn-ink-soft', bg: 'bg-mn-surface',    markerColor: '#4B5563' },
 ]
 
 export function getCategoryConfig(cat: string): CategoryConfig {

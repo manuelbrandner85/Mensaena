@@ -184,7 +184,7 @@ export default function WeeklyDigest({ userId }: WeeklyDigestProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-2.5 mb-4">
-        <StatCell icon={FileText}     label="Neue Beiträge in deiner Nähe" value={newPosts}       accent="bg-mn-amber" />
+        <StatCell icon={FileText}     label="Neue Beiträge in deiner Nähe" value={newPosts}       accent="bg-mn-bronze" />
         <StatCell icon={HandHelping}  label="Abgeschlossene Hilfen"        value={completedHelps} accent="bg-green-500"   />
         <StatCell icon={Users}        label="Neue Nachbarn"                 value={newNeighbors}   accent="bg-blue-500"    />
         <StatCell icon={Heart}        label="Deine Aktivitäten"             value={personalImpact} accent="bg-rose-500"    />

@@ -38,9 +38,9 @@ export default function ProfileStatsBar({ stats }: Props) {
       value: nettoFormatted,
       sub: `${stats.hoursGiven}h gegeben · ${stats.hoursReceived}h erhalten`,
       href: '/dashboard/timebank',
-      tint: 'from-mn-amber/8 to-primary-100/40 border-white/8',
-      iconBg: 'bg-mn-amber/10',
-      iconColor: 'text-mn-amber',
+      tint: 'from-mn-bronze/8 to-primary-100/40 border-white/8',
+      iconBg: 'bg-mn-bronze/10',
+      iconColor: 'text-mn-bronze',
     },
     {
       icon: Users,
@@ -58,7 +58,7 @@ export default function ProfileStatsBar({ stats }: Props) {
       value: String(stats.activeChallenges),
       sub: stats.activeChallenges === 1 ? 'aktiv' : 'aktiv',
       href: '/dashboard/challenges',
-      tint: 'from-mn-amber/12 to-mn-amber-warm/8/40 border-amber-100',
+      tint: 'from-mn-bronze/12 to-mn-bronze-warm/8/40 border-amber-100',
       iconBg: 'bg-amber-100',
       iconColor: 'text-amber-700',
     },
@@ -68,9 +68,9 @@ export default function ProfileStatsBar({ stats }: Props) {
       value: String(stats.postsCount),
       sub: stats.postsCount === 1 ? 'veröffentlicht' : 'veröffentlicht',
       href: '/dashboard/posts',
-      tint: 'from-mn-amber to-mn-amber-warm/40 border-white/5',
+      tint: 'from-mn-bronze to-mn-bronze-warm/40 border-white/5',
       iconBg: 'bg-mn-elevated',
-      iconColor: 'text-mn-amber',
+      iconColor: 'text-mn-bronze',
     },
   ]
 

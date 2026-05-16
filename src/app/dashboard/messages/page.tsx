@@ -23,7 +23,7 @@ function MessagesPageInner() {
 
   if (!userId) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
@@ -34,7 +34,7 @@ export default function MessagesPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <MessagesPageInner />

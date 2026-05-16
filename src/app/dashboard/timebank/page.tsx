@@ -101,7 +101,7 @@ function Avatar({ profile, size = 'md' }: { profile: Profile | null; size?: 'sm'
 function StatusBadge({ status }: { status: TimebankEntry['status'] }) {
   const styles = {
     pending:   'bg-amber-50 text-amber-600 border-amber-200',
-    confirmed: 'bg-mn-amber/5 text-mn-amber border-mn-amber/20',
+    confirmed: 'bg-mn-bronze/5 text-mn-bronze border-mn-bronze/20',
     cancelled: 'bg-mn-elevated text-mn-mute border-white/5',
   }
   const labels = {
@@ -196,7 +196,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         style={{ background: 'linear-gradient(90deg, #F59E0B, #F59E0B33)' }}
       />
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-mn-amber/12 to-yellow-500 px-6 py-4 overflow-hidden">
+      <div className="relative bg-gradient-to-r from-mn-bronze/12 to-yellow-500 px-6 py-4 overflow-hidden">
         <div className="bg-noise absolute inset-0 opacity-20 pointer-events-none" />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -220,7 +220,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
             Wem hast du geholfen? <span className="text-mn-herzrot">*</span>
           </label>
           {receiver ? (
-            <div className="flex items-center justify-between p-3 bg-mn-amber/5 border border-mn-amber/20 rounded-xl shadow-cinema-card">
+            <div className="flex items-center justify-between p-3 bg-mn-bronze/5 border border-mn-bronze/20 rounded-xl shadow-cinema-card">
               <div className="flex items-center gap-2.5">
                 <Avatar profile={receiver} />
                 <div>
@@ -381,7 +381,7 @@ function HilfeForm({ userId, onSuccess }: { userId: string; onSuccess: () => voi
         <button
           type="submit"
           disabled={submitting || !receiver || !description.trim() || totalHours <= 0}
-          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-mn-amber/12 to-orange-500 hover:from-mn-amber/12 hover:to-orange-600 disabled:from-stone-100 disabled:to-stone-100 disabled:text-mn-mute text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
+          className="shine w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-mn-bronze/12 to-orange-500 hover:from-mn-bronze/12 hover:to-orange-600 disabled:from-stone-100 disabled:to-stone-100 disabled:text-mn-mute text-white font-semibold rounded-xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
           style={submitting || !receiver || !description.trim() || totalHours <= 0 ? undefined : { boxShadow: '0 4px 16px -4px rgba(245,158,11,0.5)' }}
         >
           {submitting
@@ -582,7 +582,7 @@ function HilfeHistorie({
                   {/* Stunden-Indikator */}
                   <div className={`display-numeral text-right flex-shrink-0 font-bold text-base tabular-nums ${
                     entry.status === 'confirmed'
-                      ? isGiver ? 'text-mn-amber' : 'text-mn-teal-soft'
+                      ? isGiver ? 'text-mn-bronze' : 'text-mn-teal-soft'
                       : entry.status === 'cancelled'
                         ? 'text-mn-ghost line-through'
                         : 'text-amber-500'
@@ -689,8 +689,8 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
               })()}
               <div className="flex items-center gap-6 text-xs text-mn-mute">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-mn-amber inline-block shadow-glow" />
-                  <span className="display-numeral tabular-nums font-semibold text-mn-amber">{given}h</span> gegeben
+                  <span className="w-2.5 h-2.5 rounded-full bg-mn-bronze inline-block shadow-glow" />
+                  <span className="display-numeral tabular-nums font-semibold text-mn-bronze">{given}h</span> gegeben
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-mn-raised inline-block" />
@@ -713,9 +713,9 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
                   ? 'bg-mn-surface border-white/8'
                   : 'bg-mn-surface border-white/5'
               }`}>
-                <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-mn-amber-warm' : 'text-mn-ghost'}`} />
+                <Clock className={`w-4 h-4 flex-shrink-0 ${awaiting > 0 ? 'text-mn-bronze-warm' : 'text-mn-ghost'}`} />
                 <div>
-                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-mn-amber-warm' : 'text-mn-ink'}`}>
+                  <p className={`display-numeral text-base font-bold tabular-nums ${awaiting > 0 ? 'text-mn-bronze-warm' : 'text-mn-ink'}`}>
                     {awaiting}
                   </p>
                   <p className="text-xs text-mn-mute">Zu bestätigen</p>
@@ -726,10 +726,10 @@ function Zeitkonto({ userId, refresh }: { userId: string; refresh: number }) {
             {/* Community */}
             <div className="flex items-center justify-between py-3 border-t border-white/5">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-mn-amber" />
+                <Users className="w-4 h-4 text-mn-bronze" />
                 <span className="text-sm text-mn-ink-soft">Community-Stunden gesamt</span>
               </div>
-              <span className="display-numeral text-sm font-bold text-mn-amber tabular-nums">
+              <span className="display-numeral text-sm font-bold text-mn-bronze tabular-nums">
                 {community} Std.
               </span>
             </div>

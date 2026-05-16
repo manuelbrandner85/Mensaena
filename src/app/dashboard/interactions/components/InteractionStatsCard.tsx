@@ -10,7 +10,7 @@ interface Props {
 }
 
 const STAT_ITEMS = [
-  { key: 'total_as_helper' as const, label: 'Als Helfer', icon: HandHeart, color: 'text-mn-amber bg-mn-amber/5' },
+  { key: 'total_as_helper' as const, label: 'Als Helfer', icon: HandHeart, color: 'text-mn-bronze bg-mn-bronze/5' },
   { key: 'total_as_helped' as const, label: 'Als Hilfesuchender', icon: HelpCircle, color: 'text-mn-teal-soft bg-mn-surface' },
   { key: 'completed' as const, label: 'Abgeschlossen', icon: CheckCircle2, color: 'text-mn-leben bg-mn-surface' },
   { key: 'active' as const, label: 'Aktiv', icon: Loader, color: 'text-amber-600 bg-amber-50' },

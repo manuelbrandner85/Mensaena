@@ -38,7 +38,7 @@ export default function PullToRefresh({
       <div
         className={cn(
           'flex items-center justify-center gap-2 overflow-hidden',
-          'transition-all duration-300 bg-mn-amber/5/80',
+          'transition-all duration-300 bg-mn-bronze/5/80',
           'md:hidden'
         )}
         style={{
@@ -48,14 +48,14 @@ export default function PullToRefresh({
       >
         <RefreshCw
           className={cn(
-            'w-4 h-4 text-mn-amber transition-transform',
+            'w-4 h-4 text-mn-bronze transition-transform',
             (canRelease || isRefreshing) && 'animate-spin'
           )}
           style={{
             transform: !isRefreshing ? `rotate(${pullDistance * 3}deg)` : undefined,
           }}
         />
-        <span className="text-xs text-mn-amber font-medium select-none">
+        <span className="text-xs text-mn-bronze font-medium select-none">
           {isRefreshing
             ? 'Wird aktualisiert…'
             : canRelease

@@ -72,9 +72,9 @@ export default function SmartMatchWidget() {
   if (matches.length === 0) return null
 
   return (
-    <div className="bg-gradient-to-br from-mn-amber/8 to-white border border-white/8 rounded-2xl p-4 shadow-sm">
+    <div className="bg-gradient-to-br from-mn-bronze/8 to-white border border-white/8 rounded-2xl p-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="w-4 h-4 text-mn-amber" />
+        <Sparkles className="w-4 h-4 text-mn-bronze" />
         <h3 className="text-sm font-bold text-mn-ink">Passend für dich</h3>
       </div>
       <div className="space-y-2">
@@ -82,7 +82,7 @@ export default function SmartMatchWidget() {
           <Link
             key={m.id}
             href={`/dashboard/posts/${m.id}`}
-            className="flex items-center gap-3 p-3 bg-mn-elevated rounded-xl border border-white/5 hover:border-mn-amber/20 hover:shadow-sm transition-all group"
+            className="flex items-center gap-3 p-3 bg-mn-elevated rounded-xl border border-white/5 hover:border-mn-bronze/20 hover:shadow-sm transition-all group"
           >
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-mn-ink truncate">{m.title}</p>
@@ -92,10 +92,10 @@ export default function SmartMatchWidget() {
                     <MapPin className="w-3 h-3" /> {m.location}
                   </span>
                 )}
-                <span className="text-xs text-mn-amber">{m.category}</span>
+                <span className="text-xs text-mn-bronze">{m.category}</span>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-mn-ghost group-hover:text-mn-amber transition-colors flex-shrink-0" />
+            <ArrowRight className="w-4 h-4 text-mn-ghost group-hover:text-mn-bronze transition-colors flex-shrink-0" />
           </Link>
         ))}
       </div>

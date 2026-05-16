@@ -40,7 +40,7 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
         <button
           className={cn(
             'w-full flex items-center justify-center p-2 rounded-lg text-mn-mute hover:bg-mn-elevated/5 transition-colors',
-            hasActiveChild && 'bg-mn-amber/5 text-mn-amber',
+            hasActiveChild && 'bg-mn-bronze/5 text-mn-bronze',
           )}
           aria-label={t(group.title as Parameters<typeof t>[0])}
         >
@@ -70,13 +70,13 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                     active
                       ? isCrisis
                         ? 'bg-mn-surface text-mn-herzrot font-semibold'
-                        : 'bg-mn-amber/5 text-mn-amber font-semibold'
+                        : 'bg-mn-bronze/5 text-mn-bronze font-semibold'
                       : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                   )}
                 >
                   <Icon className={cn(
                     'w-4 h-4 flex-shrink-0',
-                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-amber') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
+                    active ? (isCrisis ? 'text-mn-herzrot' : 'text-mn-bronze') : (isCrisis ? 'text-mn-herzrot' : 'text-mn-mute'),
                   )} />
                   <span className="flex-1 truncate">{t(item.label as Parameters<typeof t>[0])}</span>
                   {badge !== undefined && badge > 0 && (
@@ -107,12 +107,12 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
         {GroupIcon && (
           <GroupIcon className={cn(
             'w-3.5 h-3.5 flex-shrink-0 transition-colors',
-            hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
+            hasActiveChild ? 'text-mn-bronze' : 'text-mn-mute group-hover:text-mn-mute',
           )} />
         )}
         <span className={cn(
           'text-xs font-semibold uppercase tracking-wider select-none whitespace-nowrap transition-colors',
-          hasActiveChild ? 'text-mn-amber' : 'text-mn-mute group-hover:text-mn-mute',
+          hasActiveChild ? 'text-mn-bronze' : 'text-mn-mute group-hover:text-mn-mute',
         )}>
           {t(group.title as Parameters<typeof t>[0])}
         </span>
@@ -149,16 +149,16 @@ export default function SidebarGroup({ group, isCollapsed, getBadge }: SidebarGr
                   active
                     ? isCrisis
                       ? 'bg-mn-surface text-mn-herzrot font-semibold border border-mn-herzrot/20'
-                      : 'bg-mn-amber/5 text-primary-800 font-semibold border border-mn-amber/20'
+                      : 'bg-mn-bronze/5 text-primary-800 font-semibold border border-mn-bronze/20'
                     : cn(
                         'text-mn-ink-soft border border-transparent hover:bg-mn-elevated/[0.02] hover:text-mn-ink',
-                        isHighlight && !active && 'bg-mn-amber/5/50 border-white/8 hover:bg-mn-amber/5',
+                        isHighlight && !active && 'bg-mn-bronze/5/50 border-white/8 hover:bg-mn-bronze/5',
                       ),
                 )}
               >
                 {/* Left accent bar */}
                 {active && (
-                  <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-mn-amber" />
+                  <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-mn-bronze" />
                 )}
 
                 {/* Icon */}

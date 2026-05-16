@@ -86,7 +86,7 @@ function ItemCard({ item, color }: { item: Item; color: string }) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-semibold text-mn-ink line-clamp-2 group-hover:text-mn-amber transition-colors">
+        <p className="text-xs font-semibold text-mn-ink line-clamp-2 group-hover:text-mn-bronze transition-colors">
           {item.title}
         </p>
         {item.provider && (
@@ -104,7 +104,7 @@ function ItemCard({ item, color }: { item: Item; color: string }) {
             </span>
           )}
           {item.type === 'course' && (item as Course).funded && (
-            <span className="text-xs font-medium text-mn-amber bg-mn-amber/5 px-1.5 py-0.5 rounded-full">
+            <span className="text-xs font-medium text-mn-bronze bg-mn-bronze/5 px-1.5 py-0.5 rounded-full">
               Förderbar
             </span>
           )}
@@ -194,8 +194,8 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
     if (loading) return (
       <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft p-4', className)}>
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-mn-amber/5 flex items-center justify-center">
-            <GraduationCap className="w-4 h-4 text-mn-amber" />
+          <div className="w-7 h-7 rounded-lg bg-mn-bronze/5 flex items-center justify-center">
+            <GraduationCap className="w-4 h-4 text-mn-bronze" />
           </div>
           <div className="h-3.5 bg-mn-elevated rounded w-36 animate-pulse" />
         </div>
@@ -206,8 +206,8 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
       <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden', className)}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
-              <GraduationCap className="w-4 h-4 text-mn-amber" />
+            <div className="w-7 h-7 rounded-lg bg-mn-bronze/5 flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-4 h-4 text-mn-bronze" />
             </div>
             <h2 className="text-sm font-semibold text-mn-ink">Bildung in deiner Nähe</h2>
           </div>
@@ -216,7 +216,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
           <GraduationCap className="w-7 h-7 text-mn-ghost mx-auto" />
           <p className="text-xs font-medium text-mn-ink-soft">Kein Standort hinterlegt</p>
           <p className="text-[11px] text-mn-mute">Trage deine PLZ im Profil ein, um lokale Bildungsangebote zu sehen.</p>
-          <a href="/dashboard/profile" className="text-xs text-mn-amber hover:underline">Profil bearbeiten →</a>
+          <a href="/dashboard/profile" className="text-xs text-mn-bronze hover:underline">Profil bearbeiten →</a>
         </div>
       </div>
     )
@@ -224,12 +224,12 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
       <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden', className)}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
-              <GraduationCap className="w-4 h-4 text-mn-amber" />
+            <div className="w-7 h-7 rounded-lg bg-mn-bronze/5 flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-4 h-4 text-mn-bronze" />
             </div>
             <h2 className="text-sm font-semibold text-mn-ink">Bildung in deiner Nähe</h2>
           </div>
-          <a href="https://www.arbeitsagentur.de/bildung" target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-xs font-medium text-mn-amber hover:text-mn-amber transition-colors">
+          <a href="https://www.arbeitsagentur.de/bildung" target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-xs font-medium text-mn-bronze hover:text-mn-bronze transition-colors">
             Mehr <ChevronRight className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -243,14 +243,14 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
       <div className={cn('bg-mn-elevated rounded-2xl border border-white/5 shadow-soft overflow-hidden', className)}>
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-mn-amber/5 flex items-center justify-center flex-shrink-0">
-              <GraduationCap className="w-4 h-4 text-mn-amber" />
+            <div className="w-7 h-7 rounded-lg bg-mn-bronze/5 flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-4 h-4 text-mn-bronze" />
             </div>
             <h2 className="text-sm font-semibold text-mn-ink">Bildung in deiner Nähe</h2>
           </div>
           <a
             href="/dashboard/community"
-            className="flex items-center gap-0.5 text-xs font-medium text-mn-amber hover:text-mn-amber transition-colors"
+            className="flex items-center gap-0.5 text-xs font-medium text-mn-bronze hover:text-mn-bronze transition-colors"
           >
             Mehr <ChevronRight className="w-3.5 h-3.5" />
           </a>
@@ -372,7 +372,7 @@ export default function EducationWidget({ compact, className }: EducationWidgetP
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-medium text-mn-amber hover:bg-mn-amber/5 border border-white/8 transition-colors"
+                  className="flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-medium text-mn-bronze hover:bg-mn-bronze/5 border border-white/8 transition-colors"
                 >
                   Alle {total.toLocaleString('de-DE')} Angebote auf arbeitsagentur.de
                   <ExternalLink className="w-3 h-3" />

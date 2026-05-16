@@ -10,7 +10,7 @@ const PAGE_SIZE = 20
 const URGENCY_COLORS: Record<string, string> = {
   low: 'bg-mn-elevated text-mn-ink-soft',
   medium: 'bg-amber-100 text-amber-700',
-  high: 'bg-mn-elevated text-mn-amber-warm',
+  high: 'bg-mn-elevated text-mn-bronze-warm',
   critical: 'bg-mn-elevated text-mn-herzrot',
 }
 
@@ -118,7 +118,7 @@ export default function CrisisTab() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
         </div>
       ) : (
         <>

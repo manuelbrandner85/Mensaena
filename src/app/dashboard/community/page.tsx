@@ -123,19 +123,19 @@ function CommunityPulseWidget() {
 
       {/* Neueste Community-Themen */}
       {topPosts.length > 0 && (
-        <div className="relative bg-gradient-to-br from-mn-amber/8 to-violet-50/60 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
+        <div className="relative bg-gradient-to-br from-mn-bronze/8 to-violet-50/60 border border-white/5 rounded-2xl p-4 shadow-cinema-card overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[3px]"
             style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
           />
           <div className="bg-noise absolute inset-0 opacity-15 pointer-events-none" />
-          <p className="relative text-sm font-bold text-mn-amber mb-2">🔥 Neue Community-Themen</p>
+          <p className="relative text-sm font-bold text-mn-bronze mb-2">🔥 Neue Community-Themen</p>
           <div className="relative space-y-2">
             {topPosts.map(p => (
               <Link key={p.id} href={`/dashboard/posts/${p.id}`}
                 className="flex items-center gap-2 p-2.5 bg-mn-elevated rounded-xl hover:bg-mn-surface hover:border-white/5 transition-all border border-white/5 group shadow-cinema-card">
                 <span className="text-sm flex-shrink-0 group-hover:scale-110 transition-transform">{typeEmoji[p.type] ?? '💬'}</span>
-                <p className="text-xs font-medium text-mn-ink truncate group-hover:text-mn-amber flex-1">{p.title}</p>
+                <p className="text-xs font-medium text-mn-ink truncate group-hover:text-mn-bronze flex-1">{p.title}</p>
               </Link>
             ))}
           </div>
@@ -148,7 +148,7 @@ function CommunityPulseWidget() {
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ background: 'linear-gradient(90deg, #8B5CF6, #8B5CF633)' }}
         />
-        <p className="text-xs font-bold text-mn-amber mb-1">💡 So funktioniert Community-Abstimmung</p>
+        <p className="text-xs font-bold text-mn-bronze mb-1">💡 So funktioniert Community-Abstimmung</p>
         <p className="text-xs text-mn-ink-soft">
           Erstelle ein Community-Thema – andere Nutzer können <strong>👍 / 👎</strong> abstimmen.
           Ideen mit den meisten Stimmen werden sichtbarer und können zur Aktion werden!
@@ -165,11 +165,11 @@ export default function CommunityPage() {
       sectionLabel="§ 20 / Community"
       mood="warm"
       iconBgClass="bg-mn-surface border-white/5"
-      iconColorClass="text-mn-amber"
+      iconColorClass="text-mn-bronze"
       title="Community & Abstimmung"
       description="Lokale Abstimmungen, Probleme melden, gemeinsam Lösungen finden"
       icon={<Users className="w-6 h-6 text-white" />}
-      color="bg-gradient-to-r from-mn-amber/8 to-mn-amber-warm"
+      color="bg-gradient-to-r from-mn-bronze/8 to-mn-bronze-warm"
       postTypes={['community']}
       moduleFilter={[
         { type: 'community', categories: ['general', 'everyday', 'knowledge', 'emergency'] },

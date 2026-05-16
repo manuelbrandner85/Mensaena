@@ -101,7 +101,7 @@ export default function ApkUpdateScreen({
           <div className="relative w-20 h-20">
             {/* Animierter Ring */}
             <div
-              className="absolute inset-[-6px] rounded-full border-4 border-mn-amber/20 dark:border-primary-800 border-t-mn-amber animate-spin"
+              className="absolute inset-[-6px] rounded-full border-4 border-mn-bronze/20 dark:border-primary-800 border-t-mn-bronze animate-spin"
               aria-hidden="true"
             />
             <div className="w-20 h-20 rounded-2xl ring-2 ring-primary-200 dark:ring-primary-800 overflow-hidden relative">
@@ -115,7 +115,7 @@ export default function ApkUpdateScreen({
             </div>
             {/* Download-Overlay-Icon */}
             <div
-              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-mn-amber flex items-center justify-center shadow-md"
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-mn-bronze flex items-center justify-center shadow-md"
               aria-hidden="true"
             >
               <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -143,7 +143,7 @@ export default function ApkUpdateScreen({
         {/* Reason-Box */}
         <div
           className={[
-            'w-full bg-mn-amber/5 dark:bg-primary-900/20 rounded-2xl p-5',
+            'w-full bg-mn-bronze/5 dark:bg-primary-900/20 rounded-2xl p-5',
             'transition-all duration-500 delay-[150ms]',
             visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3',
           ].join(' ')}
@@ -203,7 +203,7 @@ export default function ApkUpdateScreen({
                 style={{ transitionDelay: `${250 + idx * 60}ms` }}
               >
                 <span
-                  className="w-7 h-7 rounded-full bg-mn-amber/10 dark:bg-primary-900/40 text-mn-amber dark:text-primary-300 font-bold text-sm flex items-center justify-center flex-shrink-0"
+                  className="w-7 h-7 rounded-full bg-mn-bronze/10 dark:bg-primary-900/40 text-mn-bronze dark:text-primary-300 font-bold text-sm flex items-center justify-center flex-shrink-0"
                   aria-hidden="true"
                 >
                   {idx + 1}

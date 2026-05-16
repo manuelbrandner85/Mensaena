@@ -86,19 +86,19 @@ export default function IntentSuggestionBanner({
     <div
       role="status"
       className={cn(
-        'flex items-start gap-2.5 p-3 rounded-xl border bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft',
-        'border-mn-amber/20 shadow-sm animate-fade-in',
+        'flex items-start gap-2.5 p-3 rounded-xl border bg-gradient-to-r from-mn-bronze/8 to-mn-teal-soft',
+        'border-mn-bronze/20 shadow-sm animate-fade-in',
         className,
       )}
     >
-      <div className="w-7 h-7 rounded-lg bg-mn-elevated border border-mn-amber/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Sparkles className="w-4 h-4 text-mn-amber" />
+      <div className="w-7 h-7 rounded-lg bg-mn-elevated border border-mn-bronze/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Sparkles className="w-4 h-4 text-mn-bronze" />
       </div>
 
       <div className="flex-1 min-w-0">
         <p className="text-xs text-stone-700 leading-snug">
           Klingt nach{' '}
-          <strong className="text-mn-amber whitespace-nowrap">
+          <strong className="text-mn-bronze whitespace-nowrap">
             {INTENT_EMOJI[match.type]} {INTENT_LABELS[match.type]}
           </strong>
           {match.matchedKeywords.length > 0 && (
@@ -111,7 +111,7 @@ export default function IntentSuggestionBanner({
           <button
             type="button"
             onClick={handleAccept}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-mn-amber text-white hover:bg-primary-700 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-mn-bronze text-white hover:bg-primary-700 transition-colors"
           >
             {navigateOnAccept ? 'Zur passenden Seite' : 'Wechseln'}
             <ArrowRight className="w-3 h-3" />

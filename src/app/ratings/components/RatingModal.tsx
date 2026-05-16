@@ -184,7 +184,7 @@ export default function RatingModal({ currentUserId }: RatingModalProps) {
                       className={cn(
                         'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
                         categories.includes(cat.value as RatingCategory)
-                          ? 'bg-primary-100 text-primary-700 border-mn-amber/20'
+                          ? 'bg-primary-100 text-primary-700 border-mn-bronze/20'
                           : 'bg-white text-ink-600 border-stone-200 hover:bg-mn-surface',
                       )}
                     >

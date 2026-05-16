@@ -43,7 +43,7 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                     : 'text-mn-mute hover:text-mn-ink-soft',
                 )}
               >
-                <Icon className={cn('w-3.5 h-3.5', active && 'text-mn-amber')} />
+                <Icon className={cn('w-3.5 h-3.5', active && 'text-mn-bronze')} />
                 {t(tab.id)}
                 {dirty && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
@@ -74,11 +74,11 @@ export default function SettingsTabs({ activeTab, onTabChange, dirtyTabs }: Sett
                     'relative w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left mb-0.5',
                     'min-h-[44px]',
                     active
-                      ? 'bg-gradient-to-r from-mn-amber/8 to-primary-50/50 text-mn-amber shadow-cinema-card ring-1 ring-primary-100'
+                      ? 'bg-gradient-to-r from-mn-bronze/8 to-primary-50/50 text-mn-bronze shadow-cinema-card ring-1 ring-primary-100'
                       : 'text-mn-ink-soft hover:bg-mn-surface hover:text-mn-ink',
                   )}
                 >
-                  <Icon className={cn('w-4 h-4 transition-transform', active ? 'text-mn-amber scale-110' : 'text-mn-mute')} />
+                  <Icon className={cn('w-4 h-4 transition-transform', active ? 'text-mn-bronze scale-110' : 'text-mn-mute')} />
                   {t(tab.id)}
                   {dirty && (
                     <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-white shadow-cinema-card animate-pulse" />

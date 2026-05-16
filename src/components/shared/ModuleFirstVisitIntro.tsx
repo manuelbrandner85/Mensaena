@@ -77,7 +77,7 @@ export default function ModuleFirstVisitIntro({
               className="flex items-start gap-3 px-5 py-4 border-b last:border-0 border-white/5 animate-fade-in"
               style={{ animationDelay: `${i * 150}ms` }}
             >
-              <div className="w-8 h-8 rounded-full bg-mn-amber/10 text-mn-amber font-bold flex items-center justify-center flex-shrink-0 text-sm">
+              <div className="w-8 h-8 rounded-full bg-mn-bronze/10 text-mn-bronze font-bold flex items-center justify-center flex-shrink-0 text-sm">
                 {i + 1}
               </div>
               <div className="flex items-start gap-2 pt-0.5">
@@ -92,7 +92,7 @@ export default function ModuleFirstVisitIntro({
         <button
           type="button"
           onClick={handleDismiss}
-          className="w-full bg-mn-amber text-white rounded-xl px-8 py-3 text-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
+          className="w-full bg-mn-bronze text-white rounded-xl px-8 py-3 text-lg font-semibold hover:bg-primary-700 transition-colors shadow-sm"
         >
           Los geht's →
         </button>

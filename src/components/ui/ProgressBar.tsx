@@ -9,7 +9,7 @@ const sizeStyles = {
 } as const
 
 const colorStyles = {
-  primary: 'bg-mn-amber',
+  primary: 'bg-mn-bronze',
   success: 'bg-green-500',
   warning: 'bg-amber-500',
   danger:  'bg-red-500',

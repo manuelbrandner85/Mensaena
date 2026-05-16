@@ -77,7 +77,7 @@ export default function AccountSettings({
     <div className="space-y-5">
       {/* Account Info */}
       <SettingsSection
-        icon={<Settings className="w-4 h-4 text-mn-amber" />}
+        icon={<Settings className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionAccountTitle')}
         description={t('sectionAccountDesc')}
       >
@@ -99,13 +99,13 @@ export default function AccountSettings({
 
       {/* Onboarding Tour Replay */}
       <SettingsSection
-        icon={<Sparkles className="w-4 h-4 text-mn-amber" />}
+        icon={<Sparkles className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionTourTitle')}
         description={t('sectionTourDesc')}
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-amber/5 border border-mn-amber/20">
-          <div className="w-10 h-10 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-mn-amber" />
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-bronze/5 border border-mn-bronze/20">
+          <div className="w-10 h-10 rounded-xl bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-5 h-5 text-mn-bronze" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-medium text-mn-ink">{t('tourReplay')}</p>
@@ -116,7 +116,7 @@ export default function AccountSettings({
               replayOnboarding()
               toast.success(t('toastTourStarted'), { icon: '✨' })
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all min-h-[44px]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all min-h-[44px]"
           >
             <PlayCircle className="w-4 h-4" />
             {t('tourStart')}
@@ -126,7 +126,7 @@ export default function AccountSettings({
 
       {/* Mentor Settings */}
       <SettingsSection
-        icon={<GraduationCap className="w-4 h-4 text-mn-amber" />}
+        icon={<GraduationCap className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionMentorTitle')}
         description={t('sectionMentorDesc')}
       >
@@ -145,7 +145,7 @@ export default function AccountSettings({
                     onClick={() => toggleTopic(topic)}
                     className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all min-h-[36px] ${
                       mentorTopics.includes(topic)
-                        ? 'bg-mn-amber/10 text-mn-amber border-mn-amber/20'
+                        ? 'bg-mn-bronze/10 text-mn-bronze border-mn-bronze/20'
                         : 'bg-mn-elevated text-mn-mute border-white/5 hover:border-white/8'
                     }`}
                   >
@@ -161,7 +161,7 @@ export default function AccountSettings({
             <button
               onClick={handleSaveMentor}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {t('saveButton')}
@@ -172,13 +172,13 @@ export default function AccountSettings({
 
       {/* Data Export */}
       <SettingsSection
-        icon={<Download className="w-4 h-4 text-mn-amber" />}
+        icon={<Download className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionExportTitle')}
         description={t('sectionExportDesc')}
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-amber/5 border border-mn-amber/20">
-          <div className="w-10 h-10 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-            <FileJson className="w-5 h-5 text-mn-amber" />
+        <div className="flex items-center gap-4 p-4 rounded-xl bg-mn-bronze/5 border border-mn-bronze/20">
+          <div className="w-10 h-10 rounded-xl bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+            <FileJson className="w-5 h-5 text-mn-bronze" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-medium text-mn-ink">{t('exportTitle')}</p>
@@ -187,7 +187,7 @@ export default function AccountSettings({
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-all disabled:opacity-50 min-h-[44px]"
           >
             {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             {exporting ? t('exporting') : t('export')}
@@ -197,7 +197,7 @@ export default function AccountSettings({
 
       {/* Logout */}
       <SettingsSection
-        icon={<LogOut className="w-4 h-4 text-mn-amber" />}
+        icon={<LogOut className="w-4 h-4 text-mn-bronze" />}
         title={t('sectionLogoutTitle')}
         description={t('sectionLogoutDesc')}
       >

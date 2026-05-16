@@ -24,9 +24,9 @@ function getExpiryBadge(expiresAt: string | null): { label: string; color: strin
   const exp = new Date(expiresAt).getTime()
   const hoursLeft = (exp - now) / (1000 * 60 * 60)
   if (hoursLeft <= 0) return { label: 'Abgelaufen', color: 'bg-mn-elevated text-mn-herzrot' }
-  if (hoursLeft <= 24) return { label: `${Math.ceil(hoursLeft)} Std. übrig`, color: 'bg-mn-elevated text-mn-amber-warm' }
+  if (hoursLeft <= 24) return { label: `${Math.ceil(hoursLeft)} Std. übrig`, color: 'bg-mn-elevated text-mn-bronze-warm' }
   const daysLeft = Math.ceil(hoursLeft / 24)
-  if (daysLeft <= 3) return { label: `${daysLeft} Tage übrig`, color: 'bg-mn-elevated text-mn-amber' }
+  if (daysLeft <= 3) return { label: `${daysLeft} Tage übrig`, color: 'bg-mn-elevated text-mn-bronze' }
   return { label: `${daysLeft} Tage übrig`, color: 'bg-mn-elevated text-mn-ink-soft' }
 }
 
@@ -76,7 +76,7 @@ export default function BoardCard({
 
         {/* Pinned indicator */}
         {post.pinned && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-mn-amber/10 text-mn-amber">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-mn-bronze/10 text-mn-bronze">
             📌 Angepinnt
           </span>
         )}
@@ -91,7 +91,7 @@ export default function BoardCard({
               e.stopPropagation()
               onOpenDetail(post)
             }}
-            className="text-mn-amber hover:text-mn-amber font-medium ml-1"
+            className="text-mn-bronze hover:text-mn-bronze font-medium ml-1"
           >
             mehr lesen
           </button>
@@ -136,7 +136,7 @@ export default function BoardCard({
           )}
           <span className="text-xs text-mn-ink-soft truncate">{profileName}</span>
           {trustScore >= 70 && (
-            <Shield className="w-3.5 h-3.5 text-mn-amber flex-shrink-0" aria-label="Vertrauenswürdig" />
+            <Shield className="w-3.5 h-3.5 text-mn-bronze flex-shrink-0" aria-label="Vertrauenswürdig" />
           )}
         </div>
 
@@ -147,7 +147,7 @@ export default function BoardCard({
             onClick={() => onTogglePin(post.id)}
             className={cn(
               'flex items-center gap-1 text-xs transition',
-              isPinned ? 'text-mn-amber font-semibold' : 'text-mn-mute hover:text-mn-amber',
+              isPinned ? 'text-mn-bronze font-semibold' : 'text-mn-mute hover:text-mn-bronze',
             )}
             title={isPinned ? 'Pin entfernen' : 'Anpinnen'}
           >
@@ -158,7 +158,7 @@ export default function BoardCard({
           {/* Comments */}
           <button
             onClick={() => onOpenDetail(post)}
-            className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition"
+            className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-bronze transition"
           >
             <MessageCircle className="w-3.5 h-3.5" />
             {post.comment_count > 0 && <span>{post.comment_count}</span>}

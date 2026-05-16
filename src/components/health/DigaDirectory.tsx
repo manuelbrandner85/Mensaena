@@ -37,7 +37,7 @@ function ShareBanner({ diga }: { diga: DiGA }) {
   return (
     <button
       onClick={handleShare}
-      className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-amber transition-colors"
+      className="flex items-center gap-1 text-xs text-mn-mute hover:text-mn-bronze transition-colors"
       title="Teilen"
     >
       <Share2 className="w-3 h-3" />
@@ -100,14 +100,14 @@ function DigaCard({ diga, showShare }: { diga: DiGA; showShare?: boolean }) {
           <div className="flex items-center gap-2">
             {diga.playStoreUrl && (
               <a href={diga.playStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-mn-mute hover:text-mn-amber transition-colors underline underline-offset-2"
+                className="text-xs text-mn-mute hover:text-mn-bronze transition-colors underline underline-offset-2"
               >
                 Android
               </a>
             )}
             {diga.appStoreUrl && (
               <a href={diga.appStoreUrl} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-mn-mute hover:text-mn-amber transition-colors underline underline-offset-2"
+                className="text-xs text-mn-mute hover:text-mn-bronze transition-colors underline underline-offset-2"
               >
                 iOS
               </a>
@@ -158,14 +158,14 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
   return (
     <div className={cn('space-y-4', className)}>
       {/* Info banner */}
-      <div className="relative flex items-start gap-3 bg-mn-amber/5 border border-mn-amber/20 rounded-2xl p-4 overflow-hidden">
+      <div className="relative flex items-start gap-3 bg-mn-bronze/5 border border-mn-bronze/20 rounded-2xl p-4 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 to-primary-200" />
-        <div className="w-8 h-8 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-          <Info className="w-4 h-4 text-mn-amber" />
+        <div className="w-8 h-8 rounded-xl bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+          <Info className="w-4 h-4 text-mn-bronze" />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-primary-900">Gesundheits-Apps auf Rezept – kostenlos!</p>
-          <p className="text-xs text-mn-amber mt-0.5 leading-relaxed">
+          <p className="text-xs text-mn-bronze mt-0.5 leading-relaxed">
             Digitale Gesundheitsanwendungen (DiGAs) sind vom BfArM zugelassene Apps, die du{' '}
             <strong>kostenlos über deine Krankenkasse</strong> bekommst – entweder per{' '}
             ärztlichem Rezept oder per Direktantrag bei deiner Kasse (§ 33a SGB V).
@@ -201,8 +201,8 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
               className={cn(
                 'px-3 py-1.5 rounded-full text-xs font-medium border transition-all',
                 activeCategory === 'all'
-                  ? 'bg-mn-amber text-white border-primary-600'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
+                  ? 'bg-mn-bronze text-white border-primary-600'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20',
               )}
             >
               Alle ({DIGAS.length})
@@ -255,7 +255,7 @@ export default function DigaDirectory({ community, compact, className }: DigaDir
             href="https://diga.bfarm.de/de/verzeichnis"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 hover:text-mn-amber transition-colors"
+            className="flex items-center gap-1 hover:text-mn-bronze transition-colors"
           >
             Vollständiges Verzeichnis auf bfarm.de <ExternalLink className="w-3 h-3" />
           </a>

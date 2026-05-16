@@ -32,10 +32,10 @@ export default function MapLayerControl({
           className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-mn-ink hover:bg-mn-elevated/[0.02] transition-colors"
           aria-expanded={expanded}
         >
-          <Layers className="w-4 h-4 text-mn-amber" />
+          <Layers className="w-4 h-4 text-mn-bronze" />
           <span className="flex-1 text-left">Ebenen</span>
           {activeCount > 0 && (
-            <span className="text-xs font-bold bg-mn-amber/10 text-mn-amber px-1.5 py-0.5 rounded-full">
+            <span className="text-xs font-bold bg-mn-bronze/10 text-mn-bronze px-1.5 py-0.5 rounded-full">
               {activeCount}
             </span>
           )}
@@ -69,14 +69,14 @@ export default function MapLayerControl({
                         className={cn(
                           'w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left',
                           active
-                            ? 'bg-mn-amber/5 text-mn-amber font-medium'
+                            ? 'bg-mn-bronze/5 text-mn-bronze font-medium'
                             : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
                         )}
                       >
                         <span
                           className={cn(
                             'w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                            active ? 'bg-mn-amber border-mn-amber' : 'border-stone-300 bg-mn-elevated',
+                            active ? 'bg-mn-bronze border-mn-bronze' : 'border-stone-300 bg-mn-elevated',
                           )}
                         >
                           {active && !loading && (

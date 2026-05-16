@@ -18,7 +18,7 @@ export default function CrisisResourceCard({ crisis, className }: Props) {
   return (
     <div className={cn('bg-mn-elevated border border-white/5 rounded-2xl p-4 shadow-sm', className)}>
       <h4 className="text-sm font-bold text-mn-ink mb-3 flex items-center gap-2">
-        <Package className="w-4 h-4 text-mn-amber" />
+        <Package className="w-4 h-4 text-mn-bronze" />
         Benötigte Ressourcen & Fähigkeiten
       </h4>
 
@@ -27,7 +27,7 @@ export default function CrisisResourceCard({ crisis, className }: Props) {
           <p className="text-xs font-semibold text-mn-ink-soft mb-2">Materialien:</p>
           <div className="flex flex-wrap gap-1.5">
             {crisis.needed_resources.map(r => (
-              <span key={r} className="inline-flex items-center gap-1 px-2 py-0.5 bg-mn-amber/5 border border-mn-amber/20 rounded-full text-xs text-mn-amber">
+              <span key={r} className="inline-flex items-center gap-1 px-2 py-0.5 bg-mn-bronze/5 border border-mn-bronze/20 rounded-full text-xs text-mn-bronze">
                 <Package className="w-3 h-3" />
                 {r}
               </span>
@@ -68,7 +68,7 @@ export default function CrisisResourceCard({ crisis, className }: Props) {
           <div
             className={cn(
               'h-full rounded-full transition-all duration-500',
-              crisis.helper_count >= crisis.needed_helpers ? 'bg-green-500' : 'bg-mn-amber'
+              crisis.helper_count >= crisis.needed_helpers ? 'bg-green-500' : 'bg-mn-bronze'
             )}
             style={{ width: `${Math.min(100, (crisis.helper_count / Math.max(1, crisis.needed_helpers)) * 100)}%` }}
           />

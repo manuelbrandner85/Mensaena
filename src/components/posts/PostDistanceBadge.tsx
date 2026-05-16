@@ -20,7 +20,7 @@ interface PostDistanceBadgeProps {
 let _cachedUserLoc: { lat: number; lon: number } | null | 'loading' = null
 
 function getDistanceColor(km: number): string {
-  if (km < 2) return 'text-mn-amber bg-mn-amber/5 border-mn-amber/20'
+  if (km < 2) return 'text-mn-bronze bg-mn-bronze/5 border-mn-bronze/20'
   if (km < 5) return 'text-amber-700 bg-amber-50 border-amber-200'
   return 'text-mn-ink-soft bg-mn-surface border-white/5'
 }

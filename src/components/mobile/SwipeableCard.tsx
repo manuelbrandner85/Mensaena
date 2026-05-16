@@ -136,7 +136,7 @@ export default function SwipeableCard({
               key={i}
               className={cn(
                 'w-[72px] flex items-center justify-center text-white touch-target',
-                action.bgClass || 'bg-mn-amber'
+                action.bgClass || 'bg-mn-bronze'
               )}
               onClick={() => {
                 action.onClick()

@@ -10,7 +10,7 @@ export default function RescuerCreatePage() {
       moduleKey="rescuer"
       moduleTitle="Neuer Retter-Beitrag"
       moduleDescription="Rette Lebensmittel, Kleidung oder Gegenstände vor der Verschwendung."
-      gradientFrom="from-mn-amber-warm/12"
+      gradientFrom="from-mn-bronze-warm/12"
       gradientTo="to-red-400"
       ringColor="ring-orange-400"
       iconComponent={<ShieldAlert className="w-6 h-6" />}

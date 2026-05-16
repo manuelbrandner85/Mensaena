@@ -113,7 +113,7 @@ export default function BotFeedbackTab() {
             {summary.ratio7 === null ? '—' : `${summary.ratio7}%`}
           </p>
           <p className="text-[11px] text-mn-mute mt-0.5">
-            <span className="text-mn-amber font-semibold">{summary.up7} 👍</span>
+            <span className="text-mn-bronze font-semibold">{summary.up7} 👍</span>
             {' · '}
             <span className="text-mn-herzrot font-semibold">{summary.down7} 👎</span>
           </p>
@@ -130,7 +130,7 @@ export default function BotFeedbackTab() {
                 <li key={r.route} className="flex items-center justify-between text-[11px]">
                   <span className="truncate text-mn-ink-soft font-mono">{r.route}</span>
                   <span className="text-mn-mute flex-shrink-0 ml-2">
-                    {r.total} <span className="text-mn-amber">👍{r.up}</span>{' '}
+                    {r.total} <span className="text-mn-bronze">👍{r.up}</span>{' '}
                     <span className="text-mn-herzrot">👎{r.down}</span>
                   </span>
                 </li>
@@ -150,7 +150,7 @@ export default function BotFeedbackTab() {
                 onClick={() => setFilter(k)}
                 className={`text-[11px] px-2.5 py-1 rounded-full font-medium transition-colors ${
                   filter === k
-                    ? 'bg-mn-amber text-white'
+                    ? 'bg-mn-bronze text-white'
                     : 'bg-mn-surface text-mn-mute hover:bg-mn-elevated'
                 }`}
               >
@@ -160,7 +160,7 @@ export default function BotFeedbackTab() {
           </div>
           <button
             onClick={load}
-            className="text-[11px] text-mn-mute hover:text-mn-amber transition-colors"
+            className="text-[11px] text-mn-mute hover:text-mn-bronze transition-colors"
           >
             Neu laden
           </button>
@@ -203,7 +203,7 @@ export default function BotFeedbackTab() {
                     </td>
                     <td className="px-4 py-2.5 text-center">
                       {r.rating === 'up' ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mn-amber/5 text-mn-amber text-[11px] font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-mn-bronze/5 text-mn-bronze text-[11px] font-semibold">
                           <ThumbsUp className="w-3 h-3" /> positiv
                         </span>
                       ) : (

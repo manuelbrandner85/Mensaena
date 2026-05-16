@@ -52,13 +52,13 @@ export default function OfflineBanner() {
       <div
         className={`mx-auto max-w-md mt-2 pointer-events-auto rounded-2xl shadow-lg border px-4 py-2.5 flex items-center gap-3 backdrop-blur-md animate-slide-down ${
           isReconnected
-            ? 'bg-mn-amber/5/95 border-mn-amber/20 text-mn-amber'
+            ? 'bg-mn-bronze/5/95 border-mn-bronze/20 text-mn-bronze'
             : 'bg-amber-50/95 border-amber-200 text-amber-900'
         }`}
       >
         <span
           className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
-            isReconnected ? 'bg-mn-amber/5 text-mn-amber' : 'bg-amber-100 text-amber-700'
+            isReconnected ? 'bg-mn-bronze/5 text-mn-bronze' : 'bg-amber-100 text-amber-700'
           }`}
         >
           {isReconnected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}

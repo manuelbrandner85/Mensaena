@@ -75,7 +75,7 @@ export default function LegalPageShell({
             priority
           />
           <span className="font-display text-2xl font-medium text-mn-ink tracking-tight">
-            Mensaena<span className="text-mn-amber">.</span>
+            Mensaena<span className="text-mn-bronze">.</span>
           </span>
         </Link>
 
@@ -99,7 +99,7 @@ export default function LegalPageShell({
 
         {/* Prose card — premium cinematic depth surface */}
         <article className="card-depth p-7 md:p-12">
-          <div className="prose prose-sm md:prose-base max-w-none text-mn-ink-soft prose-headings:font-display prose-headings:font-medium prose-headings:text-mn-ink prose-headings:tracking-tight prose-a:text-mn-amber prose-a:no-underline hover:prose-a:text-primary-800 prose-strong:text-mn-ink">
+          <div className="prose prose-sm md:prose-base max-w-none text-mn-ink-soft prose-headings:font-display prose-headings:font-medium prose-headings:text-mn-ink prose-headings:tracking-tight prose-a:text-mn-bronze prose-a:no-underline hover:prose-a:text-primary-800 prose-strong:text-mn-ink">
             {children}
           </div>
         </article>

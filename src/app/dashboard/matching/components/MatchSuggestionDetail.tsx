@@ -94,10 +94,10 @@ function WhyThisMatch({ breakdown, distanceKm }: { breakdown: ScoreBreakdown; di
   if (reasons.length === 0) return null
 
   return (
-    <div className="bg-mn-amber/5/60 border border-white/8 rounded-xl p-3.5">
+    <div className="bg-mn-bronze/5/60 border border-white/8 rounded-xl p-3.5">
       <div className="flex items-center gap-1.5 mb-2.5">
-        <Sparkles className="w-3.5 h-3.5 text-mn-amber" />
-        <span className="text-xs font-semibold text-mn-amber uppercase tracking-wide">Warum dieser Match?</span>
+        <Sparkles className="w-3.5 h-3.5 text-mn-bronze" />
+        <span className="text-xs font-semibold text-mn-bronze uppercase tracking-wide">Warum dieser Match?</span>
       </div>
       <div className="flex flex-wrap gap-2">
         {reasons.map((r, i) => (
@@ -106,8 +106,8 @@ function WhyThisMatch({ breakdown, distanceKm }: { breakdown: ScoreBreakdown; di
             className={cn(
               'inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full',
               r.strong
-                ? 'bg-mn-amber text-white font-medium'
-                : 'bg-mn-elevated text-mn-amber border border-mn-amber/20',
+                ? 'bg-mn-bronze text-white font-medium'
+                : 'bg-mn-elevated text-mn-bronze border border-mn-bronze/20',
             )}
           >
             {r.icon}
@@ -246,7 +246,7 @@ export default function MatchSuggestionDetail({
             <PostSection
               post={match.offer_post}
               label="Angebot"
-              colorClass="bg-mn-amber/5/50 border-white/8"
+              colorClass="bg-mn-bronze/5/50 border-white/8"
             />
             <PostSection
               post={match.request_post}
@@ -299,7 +299,7 @@ export default function MatchSuggestionDetail({
               <button
                 onClick={handleAccept}
                 disabled={isResponding}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-mn-amber text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-mn-bronze text-white text-sm font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {isResponding ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

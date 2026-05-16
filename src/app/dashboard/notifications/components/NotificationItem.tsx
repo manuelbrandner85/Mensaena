@@ -33,24 +33,24 @@ const ICON_MAP: Record<string, typeof Bell> = {
 
 const COLOR_MAP: Record<string, { bg: string; icon: string; dot: string }> = {
   blue:    { bg: 'bg-mn-surface',    icon: 'bg-mn-elevated text-mn-teal-soft',    dot: 'bg-blue-500' },
-  primary: { bg: 'bg-mn-amber/5', icon: 'bg-mn-amber/10 text-mn-amber', dot: 'bg-mn-amber' },
+  primary: { bg: 'bg-mn-bronze/5', icon: 'bg-mn-bronze/10 text-mn-bronze', dot: 'bg-mn-bronze' },
   amber:   { bg: 'bg-amber-50',   icon: 'bg-amber-100 text-amber-600',   dot: 'bg-amber-500' },
-  purple:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-amber',  dot: 'bg-purple-500' },
+  purple:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-bronze',  dot: 'bg-purple-500' },
   indigo:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-teal-soft',  dot: 'bg-indigo-500' },
   gray:    { bg: 'bg-mn-surface',   icon: 'bg-mn-elevated text-mn-ink-soft',     dot: 'bg-stone-400' },
   pink:    { bg: 'bg-mn-surface',    icon: 'bg-mn-elevated text-mn-herzrot-warm',     dot: 'bg-pink-500' },
-  orange:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-amber-warm', dot: 'bg-orange-500' },
+  orange:  { bg: 'bg-mn-surface',  icon: 'bg-mn-elevated text-mn-bronze-warm', dot: 'bg-orange-500' },
 }
 
 const BADGE_MAP: Record<string, string> = {
   blue:    'bg-mn-elevated text-mn-teal-soft',
-  primary: 'bg-mn-amber/10 text-mn-amber',
+  primary: 'bg-mn-bronze/10 text-mn-bronze',
   amber:   'bg-amber-100 text-amber-700',
-  purple:  'bg-mn-elevated text-mn-amber',
+  purple:  'bg-mn-elevated text-mn-bronze',
   indigo:  'bg-mn-elevated text-mn-teal-soft',
   gray:    'bg-mn-elevated text-mn-ink-soft',
   pink:    'bg-mn-elevated text-mn-herzrot-warm',
-  orange:  'bg-mn-elevated text-mn-amber-warm',
+  orange:  'bg-mn-elevated text-mn-bronze-warm',
 }
 
 // ── Quick Actions ────────────────────────────────────────────────────
@@ -91,7 +91,7 @@ function InteractionQuickActions({ notification, onMarkAsRead }: {
       <button
         onClick={() => respond(true)}
         disabled={!!busy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-mn-amber text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-mn-bronze text-white text-xs font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
       >
         <Check className="w-3.5 h-3.5" />
         {busy === 'accept' ? 'Wird angenommen…' : 'Annehmen'}
@@ -161,7 +161,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
         'group relative flex items-start gap-3 px-4 py-4 transition-all duration-200 border-b border-white/5 last:border-0',
         n.read
           ? 'bg-mn-elevated hover:bg-mn-surface/80'
-          : 'bg-mn-amber/5/30 hover:bg-mn-amber/5/60',
+          : 'bg-mn-bronze/5/30 hover:bg-mn-bronze/5/60',
         n.link ? 'cursor-pointer' : 'cursor-default',
         deleting && 'opacity-40 pointer-events-none',
       )}
@@ -172,7 +172,7 @@ export default function NotificationItem({ notification, onMarkAsRead, onMarkAsU
     >
       {/* ── Unread stripe ── */}
       {!n.read && (
-        <div className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r bg-mn-amber" />
+        <div className="absolute left-0 top-3 bottom-3 w-0.5 rounded-r bg-mn-bronze" />
       )}
 
       {/* ── Avatar or Icon ── */}

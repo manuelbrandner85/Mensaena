@@ -82,7 +82,7 @@ export default function FoodWarningsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-4 p-4">
       <header className="flex items-center gap-3">
-        <AlertTriangle aria-hidden className="h-6 w-6 text-mn-amber-warm" />
+        <AlertTriangle aria-hidden className="h-6 w-6 text-mn-bronze-warm" />
         <div>
           <h1 className="text-xl font-bold text-mn-ink dark:text-stone-100">
             Lebensmittelwarnungen
@@ -116,7 +116,7 @@ export default function FoodWarningsPage() {
                 placeholder="Produkt, Marke, Hersteller…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full rounded-lg border border-white/5 bg-mn-elevated py-2 pl-9 pr-3 text-sm focus:border-mn-amber/30 focus:outline-none focus:ring-1 focus:ring-mn-amber dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
+                className="w-full rounded-lg border border-white/5 bg-mn-elevated py-2 pl-9 pr-3 text-sm focus:border-mn-bronze/30 focus:outline-none focus:ring-1 focus:ring-mn-bronze dark:border-stone-500 dark:bg-ink-900 dark:text-stone-100"
                 aria-label="Suchen"
               />
               {search && (
@@ -220,7 +220,7 @@ export default function FoodWarningsPage() {
                         <span className={
                           w.severity === 'high'
                             ? 'rounded-full bg-mn-elevated px-2 py-0.5 text-mn-herzrot dark:bg-red-900/40 dark:text-mn-herzrot'
-                            : 'rounded-full bg-mn-elevated px-2 py-0.5 text-mn-amber-warm dark:bg-orange-900/40 dark:text-mn-amber-warm'
+                            : 'rounded-full bg-mn-elevated px-2 py-0.5 text-mn-bronze-warm dark:bg-orange-900/40 dark:text-mn-bronze-warm'
                         }>
                           {w.severity === 'high' ? 'Rückruf' : 'Hinweis'}
                         </span>

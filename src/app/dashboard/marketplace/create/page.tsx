@@ -225,8 +225,8 @@ export default function CreateListingPage() {
 
       <div className="bg-mn-elevated rounded-2xl border border-white/5 shadow-cinema-card overflow-hidden">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
-          <div className="w-9 h-9 rounded-xl bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-            <ShoppingBag className="w-5 h-5 text-mn-amber" />
+          <div className="w-9 h-9 rounded-xl bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+            <ShoppingBag className="w-5 h-5 text-mn-bronze" />
           </div>
           <div>
             <h1 className="text-base font-semibold text-mn-ink">Neue Anzeige</h1>
@@ -261,7 +261,7 @@ export default function CreateListingPage() {
           {isBookCategory && (
             <div>
               <label className="label flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-mn-amber" />
+                <BookOpen className="w-3.5 h-3.5 text-mn-bronze" />
                 Buchinfo laden (optional)
               </label>
               <BookLookup
@@ -275,7 +275,7 @@ export default function CreateListingPage() {
           {isFoodCategory && (
             <div>
               <label className="label flex items-center gap-1.5">
-                <ScanBarcode className="w-3.5 h-3.5 text-mn-amber" />
+                <ScanBarcode className="w-3.5 h-3.5 text-mn-bronze" />
                 Barcode scannen (optional)
               </label>
               {foodProduct ? (
@@ -287,7 +287,7 @@ export default function CreateListingPage() {
                 <button
                   type="button"
                   onClick={() => setScannerOpen(true)}
-                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-mn-amber/20 rounded-xl text-sm font-medium text-mn-amber hover:bg-mn-amber/5 transition-colors"
+                  className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-mn-bronze/20 rounded-xl text-sm font-medium text-mn-bronze hover:bg-mn-bronze/5 transition-colors"
                 >
                   <ScanBarcode className="w-4 h-4" />
                   Produktinfos per Barcode laden
@@ -373,7 +373,7 @@ export default function CreateListingPage() {
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {/* Book cover preview from Open Library */}
               {bookCoverUrl && images.length === 0 && (
-                <div className="relative aspect-square rounded-xl overflow-hidden border border-mn-amber/20 group">
+                <div className="relative aspect-square rounded-xl overflow-hidden border border-mn-bronze/20 group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={bookCoverUrl} alt="Buchcover" className="w-full h-full object-cover" />
                   <button
@@ -384,7 +384,7 @@ export default function CreateListingPage() {
                   >
                     <X className="w-3 h-3" />
                   </button>
-                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-amber">
+                  <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-bronze">
                     Cover
                   </span>
                 </div>
@@ -402,7 +402,7 @@ export default function CreateListingPage() {
                     <X className="w-3 h-3" />
                   </button>
                   {idx === 0 && (
-                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-amber-warm">
+                    <span className="absolute bottom-1 left-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-mn-elevated/90 text-mn-bronze-warm">
                       Cover
                     </span>
                   )}
@@ -413,7 +413,7 @@ export default function CreateListingPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-xl border-2 border-dashed border-white/8 flex flex-col items-center justify-center gap-1 text-mn-ghost hover:text-mn-amber hover:border-mn-amber/30 hover:bg-mn-amber/5/50 transition-all"
+                  className="aspect-square rounded-xl border-2 border-dashed border-white/8 flex flex-col items-center justify-center gap-1 text-mn-ghost hover:text-mn-bronze hover:border-mn-bronze/30 hover:bg-mn-bronze/5/50 transition-all"
                 >
                   <ImagePlus className="w-5 h-5" />
                   <span className="text-xs font-medium">Bild</span>

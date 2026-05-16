@@ -263,7 +263,7 @@ function PostsContent() {
             <button
               onClick={() => setShowAdvanced(s => !s)}
               className={cn('flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold tracking-wide border transition-all',
-                showAdvanced ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20' : 'bg-mn-void text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
+                showAdvanced ? 'bg-mn-bronze/5 text-mn-bronze border-mn-bronze/20' : 'bg-mn-void text-mn-ink-soft border-white/5 hover:border-mn-bronze/20'
               )}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -329,7 +329,7 @@ function PostsContent() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-semibold text-mn-ink-soft flex items-center gap-1.5">
-                <Navigation className="w-4 h-4 text-mn-amber" /> {t('radiusFilter')}
+                <Navigation className="w-4 h-4 text-mn-bronze" /> {t('radiusFilter')}
               </label>
               {(userLat || radiusKm) && (
                 <button onClick={clearRadius} className="text-xs text-mn-herzrot hover:underline">{t('reset')}</button>
@@ -340,10 +340,10 @@ function PostsContent() {
                 <button
                   onClick={handleGetLocation}
                   disabled={gettingLocation}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm border border-mn-amber/20 bg-mn-amber/5 text-mn-amber hover:bg-mn-amber/10 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm border border-mn-bronze/20 bg-mn-bronze/5 text-mn-bronze hover:bg-mn-bronze/10 transition-all"
                 >
                   {gettingLocation
-                    ? <span className="w-4 h-4 border-2 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" />
+                    ? <span className="w-4 h-4 border-2 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" />
                     : <Navigation className="w-4 h-4" />}
                   {t('useMyLocation')}
                 </button>
@@ -358,8 +358,8 @@ function PostsContent() {
                       onClick={() => setRadiusKm(radiusKm === km ? null : km)}
                       className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
                         radiusKm === km
-                          ? 'bg-mn-amber text-white border-primary-600'
-                          : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-amber/20'
+                          ? 'bg-mn-bronze text-white border-primary-600'
+                          : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-bronze/20'
                       )}
                     >
                       {km} km
@@ -373,7 +373,7 @@ function PostsContent() {
           {/* Tag filter */}
           <div>
             <label className="text-sm font-semibold text-mn-ink-soft flex items-center gap-1.5 mb-2">
-              <Tag className="w-4 h-4 text-mn-amber" /> {t('filterByTags')}
+              <Tag className="w-4 h-4 text-mn-bronze" /> {t('filterByTags')}
             </label>
             <div className="flex flex-wrap gap-2">
               {POPULAR_TAGS.map(tag => (
@@ -383,7 +383,7 @@ function PostsContent() {
                   className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
                     activeTag === tag
                       ? 'bg-violet-600 text-white border-white/5'
-                      : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-white/5 hover:text-mn-amber'
+                      : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-white/5 hover:text-mn-bronze'
                   )}
                 >
                   {tag}
@@ -399,7 +399,7 @@ function PostsContent() {
         <div className="flex flex-wrap gap-2 items-center">
           <span className="text-xs text-mn-mute">{t('activeFilters')}</span>
           {search && (
-            <span className="flex items-center gap-1 bg-mn-amber/10 text-mn-amber px-2 py-1 rounded-full text-xs font-medium">
+            <span className="flex items-center gap-1 bg-mn-bronze/10 text-mn-bronze px-2 py-1 rounded-full text-xs font-medium">
               🔍 {search} <button onClick={clearSearch} aria-label="Suche zurücksetzen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
@@ -409,7 +409,7 @@ function PostsContent() {
             </span>
           )}
           {activeTag && (
-            <span className="flex items-center gap-1 bg-mn-elevated text-mn-amber px-2 py-1 rounded-full text-xs font-medium">
+            <span className="flex items-center gap-1 bg-mn-elevated text-mn-bronze px-2 py-1 rounded-full text-xs font-medium">
               🏷️ {activeTag} <button onClick={() => setActiveTag('')} aria-label="Tag-Filter entfernen" className="p-1"><X className="w-3 h-3" /></button>
             </span>
           )}
@@ -429,8 +429,8 @@ function PostsContent() {
             onClick={() => setFilter(f.value)}
             className={cn('px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
               filter === f.value
-                ? 'bg-mn-amber text-white border-primary-600'
-                : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-amber/20'
+                ? 'bg-mn-bronze text-white border-primary-600'
+                : 'bg-mn-elevated text-mn-ink-soft border-white/8 hover:border-mn-bronze/20'
             )}
           >
             {f.label}
@@ -488,10 +488,10 @@ function PostsContent() {
               <button
                 onClick={() => load(false)}
                 disabled={loadingMore}
-                className="flex items-center gap-2 px-6 py-2.5 bg-mn-elevated border border-white/8 rounded-xl text-sm font-medium text-mn-ink-soft hover:border-mn-amber/20 hover:text-mn-amber transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-mn-elevated border border-white/8 rounded-xl text-sm font-medium text-mn-ink-soft hover:border-mn-bronze/20 hover:text-mn-bronze transition-all disabled:opacity-50"
               >
                 {loadingMore ? (
-                  <><span className="w-4 h-4 border-2 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" /> {tc('loading')}</>
+                  <><span className="w-4 h-4 border-2 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" /> {tc('loading')}</>
                 ) : (
                   <><ChevronDown className="w-4 h-4" /> {t('loadMore')}</>
                 )}
@@ -506,7 +506,7 @@ function PostsContent() {
 
 export default function PostsPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-8 h-8 border-4 border-mn-amber/20 border-t-mn-amber rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-8 h-8 border-4 border-mn-bronze/20 border-t-mn-bronze rounded-full animate-spin" /></div>}>
       <PostsContent />
     </Suspense>
   )

@@ -23,11 +23,11 @@ function JobCard({ job }: { job: JobOffer }) {
   return (
     <div className="bg-mn-elevated rounded-2xl border border-white/8 shadow-soft hover:shadow-card hover:border-stone-300 transition-all p-4 group">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-mn-amber/5 border border-white/8 flex items-center justify-center flex-shrink-0">
-          <Briefcase className="w-5 h-5 text-mn-amber" />
+        <div className="w-10 h-10 rounded-xl bg-mn-bronze/5 border border-white/8 flex items-center justify-center flex-shrink-0">
+          <Briefcase className="w-5 h-5 text-mn-bronze" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-mn-ink text-sm leading-snug group-hover:text-mn-amber transition-colors">
+          <h3 className="font-semibold text-mn-ink text-sm leading-snug group-hover:text-mn-bronze transition-colors">
             {job.title}
           </h3>
           <p className="text-xs text-mn-ink-soft mt-0.5 font-medium">{job.employer}</p>
@@ -43,7 +43,7 @@ function JobCard({ job }: { job: JobOffer }) {
               </span>
             )}
             {wt && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-mn-amber/5 text-mn-amber border border-white/8">
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-mn-bronze/5 text-mn-bronze border border-white/8">
                 {wt}
               </span>
             )}
@@ -54,7 +54,7 @@ function JobCard({ job }: { job: JobOffer }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${job.title} bei ${job.employer} öffnen`}
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-amber text-white hover:bg-primary-700 transition-colors whitespace-nowrap"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-mn-bronze text-white hover:bg-primary-700 transition-colors whitespace-nowrap"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Zur Stelle</span>
@@ -155,7 +155,7 @@ export default function JobSearchPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-mn-ink flex items-center gap-2">
-          <Briefcase className="w-6 h-6 text-mn-amber" />
+          <Briefcase className="w-6 h-6 text-mn-bronze" />
           Jobs in der Nachbarschaft
         </h1>
         <p className="text-sm text-mn-mute mt-0.5">
@@ -213,14 +213,14 @@ export default function JobSearchPage() {
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all',
               showFilters || worktime.length
-                ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
+                ? 'bg-mn-bronze/5 text-mn-bronze border-mn-bronze/20'
                 : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:bg-mn-surface',
             )}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             Arbeitszeit
             {worktime.length > 0 && (
-              <span className="w-4 h-4 rounded-full bg-mn-amber text-white text-[9px] font-bold flex items-center justify-center">
+              <span className="w-4 h-4 rounded-full bg-mn-bronze text-white text-[9px] font-bold flex items-center justify-center">
                 {worktime.length}
               </span>
             )}
@@ -229,7 +229,7 @@ export default function JobSearchPage() {
           <button
             onClick={() => doSearch(0)}
             disabled={!plz.trim() || loading}
-            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-amber text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
+            className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-mn-bronze text-white hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
             {loading
               ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -248,13 +248,13 @@ export default function JobSearchPage() {
                 className={cn(
                   'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium border cursor-pointer transition-all select-none',
                   worktime.includes(o.key)
-                    ? 'bg-mn-amber/5 text-mn-amber border-mn-amber/20'
-                    : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20',
+                    ? 'bg-mn-bronze/5 text-mn-bronze border-mn-bronze/20'
+                    : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20',
                 )}
               >
                 <input
                   type="checkbox"
-                  className="w-3.5 h-3.5 accent-mn-amber"
+                  className="w-3.5 h-3.5 accent-mn-bronze"
                   checked={worktime.includes(o.key)}
                   onChange={() => toggleWorktime(o.key)}
                 />

@@ -77,8 +77,8 @@ export default function BottomNav({
                 aria-label={t(item.label as Parameters<typeof t>[0])}
                 className={cn(
                   'relative flex flex-col items-center justify-center gap-0.5 touch-target py-1.5 rounded-xl transition-all',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-amber focus-visible:ring-offset-2 focus-visible:ring-offset-mn-elevated',
-                  active ? 'text-mn-amber' : 'text-mn-mute hover:text-mn-ink-soft',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-mn-bronze focus-visible:ring-offset-2 focus-visible:ring-offset-mn-elevated',
+                  active ? 'text-mn-bronze' : 'text-mn-mute hover:text-mn-ink-soft',
                 )}
               >
                 {isHighlight ? (
@@ -108,13 +108,13 @@ export default function BottomNav({
                   className={cn(
                     'text-xs font-medium leading-tight',
                     isHighlight && '-mt-0.5',
-                    active ? 'text-mn-amber font-semibold' : 'text-mn-mute',
+                    active ? 'text-mn-bronze font-semibold' : 'text-mn-mute',
                   )}
                 >
                   {t(item.label as Parameters<typeof t>[0])}
                 </span>
                 {active && !isHighlight && (
-                  <div className="absolute bottom-0 w-5 h-0.5 rounded-full bg-mn-amber animate-[scaleIn_0.2s_ease-out]" />
+                  <div className="absolute bottom-0 w-5 h-0.5 rounded-full bg-mn-bronze animate-[scaleIn_0.2s_ease-out]" />
                 )}
               </Link>
             )

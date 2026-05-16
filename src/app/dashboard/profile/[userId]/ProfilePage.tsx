@@ -151,7 +151,7 @@ export default function PublicProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-mn-amber/30 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-mn-bronze/30 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -164,7 +164,7 @@ export default function PublicProfilePage() {
         <p className="text-mn-mute mb-6">
           Dieser Nutzer hat sein Profil auf privat gestellt und ist daher nicht einsehbar.
         </p>
-        <Link href="/dashboard" className="text-mn-amber hover:text-mn-amber font-medium text-sm">
+        <Link href="/dashboard" className="text-mn-bronze hover:text-mn-bronze font-medium text-sm">
           Zurück zum Dashboard
         </Link>
       </div>
@@ -179,7 +179,7 @@ export default function PublicProfilePage() {
         <p className="text-mn-mute mb-6">
           Dieses Profil ist derzeit nicht verfügbar.
         </p>
-        <Link href="/dashboard" className="text-mn-amber hover:text-mn-amber font-medium text-sm">
+        <Link href="/dashboard" className="text-mn-bronze hover:text-mn-bronze font-medium text-sm">
           Zurück zum Dashboard
         </Link>
       </div>
@@ -194,7 +194,7 @@ export default function PublicProfilePage() {
         <p className="text-mn-mute mb-6">
           Das gesuchte Profil konnte nicht gefunden werden.
         </p>
-        <Link href="/dashboard" className="text-mn-amber hover:text-mn-amber font-medium text-sm">
+        <Link href="/dashboard" className="text-mn-bronze hover:text-mn-bronze font-medium text-sm">
           Zurück zum Dashboard
         </Link>
       </div>

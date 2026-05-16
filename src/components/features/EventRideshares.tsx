@@ -104,8 +104,8 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-mn-amber/5">
-            <Car className="w-4 h-4 text-mn-amber" />
+          <div className="p-2 rounded-xl bg-mn-bronze/5">
+            <Car className="w-4 h-4 text-mn-bronze" />
           </div>
           <div>
             <h3 className="text-sm font-bold text-mn-ink">Fahrgemeinschaften</h3>
@@ -116,7 +116,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="shine inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-semibold border border-mn-amber/20 text-mn-amber rounded-xl hover:bg-mn-amber/5 transition-colors"
+            className="shine inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-semibold border border-mn-bronze/20 text-mn-bronze rounded-xl hover:bg-mn-bronze/5 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" /> Eintrag
           </button>
@@ -125,7 +125,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
 
       {/* Form */}
       {showForm && (
-        <div className="mb-5 border border-white/8 rounded-2xl p-4 bg-mn-amber/5/30">
+        <div className="mb-5 border border-white/8 rounded-2xl p-4 bg-mn-bronze/5/30">
           {/* Role toggle */}
           <div className="flex items-center gap-2 mb-4">
             <button
@@ -133,8 +133,8 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               onClick={() => setRole('offer')}
               className={`flex-1 h-9 text-xs font-semibold rounded-xl border transition-all ${
                 role === 'offer'
-                  ? 'bg-mn-amber text-white border-primary-600 shadow-soft'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
+                  ? 'bg-mn-bronze text-white border-primary-600 shadow-soft'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20'
               }`}
             >
               Ich biete Sitze an
@@ -144,8 +144,8 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               onClick={() => setRole('seek')}
               className={`flex-1 h-9 text-xs font-semibold rounded-xl border transition-all ${
                 role === 'seek'
-                  ? 'bg-mn-amber text-white border-primary-600 shadow-soft'
-                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
+                  ? 'bg-mn-bronze text-white border-primary-600 shadow-soft'
+                  : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20'
               }`}
             >
               Ich suche Mitfahrt
@@ -208,7 +208,7 @@ export default function EventRideshares({ eventId, currentUserId }: Props) {
               type="button"
               disabled={submitting}
               onClick={submit}
-              className="shine inline-flex items-center gap-1.5 h-9 px-5 text-xs font-semibold bg-mn-amber text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60 shadow-soft"
+              className="shine inline-flex items-center gap-1.5 h-9 px-5 text-xs font-semibold bg-mn-bronze text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-60 shadow-soft"
             >
               {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               Eintragen
@@ -247,7 +247,7 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
 }) {
   const isOffer = variant === 'offer'
   return (
-    <div className={`rounded-2xl border p-3 ${isOffer ? 'bg-mn-amber/5/40 border-white/8' : 'bg-[#4F6D8A]/5 border-[#4F6D8A]/20'}`}>
+    <div className={`rounded-2xl border p-3 ${isOffer ? 'bg-mn-bronze/5/40 border-white/8' : 'bg-[#4F6D8A]/5 border-[#4F6D8A]/20'}`}>
       <h4 className="text-[11px] font-semibold uppercase tracking-wider text-mn-mute mb-3">
         {title} ({items.length})
       </h4>
@@ -266,8 +266,8 @@ function RideColumn({ title, variant, items, currentUserId, onRemove }: {
                   {item.profile?.avatar_url ? (
                     <img src={item.profile.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover ring-1 ring-primary-100" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-mn-amber/5 flex items-center justify-center">
-                      <User className="w-3.5 h-3.5 text-mn-amber" />
+                    <div className="w-7 h-7 rounded-full bg-mn-bronze/5 flex items-center justify-center">
+                      <User className="w-3.5 h-3.5 text-mn-bronze" />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">

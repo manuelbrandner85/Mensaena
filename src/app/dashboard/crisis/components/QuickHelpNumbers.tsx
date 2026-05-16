@@ -14,7 +14,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   crisis: 'bg-cyan-50 border-cyan-200 text-cyan-700',
   children: 'bg-mn-surface border-white/5 text-mn-herzrot-warm',
   women: 'bg-rose-50 border-rose-200 text-rose-700',
-  poison: 'bg-mn-surface border-white/8 text-mn-amber',
+  poison: 'bg-mn-surface border-white/8 text-mn-bronze',
   other: 'bg-mn-surface border-white/5 text-mn-ink-soft',
 }
 

@@ -39,12 +39,12 @@ function DepartureRow({ dep }: { dep: TransitDeparture }) {
       )}
       <span className={cn(
         'text-sm font-semibold tabular-nums flex-shrink-0',
-        delay ? 'text-mn-amber-warm' : 'text-mn-ink',
+        delay ? 'text-mn-bronze-warm' : 'text-mn-ink',
       )}>
         {time}
       </span>
       {delay && (
-        <span className="text-xs font-medium text-mn-amber-warm flex-shrink-0 hidden sm:block">
+        <span className="text-xs font-medium text-mn-bronze-warm flex-shrink-0 hidden sm:block">
           {delay}
         </span>
       )}

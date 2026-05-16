@@ -144,7 +144,7 @@ function StatCard({
   color: 'primary' | 'green' | 'gray'
 }) {
   const colorMap = {
-    primary: 'bg-mn-amber/5 text-mn-amber border-white/8',
+    primary: 'bg-mn-bronze/5 text-mn-bronze border-white/8',
     green:   'bg-mn-surface text-mn-leben border-white/5',
     gray:    'bg-mn-surface text-mn-ink-soft border-white/5',
   }
@@ -178,7 +178,7 @@ function ViewTab({
       onClick={onClick}
       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
         active
-          ? 'bg-mn-amber text-white shadow-sm'
+          ? 'bg-mn-bronze text-white shadow-sm'
           : 'text-mn-ink-soft hover:bg-mn-elevated'
       }`}
     >
@@ -406,7 +406,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
   return (
     <div className="space-y-5">
       {/* Bereich 1: Wochenrückblick (letzte 7 Tage) */}
-      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-4">
+      <div className="bg-mn-bronze/5 border border-white/8 rounded-2xl p-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-lg">📊</span>
           <h3 className="text-sm font-bold text-mn-ink">Wochenrückblick generieren</h3>
@@ -415,7 +415,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
         <button
           onClick={generateDraft}
           disabled={generating}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors"
         >
           {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
           Wochenrückblick generieren
@@ -441,7 +441,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
           <button
             onClick={generateFreeTopic}
             disabled={generatingFree}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-xs font-medium shadow-sm disabled:opacity-50 transition-colors whitespace-nowrap"
           >
             {generatingFree ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Generieren
@@ -517,7 +517,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                   toast.error(e instanceof Error ? e.message : 'Template laden fehlgeschlagen')
                 }
               }}
-              className="px-3 py-2 bg-mn-surface hover:bg-mn-amber/5 border border-white/5 hover:border-mn-amber/20 rounded-xl text-xs font-medium text-mn-ink-soft hover:text-mn-amber transition-all"
+              className="px-3 py-2 bg-mn-surface hover:bg-mn-bronze/5 border border-white/5 hover:border-mn-bronze/20 rounded-xl text-xs font-medium text-mn-ink-soft hover:text-mn-bronze transition-all"
             >
               {tpl.icon} {tpl.label}
             </button>
@@ -597,7 +597,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
             </div>
             {socialGenerating ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-mn-amber" />
+                <Loader2 className="w-6 h-6 animate-spin text-mn-bronze" />
                 <span className="ml-3 text-sm text-mn-mute">KI generiert Posts…</span>
               </div>
             ) : socialResult && (
@@ -650,16 +650,16 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
             <div className="p-5 space-y-4">
 
               {/* AI-Optimizer */}
-              <div className="bg-gradient-to-r from-mn-amber/8 to-mn-teal-soft border border-white/8 rounded-xl p-4">
+              <div className="bg-gradient-to-r from-mn-bronze/8 to-mn-teal-soft border border-white/8 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-mn-amber" />
+                    <TrendingUp className="w-4 h-4 text-mn-bronze" />
                     <span className="text-xs font-bold text-mn-ink">KI-Betreffzeilen-Analyse</span>
                   </div>
                   <button
                     onClick={runAiOptimizer}
                     disabled={aiScoring}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-mn-amber hover:bg-mn-amber text-white rounded-lg text-xs font-medium disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-mn-bronze hover:bg-mn-bronze text-white rounded-lg text-xs font-medium disabled:opacity-50"
                   >
                     {aiScoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                     Analysieren
@@ -687,7 +687,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                               const c = campaigns.find(x => x.id === sendCampaignId)
                               if (c) { c.subject = alt; toast.success('Betreff übernommen – bitte Kampagne speichern') }
                             }}
-                            className="block w-full text-left text-xs text-mn-amber hover:text-primary-900 bg-mn-elevated hover:bg-mn-amber/5 border border-white/8 rounded-lg px-3 py-2 transition-colors"
+                            className="block w-full text-left text-xs text-mn-bronze hover:text-primary-900 bg-mn-elevated hover:bg-mn-bronze/5 border border-white/8 rounded-lg px-3 py-2 transition-colors"
                           >
                             {alt}
                           </button>
@@ -714,8 +714,8 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                       onClick={() => toggleChannel(ch.id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                         channels.includes(ch.id)
-                          ? 'bg-mn-amber text-white border-mn-amber'
-                          : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-amber/20'
+                          ? 'bg-mn-bronze text-white border-mn-bronze'
+                          : 'bg-mn-elevated text-mn-ink-soft border-white/5 hover:border-mn-bronze/20'
                       }`}
                     >
                       {ch.icon} {ch.label}
@@ -726,21 +726,21 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-mn-surface transition-colors">
-                  <input type="radio" name="sendMode" checked={sendMode === 'all'} onChange={() => setSendMode('all')} className="accent-mn-amber" />
+                  <input type="radio" name="sendMode" checked={sendMode === 'all'} onChange={() => setSendMode('all')} className="accent-mn-bronze" />
                   <div>
                     <p className="text-sm font-medium text-mn-ink">An alle Abonnenten</p>
                     <p className="text-xs text-mn-mute">Alle aktiven Subscriber</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-mn-surface transition-colors">
-                  <input type="radio" name="sendMode" checked={sendMode === 'segment'} onChange={() => setSendMode('segment')} className="accent-mn-amber" />
+                  <input type="radio" name="sendMode" checked={sendMode === 'segment'} onChange={() => setSendMode('segment')} className="accent-mn-bronze" />
                   <div>
                     <p className="text-sm font-medium text-mn-ink">An eine Gruppe</p>
                     <p className="text-xs text-mn-mute">Neue User, Inaktive oder nach Region</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-mn-surface transition-colors">
-                  <input type="radio" name="sendMode" checked={sendMode === 'specific'} onChange={() => setSendMode('specific')} className="accent-mn-amber" />
+                  <input type="radio" name="sendMode" checked={sendMode === 'specific'} onChange={() => setSendMode('specific')} className="accent-mn-bronze" />
                   <div>
                     <p className="text-sm font-medium text-mn-ink">An bestimmte Personen</p>
                     <p className="text-xs text-mn-mute">Manuelle E-Mail-Adressen eingeben</p>
@@ -778,12 +778,12 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
               {/* A/B Testing */}
               <div className="border border-white/5 rounded-xl p-4">
                 <label className="flex items-center gap-3 cursor-pointer">
-                  <div className={`w-10 h-6 rounded-full transition-colors relative ${abEnabled ? 'bg-mn-amber' : 'bg-mn-raised'}`}>
+                  <div className={`w-10 h-6 rounded-full transition-colors relative ${abEnabled ? 'bg-mn-bronze' : 'bg-mn-raised'}`}>
                     <div className={`absolute top-1 w-4 h-4 bg-mn-elevated rounded-full shadow transition-all ${abEnabled ? 'left-5' : 'left-1'}`} />
                     <input type="checkbox" className="sr-only" checked={abEnabled} onChange={e => setAbEnabled(e.target.checked)} />
                   </div>
                   <div className="flex items-center gap-2">
-                    <FlaskConical className="w-4 h-4 text-mn-amber" />
+                    <FlaskConical className="w-4 h-4 text-mn-bronze" />
                     <span className="text-xs font-bold text-mn-ink">A/B-Test aktivieren</span>
                   </div>
                 </label>
@@ -792,11 +792,11 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     <p className="text-xs text-mn-mute">Jede Variante wird an {abSplitPct}% der Empfänger gesendet. Nach 4h gewinnt die Version mit mehr Öffnungen.</p>
                     <div>
                       <label className="block text-xs font-bold text-mn-ink-soft mb-1">Betreff A</label>
-                      <input value={abSubjectA} onChange={e => setAbSubjectA(e.target.value)} className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber/30" placeholder="Variante A" />
+                      <input value={abSubjectA} onChange={e => setAbSubjectA(e.target.value)} className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze/30" placeholder="Variante A" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-mn-ink-soft mb-1">Betreff B</label>
-                      <input value={abSubjectB} onChange={e => setAbSubjectB(e.target.value)} className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-amber/30" placeholder="Variante B" />
+                      <input value={abSubjectB} onChange={e => setAbSubjectB(e.target.value)} className="w-full px-3 py-2 border border-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-mn-bronze/30" placeholder="Variante B" />
                     </div>
                     <div className="flex items-center gap-3">
                       <label className="text-xs text-mn-ink-soft whitespace-nowrap">Split: {abSplitPct}% / {abSplitPct}%</label>
@@ -813,7 +813,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
                     type="checkbox"
                     checked={!!scheduledAt}
                     onChange={e => setScheduledAt(e.target.checked ? new Date(Date.now() + 3600000).toISOString().slice(0, 16) : '')}
-                    className="accent-mn-amber"
+                    className="accent-mn-bronze"
                   />
                   <span className="font-medium">Versand planen</span>
                 </label>
@@ -833,7 +833,7 @@ function CampaignsView({ onChange }: { onChange: () => void }) {
               <button
                 onClick={doSend}
                 disabled={sending || (sendMode === 'specific' && !sendEmails.trim())}
-                className="inline-flex items-center gap-2 px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50"
               >
                 {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 {scheduledAt ? 'Versand planen' : 'Jetzt senden'}
@@ -875,15 +875,15 @@ function CampaignRow({
       })
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-mn-elevated border border-white/5 hover:border-mn-amber/20 rounded-xl transition-colors">
-      <div className="flex-shrink-0 w-10 h-10 bg-mn-amber/5 rounded-xl flex items-center justify-center">
-        <Mail className="w-4 h-4 text-mn-amber" />
+    <div className="flex items-center gap-3 p-3 bg-mn-elevated border border-white/5 hover:border-mn-bronze/20 rounded-xl transition-colors">
+      <div className="flex-shrink-0 w-10 h-10 bg-mn-bronze/5 rounded-xl flex items-center justify-center">
+        <Mail className="w-4 h-4 text-mn-bronze" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-sm font-semibold text-mn-ink truncate">{campaign.subject}</p>
           {campaign.auto_generated && (
-            <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wide bg-mn-amber/5 text-mn-amber px-1.5 py-0.5 rounded">
+            <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wide bg-mn-bronze/5 text-mn-bronze px-1.5 py-0.5 rounded">
               Auto
             </span>
           )}
@@ -914,7 +914,7 @@ function CampaignRow({
         {onSend && (
           <button
             onClick={onSend}
-            className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-amber hover:bg-mn-amber text-white rounded-lg text-xs font-medium"
+            className="inline-flex items-center gap-1 px-3 py-1.5 bg-mn-bronze hover:bg-mn-bronze text-white rounded-lg text-xs font-medium"
           >
             <Send className="w-3 h-3" /> Senden
           </button>
@@ -1047,7 +1047,7 @@ function CampaignEditModal({
               <label className="text-xs font-bold text-mn-ink-soft">HTML-Inhalt</label>
               <button
                 onClick={() => setShowPreview(p => !p)}
-                className="text-xs text-mn-amber hover:underline"
+                className="text-xs text-mn-bronze hover:underline"
               >
                 {showPreview ? 'HTML anzeigen' : 'Vorschau anzeigen'}
               </button>
@@ -1078,7 +1078,7 @@ function CampaignEditModal({
           <button
             onClick={save}
             disabled={saving}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium shadow-sm disabled:opacity-50"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             Speichern
@@ -1154,10 +1154,10 @@ function WelcomeView() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-5">
+      <div className="bg-mn-bronze/5 border border-white/8 rounded-2xl p-5">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-mn-elevated rounded-xl flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-mn-amber" />
+            <Sparkles className="w-5 h-5 text-mn-bronze" />
           </div>
           <div className="min-w-0">
             <h3 className="text-sm font-bold text-mn-ink">Automatische Willkommensmail</h3>
@@ -1174,7 +1174,7 @@ function WelcomeView() {
       <div className="bg-mn-elevated border border-white/5 rounded-2xl p-5">
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-sm font-bold text-mn-ink">Versand-Protokoll</h4>
-          <button onClick={loadLogs} className="text-xs text-mn-amber hover:underline">
+          <button onClick={loadLogs} className="text-xs text-mn-bronze hover:underline">
             <RefreshCw className="w-3 h-3 inline mr-1" />Aktualisieren
           </button>
         </div>
@@ -1381,9 +1381,9 @@ function ComplianceView() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-5">
+      <div className="bg-mn-bronze/5 border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-3 mb-1">
-          <ShieldCheck className="w-5 h-5 text-mn-amber" />
+          <ShieldCheck className="w-5 h-5 text-mn-bronze" />
           <h3 className="text-sm font-bold text-mn-ink">DSGVO & Email-Compliance</h3>
         </div>
         <p className="text-xs text-mn-ink-soft">Alle Nutzer haben beim Registrieren aktiv zugestimmt (Double-Opt-In via Supabase Auth). Jede Mail enthält einen Abmeldelink.</p>
@@ -1474,9 +1474,9 @@ function DripView() {
 
   return (
     <div className="space-y-5">
-      <div className="bg-mn-amber/5 border border-white/8 rounded-2xl p-5">
+      <div className="bg-mn-bronze/5 border border-white/8 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-1">
-          <GitBranch className="w-4 h-4 text-mn-amber" />
+          <GitBranch className="w-4 h-4 text-mn-bronze" />
           <h3 className="text-sm font-bold text-mn-ink">Drip-Kampagnen & Auto-Funnels</h3>
         </div>
         <p className="text-xs text-mn-ink-soft">Automatische E-Mail-Sequenzen: z.B. Willkommen → Tag 3: Tipps → Tag 7: Erste Hilfe anbieten → Tag 14: Feedback.</p>
@@ -1486,7 +1486,7 @@ function DripView() {
         <p className="text-sm font-bold text-mn-ink">Funnels ({campaigns.length})</p>
         <button
           onClick={() => setEditDrip({ id: '', name: '', description: null, trigger_type: 'on_register', active: false, created_at: new Date().toISOString() })}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium"
         >
           <FileText className="w-4 h-4" /> Neuer Funnel
         </button>
@@ -1501,9 +1501,9 @@ function DripView() {
       ) : (
         <div className="space-y-2">
           {campaigns.map(drip => (
-            <div key={drip.id} className="flex items-center gap-3 p-4 bg-mn-elevated border border-white/5 hover:border-mn-amber/20 rounded-xl transition-colors">
-              <div className="flex-shrink-0 w-10 h-10 bg-mn-amber/5 rounded-xl flex items-center justify-center">
-                <GitBranch className="w-4 h-4 text-mn-amber" />
+            <div key={drip.id} className="flex items-center gap-3 p-4 bg-mn-elevated border border-white/5 hover:border-mn-bronze/20 rounded-xl transition-colors">
+              <div className="flex-shrink-0 w-10 h-10 bg-mn-bronze/5 rounded-xl flex items-center justify-center">
+                <GitBranch className="w-4 h-4 text-mn-bronze" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-mn-ink">{drip.name}</p>
@@ -1698,16 +1698,16 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
           </div>
 
           {/* KI-Generator */}
-          <div className="bg-gradient-to-r from-mn-amber to-mn-teal-soft border border-white/5 rounded-xl p-4">
+          <div className="bg-gradient-to-r from-mn-bronze to-mn-teal-soft border border-white/5 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-mn-amber" />
+                <Zap className="w-4 h-4 text-mn-bronze" />
                 <span className="text-xs font-bold text-mn-ink">KI-Funnel-Generator</span>
               </div>
               <button
                 onClick={generateWithAi}
                 disabled={generating}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-mn-amber/8 text-white rounded-lg text-xs font-medium disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-mn-bronze/8 text-white rounded-lg text-xs font-medium disabled:opacity-50"
               >
                 {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                 {generating ? 'Generiert…' : 'Automatisch generieren'}
@@ -1721,7 +1721,7 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
               <label className="text-xs font-bold text-mn-ink-soft">Schritte ({steps.length})</label>
               <button
                 onClick={() => setSteps(s => [...s, { delay_days: 7, subject: '', html_content: '' }])}
-                className="text-xs text-mn-amber hover:underline"
+                className="text-xs text-mn-bronze hover:underline"
               >+ Schritt hinzufügen</button>
             </div>
             <div className="space-y-3">
@@ -1754,7 +1754,7 @@ function DripEditModal({ drip, onClose, onSaved }: { drip: DripCampaign; onClose
         </div>
         <div className="p-5 border-t border-white/5 flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 text-mn-ink-soft hover:bg-mn-elevated rounded-xl text-sm">Abbrechen</button>
-          <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2 bg-mn-amber hover:bg-mn-amber text-white rounded-xl text-sm font-medium disabled:opacity-50">
+          <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 px-5 py-2 bg-mn-bronze hover:bg-mn-bronze text-white rounded-xl text-sm font-medium disabled:opacity-50">
             {saving && <Loader2 className="w-4 h-4 animate-spin" />} Speichern
           </button>
         </div>

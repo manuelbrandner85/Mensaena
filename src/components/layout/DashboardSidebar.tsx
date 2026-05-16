@@ -47,7 +47,7 @@ interface NavGroup {
 }
 
 const ACCENTS: Record<string, GroupAccent> = {
-  personal:  { header: 'text-mn-amber',     activeBg: 'bg-mn-amber/5',     activeBorder: 'border-mn-amber',     activeText: 'text-mn-amber',     activeIcon: 'text-mn-amber',     dot: 'bg-mn-amber'     },
+  personal:  { header: 'text-mn-bronze',     activeBg: 'bg-mn-bronze/5',     activeBorder: 'border-mn-bronze',     activeText: 'text-mn-bronze',     activeIcon: 'text-mn-bronze',     dot: 'bg-mn-bronze'     },
   help:      { header: 'text-mn-teal-soft', activeBg: 'bg-mn-teal/8',      activeBorder: 'border-mn-teal',      activeText: 'text-mn-teal-soft', activeIcon: 'text-mn-teal-soft', dot: 'bg-mn-teal'      },
   community: { header: 'text-mn-trust-soft',activeBg: 'bg-mn-trust/8',     activeBorder: 'border-mn-trust',     activeText: 'text-mn-trust-soft',activeIcon: 'text-mn-trust-soft',dot: 'bg-mn-trust'     },
   emergency: { header: 'text-mn-herzrot-warm',activeBg:'bg-mn-herzrot/8',  activeBorder: 'border-mn-herzrot',   activeText: 'text-mn-herzrot-warm',activeIcon:'text-mn-herzrot-warm',dot:'bg-mn-herzrot'  },
@@ -283,7 +283,7 @@ export default function DashboardSidebar({
               className={cn(
                 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors',
                 pathname.startsWith('/dashboard/admin')
-                  ? 'bg-mn-amber/8 text-mn-amber font-medium border-l-2 border-mn-amber pl-[10px]'
+                  ? 'bg-mn-bronze/8 text-mn-bronze font-medium border-l-2 border-mn-bronze pl-[10px]'
                   : 'text-mn-ink-soft hover:bg-mn-elevated/[0.02]',
               )}
             >

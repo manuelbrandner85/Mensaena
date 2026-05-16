@@ -33,7 +33,7 @@ export function WeatherForecastCard({ day }: WeatherForecastCardProps) {
       <span className="text-xs font-medium text-mn-mute dark:text-mn-mute">
         {weekday}
       </span>
-      <Icon aria-hidden className="h-7 w-7 text-mn-amber" />
+      <Icon aria-hidden className="h-7 w-7 text-mn-bronze" />
       <div className="text-sm font-semibold text-mn-ink dark:text-stone-100">
         {Math.round(day.tempMax)}°
       </div>

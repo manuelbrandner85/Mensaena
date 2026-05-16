@@ -172,7 +172,7 @@ export default function InteractionsList({
           <div key={group.key}>
             <div className="flex items-center gap-3 mb-3">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-mn-amber" />
+                <div className="w-2 h-2 rounded-full bg-mn-bronze" />
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-mn-mute">{group.label}</h3>
               </div>
               <div className="flex-1 h-px bg-gradient-to-r from-stone-200 to-transparent" />
@@ -199,7 +199,7 @@ export default function InteractionsList({
         <div className="text-center py-4">
           <button
             onClick={onLoadMore}
-            className="px-6 py-2 text-sm font-medium text-mn-amber bg-mn-amber/5 rounded-lg hover:bg-mn-amber/10 transition-colors"
+            className="px-6 py-2 text-sm font-medium text-mn-bronze bg-mn-bronze/5 rounded-lg hover:bg-mn-bronze/10 transition-colors"
           >
             Mehr laden
           </button>

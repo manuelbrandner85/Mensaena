@@ -191,13 +191,13 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                   />
                 </div>
               ) : (
-                <div className="w-1.5 bg-mn-amber flex-shrink-0" />
+                <div className="w-1.5 bg-mn-bronze flex-shrink-0" />
               )}
 
               <div className="flex-1 p-3 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-mn-amber animate-pulse" />
-                  <span className="text-xs font-semibold text-mn-amber uppercase tracking-wider">Neu</span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-mn-bronze animate-pulse" />
+                  <span className="text-xs font-semibold text-mn-bronze uppercase tracking-wider">Neu</span>
                 </div>
                 <p className="text-sm font-semibold text-mn-ink truncate">
                   {notification.actor_name && (
@@ -214,7 +214,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                     onClick={() => toast.dismiss(t.id)}
                     className={cn(
                       'text-sm font-semibold mt-2 block',
-                      isCrisis ? 'text-mn-herzrot font-bold' : 'text-mn-amber',
+                      isCrisis ? 'text-mn-herzrot font-bold' : 'text-mn-bronze',
                     )}
                   >
                     {action.emoji} {action.label} →
@@ -227,7 +227,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 <Link
                   href={notification.link || '/dashboard/notifications'}
                   onClick={() => toast.dismiss(t.id)}
-                  className="text-xs font-medium text-mn-amber hover:text-mn-amber whitespace-nowrap"
+                  className="text-xs font-medium text-mn-bronze hover:text-mn-bronze whitespace-nowrap"
                 >
                   Anzeigen
                 </Link>
@@ -310,7 +310,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
       {/* UPDATE-SYSTEM: Minimaler Banner wenn Web-Update dismissed */}
       {mounted && update.webUpdateAvailable && update.webDismissed && (
-        <div className="fixed top-0 inset-x-0 z-[9998] h-10 bg-mn-amber text-white flex items-center justify-center gap-2 text-sm font-medium shadow-md">
+        <div className="fixed top-0 inset-x-0 z-[9998] h-10 bg-mn-bronze text-white flex items-center justify-center gap-2 text-sm font-medium shadow-md">
           <span>🆕 Update verfügbar</span>
           <button
             onClick={update.applyWebUpdate}

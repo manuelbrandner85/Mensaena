@@ -65,7 +65,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
     return (
       <button
         onClick={() => router.push(`/dashboard/events/${event.id}`)}
-        className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-mn-amber/5/50 transition text-left group"
+        className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-mn-bronze/5/50 transition text-left group"
       >
         <div
           className="w-2 h-2 rounded-full flex-shrink-0 group-hover:scale-125 transition-transform"
@@ -109,7 +109,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40 pointer-events-none" />
           {isToday(startDate) && (
-            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold bg-mn-amber/10 text-mn-amber">
+            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-bold bg-mn-bronze/10 text-mn-bronze">
               Heute
             </span>
           )}
@@ -118,7 +118,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
 
       {/* Today ring (nur wenn kein Bild vorhanden) */}
       {isToday(startDate) && !event.image_url && (
-        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-xs font-bold bg-mn-amber/10 text-mn-amber">
+        <div className="absolute top-0 right-0 m-3 px-2 py-0.5 rounded-full text-xs font-bold bg-mn-bronze/10 text-mn-bronze">
           Heute
         </div>
       )}
@@ -222,7 +222,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 'shine px-3 py-1.5 rounded-xl text-sm font-medium transition-all',
                 isFull
                   ? 'bg-mn-elevated text-mn-mute cursor-not-allowed'
-                  : 'bg-mn-amber text-white hover:bg-primary-700 shadow-sm hover:shadow-md',
+                  : 'bg-mn-bronze text-white hover:bg-primary-700 shadow-sm hover:shadow-md',
               )}
             >
               {isFull ? 'Voll' : 'Teilnehmen'}
@@ -234,7 +234,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
                 className={cn(
                   'inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all',
                   event.my_attendance === 'going'
-                    ? 'text-mn-amber border-mn-amber/20 bg-mn-amber/5'
+                    ? 'text-mn-bronze border-mn-bronze/20 bg-mn-bronze/5'
                     : event.my_attendance === 'interested'
                       ? 'text-amber-600 border-amber-300 bg-amber-50'
                       : 'text-mn-mute border-white/8 bg-mn-surface',
@@ -249,8 +249,8 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
               {showMenu && (
                 <div className="absolute right-0 top-full mt-1 bg-mn-elevated rounded-xl shadow-cinema-card border border-white/5 z-20 min-w-[160px] py-1">
                   {event.my_attendance !== 'going' && (
-                    <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-amber/5 rounded-t-xl">
-                      <Check className="w-3.5 h-3.5 text-mn-amber" /> Teilnehmen
+                    <button onClick={() => handleAttend('going')} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-mn-ink-soft hover:bg-mn-bronze/5 rounded-t-xl">
+                      <Check className="w-3.5 h-3.5 text-mn-bronze" /> Teilnehmen
                     </button>
                   )}
                   {event.my_attendance !== 'interested' && (
@@ -275,7 +275,7 @@ export default function EventCard({ event, onAttend, onRemove, compact }: EventC
           {/* Cost */}
           <span className={cn(
             'text-xs font-semibold',
-            (!event.cost || event.cost === 'kostenlos') ? 'text-mn-amber' : 'text-mn-ink-soft',
+            (!event.cost || event.cost === 'kostenlos') ? 'text-mn-bronze' : 'text-mn-ink-soft',
           )}>
             {(!event.cost || event.cost === 'kostenlos') ? 'Kostenlos' : event.cost}
           </span>

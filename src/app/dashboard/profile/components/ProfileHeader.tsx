@@ -103,10 +103,10 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
           {/* Avatar — Cinema ProfilOrb-style with amber glow ring */}
           <div className="relative flex-shrink-0">
             <div
-              className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-mn-raised p-1.5 ring-2 ring-mn-amber/40"
+              className="h-32 w-32 sm:h-36 sm:w-36 rounded-full bg-mn-raised p-1.5 ring-2 ring-mn-bronze/40"
               style={{ boxShadow: '0 0 24px 0 rgba(245,158,11,0.25), 0 0 48px 0 rgba(245,158,11,0.10)' }}
             >
-              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-mn-amber/15 to-mn-deep flex items-center justify-center">
+              <div className="h-full w-full overflow-hidden rounded-full bg-gradient-to-br from-mn-bronze/15 to-mn-deep flex items-center justify-center">
                 {profile.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -115,7 +115,7 @@ export default function ProfileHeader({ profile, onEdit }: Props) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="display-numeral text-3xl font-bold text-mn-amber">
+                  <span className="display-numeral text-3xl font-bold text-mn-bronze">
                     {initials || 'N'}
                   </span>
                 )}

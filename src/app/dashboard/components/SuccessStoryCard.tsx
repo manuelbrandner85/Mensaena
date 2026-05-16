@@ -91,8 +91,8 @@ export default function SuccessStoryCard() {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-mn-amber/10 flex items-center justify-center flex-shrink-0">
-            <BookHeart className="w-4 h-4 text-mn-amber" />
+          <div className="w-8 h-8 rounded-lg bg-mn-bronze/10 flex items-center justify-center flex-shrink-0">
+            <BookHeart className="w-4 h-4 text-mn-bronze" />
           </div>
           <p className="text-xs font-semibold uppercase tracking-wider text-mn-mute">
             Erfolgsgeschichte
