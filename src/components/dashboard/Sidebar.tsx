@@ -98,16 +98,6 @@ const navSections = [
         activeBorder: 'border-mn-bronze/30',
       },
       {
-        href: '/dashboard/create',
-        label: 'Beitrag erstellen',
-        icon: FilePlus,
-        iconBg: 'bg-mn-bronze',
-        activeBg: 'bg-mn-bronze/5',
-        activeText: 'text-mn-bronze',
-        activeBorder: 'border-mn-bronze/30',
-        highlight: true,
-      },
-      {
         href: '/dashboard/posts',
         label: 'Alle Beiträge',
         icon: FileText,

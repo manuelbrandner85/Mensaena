@@ -92,7 +92,6 @@ export default function CommandPalette() {
       { id: 'crisis', label: 'Krisenhilfe', hint: 'Schnelle Hilfe im Notfall', icon: ShieldAlert, href: '/dashboard/crisis', group: 'Navigation' },
 
       // Erstellen
-      { id: 'create-post', label: 'Beitrag erstellen', hint: 'Angebot oder Anfrage', icon: PlusCircle, href: '/dashboard/create', group: 'Erstellen', keywords: 'new neu post' },
       { id: 'create-event', label: 'Event erstellen', hint: 'Nachbarschafts-Veranstaltung', icon: Calendar, href: '/dashboard/events/create', group: 'Erstellen' },
       { id: 'create-crisis', label: 'Krise melden', hint: 'Ich brauche sofort Hilfe', icon: ShieldAlert, href: '/dashboard/crisis/create', group: 'Erstellen', keywords: 'sos notfall' },
 

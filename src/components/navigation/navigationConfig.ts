@@ -37,7 +37,6 @@ export interface NavGroupConfig {
 // ── Main Navigation (always visible, no group header) ──────────────────
 export const mainNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { id: 'create', label: 'create', path: '/dashboard/create', icon: PlusCircle, variant: 'highlight' },
   { id: 'notifications', label: 'notifications', path: '/dashboard/notifications', icon: Bell, badgeKey: 'unreadNotifications' },
 ]
 
@@ -164,7 +163,6 @@ export const navGroups: NavGroupConfig[] = [
 export const bottomNavItems: NavItemConfig[] = [
   { id: 'dashboard',     label: 'home',          path: '/dashboard',                  icon: LayoutDashboard },
   { id: 'map',           label: 'map',           path: '/dashboard/map',              icon: Map },
-  { id: 'create',        label: 'createShort',   path: '/dashboard/create',           icon: PlusCircle, variant: 'highlight' },
   { id: 'messages',      label: 'chat',          path: '/dashboard/messages',         icon: MessageCircle, badgeKey: 'unreadMessages' },
   { id: 'notifications', label: 'notifications', path: '/dashboard/notifications',    icon: Bell, badgeKey: 'unreadNotifications' },
 ]

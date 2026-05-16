@@ -41,16 +41,6 @@ export default function DashboardTopbar({ user, onOpenWidgetSettings }: Dashboar
           </button>
         )}
 
-        {/* Quick Create */}
-        <Link
-          href="/dashboard/create"
-          className="flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #1EAAA6 0%, #38a169 100%)' }}
-        >
-          <Plus className="w-4 h-4" />
-          Beitrag erstellen
-        </Link>
-
         {/* Notification Bell */}
         <NotificationBell userId={user.id} />
 

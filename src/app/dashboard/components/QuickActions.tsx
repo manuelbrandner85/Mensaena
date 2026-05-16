@@ -14,15 +14,6 @@ interface QuickActionsProps {
 
 const actions = [
   {
-    id: 'create',
-    icon: PlusCircle,
-    label: 'Beitrag erstellen',
-    href: '/dashboard/create' as string | null,
-    gradient: 'from-mn-bronze to-mn-bronze-warm',
-    glow: 'rgba(245,158,11,0.40)',
-    iconColor: 'text-mn-deep',
-  },
-  {
     id: 'map',
     icon: Map,
     label: 'Karte öffnen',

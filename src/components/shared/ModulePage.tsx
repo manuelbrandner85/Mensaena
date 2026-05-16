@@ -291,14 +291,6 @@ export default function ModulePage({
               <p className="page-subtitle mt-2">{description}</p>
             </div>
           </div>
-          <Link
-            href={createUrl}
-            onClick={() => haptic.medium()}
-            className="cta-cinema-ink magnetic group inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-paper text-sm font-medium tracking-wide flex-shrink-0"
-          >
-            <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
-            <span>Beitrag erstellen</span>
-          </Link>
         </div>
 
         {/* Live-Zähler: Suche / Biete */}

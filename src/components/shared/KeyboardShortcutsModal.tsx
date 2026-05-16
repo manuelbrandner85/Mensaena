@@ -77,7 +77,6 @@ export default function KeyboardShortcutsModal() {
           { keys: ['G', 'S'], label: 'Einstellungen' },
           { keys: ['G', 'E'], label: 'Veranstaltungen' },
           { keys: ['G', 'K'], label: 'Kalender' },
-          { keys: ['G', '+'], label: 'Beitrag erstellen' },
         ],
       },
       {
