@@ -191,11 +191,10 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
     setSelectedPost(post)
     if (post) {
       setShowMobileDetail(true)
-      // Set route destination to selected post
+      // Pre-set route destination but DON'T auto-show route display
+      // User can request routing explicitly from the detail panel
       if (post.latitude && post.longitude) {
         setRouteTo([post.latitude as number, post.longitude as number])
-        setShowRouteDisplay(true)
-        setRouteResult(null)
       }
     }
   }, [])
@@ -346,7 +345,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
               'absolute top-3 left-3 z-[500] flex items-center gap-1.5 px-3 py-2 rounded-2xl shadow-lg backdrop-blur-md text-xs font-semibold transition-all',
               waterVisible
                 ? 'bg-blue-600 text-white border border-white/5'
-                : 'bg-mn-elevated/95 text-stone-700 border border-white/5 hover:bg-mn-elevated',
+                : 'bg-mn-elevated/95 text-mn-ink-soft border border-white/5 hover:bg-mn-elevated',
               !routeFrom && 'opacity-50 cursor-not-allowed',
             )}
           >
@@ -375,14 +374,18 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
         {/* Desktop Detail Panel */}
         {selectedPost && (
           <div className="hidden lg:block w-80 flex-shrink-0 animate-slide-in">
-            <PostDetailPanel post={selectedPost} onClose={() => setSelectedPost(null)} />
+            <PostDetailPanel
+              post={selectedPost}
+              onClose={() => setSelectedPost(null)}
+              onShowRoute={() => setShowRouteDisplay(true)}
+            />
           </div>
         )}
       </div>
 
-      {/* Mobile FABs */}
+      {/* Mobile FABs – hidden when post detail sheet is open to avoid overlapping content */}
       {/* data-bot-avoid: MensaenaBot misst diesen Stack und positioniert sich darüber */}
-      <div data-bot-avoid="true" className="fixed bottom-6 right-4 z-30 flex flex-col gap-3 md:hidden">
+      <div data-bot-avoid="true" className={cn('fixed bottom-6 right-4 z-30 flex flex-col gap-3 md:hidden', (showMobileDetail && selectedPost) && 'hidden')}>
         {/* Filter FAB */}
         <button
           onClick={() => setShowMobileFilters(true)}
@@ -472,6 +475,10 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
               setShowMobileDetail(false)
               setSelectedPost(null)
             }}
+            onShowRoute={() => {
+              setShowMobileDetail(false)
+              setShowRouteDisplay(true)
+            }}
           />
         )}
       </MobileSheet>
@@ -479,7 +486,7 @@ export default function MapView({ posts, initialRouteTo, initialCenter }: {
   )
 }
 
-function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void }) {
+function PostDetailPanel({ post, onClose, onShowRoute }: { post: AnyPost; onClose: () => void; onShowRoute?: () => void }) {
   return (
     <div className="md:card md:p-5 md:h-full overflow-y-auto">
       <div className="flex items-start justify-between mb-4">
@@ -494,6 +501,14 @@ function PostDetailPanel({ post, onClose }: { post: AnyPost; onClose: () => void
       <p className="text-sm text-mn-ink-soft mb-4 leading-relaxed">{post.description}</p>
 
       <div className="space-y-2">
+        {onShowRoute && (
+          <button
+            type="button"
+            onClick={onShowRoute}
+            className="flex items-center gap-2 w-full p-3 bg-mn-bronze/10 text-mn-bronze rounded-xl text-sm font-medium hover:bg-mn-bronze/20 transition-colors touch-target border border-mn-bronze/20">
+            🗺️ Route berechnen
+          </button>
+        )}
         {post.contact_phone && (
           <a href={`tel:${post.contact_phone}`}
             className="flex items-center gap-2 w-full p-3 bg-mn-bronze/5 text-mn-bronze rounded-xl text-sm font-medium hover:bg-mn-bronze/10 transition-colors touch-target">
