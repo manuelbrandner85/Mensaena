@@ -9,6 +9,7 @@ import '../../../core/theme/dimensions.dart';
 import '../../../core/theme/typography.dart';
 import '../../../core/widgets/cinema_avatar.dart';
 import '../../../core/widgets/cinema_stat.dart';
+import '../../../core/widgets/kategorie_chip.dart';
 import '../../../core/widgets/nachbarschaft_card.dart';
 import '../../../services/supabase/supabase_service.dart';
 import '../providers/dashboard_data_provider.dart';
