@@ -33,6 +33,9 @@ coverage/
 .env.local
 *.keystore
 key.properties
+# Firebase config — wird in CI aus GOOGLE_SERVICES_JSON Secret wiederhergestellt.
+# Lokale Builds dürfen einen Stub haben, der aber nicht ins Repo gehört.
+android/app/google-services.json
 
 # OS
 .DS_Store
