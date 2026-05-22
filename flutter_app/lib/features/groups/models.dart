@@ -22,7 +22,7 @@ class GroupCategory {
     GroupCategory(value: 'bildung', label: 'Bildung & Lernen', emoji: '📚', accent: Color(0xFF6366F1)),
     GroupCategory(value: 'tiere', label: 'Tiere', emoji: '🐾', accent: Color(0xFFD97706)),
     GroupCategory(value: 'handwerk', label: 'Handwerk & DIY', emoji: '🔧', accent: Color(0xFF64748B)),
-    GroupCategory(value: 'sonstiges', label: 'Sonstiges', emoji: '💬', accent: Color(0xFF1EAAA6)),
+    GroupCategory(value: 'sonstiges', label: 'Sonstiges', emoji: '💬', accent: Color(0xFF475569)),
   ];
 
   static GroupCategory forValue(String? v) {
