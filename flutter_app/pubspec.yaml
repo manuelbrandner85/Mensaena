@@ -1,11 +1,7 @@
 name: mensaena
-description: Mensaena – Nachbarschaftshilfe (Flutter Native App)
+description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-# Version-Convention: <semver>+<buildNumber>. Build-Number nur erhöhen,
-# wenn eine neue APK released werden soll (Pflicht-Update via [mandatory]
-# im Commit-Body, sonst optional). Patches gehen automatisch via Shorebird
-# auf die aktuelle Version-Linie.
-version: 3.3.0+33000
+version: 4.0.0+40000
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -17,110 +13,62 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Backend – identisch zur Web-App
-  supabase_flutter: ^2.5.6      # Supabase: Auth, DB, Realtime, Storage
-  livekit_client: ^2.2.4        # LiveKit Voice/Video Calls
-
-  # State Management (Pendant zu Zustand-Stores aus Web)
+  # State Management
   flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
 
-  # Routing (Pendant zu Next.js App-Router)
+  # Backend
+  supabase_flutter: ^2.5.6
+
+  # Routing
   go_router: ^14.2.0
 
-  # HTTP für Cloudflare Workers API-Routes
-  dio: ^5.4.3+1
-
-  # UI / Design-System
-  google_fonts: ^6.2.1          # Inter, DM Serif Display, JetBrains Mono
-  cached_network_image: ^3.3.1
-  flutter_svg: ^2.0.10+1
-  shimmer: ^3.0.0
-  fluttertoast: ^8.2.6          # Pendant zu react-hot-toast
-  flutter_hooks: ^0.20.5
-  flutter_animate: ^4.5.0       # Cinema 3.0 — orchestrierte Micro-Animationen
-  lucide_icons: ^0.257.0        # Cinema 3.0 — Icons identisch zur Webseite
-
-  # Karte (Pendant zu Leaflet + MarkerCluster)
+  # Karte (OpenStreetMap, nicht Google Maps)
   flutter_map: ^7.0.1
   flutter_map_marker_cluster: ^1.3.6
   latlong2: ^0.9.1
-  geolocator: ^12.0.0           # @capacitor/geolocation Pendant
-  geocoding: ^3.0.0             # Cinema 3.0 — Reverse-Geocoding fuer Standort-Anzeige
-  connectivity_plus: ^6.0.5     # Cinema 3.0 — Offline-Detection
 
-  # Native-Plugins (Pendants zu Capacitor)
-  # Push-Notifications via Firebase Cloud Messaging — braucht
-  # google-services.json (in CI via GOOGLE_SERVICES_JSON Secret).
+  # Echtzeit-Voice/Video
+  livekit_client: ^2.2.4
+
+  # Push Notifications
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3
-  flutter_local_notifications: ^17.2.3
-  image_picker: ^1.1.2          # @capacitor/camera
-  image_cropper: ^10.0.0        # Cinema 3.0 — Avatar/Post-Image Crop (web-Compat fuer firebase_messaging_web)
-  flutter_sound: ^9.27.5        # Voice-Recording + Playback (single package)
-  share_plus: ^10.0.0           # @capacitor/share (kompatibel mit firebase_messaging_web + Kotlin 1.9)
-  path_provider: ^2.1.3         # @capacitor/filesystem
-  permission_handler: ^11.3.1
+
+  # Fonts (Inter, Fraunces, Instrument Serif, JetBrains Mono)
+  google_fonts: ^6.2.1
+
+  # Icons (Web-konsistent)
+  lucide_icons: ^0.257.0
+
+  # Media
+  image_picker: ^1.1.2
+  cached_network_image: ^3.3.1
+
+  # Geo
+  geolocator: ^12.0.0
+  geocoding: ^3.0.0
+
+  # Utils
+  intl: '>=0.19.0 <1.0.0'
   url_launcher: ^6.3.0
-  open_filex: ^4.5.0             # APK-Installer-Intent (in-app Update)
-  package_info_plus: ^8.0.0
-  device_info_plus: ^10.1.0
-
-  # Forms / Validation
-  form_builder_validators: ^11.0.0
-  flutter_form_builder: ^9.3.0
-
-  # Utilities
-  intl: '>=0.19.0 <1.0.0'       # i18n + Datum/Zahl-Formatierung (flexibel für Firebase-Konflikte)
-  collection: ^1.18.0
-  uuid: ^4.4.0
-  shared_preferences: ^2.2.3    # localStorage Pendant
+  share_plus: ^10.0.0
   flutter_secure_storage: ^9.2.2
-
-  # Markdown (für Wiki / Knowledge)
+  package_info_plus: ^8.0.0
+  qr_flutter: ^4.1.0
+  shimmer: ^3.0.0
+  connectivity_plus: ^6.0.5
   flutter_markdown: ^0.7.3
-
-  cupertino_icons: ^1.0.8
-
+  crypto: ^3.0.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_lints: ^4.0.0
-  build_runner: ^2.4.11
-  riverpod_generator: ^2.4.0
-  custom_lint: ^0.6.4
-  riverpod_lint: ^2.3.10
-  flutter_launcher_icons: ^0.14.1
-
-# Generiert die Android-Launcher-Icons aus assets/launcher/icon.png.
-# Aufruf in CI nach `flutter pub get`:
-#   dart run flutter_launcher_icons
-flutter_launcher_icons:
-  android: "ic_launcher"
-  ios: false
-  image_path: "assets/launcher/icon.png"
-  min_sdk_android: 23
-  adaptive_icon_background: "#0a1024"
-  adaptive_icon_foreground: "assets/launcher/icon.png"
-  remove_alpha_ios: true
+  mockito: ^5.4.4
 
 flutter:
   uses-material-design: true
-  generate: true
-
   assets:
     - assets/images/
-    - assets/launcher/
-    - assets/icons/
-    - assets/i18n/
-    - shorebird.yaml
-
-  # Cinema 3.0 — Fragment-Shader fuer Atmosphaere (FBM-Nebel, Wet-Asphalt, Film-Grain).
-  # Werden via ui.FragmentProgram.fromAsset() geladen und vom ShaderLayer-Widget gerendert.
-  shaders:
-    - shaders/atmosphere.frag
-    - shaders/wet_reflection.frag
-    - shaders/film_grain.frag
-
-  # Inter + DM Serif Display + JetBrains Mono via google_fonts (CDN, kein lokales Asset).

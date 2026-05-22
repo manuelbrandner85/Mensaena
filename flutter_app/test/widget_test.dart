@@ -1,22 +1,19 @@
-// Smoke-Test: stellt sicher, dass das Theme + Buttons-Widget rendert.
-// Der Standard-Test, den `flutter create` generiert, referenziert MyApp –
-// unsere App-Klasse heißt MensaenaApp. Diese Datei überschreibt den Default.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mensaena/core/theme/mensaena_theme.dart';
-import 'package:mensaena/widgets/buttons.dart';
+import 'package:mensaena/config/theme/app_theme.dart';
 
+/// Smoke-Test: stellt sicher, dass AppTheme.dark instantiierbar ist.
+/// SupabaseService.init() wird hier bewusst NICHT aufgerufen — der Test
+/// laeuft ohne Netzwerk.
 void main() {
-  testWidgets('BtnPrimary rendert mit Label', (WidgetTester tester) async {
+  testWidgets('AppTheme.dark wird angewendet', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: MensaenaTheme.dark,
-        home: Scaffold(
-          body: BtnPrimary(onPressed: () {}, label: 'Test'),
-        ),
+        theme: AppTheme.dark,
+        home: const Scaffold(body: Text('Mensaena')),
       ),
     );
-    expect(find.text('Test'), findsOneWidget);
+    expect(find.text('Mensaena'), findsOneWidget);
   });
 }
