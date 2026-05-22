@@ -29,7 +29,7 @@ class _LandingPageState extends ConsumerState<LandingPage> {
 
   Future<_PlatformStats?> _loadStats() async {
     try {
-      final dynamic data = await sb.rpc('get_platform_stats');
+      final data = await sb.rpc<dynamic>('get_platform_stats');
       if (data is Map) {
         final stats = _PlatformStats(
           users: (data['users'] as num?)?.toInt() ?? 0,

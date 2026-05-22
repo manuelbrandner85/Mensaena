@@ -4,14 +4,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mensaena/theme/app_theme.dart';
+import 'package:mensaena/core/theme/mensaena_theme.dart';
 import 'package:mensaena/widgets/buttons.dart';
 
 void main() {
   testWidgets('BtnPrimary rendert mit Label', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.light(),
+        theme: MensaenaTheme.dark,
         home: Scaffold(
           body: BtnPrimary(onPressed: () {}, label: 'Test'),
         ),
