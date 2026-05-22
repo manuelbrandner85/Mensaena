@@ -10,10 +10,9 @@ import '../../services/supabase_service.dart';
 /// Auth-Screen — Login + Register + Magic-Link. Voll funktional gegen
 /// dieselbe Supabase-Instanz wie die Webseite.
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({this.mode = 'login', this.referralCode, super.key});
+  const AuthScreen({this.mode = 'login', super.key});
 
   final String mode;
-  final String? referralCode;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();

@@ -7,7 +7,7 @@ import 'package:mensaena/config/theme/app_theme.dart';
 /// SupabaseService.init() wird hier bewusst NICHT aufgerufen — der Test
 /// laeuft ohne Netzwerk.
 void main() {
-  testWidgets('AppTheme.dark wird angewendet', (tester) async {
+  testWidgets('AppTheme.dark wird angewendet', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.dark,

@@ -14,12 +14,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: kDebugMode,
-    refreshListenable: _AuthRefreshNotifier(ref),
     redirect: (context, state) {
       final loggedIn = SupabaseService.isLoggedIn;
       final loc = state.matchedLocation;
-      final isAuthRoute = loc == '/auth' || loc == '/login' || loc == '/register';
-      final isPublic = _publicRoutes.any((p) => loc == p || loc.startsWith('$p/'));
+      final isAuthRoute =
+          loc == '/auth' || loc == '/login' || loc == '/register';
+      final isPublic = _publicRoutes.any(
+        (p) => loc == p || loc.startsWith('$p/'),
+      );
 
       if (!loggedIn && !isAuthRoute && !isPublic) {
         return '/auth?mode=login';
@@ -36,17 +38,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/auth',
         builder: (_, s) => AuthScreen(
           mode: s.uri.queryParameters['mode'] ?? 'login',
-          referralCode: s.uri.queryParameters['ref'],
         ),
       ),
-      GoRoute(
-        path: '/login',
-        redirect: (_, __) => '/auth?mode=login',
-      ),
-      GoRoute(
-        path: '/register',
-        redirect: (_, __) => '/auth?mode=register',
-      ),
+      GoRoute(path: '/login', redirect: (_, __) => '/auth?mode=login'),
+      GoRoute(path: '/register', redirect: (_, __) => '/auth?mode=register'),
       _placeholder('/about', 'Über uns'),
       _placeholder('/spenden', 'Spenden'),
       _placeholder('/kontakt', 'Kontakt'),
@@ -71,7 +66,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/dashboard/posts', 'Beitraege', phase: 'Phase 3'),
       _placeholder('/dashboard/profile', 'Profil', phase: 'Phase 3'),
       _placeholder('/dashboard/settings', 'Einstellungen', phase: 'Phase 3'),
-      _placeholder('/dashboard/notifications', 'Benachrichtigungen', phase: 'Phase 3'),
+      _placeholder(
+        '/dashboard/notifications',
+        'Benachrichtigungen',
+        phase: 'Phase 3',
+      ),
       _placeholder('/dashboard/animals', 'Tiere', phase: 'Phase 4'),
       _placeholder('/dashboard/housing', 'Wohnen', phase: 'Phase 4'),
       _placeholder('/dashboard/mobility', 'Mobilitaet', phase: 'Phase 4'),
@@ -87,30 +86,82 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/dashboard/badges', 'Badges', phase: 'Phase 4'),
       _placeholder('/dashboard/timebank', 'Zeitbank', phase: 'Phase 4'),
       _placeholder('/dashboard/skills', 'Skills', phase: 'Phase 4'),
-      _placeholder('/dashboard/organizations', 'Organisationen', phase: 'Phase 4'),
+      _placeholder(
+        '/dashboard/organizations',
+        'Organisationen',
+        phase: 'Phase 4',
+      ),
       _placeholder('/dashboard/supply', 'Versorgung', phase: 'Phase 4'),
       _placeholder('/dashboard/crisis', 'Krisenmodus', phase: 'Phase 4'),
-      _placeholder('/dashboard/warnungen', 'NINA-Warnungen', phase: 'Phase 4'),
+      _placeholder(
+        '/dashboard/warnungen',
+        'NINA-Warnungen',
+        phase: 'Phase 4',
+      ),
       _placeholder('/dashboard/board', 'Schwarzes Brett', phase: 'Phase 4'),
-      _placeholder('/dashboard/mental-support', 'Mentale Unterstuetzung', phase: 'Phase 4'),
+      _placeholder(
+        '/dashboard/mental-support',
+        'Mentale Unterstuetzung',
+        phase: 'Phase 4',
+      ),
       _placeholder('/dashboard/matching', 'Matching', phase: 'Phase 4'),
       _placeholder('/dashboard/rescuer', 'Rettung', phase: 'Phase 4'),
       _placeholder('/dashboard/sharing', 'Teilen', phase: 'Phase 4'),
       _placeholder('/dashboard/jobs', 'Jobs', phase: 'Phase 4'),
       _placeholder('/dashboard/invite', 'Einladen', phase: 'Phase 4'),
-      _placeholder('/dashboard/interactions', 'Interaktionen', phase: 'Phase 4'),
+      _placeholder(
+        '/dashboard/interactions',
+        'Interaktionen',
+        phase: 'Phase 4',
+      ),
 
       // ── Admin ──────────────────────────────────────────────
       _placeholder('/dashboard/admin', 'Admin', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/users', 'Admin: Users', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/posts', 'Admin: Posts', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/events', 'Admin: Events', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/board', 'Admin: Board', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/crisis', 'Admin: Krise', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/organizations', 'Admin: Orgs', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/farms', 'Admin: Farms', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/chat-moderation', 'Admin: Chat-Mod', phase: 'Phase 5'),
-      _placeholder('/dashboard/admin/system', 'Admin: System', phase: 'Phase 5'),
+      _placeholder(
+        '/dashboard/admin/users',
+        'Admin: Users',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/posts',
+        'Admin: Posts',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/events',
+        'Admin: Events',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/board',
+        'Admin: Board',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/crisis',
+        'Admin: Krise',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/organizations',
+        'Admin: Orgs',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/farms',
+        'Admin: Farms',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/chat-moderation',
+        'Admin: Chat-Mod',
+        phase: 'Phase 5',
+      ),
+      _placeholder(
+        '/dashboard/admin/system',
+        'Admin: System',
+        phase: 'Phase 5',
+      ),
     ],
     errorBuilder: (context, state) => const PlaceholderScreen(
       title: '404',
@@ -145,22 +196,3 @@ const Set<String> _publicRoutes = {
   '/live-ended',
   '/ratings',
 };
-
-/// Bridge: GoRouter refreshen wenn sich Auth-State aendert.
-class _AuthRefreshNotifier extends ChangeNotifier {
-  _AuthRefreshNotifier(this._ref) {
-    _sub = _ref.listen<AsyncValue<dynamic>>(
-      authStateProvider,
-      (_, __) => notifyListeners(),
-    );
-  }
-
-  final Ref _ref;
-  late final ProviderSubscription<AsyncValue<dynamic>> _sub;
-
-  @override
-  void dispose() {
-    _sub.close();
-    super.dispose();
-  }
-}
