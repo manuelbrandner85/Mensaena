@@ -445,6 +445,12 @@
       "skillPath": "plugins/testing-handbook-skills/skills/libfuzzer/SKILL.md",
       "computedHash": "c1983ef8e7b82370417045911a7f9e74d55d190a9b56c53cc63d87618afc5201"
     },
+    "livekit-agents": {
+      "source": "livekit/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/livekit-agents/SKILL.md",
+      "computedHash": "373669b9a938ced840f301173e838a0046408acd0397c02c03420cc9b6a8cb42"
+    },
     "marketing-ideas": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
@@ -691,6 +697,18 @@
       "skillPath": "plugins/building-secure-contracts/skills/substrate-vulnerability-scanner/SKILL.md",
       "computedHash": "91eef9710b84da7f248b3735c5d3166758268ac7a7f24cf09abf43f6cb8616fc"
     },
+    "supabase": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supabase/SKILL.md",
+      "computedHash": "1bb189e255c0e91161f14c618dce0eccf68174ceb963664cef7761b2f90cb466"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
+      "computedHash": "292c93e5a86e2429204bc37abe26b3c9023c4760eb02418462887f2082f118ce"
+    },
     "supply-chain-risk-auditor": {
       "source": "trailofbits/skills",
       "sourceType": "github",
@@ -768,6 +786,12 @@
       "sourceType": "github",
       "skillPath": "plugins/trailmark/skills/vector-forge/SKILL.md",
       "computedHash": "6e9c95d430215739d815220fc3a7adc08250dedfc5434903196815f5c70cf9ad"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/composition-patterns/SKILL.md",
+      "computedHash": "f98931159fa9c7fed043bcd18a891a46dcf89ababa38df13a4c5b7b30dc0ce07"
     },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
