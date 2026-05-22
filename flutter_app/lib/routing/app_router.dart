@@ -30,6 +30,7 @@ import '../features/groups/groups_page.dart';
 import '../features/interactions/interactions_page.dart';
 import '../features/invite/invite_page.dart';
 import '../features/jobs/jobs_page.dart';
+import '../features/download/download_page.dart';
 import '../features/landing/landing_page.dart';
 import '../features/calls/live_room_page.dart';
 import '../features/marketplace/marketplace_create_page.dart';
@@ -100,7 +101,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.login, redirect: (_, __) => '${Routes.auth}?mode=login'),
       GoRoute(path: Routes.register, redirect: (_, __) => '${Routes.auth}?mode=register'),
       GoRoute(path: Routes.onboarding, builder: (_, __) => const OnboardingPage()),
-      GoRoute(path: Routes.download, builder: (_, __) => const StubPage(title: 'Download')),
+      GoRoute(path: Routes.download, builder: (_, __) => const DownloadPage()),
       GoRoute(path: Routes.search, builder: (_, __) => const SearchPage()),
       GoRoute(path: Routes.spenden, builder: (_, __) => const StubPage(title: 'Spenden')),
       GoRoute(path: Routes.unsubscribe, builder: (_, __) => const StubPage(title: 'Unsubscribe')),
