@@ -92,3 +92,40 @@ class Group {
     );
   }
 }
+
+class GroupMember {
+  const GroupMember({
+    required this.id,
+    required this.groupId,
+    required this.userId,
+    required this.role,
+    this.joinedAt,
+    this.profileName,
+    this.profileAvatarUrl,
+  });
+
+  final String id;
+  final String groupId;
+  final String userId;
+  final String role;
+  final DateTime? joinedAt;
+  final String? profileName;
+  final String? profileAvatarUrl;
+
+  bool get isAdmin => role == 'admin' || role == 'owner';
+
+  factory GroupMember.fromJson(Map<String, dynamic> j) {
+    final profile = j['profiles'] as Map<String, dynamic>?;
+    return GroupMember(
+      id: j['id'] as String,
+      groupId: j['group_id'] as String? ?? '',
+      userId: j['user_id'] as String? ?? '',
+      role: j['role'] as String? ?? 'member',
+      joinedAt: j['joined_at'] != null
+          ? DateTime.tryParse(j['joined_at'] as String)
+          : null,
+      profileName: profile?['name'] as String? ?? profile?['display_name'] as String?,
+      profileAvatarUrl: profile?['avatar_url'] as String?,
+    );
+  }
+}

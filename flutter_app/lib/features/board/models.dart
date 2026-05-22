@@ -132,3 +132,61 @@ class BoardPost {
     );
   }
 }
+
+class BoardComment {
+  const BoardComment({
+    required this.id,
+    required this.boardPostId,
+    required this.authorId,
+    required this.content,
+    required this.createdAt,
+    this.authorName,
+    this.authorAvatarUrl,
+  });
+
+  final String id;
+  final String boardPostId;
+  final String authorId;
+  final String content;
+  final DateTime createdAt;
+  final String? authorName;
+  final String? authorAvatarUrl;
+
+  factory BoardComment.fromJson(Map<String, dynamic> j) {
+    final profile = j['profiles'] as Map<String, dynamic>?;
+    return BoardComment(
+      id: j['id'] as String,
+      boardPostId: j['board_post_id'] as String? ?? '',
+      authorId: j['author_id'] as String? ?? '',
+      content: j['content'] as String? ?? '',
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      authorName: profile?['name'] as String? ?? profile?['display_name'] as String?,
+      authorAvatarUrl: profile?['avatar_url'] as String?,
+    );
+  }
+}
+
+class BoardPin {
+  const BoardPin({
+    required this.id,
+    required this.userId,
+    required this.boardPostId,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String userId;
+  final String boardPostId;
+  final DateTime createdAt;
+
+  factory BoardPin.fromJson(Map<String, dynamic> j) {
+    return BoardPin(
+      id: j['id'] as String,
+      userId: j['user_id'] as String? ?? '',
+      boardPostId: j['board_post_id'] as String? ?? '',
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+          DateTime.now(),
+    );
+  }
+}

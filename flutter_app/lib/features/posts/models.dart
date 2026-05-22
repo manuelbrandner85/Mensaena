@@ -203,3 +203,48 @@ class Post {
     );
   }
 }
+
+class PostComment {
+  const PostComment({
+    required this.id,
+    required this.postId,
+    required this.userId,
+    required this.content,
+    required this.createdAt,
+    this.parentId,
+    this.isEdited = false,
+    this.deletedAt,
+    this.author,
+  });
+
+  final String id;
+  final String postId;
+  final String userId;
+  final String content;
+  final DateTime createdAt;
+  final String? parentId;
+  final bool isEdited;
+  final DateTime? deletedAt;
+  final Profile? author;
+
+  bool get isDeleted => deletedAt != null;
+  bool get isReply => parentId != null;
+
+  factory PostComment.fromJson(Map<String, dynamic> j) {
+    final profile = j['profiles'] as Map<String, dynamic>?;
+    return PostComment(
+      id: j['id'] as String,
+      postId: j['post_id'] as String? ?? '',
+      userId: j['user_id'] as String? ?? '',
+      content: j['content'] as String? ?? '',
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      parentId: j['parent_id'] as String?,
+      isEdited: (j['is_edited'] as bool?) ?? false,
+      deletedAt: j['deleted_at'] != null
+          ? DateTime.tryParse(j['deleted_at'] as String)
+          : null,
+      author: profile != null ? Profile.fromJson(profile) : null,
+    );
+  }
+}
