@@ -295,3 +295,46 @@ class CrisisHelper {
     );
   }
 }
+
+class CrisisUpdate {
+  const CrisisUpdate({
+    required this.id,
+    required this.crisisId,
+    required this.authorId,
+    required this.content,
+    required this.updateType,
+    required this.createdAt,
+    this.imageUrl,
+    this.isPinned = false,
+    this.authorName,
+    this.authorAvatarUrl,
+  });
+
+  final String id;
+  final String crisisId;
+  final String authorId;
+  final String content;
+  final String updateType;
+  final DateTime createdAt;
+  final String? imageUrl;
+  final bool isPinned;
+  final String? authorName;
+  final String? authorAvatarUrl;
+
+  factory CrisisUpdate.fromJson(Map<String, dynamic> j) {
+    final profile = j['profiles'] as Map<String, dynamic>?;
+    return CrisisUpdate(
+      id: j['id'] as String,
+      crisisId: j['crisis_id'] as String? ?? '',
+      authorId: j['author_id'] as String? ?? '',
+      content: j['content'] as String? ?? '',
+      updateType: j['update_type'] as String? ?? 'info',
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      imageUrl: j['image_url'] as String?,
+      isPinned: (j['is_pinned'] as bool?) ?? false,
+      authorName: profile?['name'] as String? ?? profile?['display_name'] as String?,
+      authorAvatarUrl: profile?['avatar_url'] as String?,
+    );
+  }
+}

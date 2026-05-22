@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
+// Legacy Light/Teal Theme. Wird seit Cinema 3.0 nicht mehr root-zugewiesen
+// (siehe lib/main.dart → MensaenaTheme.dark). Bleibt vorerst hier, weil
+// ~60 Feature-Files noch AppColors.* hardcoded importieren. Migration
+// dieser Imports erfolgt modulweise in Phase 4. Nichts Neues mit AppTheme.
+@Deprecated('Use MensaenaTheme.dark from lib/core/theme/mensaena_theme.dart')
 class AppTheme {
   AppTheme._();
 
