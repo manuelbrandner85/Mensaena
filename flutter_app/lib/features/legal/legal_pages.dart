@@ -215,36 +215,8 @@ Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer 
       );
 }
 
-class KontaktPage extends StatelessWidget {
-  const KontaktPage({super.key});
-  @override
-  Widget build(BuildContext context) => const _StaticTextPage(
-        title: 'Kontakt',
-        body: '''## E-Mail
-
-info@mensaena.de
-
-Wir antworten in der Regel innerhalb von 1–2 Werktagen.
-
-## Adresse
-
-Manuel Brandner
-Im Wahlsberg 10
-55545 Bad Kreuznach
-
-## Community
-
-Als registrierter Nutzer kannst du den Community-Chat nutzen, um dich mit der Mensaena-Community auszutauschen.
-
-## Häufige Anliegen
-
-- **Technische Probleme:** Bitte beschreibe das Problem und deinen Browser.
-- **Feedback & Ideen:** Wir freuen uns über Verbesserungsvorschläge!
-- **Meldungen:** Problematische Inhalte bitte mit Link melden.
-- **Datenschutz:** Anfragen gem. DSGVO bitte per E-Mail.
-''',
-      );
-}
+// KontaktPage in eigene Datei verschoben: features/kontakt/kontakt_page.dart
+// (Cinema-Variant mit echtem Formular, Supabase-Insert + Social-Links).
 
 class HaftungsausschlussPage extends StatelessWidget {
   const HaftungsausschlussPage({super.key});

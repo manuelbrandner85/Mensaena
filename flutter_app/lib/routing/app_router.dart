@@ -46,6 +46,7 @@ import '../features/warnungen/warnungen_food_page.dart';
 import '../features/warnungen/warnungen_page.dart';
 import '../features/wiki/wiki_create_page.dart';
 import '../features/wiki/wiki_page.dart';
+import '../features/kontakt/kontakt_page.dart';
 import '../features/legal/legal_pages.dart';
 import '../features/live_ended/live_ended_page.dart';
 import '../features/map/map_page.dart';
