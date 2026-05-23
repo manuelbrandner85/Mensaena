@@ -12,6 +12,11 @@ import '../../screens/dashboard/groups/groups_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_create_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_detail_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_screen.dart';
+import '../../screens/dashboard/organizations/organization_detail_screen.dart';
+import '../../screens/dashboard/organizations/organization_suggest_screen.dart';
+import '../../screens/dashboard/organizations/organizations_screen.dart';
+import '../../screens/dashboard/supply/farm_detail_screen.dart';
+import '../../screens/dashboard/supply/supply_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
@@ -221,12 +226,34 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const TimebankScreen(),
       ),
       _placeholder('/dashboard/skills', 'Skills', phase: 'Phase 4'),
-      _placeholder(
-        '/dashboard/organizations',
-        'Organisationen',
-        phase: 'Phase 4',
+      GoRoute(
+        path: '/dashboard/organizations',
+        builder: (_, __) => const OrganizationsScreen(),
+        routes: [
+          GoRoute(
+            path: 'suggest',
+            builder: (_, __) => const OrganizationSuggestScreen(),
+          ),
+          GoRoute(
+            path: ':orgId',
+            builder: (_, s) => OrganizationDetailScreen(
+              orgId: s.pathParameters['orgId']!,
+            ),
+          ),
+        ],
       ),
-      _placeholder('/dashboard/supply', 'Versorgung', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/supply',
+        builder: (_, __) => const SupplyScreen(),
+        routes: [
+          GoRoute(
+            path: ':slug',
+            builder: (_, s) => FarmDetailScreen(
+              slug: s.pathParameters['slug']!,
+            ),
+          ),
+        ],
+      ),
       GoRoute(
         path: '/dashboard/crisis',
         builder: (_, __) => const CrisisDashboardScreen(),
