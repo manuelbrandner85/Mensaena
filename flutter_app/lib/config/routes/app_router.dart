@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/dashboard/dashboard_home_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
@@ -58,7 +59,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/ratings', 'Bewertungen'),
 
       // ── Dashboard ──────────────────────────────────────────
-      _placeholder('/dashboard', 'Dashboard', phase: 'Phase 3'),
+      GoRoute(
+        path: '/dashboard',
+        builder: (_, __) => const DashboardHomeScreen(),
+      ),
       _placeholder('/dashboard/map', 'Karte', phase: 'Phase 3'),
       _placeholder('/dashboard/create', 'Beitrag erstellen', phase: 'Phase 3'),
       _placeholder('/dashboard/chat', 'Chat', phase: 'Phase 3'),

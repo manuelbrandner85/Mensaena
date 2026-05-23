@@ -1,14 +1,37 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-04-30 (feat(ui): C3 — Alle Header-Elemente auf Mobile sichtbar)
+> Aktualisiert: 2026-05-22 (Flutter Phase 3.1 – Dashboard Home + Scaffold)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=(keine kritischen)
-COUNT=200+ (alle kritischen erledigt)
-NEXT=Phase 2 Features
-LAST_SESSION=2026-04-30
-LAST_TASK=feat(ui): C3 — Alle Header-Elemente auf Mobile sichtbar
+OPEN=Flutter Phase 3.2+ (Map, Create, Posts, Chat, Messages, Notifications, Profile, Settings, Interactions)
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1 ✅, 3.1 ✅
+NEXT=Flutter Phase 3.2 – Map-Screen (flutter_map + get_nearby_posts RPC)
+LAST_SESSION=2026-05-22
+LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
+
+## Flutter-Migration
+- [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
+- [x] Phase 3.1 – Dashboard-Home + Scaffold:
+  - [x] DashboardHomeScreen (Greeting + 4 Stats parallel via Future.wait + Quick-Actions + Feed)
+  - [x] DashboardScaffold (AppBar mit NotificationBell, AppDrawer mit 6 Gruppen + Admin, BottomNav 5 Items)
+  - [x] ProfilesRepository, PostsRepository (get_nearby_posts RPC + Fallback), NotificationsRepository (Realtime), InteractionsRepository
+  - [x] notificationsStreamProvider + unreadNotificationCountProvider
+  - [x] PostCard mit Typ-Badge (13 Typen) + relative Zeit
+  - [x] StatCard mit Loading-Skeleton
+  - [x] flutter analyze 0 issues, APK 19.0 MB
+- [ ] Phase 3.2 – Map-Screen (flutter_map, MarkerCluster, get_nearby_posts RPC, Radius-Slider)
+- [ ] Phase 3.3 – Create-Post (3-Step: Art → Inhalt → Kontakt, Bild-Upload Supabase Storage, Geo, Tags)
+- [ ] Phase 3.4 – Posts-List + Post-Detail (Comments threaded, Votes, Shares, Save, Report)
+- [ ] Phase 3.5 – Chat-Screen (Realtime messages, Reactions, Pins, Reply)
+- [ ] Phase 3.6 – Messages-Screen (Konversations-Liste, Unread-Badge)
+- [ ] Phase 3.7 – Notifications-Screen (Realtime, Kategorie-Tabs)
+- [ ] Phase 3.8 – Profile-Screen (eigenes + fremdes + Trust-Score + Posts)
+- [ ] Phase 3.9 – Settings-Screen (5 Tabs: Account, Privacy, Notifications, Region, Danger)
+- [ ] Phase 3.10 – Interactions-Screen
+- [ ] Phase 4 – Module (Crisis zuerst, dann nach Brief-Reihenfolge)
+- [ ] Phase 5 – Admin-Dashboard
+- [ ] Phase 6 – LiveKit (livekit_client wieder rein wenn flutter_webrtc 3.27-kompatibel ist)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
