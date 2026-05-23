@@ -86,13 +86,20 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                 itemBuilder: (context, i) {
                   final c = convs[i];
                   final id = c['id'] as String;
-                  final title = (c['title'] as String?) ?? 'Konversation';
+                  // Verwende display_title aus enriched listMine
+                  // (Channel-Name mit Emoji ODER Partner-Display-Name).
+                  final title = (c['display_title'] as String?) ??
+                      (c['title'] as String?) ??
+                      'Konversation';
+                  final subtitle = c['display_subtitle'] as String?;
+                  final avatarUrl = c['peer_avatar_url'] as String?;
+                  final isChannel = c['is_channel'] == true;
+                  final isDm = c['is_dm'] == true;
                   final updatedAt = DateTime.tryParse(
                           (c['updated_at'] ?? c['created_at']) as String? ??
                               '') ??
                       DateTime.now();
-                  final peerId = (c['peer_user_id'] as String?) ??
-                      (c['other_user_id'] as String?);
+                  final peerId = c['peer_user_id'] as String?;
                   final online = peerId != null &&
                       (ref.watch(onlineUsersProvider).value ??
                               const <String>{})
@@ -112,16 +119,30 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                         children: [
                           Stack(
                             children: [
-                              const CircleAvatar(
+                              CircleAvatar(
                                 radius: 18,
                                 backgroundColor: AppColors.elevated,
-                                child: Icon(
-                                  LucideIcons.user,
-                                  size: 16,
-                                  color: AppColors.amber,
-                                ),
+                                backgroundImage: avatarUrl != null
+                                    ? NetworkImage(avatarUrl)
+                                    : null,
+                                child: avatarUrl == null
+                                    ? isChannel
+                                        ? Text(
+                                            (c['channel'] as Map?)?[
+                                                    'emoji']
+                                                    as String? ??
+                                                '💬',
+                                            style: const TextStyle(
+                                                fontSize: 18),
+                                          )
+                                        : const Icon(
+                                            LucideIcons.user,
+                                            size: 16,
+                                            color: AppColors.amber,
+                                          )
+                                    : null,
                               ),
-                              if (online)
+                              if (online && isDm)
                                 Positioned(
                                   right: 0,
                                   bottom: 0,
@@ -177,6 +198,16 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                     ),
                                   ],
                                 ),
+                                if (subtitle != null &&
+                                    subtitle.isNotEmpty) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    subtitle,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.caption(),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

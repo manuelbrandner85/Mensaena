@@ -7,6 +7,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/conversations_repository.dart';
+import '../../services/chat_context_service.dart';
+import '../../services/dm_call_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -28,12 +30,131 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool _peerTyping = false;
   DateTime _lastTypingBroadcast = DateTime.fromMillisecondsSinceEpoch(0);
 
+  ChatContext? _context;
+  String? _activeCallId;
+  String? _activeStreamRoom;
+
   @override
   void initState() {
     super.initState();
     MessagesRepository.markRead(widget.conversationId);
     _setupPresence();
     _ctrl.addListener(_onTextChanged);
+    _loadContext();
+  }
+
+  Future<void> _loadContext() async {
+    final ctx =
+        await ChatContextService.resolve(widget.conversationId);
+    if (mounted) setState(() => _context = ctx);
+  }
+
+  Widget? _buildActionFab() {
+    final ctx = _context;
+    if (ctx == null) return null;
+    if (ctx.kind == ChatKind.dm) {
+      // Privat-Anruf-Button (Leben-Green = Phone-Call-Style)
+      return FloatingActionButton(
+        backgroundColor:
+            _activeCallId != null ? AppColors.amber : AppColors.leben,
+        foregroundColor: AppColors.voidColor,
+        tooltip: _activeCallId != null ? 'Anruf läuft' : 'Anrufen',
+        onPressed: _activeCallId != null
+            ? () async {
+                await DmCallService.cancel(_activeCallId!);
+                if (mounted) setState(() => _activeCallId = null);
+              }
+            : _startCall,
+        child: Icon(
+          _activeCallId != null
+              ? LucideIcons.phoneOff
+              : LucideIcons.phoneCall,
+        ),
+      );
+    }
+    if (ctx.kind == ChatKind.channel) {
+      // Livestream-Button (Bronze = Cinema-Style)
+      return FloatingActionButton(
+        backgroundColor: _activeStreamRoom != null
+            ? AppColors.herzrot
+            : AppColors.bronze,
+        foregroundColor: AppColors.voidColor,
+        tooltip: _activeStreamRoom != null
+            ? 'Stream beenden'
+            : 'Livestream starten',
+        onPressed: _activeStreamRoom != null
+            ? () async {
+                await LiveStreamService.endChannelStream(_activeStreamRoom!);
+                if (mounted) setState(() => _activeStreamRoom = null);
+              }
+            : _startStream,
+        child: Icon(
+          _activeStreamRoom != null
+              ? LucideIcons.video
+              : LucideIcons.radio,
+        ),
+      );
+    }
+    return null;
+  }
+
+  Future<void> _startCall() async {
+    final ctx = _context;
+    if (ctx == null || ctx.kind != ChatKind.dm || ctx.partnerId == null) {
+      return;
+    }
+    final callId = await DmCallService.start(
+      conversationId: widget.conversationId,
+      calleeId: ctx.partnerId!,
+    );
+    if (callId == null || !mounted) return;
+    setState(() => _activeCallId = callId);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        '📞 Anruf gestartet — ${ctx.title} wird kontaktiert.',
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+      action: SnackBarAction(
+        label: 'Abbrechen',
+        textColor: AppColors.herzrotWarm,
+        onPressed: () async {
+          await DmCallService.cancel(callId);
+          if (mounted) setState(() => _activeCallId = null);
+        },
+      ),
+    ));
+  }
+
+  Future<void> _startStream() async {
+    final ctx = _context;
+    if (ctx == null || ctx.kind != ChatKind.channel || ctx.slug == null) {
+      return;
+    }
+    final room = await LiveStreamService.startChannelStream(
+      channelId: widget.conversationId,
+      channelSlug: ctx.slug!,
+      topic: 'Live im Kanal ${ctx.title}',
+    );
+    if (!mounted) return;
+    if (room != null) {
+      setState(() => _activeStreamRoom = room);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          '📡 Livestream aktiv im Kanal ${ctx.title}',
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+        action: SnackBarAction(
+          label: 'Beenden',
+          textColor: AppColors.herzrotWarm,
+          onPressed: () async {
+            await LiveStreamService.endChannelStream(room);
+            if (mounted) setState(() => _activeStreamRoom = null);
+          },
+        ),
+      ));
+    }
   }
 
   void _setupPresence() {
@@ -105,9 +226,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final stream = ref.watch(messagesStreamProvider(widget.conversationId));
     final peerReadAsync =
         ref.watch(peerLastReadProvider(widget.conversationId));
+    final titleText = _context == null
+        ? 'Chat'
+        : '${_context!.emoji} ${_context!.title}';
     return DashboardScaffold(
-      title: 'Chat',
+      title: titleText,
       currentRoute: '/dashboard/chat',
+      fab: _buildActionFab(),
       body: SafeArea(
         child: Column(
           children: [

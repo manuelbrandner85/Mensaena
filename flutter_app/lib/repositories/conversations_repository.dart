@@ -19,13 +19,96 @@ class ConversationsRepository {
           .eq('user_id', uid);
       final rows = (memberships as List).whereType<Map<String, dynamic>>();
       final result = <Map<String, dynamic>>[];
+      final convIds = <String>[];
       for (final r in rows) {
         final conv = r['conversations'] as Map<String, dynamic>?;
         if (conv == null) continue;
+        convIds.add(conv['id'] as String);
         result.add({
           ...conv,
           'last_read_at': r['last_read_at'],
         });
+      }
+
+      // Enrich mit Channel-Info (chat_channels) + Partner-Profile in
+      // einem Batch — 1:1 zu Web wo wir gleichzeitig channel.name +
+      // partner.display_name fuer die Conversation-Liste auflösen.
+      if (convIds.isNotEmpty) {
+        // 1. Channels per conversation_id Lookup
+        final channels = await sb
+            .from('chat_channels')
+            .select(
+                'conversation_id, name, emoji, slug, description, is_locked')
+            .inFilter('conversation_id', convIds);
+        final channelByConv = <String, Map<String, dynamic>>{};
+        for (final c in (channels as List)
+            .whereType<Map<String, dynamic>>()) {
+          channelByConv[c['conversation_id'] as String] = c;
+        }
+        // 2. Andere Mitglieder fuer DMs
+        final allMembers = await sb
+            .from('conversation_members')
+            .select('conversation_id, user_id')
+            .inFilter('conversation_id', convIds);
+        final peerByConv = <String, List<String>>{};
+        for (final m
+            in (allMembers as List).whereType<Map<String, dynamic>>()) {
+          final convId = m['conversation_id'] as String;
+          final memUid = m['user_id'] as String;
+          if (memUid == uid) continue;
+          peerByConv.putIfAbsent(convId, () => []).add(memUid);
+        }
+        // 3. Profile-Batch-Lookup
+        final allPeerIds = peerByConv.values.expand((l) => l).toSet().toList();
+        final profileById = <String, Map<String, dynamic>>{};
+        if (allPeerIds.isNotEmpty) {
+          final profiles = await sb
+              .from('profiles')
+              .select('id, display_name, name, avatar_url, location')
+              .inFilter('id', allPeerIds);
+          for (final p in (profiles as List)
+              .whereType<Map<String, dynamic>>()) {
+            profileById[p['id'] as String] = p;
+          }
+        }
+        // 4. Merge in result
+        for (final row in result) {
+          final convId = row['id'] as String;
+          final channel = channelByConv[convId];
+          if (channel != null) {
+            row['channel'] = channel;
+            row['display_title'] =
+                '${channel['emoji'] ?? '💬'} ${channel['name']}';
+            row['display_subtitle'] = channel['description'];
+            row['is_channel'] = true;
+            continue;
+          }
+          final peers = peerByConv[convId] ?? const [];
+          if (peers.length == 1) {
+            final p = profileById[peers.first];
+            if (p != null) {
+              row['peer_user_id'] = p['id'];
+              row['peer_name'] = (p['display_name'] as String?) ??
+                  (p['name'] as String?) ??
+                  'Nachbar:in';
+              row['peer_avatar_url'] = p['avatar_url'];
+              row['peer_location'] = p['location'];
+              row['display_title'] = row['peer_name'];
+              row['display_subtitle'] = row['peer_location'];
+              row['is_dm'] = true;
+              continue;
+            }
+          }
+          if (peers.length > 1) {
+            row['display_title'] = (row['title'] as String?) ??
+                '${peers.length + 1} Teilnehmer:innen';
+            row['display_subtitle'] = null;
+            row['is_group'] = true;
+          } else {
+            row['display_title'] =
+                (row['title'] as String?) ?? 'Konversation';
+          }
+        }
       }
       result.sort((a, b) {
         final ta = DateTime.tryParse(
