@@ -166,6 +166,8 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
                           title: _titleOf(row),
                           subtitle: _subtitleOf(row),
                           row: row,
+                          tableName: widget.tableName,
+                          onChanged: _refresh,
                         );
                       },
                     );
@@ -185,11 +187,15 @@ class _AdminRow extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.row,
+    required this.tableName,
+    required this.onChanged,
   });
 
   final String title;
   final String subtitle;
   final Map<String, dynamic> row;
+  final String tableName;
+  final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -202,41 +208,15 @@ class _AdminRow extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         builder: (_) => DraggableScrollableSheet(
-          initialChildSize: 0.6,
+          initialChildSize: 0.7,
           maxChildSize: 0.95,
           expand: false,
-          builder: (_, scroll) => ListView(
-            controller: scroll,
-            padding: const EdgeInsets.all(20),
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.line,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(title,
-                  style: AppTypography.display(
-                      size: 18, color: AppColors.ink)),
-              const SizedBox(height: 12),
-              for (final entry in row.entries) ...[
-                Text(entry.key, style: AppTypography.label(size: 9)),
-                const SizedBox(height: 2),
-                Text(
-                  entry.value?.toString() ?? 'null',
-                  style: AppTypography.mono(
-                    size: 12,
-                    color: AppColors.inkSoft,
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-            ],
+          builder: (_, scroll) => _AdminDetailSheet(
+            scroll: scroll,
+            title: title,
+            row: row,
+            tableName: tableName,
+            onChanged: onChanged,
           ),
         ),
       ),
@@ -281,6 +261,304 @@ class _AdminRow extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Detail-Sheet mit Aktionen (Delete, Status, Ban) ──────────────
+class _AdminDetailSheet extends StatefulWidget {
+  const _AdminDetailSheet({
+    required this.scroll,
+    required this.title,
+    required this.row,
+    required this.tableName,
+    required this.onChanged,
+  });
+
+  final ScrollController scroll;
+  final String title;
+  final Map<String, dynamic> row;
+  final String tableName;
+  final VoidCallback onChanged;
+
+  @override
+  State<_AdminDetailSheet> createState() => _AdminDetailSheetState();
+}
+
+class _AdminDetailSheetState extends State<_AdminDetailSheet> {
+  bool _busy = false;
+
+  String? get _id => widget.row['id'] as String?;
+
+  // Erlaubte Status-Werte je Tabelle (1:1 zu Web-Admin)
+  List<String> get _availableStatuses {
+    switch (widget.tableName) {
+      case 'content_reports':
+        return const ['open', 'reviewing', 'resolved', 'dismissed'];
+      case 'crisis_situations':
+      case 'crises':
+        return const ['active', 'resolved', 'archived'];
+      case 'farm_listings':
+      case 'organizations':
+      case 'posts':
+      case 'board_posts':
+      case 'events':
+        return const ['draft', 'published', 'archived'];
+      case 'challenges':
+        return const ['active', 'archived'];
+      default:
+        return const [];
+    }
+  }
+
+  bool get _hasStatusField => widget.row.containsKey('status');
+
+  bool get _isProfilesTable => widget.tableName == 'profiles';
+
+  Future<void> _setStatus(String s) async {
+    if (_id == null) return;
+    setState(() => _busy = true);
+    final ok = await AdminRepository.updateStatus(
+      table: widget.tableName,
+      id: _id!,
+      status: s,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status auf "$s" gesetzt.')),
+      );
+      widget.onChanged();
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Status-Update fehlgeschlagen.')),
+      );
+    }
+  }
+
+  Future<void> _setField(String column, dynamic value, String label) async {
+    if (_id == null) return;
+    setState(() => _busy = true);
+    final ok = await AdminRepository.updateField(
+      table: widget.tableName,
+      id: _id!,
+      column: column,
+      value: value,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$label gesetzt.')),
+      );
+      widget.onChanged();
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aktion fehlgeschlagen.')),
+      );
+    }
+  }
+
+  Future<void> _delete() async {
+    if (_id == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Löschen?',
+            style: AppTypography.body(
+                size: 16, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text(
+          'Soll dieser Eintrag aus "${widget.tableName}" unwiderruflich gelöscht werden?',
+          style: AppTypography.body(size: 13, color: AppColors.inkSoft),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _busy = true);
+    final ok = await AdminRepository.delete(
+      table: widget.tableName,
+      id: _id!,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Eintrag gelöscht.')),
+      );
+      widget.onChanged();
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Löschen fehlgeschlagen.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentStatus = widget.row['status'] as String?;
+    final isBanned = widget.row['is_banned'] == true;
+    final isAdmin = widget.row['role'] == 'admin';
+    return ListView(
+      controller: widget.scroll,
+      padding: const EdgeInsets.all(20),
+      children: [
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.line,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(widget.title,
+            style: AppTypography.display(size: 18, color: AppColors.ink)),
+        const SizedBox(height: 4),
+        Text('Tabelle: ${widget.tableName}',
+            style: AppTypography.label(size: 9, color: AppColors.mute)),
+        const SizedBox(height: 14),
+
+        // ── Aktionen ────────────────────────────────────────────
+        if (_hasStatusField && _availableStatuses.isNotEmpty) ...[
+          Text('Status', style: AppTypography.label(size: 10)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final s in _availableStatuses)
+                ChoiceChip(
+                  label: Text(s),
+                  selected: currentStatus == s,
+                  onSelected: _busy ? null : (_) => _setStatus(s),
+                  backgroundColor: AppColors.elevated,
+                  selectedColor: AppColors.bronze.withValues(alpha: 0.4),
+                  labelStyle: AppTypography.body(
+                    size: 11,
+                    color: currentStatus == s
+                        ? AppColors.bronze
+                        : AppColors.inkSoft,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+        ],
+
+        // ── Profile-spezifisch (Ban/Admin-Toggle) ───────────────
+        if (_isProfilesTable) ...[
+          Text('Profil-Aktionen', style: AppTypography.label(size: 10)),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _busy
+                    ? null
+                    : () => _setField('is_banned', !isBanned,
+                        isBanned ? 'Entsperrt' : 'Gesperrt'),
+                icon: Icon(
+                    isBanned ? LucideIcons.unlock : LucideIcons.ban,
+                    size: 14),
+                label: Text(isBanned ? 'Entsperren' : 'Sperren'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isBanned
+                      ? AppColors.leben.withValues(alpha: 0.2)
+                      : AppColors.herzrot.withValues(alpha: 0.2),
+                  foregroundColor:
+                      isBanned ? AppColors.lebenSoft : AppColors.herzrotWarm,
+                  elevation: 0,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: _busy
+                    ? null
+                    : () => _setField(
+                          'role',
+                          isAdmin ? 'user' : 'admin',
+                          isAdmin ? 'Admin entzogen' : 'Admin-Rechte vergeben',
+                        ),
+                icon: Icon(
+                    isAdmin
+                        ? LucideIcons.shieldOff
+                        : LucideIcons.shieldCheck,
+                    size: 14),
+                label: Text(isAdmin ? 'Admin entziehen' : 'Zum Admin machen'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      AppColors.bronze.withValues(alpha: 0.2),
+                  foregroundColor: AppColors.bronze,
+                  elevation: 0,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+        ],
+
+        // ── Delete ──────────────────────────────────────────────
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _busy || _id == null ? null : _delete,
+            icon: const Icon(LucideIcons.trash2, size: 14),
+            label: const Text('Eintrag löschen'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.herzrot,
+              side: BorderSide(
+                  color: AppColors.herzrot.withValues(alpha: 0.5)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // ── Roh-Daten ───────────────────────────────────────────
+        Text('Rohdaten', style: AppTypography.label(size: 10)),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final entry in widget.row.entries) ...[
+                Text(entry.key, style: AppTypography.label(size: 9)),
+                const SizedBox(height: 2),
+                Text(
+                  entry.value?.toString() ?? 'null',
+                  style: AppTypography.mono(
+                    size: 11,
+                    color: AppColors.inkSoft,
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

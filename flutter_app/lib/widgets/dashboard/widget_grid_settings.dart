@@ -101,6 +101,48 @@ class DashboardWidgetConfig {
       icon: LucideIcons.calendar,
     ),
     DashboardWidgetMeta(
+      id: 'unread_messages',
+      title: 'Ungelesene Nachrichten',
+      description: 'Chats mit ungelesenen Nachrichten',
+      icon: LucideIcons.messageCircle,
+    ),
+    DashboardWidgetMeta(
+      id: 'weekly_challenge',
+      title: 'Wochen-Challenge',
+      description: 'Wöchentliche Impulse zum Mitmachen',
+      icon: LucideIcons.trophy,
+    ),
+    DashboardWidgetMeta(
+      id: 'rating_prompt',
+      title: 'Bewertungs-Erinnerung',
+      description: 'Offene Bewertungen für abgeschlossene Hilfen',
+      icon: LucideIcons.star,
+    ),
+    DashboardWidgetMeta(
+      id: 'weather',
+      title: 'Wetter',
+      description: 'Aktuelles Wetter + Tipp für die Nachbarschaft',
+      icon: LucideIcons.cloud,
+    ),
+    DashboardWidgetMeta(
+      id: 'holiday_badge',
+      title: 'Feiertag',
+      description: 'Hinweis auf den nächsten Feiertag',
+      icon: LucideIcons.partyPopper,
+    ),
+    DashboardWidgetMeta(
+      id: 'success_story',
+      title: 'Erfolgsgeschichte',
+      description: 'Inspiration aus der Community',
+      icon: LucideIcons.bookOpen,
+    ),
+    DashboardWidgetMeta(
+      id: 'bot_tip',
+      title: 'MensaenaBot-Tipp',
+      description: 'Täglicher Nachbarschafts-Impuls',
+      icon: LucideIcons.sparkles,
+    ),
+    DashboardWidgetMeta(
       id: 'nearby_posts',
       title: 'In deiner Nähe',
       description: 'Lokale Beiträge in Nähe',

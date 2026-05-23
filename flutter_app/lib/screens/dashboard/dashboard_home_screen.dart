@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -13,6 +16,7 @@ import '../../repositories/notifications_repository.dart';
 import '../../repositories/posts_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
+import '../../services/weather_service.dart';
 import '../../widgets/dashboard/dashboard_hero_card.dart';
 import '../../widgets/dashboard/location_onboarding_modal.dart';
 import '../../widgets/dashboard/onboarding_tour.dart';
@@ -165,6 +169,10 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                     const _QuickActions(),
                     const SizedBox(height: 16),
                   ],
+                  if (show('unread_messages')) ...[
+                    const _UnreadMessagesWidget(),
+                    const SizedBox(height: 16),
+                  ],
                   if (show('stats')) ...[
                     _StatsRow(data: data, loading: loading),
                     const SizedBox(height: 16),
@@ -173,12 +181,38 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                     const _SmartMatchWidget(),
                     const SizedBox(height: 16),
                   ],
+                  if (show('weekly_challenge')) ...[
+                    const _WeeklyChallengeHighlight(),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('rating_prompt')) ...[
+                    _RatingPromptBanner(userId: data!.profile!.id),
+                    const SizedBox(height: 16),
+                  ],
                   if (show('trust_score')) ...[
                     _TrustScoreCard(profile: data!.profile!),
                     const SizedBox(height: 16),
                   ],
                   if (show('thanks')) ...[
                     _ThanksReceived(userId: data!.profile!.id),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('weather') &&
+                      data!.profile?.latitude != null &&
+                      data.profile?.longitude != null) ...[
+                    _WeatherWidget(
+                      lat: data.profile!.latitude!,
+                      lng: data.profile!.longitude!,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('holiday_badge') &&
+                      data!.profile?.latitude != null &&
+                      data.profile?.longitude != null) ...[
+                    _HolidayBadge(
+                      lat: data.profile!.latitude!,
+                      lng: data.profile!.longitude!,
+                    ),
                     const SizedBox(height: 16),
                   ],
                   if (show('community_pulse')) ...[
@@ -191,6 +225,14 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                   ],
                   if (show('mini_map') && data!.posts.isNotEmpty) ...[
                     _MiniMapWidget(posts: data.posts.take(20).toList()),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('success_story')) ...[
+                    const _SuccessStoryCard(),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('bot_tip')) ...[
+                    const _BotTipCard(),
                     const SizedBox(height: 16),
                   ],
                   if (show('weekly_digest')) ...[
@@ -1289,4 +1331,1180 @@ class _DigestData {
   final int posts;
   final int interactions;
   final int messages;
+}
+
+// ═════════════════════════════════════════════════════════════════
+// UnreadMessagesWidget — 1:1 zu Web src/app/dashboard/components/UnreadMessages.tsx
+// ═════════════════════════════════════════════════════════════════
+class _UnreadMessagesWidget extends StatefulWidget {
+  const _UnreadMessagesWidget();
+
+  @override
+  State<_UnreadMessagesWidget> createState() => _UnreadMessagesWidgetState();
+}
+
+class _UnreadMessagesWidgetState extends State<_UnreadMessagesWidget> {
+  late Future<List<_UnreadMessage>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<List<_UnreadMessage>> _load() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      // Eigene Conversation-Memberships + last_read_at holen
+      final memberships = await sb
+          .from('conversation_members')
+          .select('conversation_id, last_read_at')
+          .eq('user_id', uid);
+      final memList = (memberships as List).whereType<Map<String, dynamic>>();
+      if (memList.isEmpty) return const [];
+
+      final result = <_UnreadMessage>[];
+      for (final m in memList) {
+        final convId = m['conversation_id'] as String?;
+        if (convId == null) continue;
+        final lastRead = m['last_read_at'] != null
+            ? DateTime.tryParse(m['last_read_at'] as String)
+            : null;
+
+        // Letzte Nachricht der Conversation
+        final msgs = await sb
+            .from('messages')
+            .select('id, content, sender_id, created_at')
+            .eq('conversation_id', convId)
+            .neq('sender_id', uid)
+            .order('created_at', ascending: false)
+            .limit(20);
+        final msgList = (msgs as List).whereType<Map<String, dynamic>>();
+        if (msgList.isEmpty) continue;
+
+        final unread = msgList.where((row) {
+          final createdAt =
+              DateTime.tryParse(row['created_at'] as String? ?? '');
+          if (createdAt == null) return false;
+          return lastRead == null || createdAt.isAfter(lastRead);
+        }).toList();
+        if (unread.isEmpty) continue;
+
+        final newest = unread.first;
+        final senderId = newest['sender_id'] as String?;
+        String senderName = 'Nachbar:in';
+        String? senderAvatar;
+        if (senderId != null) {
+          try {
+            final p = await sb
+                .from('profiles')
+                .select('name, display_name, avatar_url')
+                .eq('id', senderId)
+                .maybeSingle();
+            if (p != null) {
+              senderName = (p['display_name'] as String?) ??
+                  (p['name'] as String?) ??
+                  senderName;
+              senderAvatar = p['avatar_url'] as String?;
+            }
+          } catch (_) {}
+        }
+        result.add(_UnreadMessage(
+          conversationId: convId,
+          senderName: senderName,
+          senderAvatar: senderAvatar,
+          lastText: (newest['content'] as String?) ?? '',
+          timestamp: DateTime.tryParse(newest['created_at'] as String? ?? '') ??
+              DateTime.now(),
+          unreadCount: unread.length,
+        ));
+      }
+      result.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      return result.take(5).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  String _ago(DateTime t) {
+    final d = DateTime.now().difference(t);
+    if (d.inMinutes < 1) return 'jetzt';
+    if (d.inMinutes < 60) return '${d.inMinutes}m';
+    if (d.inHours < 24) return '${d.inHours}h';
+    return '${d.inDays}d';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<_UnreadMessage>>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final list = snap.data ?? const <_UnreadMessage>[];
+        if (list.isEmpty) return const SizedBox.shrink();
+        final total = list.fold<int>(0, (s, m) => s + m.unreadCount);
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.5),
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.messageCircle,
+                      color: AppColors.herzrotWarm, size: 14),
+                  const SizedBox(width: 6),
+                  Text('Ungelesene Nachrichten',
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.herzrotWarm)),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: AppColors.herzrot.withValues(alpha: 0.22),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text('$total',
+                        style: AppTypography.mono(
+                            size: 10, color: AppColors.herzrotWarm)),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => context.go('/dashboard/chat'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      minimumSize: const Size(0, 24),
+                    ),
+                    child: Text('Alle →',
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.bronze)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              for (final m in list)
+                InkWell(
+                  onTap: () => context
+                      .go('/dashboard/chat?conv=${m.conversationId}'),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 14,
+                          backgroundColor: AppColors.elevated,
+                          backgroundImage: (m.senderAvatar != null &&
+                                  m.senderAvatar!.isNotEmpty)
+                              ? NetworkImage(m.senderAvatar!)
+                              : null,
+                          child: (m.senderAvatar == null ||
+                                  m.senderAvatar!.isEmpty)
+                              ? Text(
+                                  m.senderName.isNotEmpty
+                                      ? m.senderName[0].toUpperCase()
+                                      : '?',
+                                  style: AppTypography.mono(
+                                      size: 12, color: AppColors.bronze),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                m.senderName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.body(
+                                    size: 13,
+                                    color: AppColors.ink,
+                                    weight: FontWeight.w600),
+                              ),
+                              Text(
+                                m.lastText,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.body(
+                                    size: 11, color: AppColors.mute),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(_ago(m.timestamp),
+                                style: AppTypography.caption()),
+                            const SizedBox(height: 2),
+                            if (m.unreadCount > 1)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: AppColors.herzrot,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text('${m.unreadCount}',
+                                    style: AppTypography.mono(
+                                        size: 9, color: AppColors.ink)),
+                              )
+                            else
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.herzrot,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _UnreadMessage {
+  const _UnreadMessage({
+    required this.conversationId,
+    required this.senderName,
+    required this.senderAvatar,
+    required this.lastText,
+    required this.timestamp,
+    required this.unreadCount,
+  });
+  final String conversationId;
+  final String senderName;
+  final String? senderAvatar;
+  final String lastText;
+  final DateTime timestamp;
+  final int unreadCount;
+}
+
+// ═════════════════════════════════════════════════════════════════
+// WeeklyChallengeHighlight — 1:1 zu Web WeeklyChallengeHighlight.tsx
+// ═════════════════════════════════════════════════════════════════
+class _WeeklyChallengeHighlight extends StatefulWidget {
+  const _WeeklyChallengeHighlight();
+
+  @override
+  State<_WeeklyChallengeHighlight> createState() =>
+      _WeeklyChallengeHighlightState();
+}
+
+class _WeeklyChallengeHighlightState extends State<_WeeklyChallengeHighlight> {
+  late Future<List<Map<String, dynamic>>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<List<Map<String, dynamic>>> _load() async {
+    try {
+      final now = DateTime.now();
+      final weekday = now.weekday; // 1=Mo, 7=So
+      final monday = now.subtract(Duration(days: weekday - 1));
+      final weekOf =
+          '${monday.year.toString().padLeft(4, '0')}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
+      final rows = await sb
+          .from('challenges')
+          .select(
+              'id, title, description, category, difficulty, points, participant_count')
+          .eq('is_weekly', true)
+          .eq('week_of', weekOf)
+          .order('points', ascending: false)
+          .limit(3);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final list = snap.data ?? const <Map<String, dynamic>>[];
+        if (list.isEmpty) return const SizedBox.shrink();
+        return InkWell(
+          onTap: () => context.go('/dashboard/challenges'),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.bronze.withValues(alpha: 0.18),
+                  AppColors.amber.withValues(alpha: 0.10),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border:
+                  Border.all(color: AppColors.bronze.withValues(alpha: 0.4)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(LucideIcons.sparkles,
+                        color: AppColors.bronze, size: 14),
+                    const SizedBox(width: 6),
+                    Text('Challenges dieser Woche',
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.bronzeSoft)),
+                    const Spacer(),
+                    Text('Alle →',
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.bronze)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('Drei wöchentliche Impulse zum Mitmachen.',
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.mute)),
+                const SizedBox(height: 10),
+                for (final c in list)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.elevated,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  (c['title'] as String?) ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.body(
+                                      size: 13,
+                                      color: AppColors.ink,
+                                      weight: FontWeight.w600),
+                                ),
+                                if ((c['description'] as String?)
+                                        ?.isNotEmpty ==
+                                    true) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    c['description'] as String,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTypography.body(
+                                        size: 11,
+                                        color: AppColors.mute),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.amber.withValues(alpha: 0.22),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(LucideIcons.trophy,
+                                    size: 10, color: AppColors.amber),
+                                const SizedBox(width: 3),
+                                Text('${c['points'] ?? 0}',
+                                    style: AppTypography.mono(
+                                        size: 10,
+                                        color: AppColors.amberWarm)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════
+// RatingPromptBanner — 1:1 zu Web RatingPromptBanner.tsx
+// Liest offene Ratings: trust_ratings_pending oder interactions mit
+// status='completed' und rated_by_me=false.
+// ═════════════════════════════════════════════════════════════════
+class _RatingPromptBanner extends StatefulWidget {
+  const _RatingPromptBanner({required this.userId});
+  final String userId;
+
+  @override
+  State<_RatingPromptBanner> createState() => _RatingPromptBannerState();
+}
+
+class _RatingPromptBannerState extends State<_RatingPromptBanner> {
+  late Future<List<Map<String, dynamic>>> _future;
+  bool _dismissed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<List<Map<String, dynamic>>> _load() async {
+    try {
+      // Versuch 1: RPC get_pending_ratings (existiert in Web)
+      try {
+        final res = await sb
+            .rpc<dynamic>('get_pending_ratings', params: {'p_user_id': widget.userId});
+        if (res is List) {
+          return res.whereType<Map<String, dynamic>>().toList();
+        }
+      } catch (_) {}
+      // Fallback: interactions mit status='completed' wo aktueller User Helfer/Helped war
+      final rows = await sb
+          .from('interactions')
+          .select('id, helper_id, helped_id, post_id, status, completed_at')
+          .or('helper_id.eq.${widget.userId},helped_id.eq.${widget.userId}')
+          .eq('status', 'completed')
+          .order('completed_at', ascending: false)
+          .limit(5);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_dismissed) return const SizedBox.shrink();
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final list = snap.data ?? const <Map<String, dynamic>>[];
+        if (list.isEmpty) return const SizedBox.shrink();
+        final count = list.length;
+        final first = list.first;
+        final partnerName =
+            (first['partner_name'] as String?) ?? 'deinen Nachbarn';
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.amber.withValues(alpha: 0.12),
+            border:
+                Border.all(color: AppColors.amber.withValues(alpha: 0.35)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.amber.withValues(alpha: 0.22),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.star,
+                    color: AppColors.amber, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      count == 1
+                          ? 'Du hast eine offene Bewertung'
+                          : 'Du hast $count offene Bewertungen',
+                      style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Bewerte $partnerName für die Zusammenarbeit.',
+                      style: AppTypography.body(
+                          size: 12, color: AppColors.inkSoft),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 32,
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            context.go('/dashboard/interactions'),
+                        icon: const Icon(LucideIcons.star, size: 14),
+                        label: const Text('Jetzt bewerten'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.amber,
+                          foregroundColor: AppColors.voidColor,
+                          textStyle: AppTypography.body(
+                              size: 12, weight: FontWeight.w600),
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: 'Später erinnern',
+                icon:
+                    const Icon(LucideIcons.x, size: 14, color: AppColors.mute),
+                onPressed: () => setState(() => _dismissed = true),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════
+// WeatherWidget — 1:1 zu Web src/app/dashboard/components/WeatherWidget.tsx
+// ═════════════════════════════════════════════════════════════════
+class _WeatherWidget extends StatefulWidget {
+  const _WeatherWidget({required this.lat, required this.lng});
+  final double lat;
+  final double lng;
+
+  @override
+  State<_WeatherWidget> createState() => _WeatherWidgetState();
+}
+
+class _WeatherWidgetState extends State<_WeatherWidget> {
+  Future<List<WeatherDay>>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = WeatherService.forecast(
+      latitude: widget.lat,
+      longitude: widget.lng,
+      days: 1,
+    );
+  }
+
+  String _tip(WeatherDay d) {
+    if (d.code >= 95) return 'Gewitter – drinnen bleiben und Nachbarn informieren. ⚡';
+    if (d.code >= 71 && d.code <= 77) {
+      return 'Schnee – Gehwege freihalten! Hilf älteren Nachbarn. 🏠';
+    }
+    if (d.tempMin < 0) return 'Frost! Hilf älteren Nachbarn beim Räumen. 🧤';
+    if (d.code >= 61 && d.code <= 67) {
+      return 'Hast du einen Regenschirm übrig? Deine Nachbarn danken es dir. ☂️';
+    }
+    if (d.code == 45 || d.code == 48) {
+      return 'Nebel – Vorsicht beim Radfahren und zu Fuß. 🚶';
+    }
+    if (d.tempMax >= 30) return 'Heiß! Biete deinen Nachbarn etwas Wasser an. 💧';
+    return '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<WeatherDay>>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final list = snap.data ?? const <WeatherDay>[];
+        if (list.isEmpty) return const SizedBox.shrink();
+        final d = list.first;
+        final tip = _tip(d);
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.5),
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(d.emoji,
+                      style: const TextStyle(fontSize: 28, height: 1)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Aktuelles Wetter',
+                            style: AppTypography.label(
+                                size: 9, color: AppColors.mute)),
+                        const SizedBox(height: 2),
+                        RichText(
+                          text: TextSpan(
+                            style: AppTypography.body(
+                                size: 14,
+                                color: AppColors.ink,
+                                weight: FontWeight.w700),
+                            children: [
+                              TextSpan(
+                                  text:
+                                      '${d.tempMax.round()}° / ${d.tempMin.round()}°'),
+                              TextSpan(
+                                text: '  ${d.label}',
+                                style: AppTypography.body(
+                                    size: 12,
+                                    color: AppColors.mute,
+                                    weight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text('Open-Meteo',
+                      style: AppTypography.caption()),
+                ],
+              ),
+              if (tip.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.bronze.withValues(alpha: 0.08),
+                    border: Border.all(
+                        color: AppColors.bronze.withValues(alpha: 0.18)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    tip,
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.inkSoft, height: 1.4),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════
+// HolidayBadge — 1:1 zu Web HolidayBadge.tsx
+// Holt Feiertage via Nager.Date API (kostenlos, kein Key).
+// ═════════════════════════════════════════════════════════════════
+class _HolidayBadge extends StatefulWidget {
+  const _HolidayBadge({required this.lat, required this.lng});
+  final double lat;
+  final double lng;
+
+  @override
+  State<_HolidayBadge> createState() => _HolidayBadgeState();
+}
+
+class _HolidayBadgeState extends State<_HolidayBadge> {
+  Future<_HolidayStatus?>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<_HolidayStatus?> _load() async {
+    try {
+      final year = DateTime.now().year;
+      // Deutschland: Nager.Date PublicHolidays
+      final uri = Uri.https(
+          'date.nager.at', '/api/v3/PublicHolidays/$year/DE');
+      final res = await http
+          .get(uri)
+          .timeout(const Duration(seconds: 6));
+      if (res.statusCode != 200) return null;
+      final list = jsonDecode(res.body) as List<dynamic>;
+      final today = DateTime.now();
+      final todayStart = DateTime(today.year, today.month, today.day);
+      _HolidayStatus? best;
+      for (final raw in list) {
+        if (raw is! Map<String, dynamic>) continue;
+        final dateStr = raw['date'] as String?;
+        if (dateStr == null) continue;
+        final d = DateTime.tryParse(dateStr);
+        if (d == null) continue;
+        final daysDiff = d.difference(todayStart).inDays;
+        if (daysDiff < 0) continue;
+        if (daysDiff > 60) continue;
+        final name = (raw['localName'] as String?) ??
+            (raw['name'] as String?) ??
+            'Feiertag';
+        if (best == null || daysDiff < best.days) {
+          best = _HolidayStatus(name: name, date: d, days: daysDiff);
+        }
+      }
+      return best;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  String _emoji(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('weihnachten') || n.contains('christ')) return '🎄';
+    if (n.contains('silvester') || n.contains('neujahr')) return '🎆';
+    if (n.contains('ostern') || n.contains('karfreitag')) return '🐰';
+    if (n.contains('pfingst')) return '🕊️';
+    if (n.contains('himmelfahrt')) return '☁️';
+    if (n.contains('mai')) return '🌷';
+    if (n.contains('einheit') || n.contains('national')) return '🇩🇪';
+    if (n.contains('reformation')) return '✝️';
+    if (n.contains('allerheilig')) return '🕯️';
+    return '🎉';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_HolidayStatus?>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final s = snap.data;
+        if (s == null) return const SizedBox.shrink();
+        final emoji = _emoji(s.name);
+        final headline = s.days == 0
+            ? 'Heute ist ${s.name}'
+            : s.days == 1
+                ? 'Morgen ist ${s.name}'
+                : 'Nächster Feiertag: ${s.name}';
+        final subtitle = s.days == 0
+            ? 'Schönen Feiertag! 🎉'
+            : s.days == 1
+                ? 'Morgen frei – plane jetzt etwas mit deinen Nachbar:innen.'
+                : '${s.date.day.toString().padLeft(2, '0')}.${s.date.month.toString().padLeft(2, '0')}.${s.date.year} · in ${s.days} Tag${s.days == 1 ? '' : 'en'}';
+        return InkWell(
+          onTap: () => context.go('/dashboard/events'),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.bronze.withValues(alpha: 0.16),
+                  AppColors.herzrotWarm.withValues(alpha: 0.10),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border:
+                  Border.all(color: AppColors.bronze.withValues(alpha: 0.4)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.bronze.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    s.days == 0
+                        ? LucideIcons.partyPopper
+                        : LucideIcons.calendar,
+                    color: AppColors.bronze,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(emoji,
+                              style: const TextStyle(
+                                  fontSize: 18, height: 1)),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              headline,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.body(
+                                size: 13,
+                                color: AppColors.ink,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.inkSoft),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HolidayStatus {
+  const _HolidayStatus({
+    required this.name,
+    required this.date,
+    required this.days,
+  });
+  final String name;
+  final DateTime date;
+  final int days;
+}
+
+// ═════════════════════════════════════════════════════════════════
+// SuccessStoryCard — 1:1 zu Web SuccessStoryCard.tsx
+// ═════════════════════════════════════════════════════════════════
+class _SuccessStoryCard extends StatefulWidget {
+  const _SuccessStoryCard();
+
+  @override
+  State<_SuccessStoryCard> createState() => _SuccessStoryCardState();
+}
+
+class _SuccessStoryCardState extends State<_SuccessStoryCard> {
+  Future<Map<String, dynamic>?>? _future;
+  bool _rotating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<Map<String, dynamic>?> _load() async {
+    try {
+      List<Map<String, dynamic>> data;
+      try {
+        final rows = await sb
+            .from('success_stories')
+            .select(
+                'id, title, body, image_url, profiles!success_stories_author_id_fkey(name, location)')
+            .eq('is_approved', true)
+            .order('created_at', ascending: false)
+            .limit(20);
+        data = (rows as List).whereType<Map<String, dynamic>>().toList();
+      } catch (_) {
+        // Fallback ohne image_url
+        final rows = await sb
+            .from('success_stories')
+            .select(
+                'id, title, body, profiles!success_stories_author_id_fkey(name, location)')
+            .eq('is_approved', true)
+            .order('created_at', ascending: false)
+            .limit(20);
+        data = (rows as List).whereType<Map<String, dynamic>>().toList();
+      }
+      if (data.isEmpty) return null;
+      data.shuffle();
+      return data.first;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      _rotating = true;
+      _future = _load();
+    });
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    if (mounted) setState(() => _rotating = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final s = snap.data;
+        if (s == null) return const SizedBox.shrink();
+        final title = (s['title'] as String?) ?? '';
+        final body = (s['body'] as String?) ?? '';
+        final image = s['image_url'] as String?;
+        final profileRaw = s['profiles'];
+        Map<String, dynamic>? profile;
+        if (profileRaw is Map<String, dynamic>) {
+          profile = profileRaw;
+        } else if (profileRaw is List && profileRaw.isNotEmpty) {
+          final f = profileRaw.first;
+          if (f is Map<String, dynamic>) profile = f;
+        }
+        final author = profile?['name'] as String?;
+        final loc = profile?['location'] as String?;
+        final excerpt = body.length > 180
+            ? '${body.substring(0, 180).trimRight()}…'
+            : body;
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.5),
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (image != null && image.isNotEmpty)
+                SizedBox(
+                  height: 140,
+                  width: double.infinity,
+                  child: Image.network(
+                    image,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppColors.bronze.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(LucideIcons.bookOpen,
+                              size: 14, color: AppColors.bronze),
+                        ),
+                        const SizedBox(width: 8),
+                        Text('Erfolgsgeschichte',
+                            style: AppTypography.label(
+                                size: 9, color: AppColors.bronzeSoft)),
+                        const Spacer(),
+                        IconButton(
+                          tooltip: 'Andere Geschichte',
+                          onPressed: _refresh,
+                          icon: AnimatedRotation(
+                            turns: _rotating ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 500),
+                            child: const Icon(LucideIcons.refreshCw,
+                                size: 14, color: AppColors.mute),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      title,
+                      style: AppTypography.body(
+                          size: 14,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700,
+                          height: 1.3),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '„$excerpt"',
+                      style: AppTypography.body(
+                          size: 12,
+                          color: AppColors.inkSoft,
+                          height: 1.5),
+                    ),
+                    if (author != null && author.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        '— $author${loc != null && loc.isNotEmpty ? ', $loc' : ''}',
+                        style: AppTypography.caption(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════
+// BotTipCard — 1:1 zu Web BotTipCard.tsx
+// ═════════════════════════════════════════════════════════════════
+class _BotTipCard extends StatefulWidget {
+  const _BotTipCard();
+
+  @override
+  State<_BotTipCard> createState() => _BotTipCardState();
+}
+
+class _BotTipCardState extends State<_BotTipCard> {
+  static const _tips = <String>[
+    'Hast du heute schon die Karte gecheckt? Vielleicht braucht jemand in deiner Nähe Hilfe!',
+    'Ein Lächeln kostet nichts – schreib deinem Nachbarn eine nette Nachricht.',
+    'Teile deine Fähigkeiten! Im Skill-Netzwerk kannst du anderen helfen und Neues lernen.',
+    'Kleine Gesten, große Wirkung: Biete Einkaufshilfe in deiner Nachbarschaft an.',
+    'Kennst du die Zeitbank? Tausche Zeit statt Geld mit deinen Nachbarn!',
+  ];
+  late String _current;
+
+  @override
+  void initState() {
+    super.initState();
+    _current = _tips[DateTime.now().day % _tips.length];
+  }
+
+  void _next() {
+    setState(() {
+      final idx = (_tips.indexOf(_current) + 1) % _tips.length;
+      _current = _tips[idx];
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.bronze.withValues(alpha: 0.12),
+            AppColors.amber.withValues(alpha: 0.06),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: AppColors.bronze.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.bronze.withValues(alpha: 0.22),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.sparkles,
+                    size: 14, color: AppColors.bronze),
+              ),
+              const SizedBox(width: 8),
+              Text('MensaenaBot',
+                  style: AppTypography.body(
+                      size: 12,
+                      color: AppColors.ink,
+                      weight: FontWeight.w700)),
+              const Spacer(),
+              const Icon(LucideIcons.lightbulb,
+                  size: 14, color: AppColors.bronze),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _current,
+            style: AppTypography.body(
+                size: 13, color: AppColors.inkSoft, height: 1.5),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              TextButton(
+                onPressed: () => context.go('/dashboard/chat'),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  minimumSize: const Size(0, 24),
+                ),
+                child: Text('Chat mit Bot →',
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.bronze)),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: _next,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  minimumSize: const Size(0, 24),
+                ),
+                icon: const Icon(LucideIcons.refreshCw,
+                    size: 11, color: AppColors.bronze),
+                label: Text('Nächster Tipp',
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.bronze)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
