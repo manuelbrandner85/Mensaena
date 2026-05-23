@@ -17,6 +17,7 @@ import '../../widgets/dashboard/dashboard_hero_card.dart';
 import '../../widgets/dashboard/location_onboarding_modal.dart';
 import '../../widgets/dashboard/onboarding_tour.dart';
 import '../../widgets/dashboard/safety_banners.dart';
+import '../../widgets/dashboard/widget_grid_settings.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/location_map_view.dart';
 import '../../widgets/shared/post_card.dart';
@@ -102,9 +103,19 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cfg = ref.watch(dashboardWidgetConfigProvider).asData?.value ??
+        DashboardWidgetConfig.defaultConfig;
+    bool show(String id) => cfg.visible.contains(id);
     return DashboardScaffold(
       title: 'Übersicht',
       currentRoute: '/dashboard',
+      fab: FloatingActionButton.small(
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.bronze,
+        onPressed: () => WidgetSettingsSheet.show(context),
+        tooltip: 'Widgets konfigurieren',
+        child: const Icon(LucideIcons.settings, size: 16),
+      ),
       body: RefreshIndicator(
         color: AppColors.amber,
         backgroundColor: AppColors.surface,
@@ -120,59 +131,72 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
                 // 1. Persoenliche Begruessung (Hero)
-                DashboardHeroCard(
-                  profile: data?.profile,
-                  memberSinceDays: data?.profile == null
-                      ? 0
-                      : DateTime.now()
-                          .difference(data!.profile!.createdAt)
-                          .inDays,
-                ),
-                const SizedBox(height: 14),
-                // 2+3. Sicherheits-/Wetter- + Lebensmittel-Warnungen
-                SafetyBanners(
-                  lat: data?.profile?.latitude,
-                  lng: data?.profile?.longitude,
-                ),
-                const SizedBox(height: 14),
-                if (data?.profile != null) ...[
-                  // 4. Onboarding (wenn nicht abgeschlossen)
-                  _OnboardingChecklist(
-                    profile: data!.profile,
-                    posts: data.posts,
+                if (show('hero')) ...[
+                  DashboardHeroCard(
+                    profile: data?.profile,
+                    memberSinceDays: data?.profile == null
+                        ? 0
+                        : DateTime.now()
+                            .difference(data!.profile!.createdAt)
+                            .inDays,
                   ),
-                  const SizedBox(height: 16),
-                  // 5. Quick-Actions
-                  Text('Schnell-Aktionen',
-                      style: AppTypography.label(size: 10)),
-                  const SizedBox(height: 8),
-                  const _QuickActions(),
-                  const SizedBox(height: 16),
-                  // 6. Stats-Cards
-                  _StatsRow(data: data, loading: loading),
-                  const SizedBox(height: 16),
-                  // 7. Smart-Match
-                  const _SmartMatchWidget(),
-                  const SizedBox(height: 16),
-                  // 8. Trust-Score-Card
-                  _TrustScoreCard(profile: data.profile!),
-                  const SizedBox(height: 16),
-                  // 9. Thanks-Received
-                  _ThanksReceived(userId: data.profile!.id),
-                  const SizedBox(height: 16),
-                  // 10. Community-Pulse
-                  _CommunityPulse(posts: data.posts),
-                  const SizedBox(height: 16),
-                  // 11. Activity-Feed
-                  const _ActivityFeedWidget(),
-                  const SizedBox(height: 16),
-                  // 12. Mini-Map (nur wenn Posts vorhanden)
-                  if (data.posts.isNotEmpty)
+                  const SizedBox(height: 14),
+                ],
+                // 2+3. Sicherheits-/Wetter- + Lebensmittel-Warnungen
+                if (show('safety')) ...[
+                  SafetyBanners(
+                    lat: data?.profile?.latitude,
+                    lng: data?.profile?.longitude,
+                  ),
+                  const SizedBox(height: 14),
+                ],
+                if (data?.profile != null) ...[
+                  if (show('onboarding')) ...[
+                    _OnboardingChecklist(
+                      profile: data!.profile,
+                      posts: data.posts,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('quick_actions')) ...[
+                    Text('Schnell-Aktionen',
+                        style: AppTypography.label(size: 10)),
+                    const SizedBox(height: 8),
+                    const _QuickActions(),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('stats')) ...[
+                    _StatsRow(data: data, loading: loading),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('smart_match')) ...[
+                    const _SmartMatchWidget(),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('trust_score')) ...[
+                    _TrustScoreCard(profile: data!.profile!),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('thanks')) ...[
+                    _ThanksReceived(userId: data!.profile!.id),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('community_pulse')) ...[
+                    _CommunityPulse(posts: data!.posts),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('activity_feed')) ...[
+                    const _ActivityFeedWidget(),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('mini_map') && data!.posts.isNotEmpty) ...[
                     _MiniMapWidget(posts: data.posts.take(20).toList()),
-                  const SizedBox(height: 16),
-                  // 13. Weekly-Digest
-                  _WeeklyDigest(profile: data.profile!),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 16),
+                  ],
+                  if (show('weekly_digest')) ...[
+                    _WeeklyDigest(profile: data!.profile!),
+                    const SizedBox(height: 24),
+                  ],
                 ],
                 // 14. "In deiner Naehe" — Nearby-Posts Feed
                 Row(

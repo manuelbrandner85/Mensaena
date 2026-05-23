@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -6,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/notifications_repository.dart';
+import '../dashboard/zeitbank_confirmation_banner.dart';
 import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
 import '../shared/mensaena_bot_button.dart';
@@ -39,6 +41,9 @@ class DashboardScaffold extends ConsumerWidget {
       final wasNewer = prev?.value?.firstOrNull?.id != newest.id;
       if (!wasNewer) return;
       if (newest.read || newest.readAt != null) return;
+      // Haptic + Sound (System-Notification)
+      HapticFeedback.mediumImpact();
+      SystemSound.play(SystemSoundType.click);
       // Toast zeigen
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.raised,
@@ -92,7 +97,12 @@ class DashboardScaffold extends ConsumerWidget {
       floatingActionButton: fab,
       body: Stack(
         children: [
-          body,
+          Column(
+            children: [
+              const ZeitbankConfirmationBanner(),
+              Expanded(child: body),
+            ],
+          ),
           // MensaenaBot Floating-Button (links unten, oberhalb BottomNav)
           // Nicht ueberlappen mit dem regulaeren FAB (rechts unten).
           Positioned(
