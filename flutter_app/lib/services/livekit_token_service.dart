@@ -6,13 +6,14 @@ import 'package:supabase_flutter/supabase_flutter.dart' show Session;
 import '../services/supabase_service.dart';
 
 /// SKILL: mensaena-features
-/// Server-side LiveKit-JWT — ruft Web-Endpoint /api/live-room/token auf
-/// (Cloudflare Worker, LIVEKIT_SELF_KEY/SECRET als Worker-Secrets).
-/// Auth via Supabase Access-Token.
+/// Server-side LiveKit-JWT — ruft Supabase Edge Function `livekit-token`.
+/// Secrets via `supabase secrets set LIVEKIT_SELF_KEY=... LIVEKIT_SELF_SECRET=...`
+/// LiveKit-Server: wss://livekit.mensaena.de (Hostinger VPS).
 class LivekitTokenService {
   const LivekitTokenService._();
 
-  static const _tokenUrl = 'https://www.mensaena.de/api/live-room/token';
+  static const _tokenUrl =
+      'https://huaqldjkgyosefzfhjnf.supabase.co/functions/v1/livekit-token';
 
   /// Holt JWT + WSS-URL fuer einen Room.
   /// Wirft LivekitTokenError mit lesbarer Message statt null —
@@ -27,11 +28,11 @@ class LivekitTokenService {
     if (session == null) {
       throw const LivekitTokenError('Nicht angemeldet.');
     }
-    final expiresAt = session.expiresAt; // seconds since epoch
+    final expiresAt = session.expiresAt;
     if (expiresAt != null) {
       final expiresAtMs = expiresAt * 1000;
-      final isExpiringSoon = DateTime.now().millisecondsSinceEpoch >
-          expiresAtMs - 60000;
+      final isExpiringSoon =
+          DateTime.now().millisecondsSinceEpoch > expiresAtMs - 60000;
       if (isExpiringSoon) {
         try {
           final refresh = await sb.auth.refreshSession();
@@ -44,7 +45,7 @@ class LivekitTokenService {
       throw const LivekitTokenError('Kein gueltiger Access-Token.');
     }
 
-    // 2) POST an Web-Endpoint
+    // 2) POST an Supabase Edge Function
     http.Response res;
     try {
       res = await http
@@ -59,6 +60,7 @@ class LivekitTokenService {
             body: jsonEncode({
               'roomName': roomName,
               'displayName': displayName,
+              'canPublish': canPublish,
             }),
           )
           .timeout(const Duration(seconds: 20));
@@ -70,8 +72,9 @@ class LivekitTokenService {
       String detail = '';
       try {
         final json = jsonDecode(res.body);
-        if (json is Map && json['error'] is String) {
-          detail = ': ${json['error']}';
+        if (json is Map) {
+          if (json['error'] is String) detail = ': ${json['error']}';
+          if (json['hint'] is String) detail += ' — Hinweis: ${json['hint']}';
         }
       } catch (_) {}
       throw LivekitTokenError('HTTP ${res.statusCode}$detail');
