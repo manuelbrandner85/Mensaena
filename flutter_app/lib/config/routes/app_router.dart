@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
+import '../../screens/dashboard/crisis/crisis_create_screen.dart';
+import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
+import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
+import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
 import '../../screens/dashboard/dashboard_home_screen.dart';
 import '../../screens/dashboard/interactions_screen.dart';
 import '../../screens/dashboard/map_screen.dart';
@@ -156,7 +160,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         phase: 'Phase 4',
       ),
       _placeholder('/dashboard/supply', 'Versorgung', phase: 'Phase 4'),
-      _placeholder('/dashboard/crisis', 'Krisenmodus', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/crisis',
+        builder: (_, __) => const CrisisDashboardScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, __) => const CrisisCreateScreen(),
+          ),
+          GoRoute(
+            path: 'resources',
+            builder: (_, __) => const CrisisResourcesScreen(),
+          ),
+          GoRoute(
+            path: ':crisisId',
+            builder: (_, s) => CrisisDetailScreen(
+              crisisId: s.pathParameters['crisisId']!,
+            ),
+          ),
+        ],
+      ),
       _placeholder(
         '/dashboard/warnungen',
         'NINA-Warnungen',

@@ -29,7 +29,14 @@ LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
 - [x] Phase 3.8 – Profile-Screen (eigenes oder fremdes via userId, Avatar + Trust-Badge + Stats-Grid Impact/Punkte/Spenden + Bio + Skills-Chips)
 - [x] Phase 3.9 – Settings-Screen (5 TabBar-Tabs: Account/Privatsphaere/Benachrichtigungen/Standort/Konto, Privacy 5 BoolTiles + Visibility-Pills public/neighbors/private, Notif 7 BoolTiles, Region Radius-Slider 1-150km, Danger Logout + DSGVO-Hinweis)
 - [x] Phase 3.10 – Interactions-Screen (aktive Interactions pending/accepted/on_way/arrived, StatusBadge mit Cinema-Farbe)
-- [ ] Phase 4 – Module (Crisis zuerst, dann nach Brief-Reihenfolge)
+- [x] Phase 4.1 – Crisis-Modul (lebensrettend, hoechste Prioritaet):
+  - [x] models: crisis_helper, crisis_update, emergency_number
+  - [x] crisis_repository mit Realtime-Streams (watchHelpers, watchUpdates), offerHelp, addUpdate
+  - [x] CrisisDashboardScreen — Liste aktiver Krisen mit Urgency-Borders + Helper-Count + Notruf-CTA
+  - [x] CrisisDetailScreen — Live Helper-Count (crisisHelpersStreamProvider), Update-Feed (crisisUpdatesStreamProvider), Contact-Block mit Anruf-Button, 'Ich helfe'-Bottom-Sheet mit Message+ETA
+  - [x] CrisisCreateScreen — 6 Kategorien + 4 Urgency-Stufen + GPS-Button + 112-Hinweis-Banner
+  - [x] CrisisResourcesScreen — emergency_numbers nach Kategorie gruppiert, Tap → tel:
+- [ ] Phase 4 – Restliche Module nach Brief-Reihenfolge
 - [ ] Phase 5 – Admin-Dashboard
 - [ ] Phase 6 – LiveKit (livekit_client wieder rein wenn flutter_webrtc 3.27-kompatibel ist)
 
