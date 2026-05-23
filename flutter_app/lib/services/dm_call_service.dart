@@ -8,13 +8,14 @@ class DmCallService {
   const DmCallService._();
 
   /// Initiiert einen Anruf an [calleeId] in einer existierenden Conversation.
-  /// Returns die call_id bei Erfolg.
-  static Future<String?> start({
+  /// Returns (callId, roomName) bei Erfolg.
+  static Future<({String callId, String roomName})?> start({
     required String conversationId,
     required String calleeId,
   }) async {
     final caller = SupabaseService.currentUser?.id;
     if (caller == null || caller == calleeId) return null;
+    final roomName = 'dm-${DateTime.now().millisecondsSinceEpoch}';
     try {
       final row = await sb
           .from('dm_calls')
@@ -23,14 +24,26 @@ class DmCallService {
             'callee_id': calleeId,
             'conversation_id': conversationId,
             'status': 'ringing',
-            'room_name': 'dm-${DateTime.now().millisecondsSinceEpoch}',
+            'room_name': roomName,
           })
           .select('id, room_name')
           .single();
-      return row['id'] as String?;
+      final id = row['id'] as String?;
+      if (id == null) return null;
+      return (callId: id, roomName: (row['room_name'] as String?) ?? roomName);
     } catch (_) {
       return null;
     }
+  }
+
+  /// Legacy-kompatibler Wrapper — nur call_id (fuer Stellen die nichts mit
+  /// roomName anfangen koennen).
+  static Future<String?> startCallId({
+    required String conversationId,
+    required String calleeId,
+  }) async {
+    final r = await start(conversationId: conversationId, calleeId: calleeId);
+    return r?.callId;
   }
 
   /// Bricht eigenen Anruf ab.

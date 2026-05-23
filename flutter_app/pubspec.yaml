@@ -30,6 +30,8 @@ dependencies:
   # Echtzeit-Voice/Video — funktioniert mit Patch via
   # `scripts/patch_flutter_webrtc.sh` (Flutter 3.27 TextureRegistry-Bug)
   livekit_client: 2.4.3
+  # Runtime-Permissions (Mic/Cam fuer Calls + Livestreams)
+  permission_handler: ^11.3.0
 
   # Push Notifications
   firebase_core: ^3.6.0

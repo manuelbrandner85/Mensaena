@@ -31,7 +31,7 @@ class AppDrawer extends ConsumerWidget {
 
   static const _NavLink _home = _NavLink(
     icon: LucideIcons.layoutDashboard,
-    label: 'Übersicht',
+    label: 'Dashboard',
     route: '/dashboard',
   );
   static const _NavLink _notifications = _NavLink(
@@ -248,7 +248,7 @@ class AppDrawer extends ConsumerWidget {
   ];
 
   static const _NavGroup _adminGroup = _NavGroup(
-    label: 'Admin',
+    label: 'Admin-Bereich',
     headIcon: LucideIcons.shieldCheck,
     items: [
       _NavLink(

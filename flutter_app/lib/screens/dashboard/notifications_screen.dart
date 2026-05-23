@@ -99,6 +99,56 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           style: AppTypography.label(
                               size: 10, color: AppColors.amber)),
                     ),
+                  IconButton(
+                    tooltip: 'Alle löschen',
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: AppColors.surface,
+                          title: Text('Alle löschen?',
+                              style: AppTypography.body(
+                                  size: 15,
+                                  color: AppColors.ink,
+                                  weight: FontWeight.w700)),
+                          content: Text(
+                            'Alle Benachrichtigungen werden entfernt. Das kann nicht rückgängig gemacht werden.',
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.inkSoft),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: const Text('Abbrechen'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.herzrot),
+                              child: const Text('Löschen'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmed != true) return;
+                      final ok = await NotificationsRepository.deleteAll();
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: AppColors.surface,
+                          content: Text(
+                            ok
+                                ? 'Alle Benachrichtigungen gelöscht.'
+                                : 'Löschen fehlgeschlagen.',
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.ink),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(LucideIcons.trash2,
+                        size: 14, color: AppColors.mute),
+                  ),
                 ],
               ),
             ),
@@ -179,8 +229,43 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   return ListView.builder(
                     padding: const EdgeInsets.all(12),
                     itemCount: filtered.length,
-                    itemBuilder: (context, i) =>
-                        _NotificationTile(notif: filtered[i]),
+                    itemBuilder: (context, i) {
+                      final n = filtered[i];
+                      return Dismissible(
+                        key: ValueKey('notif_${n.id}'),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          alignment: Alignment.centerRight,
+                          decoration: BoxDecoration(
+                            color: AppColors.herzrot.withValues(alpha: 0.25),
+                            border: Border.all(
+                                color: AppColors.herzrot
+                                    .withValues(alpha: 0.5)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(LucideIcons.trash2,
+                              color: AppColors.herzrotWarm, size: 20),
+                        ),
+                        onDismissed: (_) async {
+                          await NotificationsRepository.delete(n.id);
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: AppColors.surface,
+                              duration: const Duration(seconds: 2),
+                              content: Text(
+                                'Benachrichtigung gelöscht.',
+                                style: AppTypography.body(
+                                    size: 13, color: AppColors.ink),
+                              ),
+                            ),
+                          );
+                        },
+                        child: _NotificationTile(notif: n),
+                      );
+                    },
                   );
                 },
               ),

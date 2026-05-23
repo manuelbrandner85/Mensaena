@@ -102,10 +102,12 @@ class PushNotificationService {
 
   /// Foreground-Handler — zeigt Local-Notification damit User immer
   /// einen visuellen Hinweis bekommt (auch bei nicht-sichtbaren Screens).
+  /// Bevorzugt data.title/body weil FCM Android-Background diese Felder
+  /// stabiler durchreicht als notification.title.
   static Future<void> _handleForegroundMessage(RemoteMessage m) async {
     final n = m.notification;
-    final title = n?.title ?? m.data['title'] as String?;
-    final body = n?.body ?? m.data['body'] as String?;
+    final title = (m.data['title'] as String?) ?? n?.title;
+    final body = (m.data['body'] as String?) ?? n?.body;
     if (title == null && body == null) return;
     await _showLocalNotification(
       id: m.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch,
@@ -216,8 +218,9 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
   try {
     await Firebase.initializeApp();
     final n = m.notification;
-    final title = n?.title ?? m.data['title'] as String?;
-    final body = n?.body ?? m.data['body'] as String?;
+    // data.* hat Vorrang — Android-Background haengt notification.title oft ab.
+    final title = (m.data['title'] as String?) ?? n?.title;
+    final body = (m.data['body'] as String?) ?? n?.body;
     if (title == null && body == null) return;
 
     final plugin = FlutterLocalNotificationsPlugin();

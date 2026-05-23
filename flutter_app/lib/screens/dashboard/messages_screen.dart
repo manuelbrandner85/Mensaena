@@ -11,7 +11,8 @@ import '../../services/presence_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
-/// Konversations-Liste sortiert nach updated_at.
+/// Chat-Hub: 2 Tabs — Community (Channels gruppiert nach Kategorie)
+/// + Nachrichten (Direct Messages + Groups). 1:1 zu Web ChatView.tsx.
 class MessagesScreen extends ConsumerStatefulWidget {
   const MessagesScreen({super.key});
 
@@ -19,211 +20,502 @@ class MessagesScreen extends ConsumerStatefulWidget {
   ConsumerState<MessagesScreen> createState() => _MessagesScreenState();
 }
 
-class _MessagesScreenState extends ConsumerState<MessagesScreen> {
-  Future<List<Map<String, dynamic>>>? _future;
+class _MessagesScreenState extends ConsumerState<MessagesScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab;
+  Future<List<Map<String, dynamic>>>? _convs;
+  Future<List<Map<String, dynamic>>>? _channels;
+  String _searchDm = '';
 
   @override
   void initState() {
     super.initState();
-    _future = ConversationsRepository.listMine();
+    _tab = TabController(length: 2, vsync: this);
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
+
+  void _load() {
+    _convs = ConversationsRepository.listMine();
+    _channels = ConversationsRepository.listChannels();
   }
 
   Future<void> _refresh() async {
-    final fresh = ConversationsRepository.listMine();
-    setState(() => _future = fresh);
-    await fresh;
+    setState(_load);
+    await Future.wait([_convs!, _channels!]);
   }
 
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Nachrichten',
+      title: 'Chat',
       currentRoute: '/dashboard/messages',
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.amber,
-          backgroundColor: AppColors.surface,
-          onRefresh: _refresh,
-          child: FutureBuilder<List<Map<String, dynamic>>>(
-            future: _future,
-            builder: (context, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
-                );
-              }
-              final convs = snap.data ?? const [];
-              if (convs.isEmpty) {
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            // Tab-Bar Community | Nachrichten
+            Container(
+              margin: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.elevated,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: AppColors.line),
+              ),
+              child: TabBar(
+                controller: _tab,
+                indicator: BoxDecoration(
+                  color: AppColors.bronze.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                      color: AppColors.bronze.withValues(alpha: 0.5)),
+                ),
+                dividerColor: Colors.transparent,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: AppColors.bronze,
+                unselectedLabelColor: AppColors.inkSoft,
+                labelStyle: AppTypography.body(
+                    size: 12, weight: FontWeight.w700),
+                unselectedLabelStyle: AppTypography.body(size: 12),
+                tabs: const [
+                  Tab(
+                    height: 36,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(LucideIcons.hash, size: 14),
+                        SizedBox(width: 6),
+                        Text('Community'),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    height: 36,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(LucideIcons.mail, size: 14),
+                        SizedBox(width: 6),
+                        Text('Nachrichten'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.amber,
+                backgroundColor: AppColors.surface,
+                onRefresh: _refresh,
+                child: TabBarView(
+                  controller: _tab,
                   children: [
-                    const SizedBox(height: 120),
-                    Center(
-                      child: Column(
-                        children: [
-                          const Icon(
-                            LucideIcons.messagesSquare,
-                            size: 32,
-                            color: AppColors.mute,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Noch keine Konversationen.',
-                            style: AppTypography.body(
-                              size: 14,
-                              color: AppColors.mute,
-                            ),
-                          ),
-                        ],
-                      ),
+                    _ChannelListView(future: _channels),
+                    _DmListView(
+                      future: _convs,
+                      search: _searchDm,
+                      onSearchChanged: (v) => setState(() => _searchDm = v),
+                      onlineUserIds: ref
+                              .watch(onlineUsersProvider)
+                              .value ??
+                          const <String>{},
                     ),
                   ],
-                );
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: convs.length,
-                itemBuilder: (context, i) {
-                  final c = convs[i];
-                  final id = c['id'] as String;
-                  // Verwende display_title aus enriched listMine
-                  // (Channel-Name mit Emoji ODER Partner-Display-Name).
-                  final title = (c['display_title'] as String?) ??
-                      (c['title'] as String?) ??
-                      'Konversation';
-                  final subtitle = c['display_subtitle'] as String?;
-                  final avatarUrl = c['peer_avatar_url'] as String?;
-                  final isChannel = c['is_channel'] == true;
-                  final isDm = c['is_dm'] == true;
-                  final updatedAt = DateTime.tryParse(
-                          (c['updated_at'] ?? c['created_at']) as String? ??
-                              '') ??
-                      DateTime.now();
-                  final peerId = c['peer_user_id'] as String?;
-                  final online = peerId != null &&
-                      (ref.watch(onlineUsersProvider).value ??
-                              const <String>{})
-                          .contains(peerId);
-                  return InkWell(
-                    onTap: () => context.go('/dashboard/messages/$id'),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.4),
-                        border: Border.all(color: AppColors.line),
-                        borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Community: Channel-Liste gruppiert nach Kategorie ──────────────
+class _ChannelListView extends StatelessWidget {
+  const _ChannelListView({required this.future});
+  final Future<List<Map<String, dynamic>>>? future;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.amber),
+          );
+        }
+        final list = snap.data ?? const <Map<String, dynamic>>[];
+        if (list.isEmpty) {
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const SizedBox(height: 100),
+              Center(
+                child: Column(
+                  children: [
+                    const Icon(LucideIcons.hash,
+                        size: 36, color: AppColors.mute),
+                    const SizedBox(height: 10),
+                    Text('Keine Kanäle verfügbar.',
+                        style: AppTypography.body(
+                            size: 14, color: AppColors.mute)),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+        // Gruppieren nach category
+        final grouped = <String, List<Map<String, dynamic>>>{};
+        for (final ch in list) {
+          final cat = (ch['category'] as String?)?.trim();
+          final key = (cat == null || cat.isEmpty) ? 'Allgemein' : cat;
+          grouped.putIfAbsent(key, () => []).add(ch);
+        }
+        final keys = grouped.keys.toList()..sort();
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
+          children: [
+            for (final cat in keys) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4, 14, 4, 6),
+                child: Text(
+                  cat.toUpperCase(),
+                  style: AppTypography.label(size: 9, color: AppColors.mute),
+                ),
+              ),
+              for (final ch in grouped[cat]!) _ChannelTile(channel: ch),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ChannelTile extends StatelessWidget {
+  const _ChannelTile({required this.channel});
+  final Map<String, dynamic> channel;
+
+  @override
+  Widget build(BuildContext context) {
+    final convId = channel['conversation_id'] as String?;
+    final name = (channel['name'] as String?) ?? 'Kanal';
+    final emoji = (channel['emoji'] as String?) ?? '💬';
+    final desc = channel['description'] as String?;
+    final locked = channel['is_locked'] == true;
+    final memberCount = channel['member_count'] as int?;
+    return InkWell(
+      onTap: convId == null
+          ? null
+          : () => context.go('/dashboard/messages/$convId'),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface.withValues(alpha: 0.5),
+          border: Border.all(color: AppColors.line),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.bronze.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(emoji, style: const TextStyle(fontSize: 20)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.body(
+                              size: 14,
+                              color: AppColors.ink,
+                              weight: FontWeight.w700),
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 18,
-                                backgroundColor: AppColors.elevated,
-                                backgroundImage: avatarUrl != null
-                                    ? NetworkImage(avatarUrl)
-                                    : null,
-                                child: avatarUrl == null
-                                    ? isChannel
-                                        ? Text(
-                                            (c['channel'] as Map?)?[
-                                                    'emoji']
-                                                    as String? ??
-                                                '💬',
-                                            style: const TextStyle(
-                                                fontSize: 18),
-                                          )
-                                        : const Icon(
-                                            LucideIcons.user,
-                                            size: 16,
-                                            color: AppColors.amber,
-                                          )
-                                    : null,
-                              ),
-                              if (online && isDm)
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: Container(
-                                    width: 10,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.leben,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                          color: AppColors.surface,
-                                          width: 2),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  style: AppTypography.body(
-                                    size: 14,
-                                    color: AppColors.ink,
-                                    weight: FontWeight.w600,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    if (online) ...[
-                                      Container(
-                                        width: 6,
-                                        height: 6,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.leben,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text('Online',
-                                          style: AppTypography.label(
-                                              size: 9,
-                                              color: AppColors.lebenSoft)),
-                                      const SizedBox(width: 6),
-                                    ],
-                                    Text(
-                                      DateFormat('dd.MM.yyyy HH:mm')
-                                          .format(updatedAt),
-                                      style: AppTypography.caption(),
-                                    ),
-                                  ],
-                                ),
-                                if (subtitle != null &&
-                                    subtitle.isNotEmpty) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    subtitle,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: AppTypography.caption(),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          const Icon(
-                            LucideIcons.chevronRight,
-                            size: 16,
-                            color: AppColors.mute,
-                          ),
-                        ],
+                      if (locked)
+                        const Icon(LucideIcons.lock,
+                            size: 12, color: AppColors.mute),
+                    ],
+                  ),
+                  if (desc != null && desc.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      desc,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body(
+                          size: 12, color: AppColors.inkSoft),
+                    ),
+                  ],
+                  if (memberCount != null && memberCount > 0) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(LucideIcons.users,
+                            size: 10, color: AppColors.mute),
+                        const SizedBox(width: 3),
+                        Text('$memberCount Teilnehmende',
+                            style: AppTypography.caption()),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight,
+                size: 14, color: AppColors.mute),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Nachrichten: Direct-Message-Liste + Suche ─────────────────────
+class _DmListView extends StatelessWidget {
+  const _DmListView({
+    required this.future,
+    required this.search,
+    required this.onSearchChanged,
+    required this.onlineUserIds,
+  });
+
+  final Future<List<Map<String, dynamic>>>? future;
+  final String search;
+  final ValueChanged<String> onSearchChanged;
+  final Set<String> onlineUserIds;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.amber),
+          );
+        }
+        final all = snap.data ?? const <Map<String, dynamic>>[];
+        // Nur DMs + Groups (channels raus)
+        final dms = all.where((c) {
+          if (c['is_channel'] == true) return false;
+          return c['is_dm'] == true || c['is_group'] == true;
+        }).toList();
+        if (dms.isEmpty) {
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const SizedBox(height: 100),
+              Center(
+                child: Column(
+                  children: [
+                    const Text('💌', style: TextStyle(fontSize: 36)),
+                    const SizedBox(height: 10),
+                    Text('Noch keine Nachrichten.',
+                        style: AppTypography.body(
+                            size: 14,
+                            color: AppColors.ink,
+                            weight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(
+                        'Schreibe einem:r Nachbar:in über deren Profil oder Beitrag.',
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.mute),
+                        textAlign: TextAlign.center),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+        final filtered = search.trim().isEmpty
+            ? dms
+            : dms.where((c) {
+                final t = (c['display_title'] as String? ?? '').toLowerCase();
+                final s = (c['display_subtitle'] as String? ?? '')
+                    .toLowerCase();
+                final q = search.toLowerCase();
+                return t.contains(q) || s.contains(q);
+              }).toList();
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(12, 6, 12, 24),
+          children: [
+            // Suche-Input
+            TextField(
+              onChanged: onSearchChanged,
+              style: AppTypography.body(size: 13, color: AppColors.ink),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: AppColors.elevated,
+                prefixIcon: const Icon(LucideIcons.search,
+                    size: 14, color: AppColors.mute),
+                hintText: 'Gespräche durchsuchen…',
+                hintStyle:
+                    AppTypography.body(size: 12, color: AppColors.mute),
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            for (final c in filtered)
+              _DmTile(conv: c, onlineUserIds: onlineUserIds),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DmTile extends StatelessWidget {
+  const _DmTile({required this.conv, required this.onlineUserIds});
+  final Map<String, dynamic> conv;
+  final Set<String> onlineUserIds;
+
+  @override
+  Widget build(BuildContext context) {
+    final id = conv['id'] as String;
+    final title = (conv['display_title'] as String?) ??
+        (conv['title'] as String?) ??
+        'Konversation';
+    final subtitle = conv['display_subtitle'] as String?;
+    final avatarUrl = conv['peer_avatar_url'] as String?;
+    final isDm = conv['is_dm'] == true;
+    final updatedAt = DateTime.tryParse(
+            (conv['updated_at'] ?? conv['created_at']) as String? ?? '') ??
+        DateTime.now();
+    final peerId = conv['peer_user_id'] as String?;
+    final online = peerId != null && onlineUserIds.contains(peerId);
+
+    return InkWell(
+      onTap: () => context.go('/dashboard/messages/$id'),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface.withValues(alpha: 0.5),
+          border: Border.all(color: AppColors.line),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: AppColors.elevated,
+                  backgroundImage:
+                      avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                  child: avatarUrl == null
+                      ? const Icon(LucideIcons.user,
+                          size: 18, color: AppColors.bronze)
+                      : null,
+                ),
+                if (online && isDm)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 11,
+                      height: 11,
+                      decoration: BoxDecoration(
+                        color: AppColors.leben,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: AppColors.surface, width: 2),
                       ),
                     ),
-                  );
-                },
-              );
-            },
-          ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.body(
+                              size: 14,
+                              color: AppColors.ink,
+                              weight: FontWeight.w600),
+                        ),
+                      ),
+                      Text(
+                        DateFormat('dd.MM. HH:mm').format(updatedAt),
+                        style: AppTypography.caption(),
+                      ),
+                    ],
+                  ),
+                  if (subtitle != null && subtitle.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body(
+                          size: 12, color: AppColors.inkSoft),
+                    ),
+                  ],
+                  if (online && isDm) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.leben,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text('Online',
+                            style: AppTypography.label(
+                                size: 9, color: AppColors.lebenSoft)),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight,
+                size: 14, color: AppColors.mute),
+          ],
         ),
       ),
     );

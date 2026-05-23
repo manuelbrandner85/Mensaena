@@ -149,16 +149,15 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
     url: url || '/dashboard/notifications',
     tag: tag || 'mensaena-notification',
     type: type || 'notification',
+    // title+body IMMER in data — Android-Background-Handler liest sie zuverlässig,
+    // notification.title wird vom System teils ueberschrieben.
+    title: title || 'Mensaena',
+    body:  body  || '',
   }
   if (metadata && typeof metadata === 'object') {
     for (const [k, v] of Object.entries(metadata)) {
       if (v !== null && v !== undefined) dataFields[k] = String(v)
     }
-  }
-
-  if (isCall) {
-    dataFields.title = title || 'Anruf'
-    dataFields.body  = body  || 'Eingehender Anruf'
   }
 
   const payload = {

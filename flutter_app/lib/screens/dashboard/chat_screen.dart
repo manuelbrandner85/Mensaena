@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -103,27 +104,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (ctx == null || ctx.kind != ChatKind.dm || ctx.partnerId == null) {
       return;
     }
-    final callId = await DmCallService.start(
+    final result = await DmCallService.start(
       conversationId: widget.conversationId,
       calleeId: ctx.partnerId!,
     );
-    if (callId == null || !mounted) return;
-    setState(() => _activeCallId = callId);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        '📞 Anruf gestartet — ${ctx.title} wird kontaktiert.',
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-      action: SnackBarAction(
-        label: 'Abbrechen',
-        textColor: AppColors.herzrotWarm,
-        onPressed: () async {
-          await DmCallService.cancel(callId);
-          if (mounted) setState(() => _activeCallId = null);
-        },
-      ),
-    ));
+    if (result == null || !mounted) return;
+    setState(() => _activeCallId = result.callId);
+    // Navigation in CallScreen — startet LiveKit-Verbindung.
+    final peer = Uri.encodeComponent(ctx.title);
+    final room = Uri.encodeComponent(result.roomName);
+    context.push('/dashboard/call/${result.callId}?room=$room&peer=$peer');
   }
 
   Future<void> _startStream() async {
@@ -137,24 +127,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       topic: 'Live im Kanal ${ctx.title}',
     );
     if (!mounted) return;
-    if (room != null) {
-      setState(() => _activeStreamRoom = room);
+    if (room == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text(
-          '📡 Livestream aktiv im Kanal ${ctx.title}',
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-        action: SnackBarAction(
-          label: 'Beenden',
-          textColor: AppColors.herzrotWarm,
-          onPressed: () async {
-            await LiveStreamService.endChannelStream(room);
-            if (mounted) setState(() => _activeStreamRoom = null);
-          },
-        ),
+        content: Text('Livestream konnte nicht gestartet werden.',
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
+      return;
     }
+    setState(() => _activeStreamRoom = room);
+    final title = Uri.encodeComponent(ctx.title);
+    final r = Uri.encodeComponent(room);
+    context.push('/dashboard/live/$r?title=$title&host=1');
   }
 
   void _setupPresence() {

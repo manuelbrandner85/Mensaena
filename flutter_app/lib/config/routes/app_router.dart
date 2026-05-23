@@ -11,6 +11,8 @@ import '../../screens/dashboard/admin/admin_system_screen.dart';
 import '../../screens/dashboard/admin/admin_table_screen.dart';
 import '../../screens/dashboard/admin/admin_users_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
+import '../../screens/dashboard/call/call_screen.dart';
+import '../../screens/dashboard/live/live_room_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
 import '../../screens/dashboard/create/module_create_config.dart';
@@ -680,6 +682,23 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/admin/system',
         builder: (_, __) => const AdminSystemScreen(),
+      ),
+      // LiveKit Call + Live-Room Screens (DM-Call / Channel-Stream)
+      GoRoute(
+        path: '/dashboard/call/:callId',
+        builder: (ctx, st) => CallScreen(
+          callId: st.pathParameters['callId']!,
+          roomName: st.uri.queryParameters['room'] ?? '',
+          peerName: st.uri.queryParameters['peer'] ?? 'Anruf',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/live/:roomName',
+        builder: (ctx, st) => LiveRoomScreen(
+          roomName: st.pathParameters['roomName']!,
+          channelTitle: st.uri.queryParameters['title'] ?? '',
+          isHost: st.uri.queryParameters['host'] == '1',
+        ),
       ),
     ],
     errorBuilder: (context, state) => const PlaceholderScreen(

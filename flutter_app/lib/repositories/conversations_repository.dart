@@ -7,6 +7,22 @@ import '../services/supabase_service.dart';
 class ConversationsRepository {
   const ConversationsRepository._();
 
+  /// Alle Community-Channels (chat_channels) gruppiert nach category.
+  /// 1:1 zu Web `loadChannels`. Returns Map mit channels-Liste + sort.
+  static Future<List<Map<String, dynamic>>> listChannels() async {
+    try {
+      final rows = await sb
+          .from('chat_channels')
+          .select(
+              'id, conversation_id, name, emoji, slug, description, category, is_locked, sort_order, member_count')
+          .order('sort_order')
+          .limit(200);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Eigene Konversationen sortiert nach last_message_at (neueste oben).
   static Future<List<Map<String, dynamic>>> listMine() async {
     final uid = SupabaseService.currentUser?.id;

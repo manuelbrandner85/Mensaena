@@ -72,6 +72,52 @@ class NotificationsRepository {
           .filter('read_at', 'is', null);
     } catch (_) {}
   }
+
+  /// Einzelne Notification loeschen via RPC delete_notification.
+  /// Realtime DELETE-Event entfernt Row automatisch aus dem Stream.
+  static Future<bool> delete(String id) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.rpc<dynamic>('delete_notification',
+          params: {'p_id': id, 'p_user_id': uid});
+      return true;
+    } catch (_) {
+      // Fallback: direct soft-delete (RPC fehlt eventuell)
+      try {
+        await sb.from('notifications').update({
+          'deleted_at': DateTime.now().toUtc().toIso8601String(),
+        }).eq('id', id);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
+
+  /// Alle Notifications soft-deleten via RPC.
+  static Future<bool> deleteAll() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.rpc<dynamic>('soft_delete_all_notifications',
+          params: {'p_user_id': uid});
+      return true;
+    } catch (_) {
+      try {
+        await sb
+            .from('notifications')
+            .update({
+              'deleted_at': DateTime.now().toUtc().toIso8601String(),
+            })
+            .eq('user_id', uid)
+            .filter('deleted_at', 'is', null);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
 }
 
 /// Realtime-Stream aller Notifications des aktuellen Users.
