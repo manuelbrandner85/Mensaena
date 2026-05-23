@@ -63,6 +63,10 @@ dependencies:
   flutter_markdown: ^0.7.3
   crypto: ^3.0.5
 
+  # Shorebird OTA: liest die Patch-Nummer + meldet sich beim Server.
+  # Patches selber werden automatisch beim Launch installiert.
+  shorebird_code_push: ^2.0.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

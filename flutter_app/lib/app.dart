@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
+import 'widgets/shared/update_gate.dart';
 
 /// SKILL: mensaena-architektur
 /// Root-Widget. MaterialApp.router mit GoRouter aus app_router.dart.
@@ -39,6 +40,11 @@ class MensaenaApp extends ConsumerWidget {
       ],
       supportedLocales: const [Locale('de', 'DE'), Locale('en', 'US')],
       locale: const Locale('de', 'DE'),
+      // UpdateGate wickelt jede Seite — bei mandatory Update wird ALLES
+      // blockiert bis APK heruntergeladen ist.
+      builder: (context, navChild) => UpdateGate(
+        child: navChild ?? const SizedBox.shrink(),
+      ),
     );
   }
 }
