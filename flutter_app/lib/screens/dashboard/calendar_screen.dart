@@ -22,7 +22,14 @@ class CalendarScreen extends ConsumerWidget {
       title: 'Kalender',
       currentRoute: '/dashboard/calendar',
       body: SafeArea(
-        child: async.when(
+        child: RefreshIndicator(
+          color: AppColors.amber,
+          backgroundColor: AppColors.surface,
+          onRefresh: () async {
+            ref.invalidate(upcomingEventsProvider);
+            await ref.read(upcomingEventsProvider.future);
+          },
+          child: async.when(
           loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.amber),
           ),
@@ -63,6 +70,7 @@ class CalendarScreen extends ConsumerWidget {
               ],
             );
           },
+        ),
         ),
       ),
     );

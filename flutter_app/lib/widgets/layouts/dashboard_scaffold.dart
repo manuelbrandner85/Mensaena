@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/notifications_repository.dart';
+import '../effects/cinema_overlay.dart';
 import '../shared/fcm_foreground_listener.dart';
 import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
@@ -97,24 +98,26 @@ class DashboardScaffold extends ConsumerWidget {
       drawer: const AppDrawer(),
       bottomNavigationBar: _BottomNav(currentRoute: currentRoute),
       floatingActionButton: fab,
-      body: FcmForegroundListener(
-        child: IncomingCallListener(
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  const ZeitbankConfirmationBanner(),
-                  Expanded(child: body),
-                ],
-              ),
-          // MensaenaBot Floating-Button (links unten, oberhalb BottomNav)
-          // Nicht ueberlappen mit dem regulaeren FAB (rechts unten).
-          Positioned(
-            left: 16,
-            bottom: 16,
-            child: SafeArea(child: const MensaenaBotButton()),
-          ),
-            ],
+      body: CinemaOverlay(
+        child: FcmForegroundListener(
+          child: IncomingCallListener(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    const ZeitbankConfirmationBanner(),
+                    Expanded(child: body),
+                  ],
+                ),
+                // MensaenaBot Floating-Button (links unten, oberhalb BottomNav)
+                // Nicht ueberlappen mit dem regulaeren FAB (rechts unten).
+                Positioned(
+                  left: 16,
+                  bottom: 16,
+                  child: SafeArea(child: const MensaenaBotButton()),
+                ),
+              ],
+            ),
           ),
         ),
       ),

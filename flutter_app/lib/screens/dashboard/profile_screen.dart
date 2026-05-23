@@ -618,48 +618,87 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final isMe = SupabaseService.currentUser?.id == profile.id;
+    return Column(
       children: [
-        CircleAvatar(
-          radius: 36,
-          backgroundColor: AppColors.surface,
-          backgroundImage: profile.avatarUrl != null
-              ? NetworkImage(profile.avatarUrl!)
-              : null,
-          child: profile.avatarUrl == null
-              ? Text(
-                  (profile.name ?? '?').substring(0, 1).toUpperCase(),
-                  style: AppTypography.display(
-                    size: 28,
-                    color: AppColors.amber,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 36,
+              backgroundColor: AppColors.surface,
+              backgroundImage: profile.avatarUrl != null
+                  ? NetworkImage(profile.avatarUrl!)
+                  : null,
+              child: profile.avatarUrl == null
+                  ? Text(
+                      (profile.name ?? '?').substring(0, 1).toUpperCase(),
+                      style: AppTypography.display(
+                        size: 28,
+                        color: AppColors.amber,
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    profile.displayName ?? profile.name ?? 'Nachbar:in',
+                    style: AppTypography.display(
+                      size: 22,
+                      color: AppColors.ink,
+                    ),
                   ),
-                )
-              : null,
+                  if (profile.location != null)
+                    Text(
+                      profile.location!,
+                      style: AppTypography.body(
+                          size: 13, color: AppColors.mute),
+                    ),
+                  const SizedBox(height: 8),
+                  _TrustBadge(
+                      score: profile.trustScore,
+                      count: profile.trustScoreCount),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        if (isMe) ...[
+          const SizedBox(height: 12),
+          Row(
             children: [
-              Text(
-                profile.displayName ?? profile.name ?? 'Nachbar:in',
-                style: AppTypography.display(
-                  size: 22,
-                  color: AppColors.ink,
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go('/dashboard/profile/edit'),
+                  icon: const Icon(LucideIcons.edit2, size: 14),
+                  label: const Text('Profil bearbeiten'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    side: BorderSide(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                  ),
                 ),
               ),
-              if (profile.location != null)
-                Text(
-                  profile.location!,
-                  style: AppTypography.body(size: 13, color: AppColors.mute),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go('/dashboard/profile/saved'),
+                  icon: const Icon(LucideIcons.bookmark, size: 14),
+                  label: const Text('Gespeichert'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.amber,
+                    side: BorderSide(
+                        color: AppColors.amber.withValues(alpha: 0.5)),
+                  ),
                 ),
-              const SizedBox(height: 8),
-              _TrustBadge(
-                  score: profile.trustScore, count: profile.trustScoreCount),
+              ),
             ],
           ),
-        ),
+        ],
       ],
     );
   }

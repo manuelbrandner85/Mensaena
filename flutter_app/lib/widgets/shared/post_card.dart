@@ -2,21 +2,228 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
+import '../../repositories/posts_repository.dart';
+import '../../repositories/user_blocks_repository.dart';
+import '../../repositories/content_reports_repository.dart';
 
 /// SKILL: mensaena-design + mensaena-features
 /// PostCard fuer Listen-Ansichten. Zeigt Typ-Badge, Titel,
 /// Beschreibung, Standort, Zeit. Tippen → Detail-Seite.
-class PostCard extends StatelessWidget {
+/// 1:1 Action-Parität zu Web PostCard.tsx: Save / Share / Menü
+/// (Blocken, Melden).
+class PostCard extends StatefulWidget {
   const PostCard({required this.post, super.key});
 
   final Post post;
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  bool _saved = false;
+  bool _savedKnown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSaved();
+  }
+
+  Future<void> _loadSaved() async {
+    final s = await PostsRepository.isSaved(widget.post.id);
+    if (!mounted) return;
+    setState(() {
+      _saved = s;
+      _savedKnown = true;
+    });
+  }
+
+  Future<void> _toggleSave() async {
+    final next = await PostsRepository.toggleSave(widget.post.id);
+    if (!mounted) return;
+    setState(() => _saved = next);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      duration: const Duration(seconds: 2),
+      content: Text(
+        next ? '✓ Beitrag gespeichert.' : '✗ Aus Lesezeichen entfernt.',
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
+  Future<void> _share() async {
+    final url = 'https://www.mensaena.de/dashboard/posts/${widget.post.id}';
+    await Share.share(
+      '${widget.post.title}\n$url',
+      subject: widget.post.title,
+    );
+  }
+
+  Future<void> _openMenu() async {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.line,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _MenuTile(
+              icon: _saved ? LucideIcons.bookmarkMinus : LucideIcons.bookmark,
+              label: _saved ? 'Aus Lesezeichen entfernen' : 'Speichern',
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                _toggleSave();
+              },
+            ),
+            _MenuTile(
+              icon: LucideIcons.share2,
+              label: 'Teilen',
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                _share();
+              },
+            ),
+            const Divider(color: AppColors.line, height: 1),
+            _MenuTile(
+              icon: LucideIcons.userX,
+              label: 'Nutzer:in blockieren',
+              color: AppColors.herzrotWarm,
+              onTap: () async {
+                Navigator.pop(sheetCtx);
+                await _confirmBlock();
+              },
+            ),
+            _MenuTile(
+              icon: LucideIcons.flag,
+              label: 'Beitrag melden',
+              color: AppColors.herzrotWarm,
+              onTap: () async {
+                Navigator.pop(sheetCtx);
+                await _showReportDialog();
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmBlock() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Nutzer:in blockieren?',
+            style: AppTypography.body(
+                size: 15, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text(
+            'Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.',
+            style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: const Text('Blockieren'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final ok = await UserBlocksRepository.block(widget.post.userId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(ok ? 'Nutzer:in blockiert.' : 'Fehler beim Blockieren.',
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
+  }
+
+  Future<void> _showReportDialog() async {
+    const reasons = <String>[
+      'Spam',
+      'Belästigung',
+      'Hass / Diskriminierung',
+      'Gewalt',
+      'Falsche Informationen',
+      'Anstößige Inhalte',
+      'Anderer Grund',
+    ];
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Beitrag melden',
+            style: AppTypography.body(
+                size: 15, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Wähle einen Grund:',
+                style: AppTypography.body(
+                    size: 13, color: AppColors.inkSoft)),
+            const SizedBox(height: 10),
+            for (final r in reasons)
+              ListTile(
+                dense: true,
+                title: Text(r,
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.ink)),
+                onTap: () => Navigator.pop(ctx, r),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Abbrechen'),
+          ),
+        ],
+      ),
+    );
+    if (selected == null) return;
+    final ok = await ContentReportsRepository.report(
+      contentType: 'post',
+      contentId: widget.post.id,
+      reason: selected,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok ? 'Meldung übermittelt. Danke.' : 'Meldung fehlgeschlagen.',
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final post = widget.post;
     final cfg = _typeConfig(post.type);
     return InkWell(
       onTap: () => context.go('/dashboard/posts/${post.id}'),
@@ -42,7 +249,8 @@ class PostCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: cfg.color.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: cfg.color.withValues(alpha: 0.4)),
+                    border:
+                        Border.all(color: cfg.color.withValues(alpha: 0.4)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -67,6 +275,15 @@ class PostCard extends StatelessWidget {
                     size: 11,
                     color: AppColors.mute,
                   ),
+                ),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                      minWidth: 28, minHeight: 28),
+                  onPressed: _openMenu,
+                  icon: const Icon(LucideIcons.moreVertical,
+                      size: 16, color: AppColors.mute),
                 ),
               ],
             ),
@@ -115,7 +332,7 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ],
-            // Action-Bar — 1:1 Pendant zu Web PostCard.tsx Z.270 ff
+            // Action-Bar
             const SizedBox(height: 12),
             Divider(
               height: 1,
@@ -136,10 +353,31 @@ class PostCard extends StatelessWidget {
                   color: AppColors.tealSoft,
                 ),
                 const SizedBox(width: 14),
-                _PostCardAction(
-                  icon: LucideIcons.bookmark,
-                  label: '',
-                  color: AppColors.bronze,
+                InkWell(
+                  onTap: _savedKnown ? _toggleSave : null,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 4, vertical: 2),
+                    child: Icon(
+                      _saved
+                          ? LucideIcons.bookmarkPlus
+                          : LucideIcons.bookmark,
+                      size: 14,
+                      color: _saved ? AppColors.bronze : AppColors.mute,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                InkWell(
+                  onTap: _share,
+                  borderRadius: BorderRadius.circular(6),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 4, vertical: 2),
+                    child: Icon(LucideIcons.share2,
+                        size: 14, color: AppColors.mute),
+                  ),
                 ),
                 const Spacer(),
                 if (post.urgency != null && post.urgency! >= 3)
@@ -157,8 +395,7 @@ class PostCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text('DRINGEND',
                             style: AppTypography.label(
-                                size: 7,
-                                color: AppColors.herzrotWarm)),
+                                size: 7, color: AppColors.herzrotWarm)),
                       ],
                     ),
                   ),
@@ -178,6 +415,40 @@ class PostCard extends StatelessWidget {
     if (diff.inDays == 1) return 'gestern';
     if (diff.inDays < 7) return 'vor ${diff.inDays} Tagen';
     return DateFormat('dd.MM.yyyy').format(t);
+  }
+}
+
+class _MenuTile extends StatelessWidget {
+  const _MenuTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? AppColors.ink;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: c),
+            const SizedBox(width: 12),
+            Text(label,
+                style: AppTypography.body(
+                    size: 14, color: c, weight: FontWeight.w500)),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -201,112 +472,40 @@ class _PostCardAction extends StatelessWidget {
         if (label.isNotEmpty) ...[
           const SizedBox(width: 4),
           Text(label,
-              style: AppTypography.mono(
-                size: 11,
-                color: AppColors.inkSoft,
-              )),
+              style: AppTypography.body(size: 11, color: AppColors.inkSoft)),
         ],
       ],
     );
   }
 }
 
-class _TypeConfig {
-  const _TypeConfig({
-    required this.label,
-    required this.emoji,
-    required this.color,
-  });
-  final String label;
-  final String emoji;
-  final Color color;
-}
-
-_TypeConfig _typeConfig(String type) {
+({String label, String emoji, Color color}) _typeConfig(String type) {
   switch (type) {
-    case 'rescue':
-      return const _TypeConfig(
-        label: 'Retten',
-        emoji: '🧡',
-        color: Color(0xFFFB923C),
-      );
-    case 'animal':
-      return const _TypeConfig(
-        label: 'Tier',
-        emoji: '🐾',
-        color: Color(0xFFEC4899),
-      );
-    case 'housing':
-      return const _TypeConfig(
-        label: 'Wohnen',
-        emoji: '🏡',
-        color: Color(0xFF60A5FA),
-      );
-    case 'supply':
-      return const _TypeConfig(
-        label: 'Versorgung',
-        emoji: '🌾',
-        color: Color(0xFFFACC15),
-      );
-    case 'mobility':
-      return const _TypeConfig(
-        label: 'Mobilität',
-        emoji: '🚗',
-        color: Color(0xFF818CF8),
-      );
-    case 'sharing':
-      return const _TypeConfig(
-        label: 'Teilen',
-        emoji: '🔄',
-        color: AppColors.teal,
-      );
-    case 'community':
-      return const _TypeConfig(
-        label: 'Community',
-        emoji: '🗳️',
-        color: Color(0xFFC084FC),
-      );
-    case 'crisis':
-      return const _TypeConfig(
-        label: 'Notfall',
-        emoji: '🚨',
-        color: AppColors.herzrot,
-      );
     case 'help_request':
-      return const _TypeConfig(
-        label: 'Hilfe gesucht',
-        emoji: '🆘',
-        color: AppColors.herzrot,
-      );
+      return (label: 'Hilfe gesucht', emoji: '🙋', color: AppColors.herzrotWarm);
     case 'help_offered':
-      return const _TypeConfig(
-        label: 'Hilfe',
-        emoji: '💚',
-        color: AppColors.leben,
-      );
+      return (label: 'Hilfe da', emoji: '🤝', color: AppColors.lebenSoft);
+    case 'sharing':
+      return (label: 'Teilen', emoji: '🌱', color: AppColors.leben);
+    case 'event':
+      return (label: 'Event', emoji: '📅', color: AppColors.bronze);
+    case 'item':
+      return (label: 'Ding', emoji: '📦', color: AppColors.amber);
+    case 'animal':
+      return (label: 'Tier', emoji: '🐾', color: AppColors.bronzeSoft);
+    case 'housing':
+      return (label: 'Wohnen', emoji: '🏠', color: AppColors.tealSoft);
+    case 'mobility':
+      return (label: 'Mobilität', emoji: '🚗', color: AppColors.amber);
+    case 'harvest':
+      return (label: 'Ernte', emoji: '🌾', color: AppColors.leben);
     case 'skill':
-      return const _TypeConfig(
-        label: 'Skill',
-        emoji: '🎯',
-        color: Color(0xFFA78BFA),
-      );
-    case 'knowledge':
-      return const _TypeConfig(
-        label: 'Wissen',
-        emoji: '📚',
-        color: AppColors.amber,
-      );
+      return (label: 'Skill', emoji: '🧠', color: AppColors.bronze);
+    case 'crisis':
+      return (label: 'Krise', emoji: '🚨', color: AppColors.herzrot);
     case 'mental':
-      return const _TypeConfig(
-        label: 'Mental',
-        emoji: '🧠',
-        color: AppColors.tealSoft,
-      );
+      return (label: 'Mental', emoji: '💚', color: AppColors.leben);
     default:
-      return const _TypeConfig(
-        label: 'Beitrag',
-        emoji: '📝',
-        color: AppColors.mute,
-      );
+      return (label: 'Post', emoji: '📝', color: AppColors.bronze);
   }
 }

@@ -13,6 +13,7 @@ import '../../services/chat_context_service.dart';
 import '../../services/dm_call_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/image_lightbox.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Screen mit Realtime-Messages via Supabase Stream.
@@ -609,30 +610,40 @@ class _MessageBubble extends ConsumerWidget {
                 _ReplyQuote(messageId: replyToId),
                 const SizedBox(height: 6),
               ],
-              // Inline-Images
+              // Inline-Images (Tap → Lightbox)
               if (hasImages && !deleted)
                 for (final m in imageMatches)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: m.group(1)!,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(
-                          height: 120,
-                          color: AppColors.elevated,
-                          alignment: Alignment.center,
-                          child: const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColors.amber),
+                    child: GestureDetector(
+                      onTap: () => ImageLightbox.open(
+                        context,
+                        urls: imageMatches
+                            .map((m) => m.group(1)!)
+                            .toList(),
+                        initialIndex:
+                            imageMatches.toList().indexOf(m),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: m.group(1)!,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(
+                            height: 120,
+                            color: AppColors.elevated,
+                            alignment: Alignment.center,
+                            child: const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: AppColors.amber),
+                            ),
                           ),
+                          errorWidget: (_, __, ___) => const Icon(
+                              LucideIcons.imageOff,
+                              color: AppColors.mute),
                         ),
-                        errorWidget: (_, __, ___) => const Icon(
-                            LucideIcons.imageOff,
-                            color: AppColors.mute),
                       ),
                     ),
                   ),

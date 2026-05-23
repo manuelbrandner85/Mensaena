@@ -134,6 +134,77 @@ class PostsRepository {
       return null;
     }
   }
+
+  /// Bookmark toggle — saved_posts(user_id, post_id) UPSERT/DELETE.
+  /// Returns neuen Status (true = jetzt gespeichert).
+  static Future<bool> toggleSave(String postId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final existing = await sb
+          .from('saved_posts')
+          .select('post_id')
+          .eq('user_id', uid)
+          .eq('post_id', postId)
+          .maybeSingle();
+      if (existing != null) {
+        await sb
+            .from('saved_posts')
+            .delete()
+            .eq('user_id', uid)
+            .eq('post_id', postId);
+        return false;
+      }
+      await sb.from('saved_posts').insert({
+        'user_id': uid,
+        'post_id': postId,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Prueft ob ein Post bereits gespeichert ist.
+  static Future<bool> isSaved(String postId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final row = await sb
+          .from('saved_posts')
+          .select('post_id')
+          .eq('user_id', uid)
+          .eq('post_id', postId)
+          .maybeSingle();
+      return row != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Alle gespeicherten Posts des aktuellen Users.
+  static Future<List<Post>> listSaved() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final rows = await sb
+          .from('saved_posts')
+          .select('post_id, posts(*)')
+          .eq('user_id', uid)
+          .order('created_at', ascending: false)
+          .limit(100);
+      final out = <Post>[];
+      for (final r in (rows as List).whereType<Map<String, dynamic>>()) {
+        final p = r['posts'];
+        if (p is Map<String, dynamic>) {
+          out.add(Post.fromJson(p));
+        }
+      }
+      return out;
+    } catch (_) {
+      return const [];
+    }
+  }
 }
 
 /// Populaere Tags — 1:1 aus `src/app/dashboard/posts/page.tsx` Z. 12.

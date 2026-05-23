@@ -5,7 +5,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
+import '../../providers/cinema_provider.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -27,7 +29,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    _tab = TabController(length: 6, vsync: this);
     _future = ProfilesRepository.getMine();
   }
 
@@ -65,6 +67,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 Tab(text: 'Privatsphäre'),
                 Tab(text: 'Benachrichtigungen'),
                 Tab(text: 'Standort'),
+                Tab(text: 'Erscheinungsbild'),
                 Tab(text: 'Konto'),
               ],
             ),
@@ -92,6 +95,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     _PrivacyTab(profile: p, onPatch: _patch),
                     _NotifTab(profile: p, onPatch: _patch),
                     _RegionTab(profile: p, onPatch: _patch),
+                    const _AppearanceTab(),
                     _DangerTab(),
                   ],
                 );
@@ -378,6 +382,226 @@ class _BoolTile extends StatelessWidget {
       title: Text(
         label,
         style: AppTypography.body(size: 14, color: AppColors.ink),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Erscheinungsbild — Tageszeit-adaptives Cinema-Theme
+// ─────────────────────────────────────────────────────────────
+class _AppearanceTab extends ConsumerWidget {
+  const _AppearanceTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(cinemaModeProvider);
+    final phase = ref.watch(effectiveCinemaPhaseProvider);
+    final spec =
+        phase != null ? CinemaTheme.specFor(phase) : null;
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        // Live-Preview-Card
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.palette,
+                      color: AppColors.bronze, size: 16),
+                  const SizedBox(width: 6),
+                  Text('AKTUELLE STIMMUNG',
+                      style: AppTypography.label(
+                          size: 9, color: AppColors.bronzeSoft)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (spec == null)
+                Text('Aus — pures Cinema-Dark.',
+                    style: AppTypography.body(
+                        size: 14, color: AppColors.ink))
+              else ...[
+                Row(
+                  children: [
+                    Text(spec.emoji,
+                        style: const TextStyle(fontSize: 28)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(spec.label,
+                              style: AppTypography.display(
+                                  size: 20, color: AppColors.ink)),
+                          Text('Cinema-Theme aktiv',
+                              style: AppTypography.body(
+                                  size: 12, color: AppColors.mute)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Mini-Preview der Phase-Farben
+                Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: spec.bgStops,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text('CINEMA-MODUS',
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 8),
+        for (final m in CinemaMode.values)
+          _ModeTile(
+            mode: m,
+            active: mode == m,
+            onTap: () =>
+                ref.read(cinemaModeProvider.notifier).set(m),
+          ),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.5),
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.info,
+                      size: 14, color: AppColors.mute),
+                  const SizedBox(width: 6),
+                  Text('Was ist das?',
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.mute)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Die App ändert ihre Atmosphäre subtil je nach Tageszeit — Nacht ist tiefes Indigo, Sunset wird warm bronze-orange, Tag ist klar. 6 Cinema-Effekte (Gradient, Tint, Vignette, Film-Grain, Light-Leaks, Smooth-Transitions) sorgen für ein hyperrealistisches Film-Gefühl. Brand-Farben (Bronze, Amber) bleiben gleich.',
+                style: AppTypography.body(
+                    size: 12, color: AppColors.inkSoft, height: 1.5),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ModeTile extends StatelessWidget {
+  const _ModeTile({
+    required this.mode,
+    required this.active,
+    required this.onTap,
+  });
+  final CinemaMode mode;
+  final bool active;
+  final VoidCallback onTap;
+
+  IconData get _icon {
+    switch (mode) {
+      case CinemaMode.auto:       return LucideIcons.clock;
+      case CinemaMode.off:        return LucideIcons.power;
+      case CinemaMode.forceNight: return LucideIcons.moon;
+      case CinemaMode.forceDay:   return LucideIcons.sun;
+      case CinemaMode.forceDusk:  return LucideIcons.sunset;
+    }
+  }
+
+  String get _description {
+    switch (mode) {
+      case CinemaMode.auto:
+        return 'Wechselt automatisch — 6 Phasen über den Tag verteilt.';
+      case CinemaMode.off:
+        return 'Keine Cinema-Effekte, pures Dark-Theme.';
+      case CinemaMode.forceNight:
+        return 'Tiefes Indigo, ruhig, kontrastreich.';
+      case CinemaMode.forceDay:
+        return 'Heller, klarer Tag-Modus.';
+      case CinemaMode.forceDusk:
+        return 'Hyperreal Sunset — warmes Amber, Light-Leaks.';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: active
+              ? AppColors.bronze.withValues(alpha: 0.16)
+              : AppColors.surface.withValues(alpha: 0.5),
+          border: Border.all(
+            color: active ? AppColors.bronze : AppColors.line,
+            width: active ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: active
+                    ? AppColors.bronze.withValues(alpha: 0.22)
+                    : AppColors.elevated,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(_icon,
+                  size: 16,
+                  color: active ? AppColors.bronze : AppColors.mute),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(mode.label,
+                      style: AppTypography.body(
+                          size: 14,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  Text(_description,
+                      style: AppTypography.body(
+                          size: 12, color: AppColors.inkSoft)),
+                ],
+              ),
+            ),
+            if (active)
+              const Icon(LucideIcons.checkCircle2,
+                  color: AppColors.bronze, size: 18),
+          ],
+        ),
       ),
     );
   }

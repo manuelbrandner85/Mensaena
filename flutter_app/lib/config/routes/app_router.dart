@@ -13,6 +13,8 @@ import '../../screens/dashboard/admin/admin_users_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
+import '../../screens/dashboard/profile_edit_screen.dart';
+import '../../screens/dashboard/profile_saved_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
 import '../../screens/dashboard/create/module_create_config.dart';
@@ -682,6 +684,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/admin/system',
         builder: (_, __) => const AdminSystemScreen(),
+      ),
+      // Profile-Edit + Saved-Posts
+      GoRoute(
+        path: '/dashboard/profile/edit',
+        builder: (_, __) => const ProfileEditScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/profile/saved',
+        builder: (_, __) => const ProfileSavedScreen(),
       ),
       // LiveKit Call + Live-Room Screens (DM-Call / Channel-Stream)
       GoRoute(
