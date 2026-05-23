@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -23,17 +24,63 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _ctrl = TextEditingController();
   final _scrollCtrl = ScrollController();
+  RealtimeChannel? _typingChannel;
+  bool _peerTyping = false;
+  DateTime _lastTypingBroadcast = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   void initState() {
     super.initState();
     MessagesRepository.markRead(widget.conversationId);
+    _setupPresence();
+    _ctrl.addListener(_onTextChanged);
+  }
+
+  void _setupPresence() {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    _typingChannel = sb.channel('chat:${widget.conversationId}');
+    _typingChannel!
+      ..onBroadcast(
+        event: 'typing',
+        callback: (payload) {
+          final from = payload['from'] as String?;
+          final isTyping = payload['typing'] as bool? ?? false;
+          if (from == null || from == uid) return;
+          if (!mounted) return;
+          setState(() => _peerTyping = isTyping);
+          if (isTyping) {
+            Future.delayed(const Duration(seconds: 4), () {
+              if (!mounted) return;
+              setState(() => _peerTyping = false);
+            });
+          }
+        },
+      )
+      ..subscribe();
+  }
+
+  void _onTextChanged() {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null || _typingChannel == null) return;
+    final now = DateTime.now();
+    if (now.difference(_lastTypingBroadcast) <
+        const Duration(milliseconds: 1500)) {
+      return;
+    }
+    _lastTypingBroadcast = now;
+    _typingChannel!.sendBroadcastMessage(
+      event: 'typing',
+      payload: {'from': uid, 'typing': _ctrl.text.isNotEmpty},
+    );
   }
 
   @override
   void dispose() {
+    _ctrl.removeListener(_onTextChanged);
     _ctrl.dispose();
     _scrollCtrl.dispose();
+    _typingChannel?.unsubscribe();
     super.dispose();
   }
 
@@ -126,6 +173,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 },
               ),
             ),
+            if (_peerTyping)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 6),
+                color: AppColors.deep,
+                child: Row(
+                  children: [
+                    const _TypingDots(),
+                    const SizedBox(width: 8),
+                    Text('schreibt…',
+                        style: AppTypography.body(
+                            size: 11, color: AppColors.mute)),
+                  ],
+                ),
+              ),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
@@ -288,6 +350,63 @@ class _MessageBubble extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TypingDots extends StatefulWidget {
+  const _TypingDots();
+
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, __) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(3, (i) {
+            final t = (_ctrl.value + i * 0.18) % 1.0;
+            final scale = 0.5 + (1 - (2 * t - 1).abs()) * 0.5;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1.5),
+              child: Transform.scale(
+                scale: scale,
+                child: Container(
+                  width: 5,
+                  height: 5,
+                  decoration: const BoxDecoration(
+                    color: AppColors.amber,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            );
+          }),
+        );
+      },
     );
   }
 }

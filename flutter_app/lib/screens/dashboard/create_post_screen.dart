@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../services/ai_post_assist_service.dart';
 import '../../services/intent_classifier_service.dart';
 import '../../services/location_service.dart';
 import '../../services/rate_limit_service.dart';
@@ -329,6 +330,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           },
           isAnonymous: _isAnonymous,
           onToggleAnonymous: (v) => setState(() => _isAnonymous = v),
+          postType: _type,
         );
       case 2:
       default:
@@ -522,6 +524,7 @@ class _StepInhalt extends StatelessWidget {
     required this.onApplyIntent,
     required this.isAnonymous,
     required this.onToggleAnonymous,
+    required this.postType,
   });
 
   final TextEditingController titleCtrl;
@@ -534,6 +537,7 @@ class _StepInhalt extends StatelessWidget {
   final ValueChanged<String> onApplyIntent;
   final bool isAnonymous;
   final ValueChanged<bool> onToggleAnonymous;
+  final String? postType;
 
   @override
   Widget build(BuildContext context) {
@@ -545,6 +549,12 @@ class _StepInhalt extends StatelessWidget {
           style: AppTypography.display(size: 22, color: AppColors.ink),
         ),
         const SizedBox(height: 14),
+        _AiAssistantCard(
+          titleCtrl: titleCtrl,
+          descCtrl: descCtrl,
+          postType: postType,
+        ),
+        const SizedBox(height: 12),
         TextField(
           controller: titleCtrl,
           maxLength: 120,
@@ -858,6 +868,222 @@ class _StepKontakt extends StatelessWidget {
           }),
         ),
       ],
+    );
+  }
+}
+
+// ── KI-Beitrags-Assistent ─────────────────────────────────────────────
+class _AiAssistantCard extends StatefulWidget {
+  const _AiAssistantCard({
+    required this.titleCtrl,
+    required this.descCtrl,
+    required this.postType,
+  });
+
+  final TextEditingController titleCtrl;
+  final TextEditingController descCtrl;
+  final String? postType;
+
+  @override
+  State<_AiAssistantCard> createState() => _AiAssistantCardState();
+}
+
+class _AiAssistantCardState extends State<_AiAssistantCard> {
+  final _promptCtrl = TextEditingController();
+  bool _loading = false;
+  AiPostSuggestions? _suggestions;
+  String? _error;
+
+  @override
+  void dispose() {
+    _promptCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _generate() async {
+    final input = _promptCtrl.text.trim().isNotEmpty
+        ? _promptCtrl.text.trim()
+        : widget.titleCtrl.text.trim().isNotEmpty
+            ? widget.titleCtrl.text.trim()
+            : widget.descCtrl.text.trim();
+    if (input.isEmpty) {
+      setState(() => _error =
+          'Gib zuerst ein Thema, einen Titel oder eine Beschreibung ein.');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+      _suggestions = null;
+    });
+    final result = await AiPostAssistService.suggest(
+      input: input,
+      type: widget.postType,
+    );
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _suggestions = result;
+      if (result == null || result.isEmpty) {
+        _error =
+            'KI ist gerade nicht erreichbar. Versuche es später noch einmal.';
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.bronze.withValues(alpha: 0.12),
+            AppColors.amber.withValues(alpha: 0.08),
+          ],
+        ),
+        border: Border.all(color: AppColors.bronze.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.wand,
+                  size: 14, color: AppColors.bronze),
+              const SizedBox(width: 6),
+              Text('KI-Beitrags-Assistent',
+                  style: AppTypography.label(
+                      size: 10, color: AppColors.bronzeSoft)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _promptCtrl,
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: AppColors.elevated,
+                    hintText: 'z.B. "Suche Pflegestelle Hund"',
+                    hintStyle: AppTypography.body(
+                        size: 12, color: AppColors.mute),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.bronze,
+                  foregroundColor: AppColors.voidColor,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                ),
+                onPressed: _loading ? null : _generate,
+                child: _loading
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.voidColor,
+                        ),
+                      )
+                    : const Icon(LucideIcons.sparkles, size: 14),
+              ),
+            ],
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(_error!,
+                style: AppTypography.caption()
+                    .copyWith(color: AppColors.herzrotWarm)),
+          ],
+          if (_suggestions != null && !_suggestions!.isEmpty) ...[
+            const SizedBox(height: 12),
+            if (_suggestions!.titles.isNotEmpty) ...[
+              Text('Titel-Vorschläge',
+                  style: AppTypography.label(size: 9)),
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final t in _suggestions!.titles)
+                    GestureDetector(
+                      onTap: () {
+                        widget.titleCtrl.text = t;
+                        setState(() {});
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppColors.elevated,
+                          border: Border.all(color: AppColors.line),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(t,
+                            style: AppTypography.body(
+                                size: 12,
+                                color: AppColors.ink)),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+            if (_suggestions!.description != null &&
+                _suggestions!.description!.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text('Beschreibungs-Vorschlag',
+                  style: AppTypography.label(size: 9)),
+              const SizedBox(height: 4),
+              InkWell(
+                onTap: () {
+                  widget.descCtrl.text = _suggestions!.description!;
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.elevated,
+                    border: Border.all(color: AppColors.line),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_suggestions!.description!,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.body(
+                              size: 12,
+                              color: AppColors.inkSoft,
+                              height: 1.45)),
+                      const SizedBox(height: 4),
+                      Text('Tippen zum Übernehmen',
+                          style: AppTypography.label(
+                              size: 8, color: AppColors.bronze)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
     );
   }
 }

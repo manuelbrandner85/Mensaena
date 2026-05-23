@@ -8,11 +8,13 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../models/profile.dart';
 import '../../repositories/interactions_repository.dart';
+import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../repositories/posts_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/location_map_view.dart';
 import '../../widgets/shared/post_card.dart';
 import '../../widgets/shared/stat_card.dart';
 
@@ -93,9 +95,16 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                   const SizedBox(height: 16),
                   _TrustScoreCard(profile: data.profile!),
                   const SizedBox(height: 16),
+                  const _SmartMatchWidget(),
+                  const SizedBox(height: 16),
                   _ThanksReceived(userId: data.profile!.id),
                   const SizedBox(height: 16),
                   const _ActivityFeedWidget(),
+                  const SizedBox(height: 16),
+                  if (data.posts.isNotEmpty)
+                    _MiniMapWidget(posts: data.posts.take(20).toList()),
+                  const SizedBox(height: 16),
+                  _WeeklyDigest(profile: data.profile!),
                   const SizedBox(height: 16),
                 ],
                 _CommunityPulse(posts: data?.posts ?? const []),
@@ -936,4 +945,315 @@ class _ThanksReceived extends ConsumerWidget {
       return const [];
     }
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// SmartMatch — Top 3 Match-Vorschlaege
+// ─────────────────────────────────────────────────────────────
+class _SmartMatchWidget extends ConsumerWidget {
+  const _SmartMatchWidget();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(matchingListProvider);
+    return async.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (matches) {
+        final pending =
+            matches.where((m) => m.status == 'pending').take(3).toList();
+        if (pending.isEmpty) return const SizedBox.shrink();
+        return InkWell(
+          onTap: () => context.go('/dashboard/matching'),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.tealSoft.withValues(alpha: 0.12),
+                  AppColors.amber.withValues(alpha: 0.08),
+                ],
+              ),
+              border: Border.all(
+                  color: AppColors.tealSoft.withValues(alpha: 0.4)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(LucideIcons.sparkles,
+                        color: AppColors.tealSoft, size: 14),
+                    const SizedBox(width: 6),
+                    Text('Smart-Match',
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.tealSoft)),
+                    const Spacer(),
+                    Text('${pending.length} offen',
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.mute)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                for (final m in pending)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color:
+                                AppColors.teal.withValues(alpha: 0.22),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            '${(m.matchScore * 100).toInt()}%',
+                            style: AppTypography.mono(
+                                size: 10, color: AppColors.tealSoft),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            m.requestPost.title.isNotEmpty
+                                ? m.requestPost.title
+                                : m.offerPost.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.body(
+                                size: 12, color: AppColors.ink),
+                          ),
+                        ),
+                        if (m.distanceKm != null)
+                          Text('${m.distanceKm!.toStringAsFixed(0)} km',
+                              style: AppTypography.caption()),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// MiniMapWidget — kleine Karte mit Posts in der Naehe
+// ─────────────────────────────────────────────────────────────
+class _MiniMapWidget extends StatelessWidget {
+  const _MiniMapWidget({required this.posts});
+  final List<Post> posts;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 8),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.mapPin,
+                    color: AppColors.amber, size: 14),
+                const SizedBox(width: 6),
+                Text('Karte',
+                    style: AppTypography.label(
+                        size: 10, color: AppColors.amber)),
+                const Spacer(),
+                TextButton(
+                  onPressed: () => context.go('/dashboard/map'),
+                  style: TextButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4),
+                    minimumSize: const Size(0, 24),
+                  ),
+                  child: Text('Vollbild',
+                      style: AppTypography.label(
+                          size: 9, color: AppColors.amber)),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 180,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(11)),
+              child: LocationMapView(
+                markers: [
+                  for (final p in posts)
+                    MapMarkerData(
+                      id: p.id,
+                      lat: p.latitude,
+                      lng: p.longitude,
+                      color: AppColors.amber,
+                      title: p.title,
+                    ),
+                ],
+                initialZoom: 9,
+                onMarkerTap: (m) =>
+                    context.go('/dashboard/posts/${m.id}'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// WeeklyDigest — Aktivitaet der letzten 7 Tage
+// ─────────────────────────────────────────────────────────────
+class _WeeklyDigest extends StatefulWidget {
+  const _WeeklyDigest({required this.profile});
+  final Profile profile;
+
+  @override
+  State<_WeeklyDigest> createState() => _WeeklyDigestState();
+}
+
+class _WeeklyDigestState extends State<_WeeklyDigest> {
+  late Future<_DigestData> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<_DigestData> _load() async {
+    final since = DateTime.now()
+        .toUtc()
+        .subtract(const Duration(days: 7))
+        .toIso8601String();
+    try {
+      final results = await Future.wait([
+        sb
+            .from('posts')
+            .select('id')
+            .eq('user_id', widget.profile.id)
+            .gte('created_at', since),
+        sb
+            .from('interactions')
+            .select('id')
+            .or('helper_id.eq.${widget.profile.id},helped_id.eq.${widget.profile.id}')
+            .gte('created_at', since),
+        sb
+            .from('messages')
+            .select('id')
+            .eq('sender_id', widget.profile.id)
+            .gte('created_at', since),
+      ]);
+      return _DigestData(
+        posts: (results[0] as List).length,
+        interactions: (results[1] as List).length,
+        messages: (results[2] as List).length,
+      );
+    } catch (_) {
+      return const _DigestData(posts: 0, interactions: 0, messages: 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_DigestData>(
+      future: _future,
+      builder: (context, snap) {
+        final d = snap.data ?? const _DigestData(
+          posts: 0,
+          interactions: 0,
+          messages: 0,
+        );
+        if (d.posts + d.interactions + d.messages == 0) {
+          return const SizedBox.shrink();
+        }
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.bronze.withValues(alpha: 0.10),
+            border: Border.all(
+                color: AppColors.bronze.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.calendar,
+                      color: AppColors.bronze, size: 14),
+                  const SizedBox(width: 6),
+                  Text('Diese Woche',
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.bronzeSoft)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                      child: _digestStat('${d.posts}',
+                          'Beiträge', LucideIcons.fileText)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                      child: _digestStat('${d.interactions}',
+                          'Hilfen', LucideIcons.helpingHand)),
+                  const SizedBox(width: 6),
+                  Expanded(
+                      child: _digestStat('${d.messages}',
+                          'Nachrichten', LucideIcons.messageCircle)),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _digestStat(String value, String label, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 12, color: AppColors.bronzeSoft),
+          const SizedBox(height: 4),
+          Text(value,
+              style: AppTypography.mono(size: 18, color: AppColors.ink)),
+          Text(label,
+              style: AppTypography.label(
+                  size: 8, color: AppColors.bronzeSoft)),
+        ],
+      ),
+    );
+  }
+}
+
+class _DigestData {
+  const _DigestData({
+    required this.posts,
+    required this.interactions,
+    required this.messages,
+  });
+  final int posts;
+  final int interactions;
+  final int messages;
 }
