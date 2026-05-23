@@ -36,6 +36,9 @@ LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
   - [x] CrisisDetailScreen — Live Helper-Count (crisisHelpersStreamProvider), Update-Feed (crisisUpdatesStreamProvider), Contact-Block mit Anruf-Button, 'Ich helfe'-Bottom-Sheet mit Message+ETA
   - [x] CrisisCreateScreen — 6 Kategorien + 4 Urgency-Stufen + GPS-Button + 112-Hinweis-Banner
   - [x] CrisisResourcesScreen — emergency_numbers nach Kategorie gruppiert, Tap → tel:
+- [x] Phase 4.2 – NINA-Warnungen + Lebensmittelwarnungen:
+  - [x] WarnungenScreen: NINA-API via nina_service (15min Cache), Severity-sortiert, Detail-Sheet mit Handlungsempfehlung
+  - [x] FoodWarningsScreen: direkter BVL-API-Fetch, Link → externer Browser
 - [ ] Phase 4 – Restliche Module nach Brief-Reihenfolge
 - [ ] Phase 5 – Admin-Dashboard
 - [ ] Phase 6 – LiveKit (livekit_client wieder rein wenn flutter_webrtc 3.27-kompatibel ist)

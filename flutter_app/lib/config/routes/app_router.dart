@@ -17,6 +17,8 @@ import '../../screens/dashboard/post_detail_screen.dart';
 import '../../screens/dashboard/posts_list_screen.dart';
 import '../../screens/dashboard/profile_screen.dart';
 import '../../screens/dashboard/settings_screen.dart';
+import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
+import '../../screens/dashboard/warnungen/warnungen_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
@@ -180,10 +182,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      _placeholder(
-        '/dashboard/warnungen',
-        'NINA-Warnungen',
-        phase: 'Phase 4',
+      GoRoute(
+        path: '/dashboard/warnungen',
+        builder: (_, __) => const WarnungenScreen(),
+        routes: [
+          GoRoute(
+            path: 'food',
+            builder: (_, __) => const FoodWarningsScreen(),
+          ),
+        ],
       ),
       _placeholder('/dashboard/board', 'Schwarzes Brett', phase: 'Phase 4'),
       _placeholder(
