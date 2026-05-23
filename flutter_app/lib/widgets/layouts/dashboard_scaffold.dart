@@ -8,6 +8,7 @@ import '../../config/theme/app_typography.dart';
 import '../../repositories/notifications_repository.dart';
 import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
+import '../shared/mensaena_bot_button.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
 /// Dashboard-Shell — Web-Parity (src/components/navigation/BottomNav.tsx).
@@ -42,7 +43,18 @@ class DashboardScaffold extends ConsumerWidget {
       drawer: const AppDrawer(),
       bottomNavigationBar: _BottomNav(currentRoute: currentRoute),
       floatingActionButton: fab,
-      body: body,
+      body: Stack(
+        children: [
+          body,
+          // MensaenaBot Floating-Button (links unten, oberhalb BottomNav)
+          // Nicht ueberlappen mit dem regulaeren FAB (rechts unten).
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: SafeArea(child: const MensaenaBotButton()),
+          ),
+        ],
+      ),
     );
   }
 }

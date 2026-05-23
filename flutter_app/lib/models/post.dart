@@ -29,6 +29,9 @@ class Post {
     this.tags = const [],
     this.privacyPhone = false,
     this.privacyEmail = false,
+    this.likeCount,
+    this.commentCount,
+    this.saveCount,
   });
 
   final String id;
@@ -58,6 +61,9 @@ class Post {
   final List<String> tags;
   final bool privacyPhone;
   final bool privacyEmail;
+  final int? likeCount;
+  final int? commentCount;
+  final int? saveCount;
 
   factory Post.fromJson(Map<String, dynamic> j) {
     return Post(
@@ -89,6 +95,9 @@ class Post {
       availabilityStart: j['availability_start'] as String?,
       availabilityEnd: j['availability_end'] as String?,
       reactionCount: (j['reaction_count'] as num?)?.toInt() ?? 0,
+      likeCount: (j['like_count'] as num?)?.toInt(),
+      commentCount: (j['comment_count'] as num?)?.toInt(),
+      saveCount: (j['save_count'] as num?)?.toInt(),
       mediaUrls: (j['media_urls'] is List)
           ? (j['media_urls'] as List).whereType<String>().toList()
           : const [],

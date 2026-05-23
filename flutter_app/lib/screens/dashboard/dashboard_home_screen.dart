@@ -14,6 +14,7 @@ import '../../repositories/posts_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/dashboard/dashboard_hero_card.dart';
+import '../../widgets/dashboard/location_onboarding_modal.dart';
 import '../../widgets/dashboard/safety_banners.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/location_map_view.dart';
@@ -38,11 +39,39 @@ class DashboardHomeScreen extends ConsumerStatefulWidget {
 
 class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
   Future<_DashboardData>? _data;
+  bool _locationCheckDone = false;
 
   @override
   void initState() {
     super.initState();
-    _data = _loadAll();
+    _data = _loadAll().then((d) {
+      _maybeShowLocationOnboarding(d.profile);
+      return d;
+    });
+  }
+
+  Future<void> _maybeShowLocationOnboarding(Profile? p) async {
+    if (_locationCheckDone || p == null) return;
+    if (p.latitude != null && p.longitude != null) {
+      _locationCheckDone = true;
+      return;
+    }
+    _locationCheckDone = true;
+    // Warte einen Frame bis Scaffold gemounted
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      builder: (_) => LocationOnboardingModal(
+        userId: p.id,
+        onSaved: (_, __, ___) {
+          setState(() => _data = _loadAll());
+        },
+      ),
+    );
   }
 
   Future<_DashboardData> _loadAll() async {

@@ -115,6 +115,55 @@ class PostCard extends StatelessWidget {
                 ],
               ),
             ],
+            // Action-Bar — 1:1 Pendant zu Web PostCard.tsx Z.270 ff
+            const SizedBox(height: 12),
+            Divider(
+              height: 1,
+              color: Colors.white.withValues(alpha: 0.04),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                _PostCardAction(
+                  icon: LucideIcons.heart,
+                  label: '${post.likeCount ?? 0}',
+                  color: AppColors.herzrotWarm,
+                ),
+                const SizedBox(width: 14),
+                _PostCardAction(
+                  icon: LucideIcons.messageCircle,
+                  label: '${post.commentCount ?? 0}',
+                  color: AppColors.tealSoft,
+                ),
+                const SizedBox(width: 14),
+                _PostCardAction(
+                  icon: LucideIcons.bookmark,
+                  label: '',
+                  color: AppColors.bronze,
+                ),
+                const Spacer(),
+                if (post.urgency != null && post.urgency! >= 3)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.herzrot.withValues(alpha: 0.20),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(LucideIcons.alertTriangle,
+                            size: 9, color: AppColors.herzrotWarm),
+                        const SizedBox(width: 4),
+                        Text('DRINGEND',
+                            style: AppTypography.label(
+                                size: 7,
+                                color: AppColors.herzrotWarm)),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ],
         ),
       ),
@@ -129,6 +178,36 @@ class PostCard extends StatelessWidget {
     if (diff.inDays == 1) return 'gestern';
     if (diff.inDays < 7) return 'vor ${diff.inDays} Tagen';
     return DateFormat('dd.MM.yyyy').format(t);
+  }
+}
+
+class _PostCardAction extends StatelessWidget {
+  const _PostCardAction({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: color),
+        if (label.isNotEmpty) ...[
+          const SizedBox(width: 4),
+          Text(label,
+              style: AppTypography.mono(
+                size: 11,
+                color: AppColors.inkSoft,
+              )),
+        ],
+      ],
+    );
   }
 }
 
