@@ -83,6 +83,11 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                 _Greeting(profile: data?.profile, loading: loading),
                 const SizedBox(height: 20),
                 _StatsRow(data: data, loading: loading),
+                const SizedBox(height: 16),
+                if (data?.profile != null)
+                  _TrustScoreCard(profile: data!.profile!),
+                const SizedBox(height: 20),
+                _CommunityPulse(posts: data?.posts ?? const []),
                 const SizedBox(height: 24),
                 Text(
                   'Schnell-Aktionen',
@@ -378,4 +383,232 @@ class _DashboardData {
   final int unreadCount;
   final int activeInteractions;
   final List<Post> posts;
+}
+
+// ─────────────────────────────────────────────────────────────
+// TrustScore-Card — Pendant zu TrustScoreWidget aus Dashboard
+// ─────────────────────────────────────────────────────────────
+class _TrustScoreCard extends StatelessWidget {
+  const _TrustScoreCard({required this.profile});
+  final Profile profile;
+
+  String _levelLabel(double score) {
+    if (score >= 4.5) return 'Legende';
+    if (score >= 4.0) return 'Vorbild';
+    if (score >= 3.5) return 'Erfahren';
+    if (score >= 3.0) return 'Etabliert';
+    if (score >= 2.0) return 'Aufsteigend';
+    return 'Neu';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final score = profile.trustScore.toDouble();
+    final count = profile.trustScoreCount;
+    final level = _levelLabel(score);
+    final ratio = (score / 5).clamp(0.0, 1.0);
+    return InkWell(
+      onTap: () => context.go('/dashboard/profile'),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.trust.withValues(alpha: 0.16),
+              AppColors.amber.withValues(alpha: 0.08),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: AppColors.trust.withValues(alpha: 0.4)),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.trust.withValues(alpha: 0.22),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(LucideIcons.shieldCheck,
+                  color: AppColors.trust, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text('Vertrauen',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.trust)),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.trust.withValues(alpha: 0.22),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(level,
+                            style: AppTypography.label(
+                                size: 8, color: AppColors.trustSoft)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(score.toStringAsFixed(1),
+                          style: AppTypography.mono(
+                            size: 22,
+                            color: AppColors.ink,
+                          )),
+                      Text(' / 5',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.mute)),
+                      const SizedBox(width: 8),
+                      Text('($count Bew.)',
+                          style: AppTypography.caption()),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: ratio,
+                      minHeight: 4,
+                      backgroundColor: AppColors.elevated,
+                      valueColor: const AlwaysStoppedAnimation(
+                          AppColors.trust),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Community-Pulse — Live-Aktivitaet
+// ─────────────────────────────────────────────────────────────
+class _CommunityPulse extends StatelessWidget {
+  const _CommunityPulse({required this.posts});
+  final List<Post> posts;
+
+  @override
+  Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final last24h = posts.where((p) {
+      return today.difference(p.createdAt).inHours < 24;
+    }).length;
+    final helpRequests =
+        posts.where((p) => p.type == 'help_request').length;
+    final helpOffers =
+        posts.where((p) => p.type == 'help_offered').length;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: AppColors.leben,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text('Community-Puls',
+                  style: AppTypography.label(
+                      size: 10, color: AppColors.lebenSoft)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _PulseStat(
+                    label: 'Neue Posts (24h)',
+                    value: '$last24h',
+                    icon: LucideIcons.trendingUp,
+                    color: AppColors.amber),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _PulseStat(
+                    label: 'Hilfe gesucht',
+                    value: '$helpRequests',
+                    icon: LucideIcons.heart,
+                    color: AppColors.herzrotWarm),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _PulseStat(
+                    label: 'Hilfe da',
+                    value: '$helpOffers',
+                    icon: LucideIcons.helpingHand,
+                    color: AppColors.lebenSoft),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PulseStat extends StatelessWidget {
+  const _PulseStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 14),
+          const SizedBox(height: 4),
+          Text(value,
+              style: AppTypography.mono(size: 18, color: AppColors.ink)),
+          Text(label,
+              style: AppTypography.label(size: 8, color: color)),
+        ],
+      ),
+    );
+  }
 }

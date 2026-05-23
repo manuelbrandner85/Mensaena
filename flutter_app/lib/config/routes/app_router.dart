@@ -6,8 +6,10 @@ import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
 import '../../screens/dashboard/admin/admin_dashboard_screen.dart';
+import '../../screens/dashboard/admin/admin_reports_screen.dart';
 import '../../screens/dashboard/admin/admin_system_screen.dart';
 import '../../screens/dashboard/admin/admin_table_screen.dart';
+import '../../screens/dashboard/admin/admin_users_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
@@ -431,13 +433,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/admin/users',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Users',
-          tableName: 'profiles',
-          currentRoute: '/dashboard/admin/users',
-          titleField: 'display_name',
-          subtitleFields: ['email', 'home_city', 'home_postal_code'],
-        ),
+        builder: (_, __) => const AdminUsersScreen(),
       ),
       GoRoute(
         path: '/dashboard/admin/posts',
@@ -497,12 +493,65 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/admin/chat-moderation',
+        builder: (_, __) => const AdminReportsScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/groups',
         builder: (_, __) => const AdminTableScreen(
-          title: 'Reports',
-          tableName: 'content_reports',
-          currentRoute: '/dashboard/admin/chat-moderation',
-          titleField: 'reason',
-          subtitleFields: ['content_type', 'status'],
+          title: 'Groups',
+          tableName: 'groups',
+          currentRoute: '/dashboard/admin/groups',
+          titleField: 'name',
+          subtitleFields: ['category', 'is_private'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/challenges',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Challenges',
+          tableName: 'challenges',
+          currentRoute: '/dashboard/admin/challenges',
+          subtitleFields: ['type', 'target_count', 'is_active'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/timebank',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Zeitbank',
+          tableName: 'timebank_entries',
+          currentRoute: '/dashboard/admin/timebank',
+          titleField: 'description',
+          subtitleFields: ['category', 'hours', 'status'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/contact',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Kontakt-Anfragen',
+          tableName: 'contact_messages',
+          currentRoute: '/dashboard/admin/contact',
+          titleField: 'subject',
+          subtitleFields: ['email', 'status', 'category'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/bot-feedback',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Bot Feedback',
+          tableName: 'bot_feedback',
+          currentRoute: '/dashboard/admin/bot-feedback',
+          titleField: 'message',
+          subtitleFields: ['rating', 'category'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/marketing',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Marketing',
+          tableName: 'marketing_campaigns',
+          currentRoute: '/dashboard/admin/marketing',
+          titleField: 'name',
+          subtitleFields: ['status', 'sent_count'],
         ),
       ),
       GoRoute(

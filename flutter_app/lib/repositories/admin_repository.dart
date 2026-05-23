@@ -44,16 +44,62 @@ class AdminRepository {
   static Future<List<Map<String, dynamic>>> recent(
     String table, {
     String orderBy = 'created_at',
+    String? statusFilter,
+    String? search,
   }) async {
     try {
-      final rows = await sb
-          .from(table)
-          .select()
-          .order(orderBy, ascending: false)
-          .limit(100);
+      var q = sb.from(table).select();
+      if (statusFilter != null) q = q.eq('status', statusFilter);
+      if (search != null && search.trim().isNotEmpty) {
+        final esc = search.trim().replaceAll('%', r'\%');
+        q = q.or('reason.ilike.%$esc%,title.ilike.%$esc%,name.ilike.%$esc%');
+      }
+      final rows = await q.order(orderBy, ascending: false).limit(100);
       return (rows as List).whereType<Map<String, dynamic>>().toList();
     } catch (_) {
       return const [];
+    }
+  }
+
+  /// Generisches Status-Update fuer Moderation (z.B. Reports, Posts).
+  static Future<bool> updateStatus({
+    required String table,
+    required String id,
+    required String status,
+  }) async {
+    try {
+      await sb.from(table).update({'status': status}).eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Generisches Hard-Delete einer Row.
+  static Future<bool> delete({
+    required String table,
+    required String id,
+  }) async {
+    try {
+      await sb.from(table).delete().eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Generisches Feld-Update (z.B. is_banned/is_admin auf profiles).
+  static Future<bool> updateField({
+    required String table,
+    required String id,
+    required String column,
+    required dynamic value,
+  }) async {
+    try {
+      await sb.from(table).update({column: value}).eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 }
