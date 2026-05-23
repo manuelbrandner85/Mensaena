@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,11 +12,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/ai_post_assist_service.dart';
+import '../../services/geocoding_service.dart';
 import '../../services/intent_classifier_service.dart';
 import '../../services/location_service.dart';
+import '../../services/post_draft_service.dart';
 import '../../services/rate_limit_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/address_autocomplete_field.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
 /// 3-Step Create-Post-Wizard (matched zur Web /dashboard/create):
@@ -68,15 +72,73 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     _PostType('mental', 'Mental', '🧠', AppColors.tealSoft),
   ];
 
+  Timer? _draftTimer;
+
   @override
   void initState() {
     super.initState();
     _type = widget.initialType;
     if (_type != null) _step = 1;
+    _loadDraft();
+    // Auto-save alle 3s wenn was im Titel/Beschreibung steht.
+    _titleCtrl.addListener(_scheduleDraftSave);
+    _descCtrl.addListener(_scheduleDraftSave);
+    _locationCtrl.addListener(_scheduleDraftSave);
+    _tagsCtrl.addListener(_scheduleDraftSave);
+  }
+
+  Future<void> _loadDraft() async {
+    final draft = await PostDraftService.load();
+    if (!mounted || draft == null || draft.isEmpty) return;
+    // Erst beim User-Consent uebernehmen — Snackbar mit "Wiederherstellen"
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      duration: const Duration(seconds: 6),
+      content: Text(
+        'Entwurf gefunden. Wiederherstellen?',
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+      action: SnackBarAction(
+        label: 'Ja',
+        textColor: AppColors.amber,
+        onPressed: () {
+          setState(() {
+            _type = draft.type ?? _type;
+            _titleCtrl.text = draft.title;
+            _descCtrl.text = draft.description;
+            _locationCtrl.text = draft.location;
+            _tagsCtrl.text = draft.tags;
+            if (_type != null && _step == 0) _step = 1;
+          });
+        },
+      ),
+    ));
+  }
+
+  void _scheduleDraftSave() {
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(seconds: 3), _saveDraft);
+  }
+
+  Future<void> _saveDraft() async {
+    if (_titleCtrl.text.isEmpty && _descCtrl.text.isEmpty) return;
+    await PostDraftService.save(PostDraft(
+      type: _type,
+      title: _titleCtrl.text,
+      description: _descCtrl.text,
+      location: _locationCtrl.text,
+      tags: _tagsCtrl.text,
+      savedAt: DateTime.now(),
+    ));
   }
 
   @override
   void dispose() {
+    _draftTimer?.cancel();
+    _titleCtrl.removeListener(_scheduleDraftSave);
+    _descCtrl.removeListener(_scheduleDraftSave);
+    _locationCtrl.removeListener(_scheduleDraftSave);
+    _tagsCtrl.removeListener(_scheduleDraftSave);
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _locationCtrl.dispose();
@@ -216,6 +278,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
       if (!mounted) return;
       final id = inserted['id'] as String;
+      await PostDraftService.clear();
+      if (!mounted) return;
       context.go('/dashboard/posts/$id');
     } catch (e) {
       if (!mounted) return;
@@ -346,6 +410,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           urgency: _urgency,
           onUrgency: (u) => setState(() => _urgency = u),
           onUseGps: _useGps,
+          onAddressSelected: (s) {
+            setState(() {
+              _lat = s.lat;
+              _lng = s.lng;
+            });
+          },
         );
     }
   }
@@ -741,6 +811,7 @@ class _StepKontakt extends StatelessWidget {
     required this.urgency,
     required this.onUrgency,
     required this.onUseGps,
+    required this.onAddressSelected,
   });
 
   final TextEditingController locationCtrl;
@@ -754,6 +825,7 @@ class _StepKontakt extends StatelessWidget {
   final int urgency;
   final ValueChanged<int> onUrgency;
   final VoidCallback onUseGps;
+  final void Function(AddressSuggestion) onAddressSelected;
 
   static const List<String> _urgencyLabels = [
     'Niedrig',
@@ -776,20 +848,21 @@ class _StepKontakt extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: TextField(
+              child: AddressAutocompleteField(
                 controller: locationCtrl,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: const InputDecoration(
-                  labelText: 'Ort',
-                  hintText: 'Straße / Stadtteil',
-                ),
+                label: 'Ort',
+                hint: 'Straße, PLZ oder Stadt',
+                onSelected: onAddressSelected,
               ),
             ),
             const SizedBox(width: 10),
-            OutlinedButton.icon(
-              onPressed: onUseGps,
-              icon: const Icon(LucideIcons.locate, size: 16),
-              label: const Text('GPS'),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: OutlinedButton.icon(
+                onPressed: onUseGps,
+                icon: const Icon(LucideIcons.locate, size: 16),
+                label: const Text('GPS'),
+              ),
             ),
           ],
         ),

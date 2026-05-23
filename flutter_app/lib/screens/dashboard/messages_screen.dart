@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/conversations_repository.dart';
+import '../../services/presence_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -90,6 +91,12 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                           (c['updated_at'] ?? c['created_at']) as String? ??
                               '') ??
                       DateTime.now();
+                  final peerId = (c['peer_user_id'] as String?) ??
+                      (c['other_user_id'] as String?);
+                  final online = peerId != null &&
+                      (ref.watch(onlineUsersProvider).value ??
+                              const <String>{})
+                          .contains(peerId);
                   return InkWell(
                     onTap: () => context.go('/dashboard/messages/$id'),
                     borderRadius: BorderRadius.circular(12),
@@ -103,14 +110,34 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                       ),
                       child: Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 18,
-                            backgroundColor: AppColors.elevated,
-                            child: Icon(
-                              LucideIcons.user,
-                              size: 16,
-                              color: AppColors.amber,
-                            ),
+                          Stack(
+                            children: [
+                              const CircleAvatar(
+                                radius: 18,
+                                backgroundColor: AppColors.elevated,
+                                child: Icon(
+                                  LucideIcons.user,
+                                  size: 16,
+                                  color: AppColors.amber,
+                                ),
+                              ),
+                              if (online)
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.leben,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          color: AppColors.surface,
+                                          width: 2),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -125,10 +152,30 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                                     weight: FontWeight.w600,
                                   ),
                                 ),
-                                Text(
-                                  DateFormat('dd.MM.yyyy HH:mm')
-                                      .format(updatedAt),
-                                  style: AppTypography.caption(),
+                                Row(
+                                  children: [
+                                    if (online) ...[
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.leben,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text('Online',
+                                          style: AppTypography.label(
+                                              size: 9,
+                                              color: AppColors.lebenSoft)),
+                                      const SizedBox(width: 6),
+                                    ],
+                                    Text(
+                                      DateFormat('dd.MM.yyyy HH:mm')
+                                          .format(updatedAt),
+                                      style: AppTypography.caption(),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
