@@ -24,8 +24,10 @@ class PushNotificationService {
     }
   }
 
-  /// FCM-Token holen + in Supabase push_subscriptions persistieren.
-  /// Idempotent: existierende Subscription wird per upsert ersetzt.
+  /// FCM-Token holen + in Supabase `fcm_tokens` persistieren.
+  /// Idempotent: existierender Eintrag wird per upsert ersetzt.
+  /// Schreibt in `fcm_tokens` weil send-push Edge-Function von dort liest
+  /// (NICHT push_subscriptions — das ist die Web-Push/VAPID-Tabelle).
   static Future<String?> registerToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
@@ -33,21 +35,35 @@ class PushNotificationService {
       final uid = SupabaseService.currentUser?.id;
       if (uid == null) return token;
 
-      await sb.from('push_subscriptions').upsert(
+      await sb.from('fcm_tokens').upsert(
         {
           'user_id': uid,
-          'endpoint': token,
-          'p256dh': '',
-          'auth': '',
+          'token': token,
           'active': true,
-          'device_type': 'android',
+          'platform': 'android',
+          'last_seen_at':
+              DateTime.now().toUtc().toIso8601String(),
         },
-        onConflict: 'user_id,endpoint',
+        onConflict: 'user_id,token',
       );
       return token;
     } catch (_) {
       return null;
     }
+  }
+
+  /// Token deaktivieren beim Logout — verhindert Push an alte Geraete.
+  static Future<void> unregisterToken() async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      final uid = SupabaseService.currentUser?.id;
+      if (token == null || uid == null) return;
+      await sb
+          .from('fcm_tokens')
+          .update({'active': false})
+          .eq('user_id', uid)
+          .eq('token', token);
+    } catch (_) {}
   }
 
   /// Token-Refresh-Stream → Re-Register beim Wechsel.

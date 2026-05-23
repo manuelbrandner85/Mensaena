@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -145,11 +146,65 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     if (mounted) setState(() => _comments = fresh);
   }
 
+  Future<void> _deletePost() async {
+    if (_post == null) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Beitrag löschen?',
+            style:
+                AppTypography.display(size: 18, color: AppColors.ink)),
+        content: Text(
+          'Diese Aktion ist nicht rückgängig. Der Beitrag und alle Kommentare werden entfernt.',
+          style:
+              AppTypography.body(size: 13, color: AppColors.inkSoft),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Abbrechen')),
+          FilledButton(
+            style: FilledButton.styleFrom(
+                backgroundColor: AppColors.herzrot),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    try {
+      await sb.from('posts').delete().eq('id', _post!.id);
+      if (!mounted) return;
+      context.go('/dashboard/posts');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Löschen fehlgeschlagen.',
+            style:
+                AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isMyPost =
+        _post != null && _post!.userId == SupabaseService.currentUser?.id;
     return DashboardScaffold(
       title: 'Beitrag',
       currentRoute: '/dashboard/posts',
+      fab: isMyPost
+          ? FloatingActionButton.small(
+              backgroundColor: AppColors.herzrot,
+              foregroundColor: AppColors.ink,
+              tooltip: 'Beitrag löschen',
+              onPressed: _deletePost,
+              child: const Icon(LucideIcons.trash2, size: 16),
+            )
+          : null,
       body: SafeArea(
         child: _loading
             ? const Center(

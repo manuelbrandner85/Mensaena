@@ -10,6 +10,7 @@ import '../../../models/crisis.dart';
 import '../../../models/crisis_helper.dart';
 import '../../../models/crisis_update.dart';
 import '../../../repositories/crisis_repository.dart';
+import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -56,12 +57,154 @@ class CrisisDetailScreen extends ConsumerWidget {
                   onOffer: () => _offerHelp(context, ref, c),
                 ),
                 const SizedBox(height: 18),
-                Text('Updates', style: AppTypography.label(size: 10)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('Updates',
+                          style: AppTypography.label(size: 10)),
+                    ),
+                    if (SupabaseService.currentUser?.id != null)
+                      TextButton.icon(
+                        onPressed: () =>
+                            _openUpdateSheet(context, ref, c),
+                        icon: const Icon(LucideIcons.plus,
+                            size: 12, color: AppColors.bronze),
+                        label: Text('Update posten',
+                            style: AppTypography.label(
+                                size: 10,
+                                color: AppColors.bronze)),
+                      ),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 _UpdatesFeed(updates: updates.asData?.value ?? const []),
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openUpdateSheet(
+      BuildContext context, WidgetRef ref, Crisis c) async {
+    final ctrl = TextEditingController();
+    String severity = 'info';
+    bool sending = false;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => StatefulBuilder(
+        builder: (sheetCtx, setLocal) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20, 16, 20,
+            16 + MediaQuery.of(sheetCtx).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('Status-Update posten',
+                  style: AppTypography.display(
+                      size: 20, color: AppColors.ink)),
+              const SizedBox(height: 14),
+              TextField(
+                controller: ctrl,
+                maxLines: 4,
+                minLines: 2,
+                style: AppTypography.body(
+                    size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.elevated,
+                  hintText: 'Was hat sich geaendert?',
+                  hintStyle: AppTypography.body(
+                      size: 13, color: AppColors.mute),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text('Schwere', style: AppTypography.label(size: 10)),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                children: [
+                  for (final s in const [
+                    ('info', 'ℹ️ Info', AppColors.tealSoft),
+                    ('progress', '⏳ Fortschritt', AppColors.amber),
+                    ('resolved', '✅ Geloest', AppColors.leben),
+                  ])
+                    ChoiceChip(
+                      label: Text(s.$2,
+                          style: AppTypography.label(size: 10)),
+                      selected: severity == s.$1,
+                      onSelected: (_) =>
+                          setLocal(() => severity = s.$1),
+                      selectedColor:
+                          s.$3.withValues(alpha: 0.3),
+                      backgroundColor: AppColors.elevated,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.bronze,
+                  foregroundColor: AppColors.voidColor,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                onPressed: sending
+                    ? null
+                    : () async {
+                        final text = ctrl.text.trim();
+                        if (text.isEmpty) return;
+                        setLocal(() => sending = true);
+                        try {
+                          await sb.from('crisis_updates').insert({
+                            'crisis_id': c.id,
+                            'user_id': SupabaseService
+                                .currentUser!.id,
+                            'content': text,
+                            'severity': severity,
+                          });
+                          if (!sheetCtx.mounted) return;
+                          Navigator.pop(sheetCtx);
+                          ref.invalidate(
+                              crisisUpdatesStreamProvider(c.id));
+                        } catch (_) {
+                          setLocal(() => sending = false);
+                        }
+                      },
+                child: sending
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.voidColor),
+                      )
+                    : const Text('Posten'),
+              ),
+            ],
+          ),
         ),
       ),
     );
