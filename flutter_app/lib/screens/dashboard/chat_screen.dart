@@ -56,6 +56,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final stream = ref.watch(messagesStreamProvider(widget.conversationId));
+    final peerReadAsync =
+        ref.watch(peerLastReadProvider(widget.conversationId));
     return DashboardScaffold(
       title: 'Chat',
       currentRoute: '/dashboard/chat',
@@ -91,6 +93,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       );
                     }
                   });
+                  final peerLastRead = peerReadAsync.value;
                   return ListView.builder(
                     controller: _scrollCtrl,
                     padding: const EdgeInsets.all(12),
@@ -99,7 +102,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       final m = msgs[i];
                       final mine =
                           m['sender_id'] == SupabaseService.currentUser?.id;
-                      return _MessageBubble(json: m, mine: mine);
+                      final isLast = i == msgs.length - 1;
+                      bool readByPeer = false;
+                      if (mine && peerLastRead != null) {
+                        final ts = DateTime.tryParse(
+                            m['created_at'] as String? ?? '');
+                        readByPeer =
+                            ts != null && !ts.isAfter(peerLastRead);
+                      }
+                      return _MessageBubble(
+                        json: m,
+                        mine: mine,
+                        showReadReceipt: mine && isLast,
+                        readByPeer: readByPeer,
+                        onReact: (emoji) =>
+                            MessagesRepository.toggleReaction(
+                          messageId: m['id'] as String,
+                          emoji: emoji,
+                        ),
+                      );
                     },
                   );
                 },
@@ -142,54 +163,129 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.json, required this.mine});
+  const _MessageBubble({
+    required this.json,
+    required this.mine,
+    this.showReadReceipt = false,
+    this.readByPeer = false,
+    this.onReact,
+  });
   final Map<String, dynamic> json;
   final bool mine;
+  final bool showReadReceipt;
+  final bool readByPeer;
+  final Future<bool> Function(String emoji)? onReact;
+
+  static const _reactionEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+
+  void _openReactionPicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            for (final emoji in _reactionEmojis)
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  onReact?.call(emoji);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: AppColors.elevated,
+                    shape: BoxShape.circle,
+                  ),
+                  child:
+                      Text(emoji, style: const TextStyle(fontSize: 26)),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final content = json['content'] as String? ?? '';
     final at = DateTime.tryParse(json['created_at'] as String? ?? '') ??
         DateTime.now();
-    return Align(
-      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        decoration: BoxDecoration(
-          color:
-              mine ? AppColors.amber.withValues(alpha: 0.2) : AppColors.surface,
-          border: Border.all(
-            color:
-                mine ? AppColors.amber.withValues(alpha: 0.4) : AppColors.line,
+    return GestureDetector(
+      onLongPress:
+          onReact == null ? null : () => _openReactionPicker(context),
+      child: Align(
+        alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(14),
-            topRight: const Radius.circular(14),
-            bottomLeft: Radius.circular(mine ? 14 : 4),
-            bottomRight: Radius.circular(mine ? 4 : 14),
+          decoration: BoxDecoration(
+            color: mine
+                ? AppColors.amber.withValues(alpha: 0.2)
+                : AppColors.surface,
+            border: Border.all(
+              color: mine
+                  ? AppColors.amber.withValues(alpha: 0.4)
+                  : AppColors.line,
+            ),
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(14),
+              topRight: const Radius.circular(14),
+              bottomLeft: Radius.circular(mine ? 14 : 4),
+              bottomRight: Radius.circular(mine ? 4 : 14),
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              content,
-              style: AppTypography.body(
-                size: 14,
-                color: AppColors.ink,
-                height: 1.4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                content,
+                style: AppTypography.body(
+                  size: 14,
+                  color: AppColors.ink,
+                  height: 1.4,
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              DateFormat('HH:mm').format(at),
-              style: AppTypography.body(size: 10, color: AppColors.mute),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    DateFormat('HH:mm').format(at),
+                    style:
+                        AppTypography.body(size: 10, color: AppColors.mute),
+                  ),
+                  if (mine) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      readByPeer
+                          ? LucideIcons.checkCheck
+                          : LucideIcons.check,
+                      size: 11,
+                      color: readByPeer
+                          ? AppColors.tealSoft
+                          : AppColors.mute,
+                    ),
+                  ],
+                ],
+              ),
+              if (showReadReceipt && mine && readByPeer) ...[
+                const SizedBox(height: 2),
+                Text('Gelesen',
+                    style: AppTypography.label(
+                        size: 8, color: AppColors.tealSoft)),
+              ],
+            ],
+          ),
         ),
       ),
     );

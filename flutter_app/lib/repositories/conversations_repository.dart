@@ -102,10 +102,85 @@ class MessagesRepository {
           .eq('conversation_id', conversationId);
     } catch (_) {}
   }
+
+  /// Reaktion auf eine Message hinzufuegen/entfernen (Toggle).
+  /// Schema: message_reactions(message_id, user_id, emoji).
+  static Future<bool> toggleReaction({
+    required String messageId,
+    required String emoji,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final existing = await sb
+          .from('message_reactions')
+          .select('id')
+          .eq('message_id', messageId)
+          .eq('user_id', uid)
+          .eq('emoji', emoji)
+          .maybeSingle();
+      if (existing != null) {
+        await sb
+            .from('message_reactions')
+            .delete()
+            .eq('id', existing['id'] as Object);
+        return true;
+      }
+      await sb.from('message_reactions').insert({
+        'message_id': messageId,
+        'user_id': uid,
+        'emoji': emoji,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Realtime: alle Reaktionen einer Conversation (joinable).
+  static Stream<List<Map<String, dynamic>>> watchReactions(
+      String conversationId) {
+    return sb
+        .from('message_reactions')
+        .stream(primaryKey: ['id'])
+        .map((rows) => rows
+            .where((r) =>
+                r['conversation_id'] == null ||
+                r['conversation_id'] == conversationId)
+            .toList());
+  }
+
+  /// Live-Stream der last_read_at-Werte der anderen Mitglieder
+  /// (fuer Read-Receipts: "Gelesen am ...").
+  static Stream<DateTime?> watchPeerLastRead(String conversationId) {
+    final uid = SupabaseService.currentUser?.id;
+    return sb
+        .from('conversation_members')
+        .stream(primaryKey: ['conversation_id', 'user_id'])
+        .eq('conversation_id', conversationId)
+        .map((rows) {
+          final peers = rows.where((r) => r['user_id'] != uid);
+          DateTime? latest;
+          for (final p in peers) {
+            final ts =
+                DateTime.tryParse(p['last_read_at'] as String? ?? '');
+            if (ts != null && (latest == null || ts.isAfter(latest))) {
+              latest = ts;
+            }
+          }
+          return latest;
+        });
+  }
 }
 
 final messagesStreamProvider =
     StreamProvider.family<List<Map<String, dynamic>>, String>(
         (ref, conversationId) {
   return MessagesRepository.watch(conversationId);
+});
+
+/// Stream der zuletzt-gelesen-Zeit der anderen Mitglieder (fuer Read-Receipts).
+final peerLastReadProvider =
+    StreamProvider.family<DateTime?, String>((ref, conversationId) {
+  return MessagesRepository.watchPeerLastRead(conversationId);
 });
