@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
+import '../../screens/dashboard/admin/admin_dashboard_screen.dart';
+import '../../screens/dashboard/admin/admin_system_screen.dart';
+import '../../screens/dashboard/admin/admin_table_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
@@ -34,6 +37,8 @@ import '../../screens/dashboard/events/event_create_screen.dart';
 import '../../screens/dashboard/events/event_detail_screen.dart';
 import '../../screens/dashboard/events/events_screen.dart';
 import '../../screens/dashboard/interactions_screen.dart';
+import '../../screens/dashboard/invite/invite_screen.dart';
+import '../../screens/dashboard/mental_support/mental_support_screen.dart';
 import '../../screens/dashboard/map_screen.dart';
 import '../../screens/dashboard/messages_screen.dart';
 import '../../screens/dashboard/notifications_screen.dart';
@@ -372,16 +377,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      _placeholder(
-        '/dashboard/mental-support',
-        'Mentale Unterstuetzung',
-        phase: 'Phase 4',
+      GoRoute(
+        path: '/dashboard/mental-support',
+        builder: (_, __) => const MentalSupportScreen(),
       ),
       GoRoute(
         path: '/dashboard/matching',
         builder: (_, __) => const MatchingScreen(),
       ),
-      _placeholder('/dashboard/rescuer', 'Rettung', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/rescuer',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Rettung',
+          emoji: '🛟',
+          postType: 'rescue',
+          route: '/dashboard/rescuer',
+          subtitle: 'Geretttete Lebensmittel, Kleidung, Gegenstände',
+        ),
+      ),
       GoRoute(
         path: '/dashboard/sharing',
         builder: (_, __) => const ModulePostsScreen(
@@ -392,59 +405,109 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           subtitle: 'Werkzeug, Bücher, Geräte verleihen',
         ),
       ),
-      _placeholder('/dashboard/jobs', 'Jobs', phase: 'Phase 4'),
-      _placeholder('/dashboard/invite', 'Einladen', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/jobs',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Jobs',
+          emoji: '💼',
+          postType: 'job',
+          route: '/dashboard/jobs',
+          subtitle: 'Stellen, Mini-Jobs, ehrenamtliche Tätigkeiten',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/invite',
+        builder: (_, __) => const InviteScreen(),
+      ),
       GoRoute(
         path: '/dashboard/interactions',
         builder: (_, __) => const InteractionsScreen(),
       ),
 
-      // ── Admin ──────────────────────────────────────────────
-      _placeholder('/dashboard/admin', 'Admin', phase: 'Phase 5'),
-      _placeholder(
-        '/dashboard/admin/users',
-        'Admin: Users',
-        phase: 'Phase 5',
+      // ── Admin (Phase 5) ────────────────────────────────────
+      GoRoute(
+        path: '/dashboard/admin',
+        builder: (_, __) => const AdminDashboardScreen(),
       ),
-      _placeholder(
-        '/dashboard/admin/posts',
-        'Admin: Posts',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/users',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Users',
+          tableName: 'profiles',
+          currentRoute: '/dashboard/admin/users',
+          titleField: 'display_name',
+          subtitleFields: ['email', 'home_city', 'home_postal_code'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/events',
-        'Admin: Events',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/posts',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Posts',
+          tableName: 'posts',
+          currentRoute: '/dashboard/admin/posts',
+          subtitleFields: ['type', 'category', 'status'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/board',
-        'Admin: Board',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/events',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Events',
+          tableName: 'events',
+          currentRoute: '/dashboard/admin/events',
+          subtitleFields: ['location_name', 'category'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/crisis',
-        'Admin: Krise',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/board',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Board',
+          tableName: 'board_posts',
+          currentRoute: '/dashboard/admin/board',
+          subtitleFields: ['category', 'status'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/organizations',
-        'Admin: Orgs',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/crisis',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Krisen',
+          tableName: 'crisis_situations',
+          currentRoute: '/dashboard/admin/crisis',
+          subtitleFields: ['severity', 'status', 'crisis_type'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/farms',
-        'Admin: Farms',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/organizations',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Organisationen',
+          tableName: 'organizations',
+          currentRoute: '/dashboard/admin/organizations',
+          titleField: 'name',
+          subtitleFields: ['category', 'city', 'is_verified'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/chat-moderation',
-        'Admin: Chat-Mod',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/farms',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Farms',
+          tableName: 'farm_listings',
+          currentRoute: '/dashboard/admin/farms',
+          titleField: 'name',
+          subtitleFields: ['category', 'city', 'is_bio'],
+        ),
       ),
-      _placeholder(
-        '/dashboard/admin/system',
-        'Admin: System',
-        phase: 'Phase 5',
+      GoRoute(
+        path: '/dashboard/admin/chat-moderation',
+        builder: (_, __) => const AdminTableScreen(
+          title: 'Reports',
+          tableName: 'content_reports',
+          currentRoute: '/dashboard/admin/chat-moderation',
+          titleField: 'reason',
+          subtitleFields: ['content_type', 'status'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/system',
+        builder: (_, __) => const AdminSystemScreen(),
       ),
     ],
     errorBuilder: (context, state) => const PlaceholderScreen(
