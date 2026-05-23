@@ -30,6 +30,14 @@ class MatchingScreen extends ConsumerWidget {
     final prefsAsync = ref.watch(matchPreferencesProvider);
     final matchingDisabled = prefsAsync.value?.matchingEnabled == false;
 
+    // Realtime-Sub: bei jedem Insert/Update der matches-Tabelle die Liste neu laden.
+    ref.listen(matchingStreamProvider, (prev, next) {
+      if (next.hasValue) {
+        ref.invalidate(matchingListProvider);
+        ref.invalidate(matchingCountsProvider);
+      }
+    });
+
     return DashboardScaffold(
       title: 'Matching',
       currentRoute: '/dashboard/matching',

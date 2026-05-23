@@ -8,13 +8,15 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/post.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/post_card.dart';
 
 /// SKILL: mensaena-features
-/// Generischer Modul-Screen — filtert posts nach Type.
-/// Pendant zur Web shared/ModulePage.tsx. Pro Modul werden Title, Emoji,
-/// PostType (z.B. 'animal'/'housing'/...) konfiguriert. Create-FAB
-/// navigiert zu /dashboard/create?type=<typ>.
+/// Generischer Modul-Screen — 1:1 zu `src/components/shared/ModulePage.tsx`.
+/// Filtert posts nach Type. Pro Modul: Title, Emoji, Subtitle, PostType,
+/// optionale Sub-Filter-Pills (z.B. animals: lost/found/care).
 class ModulePostsScreen extends ConsumerStatefulWidget {
   const ModulePostsScreen({
     required this.title,
@@ -22,6 +24,7 @@ class ModulePostsScreen extends ConsumerStatefulWidget {
     required this.postType,
     required this.route,
     this.subtitle,
+    this.subFilters = const [],
     super.key,
   });
 
@@ -30,6 +33,7 @@ class ModulePostsScreen extends ConsumerStatefulWidget {
   final String postType;
   final String route;
   final String? subtitle;
+  final List<FilterOption<String>> subFilters;
 
   @override
   ConsumerState<ModulePostsScreen> createState() => _ModulePostsScreenState();
@@ -37,6 +41,8 @@ class ModulePostsScreen extends ConsumerStatefulWidget {
 
 class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
   Future<List<Post>>? _future;
+  String _search = '';
+  String? _subFilter;
 
   @override
   void initState() {
@@ -52,7 +58,7 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
           .eq('type', widget.postType)
           .eq('status', 'active')
           .order('created_at', ascending: false)
-          .limit(50);
+          .limit(100);
       return (rows as List)
           .whereType<Map<String, dynamic>>()
           .map(Post.fromJson)
@@ -66,6 +72,18 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
     final fresh = _load();
     setState(() => _future = fresh);
     await fresh;
+  }
+
+  bool get _hasFilters => _search.isNotEmpty || _subFilter != null;
+
+  List<Post> _apply(List<Post> all) {
+    final q = _search.trim().toLowerCase();
+    return all.where((p) {
+      if (_subFilter != null && p.category != _subFilter) return false;
+      if (q.isEmpty) return true;
+      return p.title.toLowerCase().contains(q) ||
+          (p.description ?? '').toLowerCase().contains(q);
+    }).toList();
   }
 
   @override
@@ -82,93 +100,133 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
         label: const Text('Beitrag'),
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.amber,
-          backgroundColor: AppColors.surface,
-          onRefresh: _refresh,
-          child: FutureBuilder<List<Post>>(
-            future: _future,
-            builder: (context, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
-                );
-              }
-              final list = snap.data ?? const <Post>[];
-              return ListView(
-                padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.amber.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(widget.emoji,
-                            style: const TextStyle(fontSize: 22)),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(widget.title,
-                                style: AppTypography.display(
-                                  size: 22,
-                                  color: AppColors.ink,
-                                )),
-                            if (widget.subtitle != null)
-                              Text(
-                                widget.subtitle!,
-                                style: AppTypography.caption(),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.amber.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(widget.emoji,
+                        style: const TextStyle(fontSize: 22)),
                   ),
-                  const SizedBox(height: 16),
-                  if (list.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.4),
-                        border: Border.all(color: AppColors.line),
-                        borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.title,
+                            style: AppTypography.display(
+                                size: 22, color: AppColors.ink)),
+                        if (widget.subtitle != null)
+                          Text(widget.subtitle!,
+                              style: AppTypography.caption()),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+              child: ModuleSearchBar(
+                hintText: '${widget.title} durchsuchen…',
+                onChanged: (v) => setState(() => _search = v),
+              ),
+            ),
+            if (widget.subFilters.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+                child: FilterChipBar<String>(
+                  options: widget.subFilters,
+                  selected:
+                      _subFilter == null ? const <String>{} : {_subFilter!},
+                  onChanged: (s) => setState(
+                      () => _subFilter = s.isEmpty ? null : s.first),
+                ),
+              ),
+            if (_hasFilters)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: ActiveFilterStrip(
+                  chips: [
+                    if (_subFilter != null)
+                      ActiveFilterChip(
+                        label: widget.subFilters
+                            .firstWhere((o) => o.value == _subFilter)
+                            .label,
+                        onRemove: () => setState(() => _subFilter = null),
                       ),
-                      child: Column(
+                    if (_search.isNotEmpty)
+                      ActiveFilterChip(
+                        label: '🔍 $_search',
+                        onRemove: () => setState(() => _search = ''),
+                      ),
+                  ],
+                  onClearAll: () => setState(() {
+                    _search = '';
+                    _subFilter = null;
+                  }),
+                ),
+              ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.amber,
+                backgroundColor: AppColors.surface,
+                onRefresh: _refresh,
+                child: FutureBuilder<List<Post>>(
+                  future: _future,
+                  builder: (context, snap) {
+                    if (snap.connectionState != ConnectionState.done) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.amber),
+                      );
+                    }
+                    final list = _apply(snap.data ?? const <Post>[]);
+                    if (list.isEmpty) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
                         children: [
-                          const Icon(LucideIcons.inbox,
-                              size: 28, color: AppColors.mute),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Noch keine ${widget.title}-Beiträge.',
-                            textAlign: TextAlign.center,
-                            style: AppTypography.body(
-                              size: 13,
-                              color: AppColors.inkSoft,
-                              height: 1.55,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Sei der/die Erste:r — tippe den Plus-Button.',
-                            textAlign: TextAlign.center,
-                            style: AppTypography.caption(),
+                          const SizedBox(height: 40),
+                          EmptyStateCard(
+                            icon: LucideIcons.inbox,
+                            title: _hasFilters
+                                ? 'Keine Treffer.'
+                                : 'Noch keine ${widget.title}-Beiträge.',
+                            description: _hasFilters
+                                ? 'Andere Filter probieren.'
+                                : 'Sei der/die Erste:r — Plus-Button.',
+                            actionLabel:
+                                _hasFilters ? 'Filter zurücksetzen' : null,
+                            onAction: _hasFilters
+                                ? () => setState(() {
+                                      _search = '';
+                                      _subFilter = null;
+                                    })
+                                : null,
                           ),
                         ],
-                      ),
-                    )
-                  else
-                    ...list.map((p) => PostCard(post: p)),
-                ],
-              );
-            },
-          ),
+                      );
+                    }
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: list.length,
+                      itemBuilder: (context, i) => PostCard(post: list[i]),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

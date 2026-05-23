@@ -38,10 +38,34 @@ class InteractionsRepository {
     final list = await getActive();
     return list.length;
   }
+
+  /// Realtime-Stream: alle Interaktionen (helper ODER helped = user),
+  /// gefiltert auf nicht-abgeschlossene Status.
+  static Stream<List<Interaction>> watchActive() {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return Stream.value(const []);
+    return sb
+        .from('interactions')
+        .stream(primaryKey: ['id'])
+        .order('updated_at', ascending: false)
+        .map((rows) => rows
+            .where((r) =>
+                (r['helper_id'] == uid || r['helped_id'] == uid) &&
+                const ['pending', 'accepted', 'on_way', 'arrived']
+                    .contains(r['status'] as String?))
+            .map(Interaction.fromJson)
+            .toList());
+  }
 }
 
 /// Provider mit AsyncValue<int> fuer Dashboard-Stat.
 final activeInteractionsCountProvider = FutureProvider<int>((ref) async {
   ref.watch(authStateProvider);
   return InteractionsRepository.activeCount();
+});
+
+/// Realtime-Stream aller aktiven Interaktionen.
+final interactionsStreamProvider =
+    StreamProvider<List<Interaction>>((ref) {
+  return InteractionsRepository.watchActive();
 });

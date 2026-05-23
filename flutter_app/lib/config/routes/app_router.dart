@@ -55,6 +55,7 @@ import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/shared/filter_chip_bar.dart';
 
 /// SKILL: flutter-setup-declarative-routing
 /// Alle Routen der App. Public-Routen sind ohne Login zugaenglich,
@@ -181,6 +182,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'animal',
           route: '/dashboard/animals',
           subtitle: 'Tierhilfe, Fundtiere, Pflegestellen',
+          subFilters: [
+            FilterOption(value: 'lost', label: '😢 Vermisst'),
+            FilterOption(value: 'found', label: '🔍 Gefunden'),
+            FilterOption(value: 'care', label: '🏠 Pflege'),
+            FilterOption(value: 'adoption', label: '❤️ Adoption'),
+          ],
         ),
       ),
       GoRoute(
@@ -191,6 +198,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'housing',
           route: '/dashboard/housing',
           subtitle: 'Wohnungen, WG-Zimmer, Mitwohnen',
+          subFilters: [
+            FilterOption(value: 'seeking', label: '🔍 Suche'),
+            FilterOption(value: 'offering', label: '🎁 Biete'),
+            FilterOption(value: 'wg', label: '🏠 WG'),
+            FilterOption(value: 'emergency', label: '🚨 Notunterkunft'),
+          ],
         ),
       ),
       GoRoute(
@@ -201,6 +214,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'mobility',
           route: '/dashboard/mobility',
           subtitle: 'Mitfahrten, Carsharing, Transport',
+          subFilters: [
+            FilterOption(value: 'rideshare', label: '🚗 Mitfahrt'),
+            FilterOption(value: 'carpool', label: '👥 Fahrgemeinschaft'),
+            FilterOption(value: 'transport', label: '📦 Transport'),
+          ],
         ),
       ),
       GoRoute(
@@ -211,6 +229,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'supply',
           route: '/dashboard/harvest',
           subtitle: 'Obst, Gemüse, Garten-Ernte teilen',
+          subFilters: [
+            FilterOption(value: 'fruit', label: '🍎 Obst'),
+            FilterOption(value: 'vegetable', label: '🥕 Gemüse'),
+            FilterOption(value: 'herbs', label: '🌿 Kräuter'),
+            FilterOption(value: 'eggs', label: '🥚 Eier/Milch'),
+          ],
         ),
       ),
       GoRoute(
@@ -221,6 +245,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'community',
           route: '/dashboard/community',
           subtitle: 'Diskussionen, Treffen, Nachbarschaft',
+          subFilters: [
+            FilterOption(value: 'discussion', label: '💬 Diskussion'),
+            FilterOption(value: 'meeting', label: '👥 Treffen'),
+            FilterOption(value: 'announcement', label: '📣 Ankündigung'),
+          ],
         ),
       ),
       GoRoute(
@@ -395,6 +424,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'rescue',
           route: '/dashboard/rescuer',
           subtitle: 'Geretttete Lebensmittel, Kleidung, Gegenstände',
+          subFilters: [
+            FilterOption(value: 'food', label: '🍎 Lebensmittel'),
+            FilterOption(value: 'everyday', label: '👕 Kleidung'),
+            FilterOption(value: 'sharing', label: '📦 Gegenstände'),
+          ],
         ),
       ),
       GoRoute(
@@ -405,6 +439,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'sharing',
           route: '/dashboard/sharing',
           subtitle: 'Werkzeug, Bücher, Geräte verleihen',
+          subFilters: [
+            FilterOption(value: 'tools', label: '🔧 Werkzeug'),
+            FilterOption(value: 'books', label: '📚 Bücher'),
+            FilterOption(value: 'devices', label: '📱 Geräte'),
+            FilterOption(value: 'kitchen', label: '🍴 Küche'),
+            FilterOption(value: 'sports', label: '⚽ Sport'),
+          ],
         ),
       ),
       GoRoute(
@@ -415,6 +456,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'job',
           route: '/dashboard/jobs',
           subtitle: 'Stellen, Mini-Jobs, ehrenamtliche Tätigkeiten',
+          subFilters: [
+            FilterOption(value: 'fulltime', label: '💼 Vollzeit'),
+            FilterOption(value: 'parttime', label: '⏰ Teilzeit'),
+            FilterOption(value: 'minijob', label: '🔧 Mini-Job'),
+            FilterOption(value: 'volunteer', label: '❤️ Ehrenamt'),
+          ],
         ),
       ),
       GoRoute(

@@ -122,6 +122,22 @@ class MatchingRepository {
     }
   }
 
+  /// Realtime-Stream: alle Matches des aktuellen Users (offer ODER request).
+  /// Sortiert nach created_at desc.
+  static Stream<List<MatchSummary>> watchMine() {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return Stream.value(const []);
+    return sb
+        .from('matches')
+        .stream(primaryKey: ['id'])
+        .order('created_at', ascending: false)
+        .map((rows) => rows
+            .where((r) =>
+                r['offer_user_id'] == uid || r['request_user_id'] == uid)
+            .map(MatchSummary.fromRpcRow)
+            .toList());
+  }
+
   static Future<void> markSeen(String matchId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
@@ -256,6 +272,12 @@ final matchingFilterProvider = StateProvider<String>((ref) => 'all');
 final matchPreferencesProvider =
     FutureProvider<MatchPreferences>((ref) async {
   return MatchingRepository.fetchPreferences();
+});
+
+/// Realtime-Stream — Live-Updates der eigenen Matches.
+final matchingStreamProvider =
+    StreamProvider<List<MatchSummary>>((ref) {
+  return MatchingRepository.watchMine();
 });
 
 final matchingListProvider =
