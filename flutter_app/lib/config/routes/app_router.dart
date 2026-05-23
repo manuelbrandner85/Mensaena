@@ -24,6 +24,9 @@ import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
 import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
 import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
 import '../../screens/dashboard/dashboard_home_screen.dart';
+import '../../screens/dashboard/knowledge/knowledge_screen.dart';
+import '../../screens/dashboard/module/module_posts_screen.dart';
+import '../../screens/dashboard/skills/skills_screen.dart';
 import '../../screens/dashboard/events/event_create_screen.dart';
 import '../../screens/dashboard/events/event_detail_screen.dart';
 import '../../screens/dashboard/events/events_screen.dart';
@@ -160,13 +163,70 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/notifications',
         builder: (_, __) => const NotificationsScreen(),
       ),
-      _placeholder('/dashboard/animals', 'Tiere', phase: 'Phase 4'),
-      _placeholder('/dashboard/housing', 'Wohnen', phase: 'Phase 4'),
-      _placeholder('/dashboard/mobility', 'Mobilitaet', phase: 'Phase 4'),
-      _placeholder('/dashboard/harvest', 'Ernte', phase: 'Phase 4'),
-      _placeholder('/dashboard/community', 'Community', phase: 'Phase 4'),
-      _placeholder('/dashboard/wiki', 'Wiki', phase: 'Phase 4'),
-      _placeholder('/dashboard/knowledge', 'Wissen', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/animals',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Tiere',
+          emoji: '🐾',
+          postType: 'animal',
+          route: '/dashboard/animals',
+          subtitle: 'Tierhilfe, Fundtiere, Pflegestellen',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/housing',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Wohnen',
+          emoji: '🏡',
+          postType: 'housing',
+          route: '/dashboard/housing',
+          subtitle: 'Wohnungen, WG-Zimmer, Mitwohnen',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/mobility',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Mobilität',
+          emoji: '🚗',
+          postType: 'mobility',
+          route: '/dashboard/mobility',
+          subtitle: 'Mitfahrten, Carsharing, Transport',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/harvest',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Ernte',
+          emoji: '🌾',
+          postType: 'supply',
+          route: '/dashboard/harvest',
+          subtitle: 'Obst, Gemüse, Garten-Ernte teilen',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/community',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Community',
+          emoji: '🗳️',
+          postType: 'community',
+          route: '/dashboard/community',
+          subtitle: 'Diskussionen, Treffen, Nachbarschaft',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/wiki',
+        builder: (_, __) => const KnowledgeScreen(
+          title: 'Wiki',
+          routePath: '/dashboard/wiki',
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/knowledge',
+        builder: (_, __) => const KnowledgeScreen(
+          title: 'Wissen',
+          routePath: '/dashboard/knowledge',
+        ),
+      ),
       GoRoute(
         path: '/dashboard/groups',
         builder: (_, __) => const GroupsScreen(),
@@ -225,7 +285,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/timebank',
         builder: (_, __) => const TimebankScreen(),
       ),
-      _placeholder('/dashboard/skills', 'Skills', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/skills',
+        builder: (_, __) => const SkillsScreen(),
+      ),
       GoRoute(
         path: '/dashboard/organizations',
         builder: (_, __) => const OrganizationsScreen(),
@@ -307,7 +370,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       _placeholder('/dashboard/matching', 'Matching', phase: 'Phase 4'),
       _placeholder('/dashboard/rescuer', 'Rettung', phase: 'Phase 4'),
-      _placeholder('/dashboard/sharing', 'Teilen', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/sharing',
+        builder: (_, __) => const ModulePostsScreen(
+          title: 'Teilen',
+          emoji: '🔄',
+          postType: 'sharing',
+          route: '/dashboard/sharing',
+          subtitle: 'Werkzeug, Bücher, Geräte verleihen',
+        ),
+      ),
       _placeholder('/dashboard/jobs', 'Jobs', phase: 'Phase 4'),
       _placeholder('/dashboard/invite', 'Einladen', phase: 'Phase 4'),
       GoRoute(
