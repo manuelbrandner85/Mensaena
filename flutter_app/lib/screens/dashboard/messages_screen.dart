@@ -212,7 +212,6 @@ class _ChannelTile extends StatelessWidget {
     final emoji = (channel['emoji'] as String?) ?? '💬';
     final desc = channel['description'] as String?;
     final locked = channel['is_locked'] == true;
-    final memberCount = channel['member_count'] as int?;
     return InkWell(
       onTap: convId == null
           ? null
@@ -269,18 +268,6 @@ class _ChannelTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.body(
                           size: 12, color: AppColors.inkSoft),
-                    ),
-                  ],
-                  if (memberCount != null && memberCount > 0) ...[
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        const Icon(LucideIcons.users,
-                            size: 10, color: AppColors.mute),
-                        const SizedBox(width: 3),
-                        Text('$memberCount Teilnehmende',
-                            style: AppTypography.caption()),
-                      ],
                     ),
                   ],
                 ],

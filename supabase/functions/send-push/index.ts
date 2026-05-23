@@ -172,10 +172,16 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
         ...(isCall
           ? { ttl: '45s' }
           : {
+              // android.notification.title MUSS explizit gesetzt sein,
+              // sonst zeigt Android nur den App-Namen "Mensaena".
               notification: {
+                title: title || 'Mensaena',
+                body:  body  || '',
                 channel_id: 'mensaena_default',
                 click_action: 'FLUTTER_NOTIFICATION_CLICK',
                 sound: 'default',
+                default_sound: true,
+                default_vibrate_timings: true,
               },
             }),
       },

@@ -14,7 +14,7 @@ class ConversationsRepository {
       final rows = await sb
           .from('chat_channels')
           .select(
-              'id, conversation_id, name, emoji, slug, description, category, is_locked, sort_order, member_count')
+              'id, conversation_id, name, emoji, slug, description, category, is_locked, sort_order, avatar_url')
           .order('sort_order')
           .limit(200);
       return (rows as List).whereType<Map<String, dynamic>>().toList();

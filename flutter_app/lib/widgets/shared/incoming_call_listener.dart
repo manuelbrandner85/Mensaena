@@ -74,6 +74,7 @@ class _IncomingCallListenerState
     SystemSound.play(SystemSoundType.click);
     final callerId = call['caller_id'] as String?;
     final callId = call['id'] as String;
+    final roomName = (call['room_name'] as String?) ?? '';
 
     // Caller-Profile laden
     String callerName = 'Nachbar:in';
@@ -109,10 +110,11 @@ class _IncomingCallListenerState
           await _updateStatus(callId, 'accepted');
           if (!mounted) return;
           Navigator.pop(context);
-          // Navigate to call screen (chat with conv id)
-          final conv = call['conversation_id'] as String?;
-          if (conv != null && mounted) {
-            context.go('/dashboard/chat?conv=$conv');
+          // Navigate to LiveKit-Call-Screen (NICHT mehr zu Chat-Conv!)
+          if (roomName.isNotEmpty && mounted) {
+            final peer = Uri.encodeComponent(callerName);
+            final room = Uri.encodeComponent(roomName);
+            context.push('/dashboard/call/$callId?room=$room&peer=$peer');
           }
         },
         onDecline: () async {

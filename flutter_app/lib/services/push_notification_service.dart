@@ -212,15 +212,20 @@ class PushNotificationService {
 /// Wird in main.dart via FirebaseMessaging.onBackgroundMessage() registriert.
 @pragma('vm:entry-point')
 Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
-  // Wenn das Edge-Function FCM-Payload `notification` UND `data` schickt,
-  // zeigt Android automatisch die Notification. Bei data-only Pushes
-  // (z.B. incoming_call mit TTL=45s) muessen WIR die Notification bauen.
+  // Wenn FCM-Payload `notification` enthaelt, zeigt Android System bereits
+  // automatisch die System-Notification — wir duerfen KEINE duplicate
+  // Local-Notification bauen (sonst sieht der User zwei Notifications,
+  // eine mit "Mensaena" Fallback).
+  // Nur bei DATA-ONLY Pushes (z.B. incoming_call) muessen wir selbst
+  // sichtbar machen.
+  final isDataOnly = m.notification == null;
+  if (!isDataOnly) {
+    return; // Android System hat schon Notification gerendert
+  }
   try {
     await Firebase.initializeApp();
-    final n = m.notification;
-    // data.* hat Vorrang — Android-Background haengt notification.title oft ab.
-    final title = (m.data['title'] as String?) ?? n?.title;
-    final body = (m.data['body'] as String?) ?? n?.body;
+    final title = (m.data['title'] as String?);
+    final body = (m.data['body'] as String?);
     if (title == null && body == null) return;
 
     final plugin = FlutterLocalNotificationsPlugin();
