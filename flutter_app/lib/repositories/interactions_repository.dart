@@ -39,6 +39,25 @@ class InteractionsRepository {
     return list.length;
   }
 
+  /// Status weiterschieben: pending → accepted → on_way → arrived → completed.
+  /// Optional: cancelled (von jedem Status moeglich).
+  /// 1:1-Pendant zu Web `/api/interactions/:id/status` PATCH.
+  static Future<bool> setStatus(String id, String status) async {
+    try {
+      final patch = <String, dynamic>{
+        'status': status,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      };
+      if (status == 'completed') {
+        patch['completed_at'] = DateTime.now().toUtc().toIso8601String();
+      }
+      await sb.from('interactions').update(patch).eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Realtime-Stream: alle Interaktionen (helper ODER helped = user),
   /// gefiltert auf nicht-abgeschlossene Status.
   static Stream<List<Interaction>> watchActive() {

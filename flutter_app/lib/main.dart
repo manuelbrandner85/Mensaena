@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -16,6 +17,9 @@ import 'services/supabase_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseService.init();
+  // Background-Handler MUSS vor Firebase-Init registriert werden,
+  // sonst gehen die data-only Messages verloren wenn App killed ist.
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
   // Firebase async — kann ggf. fail-silently bei fehlender Konfiguration
   // (Dev-Builds ohne google-services.json). Push laeuft dann lokal nicht,
   // Production-Build mit Secret hat das google-services.json.

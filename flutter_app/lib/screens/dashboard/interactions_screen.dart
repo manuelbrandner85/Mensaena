@@ -7,6 +7,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/interaction.dart';
 import '../../repositories/interactions_repository.dart';
+import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -117,6 +118,17 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                             ),
                           ),
                         ],
+                        const SizedBox(height: 10),
+                        _StatusActions(
+                          interactionId: it.id,
+                          status: it.status,
+                          isHelper:
+                              it.helperId == SupabaseService.currentUser?.id,
+                          onChanged: () {
+                            ref.invalidate(activeInteractionsCountProvider);
+                            ref.invalidate(interactionsStreamProvider);
+                          },
+                        ),
                       ],
                     ),
                   );
@@ -168,5 +180,141 @@ class _StatusBadge extends StatelessWidget {
       default:
         return (label: s, color: AppColors.mute);
     }
+  }
+}
+
+class _StatusActions extends StatelessWidget {
+  const _StatusActions({
+    required this.interactionId,
+    required this.status,
+    required this.isHelper,
+    required this.onChanged,
+  });
+
+  final String interactionId;
+  final String status;
+  final bool isHelper;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final next = _nextSteps(status, isHelper);
+    if (next.isEmpty) return const SizedBox.shrink();
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (final step in next)
+          _ActionPill(
+            label: step.label,
+            icon: step.icon,
+            color: step.color,
+            onTap: () async {
+              final ok = await InteractionsRepository.setStatus(
+                  interactionId, step.value);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: AppColors.surface,
+                content: Text(
+                  ok ? 'Status: ${step.label}' : 'Fehler.',
+                  style:
+                      AppTypography.body(size: 13, color: AppColors.ink),
+                ),
+              ));
+              if (ok) onChanged();
+            },
+          ),
+      ],
+    );
+  }
+
+  List<_Step> _nextSteps(String s, bool isHelper) {
+    // Helper-Flow: pending → accepted → on_way → arrived → completed
+    // Helped-Flow: kann annehmen/ablehnen (pending), bewerten (completed)
+    switch (s) {
+      case 'pending':
+        if (isHelper) {
+          return const [
+            _Step('accepted', 'Annehmen', LucideIcons.check, AppColors.leben),
+            _Step('cancelled', 'Ablehnen', LucideIcons.x, AppColors.herzrot),
+          ];
+        }
+        return const [
+          _Step('cancelled', 'Anfrage zurueckziehen', LucideIcons.x,
+              AppColors.mute),
+        ];
+      case 'accepted':
+        if (isHelper) {
+          return const [
+            _Step('on_way', 'Unterwegs', LucideIcons.navigation,
+                AppColors.tealSoft),
+            _Step('cancelled', 'Absagen', LucideIcons.x, AppColors.herzrot),
+          ];
+        }
+        return const [];
+      case 'on_way':
+        if (isHelper) {
+          return const [
+            _Step('arrived', 'Angekommen', LucideIcons.mapPin,
+                AppColors.tealSoft),
+          ];
+        }
+        return const [];
+      case 'arrived':
+        return const [
+          _Step('completed', 'Abgeschlossen', LucideIcons.checkCircle,
+              AppColors.leben),
+        ];
+      case 'completed':
+      case 'cancelled':
+      default:
+        return const [];
+    }
+  }
+}
+
+class _Step {
+  const _Step(this.value, this.label, this.icon, this.color);
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color color;
+}
+
+class _ActionPill extends StatelessWidget {
+  const _ActionPill({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.14),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: color),
+            const SizedBox(width: 5),
+            Text(label,
+                style: AppTypography.label(size: 10, color: color)),
+          ],
+        ),
+      ),
+    );
   }
 }
