@@ -31,6 +31,53 @@ class DashboardScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(unreadNotificationCountProvider);
+    // Realtime-Toast: zeige bei jeder neuen Notification eine Snackbar.
+    ref.listen(notificationsStreamProvider, (prev, next) {
+      final list = next.value;
+      if (list == null || list.isEmpty) return;
+      final newest = list.first;
+      final wasNewer = prev?.value?.firstOrNull?.id != newest.id;
+      if (!wasNewer) return;
+      if (newest.read || newest.readAt != null) return;
+      // Toast zeigen
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.raised,
+        duration: const Duration(seconds: 4),
+        content: Row(
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: AppColors.bronze,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text('NEU',
+                style: AppTypography.label(
+                    size: 9, color: AppColors.bronze)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                newest.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.body(
+                    size: 13, color: AppColors.ink),
+              ),
+            ),
+          ],
+        ),
+        action: newest.link != null && newest.link!.isNotEmpty
+            ? SnackBarAction(
+                label: 'Öffnen',
+                textColor: AppColors.bronze,
+                onPressed: () => context.go(newest.link!),
+              )
+            : null,
+      ));
+    });
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(

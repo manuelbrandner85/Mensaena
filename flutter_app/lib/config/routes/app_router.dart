@@ -54,42 +54,48 @@ import '../../screens/dashboard/warnungen/warnungen_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
+import '../../screens/public/splash_screen.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
 
 /// SKILL: flutter-setup-declarative-routing
 /// Alle Routen der App. Public-Routen sind ohne Login zugaenglich,
 /// alle anderen werden bei nicht-Login zu /auth umgeleitet.
-/// initialLocation = /auth: Anmelde-/Registrierungsbildschirm ist der
-/// erste Screen wenn die App geoeffnet wird (1:1 Mobile-App-UX).
-/// Logged-in User werden direkt zum Dashboard umgeleitet.
+/// initialLocation = /splash: Splash-Screen ist der erste Screen.
+/// Splash navigiert nach ~1.6s zum Dashboard (wenn eingeloggt) oder /auth.
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/auth',
+    initialLocation: '/splash',
     debugLogDiagnostics: kDebugMode,
     redirect: (context, state) {
       final loggedIn = SupabaseService.isLoggedIn;
       final loc = state.matchedLocation;
+      final isSplash = loc == '/splash';
       final isAuthRoute =
           loc == '/auth' || loc == '/login' || loc == '/register';
       final isPublicInfo = _publicRoutes.any(
         (p) => p != '/' && (loc == p || loc.startsWith('$p/')),
       );
 
-      // Landing nur fuer Logged-in User als "Home"-Konzept; nicht eingeloggte
-      // werden direkt zu /auth gefuehrt.
+      // Splash darf von jedem Status angezeigt werden (selbst-navigierend)
+      if (isSplash) return null;
+
       if (!loggedIn) {
         if (isAuthRoute) return null;
         if (isPublicInfo) return null;
         return '/auth?mode=login';
       }
-      // Eingeloggte sehen niemals den Auth- oder Landing-Screen.
       if (loggedIn && (isAuthRoute || loc == '/')) {
         return '/dashboard';
       }
       return null;
     },
     routes: <RouteBase>[
+      // ── Splash ─────────────────────────────────────────────
+      GoRoute(
+        path: '/splash',
+        builder: (_, __) => const SplashScreen(),
+      ),
       // ── Public ─────────────────────────────────────────────
       GoRoute(path: '/', builder: (_, __) => const LandingScreen()),
       GoRoute(

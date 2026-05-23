@@ -223,23 +223,61 @@ class _Tile extends StatelessWidget {
                         ),
                       ),
                       if (group.isPrivate)
-                        const Padding(
-                          padding: EdgeInsets.only(left: 4),
-                          child: Icon(LucideIcons.lock,
-                              size: 12, color: AppColors.mute),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color:
+                                AppColors.bronze.withValues(alpha: 0.14),
+                            border: Border.all(
+                                color: AppColors.bronze
+                                    .withValues(alpha: 0.4)),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(LucideIcons.lock,
+                                  size: 9,
+                                  color: AppColors.bronze),
+                              const SizedBox(width: 3),
+                              Text('PRIVAT',
+                                  style: AppTypography.label(
+                                      size: 7,
+                                      color: AppColors.bronze)),
+                            ],
+                          ),
                         ),
                     ],
                   ),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text(group.category,
-                          style: AppTypography.label(size: 9)),
-                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.elevated,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(group.category,
+                            style: AppTypography.label(size: 8)),
+                      ),
+                      const SizedBox(width: 6),
                       const Icon(LucideIcons.users,
-                          size: 10, color: AppColors.mute),
+                          size: 11, color: AppColors.tealSoft),
                       const SizedBox(width: 3),
                       Text('${group.memberCount}',
-                          style: AppTypography.caption()),
+                          style: AppTypography.mono(
+                              size: 10, color: AppColors.tealSoft)),
+                      const SizedBox(width: 2),
+                      Text(
+                        group.memberCount == 1
+                            ? 'Mitglied'
+                            : 'Mitglieder',
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.mute),
+                      ),
                     ],
                   ),
                   if (group.description != null) ...[

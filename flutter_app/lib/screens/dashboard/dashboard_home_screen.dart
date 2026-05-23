@@ -15,6 +15,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/dashboard/dashboard_hero_card.dart';
 import '../../widgets/dashboard/location_onboarding_modal.dart';
+import '../../widgets/dashboard/onboarding_tour.dart';
 import '../../widgets/dashboard/safety_banners.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/location_map_view.dart';
@@ -47,6 +48,9 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
     _data = _loadAll().then((d) {
       _maybeShowLocationOnboarding(d.profile);
       return d;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) OnboardingTour.maybeShow(context);
     });
   }
 
