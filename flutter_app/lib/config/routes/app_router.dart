@@ -9,6 +9,9 @@ import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/groups/group_create_screen.dart';
 import '../../screens/dashboard/groups/group_detail_screen.dart';
 import '../../screens/dashboard/groups/groups_screen.dart';
+import '../../screens/dashboard/marketplace/marketplace_create_screen.dart';
+import '../../screens/dashboard/marketplace/marketplace_detail_screen.dart';
+import '../../screens/dashboard/marketplace/marketplace_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
@@ -175,7 +178,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      _placeholder('/dashboard/marketplace', 'Marktplatz', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/marketplace',
+        builder: (_, __) => const MarketplaceScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, __) => const MarketplaceCreateScreen(),
+          ),
+          GoRoute(
+            path: ':listingId',
+            builder: (_, s) => MarketplaceDetailScreen(
+              listingId: s.pathParameters['listingId']!,
+            ),
+          ),
+        ],
+      ),
       GoRoute(
         path: '/dashboard/events',
         builder: (_, __) => const EventsScreen(),
