@@ -20,8 +20,8 @@ LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
   - [x] PostCard mit Typ-Badge (13 Typen) + relative Zeit
   - [x] StatCard mit Loading-Skeleton
   - [x] flutter analyze 0 issues, APK 19.0 MB
-- [ ] Phase 3.2 – Map-Screen (flutter_map, MarkerCluster, get_nearby_posts RPC, Radius-Slider)
-- [ ] Phase 3.3 – Create-Post (3-Step: Art → Inhalt → Kontakt, Bild-Upload Supabase Storage, Geo, Tags)
+- [x] Phase 3.2 – Map-Screen: flutter_map + MarkerClusterLayerWidget + OSM-Tiles + get_nearby_posts RPC + Radius-Slider (5/10/25/50/100km) + GPS-Recenter-FAB + Bottom-Sheet auf Marker-Tap (13 Typ-Emoji + Cinema-Farben)
+- [x] Phase 3.3 – Create-Post 3-Step Wizard: Art (13 Typen Grid) → Inhalt (Titel + Beschreibung + Bilder via image_picker + Tags + Anonym-Toggle + Intent-Classifier-Hint) → Kontakt (Standort mit GPS-Button + Telefon/Email/WhatsApp + Privacy-Toggles + Urgency 0-4). Bild-Upload nach post-images Bucket. check_rate_limit (2/min, 10/h). Direkt-Insert in posts, dann context.go(/dashboard/posts/[id])
 - [ ] Phase 3.4 – Posts-List + Post-Detail (Comments threaded, Votes, Shares, Save, Report)
 - [ ] Phase 3.5 – Chat-Screen (Realtime messages, Reactions, Pins, Reply)
 - [ ] Phase 3.6 – Messages-Screen (Konversations-Liste, Unread-Badge)

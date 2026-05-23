@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/dashboard_home_screen.dart';
+import '../../screens/dashboard/map_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
@@ -63,8 +65,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard',
         builder: (_, __) => const DashboardHomeScreen(),
       ),
-      _placeholder('/dashboard/map', 'Karte', phase: 'Phase 3'),
-      _placeholder('/dashboard/create', 'Beitrag erstellen', phase: 'Phase 3'),
+      GoRoute(
+        path: '/dashboard/map',
+        builder: (_, __) => const MapScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/create',
+        builder: (_, s) => CreatePostScreen(
+          initialType: s.uri.queryParameters['type'],
+        ),
+      ),
       _placeholder('/dashboard/chat', 'Chat', phase: 'Phase 3'),
       _placeholder('/dashboard/messages', 'Nachrichten', phase: 'Phase 3'),
       _placeholder('/dashboard/posts', 'Beitraege', phase: 'Phase 3'),
