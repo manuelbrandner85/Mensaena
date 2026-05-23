@@ -6,6 +6,9 @@ import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
+import '../../screens/dashboard/groups/group_create_screen.dart';
+import '../../screens/dashboard/groups/group_detail_screen.dart';
+import '../../screens/dashboard/groups/groups_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
@@ -156,7 +159,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/dashboard/community', 'Community', phase: 'Phase 4'),
       _placeholder('/dashboard/wiki', 'Wiki', phase: 'Phase 4'),
       _placeholder('/dashboard/knowledge', 'Wissen', phase: 'Phase 4'),
-      _placeholder('/dashboard/groups', 'Gruppen', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/groups',
+        builder: (_, __) => const GroupsScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, __) => const GroupCreateScreen(),
+          ),
+          GoRoute(
+            path: ':groupId',
+            builder: (_, s) => GroupDetailScreen(
+              groupId: s.pathParameters['groupId']!,
+            ),
+          ),
+        ],
+      ),
       _placeholder('/dashboard/marketplace', 'Marktplatz', phase: 'Phase 4'),
       GoRoute(
         path: '/dashboard/events',

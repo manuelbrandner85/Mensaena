@@ -1,0 +1,252 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
+import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_typography.dart';
+import '../../../repositories/groups_repository.dart';
+import '../../../widgets/layouts/dashboard_scaffold.dart';
+
+class GroupDetailScreen extends ConsumerStatefulWidget {
+  const GroupDetailScreen({required this.groupId, super.key});
+  final String groupId;
+
+  @override
+  ConsumerState<GroupDetailScreen> createState() => _GroupDetailScreenState();
+}
+
+class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
+  final _postCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _postCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final text = _postCtrl.text.trim();
+    if (text.isEmpty) return;
+    final ok = await GroupsRepository.addPost(
+      groupId: widget.groupId,
+      content: text,
+    );
+    if (!ok || !mounted) return;
+    _postCtrl.clear();
+    ref.invalidate(groupPostsProvider(widget.groupId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final group = ref.watch(groupDetailProvider(widget.groupId));
+    final isMember = ref.watch(groupMembershipProvider(widget.groupId));
+    final posts = ref.watch(groupPostsProvider(widget.groupId));
+
+    return DashboardScaffold(
+      title: 'Gruppe',
+      currentRoute: '/dashboard/groups',
+      body: SafeArea(
+        child: group.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: AppColors.amber),
+          ),
+          error: (e, _) =>
+              Center(child: Text('$e', style: AppTypography.caption())),
+          data: (g) {
+            if (g == null) {
+              return Center(
+                child: Text('Gruppe nicht gefunden.',
+                    style: AppTypography.caption()),
+              );
+            }
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      if (g.bannerUrl != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.network(
+                            g.bannerUrl!,
+                            height: 140,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: AppColors.elevated,
+                            backgroundImage: g.avatarUrl != null
+                                ? NetworkImage(g.avatarUrl!)
+                                : null,
+                            child: g.avatarUrl == null
+                                ? const Icon(LucideIcons.users2,
+                                    color: AppColors.amber)
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  g.name,
+                                  style: AppTypography.display(
+                                    size: 22,
+                                    color: AppColors.ink,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Text(g.category,
+                                        style: AppTypography.label(size: 10)),
+                                    const SizedBox(width: 8),
+                                    const Icon(LucideIcons.users,
+                                        size: 12, color: AppColors.mute),
+                                    const SizedBox(width: 4),
+                                    Text('${g.memberCount} Mitglieder',
+                                        style: AppTypography.caption()),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isMember.asData?.value == true)
+                            OutlinedButton.icon(
+                              onPressed: () async {
+                                await GroupsRepository.leave(g.id);
+                                ref.invalidate(
+                                    groupMembershipProvider(g.id));
+                                ref.invalidate(groupDetailProvider(g.id));
+                              },
+                              icon: const Icon(LucideIcons.logOut, size: 14),
+                              label: const Text('Verlassen'),
+                            )
+                          else
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                await GroupsRepository.join(g.id);
+                                ref.invalidate(
+                                    groupMembershipProvider(g.id));
+                                ref.invalidate(groupDetailProvider(g.id));
+                              },
+                              icon: const Icon(LucideIcons.plus, size: 14),
+                              label: const Text('Beitreten'),
+                            ),
+                        ],
+                      ),
+                      if (g.description != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          g.description!,
+                          style: AppTypography.body(
+                            size: 14,
+                            color: AppColors.inkSoft,
+                            height: 1.55,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      Text('Beiträge',
+                          style: AppTypography.label(size: 10)),
+                      const SizedBox(height: 8),
+                      posts.when(
+                        loading: () => const SizedBox.shrink(),
+                        error: (e, _) =>
+                            Text('$e', style: AppTypography.caption()),
+                        data: (list) {
+                          if (list.isEmpty) {
+                            return Text(
+                              'Noch keine Beitraege in der Gruppe.',
+                              style: AppTypography.caption(),
+                            );
+                          }
+                          return Column(
+                            children: list.map((p) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppColors.surface.withValues(alpha: 0.4),
+                                  border: Border.all(color: AppColors.line),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    if (p.isPinned)
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 4),
+                                        child: Icon(LucideIcons.pin,
+                                            size: 12, color: AppColors.amber),
+                                      ),
+                                    Text(
+                                      p.content,
+                                      style: AppTypography.body(
+                                        size: 13,
+                                        color: AppColors.ink,
+                                        height: 1.45,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    if (p.createdAt != null)
+                                      Text(
+                                        DateFormat('dd.MM. HH:mm')
+                                            .format(p.createdAt!),
+                                        style: AppTypography.caption(),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                if (isMember.asData?.value == true)
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: AppColors.deep,
+                      border: Border(top: BorderSide(color: AppColors.line)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _postCtrl,
+                            maxLines: null,
+                            style: AppTypography.body(
+                                size: 14, color: AppColors.ink),
+                            decoration: const InputDecoration(
+                              hintText: 'Beitrag schreiben…',
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: _submit,
+                          icon: const Icon(LucideIcons.send,
+                              color: AppColors.amber),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
