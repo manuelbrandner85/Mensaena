@@ -94,8 +94,12 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
-        onPressed: () =>
-            context.go('/dashboard/create?type=${widget.postType}'),
+        onPressed: () {
+          // 1:1 Web: Modul-spezifische Create-Route mit Whitelist
+          // statt generischem /dashboard/create?type=
+          final moduleRoute = _moduleCreateRouteFor(widget.postType);
+          context.go(moduleRoute);
+        },
         icon: const Icon(LucideIcons.plus),
         label: const Text('Beitrag'),
       ),
@@ -230,5 +234,30 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
         ),
       ),
     );
+  }
+}
+
+/// Mappt den postType auf die Modul-Create-Route. Siehe ModuleCreateConfig
+/// fuer die 1:1-Web-Parity-Whitelist-Pages.
+String _moduleCreateRouteFor(String postType) {
+  switch (postType) {
+    case 'animal':
+      return '/dashboard/animals/create';
+    case 'housing':
+      return '/dashboard/housing/create';
+    case 'mobility':
+      return '/dashboard/mobility/create';
+    case 'sharing':
+      return '/dashboard/sharing/create';
+    case 'supply': // harvest verwendet supply als Post-Type
+      return '/dashboard/harvest/create';
+    case 'community':
+      return '/dashboard/community/create';
+    case 'rescue':
+      return '/dashboard/rescuer/create';
+    case 'job':
+      return '/dashboard/jobs/create';
+    default:
+      return '/dashboard/create?type=$postType';
   }
 }

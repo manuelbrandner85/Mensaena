@@ -59,7 +59,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
-        onPressed: () => context.go('/dashboard/create?type=skill'),
+        onPressed: () => context.go('/dashboard/skills/create'),
         icon: const Icon(LucideIcons.plus),
         label: const Text('Skill anbieten'),
       ),

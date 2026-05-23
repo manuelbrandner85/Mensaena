@@ -13,6 +13,8 @@ import '../../screens/dashboard/admin/admin_users_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
+import '../../screens/dashboard/create/module_create_config.dart';
+import '../../screens/dashboard/create/module_create_post_screen.dart';
 import '../../screens/dashboard/groups/group_create_screen.dart';
 import '../../screens/dashboard/groups/group_detail_screen.dart';
 import '../../screens/dashboard/groups/groups_screen.dart';
@@ -187,6 +189,58 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/notifications',
         builder: (_, __) => const NotificationsScreen(),
+      ),
+      // ── Module-spezifische Create-Pages (1:1 zu Web
+      //    /dashboard/<module>/create) ───────────────────────
+      GoRoute(
+        path: '/dashboard/animals/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.animals),
+      ),
+      GoRoute(
+        path: '/dashboard/housing/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.housing),
+      ),
+      GoRoute(
+        path: '/dashboard/mobility/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.mobility),
+      ),
+      GoRoute(
+        path: '/dashboard/sharing/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.sharing),
+      ),
+      GoRoute(
+        path: '/dashboard/harvest/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.harvest),
+      ),
+      GoRoute(
+        path: '/dashboard/community/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.community),
+      ),
+      GoRoute(
+        path: '/dashboard/knowledge/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.knowledge),
+      ),
+      GoRoute(
+        path: '/dashboard/skills/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.skills),
+      ),
+      GoRoute(
+        path: '/dashboard/jobs/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.jobs),
+      ),
+      GoRoute(
+        path: '/dashboard/rescuer/create',
+        builder: (_, __) => const ModuleCreatePostScreen(
+            config: ModuleCreateConfigs.rescuer),
       ),
       GoRoute(
         path: '/dashboard/animals',
