@@ -13,6 +13,8 @@ import '../../repositories/notifications_repository.dart';
 import '../../repositories/posts_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/dashboard/dashboard_hero_card.dart';
+import '../../widgets/dashboard/safety_banners.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/location_map_view.dart';
 import '../../widgets/shared/post_card.dart';
@@ -79,43 +81,67 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
           builder: (context, snap) {
             final loading = snap.connectionState != ConnectionState.done;
             final data = snap.data;
+            // Reihenfolge 1:1 zu `src/app/dashboard/page.tsx`
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                _Greeting(profile: data?.profile, loading: loading),
-                const SizedBox(height: 20),
-                _StatsRow(data: data, loading: loading),
-                const SizedBox(height: 16),
+                // 1. Persoenliche Begruessung (Hero)
+                DashboardHeroCard(
+                  profile: data?.profile,
+                  memberSinceDays: data?.profile == null
+                      ? 0
+                      : DateTime.now()
+                          .difference(data!.profile!.createdAt)
+                          .inDays,
+                ),
+                const SizedBox(height: 14),
+                // 2+3. Sicherheits-/Wetter- + Lebensmittel-Warnungen
+                SafetyBanners(
+                  lat: data?.profile?.latitude,
+                  lng: data?.profile?.longitude,
+                ),
+                const SizedBox(height: 14),
                 if (data?.profile != null) ...[
+                  // 4. Onboarding (wenn nicht abgeschlossen)
                   _OnboardingChecklist(
                     profile: data!.profile,
                     posts: data.posts,
                   ),
                   const SizedBox(height: 16),
-                  _TrustScoreCard(profile: data.profile!),
+                  // 5. Quick-Actions
+                  Text('Schnell-Aktionen',
+                      style: AppTypography.label(size: 10)),
+                  const SizedBox(height: 8),
+                  const _QuickActions(),
                   const SizedBox(height: 16),
+                  // 6. Stats-Cards
+                  _StatsRow(data: data, loading: loading),
+                  const SizedBox(height: 16),
+                  // 7. Smart-Match
                   const _SmartMatchWidget(),
                   const SizedBox(height: 16),
+                  // 8. Trust-Score-Card
+                  _TrustScoreCard(profile: data.profile!),
+                  const SizedBox(height: 16),
+                  // 9. Thanks-Received
                   _ThanksReceived(userId: data.profile!.id),
                   const SizedBox(height: 16),
+                  // 10. Community-Pulse
+                  _CommunityPulse(posts: data.posts),
+                  const SizedBox(height: 16),
+                  // 11. Activity-Feed
                   const _ActivityFeedWidget(),
                   const SizedBox(height: 16),
+                  // 12. Mini-Map (nur wenn Posts vorhanden)
                   if (data.posts.isNotEmpty)
                     _MiniMapWidget(posts: data.posts.take(20).toList()),
                   const SizedBox(height: 16),
+                  // 13. Weekly-Digest
                   _WeeklyDigest(profile: data.profile!),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                 ],
-                _CommunityPulse(posts: data?.posts ?? const []),
-                const SizedBox(height: 24),
-                Text(
-                  'Schnell-Aktionen',
-                  style: AppTypography.label(size: 10),
-                ),
-                const SizedBox(height: 10),
-                const _QuickActions(),
-                const SizedBox(height: 24),
+                // 14. "In deiner Naehe" — Nearby-Posts Feed
                 Row(
                   children: [
                     Text(
@@ -139,56 +165,6 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
           },
         ),
       ),
-    );
-  }
-}
-
-// ── Greeting ─────────────────────────────────────────────────────────────
-class _Greeting extends StatelessWidget {
-  const _Greeting({required this.profile, required this.loading});
-  final Profile? profile;
-  final bool loading;
-
-  @override
-  Widget build(BuildContext context) {
-    final hour = DateTime.now().hour;
-    final greeting = hour < 11
-        ? 'Guten Morgen'
-        : hour < 18
-            ? 'Hallo'
-            : 'Guten Abend';
-    final name = profile?.displayName ?? profile?.name ?? '';
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '— ${DateTime.now().toLocal().toString().substring(0, 10)}',
-          style: AppTypography.label(
-            size: 10,
-            color: AppColors.amber,
-            letterSpacing: 0.15,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '$greeting,${name.isEmpty ? "" : "\n$name"}.',
-          style: AppTypography.display(
-            size: 32,
-            color: AppColors.ink,
-            height: 1.15,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          loading
-              ? 'Lade aktuelle Lage…'
-              : 'Hier ist was heute in deiner Nachbarschaft los ist.',
-          style: AppTypography.body(
-            size: 14,
-            color: AppColors.inkSoft,
-          ),
-        ),
-      ],
     );
   }
 }
