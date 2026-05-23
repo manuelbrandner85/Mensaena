@@ -60,23 +60,31 @@ import '../../widgets/shared/filter_chip_bar.dart';
 /// SKILL: flutter-setup-declarative-routing
 /// Alle Routen der App. Public-Routen sind ohne Login zugaenglich,
 /// alle anderen werden bei nicht-Login zu /auth umgeleitet.
+/// initialLocation = /auth: Anmelde-/Registrierungsbildschirm ist der
+/// erste Screen wenn die App geoeffnet wird (1:1 Mobile-App-UX).
+/// Logged-in User werden direkt zum Dashboard umgeleitet.
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/auth',
     debugLogDiagnostics: kDebugMode,
     redirect: (context, state) {
       final loggedIn = SupabaseService.isLoggedIn;
       final loc = state.matchedLocation;
       final isAuthRoute =
           loc == '/auth' || loc == '/login' || loc == '/register';
-      final isPublic = _publicRoutes.any(
-        (p) => loc == p || loc.startsWith('$p/'),
+      final isPublicInfo = _publicRoutes.any(
+        (p) => p != '/' && (loc == p || loc.startsWith('$p/')),
       );
 
-      if (!loggedIn && !isAuthRoute && !isPublic) {
+      // Landing nur fuer Logged-in User als "Home"-Konzept; nicht eingeloggte
+      // werden direkt zu /auth gefuehrt.
+      if (!loggedIn) {
+        if (isAuthRoute) return null;
+        if (isPublicInfo) return null;
         return '/auth?mode=login';
       }
-      if (loggedIn && isAuthRoute) {
+      // Eingeloggte sehen niemals den Auth- oder Landing-Screen.
+      if (loggedIn && (isAuthRoute || loc == '/')) {
         return '/dashboard';
       }
       return null;

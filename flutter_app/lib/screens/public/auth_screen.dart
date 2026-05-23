@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -6,13 +9,14 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 
-enum _AuthMode { login, register, forgot, magic }
+enum _AuthMode { login, register, forgot }
 
-/// SKILL: supabase
-/// 1:1 zu `src/app/auth/page.tsx`. Modi: login / register / forgot / magic.
-/// Features: Passwort-Anforderungen-Check (≥8 Zeichen, Klein+Gross, Zahl),
-/// Stärke-Indikator (0-4), Name-Feld bei Registrierung, Referral-Code
-/// aus Query-Param, Forgot-Password-Reset, Magic-Link (passwortlos).
+/// SKILL: mensaena-design + mensaena-features
+/// 1:1-Spiegel von `src/app/auth/page.tsx` (Cinema-Dark + Bronze-Akzent).
+/// Elemente: Hero-Orbs, Firefly-Partikel, Logo + Wortmarke, Meta-Label
+/// "01 / Anmelden", Cinema-Serif-Heading mit Akzent-Wort, Inline-Forgot-Link,
+/// Passwort-Strength-Bar mit 4-stufiger Farbkurve, Agreement-Checkbox,
+/// Bronze-Gradient-CTA mit Pfeil, Mode-Toggle im Footer, Back-to-Home-Link.
 class AuthScreen extends StatefulWidget {
   const AuthScreen({this.mode = 'login', super.key});
 
@@ -22,7 +26,8 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _AuthScreenState extends State<AuthScreen>
+    with TickerProviderStateMixin {
   late _AuthMode _mode;
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
@@ -30,8 +35,14 @@ class _AuthScreenState extends State<AuthScreen> {
   final _passwordCtrl = TextEditingController();
   bool _busy = false;
   bool _obscure = true;
+  bool _agreed = false;
   String? _error;
   String? _info;
+  int _failCount = 0;
+  DateTime? _lockUntil;
+
+  // Animation for fireflies
+  late final AnimationController _fireflyCtrl;
 
   @override
   void initState() {
@@ -39,12 +50,13 @@ class _AuthScreenState extends State<AuthScreen> {
     _mode = switch (widget.mode) {
       'register' => _AuthMode.register,
       'forgot' => _AuthMode.forgot,
-      'magic' => _AuthMode.magic,
       _ => _AuthMode.login,
     };
-    _passwordCtrl.addListener(() {
-      if (mounted) setState(() {});
-    });
+    _passwordCtrl.addListener(() => mounted ? setState(() {}) : null);
+    _fireflyCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat();
   }
 
   @override
@@ -52,15 +64,16 @@ class _AuthScreenState extends State<AuthScreen> {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _fireflyCtrl.dispose();
     super.dispose();
   }
 
-  // ── Validators ──────────────────────────────────────────────────────
+  // ── Validators ─────────────────────────────────────────────
   String? _validateEmail(String? v) {
     final s = v?.trim() ?? '';
     if (s.isEmpty) return 'E-Mail fehlt.';
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(s)) {
-      return 'Ungültige E-Mail.';
+      return 'Bitte gib eine gültige E-Mail ein.';
     }
     return null;
   }
@@ -77,7 +90,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return null;
   }
 
-  // ── Password strength ──────────────────────────────────────────────
+  // ── Password-Strength ──────────────────────────────────────
   List<({String label, bool ok})> get _checks {
     final p = _passwordCtrl.text;
     return [
@@ -101,12 +114,77 @@ class _AuthScreenState extends State<AuthScreen> {
     return s;
   }
 
-  // ── Actions ─────────────────────────────────────────────────────────
+  Color _pwColor() {
+    final s = _pwScore;
+    if (s <= 1) return AppColors.herzrotWarm;
+    if (s == 2) return AppColors.bronze;
+    if (s == 3) return const Color(0xFF60A5FA);
+    return const Color(0xFF4ADE80);
+  }
+
+  String _pwLabel() {
+    final s = _pwScore;
+    if (s <= 1) return 'schwach';
+    if (s == 2) return 'mittel';
+    if (s == 3) return 'gut';
+    return 'stark';
+  }
+
+  String _modeIndex() => switch (_mode) {
+        _AuthMode.login => '01',
+        _AuthMode.register => '02',
+        _AuthMode.forgot => '03',
+      };
+
+  String _modeLabel() => switch (_mode) {
+        _AuthMode.login => 'Anmelden',
+        _AuthMode.register => 'Konto erstellen',
+        _AuthMode.forgot => 'Passwort vergessen',
+      };
+
+  String _heading() => switch (_mode) {
+        _AuthMode.login => 'Willkommen ',
+        _AuthMode.register => 'Werde Teil der ',
+        _AuthMode.forgot => 'Passwort ',
+      };
+
+  String _headingAccent() => switch (_mode) {
+        _AuthMode.login => 'zurück.',
+        _AuthMode.register => 'Nachbarschaft.',
+        _AuthMode.forgot => 'vergessen?',
+      };
+
+  String _subtitle() => switch (_mode) {
+        _AuthMode.login =>
+          'Schön, dass du wieder da bist. Melde dich an, um deine Nachbarschaft zu sehen.',
+        _AuthMode.register =>
+          'Trag dich ein — wir helfen dir nicht mit Werbung, sondern mit echten Nachbarn.',
+        _AuthMode.forgot =>
+          'Wir senden dir einen Reset-Link per E-Mail. Klicke ihn, um ein neues Passwort zu setzen.',
+      };
+
+  String _submitLabel() => switch (_mode) {
+        _AuthMode.login => 'Anmelden',
+        _AuthMode.register => 'Konto erstellen',
+        _AuthMode.forgot => 'Reset-Link senden',
+      };
+
+  // ── Actions ────────────────────────────────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_mode == _AuthMode.register && !_checks.every((c) => c.ok)) {
-      setState(() => _error =
-          'Passwort erfüllt nicht alle Anforderungen.');
+    if (_mode == _AuthMode.register) {
+      if (!_checks.every((c) => c.ok)) {
+        setState(() => _error =
+            'Passwort erfüllt nicht alle Anforderungen.');
+        return;
+      }
+      if (!_agreed) {
+        setState(() => _error =
+            'Bitte stimme den Bedingungen zu, um fortzufahren.');
+        return;
+      }
+    }
+    if (_lockUntil != null && DateTime.now().isBefore(_lockUntil!)) {
       return;
     }
     setState(() {
@@ -122,10 +200,10 @@ class _AuthScreenState extends State<AuthScreen> {
             password: _passwordCtrl.text,
           );
           if (!mounted) return;
+          _failCount = 0;
           context.go('/dashboard');
           return;
         case _AuthMode.register:
-          // Referral-Code BEVOR async aus Query-Param holen.
           final refCode = mounted
               ? GoRouterState.of(context).uri.queryParameters['ref']
               : null;
@@ -159,302 +237,599 @@ class _AuthScreenState extends State<AuthScreen> {
           setState(() => _info =
               'Wir haben dir einen Reset-Link geschickt. Prüfe dein Postfach.');
           break;
-        case _AuthMode.magic:
-          await sb.auth.signInWithOtp(
-            email: _emailCtrl.text.trim().toLowerCase(),
-            emailRedirectTo: 'https://www.mensaena.de/dashboard',
-          );
-          setState(() => _info =
-              'Magic-Link gesendet. Öffne deine E-Mail.');
-          break;
       }
     } catch (e) {
-      setState(() {
-        var msg = e.toString().replaceFirst('AuthApiException: ', '');
-        if (msg.contains('already registered') ||
-            msg.contains('User already')) {
-          msg = 'Diese E-Mail ist bereits registriert.';
-        } else if (msg.contains('Invalid login')) {
-          msg = 'Falsche E-Mail oder Passwort.';
+      var msg = e.toString().replaceFirst('AuthApiException: ', '');
+      if (msg.contains('already registered') ||
+          msg.contains('User already')) {
+        msg = 'Diese E-Mail ist bereits registriert.';
+      } else if (msg.contains('Invalid login')) {
+        msg = 'Falsche E-Mail oder Passwort.';
+        _failCount += 1;
+        if (_failCount >= 5) {
+          _lockUntil = DateTime.now().add(const Duration(seconds: 60));
         }
-        _error = msg;
-      });
+      }
+      setState(() => _error = msg);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
+  // ── Build ──────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final isRegister = _mode == _AuthMode.register;
     final isForgot = _mode == _AuthMode.forgot;
-    final isMagic = _mode == _AuthMode.magic;
-
-    String title;
-    String submitLabel;
-    switch (_mode) {
-      case _AuthMode.login:
-        title = 'Anmelden';
-        submitLabel = 'Anmelden';
-        break;
-      case _AuthMode.register:
-        title = 'Registrieren';
-        submitLabel = 'Konto erstellen';
-        break;
-      case _AuthMode.forgot:
-        title = 'Passwort zurücksetzen';
-        submitLabel = 'Reset-Link senden';
-        break;
-      case _AuthMode.magic:
-        title = 'Magic-Link';
-        submitLabel = 'Link senden';
-        break;
-    }
+    final lockSeconds = _lockUntil == null
+        ? 0
+        : _lockUntil!.difference(DateTime.now()).inSeconds.clamp(0, 999);
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/'),
-        ),
-        title: Text(title, style: AppTypography.appBarTitle()),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _HeroLogo(),
-                    const SizedBox(height: 18),
-                    Text(
-                      isRegister
-                          ? 'Willkommen in der Nachbarschaft.'
-                          : isForgot
-                              ? 'Passwort vergessen?'
-                              : isMagic
-                                  ? 'Login ohne Passwort.'
-                                  : 'Willkommen zurück.',
-                      style: AppTypography.display(size: 28, height: 1.15),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      isRegister
-                          ? 'Trag dich ein — wir helfen dir nicht mit Werbung, sondern mit echten Nachbarn.'
-                          : isForgot
-                              ? 'Wir senden dir einen Reset-Link per E-Mail.'
-                              : isMagic
-                                  ? 'Nur deine E-Mail — keine Passwörter.'
-                                  : 'Schön, dass du wieder da bist.',
-                      style: AppTypography.body(
-                          size: 13, color: AppColors.inkSoft),
-                    ),
-                    const SizedBox(height: 28),
+      backgroundColor: AppColors.voidColor,
+      body: Stack(
+        children: [
+          // Hero-Orb 1 (Bronze, top-left)
+          const _HeroOrb(
+            color: AppColors.bronze,
+            opacity: 0.10,
+            top: -0.20,
+            left: -0.10,
+            sizeRatio: 0.7,
+          ),
+          // Hero-Orb 2 (Teal, bottom-right)
+          const _HeroOrb(
+            color: AppColors.teal,
+            opacity: 0.05,
+            bottom: -0.15,
+            right: -0.10,
+            sizeRatio: 0.65,
+          ),
+          // Firefly-Particles
+          ..._buildFireflies(MediaQuery.of(context).size),
 
-                    // Name nur bei Registrierung
-                    if (isRegister) ...[
-                      TextFormField(
-                        controller: _nameCtrl,
-                        textInputAction: TextInputAction.next,
-                        validator: _validateName,
-                        style: AppTypography.body(color: AppColors.ink),
-                        decoration: const InputDecoration(
-                          labelText: 'Name (sichtbar für Nachbarn)',
-                          prefixIcon: Icon(LucideIcons.user, size: 16),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                    ],
+          // Content
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 440),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Logo + Wortmarke
+                      const _LogoLockup(),
+                      const SizedBox(height: 32),
 
-                    TextFormField(
-                      controller: _emailCtrl,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: _validateEmail,
-                      style: AppTypography.body(color: AppColors.ink),
-                      decoration: const InputDecoration(
-                        labelText: 'E-Mail',
-                        prefixIcon: Icon(LucideIcons.mail, size: 16),
-                      ),
-                    ),
-
-                    if (!isForgot && !isMagic) ...[
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _passwordCtrl,
-                        obscureText: _obscure,
-                        validator: _validatePassword,
-                        style: AppTypography.body(color: AppColors.ink),
-                        decoration: InputDecoration(
-                          labelText: 'Passwort',
-                          prefixIcon:
-                              const Icon(LucideIcons.lock, size: 16),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscure
-                                  ? LucideIcons.eye
-                                  : LucideIcons.eyeOff,
-                              size: 16,
+                      // Card (bg-mn-raised + shadow-cinema-raised)
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppColors.raised,
+                          border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.05)),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.black.withValues(alpha: 0.45),
+                              blurRadius: 38,
+                              offset: const Offset(0, 18),
                             ),
-                            onPressed: () =>
-                                setState(() => _obscure = !_obscure),
+                            BoxShadow(
+                              color: AppColors.bronze
+                                  .withValues(alpha: 0.06),
+                              blurRadius: 60,
+                            ),
+                          ],
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _MetaLabel(
+                                index: _modeIndex(),
+                                label: _modeLabel(),
+                              ),
+                              const SizedBox(height: 14),
+                              _CinemaHeading(
+                                base: _heading(),
+                                accent: _headingAccent(),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                _subtitle(),
+                                style: AppTypography.body(
+                                  size: 13,
+                                  color: AppColors.mute,
+                                  height: 1.55,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+
+                              if (_error != null)
+                                _AlertBanner(
+                                    text: _error!, isError: true),
+                              if (_info != null)
+                                _AlertBanner(
+                                    text: _info!, isError: false),
+                              if (_error != null || _info != null)
+                                const SizedBox(height: 16),
+
+                              // Name (register only)
+                              if (isRegister) ...[
+                                _FieldLabel('NAME'),
+                                _CinemaTextField(
+                                  controller: _nameCtrl,
+                                  hint: 'Wie sollen dich Nachbarn nennen?',
+                                  icon: LucideIcons.user,
+                                  validator: _validateName,
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+
+                              // E-Mail
+                              _FieldLabel('E-MAIL'),
+                              _CinemaTextField(
+                                controller: _emailCtrl,
+                                hint: 'nachbarin@beispiel.at',
+                                icon: LucideIcons.mail,
+                                keyboardType:
+                                    TextInputType.emailAddress,
+                                validator: _validateEmail,
+                              ),
+
+                              // Passwort + Inline-Forgot-Link
+                              if (!isForgot) ...[
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _FieldLabel('PASSWORT'),
+                                    if (_mode == _AuthMode.login)
+                                      GestureDetector(
+                                        onTap: () => setState(() {
+                                          _mode = _AuthMode.forgot;
+                                          _error = null;
+                                          _info = null;
+                                        }),
+                                        child: Text(
+                                          'Vergessen?',
+                                          style: AppTypography.body(
+                                            size: 11,
+                                            color: AppColors.bronze,
+                                            weight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                _CinemaTextField(
+                                  controller: _passwordCtrl,
+                                  hint: isRegister
+                                      ? 'Mindestens 8 Zeichen'
+                                      : '••••••••',
+                                  icon: LucideIcons.lock,
+                                  obscure: _obscure,
+                                  validator: _validatePassword,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscure
+                                          ? LucideIcons.eyeOff
+                                          : LucideIcons.eye,
+                                      size: 16,
+                                      color: AppColors.ghost,
+                                    ),
+                                    onPressed: () => setState(
+                                        () => _obscure = !_obscure),
+                                  ),
+                                ),
+                                if (isRegister &&
+                                    _passwordCtrl.text.isNotEmpty)
+                                  _PasswordStrength(
+                                    score: _pwScore,
+                                    color: _pwColor(),
+                                    label: _pwLabel(),
+                                    checks: _checks,
+                                  ),
+                              ],
+
+                              // Agreement (register only)
+                              if (isRegister) ...[
+                                const SizedBox(height: 16),
+                                _AgreementCheckbox(
+                                  checked: _agreed,
+                                  onChanged: (v) =>
+                                      setState(() => _agreed = v),
+                                ),
+                              ],
+
+                              // Rate-limit warning
+                              if (lockSeconds > 0) ...[
+                                const SizedBox(height: 12),
+                                Center(
+                                  child: Text(
+                                    'GESPERRT — ${lockSeconds}s',
+                                    style: AppTypography.mono(
+                                      size: 10,
+                                      color: AppColors.herzrotWarm,
+                                    ),
+                                  ),
+                                ),
+                              ],
+
+                              const SizedBox(height: 22),
+
+                              // Submit Button — Bronze Gradient + Arrow
+                              _SubmitButton(
+                                label: _submitLabel(),
+                                loading: _busy,
+                                disabled: lockSeconds > 0,
+                                onPressed: _submit,
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      if (isRegister && _passwordCtrl.text.isNotEmpty)
-                        _PasswordStrength(
-                          score: _pwScore,
-                          checks: _checks,
+
+                      // Mode Toggle (im Card-Footer)
+                      const SizedBox(height: 18),
+                      Center(child: _ModeToggle(
+                        mode: _mode,
+                        onChange: (m) => setState(() {
+                          _mode = m;
+                          _error = null;
+                          _info = null;
+                        }),
+                      )),
+
+                      // Back to home
+                      const SizedBox(height: 18),
+                      Center(
+                        child: TextButton(
+                          onPressed: () => context.go('/'),
+                          child: Text(
+                            'Zur Startseite',
+                            style: AppTypography.label(
+                              size: 10,
+                              color: AppColors.mute,
+                              letterSpacing: 0.10,
+                            ),
+                          ),
                         ),
-                    ],
-
-                    if (_error != null) ...[
-                      const SizedBox(height: 14),
-                      _Banner(text: _error!, isError: true),
-                    ],
-                    if (_info != null) ...[
-                      const SizedBox(height: 14),
-                      _Banner(text: _info!),
-                    ],
-
-                    const SizedBox(height: 22),
-                    ElevatedButton(
-                      onPressed: _busy ? null : _submit,
-                      child: _busy
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.voidColor,
-                              ),
-                            )
-                          : Text(submitLabel),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // ── Mode-Switch-Buttons ────────────────────
-                    if (_mode == _AuthMode.login) ...[
-                      TextButton(
-                        onPressed: () => setState(() {
-                          _mode = _AuthMode.forgot;
-                          _error = null;
-                          _info = null;
-                        }),
-                        child: const Text('Passwort vergessen?'),
-                      ),
-                      TextButton.icon(
-                        onPressed: () => setState(() {
-                          _mode = _AuthMode.magic;
-                          _error = null;
-                          _info = null;
-                        }),
-                        icon: const Icon(LucideIcons.wand, size: 14),
-                        label: const Text('Login per Magic-Link'),
-                      ),
-                      const SizedBox(height: 8),
-                      const Divider(color: AppColors.line, height: 1),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        onPressed: () => setState(() {
-                          _mode = _AuthMode.register;
-                          _error = null;
-                          _info = null;
-                        }),
-                        icon: const Icon(LucideIcons.userPlus, size: 16),
-                        label: const Text('Noch kein Konto? Registrieren'),
-                      ),
-                    ] else ...[
-                      TextButton(
-                        onPressed: () => setState(() {
-                          _mode = _AuthMode.login;
-                          _error = null;
-                          _info = null;
-                        }),
-                        child: const Text('Zurück zum Login'),
                       ),
                     ],
-
-                    if (isRegister) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        'Mit der Registrierung akzeptierst du die '
-                        'Nutzungsbedingungen und Datenschutzerklärung.',
-                        textAlign: TextAlign.center,
-                        style: AppTypography.caption(),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+
+  List<Widget> _buildFireflies(Size size) {
+    return List<Widget>.generate(6, (i) {
+      return AnimatedBuilder(
+        animation: _fireflyCtrl,
+        builder: (_, __) {
+          final t = (_fireflyCtrl.value + i * 0.18) % 1.0;
+          final y = (15 + i * 13) / 100 * size.height +
+              math.sin(t * 2 * math.pi) * 10;
+          final x = (8 + i * 14) / 100 * size.width +
+              math.cos(t * 2 * math.pi) * 8;
+          final s = 3.0 + (i % 3);
+          return Positioned(
+            top: y,
+            left: x,
+            child: Container(
+              width: s,
+              height: s,
+              decoration: BoxDecoration(
+                color: AppColors.bronze.withValues(alpha: 0.5),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.bronze.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    });
+  }
 }
 
-class _HeroLogo extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────
+// Hero-Orb (Radial-Gradient Hintergrund-Blob)
+// ─────────────────────────────────────────────────────────────
+class _HeroOrb extends StatelessWidget {
+  const _HeroOrb({
+    required this.color,
+    required this.opacity,
+    this.top,
+    this.left,
+    this.bottom,
+    this.right,
+    required this.sizeRatio,
+  });
+
+  final Color color;
+  final double opacity;
+  final double? top;
+  final double? left;
+  final double? bottom;
+  final double? right;
+  final double sizeRatio;
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 64,
-        height: 64,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.amber, AppColors.amberWarm],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.amber.withValues(alpha: 0.4),
-              blurRadius: 18,
-              spreadRadius: 1,
+    final size = MediaQuery.of(context).size;
+    final dim = size.width * sizeRatio;
+    return Positioned(
+      top: top != null ? size.height * top! : null,
+      left: left != null ? size.width * left! : null,
+      bottom: bottom != null ? size.height * bottom! : null,
+      right: right != null ? size.width * right! : null,
+      child: IgnorePointer(
+        child: Container(
+          width: dim,
+          height: dim,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                color.withValues(alpha: opacity),
+                color.withValues(alpha: 0),
+              ],
             ),
-          ],
+          ),
         ),
-        child: const Icon(LucideIcons.heart,
-            size: 30, color: AppColors.voidColor),
       ),
     );
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Logo + Wortmarke (Mensaena. mit bronze Punkt)
+// ─────────────────────────────────────────────────────────────
+class _LogoLockup extends StatelessWidget {
+  const _LogoLockup();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.bronze, AppColors.bronzeSoft],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.bronze.withValues(alpha: 0.35),
+                blurRadius: 22,
+              ),
+            ],
+          ),
+          child: const Icon(LucideIcons.heart,
+              size: 28, color: AppColors.voidColor),
+        ),
+        const SizedBox(width: 12),
+        RichText(
+          text: TextSpan(
+            style: AppTypography.display(
+              size: 28,
+              color: AppColors.ink,
+            ),
+            children: const [
+              TextSpan(text: 'Mensaena'),
+              TextSpan(
+                text: '.',
+                style: TextStyle(color: AppColors.bronze),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Meta-Label "01 / Anmelden"
+// ─────────────────────────────────────────────────────────────
+class _MetaLabel extends StatelessWidget {
+  const _MetaLabel({required this.index, required this.label});
+  final String index;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 18,
+          height: 1,
+          color: AppColors.bronze.withValues(alpha: 0.5),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '$index / $label',
+          style: AppTypography.label(
+            size: 9,
+            color: AppColors.bronze.withValues(alpha: 0.85),
+            letterSpacing: 0.20,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cinema-Serif Heading mit Akzent-Wort (bronze)
+// ─────────────────────────────────────────────────────────────
+class _CinemaHeading extends StatelessWidget {
+  const _CinemaHeading({required this.base, required this.accent});
+  final String base;
+  final String accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        style: AppTypography.display(
+          size: 30,
+          color: AppColors.ink,
+          height: 1.10,
+        ),
+        children: [
+          TextSpan(text: base),
+          TextSpan(
+            text: accent,
+            style: TextStyle(
+              color: AppColors.bronze,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Field Label (UPPERCASE, tracking-wide)
+// ─────────────────────────────────────────────────────────────
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        text,
+        style: AppTypography.label(
+          size: 9,
+          color: const Color(0xFFF5F0E8).withValues(alpha: 0.55),
+          letterSpacing: 0.20,
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Cinema-TextField
+// ─────────────────────────────────────────────────────────────
+class _CinemaTextField extends StatelessWidget {
+  const _CinemaTextField({
+    required this.controller,
+    required this.hint,
+    required this.icon,
+    this.obscure = false,
+    this.validator,
+    this.keyboardType,
+    this.suffixIcon,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final IconData icon;
+  final bool obscure;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final Widget? suffixIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      validator: validator,
+      keyboardType: keyboardType,
+      style: AppTypography.body(size: 14, color: AppColors.ink),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: AppColors.surface,
+        hintText: hint,
+        hintStyle: AppTypography.body(
+          size: 13,
+          color: AppColors.ghost,
+        ),
+        prefixIcon: Icon(icon, size: 16, color: AppColors.ghost),
+        suffixIcon: suffixIcon,
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+              color: Colors.white.withValues(alpha: 0.07)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+              color: Colors.white.withValues(alpha: 0.07)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+              color: AppColors.bronze.withValues(alpha: 0.45),
+              width: 1.4),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide:
+              BorderSide(color: AppColors.herzrot.withValues(alpha: 0.6)),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.herzrot, width: 1.4),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Password-Strength
+// ─────────────────────────────────────────────────────────────
 class _PasswordStrength extends StatelessWidget {
-  const _PasswordStrength({required this.score, required this.checks});
+  const _PasswordStrength({
+    required this.score,
+    required this.color,
+    required this.label,
+    required this.checks,
+  });
+
   final int score;
+  final Color color;
+  final String label;
   final List<({String label, bool ok})> checks;
 
   @override
   Widget build(BuildContext context) {
-    Color scoreColor;
-    String scoreLabel;
-    if (score <= 1) {
-      scoreColor = AppColors.herzrot;
-      scoreLabel = 'schwach';
-    } else if (score == 2) {
-      scoreColor = AppColors.amber;
-      scoreLabel = 'mittel';
-    } else if (score == 3) {
-      scoreColor = AppColors.tealSoft;
-      scoreLabel = 'gut';
-    } else {
-      scoreColor = AppColors.leben;
-      scoreLabel = 'stark';
-    }
     return Padding(
-      padding: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.only(top: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -466,15 +841,23 @@ class _PasswordStrength extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: score / 4,
                     minHeight: 4,
-                    backgroundColor: AppColors.elevated,
-                    valueColor: AlwaysStoppedAnimation(scoreColor),
+                    backgroundColor: AppColors.surface,
+                    valueColor: AlwaysStoppedAnimation(color),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              Text(scoreLabel,
-                  style: AppTypography.label(
-                      size: 9, color: scoreColor)),
+              SizedBox(
+                width: 56,
+                child: Text(
+                  label.toUpperCase(),
+                  textAlign: TextAlign.right,
+                  style: AppTypography.mono(
+                    size: 8,
+                    color: AppColors.mute,
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -484,14 +867,17 @@ class _PasswordStrength extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    c.ok ? LucideIcons.checkCircle2 : LucideIcons.circle,
+                    LucideIcons.checkCircle2,
                     size: 12,
-                    color: c.ok ? AppColors.lebenSoft : AppColors.mute,
+                    color: c.ok ? AppColors.leben : AppColors.ghost,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     c.label,
-                    style: AppTypography.caption(),
+                    style: AppTypography.body(
+                      size: 11,
+                      color: c.ok ? AppColors.lebenSoft : AppColors.mute,
+                    ),
                   ),
                 ],
               ),
@@ -502,36 +888,111 @@ class _PasswordStrength extends StatelessWidget {
   }
 }
 
-class _Banner extends StatelessWidget {
-  const _Banner({required this.text, this.isError = false});
+// ─────────────────────────────────────────────────────────────
+// Agreement-Checkbox mit Inline-Links zu Terms + Privacy
+// ─────────────────────────────────────────────────────────────
+class _AgreementCheckbox extends StatelessWidget {
+  const _AgreementCheckbox({required this.checked, required this.onChanged});
+  final bool checked;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => onChanged(!checked),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 18,
+              height: 18,
+              child: Checkbox(
+                value: checked,
+                onChanged: (v) => onChanged(v ?? false),
+                activeColor: AppColors.bronze,
+                checkColor: AppColors.voidColor,
+                side: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.2)),
+                materialTapTargetSize:
+                    MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: RichText(
+                text: TextSpan(
+                  style: AppTypography.body(
+                    size: 11,
+                    color: AppColors.mute,
+                    height: 1.5,
+                  ),
+                  children: [
+                    const TextSpan(text: 'Ich stimme den '),
+                    TextSpan(
+                      text: 'Nutzungsbedingungen',
+                      style: TextStyle(
+                          color: AppColors.bronze,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    const TextSpan(text: ' und der '),
+                    TextSpan(
+                      text: 'Datenschutzerklärung',
+                      style: TextStyle(
+                          color: AppColors.bronze,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    const TextSpan(text: ' zu.'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Alert-Banner (Error / Info)
+// ─────────────────────────────────────────────────────────────
+class _AlertBanner extends StatelessWidget {
+  const _AlertBanner({required this.text, required this.isError});
   final String text;
   final bool isError;
 
   @override
   Widget build(BuildContext context) {
     final color = isError ? AppColors.herzrot : AppColors.leben;
+    final fg = isError ? AppColors.herzrotWarm : AppColors.lebenSoft;
     return Container(
+      margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        border: Border.all(color: color),
-        borderRadius: BorderRadius.circular(10),
+        color: color.withValues(alpha: 0.06),
+        border: Border.all(color: color.withValues(alpha: 0.20)),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            isError ? LucideIcons.alertTriangle : LucideIcons.checkCircle,
+            isError ? LucideIcons.alertCircle : LucideIcons.checkCircle2,
             size: 14,
-            color: isError ? AppColors.herzrotWarm : AppColors.lebenSoft,
+            color: fg,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
               style: AppTypography.body(
                 size: 13,
-                color: isError ? AppColors.herzrotWarm : AppColors.lebenSoft,
-                height: 1.5,
+                color: fg,
+                height: 1.4,
               ),
             ),
           ),
@@ -539,4 +1000,130 @@ class _Banner extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Submit-Button mit Bronze-Gradient + Arrow
+// ─────────────────────────────────────────────────────────────
+class _SubmitButton extends StatelessWidget {
+  const _SubmitButton({
+    required this.label,
+    required this.loading,
+    required this.disabled,
+    required this.onPressed,
+  });
+
+  final String label;
+  final bool loading;
+  final bool disabled;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: disabled ? 0.5 : 1,
+      child: InkWell(
+        onTap: disabled || loading ? null : onPressed,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          height: 50,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                AppColors.bronze,
+                AppColors.bronzeSoft,
+                AppColors.bronze,
+              ],
+              stops: [0.0, 0.5, 1.0],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.bronze.withValues(alpha: 0.35),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+              BoxShadow(
+                color: AppColors.bronze.withValues(alpha: 0.12),
+                blurRadius: 40,
+              ),
+            ],
+          ),
+          child: loading
+              ? const SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(AppColors.voidColor),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      label,
+                      style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.voidColor,
+                        weight: FontWeight.w600,
+                        letterSpacing: 0.05,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(LucideIcons.arrowRight,
+                        size: 16, color: AppColors.voidColor),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Mode-Toggle (Login ↔ Register ↔ Forgot)
+// ─────────────────────────────────────────────────────────────
+class _ModeToggle extends StatelessWidget {
+  const _ModeToggle({required this.mode, required this.onChange});
+  final _AuthMode mode;
+  final void Function(_AuthMode) onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        style: AppTypography.body(
+          size: 11,
+          color: AppColors.mute,
+        ),
+        children: [
+          if (mode == _AuthMode.login) ...[
+            const TextSpan(text: 'Noch kein Konto? '),
+            _link('Jetzt registrieren', () => onChange(_AuthMode.register)),
+          ] else if (mode == _AuthMode.register) ...[
+            const TextSpan(text: 'Bereits registriert? '),
+            _link('Anmelden', () => onChange(_AuthMode.login)),
+          ] else if (mode == _AuthMode.forgot) ...[
+            const TextSpan(text: 'Passwort wieder eingefallen? '),
+            _link('Zurück zum Login', () => onChange(_AuthMode.login)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  TextSpan _link(String text, VoidCallback onTap) => TextSpan(
+        text: text,
+        style: TextStyle(
+          color: AppColors.bronze,
+          fontWeight: FontWeight.w600,
+          decoration: TextDecoration.underline,
+          decorationColor: AppColors.bronze.withValues(alpha: 0.5),
+        ),
+        recognizer: TapGestureRecognizer()..onTap = onTap,
+      );
 }
