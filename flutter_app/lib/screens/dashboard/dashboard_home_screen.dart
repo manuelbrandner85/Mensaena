@@ -11,6 +11,7 @@ import '../../repositories/interactions_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../repositories/posts_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/post_card.dart';
 import '../../widgets/shared/stat_card.dart';
@@ -84,9 +85,19 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                 const SizedBox(height: 20),
                 _StatsRow(data: data, loading: loading),
                 const SizedBox(height: 16),
-                if (data?.profile != null)
-                  _TrustScoreCard(profile: data!.profile!),
-                const SizedBox(height: 20),
+                if (data?.profile != null) ...[
+                  _OnboardingChecklist(
+                    profile: data!.profile,
+                    posts: data.posts,
+                  ),
+                  const SizedBox(height: 16),
+                  _TrustScoreCard(profile: data.profile!),
+                  const SizedBox(height: 16),
+                  _ThanksReceived(userId: data.profile!.id),
+                  const SizedBox(height: 16),
+                  const _ActivityFeedWidget(),
+                  const SizedBox(height: 16),
+                ],
                 _CommunityPulse(posts: data?.posts ?? const []),
                 const SizedBox(height: 24),
                 Text(
@@ -610,5 +621,319 @@ class _PulseStat extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// ActivityFeed — letzte Interaktionen
+// ─────────────────────────────────────────────────────────────
+class _ActivityFeedWidget extends ConsumerWidget {
+  const _ActivityFeedWidget();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stream = ref.watch(interactionsStreamProvider);
+    return stream.when(
+      loading: () => const SizedBox(height: 80),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (interactions) {
+        if (interactions.isEmpty) return const SizedBox.shrink();
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.5),
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.activity,
+                      color: AppColors.amber, size: 14),
+                  const SizedBox(width: 6),
+                  Text('Aktivität',
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.amber)),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () =>
+                        context.go('/dashboard/interactions'),
+                    style: TextButton.styleFrom(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 4),
+                      minimumSize: const Size(0, 24),
+                    ),
+                    child: Text('Alle',
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.amber)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              for (final ix in interactions.take(3))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: _statusColor(ix.status),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _statusLabel(ix.status),
+                          style: AppTypography.body(
+                              size: 12, color: AppColors.inkSoft),
+                        ),
+                      ),
+                      Text(
+                        _relativeTime(ix.createdAt),
+                        style: AppTypography.caption(),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Color _statusColor(String s) {
+    switch (s) {
+      case 'pending':
+        return AppColors.amber;
+      case 'accepted':
+        return AppColors.lebenSoft;
+      case 'on_way':
+        return AppColors.tealSoft;
+      case 'arrived':
+        return AppColors.leben;
+      default:
+        return AppColors.mute;
+    }
+  }
+
+  String _statusLabel(String s) {
+    switch (s) {
+      case 'pending':
+        return 'Anfrage gesendet';
+      case 'accepted':
+        return 'Hilfe zugesagt';
+      case 'on_way':
+        return 'Unterwegs';
+      case 'arrived':
+        return 'Angekommen';
+      default:
+        return s;
+    }
+  }
+
+  String _relativeTime(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'jetzt';
+    if (diff.inHours < 1) return '${diff.inMinutes}m';
+    if (diff.inDays < 1) return '${diff.inHours}h';
+    return '${diff.inDays}d';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// OnboardingChecklist — progressive Disclosure
+// ─────────────────────────────────────────────────────────────
+class _OnboardingChecklist extends StatelessWidget {
+  const _OnboardingChecklist({required this.profile, required this.posts});
+  final Profile? profile;
+  final List<Post> posts;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasAvatar = (profile?.avatarUrl ?? '').isNotEmpty;
+    final hasBio = (profile?.bio ?? '').isNotEmpty;
+    final hasLocation = (profile?.location ?? '').isNotEmpty;
+    final hasPost = posts.any(
+        (p) => p.userId == profile?.id);
+    final steps = [
+      ('Avatar hochgeladen', hasAvatar, '/dashboard/profile'),
+      ('Bio ausgefüllt', hasBio, '/dashboard/settings'),
+      ('Standort gesetzt', hasLocation, '/dashboard/settings'),
+      ('Erster Beitrag', hasPost, '/dashboard/create'),
+    ];
+    final done = steps.where((s) => s.$2).length;
+    if (done == steps.length) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.amber.withValues(alpha: 0.12),
+            AppColors.tealSoft.withValues(alpha: 0.08),
+          ],
+        ),
+        border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.checkCircle,
+                  color: AppColors.amber, size: 14),
+              const SizedBox(width: 6),
+              Text('Einstieg ($done/${steps.length})',
+                  style: AppTypography.label(
+                      size: 10, color: AppColors.amber)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: done / steps.length,
+              minHeight: 4,
+              backgroundColor: AppColors.elevated,
+              valueColor: const AlwaysStoppedAnimation(AppColors.amber),
+            ),
+          ),
+          const SizedBox(height: 10),
+          for (final s in steps)
+            InkWell(
+              onTap: s.$2 ? null : () => context.go(s.$3),
+              borderRadius: BorderRadius.circular(6),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                child: Row(
+                  children: [
+                    Icon(
+                      s.$2
+                          ? LucideIcons.checkCircle2
+                          : LucideIcons.circle,
+                      size: 14,
+                      color: s.$2 ? AppColors.lebenSoft : AppColors.mute,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        s.$1,
+                        style: AppTypography.body(
+                          size: 13,
+                          color: s.$2 ? AppColors.mute : AppColors.ink,
+                          weight: s.$2
+                              ? FontWeight.w400
+                              : FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (!s.$2)
+                      const Icon(LucideIcons.chevronRight,
+                          size: 14, color: AppColors.amber),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// ThanksReceived — letzte Trust-Ratings die der User erhalten hat
+// ─────────────────────────────────────────────────────────────
+class _ThanksReceived extends ConsumerWidget {
+  const _ThanksReceived({required this.userId});
+  final String userId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _loadRatings(),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox.shrink();
+        }
+        final list = snap.data ?? const [];
+        if (list.isEmpty) return const SizedBox.shrink();
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.lebenSoft.withValues(alpha: 0.08),
+            border: Border.all(
+                color: AppColors.lebenSoft.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.heart,
+                      color: AppColors.lebenSoft, size: 14),
+                  const SizedBox(width: 6),
+                  Text('Dank erhalten',
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.lebenSoft)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              for (final r in list.take(2))
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          for (var i = 0;
+                              i < ((r['stars'] as num?)?.toInt() ?? 0);
+                              i++)
+                            const Icon(LucideIcons.star,
+                                size: 11, color: AppColors.amber),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          (r['comment'] as String?) ?? '—',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.body(
+                              size: 12,
+                              color: AppColors.inkSoft,
+                              height: 1.4),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> _loadRatings() async {
+    try {
+      final rows = await sb
+          .from('trust_ratings')
+          .select()
+          .eq('rated_user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(5);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
   }
 }

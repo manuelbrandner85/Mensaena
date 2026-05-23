@@ -14,6 +14,7 @@ import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/view_toggle.dart';
+import '../../../widgets/shared/weather_forecast_strip.dart';
 
 enum _EventView { list, calendar, map }
 
@@ -140,6 +141,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   }),
                 ),
               ),
+            // ── Wetter-Strip (Pendant zu Web WeatherForecastStrip) ──
+            if (_view == _EventView.list) const WeatherForecastStrip(),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.amber,
