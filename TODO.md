@@ -39,6 +39,10 @@ LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
 - [x] Phase 4.2 – NINA-Warnungen + Lebensmittelwarnungen:
   - [x] WarnungenScreen: NINA-API via nina_service (15min Cache), Severity-sortiert, Detail-Sheet mit Handlungsempfehlung
   - [x] FoodWarningsScreen: direkter BVL-API-Fetch, Link → externer Browser
+- [x] Phase 4.3 – Zeitbank:
+  - [x] timebank_repository (listMine, balance, create, confirm, reject, watchUnseenNotifications Realtime-Stream)
+  - [x] zeitbank_notification model
+  - [x] TimebankScreen: Balance-Card (given/received/balance/pending), Historie mit Bestätigen/Ablehnen Inline-Buttons fuer Empfänger
 - [ ] Phase 4 – Restliche Module nach Brief-Reihenfolge
 - [ ] Phase 5 – Admin-Dashboard
 - [ ] Phase 6 – LiveKit (livekit_client wieder rein wenn flutter_webrtc 3.27-kompatibel ist)

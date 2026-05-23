@@ -17,6 +17,7 @@ import '../../screens/dashboard/post_detail_screen.dart';
 import '../../screens/dashboard/posts_list_screen.dart';
 import '../../screens/dashboard/profile_screen.dart';
 import '../../screens/dashboard/settings_screen.dart';
+import '../../screens/dashboard/timebank_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
 import '../../screens/dashboard/warnungen/warnungen_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
@@ -154,7 +155,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/dashboard/calendar', 'Kalender', phase: 'Phase 4'),
       _placeholder('/dashboard/challenges', 'Challenges', phase: 'Phase 4'),
       _placeholder('/dashboard/badges', 'Badges', phase: 'Phase 4'),
-      _placeholder('/dashboard/timebank', 'Zeitbank', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/timebank',
+        builder: (_, __) => const TimebankScreen(),
+      ),
       _placeholder('/dashboard/skills', 'Skills', phase: 'Phase 4'),
       _placeholder(
         '/dashboard/organizations',
