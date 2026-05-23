@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
+import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
+import '../../screens/dashboard/challenges/challenges_screen.dart';
 import '../../screens/dashboard/groups/group_create_screen.dart';
 import '../../screens/dashboard/groups/group_detail_screen.dart';
 import '../../screens/dashboard/groups/groups_screen.dart';
@@ -279,8 +281,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/calendar',
         builder: (_, __) => const CalendarScreen(),
       ),
-      _placeholder('/dashboard/challenges', 'Challenges', phase: 'Phase 4'),
-      _placeholder('/dashboard/badges', 'Badges', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/challenges',
+        builder: (_, __) => const ChallengesScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/badges',
+        builder: (_, __) => const BadgesScreen(),
+      ),
       GoRoute(
         path: '/dashboard/timebank',
         builder: (_, __) => const TimebankScreen(),
