@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
@@ -9,6 +10,9 @@ import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
 import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
 import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
 import '../../screens/dashboard/dashboard_home_screen.dart';
+import '../../screens/dashboard/events/event_create_screen.dart';
+import '../../screens/dashboard/events/event_detail_screen.dart';
+import '../../screens/dashboard/events/events_screen.dart';
 import '../../screens/dashboard/interactions_screen.dart';
 import '../../screens/dashboard/map_screen.dart';
 import '../../screens/dashboard/messages_screen.dart';
@@ -151,8 +155,26 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/dashboard/knowledge', 'Wissen', phase: 'Phase 4'),
       _placeholder('/dashboard/groups', 'Gruppen', phase: 'Phase 4'),
       _placeholder('/dashboard/marketplace', 'Marktplatz', phase: 'Phase 4'),
-      _placeholder('/dashboard/events', 'Events', phase: 'Phase 4'),
-      _placeholder('/dashboard/calendar', 'Kalender', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/events',
+        builder: (_, __) => const EventsScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, __) => const EventCreateScreen(),
+          ),
+          GoRoute(
+            path: ':eventId',
+            builder: (_, s) => EventDetailScreen(
+              eventId: s.pathParameters['eventId']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/dashboard/calendar',
+        builder: (_, __) => const CalendarScreen(),
+      ),
       _placeholder('/dashboard/challenges', 'Challenges', phase: 'Phase 4'),
       _placeholder('/dashboard/badges', 'Badges', phase: 'Phase 4'),
       GoRoute(
