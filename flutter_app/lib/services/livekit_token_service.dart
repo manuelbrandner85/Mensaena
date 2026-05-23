@@ -6,8 +6,9 @@ import 'package:supabase_flutter/supabase_flutter.dart' show Session;
 import '../services/supabase_service.dart';
 
 /// SKILL: mensaena-features
-/// Server-side LiveKit-JWT — ruft Supabase Edge Function `livekit-token`.
-/// Secrets via `supabase secrets set LIVEKIT_SELF_KEY=... LIVEKIT_SELF_SECRET=...`
+/// Server-side LiveKit-JWT via Supabase Edge Function (1:1 wie
+/// Weltenbibliothek). Secrets liegen in private.push_config (DB),
+/// NICHT in supabase secrets — kein CLI-Setup noetig.
 /// LiveKit-Server: wss://livekit.mensaena.de (Hostinger VPS).
 class LivekitTokenService {
   const LivekitTokenService._();
