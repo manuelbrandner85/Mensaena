@@ -6,6 +6,13 @@ on:
       - main
   workflow_dispatch:
 
+# GITHUB_TOKEN braucht read-only contents-Permission fuer actions/checkout@v4,
+# sonst schlaegt das interne post-clone fetch mit "could not read Username
+# for 'https://github.com': terminal prompts disabled" fehl, wenn die Org
+# GITHUB_TOKEN-Default-Permissions auf "no permissions" gesetzt hat.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,6 +22,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Explizit, damit der Token-Auth-Header bei der Second-Fetch
+          # (zur SHA-Validierung) erhalten bleibt.
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
