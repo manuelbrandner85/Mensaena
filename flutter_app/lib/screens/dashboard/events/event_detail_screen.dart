@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../models/event.dart';
 import '../../../repositories/events_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -214,12 +219,88 @@ class EventDetailScreen extends ConsumerWidget {
                   '${e.maxAttendees != null ? ' / max. ${e.maxAttendees}' : ''}',
                   style: AppTypography.caption(),
                 ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: () => _exportToCalendar(context, e),
+                  icon: const Icon(LucideIcons.calendarPlus, size: 14),
+                  label: const Text('Zum Kalender hinzufügen'),
+                ),
               ],
             );
           },
         ),
       ),
     );
+  }
+
+  /// ICS (iCalendar) Export — Pendant zu Web `event-to-ics` Util.
+  /// Generiert RFC-5545 konforme .ics-Datei und teilt sie via Share-Sheet.
+  /// Apple Kalender / Google Kalender / Outlook erkennen das Format automatisch.
+  Future<void> _exportToCalendar(BuildContext context, EventItem e) async {
+    String fmt(DateTime d) {
+      final utc = d.toUtc();
+      final y = utc.year.toString().padLeft(4, '0');
+      final m = utc.month.toString().padLeft(2, '0');
+      final dd = utc.day.toString().padLeft(2, '0');
+      final hh = utc.hour.toString().padLeft(2, '0');
+      final mm = utc.minute.toString().padLeft(2, '0');
+      final ss = utc.second.toString().padLeft(2, '0');
+      return '$y$m${dd}T$hh$mm${ss}Z';
+    }
+
+    String esc(String s) =>
+        s.replaceAll(r'\', r'\\')
+            .replaceAll(',', r'\,')
+            .replaceAll(';', r'\;')
+            .replaceAll('\n', r'\n');
+
+    final start = fmt(e.startDate);
+    final end = fmt(e.endDate ?? e.startDate.add(const Duration(hours: 2)));
+    final now = fmt(DateTime.now());
+    final location = [e.locationName, e.locationAddress]
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .join(', ');
+
+    final ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Mensaena//EventExport 1.0//DE',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      'UID:event-${e.id}@mensaena.de',
+      'DTSTAMP:$now',
+      'DTSTART:$start',
+      'DTEND:$end',
+      'SUMMARY:${esc(e.title)}',
+      if (e.description != null && e.description!.isNotEmpty)
+        'DESCRIPTION:${esc(e.description!)}',
+      if (location.isNotEmpty) 'LOCATION:${esc(location)}',
+      if (e.onlineUrl != null) 'URL:${esc(e.onlineUrl!)}',
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/event-${e.id}.ics');
+      await file.writeAsString(ics);
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'text/calendar')],
+        text: '${e.title} — Mensaena',
+        subject: e.title,
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Export fehlgeschlagen.',
+            style: AppTypography.body(
+                size: 13, color: AppColors.ink)),
+      ));
+    }
   }
 }
 

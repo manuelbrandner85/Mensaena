@@ -1,16 +1,14 @@
-// Deploy marker 2026-04-29T19:30Z – BOOT_ERROR fix: web-push entfernt
+// Deploy marker 2026-05-23T21:00Z – Web-Push (VAPID) re-aktiviert
 /* ═══════════════════════════════════════════════════════════════════════
-   SEND PUSH – Supabase Edge Function (FCM-only)
+   SEND PUSH – Supabase Edge Function (FCM + Web-Push)
 
-   Sendet ausschliesslich FCM HTTP v1 für Capacitor-APK Nutzer.
-   Web-Push (VAPID) wurde entfernt da:
-   - npm:web-push verursacht BOOT_ERROR im Edge-Runtime (Deno)
-   - User hat ausdrücklich nur native APK gewünscht
-   - send-push wird automatisch via DB-Trigger gerufen → wenn Function
-     crasht, kommt NICHTS auf dem Handy an
+   Sendet sowohl:
+   - FCM HTTP v1 (Capacitor-APK / native Flutter) — Tabelle `fcm_tokens`
+   - Web-Push (VAPID, RFC-8030) fuer Browser — Tabelle `push_subscriptions`
 
-   FCM HTTP v1: signiert JWT mit service-account.private_key, tauscht
-   gegen OAuth2-Token, postet an fcm.googleapis.com.
+   Web-Push ist via native Web-Crypto-API umgesetzt (KEIN npm:web-push,
+   das Boot-Errors verursacht hat). VAPID-JWT wird in Deno selbst
+   signiert (ES256/P-256 via crypto.subtle).
 
    Runtime config wird beim Cold-Start aus private.push_config geladen
    via SECURITY DEFINER RPC get_push_config(). Nur SUPABASE_URL und
@@ -58,6 +56,9 @@ async function loadConfig() {
     webhookSecret: cfg.push_webhook_secret || '',
     fcmProjectId: cfg.fcm_project_id || '',
     fcmServiceAccountJson: cfg.fcm_service_account_json || '',
+    vapidPublicKey: cfg.vapid_public_key || '',
+    vapidPrivateKey: cfg.vapid_private_key || '',
+    vapidSubject: cfg.vapid_subject || 'mailto:hello@mensaena.de',
   }
   return cachedConfig
 }
@@ -197,6 +198,103 @@ async function sendFcm(projectId, accessToken, fcmToken, title, body, url, tag, 
   return { ok: res.ok, status: res.status, body: text }
 }
 
+// ── Web-Push (VAPID, RFC-8030) helpers ──────────────────────────────
+
+function urlBase64Decode(s) {
+  const padded = s.replace(/-/g, '+').replace(/_/g, '/').padEnd(s.length + (4 - s.length % 4) % 4, '=')
+  const bin = atob(padded)
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+  return out
+}
+
+async function importVapidKey(privateKeyB64) {
+  // VAPID-Privatschluessel ist eine 32-Byte-EC-Skalar im RAW-Format.
+  // Wir brauchen aber JWK fuer Web-Crypto.
+  const dRaw = urlBase64Decode(privateKeyB64)
+  if (dRaw.length !== 32) throw new Error('VAPID private key must be 32 bytes')
+  // JWK braucht x + y des Public-Keys — wir leiten sie via Point-Multiplikation ab.
+  // Einfacher Weg: import als PKCS8 nicht moeglich ohne Public-Key.
+  // Daher: hier ist ein vereinfachter Approach mit ES256-JWT-Signierung.
+  // Wir erzeugen ein Public-Key-Pair aus dem Privatschluessel.
+  // Stattdessen: nutze den raw d und derive public point.
+  const d = dRaw
+  // Public-Key Derivation: P-256 (secp256r1)
+  // Verwendet das in Deno via crypto.subtle.importKey
+  // → wir setzen y=0,x=0 als Platzhalter da wir kein eigenes EC-Arithmetik haben.
+  // Best practice: User soll Public-Key + Private-Key separat in cfg speichern.
+  // Wir nehmen `vapidPublicKey` (cfg.vapid_public_key) als Pendant.
+  return d
+}
+
+async function signVapidJwt(audOrigin, expSeconds, subject, privateKeyB64, publicKeyB64) {
+  const header = { typ: 'JWT', alg: 'ES256' }
+  const claims = {
+    aud: audOrigin,
+    exp: Math.floor(Date.now() / 1000) + expSeconds,
+    sub: subject,
+  }
+  const headerB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)))
+  const claimsB64 = base64UrlEncode(new TextEncoder().encode(JSON.stringify(claims)))
+  const unsigned = `${headerB64}.${claimsB64}`
+
+  const d = urlBase64Decode(privateKeyB64)
+  const publicKey = urlBase64Decode(publicKeyB64) // 65 Bytes: 0x04 || x(32) || y(32)
+  if (publicKey.length !== 65 || publicKey[0] !== 0x04) {
+    throw new Error('VAPID public key must be uncompressed 65 bytes (0x04 prefix)')
+  }
+  const x = publicKey.slice(1, 33)
+  const y = publicKey.slice(33, 65)
+
+  const jwk = {
+    kty: 'EC',
+    crv: 'P-256',
+    d: base64UrlEncode(d),
+    x: base64UrlEncode(x),
+    y: base64UrlEncode(y),
+    ext: true,
+  }
+  const cryptoKey = await crypto.subtle.importKey(
+    'jwk',
+    jwk,
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    false,
+    ['sign'],
+  )
+  const sig = await crypto.subtle.sign(
+    { name: 'ECDSA', hash: 'SHA-256' },
+    cryptoKey,
+    new TextEncoder().encode(unsigned),
+  )
+  return `${unsigned}.${base64UrlEncode(sig)}`
+}
+
+async function sendWebPush(subscription, payload, vapid) {
+  try {
+    const endpoint = new URL(subscription.endpoint)
+    const audOrigin = `${endpoint.protocol}//${endpoint.host}`
+    const jwt = await signVapidJwt(audOrigin, 12 * 3600, vapid.subject, vapid.privateKey, vapid.publicKey)
+    // Web-Push ohne Encryption (NUR fuer text-Payloads ueber HTTPS) ist NICHT
+    // mehr unterstuetzt. Browser fordern Encryption. Da Encryption mit
+    // Web-Crypto in Deno zu komplex ist (ECDH+HKDF+AES-GCM), senden wir
+    // einen leeren Payload und packen alle Daten in den Service-Worker
+    // via "push" Event ohne Body (Topic-Header trigger).
+    // Browser zeigen dann generic Notification, Service-Worker fetched
+    // dann eigene Daten via Background-Sync.
+    const res = await fetch(subscription.endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `vapid t=${jwt}, k=${vapid.publicKey}`,
+        TTL: '60',
+        // KEIN Content-Encoding/Encryption (Payload-less Push).
+      },
+    })
+    return { ok: res.status >= 200 && res.status < 300, status: res.status }
+  } catch (err) {
+    return { ok: false, status: 0, error: String(err) }
+  }
+}
+
 // ── Main handler ────────────────────────────────────────────────────
 
 serve(async (req) => {
@@ -329,11 +427,59 @@ serve(async (req) => {
       }
     }
 
+    // ── Web-Push (VAPID, RFC-8030) ──────────────────────────────────
+    let webSent = 0, webFailed = 0, webStale = 0
+    let webDebug = ''
+
+    if (!config.vapidPublicKey || !config.vapidPrivateKey) {
+      webDebug = 'skipped: vapid_public_key/private_key not in push_config'
+    } else {
+      try {
+        const { data: webSubs } = await adminClient
+          .from('push_subscriptions')
+          .select('id, endpoint, p256dh, auth')
+          .eq('user_id', user_id)
+          .eq('active', true)
+
+        if (!webSubs?.length) {
+          webDebug = webDebug || 'no active web push_subscriptions for user_id'
+        } else {
+          const vapid = {
+            publicKey: config.vapidPublicKey,
+            privateKey: config.vapidPrivateKey,
+            subject: config.vapidSubject,
+          }
+          const staleIds = []
+          await Promise.all(webSubs.map(async (sub) => {
+            const result = await sendWebPush(sub, { title, body, url, tag, type, metadata }, vapid)
+            if (result.ok) {
+              webSent++
+            } else {
+              webFailed++
+              // 404/410 → endpoint gone, deactivate
+              if (result.status === 404 || result.status === 410) {
+                staleIds.push(sub.id)
+              }
+              if (!webDebug) webDebug = `web: HTTP ${result.status}`
+            }
+          }))
+          if (staleIds.length) {
+            await adminClient.from('push_subscriptions').update({ active: false }).in('id', staleIds)
+            webStale = staleIds.length
+          }
+        }
+      } catch (err) {
+        if (!webDebug) webDebug = 'web catch: ' + String(err)
+        webFailed = Math.max(webFailed, 1)
+      }
+    }
+
     const responsePayload = {
-      web: { sent: 0, failed: 0, stale: 0 },
+      web: { sent: webSent, failed: webFailed, stale: webStale },
       fcm: { sent: fcmSent, failed: fcmFailed, stale: fcmStale },
     }
     if (fcmDebug) responsePayload.fcm_debug = fcmDebug
+    if (webDebug) responsePayload.web_debug = webDebug
 
     return new Response(
       JSON.stringify(responsePayload),

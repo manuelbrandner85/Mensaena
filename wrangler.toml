@@ -18,19 +18,22 @@ binding = "ASSETS"
 [ai]
 binding = "AI"
 
-# Runtime environment variables (public/anon values only)
+# Runtime environment variables (NUR public/anon values — KEINE Secrets!).
+# Sensitive Werte gehoeren in Cloudflare Worker Secrets, nicht in diese Datei.
+#
+# Secrets-Setup (einmalig pro Worker):
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   wrangler secret put LIVEKIT_SELF_KEY
+#   wrangler secret put LIVEKIT_SELF_SECRET
+# (Oder via Dashboard → Worker → Settings → Variables → Add Secret.)
 [vars]
 NEXT_PUBLIC_SUPABASE_URL = "https://huaqldjkgyosefzfhjnf.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODcxMTgsImV4cCI6MjA5MDU2MzExOH0.Q5ciM8f--f1xAsKyr9-hv1mz7GGbJ6vbxPe4Cj5mgYE"
 NEXT_PUBLIC_APP_NAME = "Mensaena"
 NEXT_PUBLIC_APP_URL = "https://www.mensaena.de"
 NEXT_PUBLIC_ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjNlNzlmZmQ3MzkyYTQ0MmI5MzNjNGZjMzA2NTYzMmQ1IiwiaCI6Im11cm11cjY0In0="
+# LiveKit-URL ist public (WebSocket-Adresse) — Key und Secret als Secrets gesetzt.
 LIVEKIT_SELF_URL = "wss://livekit.mensaena.de"
-LIVEKIT_SELF_KEY = "APImsn6f2c8fd70b21c369"
-LIVEKIT_SELF_SECRET = "MnKPrt1SrPoYfTHzz7YgJSMZt1O2iKMLg5uUlDy2"
-# SUPABASE_SERVICE_ROLE_KEY wird als Cloudflare Worker Secret gesetzt (nicht hier!):
-# Dashboard → mensaena Worker → Settings → Variables → Add Secret
-# Oder: wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 
 # Cron Triggers – Mo 22:00 UTC: Newsletter-Entwurf + Re-Engagement Followups
 [triggers]

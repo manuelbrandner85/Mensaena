@@ -23,8 +23,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Explizit, damit der Token-Auth-Header bei der Second-Fetch
-          # (zur SHA-Validierung) erhalten bleibt.
+          # fetch-depth: 0 holt die volle History in einem einzigen Clone —
+          # umgeht den Second-Fetch-Bug in actions/checkout@v4, der bei
+          # bestimmten Org-Token-Konfigurationen das Credential verliert
+          # ("could not read Username for https://github.com").
+          fetch-depth: 0
           persist-credentials: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
