@@ -74,16 +74,25 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
           'Mitglied';
     } catch (_) {}
 
-    final tok = await LivekitTokenService.fetch(
-      roomName: widget.roomName,
-      displayName: myName,
-      canPublish: widget.isHost,
-    );
-    if (tok == null) {
+    final ({String token, String url}) tok;
+    try {
+      tok = await LivekitTokenService.fetch(
+        roomName: widget.roomName,
+        displayName: myName,
+        canPublish: widget.isHost,
+      );
+    } on LivekitTokenError catch (e) {
       if (!mounted) return;
       setState(() {
         _state = _RoomState.failed;
-        _error = 'Token konnte nicht erstellt werden.';
+        _error = 'Token-Fehler: ${e.message}';
+      });
+      return;
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _state = _RoomState.failed;
+        _error = 'Token-Fehler: $e';
       });
       return;
     }
