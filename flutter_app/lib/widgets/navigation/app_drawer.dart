@@ -5,6 +5,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/conversations_repository.dart';
+import '../../repositories/crisis_repository.dart';
+import '../../repositories/interactions_repository.dart';
+import '../../repositories/matching_repository.dart';
+import '../../repositories/notifications_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 
@@ -33,6 +38,7 @@ class AppDrawer extends ConsumerWidget {
     icon: LucideIcons.bell,
     label: 'Benachrichtigungen',
     route: '/dashboard/notifications',
+    badgeKey: 'unreadNotifications',
   );
 
   static const List<_NavGroup> _groups = [
@@ -44,6 +50,7 @@ class AppDrawer extends ConsumerWidget {
           icon: LucideIcons.mail,
           label: 'Nachrichten',
           route: '/dashboard/messages',
+          badgeKey: 'unreadMessages',
         ),
         _NavLink(
           icon: LucideIcons.messageCircle,
@@ -54,6 +61,7 @@ class AppDrawer extends ConsumerWidget {
           icon: LucideIcons.sparkles,
           label: 'Matching',
           route: '/dashboard/matching',
+          badgeKey: 'suggestedMatches',
         ),
       ],
     ),
@@ -80,6 +88,7 @@ class AppDrawer extends ConsumerWidget {
           icon: LucideIcons.helpingHand,
           label: 'Interaktionen',
           route: '/dashboard/interactions',
+          badgeKey: 'interactionRequests',
         ),
         _NavLink(
           icon: LucideIcons.dog,
@@ -97,6 +106,7 @@ class AppDrawer extends ConsumerWidget {
           label: 'Krisenmodus',
           route: '/dashboard/crisis',
           variant: _NavVariant.crisis,
+          badgeKey: 'activeCrises',
         ),
         _NavLink(
           icon: LucideIcons.brain,
@@ -416,12 +426,49 @@ class _GroupSectionState extends State<_GroupSection> {
   }
 }
 
-class _LinkTile extends StatelessWidget {
+class _LinkTile extends ConsumerWidget {
   const _LinkTile({required this.link});
   final _NavLink link;
 
+  int _badgeCount(WidgetRef ref) {
+    switch (link.badgeKey) {
+      case 'unreadNotifications':
+        return ref.watch(unreadNotificationCountProvider);
+      case 'unreadMessages':
+        return ref
+                .watch(conversationsProvider)
+                .asData
+                ?.value
+                .where((c) => (c['unread_count'] as num?) != null
+                    ? ((c['unread_count'] as num).toInt() > 0)
+                    : false)
+                .length ??
+            0;
+      case 'activeCrises':
+        return ref
+                .watch(activeCrisesProvider)
+                .asData
+                ?.value
+                .where((c) => c.urgency == 'critical' || c.urgency == 'high')
+                .length ??
+            0;
+      case 'suggestedMatches':
+        return ref
+                .watch(matchingListProvider)
+                .asData
+                ?.value
+                .where((m) => m.status == 'pending')
+                .length ??
+            0;
+      case 'interactionRequests':
+        return ref.watch(activeInteractionsCountProvider).asData?.value ?? 0;
+      default:
+        return 0;
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = switch (link.variant) {
       _NavVariant.crisis => AppColors.herzrot,
       _NavVariant.highlight => AppColors.amber,
@@ -432,6 +479,10 @@ class _LinkTile extends StatelessWidget {
       _NavVariant.highlight => AppColors.amber,
       _ => AppColors.ink,
     };
+    final badge = link.badgeKey == null ? 0 : _badgeCount(ref);
+    final badgeColor = link.variant == _NavVariant.crisis
+        ? AppColors.herzrot
+        : AppColors.bronze;
     return ListTile(
       dense: true,
       leading: Padding(
@@ -448,6 +499,23 @@ class _LinkTile extends StatelessWidget {
               : FontWeight.w400,
         ),
       ),
+      trailing: badge > 0
+          ? Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: badgeColor,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                badge > 99 ? '99+' : '$badge',
+                style: AppTypography.mono(
+                  size: 9,
+                  color: AppColors.voidColor,
+                ),
+              ),
+            )
+          : null,
       onTap: () {
         Navigator.of(context).pop();
         context.go(link.route);
@@ -475,9 +543,13 @@ class _NavLink {
     required this.label,
     required this.route,
     this.variant = _NavVariant.defaultVariant,
+    this.badgeKey,
   });
   final IconData icon;
   final String label;
   final String route;
   final _NavVariant variant;
+  /// one of: 'unreadMessages' | 'unreadNotifications' | 'activeCrises' |
+  /// 'suggestedMatches' | 'interactionRequests'
+  final String? badgeKey;
 }

@@ -121,6 +121,8 @@ class _AboutTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        _ProfileStatsBar(userId: p.id),
+        const SizedBox(height: 18),
         if (p.bio != null && p.bio!.isNotEmpty) ...[
           Text('Über', style: AppTypography.label(size: 10)),
           const SizedBox(height: 6),
@@ -173,6 +175,212 @@ class _AboutTab extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _ProfileStatsBar extends StatefulWidget {
+  const _ProfileStatsBar({required this.userId});
+  final String userId;
+
+  @override
+  State<_ProfileStatsBar> createState() => _ProfileStatsBarState();
+}
+
+class _ProfileStatsBarState extends State<_ProfileStatsBar> {
+  late Future<_StatsData> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<_StatsData> _load() async {
+    try {
+      final results = await Future.wait([
+        sb
+            .from('posts')
+            .select('id')
+            .eq('user_id', widget.userId)
+            .eq('status', 'active'),
+        sb
+            .from('group_members')
+            .select('id')
+            .eq('user_id', widget.userId),
+        sb
+            .from('challenge_progress')
+            .select('id, completed')
+            .eq('user_id', widget.userId),
+        sb
+            .from('timebank_entries')
+            .select('hours, giver_id, receiver_id, status')
+            .or('giver_id.eq.${widget.userId},receiver_id.eq.${widget.userId}')
+            .eq('status', 'confirmed'),
+      ]);
+      double given = 0;
+      double received = 0;
+      for (final r in (results[3] as List).whereType<Map<String, dynamic>>()) {
+        final h = (r['hours'] as num?)?.toDouble() ?? 0;
+        if (r['giver_id'] == widget.userId) {
+          given += h;
+        } else {
+          received += h;
+        }
+      }
+      final activeCh = (results[2] as List)
+          .whereType<Map<String, dynamic>>()
+          .where((c) => c['completed'] != true)
+          .length;
+      return _StatsData(
+        postsCount: (results[0] as List).length,
+        groupsCount: (results[1] as List).length,
+        activeChallenges: activeCh,
+        hoursGiven: given,
+        hoursReceived: received,
+      );
+    } catch (_) {
+      return const _StatsData(
+        postsCount: 0,
+        groupsCount: 0,
+        activeChallenges: 0,
+        hoursGiven: 0,
+        hoursReceived: 0,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_StatsData>(
+      future: _future,
+      builder: (context, snap) {
+        final s = snap.data ??
+            const _StatsData(
+              postsCount: 0,
+              groupsCount: 0,
+              activeChallenges: 0,
+              hoursGiven: 0,
+              hoursReceived: 0,
+            );
+        final netto = (s.hoursGiven - s.hoursReceived);
+        return Row(
+          children: [
+            Expanded(
+              child: _StatTile(
+                icon: LucideIcons.clock,
+                color: AppColors.bronze,
+                value: '${netto.toStringAsFixed(1)}h',
+                label: 'Zeitbank',
+                sub: '${s.hoursGiven.toStringAsFixed(0)}h ↑ ${s.hoursReceived.toStringAsFixed(0)}h ↓',
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: _StatTile(
+                icon: LucideIcons.users2,
+                color: AppColors.tealSoft,
+                value: '${s.groupsCount}',
+                label: 'Gruppen',
+                sub: s.groupsCount == 1
+                    ? 'Mitgliedschaft'
+                    : 'Mitgliedschaften',
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: _StatTile(
+                icon: LucideIcons.trophy,
+                color: AppColors.amber,
+                value: '${s.activeChallenges}',
+                label: 'Challenges',
+                sub: 'aktiv',
+              ),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: _StatTile(
+                icon: LucideIcons.fileText,
+                color: AppColors.lebenSoft,
+                value: '${s.postsCount}',
+                label: 'Beiträge',
+                sub: 'aktiv',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _StatsData {
+  const _StatsData({
+    required this.postsCount,
+    required this.groupsCount,
+    required this.activeChallenges,
+    required this.hoursGiven,
+    required this.hoursReceived,
+  });
+  final int postsCount;
+  final int groupsCount;
+  final int activeChallenges;
+  final double hoursGiven;
+  final double hoursReceived;
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({
+    required this.icon,
+    required this.color,
+    required this.value,
+    required this.label,
+    required this.sub,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String value;
+  final String label;
+  final String sub;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.6),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: AppTypography.mono(
+              size: 16,
+              color: AppColors.ink,
+            ),
+          ),
+          Text(
+            label,
+            style: AppTypography.label(size: 8, color: color),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            sub,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.body(
+              size: 9,
+              color: AppColors.mute,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

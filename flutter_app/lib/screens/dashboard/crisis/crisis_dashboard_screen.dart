@@ -376,36 +376,98 @@ class _StatsBar extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────
 // Critical Banner
 // ─────────────────────────────────────────────────────────────────────────
-class _CriticalBanner extends StatelessWidget {
+class _CriticalBanner extends StatefulWidget {
   const _CriticalBanner({required this.count});
   final int count;
 
   @override
+  State<_CriticalBanner> createState() => _CriticalBannerState();
+}
+
+class _CriticalBannerState extends State<_CriticalBanner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.herzrot.withValues(alpha: 0.14),
-        border: Border.all(color: AppColors.herzrot.withValues(alpha: 0.6)),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          const Icon(LucideIcons.alertTriangle,
-              color: AppColors.herzrotWarm, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              '$count kritische Krise${count == 1 ? "" : "n"} aktiv — Hilfe wird gebraucht.',
-              style: AppTypography.body(
-                size: 13,
-                color: AppColors.herzrotWarm,
-                weight: FontWeight.w700,
-              ),
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, __) {
+        // Sin-Wave-Pulse: 0..1..0
+        final wave = (0.5 + 0.5 * (_ctrl.value < 0.5
+            ? _ctrl.value * 2
+            : (1 - _ctrl.value) * 2));
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.herzrot
+                .withValues(alpha: 0.14 + wave * 0.10),
+            border: Border.all(
+              color: AppColors.herzrot
+                  .withValues(alpha: 0.5 + wave * 0.4),
+              width: 1.2 + wave * 0.6,
             ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.herzrot
+                    .withValues(alpha: 0.15 + wave * 0.35),
+                blurRadius: 8 + wave * 16,
+                spreadRadius: wave * 2,
+              ),
+            ],
           ),
-        ],
-      ),
+          child: Row(
+            children: [
+              // Pulsing red dot
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: AppColors.herzrot,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.herzrot
+                          .withValues(alpha: 0.7 * wave),
+                      blurRadius: 4 + wave * 8,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Icon(LucideIcons.alertTriangle,
+                  color: AppColors.herzrotWarm, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${widget.count} kritische Krise${widget.count == 1 ? "" : "n"} aktiv — Hilfe wird gebraucht.',
+                  style: AppTypography.body(
+                    size: 13,
+                    color: AppColors.herzrotWarm,
+                    weight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

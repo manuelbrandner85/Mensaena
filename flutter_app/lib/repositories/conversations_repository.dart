@@ -173,6 +173,11 @@ class MessagesRepository {
   }
 }
 
+final conversationsProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  return ConversationsRepository.listMine();
+});
+
 final messagesStreamProvider =
     StreamProvider.family<List<Map<String, dynamic>>, String>(
         (ref, conversationId) {
