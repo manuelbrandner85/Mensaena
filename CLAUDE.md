@@ -83,14 +83,45 @@ Leeres Array `[]` als Antwort = Erfolg. Token wird nur für die Dauer der Sitzun
 → CLI ist dort nicht verfügbar und bricht den Build.
 
 ### Benötigte GitHub Secrets
-| Secret | Woher |
-|--------|-------|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare Dashboard → My Profile → API Tokens |
-| `GOOGLE_SERVICES_JSON` | Firebase Console → Android App → google-services.json |
-| `ANDROID_KEYSTORE_BASE64` | `base64 -w0 mensaena.jks` |
-| `ANDROID_KEYSTORE_PASSWORD` | Keystore-Passwort |
-| `ANDROID_KEY_ALIAS` | Key-Alias (Standard: `mensaena`) |
-| `ANDROID_KEY_PASSWORD` | Key-Passwort |
+| Secret | Woher | Wofür |
+|--------|-------|-------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare Dashboard → My Profile → API Tokens | deploy.yml (Web) |
+| `GOOGLE_SERVICES_JSON` | Firebase Console → Android App → google-services.json | flutter.yml + shorebird_*.yml |
+| `ANDROID_KEYSTORE_BASE64` | `base64 -w0 mensaena.jks` | flutter.yml + shorebird_*.yml |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore-Passwort | flutter.yml + shorebird_*.yml |
+| `ANDROID_KEY_ALIAS` | Key-Alias (Standard: `mensaena`) | flutter.yml + shorebird_*.yml |
+| `ANDROID_KEY_PASSWORD` | Key-Passwort | flutter.yml + shorebird_*.yml |
+| `SHOREBIRD_TOKEN` | `shorebird login:ci` → Token kopieren | shorebird_patch.yml + shorebird_release.yml |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Project Settings → API → service_role | flutter.yml (app_releases-Insert) |
+
+### Update-Flow (Flutter 4.0+)
+
+**1) Shorebird OTA-Patches (lautlos, automatisch):**
+- `shorebird_patch.yml` triggert auf jedem `push` zu `main` mit `flutter_app/**`-Pfaden.
+- Pusht einen Dart-only Patch ans aktuelle Shorebird-Release (`pubspec.yaml.version`).
+- Client mit `shorebird_code_push` SDK installiert den Patch beim nächsten App-Launch lautlos — keine UI.
+- **Wichtig:** Nur Dart-Änderungen. Dependencies/native Plugins ändern → neues Release.
+
+**2) Initial Shorebird-Release (manuell, pro Major.Minor):**
+- `shorebird_release.yml` läuft NUR auf `workflow_dispatch` (Actions-Tab → manuell auslösen).
+- Trigger wenn `pubspec.yaml.version` major/minor bumpt (z.B. 4.0.0+40000 → 4.1.0+41000).
+- Sonst schlägt `shorebird_patch.yml` mit "no release for version X" fehl.
+
+**3) Mandatory APK-Update (UpdateGate blockiert App, In-App-Download):**
+- `flutter.yml` baut auf jedem main-Push die signierte APK + erstellt GitHub Release.
+- Schreibt `app_releases`-Row mit `apk_url` und `mandatory`-Flag.
+- **Auto-mandatory** wenn Commit-Message enthält: `[mandatory]`, `[force-update]`, `BREAKING:`, `BREAKING CHANGE:`
+- Client `UpdateGate` (in `lib/widgets/shared/update_gate.dart`):
+  - Watcht `app_releases` beim Launch
+  - Wenn `latest.build_number > currentBuild` && `latest.mandatory == true` → Vollbild-Block-Screen
+  - **In-App-Download** via `http`-Stream mit Progress, Speicherort `getTemporaryDirectory()`
+  - **In-App-Install** via `open_filex` → triggert Android PackageInstaller-Intent
+  - `AndroidManifest` hat `REQUEST_INSTALL_PACKAGES` + FileProvider schon konfiguriert
+
+**`changelog`-JSON-Format** (von `flutter.yml` geschrieben, von Client gelesen):
+```json
+{ "entries": [{ "type": "feature", "title": "...", "description": "..." }] }
+```
 
 ## Git Push (bei lokalem Proxy-Problem)
 ```bash

@@ -67,6 +67,14 @@ dependencies:
   # Patches selber werden automatisch beim Launch installiert.
   shorebird_code_push: ^2.0.6
 
+  # In-App APK-Download + Install (Pflicht-Updates):
+  # http fuer Stream-Download mit Progress, path_provider fuer Temp-Pfad,
+  # open_filex fuer PackageInstaller-Intent (Android REQUEST_INSTALL_PACKAGES
+  # ist in AndroidManifest schon gesetzt).
+  http: ^1.2.2
+  path_provider: ^2.1.5
+  open_filex: ^4.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

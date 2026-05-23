@@ -2,22 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/app_release.dart';
 import '../../repositories/app_releases_repository.dart';
+import '../../services/apk_installer_service.dart';
 
 /// SKILL: mensaena-architektur + mensaena-features
-/// UpdateGate — wickelt die ganze App. Prueft bei Start app_releases:
-/// - Wenn neuere mandatory APK existiert: blockierender Vollbild-Screen
-///   mit "Update herunterladen" Button (oeffnet apk_url extern).
-/// - Wenn neuere optionale APK: kein Block, optionaler Toast in der UI.
-/// - Wenn aktuelle Version OK: gibt child durch.
-///
-/// Shorebird-Patches werden automatisch beim Launch installiert und
-/// brauchen kein UI — passieren lautlos.
+/// UpdateGate — wickelt die ganze App.
+/// - Mandatory APK-Release: blockierender Vollbild-Screen mit
+///   IN-APP Download (Progress-Bar) → triggert direkt Android-
+///   Installer-Intent ueber OpenFilex/FileProvider. User muss
+///   nicht raus, kein Browser, kein manueller Download.
+/// - Shorebird-Patches: passieren transparent beim App-Launch, kein UI.
 class UpdateGate extends ConsumerWidget {
   const UpdateGate({required this.child, super.key});
 
@@ -48,21 +46,46 @@ class _MandatoryUpdateScreen extends StatefulWidget {
 }
 
 class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
-  bool _launching = false;
+  double _progress = 0;
+  bool _busy = false;
+  String? _error;
+  bool _waitingInstaller = false;
 
-  Future<void> _download() async {
+  Future<void> _downloadAndInstall() async {
     final url = widget.release.apkUrl;
-    if (url == null || url.isEmpty) return;
-    setState(() => _launching = true);
-    try {
-      await launchUrl(
-        Uri.parse(url),
-        mode: LaunchMode.externalApplication,
-      );
-    } catch (_) {
-      // ignore — User kann manuell auf Link tippen.
+    if (url == null || url.isEmpty) {
+      setState(() => _error = 'Keine APK-URL hinterlegt.');
+      return;
     }
-    if (mounted) setState(() => _launching = false);
+    setState(() {
+      _busy = true;
+      _progress = 0;
+      _error = null;
+      _waitingInstaller = false;
+    });
+
+    final result = await ApkInstallerService.downloadAndInstall(
+      url: url,
+      version: widget.release.version,
+      onProgress: (p) {
+        if (!mounted) return;
+        setState(() => _progress = p);
+      },
+    );
+
+    if (!mounted) return;
+    if (result.ok) {
+      setState(() {
+        _busy = false;
+        _waitingInstaller = true;
+        _progress = 1;
+      });
+    } else {
+      setState(() {
+        _busy = false;
+        _error = result.errorMessage ?? 'Update fehlgeschlagen.';
+      });
+    }
   }
 
   @override
@@ -90,15 +113,21 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                     color: AppColors.amber.withValues(alpha: 0.18),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    LucideIcons.download,
-                    color: AppColors.amber,
+                  child: Icon(
+                    _waitingInstaller
+                        ? LucideIcons.checkCircle2
+                        : LucideIcons.download,
+                    color: _waitingInstaller
+                        ? AppColors.leben
+                        : AppColors.amber,
                     size: 36,
                   ),
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  'Update verfügbar',
+                  _waitingInstaller
+                      ? 'Download abgeschlossen'
+                      : 'Update verfügbar',
                   textAlign: TextAlign.center,
                   style: AppTypography.display(
                     size: 30,
@@ -106,20 +135,20 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                     height: 1.15,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
                   'Version ${widget.release.version}',
                   textAlign: TextAlign.center,
                   style: AppTypography.mono(size: 14),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
                 Text(
-                  'Diese Version ist verpflichtend. Bitte lade die neueste '
-                  'APK herunter und installiere sie, um Mensaena '
-                  'weiterzunutzen.',
+                  _waitingInstaller
+                      ? 'Android öffnet jetzt den System-Installer. Tippe "Installieren" um zu aktualisieren. Falls der Dialog nicht erscheint, drücke unten erneut.'
+                      : 'Diese Version ist verpflichtend. Lade sie direkt in der App und installiere sie — kein Browser nötig.',
                   textAlign: TextAlign.center,
                   style: AppTypography.body(
-                    size: 15,
+                    size: 14,
                     color: AppColors.inkSoft,
                     height: 1.6,
                   ),
@@ -136,10 +165,8 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Was ist neu',
-                          style: AppTypography.label(size: 10),
-                        ),
+                        Text('Was ist neu',
+                            style: AppTypography.label(size: 10)),
                         const SizedBox(height: 8),
                         Text(
                           _changelogPreview()!,
@@ -153,16 +180,66 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                     ),
                   ),
                 ],
+                if (_busy) ...[
+                  const SizedBox(height: 24),
+                  Column(
+                    children: [
+                      LinearProgressIndicator(
+                        value: _progress > 0 ? _progress : null,
+                        backgroundColor: AppColors.elevated,
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.amber,
+                        ),
+                        minHeight: 6,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _progress > 0
+                            ? '${(_progress * 100).toStringAsFixed(0)} %'
+                            : 'Starte Download…',
+                        style: AppTypography.mono(
+                          size: 12,
+                          color: AppColors.amber,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (_error != null) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.herzrot.withValues(alpha: 0.12),
+                      border: Border.all(color: AppColors.herzrot),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: AppTypography.body(
+                        size: 12,
+                        color: AppColors.herzrotWarm,
+                      ),
+                    ),
+                  ),
+                ],
                 const Spacer(),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: _launching ? null : _download,
-                    icon: const Icon(LucideIcons.download, size: 18),
+                    onPressed: _busy ? null : _downloadAndInstall,
+                    icon: Icon(
+                      _waitingInstaller
+                          ? LucideIcons.refreshCw
+                          : LucideIcons.download,
+                      size: 18,
+                    ),
                     label: Text(
-                      _launching
-                          ? 'Wird gestartet…'
-                          : 'APK herunterladen & installieren',
+                      _busy
+                          ? 'Lade…'
+                          : _waitingInstaller
+                              ? 'Installer erneut öffnen'
+                              : 'Update herunterladen',
                     ),
                     style: ElevatedButton.styleFrom(
                       padding:
@@ -172,8 +249,9 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Android fragt evtl. nach Berechtigung "Apps aus unbekannten '
-                  'Quellen installieren" — bitte erlauben.',
+                  'Android fragt bei erstem Update evtl. nach Berechtigung '
+                  '"Apps aus unbekannten Quellen installieren" — bitte für '
+                  'Mensaena erlauben.',
                   textAlign: TextAlign.center,
                   style: AppTypography.caption(),
                 ),
@@ -188,7 +266,29 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
   String? _changelogPreview() {
     final cl = widget.release.changelog;
     if (cl.isEmpty) return null;
-    // changelog kann verschiedene Formate haben — versuche tolerant zu lesen.
+    // flutter.yml schreibt: { entries: [{ type, title, description }] }
+    final entries = cl['entries'];
+    if (entries is List && entries.isNotEmpty) {
+      final lines = <String>[];
+      for (final raw in entries) {
+        if (raw is! Map) continue;
+        final title = raw['title']?.toString() ?? '';
+        final desc = raw['description']?.toString() ?? '';
+        if (title.isEmpty && desc.isEmpty) continue;
+        lines.add(title.isEmpty ? '• $desc' : '• $title');
+        if (desc.isNotEmpty && desc != title) {
+          lines.add('  $desc');
+        }
+        if (lines.length >= 8) break;
+      }
+      if (lines.isNotEmpty) {
+        final joined = lines.join('\n');
+        return joined.length > 400
+            ? '${joined.substring(0, 397)}…'
+            : joined;
+      }
+    }
+    // Fallback: notes/summary/de (vor Workflow-Format-Change moeglich).
     final notes = cl['notes'] ?? cl['summary'] ?? cl['de'];
     if (notes is String && notes.isNotEmpty) {
       return notes.length > 240 ? '${notes.substring(0, 237)}…' : notes;
