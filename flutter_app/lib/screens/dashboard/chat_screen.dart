@@ -125,7 +125,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       return;
     }
     final room = await LiveStreamService.startChannelStream(
-      channelId: widget.conversationId,
+      conversationId: widget.conversationId,
       channelSlug: ctx.slug!,
       topic: 'Live im Kanal ${ctx.title}',
     );
@@ -286,6 +286,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Live-Banner — wenn jemand im Channel live ist, koennen
+            // alle anderen beitreten.
+            if (_context?.kind == ChatKind.channel)
+              _LiveRoomBanner(
+                conversationId: widget.conversationId,
+                channelTitle: _context!.title,
+                myUserId: SupabaseService.currentUser?.id,
+              ),
             Expanded(
               child: stream.when(
                 loading: () => const Center(
@@ -955,6 +963,142 @@ class _TypingDotsState extends State<_TypingDots>
               ),
             );
           }),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Live-Banner — zeigt sich nur wenn jemand im Channel live ist
+// Jeder kann tap'en um beizutreten (host=0 → guest)
+// ─────────────────────────────────────────────────────────────
+class _LiveRoomBanner extends StatefulWidget {
+  const _LiveRoomBanner({
+    required this.conversationId,
+    required this.channelTitle,
+    required this.myUserId,
+  });
+
+  final String conversationId;
+  final String channelTitle;
+  final String? myUserId;
+
+  @override
+  State<_LiveRoomBanner> createState() => _LiveRoomBannerState();
+}
+
+class _LiveRoomBannerState extends State<_LiveRoomBanner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Map<String, dynamic>?>(
+      stream: LiveStreamService.watchActiveRoom(widget.conversationId),
+      builder: (context, snap) {
+        final room = snap.data;
+        if (room == null) return const SizedBox.shrink();
+        final roomName = (room['room_name'] as String?) ?? '';
+        final topic = (room['topic'] as String?) ?? widget.channelTitle;
+        final hostId = room['host_id'] as String?;
+        final isHost = hostId != null && hostId == widget.myUserId;
+        if (roomName.isEmpty) return const SizedBox.shrink();
+
+        return InkWell(
+          onTap: () {
+            final title = Uri.encodeComponent(widget.channelTitle);
+            final r = Uri.encodeComponent(roomName);
+            context.push(
+                '/dashboard/live/$r?title=$title&host=${isHost ? '1' : '0'}');
+          },
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.herzrot.withValues(alpha: 0.22),
+                  AppColors.bronze.withValues(alpha: 0.16),
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              border: Border.all(
+                  color: AppColors.herzrot.withValues(alpha: 0.5)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                AnimatedBuilder(
+                  animation: _pulse,
+                  builder: (_, __) => Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: AppColors.herzrot.withValues(
+                          alpha: 0.5 + _pulse.value * 0.5),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.herzrot.withValues(
+                              alpha: 0.6 * _pulse.value),
+                          blurRadius: 10 * _pulse.value,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text('LIVE',
+                    style: AppTypography.label(
+                        size: 10, color: AppColors.herzrotWarm)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    topic,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColors.bronze,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    isHost ? 'Zurück' : 'Beitreten',
+                    style: AppTypography.body(
+                        size: 11,
+                        color: AppColors.voidColor,
+                        weight: FontWeight.w700),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
