@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/dashboard/board/board_create_screen.dart';
+import '../../screens/dashboard/board/board_detail_screen.dart';
+import '../../screens/dashboard/board/board_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
@@ -218,7 +221,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      _placeholder('/dashboard/board', 'Schwarzes Brett', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/board',
+        builder: (_, __) => const BoardScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, __) => const BoardCreateScreen(),
+          ),
+          GoRoute(
+            path: ':boardPostId',
+            builder: (_, s) => BoardDetailScreen(
+              boardPostId: s.pathParameters['boardPostId']!,
+            ),
+          ),
+        ],
+      ),
       _placeholder(
         '/dashboard/mental-support',
         'Mentale Unterstuetzung',
