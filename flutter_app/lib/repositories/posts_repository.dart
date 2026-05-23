@@ -2,13 +2,12 @@ import '../models/post.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
-/// Posts-Repository: nearby (RPC), feed, create, watch.
+/// Posts-Repository: nearby (RPC), search_posts (RPC), feed, get-by-id.
+/// 1:1 zum Web — gleiche RPC-Signaturen.
 class PostsRepository {
   const PostsRepository._();
 
   /// Posts in einem Umkreis um (lat, lng). Nutzt get_nearby_posts RPC.
-  /// Fallback: ohne lat/lng wird die naechste active-Liste ohne Geo-Sort
-  /// gezogen — z.B. wenn User Standort noch nicht freigegeben hat.
   static Future<List<Post>> getNearby({
     double? lat,
     double? lng,
@@ -36,8 +35,74 @@ class PostsRepository {
       }
       return const [];
     } catch (_) {
-      // RPC nicht verfuegbar / Geo-Fehler → fallback.
       return _latestActive(limit: limit);
+    }
+  }
+
+  /// Volltext-/Geo-Suche via `search_posts` RPC — gleicher Aufruf wie auf
+  /// www.mensaena.de (`posts/page.tsx` Z. 130-148). Liefert Posts nach
+  /// Relevanz sortiert; ggf. filterbar via [type] und [radiusKm].
+  static Future<List<Post>> search({
+    String query = '',
+    String? type,
+    double? lat,
+    double? lng,
+    int radiusKm = 50,
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    try {
+      final res = await sb.rpc<dynamic>('search_posts', params: {
+        'p_query': query,
+        'p_type': (type == null || type == 'all') ? null : type,
+        'p_lat': lat,
+        'p_lng': lng,
+        'p_radius_km': radiusKm,
+        'p_limit': limit,
+        'p_offset': offset,
+      });
+      if (res is List) {
+        return res
+            .whereType<Map<String, dynamic>>()
+            .map(Post.fromJson)
+            .toList();
+      }
+      return const [];
+    } catch (_) {
+      return _filterFallback(
+        type: type,
+        query: query,
+        limit: limit,
+        offset: offset,
+      );
+    }
+  }
+
+  /// Fallback wenn RPC nicht verfuegbar — Client-side LIKE/eq.
+  static Future<List<Post>> _filterFallback({
+    String? type,
+    String query = '',
+    int limit = 20,
+    int offset = 0,
+  }) async {
+    try {
+      var q = sb.from('posts').select().eq('status', 'active');
+      if (type != null && type != 'all') {
+        q = q.eq('type', type);
+      }
+      if (query.trim().isNotEmpty) {
+        final esc = query.trim().replaceAll('%', r'\%');
+        q = q.or('title.ilike.%$esc%,description.ilike.%$esc%');
+      }
+      final rows = await q
+          .order('created_at', ascending: false)
+          .range(offset, offset + limit - 1);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(Post.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
     }
   }
 
@@ -61,7 +126,8 @@ class PostsRepository {
   /// Einzelnen Post per ID holen.
   static Future<Post?> getById(String id) async {
     try {
-      final row = await sb.from('posts').select().eq('id', id).maybeSingle();
+      final row =
+          await sb.from('posts').select().eq('id', id).maybeSingle();
       if (row == null) return null;
       return Post.fromJson(row);
     } catch (_) {
@@ -69,3 +135,19 @@ class PostsRepository {
     }
   }
 }
+
+/// Populaere Tags — 1:1 aus `src/app/dashboard/posts/page.tsx` Z. 12.
+const List<String> kPopularPostTags = [
+  '#hilfe',
+  '#notfall',
+  '#tauschen',
+  '#wien',
+  '#graz',
+  '#österreich',
+  '#lebensmittel',
+  '#wohnen',
+  '#transport',
+];
+
+/// Radius-Presets — 1:1 aus Web `posts/page.tsx` Radius-Buttons.
+const List<int> kRadiusPresetsKm = [5, 10, 25, 50, 100];

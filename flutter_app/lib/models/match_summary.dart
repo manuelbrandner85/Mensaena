@@ -19,6 +19,7 @@ class MatchSummary {
     this.conversationId,
     this.seenByOffer = false,
     this.seenByRequest = false,
+    this.scoreBreakdown = const {},
   });
 
   final String id;
@@ -37,6 +38,7 @@ class MatchSummary {
   final String? conversationId;
   final bool seenByOffer;
   final bool seenByRequest;
+  final Map<String, dynamic> scoreBreakdown;
 
   factory MatchSummary.fromRpcRow(Map<String, dynamic> r) {
     return MatchSummary(
@@ -81,6 +83,9 @@ class MatchSummary {
       conversationId: r['conversation_id'] as String?,
       seenByOffer: (r['seen_by_offer'] as bool?) ?? false,
       seenByRequest: (r['seen_by_request'] as bool?) ?? false,
+      scoreBreakdown: (r['score_breakdown'] is Map)
+          ? Map<String, dynamic>.from(r['score_breakdown'] as Map)
+          : const {},
     );
   }
 }

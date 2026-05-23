@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,16 +11,64 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/board_post.dart';
 import '../../../repositories/board_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/module_search_bar.dart';
 
 /// SKILL: mensaena-features
-/// Schwarzes Brett — Cinema-Sticky-Notes Grid in Cinema-Dark.
-class BoardScreen extends ConsumerWidget {
+/// Schwarzes Brett — 1:1 zu `src/app/dashboard/board/page.tsx`.
+/// Search-Bar + Kategorie-Filter (9) + Aktive-Filter-Strip + Grid + FAB.
+class BoardScreen extends ConsumerStatefulWidget {
   const BoardScreen({super.key});
 
+  @override
+  ConsumerState<BoardScreen> createState() => _BoardScreenState();
+}
+
+class _BoardScreenState extends ConsumerState<BoardScreen> {
+  // Mirror von CATEGORY_LABELS + CATEGORY_ICONS aus useBoard.ts.
+  static const List<FilterOption<String>> _categories = [
+    FilterOption(value: 'general', label: '📌 Allgemein'),
+    FilterOption(value: 'gesucht', label: '🔍 Gesucht'),
+    FilterOption(value: 'biete', label: '🎁 Biete'),
+    FilterOption(value: 'event', label: '📅 Event'),
+    FilterOption(value: 'info', label: 'ℹ️ Info'),
+    FilterOption(value: 'warnung', label: '⚠️ Warnung'),
+    FilterOption(value: 'verloren', label: '😢 Verloren'),
+    FilterOption(value: 'fundbuero', label: '🔑 Fundbüro'),
+  ];
+
+  String _search = '';
+  String _category = 'all';
+  Timer? _debounce;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearch(String v) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      setState(() => _search = v);
+    });
+  }
+
+  List<BoardPost> _apply(List<BoardPost> all) {
+    final q = _search.trim().toLowerCase();
+    return all.where((p) {
+      if (_category != 'all' && p.category != _category) return false;
+      if (q.isEmpty) return true;
+      return p.content.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final async = ref.watch(boardPostsProvider);
+    final hasFilters = _search.isNotEmpty || _category != 'all';
+
     return DashboardScaffold(
       title: 'Schwarzes Brett',
       currentRoute: '/dashboard/board',
@@ -30,57 +80,106 @@ class BoardScreen extends ConsumerWidget {
         label: const Text('Anpinnen'),
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.amber,
-          backgroundColor: AppColors.surface,
-          onRefresh: () async => ref.invalidate(boardPostsProvider),
-          child: async.when(
-            loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.amber),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              child: ModuleSearchBar(
+                hintText: 'Pinnwand durchsuchen…',
+                onChanged: _onSearch,
+              ),
             ),
-            error: (e, _) => Center(child: Text('$e', style: AppTypography.caption())),
-            data: (list) {
-              if (list.isEmpty) {
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    const SizedBox(height: 120),
-                    Center(
-                      child: Column(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              child: FilterChipBar<String>(
+                options: _categories,
+                selected: _category == 'all' ? const <String>{} : {_category},
+                onChanged: (s) =>
+                    setState(() => _category = s.isEmpty ? 'all' : s.first),
+              ),
+            ),
+            if (hasFilters)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: ActiveFilterStrip(
+                  chips: [
+                    if (_category != 'all')
+                      ActiveFilterChip(
+                        label: _categories
+                            .firstWhere((c) => c.value == _category)
+                            .label,
+                        onRemove: () => setState(() => _category = 'all'),
+                      ),
+                    if (_search.isNotEmpty)
+                      ActiveFilterChip(
+                        label: '🔍 $_search',
+                        onRemove: () => setState(() => _search = ''),
+                      ),
+                  ],
+                  onClearAll: () => setState(() {
+                    _search = '';
+                    _category = 'all';
+                  }),
+                ),
+              ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.amber,
+                backgroundColor: AppColors.surface,
+                onRefresh: () async => ref.invalidate(boardPostsProvider),
+                child: async.when(
+                  loading: () => const Center(
+                    child:
+                        CircularProgressIndicator(color: AppColors.amber),
+                  ),
+                  error: (e, _) => Center(
+                      child: Text('$e', style: AppTypography.caption())),
+                  data: (all) {
+                    final list = _apply(all);
+                    if (list.isEmpty) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
                         children: [
-                          const Icon(
-                            LucideIcons.stickyNote,
-                            size: 32,
-                            color: AppColors.mute,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Pinnwand ist leer.',
-                            style: AppTypography.body(
-                              size: 14,
-                              color: AppColors.mute,
-                            ),
+                          const SizedBox(height: 60),
+                          EmptyStateCard(
+                            icon: LucideIcons.stickyNote,
+                            title: hasFilters
+                                ? 'Keine Treffer.'
+                                : 'Pinnwand ist leer.',
+                            description: hasFilters
+                                ? 'Andere Filter probieren.'
+                                : 'Sei der/die Erste:r — Plus-Button.',
+                            actionLabel:
+                                hasFilters ? 'Filter zurücksetzen' : null,
+                            onAction: hasFilters
+                                ? () => setState(() {
+                                      _search = '';
+                                      _category = 'all';
+                                    })
+                                : null,
                           ),
                         ],
+                      );
+                    }
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 220,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 0.95,
                       ),
-                    ),
-                  ],
-                );
-              }
-              return GridView.builder(
-                padding: const EdgeInsets.all(12),
-                physics: const AlwaysScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 220,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 0.95,
+                      itemCount: list.length,
+                      itemBuilder: (context, i) => _Note(post: list[i]),
+                    );
+                  },
                 ),
-                itemCount: list.length,
-                itemBuilder: (context, i) => _Note(post: list[i]),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -102,7 +201,6 @@ class _Note extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Cinema-Dark: Pastel-Noten zu gedaempften Versionen umrechnen.
     final base = _bgColors[post.color] ?? const Color(0xFFFEF08A);
     return InkWell(
       onTap: () => context.go('/dashboard/board/${post.id}'),
@@ -122,7 +220,8 @@ class _Note extends StatelessWidget {
                 if (post.pinned)
                   const Padding(
                     padding: EdgeInsets.only(right: 4),
-                    child: Icon(LucideIcons.pin, size: 11, color: AppColors.amber),
+                    child: Icon(LucideIcons.pin,
+                        size: 11, color: AppColors.amber),
                   ),
                 Text(
                   post.category.toUpperCase(),

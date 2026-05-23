@@ -82,6 +82,46 @@ class MatchingRepository {
     }
   }
 
+  /// Match-Praeferenzen laden (oder DEFAULTS).
+  static Future<MatchPreferences> fetchPreferences() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return MatchPreferences.defaults();
+    try {
+      final row = await sb
+          .from('match_preferences')
+          .select()
+          .eq('user_id', uid)
+          .maybeSingle();
+      if (row == null) return MatchPreferences.defaults();
+      return MatchPreferences.fromJson(row);
+    } catch (_) {
+      return MatchPreferences.defaults();
+    }
+  }
+
+  /// Match-Praeferenzen speichern (upsert).
+  static Future<bool> savePreferences(MatchPreferences prefs) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('match_preferences').upsert({
+        'user_id': uid,
+        'matching_enabled': prefs.matchingEnabled,
+        'max_distance_km': prefs.maxDistanceKm,
+        'preferred_categories': prefs.preferredCategories,
+        'excluded_categories': prefs.excludedCategories,
+        'min_trust_score': prefs.minTrustScore,
+        'max_matches_per_day': prefs.maxMatchesPerDay,
+        'notify_on_match': prefs.notifyOnMatch,
+        'auto_accept_threshold': prefs.autoAcceptThreshold,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<void> markSeen(String matchId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
@@ -136,7 +176,87 @@ class MatchResponseResult {
   final String? error;
 }
 
+/// Match-Praeferenzen — 1:1 zu DEFAULT_PREFERENCES aus matching/types.ts.
+class MatchPreferences {
+  const MatchPreferences({
+    required this.matchingEnabled,
+    required this.maxDistanceKm,
+    required this.preferredCategories,
+    required this.excludedCategories,
+    required this.minTrustScore,
+    required this.maxMatchesPerDay,
+    required this.notifyOnMatch,
+    this.autoAcceptThreshold,
+  });
+
+  factory MatchPreferences.defaults() => const MatchPreferences(
+        matchingEnabled: true,
+        maxDistanceKm: 25,
+        preferredCategories: [],
+        excludedCategories: [],
+        minTrustScore: 0,
+        maxMatchesPerDay: 5,
+        notifyOnMatch: true,
+      );
+
+  factory MatchPreferences.fromJson(Map<String, dynamic> j) {
+    return MatchPreferences(
+      matchingEnabled: (j['matching_enabled'] as bool?) ?? true,
+      maxDistanceKm: (j['max_distance_km'] as num?)?.toInt() ?? 25,
+      preferredCategories: (j['preferred_categories'] as List?)
+              ?.whereType<String>()
+              .toList() ??
+          const [],
+      excludedCategories: (j['excluded_categories'] as List?)
+              ?.whereType<String>()
+              .toList() ??
+          const [],
+      minTrustScore: (j['min_trust_score'] as num?)?.toInt() ?? 0,
+      maxMatchesPerDay: (j['max_matches_per_day'] as num?)?.toInt() ?? 5,
+      notifyOnMatch: (j['notify_on_match'] as bool?) ?? true,
+      autoAcceptThreshold:
+          (j['auto_accept_threshold'] as num?)?.toDouble(),
+    );
+  }
+
+  final bool matchingEnabled;
+  final int maxDistanceKm;
+  final List<String> preferredCategories;
+  final List<String> excludedCategories;
+  final int minTrustScore;
+  final int maxMatchesPerDay;
+  final bool notifyOnMatch;
+  final double? autoAcceptThreshold;
+
+  MatchPreferences copyWith({
+    bool? matchingEnabled,
+    int? maxDistanceKm,
+    List<String>? preferredCategories,
+    List<String>? excludedCategories,
+    int? minTrustScore,
+    int? maxMatchesPerDay,
+    bool? notifyOnMatch,
+    double? autoAcceptThreshold,
+  }) {
+    return MatchPreferences(
+      matchingEnabled: matchingEnabled ?? this.matchingEnabled,
+      maxDistanceKm: maxDistanceKm ?? this.maxDistanceKm,
+      preferredCategories: preferredCategories ?? this.preferredCategories,
+      excludedCategories: excludedCategories ?? this.excludedCategories,
+      minTrustScore: minTrustScore ?? this.minTrustScore,
+      maxMatchesPerDay: maxMatchesPerDay ?? this.maxMatchesPerDay,
+      notifyOnMatch: notifyOnMatch ?? this.notifyOnMatch,
+      autoAcceptThreshold: autoAcceptThreshold ?? this.autoAcceptThreshold,
+    );
+  }
+}
+
 final matchingFilterProvider = StateProvider<String>((ref) => 'all');
+
+final matchPreferencesProvider =
+    FutureProvider<MatchPreferences>((ref) async {
+  return MatchingRepository.fetchPreferences();
+});
 
 final matchingListProvider =
     FutureProvider<List<MatchSummary>>((ref) async {
