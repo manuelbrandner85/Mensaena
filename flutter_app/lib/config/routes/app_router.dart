@@ -14,6 +14,7 @@ import '../../screens/dashboard/groups/groups_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_create_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_detail_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_screen.dart';
+import '../../screens/dashboard/matching/matching_screen.dart';
 import '../../screens/dashboard/organizations/organization_detail_screen.dart';
 import '../../screens/dashboard/organizations/organization_suggest_screen.dart';
 import '../../screens/dashboard/organizations/organizations_screen.dart';
@@ -376,7 +377,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         'Mentale Unterstuetzung',
         phase: 'Phase 4',
       ),
-      _placeholder('/dashboard/matching', 'Matching', phase: 'Phase 4'),
+      GoRoute(
+        path: '/dashboard/matching',
+        builder: (_, __) => const MatchingScreen(),
+      ),
       _placeholder('/dashboard/rescuer', 'Rettung', phase: 'Phase 4'),
       GoRoute(
         path: '/dashboard/sharing',
