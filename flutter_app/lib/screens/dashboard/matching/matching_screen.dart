@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../models/match_summary.dart';
 import '../../../repositories/matching_repository.dart';
 import '../../../services/supabase_service.dart';
@@ -60,6 +61,12 @@ class MatchingScreen extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              EditorialModuleHeader(
+                metaIndex: '§ 10',
+                metaCategory: 'Matching',
+                title: 'Smart-Match',
+                subtitle: 'KI-Vorschlaege fuer passende Beitraege',
+              ),
               _header(
                 countsAsync.value ?? const MatchCounts.empty(),
                 onRefresh: () {

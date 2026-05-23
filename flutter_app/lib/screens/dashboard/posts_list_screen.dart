@@ -11,6 +11,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/editorial_module_header.dart';
 import '../../widgets/shared/empty_state_card.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
 import '../../widgets/shared/module_search_bar.dart';
@@ -260,6 +261,18 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // ── Editorial-Header (1:1 Web) ─────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: EditorialModuleHeader(
+                metaIndex: '§ 05',
+                metaCategory: 'Beiträge',
+                title: 'Alle Beiträge',
+                subtitle: _loading
+                    ? 'Lade Beiträge in deiner Nähe…'
+                    : '${_items.length}${_hasMore ? "+" : ""} aktiv in deiner Nähe',
+              ),
+            ),
             // ── Search + Filter-Sheet ────────────────────────────
             Padding(
               padding:

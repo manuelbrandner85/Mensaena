@@ -8,6 +8,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/skill_offer.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/editorial_module_header.dart';
 
 /// SKILL: mensaena-features
 /// Skills-Liste aus skill_offers (eigenes Schema, kein post.type).
@@ -63,7 +64,19 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
         label: const Text('Skill anbieten'),
       ),
       body: SafeArea(
-        child: RefreshIndicator(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: EditorialModuleHeader(
+                metaIndex: '§ 12',
+                metaCategory: 'Skills',
+                title: 'Skill-Tausch',
+                subtitle: 'Talente teilen, voneinander lernen',
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
           color: AppColors.amber,
           backgroundColor: AppColors.surface,
           onRefresh: _refresh,
@@ -107,6 +120,9 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
               );
             },
           ),
+        ),
+            ),
+          ],
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../widgets/shared/editorial_module_header.dart';
 import '../../models/notification_model.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/notification_service.dart';
@@ -44,9 +45,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Action-Bar: Unread + Mark-All-Read ────────────────
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: EditorialModuleHeader(
+                metaIndex: '§ 03',
+                metaCategory: 'Benachrichtigungen',
+                title: 'Aktivitäten',
+                subtitle: unread > 0
+                    ? '$unread ungelesen'
+                    : 'Alle gelesen',
+              ),
+            ),
+            // ── Action-Bar: Mark-All-Read ────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: Row(
                 children: [
                   if (unread > 0)

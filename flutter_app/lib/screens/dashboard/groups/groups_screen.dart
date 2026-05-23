@@ -8,6 +8,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/group.dart';
 import '../../../repositories/groups_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -65,7 +66,16 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: EditorialModuleHeader(
+                metaIndex: '§ 08',
+                metaCategory: 'Gruppen',
+                title: 'Nachbarschafts-Gruppen',
+                subtitle: 'Hobby, Sport, Eltern, Senioren, Umwelt',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: ModuleSearchBar(
                 hintText: 'Gruppen suchen…',
                 onChanged: (v) => setState(() => _search = v),

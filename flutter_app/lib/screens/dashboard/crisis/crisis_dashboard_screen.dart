@@ -10,6 +10,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/crisis.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
@@ -110,7 +111,16 @@ class _CrisisDashboardScreenState
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: EditorialModuleHeader(
+                metaIndex: '§ 09',
+                metaCategory: 'Krisenmodus',
+                title: 'Krise & Hilfe',
+                subtitle: 'Akute Notlagen, Nachbarschafts-Mobilisierung',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: Row(
                 children: [
                   Expanded(

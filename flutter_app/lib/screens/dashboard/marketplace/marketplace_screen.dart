@@ -8,6 +8,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -88,7 +89,16 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: EditorialModuleHeader(
+                metaIndex: '§ 11',
+                metaCategory: 'Marktplatz',
+                title: 'Verschenken, Tauschen, Leihen',
+                subtitle: 'Kein kommerzieller Handel — nur Nachbarschaft',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
