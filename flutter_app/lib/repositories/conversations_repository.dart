@@ -190,6 +190,49 @@ class MessagesRepository {
     }
   }
 
+  /// Eigene Nachricht editieren (nur eigene erlaubt — RLS).
+  static Future<bool> edit({
+    required String messageId,
+    required String newContent,
+  }) async {
+    try {
+      await sb.from('messages').update({
+        'content': newContent,
+        'edited_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', messageId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Eigene Nachricht soft-deleten (RLS auf sender_id = auth.uid()).
+  static Future<bool> deleteMessage(String messageId) async {
+    try {
+      await sb.from('messages').update({
+        'deleted_at': DateTime.now().toUtc().toIso8601String(),
+        'content': '',
+      }).eq('id', messageId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Lookup einer Single-Message (z.B. fuer Reply-to-Quote-Anzeige).
+  static Future<Map<String, dynamic>?> fetchById(String messageId) async {
+    try {
+      final row = await sb
+          .from('messages')
+          .select('id, sender_id, content, created_at')
+          .eq('id', messageId)
+          .maybeSingle();
+      return row;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<void> markRead(String conversationId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
