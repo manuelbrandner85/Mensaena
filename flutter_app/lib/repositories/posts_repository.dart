@@ -61,8 +61,7 @@ class PostsRepository {
   /// Einzelnen Post per ID holen.
   static Future<Post?> getById(String id) async {
     try {
-      final row =
-          await sb.from('posts').select().eq('id', id).maybeSingle();
+      final row = await sb.from('posts').select().eq('id', id).maybeSingle();
       if (row == null) return null;
       return Post.fromJson(row);
     } catch (_) {

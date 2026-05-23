@@ -22,8 +22,11 @@ class ConversationMember {
       id: j['id'] as String? ?? '',
       conversationId: j['conversation_id'] as String? ?? '',
       userId: j['user_id'] as String? ?? '',
-      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
-      lastReadAt: j['last_read_at'] != null ? DateTime.tryParse(j['last_read_at'] as String) : null,
+      createdAt:
+          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+      lastReadAt: j['last_read_at'] != null
+          ? DateTime.tryParse(j['last_read_at'] as String)
+          : null,
       role: j['role'] as String?,
     );
   }

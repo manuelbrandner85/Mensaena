@@ -32,11 +32,16 @@ class BotScheduledMessage {
       title: j['title'] as String? ?? '',
       content: j['content'] as String? ?? '',
       targetAudience: j['target_audience'] as String?,
-      scheduledFor: DateTime.tryParse(j['scheduled_for'] as String? ?? '') ?? DateTime.now(),
-      sentAt: j['sent_at'] != null ? DateTime.tryParse(j['sent_at'] as String) : null,
+      scheduledFor: DateTime.tryParse(j['scheduled_for'] as String? ?? '') ??
+          DateTime.now(),
+      sentAt: j['sent_at'] != null
+          ? DateTime.tryParse(j['sent_at'] as String)
+          : null,
       status: j['status'] as String? ?? '',
       createdBy: j['created_by'] as String?,
-      createdAt: j['created_at'] != null ? DateTime.tryParse(j['created_at'] as String) : null,
+      createdAt: j['created_at'] != null
+          ? DateTime.tryParse(j['created_at'] as String)
+          : null,
     );
   }
 

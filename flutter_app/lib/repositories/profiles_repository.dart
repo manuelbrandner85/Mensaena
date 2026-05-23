@@ -11,11 +11,8 @@ class ProfilesRepository {
   /// Profil per User-ID. null wenn nicht gefunden.
   static Future<Profile?> getById(String userId) async {
     try {
-      final row = await sb
-          .from('profiles')
-          .select()
-          .eq('id', userId)
-          .maybeSingle();
+      final row =
+          await sb.from('profiles').select().eq('id', userId).maybeSingle();
       if (row == null) return null;
       return Profile.fromJson(row);
     } catch (_) {

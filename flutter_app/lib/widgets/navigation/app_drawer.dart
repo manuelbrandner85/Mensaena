@@ -18,62 +18,151 @@ class AppDrawer extends ConsumerWidget {
     _NavGroup(
       label: 'Nachbarschaft',
       items: [
-        _NavLink(icon: LucideIcons.home, label: 'Übersicht', route: '/dashboard'),
-        _NavLink(icon: LucideIcons.map, label: 'Karte', route: '/dashboard/map'),
-        _NavLink(icon: LucideIcons.fileText, label: 'Beiträge', route: '/dashboard/posts'),
-        _NavLink(icon: LucideIcons.users, label: 'Community', route: '/dashboard/community'),
-        _NavLink(icon: LucideIcons.bell, label: 'Benachrichtigungen', route: '/dashboard/notifications'),
+        _NavLink(
+            icon: LucideIcons.home, label: 'Übersicht', route: '/dashboard'),
+        _NavLink(
+            icon: LucideIcons.map, label: 'Karte', route: '/dashboard/map'),
+        _NavLink(
+            icon: LucideIcons.fileText,
+            label: 'Beiträge',
+            route: '/dashboard/posts'),
+        _NavLink(
+            icon: LucideIcons.users,
+            label: 'Community',
+            route: '/dashboard/community'),
+        _NavLink(
+            icon: LucideIcons.bell,
+            label: 'Benachrichtigungen',
+            route: '/dashboard/notifications'),
       ],
     ),
     _NavGroup(
       label: 'Hilfe & Krise',
       items: [
-        _NavLink(icon: LucideIcons.alertTriangle, label: 'Krisenmodus', route: '/dashboard/crisis'),
-        _NavLink(icon: LucideIcons.shieldAlert, label: 'NINA-Warnungen', route: '/dashboard/warnungen'),
-        _NavLink(icon: LucideIcons.helpingHand, label: 'Interaktionen', route: '/dashboard/interactions'),
-        _NavLink(icon: LucideIcons.heart, label: 'Mentale Unterstützung', route: '/dashboard/mental-support'),
-        _NavLink(icon: LucideIcons.lifeBuoy, label: 'Rettung', route: '/dashboard/rescuer'),
+        _NavLink(
+            icon: LucideIcons.alertTriangle,
+            label: 'Krisenmodus',
+            route: '/dashboard/crisis'),
+        _NavLink(
+            icon: LucideIcons.shieldAlert,
+            label: 'NINA-Warnungen',
+            route: '/dashboard/warnungen'),
+        _NavLink(
+            icon: LucideIcons.helpingHand,
+            label: 'Interaktionen',
+            route: '/dashboard/interactions'),
+        _NavLink(
+            icon: LucideIcons.heart,
+            label: 'Mentale Unterstützung',
+            route: '/dashboard/mental-support'),
+        _NavLink(
+            icon: LucideIcons.lifeBuoy,
+            label: 'Rettung',
+            route: '/dashboard/rescuer'),
       ],
     ),
     _NavGroup(
       label: 'Module',
       items: [
-        _NavLink(icon: LucideIcons.bird, label: 'Tiere', route: '/dashboard/animals'),
-        _NavLink(icon: LucideIcons.home, label: 'Wohnen', route: '/dashboard/housing'),
-        _NavLink(icon: LucideIcons.car, label: 'Mobilität', route: '/dashboard/mobility'),
-        _NavLink(icon: LucideIcons.apple, label: 'Ernte', route: '/dashboard/harvest'),
-        _NavLink(icon: LucideIcons.shoppingBag, label: 'Marktplatz', route: '/dashboard/marketplace'),
-        _NavLink(icon: LucideIcons.leaf, label: 'Versorgung', route: '/dashboard/supply'),
-        _NavLink(icon: LucideIcons.share2, label: 'Teilen', route: '/dashboard/sharing'),
+        _NavLink(
+            icon: LucideIcons.bird,
+            label: 'Tiere',
+            route: '/dashboard/animals'),
+        _NavLink(
+            icon: LucideIcons.home,
+            label: 'Wohnen',
+            route: '/dashboard/housing'),
+        _NavLink(
+            icon: LucideIcons.car,
+            label: 'Mobilität',
+            route: '/dashboard/mobility'),
+        _NavLink(
+            icon: LucideIcons.apple,
+            label: 'Ernte',
+            route: '/dashboard/harvest'),
+        _NavLink(
+            icon: LucideIcons.shoppingBag,
+            label: 'Marktplatz',
+            route: '/dashboard/marketplace'),
+        _NavLink(
+            icon: LucideIcons.leaf,
+            label: 'Versorgung',
+            route: '/dashboard/supply'),
+        _NavLink(
+            icon: LucideIcons.share2,
+            label: 'Teilen',
+            route: '/dashboard/sharing'),
       ],
     ),
     _NavGroup(
       label: 'Wissen & Skills',
       items: [
-        _NavLink(icon: LucideIcons.bookOpen, label: 'Wiki', route: '/dashboard/wiki'),
-        _NavLink(icon: LucideIcons.lightbulb, label: 'Wissen', route: '/dashboard/knowledge'),
-        _NavLink(icon: LucideIcons.graduationCap, label: 'Skills', route: '/dashboard/skills'),
-        _NavLink(icon: LucideIcons.briefcase, label: 'Jobs', route: '/dashboard/jobs'),
+        _NavLink(
+            icon: LucideIcons.bookOpen,
+            label: 'Wiki',
+            route: '/dashboard/wiki'),
+        _NavLink(
+            icon: LucideIcons.lightbulb,
+            label: 'Wissen',
+            route: '/dashboard/knowledge'),
+        _NavLink(
+            icon: LucideIcons.graduationCap,
+            label: 'Skills',
+            route: '/dashboard/skills'),
+        _NavLink(
+            icon: LucideIcons.briefcase,
+            label: 'Jobs',
+            route: '/dashboard/jobs'),
       ],
     ),
     _NavGroup(
       label: 'Aktivitäten',
       items: [
-        _NavLink(icon: LucideIcons.calendar, label: 'Events', route: '/dashboard/events'),
-        _NavLink(icon: LucideIcons.calendarDays, label: 'Kalender', route: '/dashboard/calendar'),
-        _NavLink(icon: LucideIcons.users2, label: 'Gruppen', route: '/dashboard/groups'),
-        _NavLink(icon: LucideIcons.pin, label: 'Schwarzes Brett', route: '/dashboard/board'),
-        _NavLink(icon: LucideIcons.building2, label: 'Organisationen', route: '/dashboard/organizations'),
+        _NavLink(
+            icon: LucideIcons.calendar,
+            label: 'Events',
+            route: '/dashboard/events'),
+        _NavLink(
+            icon: LucideIcons.calendarDays,
+            label: 'Kalender',
+            route: '/dashboard/calendar'),
+        _NavLink(
+            icon: LucideIcons.users2,
+            label: 'Gruppen',
+            route: '/dashboard/groups'),
+        _NavLink(
+            icon: LucideIcons.pin,
+            label: 'Schwarzes Brett',
+            route: '/dashboard/board'),
+        _NavLink(
+            icon: LucideIcons.building2,
+            label: 'Organisationen',
+            route: '/dashboard/organizations'),
       ],
     ),
     _NavGroup(
       label: 'Mein Engagement',
       items: [
-        _NavLink(icon: LucideIcons.clock, label: 'Zeitbank', route: '/dashboard/timebank'),
-        _NavLink(icon: LucideIcons.trophy, label: 'Challenges', route: '/dashboard/challenges'),
-        _NavLink(icon: LucideIcons.award, label: 'Badges', route: '/dashboard/badges'),
-        _NavLink(icon: LucideIcons.sparkles, label: 'Matching', route: '/dashboard/matching'),
-        _NavLink(icon: LucideIcons.userPlus, label: 'Einladen', route: '/dashboard/invite'),
+        _NavLink(
+            icon: LucideIcons.clock,
+            label: 'Zeitbank',
+            route: '/dashboard/timebank'),
+        _NavLink(
+            icon: LucideIcons.trophy,
+            label: 'Challenges',
+            route: '/dashboard/challenges'),
+        _NavLink(
+            icon: LucideIcons.award,
+            label: 'Badges',
+            route: '/dashboard/badges'),
+        _NavLink(
+            icon: LucideIcons.sparkles,
+            label: 'Matching',
+            route: '/dashboard/matching'),
+        _NavLink(
+            icon: LucideIcons.userPlus,
+            label: 'Einladen',
+            route: '/dashboard/invite'),
       ],
     ),
   ];

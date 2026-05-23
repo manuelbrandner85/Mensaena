@@ -25,8 +25,12 @@ class ChatBannedUser {
       userId: j['user_id'] as String? ?? '',
       bannedBy: j['banned_by'] as String? ?? '',
       reason: j['reason'] as String?,
-      bannedAt: j['banned_at'] != null ? DateTime.tryParse(j['banned_at'] as String) : null,
-      expiresAt: j['expires_at'] != null ? DateTime.tryParse(j['expires_at'] as String) : null,
+      bannedAt: j['banned_at'] != null
+          ? DateTime.tryParse(j['banned_at'] as String)
+          : null,
+      expiresAt: j['expires_at'] != null
+          ? DateTime.tryParse(j['expires_at'] as String)
+          : null,
       channelId: j['channel_id'] as String?,
     );
   }

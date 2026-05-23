@@ -95,7 +95,8 @@ class NotificationService {
   };
 
   static NotificationStyle styleFor(String category) =>
-      styles[category] ?? const NotificationStyle(
+      styles[category] ??
+      const NotificationStyle(
         icon: LucideIcons.bell,
         color: AppColors.amber,
         label: 'Nachricht',

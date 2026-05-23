@@ -85,8 +85,12 @@ class Crisis {
       isAnonymous: j['is_anonymous'] as bool?,
       isVerified: j['is_verified'] as bool?,
       verifiedBy: j['verified_by'] as String?,
-      verifiedAt: j['verified_at'] != null ? DateTime.tryParse(j['verified_at'] as String) : null,
-      resolvedAt: j['resolved_at'] != null ? DateTime.tryParse(j['resolved_at'] as String) : null,
+      verifiedAt: j['verified_at'] != null
+          ? DateTime.tryParse(j['verified_at'] as String)
+          : null,
+      resolvedAt: j['resolved_at'] != null
+          ? DateTime.tryParse(j['resolved_at'] as String)
+          : null,
       resolvedBy: j['resolved_by'] as String?,
       falseAlarmBy: j['false_alarm_by'] as String?,
       helperCount: (j['helper_count'] as num?)?.toInt(),
@@ -97,8 +101,12 @@ class Crisis {
       neededResources: (j['needed_resources'] is List)
           ? (j['needed_resources'] as List).whereType<String>().toList()
           : const [],
-      createdAt: j['created_at'] != null ? DateTime.tryParse(j['created_at'] as String) : null,
-      updatedAt: j['updated_at'] != null ? DateTime.tryParse(j['updated_at'] as String) : null,
+      createdAt: j['created_at'] != null
+          ? DateTime.tryParse(j['created_at'] as String)
+          : null,
+      updatedAt: j['updated_at'] != null
+          ? DateTime.tryParse(j['updated_at'] as String)
+          : null,
       resolvedImageUrl: j['resolved_image_url'] as String?,
     );
   }

@@ -131,8 +131,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     for (var i = 0; i < _images.length; i++) {
       final file = _images[i];
       final ext = file.path.split('.').last;
-      final path =
-          '$uid/${DateTime.now().millisecondsSinceEpoch}-$i.$ext';
+      final path = '$uid/${DateTime.now().millisecondsSinceEpoch}-$i.$ext';
       try {
         await sb.storage.from('post-images').upload(path, file);
         urls.add(sb.storage.from('post-images').getPublicUrl(path));
@@ -183,35 +182,36 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         .toList();
 
     try {
-      final inserted = await sb.from('posts').insert({
-        'user_id': uid,
-        'type': _type,
-        'title': _titleCtrl.text.trim(),
-        'description': _descCtrl.text.trim().isEmpty
-            ? null
-            : _descCtrl.text.trim(),
-        'location_text': _locationCtrl.text.trim().isEmpty
-            ? null
-            : _locationCtrl.text.trim(),
-        'latitude': _lat,
-        'longitude': _lng,
-        'contact_phone': _phoneCtrl.text.trim().isEmpty
-            ? null
-            : _phoneCtrl.text.trim(),
-        'contact_email': _emailCtrl.text.trim().isEmpty
-            ? null
-            : _emailCtrl.text.trim(),
-        'contact_whatsapp': _whatsappCtrl.text.trim().isEmpty
-            ? null
-            : _whatsappCtrl.text.trim(),
-        'urgency': _urgency,
-        'privacy_phone': _privacyPhone,
-        'privacy_email': _privacyEmail,
-        'is_anonymous': _isAnonymous,
-        'media_urls': urls,
-        'tags': tags,
-        'status': 'active',
-      }).select().single();
+      final inserted = await sb
+          .from('posts')
+          .insert({
+            'user_id': uid,
+            'type': _type,
+            'title': _titleCtrl.text.trim(),
+            'description':
+                _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+            'location_text': _locationCtrl.text.trim().isEmpty
+                ? null
+                : _locationCtrl.text.trim(),
+            'latitude': _lat,
+            'longitude': _lng,
+            'contact_phone':
+                _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+            'contact_email':
+                _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
+            'contact_whatsapp': _whatsappCtrl.text.trim().isEmpty
+                ? null
+                : _whatsappCtrl.text.trim(),
+            'urgency': _urgency,
+            'privacy_phone': _privacyPhone,
+            'privacy_email': _privacyEmail,
+            'is_anonymous': _isAnonymous,
+            'media_urls': urls,
+            'tags': tags,
+            'status': 'active',
+          })
+          .select()
+          .single();
 
       if (!mounted) return;
       final id = inserted['id'] as String;
@@ -258,9 +258,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   if (_step > 0)
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _submitting
-                            ? null
-                            : () => setState(() => _step--),
+                        onPressed:
+                            _submitting ? null : () => setState(() => _step--),
                         child: const Text('Zurück'),
                       ),
                     ),
@@ -397,9 +396,7 @@ class _StepIndicator extends StatelessWidget {
                   height: 22,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: active
-                        ? AppColors.amber
-                        : AppColors.surface,
+                    color: active ? AppColors.amber : AppColors.surface,
                     border: Border.all(
                       color: active ? AppColors.amber : AppColors.line,
                     ),
@@ -580,7 +577,8 @@ class _StepInhalt extends StatelessWidget {
           controller: tagsCtrl,
           style: AppTypography.body(size: 14, color: AppColors.ink),
           inputFormatters: [
-            FilteringTextInputFormatter.deny(RegExp(r'[^a-zA-Z0-9äöüÄÖÜß ,_-]')),
+            FilteringTextInputFormatter.deny(
+                RegExp(r'[^a-zA-Z0-9äöüÄÖÜß ,_-]')),
           ],
           decoration: const InputDecoration(
             labelText: 'Tags (Komma-getrennt)',

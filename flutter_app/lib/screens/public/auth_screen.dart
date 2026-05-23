@@ -81,7 +81,8 @@ class _AuthScreenState extends State<AuthScreen> {
         return;
       }
     } catch (e) {
-      setState(() => _error = e.toString().replaceFirst('AuthApiException: ', ''));
+      setState(
+          () => _error = e.toString().replaceFirst('AuthApiException: ', ''));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -151,9 +152,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: Text(
                         _busy
                             ? '...'
-                            : (isRegister
-                                ? 'Konto erstellen'
-                                : 'Anmelden'),
+                            : (isRegister ? 'Konto erstellen' : 'Anmelden'),
                       ),
                     ),
                     const SizedBox(height: 16),

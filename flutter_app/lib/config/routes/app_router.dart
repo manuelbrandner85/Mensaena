@@ -2,9 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/dashboard_home_screen.dart';
+import '../../screens/dashboard/interactions_screen.dart';
 import '../../screens/dashboard/map_screen.dart';
+import '../../screens/dashboard/messages_screen.dart';
+import '../../screens/dashboard/notifications_screen.dart';
+import '../../screens/dashboard/post_detail_screen.dart';
+import '../../screens/dashboard/posts_list_screen.dart';
+import '../../screens/dashboard/profile_screen.dart';
+import '../../screens/dashboard/settings_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
@@ -75,15 +83,57 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           initialType: s.uri.queryParameters['type'],
         ),
       ),
-      _placeholder('/dashboard/chat', 'Chat', phase: 'Phase 3'),
-      _placeholder('/dashboard/messages', 'Nachrichten', phase: 'Phase 3'),
-      _placeholder('/dashboard/posts', 'Beitraege', phase: 'Phase 3'),
-      _placeholder('/dashboard/profile', 'Profil', phase: 'Phase 3'),
-      _placeholder('/dashboard/settings', 'Einstellungen', phase: 'Phase 3'),
-      _placeholder(
-        '/dashboard/notifications',
-        'Benachrichtigungen',
-        phase: 'Phase 3',
+      GoRoute(
+        path: '/dashboard/chat',
+        builder: (_, s) {
+          final conv = s.uri.queryParameters['conv'];
+          if (conv != null) {
+            return ChatScreen(conversationId: conv);
+          }
+          return const MessagesScreen();
+        },
+      ),
+      GoRoute(
+        path: '/dashboard/messages',
+        builder: (_, __) => const MessagesScreen(),
+        routes: [
+          GoRoute(
+            path: ':conversationId',
+            builder: (_, s) => ChatScreen(
+              conversationId: s.pathParameters['conversationId']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/dashboard/posts',
+        builder: (_, __) => const PostsListScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (_, s) =>
+                PostDetailScreen(postId: s.pathParameters['id']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/dashboard/profile',
+        builder: (_, __) => const ProfileScreen(),
+        routes: [
+          GoRoute(
+            path: ':userId',
+            builder: (_, s) =>
+                ProfileScreen(userId: s.pathParameters['userId']),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/dashboard/settings',
+        builder: (_, __) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/notifications',
+        builder: (_, __) => const NotificationsScreen(),
       ),
       _placeholder('/dashboard/animals', 'Tiere', phase: 'Phase 4'),
       _placeholder('/dashboard/housing', 'Wohnen', phase: 'Phase 4'),
@@ -123,10 +173,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/dashboard/sharing', 'Teilen', phase: 'Phase 4'),
       _placeholder('/dashboard/jobs', 'Jobs', phase: 'Phase 4'),
       _placeholder('/dashboard/invite', 'Einladen', phase: 'Phase 4'),
-      _placeholder(
-        '/dashboard/interactions',
-        'Interaktionen',
-        phase: 'Phase 4',
+      GoRoute(
+        path: '/dashboard/interactions',
+        builder: (_, __) => const InteractionsScreen(),
       ),
 
       // ── Admin ──────────────────────────────────────────────

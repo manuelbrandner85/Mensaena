@@ -49,8 +49,8 @@ class ChatService {
       if (match.start > lastEnd) {
         segments.add(
           MarkdownSegment(
-          text: text.substring(lastEnd, match.start),
-          style: MarkdownStyle.normal,
+            text: text.substring(lastEnd, match.start),
+            style: MarkdownStyle.normal,
           ),
         );
       }
@@ -58,36 +58,36 @@ class ChatService {
       if (raw.startsWith('```')) {
         segments.add(
           MarkdownSegment(
-          text: raw.substring(3, raw.length - 3),
-          style: MarkdownStyle.codeBlock,
+            text: raw.substring(3, raw.length - 3),
+            style: MarkdownStyle.codeBlock,
           ),
         );
       } else if (raw.startsWith('`')) {
         segments.add(
           MarkdownSegment(
-          text: raw.substring(1, raw.length - 1),
-          style: MarkdownStyle.code,
+            text: raw.substring(1, raw.length - 1),
+            style: MarkdownStyle.code,
           ),
         );
       } else if (raw.startsWith('**')) {
         segments.add(
           MarkdownSegment(
-          text: raw.substring(2, raw.length - 2),
-          style: MarkdownStyle.bold,
+            text: raw.substring(2, raw.length - 2),
+            style: MarkdownStyle.bold,
           ),
         );
       } else if (raw.startsWith('~~')) {
         segments.add(
           MarkdownSegment(
-          text: raw.substring(2, raw.length - 2),
-          style: MarkdownStyle.strike,
+            text: raw.substring(2, raw.length - 2),
+            style: MarkdownStyle.strike,
           ),
         );
       } else if (raw.startsWith('*')) {
         segments.add(
           MarkdownSegment(
-          text: raw.substring(1, raw.length - 1),
-          style: MarkdownStyle.italic,
+            text: raw.substring(1, raw.length - 1),
+            style: MarkdownStyle.italic,
           ),
         );
       }

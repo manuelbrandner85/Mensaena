@@ -22,13 +22,13 @@ LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
   - [x] flutter analyze 0 issues, APK 19.0 MB
 - [x] Phase 3.2 – Map-Screen: flutter_map + MarkerClusterLayerWidget + OSM-Tiles + get_nearby_posts RPC + Radius-Slider (5/10/25/50/100km) + GPS-Recenter-FAB + Bottom-Sheet auf Marker-Tap (13 Typ-Emoji + Cinema-Farben)
 - [x] Phase 3.3 – Create-Post 3-Step Wizard: Art (13 Typen Grid) → Inhalt (Titel + Beschreibung + Bilder via image_picker + Tags + Anonym-Toggle + Intent-Classifier-Hint) → Kontakt (Standort mit GPS-Button + Telefon/Email/WhatsApp + Privacy-Toggles + Urgency 0-4). Bild-Upload nach post-images Bucket. check_rate_limit (2/min, 10/h). Direkt-Insert in posts, dann context.go(/dashboard/posts/[id])
-- [ ] Phase 3.4 – Posts-List + Post-Detail (Comments threaded, Votes, Shares, Save, Report)
-- [ ] Phase 3.5 – Chat-Screen (Realtime messages, Reactions, Pins, Reply)
-- [ ] Phase 3.6 – Messages-Screen (Konversations-Liste, Unread-Badge)
-- [ ] Phase 3.7 – Notifications-Screen (Realtime, Kategorie-Tabs)
-- [ ] Phase 3.8 – Profile-Screen (eigenes + fremdes + Trust-Score + Posts)
-- [ ] Phase 3.9 – Settings-Screen (5 Tabs: Account, Privacy, Notifications, Region, Danger)
-- [ ] Phase 3.10 – Interactions-Screen
+- [x] Phase 3.4 – Posts-List (Filter-Chips fuer 11 Typen + 'Alle', FAB→Create) + Post-Detail (Hero mit Bild-Carousel + Typ-Badge + Tags + Stats, Helfen-Button → interactions INSERT, Vote Up/Down toggle, Save toggle, Share → share_plus, Report → Bottom-Sheet mit 6 Gruenden, Comments threaded mit Inline-Input)
+- [x] Phase 3.5 – Chat-Screen (Realtime via Supabase Stream auf messages, gefiltert nach conversation_id, mark_read on open, Send-Button + Enter, Bubble-Layout mit mine/other)
+- [x] Phase 3.6 – Messages-Screen (Konversations-Liste sortiert nach updated_at, Avatar + Title + Zeit, Tap → /messages/[id])
+- [x] Phase 3.7 – Notifications-Screen (notificationsStreamProvider, Tabs: Alle/Ungelesen/Nachrichten/Interaktionen/System, Tap markiert gelesen + navigiert zu .link, Cinema-Farbe + Icon pro Kategorie)
+- [x] Phase 3.8 – Profile-Screen (eigenes oder fremdes via userId, Avatar + Trust-Badge + Stats-Grid Impact/Punkte/Spenden + Bio + Skills-Chips)
+- [x] Phase 3.9 – Settings-Screen (5 TabBar-Tabs: Account/Privatsphaere/Benachrichtigungen/Standort/Konto, Privacy 5 BoolTiles + Visibility-Pills public/neighbors/private, Notif 7 BoolTiles, Region Radius-Slider 1-150km, Danger Logout + DSGVO-Hinweis)
+- [x] Phase 3.10 – Interactions-Screen (aktive Interactions pending/accepted/on_way/arrived, StatusBadge mit Cinema-Farbe)
 - [ ] Phase 4 – Module (Crisis zuerst, dann nach Brief-Reihenfolge)
 - [ ] Phase 5 – Admin-Dashboard
 - [ ] Phase 6 – LiveKit (livekit_client wieder rein wenn flutter_webrtc 3.27-kompatibel ist)

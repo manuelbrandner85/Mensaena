@@ -1,0 +1,197 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
+import '../../config/theme/app_colors.dart';
+import '../../config/theme/app_typography.dart';
+import '../../repositories/conversations_repository.dart';
+import '../../services/supabase_service.dart';
+import '../../widgets/layouts/dashboard_scaffold.dart';
+
+/// SKILL: mensaena-features
+/// Chat-Screen mit Realtime-Messages via Supabase Stream.
+class ChatScreen extends ConsumerStatefulWidget {
+  const ChatScreen({required this.conversationId, super.key});
+
+  final String conversationId;
+
+  @override
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends ConsumerState<ChatScreen> {
+  final _ctrl = TextEditingController();
+  final _scrollCtrl = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    MessagesRepository.markRead(widget.conversationId);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final text = _ctrl.text.trim();
+    if (text.isEmpty) return;
+    _ctrl.clear();
+    final ok = await MessagesRepository.send(
+      conversationId: widget.conversationId,
+      content: text,
+    );
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Nachricht konnte nicht gesendet werden.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final stream = ref.watch(messagesStreamProvider(widget.conversationId));
+    return DashboardScaffold(
+      title: 'Chat',
+      currentRoute: '/dashboard/chat',
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: stream.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.amber),
+                ),
+                error: (e, _) => Center(
+                  child: Text(
+                    'Fehler: $e',
+                    style: AppTypography.caption(),
+                  ),
+                ),
+                data: (msgs) {
+                  if (msgs.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Schreib die erste Nachricht.',
+                        style: AppTypography.caption(),
+                      ),
+                    );
+                  }
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scrollCtrl.hasClients) {
+                      _scrollCtrl.animateTo(
+                        _scrollCtrl.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                      );
+                    }
+                  });
+                  return ListView.builder(
+                    controller: _scrollCtrl,
+                    padding: const EdgeInsets.all(12),
+                    itemCount: msgs.length,
+                    itemBuilder: (context, i) {
+                      final m = msgs[i];
+                      final mine =
+                          m['sender_id'] == SupabaseService.currentUser?.id;
+                      return _MessageBubble(json: m, mine: mine);
+                    },
+                  );
+                },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                color: AppColors.deep,
+                border: Border(top: BorderSide(color: AppColors.line)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _ctrl,
+                      maxLines: null,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _send(),
+                      style: AppTypography.body(size: 14, color: AppColors.ink),
+                      decoration: const InputDecoration(
+                        hintText: 'Nachricht…',
+                        isDense: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _send,
+                    icon: const Icon(LucideIcons.send, color: AppColors.amber),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  const _MessageBubble({required this.json, required this.mine});
+  final Map<String, dynamic> json;
+  final bool mine;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = json['content'] as String? ?? '';
+    final at = DateTime.tryParse(json['created_at'] as String? ?? '') ??
+        DateTime.now();
+    return Align(
+      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.75,
+        ),
+        decoration: BoxDecoration(
+          color:
+              mine ? AppColors.amber.withValues(alpha: 0.2) : AppColors.surface,
+          border: Border.all(
+            color:
+                mine ? AppColors.amber.withValues(alpha: 0.4) : AppColors.line,
+          ),
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(14),
+            topRight: const Radius.circular(14),
+            bottomLeft: Radius.circular(mine ? 14 : 4),
+            bottomRight: Radius.circular(mine ? 4 : 14),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              content,
+              style: AppTypography.body(
+                size: 14,
+                color: AppColors.ink,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              DateFormat('HH:mm').format(at),
+              style: AppTypography.body(size: 10, color: AppColors.mute),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

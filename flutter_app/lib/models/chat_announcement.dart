@@ -33,8 +33,12 @@ class ChatAnnouncement {
       type: j['type'] as String?,
       isActive: j['is_active'] as bool?,
       createdBy: j['created_by'] as String?,
-      createdAt: j['created_at'] != null ? DateTime.tryParse(j['created_at'] as String) : null,
-      expiresAt: j['expires_at'] != null ? DateTime.tryParse(j['expires_at'] as String) : null,
+      createdAt: j['created_at'] != null
+          ? DateTime.tryParse(j['created_at'] as String)
+          : null,
+      expiresAt: j['expires_at'] != null
+          ? DateTime.tryParse(j['expires_at'] as String)
+          : null,
       conversationId: j['conversation_id'] as String?,
       authorId: j['author_id'] as String?,
     );

@@ -20,14 +20,15 @@ class AppTypography {
     double letterSpacing = -0.02,
     double? height,
     List<Shadow>? shadows,
-  }) => GoogleFonts.instrumentSerif(
-    fontSize: size,
-    color: color,
-    fontWeight: weight,
-    letterSpacing: letterSpacing * size,
-    height: height,
-    shadows: shadows,
-  );
+  }) =>
+      GoogleFonts.instrumentSerif(
+        fontSize: size,
+        color: color,
+        fontWeight: weight,
+        letterSpacing: letterSpacing * size,
+        height: height,
+        shadows: shadows,
+      );
 
   /// Display-Backup / Wordmark (Cinema-Display-Variable Font).
   static TextStyle frauncesDisplay({
@@ -36,13 +37,14 @@ class AppTypography {
     FontWeight weight = FontWeight.w500,
     double letterSpacing = -0.025,
     double? height,
-  }) => GoogleFonts.fraunces(
-    fontSize: size,
-    color: color,
-    fontWeight: weight,
-    letterSpacing: letterSpacing * size,
-    height: height,
-  );
+  }) =>
+      GoogleFonts.fraunces(
+        fontSize: size,
+        color: color,
+        fontWeight: weight,
+        letterSpacing: letterSpacing * size,
+        height: height,
+      );
 
   /// Standard-Text (UI, Buttons, Paragraphs).
   static TextStyle body({
@@ -51,13 +53,14 @@ class AppTypography {
     FontWeight weight = FontWeight.w400,
     double height = 1.6,
     double? letterSpacing,
-  }) => GoogleFonts.inter(
-    fontSize: size,
-    color: color,
-    fontWeight: weight,
-    height: height,
-    letterSpacing: letterSpacing,
-  );
+  }) =>
+      GoogleFonts.inter(
+        fontSize: size,
+        color: color,
+        fontWeight: weight,
+        height: height,
+        letterSpacing: letterSpacing,
+      );
 
   /// Zahlen, Stats, Code, Timestamps.
   static TextStyle mono({
@@ -65,12 +68,13 @@ class AppTypography {
     Color color = AppColors.amber,
     FontWeight weight = FontWeight.w500,
     double? letterSpacing,
-  }) => GoogleFonts.jetBrainsMono(
-    fontSize: size,
-    color: color,
-    fontWeight: weight,
-    letterSpacing: letterSpacing,
-  );
+  }) =>
+      GoogleFonts.jetBrainsMono(
+        fontSize: size,
+        color: color,
+        fontWeight: weight,
+        letterSpacing: letterSpacing,
+      );
 
   /// Uppercase Labels (Kategorie-Pillen, Eyebrows, Section-Labels).
   static TextStyle label({
@@ -78,12 +82,13 @@ class AppTypography {
     Color color = AppColors.mute,
     FontWeight weight = FontWeight.w600,
     double letterSpacing = 0.05,
-  }) => GoogleFonts.inter(
-    fontSize: size,
-    color: color,
-    fontWeight: weight,
-    letterSpacing: letterSpacing * size,
-  );
+  }) =>
+      GoogleFonts.inter(
+        fontSize: size,
+        color: color,
+        fontWeight: weight,
+        letterSpacing: letterSpacing * size,
+      );
 
   /// AppBar-Titel (wide-tracked Inter mit subtilem Amber-Glow).
   static TextStyle appBarTitle({Color color = AppColors.ink}) =>

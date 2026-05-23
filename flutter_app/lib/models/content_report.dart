@@ -37,9 +37,13 @@ class ContentReport {
       details: j['details'] as String?,
       status: j['status'] as String? ?? '',
       resolvedBy: j['resolved_by'] as String?,
-      resolvedAt: j['resolved_at'] != null ? DateTime.tryParse(j['resolved_at'] as String) : null,
+      resolvedAt: j['resolved_at'] != null
+          ? DateTime.tryParse(j['resolved_at'] as String)
+          : null,
       resolveNote: j['resolve_note'] as String?,
-      createdAt: j['created_at'] != null ? DateTime.tryParse(j['created_at'] as String) : null,
+      createdAt: j['created_at'] != null
+          ? DateTime.tryParse(j['created_at'] as String)
+          : null,
     );
   }
 

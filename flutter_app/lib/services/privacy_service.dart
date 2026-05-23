@@ -69,6 +69,5 @@ class PrivacyService {
   }
 
   /// Show-Toggle anwenden — gibt den Wert nur zurueck wenn der Toggle erlaubt.
-  static T? maybeShow<T>(T? value, {required bool show}) =>
-      show ? value : null;
+  static T? maybeShow<T>(T? value, {required bool show}) => show ? value : null;
 }

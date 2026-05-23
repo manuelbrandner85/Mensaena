@@ -125,9 +125,7 @@ class _BottomBar extends StatelessWidget {
                         style: AppTypography.body(
                           size: 10,
                           color: isActive ? AppColors.amber : AppColors.mute,
-                          weight: isActive
-                              ? FontWeight.w600
-                              : FontWeight.w400,
+                          weight: isActive ? FontWeight.w600 : FontWeight.w400,
                         ),
                       ),
                     ],

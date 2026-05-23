@@ -147,8 +147,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'de.mensaena.app',
               ),
               MarkerClusterLayerWidget(
@@ -383,9 +382,8 @@ class _RadiusBar extends StatelessWidget {
                             ? AppColors.amber.withValues(alpha: 0.2)
                             : AppColors.surface.withValues(alpha: 0.7),
                         border: Border.all(
-                          color: km == selected
-                              ? AppColors.amber
-                              : AppColors.line,
+                          color:
+                              km == selected ? AppColors.amber : AppColors.line,
                         ),
                         borderRadius: BorderRadius.circular(999),
                       ),

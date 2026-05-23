@@ -27,7 +27,9 @@ class EventAttendee {
       status: j['status'] as String?,
       reminderSet: j['reminder_set'] as bool?,
       reminderMinutes: (j['reminder_minutes'] as num?)?.toInt(),
-      createdAt: j['created_at'] != null ? DateTime.tryParse(j['created_at'] as String) : null,
+      createdAt: j['created_at'] != null
+          ? DateTime.tryParse(j['created_at'] as String)
+          : null,
     );
   }
 

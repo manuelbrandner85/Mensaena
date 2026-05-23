@@ -107,7 +107,9 @@ class FarmListing {
       imageUrl: j['image_url'] as String?,
       sourceUrl: j['source_url'] as String?,
       sourceName: j['source_name'] as String?,
-      importedAt: j['imported_at'] != null ? DateTime.tryParse(j['imported_at'] as String) : null,
+      importedAt: j['imported_at'] != null
+          ? DateTime.tryParse(j['imported_at'] as String)
+          : null,
       lastVerifiedAt: j['last_verified_at'] != null
           ? DateTime.tryParse(j['last_verified_at'] as String)
           : null,
@@ -115,8 +117,10 @@ class FarmListing {
       isVerified: j['is_verified'] as bool?,
       isBio: j['is_bio'] as bool?,
       isSeasonal: j['is_seasonal'] as bool?,
-      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+      updatedAt:
+          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
       mediaUrls: (j['media_urls'] is List)
           ? (j['media_urls'] as List).whereType<String>().toList()
           : const [],

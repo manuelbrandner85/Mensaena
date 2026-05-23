@@ -18,8 +18,12 @@ class InteractionsRepository {
           .from('interactions')
           .select()
           .or('helper_id.eq.$uid,helped_id.eq.$uid')
-          .inFilter('status', ['pending', 'accepted', 'on_way', 'arrived'])
-          .order('updated_at', ascending: false);
+          .inFilter('status', [
+        'pending',
+        'accepted',
+        'on_way',
+        'arrived'
+      ]).order('updated_at', ascending: false);
       return (rows as List)
           .whereType<Map<String, dynamic>>()
           .map(Interaction.fromJson)
