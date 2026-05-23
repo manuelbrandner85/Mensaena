@@ -117,7 +117,13 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                               ],
                             ),
                           ),
-                          if (isMember.asData?.value == true)
+                          if (isMember.asData?.value == true) ...[
+                            IconButton(
+                              onPressed: () => _openInviteDialog(context, g.id),
+                              tooltip: 'Mitglied einladen',
+                              icon: const Icon(LucideIcons.userPlus,
+                                  size: 18, color: AppColors.amber),
+                            ),
                             OutlinedButton.icon(
                               onPressed: () async {
                                 await GroupsRepository.leave(g.id);
@@ -127,7 +133,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                               },
                               icon: const Icon(LucideIcons.logOut, size: 14),
                               label: const Text('Verlassen'),
-                            )
+                            ),
+                          ]
                           else
                             ElevatedButton.icon(
                               onPressed: () async {
@@ -245,6 +252,91 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openInviteDialog(BuildContext ctx, String groupId) async {
+    final emailCtrl = TextEditingController();
+    bool sending = false;
+    await showDialog<void>(
+      context: ctx,
+      builder: (dlg) => StatefulBuilder(
+        builder: (dlg, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('Mitglied einladen',
+              style:
+                  AppTypography.display(size: 18, color: AppColors.ink)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Eingabe der E-Mail-Adresse — die Einladung erscheint im Konto des Nachbarn:in.',
+                style: AppTypography.caption(),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: emailCtrl,
+                keyboardType: TextInputType.emailAddress,
+                autofocus: true,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: const InputDecoration(
+                  hintText: 'nachbarin@beispiel.at',
+                  prefixIcon: Icon(LucideIcons.mail,
+                      size: 16, color: AppColors.mute),
+                  isDense: true,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed:
+                  sending ? null : () => Navigator.pop(dlg),
+              child: const Text('Abbrechen'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.amber,
+                foregroundColor: AppColors.voidColor,
+              ),
+              onPressed: sending
+                  ? null
+                  : () async {
+                      final email = emailCtrl.text.trim();
+                      if (email.isEmpty || !email.contains('@')) return;
+                      setLocal(() => sending = true);
+                      final ok = await GroupsRepository.inviteByEmail(
+                          groupId, email);
+                      if (!dlg.mounted) return;
+                      Navigator.pop(dlg);
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          backgroundColor: AppColors.surface,
+                          content: Text(
+                            ok
+                                ? 'Einladung gesendet an $email'
+                                : 'Einladung fehlgeschlagen.',
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.ink),
+                          ),
+                        ),
+                      );
+                    },
+              child: sending
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.voidColor,
+                      ),
+                    )
+                  : const Text('Einladen'),
+            ),
+          ],
         ),
       ),
     );

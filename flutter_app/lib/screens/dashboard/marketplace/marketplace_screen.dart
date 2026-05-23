@@ -262,7 +262,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   }
 }
 
-class _Tile extends StatelessWidget {
+class _Tile extends ConsumerWidget {
   const _Tile({required this.item});
   final MarketplaceListing item;
 
@@ -274,10 +274,12 @@ class _Tile extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final color = _typeColors[item.listingType] ?? AppColors.amber;
     final firstImage =
         item.images.isNotEmpty ? item.images.first : item.thumbnailUrl;
+    final savedAsync = ref.watch(savedListingIdsProvider);
+    final isSaved = savedAsync.value?.contains(item.id) ?? false;
     return InkWell(
       onTap: () => context.go('/dashboard/marketplace/${item.id}'),
       borderRadius: BorderRadius.circular(12),
@@ -291,29 +293,61 @@ class _Tile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(11),
-                ),
-                child: firstImage != null
-                    ? Image.network(
-                        firstImage,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: AppColors.elevated,
-                          child: const Center(
-                            child: Icon(LucideIcons.imageOff,
-                                color: AppColors.mute),
-                          ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(11),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: firstImage != null
+                          ? Image.network(
+                              firstImage,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: AppColors.elevated,
+                                child: const Center(
+                                  child: Icon(LucideIcons.imageOff,
+                                      color: AppColors.mute),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              color: AppColors.elevated,
+                              alignment: Alignment.center,
+                              child: const Icon(LucideIcons.package,
+                                  color: AppColors.mute, size: 32),
+                            ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await MarketplaceFavorites.toggle(item.id);
+                        ref.invalidate(savedListingIdsProvider);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.voidColor.withValues(alpha: 0.7),
+                          shape: BoxShape.circle,
                         ),
-                      )
-                    : Container(
-                        color: AppColors.elevated,
-                        alignment: Alignment.center,
-                        child: const Icon(LucideIcons.package,
-                            color: AppColors.mute, size: 32),
+                        child: Icon(
+                          isSaved
+                              ? LucideIcons.heart
+                              : LucideIcons.bookmark,
+                          size: 14,
+                          color: isSaved
+                              ? AppColors.amber
+                              : AppColors.inkSoft,
+                        ),
                       ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(

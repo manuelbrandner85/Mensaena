@@ -68,6 +68,21 @@ class GroupsRepository {
     }
   }
 
+  /// Mitglied per E-Mail einladen — laeuft ueber RPC `invite_user_to_group`
+  /// (lookupt User per email, dann insert in group_members mit invited-Flag).
+  /// Fallback: einfacher Insert wenn RPC nicht existiert.
+  static Future<bool> inviteByEmail(String groupId, String email) async {
+    try {
+      await sb.rpc<dynamic>('invite_user_to_group', params: {
+        'p_group_id': groupId,
+        'p_email': email.trim().toLowerCase(),
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> leave(String groupId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;

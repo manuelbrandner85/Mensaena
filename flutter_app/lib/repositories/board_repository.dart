@@ -150,6 +150,37 @@ class BoardRepository {
       return false;
     }
   }
+
+  /// Inhalt eines eigenen Board-Posts aktualisieren.
+  static Future<bool> update({
+    required String id,
+    String? content,
+    String? category,
+    String? color,
+  }) async {
+    try {
+      final patch = <String, dynamic>{
+        if (content != null) 'content': content,
+        if (category != null) 'category': category,
+        if (color != null) 'color': color,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      };
+      await sb.from('board_posts').update(patch).eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Eigenen Board-Post loeschen (RLS prueft Eigentuemer).
+  static Future<bool> delete(String id) async {
+    try {
+      await sb.from('board_posts').delete().eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 final boardPostsProvider =

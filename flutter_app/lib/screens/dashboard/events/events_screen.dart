@@ -11,10 +11,11 @@ import '../../../repositories/events_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/view_toggle.dart';
 
-enum _EventView { list, calendar }
+enum _EventView { list, calendar, map }
 
 /// SKILL: mensaena-features
 /// Events — 1:1-Spiegel von `src/app/dashboard/events/page.tsx`.
@@ -97,6 +98,10 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                           value: _EventView.calendar,
                           label: 'Kalender',
                           icon: LucideIcons.calendar),
+                      ViewToggleOption(
+                          value: _EventView.map,
+                          label: 'Karte',
+                          icon: LucideIcons.mapPin),
                     ],
                   ),
                 ],
@@ -156,6 +161,24 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                         month: _calendarMonth,
                         onMonthChange: (m) =>
                             setState(() => _calendarMonth = m),
+                      );
+                    }
+                    if (_view == _EventView.map) {
+                      return LocationMapView(
+                        markers: [
+                          for (final e in list)
+                            MapMarkerData(
+                              id: e.id,
+                              lat: e.latitude,
+                              lng: e.longitude,
+                              color: AppColors.amber,
+                              title: e.title,
+                              subtitle: e.locationName,
+                              icon: LucideIcons.calendar,
+                            ),
+                        ],
+                        onMarkerTap: (m) =>
+                            context.go('/dashboard/events/${m.id}'),
                       );
                     }
                     if (list.isEmpty) {

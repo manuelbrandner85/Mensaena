@@ -90,3 +90,59 @@ final marketplaceListingsProvider =
 final marketplaceDetailProvider =
     FutureProvider.family<MarketplaceListing?, String>(
         (ref, id) => MarketplaceRepository.getById(id));
+
+/// Favoriten-Helpers — `saved_listings` Pendant zu Web.
+class MarketplaceFavorites {
+  const MarketplaceFavorites._();
+
+  /// Toggle: Listing speichern oder Save entfernen.
+  static Future<bool> toggle(String listingId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final existing = await sb
+          .from('saved_listings')
+          .select('id')
+          .eq('listing_id', listingId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      if (existing != null) {
+        await sb
+            .from('saved_listings')
+            .delete()
+            .eq('id', existing['id'] as Object);
+        return false;
+      }
+      await sb.from('saved_listings').insert({
+        'listing_id': listingId,
+        'user_id': uid,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// IDs aller gespeicherten Listings des aktuellen Users.
+  static Future<Set<String>> getSavedIds() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const {};
+    try {
+      final rows = await sb
+          .from('saved_listings')
+          .select('listing_id')
+          .eq('user_id', uid);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map((r) => r['listing_id'] as String)
+          .toSet();
+    } catch (_) {
+      return const {};
+    }
+  }
+}
+
+final savedListingIdsProvider =
+    FutureProvider<Set<String>>((ref) async {
+  return MarketplaceFavorites.getSavedIds();
+});

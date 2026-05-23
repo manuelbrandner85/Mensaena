@@ -12,7 +12,9 @@ import '../../../repositories/crisis_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
+import '../../../widgets/shared/view_toggle.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Krisen-Dashboard — 1:1-Spiegel von `src/app/dashboard/crisis/page.tsx`.
@@ -54,9 +56,23 @@ class _CrisisDashboardScreenState
   String _search = '';
   String? _category;
   String? _urgency;
+  _CrisisView _view = _CrisisView.list;
 
   bool get _hasFilters =>
       _search.isNotEmpty || _category != null || _urgency != null;
+
+  static Color _urgencyColor(String u) {
+    switch (u) {
+      case 'critical':
+        return AppColors.herzrot;
+      case 'high':
+        return const Color(0xFFFB923C);
+      case 'medium':
+        return AppColors.amber;
+      default:
+        return AppColors.teal;
+    }
+  }
 
   void _reset() {
     setState(() {
@@ -95,9 +111,30 @@ class _CrisisDashboardScreenState
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
-              child: ModuleSearchBar(
-                hintText: 'Krisen durchsuchen…',
-                onChanged: (v) => setState(() => _search = v),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ModuleSearchBar(
+                      hintText: 'Krisen durchsuchen…',
+                      onChanged: (v) => setState(() => _search = v),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ViewToggle<_CrisisView>(
+                    value: _view,
+                    onChanged: (v) => setState(() => _view = v),
+                    options: const [
+                      ViewToggleOption(
+                          value: _CrisisView.list,
+                          label: 'Liste',
+                          icon: LucideIcons.list),
+                      ViewToggleOption(
+                          value: _CrisisView.map,
+                          label: 'Karte',
+                          icon: LucideIcons.mapPin),
+                    ],
+                  ),
+                ],
               ),
             ),
             // ── Kategorie ──────────────────────────────
@@ -165,6 +202,24 @@ class _CrisisDashboardScreenState
                   ),
                   data: (all) {
                     final list = _apply(all);
+                    if (_view == _CrisisView.map) {
+                      return LocationMapView(
+                        markers: [
+                          for (final c in list)
+                            MapMarkerData(
+                              id: c.id,
+                              lat: c.latitude,
+                              lng: c.longitude,
+                              color: _urgencyColor(c.urgency),
+                              title: c.title,
+                              subtitle: c.locationText,
+                              icon: LucideIcons.alertTriangle,
+                            ),
+                        ],
+                        onMarkerTap: (m) =>
+                            context.go('/dashboard/crisis/${m.id}'),
+                      );
+                    }
                     return ListView(
                       padding: const EdgeInsets.all(16),
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -665,3 +720,6 @@ class _CrisisTile extends StatelessWidget {
     );
   }
 }
+
+
+enum _CrisisView { list, map }
