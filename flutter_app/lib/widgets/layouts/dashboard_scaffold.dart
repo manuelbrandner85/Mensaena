@@ -10,9 +10,9 @@ import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
-/// Dashboard-Shell: Top-AppBar mit Bell, Drawer mit Module-Navigation,
-/// Bottom-NavBar mit 5 Items (Home, Karte, Erstellen, Chat, Mehr).
-/// Wird von jedem Dashboard-Screen via DashboardScaffold(body: ...) umschlossen.
+/// Dashboard-Shell — Web-Parity (src/components/navigation/BottomNav.tsx).
+/// BottomNav-Reihenfolge: Home / Karte / Erstellen (zentral, primaer) /
+/// Nachrichten / Benachrichtigungen.
 class DashboardScaffold extends ConsumerWidget {
   const DashboardScaffold({
     required this.body,
@@ -27,34 +27,6 @@ class DashboardScaffold extends ConsumerWidget {
   final String currentRoute;
   final Widget? fab;
 
-  static const List<_NavItem> _bottomItems = [
-    _NavItem(
-      icon: LucideIcons.home,
-      label: 'Home',
-      route: '/dashboard',
-    ),
-    _NavItem(
-      icon: LucideIcons.map,
-      label: 'Karte',
-      route: '/dashboard/map',
-    ),
-    _NavItem(
-      icon: LucideIcons.plus,
-      label: 'Erstellen',
-      route: '/dashboard/create',
-    ),
-    _NavItem(
-      icon: LucideIcons.messageSquare,
-      label: 'Chat',
-      route: '/dashboard/chat',
-    ),
-    _NavItem(
-      icon: LucideIcons.menu,
-      label: 'Mehr',
-      route: '_more',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(unreadNotificationCountProvider);
@@ -68,27 +40,20 @@ class DashboardScaffold extends ConsumerWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      bottomNavigationBar: _BottomBar(
-        items: _bottomItems,
-        currentRoute: currentRoute,
-      ),
+      bottomNavigationBar: _BottomNav(currentRoute: currentRoute),
       floatingActionButton: fab,
       body: body,
     );
   }
 }
 
-class _BottomBar extends StatelessWidget {
-  const _BottomBar({
-    required this.items,
-    required this.currentRoute,
-  });
-
-  final List<_NavItem> items;
+class _BottomNav extends ConsumerWidget {
+  const _BottomNav({required this.currentRoute});
   final String currentRoute;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadNotif = ref.watch(unreadNotificationCountProvider);
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.deep,
@@ -96,57 +61,148 @@ class _BottomBar extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: items.map((item) {
-            final isActive = currentRoute == item.route;
-            return Expanded(
-              child: InkWell(
-                onTap: () {
-                  if (item.route == '_more') {
-                    Scaffold.of(context).openDrawer();
-                  } else {
-                    context.go(item.route);
-                  }
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        item.icon,
-                        size: 22,
-                        color: isActive ? AppColors.amber : AppColors.mute,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.layoutDashboard,
+                  label: 'Home',
+                  route: '/dashboard',
+                  active: currentRoute == '/dashboard',
+                ),
+              ),
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.map,
+                  label: 'Karte',
+                  route: '/dashboard/map',
+                  active: currentRoute == '/dashboard/map',
+                ),
+              ),
+              // Zentraler Primary-FAB-Style fuer Erstellen.
+              SizedBox(
+                width: 64,
+                child: GestureDetector(
+                  onTap: () => context.go('/dashboard/create'),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [AppColors.amber, AppColors.amberWarm],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item.label,
-                        style: AppTypography.body(
-                          size: 10,
-                          color: isActive ? AppColors.amber : AppColors.mute,
-                          weight: isActive ? FontWeight.w600 : FontWeight.w400,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.amberGlow,
+                          blurRadius: 16,
+                          spreadRadius: -2,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: const Icon(
+                      LucideIcons.plusCircle,
+                      color: AppColors.voidColor,
+                      size: 24,
+                    ),
                   ),
                 ),
               ),
-            );
-          }).toList(),
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.messageCircle,
+                  label: 'Chat',
+                  route: '/dashboard/messages',
+                  active: currentRoute.startsWith('/dashboard/messages') ||
+                      currentRoute.startsWith('/dashboard/chat'),
+                ),
+              ),
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.bell,
+                  label: 'Bell',
+                  route: '/dashboard/notifications',
+                  active: currentRoute == '/dashboard/notifications',
+                  badge: unreadNotif,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _NavItem {
-  const _NavItem({
+class _BottomItem extends StatelessWidget {
+  const _BottomItem({
     required this.icon,
     required this.label,
     required this.route,
+    required this.active,
+    this.badge = 0,
   });
+
   final IconData icon;
   final String label;
   final String route;
+  final bool active;
+  final int badge;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? AppColors.amber : AppColors.mute;
+    return InkWell(
+      onTap: () => context.go(route),
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 22, color: color),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: AppTypography.body(
+                  size: 10,
+                  color: color,
+                  weight: active ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+          if (badge > 0)
+            Positioned(
+              top: 6,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: const BoxDecoration(
+                  color: AppColors.herzrot,
+                  borderRadius: BorderRadius.all(Radius.circular(999)),
+                ),
+                constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                child: Text(
+                  badge > 99 ? '99+' : '$badge',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.body(
+                    size: 9,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }

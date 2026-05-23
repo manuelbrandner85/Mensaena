@@ -117,9 +117,8 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                     _waitingInstaller
                         ? LucideIcons.checkCircle2
                         : LucideIcons.download,
-                    color: _waitingInstaller
-                        ? AppColors.leben
-                        : AppColors.amber,
+                    color:
+                        _waitingInstaller ? AppColors.leben : AppColors.amber,
                     size: 36,
                   ),
                 ),
@@ -242,8 +241,7 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                               : 'Update herunterladen',
                     ),
                     style: ElevatedButton.styleFrom(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                   ),
                 ),
@@ -283,9 +281,7 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
       }
       if (lines.isNotEmpty) {
         final joined = lines.join('\n');
-        return joined.length > 400
-            ? '${joined.substring(0, 397)}…'
-            : joined;
+        return joined.length > 400 ? '${joined.substring(0, 397)}…' : joined;
       }
     }
     // Fallback: notes/summary/de (vor Workflow-Format-Change moeglich).

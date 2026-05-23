@@ -9,280 +9,271 @@ import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 
 /// SKILL: flutter-setup-declarative-routing + mensaena-design
-/// Module-Navigation per Drawer. Spiegelt die Web-Sidebar-Struktur:
-/// 6 Hauptgruppen + Admin (wenn role).
+/// 1:1-Spiegel der Web-Sidebar (src/components/navigation/navigationConfig.ts).
+/// 7 Gruppen + Admin in identischer Reihenfolge + Labels:
+///   1. Kommunikation       — Nachrichten / Community-Chat / Matching
+///   2. Helfen & Finden     — Karte / Beiträge / Organisationen / Interaktionen / Tiere
+///   3. Notfall & Sicherheit — Krisenmodus (crisis-variant) / Mentale Unterstützung
+///   4. Gemeinschaft        — Gruppen / Events / Pinnwand / Challenges
+///   5. Teilen & Ressourcen — Teilen / Zeitbank / Marktplatz / Versorgung / Ernte /
+///                            Rettung / Wohnen / Mobilität / Jobs
+///   6. Wissen & Skills     — Wiki / Bildung / Skills
+///   7. Mein Bereich        — Profil / Einladen (highlight) / Badges / Kalender /
+///                            Einstellungen
+///   Admin (only role=admin|moderator) — Admin Dashboard
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
+  static const _NavLink _home = _NavLink(
+    icon: LucideIcons.layoutDashboard,
+    label: 'Übersicht',
+    route: '/dashboard',
+  );
+  static const _NavLink _notifications = _NavLink(
+    icon: LucideIcons.bell,
+    label: 'Benachrichtigungen',
+    route: '/dashboard/notifications',
+  );
+
   static const List<_NavGroup> _groups = [
     _NavGroup(
-      label: 'Nachbarschaft',
+      label: 'Kommunikation',
+      headIcon: LucideIcons.messageCircle,
       items: [
         _NavLink(
-            icon: LucideIcons.home, label: 'Übersicht', route: '/dashboard'),
+          icon: LucideIcons.mail,
+          label: 'Nachrichten',
+          route: '/dashboard/messages',
+        ),
         _NavLink(
-            icon: LucideIcons.map, label: 'Karte', route: '/dashboard/map'),
+          icon: LucideIcons.messageCircle,
+          label: 'Community-Chat',
+          route: '/dashboard/chat',
+        ),
         _NavLink(
-            icon: LucideIcons.fileText,
-            label: 'Beiträge',
-            route: '/dashboard/posts'),
-        _NavLink(
-            icon: LucideIcons.users,
-            label: 'Community',
-            route: '/dashboard/community'),
-        _NavLink(
-            icon: LucideIcons.bell,
-            label: 'Benachrichtigungen',
-            route: '/dashboard/notifications'),
+          icon: LucideIcons.sparkles,
+          label: 'Matching',
+          route: '/dashboard/matching',
+        ),
       ],
     ),
     _NavGroup(
-      label: 'Hilfe & Krise',
+      label: 'Helfen & Finden',
+      headIcon: LucideIcons.heart,
       items: [
         _NavLink(
-            icon: LucideIcons.alertTriangle,
-            label: 'Krisenmodus',
-            route: '/dashboard/crisis'),
+          icon: LucideIcons.map,
+          label: 'Karte',
+          route: '/dashboard/map',
+        ),
         _NavLink(
-            icon: LucideIcons.shieldAlert,
-            label: 'NINA-Warnungen',
-            route: '/dashboard/warnungen'),
+          icon: LucideIcons.fileText,
+          label: 'Beiträge',
+          route: '/dashboard/posts',
+        ),
         _NavLink(
-            icon: LucideIcons.helpingHand,
-            label: 'Interaktionen',
-            route: '/dashboard/interactions'),
+          icon: LucideIcons.building2,
+          label: 'Organisationen',
+          route: '/dashboard/organizations',
+        ),
         _NavLink(
-            icon: LucideIcons.heart,
-            label: 'Mentale Unterstützung',
-            route: '/dashboard/mental-support'),
+          icon: LucideIcons.helpingHand,
+          label: 'Interaktionen',
+          route: '/dashboard/interactions',
+        ),
         _NavLink(
-            icon: LucideIcons.lifeBuoy,
-            label: 'Rettung',
-            route: '/dashboard/rescuer'),
+          icon: LucideIcons.dog,
+          label: 'Tiere',
+          route: '/dashboard/animals',
+        ),
       ],
     ),
     _NavGroup(
-      label: 'Module',
+      label: 'Notfall & Sicherheit',
+      headIcon: LucideIcons.alertTriangle,
       items: [
         _NavLink(
-            icon: LucideIcons.bird,
-            label: 'Tiere',
-            route: '/dashboard/animals'),
+          icon: LucideIcons.alertTriangle,
+          label: 'Krisenmodus',
+          route: '/dashboard/crisis',
+          variant: _NavVariant.crisis,
+        ),
         _NavLink(
-            icon: LucideIcons.home,
-            label: 'Wohnen',
-            route: '/dashboard/housing'),
+          icon: LucideIcons.brain,
+          label: 'Mentale Unterstützung',
+          route: '/dashboard/mental-support',
+        ),
+      ],
+    ),
+    _NavGroup(
+      label: 'Gemeinschaft',
+      headIcon: LucideIcons.users,
+      items: [
         _NavLink(
-            icon: LucideIcons.car,
-            label: 'Mobilität',
-            route: '/dashboard/mobility'),
+          icon: LucideIcons.users2,
+          label: 'Gruppen',
+          route: '/dashboard/groups',
+        ),
         _NavLink(
-            icon: LucideIcons.apple,
-            label: 'Ernte',
-            route: '/dashboard/harvest'),
+          icon: LucideIcons.calendar,
+          label: 'Events',
+          route: '/dashboard/events',
+        ),
         _NavLink(
-            icon: LucideIcons.shoppingBag,
-            label: 'Marktplatz',
-            route: '/dashboard/marketplace'),
+          icon: LucideIcons.stickyNote,
+          label: 'Pinnwand',
+          route: '/dashboard/board',
+        ),
         _NavLink(
-            icon: LucideIcons.leaf,
-            label: 'Versorgung',
-            route: '/dashboard/supply'),
+          icon: LucideIcons.trophy,
+          label: 'Challenges',
+          route: '/dashboard/challenges',
+        ),
+      ],
+    ),
+    _NavGroup(
+      label: 'Teilen & Ressourcen',
+      headIcon: LucideIcons.repeat,
+      items: [
         _NavLink(
-            icon: LucideIcons.share2,
-            label: 'Teilen',
-            route: '/dashboard/sharing'),
+          icon: LucideIcons.repeat,
+          label: 'Teilen',
+          route: '/dashboard/sharing',
+        ),
+        _NavLink(
+          icon: LucideIcons.clock,
+          label: 'Zeitbank',
+          route: '/dashboard/timebank',
+        ),
+        _NavLink(
+          icon: LucideIcons.store,
+          label: 'Marktplatz',
+          route: '/dashboard/marketplace',
+        ),
+        _NavLink(
+          icon: LucideIcons.package,
+          label: 'Versorgung',
+          route: '/dashboard/supply',
+        ),
+        _NavLink(
+          icon: LucideIcons.wheat,
+          label: 'Ernte',
+          route: '/dashboard/harvest',
+        ),
+        _NavLink(
+          icon: LucideIcons.lifeBuoy,
+          label: 'Rettung',
+          route: '/dashboard/rescuer',
+        ),
+        _NavLink(
+          icon: LucideIcons.home,
+          label: 'Wohnen',
+          route: '/dashboard/housing',
+        ),
+        _NavLink(
+          icon: LucideIcons.car,
+          label: 'Mobilität',
+          route: '/dashboard/mobility',
+        ),
+        _NavLink(
+          icon: LucideIcons.briefcase,
+          label: 'Jobs',
+          route: '/dashboard/jobs',
+        ),
       ],
     ),
     _NavGroup(
       label: 'Wissen & Skills',
+      headIcon: LucideIcons.bookOpen,
       items: [
         _NavLink(
-            icon: LucideIcons.bookOpen,
-            label: 'Wiki',
-            route: '/dashboard/wiki'),
+          icon: LucideIcons.bookOpen,
+          label: 'Wiki',
+          route: '/dashboard/wiki',
+        ),
         _NavLink(
-            icon: LucideIcons.lightbulb,
-            label: 'Wissen',
-            route: '/dashboard/knowledge'),
+          icon: LucideIcons.graduationCap,
+          label: 'Bildung',
+          route: '/dashboard/knowledge',
+        ),
         _NavLink(
-            icon: LucideIcons.graduationCap,
-            label: 'Skills',
-            route: '/dashboard/skills'),
-        _NavLink(
-            icon: LucideIcons.briefcase,
-            label: 'Jobs',
-            route: '/dashboard/jobs'),
+          icon: LucideIcons.wrench,
+          label: 'Skills',
+          route: '/dashboard/skills',
+        ),
       ],
     ),
     _NavGroup(
-      label: 'Aktivitäten',
+      label: 'Mein Bereich',
+      headIcon: LucideIcons.userCircle,
       items: [
         _NavLink(
-            icon: LucideIcons.calendar,
-            label: 'Events',
-            route: '/dashboard/events'),
+          icon: LucideIcons.user,
+          label: 'Profil',
+          route: '/dashboard/profile',
+        ),
         _NavLink(
-            icon: LucideIcons.calendarDays,
-            label: 'Kalender',
-            route: '/dashboard/calendar'),
+          icon: LucideIcons.share2,
+          label: 'Nachbarn einladen',
+          route: '/dashboard/invite',
+          variant: _NavVariant.highlight,
+        ),
         _NavLink(
-            icon: LucideIcons.users2,
-            label: 'Gruppen',
-            route: '/dashboard/groups'),
+          icon: LucideIcons.award,
+          label: 'Badges',
+          route: '/dashboard/badges',
+        ),
         _NavLink(
-            icon: LucideIcons.pin,
-            label: 'Schwarzes Brett',
-            route: '/dashboard/board'),
+          icon: LucideIcons.calendar,
+          label: 'Kalender',
+          route: '/dashboard/calendar',
+        ),
         _NavLink(
-            icon: LucideIcons.building2,
-            label: 'Organisationen',
-            route: '/dashboard/organizations'),
-      ],
-    ),
-    _NavGroup(
-      label: 'Mein Engagement',
-      items: [
-        _NavLink(
-            icon: LucideIcons.clock,
-            label: 'Zeitbank',
-            route: '/dashboard/timebank'),
-        _NavLink(
-            icon: LucideIcons.trophy,
-            label: 'Challenges',
-            route: '/dashboard/challenges'),
-        _NavLink(
-            icon: LucideIcons.award,
-            label: 'Badges',
-            route: '/dashboard/badges'),
-        _NavLink(
-            icon: LucideIcons.sparkles,
-            label: 'Matching',
-            route: '/dashboard/matching'),
-        _NavLink(
-            icon: LucideIcons.userPlus,
-            label: 'Einladen',
-            route: '/dashboard/invite'),
+          icon: LucideIcons.settings,
+          label: 'Einstellungen',
+          route: '/dashboard/settings',
+        ),
       ],
     ),
   ];
 
+  static const _NavGroup _adminGroup = _NavGroup(
+    label: 'Admin',
+    headIcon: LucideIcons.shieldCheck,
+    items: [
+      _NavLink(
+        icon: LucideIcons.shieldCheck,
+        label: 'Admin-Dashboard',
+        route: '/dashboard/admin',
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(myProfileProvider).asData?.value;
-    final isAdmin = profile?.role == 'admin' || profile?.role == 'moderator';
+    final role = profile?.role ?? 'user';
+    final isAdmin = role == 'admin' || role == 'moderator';
 
     return Drawer(
       backgroundColor: AppColors.deep,
       child: SafeArea(
         child: Column(
           children: [
-            // ── Header: Avatar + Name ────────────────────────────────
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: AppColors.line)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: AppColors.surface,
-                    backgroundImage: profile?.avatarUrl != null
-                        ? NetworkImage(profile!.avatarUrl!)
-                        : null,
-                    child: profile?.avatarUrl == null
-                        ? Text(
-                            (profile?.name ?? '?')
-                                .substring(0, 1)
-                                .toUpperCase(),
-                            style: AppTypography.display(
-                              size: 22,
-                              color: AppColors.amber,
-                            ),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    profile?.displayName ?? profile?.name ?? 'Nachbar:in',
-                    style: AppTypography.display(
-                      size: 18,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                  if (profile?.location != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        profile!.location!,
-                        style: AppTypography.body(
-                          size: 12,
-                          color: AppColors.mute,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            // ── Nav-Groups ──────────────────────────────────────────
+            _ProfileHeader(profile: profile),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
-                  for (final g in _groups) _GroupTile(group: g),
-                  if (isAdmin)
-                    const _GroupTile(
-                      group: _NavGroup(
-                        label: 'Admin',
-                        items: [
-                          _NavLink(
-                            icon: LucideIcons.shield,
-                            label: 'Admin-Dashboard',
-                            route: '/dashboard/admin',
-                          ),
-                        ],
-                      ),
-                    ),
-                  const Divider(color: AppColors.line, height: 24),
-                  ListTile(
-                    leading: const Icon(
-                      LucideIcons.user,
-                      color: AppColors.inkSoft,
-                      size: 18,
-                    ),
-                    title: Text(
-                      'Profil',
-                      style: AppTypography.body(
-                        size: 14,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go('/dashboard/profile');
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      LucideIcons.settings,
-                      color: AppColors.inkSoft,
-                      size: 18,
-                    ),
-                    title: Text(
-                      'Einstellungen',
-                      style: AppTypography.body(
-                        size: 14,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      context.go('/dashboard/settings');
-                    },
-                  ),
+                  const _LinkTile(link: _home),
+                  const _LinkTile(link: _notifications),
+                  const Divider(color: AppColors.line, height: 16),
+                  for (final g in _groups) _GroupSection(group: g),
+                  if (isAdmin) ...[
+                    const Divider(color: AppColors.line, height: 16),
+                    const _GroupSection(group: _adminGroup, initiallyOpen: true),
+                  ],
+                  const Divider(color: AppColors.line, height: 16),
                   ListTile(
                     leading: const Icon(
                       LucideIcons.logOut,
@@ -311,16 +302,75 @@ class AppDrawer extends ConsumerWidget {
   }
 }
 
-class _GroupTile extends StatefulWidget {
-  const _GroupTile({required this.group});
-  final _NavGroup group;
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.profile});
+  final dynamic profile;
 
   @override
-  State<_GroupTile> createState() => _GroupTileState();
+  Widget build(BuildContext context) {
+    final avatarUrl = profile?.avatarUrl as String?;
+    final displayName =
+        profile?.displayName as String? ?? profile?.name as String?;
+    final location = profile?.location as String?;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: AppColors.line)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: AppColors.surface,
+            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+            child: avatarUrl == null
+                ? Text(
+                    (displayName ?? '?').substring(0, 1).toUpperCase(),
+                    style: AppTypography.display(
+                      size: 22,
+                      color: AppColors.amber,
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            displayName ?? 'Nachbar:in',
+            style: AppTypography.display(
+              size: 18,
+              color: AppColors.ink,
+            ),
+          ),
+          if (location != null && location.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                location,
+                style: AppTypography.body(
+                  size: 12,
+                  color: AppColors.mute,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
-class _GroupTileState extends State<_GroupTile> {
-  bool _open = false;
+class _GroupSection extends StatefulWidget {
+  const _GroupSection({required this.group, this.initiallyOpen = false});
+  final _NavGroup group;
+  final bool initiallyOpen;
+
+  @override
+  State<_GroupSection> createState() => _GroupSectionState();
+}
+
+class _GroupSectionState extends State<_GroupSection> {
+  late bool _open = widget.initiallyOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -330,9 +380,17 @@ class _GroupTileState extends State<_GroupTile> {
         InkWell(
           onTap: () => setState(() => _open = !_open),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 16, 12),
+            padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
             child: Row(
               children: [
+                if (widget.group.headIcon != null) ...[
+                  Icon(
+                    widget.group.headIcon,
+                    size: 13,
+                    color: AppColors.mute,
+                  ),
+                  const SizedBox(width: 6),
+                ],
                 Expanded(
                   child: Text(
                     widget.group.label,
@@ -352,10 +410,7 @@ class _GroupTileState extends State<_GroupTile> {
             ),
           ),
         ),
-        if (_open)
-          ...widget.group.items.map(
-            (link) => _LinkTile(link: link),
-          ),
+        if (_open) ...widget.group.items.map((l) => _LinkTile(link: l)),
       ],
     );
   }
@@ -367,17 +422,30 @@ class _LinkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = switch (link.variant) {
+      _NavVariant.crisis => AppColors.herzrot,
+      _NavVariant.highlight => AppColors.amber,
+      _ => AppColors.inkSoft,
+    };
+    final textColor = switch (link.variant) {
+      _NavVariant.crisis => AppColors.herzrotWarm,
+      _NavVariant.highlight => AppColors.amber,
+      _ => AppColors.ink,
+    };
     return ListTile(
       dense: true,
       leading: Padding(
         padding: const EdgeInsets.only(left: 8),
-        child: Icon(link.icon, size: 18, color: AppColors.inkSoft),
+        child: Icon(link.icon, size: 18, color: color),
       ),
       title: Text(
         link.label,
         style: AppTypography.body(
           size: 14,
-          color: AppColors.ink,
+          color: textColor,
+          weight: link.variant == _NavVariant.highlight
+              ? FontWeight.w600
+              : FontWeight.w400,
         ),
       ),
       onTap: () {
@@ -388,9 +456,16 @@ class _LinkTile extends StatelessWidget {
   }
 }
 
+enum _NavVariant { defaultVariant, crisis, highlight }
+
 class _NavGroup {
-  const _NavGroup({required this.label, required this.items});
+  const _NavGroup({
+    required this.label,
+    required this.items,
+    this.headIcon,
+  });
   final String label;
+  final IconData? headIcon;
   final List<_NavLink> items;
 }
 
@@ -399,8 +474,10 @@ class _NavLink {
     required this.icon,
     required this.label,
     required this.route,
+    this.variant = _NavVariant.defaultVariant,
   });
   final IconData icon;
   final String label;
   final String route;
+  final _NavVariant variant;
 }
