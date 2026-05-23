@@ -102,6 +102,33 @@ class AdminRepository {
       return false;
     }
   }
+
+  /// Users-Lookup via admin_list_users RPC. Liefert ALLE auth.users
+  /// (auch unconfirmed + ohne Profile-Row). 1:1 zum Web Admin-UsersTab.
+  /// Bei Fehler/keine Admin-Rolle → Fallback auf profiles-Lookup.
+  static Future<List<Map<String, dynamic>>> listUsersViaRpc({
+    String? search,
+    bool onlyUnconfirmed = false,
+    bool onlyMissingProfile = false,
+    int limit = 100,
+  }) async {
+    try {
+      final res = await sb.rpc<dynamic>('admin_list_users', params: {
+        'p_search': (search ?? '').isEmpty ? null : search,
+        'p_only_unconfirmed': onlyUnconfirmed,
+        'p_only_missing_profile': onlyMissingProfile,
+        'p_limit': limit,
+        'p_offset': 0,
+      });
+      if (res is List) {
+        return res.whereType<Map<String, dynamic>>().toList();
+      }
+      return const [];
+    } catch (_) {
+      // Fallback fuer den Fall dass Migration noch nicht angewendet wurde
+      return recent('profiles', orderBy: 'created_at');
+    }
+  }
 }
 
 class AdminStats {

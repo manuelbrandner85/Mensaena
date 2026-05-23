@@ -263,6 +263,13 @@ jobs:
       - name: Pub get
         run: flutter pub get
 
+      # ── flutter_webrtc Flutter-3.27 Patch ──
+      # flutter_webrtc 0.13.x/0.14.x verwendet `onSurfaceCleanup`
+      # statt `onSurfaceDestroyed` in der TextureRegistry-Callback.
+      # Build schlaegt sonst fehl. Patch ist idempotent.
+      - name: Patch flutter_webrtc for Flutter 3.27
+        run: bash scripts/patch_flutter_webrtc.sh
+
       # ── Firebase Cloud Messaging: google-services.json aus GitHub-Secret ──
       # GOOGLE_SERVICES_JSON enthält den kompletten JSON-Inhalt der vom
       # Firebase-Console heruntergeladenen Datei. Wird in android/app/

@@ -157,6 +157,12 @@ jobs:
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
+      # ── flutter_webrtc Flutter-3.27-Patch ──
+      # Idempotenter Java-Patch: onSurfaceCleanup → onSurfaceDestroyed
+      - name: Patch flutter_webrtc
+        if: steps.status.outputs.skip != 'true'
+        run: bash scripts/patch_flutter_webrtc.sh
+
       # ── Patch (kein hybrider release-or-patch) ──────────────────────────
       # Weltenbibliothek-Pattern: Wenn das Release noch nicht existiert,
       # läuft separate `shorebird_release.yml` (workflow_dispatch one-shot).

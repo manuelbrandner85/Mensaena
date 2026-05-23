@@ -34,6 +34,7 @@ import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
 import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
 import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
 import '../../screens/dashboard/dashboard_home_screen.dart';
+import '../../screens/dashboard/knowledge/knowledge_create_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_screen.dart';
 import '../../screens/dashboard/module/module_posts_screen.dart';
 import '../../screens/dashboard/skills/skills_screen.dart';
@@ -222,10 +223,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.community),
       ),
+      // Wissen/Wiki nutzt eigenes Schema `knowledge_articles`
+      // (kein posts-Entry) — daher dedicated Create-Screen.
       GoRoute(
         path: '/dashboard/knowledge/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
-            config: ModuleCreateConfigs.knowledge),
+        builder: (_, __) => const KnowledgeCreateScreen(
+            routePath: '/dashboard/knowledge'),
+      ),
+      GoRoute(
+        path: '/dashboard/wiki/create',
+        builder: (_, __) => const KnowledgeCreateScreen(
+            routePath: '/dashboard/wiki'),
       ),
       GoRoute(
         path: '/dashboard/skills/create',

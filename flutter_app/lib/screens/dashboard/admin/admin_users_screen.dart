@@ -31,7 +31,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
 
   void _load() {
     setState(() {
-      _future = AdminRepository.recent('profiles', orderBy: 'created_at');
+      _future = AdminRepository.listUsersViaRpc(search: _search);
     });
   }
 

@@ -8,42 +8,66 @@ import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 
 /// SKILL: mensaena-architektur
-/// Bootstrap-Sequenz:
-///   1. Supabase initialisieren (Session aus Secure-Storage restoren)
-///   2. Firebase / FCM initialisieren (Token + Permission Prompt)
-///   3. Bei Login automatisch FCM-Token in fcm_tokens registrieren
-///   4. Bei Logout Token deaktivieren
-///   5. MaterialApp.router starten
+/// Bootstrap — Performance-optimiert:
+///   1. KRITISCH (await): Supabase initialisieren (Session-Restore +
+///      Anon-Key). Ohne das kann die App keine Daten holen.
+///   2. Background-Handler MUSS vor runApp() registriert werden, sonst
+///      gehen kalt-gestartete Pushes verloren (Firebase-Doku).
+///   3. Alles andere (Firebase, FCM-Token, Auth-Listener) wird NICHT
+///      awaitet — laeuft im Background nach erstem Frame. Das verhindert
+///      "App baut sich nicht auf"-Verhalten wenn Firebase langsam ist.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 1. Supabase Session-Restore (kritisch, blockierend, ~100-300ms)
   await SupabaseService.init();
-  // Background-Handler MUSS vor Firebase-Init registriert werden,
-  // sonst gehen die data-only Messages verloren wenn App killed ist.
+
+  // 2. Background-Handler-Registration (top-level @pragma function)
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
-  // Firebase async — kann ggf. fail-silently bei fehlender Konfiguration
-  // (Dev-Builds ohne google-services.json). Push laeuft dann lokal nicht,
-  // Production-Build mit Secret hat das google-services.json.
-  await PushNotificationService.init();
-  // Wenn bereits eingeloggt → Token sofort registrieren
+
+  // 3. App SOFORT rendern — kein await auf Firebase/FCM/Listener!
+  runApp(const ProviderScope(child: MensaenaApp()));
+
+  // 4. Nach erstem Frame: alles andere im Background initialisieren.
+  // Wenn Firebase nicht konfiguriert ist (Dev-Build) faellt das
+  // fail-silently. Push laeuft dann lokal nicht, App laeuft trotzdem.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _initBackgroundServices();
+  });
+}
+
+/// Alles was die UI nicht braucht laeuft hier im Background.
+Future<void> _initBackgroundServices() async {
+  try {
+    await PushNotificationService.init();
+  } catch (_) {}
+
+  // FCM-Token bei aktuellem Login direkt registrieren
   if (SupabaseService.isLoggedIn) {
-    PushNotificationService.registerToken();
+    unawaited(PushNotificationService.registerToken());
   }
-  // Bei jedem Login/Logout: Token-Lifecycle managen
+
+  // Auth-State-Listener: bei Login/Logout Token-Lifecycle managen
   sb.auth.onAuthStateChange.listen((event) {
     switch (event.event) {
       case AuthChangeEvent.signedIn:
-        PushNotificationService.registerToken();
+        unawaited(PushNotificationService.registerToken());
         break;
       case AuthChangeEvent.signedOut:
-        PushNotificationService.unregisterToken();
+        unawaited(PushNotificationService.unregisterToken());
         break;
       default:
         break;
     }
   });
+
   // Token-Refresh-Stream: bei neuer Token-ID neu registrieren
   PushNotificationService.onTokenRefresh.listen((_) {
-    PushNotificationService.registerToken();
+    unawaited(PushNotificationService.registerToken());
   });
-  runApp(const ProviderScope(child: MensaenaApp()));
+}
+
+/// Fire-and-forget helper.
+void unawaited(Future<void> f) {
+  f.catchError((_) {});
 }

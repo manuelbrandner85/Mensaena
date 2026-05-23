@@ -121,6 +121,10 @@ jobs:
           echo "── shorebird releases list --platforms=android (vor Release) ──"
           shorebird releases list --platforms=android 2>&1 || true
 
+      # flutter_webrtc Flutter-3.27-Patch (idempotent)
+      - name: Patch flutter_webrtc
+        run: bash scripts/patch_flutter_webrtc.sh
+
       - name: 🐦 Initiales Release veröffentlichen
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
