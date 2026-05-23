@@ -9,14 +9,56 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
 import '../../../repositories/events_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/module_search_bar.dart';
+import '../../../widgets/shared/view_toggle.dart';
+
+enum _EventView { list, calendar }
 
 /// SKILL: mensaena-features
-/// Events-Liste: kommende Events sortiert nach Startdatum.
-class EventsScreen extends ConsumerWidget {
+/// Events — 1:1-Spiegel von `src/app/dashboard/events/page.tsx`.
+/// View-Toggle (Liste / Kalender), Kategorie-Filter, Such-Bar,
+/// Aktive-Filter-Strip, Empty-State mit Reset.
+class EventsScreen extends ConsumerStatefulWidget {
   const EventsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<EventsScreen> createState() => _EventsScreenState();
+}
+
+class _EventsScreenState extends ConsumerState<EventsScreen> {
+  static const List<FilterOption<String>> _categories = [
+    FilterOption(value: 'community', label: '🏘️ Community'),
+    FilterOption(value: 'helping', label: '💚 Helfen'),
+    FilterOption(value: 'sharing', label: '🔄 Teilen'),
+    FilterOption(value: 'learning', label: '📚 Lernen'),
+    FilterOption(value: 'celebration', label: '🎉 Feiern'),
+    FilterOption(value: 'sport', label: '⚽ Sport'),
+    FilterOption(value: 'crisis', label: '🚨 Krise'),
+    FilterOption(value: 'other', label: '❓ Sonstiges'),
+  ];
+
+  _EventView _view = _EventView.list;
+  String? _category;
+  String _search = '';
+  DateTime _calendarMonth =
+      DateTime(DateTime.now().year, DateTime.now().month);
+
+  bool get _hasFilters => _category != null || _search.isNotEmpty;
+
+  List<EventItem> _apply(List<EventItem> all) {
+    final q = _search.trim().toLowerCase();
+    return all.where((e) {
+      if (_category != null && e.category != _category) return false;
+      if (q.isEmpty) return true;
+      return e.title.toLowerCase().contains(q) ||
+          (e.locationName ?? '').toLowerCase().contains(q);
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final async = ref.watch(upcomingEventsProvider);
     return DashboardScaffold(
       title: 'Events',
@@ -29,53 +71,302 @@ class EventsScreen extends ConsumerWidget {
         label: const Text('Event erstellen'),
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.amber,
-          backgroundColor: AppColors.surface,
-          onRefresh: () async => ref.invalidate(upcomingEventsProvider),
-          child: async.when(
-            loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.amber),
+        child: Column(
+          children: [
+            // ── Header: View-Toggle + Refresh ──────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ModuleSearchBar(
+                      hintText: 'Events suchen…',
+                      onChanged: (v) => setState(() => _search = v),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ViewToggle<_EventView>(
+                    value: _view,
+                    onChanged: (v) => setState(() => _view = v),
+                    options: const [
+                      ViewToggleOption(
+                          value: _EventView.list,
+                          label: 'Liste',
+                          icon: LucideIcons.list),
+                      ViewToggleOption(
+                          value: _EventView.calendar,
+                          label: 'Kalender',
+                          icon: LucideIcons.calendar),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            error: (e, _) => Center(
-              child: Text('$e', style: AppTypography.caption()),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              child: FilterChipBar<String>(
+                options: _categories,
+                selected: _category == null ? const <String>{} : {_category!},
+                onChanged: (s) =>
+                    setState(() => _category = s.isEmpty ? null : s.first),
+              ),
             ),
-            data: (list) {
-              if (list.isEmpty) {
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    const SizedBox(height: 120),
-                    Center(
-                      child: Column(
+            if (_hasFilters)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: ActiveFilterStrip(
+                  chips: [
+                    if (_category != null)
+                      ActiveFilterChip(
+                        label: _categories
+                            .firstWhere((c) => c.value == _category)
+                            .label,
+                        onRemove: () => setState(() => _category = null),
+                      ),
+                    if (_search.isNotEmpty)
+                      ActiveFilterChip(
+                        label: '🔍 $_search',
+                        onRemove: () => setState(() => _search = ''),
+                      ),
+                  ],
+                  onClearAll: () => setState(() {
+                    _category = null;
+                    _search = '';
+                  }),
+                ),
+              ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.amber,
+                backgroundColor: AppColors.surface,
+                onRefresh: () async =>
+                    ref.invalidate(upcomingEventsProvider),
+                child: async.when(
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(
+                        color: AppColors.amber),
+                  ),
+                  error: (e, _) => Center(
+                      child: Text('$e', style: AppTypography.caption())),
+                  data: (all) {
+                    final list = _apply(all);
+                    if (_view == _EventView.calendar) {
+                      return _CalendarView(
+                        events: list,
+                        month: _calendarMonth,
+                        onMonthChange: (m) =>
+                            setState(() => _calendarMonth = m),
+                      );
+                    }
+                    if (list.isEmpty) {
+                      return ListView(
+                        physics:
+                            const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
                         children: [
-                          const Icon(
-                            LucideIcons.calendar,
-                            size: 32,
-                            color: AppColors.mute,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Keine kommenden Events.',
-                            style: AppTypography.body(
-                              size: 14,
-                              color: AppColors.mute,
-                            ),
+                          const SizedBox(height: 60),
+                          EmptyStateCard(
+                            icon: LucideIcons.calendar,
+                            title: _hasFilters
+                                ? 'Keine Treffer.'
+                                : 'Keine kommenden Events.',
+                            description: _hasFilters
+                                ? 'Andere Filter probieren.'
+                                : 'Sei der/die Erste:r — Plus-Button.',
+                            actionLabel: _hasFilters
+                                ? 'Filter zurücksetzen'
+                                : null,
+                            onAction: _hasFilters
+                                ? () => setState(() {
+                                      _category = null;
+                                      _search = '';
+                                    })
+                                : null,
                           ),
                         ],
-                      ),
-                    ),
-                  ],
-                );
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: list.length,
-                itemBuilder: (context, i) => _EventTile(event: list[i]),
-              );
-            },
-          ),
+                      );
+                    }
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: list.length,
+                      itemBuilder: (context, i) =>
+                          _EventTile(event: list[i]),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Calendar-View (Monatsansicht mit Event-Dots)
+// ──────────────────────────────────────────────────────────────
+class _CalendarView extends StatelessWidget {
+  const _CalendarView({
+    required this.events,
+    required this.month,
+    required this.onMonthChange,
+  });
+
+  final List<EventItem> events;
+  final DateTime month;
+  final ValueChanged<DateTime> onMonthChange;
+
+  @override
+  Widget build(BuildContext context) {
+    final df = DateFormat('MMMM yyyy', 'de');
+    final firstDay = DateTime(month.year, month.month, 1);
+    final daysInMonth =
+        DateTime(month.year, month.month + 1, 0).day;
+    // Mo=1...So=7 → Spalten-Index (0-basiert) für Wochenstart Mo.
+    final firstWeekday = firstDay.weekday - 1;
+    final eventsByDay = <int, List<EventItem>>{};
+    for (final e in events) {
+      if (e.startDate.year == month.year &&
+          e.startDate.month == month.month) {
+        eventsByDay.putIfAbsent(e.startDate.day, () => []).add(e);
+      }
+    }
+
+    final today = DateTime.now();
+    final isCurrentMonth =
+        today.year == month.year && today.month == month.month;
+
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        // ── Monats-Header ──
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(LucideIcons.chevronLeft,
+                  size: 18, color: AppColors.inkSoft),
+              onPressed: () => onMonthChange(
+                  DateTime(month.year, month.month - 1)),
+            ),
+            Expanded(
+              child: Text(
+                df.format(month),
+                textAlign: TextAlign.center,
+                style: AppTypography.display(
+                    size: 18, color: AppColors.ink),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(LucideIcons.chevronRight,
+                  size: 18, color: AppColors.inkSoft),
+              onPressed: () => onMonthChange(
+                  DateTime(month.year, month.month + 1)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // ── Wochentags-Header ──
+        Row(
+          children: [
+            for (final d in const ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'])
+              Expanded(
+                child: Text(d,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.label(size: 9)),
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        // ── Grid: 6 Reihen × 7 Spalten ──
+        for (var row = 0; row < 6; row++)
+          Row(
+            children: [
+              for (var col = 0; col < 7; col++)
+                Expanded(
+                  child: _CalendarCell(
+                    day: row * 7 + col - firstWeekday + 1,
+                    daysInMonth: daysInMonth,
+                    events: eventsByDay,
+                    isToday: isCurrentMonth &&
+                        today.day == row * 7 + col - firstWeekday + 1,
+                  ),
+                ),
+            ],
+          ),
+        const SizedBox(height: 12),
+        // ── Liste der Events im Monat ──
+        if (events.isNotEmpty) ...[
+          Text('Events im Monat',
+              style: AppTypography.label(size: 10)),
+          const SizedBox(height: 6),
+          for (final e in events) _EventTile(event: e),
+        ],
+      ],
+    );
+  }
+}
+
+class _CalendarCell extends StatelessWidget {
+  const _CalendarCell({
+    required this.day,
+    required this.daysInMonth,
+    required this.events,
+    required this.isToday,
+  });
+
+  final int day;
+  final int daysInMonth;
+  final Map<int, List<EventItem>> events;
+  final bool isToday;
+
+  @override
+  Widget build(BuildContext context) {
+    if (day < 1 || day > daysInMonth) {
+      return const SizedBox(height: 44);
+    }
+    final list = events[day] ?? const [];
+    return Container(
+      height: 44,
+      margin: const EdgeInsets.all(1),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: isToday
+            ? AppColors.amber.withValues(alpha: 0.16)
+            : list.isNotEmpty
+                ? AppColors.elevated
+                : null,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('$day',
+              style: AppTypography.mono(
+                size: 12,
+                color: isToday ? AppColors.amber : AppColors.ink,
+                weight: isToday ? FontWeight.w800 : FontWeight.w500,
+              )),
+          if (list.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var i = 0; i < list.length && i < 3; i++) ...[
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: AppColors.amber,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                ],
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

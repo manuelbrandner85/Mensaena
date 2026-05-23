@@ -8,6 +8,9 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/module_search_bar.dart';
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
@@ -18,14 +21,55 @@ class MarketplaceScreen extends ConsumerStatefulWidget {
 
 class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   String _type = 'all';
+  String _search = '';
+  String? _category;
+  String? _condition;
 
-  static const List<({String value, String label, String emoji})> _types = [
-    (value: 'all', label: 'Alle', emoji: '🛒'),
-    (value: 'verschenken', label: 'Verschenken', emoji: '🎁'),
-    (value: 'tauschen', label: 'Tauschen', emoji: '🔄'),
-    (value: 'verkaufen', label: 'Günstig', emoji: '💶'),
-    (value: 'leihen', label: 'Leihen', emoji: '📅'),
+  static const List<FilterOption<String>> _types = [
+    FilterOption(value: 'verschenken', label: '🎁 Verschenken'),
+    FilterOption(value: 'tauschen', label: '🔄 Tauschen'),
+    FilterOption(value: 'verkaufen', label: '💶 Günstig'),
+    FilterOption(value: 'leihen', label: '📅 Leihen'),
   ];
+
+  // Kategorien aus Web `marketplace/page.tsx` CATEGORY_OPTIONS.
+  static const List<FilterOption<String>> _categories = [
+    FilterOption(value: 'electronics', label: '📱 Elektronik'),
+    FilterOption(value: 'clothing', label: '👕 Kleidung'),
+    FilterOption(value: 'furniture', label: '🪑 Möbel'),
+    FilterOption(value: 'kitchen', label: '🍴 Küche'),
+    FilterOption(value: 'kids', label: '🧸 Kinder'),
+    FilterOption(value: 'books', label: '📚 Bücher'),
+    FilterOption(value: 'sports', label: '⚽ Sport'),
+    FilterOption(value: 'garden', label: '🌱 Garten'),
+    FilterOption(value: 'tools', label: '🔧 Werkzeug'),
+    FilterOption(value: 'other', label: '❓ Sonstiges'),
+  ];
+
+  // Zustand aus Web CONDITION_OPTIONS.
+  static const List<FilterOption<String>> _conditions = [
+    FilterOption(value: 'new', label: 'Neu'),
+    FilterOption(value: 'like_new', label: 'Wie neu'),
+    FilterOption(value: 'good', label: 'Gut'),
+    FilterOption(value: 'used', label: 'Gebraucht'),
+  ];
+
+  bool get _hasFilters =>
+      _search.isNotEmpty ||
+      _category != null ||
+      _condition != null ||
+      _type != 'all';
+
+  List<MarketplaceListing> _apply(List<MarketplaceListing> all) {
+    final q = _search.trim().toLowerCase();
+    return all.where((m) {
+      if (_category != null && m.category != _category) return false;
+      if (_condition != null && m.condition != _condition) return false;
+      if (q.isEmpty) return true;
+      return m.title.toLowerCase().contains(q) ||
+          m.description.toLowerCase().contains(q);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +88,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.amber.withValues(alpha: 0.08),
-                  border:
-                      Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppColors.amber.withValues(alpha: 0.3)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -71,53 +116,83 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                scrollDirection: Axis.horizontal,
-                itemCount: _types.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 6),
-                itemBuilder: (context, i) {
-                  final t = _types[i];
-                  final active = t.value == _type;
-                  return GestureDetector(
-                    onTap: () => setState(() => _type = t.value),
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: active
-                            ? AppColors.amber.withValues(alpha: 0.2)
-                            : AppColors.surface.withValues(alpha: 0.5),
-                        border: Border.all(
-                          color: active ? AppColors.amber : AppColors.line,
-                        ),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(t.emoji, style: const TextStyle(fontSize: 13)),
-                          const SizedBox(width: 4),
-                          Text(
-                            t.label,
-                            style: AppTypography.label(
-                              size: 10,
-                              color: active
-                                  ? AppColors.amber
-                                  : AppColors.inkSoft,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              child: ModuleSearchBar(
+                hintText: 'Inserate durchsuchen…',
+                onChanged: (v) => setState(() => _search = v),
               ),
             ),
-            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              child: FilterChipBar<String>(
+                options: _types,
+                selected: _type == 'all' ? const <String>{} : {_type},
+                onChanged: (s) =>
+                    setState(() => _type = s.isEmpty ? 'all' : s.first),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              child: FilterChipBar<String>(
+                options: _categories,
+                selected: _category == null ? const <String>{} : {_category!},
+                allLabel: 'Alle Kategorien',
+                onChanged: (s) =>
+                    setState(() => _category = s.isEmpty ? null : s.first),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              child: FilterChipBar<String>(
+                options: _conditions,
+                selected:
+                    _condition == null ? const <String>{} : {_condition!},
+                allLabel: 'Alle Zustände',
+                onChanged: (s) =>
+                    setState(() => _condition = s.isEmpty ? null : s.first),
+              ),
+            ),
+            if (_hasFilters)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: ActiveFilterStrip(
+                  chips: [
+                    if (_type != 'all')
+                      ActiveFilterChip(
+                        label: _types
+                            .firstWhere((t) => t.value == _type)
+                            .label,
+                        onRemove: () => setState(() => _type = 'all'),
+                      ),
+                    if (_category != null)
+                      ActiveFilterChip(
+                        label: _categories
+                            .firstWhere((c) => c.value == _category)
+                            .label,
+                        onRemove: () => setState(() => _category = null),
+                      ),
+                    if (_condition != null)
+                      ActiveFilterChip(
+                        label: _conditions
+                            .firstWhere((c) => c.value == _condition)
+                            .label,
+                        onRemove: () => setState(() => _condition = null),
+                      ),
+                    if (_search.isNotEmpty)
+                      ActiveFilterChip(
+                        label: '🔍 $_search',
+                        onRemove: () => setState(() => _search = ''),
+                      ),
+                  ],
+                  onClearAll: () => setState(() {
+                    _type = 'all';
+                    _category = null;
+                    _condition = null;
+                    _search = '';
+                  }),
+                ),
+              ),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.amber,
@@ -126,28 +201,40 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     ref.invalidate(marketplaceListingsProvider(_type)),
                 child: async.when(
                   loading: () => const Center(
-                    child: CircularProgressIndicator(color: AppColors.amber),
+                    child: CircularProgressIndicator(
+                        color: AppColors.amber),
                   ),
                   error: (e, _) =>
                       Center(child: Text('$e', style: AppTypography.caption())),
-                  data: (list) {
+                  data: (all) {
+                    final list = _apply(all);
                     if (list.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(LucideIcons.store,
-                                size: 32, color: AppColors.mute),
-                            const SizedBox(height: 10),
-                            Text(
-                              'Keine Inserate in dieser Kategorie.',
-                              style: AppTypography.body(
-                                size: 14,
-                                color: AppColors.mute,
-                              ),
-                            ),
-                          ],
-                        ),
+                      return ListView(
+                        physics:
+                            const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          const SizedBox(height: 40),
+                          EmptyStateCard(
+                            icon: LucideIcons.store,
+                            title: _hasFilters
+                                ? 'Keine Treffer.'
+                                : 'Keine Inserate vorhanden.',
+                            description: _hasFilters
+                                ? 'Filter zurücksetzen oder andere wählen.'
+                                : 'Sei der/die Erste:r — Plus-Button.',
+                            actionLabel:
+                                _hasFilters ? 'Filter zurücksetzen' : null,
+                            onAction: _hasFilters
+                                ? () => setState(() {
+                                      _type = 'all';
+                                      _category = null;
+                                      _condition = null;
+                                      _search = '';
+                                    })
+                                : null,
+                          ),
+                        ],
                       );
                     }
                     return GridView.builder(
@@ -161,7 +248,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         childAspectRatio: 0.72,
                       ),
                       itemCount: list.length,
-                      itemBuilder: (context, i) => _Tile(item: list[i]),
+                      itemBuilder: (context, i) =>
+                          _Tile(item: list[i]),
                     );
                   },
                 ),

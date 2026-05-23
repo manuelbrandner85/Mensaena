@@ -8,6 +8,9 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/group.dart';
 import '../../../repositories/groups_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/filter_chip_bar.dart';
+import '../../../widgets/shared/module_search_bar.dart';
 
 class GroupsScreen extends ConsumerStatefulWidget {
   const GroupsScreen({super.key});
@@ -18,20 +21,32 @@ class GroupsScreen extends ConsumerStatefulWidget {
 
 class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   String _filter = 'all';
+  String _search = '';
 
-  static const List<({String value, String label})> _categories = [
-    (value: 'all', label: 'Alle'),
-    (value: 'nachbarschaft', label: 'Nachbarschaft'),
-    (value: 'hobby', label: 'Hobby'),
-    (value: 'sport', label: 'Sport'),
-    (value: 'eltern', label: 'Eltern'),
-    (value: 'senioren', label: 'Senioren'),
-    (value: 'umwelt', label: 'Umwelt'),
-    (value: 'bildung', label: 'Bildung'),
-    (value: 'tiere', label: 'Tiere'),
-    (value: 'handwerk', label: 'Handwerk'),
-    (value: 'sonstiges', label: 'Sonstiges'),
+  static const List<FilterOption<String>> _categories = [
+    FilterOption(value: 'nachbarschaft', label: '🏘️ Nachbarschaft'),
+    FilterOption(value: 'hobby', label: '🎨 Hobby'),
+    FilterOption(value: 'sport', label: '⚽ Sport'),
+    FilterOption(value: 'eltern', label: '👨‍👩‍👧 Eltern'),
+    FilterOption(value: 'senioren', label: '👴 Senioren'),
+    FilterOption(value: 'umwelt', label: '🌱 Umwelt'),
+    FilterOption(value: 'bildung', label: '📚 Bildung'),
+    FilterOption(value: 'tiere', label: '🐾 Tiere'),
+    FilterOption(value: 'handwerk', label: '🔧 Handwerk'),
+    FilterOption(value: 'sonstiges', label: '❓ Sonstiges'),
   ];
+
+  bool get _hasFilters => _filter != 'all' || _search.isNotEmpty;
+
+  List<Group> _apply(List<Group> all) {
+    final q = _search.trim().toLowerCase();
+    return all.where((g) {
+      if (_filter != 'all' && g.category != _filter) return false;
+      if (q.isEmpty) return true;
+      return g.name.toLowerCase().contains(q) ||
+          (g.description ?? '').toLowerCase().contains(q);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,47 +64,46 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: 44,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                scrollDirection: Axis.horizontal,
-                itemCount: _categories.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 6),
-                itemBuilder: (context, i) {
-                  final c = _categories[i];
-                  final active = c.value == _filter;
-                  return GestureDetector(
-                    onTap: () => setState(() => _filter = c.value),
-                    child: Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: active
-                            ? AppColors.amber.withValues(alpha: 0.2)
-                            : AppColors.surface.withValues(alpha: 0.5),
-                        border: Border.all(
-                          color: active ? AppColors.amber : AppColors.line,
-                        ),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        c.label,
-                        style: AppTypography.label(
-                          size: 10,
-                          color: active
-                              ? AppColors.amber
-                              : AppColors.inkSoft,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              child: ModuleSearchBar(
+                hintText: 'Gruppen suchen…',
+                onChanged: (v) => setState(() => _search = v),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              child: FilterChipBar<String>(
+                options: _categories,
+                selected: _filter == 'all' ? const <String>{} : {_filter},
+                onChanged: (s) =>
+                    setState(() => _filter = s.isEmpty ? 'all' : s.first),
+              ),
+            ),
+            if (_hasFilters)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: ActiveFilterStrip(
+                  chips: [
+                    if (_filter != 'all')
+                      ActiveFilterChip(
+                        label: _categories
+                            .firstWhere((c) => c.value == _filter)
+                            .label,
+                        onRemove: () => setState(() => _filter = 'all'),
+                      ),
+                    if (_search.isNotEmpty)
+                      ActiveFilterChip(
+                        label: '🔍 $_search',
+                        onRemove: () => setState(() => _search = ''),
+                      ),
+                  ],
+                  onClearAll: () => setState(() {
+                    _filter = 'all';
+                    _search = '';
+                  }),
+                ),
+              ),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.amber,
@@ -97,32 +111,37 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                 onRefresh: () async => ref.invalidate(groupsListProvider),
                 child: async.when(
                   loading: () => const Center(
-                    child: CircularProgressIndicator(color: AppColors.amber),
+                    child: CircularProgressIndicator(
+                        color: AppColors.amber),
                   ),
-                  error: (e, _) =>
-                      Center(child: Text('$e', style: AppTypography.caption())),
+                  error: (e, _) => Center(
+                      child: Text('$e', style: AppTypography.caption())),
                   data: (all) {
-                    final list = _filter == 'all'
-                        ? all
-                        : all.where((g) => g.category == _filter).toList();
+                    final list = _apply(all);
                     if (list.isEmpty) {
                       return ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
                         children: [
-                          const SizedBox(height: 120),
-                          Center(
-                            child: Column(
-                              children: [
-                                const Icon(LucideIcons.users2,
-                                    size: 32, color: AppColors.mute),
-                                const SizedBox(height: 10),
-                                Text('Keine Gruppen in dieser Kategorie.',
-                                    style: AppTypography.body(
-                                      size: 14,
-                                      color: AppColors.mute,
-                                    )),
-                              ],
-                            ),
+                          const SizedBox(height: 60),
+                          EmptyStateCard(
+                            icon: LucideIcons.users2,
+                            title: _hasFilters
+                                ? 'Keine Treffer.'
+                                : 'Noch keine Gruppen.',
+                            description: _hasFilters
+                                ? 'Andere Filter probieren.'
+                                : 'Gründe die erste Gruppe!',
+                            actionLabel: _hasFilters
+                                ? 'Filter zurücksetzen'
+                                : 'Gruppe erstellen',
+                            onAction: _hasFilters
+                                ? () => setState(() {
+                                      _filter = 'all';
+                                      _search = '';
+                                    })
+                                : () =>
+                                    context.go('/dashboard/groups/create'),
                           ),
                         ],
                       );
@@ -130,7 +149,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
                       itemCount: list.length,
-                      itemBuilder: (context, i) => _Tile(group: list[i]),
+                      itemBuilder: (context, i) =>
+                          _Tile(group: list[i]),
                     );
                   },
                 ),

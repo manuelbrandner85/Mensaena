@@ -34,12 +34,62 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final stream = ref.watch(notificationsStreamProvider);
+    final unread = stream.value
+            ?.where((n) => !n.read && n.readAt == null)
+            .length ??
+        0;
     return DashboardScaffold(
       title: 'Benachrichtigungen',
       currentRoute: '/dashboard/notifications',
       body: SafeArea(
         child: Column(
           children: [
+            // ── Action-Bar: Unread + Mark-All-Read ────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+              child: Row(
+                children: [
+                  if (unread > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.amber.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text('$unread ungelesen',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.amber)),
+                    )
+                  else
+                    Text('Alle gelesen ✓',
+                        style: AppTypography.caption()),
+                  const Spacer(),
+                  if (unread > 0)
+                    TextButton.icon(
+                      onPressed: () async {
+                        await NotificationsRepository.markAllRead();
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: AppColors.surface,
+                            content: Text(
+                              'Alles als gelesen markiert.',
+                              style: AppTypography.body(
+                                  size: 13, color: AppColors.ink),
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(LucideIcons.checkCheck,
+                          size: 14, color: AppColors.amber),
+                      label: Text('Alle gelesen',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.amber)),
+                    ),
+                ],
+              ),
+            ),
             SizedBox(
               height: 44,
               child: ListView.separated(
