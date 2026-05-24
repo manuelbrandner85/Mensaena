@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -70,6 +71,43 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                 metaCategory: 'Versorgung',
                 title: 'Höfe & Direktvermarkter',
                 subtitle: 'Lokale Lebensmittel, Solawi, Hofläden',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: InkWell(
+                onTap: () => context.go('/dashboard/supply/foodbanks'),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.amber.withValues(alpha: 0.08),
+                    border: Border.all(
+                      color: AppColors.amber.withValues(alpha: 0.35),
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.heartHandshake,
+                          size: 18, color: AppColors.amber),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'foodbanks.title'.tr(),
+                          style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.ink,
+                            weight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const Icon(LucideIcons.chevronRight,
+                          size: 16, color: AppColors.mute),
+                    ],
+                  ),
+                ),
               ),
             ),
             Padding(

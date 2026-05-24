@@ -707,5 +707,14 @@
     "levelPoor": "Hassas için zararlı",
     "levelBad": "Sağlıksız",
     "levelHazardous": "Tehlikeli"
+  },
+  "foodbanks": {
+    "title": "Gıda Bankaları",
+    "subtitle": "{country} ve komşu ülkelerde gıda yardımı",
+    "findLocal": "Yakınındaki gıda bankasını bul",
+    "callBtn": "Ara",
+    "emailBtn": "E-posta",
+    "websiteBtn": "Web sitesi",
+    "noneInCountry": "Bu ülke için henüz kayıtlı gıda bankası yok."
   }
 }

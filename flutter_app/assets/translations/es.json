@@ -707,5 +707,14 @@
     "levelPoor": "Insalubre para sensibles",
     "levelBad": "Insalubre",
     "levelHazardous": "Peligrosa"
+  },
+  "foodbanks": {
+    "title": "Bancos de Alimentos",
+    "subtitle": "Ayuda alimentaria en {country} y países vecinos",
+    "findLocal": "Encuentra un banco de alimentos cerca de ti",
+    "callBtn": "Llamar",
+    "emailBtn": "Correo",
+    "websiteBtn": "Sitio web",
+    "noneInCountry": "Aún no hay banco de alimentos registrado para este país."
   }
 }

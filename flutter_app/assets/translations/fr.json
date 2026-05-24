@@ -707,5 +707,14 @@
     "levelPoor": "Mauvaise pour les sensibles",
     "levelBad": "Mauvaise",
     "levelHazardous": "Dangereuse"
+  },
+  "foodbanks": {
+    "title": "Banques Alimentaires",
+    "subtitle": "Aide alimentaire en {country} et pays voisins",
+    "findLocal": "Trouver une banque alimentaire près de chez vous",
+    "callBtn": "Appeler",
+    "emailBtn": "E-mail",
+    "websiteBtn": "Site web",
+    "noneInCountry": "Aucune banque alimentaire n'est encore référencée pour ce pays."
   }
 }

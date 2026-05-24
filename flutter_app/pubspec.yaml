@@ -133,3 +133,4 @@ flutter:
     - assets/images/
     - assets/launcher/
     - assets/translations/
+    - assets/data/

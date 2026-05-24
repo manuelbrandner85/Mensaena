@@ -33,6 +33,7 @@ import '../../screens/dashboard/organizations/organization_suggest_screen.dart';
 import '../../screens/dashboard/organizations/organizations_screen.dart';
 import '../../screens/dashboard/supply/farm_create_screen.dart';
 import '../../screens/dashboard/supply/farm_detail_screen.dart';
+import '../../screens/dashboard/supply/foodbanks_screen.dart';
 import '../../screens/dashboard/supply/supply_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
@@ -515,6 +516,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'farm/add',
             builder: (_, __) => const FarmCreateScreen(),
+          ),
+          GoRoute(
+            path: 'foodbanks',
+            builder: (_, __) => const FoodbanksScreen(),
           ),
           GoRoute(
             path: ':slug',

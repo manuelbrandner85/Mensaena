@@ -707,5 +707,14 @@
     "levelPoor": "Bedenklich",
     "levelBad": "Schlecht",
     "levelHazardous": "Gefährlich"
+  },
+  "foodbanks": {
+    "title": "Foodbanks & Tafeln",
+    "subtitle": "Lebensmittelhilfe in {country} und Nachbarländern",
+    "findLocal": "Tafel in deiner Nähe",
+    "callBtn": "Anrufen",
+    "emailBtn": "E-Mail",
+    "websiteBtn": "Webseite",
+    "noneInCountry": "Für dieses Land ist noch keine Foodbank hinterlegt."
   }
 }
