@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'providers/locale_provider.dart';
+import 'repositories/extra_repositories.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 
@@ -20,6 +22,25 @@ import 'services/supabase_service.dart';
 ///      "App baut sich nicht auf"-Verhalten wenn Firebase langsam ist.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Globaler Crash-Reporter → error_logs Tabelle in Supabase.
+  // Per fail-silent: ErrorLogsRepository fängt eigene Exceptions ab.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    ErrorLogsRepository.log(
+      errorType: 'FlutterError',
+      message: details.exceptionAsString(),
+      stack: details.stack?.toString(),
+    );
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    ErrorLogsRepository.log(
+      errorType: 'Uncaught',
+      message: error.toString(),
+      stack: stack.toString(),
+    );
+    return false;
+  };
 
   // 1. Supabase Session-Restore (kritisch, blockierend, ~100-300ms)
   await SupabaseService.init();

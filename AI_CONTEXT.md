@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + Datenintegrität-Audit (2 Supabase-Bugs gefixed: saved_listings→marketplace_favorites, rated_user_id→rated_id)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos (alle Supabase-Tabellen abgedeckt) + globaler Crash-Reporter zu error_logs
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Supabase-Datenintegrität auditiert + 2 kritische Bugs gefixed. Alle 52 Flutter-Tabellen-Refs gegen Supabase verifiziert.
-COUNT=200+ Web | Flutter: Phase 1-7 + Parität W1-W2 + Cinema v3 + i18n W3 + Datenintegrität-Audit ✅
-NEXT=Iterativ i18n in restliche Screens
+OPEN=25 Extra-Repos für alle ungenutzten Supabase-Tabellen live (Foundation). UI-Integration iterativ.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Audit + 25 Extra-Repos ✅
+NEXT=UI-Integration der wichtigsten Extra-Features (post_reactions auf PostCard, organization_reviews auf OrgDetail, group_post_comments+reactions auf GroupDetail, channel_polls in Chat, etc.)
 LAST_SESSION=2026-05-24
-LAST_TASK=fix(supabase-audit): 1) marketplace_repository.dart nutzte nicht-existente Tabelle `saved_listings` → auf `marketplace_favorites` korrigiert (Marketplace-Favoriten waren komplett kaputt). 2) dashboard_home_screen.dart _ThanksReceived._loadRatings nutzte nicht-existente Spalte `rated_user_id` → auf `rated_id` korrigiert (ThanksReceived-Widget zeigte nie etwas). Vollständiger Cross-Check: alle 52 Tabellen-Referenzen des Flutter-Codes existieren in Supabase.
+LAST_TASK=feat(extra-repos): extra_repositories.dart mit 25 Repository-Klassen für alle bisher ungenutzten Supabase-Tabellen (post_reactions/tags/drafts/templates, organization_reviews+members+invites, group_post_comments/reactions/invitations, event_rsvps/rideshares, marketplace_messages/reports, farm_favorites, channel_polls/poll_votes/events, crisis_reports/resources, interaction_updates, volunteer_signups, user_status, thanks, regions, testimonials, contact_messages, bot_feedback, feature_flags, app_settings, widget_configs, error_logs, audit_logs). Globaler FlutterError + PlatformDispatcher Crash-Reporter in main.dart → automatisches Logging in error_logs.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
