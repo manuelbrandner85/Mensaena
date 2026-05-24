@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Push-Wave-2 KOMPLETT (SQL + Flutter + Edge Function + Settings). F-Reminders cron-Jobs ausstehend.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Audit + 25 Extra-Repos + Push-Wave-2 Full-Stack ✅
-NEXT=Optional pg_cron F1-F4 (Reminders) + G1 (Bot-Broadcast)
+OPEN=Push komplett (Wave 1+2+3 mit cron-Reminders + Bot-Broadcast). CI deploy-supabase gefixed.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + 25 Extra-Repos + Push Full-Stack W1-W3 ✅
+NEXT=Frei
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(push-wave2-flutter): 6 Android-Channels (mensaena_default/calls/crisis/chat/social/system), Foreground-Handler routet per category+priority+type zum richtigen Channel, send-push v22 mit user_notification_prefs-Filter (master + 6 type-toggles + quiet-hours mit UTC+1-DACH-Heuristik + critical-override), NotifPrefs-Repo + Settings-Tab mit kategorie-spezifischen Toggles und Hour-Slidern für Quiet-Hours. Trigger notify_push_on_new_notification leitet jetzt category+priority weiter.
+LAST_TASK=feat(push-wave3): 5 pg_cron-Jobs (F1 event-reminders */5min, F2 challenge-reminders 09:00 täglich, F3 inactivity Mo 10:00, F4 daily-digest 07:00, G1 bot-broadcast jede Minute) + profile.timezone + profile.last_seen_at. PLUS: CI deploy-supabase Fix — delete-user + run-migrations Imports von '@2' auf '@2.45.4' gepinnt (esm.sh HTTP 522 bei unpinned Builds).
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
