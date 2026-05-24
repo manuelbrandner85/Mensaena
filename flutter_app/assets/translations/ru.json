@@ -235,5 +235,31 @@
     "network": "Ошибка соединения. Вы в сети?",
     "notFound": "Не найдено.",
     "permissionDenied": "Доступ запрещён."
+  },
+  "home": {
+    "quickActions": "Быстрые действия",
+    "viewAll": "Смотреть все",
+    "trust": "Доверие",
+    "communityPulse": "Пульс сообщества",
+    "activity": "Активность",
+    "all": "Все",
+    "onboardingStart": "Начало ({done}/{total})",
+    "thanksReceived": "Полученные благодарности",
+    "smartMatch": "Умный подбор",
+    "map": "Карта",
+    "fullscreen": "Полный экран",
+    "thisWeek": "На этой неделе",
+    "unreadMessages": "Непрочитанные сообщения",
+    "allArrow": "Все →",
+    "challengesThisWeek": "Челленджи этой недели",
+    "weeklyImpulses": "Три еженедельных импульса, чтобы присоединиться.",
+    "rateNow": "Оценить сейчас",
+    "currentWeather": "Текущая погода",
+    "successStory": "История успеха",
+    "chatWithBot": "Чат с ботом →",
+    "nextTip": "Следующий совет",
+    "exploreMap": "Изучить карту",
+    "botName": "MensaenaBot",
+    "weatherSource": "Open-Meteo"
   }
 }

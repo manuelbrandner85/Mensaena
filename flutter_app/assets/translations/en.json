@@ -235,5 +235,31 @@
     "network": "Connection failed. Are you online?",
     "notFound": "Not found.",
     "permissionDenied": "Permission denied."
+  },
+  "home": {
+    "quickActions": "Quick Actions",
+    "viewAll": "View all",
+    "trust": "Trust",
+    "communityPulse": "Community Pulse",
+    "activity": "Activity",
+    "all": "All",
+    "onboardingStart": "Getting started ({done}/{total})",
+    "thanksReceived": "Thanks received",
+    "smartMatch": "Smart Match",
+    "map": "Map",
+    "fullscreen": "Fullscreen",
+    "thisWeek": "This Week",
+    "unreadMessages": "Unread Messages",
+    "allArrow": "All →",
+    "challengesThisWeek": "Challenges this week",
+    "weeklyImpulses": "Three weekly nudges to join in.",
+    "rateNow": "Rate now",
+    "currentWeather": "Current weather",
+    "successStory": "Success story",
+    "chatWithBot": "Chat with bot →",
+    "nextTip": "Next tip",
+    "exploreMap": "Explore the map",
+    "botName": "MensaenaBot",
+    "weatherSource": "Open-Meteo"
   }
 }

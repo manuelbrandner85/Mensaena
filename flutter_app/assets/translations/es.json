@@ -235,5 +235,31 @@
     "network": "Conexión fallida. ¿Estás en línea?",
     "notFound": "No encontrado.",
     "permissionDenied": "Permiso denegado."
+  },
+  "home": {
+    "quickActions": "Acciones rápidas",
+    "viewAll": "Ver todo",
+    "trust": "Confianza",
+    "communityPulse": "Pulso de la comunidad",
+    "activity": "Actividad",
+    "all": "Todos",
+    "onboardingStart": "Comienzo ({done}/{total})",
+    "thanksReceived": "Agradecimientos recibidos",
+    "smartMatch": "Smart Match",
+    "map": "Mapa",
+    "fullscreen": "Pantalla completa",
+    "thisWeek": "Esta semana",
+    "unreadMessages": "Mensajes sin leer",
+    "allArrow": "Todos →",
+    "challengesThisWeek": "Retos de esta semana",
+    "weeklyImpulses": "Tres impulsos semanales para participar.",
+    "rateNow": "Valorar ahora",
+    "currentWeather": "Tiempo actual",
+    "successStory": "Historia de éxito",
+    "chatWithBot": "Chatear con el bot →",
+    "nextTip": "Siguiente consejo",
+    "exploreMap": "Explora el mapa",
+    "botName": "MensaenaBot",
+    "weatherSource": "Open-Meteo"
   }
 }

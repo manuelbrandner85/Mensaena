@@ -235,5 +235,31 @@
     "network": "Échec de la connexion. Êtes-vous en ligne ?",
     "notFound": "Non trouvé.",
     "permissionDenied": "Autorisation refusée."
+  },
+  "home": {
+    "quickActions": "Actions rapides",
+    "viewAll": "Tout voir",
+    "trust": "Confiance",
+    "communityPulse": "Pouls de la communauté",
+    "activity": "Activité",
+    "all": "Tout",
+    "onboardingStart": "Démarrage ({done}/{total})",
+    "thanksReceived": "Remerciements reçus",
+    "smartMatch": "Smart Match",
+    "map": "Carte",
+    "fullscreen": "Plein écran",
+    "thisWeek": "Cette semaine",
+    "unreadMessages": "Messages non lus",
+    "allArrow": "Tout →",
+    "challengesThisWeek": "Défis de la semaine",
+    "weeklyImpulses": "Trois impulsions hebdomadaires pour participer.",
+    "rateNow": "Évaluer maintenant",
+    "currentWeather": "Météo actuelle",
+    "successStory": "Histoire de réussite",
+    "chatWithBot": "Discuter avec le bot →",
+    "nextTip": "Astuce suivante",
+    "exploreMap": "Explorer la carte",
+    "botName": "MensaenaBot",
+    "weatherSource": "Open-Meteo"
   }
 }

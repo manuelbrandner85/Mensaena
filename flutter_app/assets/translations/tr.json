@@ -235,5 +235,31 @@
     "network": "Bağlantı başarısız. Çevrimiçi misin?",
     "notFound": "Bulunamadı.",
     "permissionDenied": "İzin reddedildi."
+  },
+  "home": {
+    "quickActions": "Hızlı işlemler",
+    "viewAll": "Tümünü gör",
+    "trust": "Güven",
+    "communityPulse": "Topluluk nabzı",
+    "activity": "Etkinlik",
+    "all": "Tümü",
+    "onboardingStart": "Başlangıç ({done}/{total})",
+    "thanksReceived": "Alınan teşekkürler",
+    "smartMatch": "Akıllı eşleşme",
+    "map": "Harita",
+    "fullscreen": "Tam ekran",
+    "thisWeek": "Bu hafta",
+    "unreadMessages": "Okunmamış mesajlar",
+    "allArrow": "Tümü →",
+    "challengesThisWeek": "Bu haftanın görevleri",
+    "weeklyImpulses": "Katılmak için üç haftalık öneri.",
+    "rateNow": "Şimdi değerlendir",
+    "currentWeather": "Güncel hava durumu",
+    "successStory": "Başarı hikâyesi",
+    "chatWithBot": "Botla sohbet et →",
+    "nextTip": "Sonraki ipucu",
+    "exploreMap": "Haritayı keşfet",
+    "botName": "MensaenaBot",
+    "weatherSource": "Open-Meteo"
   }
 }

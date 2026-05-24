@@ -235,5 +235,31 @@
     "network": "Verbindung fehlgeschlagen. Bist du online?",
     "notFound": "Nicht gefunden.",
     "permissionDenied": "Berechtigung verweigert."
+  },
+  "home": {
+    "quickActions": "Schnell-Aktionen",
+    "viewAll": "Alle ansehen",
+    "trust": "Vertrauen",
+    "communityPulse": "Community-Puls",
+    "activity": "Aktivität",
+    "all": "Alle",
+    "onboardingStart": "Einstieg ({done}/{total})",
+    "thanksReceived": "Dank erhalten",
+    "smartMatch": "Smart-Match",
+    "map": "Karte",
+    "fullscreen": "Vollbild",
+    "thisWeek": "Diese Woche",
+    "unreadMessages": "Ungelesene Nachrichten",
+    "allArrow": "Alle →",
+    "challengesThisWeek": "Challenges dieser Woche",
+    "weeklyImpulses": "Drei wöchentliche Impulse zum Mitmachen.",
+    "rateNow": "Jetzt bewerten",
+    "currentWeather": "Aktuelles Wetter",
+    "successStory": "Erfolgsgeschichte",
+    "chatWithBot": "Chat mit Bot →",
+    "nextTip": "Nächster Tipp",
+    "exploreMap": "Erkunde die Karte",
+    "botName": "MensaenaBot",
+    "weatherSource": "Open-Meteo"
   }
 }

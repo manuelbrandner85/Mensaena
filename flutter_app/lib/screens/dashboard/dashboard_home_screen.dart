@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -163,7 +164,7 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                     const SizedBox(height: 16),
                   ],
                   if (show('quick_actions')) ...[
-                    Text('Schnell-Aktionen',
+                    Text('home.quickActions'.tr(),
                         style: AppTypography.label(size: 10)),
                     const SizedBox(height: 8),
                     const _QuickActions(),
@@ -263,7 +264,7 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                     const Spacer(),
                     TextButton(
                       onPressed: () => context.go('/dashboard/posts'),
-                      child: const Text('Alle ansehen'),
+                      child: Text('home.viewAll'.tr()),
                     ),
                   ],
                 ),
@@ -549,7 +550,7 @@ class _TrustScoreCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text('Vertrauen',
+                      Text('home.trust'.tr(),
                           style: AppTypography.label(
                               size: 10, color: AppColors.trust)),
                       const SizedBox(width: 6),
@@ -643,7 +644,7 @@ class _CommunityPulse extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Text('Community-Puls',
+              Text('home.communityPulse'.tr(),
                   style: AppTypography.label(
                       size: 10, color: AppColors.lebenSoft)),
             ],
@@ -747,7 +748,7 @@ class _ActivityFeedWidget extends ConsumerWidget {
                   const Icon(LucideIcons.activity,
                       color: AppColors.amber, size: 14),
                   const SizedBox(width: 6),
-                  Text('Aktivität',
+                  Text('home.activity'.tr(),
                       style: AppTypography.label(
                           size: 10, color: AppColors.amber)),
                   const Spacer(),
@@ -759,7 +760,7 @@ class _ActivityFeedWidget extends ConsumerWidget {
                           const EdgeInsets.symmetric(horizontal: 4),
                       minimumSize: const Size(0, 24),
                     ),
-                    child: Text('Alle',
+                    child: Text('home.all'.tr(),
                         style: AppTypography.label(
                             size: 9, color: AppColors.amber)),
                   ),
@@ -883,7 +884,11 @@ class _OnboardingChecklist extends StatelessWidget {
               const Icon(LucideIcons.checkCircle,
                   color: AppColors.amber, size: 14),
               const SizedBox(width: 6),
-              Text('Einstieg ($done/${steps.length})',
+              Text(
+                  'home.onboardingStart'.tr(namedArgs: {
+                    'done': '$done',
+                    'total': '${steps.length}',
+                  }),
                   style: AppTypography.label(
                       size: 10, color: AppColors.amber)),
             ],
@@ -974,7 +979,7 @@ class _ThanksReceived extends ConsumerWidget {
                   const Icon(LucideIcons.heart,
                       color: AppColors.lebenSoft, size: 14),
                   const SizedBox(width: 6),
-                  Text('Dank erhalten',
+                  Text('home.thanksReceived'.tr(),
                       style: AppTypography.label(
                           size: 10, color: AppColors.lebenSoft)),
                 ],
@@ -1072,7 +1077,7 @@ class _SmartMatchWidget extends ConsumerWidget {
                     const Icon(LucideIcons.sparkles,
                         color: AppColors.tealSoft, size: 14),
                     const SizedBox(width: 6),
-                    Text('Smart-Match',
+                    Text('home.smartMatch'.tr(),
                         style: AppTypography.label(
                             size: 10, color: AppColors.tealSoft)),
                     const Spacer(),
@@ -1153,7 +1158,7 @@ class _MiniMapWidget extends StatelessWidget {
                 const Icon(LucideIcons.mapPin,
                     color: AppColors.amber, size: 14),
                 const SizedBox(width: 6),
-                Text('Karte',
+                Text('home.map'.tr(),
                     style: AppTypography.label(
                         size: 10, color: AppColors.amber)),
                 const Spacer(),
@@ -1164,7 +1169,7 @@ class _MiniMapWidget extends StatelessWidget {
                         const EdgeInsets.symmetric(horizontal: 4),
                     minimumSize: const Size(0, 24),
                   ),
-                  child: Text('Vollbild',
+                  child: Text('home.fullscreen'.tr(),
                       style: AppTypography.label(
                           size: 9, color: AppColors.amber)),
                 ),
@@ -1281,7 +1286,7 @@ class _WeeklyDigestState extends State<_WeeklyDigest> {
                   const Icon(LucideIcons.calendar,
                       color: AppColors.bronze, size: 14),
                   const SizedBox(width: 6),
-                  Text('Diese Woche',
+                  Text('home.thisWeek'.tr(),
                       style: AppTypography.label(
                           size: 10, color: AppColors.bronzeSoft)),
                 ],
@@ -1471,7 +1476,7 @@ class _UnreadMessagesWidgetState extends State<_UnreadMessagesWidget> {
                   const Icon(LucideIcons.messageCircle,
                       color: AppColors.herzrotWarm, size: 14),
                   const SizedBox(width: 6),
-                  Text('Ungelesene Nachrichten',
+                  Text('home.unreadMessages'.tr(),
                       style: AppTypography.label(
                           size: 10, color: AppColors.herzrotWarm)),
                   const SizedBox(width: 8),
@@ -1493,7 +1498,7 @@ class _UnreadMessagesWidgetState extends State<_UnreadMessagesWidget> {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       minimumSize: const Size(0, 24),
                     ),
-                    child: Text('Alle →',
+                    child: Text('home.allArrow'.tr(),
                         style: AppTypography.label(
                             size: 9, color: AppColors.bronze)),
                   ),
@@ -1687,17 +1692,17 @@ class _WeeklyChallengeHighlightState extends State<_WeeklyChallengeHighlight> {
                     const Icon(LucideIcons.sparkles,
                         color: AppColors.bronze, size: 14),
                     const SizedBox(width: 6),
-                    Text('Challenges dieser Woche',
+                    Text('home.challengesThisWeek'.tr(),
                         style: AppTypography.label(
                             size: 10, color: AppColors.bronzeSoft)),
                     const Spacer(),
-                    Text('Alle →',
+                    Text('home.allArrow'.tr(),
                         style: AppTypography.label(
                             size: 9, color: AppColors.bronze)),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text('Drei wöchentliche Impulse zum Mitmachen.',
+                Text('home.weeklyImpulses'.tr(),
                     style: AppTypography.body(
                         size: 11, color: AppColors.mute)),
                 const SizedBox(height: 10),
@@ -1886,7 +1891,7 @@ class _RatingPromptBannerState extends State<_RatingPromptBanner> {
                         onPressed: () =>
                             context.go('/dashboard/interactions'),
                         icon: const Icon(LucideIcons.star, size: 14),
-                        label: const Text('Jetzt bewerten'),
+                        label: Text('home.rateNow'.tr()),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.amber,
                           foregroundColor: AppColors.voidColor,
@@ -1986,7 +1991,7 @@ class _WeatherWidgetState extends State<_WeatherWidget> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Aktuelles Wetter',
+                        Text('home.currentWeather'.tr(),
                             style: AppTypography.label(
                                 size: 9, color: AppColors.mute)),
                         const SizedBox(height: 2),
@@ -2013,7 +2018,7 @@ class _WeatherWidgetState extends State<_WeatherWidget> {
                       ],
                     ),
                   ),
-                  Text('Open-Meteo',
+                  Text('home.weatherSource'.tr(),
                       style: AppTypography.caption()),
                 ],
               ),
@@ -2352,7 +2357,7 @@ class _SuccessStoryCardState extends State<_SuccessStoryCard> {
                               size: 14, color: AppColors.bronze),
                         ),
                         const SizedBox(width: 8),
-                        Text('Erfolgsgeschichte',
+                        Text('home.successStory'.tr(),
                             style: AppTypography.label(
                                 size: 9, color: AppColors.bronzeSoft)),
                         const Spacer(),
@@ -2469,7 +2474,7 @@ class _BotTipCardState extends State<_BotTipCard> {
                     size: 14, color: AppColors.bronze),
               ),
               const SizedBox(width: 8),
-              Text('MensaenaBot',
+              Text('home.botName'.tr(),
                   style: AppTypography.body(
                       size: 12,
                       color: AppColors.ink,
@@ -2494,7 +2499,7 @@ class _BotTipCardState extends State<_BotTipCard> {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   minimumSize: const Size(0, 24),
                 ),
-                child: Text('Chat mit Bot →',
+                child: Text('home.chatWithBot'.tr(),
                     style: AppTypography.label(
                         size: 9, color: AppColors.bronze)),
               ),
@@ -2507,7 +2512,7 @@ class _BotTipCardState extends State<_BotTipCard> {
                 ),
                 icon: const Icon(LucideIcons.refreshCw,
                     size: 11, color: AppColors.bronze),
-                label: Text('Nächster Tipp',
+                label: Text('home.nextTip'.tr(),
                     style: AppTypography.label(
                         size: 9, color: AppColors.bronze)),
               ),
@@ -2609,7 +2614,7 @@ class _MapEmptyTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Erkunde die Karte',
+                  Text('home.exploreMap'.tr(),
                       style: AppTypography.body(
                         size: 14,
                         color: AppColors.ink,
