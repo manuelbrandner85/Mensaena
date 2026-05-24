@@ -15,7 +15,11 @@ import '../../widgets/shared/skeleton_card.dart';
 /// Chat-Hub: 2 Tabs — Community (Channels gruppiert nach Kategorie)
 /// + Nachrichten (Direct Messages + Groups). 1:1 zu Web ChatView.tsx.
 class MessagesScreen extends ConsumerStatefulWidget {
-  const MessagesScreen({super.key});
+  const MessagesScreen({super.key, this.initialTab = 0});
+
+  /// 0 = Community (Channels), 1 = Nachrichten (DMs).
+  /// /dashboard/chat → 0, /dashboard/messages → 1.
+  final int initialTab;
 
   @override
   ConsumerState<MessagesScreen> createState() => _MessagesScreenState();
@@ -31,7 +35,11 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 2, vsync: this);
+    _tab = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTab.clamp(0, 1),
+    );
     _load();
   }
 

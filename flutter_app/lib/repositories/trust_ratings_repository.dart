@@ -86,6 +86,43 @@ class TrustRatingsRepository {
     }
   }
 
+  /// Ratings I have given (newest first). Joins profiles for rated user.
+  static Future<List<Map<String, dynamic>>> getGiven({int limit = 50}) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final res = await sb
+          .from('trust_ratings')
+          .select(
+              'id, score, comment, categories, helpful, would_recommend, created_at, rated_id, profiles!trust_ratings_rated_id_fkey(id, name, display_name, avatar_url)')
+          .eq('rater_id', uid)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (res as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Ratings I have received (newest first). Joins profiles for rater.
+  static Future<List<Map<String, dynamic>>> getReceived(
+      {int limit = 50}) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final res = await sb
+          .from('trust_ratings')
+          .select(
+              'id, score, comment, categories, helpful, would_recommend, created_at, rater_id, profiles!trust_ratings_rater_id_fkey(id, name, display_name, avatar_url)')
+          .eq('rated_id', uid)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (res as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Trust-Score-Breakdown for a user (calls get_trust_breakdown RPC).
   static Future<Map<String, dynamic>?> getBreakdown(String userId) async {
     try {

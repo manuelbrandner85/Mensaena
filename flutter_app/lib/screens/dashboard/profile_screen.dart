@@ -8,8 +8,10 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../models/profile.dart';
 import '../../repositories/challenges_repository.dart';
+import '../../repositories/content_reports_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../repositories/trust_ratings_repository.dart';
+import '../../repositories/user_blocks_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/post_card.dart';
@@ -700,7 +702,155 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
+        ] else ...[
+          const SizedBox(height: 12),
+          _OtherUserActions(targetUserId: profile.id),
         ],
+      ],
+    );
+  }
+}
+
+/// 3-Punkte-Menü für fremde Profile: Blockieren + Melden.
+/// 1:1 zur Web-Implementierung in OtherUserProfile.tsx.
+class _OtherUserActions extends StatefulWidget {
+  const _OtherUserActions({required this.targetUserId});
+  final String targetUserId;
+
+  @override
+  State<_OtherUserActions> createState() => _OtherUserActionsState();
+}
+
+class _OtherUserActionsState extends State<_OtherUserActions> {
+  bool _busy = false;
+
+  Future<void> _confirmBlock() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Nutzer:in blockieren?',
+            style: AppTypography.body(
+                size: 15, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text(
+            'Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.',
+            style:
+                AppTypography.body(size: 13, color: AppColors.inkSoft)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style:
+                TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: const Text('Blockieren'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _busy = true);
+    final ok = await UserBlocksRepository.block(widget.targetUserId);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(ok ? 'Nutzer:in blockiert.' : 'Fehler beim Blockieren.',
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
+  }
+
+  Future<void> _showReportDialog() async {
+    const reasons = <String>[
+      'Spam',
+      'Belästigung',
+      'Hass / Diskriminierung',
+      'Gewalt',
+      'Falsche Informationen',
+      'Anstößige Inhalte',
+      'Anderer Grund',
+    ];
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Nutzer:in melden',
+            style: AppTypography.body(
+                size: 15, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Wähle einen Grund:',
+                style: AppTypography.body(
+                    size: 13, color: AppColors.inkSoft)),
+            const SizedBox(height: 10),
+            for (final r in reasons)
+              ListTile(
+                dense: true,
+                title: Text(r,
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.ink)),
+                onTap: () => Navigator.pop(ctx, r),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Abbrechen'),
+          ),
+        ],
+      ),
+    );
+    if (selected == null || !mounted) return;
+    setState(() => _busy = true);
+    final ok = await ContentReportsRepository.report(
+      contentType: 'user',
+      contentId: widget.targetUserId,
+      reason: selected,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok ? 'Meldung übermittelt. Danke.' : 'Meldung fehlgeschlagen.',
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: _busy ? null : _showReportDialog,
+            icon: const Icon(LucideIcons.flag, size: 14),
+            label: const Text('Melden'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.amber,
+              side: BorderSide(
+                  color: AppColors.amber.withValues(alpha: 0.5)),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: _busy ? null : _confirmBlock,
+            icon: const Icon(LucideIcons.ban, size: 14),
+            label: const Text('Blockieren'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.herzrot,
+              side: BorderSide(
+                  color: AppColors.herzrot.withValues(alpha: 0.5)),
+            ),
+          ),
+        ),
       ],
     );
   }

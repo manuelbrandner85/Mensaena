@@ -55,7 +55,10 @@ import '../../screens/dashboard/notifications_screen.dart';
 import '../../screens/dashboard/post_detail_screen.dart';
 import '../../screens/dashboard/posts_list_screen.dart';
 import '../../screens/dashboard/profile_screen.dart';
+import '../../screens/dashboard/ratings_hub_screen.dart';
 import '../../screens/dashboard/settings_screen.dart';
+import '../../screens/legal/legal_page_screen.dart';
+import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
 import '../../screens/dashboard/warnungen/warnungen_screen.dart';
@@ -114,15 +117,46 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/login', redirect: (_, __) => '/auth?mode=login'),
       GoRoute(path: '/register', redirect: (_, __) => '/auth?mode=register'),
-      _placeholder('/about', 'Über uns'),
-      _placeholder('/spenden', 'Spenden'),
-      _placeholder('/kontakt', 'Kontakt'),
-      _placeholder('/impressum', 'Impressum'),
-      _placeholder('/datenschutz', 'Datenschutz'),
-      _placeholder('/agb', 'AGB'),
-      _placeholder('/haftungsausschluss', 'Haftungsausschluss'),
-      _placeholder('/nutzungsbedingungen', 'Nutzungsbedingungen'),
-      _placeholder('/community-guidelines', 'Community-Guidelines'),
+      GoRoute(
+        path: '/about',
+        builder: (_, __) => const LegalPageScreen(contentKey: 'about'),
+      ),
+      GoRoute(
+        path: '/spenden',
+        builder: (_, __) => const SpendenScreen(),
+      ),
+      GoRoute(
+        path: '/kontakt',
+        builder: (_, __) => const LegalPageScreen(contentKey: 'kontakt'),
+      ),
+      GoRoute(
+        path: '/impressum',
+        builder: (_, __) => const LegalPageScreen(contentKey: 'impressum'),
+      ),
+      GoRoute(
+        path: '/datenschutz',
+        builder: (_, __) =>
+            const LegalPageScreen(contentKey: 'datenschutz'),
+      ),
+      GoRoute(
+        path: '/agb',
+        builder: (_, __) => const LegalPageScreen(contentKey: 'agb'),
+      ),
+      GoRoute(
+        path: '/haftungsausschluss',
+        builder: (_, __) =>
+            const LegalPageScreen(contentKey: 'haftungsausschluss'),
+      ),
+      GoRoute(
+        path: '/nutzungsbedingungen',
+        builder: (_, __) =>
+            const LegalPageScreen(contentKey: 'nutzungsbedingungen'),
+      ),
+      GoRoute(
+        path: '/community-guidelines',
+        builder: (_, __) =>
+            const LegalPageScreen(contentKey: 'community-guidelines'),
+      ),
       _placeholder('/download', 'Download'),
       GoRoute(
         path: '/search',
@@ -136,9 +170,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           initialQuery: s.uri.queryParameters['q'],
         ),
       ),
-      _placeholder('/unsubscribe', 'Abmeldung'),
+      GoRoute(
+        path: '/unsubscribe',
+        builder: (_, s) =>
+            UnsubscribeScreen(token: s.uri.queryParameters['token']),
+      ),
       _placeholder('/live-ended', 'Session beendet'),
-      _placeholder('/ratings', 'Bewertungen'),
+      GoRoute(
+        path: '/ratings',
+        builder: (_, __) => const RatingsHubScreen(),
+      ),
 
       // ── Dashboard ──────────────────────────────────────────
       GoRoute(
@@ -162,12 +203,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           if (conv != null) {
             return ChatScreen(conversationId: conv);
           }
-          return const MessagesScreen();
+          return const MessagesScreen(initialTab: 0);
         },
       ),
       GoRoute(
         path: '/dashboard/messages',
-        builder: (_, __) => const MessagesScreen(),
+        builder: (_, __) => const MessagesScreen(initialTab: 1),
         routes: [
           GoRoute(
             path: ':conversationId',

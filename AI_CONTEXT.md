@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 KOMPLETT + Web-Parität Gap-Audit (Gap 1/8 erledigt: Drawer-Kommunikation 3 Items)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität Wave 1 KOMPLETT (Gaps 1-9: Drawer-Split, Messages-initialTab, RatingsHub, Legal/Info-Markdown-Seiten, Spenden-Screen, In-App-Unsubscribe, Profile-Other Block/Report)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
