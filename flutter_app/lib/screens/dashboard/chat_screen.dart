@@ -13,6 +13,7 @@ import '../../config/theme/app_typography.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/chat_context_service.dart';
 import '../../services/dm_call_service.dart';
+import '../../services/presence_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/voice_recorder_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -417,6 +418,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               }),
               onSearchChanged: (v) => setState(() => _searchQuery = v),
             ),
+            // DM-Presence: Online-Status-Dot des Peers unter dem Header.
+            if (_context?.kind == ChatKind.dm &&
+                _context?.partnerId != null)
+              _DmPresenceBar(peerId: _context!.partnerId!),
             // Live-Banner — wenn jemand im Channel live ist, koennen
             // alle anderen beitreten.
             if (_context?.kind == ChatKind.channel)
@@ -1740,6 +1745,44 @@ class _PinnedItem extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ── DM-Presence-Bar — zeigt Online/Offline-Status des Peers ──────────
+class _DmPresenceBar extends ConsumerWidget {
+  const _DmPresenceBar({required this.peerId});
+  final String peerId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final online = ref.watch(onlineUsersProvider).value?.contains(peerId) ??
+        false;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      color: AppColors.surface.withValues(alpha: 0.3),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              color: online ? AppColors.leben : AppColors.mute,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            online ? 'Online' : 'Offline',
+            style: AppTypography.label(
+              size: 9,
+              color: online ? AppColors.lebenSoft : AppColors.mute,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

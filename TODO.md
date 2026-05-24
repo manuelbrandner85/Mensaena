@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Web-Parität Gap-Audit Wave 1 abgeschlossen (Gaps 1-9 erledigt). Frei für nächste Aufgaben.
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität-Wave 1 ✅
+OPEN=Web-Parität Wave 1+2 abgeschlossen. Frei für nächste Aufgaben.
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität-Wave 1+2 ✅
 NEXT=Frei
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(parity-wave-1): Gaps 2-9 — initialTab Messages, RatingsHubScreen, alle Legal-/Info-Screens als echte Markdown-Seiten (Impressum/Datenschutz/AGB/Haftungsausschluss/Nutzungsbedingungen/Community-Guidelines/About/Kontakt), Spenden-Screen mit IBAN-Copy, In-App UnsubscribeScreen mit HTTP-Call, Profile-Other Block+Report-Buttons
+LAST_TASK=feat(parity-wave-2): Challenge-Create-Screen, Farm-Create-Screen mit Foto-Upload (max 5), Settings Security-Tab (Passwort ändern + Reset-Link + Andere Sessions abmelden), Chat DM-Presence-Bar (Online/Offline-Dot)
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

@@ -76,6 +76,47 @@ class ChallengesRepository {
     }
   }
 
+  /// Erstellt eine neue Challenge. Mapped 1:1 zu Web-Form
+  /// /dashboard/challenges/create. Gibt die neue ID zurück oder null.
+  static Future<String?> create({
+    required String title,
+    required String category, // umwelt|sozial|fitness|bildung|kreativ|ernaehrung|gemeinschaft
+    required String difficulty, // leicht|mittel|schwer
+    required int durationDays, // 1-90
+    String? description,
+    int points = 50,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    if (title.trim().length < 5 || title.trim().length > 80) return null;
+    if (durationDays < 1 || durationDays > 90) return null;
+    if (points < 10 || points > 500) return null;
+    final start = DateTime.now().toUtc();
+    final end = start.add(Duration(days: durationDays));
+    try {
+      final row = await sb
+          .from('challenges')
+          .insert({
+            'title': title.trim(),
+            if (description != null && description.trim().isNotEmpty)
+              'description': description.trim(),
+            'category': category,
+            'difficulty': difficulty,
+            'points': points,
+            'start_date': start.toIso8601String(),
+            'end_date': end.toIso8601String(),
+            'status': 'active',
+            'participant_count': 0,
+            'creator_id': uid,
+          })
+          .select('id')
+          .maybeSingle();
+      return row?['id'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<bool> join(String challengeId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;

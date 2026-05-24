@@ -17,6 +17,7 @@ import '../../screens/dashboard/global_search_screen.dart';
 import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
+import '../../screens/dashboard/challenges/challenge_create_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
 import '../../screens/dashboard/create/module_create_config.dart';
 import '../../screens/dashboard/create/module_create_post_screen.dart';
@@ -30,6 +31,7 @@ import '../../screens/dashboard/matching/matching_screen.dart';
 import '../../screens/dashboard/organizations/organization_detail_screen.dart';
 import '../../screens/dashboard/organizations/organization_suggest_screen.dart';
 import '../../screens/dashboard/organizations/organizations_screen.dart';
+import '../../screens/dashboard/supply/farm_create_screen.dart';
 import '../../screens/dashboard/supply/farm_detail_screen.dart';
 import '../../screens/dashboard/supply/supply_screen.dart';
 import '../../screens/dashboard/chat_screen.dart';
@@ -454,6 +456,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/challenges',
         builder: (_, __) => const ChallengesScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, __) => const ChallengeCreateScreen(),
+          ),
+        ],
       ),
       GoRoute(
         path: '/dashboard/badges',
@@ -487,6 +495,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/supply',
         builder: (_, __) => const SupplyScreen(),
         routes: [
+          GoRoute(
+            path: 'farm/add',
+            builder: (_, __) => const FarmCreateScreen(),
+          ),
           GoRoute(
             path: ':slug',
             builder: (_, s) => FarmDetailScreen(

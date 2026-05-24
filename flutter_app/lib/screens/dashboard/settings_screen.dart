@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show SignOutScope, UserAttributes;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -34,7 +35,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 6, vsync: this);
+    _tab = TabController(length: 7, vsync: this);
     _future = ProfilesRepository.getMine();
   }
 
@@ -70,6 +71,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               tabs: const [
                 Tab(text: 'Account'),
                 Tab(text: 'Privatsphäre'),
+                Tab(text: 'Sicherheit'),
                 Tab(text: 'Benachrichtigungen'),
                 Tab(text: 'Standort'),
                 Tab(text: 'Erscheinungsbild'),
@@ -98,6 +100,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                   children: [
                     _AccountTab(profile: p),
                     _PrivacyTab(profile: p, onPatch: _patch),
+                    const _SecurityTab(),
                     _NotifTab(profile: p, onPatch: _patch),
                     _RegionTab(profile: p, onPatch: _patch),
                     const _AppearanceTab(),
@@ -852,6 +855,269 @@ class _ModeTile extends StatelessWidget {
                   color: AppColors.bronze, size: 18),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Security-Tab — Passwort ändern + Recovery-E-Mail-Versand ────────────
+class _SecurityTab extends StatefulWidget {
+  const _SecurityTab();
+
+  @override
+  State<_SecurityTab> createState() => _SecurityTabState();
+}
+
+class _SecurityTabState extends State<_SecurityTab> {
+  final _newPw = TextEditingController();
+  final _confirmPw = TextEditingController();
+  bool _busy = false;
+  bool _show = false;
+
+  @override
+  void dispose() {
+    _newPw.dispose();
+    _confirmPw.dispose();
+    super.dispose();
+  }
+
+  Future<void> _changePassword() async {
+    final pw = _newPw.text;
+    final c = _confirmPw.text;
+    if (pw.length < 8) {
+      _toast('Passwort muss mindestens 8 Zeichen lang sein.');
+      return;
+    }
+    if (pw != c) {
+      _toast('Passwörter stimmen nicht überein.');
+      return;
+    }
+    setState(() => _busy = true);
+    try {
+      await sb.auth.updateUser(UserAttributes(password: pw));
+      if (!mounted) return;
+      _newPw.clear();
+      _confirmPw.clear();
+      _toast('Passwort geändert.');
+    } catch (e) {
+      _toast('Fehler: $e');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _sendPasswordResetMail() async {
+    final email = SupabaseService.currentUser?.email;
+    if (email == null) return;
+    setState(() => _busy = true);
+    try {
+      await sb.auth.resetPasswordForEmail(email);
+      _toast('Reset-Link an $email gesendet.');
+    } catch (_) {
+      _toast('Reset-Mail konnte nicht versendet werden.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _signOutAllOtherSessions() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Alle anderen Sessions abmelden?',
+            style: AppTypography.body(
+                size: 15,
+                color: AppColors.ink,
+                weight: FontWeight.w700)),
+        content: Text(
+            'Du bleibst auf diesem Gerät eingeloggt, alle anderen Geräte werden abgemeldet.',
+            style:
+                AppTypography.body(size: 13, color: AppColors.inkSoft)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Abbrechen')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style:
+                TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: const Text('Abmelden'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _busy = true);
+    try {
+      await sb.auth.signOut(scope: SignOutScope.others);
+      _toast('Andere Sessions abgemeldet.');
+    } catch (_) {
+      _toast('Abmelden fehlgeschlagen.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _toast(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(msg,
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final email = SupabaseService.currentUser?.email ?? '–';
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      children: [
+        _label('Angemeldet als'),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.mail,
+                  size: 16, color: AppColors.mute),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(email,
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.ink)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        _label('Passwort ändern'),
+        TextField(
+          controller: _newPw,
+          obscureText: !_show,
+          style: AppTypography.body(size: 14, color: AppColors.ink),
+          decoration: _input('Neues Passwort'),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _confirmPw,
+          obscureText: !_show,
+          style: AppTypography.body(size: 14, color: AppColors.ink),
+          decoration: _input('Neues Passwort bestätigen'),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Checkbox(
+              value: _show,
+              onChanged: (v) => setState(() => _show = v ?? false),
+              activeColor: AppColors.bronze,
+            ),
+            Text('Passwort anzeigen',
+                style: AppTypography.label(
+                    size: 10, color: AppColors.mute)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: _busy ? null : _changePassword,
+          icon: const Icon(LucideIcons.lock, size: 14),
+          label: const Text('Passwort ändern'),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.bronze,
+            foregroundColor: AppColors.voidColor,
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 28),
+        _label('Passwort vergessen'),
+        Text(
+          'Wenn du dein aktuelles Passwort nicht kennst, senden wir dir einen Reset-Link an deine E-Mail-Adresse.',
+          style: AppTypography.body(
+              size: 12, color: AppColors.inkSoft, height: 1.5),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _sendPasswordResetMail,
+          icon: const Icon(LucideIcons.mail, size: 14),
+          label: const Text('Reset-Link senden'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.amber,
+            side: BorderSide(
+                color: AppColors.amber.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 28),
+        _label('Aktive Sessions'),
+        Text(
+          'Falls du dich auf einem fremden Gerät eingeloggt hast, kannst du alle anderen Sessions hier beenden.',
+          style: AppTypography.body(
+              size: 12, color: AppColors.inkSoft, height: 1.5),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _signOutAllOtherSessions,
+          icon: const Icon(LucideIcons.logOut, size: 14),
+          label: const Text('Andere Sessions abmelden'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.herzrot,
+            side: BorderSide(
+                color: AppColors.herzrot.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 28),
+        _label('Zwei-Faktor-Authentisierung'),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.line),
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.shield,
+                  size: 16, color: AppColors.mute),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'TOTP-/Authenticator-App-Unterstützung kommt in einem späteren Release.',
+                  style: AppTypography.body(
+                      size: 12, color: AppColors.inkSoft, height: 1.4),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _label(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(text.toUpperCase(),
+            style: AppTypography.label(size: 10, color: AppColors.bronze)),
+      );
+
+  InputDecoration _input(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: AppTypography.body(size: 13, color: AppColors.mute),
+      filled: true,
+      fillColor: AppColors.elevated,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.bronze),
       ),
     );
   }

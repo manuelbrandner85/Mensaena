@@ -106,6 +106,84 @@ class FarmsRepository {
     }
   }
 
+  /// Erstellt einen neuen Farm/Bauernhof-Eintrag (Nutzer-Eintrag).
+  /// 1:1 zu Web /dashboard/supply/farm/add. Gibt slug zurück oder null.
+  static Future<String?> create({
+    required String name,
+    required String city,
+    required String category,
+    String country = 'AT',
+    String? description,
+    String? address,
+    String? postalCode,
+    String? state,
+    String? phone,
+    String? email,
+    String? website,
+    List<String> products = const [],
+    List<String> services = const [],
+    List<String> deliveryOptions = const [],
+    List<String> mediaUrls = const [],
+    bool isBio = false,
+    bool isSeasonal = false,
+  }) async {
+    final trimmedName = name.trim();
+    final trimmedCity = city.trim();
+    if (trimmedName.isEmpty || trimmedCity.isEmpty) return null;
+    final slug = _slugify(trimmedName);
+    try {
+      await sb.from('farm_listings').insert({
+        'name': trimmedName,
+        'slug': slug,
+        'category': category,
+        if (description != null && description.trim().isNotEmpty)
+          'description': description.trim(),
+        if (address != null && address.trim().isNotEmpty)
+          'address': address.trim(),
+        if (postalCode != null && postalCode.trim().isNotEmpty)
+          'postal_code': postalCode.trim(),
+        'city': trimmedCity,
+        if (state != null && state.trim().isNotEmpty)
+          'state': state.trim(),
+        'country': country,
+        if (phone != null && phone.trim().isNotEmpty)
+          'phone': phone.trim(),
+        if (email != null && email.trim().isNotEmpty)
+          'email': email.trim(),
+        if (website != null && website.trim().isNotEmpty)
+          'website': website.trim(),
+        if (products.isNotEmpty) 'products': products,
+        if (services.isNotEmpty) 'services': services,
+        if (deliveryOptions.isNotEmpty)
+          'delivery_options': deliveryOptions,
+        'is_bio': isBio,
+        'is_seasonal': isSeasonal,
+        'is_verified': false,
+        'is_public': true,
+        'source_name': 'Nutzer-Eintrag',
+        if (mediaUrls.isNotEmpty) ...{
+          'image_url': mediaUrls.first,
+          'media_urls': mediaUrls,
+        },
+      });
+      return slug;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String _slugify(String input) {
+    final umlauts = {'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss'};
+    var s = input.toLowerCase();
+    umlauts.forEach((k, v) => s = s.replaceAll(k, v));
+    s = s.replaceAll(RegExp(r'[^a-z0-9]+'), '-');
+    s = s.replaceAll(RegExp(r'^-|-$'), '');
+    final suffix = DateTime.now()
+        .millisecondsSinceEpoch
+        .toRadixString(36);
+    return '$s-$suffix';
+  }
+
   static Future<FarmListing?> getBySlug(String slug) async {
     try {
       final row = await sb
