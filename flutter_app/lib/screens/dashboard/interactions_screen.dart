@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +39,7 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Interaktionen',
+      title: 'misc.interactions'.tr(),
       currentRoute: '/dashboard/interactions',
       body: SafeArea(
         child: RefreshIndicator(

@@ -90,7 +90,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Event erstellen',
+      title: 'create.eventTitle'.tr(),
       currentRoute: '/dashboard/events',
       body: SafeArea(
         child: ListView(
@@ -100,15 +100,15 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
               controller: _title,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Titel'),
+              decoration: InputDecoration(labelText: 'create.title'.tr()),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _desc,
               maxLines: 4,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Beschreibung',
+              decoration: InputDecoration(
+                labelText: 'create.description'.tr(),
                 alignLabelWithHint: true,
               ),
             ),
@@ -158,15 +158,15 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
             TextField(
               controller: _location,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Ort'),
+              decoration: InputDecoration(labelText: 'create.place'.tr()),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _maxAttendees,
               keyboardType: TextInputType.number,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Max. Teilnehmer:innen (optional)',
+              decoration: InputDecoration(
+                labelText: 'create.maxParticipants'.tr(),
               ),
             ),
             SwitchListTile(

@@ -33,7 +33,9 @@
     "or": "o",
     "received": "Recibidas",
     "given": "Dadas",
-    "feedbackThanks": "¡Comentarios enviados — gracias!"
+    "feedbackThanks": "¡Comentarios enviados — gracias!",
+    "phone": "Teléfono",
+    "description": "Descripción"
   },
   "nav": {
     "dashboard": "Panel",
@@ -235,7 +237,8 @@
       "public": "Público",
       "neighbors": "Vecinos",
       "private": "Privado"
-    }
+    },
+    "savedTitle": "Guardados"
   },
   "settings": {
     "title": "Ajustes",
@@ -300,7 +303,8 @@
     "changePassword": "Cambiar contraseña",
     "sendResetLink": "Enviar enlace de restablecimiento",
     "signOutOthersBtn": "Cerrar otras sesiones",
-    "languageByLocation": "Idioma según ubicación"
+    "languageByLocation": "Idioma según ubicación",
+    "tooltipDetectAgain": "Detectar de nuevo"
   },
   "chat": {
     "writeMessage": "Escribe un mensaje …",
@@ -329,7 +333,11 @@
     "micPermissionDenied": "Permiso de micrófono denegado.",
     "messageHint": "Mensaje… (@ para mencionar)",
     "send": "Enviar",
-    "liveLabel": "EN VIVO"
+    "liveLabel": "EN VIVO",
+    "searchMessages": "Buscar mensajes…",
+    "tooltipCancel": "Cancelar",
+    "tooltipSend": "Enviar",
+    "tooltipRecordVoice": "Grabar mensaje de voz"
   },
   "languages": {
     "de": "Alemán",
@@ -377,7 +385,41 @@
       }
     },
     "saveLocation": "Guardar ubicación",
-    "back": "Atrás"
+    "back": "Atrás",
+    "gpsTitle": "Ubicación por GPS",
+    "gpsSubtitle": "Rápido y preciso",
+    "tour": {
+      "step0": {
+        "eyebrow": "Bienvenido",
+        "title": "Nos alegra que estés aquí.",
+        "body": "Mensaena es tu lugar para la ayuda vecinal real. En seis pasos cortos te mostramos cómo orientarte con seguridad."
+      },
+      "step1": {
+        "eyebrow": "Tu panel",
+        "title": "Todo de un vistazo.",
+        "body": "En el panel encuentras toda la información clave: nuevas solicitudes, ofertas de tu vecindario y recomendaciones personalizadas."
+      },
+      "step2": {
+        "eyebrow": "El mapa",
+        "title": "Ayuda cerca de ti.",
+        "body": "En el mapa interactivo ves dónde se necesita o se ofrece ayuda cerca. Toca un pin y conoce a tus vecinos."
+      },
+      "step3": {
+        "eyebrow": "Tu primera publicación",
+        "title": "Comparte lo que ofreces o necesitas.",
+        "body": "Ya prestes herramientas, ayudes con la compra o necesites apoyo: una publicación toma segundos."
+      },
+      "step4": {
+        "eyebrow": "Mensajes",
+        "title": "Hablad directamente entre vosotros.",
+        "body": "Todo lo que pasa entre vecinos va por mensajes directos seguros. Amistoso, respetuoso, conforme al GDPR."
+      },
+      "step5": {
+        "eyebrow": "Comunidad",
+        "title": "Más fuertes juntos.",
+        "body": "Mensaena vive de la convivencia. Sé respetuoso, atento y abierto: pronto notarás lo cálido que es tu vecindario."
+      }
+    }
   },
   "errors": {
     "generic": "Algo salió mal.",
@@ -427,7 +469,9 @@
     "weatherUnlockTitle": "Desbloquear el clima",
     "weatherUnlockBody": "Configura tu ubicación para ver el clima y las alertas locales.",
     "dashboardTitle": "Resumen",
-    "configureWidgets": "Configurar widgets"
+    "configureWidgets": "Configurar widgets",
+    "tooltipRemindLater": "Recordar más tarde",
+    "tooltipOtherStory": "Otra historia"
   },
   "matching": {
     "disabled": "Matching desactivado",
@@ -438,7 +482,8 @@
     "enable": "Activar matching",
     "maxDistanceKm": "Radio máximo: {km} km",
     "maxMatchesPerDay": "Máx. matches por día: {n}",
-    "minTrustScore": "Puntuación mínima de confianza: {n}"
+    "minTrustScore": "Puntuación mínima de confianza: {n}",
+    "screenTitle": "Matching"
   },
   "admin": {
     "statusSetTo": "Estado establecido en \"{s}\".",
@@ -457,7 +502,34 @@
     "statsLoadFailed": "No se pudieron cargar las estadísticas.",
     "cockpit": "Panel de admin",
     "cockpitSubtitle": "Resumen y moderación de todos los módulos.",
-    "statsLoadShort": "No se pudieron cargar las estadísticas."
+    "statsLoadShort": "No se pudieron cargar las estadísticas.",
+    "searchInTable": "Buscar en {table}…",
+    "usersTitle": "Admin: usuarios",
+    "systemTitle": "Admin: sistema",
+    "tableTitlePrefix": "Admin: {title}",
+    "reportsTitle": "Admin: reportes",
+    "noUsers": "Sin usuarios.",
+    "noReports": "Sin reportes.",
+    "searchUsersHint": "Buscar nombre o e-mail…",
+    "searchReason": "Buscar motivo…",
+    "adminTitle": "Admin",
+    "tiles": {
+      "users": "Usuarios",
+      "posts": "Publicaciones",
+      "events": "Eventos",
+      "board": "Tablón",
+      "crisis": "Crisis",
+      "organizations": "Organizaciones",
+      "farms": "Granjas",
+      "reports": "Reportes",
+      "groups": "Grupos",
+      "challenges": "Retos",
+      "timebank": "Banco de tiempo",
+      "suggestions": "Sugerencias org.",
+      "botScheduled": "Bot programado",
+      "auditLog": "Registro de auditoría",
+      "system": "Sistema"
+    }
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",
@@ -529,7 +601,39 @@
     "aiDescriptionSuggestion": "Sugerencia de descripción",
     "aiTapToApply": "Toca para aplicar",
     "aiDescSuggestion": "Sugerencia de descripción",
-    "tapToApply": "Toca para aplicar"
+    "tapToApply": "Toca para aplicar",
+    "titleStar": "Título*",
+    "contentStar": "Contenido*",
+    "summary": "Resumen (1–2 frases, opcional)",
+    "titleHintWriteAbout": "¿Sobre qué quieres escribir?",
+    "descriptionOptional": "Descripción (opcional)",
+    "phone": "Teléfono",
+    "categoryLabel": "Categoría",
+    "condition": "Estado",
+    "priceEuro": "Precio en €",
+    "location": "Ubicación",
+    "place": "Lugar",
+    "maxParticipants": "Máx. participantes (opcional)",
+    "eventTitle": "Crear evento",
+    "groupName": "Nombre del grupo",
+    "groupCreateTitle": "Crear grupo",
+    "pinTitle": "Nota del tablón",
+    "pinNote": "Nota",
+    "pinContactHint": "Teléfono / e-mail / @mention",
+    "newKnowledgeArticle": "Nuevo artículo de conocimiento",
+    "newAnimalPost": "Nueva publicación de animales",
+    "newHousingPost": "Nueva publicación de vivienda",
+    "newMobilityPost": "Nueva publicación de movilidad",
+    "newSharingPost": "Nueva publicación de compartir",
+    "newHarvestPost": "Nueva publicación de cosecha",
+    "newCommunityPost": "Nueva publicación comunitaria",
+    "newKnowledgePost": "Nueva publicación de conocimiento",
+    "newSkillPost": "Nueva publicación de habilidad",
+    "newJobPost": "Nueva publicación de empleo",
+    "newRescuerPost": "Nueva publicación de rescate",
+    "scanFood": "Escanear alimento",
+    "marketplaceTitle": "Anuncio",
+    "farmCreateTitle": "Registrar granja"
   },
   "crisis": {
     "error": "Error: {error}",
@@ -726,7 +830,9 @@
     "type": "Tipo",
     "scanBarcode": "Escanear código de barras (alimentos)",
     "createListing": "Publicar",
-    "advertise": "Publicar"
+    "advertise": "Publicar",
+    "searchPlaceholder": "Buscar anuncios…",
+    "screenTitle": "Mercado"
   },
   "trust": {
     "rate": "Valora a {name}",
@@ -767,7 +873,9 @@
     "attendeesWithMax": "{count} asistentes / máx. {max}",
     "create": "Crear evento",
     "categoryLabel": "Categoría",
-    "eventsInMonth": "Eventos en el mes"
+    "eventsInMonth": "Eventos en el mes",
+    "searchPlaceholder": "Buscar eventos…",
+    "screenTitle": "Eventos"
   },
   "challenges": {
     "create": "Crear reto",
@@ -800,7 +908,8 @@
     "diffHard": "Difícil",
     "title": "Retos",
     "badges": "Insignias",
-    "join": "Participar"
+    "join": "Participar",
+    "screenTitle": "Retos"
   },
   "invite": {
     "title": "Invitar",
@@ -833,7 +942,9 @@
     "inviteFailed": "Invitación fallida.",
     "memberCount": "{count} miembros",
     "create": "Crear grupo",
-    "categoryLabel": "Categoría"
+    "categoryLabel": "Categoría",
+    "searchPlaceholder": "Buscar grupos…",
+    "screenTitle": "Grupos"
   },
   "board": {
     "title": "Nota",
@@ -848,7 +959,9 @@
     "color": "Color",
     "pin": "Anclar",
     "colorLabel": "Color",
-    "categoryLabel": "Categoría"
+    "categoryLabel": "Categoría",
+    "searchPlaceholder": "Buscar en el tablón…",
+    "screenTitle": "Tablón de anuncios"
   },
   "messages": {
     "title": "Chat",
@@ -871,14 +984,17 @@
     "farmSubmit": "Enviar entrada",
     "farmNotFound": "Granja no encontrada.",
     "products": "Productos",
-    "notFound": "Granja no encontrada."
+    "notFound": "Granja no encontrada.",
+    "searchPlaceholder": "Buscar granjas…",
+    "screenTitle": "Suministro"
   },
   "knowledge": {
     "category": "Categoría",
     "publicVisible": "Visible públicamente",
     "publishArticle": "Publicar artículo",
     "article": "Artículo",
-    "writeArticle": "Escribir artículo"
+    "writeArticle": "Escribir artículo",
+    "searchPlaceholder": "Buscar artículos…"
   },
   "air": {
     "title": "Calidad del aire",
@@ -958,7 +1074,8 @@
   },
   "bot": {
     "name": "Bot de Mensaena",
-    "online": "En línea"
+    "online": "En línea",
+    "askMeHint": "Pregúntame algo…"
   },
   "update": {
     "whatsNew": "Novedades"
@@ -968,50 +1085,82 @@
     "alreadyMember": "¿Ya tienes cuenta? Inicia sesión"
   },
   "misc": {
-    "toHome": "Ir al inicio"
+    "toHome": "Ir al inicio",
+    "interactions": "Interacciones",
+    "unsubscribeSuccess": "Cancelado con éxito",
+    "unsubscribeFailed": "Cancelación fallida",
+    "pageNotFound": "Página no encontrada",
+    "badges": "Insignias"
   },
   "map": {
-    "locationUnavailable": "No se pudo determinar la ubicación."
+    "locationUnavailable": "No se pudo determinar la ubicación.",
+    "screenTitle": "Mapa"
   },
   "calendar": {
-    "noEvents": "No hay eventos en el calendario."
+    "noEvents": "No hay eventos en el calendario.",
+    "screenTitle": "Calendario"
   },
   "notifications": {
     "allRead": "Todas leídas ✓",
     "markAllRead": "Marcar todas como leídas",
-    "deleteAllTitle": "¿Eliminar todas?"
+    "deleteAllTitle": "¿Eliminar todas?",
+    "screenTitle": "Notificaciones",
+    "activities": "Actividad",
+    "tooltipClearAll": "Borrar todo"
   },
   "timebank": {
     "history": "Historial",
     "zeitbankConfirmation": "CONFIRMACIÓN BANCO DE TIEMPO",
     "reject": "Rechazar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "screenTitle": "Banco de tiempo"
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",
     "noResultsForQuery": "Sin resultados para «{query}»",
     "tryOther": "Prueba con otros términos o menos caracteres.",
-    "noResults": "Sin resultados para \"{query}\""
+    "noResults": "Sin resultados para \"{query}\"",
+    "hintPostsProfilesEvents": "Publicaciones, perfiles, eventos, organizaciones…",
+    "title": "Búsqueda"
   },
   "skills": {
     "offerSkill": "Ofrecer habilidad",
-    "free": "Gratis"
+    "free": "Gratis",
+    "screenTitle": "Habilidades"
   },
   "wissen": {
-    "shareTitle": "Comparte conocimiento"
+    "shareTitle": "Comparte conocimiento",
+    "wiki": "Wiki",
+    "education": "Educación",
+    "skills": "Habilidades",
+    "knowledge": "Conocimiento"
   },
   "teilen": {
-    "hubTitle": "Comparte e intercambia"
+    "hubTitle": "Comparte e intercambia",
+    "hubScreenTitle": "Compartir y prestar",
+    "marketplace": "Mercado",
+    "timebank": "Banco de tiempo",
+    "share": "Compartir"
   },
   "organizations": {
     "notFound": "Organización no encontrada.",
     "offers": "Ofertas",
     "suggestOrg": "Sugerir organización",
-    "emptyForRegion": "Aún no hay organizaciones en {country}."
+    "emptyForRegion": "Aún no hay organizaciones en {country}.",
+    "name": "Nombre",
+    "categoryField": "Categoría",
+    "city": "Ciudad",
+    "address": "Dirección",
+    "description": "Descripción",
+    "phone": "Teléfono",
+    "website": "Sitio web",
+    "suggestTitle": "Sugerir org.",
+    "organizationsTitle": "Organizaciones"
   },
   "live": {
     "connectionFailed": "Conexión fallida",
-    "waitingParticipants": "Esperando participantes …"
+    "waitingParticipants": "Esperando participantes …",
+    "tooltipLeave": "Salir"
   },
   "call": {
     "incoming": "Llamada entrante"
@@ -1021,7 +1170,29 @@
   },
   "widgets": {
     "config": "Configuración de widgets",
-    "reset": "Restablecer"
+    "reset": "Restablecer",
+    "titles": {
+      "greeting": "Saludo",
+      "safetyAlerts": "Alertas de seguridad",
+      "startup": "Para empezar",
+      "quickActions": "Acciones rápidas",
+      "stats": "Estadísticas",
+      "smartMatch": "Smart match",
+      "trust": "Confianza",
+      "thanksReceived": "Agradecimientos recibidos",
+      "communityPulse": "Pulso comunitario",
+      "activity": "Actividad",
+      "map": "Mapa",
+      "weekOverview": "Resumen semanal",
+      "unreadMessages": "Mensajes no leídos",
+      "weekChallenge": "Reto semanal",
+      "ratingReminder": "Recordatorio de valoración",
+      "weather": "Tiempo",
+      "holiday": "Festivo",
+      "successStory": "Historia de éxito",
+      "botTip": "Consejo de MensaenaBot",
+      "nearYou": "Cerca de ti"
+    }
   },
   "hubs": {
     "share": "Compartir e intercambiar",
@@ -1029,9 +1200,70 @@
   },
   "ratings": {
     "given": "Dadas",
-    "received": "Recibidas"
+    "received": "Recibidas",
+    "screenTitle": "Valoraciones"
   },
   "modules": {
-    "post": "Publicación"
+    "post": "Publicación",
+    "animals": {
+      "subtitle": "Ayuda animal, animales perdidos, hogares de acogida"
+    },
+    "housing": {
+      "subtitle": "Pisos, habitaciones compartidas, convivencia"
+    },
+    "mobility": {
+      "subtitle": "Viajes compartidos, carsharing, transporte"
+    },
+    "harvest": {
+      "subtitle": "Comparte fruta, verdura, cosecha del huerto"
+    },
+    "community": {
+      "subtitle": "Debates, encuentros, vecindario"
+    },
+    "rescuer": {
+      "subtitle": "Alimentos rescatados, ropa, objetos"
+    },
+    "sharing": {
+      "subtitle": "Prestar herramientas, libros, dispositivos"
+    },
+    "jobs": {
+      "subtitle": "Puestos, mini-empleos, voluntariado"
+    },
+    "board": {
+      "subtitle": "Anuncios locales, perdido y encontrado",
+      "titleAlt": "Tablón"
+    },
+    "farms": {
+      "title": "Granjas y productores directos",
+      "subtitle": "Alimentos locales, CSA, tiendas de granja"
+    },
+    "marketplaceHero": {
+      "title": "Regalar, intercambiar, prestar",
+      "subtitle": "Sin comercio — solo vecindario"
+    },
+    "groupsHero": {
+      "title": "Grupos vecinales",
+      "subtitle": "Hobbies, deporte, padres, mayores, medio ambiente"
+    },
+    "eventsHero": {
+      "title": "Eventos",
+      "subtitle": "Encuentros, talleres, mercados en el vecindario"
+    },
+    "skillsHero": {
+      "title": "Intercambio de habilidades",
+      "subtitle": "Comparte talentos, aprended juntos"
+    },
+    "matchingHero": {
+      "title": "Smart match"
+    },
+    "wiki": "Wiki",
+    "rescue": "Rescate",
+    "sharingTitle": "Compartir",
+    "foodWarnings": "Avisos alimentarios",
+    "teilenHub": "Comparte y presta",
+    "crisisDetail": "Crisis",
+    "organization": "Organización",
+    "farm": "Granja",
+    "mentalSupport": "Apoyo mental"
   }
 }

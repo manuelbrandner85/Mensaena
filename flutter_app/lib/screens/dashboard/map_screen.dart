@@ -128,7 +128,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Karte',
+      title: 'map.screenTitle'.tr(),
       currentRoute: '/dashboard/map',
       fab: FloatingActionButton(
         backgroundColor: AppColors.amber,

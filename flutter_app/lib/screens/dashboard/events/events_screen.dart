@@ -65,7 +65,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(upcomingEventsProvider);
     return DashboardScaffold(
-      title: 'Events',
+      title: 'events.screenTitle'.tr(),
       currentRoute: '/dashboard/events',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
@@ -77,13 +77,13 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 07',
-                metaCategory: 'Events',
-                title: 'Veranstaltungen',
-                subtitle: 'Treffen, Workshops, Märkte in der Nachbarschaft',
+                metaCategory: 'events.screenTitle'.tr(),
+                title: 'modules.eventsHero.title'.tr(),
+                subtitle: 'modules.eventsHero.subtitle'.tr(),
               ),
             ),
             // ── Header: View-Toggle + Refresh ──────────────

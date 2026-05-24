@@ -19,7 +19,7 @@ class CalendarScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(upcomingEventsProvider);
     return DashboardScaffold(
-      title: 'Kalender',
+      title: 'calendar.screenTitle'.tr(),
       currentRoute: '/dashboard/calendar',
       body: SafeArea(
         child: RefreshIndicator(

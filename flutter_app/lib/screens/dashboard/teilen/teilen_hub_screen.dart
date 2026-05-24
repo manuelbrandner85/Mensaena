@@ -19,21 +19,21 @@ class TeilenHubScreen extends ConsumerWidget {
   static const _tiles = <_HubTile>[
     _HubTile(
       icon: LucideIcons.gift,
-      title: 'Teilen & Verleihen',
+      title: 'teilen.hubScreenTitle',
       sub: 'Verschenken, leihweise weitergeben, kostenlos abholen',
       color: AppColors.leben,
       route: '/dashboard/sharing',
     ),
     _HubTile(
       icon: LucideIcons.store,
-      title: 'Marktplatz',
+      title: 'teilen.marketplace',
       sub: 'Verkaufen, tauschen, zum kleinen Preis',
       color: AppColors.bronze,
       route: '/dashboard/marketplace',
     ),
     _HubTile(
       icon: LucideIcons.clock,
-      title: 'Zeitbank',
+      title: 'teilen.timebank',
       sub: 'Eine Stunde geben, eine Stunde bekommen',
       color: AppColors.amber,
       route: '/dashboard/timebank',
@@ -43,7 +43,7 @@ class TeilenHubScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DashboardScaffold(
-      title: 'Teilen',
+      title: 'teilen.share'.tr(),
       currentRoute: '/dashboard/teilen',
       body: SafeArea(
         child: ListView(

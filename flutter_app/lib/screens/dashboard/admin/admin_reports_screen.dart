@@ -108,7 +108,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Admin: Reports',
+      title: 'admin.reportsTitle'.tr(),
       currentRoute: '/dashboard/admin/chat-moderation',
       body: SafeArea(
         child: Column(
@@ -116,7 +116,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
               child: ModuleSearchBar(
-                hintText: 'Grund suchen…',
+                hintText: 'admin.searchReason'.tr(),
                 onChanged: (v) => setState(() => _search = v),
               ),
             ),
@@ -147,11 +147,11 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                       return ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
-                        children: const [
-                          SizedBox(height: 60),
+                        children: [
+                          const SizedBox(height: 60),
                           EmptyStateCard(
                             icon: LucideIcons.flag,
-                            title: 'Keine Meldungen.',
+                            title: 'admin.noReports'.tr(),
                             description: 'Andere Filter probieren.',
                           ),
                         ],

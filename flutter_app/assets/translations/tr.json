@@ -33,7 +33,9 @@
     "or": "veya",
     "received": "Alınan",
     "given": "Verilen",
-    "feedbackThanks": "Geri bildirim gönderildi — teşekkürler!"
+    "feedbackThanks": "Geri bildirim gönderildi — teşekkürler!",
+    "phone": "Telefon",
+    "description": "Açıklama"
   },
   "nav": {
     "dashboard": "Panel",
@@ -235,7 +237,8 @@
       "public": "Herkese açık",
       "neighbors": "Komşular",
       "private": "Özel"
-    }
+    },
+    "savedTitle": "Kaydedildi"
   },
   "settings": {
     "title": "Ayarlar",
@@ -300,7 +303,8 @@
     "changePassword": "Şifreyi değiştir",
     "sendResetLink": "Sıfırlama bağlantısı gönder",
     "signOutOthersBtn": "Diğer oturumları kapat",
-    "languageByLocation": "Konuma göre dil"
+    "languageByLocation": "Konuma göre dil",
+    "tooltipDetectAgain": "Yeniden algıla"
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",
@@ -329,7 +333,11 @@
     "micPermissionDenied": "Mikrofon izni reddedildi.",
     "messageHint": "Mesaj… (@ ile bahset)",
     "send": "Gönder",
-    "liveLabel": "CANLI"
+    "liveLabel": "CANLI",
+    "searchMessages": "Mesajları ara…",
+    "tooltipCancel": "İptal",
+    "tooltipSend": "Gönder",
+    "tooltipRecordVoice": "Sesli mesaj kaydet"
   },
   "languages": {
     "de": "Almanca",
@@ -377,7 +385,41 @@
       }
     },
     "saveLocation": "Konumu kaydet",
-    "back": "Geri"
+    "back": "Geri",
+    "gpsTitle": "GPS ile konum",
+    "gpsSubtitle": "Hızlı ve hassas",
+    "tour": {
+      "step0": {
+        "eyebrow": "Hoş geldin",
+        "title": "Burada olmana sevindik.",
+        "body": "Mensaena, yaşayan komşuluk yardımı için yerin. Altı kısa adımda nasıl güvenle uyum sağlayacağını gösteriyoruz."
+      },
+      "step1": {
+        "eyebrow": "Panonuz",
+        "title": "Bir bakışta her şey.",
+        "body": "Panoda tüm önemli bilgileri tek bakışta görürsün: yeni talepler, mahallenden teklifler ve kişisel öneriler."
+      },
+      "step2": {
+        "eyebrow": "Harita",
+        "title": "Çevrende yardım.",
+        "body": "Etkileşimli haritada çevrende nerede yardım gerektiğini görürsün. Bir noktaya dokun ve komşularını tanı."
+      },
+      "step3": {
+        "eyebrow": "İlk gönderin",
+        "title": "Sunabildiğini ya da aradığını paylaş.",
+        "body": "Alet ödünç ver, alışverişe yardım et ya da destek ara — bir gönderi saniyeler içinde hazır."
+      },
+      "step4": {
+        "eyebrow": "Mesajlar",
+        "title": "Doğrudan birbirinizle konuşun.",
+        "body": "Komşular arasındaki her şey güvenli özel mesajlarla yürür. Dostça, saygılı, GDPR uyumlu."
+      },
+      "step5": {
+        "eyebrow": "Topluluk",
+        "title": "Birlikte daha güçlü.",
+        "body": "Mensaena birliktelikle yaşar. Saygılı, yardımsever ve açık ol — mahallenin ne kadar sıcak olduğunu hemen hissedersin."
+      }
+    }
   },
   "errors": {
     "generic": "Bir şeyler ters gitti.",
@@ -427,7 +469,9 @@
     "weatherUnlockTitle": "Hava durumunu aç",
     "weatherUnlockBody": "Hava ve yerel uyarıları görmek için konumunu ayarlardan gir.",
     "dashboardTitle": "Genel bakış",
-    "configureWidgets": "Widget'ları yapılandır"
+    "configureWidgets": "Widget'ları yapılandır",
+    "tooltipRemindLater": "Sonra hatırlat",
+    "tooltipOtherStory": "Başka hikaye"
   },
   "matching": {
     "disabled": "Eşleşme devre dışı",
@@ -438,7 +482,8 @@
     "enable": "Eşleşmeyi etkinleştir",
     "maxDistanceKm": "En fazla yarıçap: {km} km",
     "maxMatchesPerDay": "Günlük maks. eşleşme: {n}",
-    "minTrustScore": "Asgari güven puanı: {n}"
+    "minTrustScore": "Asgari güven puanı: {n}",
+    "screenTitle": "Eşleştirme"
   },
   "admin": {
     "statusSetTo": "Durum \"{s}\" olarak ayarlandı.",
@@ -457,7 +502,34 @@
     "statsLoadFailed": "İstatistikler yüklenemedi.",
     "cockpit": "Yönetici Paneli",
     "cockpitSubtitle": "Tüm modüllerin genel görünümü ve denetimi.",
-    "statsLoadShort": "İstatistikler yüklenemedi."
+    "statsLoadShort": "İstatistikler yüklenemedi.",
+    "searchInTable": "{table} içinde ara…",
+    "usersTitle": "Admin: Kullanıcılar",
+    "systemTitle": "Admin: Sistem",
+    "tableTitlePrefix": "Admin: {title}",
+    "reportsTitle": "Admin: Raporlar",
+    "noUsers": "Kullanıcı yok.",
+    "noReports": "Rapor yok.",
+    "searchUsersHint": "İsim veya e-posta ara…",
+    "searchReason": "Sebep ara…",
+    "adminTitle": "Admin",
+    "tiles": {
+      "users": "Kullanıcılar",
+      "posts": "Gönderiler",
+      "events": "Etkinlikler",
+      "board": "Tablo",
+      "crisis": "Krizler",
+      "organizations": "Kuruluşlar",
+      "farms": "Çiftlikler",
+      "reports": "Raporlar",
+      "groups": "Gruplar",
+      "challenges": "Görevler",
+      "timebank": "Zaman bankası",
+      "suggestions": "Org. önerileri",
+      "botScheduled": "Bot zamanlanmış",
+      "auditLog": "Denetim günlüğü",
+      "system": "Sistem"
+    }
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",
@@ -529,7 +601,39 @@
     "aiDescriptionSuggestion": "Açıklama önerisi",
     "aiTapToApply": "Uygulamak için dokun",
     "aiDescSuggestion": "Açıklama önerisi",
-    "tapToApply": "Uygulamak için dokun"
+    "tapToApply": "Uygulamak için dokun",
+    "titleStar": "Başlık*",
+    "contentStar": "İçerik*",
+    "summary": "Özet (1–2 cümle, opsiyonel)",
+    "titleHintWriteAbout": "Ne hakkında yazmak istiyorsun?",
+    "descriptionOptional": "Açıklama (opsiyonel)",
+    "phone": "Telefon",
+    "categoryLabel": "Kategori",
+    "condition": "Durum",
+    "priceEuro": "Fiyat (€)",
+    "location": "Konum",
+    "place": "Yer",
+    "maxParticipants": "Maks. katılımcı (opsiyonel)",
+    "eventTitle": "Etkinlik oluştur",
+    "groupName": "Grup adı",
+    "groupCreateTitle": "Grup oluştur",
+    "pinTitle": "İlan tahtası notu",
+    "pinNote": "Not",
+    "pinContactHint": "Telefon / e-posta / @mention",
+    "newKnowledgeArticle": "Yeni bilgi makalesi",
+    "newAnimalPost": "Yeni hayvan gönderisi",
+    "newHousingPost": "Yeni konut gönderisi",
+    "newMobilityPost": "Yeni ulaşım gönderisi",
+    "newSharingPost": "Yeni paylaşım gönderisi",
+    "newHarvestPost": "Yeni hasat gönderisi",
+    "newCommunityPost": "Yeni topluluk gönderisi",
+    "newKnowledgePost": "Yeni bilgi gönderisi",
+    "newSkillPost": "Yeni beceri gönderisi",
+    "newJobPost": "Yeni iş ilanı",
+    "newRescuerPost": "Yeni kurtarma gönderisi",
+    "scanFood": "Gıda tara",
+    "marketplaceTitle": "İlan",
+    "farmCreateTitle": "Çiftlik kaydet"
   },
   "crisis": {
     "error": "Hata: {error}",
@@ -726,7 +830,9 @@
     "type": "Tür",
     "scanBarcode": "Barkod tara (gıda)",
     "createListing": "İlan ver",
-    "advertise": "İlan ver"
+    "advertise": "İlan ver",
+    "searchPlaceholder": "İlanları ara…",
+    "screenTitle": "Pazaryeri"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -767,7 +873,9 @@
     "attendeesWithMax": "{count} katılımcı / maks. {max}",
     "create": "Etkinlik oluştur",
     "categoryLabel": "Kategori",
-    "eventsInMonth": "Bu ayki etkinlikler"
+    "eventsInMonth": "Bu ayki etkinlikler",
+    "searchPlaceholder": "Etkinlik ara…",
+    "screenTitle": "Etkinlikler"
   },
   "challenges": {
     "create": "Meydan okuma oluştur",
@@ -800,7 +908,8 @@
     "diffHard": "Zor",
     "title": "Görevler",
     "badges": "Rozetler",
-    "join": "Katıl"
+    "join": "Katıl",
+    "screenTitle": "Görevler"
   },
   "invite": {
     "title": "Davet et",
@@ -833,7 +942,9 @@
     "inviteFailed": "Davet başarısız oldu.",
     "memberCount": "{count} üye",
     "create": "Grup oluştur",
-    "categoryLabel": "Kategori"
+    "categoryLabel": "Kategori",
+    "searchPlaceholder": "Grupları ara…",
+    "screenTitle": "Gruplar"
   },
   "board": {
     "title": "Not",
@@ -848,7 +959,9 @@
     "color": "Renk",
     "pin": "Sabitle",
     "colorLabel": "Renk",
-    "categoryLabel": "Kategori"
+    "categoryLabel": "Kategori",
+    "searchPlaceholder": "İlan tahtasında ara…",
+    "screenTitle": "İlan tahtası"
   },
   "messages": {
     "title": "Sohbet",
@@ -871,14 +984,17 @@
     "farmSubmit": "Kaydı gönder",
     "farmNotFound": "Çiftlik bulunamadı.",
     "products": "Ürünler",
-    "notFound": "Çiftlik bulunamadı."
+    "notFound": "Çiftlik bulunamadı.",
+    "searchPlaceholder": "Çiftlik ara…",
+    "screenTitle": "Tedarik"
   },
   "knowledge": {
     "category": "Kategori",
     "publicVisible": "Herkese açık",
     "publishArticle": "Makaleyi yayınla",
     "article": "Makale",
-    "writeArticle": "Makale yaz"
+    "writeArticle": "Makale yaz",
+    "searchPlaceholder": "Makale ara…"
   },
   "air": {
     "title": "Hava kalitesi",
@@ -958,7 +1074,8 @@
   },
   "bot": {
     "name": "Mensaena Bot",
-    "online": "Çevrimiçi"
+    "online": "Çevrimiçi",
+    "askMeHint": "Bana bir şey sor…"
   },
   "update": {
     "whatsNew": "Yenilikler"
@@ -968,50 +1085,82 @@
     "alreadyMember": "Zaten üye misiniz? Giriş yap"
   },
   "misc": {
-    "toHome": "Ana sayfaya dön"
+    "toHome": "Ana sayfaya dön",
+    "interactions": "Etkileşimler",
+    "unsubscribeSuccess": "Başarıyla aboneliğiniz iptal edildi",
+    "unsubscribeFailed": "Abonelik iptali başarısız",
+    "pageNotFound": "Sayfa bulunamadı",
+    "badges": "Rozetler"
   },
   "map": {
-    "locationUnavailable": "Konum belirlenemedi."
+    "locationUnavailable": "Konum belirlenemedi.",
+    "screenTitle": "Harita"
   },
   "calendar": {
-    "noEvents": "Takvimde etkinlik yok."
+    "noEvents": "Takvimde etkinlik yok.",
+    "screenTitle": "Takvim"
   },
   "notifications": {
     "allRead": "Tümü okundu ✓",
     "markAllRead": "Tümünü okundu işaretle",
-    "deleteAllTitle": "Tümünü sil?"
+    "deleteAllTitle": "Tümünü sil?",
+    "screenTitle": "Bildirimler",
+    "activities": "Etkinlik",
+    "tooltipClearAll": "Tümünü sil"
   },
   "timebank": {
     "history": "Geçmiş",
     "zeitbankConfirmation": "ZAMAN BANKASI ONAYI",
     "reject": "Reddet",
-    "confirm": "Onayla"
+    "confirm": "Onayla",
+    "screenTitle": "Zaman bankası"
   },
   "search": {
     "minChars": "En az 2 karakter girin",
     "noResultsForQuery": "\"{query}\" için sonuç yok",
     "tryOther": "Başka kelimeler veya daha az karakter deneyin.",
-    "noResults": "\"{query}\" için sonuç yok"
+    "noResults": "\"{query}\" için sonuç yok",
+    "hintPostsProfilesEvents": "Gönderiler, profiller, etkinlikler, kuruluşlar…",
+    "title": "Arama"
   },
   "skills": {
     "offerSkill": "Beceri öner",
-    "free": "Ücretsiz"
+    "free": "Ücretsiz",
+    "screenTitle": "Beceriler"
   },
   "wissen": {
-    "shareTitle": "Bilgiyi paylaş"
+    "shareTitle": "Bilgiyi paylaş",
+    "wiki": "Wiki",
+    "education": "Eğitim",
+    "skills": "Beceriler",
+    "knowledge": "Bilgi"
   },
   "teilen": {
-    "hubTitle": "Paylaş ve takas et"
+    "hubTitle": "Paylaş ve takas et",
+    "hubScreenTitle": "Paylaş ve ödünç ver",
+    "marketplace": "Pazaryeri",
+    "timebank": "Zaman bankası",
+    "share": "Paylaşım"
   },
   "organizations": {
     "notFound": "Kuruluş bulunamadı.",
     "offers": "Teklifler",
     "suggestOrg": "Kuruluş öner",
-    "emptyForRegion": "{country} bölgesinde henüz kuruluş yok."
+    "emptyForRegion": "{country} bölgesinde henüz kuruluş yok.",
+    "name": "Ad",
+    "categoryField": "Kategori",
+    "city": "Şehir",
+    "address": "Adres",
+    "description": "Açıklama",
+    "phone": "Telefon",
+    "website": "Web sitesi",
+    "suggestTitle": "Org. öner",
+    "organizationsTitle": "Kuruluşlar"
   },
   "live": {
     "connectionFailed": "Bağlantı başarısız",
-    "waitingParticipants": "Katılımcılar bekleniyor …"
+    "waitingParticipants": "Katılımcılar bekleniyor …",
+    "tooltipLeave": "Ayrıl"
   },
   "call": {
     "incoming": "Gelen arama"
@@ -1021,7 +1170,29 @@
   },
   "widgets": {
     "config": "Widget yapılandırması",
-    "reset": "Sıfırla"
+    "reset": "Sıfırla",
+    "titles": {
+      "greeting": "Karşılama",
+      "safetyAlerts": "Güvenlik uyarıları",
+      "startup": "Başlangıç",
+      "quickActions": "Hızlı işlemler",
+      "stats": "İstatistikler",
+      "smartMatch": "Akıllı eşleşme",
+      "trust": "Güven",
+      "thanksReceived": "Alınan teşekkürler",
+      "communityPulse": "Topluluk nabzı",
+      "activity": "Etkinlik",
+      "map": "Harita",
+      "weekOverview": "Haftalık özet",
+      "unreadMessages": "Okunmamış mesajlar",
+      "weekChallenge": "Haftalık görev",
+      "ratingReminder": "Değerlendirme hatırlatması",
+      "weather": "Hava durumu",
+      "holiday": "Tatil",
+      "successStory": "Başarı hikayesi",
+      "botTip": "MensaenaBot ipucu",
+      "nearYou": "Yakınında"
+    }
   },
   "hubs": {
     "share": "Paylaş ve takas et",
@@ -1029,9 +1200,70 @@
   },
   "ratings": {
     "given": "Verilen",
-    "received": "Alınan"
+    "received": "Alınan",
+    "screenTitle": "Değerlendirmeler"
   },
   "modules": {
-    "post": "Gönderi"
+    "post": "Gönderi",
+    "animals": {
+      "subtitle": "Hayvan yardımı, bulunan hayvanlar, geçici bakım"
+    },
+    "housing": {
+      "subtitle": "Daireler, ev arkadaşı, birlikte yaşam"
+    },
+    "mobility": {
+      "subtitle": "Ortak yolculuk, araç paylaşımı, taşıma"
+    },
+    "harvest": {
+      "subtitle": "Meyve, sebze, bahçe hasadını paylaş"
+    },
+    "community": {
+      "subtitle": "Tartışmalar, buluşmalar, komşuluk"
+    },
+    "rescuer": {
+      "subtitle": "Kurtarılan gıda, kıyafet ve eşyalar"
+    },
+    "sharing": {
+      "subtitle": "Alet, kitap, cihaz ödünç verme"
+    },
+    "jobs": {
+      "subtitle": "Pozisyonlar, yarı zamanlı işler, gönüllülük"
+    },
+    "board": {
+      "subtitle": "Yerel duyurular, kayıp ve bulundu",
+      "titleAlt": "İlan tahtası"
+    },
+    "farms": {
+      "title": "Çiftlikler ve doğrudan üreticiler",
+      "subtitle": "Yerel gıda, topluluk destekli tarım, çiftlik dükkanları"
+    },
+    "marketplaceHero": {
+      "title": "Bağışla, takas et, ödünç ver",
+      "subtitle": "Ticaret yok — sadece komşuluk"
+    },
+    "groupsHero": {
+      "title": "Komşuluk grupları",
+      "subtitle": "Hobi, spor, ebeveynler, yaşlılar, çevre"
+    },
+    "eventsHero": {
+      "title": "Etkinlikler",
+      "subtitle": "Mahallede buluşmalar, atölyeler, pazarlar"
+    },
+    "skillsHero": {
+      "title": "Beceri takası",
+      "subtitle": "Yetenekleri paylaş, birbirinden öğren"
+    },
+    "matchingHero": {
+      "title": "Akıllı eşleşme"
+    },
+    "wiki": "Wiki",
+    "rescue": "Kurtarma",
+    "sharingTitle": "Paylaşım",
+    "foodWarnings": "Gıda uyarıları",
+    "teilenHub": "Paylaş ve ödünç ver",
+    "crisisDetail": "Kriz",
+    "organization": "Kuruluş",
+    "farm": "Çiftlik",
+    "mentalSupport": "Ruhsal destek"
   }
 }

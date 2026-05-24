@@ -134,16 +134,16 @@ class _KnowledgeCreateScreenState
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Neuer Wissens-Artikel',
+      title: 'create.newKnowledgeArticle'.tr(),
       currentRoute: widget.routePath,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const EditorialModuleHeader(
+            EditorialModuleHeader(
               metaIndex: '✦ Neu',
               metaCategory: 'WISSEN',
-              title: 'Neuer Wissens-Artikel',
+              title: 'create.newKnowledgeArticle'.tr(),
               subtitle:
                   'Teile dein Wissen mit der Community — Schritt-für-Schritt-Anleitung, Tipp oder Erklärung.',
             ),
@@ -152,10 +152,10 @@ class _KnowledgeCreateScreenState
               controller: _titleCtrl,
               maxLength: 200,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Titel*',
+              decoration: InputDecoration(
+                labelText: 'create.titleStar'.tr(),
                 counterText: '',
-                hintText: 'Worüber willst du schreiben?',
+                hintText: 'create.titleHintWriteAbout'.tr(),
               ),
             ),
             const SizedBox(height: 12),
@@ -163,8 +163,8 @@ class _KnowledgeCreateScreenState
               controller: _summaryCtrl,
               maxLines: 2,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Kurzfassung (1–2 Sätze, optional)',
+              decoration: InputDecoration(
+                labelText: 'create.summary'.tr(),
                 alignLabelWithHint: true,
               ),
             ),
@@ -195,8 +195,8 @@ class _KnowledgeCreateScreenState
               minLines: 10,
               style: AppTypography.body(
                   size: 14, color: AppColors.ink, height: 1.55),
-              decoration: const InputDecoration(
-                labelText: 'Inhalt*',
+              decoration: InputDecoration(
+                labelText: 'create.contentStar'.tr(),
                 alignLabelWithHint: true,
                 hintText:
                     'Schreibe deinen Artikel hier. Du kannst Markdown verwenden (**fett**, *kursiv*, # Überschriften, - Listen).',
@@ -206,8 +206,8 @@ class _KnowledgeCreateScreenState
             TextField(
               controller: _tagsCtrl,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Tags (komma-getrennt)',
+              decoration: InputDecoration(
+                labelText: 'create.tagsCommaSeparated'.tr(),
                 hintText: 'z.B. einkaufen, wien, vegan',
               ),
             ),

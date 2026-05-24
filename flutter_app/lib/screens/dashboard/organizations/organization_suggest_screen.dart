@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -32,7 +33,7 @@ class _OrganizationSuggestScreenState
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Org. vorschlagen',
+      title: 'organizations.suggestTitle'.tr(),
       currentRoute: '/dashboard/organizations',
       body: SafeArea(
         child: ListView(
@@ -47,12 +48,12 @@ class _OrganizationSuggestScreenState
             TextField(
               controller: _name,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: 'organizations.name'.tr()),
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: _category,
-              decoration: const InputDecoration(labelText: 'Kategorie'),
+              decoration: InputDecoration(labelText: 'organizations.categoryField'.tr()),
               dropdownColor: AppColors.surface,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               items: const [
@@ -73,21 +74,21 @@ class _OrganizationSuggestScreenState
             TextField(
               controller: _city,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Stadt'),
+              decoration: InputDecoration(labelText: 'organizations.city'.tr()),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _address,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Adresse'),
+              decoration: InputDecoration(labelText: 'organizations.address'.tr()),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _desc,
               maxLines: 3,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Beschreibung',
+              decoration: InputDecoration(
+                labelText: 'organizations.description'.tr(),
                 alignLabelWithHint: true,
               ),
             ),
@@ -96,7 +97,7 @@ class _OrganizationSuggestScreenState
               controller: _phone,
               keyboardType: TextInputType.phone,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Telefon'),
+              decoration: InputDecoration(labelText: 'organizations.phone'.tr()),
             ),
             const SizedBox(height: 10),
             TextField(
@@ -110,7 +111,7 @@ class _OrganizationSuggestScreenState
               controller: _website,
               keyboardType: TextInputType.url,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Webseite'),
+              decoration: InputDecoration(labelText: 'organizations.website'.tr()),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),

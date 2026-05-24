@@ -21,7 +21,7 @@ class TimebankScreen extends ConsumerWidget {
     final balance = ref.watch(timebankBalanceProvider);
     final entries = ref.watch(timebankEntriesProvider);
     return DashboardScaffold(
-      title: 'Zeitbank',
+      title: 'timebank.screenTitle'.tr(),
       currentRoute: '/dashboard/timebank',
       body: SafeArea(
         child: RefreshIndicator(

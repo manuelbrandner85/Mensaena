@@ -78,7 +78,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Gruppe erstellen',
+      title: 'create.groupCreateTitle'.tr(),
       currentRoute: '/dashboard/groups',
       body: SafeArea(
         child: ListView(
@@ -88,7 +88,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
               controller: _name,
               maxLength: 60,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Gruppenname'),
+              decoration: InputDecoration(labelText: 'create.groupName'.tr()),
             ),
             const SizedBox(height: 8),
             TextField(
@@ -96,8 +96,8 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
               maxLines: 4,
               maxLength: 500,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Beschreibung',
+              decoration: InputDecoration(
+                labelText: 'create.description'.tr(),
                 alignLabelWithHint: true,
               ),
             ),

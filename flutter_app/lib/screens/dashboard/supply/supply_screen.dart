@@ -73,18 +73,18 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
     );
     final async = ref.watch(farmsForUserProvider(args));
     return DashboardScaffold(
-      title: 'Versorgung',
+      title: 'supply.screenTitle'.tr(),
       currentRoute: '/dashboard/supply',
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 13',
-                metaCategory: 'Versorgung',
-                title: 'Höfe & Direktvermarkter',
-                subtitle: 'Lokale Lebensmittel, Solawi, Hofläden',
+                metaCategory: 'supply.screenTitle'.tr(),
+                title: 'modules.farms.title'.tr(),
+                subtitle: 'modules.farms.subtitle'.tr(),
               ),
             ),
             Padding(
@@ -130,7 +130,7 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                 children: [
                   Expanded(
                     child: ModuleSearchBar(
-                      hintText: 'Höfe suchen…',
+                      hintText: 'supply.searchPlaceholder'.tr(),
                       onChanged: (v) => setState(() => _search = v),
                     ),
                   ),

@@ -77,7 +77,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(marketplaceListingsProvider(_type));
     return DashboardScaffold(
-      title: 'Marktplatz',
+      title: 'marketplace.screenTitle'.tr(),
       currentRoute: '/dashboard/marketplace',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
@@ -89,13 +89,13 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 11',
-                metaCategory: 'Marktplatz',
-                title: 'Verschenken, Tauschen, Leihen',
-                subtitle: 'Kein kommerzieller Handel — nur Nachbarschaft',
+                metaCategory: 'marketplace.screenTitle'.tr(),
+                title: 'modules.marketplaceHero.title'.tr(),
+                subtitle: 'modules.marketplaceHero.subtitle'.tr(),
               ),
             ),
             Padding(
@@ -130,7 +130,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: ModuleSearchBar(
-                hintText: 'Inserate durchsuchen…',
+                hintText: 'marketplace.searchPlaceholder'.tr(),
                 onChanged: (v) => setState(() => _search = v),
               ),
             ),

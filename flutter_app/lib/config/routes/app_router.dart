@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -331,13 +332,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/animals',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Tiere',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'nav.animals'.tr(),
           emoji: '🐾',
           postType: 'animal',
           route: '/dashboard/animals',
-          subtitle: 'Tierhilfe, Fundtiere, Pflegestellen',
-          subFilters: [
+          subtitle: 'modules.animals.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'lost', label: '😢 Vermisst'),
             FilterOption(value: 'found', label: '🔍 Gefunden'),
             FilterOption(value: 'care', label: '🏠 Pflege'),
@@ -347,13 +348,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/housing',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Wohnen',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'nav.housing'.tr(),
           emoji: '🏡',
           postType: 'housing',
           route: '/dashboard/housing',
-          subtitle: 'Wohnungen, WG-Zimmer, Mitwohnen',
-          subFilters: [
+          subtitle: 'modules.housing.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'seeking', label: '🔍 Suche'),
             FilterOption(value: 'offering', label: '🎁 Biete'),
             FilterOption(value: 'wg', label: '🏠 WG'),
@@ -363,13 +364,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/mobility',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Mobilität',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'nav.mobility'.tr(),
           emoji: '🚗',
           postType: 'mobility',
           route: '/dashboard/mobility',
-          subtitle: 'Mitfahrten, Carsharing, Transport',
-          subFilters: [
+          subtitle: 'modules.mobility.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'rideshare', label: '🚗 Mitfahrt'),
             FilterOption(value: 'carpool', label: '👥 Fahrgemeinschaft'),
             FilterOption(value: 'transport', label: '📦 Transport'),
@@ -378,13 +379,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/harvest',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Ernte',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'nav.harvest'.tr(),
           emoji: '🌾',
           postType: 'supply',
           route: '/dashboard/harvest',
-          subtitle: 'Obst, Gemüse, Garten-Ernte teilen',
-          subFilters: [
+          subtitle: 'modules.harvest.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'fruit', label: '🍎 Obst'),
             FilterOption(value: 'vegetable', label: '🥕 Gemüse'),
             FilterOption(value: 'herbs', label: '🌿 Kräuter'),
@@ -394,13 +395,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/community',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Community',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'navGroups.community'.tr(),
           emoji: '🗳️',
           postType: 'community',
           route: '/dashboard/community',
-          subtitle: 'Diskussionen, Treffen, Nachbarschaft',
-          subFilters: [
+          subtitle: 'modules.community.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'discussion', label: '💬 Diskussion'),
             FilterOption(value: 'meeting', label: '👥 Treffen'),
             FilterOption(value: 'announcement', label: '📣 Ankündigung'),
@@ -409,15 +410,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/wiki',
-        builder: (_, __) => const KnowledgeScreen(
-          title: 'Wiki',
+        builder: (_, __) => KnowledgeScreen(
+          title: 'modules.wiki'.tr(),
           routePath: '/dashboard/wiki',
         ),
       ),
       GoRoute(
         path: '/dashboard/knowledge',
-        builder: (_, __) => const KnowledgeScreen(
-          title: 'Wissen',
+        builder: (_, __) => KnowledgeScreen(
+          title: 'nav.knowledge'.tr(),
           routePath: '/dashboard/knowledge',
         ),
       ),
@@ -623,13 +624,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/rescuer',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Rettung',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'modules.rescue'.tr(),
           emoji: '🛟',
           postType: 'rescue',
           route: '/dashboard/rescuer',
-          subtitle: 'Geretttete Lebensmittel, Kleidung, Gegenstände',
-          subFilters: [
+          subtitle: 'modules.rescuer.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'food', label: '🍎 Lebensmittel'),
             FilterOption(value: 'everyday', label: '👕 Kleidung'),
             FilterOption(value: 'sharing', label: '📦 Gegenstände'),
@@ -638,13 +639,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/sharing',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Teilen',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'modules.sharingTitle'.tr(),
           emoji: '🔄',
           postType: 'sharing',
           route: '/dashboard/sharing',
-          subtitle: 'Werkzeug, Bücher, Geräte verleihen',
-          subFilters: [
+          subtitle: 'modules.sharing.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'tools', label: '🔧 Werkzeug'),
             FilterOption(value: 'books', label: '📚 Bücher'),
             FilterOption(value: 'devices', label: '📱 Geräte'),
@@ -659,13 +660,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/jobs',
-        builder: (_, __) => const ModulePostsScreen(
-          title: 'Jobs',
+        builder: (_, __) => ModulePostsScreen(
+          title: 'nav.jobs'.tr(),
           emoji: '💼',
           postType: 'job',
           route: '/dashboard/jobs',
-          subtitle: 'Stellen, Mini-Jobs, ehrenamtliche Tätigkeiten',
-          subFilters: [
+          subtitle: 'modules.jobs.subtitle'.tr(),
+          subFilters: const [
             FilterOption(value: 'fulltime', label: '💼 Vollzeit'),
             FilterOption(value: 'parttime', label: '⏰ Teilzeit'),
             FilterOption(value: 'minijob', label: '🔧 Mini-Job'),
@@ -693,60 +694,60 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/admin/posts',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Posts',
+        builder: (_, __) => AdminTableScreen(
+          title: 'admin.tiles.posts'.tr(),
           tableName: 'posts',
           currentRoute: '/dashboard/admin/posts',
-          subtitleFields: ['type', 'category', 'status'],
+          subtitleFields: const ['type', 'category', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/events',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Events',
+        builder: (_, __) => AdminTableScreen(
+          title: 'admin.tiles.events'.tr(),
           tableName: 'events',
           currentRoute: '/dashboard/admin/events',
-          subtitleFields: ['location_name', 'category'],
+          subtitleFields: const ['location_name', 'category'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/board',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Board',
+        builder: (_, __) => AdminTableScreen(
+          title: 'admin.tiles.board'.tr(),
           tableName: 'board_posts',
           currentRoute: '/dashboard/admin/board',
-          subtitleFields: ['category', 'status'],
+          subtitleFields: const ['category', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/crisis',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // FIX R6: Tabelle heisst 'crises', nicht 'crisis_situations'
-          title: 'Krisen',
+          title: 'admin.tiles.crisis'.tr(),
           tableName: 'crises',
           currentRoute: '/dashboard/admin/crisis',
-          subtitleFields: ['category', 'urgency', 'status'],
+          subtitleFields: const ['category', 'urgency', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/organizations',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Organisationen',
+        builder: (_, __) => AdminTableScreen(
+          title: 'admin.tiles.organizations'.tr(),
           tableName: 'organizations',
           currentRoute: '/dashboard/admin/organizations',
           titleField: 'name',
-          subtitleFields: ['category', 'city', 'is_verified'],
+          subtitleFields: const ['category', 'city', 'is_verified'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/farms',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // FIX R6: 'is_bio' existiert nicht — verwende 'status' aus farm_listings
-          title: 'Farms',
+          title: 'admin.tiles.farms'.tr(),
           tableName: 'farm_listings',
           currentRoute: '/dashboard/admin/farms',
           titleField: 'name',
-          subtitleFields: ['category', 'address', 'status'],
+          subtitleFields: const ['category', 'address', 'status'],
         ),
       ),
       GoRoute(
@@ -755,66 +756,66 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/admin/groups',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Groups',
+        builder: (_, __) => AdminTableScreen(
+          title: 'admin.tiles.groups'.tr(),
           tableName: 'groups',
           currentRoute: '/dashboard/admin/groups',
           titleField: 'name',
-          subtitleFields: ['category', 'is_private'],
+          subtitleFields: const ['category', 'is_private'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/challenges',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // FIX R6: Spalten aus challenges-Schema (category/difficulty/points)
-          title: 'Challenges',
+          title: 'admin.tiles.challenges'.tr(),
           tableName: 'challenges',
           currentRoute: '/dashboard/admin/challenges',
-          subtitleFields: ['category', 'difficulty', 'status'],
+          subtitleFields: const ['category', 'difficulty', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/timebank',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // FIX R6: timebank_entries hat type/hours, KEINE status-Spalte
-          title: 'Zeitbank',
+          title: 'admin.tiles.timebank'.tr(),
           tableName: 'timebank_entries',
           currentRoute: '/dashboard/admin/timebank',
           titleField: 'description',
-          subtitleFields: ['type', 'hours'],
+          subtitleFields: const ['type', 'hours'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/bot-scheduled',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // FIX R6: korrekte Tabelle ist bot_scheduled_messages
-          title: 'Bot Scheduled',
+          title: 'admin.tiles.botScheduled'.tr(),
           tableName: 'bot_scheduled_messages',
           currentRoute: '/dashboard/admin/bot-scheduled',
           titleField: 'title',
-          subtitleFields: ['message_type', 'target_audience', 'status'],
+          subtitleFields: const ['message_type', 'target_audience', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/suggestions',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // organization_suggestions ist eine echte Tabelle (R6 verifiziert)
-          title: 'Org-Vorschläge',
+          title: 'admin.tiles.suggestions'.tr(),
           tableName: 'organization_suggestions',
           currentRoute: '/dashboard/admin/suggestions',
           titleField: 'name',
-          subtitleFields: ['category', 'city', 'status'],
+          subtitleFields: const ['category', 'city', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/audit',
-        builder: (_, __) => const AdminTableScreen(
+        builder: (_, __) => AdminTableScreen(
           // audit_logs Tabelle existiert (R6 verifiziert)
-          title: 'Audit Log',
+          title: 'admin.tiles.auditLog'.tr(),
           tableName: 'audit_logs',
           currentRoute: '/dashboard/admin/audit',
           titleField: 'action',
-          subtitleFields: ['target_type', 'actor_id'],
+          subtitleFields: const ['target_type', 'actor_id'],
         ),
       ),
       GoRoute(
@@ -848,9 +849,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
     ],
-    errorBuilder: (context, state) => const PlaceholderScreen(
+    errorBuilder: (context, state) => PlaceholderScreen(
       title: '404',
-      phase: 'Seite nicht gefunden',
+      phase: 'misc.pageNotFound'.tr(),
     ),
   );
 });

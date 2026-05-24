@@ -75,7 +75,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Pinnwand-Notiz',
+      title: 'create.pinTitle'.tr(),
       currentRoute: '/dashboard/board',
       body: SafeArea(
         child: ListView(
@@ -154,8 +154,8 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
               maxLines: 6,
               maxLength: 1000,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Notiz',
+              decoration: InputDecoration(
+                labelText: 'create.pinNote'.tr(),
                 alignLabelWithHint: true,
               ),
             ),
@@ -163,9 +163,9 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
             TextField(
               controller: _contactInfo,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Kontakt (optional)',
-                hintText: 'Telefon / E-Mail / @mention',
+              decoration: InputDecoration(
+                labelText: 'create.contactOptional'.tr(),
+                hintText: 'create.pinContactHint'.tr(),
               ),
             ),
             if (_error != null) ...[

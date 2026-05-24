@@ -63,7 +63,7 @@ class _MarketplaceCreateScreenState
   /// Beschreibung. Snackbar bei Erfolg/Fehler.
   Future<void> _scanAndFillFromFood() async {
     final code = await BarcodeScannerScreen.open(context,
-        title: 'Lebensmittel scannen');
+        title: 'create.scanFood'.tr());
     if (code == null || !mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.elevated,
@@ -135,7 +135,7 @@ class _MarketplaceCreateScreenState
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Inserat',
+      title: 'create.marketplaceTitle'.tr(),
       currentRoute: '/dashboard/marketplace',
       body: SafeArea(
         child: ListView(
@@ -198,22 +198,22 @@ class _MarketplaceCreateScreenState
               controller: _title,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Titel'),
+              decoration: InputDecoration(labelText: 'create.title'.tr()),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _desc,
               maxLines: 4,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Beschreibung',
+              decoration: InputDecoration(
+                labelText: 'create.description'.tr(),
                 alignLabelWithHint: true,
               ),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _category,
-              decoration: const InputDecoration(labelText: 'Kategorie'),
+              decoration: InputDecoration(labelText: 'create.categoryLabel'.tr()),
               dropdownColor: AppColors.surface,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               items: _categories
@@ -224,7 +224,7 @@ class _MarketplaceCreateScreenState
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: _condition,
-              decoration: const InputDecoration(labelText: 'Zustand'),
+              decoration: InputDecoration(labelText: 'create.condition'.tr()),
               dropdownColor: AppColors.surface,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               items: _conditions
@@ -240,14 +240,14 @@ class _MarketplaceCreateScreenState
                   decimal: true,
                 ),
                 style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: const InputDecoration(labelText: 'Preis in €'),
+                decoration: InputDecoration(labelText: 'create.priceEuro'.tr()),
               ),
             ],
             const SizedBox(height: 10),
             TextField(
               controller: _location,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Standort'),
+              decoration: InputDecoration(labelText: 'create.location'.tr()),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),

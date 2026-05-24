@@ -17,7 +17,7 @@ class AdminSystemScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(adminStatsProvider);
     return DashboardScaffold(
-      title: 'Admin: System',
+      title: 'admin.systemTitle'.tr(),
       currentRoute: '/dashboard/admin/system',
       body: SafeArea(
         child: ListView(

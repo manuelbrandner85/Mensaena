@@ -33,7 +33,9 @@
     "or": "or",
     "received": "Received",
     "given": "Given",
-    "feedbackThanks": "Feedback sent — thanks!"
+    "feedbackThanks": "Feedback sent — thanks!",
+    "phone": "Phone",
+    "description": "Description"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -235,7 +237,8 @@
       "public": "Public",
       "neighbors": "Neighbours",
       "private": "Private"
-    }
+    },
+    "savedTitle": "Saved"
   },
   "settings": {
     "title": "Settings",
@@ -300,7 +303,8 @@
     "changePassword": "Change password",
     "sendResetLink": "Send reset link",
     "signOutOthersBtn": "Sign out other sessions",
-    "languageByLocation": "Language by location"
+    "languageByLocation": "Language by location",
+    "tooltipDetectAgain": "Detect again"
   },
   "chat": {
     "writeMessage": "Write a message …",
@@ -329,7 +333,11 @@
     "micPermissionDenied": "Microphone permission denied.",
     "messageHint": "Message… (@ to mention)",
     "send": "Send",
-    "liveLabel": "LIVE"
+    "liveLabel": "LIVE",
+    "searchMessages": "Search messages…",
+    "tooltipCancel": "Cancel",
+    "tooltipSend": "Send",
+    "tooltipRecordVoice": "Record voice message"
   },
   "languages": {
     "de": "German",
@@ -377,7 +385,41 @@
       }
     },
     "saveLocation": "Save location",
-    "back": "Back"
+    "back": "Back",
+    "gpsTitle": "Location via GPS",
+    "gpsSubtitle": "Fast & precise",
+    "tour": {
+      "step0": {
+        "eyebrow": "Welcome",
+        "title": "Glad you're here.",
+        "body": "Mensaena is your place for lived neighbourhood help. In six short steps we show you how to settle in safely and effortlessly."
+      },
+      "step1": {
+        "eyebrow": "Your dashboard",
+        "title": "Everything at a glance.",
+        "body": "On the dashboard you find all key info at a glance: new requests, offers from your neighbourhood, and personal recommendations."
+      },
+      "step2": {
+        "eyebrow": "The map",
+        "title": "Help nearby.",
+        "body": "On the interactive map you see where help is needed or offered near you. Tap a pin and meet your neighbours."
+      },
+      "step3": {
+        "eyebrow": "Your first post",
+        "title": "Share what you can offer or seek.",
+        "body": "Whether you're lending tools, helping with shopping or needing support — a post takes only seconds."
+      },
+      "step4": {
+        "eyebrow": "Messages",
+        "title": "Talk directly with each other.",
+        "body": "Everything between neighbours runs via secure direct messages. Friendly, respectful, GDPR-compliant."
+      },
+      "step5": {
+        "eyebrow": "Community",
+        "title": "Stronger together.",
+        "body": "Mensaena thrives on togetherness. Be respectful, helpful and open — you'll soon feel how warm your neighbourhood is."
+      }
+    }
   },
   "errors": {
     "generic": "Something went wrong.",
@@ -427,7 +469,9 @@
     "weatherUnlockTitle": "Unlock weather",
     "weatherUnlockBody": "Set your location in settings to see weather and local alerts.",
     "dashboardTitle": "Overview",
-    "configureWidgets": "Configure widgets"
+    "configureWidgets": "Configure widgets",
+    "tooltipRemindLater": "Remind later",
+    "tooltipOtherStory": "Other story"
   },
   "matching": {
     "disabled": "Matching is disabled",
@@ -438,7 +482,8 @@
     "enable": "Enable matching",
     "maxDistanceKm": "Maximum radius: {km} km",
     "maxMatchesPerDay": "Max. matches per day: {n}",
-    "minTrustScore": "Minimum trust score: {n}"
+    "minTrustScore": "Minimum trust score: {n}",
+    "screenTitle": "Matching"
   },
   "admin": {
     "statusSetTo": "Status set to \"{s}\".",
@@ -457,7 +502,34 @@
     "statsLoadFailed": "Stats could not be loaded.",
     "cockpit": "Admin Cockpit",
     "cockpitSubtitle": "Overview & moderation of all modules.",
-    "statsLoadShort": "Could not load stats."
+    "statsLoadShort": "Could not load stats.",
+    "searchInTable": "Search in {table}…",
+    "usersTitle": "Admin: Users",
+    "systemTitle": "Admin: System",
+    "tableTitlePrefix": "Admin: {title}",
+    "reportsTitle": "Admin: Reports",
+    "noUsers": "No users.",
+    "noReports": "No reports.",
+    "searchUsersHint": "Search name or e-mail…",
+    "searchReason": "Search reason…",
+    "adminTitle": "Admin",
+    "tiles": {
+      "users": "Users",
+      "posts": "Posts",
+      "events": "Events",
+      "board": "Board",
+      "crisis": "Crises",
+      "organizations": "Organisations",
+      "farms": "Farms",
+      "reports": "Reports",
+      "groups": "Groups",
+      "challenges": "Challenges",
+      "timebank": "Timebank",
+      "suggestions": "Org suggestions",
+      "botScheduled": "Bot scheduled",
+      "auditLog": "Audit log",
+      "system": "System"
+    }
   },
   "create": {
     "locationUnavailable": "Location unavailable.",
@@ -529,7 +601,39 @@
     "aiDescriptionSuggestion": "Description suggestion",
     "aiTapToApply": "Tap to apply",
     "aiDescSuggestion": "Description suggestion",
-    "tapToApply": "Tap to apply"
+    "tapToApply": "Tap to apply",
+    "titleStar": "Title*",
+    "contentStar": "Content*",
+    "summary": "Summary (1–2 sentences, optional)",
+    "titleHintWriteAbout": "What do you want to write about?",
+    "descriptionOptional": "Description (optional)",
+    "phone": "Phone",
+    "categoryLabel": "Category",
+    "condition": "Condition",
+    "priceEuro": "Price in €",
+    "location": "Location",
+    "place": "Place",
+    "maxParticipants": "Max. participants (optional)",
+    "eventTitle": "Create event",
+    "groupName": "Group name",
+    "groupCreateTitle": "Create group",
+    "pinTitle": "Pinboard note",
+    "pinNote": "Note",
+    "pinContactHint": "Phone / e-mail / @mention",
+    "newKnowledgeArticle": "New knowledge article",
+    "newAnimalPost": "New animal post",
+    "newHousingPost": "New housing post",
+    "newMobilityPost": "New mobility post",
+    "newSharingPost": "New sharing post",
+    "newHarvestPost": "New harvest post",
+    "newCommunityPost": "New community post",
+    "newKnowledgePost": "New knowledge post",
+    "newSkillPost": "New skill post",
+    "newJobPost": "New job post",
+    "newRescuerPost": "New rescue post",
+    "scanFood": "Scan food",
+    "marketplaceTitle": "Listing",
+    "farmCreateTitle": "Register farm"
   },
   "crisis": {
     "error": "Error: {error}",
@@ -726,7 +830,9 @@
     "type": "Type",
     "scanBarcode": "Scan barcode (food)",
     "createListing": "List item",
-    "advertise": "List item"
+    "advertise": "List item",
+    "searchPlaceholder": "Search listings…",
+    "screenTitle": "Marketplace"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -767,7 +873,9 @@
     "attendeesWithMax": "{count} attendees / max. {max}",
     "create": "Create event",
     "categoryLabel": "Category",
-    "eventsInMonth": "Events this month"
+    "eventsInMonth": "Events this month",
+    "searchPlaceholder": "Search events…",
+    "screenTitle": "Events"
   },
   "challenges": {
     "create": "Create challenge",
@@ -800,7 +908,8 @@
     "diffHard": "Hard",
     "title": "Challenges",
     "badges": "Badges",
-    "join": "Join"
+    "join": "Join",
+    "screenTitle": "Challenges"
   },
   "invite": {
     "title": "Invite",
@@ -833,7 +942,9 @@
     "inviteFailed": "Invitation failed.",
     "memberCount": "{count} members",
     "create": "Create group",
-    "categoryLabel": "Category"
+    "categoryLabel": "Category",
+    "searchPlaceholder": "Search groups…",
+    "screenTitle": "Groups"
   },
   "board": {
     "title": "Note",
@@ -848,7 +959,9 @@
     "color": "Colour",
     "pin": "Pin",
     "colorLabel": "Color",
-    "categoryLabel": "Category"
+    "categoryLabel": "Category",
+    "searchPlaceholder": "Search pinboard…",
+    "screenTitle": "Pinboard"
   },
   "messages": {
     "title": "Chat",
@@ -871,14 +984,17 @@
     "farmSubmit": "Submit entry",
     "farmNotFound": "Farm not found.",
     "products": "Products",
-    "notFound": "Farm not found."
+    "notFound": "Farm not found.",
+    "searchPlaceholder": "Search farms…",
+    "screenTitle": "Supply"
   },
   "knowledge": {
     "category": "Category",
     "publicVisible": "Publicly visible",
     "publishArticle": "Publish article",
     "article": "Article",
-    "writeArticle": "Write article"
+    "writeArticle": "Write article",
+    "searchPlaceholder": "Search articles…"
   },
   "air": {
     "title": "Air quality",
@@ -958,7 +1074,8 @@
   },
   "bot": {
     "name": "Mensaena Bot",
-    "online": "Online"
+    "online": "Online",
+    "askMeHint": "Ask me anything…"
   },
   "update": {
     "whatsNew": "What's new"
@@ -968,50 +1085,82 @@
     "alreadyMember": "Already a member? Sign in"
   },
   "misc": {
-    "toHome": "Back to home"
+    "toHome": "Back to home",
+    "interactions": "Interactions",
+    "unsubscribeSuccess": "Successfully unsubscribed",
+    "unsubscribeFailed": "Unsubscribe failed",
+    "pageNotFound": "Page not found",
+    "badges": "Badges"
   },
   "map": {
-    "locationUnavailable": "Location could not be determined."
+    "locationUnavailable": "Location could not be determined.",
+    "screenTitle": "Map"
   },
   "calendar": {
-    "noEvents": "No events in calendar."
+    "noEvents": "No events in calendar.",
+    "screenTitle": "Calendar"
   },
   "notifications": {
     "allRead": "All read ✓",
     "markAllRead": "Mark all read",
-    "deleteAllTitle": "Delete all?"
+    "deleteAllTitle": "Delete all?",
+    "screenTitle": "Notifications",
+    "activities": "Activity",
+    "tooltipClearAll": "Clear all"
   },
   "timebank": {
     "history": "History",
     "zeitbankConfirmation": "TIMEBANK CONFIRMATION",
     "reject": "Decline",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "screenTitle": "Timebank"
   },
   "search": {
     "minChars": "Type at least 2 characters",
     "noResultsForQuery": "No matches for \"{query}\"",
     "tryOther": "Try other terms or fewer characters.",
-    "noResults": "No results for \"{query}\""
+    "noResults": "No results for \"{query}\"",
+    "hintPostsProfilesEvents": "Posts, profiles, events, organisations…",
+    "title": "Search"
   },
   "skills": {
     "offerSkill": "Offer skill",
-    "free": "Free"
+    "free": "Free",
+    "screenTitle": "Skills"
   },
   "wissen": {
-    "shareTitle": "Share knowledge"
+    "shareTitle": "Share knowledge",
+    "wiki": "Wiki",
+    "education": "Education",
+    "skills": "Skills",
+    "knowledge": "Knowledge"
   },
   "teilen": {
-    "hubTitle": "Share & swap"
+    "hubTitle": "Share & swap",
+    "hubScreenTitle": "Share & lend",
+    "marketplace": "Marketplace",
+    "timebank": "Timebank",
+    "share": "Sharing"
   },
   "organizations": {
     "notFound": "Organisation not found.",
     "offers": "Offers",
     "suggestOrg": "Suggest org.",
-    "emptyForRegion": "No organisations yet in {country}."
+    "emptyForRegion": "No organisations yet in {country}.",
+    "name": "Name",
+    "categoryField": "Category",
+    "city": "City",
+    "address": "Address",
+    "description": "Description",
+    "phone": "Phone",
+    "website": "Website",
+    "suggestTitle": "Suggest org.",
+    "organizationsTitle": "Organisations"
   },
   "live": {
     "connectionFailed": "Connection failed",
-    "waitingParticipants": "Waiting for participants …"
+    "waitingParticipants": "Waiting for participants …",
+    "tooltipLeave": "Leave"
   },
   "call": {
     "incoming": "Incoming call"
@@ -1021,7 +1170,29 @@
   },
   "widgets": {
     "config": "Widget configuration",
-    "reset": "Reset"
+    "reset": "Reset",
+    "titles": {
+      "greeting": "Greeting",
+      "safetyAlerts": "Safety alerts",
+      "startup": "Getting started",
+      "quickActions": "Quick actions",
+      "stats": "Statistics",
+      "smartMatch": "Smart match",
+      "trust": "Trust",
+      "thanksReceived": "Thanks received",
+      "communityPulse": "Community pulse",
+      "activity": "Activity",
+      "map": "Map",
+      "weekOverview": "Week overview",
+      "unreadMessages": "Unread messages",
+      "weekChallenge": "Weekly challenge",
+      "ratingReminder": "Rating reminder",
+      "weather": "Weather",
+      "holiday": "Holiday",
+      "successStory": "Success story",
+      "botTip": "MensaenaBot tip",
+      "nearYou": "Near you"
+    }
   },
   "hubs": {
     "share": "Share & Swap",
@@ -1029,9 +1200,70 @@
   },
   "ratings": {
     "given": "Given",
-    "received": "Received"
+    "received": "Received",
+    "screenTitle": "Ratings"
   },
   "modules": {
-    "post": "Post"
+    "post": "Post",
+    "animals": {
+      "subtitle": "Animal help, found animals, foster homes"
+    },
+    "housing": {
+      "subtitle": "Apartments, shared rooms, co-living"
+    },
+    "mobility": {
+      "subtitle": "Rideshare, carsharing, transport"
+    },
+    "harvest": {
+      "subtitle": "Share fruit, vegetables, garden harvest"
+    },
+    "community": {
+      "subtitle": "Discussions, meetups, neighbourhood"
+    },
+    "rescuer": {
+      "subtitle": "Rescued food, clothing, items"
+    },
+    "sharing": {
+      "subtitle": "Lend tools, books, devices"
+    },
+    "jobs": {
+      "subtitle": "Positions, part-time jobs, volunteer work"
+    },
+    "board": {
+      "subtitle": "Local announcements, lost & found",
+      "titleAlt": "Pinboard"
+    },
+    "farms": {
+      "title": "Farms & direct producers",
+      "subtitle": "Local food, CSA, farm shops"
+    },
+    "marketplaceHero": {
+      "title": "Give, swap, lend",
+      "subtitle": "No commercial trade — neighbourhood only"
+    },
+    "groupsHero": {
+      "title": "Neighbourhood groups",
+      "subtitle": "Hobbies, sports, parents, seniors, environment"
+    },
+    "eventsHero": {
+      "title": "Events",
+      "subtitle": "Meetups, workshops, markets in the neighbourhood"
+    },
+    "skillsHero": {
+      "title": "Skill exchange",
+      "subtitle": "Share talents, learn from each other"
+    },
+    "matchingHero": {
+      "title": "Smart match"
+    },
+    "wiki": "Wiki",
+    "rescue": "Rescue",
+    "sharingTitle": "Sharing",
+    "foodWarnings": "Food warnings",
+    "teilenHub": "Share & lend",
+    "crisisDetail": "Crisis",
+    "organization": "Organisation",
+    "farm": "Farm",
+    "mentalSupport": "Mental support"
   }
 }

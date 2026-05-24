@@ -38,7 +38,7 @@ class _ProfileSavedScreenState extends ConsumerState<ProfileSavedScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Gespeichert',
+      title: 'profile.savedTitle'.tr(),
       currentRoute: '/dashboard/profile/saved',
       body: SafeArea(
         child: RefreshIndicator(

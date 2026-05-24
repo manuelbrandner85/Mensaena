@@ -72,7 +72,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
     final hasFilters = _search.isNotEmpty || _category != 'all';
 
     return DashboardScaffold(
-      title: 'Schwarzes Brett',
+      title: 'board.screenTitle'.tr(),
       currentRoute: '/dashboard/board',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
@@ -84,19 +84,19 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 06',
-                metaCategory: 'Schwarzes Brett',
-                title: 'Pinnwand',
-                subtitle: 'Lokale Mitteilungen, gesucht & gefunden',
+                metaCategory: 'board.screenTitle'.tr(),
+                title: 'modules.board.titleAlt'.tr(),
+                subtitle: 'modules.board.subtitle'.tr(),
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: ModuleSearchBar(
-                hintText: 'Pinnwand durchsuchen…',
+                hintText: 'board.searchPlaceholder'.tr(),
                 onChanged: _onSearch,
               ),
             ),

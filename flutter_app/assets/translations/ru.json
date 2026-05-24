@@ -33,7 +33,9 @@
     "or": "или",
     "received": "Полученные",
     "given": "Данные",
-    "feedbackThanks": "Отзыв отправлен — спасибо!"
+    "feedbackThanks": "Отзыв отправлен — спасибо!",
+    "phone": "Телефон",
+    "description": "Описание"
   },
   "nav": {
     "dashboard": "Панель",
@@ -235,7 +237,8 @@
       "public": "Публично",
       "neighbors": "Соседи",
       "private": "Приватно"
-    }
+    },
+    "savedTitle": "Сохранено"
   },
   "settings": {
     "title": "Настройки",
@@ -300,7 +303,8 @@
     "changePassword": "Сменить пароль",
     "sendResetLink": "Отправить ссылку для сброса",
     "signOutOthersBtn": "Выйти из других сеансов",
-    "languageByLocation": "Язык по местоположению"
+    "languageByLocation": "Язык по местоположению",
+    "tooltipDetectAgain": "Распознать заново"
   },
   "chat": {
     "writeMessage": "Написать сообщение …",
@@ -329,7 +333,11 @@
     "micPermissionDenied": "Доступ к микрофону запрещён.",
     "messageHint": "Сообщение… (@ для упоминания)",
     "send": "Отправить",
-    "liveLabel": "ЭФИР"
+    "liveLabel": "ЭФИР",
+    "searchMessages": "Поиск сообщений…",
+    "tooltipCancel": "Отмена",
+    "tooltipSend": "Отправить",
+    "tooltipRecordVoice": "Записать голосовое сообщение"
   },
   "languages": {
     "de": "Немецкий",
@@ -377,7 +385,41 @@
       }
     },
     "saveLocation": "Сохранить местоположение",
-    "back": "Назад"
+    "back": "Назад",
+    "gpsTitle": "Местоположение через GPS",
+    "gpsSubtitle": "Быстро и точно",
+    "tour": {
+      "step0": {
+        "eyebrow": "Добро пожаловать",
+        "title": "Рады тебя видеть.",
+        "body": "Mensaena — твоё место для живой соседской помощи. За шесть коротких шагов покажем, как освоиться легко и безопасно."
+      },
+      "step1": {
+        "eyebrow": "Твоя панель",
+        "title": "Всё на одном экране.",
+        "body": "На панели — все важные данные сразу: новые запросы, предложения из района и персональные рекомендации."
+      },
+      "step2": {
+        "eyebrow": "Карта",
+        "title": "Помощь рядом.",
+        "body": "На интерактивной карте видно, где рядом нужна или предложена помощь. Нажми на маркер и познакомься с соседями."
+      },
+      "step3": {
+        "eyebrow": "Твоя первая запись",
+        "title": "Поделись тем, что предлагаешь или ищешь.",
+        "body": "Одалживаешь инструменты, помогаешь с покупками или сам ищешь поддержку — запись создаётся за секунды."
+      },
+      "step4": {
+        "eyebrow": "Сообщения",
+        "title": "Общайтесь напрямую друг с другом.",
+        "body": "Всё общение соседей идёт через защищённые личные сообщения. Дружелюбно, уважительно, соответствует GDPR."
+      },
+      "step5": {
+        "eyebrow": "Сообщество",
+        "title": "Вместе мы сильнее.",
+        "body": "Mensaena живёт сообществом. Будь уважительным, открытым и готовым помочь — скоро почувствуешь, как тёплый твой район."
+      }
+    }
   },
   "errors": {
     "generic": "Что-то пошло не так.",
@@ -427,7 +469,9 @@
     "weatherUnlockTitle": "Включить погоду",
     "weatherUnlockBody": "Укажите местоположение в настройках, чтобы видеть погоду и оповещения.",
     "dashboardTitle": "Обзор",
-    "configureWidgets": "Настроить виджеты"
+    "configureWidgets": "Настроить виджеты",
+    "tooltipRemindLater": "Напомнить позже",
+    "tooltipOtherStory": "Другая история"
   },
   "matching": {
     "disabled": "Подбор отключён",
@@ -438,7 +482,8 @@
     "enable": "Включить подбор",
     "maxDistanceKm": "Максимальный радиус: {km} км",
     "maxMatchesPerDay": "Макс. совпадений в день: {n}",
-    "minTrustScore": "Минимальный балл доверия: {n}"
+    "minTrustScore": "Минимальный балл доверия: {n}",
+    "screenTitle": "Совпадения"
   },
   "admin": {
     "statusSetTo": "Статус установлен на «{s}».",
@@ -457,7 +502,34 @@
     "statsLoadFailed": "Не удалось загрузить статистику.",
     "cockpit": "Админ-панель",
     "cockpitSubtitle": "Обзор и модерация всех модулей.",
-    "statsLoadShort": "Не удалось загрузить статистику."
+    "statsLoadShort": "Не удалось загрузить статистику.",
+    "searchInTable": "Поиск в {table}…",
+    "usersTitle": "Админ: пользователи",
+    "systemTitle": "Админ: система",
+    "tableTitlePrefix": "Админ: {title}",
+    "reportsTitle": "Админ: жалобы",
+    "noUsers": "Нет пользователей.",
+    "noReports": "Жалоб нет.",
+    "searchUsersHint": "Поиск имени или e-mail…",
+    "searchReason": "Поиск причины…",
+    "adminTitle": "Админ",
+    "tiles": {
+      "users": "Пользователи",
+      "posts": "Записи",
+      "events": "События",
+      "board": "Доска",
+      "crisis": "Кризисы",
+      "organizations": "Организации",
+      "farms": "Фермы",
+      "reports": "Жалобы",
+      "groups": "Группы",
+      "challenges": "Задачи",
+      "timebank": "Банк времени",
+      "suggestions": "Предложения орг.",
+      "botScheduled": "Запланированные боты",
+      "auditLog": "Журнал аудита",
+      "system": "Система"
+    }
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",
@@ -529,7 +601,39 @@
     "aiDescriptionSuggestion": "Вариант описания",
     "aiTapToApply": "Нажми, чтобы применить",
     "aiDescSuggestion": "Вариант описания",
-    "tapToApply": "Нажмите, чтобы применить"
+    "tapToApply": "Нажмите, чтобы применить",
+    "titleStar": "Заголовок*",
+    "contentStar": "Содержание*",
+    "summary": "Краткое описание (1–2 предложения, по желанию)",
+    "titleHintWriteAbout": "О чём ты хочешь написать?",
+    "descriptionOptional": "Описание (необязательно)",
+    "phone": "Телефон",
+    "categoryLabel": "Категория",
+    "condition": "Состояние",
+    "priceEuro": "Цена в €",
+    "location": "Местоположение",
+    "place": "Место",
+    "maxParticipants": "Макс. участников (необязательно)",
+    "eventTitle": "Создать событие",
+    "groupName": "Название группы",
+    "groupCreateTitle": "Создать группу",
+    "pinTitle": "Заметка на доске",
+    "pinNote": "Заметка",
+    "pinContactHint": "Телефон / e-mail / @упоминание",
+    "newKnowledgeArticle": "Новая статья знаний",
+    "newAnimalPost": "Новая запись о животных",
+    "newHousingPost": "Новая запись о жилье",
+    "newMobilityPost": "Новая запись о мобильности",
+    "newSharingPost": "Новая запись об обмене",
+    "newHarvestPost": "Новая запись об урожае",
+    "newCommunityPost": "Новая запись сообщества",
+    "newKnowledgePost": "Новая запись знаний",
+    "newSkillPost": "Новая запись о навыке",
+    "newJobPost": "Новая запись о работе",
+    "newRescuerPost": "Новая запись о спасении",
+    "scanFood": "Сканировать продукт",
+    "marketplaceTitle": "Объявление",
+    "farmCreateTitle": "Зарегистрировать ферму"
   },
   "crisis": {
     "error": "Ошибка: {error}",
@@ -726,7 +830,9 @@
     "type": "Тип",
     "scanBarcode": "Сканировать штрих-код (продукты)",
     "createListing": "Разместить",
-    "advertise": "Разместить"
+    "advertise": "Разместить",
+    "searchPlaceholder": "Поиск объявлений…",
+    "screenTitle": "Маркетплейс"
   },
   "trust": {
     "rate": "Оценить {name}",
@@ -767,7 +873,9 @@
     "attendeesWithMax": "{count} участников / макс. {max}",
     "create": "Создать событие",
     "categoryLabel": "Категория",
-    "eventsInMonth": "События за месяц"
+    "eventsInMonth": "События за месяц",
+    "searchPlaceholder": "Поиск событий…",
+    "screenTitle": "События"
   },
   "challenges": {
     "create": "Создать челлендж",
@@ -800,7 +908,8 @@
     "diffHard": "Сложный",
     "title": "Челленджи",
     "badges": "Бейджи",
-    "join": "Участвовать"
+    "join": "Участвовать",
+    "screenTitle": "Задачи"
   },
   "invite": {
     "title": "Пригласить",
@@ -833,7 +942,9 @@
     "inviteFailed": "Не удалось отправить приглашение.",
     "memberCount": "{count} участников",
     "create": "Создать группу",
-    "categoryLabel": "Категория"
+    "categoryLabel": "Категория",
+    "searchPlaceholder": "Поиск групп…",
+    "screenTitle": "Группы"
   },
   "board": {
     "title": "Заметка",
@@ -848,7 +959,9 @@
     "color": "Цвет",
     "pin": "Закрепить",
     "colorLabel": "Цвет",
-    "categoryLabel": "Категория"
+    "categoryLabel": "Категория",
+    "searchPlaceholder": "Поиск на доске…",
+    "screenTitle": "Доска объявлений"
   },
   "messages": {
     "title": "Чат",
@@ -871,14 +984,17 @@
     "farmSubmit": "Отправить запись",
     "farmNotFound": "Хозяйство не найдено.",
     "products": "Продукты",
-    "notFound": "Ферма не найдена."
+    "notFound": "Ферма не найдена.",
+    "searchPlaceholder": "Поиск ферм…",
+    "screenTitle": "Снабжение"
   },
   "knowledge": {
     "category": "Категория",
     "publicVisible": "Публично видимо",
     "publishArticle": "Опубликовать статью",
     "article": "Статья",
-    "writeArticle": "Написать статью"
+    "writeArticle": "Написать статью",
+    "searchPlaceholder": "Поиск статей…"
   },
   "air": {
     "title": "Качество воздуха",
@@ -958,7 +1074,8 @@
   },
   "bot": {
     "name": "Mensaena-бот",
-    "online": "В сети"
+    "online": "В сети",
+    "askMeHint": "Спроси меня…"
   },
   "update": {
     "whatsNew": "Что нового"
@@ -968,50 +1085,82 @@
     "alreadyMember": "Уже с нами? Войти"
   },
   "misc": {
-    "toHome": "На главную"
+    "toHome": "На главную",
+    "interactions": "Взаимодействия",
+    "unsubscribeSuccess": "Успешно отписан",
+    "unsubscribeFailed": "Не удалось отписаться",
+    "pageNotFound": "Страница не найдена",
+    "badges": "Значки"
   },
   "map": {
-    "locationUnavailable": "Не удалось определить местоположение."
+    "locationUnavailable": "Не удалось определить местоположение.",
+    "screenTitle": "Карта"
   },
   "calendar": {
-    "noEvents": "В календаре нет событий."
+    "noEvents": "В календаре нет событий.",
+    "screenTitle": "Календарь"
   },
   "notifications": {
     "allRead": "Все прочитаны ✓",
     "markAllRead": "Отметить все прочитанными",
-    "deleteAllTitle": "Удалить все?"
+    "deleteAllTitle": "Удалить все?",
+    "screenTitle": "Уведомления",
+    "activities": "Активность",
+    "tooltipClearAll": "Очистить все"
   },
   "timebank": {
     "history": "История",
     "zeitbankConfirmation": "ПОДТВЕРЖДЕНИЕ БАНКА ВРЕМЕНИ",
     "reject": "Отклонить",
-    "confirm": "Подтвердить"
+    "confirm": "Подтвердить",
+    "screenTitle": "Банк времени"
   },
   "search": {
     "minChars": "Введите минимум 2 символа",
     "noResultsForQuery": "Нет совпадений по «{query}»",
     "tryOther": "Попробуйте другие слова или меньше символов.",
-    "noResults": "Нет результатов для «{query}»"
+    "noResults": "Нет результатов для «{query}»",
+    "hintPostsProfilesEvents": "Записи, профили, события, организации…",
+    "title": "Поиск"
   },
   "skills": {
     "offerSkill": "Предложить навык",
-    "free": "Бесплатно"
+    "free": "Бесплатно",
+    "screenTitle": "Навыки"
   },
   "wissen": {
-    "shareTitle": "Делиться знаниями"
+    "shareTitle": "Делиться знаниями",
+    "wiki": "Вики",
+    "education": "Образование",
+    "skills": "Навыки",
+    "knowledge": "Знания"
   },
   "teilen": {
-    "hubTitle": "Делиться и обмениваться"
+    "hubTitle": "Делиться и обмениваться",
+    "hubScreenTitle": "Делиться и одалживать",
+    "marketplace": "Маркетплейс",
+    "timebank": "Банк времени",
+    "share": "Делиться"
   },
   "organizations": {
     "notFound": "Организация не найдена.",
     "offers": "Предложения",
     "suggestOrg": "Предложить организацию",
-    "emptyForRegion": "В стране {country} пока нет организаций."
+    "emptyForRegion": "В стране {country} пока нет организаций.",
+    "name": "Название",
+    "categoryField": "Категория",
+    "city": "Город",
+    "address": "Адрес",
+    "description": "Описание",
+    "phone": "Телефон",
+    "website": "Веб-сайт",
+    "suggestTitle": "Предложить орг.",
+    "organizationsTitle": "Организации"
   },
   "live": {
     "connectionFailed": "Сбой подключения",
-    "waitingParticipants": "Ожидание участников …"
+    "waitingParticipants": "Ожидание участников …",
+    "tooltipLeave": "Покинуть"
   },
   "call": {
     "incoming": "Входящий вызов"
@@ -1021,7 +1170,29 @@
   },
   "widgets": {
     "config": "Настройка виджетов",
-    "reset": "Сбросить"
+    "reset": "Сбросить",
+    "titles": {
+      "greeting": "Приветствие",
+      "safetyAlerts": "Предупреждения безопасности",
+      "startup": "Начало работы",
+      "quickActions": "Быстрые действия",
+      "stats": "Статистика",
+      "smartMatch": "Умное совпадение",
+      "trust": "Доверие",
+      "thanksReceived": "Полученные благодарности",
+      "communityPulse": "Пульс сообщества",
+      "activity": "Активность",
+      "map": "Карта",
+      "weekOverview": "Обзор недели",
+      "unreadMessages": "Непрочитанные сообщения",
+      "weekChallenge": "Задача недели",
+      "ratingReminder": "Напоминание об оценке",
+      "weather": "Погода",
+      "holiday": "Праздник",
+      "successStory": "История успеха",
+      "botTip": "Совет MensaenaBot",
+      "nearYou": "Рядом с тобой"
+    }
   },
   "hubs": {
     "share": "Делиться и обмениваться",
@@ -1029,9 +1200,70 @@
   },
   "ratings": {
     "given": "Отданные",
-    "received": "Полученные"
+    "received": "Полученные",
+    "screenTitle": "Оценки"
   },
   "modules": {
-    "post": "Запись"
+    "post": "Запись",
+    "animals": {
+      "subtitle": "Помощь животным, найденные животные, передержка"
+    },
+    "housing": {
+      "subtitle": "Квартиры, комнаты, совместное проживание"
+    },
+    "mobility": {
+      "subtitle": "Попутки, каршеринг, перевозки"
+    },
+    "harvest": {
+      "subtitle": "Делитесь фруктами, овощами, урожаем сада"
+    },
+    "community": {
+      "subtitle": "Обсуждения, встречи, соседство"
+    },
+    "rescuer": {
+      "subtitle": "Спасённые продукты, одежда, вещи"
+    },
+    "sharing": {
+      "subtitle": "Одалживайте инструменты, книги, устройства"
+    },
+    "jobs": {
+      "subtitle": "Вакансии, подработка, волонтёрство"
+    },
+    "board": {
+      "subtitle": "Местные объявления, потеряно и найдено",
+      "titleAlt": "Доска объявлений"
+    },
+    "farms": {
+      "title": "Фермы и прямые производители",
+      "subtitle": "Местные продукты, CSA, фермерские магазины"
+    },
+    "marketplaceHero": {
+      "title": "Дарите, меняйте, одалживайте",
+      "subtitle": "Без коммерции — только соседи"
+    },
+    "groupsHero": {
+      "title": "Соседские группы",
+      "subtitle": "Хобби, спорт, родители, пожилые, экология"
+    },
+    "eventsHero": {
+      "title": "События",
+      "subtitle": "Встречи, мастер-классы, рынки в районе"
+    },
+    "skillsHero": {
+      "title": "Обмен навыками",
+      "subtitle": "Делитесь талантами, учитесь друг у друга"
+    },
+    "matchingHero": {
+      "title": "Умное совпадение"
+    },
+    "wiki": "Вики",
+    "rescue": "Спасение",
+    "sharingTitle": "Делиться",
+    "foodWarnings": "Предупреждения о продуктах",
+    "teilenHub": "Делиться и одалживать",
+    "crisisDetail": "Кризис",
+    "organization": "Организация",
+    "farm": "Ферма",
+    "mentalSupport": "Психологическая поддержка"
   }
 }

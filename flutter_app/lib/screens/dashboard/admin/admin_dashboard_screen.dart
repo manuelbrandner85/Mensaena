@@ -18,7 +18,7 @@ class AdminDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(adminStatsProvider);
     return DashboardScaffold(
-      title: 'Admin',
+      title: 'admin.adminTitle'.tr(),
       currentRoute: '/dashboard/admin',
       body: SafeArea(
         child: RefreshIndicator(
@@ -92,77 +92,77 @@ class _AdminGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final tiles = <_AdminTile>[
       _AdminTile(
-        title: 'Users',
+        title: 'admin.tiles.users'.tr(),
         count: stats.users,
         icon: LucideIcons.users,
         color: AppColors.tealSoft,
         route: '/dashboard/admin/users',
       ),
       _AdminTile(
-        title: 'Posts',
+        title: 'admin.tiles.posts'.tr(),
         count: stats.posts,
         icon: LucideIcons.fileText,
         color: AppColors.amber,
         route: '/dashboard/admin/posts',
       ),
       _AdminTile(
-        title: 'Events',
+        title: 'admin.tiles.events'.tr(),
         count: stats.events,
         icon: LucideIcons.calendar,
         color: AppColors.tealSoft,
         route: '/dashboard/admin/events',
       ),
       _AdminTile(
-        title: 'Board',
+        title: 'admin.tiles.board'.tr(),
         count: stats.boardPosts,
         icon: LucideIcons.layoutDashboard,
         color: AppColors.amber,
         route: '/dashboard/admin/board',
       ),
       _AdminTile(
-        title: 'Krisen',
+        title: 'admin.tiles.crisis'.tr(),
         count: stats.crises,
         icon: LucideIcons.alertTriangle,
         color: AppColors.herzrotWarm,
         route: '/dashboard/admin/crisis',
       ),
       _AdminTile(
-        title: 'Organisationen',
+        title: 'admin.tiles.organizations'.tr(),
         count: stats.organizations,
         icon: LucideIcons.building2,
         color: AppColors.tealSoft,
         route: '/dashboard/admin/organizations',
       ),
       _AdminTile(
-        title: 'Farms',
+        title: 'admin.tiles.farms'.tr(),
         count: stats.farms,
         icon: LucideIcons.wheat,
         color: AppColors.lebenSoft,
         route: '/dashboard/admin/farms',
       ),
       _AdminTile(
-        title: 'Reports',
+        title: 'admin.tiles.reports'.tr(),
         count: stats.reports,
         icon: LucideIcons.flag,
         color: AppColors.herzrot,
         route: '/dashboard/admin/chat-moderation',
       ),
-      const _AdminTile(
-        title: 'Groups',
+      _AdminTile(
+        title: 'admin.tiles.groups'.tr(),
         count: 0,
         icon: LucideIcons.users2,
         color: AppColors.tealSoft,
         route: '/dashboard/admin/groups',
       ),
-      const _AdminTile(
-        title: 'Challenges',
+      _AdminTile(
+        title: 'admin.tiles.challenges'.tr(),
         count: 0,
         icon: LucideIcons.target,
         color: AppColors.amber,
         route: '/dashboard/admin/challenges',
       ),
-      const _AdminTile(
-        title: 'Zeitbank',
+      _AdminTile(
+        title: 'admin.tiles.timebank'.tr(),
         count: 0,
         icon: LucideIcons.clock,
         color: AppColors.tealSoft,
@@ -170,29 +170,29 @@ class _AdminGrid extends StatelessWidget {
       ),
       // FIX R6: Tabellen contact_messages/bot_feedback/marketing_campaigns
       // existieren NICHT im Schema — durch real existierende ersetzt:
-      const _AdminTile(
-        title: 'Org-Vorschläge',
+      _AdminTile(
+        title: 'admin.tiles.suggestions'.tr(),
         count: 0,
         icon: LucideIcons.building2,
         color: AppColors.tealSoft,
         route: '/dashboard/admin/suggestions',
       ),
-      const _AdminTile(
-        title: 'Bot Scheduled',
+      _AdminTile(
+        title: 'admin.tiles.botScheduled'.tr(),
         count: 0,
         icon: LucideIcons.bot,
         color: AppColors.lebenSoft,
         route: '/dashboard/admin/bot-scheduled',
       ),
-      const _AdminTile(
-        title: 'Audit Log',
+      _AdminTile(
+        title: 'admin.tiles.auditLog'.tr(),
         count: 0,
         icon: LucideIcons.fileText,
         color: AppColors.amber,
         route: '/dashboard/admin/audit',
       ),
-      const _AdminTile(
-        title: 'System',
+      _AdminTile(
+        title: 'admin.tiles.system'.tr(),
         count: 0,
         icon: LucideIcons.settings,
         color: AppColors.mute,

@@ -18,21 +18,21 @@ class WissenHubScreen extends ConsumerWidget {
   static const _tiles = <_HubTile>[
     _HubTile(
       icon: LucideIcons.bookOpen,
-      title: 'Wiki',
+      title: 'wissen.wiki',
       sub: 'Gemeinsames Lexikon, Anleitungen, FAQ',
       color: AppColors.bronze,
       route: '/dashboard/wiki',
     ),
     _HubTile(
       icon: LucideIcons.graduationCap,
-      title: 'Bildung',
+      title: 'wissen.education',
       sub: 'Kurse, Workshops, Lernmaterial',
       color: AppColors.amber,
       route: '/dashboard/knowledge',
     ),
     _HubTile(
       icon: LucideIcons.wrench,
-      title: 'Skills',
+      title: 'wissen.skills',
       sub: 'Wer kann was — Personen mit ihren Fähigkeiten',
       color: AppColors.tealSoft,
       route: '/dashboard/skills',
@@ -42,7 +42,7 @@ class WissenHubScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DashboardScaffold(
-      title: 'Wissen',
+      title: 'wissen.knowledge'.tr(),
       currentRoute: '/dashboard/wissen',
       body: SafeArea(
         child: ListView(

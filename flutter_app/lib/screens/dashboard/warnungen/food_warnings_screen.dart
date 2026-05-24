@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -64,7 +65,7 @@ class _FoodWarningsScreenState extends ConsumerState<FoodWarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Lebensmittelwarnungen',
+      title: 'modules.foodWarnings'.tr(),
       currentRoute: '/dashboard/warnungen',
       body: SafeArea(
         child: RefreshIndicator(

@@ -256,7 +256,7 @@ class _ModuleCreatePostScreenState
   Widget build(BuildContext context) {
     final c = widget.config;
     return DashboardScaffold(
-      title: c.title,
+      title: c.title.tr(),
       currentRoute: c.returnRoute,
       body: SafeArea(
         child: ListView(
@@ -289,7 +289,7 @@ class _ModuleCreatePostScreenState
                   child: EditorialModuleHeader(
                     metaIndex: '✦ Neu',
                     metaCategory: c.moduleKey.toUpperCase(),
-                    title: c.title,
+                    title: c.title.tr(),
                     subtitle: c.description,
                   ),
                 ),
@@ -351,8 +351,8 @@ class _ModuleCreatePostScreenState
               controller: _titleCtrl,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Titel',
+              decoration: InputDecoration(
+                labelText: 'create.title'.tr(),
                 counterText: '',
               ),
             ),
@@ -364,8 +364,8 @@ class _ModuleCreatePostScreenState
               maxLines: 6,
               minLines: 3,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Beschreibung (optional)',
+              decoration: InputDecoration(
+                labelText: 'create.descriptionOptional'.tr(),
                 alignLabelWithHint: true,
               ),
             ),
@@ -429,7 +429,7 @@ class _ModuleCreatePostScreenState
                 Expanded(
                   child: AddressAutocompleteField(
                     controller: _locationCtrl,
-                    label: 'Ort',
+                    label: 'create.place'.tr(),
                     onSelected: (s) => setState(() {
                       _lat = s.lat;
                       _lng = s.lng;
@@ -453,8 +453,8 @@ class _ModuleCreatePostScreenState
             TextField(
               controller: _tagsCtrl,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Tags (komma-getrennt)',
+              decoration: InputDecoration(
+                labelText: 'create.tagsCommaSeparated'.tr(),
                 hintText: 'z.B. dringend, lokal, vegan',
               ),
             ),
@@ -468,8 +468,8 @@ class _ModuleCreatePostScreenState
               controller: _phoneCtrl,
               keyboardType: TextInputType.phone,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Telefon',
+              decoration: InputDecoration(
+                labelText: 'create.phone'.tr(),
                 isDense: true,
               ),
             ),
@@ -573,7 +573,7 @@ class _ModuleCreatePostScreenState
                       ),
                     )
                   : const Icon(LucideIcons.send, size: 16),
-              label: Text('${c.title.split(' ').last} veröffentlichen'),
+              label: Text('create.publish'.tr()),
             ),
             const SizedBox(height: 10),
             OutlinedButton(

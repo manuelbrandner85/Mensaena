@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -73,7 +74,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Admin: Users',
+      title: 'admin.usersTitle'.tr(),
       currentRoute: '/dashboard/admin/users',
       body: SafeArea(
         child: Column(
@@ -81,7 +82,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
               child: ModuleSearchBar(
-                hintText: 'Name oder E-Mail suchen…',
+                hintText: 'admin.searchUsersHint'.tr(),
                 onChanged: (v) => setState(() => _search = v),
               ),
             ),
@@ -101,11 +102,11 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                       return ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
-                        children: const [
-                          SizedBox(height: 60),
+                        children: [
+                          const SizedBox(height: 60),
                           EmptyStateCard(
                             icon: LucideIcons.users,
-                            title: 'Keine Benutzer.',
+                            title: 'admin.noUsers'.tr(),
                           ),
                         ],
                       );

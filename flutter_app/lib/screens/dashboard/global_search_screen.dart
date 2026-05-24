@@ -119,7 +119,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Suche',
+      title: 'search.title'.tr(),
       currentRoute: '/dashboard/search',
       body: SafeArea(
         child: Column(
@@ -146,7 +146,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                           },
                         )
                       : null,
-                  hintText: 'Posts, Profile, Events, Organisationen…',
+                  hintText: 'search.hintPostsProfilesEvents'.tr(),
                   hintStyle: AppTypography.body(
                       size: 14, color: AppColors.mute),
                   border: OutlineInputBorder(

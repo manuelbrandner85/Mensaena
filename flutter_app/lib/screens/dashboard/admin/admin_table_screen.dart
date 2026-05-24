@@ -89,7 +89,7 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Admin: ${widget.title}',
+      title: 'admin.tableTitlePrefix'.tr(namedArgs: {'title': widget.title}),
       currentRoute: widget.currentRoute,
       body: SafeArea(
         child: Column(
@@ -107,7 +107,7 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
                   fillColor: AppColors.elevated,
                   prefixIcon: const Icon(LucideIcons.search,
                       size: 16, color: AppColors.mute),
-                  hintText: 'Suchen in ${widget.tableName}…',
+                  hintText: 'admin.searchInTable'.tr(namedArgs: {'table': widget.tableName}),
                   hintStyle: AppTypography.body(
                     size: 13,
                     color: AppColors.mute,

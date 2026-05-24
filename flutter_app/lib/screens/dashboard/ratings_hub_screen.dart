@@ -53,7 +53,7 @@ class _RatingsHubScreenState extends ConsumerState<RatingsHubScreen>
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Bewertungen',
+      title: 'ratings.screenTitle'.tr(),
       currentRoute: '/ratings',
       body: SafeArea(
         child: Column(

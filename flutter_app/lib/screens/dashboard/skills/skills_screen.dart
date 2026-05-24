@@ -55,7 +55,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Skills',
+      title: 'skills.screenTitle'.tr(),
       currentRoute: '/dashboard/skills',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
@@ -67,13 +67,13 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 12',
-                metaCategory: 'Skills',
-                title: 'Skill-Tausch',
-                subtitle: 'Talente teilen, voneinander lernen',
+                metaCategory: 'skills.screenTitle'.tr(),
+                title: 'modules.skillsHero.title'.tr(),
+                subtitle: 'modules.skillsHero.subtitle'.tr(),
               ),
             ),
             Expanded(
