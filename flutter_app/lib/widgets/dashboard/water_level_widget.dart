@@ -139,7 +139,7 @@ class _WaterLevelWidgetState extends State<WaterLevelWidget> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('${w.level.toStringAsFixed(0)}',
+                  Text(w.level.toStringAsFixed(0),
                       style: AppTypography.mono(
                           size: 28, color: AppColors.ink)),
                   const SizedBox(width: 4),

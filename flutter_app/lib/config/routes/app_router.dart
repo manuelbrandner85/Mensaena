@@ -43,7 +43,7 @@ import '../../screens/dashboard/crisis/crisis_create_screen.dart';
 import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
 import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
 import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
-import '../../screens/dashboard/dashboard_home_screen.dart';
+import '../../screens/dashboard/home/dashboard_home_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_create_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_screen.dart';
 import '../../screens/dashboard/module/module_posts_screen.dart';
