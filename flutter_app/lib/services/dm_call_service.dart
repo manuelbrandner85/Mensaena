@@ -40,6 +40,8 @@ class DmCallService {
       return const DmCallStartResult(
           success: false, errorReason: 'Du kannst dich nicht selbst anrufen');
     }
+    // JWT kann abgelaufen sein (Background, lange Idle) → refresh.
+    await SupabaseService.ensureFreshSession();
     final roomName = 'dm-${DateTime.now().millisecondsSinceEpoch}';
     try {
       final row = await sb
@@ -134,6 +136,8 @@ class LiveStreamService {
       );
       return null;
     }
+    // JWT kann abgelaufen sein → refresh damit RLS-Insert nicht abgewiesen wird.
+    await SupabaseService.ensureFreshSession();
     final roomName =
         'channel-$channelSlug-${DateTime.now().millisecondsSinceEpoch}';
     try {
