@@ -1,5 +1,10 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
@@ -34,7 +39,7 @@ class CallScreen extends ConsumerStatefulWidget {
   ConsumerState<CallScreen> createState() => _CallScreenState();
 }
 
-enum _CallState { connecting, connected, ended, failed }
+enum _CallState { outgoingRinging, connecting, connected, ended, failed }
 
 class _CallScreenState extends ConsumerState<CallScreen> {
   lk.Room? _room;
@@ -44,12 +49,148 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   bool _camEnabled = false;
   String? _error;
   String? _peerAvatarUrl;
+  // Outgoing-Call (Caller-Side): wir warten auf Status='active' bevor
+  // wir LiveKit verbinden. Ringback-Tone laeuft solange.
+  bool _isCaller = false;
+  AudioPlayer? _ringback;
+  Timer? _ringbackHaptic;
+  Timer? _ringingTimeout;
+  StreamSubscription<List<Map<String, dynamic>>>? _callStatusSub;
 
   @override
   void initState() {
     super.initState();
-    _connect();
+    _bootstrap();
     _loadPeerAvatar();
+  }
+
+  /// Entscheidet ob wir Caller (Outgoing-Ringing-UI + Ringback) oder
+  /// Callee (sofort LiveKit-Connect — Annahme erfolgt schon vor Nav) sind.
+  Future<void> _bootstrap() async {
+    try {
+      final me = SupabaseService.currentUser?.id;
+      final call = await sb
+          .from('dm_calls')
+          .select('caller_id, callee_id, status')
+          .eq('id', widget.callId)
+          .maybeSingle();
+      if (call == null) {
+        await _connect();
+        return;
+      }
+      final callerId = call['caller_id'] as String?;
+      final status = call['status'] as String?;
+      _isCaller = me != null && callerId == me;
+      // Caller + Status noch 'ringing' → Outgoing-Ringing-Modus.
+      if (_isCaller && status == 'ringing') {
+        if (mounted) {
+          setState(() => _state = _CallState.outgoingRinging);
+        }
+        _startRingback();
+        _watchCallStatus();
+        // 45s Timeout (parallel zur Callee-Seite).
+        _ringingTimeout = Timer(const Duration(seconds: 45), () {
+          if (_state == _CallState.outgoingRinging) {
+            _onPeerUnreachable(status: 'missed');
+          }
+        });
+        return;
+      }
+      // Sonst: direkt connecten (Callee-Side oder bereits 'active').
+      await _connect();
+    } catch (_) {
+      await _connect();
+    }
+  }
+
+  void _watchCallStatus() {
+    try {
+      _callStatusSub = sb
+          .from('dm_calls')
+          .stream(primaryKey: ['id'])
+          .eq('id', widget.callId)
+          .listen((rows) async {
+            if (rows.isEmpty) return;
+            final r = rows.first;
+            final s = r['status'] as String?;
+            if (s == 'active') {
+              _ringingTimeout?.cancel();
+              await _stopRingback();
+              if (!mounted) return;
+              setState(() => _state = _CallState.connecting);
+              await _connect();
+            } else if (s == 'cancelled' || s == 'missed' || s == 'ended') {
+              _onPeerUnreachable(status: s ?? 'cancelled');
+            }
+          });
+    } catch (_) {}
+  }
+
+  Future<void> _startRingback() async {
+    // Versuche zuerst die Asset-MP3. Wenn nicht vorhanden — Vibrations-Pulse
+    // als Fallback (haptic alle 2s).
+    try {
+      final player = AudioPlayer();
+      await player.setReleaseMode(ReleaseMode.loop);
+      await player.setVolume(0.6);
+      await player.play(AssetSource('sounds/ringback.mp3'));
+      _ringback = player;
+    } catch (_) {
+      _ringback = null;
+    }
+    // Haptic-Pulse parallel: dezenter Tap alle 2 Sekunden bis Verbindung.
+    _ringbackHaptic = Timer.periodic(const Duration(seconds: 2), (_) {
+      HapticFeedback.lightImpact();
+    });
+  }
+
+  Future<void> _stopRingback() async {
+    _ringbackHaptic?.cancel();
+    _ringbackHaptic = null;
+    try {
+      await _ringback?.stop();
+      await _ringback?.dispose();
+    } catch (_) {}
+    _ringback = null;
+  }
+
+  Future<void> _onPeerUnreachable({String status = 'missed'}) async {
+    _ringingTimeout?.cancel();
+    await _stopRingback();
+    if (status == 'missed') {
+      try {
+        await sb.from('dm_calls').update({
+          'status': 'missed',
+          'ended_at': DateTime.now().toUtc().toIso8601String(),
+        }).eq('id', widget.callId);
+      } catch (_) {}
+    }
+    if (!mounted) return;
+    final msg = status == 'cancelled'
+        ? 'call.callDeclined'.tr()
+        : 'call.notReachable'.tr();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(msg,
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/dashboard/messages');
+    }
+  }
+
+  Future<void> _cancelOutgoing() async {
+    _ringingTimeout?.cancel();
+    await _stopRingback();
+    await DmCallService.cancel(widget.callId);
+    if (!mounted) return;
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/dashboard/messages');
+    }
   }
 
   Future<void> _loadPeerAvatar() async {
@@ -185,6 +326,13 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   @override
   void dispose() {
+    _ringingTimeout?.cancel();
+    _ringbackHaptic?.cancel();
+    _callStatusSub?.cancel();
+    try {
+      _ringback?.stop();
+      _ringback?.dispose();
+    } catch (_) {}
     _listener?.dispose();
     _room?.dispose();
     super.dispose();
@@ -192,6 +340,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Outgoing-Ringing-Sonder-UI: Avatar mit Pulse-Ring + Cancel-Button.
+    if (_state == _CallState.outgoingRinging) {
+      return _OutgoingRingingView(
+        peerName: widget.peerName,
+        avatarUrl: _peerAvatarUrl,
+        onCancel: _cancelOutgoing,
+      );
+    }
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       body: SafeArea(
@@ -271,15 +427,179 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   String _subtitle() {
     switch (_state) {
+      case _CallState.outgoingRinging:
+        return 'call.calling'.tr();
       case _CallState.connecting:
         return 'Verbinde…';
       case _CallState.connected:
         return 'Verbunden';
       case _CallState.ended:
-        return 'Beendet';
+        return 'call.callEnded'.tr();
       case _CallState.failed:
         return 'Verbindung fehlgeschlagen';
     }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// OutgoingRingingView — WhatsApp-Style "Klingelt…" beim Anrufen
+// ─────────────────────────────────────────────────────────────
+class _OutgoingRingingView extends StatefulWidget {
+  const _OutgoingRingingView({
+    required this.peerName,
+    required this.onCancel,
+    this.avatarUrl,
+  });
+
+  final String peerName;
+  final String? avatarUrl;
+  final VoidCallback onCancel;
+
+  @override
+  State<_OutgoingRingingView> createState() => _OutgoingRingingViewState();
+}
+
+class _OutgoingRingingViewState extends State<_OutgoingRingingView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = widget.peerName.isNotEmpty
+        ? widget.peerName[0].toUpperCase()
+        : '?';
+    return Scaffold(
+      backgroundColor: AppColors.voidColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(),
+            AnimatedBuilder(
+              animation: _pulse,
+              builder: (_, __) {
+                final scale = 1.0 + _pulse.value * 0.18;
+                final opacity = 0.55 - _pulse.value * 0.35;
+                return SizedBox(
+                  width: 240,
+                  height: 240,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Transform.scale(
+                        scale: scale,
+                        child: Container(
+                          width: 220,
+                          height: 220,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.bronze
+                                  .withValues(alpha: opacity),
+                              width: 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 160,
+                        height: 160,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.bronze.withValues(alpha: 0.18),
+                          border:
+                              Border.all(color: AppColors.bronze, width: 2),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: widget.avatarUrl != null &&
+                                widget.avatarUrl!.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: widget.avatarUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => Text(
+                                  initial,
+                                  style: AppTypography.display(
+                                      size: 56, color: AppColors.bronze),
+                                ),
+                                errorWidget: (_, __, ___) => Text(
+                                  initial,
+                                  style: AppTypography.display(
+                                      size: 56, color: AppColors.bronze),
+                                ),
+                              )
+                            : Text(
+                                initial,
+                                style: AppTypography.display(
+                                    size: 56, color: AppColors.bronze),
+                              ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 32),
+            Text(
+              widget.peerName,
+              style: AppTypography.display(
+                  size: 28, color: AppColors.ink, height: 1.2),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'call.calling'.tr(),
+              style: AppTypography.body(size: 14, color: AppColors.inkSoft),
+            ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 56),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  InkWell(
+                    onTap: widget.onCancel,
+                    borderRadius: BorderRadius.circular(72),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.herzrot.withValues(alpha: 0.22),
+                        border:
+                            Border.all(color: AppColors.herzrot, width: 2),
+                      ),
+                      child: const Icon(LucideIcons.phoneOff,
+                          color: AppColors.herzrot, size: 32),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'call.cancelCall'.tr(),
+                    style: AppTypography.label(
+                        size: 11, color: AppColors.inkSoft),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

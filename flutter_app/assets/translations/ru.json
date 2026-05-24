@@ -1176,7 +1176,14 @@
     "tooltipLeave": "Покинуть"
   },
   "call": {
-    "incoming": "Входящий вызов"
+    "incoming": "Входящий вызов",
+    "calling": "Звонок …",
+    "ringing": "Входящий вызов",
+    "cancelCall": "Отменить вызов",
+    "callDeclined": "Вызов отклонён",
+    "callMissed": "Пропущенный вызов",
+    "callEnded": "Вызов завершён",
+    "notReachable": "Не удалось дозвониться"
   },
   "voice": {
     "micDenied": "Доступ к микрофону запрещён."

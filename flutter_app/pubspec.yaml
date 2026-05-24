@@ -105,6 +105,11 @@ dependencies:
   # Accelerometer/Gyroscope fuer 3D-Tilt-Cards (Cinematic Phase B).
   sensors_plus: ^6.0.1
 
+  # WhatsApp-Style native Call-UI (Lock-Screen + Fullscreen Ringing).
+  # Auch im Background/Killed-State zeigt Android das native CallScreen
+  # statt einer Heads-Up-Notification.
+  flutter_callkit_incoming: ^2.5.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

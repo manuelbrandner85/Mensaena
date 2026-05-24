@@ -1176,7 +1176,14 @@
     "tooltipLeave": "Leave"
   },
   "call": {
-    "incoming": "Incoming call"
+    "incoming": "Incoming call",
+    "calling": "Ringing …",
+    "ringing": "Incoming call",
+    "cancelCall": "Cancel call",
+    "callDeclined": "Call declined",
+    "callMissed": "Missed call",
+    "callEnded": "Call ended",
+    "notReachable": "Could not be reached"
   },
   "voice": {
     "micDenied": "Microphone permission denied."

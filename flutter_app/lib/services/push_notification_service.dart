@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'callkit_service.dart';
 import 'supabase_service.dart';
 
 /// SKILL: mensaena-architektur
@@ -340,9 +341,37 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
 
     if (isCall) {
       // ── Incoming Call ─────────────────────────────────────────
-      // Separate channel with Importance.max + fullScreenIntent so the
-      // device shows the call UI on top of the lock-screen, even when
-      // the app is killed. 45s timeout = LiveKit room expiry default.
+      // WhatsApp-Style: zeige native CallKit-UI (Vollbild, klingelnd,
+      // auch im Lock-Screen / Killed-State). Fallback: fullScreenIntent
+      // Notification falls CallKit fehlschlaegt.
+      final callerName =
+          (m.data['caller_name'] as String?) ?? 'Nachbar:in';
+      final callId = (m.data['call_id'] as String?) ?? '';
+      final roomName = (m.data['room_name'] as String?) ?? '';
+      final conversationId = m.data['conversation_id'] as String?;
+      final callerId = m.data['caller_id'] as String?;
+      final callerAvatar = m.data['caller_avatar'] as String?;
+      final callType = (m.data['call_type'] as String?) ?? 'audio';
+
+      // 1) Primaer: native CallKit-Bridge.
+      try {
+        if (callId.isNotEmpty) {
+          await CallkitService.showIncoming(
+            callId: callId,
+            callerName: callerName,
+            callerAvatar: callerAvatar,
+            roomName: roomName,
+            conversationId: conversationId,
+            callerId: callerId,
+            callType: callType,
+          );
+          return;
+        }
+      } catch (e) {
+        debugPrint('[BG-Handler] CallKit failed → Fallback Notification: $e');
+      }
+
+      // 2) Fallback: alte fullScreenIntent-Notification.
       final callsChannel = AndroidNotificationChannel(
         'mensaena_calls',
         'Eingehende Anrufe',
@@ -355,10 +384,6 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
       );
       await androidPlugin?.createNotificationChannel(callsChannel);
 
-      final callerName =
-          (m.data['caller_name'] as String?) ?? 'Nachbar:in';
-      final callId = (m.data['call_id'] as String?) ?? '';
-      final roomName = (m.data['room_name'] as String?) ?? '';
       final peerEnc = Uri.encodeComponent(callerName);
       final roomEnc = Uri.encodeComponent(roomName);
       final deepLink = '/dashboard/call/$callId?room=$roomEnc&peer=$peerEnc';

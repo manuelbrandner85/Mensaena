@@ -1176,7 +1176,14 @@
     "tooltipLeave": "Verlassen"
   },
   "call": {
-    "incoming": "Eingehender Anruf"
+    "incoming": "Eingehender Anruf",
+    "calling": "Klingelt …",
+    "ringing": "Eingehender Anruf",
+    "cancelCall": "Anruf abbrechen",
+    "callDeclined": "Anruf abgelehnt",
+    "callMissed": "Nicht erreicht",
+    "callEnded": "Anruf beendet",
+    "notReachable": "Konnte nicht erreicht werden"
   },
   "voice": {
     "micDenied": "Mikrofon-Berechtigung verweigert."

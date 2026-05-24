@@ -1176,7 +1176,14 @@
     "tooltipLeave": "Salir"
   },
   "call": {
-    "incoming": "Llamada entrante"
+    "incoming": "Llamada entrante",
+    "calling": "Llamando …",
+    "ringing": "Llamada entrante",
+    "cancelCall": "Cancelar llamada",
+    "callDeclined": "Llamada rechazada",
+    "callMissed": "Llamada perdida",
+    "callEnded": "Llamada finalizada",
+    "notReachable": "No se ha podido contactar"
   },
   "voice": {
     "micDenied": "Permiso de micrófono denegado."

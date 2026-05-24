@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
 import 'providers/locale_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'services/callkit_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 
@@ -75,6 +76,11 @@ Future<void> main() async {
 Future<void> _initBackgroundServices() async {
   try {
     await PushNotificationService.init();
+  } catch (_) {}
+
+  // Native Call-UI (flutter_callkit_incoming): WhatsApp-Style Ringing.
+  try {
+    await CallkitService.initialize();
   } catch (_) {}
 
   // FCM-Token bei aktuellem Login direkt registrieren

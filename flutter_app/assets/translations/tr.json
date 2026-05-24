@@ -1176,7 +1176,14 @@
     "tooltipLeave": "Ayrıl"
   },
   "call": {
-    "incoming": "Gelen arama"
+    "incoming": "Gelen arama",
+    "calling": "Çalıyor …",
+    "ringing": "Gelen arama",
+    "cancelCall": "Aramayı iptal et",
+    "callDeclined": "Arama reddedildi",
+    "callMissed": "Cevapsız arama",
+    "callEnded": "Arama sona erdi",
+    "notReachable": "Ulaşılamadı"
   },
   "voice": {
     "micDenied": "Mikrofon izni reddedildi."

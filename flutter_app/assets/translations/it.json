@@ -1176,7 +1176,14 @@
     "tooltipLeave": "Esci"
   },
   "call": {
-    "incoming": "Chiamata in arrivo"
+    "incoming": "Chiamata in arrivo",
+    "calling": "Sta squillando …",
+    "ringing": "Chiamata in arrivo",
+    "cancelCall": "Annulla chiamata",
+    "callDeclined": "Chiamata rifiutata",
+    "callMissed": "Chiamata persa",
+    "callEnded": "Chiamata terminata",
+    "notReachable": "Non è stato possibile contattarlo"
   },
   "voice": {
     "micDenied": "Permesso microfono negato."
