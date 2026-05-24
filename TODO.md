@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Frei für Polish + neue Web-Features
+OPEN=Web-Parität Gap-Audit (8 Gaps offen, Gap 1 erledigt)
 COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 ✅ KOMPLETT (Calls/Livestream production-ready)
-NEXT=Frei
+NEXT=Gap 2 (Messages-Screen initialTab DM vs Community)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(calls): production-ready IncomingCallListener + notify-call Edge Function + DB-Webhook + Android USE_FULL_SCREEN_INTENT
+LAST_TASK=feat(nav): Drawer-Gruppe Kommunikation auf 3 Items gesplittet (Nachrichten + Community-Chat + Matching) — Web-Parität Gap 1
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

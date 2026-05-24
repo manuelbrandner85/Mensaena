@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 KOMPLETT — incoming-call Push + Edge Function + DB-Webhook + fullScreenIntent
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 KOMPLETT + Web-Parität Gap-Audit (Gap 1/8 erledigt: Drawer-Kommunikation 3 Items)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

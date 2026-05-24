@@ -47,10 +47,15 @@ class AppDrawer extends ConsumerWidget {
       headIcon: LucideIcons.messageCircle,
       items: [
         _NavLink(
-          icon: LucideIcons.messageCircle,
-          label: 'Chat',
-          route: '/dashboard/chat',
+          icon: LucideIcons.mail,
+          label: 'Nachrichten',
+          route: '/dashboard/messages',
           badgeKey: 'unreadMessages',
+        ),
+        _NavLink(
+          icon: LucideIcons.messageCircle,
+          label: 'Community-Chat',
+          route: '/dashboard/chat',
         ),
         _NavLink(
           icon: LucideIcons.sparkles,
