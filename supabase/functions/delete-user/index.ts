@@ -7,7 +7,9 @@
 //     body: { userId },
 //   })
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+// Pin auf exakte Version — esm.sh @2-Resolver liefert manchmal HTTP 522
+// während CI-Build (kein Caching, kein Retry). Exakte Version = stabil.
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
