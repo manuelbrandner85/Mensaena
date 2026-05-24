@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -64,14 +65,14 @@ class _ProfileSavedScreenState extends ConsumerState<ProfileSavedScreen> {
                           const Icon(LucideIcons.bookmark,
                               size: 36, color: AppColors.mute),
                           const SizedBox(height: 10),
-                          Text('Noch nichts gespeichert.',
+                          Text('profile.nothingSaved'.tr(),
                               style: AppTypography.body(
                                   size: 14,
                                   color: AppColors.ink,
                                   weight: FontWeight.w600)),
                           const SizedBox(height: 4),
                           Text(
-                              'Tippe das Lesezeichen auf einem Beitrag, um ihn hier zu sammeln.',
+                              'profile.savedHint'.tr(),
                               textAlign: TextAlign.center,
                               style: AppTypography.body(
                                   size: 12, color: AppColors.mute)),

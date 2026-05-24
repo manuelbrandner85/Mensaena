@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -68,11 +69,11 @@ class LandingScreen extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: () => context.go('/auth?mode=register'),
                         icon: const Icon(LucideIcons.arrowRight, size: 16),
-                        label: const Text('Kostenlos starten'),
+                        label: Text('landing.startFree'.tr()),
                       ),
                       OutlinedButton(
                         onPressed: () => context.go('/auth?mode=login'),
-                        child: const Text('Bereits dabei? Anmelden'),
+                        child: Text('landing.alreadyMember'.tr()),
                       ),
                     ],
                   ),

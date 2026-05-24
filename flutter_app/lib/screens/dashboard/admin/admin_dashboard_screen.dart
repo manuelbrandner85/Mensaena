@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,7 +41,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         CircularProgressIndicator(color: AppColors.amber),
                   ),
                 ),
-                error: (_, __) => Text('Stats konnten nicht geladen werden.',
+                error: (_, __) => Text('admin.statsLoadFailed'.tr(),
                     style: AppTypography.caption()),
                 data: (s) => _AdminGrid(stats: s),
               ),
@@ -70,10 +71,10 @@ class AdminDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Admin-Cockpit',
+              Text('admin.cockpit'.tr(),
                   style: AppTypography.display(
                       size: 22, color: AppColors.ink)),
-              Text('Übersicht & Moderation aller Module.',
+              Text('admin.cockpitSubtitle'.tr(),
                   style: AppTypography.caption()),
             ],
           ),

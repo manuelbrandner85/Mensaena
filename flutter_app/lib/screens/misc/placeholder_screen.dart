@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -59,7 +60,7 @@ class PlaceholderScreen extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: () => context.go('/'),
                 icon: const Icon(LucideIcons.home, size: 16),
-                label: const Text('Zur Startseite'),
+                label: Text('misc.toHome'.tr()),
               ),
             ],
           ),

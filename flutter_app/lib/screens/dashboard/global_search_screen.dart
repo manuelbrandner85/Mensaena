@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -284,7 +285,7 @@ class _EmptyHint extends StatelessWidget {
         children: [
           const Icon(LucideIcons.search, size: 32, color: AppColors.mute),
           const SizedBox(height: 10),
-          Text('Mindestens 2 Zeichen eingeben',
+          Text('search.minChars'.tr(),
               style:
                   AppTypography.body(size: 13, color: AppColors.mute)),
         ],
@@ -305,11 +306,11 @@ class _NoResults extends StatelessWidget {
         children: [
           const Icon(LucideIcons.searchX, size: 32, color: AppColors.mute),
           const SizedBox(height: 10),
-          Text('Keine Treffer für „$query"',
+          Text('search.noResultsForQuery'.tr(namedArgs: {'query': query}),
               style:
                   AppTypography.body(size: 14, color: AppColors.ink)),
           const SizedBox(height: 4),
-          Text('Versuch andere Begriffe oder weniger Zeichen.',
+          Text('search.tryOther'.tr(),
               style:
                   AppTypography.body(size: 12, color: AppColors.mute)),
         ],

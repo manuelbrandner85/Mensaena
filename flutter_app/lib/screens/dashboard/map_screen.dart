@@ -107,8 +107,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Standort konnte nicht ermittelt werden.'),
+        SnackBar(
+          content: Text('map.locationUnavailable'.tr()),
         ),
       );
     }
@@ -483,7 +483,7 @@ class _PostBottomSheet extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Schließen'),
+                    child: Text('common.close'.tr()),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -494,7 +494,7 @@ class _PostBottomSheet extends StatelessWidget {
                       context.go('/dashboard/posts/${post.id}');
                     },
                     icon: const Icon(LucideIcons.arrowRight, size: 16),
-                    label: const Text('Öffnen'),
+                    label: Text('common.open'.tr()),
                   ),
                 ),
               ],

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -70,7 +71,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Standort nicht verfügbar.')),
+        SnackBar(content: Text('crisis.locationUnavailable'.tr())),
       );
     }
   }
@@ -141,7 +142,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
               ),
             ),
             const SizedBox(height: 18),
-            Text('Kategorie', style: AppTypography.label(size: 10)),
+            Text('crisis.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 6,
@@ -181,7 +182,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
               }).toList(),
             ),
             const SizedBox(height: 14),
-            Text('Dringlichkeit', style: AppTypography.label(size: 10)),
+            Text('crisis.urgency'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 6,

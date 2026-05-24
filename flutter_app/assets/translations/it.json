@@ -139,7 +139,8 @@
     "minChars": "Almeno {n} caratteri",
     "maxChars": "Massimo {n} caratteri",
     "urlMustStart": "L’URL deve iniziare con https://",
-    "nothingSaved": "Ancora nulla salvato."
+    "nothingSaved": "Ancora nulla salvato.",
+    "savedHint": "Tocca il segnalibro su un post per raccoglierlo qui."
   },
   "settings": {
     "title": "Impostazioni",
@@ -229,7 +230,8 @@
     "read": "Letto",
     "reply": "Risposta",
     "view": "Vedi",
-    "pinnedMessages": "Messaggi fissati"
+    "pinnedMessages": "Messaggi fissati",
+    "micPermissionDenied": "Permesso microfono negato."
   },
   "languages": {
     "de": "Tedesco",
@@ -275,7 +277,9 @@
         "subtitle": "7 lingue disponibili",
         "body": "Mensaena parla 7 lingue. Il rilevamento automatico in base alla posizione è attivo di default — modificalo in qualsiasi momento tramite il pulsante bandiera in alto in ogni schermata."
       }
-    }
+    },
+    "saveLocation": "Salva posizione",
+    "back": "Indietro"
   },
   "errors": {
     "generic": "Qualcosa è andato storto.",
@@ -495,7 +499,9 @@
     "locationUnavailable": "Posizione non disponibile.",
     "categoryLabel": "Categoria",
     "urgency": "Urgenza",
-    "errorWith": "Errore: {error}"
+    "errorWith": "Errore: {error}",
+    "urgencyLabel": "Urgenza",
+    "resourceError": "Errore: {error}"
   },
   "posts": {
     "title": "Post",
@@ -722,7 +728,8 @@
     "farmIsSeasonal": "Stagionale",
     "farmSubmit": "Invia voce",
     "farmNotFound": "Fattoria non trovata.",
-    "products": "Prodotti"
+    "products": "Prodotti",
+    "notFound": "Fattoria non trovata."
   },
   "knowledge": {
     "category": "Categoria",
@@ -802,7 +809,8 @@
     "source": "Fonte: Wikipedia"
   },
   "bot": {
-    "name": "Bot Mensaena"
+    "name": "Bot Mensaena",
+    "online": "Online"
   },
   "update": {
     "whatsNew": "Novità"
@@ -827,12 +835,15 @@
   },
   "timebank": {
     "history": "Storico",
-    "zeitbankConfirmation": "CONFERMA BANCA DEL TEMPO"
+    "zeitbankConfirmation": "CONFERMA BANCA DEL TEMPO",
+    "reject": "Rifiuta",
+    "confirm": "Conferma"
   },
   "search": {
     "minChars": "Inserisci almeno 2 caratteri",
     "noResultsForQuery": "Nessun risultato per «{query}»",
-    "tryOther": "Prova altri termini o meno caratteri."
+    "tryOther": "Prova altri termini o meno caratteri.",
+    "noResults": "Nessun risultato per \"{query}\""
   },
   "skills": {
     "offerSkill": "Offri un'abilità",
@@ -860,6 +871,18 @@
     "micDenied": "Permesso microfono negato."
   },
   "widgets": {
-    "config": "Configurazione widget"
+    "config": "Configurazione widget",
+    "reset": "Reimposta"
+  },
+  "hubs": {
+    "share": "Condividi e scambia",
+    "knowledge": "Condividi conoscenza"
+  },
+  "ratings": {
+    "given": "Date",
+    "received": "Ricevute"
+  },
+  "modules": {
+    "post": "Post"
   }
 }

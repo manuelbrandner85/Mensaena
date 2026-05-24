@@ -139,7 +139,8 @@
     "minChars": "At least {n} characters",
     "maxChars": "At most {n} characters",
     "urlMustStart": "URL must start with https://",
-    "nothingSaved": "Nothing saved yet."
+    "nothingSaved": "Nothing saved yet.",
+    "savedHint": "Tap the bookmark on a post to collect it here."
   },
   "settings": {
     "title": "Settings",
@@ -229,7 +230,8 @@
     "read": "Read",
     "reply": "Reply",
     "view": "View",
-    "pinnedMessages": "Pinned messages"
+    "pinnedMessages": "Pinned messages",
+    "micPermissionDenied": "Microphone permission denied."
   },
   "languages": {
     "de": "German",
@@ -275,7 +277,9 @@
         "subtitle": "7 languages available",
         "body": "Mensaena speaks 7 languages. Auto-detection by location is on by default — change anytime via the flag button at the top of every screen."
       }
-    }
+    },
+    "saveLocation": "Save location",
+    "back": "Back"
   },
   "errors": {
     "generic": "Something went wrong.",
@@ -495,7 +499,9 @@
     "locationUnavailable": "Location not available.",
     "categoryLabel": "Category",
     "urgency": "Urgency",
-    "errorWith": "Error: {error}"
+    "errorWith": "Error: {error}",
+    "urgencyLabel": "Urgency",
+    "resourceError": "Error: {error}"
   },
   "posts": {
     "title": "Posts",
@@ -722,7 +728,8 @@
     "farmIsSeasonal": "Seasonal",
     "farmSubmit": "Submit entry",
     "farmNotFound": "Farm not found.",
-    "products": "Products"
+    "products": "Products",
+    "notFound": "Farm not found."
   },
   "knowledge": {
     "category": "Category",
@@ -802,7 +809,8 @@
     "source": "Source: Wikipedia"
   },
   "bot": {
-    "name": "Mensaena Bot"
+    "name": "Mensaena Bot",
+    "online": "Online"
   },
   "update": {
     "whatsNew": "What's new"
@@ -827,12 +835,15 @@
   },
   "timebank": {
     "history": "History",
-    "zeitbankConfirmation": "TIMEBANK CONFIRMATION"
+    "zeitbankConfirmation": "TIMEBANK CONFIRMATION",
+    "reject": "Decline",
+    "confirm": "Confirm"
   },
   "search": {
     "minChars": "Type at least 2 characters",
     "noResultsForQuery": "No matches for \"{query}\"",
-    "tryOther": "Try other terms or fewer characters."
+    "tryOther": "Try other terms or fewer characters.",
+    "noResults": "No results for \"{query}\""
   },
   "skills": {
     "offerSkill": "Offer skill",
@@ -860,6 +871,18 @@
     "micDenied": "Microphone permission denied."
   },
   "widgets": {
-    "config": "Widget configuration"
+    "config": "Widget configuration",
+    "reset": "Reset"
+  },
+  "hubs": {
+    "share": "Share & Swap",
+    "knowledge": "Share knowledge"
+  },
+  "ratings": {
+    "given": "Given",
+    "received": "Received"
+  },
+  "modules": {
+    "post": "Post"
   }
 }

@@ -139,7 +139,8 @@
     "minChars": "Mínimo {n} caracteres",
     "maxChars": "Máximo {n} caracteres",
     "urlMustStart": "La URL debe empezar con https://",
-    "nothingSaved": "Aún no hay nada guardado."
+    "nothingSaved": "Aún no hay nada guardado.",
+    "savedHint": "Toca el marcador en una publicación para guardarla aquí."
   },
   "settings": {
     "title": "Ajustes",
@@ -229,7 +230,8 @@
     "read": "Leído",
     "reply": "Respuesta",
     "view": "Ver",
-    "pinnedMessages": "Mensajes fijados"
+    "pinnedMessages": "Mensajes fijados",
+    "micPermissionDenied": "Permiso de micrófono denegado."
   },
   "languages": {
     "de": "Alemán",
@@ -275,7 +277,9 @@
         "subtitle": "7 idiomas disponibles",
         "body": "Mensaena habla 7 idiomas. La detección automática por ubicación está activada por defecto — cámbiala en cualquier momento mediante el botón de bandera en la parte superior de cada pantalla."
       }
-    }
+    },
+    "saveLocation": "Guardar ubicación",
+    "back": "Atrás"
   },
   "errors": {
     "generic": "Algo salió mal.",
@@ -495,7 +499,9 @@
     "locationUnavailable": "Ubicación no disponible.",
     "categoryLabel": "Categoría",
     "urgency": "Urgencia",
-    "errorWith": "Error: {error}"
+    "errorWith": "Error: {error}",
+    "urgencyLabel": "Urgencia",
+    "resourceError": "Error: {error}"
   },
   "posts": {
     "title": "Publicaciones",
@@ -722,7 +728,8 @@
     "farmIsSeasonal": "De temporada",
     "farmSubmit": "Enviar entrada",
     "farmNotFound": "Granja no encontrada.",
-    "products": "Productos"
+    "products": "Productos",
+    "notFound": "Granja no encontrada."
   },
   "knowledge": {
     "category": "Categoría",
@@ -802,7 +809,8 @@
     "source": "Fuente: Wikipedia"
   },
   "bot": {
-    "name": "Bot de Mensaena"
+    "name": "Bot de Mensaena",
+    "online": "En línea"
   },
   "update": {
     "whatsNew": "Novedades"
@@ -827,12 +835,15 @@
   },
   "timebank": {
     "history": "Historial",
-    "zeitbankConfirmation": "CONFIRMACIÓN BANCO DE TIEMPO"
+    "zeitbankConfirmation": "CONFIRMACIÓN BANCO DE TIEMPO",
+    "reject": "Rechazar",
+    "confirm": "Confirmar"
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",
     "noResultsForQuery": "Sin resultados para «{query}»",
-    "tryOther": "Prueba con otros términos o menos caracteres."
+    "tryOther": "Prueba con otros términos o menos caracteres.",
+    "noResults": "Sin resultados para \"{query}\""
   },
   "skills": {
     "offerSkill": "Ofrecer habilidad",
@@ -860,6 +871,18 @@
     "micDenied": "Permiso de micrófono denegado."
   },
   "widgets": {
-    "config": "Configuración de widgets"
+    "config": "Configuración de widgets",
+    "reset": "Restablecer"
+  },
+  "hubs": {
+    "share": "Compartir e intercambiar",
+    "knowledge": "Compartir conocimiento"
+  },
+  "ratings": {
+    "given": "Dadas",
+    "received": "Recibidas"
+  },
+  "modules": {
+    "post": "Publicación"
   }
 }

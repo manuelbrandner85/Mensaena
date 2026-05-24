@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -66,7 +67,7 @@ class ChallengesScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Challenges',
+                            Text('challenges.title'.tr(),
                                 style: AppTypography.display(
                                   size: 22,
                                   color: AppColors.ink,
@@ -82,7 +83,7 @@ class ChallengesScreen extends ConsumerWidget {
                         onPressed: () => context.go('/dashboard/badges'),
                         icon: const Icon(LucideIcons.award,
                             size: 14, color: AppColors.amber),
-                        label: Text('Badges',
+                        label: Text('challenges.badges'.tr(),
                             style: AppTypography.label(
                               size: 10,
                               color: AppColors.amber,
@@ -261,7 +262,7 @@ class _ChallengeTile extends StatelessWidget {
                     backgroundColor:
                         AppColors.amber.withValues(alpha: 0.16),
                   ),
-                  child: Text('Mitmachen',
+                  child: Text('challenges.join'.tr(),
                       style: AppTypography.label(
                         size: 10,
                         color: AppColors.amber,

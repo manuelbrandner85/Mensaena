@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -122,7 +123,7 @@ class _SingleBanner extends StatelessWidget {
               const Icon(LucideIcons.clock,
                   size: 14, color: AppColors.bronze),
               const SizedBox(width: 6),
-              Text('ZEITBANK-BESTÄTIGUNG',
+              Text('timebank.zeitbankConfirmation'.tr(),
                   style: AppTypography.label(
                       size: 9, color: AppColors.bronze)),
               const Spacer(),
@@ -161,7 +162,7 @@ class _SingleBanner extends StatelessWidget {
                             .withValues(alpha: 0.5)),
                   ),
                   icon: const Icon(LucideIcons.x, size: 14),
-                  label: const Text('Ablehnen'),
+                  label: Text('common.reject'.tr()),
                 ),
               ),
               const SizedBox(width: 8),
@@ -183,7 +184,7 @@ class _SingleBanner extends StatelessWidget {
                           ),
                         )
                       : const Icon(LucideIcons.check, size: 14),
-                  label: const Text('Bestätigen'),
+                  label: Text('common.confirm'.tr()),
                 ),
               ),
             ],

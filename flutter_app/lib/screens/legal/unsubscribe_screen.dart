@@ -4,6 +4,7 @@
 /// auf und zeigt Loading/Success/Error-State. KEIN Browser-Redirect.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -95,7 +96,7 @@ class _UnsubscribeScreenState extends State<UnsubscribeScreen> {
             }
           },
         ),
-        title: Text('Abmeldung',
+        title: Text('legal.unsubscribeTitle'.tr(),
             style: AppTypography.display(size: 18, color: AppColors.ink)),
         actions: const [LanguagePicker(), SizedBox(width: 4)],
       ),
@@ -109,7 +110,7 @@ class _UnsubscribeScreenState extends State<UnsubscribeScreen> {
                   children: [
                     const CircularProgressIndicator(color: AppColors.amber),
                     const SizedBox(height: 20),
-                    Text('Verarbeite deine Abmeldung…',
+                    Text('legal.unsubscribeProcessing'.tr(),
                         style: AppTypography.body(
                             size: 14, color: AppColors.inkSoft)),
                   ],

@@ -139,7 +139,8 @@
     "minChars": "Au moins {n} caractères",
     "maxChars": "Au plus {n} caractères",
     "urlMustStart": "L’URL doit commencer par https://",
-    "nothingSaved": "Rien d'enregistré pour l'instant."
+    "nothingSaved": "Rien d'enregistré pour l'instant.",
+    "savedHint": "Touchez le signet sur une publication pour l'enregistrer ici."
   },
   "settings": {
     "title": "Paramètres",
@@ -229,7 +230,8 @@
     "read": "Lu",
     "reply": "Réponse",
     "view": "Voir",
-    "pinnedMessages": "Messages épinglés"
+    "pinnedMessages": "Messages épinglés",
+    "micPermissionDenied": "Autorisation du microphone refusée."
   },
   "languages": {
     "de": "Allemand",
@@ -275,7 +277,9 @@
         "subtitle": "7 langues disponibles",
         "body": "Mensaena parle 7 langues. La détection automatique par localisation est activée par défaut — changez à tout moment via le bouton drapeau en haut de chaque écran."
       }
-    }
+    },
+    "saveLocation": "Enregistrer la position",
+    "back": "Retour"
   },
   "errors": {
     "generic": "Une erreur s'est produite.",
@@ -495,7 +499,9 @@
     "locationUnavailable": "Position non disponible.",
     "categoryLabel": "Catégorie",
     "urgency": "Urgence",
-    "errorWith": "Erreur : {error}"
+    "errorWith": "Erreur : {error}",
+    "urgencyLabel": "Urgence",
+    "resourceError": "Erreur : {error}"
   },
   "posts": {
     "title": "Publications",
@@ -722,7 +728,8 @@
     "farmIsSeasonal": "De saison",
     "farmSubmit": "Envoyer l'entrée",
     "farmNotFound": "Ferme introuvable.",
-    "products": "Produits"
+    "products": "Produits",
+    "notFound": "Ferme introuvable."
   },
   "knowledge": {
     "category": "Catégorie",
@@ -802,7 +809,8 @@
     "source": "Source : Wikipédia"
   },
   "bot": {
-    "name": "Bot Mensaena"
+    "name": "Bot Mensaena",
+    "online": "En ligne"
   },
   "update": {
     "whatsNew": "Nouveautés"
@@ -827,12 +835,15 @@
   },
   "timebank": {
     "history": "Historique",
-    "zeitbankConfirmation": "CONFIRMATION BANQUE DE TEMPS"
+    "zeitbankConfirmation": "CONFIRMATION BANQUE DE TEMPS",
+    "reject": "Refuser",
+    "confirm": "Confirmer"
   },
   "search": {
     "minChars": "Saisissez au moins 2 caractères",
     "noResultsForQuery": "Aucun résultat pour « {query} »",
-    "tryOther": "Essayez d'autres mots ou moins de caractères."
+    "tryOther": "Essayez d'autres mots ou moins de caractères.",
+    "noResults": "Aucun résultat pour « {query} »"
   },
   "skills": {
     "offerSkill": "Proposer une compétence",
@@ -860,6 +871,18 @@
     "micDenied": "Autorisation du micro refusée."
   },
   "widgets": {
-    "config": "Configuration des widgets"
+    "config": "Configuration des widgets",
+    "reset": "Réinitialiser"
+  },
+  "hubs": {
+    "share": "Partager & échanger",
+    "knowledge": "Partager des savoirs"
+  },
+  "ratings": {
+    "given": "Données",
+    "received": "Reçues"
+  },
+  "modules": {
+    "post": "Publication"
   }
 }

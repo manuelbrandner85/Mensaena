@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +44,7 @@ class CalendarScreen extends ConsumerWidget {
                     const Icon(LucideIcons.calendar,
                         size: 32, color: AppColors.mute),
                     const SizedBox(height: 10),
-                    Text('Keine Events im Kalender.',
+                    Text('calendar.noEvents'.tr(),
                         style: AppTypography.body(
                           size: 14,
                           color: AppColors.mute,

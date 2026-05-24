@@ -139,7 +139,8 @@
     "minChars": "En az {n} karakter",
     "maxChars": "En fazla {n} karakter",
     "urlMustStart": "URL https:// ile başlamalı",
-    "nothingSaved": "Henüz kaydedilmedi."
+    "nothingSaved": "Henüz kaydedilmedi.",
+    "savedHint": "Bir gönderideki yer imine dokunarak burada toplayın."
   },
   "settings": {
     "title": "Ayarlar",
@@ -229,7 +230,8 @@
     "read": "Okundu",
     "reply": "Yanıt",
     "view": "Görüntüle",
-    "pinnedMessages": "Sabitlenmiş mesajlar"
+    "pinnedMessages": "Sabitlenmiş mesajlar",
+    "micPermissionDenied": "Mikrofon izni reddedildi."
   },
   "languages": {
     "de": "Almanca",
@@ -275,7 +277,9 @@
         "subtitle": "7 dil mevcut",
         "body": "Mensaena 7 dil konuşuyor. Konuma göre otomatik algılama varsayılan olarak açık — her ekranın üstündeki bayrak düğmesinden istediğin zaman değiştirebilirsin."
       }
-    }
+    },
+    "saveLocation": "Konumu kaydet",
+    "back": "Geri"
   },
   "errors": {
     "generic": "Bir şeyler ters gitti.",
@@ -495,7 +499,9 @@
     "locationUnavailable": "Konum mevcut değil.",
     "categoryLabel": "Kategori",
     "urgency": "Aciliyet",
-    "errorWith": "Hata: {error}"
+    "errorWith": "Hata: {error}",
+    "urgencyLabel": "Aciliyet",
+    "resourceError": "Hata: {error}"
   },
   "posts": {
     "title": "Gönderiler",
@@ -722,7 +728,8 @@
     "farmIsSeasonal": "Mevsimsel",
     "farmSubmit": "Kaydı gönder",
     "farmNotFound": "Çiftlik bulunamadı.",
-    "products": "Ürünler"
+    "products": "Ürünler",
+    "notFound": "Çiftlik bulunamadı."
   },
   "knowledge": {
     "category": "Kategori",
@@ -802,7 +809,8 @@
     "source": "Kaynak: Wikipedia"
   },
   "bot": {
-    "name": "Mensaena Bot"
+    "name": "Mensaena Bot",
+    "online": "Çevrimiçi"
   },
   "update": {
     "whatsNew": "Yenilikler"
@@ -827,12 +835,15 @@
   },
   "timebank": {
     "history": "Geçmiş",
-    "zeitbankConfirmation": "ZAMAN BANKASI ONAYI"
+    "zeitbankConfirmation": "ZAMAN BANKASI ONAYI",
+    "reject": "Reddet",
+    "confirm": "Onayla"
   },
   "search": {
     "minChars": "En az 2 karakter girin",
     "noResultsForQuery": "\"{query}\" için sonuç yok",
-    "tryOther": "Başka kelimeler veya daha az karakter deneyin."
+    "tryOther": "Başka kelimeler veya daha az karakter deneyin.",
+    "noResults": "\"{query}\" için sonuç yok"
   },
   "skills": {
     "offerSkill": "Beceri öner",
@@ -860,6 +871,18 @@
     "micDenied": "Mikrofon izni reddedildi."
   },
   "widgets": {
-    "config": "Widget yapılandırması"
+    "config": "Widget yapılandırması",
+    "reset": "Sıfırla"
+  },
+  "hubs": {
+    "share": "Paylaş ve takas et",
+    "knowledge": "Bilgi paylaş"
+  },
+  "ratings": {
+    "given": "Verilen",
+    "received": "Alınan"
+  },
+  "modules": {
+    "post": "Gönderi"
   }
 }

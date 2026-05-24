@@ -139,7 +139,8 @@
     "minChars": "Mindestens {n} Zeichen",
     "maxChars": "Maximal {n} Zeichen",
     "urlMustStart": "URL muss mit https:// beginnen",
-    "nothingSaved": "Noch nichts gespeichert."
+    "nothingSaved": "Noch nichts gespeichert.",
+    "savedHint": "Tippe das Lesezeichen auf einem Beitrag, um ihn hier zu sammeln."
   },
   "settings": {
     "title": "Einstellungen",
@@ -229,7 +230,8 @@
     "read": "Gelesen",
     "reply": "Antwort",
     "view": "Ansehen",
-    "pinnedMessages": "Angepinnte Nachrichten"
+    "pinnedMessages": "Angepinnte Nachrichten",
+    "micPermissionDenied": "Mikrofon-Berechtigung verweigert."
   },
   "languages": {
     "de": "Deutsch",
@@ -275,7 +277,9 @@
         "subtitle": "7 Sprachen verfügbar",
         "body": "Mensaena spricht 7 Sprachen. Auto-Erkennung nach Standort ist standardmäßig an — ändere jederzeit über den Flag-Button oben in jedem Screen."
       }
-    }
+    },
+    "saveLocation": "Standort speichern",
+    "back": "Zurück"
   },
   "errors": {
     "generic": "Etwas ist schief gelaufen.",
@@ -495,7 +499,9 @@
     "locationUnavailable": "Standort nicht verfügbar.",
     "categoryLabel": "Kategorie",
     "urgency": "Dringlichkeit",
-    "errorWith": "Fehler: {error}"
+    "errorWith": "Fehler: {error}",
+    "urgencyLabel": "Dringlichkeit",
+    "resourceError": "Fehler: {error}"
   },
   "posts": {
     "title": "Beiträge",
@@ -722,7 +728,8 @@
     "farmIsSeasonal": "Saisonal",
     "farmSubmit": "Eintrag absenden",
     "farmNotFound": "Hof nicht gefunden.",
-    "products": "Produkte"
+    "products": "Produkte",
+    "notFound": "Hof nicht gefunden."
   },
   "knowledge": {
     "category": "Kategorie",
@@ -802,7 +809,8 @@
     "source": "Quelle: Wikipedia"
   },
   "bot": {
-    "name": "Mensaena-Bot"
+    "name": "Mensaena-Bot",
+    "online": "Online"
   },
   "update": {
     "whatsNew": "Was ist neu"
@@ -827,12 +835,15 @@
   },
   "timebank": {
     "history": "Historie",
-    "zeitbankConfirmation": "ZEITBANK-BESTÄTIGUNG"
+    "zeitbankConfirmation": "ZEITBANK-BESTÄTIGUNG",
+    "reject": "Ablehnen",
+    "confirm": "Bestätigen"
   },
   "search": {
     "minChars": "Mindestens 2 Zeichen eingeben",
     "noResultsForQuery": "Keine Treffer für „{query}\"",
-    "tryOther": "Versuch andere Begriffe oder weniger Zeichen."
+    "tryOther": "Versuch andere Begriffe oder weniger Zeichen.",
+    "noResults": "Keine Treffer für „{query}\""
   },
   "skills": {
     "offerSkill": "Skill anbieten",
@@ -860,6 +871,18 @@
     "micDenied": "Mikrofon-Berechtigung verweigert."
   },
   "widgets": {
-    "config": "Widget-Konfiguration"
+    "config": "Widget-Konfiguration",
+    "reset": "Zurücksetzen"
+  },
+  "hubs": {
+    "share": "Teilen & Tauschen",
+    "knowledge": "Wissen teilen"
+  },
+  "ratings": {
+    "given": "Gegeben",
+    "received": "Erhalten"
+  },
+  "modules": {
+    "post": "Beitrag"
   }
 }

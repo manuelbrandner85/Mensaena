@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -146,7 +147,7 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
                       onPressed: _skip,
                       icon: const Icon(LucideIcons.x,
                           size: 14, color: AppColors.mute),
-                      label: Text('Überspringen',
+                      label: Text('onboarding.skip'.tr(),
                           style: AppTypography.label(
                               size: 10, color: AppColors.mute)),
                     ),
@@ -263,7 +264,7 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
                           onPressed: _step == 0 ? null : _back,
                           icon: const Icon(LucideIcons.arrowLeft,
                               size: 14),
-                          label: const Text('Zurück'),
+                          label: Text('common.back'.tr()),
                         ),
                       ),
                       const SizedBox(width: 10),
