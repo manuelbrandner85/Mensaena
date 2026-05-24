@@ -291,5 +291,18 @@
     "profileActions": "Profil işlemleri",
     "deleteEntry": "Kaydı sil",
     "rawData": "Ham veri"
+  },
+  "create": {
+    "locationUnavailable": "Konum mevcut değil.",
+    "maxImages": "En fazla 5 resim.",
+    "kind": "Tür",
+    "category": "Kategori",
+    "imagesMax5": "Resimler (en fazla 5)",
+    "contactOptional": "İletişim (isteğe bağlı)",
+    "phoneOnlyInterested": "Telefonu sadece ilgilenenlerle paylaş",
+    "postAnonymously": "Anonim paylaş",
+    "noProfileVisible": "Profil bağlantısı yok, isim görünmez",
+    "urgency": "Aciliyet",
+    "emailOnlyInterested": "E-postayı sadece ilgilenenlerle paylaş"
   }
 }

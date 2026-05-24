@@ -291,5 +291,18 @@
     "profileActions": "Profil-Aktionen",
     "deleteEntry": "Eintrag löschen",
     "rawData": "Rohdaten"
+  },
+  "create": {
+    "locationUnavailable": "Standort nicht verfügbar.",
+    "maxImages": "Maximal 5 Bilder.",
+    "kind": "Art",
+    "category": "Kategorie",
+    "imagesMax5": "Bilder (max. 5)",
+    "contactOptional": "Kontakt (optional)",
+    "phoneOnlyInterested": "Telefon nur an Interessenten",
+    "postAnonymously": "Anonym posten",
+    "noProfileVisible": "Kein Profil-Link, kein Name sichtbar",
+    "urgency": "Dringlichkeit",
+    "emailOnlyInterested": "E-Mail nur an Interessenten"
   }
 }

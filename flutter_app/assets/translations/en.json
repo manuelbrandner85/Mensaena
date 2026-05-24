@@ -291,5 +291,18 @@
     "profileActions": "Profile actions",
     "deleteEntry": "Delete entry",
     "rawData": "Raw data"
+  },
+  "create": {
+    "locationUnavailable": "Location unavailable.",
+    "maxImages": "Maximum 5 images.",
+    "kind": "Kind",
+    "category": "Category",
+    "imagesMax5": "Images (max. 5)",
+    "contactOptional": "Contact (optional)",
+    "phoneOnlyInterested": "Share phone only with interested users",
+    "postAnonymously": "Post anonymously",
+    "noProfileVisible": "No profile link, no name visible",
+    "urgency": "Urgency",
+    "emailOnlyInterested": "Share email only with interested users"
   }
 }

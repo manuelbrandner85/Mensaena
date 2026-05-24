@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -120,7 +121,7 @@ class _ModuleCreatePostScreenState
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Standort nicht verfügbar.')),
+        SnackBar(content: Text('create.locationUnavailable'.tr())),
       );
     }
   }
@@ -128,7 +129,7 @@ class _ModuleCreatePostScreenState
   Future<void> _pickImage() async {
     if (_images.length >= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximal 5 Bilder.')),
+        SnackBar(content: Text('create.maxImages'.tr())),
       );
       return;
     }
@@ -297,7 +298,7 @@ class _ModuleCreatePostScreenState
             const SizedBox(height: 8),
 
             // Type-Auswahl (whitelisted)
-            Text('Art', style: AppTypography.label(size: 10)),
+            Text('create.kind'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
@@ -323,7 +324,7 @@ class _ModuleCreatePostScreenState
 
             // Kategorie (nur wenn nicht durch Type fest)
             if (c.categories.length > 1) ...[
-              Text('Kategorie', style: AppTypography.label(size: 10)),
+              Text('create.category'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
@@ -373,7 +374,7 @@ class _ModuleCreatePostScreenState
             // Bilder
             Row(
               children: [
-                Text('Bilder (max. 5)',
+                Text('create.imagesMax5'.tr(),
                     style: AppTypography.label(size: 10)),
                 const Spacer(),
                 IconButton(
@@ -460,7 +461,7 @@ class _ModuleCreatePostScreenState
             const SizedBox(height: 14),
 
             // Kontakt-Optional
-            Text('Kontakt (optional)',
+            Text('create.contactOptional'.tr(),
                 style: AppTypography.label(size: 10)),
             const SizedBox(height: 8),
             TextField(
@@ -477,7 +478,7 @@ class _ModuleCreatePostScreenState
               onChanged: (v) => setState(() => _privacyPhone = v),
               activeColor: c.accentColor,
               contentPadding: EdgeInsets.zero,
-              title: Text('Telefon nur an Interessenten',
+              title: Text('create.phoneOnlyInterested'.tr(),
                   style: AppTypography.caption()),
             ),
             const SizedBox(height: 6),
@@ -495,7 +496,7 @@ class _ModuleCreatePostScreenState
               onChanged: (v) => setState(() => _privacyEmail = v),
               activeColor: c.accentColor,
               contentPadding: EdgeInsets.zero,
-              title: Text('E-Mail nur an Interessenten',
+              title: Text('create.emailOnlyInterested'.tr(),
                   style: AppTypography.caption()),
             ),
 
@@ -506,18 +507,18 @@ class _ModuleCreatePostScreenState
               onChanged: (v) => setState(() => _isAnonymous = v),
               activeColor: c.accentColor,
               contentPadding: EdgeInsets.zero,
-              title: Text('Anonym posten',
+              title: Text('create.postAnonymously'.tr(),
                   style: AppTypography.body(
                       size: 13,
                       color: AppColors.inkSoft,
                       weight: FontWeight.w600)),
-              subtitle: Text('Kein Profil-Link, kein Name sichtbar',
+              subtitle: Text('create.noProfileVisible'.tr(),
                   style: AppTypography.caption()),
             ),
 
             // Dringlichkeit
             const SizedBox(height: 14),
-            Text('Dringlichkeit', style: AppTypography.label(size: 10)),
+            Text('create.urgency'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
@@ -581,7 +582,7 @@ class _ModuleCreatePostScreenState
                 side: const BorderSide(color: AppColors.line),
               ),
               onPressed: () => context.go(c.returnRoute),
-              child: const Text('Abbrechen'),
+              child: Text('common.cancel'.tr()),
             ),
           ],
         ),

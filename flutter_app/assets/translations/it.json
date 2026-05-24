@@ -291,5 +291,18 @@
     "profileActions": "Azioni profilo",
     "deleteEntry": "Elimina voce",
     "rawData": "Dati grezzi"
+  },
+  "create": {
+    "locationUnavailable": "Posizione non disponibile.",
+    "maxImages": "Massimo 5 immagini.",
+    "kind": "Tipo",
+    "category": "Categoria",
+    "imagesMax5": "Immagini (max. 5)",
+    "contactOptional": "Contatto (facoltativo)",
+    "phoneOnlyInterested": "Telefono solo agli interessati",
+    "postAnonymously": "Pubblica in forma anonima",
+    "noProfileVisible": "Nessun link al profilo, nessun nome visibile",
+    "urgency": "Urgenza",
+    "emailOnlyInterested": "E-mail solo agli interessati"
   }
 }

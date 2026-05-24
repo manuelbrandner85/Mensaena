@@ -291,5 +291,18 @@
     "profileActions": "Действия с профилем",
     "deleteEntry": "Удалить запись",
     "rawData": "Сырые данные"
+  },
+  "create": {
+    "locationUnavailable": "Местоположение недоступно.",
+    "maxImages": "Максимум 5 изображений.",
+    "kind": "Тип",
+    "category": "Категория",
+    "imagesMax5": "Изображения (макс. 5)",
+    "contactOptional": "Контакт (необязательно)",
+    "phoneOnlyInterested": "Показывать телефон только заинтересованным",
+    "postAnonymously": "Опубликовать анонимно",
+    "noProfileVisible": "Без ссылки на профиль, без имени",
+    "urgency": "Срочность",
+    "emailOnlyInterested": "Показывать email только заинтересованным"
   }
 }
