@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,19 +33,19 @@ class PostsListScreen extends ConsumerStatefulWidget {
 
 class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   // ── Filter-State ────────────────────────────────────────────────────────
-  static const List<FilterOption<String>> _typeOptions = [
-    FilterOption(value: 'help_request', label: '🆘 Hilfe gesucht'),
-    FilterOption(value: 'help_offered', label: '💚 Hilfe'),
-    FilterOption(value: 'rescue', label: '🧡 Retten'),
-    FilterOption(value: 'animal', label: '🐾 Tier'),
-    FilterOption(value: 'housing', label: '🏡 Wohnen'),
-    FilterOption(value: 'supply', label: '🌾 Versorgung'),
-    FilterOption(value: 'mobility', label: '🚗 Mobilität'),
-    FilterOption(value: 'sharing', label: '🔄 Teilen'),
-    FilterOption(value: 'community', label: '🗳️ Community'),
-    FilterOption(value: 'crisis', label: '🚨 Notfall'),
-    FilterOption(value: 'job', label: '💼 Job'),
-  ];
+  static List<FilterOption<String>> get _typeOptions => [
+        FilterOption(value: 'help_request', label: 'posts.typeHelpRequest'.tr()),
+        FilterOption(value: 'help_offered', label: 'posts.typeHelpOffered'.tr()),
+        FilterOption(value: 'rescue', label: 'posts.typeRescue'.tr()),
+        FilterOption(value: 'animal', label: 'posts.typeAnimal'.tr()),
+        FilterOption(value: 'housing', label: 'posts.typeHousing'.tr()),
+        FilterOption(value: 'supply', label: 'posts.typeSupply'.tr()),
+        FilterOption(value: 'mobility', label: 'posts.typeMobility'.tr()),
+        FilterOption(value: 'sharing', label: 'posts.typeSharing'.tr()),
+        FilterOption(value: 'community', label: 'posts.typeCommunity'.tr()),
+        FilterOption(value: 'crisis', label: 'posts.typeCrisis'.tr()),
+        FilterOption(value: 'job', label: 'posts.typeJob'.tr()),
+      ];
 
   String _search = '';
   String _location = '';
@@ -92,7 +93,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: AppColors.surface,
-          content: Text('Standort verweigert.',
+          content: Text('posts.locationDenied'.tr(),
               style: AppTypography.body(
                   size: 13, color: AppColors.ink)),
         ));
@@ -250,14 +251,14 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Beiträge',
+      title: 'posts.title'.tr(),
       currentRoute: '/dashboard/posts',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('/dashboard/create'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Posten'),
+        label: Text('posts.post'.tr()),
       ),
       body: SafeArea(
         child: Column(
@@ -267,11 +268,14 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 05',
-                metaCategory: 'Beiträge',
-                title: 'Alle Beiträge',
+                metaCategory: 'posts.title'.tr(),
+                title: 'posts.allPosts'.tr(),
                 subtitle: _loading
-                    ? 'Lade Beiträge in deiner Nähe…'
-                    : '${_items.length}${_hasMore ? "+" : ""} aktiv in deiner Nähe',
+                    ? 'posts.loadingNearby'.tr()
+                    : 'posts.activeNearby'.tr(namedArgs: {
+                        'count': '${_items.length}',
+                        'more': _hasMore ? '+' : '',
+                      }),
               ),
             ),
             // ── Search + Filter-Sheet ────────────────────────────
@@ -279,7 +283,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
               padding:
                   const EdgeInsets.fromLTRB(12, 10, 12, 6),
               child: ModuleSearchBar(
-                hintText: 'Beiträge durchsuchen…',
+                hintText: 'posts.searchHint'.tr(),
                 initialValue: _search,
                 onChanged: _onSearchChanged,
                 onFilterTap: () => _openFilterSheet(context),
@@ -354,12 +358,12 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
           EmptyStateCard(
             icon: LucideIcons.inbox,
             title: _hasActiveFilters
-                ? 'Keine Treffer für die Filter.'
-                : 'Noch keine Beiträge.',
+                ? 'posts.noMatchingFilters'.tr()
+                : 'posts.noPostsYet'.tr(),
             description: _hasActiveFilters
-                ? 'Setze Filter zurück oder verändere deine Suche.'
-                : 'Sei der/die Erste:r — tippe den Plus-Button.',
-            actionLabel: _hasActiveFilters ? 'Filter zurücksetzen' : null,
+                ? 'posts.resetOrChange'.tr()
+                : 'posts.beFirst'.tr(),
+            actionLabel: _hasActiveFilters ? 'posts.resetFilter'.tr() : null,
             onAction: _hasActiveFilters ? _resetAll : null,
           ),
         ],
@@ -386,7 +390,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                         color: AppColors.amber)
                     : TextButton(
                         onPressed: () => _load(),
-                        child: Text('Mehr laden',
+                        child: Text('posts.loadMore'.tr(),
                             style: AppTypography.label(
                               size: 10,
                               color: AppColors.amber,
@@ -433,11 +437,11 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                 ),
               ),
               const SizedBox(height: 14),
-              Text('Erweiterte Filter',
+              Text('posts.advancedFilters'.tr(),
                   style: AppTypography.display(
                       size: 18, color: AppColors.ink)),
               const SizedBox(height: 14),
-              Text('Ort', style: AppTypography.label(size: 10)),
+              Text('posts.location'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 6),
               TextField(
                 controller:
@@ -451,7 +455,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                   fillColor: AppColors.elevated,
                   prefixIcon: const Icon(LucideIcons.mapPin,
                       size: 14, color: AppColors.mute),
-                  hintText: 'z.B. Wien, 1010, Graz…',
+                  hintText: 'posts.locationExample'.tr(),
                   hintStyle: AppTypography.body(
                       size: 13, color: AppColors.mute),
                   border: OutlineInputBorder(
@@ -465,7 +469,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
               const SizedBox(height: 14),
               Row(
                 children: [
-                  Text('Umkreis', style: AppTypography.label(size: 10)),
+                  Text('posts.radius'.tr(), style: AppTypography.label(size: 10)),
                   const Spacer(),
                   if (_userLat == null)
                     TextButton.icon(
@@ -475,7 +479,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                       },
                       icon: const Icon(LucideIcons.locate,
                           size: 12, color: AppColors.amber),
-                      label: Text('Standort verwenden',
+                      label: Text('posts.useLocation'.tr(),
                           style: AppTypography.label(
                               size: 9, color: AppColors.amber)),
                     ),
@@ -529,7 +533,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                         _resetAll();
                         Navigator.pop(sheetCtx);
                       },
-                      child: const Text('Zurücksetzen'),
+                      child: Text('posts.reset'.tr()),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -540,7 +544,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                         foregroundColor: AppColors.voidColor,
                       ),
                       onPressed: () => Navigator.pop(sheetCtx),
-                      child: const Text('Übernehmen'),
+                      child: Text('posts.apply'.tr()),
                     ),
                   ),
                 ],

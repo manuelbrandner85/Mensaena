@@ -20,7 +20,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(marketplaceDetailProvider(listingId));
     return DashboardScaffold(
-      title: 'Inserat',
+      title: 'marketplace.listing'.tr(),
       currentRoute: '/dashboard/marketplace',
       body: SafeArea(
         child: async.when(
@@ -31,7 +31,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
           data: (l) {
             if (l == null) {
               return Center(
-                child: Text('Inserat nicht gefunden.',
+                child: Text('marketplace.listingNotFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -87,7 +87,9 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                 ),
                 if (l.conditionState != null) ...[
                   const SizedBox(height: 6),
-                  Text('Zustand: ${l.conditionState}',
+                  Text(
+                      'marketplace.condition'.tr(
+                          namedArgs: {'state': l.conditionState!}),
                       style: AppTypography.caption()),
                 ],
                 const SizedBox(height: 12),
@@ -131,7 +133,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                         icon: const Icon(
                             LucideIcons.messageCircle,
                             size: 16),
-                        label: const Text('Kontakt'),
+                        label: Text('marketplace.contact'.tr()),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -177,7 +179,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                             size: 14,
                             color: AppColors.amber),
                         const SizedBox(width: 8),
-                        Text('Reserviert',
+                        Text('marketplace.reserved'.tr(),
                             style: AppTypography.label(
                                 size: 10,
                                 color: AppColors.amber)),
@@ -202,7 +204,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                             size: 14,
                             color: AppColors.lebenSoft),
                         const SizedBox(width: 8),
-                        Text('Vergeben',
+                        Text('marketplace.sold'.tr(),
                             style: AppTypography.label(
                                 size: 10,
                                 color: AppColors.lebenSoft)),
@@ -212,7 +214,9 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                 ],
                 const SizedBox(height: 18),
                 Text(
-                  'Inseriert am ${DateFormat('dd.MM.yyyy').format(l.createdAt)}',
+                  'marketplace.postedOn'.tr(namedArgs: {
+                    'date': DateFormat('dd.MM.yyyy').format(l.createdAt),
+                  }),
                   style: AppTypography.caption(),
                 ),
               ],
@@ -253,8 +257,11 @@ class MarketplaceDetailScreen extends ConsumerWidget {
         final inserted = await sb
             .from('conversations')
             .insert({
-              'title':
-                  'Marktplatz: ${l.title.length > 40 ? "${l.title.substring(0, 40)}..." : l.title}',
+              'title': 'marketplace.chatTitle'.tr(namedArgs: {
+                'title': l.title.length > 40
+                    ? '${l.title.substring(0, 40)}...'
+                    : l.title,
+              }),
             })
             .select()
             .single();
@@ -270,7 +277,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Konnte Kontakt nicht aufnehmen.',
+        content: Text('marketplace.contactFailed'.tr(),
             style: AppTypography.body(
                 size: 13, color: AppColors.ink)),
       ));
@@ -279,8 +286,12 @@ class MarketplaceDetailScreen extends ConsumerWidget {
 
   Future<void> _share(MarketplaceListing l) async {
     await Share.share(
-      '${l.title}\n\nAuf Mensaena: https://www.mensaena.de/dashboard/marketplace/${l.id}',
-      subject: 'Mensaena: ${l.title}',
+      'marketplace.shareBody'.tr(namedArgs: {
+        'title': l.title,
+        'url': 'https://www.mensaena.de/dashboard/marketplace/${l.id}',
+      }),
+      subject: 'marketplace.shareSubject'
+          .tr(namedArgs: {'title': l.title}),
     );
   }
 
@@ -297,8 +308,8 @@ class MarketplaceDetailScreen extends ConsumerWidget {
         backgroundColor: AppColors.surface,
         content: Text(
           next == 'reserved'
-              ? 'Als reserviert markiert.'
-              : 'Reservierung aufgehoben.',
+              ? 'marketplace.markedReserved'.tr()
+              : 'marketplace.reservationLifted'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink),
         ),
       ));
@@ -311,11 +322,11 @@ class MarketplaceDetailScreen extends ConsumerWidget {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Als vergeben markieren?',
+        title: Text('marketplace.markAsSoldQuestion'.tr(),
             style:
                 AppTypography.display(size: 18, color: AppColors.ink)),
         content: Text(
-          'Das Inserat wird inaktiv und für andere nicht mehr sichtbar.',
+          'marketplace.markAsSoldDescription'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.inkSoft),
         ),
         actions: [
@@ -327,7 +338,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                 backgroundColor: AppColors.leben,
                 foregroundColor: AppColors.voidColor),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Vergeben'),
+            child: Text('marketplace.markSold'.tr()),
           ),
         ],
       ),

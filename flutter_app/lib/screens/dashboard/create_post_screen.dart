@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,21 +57,32 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   bool _submitting = false;
   String? _error;
 
-  static const List<_PostType> _types = [
-    _PostType('help_request', 'Hilfe gesucht', '🆘', AppColors.herzrot),
-    _PostType('help_offered', 'Hilfe angeboten', '💚', AppColors.leben),
-    _PostType('animal', 'Tier', '🐾', Color(0xFFEC4899)),
-    _PostType('housing', 'Wohnen', '🏡', Color(0xFF60A5FA)),
-    _PostType('supply', 'Versorgung', '🌾', Color(0xFFFACC15)),
-    _PostType('mobility', 'Mobilität', '🚗', Color(0xFF818CF8)),
-    _PostType('sharing', 'Teilen', '🔄', AppColors.teal),
-    _PostType('community', 'Community', '🗳️', Color(0xFFC084FC)),
-    _PostType('crisis', 'Notfall', '🚨', AppColors.herzrot),
-    _PostType('rescue', 'Retten', '🧡', Color(0xFFFB923C)),
-    _PostType('skill', 'Skill', '🎯', Color(0xFFA78BFA)),
-    _PostType('knowledge', 'Wissen', '📚', AppColors.amber),
-    _PostType('mental', 'Mental', '🧠', AppColors.tealSoft),
-  ];
+  static List<_PostType> get _types => [
+        _PostType('help_request', 'create.typeHelpRequest'.tr(), '🆘',
+            AppColors.herzrot),
+        _PostType('help_offered', 'create.typeHelpOffered'.tr(), '💚',
+            AppColors.leben),
+        _PostType('animal', 'create.typeAnimal'.tr(), '🐾',
+            const Color(0xFFEC4899)),
+        _PostType('housing', 'create.typeHousing'.tr(), '🏡',
+            const Color(0xFF60A5FA)),
+        _PostType('supply', 'create.typeSupply'.tr(), '🌾',
+            const Color(0xFFFACC15)),
+        _PostType('mobility', 'create.typeMobility'.tr(), '🚗',
+            const Color(0xFF818CF8)),
+        _PostType('sharing', 'create.typeSharing'.tr(), '🔄', AppColors.teal),
+        _PostType('community', 'create.typeCommunity'.tr(), '🗳️',
+            const Color(0xFFC084FC)),
+        _PostType('crisis', 'create.typeCrisis'.tr(), '🚨', AppColors.herzrot),
+        _PostType('rescue', 'create.typeRescue'.tr(), '🧡',
+            const Color(0xFFFB923C)),
+        _PostType('skill', 'create.typeSkill'.tr(), '🎯',
+            const Color(0xFFA78BFA)),
+        _PostType('knowledge', 'create.typeKnowledge'.tr(), '📚',
+            AppColors.amber),
+        _PostType(
+            'mental', 'create.typeMental'.tr(), '🧠', AppColors.tealSoft),
+      ];
 
   Timer? _draftTimer;
 
@@ -95,11 +107,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       backgroundColor: AppColors.surface,
       duration: const Duration(seconds: 6),
       content: Text(
-        'Entwurf gefunden. Wiederherstellen?',
+        'create.draftFoundRestore'.tr(),
         style: AppTypography.body(size: 13, color: AppColors.ink),
       ),
       action: SnackBarAction(
-        label: 'Ja',
+        label: 'create.restoreYes'.tr(),
         textColor: AppColors.amber,
         onPressed: () {
           setState(() {
@@ -164,7 +176,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Standort nicht verfügbar.')),
+        SnackBar(content: Text('create.locationUnavailable'.tr())),
       );
     }
   }
@@ -172,7 +184,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Future<void> _pickImage() async {
     if (_images.length >= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Maximal 5 Bilder.')),
+        SnackBar(content: Text('create.maxImages'.tr())),
       );
       return;
     }
@@ -207,7 +219,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   Future<void> _submit() async {
     if (_type == null || _titleCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'Bitte Typ und Titel ausfüllen.');
+      setState(() => _error = 'create.pleaseFillTypeAndTitle'.tr());
       return;
     }
     setState(() {
@@ -223,7 +235,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     if (!ok) {
       setState(() {
         _submitting = false;
-        _error = 'Zu viele Beiträge — versuche es später noch einmal.';
+        _error = 'create.rateLimited'.tr();
       });
       return;
     }
@@ -232,7 +244,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     if (uid == null) {
       setState(() {
         _submitting = false;
-        _error = 'Nicht eingeloggt.';
+        _error = 'create.notLoggedIn'.tr();
       });
       return;
     }
@@ -285,7 +297,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _error = 'Konnte Beitrag nicht speichern.';
+        _error = 'create.savingFailed'.tr();
       });
     }
   }
@@ -293,7 +305,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Beitrag erstellen',
+      title: 'create.newPost'.tr(),
       currentRoute: '/dashboard/create',
       body: SafeArea(
         child: Column(
@@ -325,7 +337,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                       child: OutlinedButton(
                         onPressed:
                             _submitting ? null : () => setState(() => _step--),
-                        child: const Text('Zurück'),
+                        child: Text('common.back'.tr()),
                       ),
                     ),
                   if (_step > 0) const SizedBox(width: 10),
@@ -338,7 +350,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                               if (_step < 2) {
                                 if (_step == 0 && _type == null) {
                                   setState(
-                                    () => _error = 'Bitte wähle einen Typ.',
+                                    () => _error =
+                                        'create.pleaseChooseType'.tr(),
                                   );
                                   return;
                                 }
@@ -352,10 +365,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             },
                       child: Text(
                         _step < 2
-                            ? 'Weiter'
+                            ? 'common.next'.tr()
                             : (_submitting
-                                ? 'Veröffentliche…'
-                                : 'Veröffentlichen'),
+                                ? 'create.publishing'.tr()
+                                : 'create.publish'.tr()),
                       ),
                     ),
                   ),
@@ -448,7 +461,11 @@ class _StepIndicator extends StatelessWidget {
   const _StepIndicator({required this.current});
   final int current;
 
-  static const List<String> _labels = ['Art', 'Inhalt', 'Kontakt'];
+  static List<String> get _labels => [
+        'create.stepArt'.tr(),
+        'create.stepInhalt'.tr(),
+        'create.stepKontakt'.tr(),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -521,7 +538,7 @@ class _StepArt extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Was möchtest du teilen?',
+          'create.whatShare'.tr(),
           style: AppTypography.display(size: 22, color: AppColors.ink),
         ),
         const SizedBox(height: 14),
@@ -615,7 +632,7 @@ class _StepInhalt extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Worum geht es?',
+          'create.whatAbout'.tr(),
           style: AppTypography.display(size: 22, color: AppColors.ink),
         ),
         const SizedBox(height: 14),
@@ -629,8 +646,8 @@ class _StepInhalt extends StatelessWidget {
           controller: titleCtrl,
           maxLength: 120,
           style: AppTypography.body(size: 15, color: AppColors.ink),
-          decoration: const InputDecoration(
-            labelText: 'Titel',
+          decoration: InputDecoration(
+            labelText: 'create.title'.tr(),
             counterText: '',
           ),
         ),
@@ -647,8 +664,8 @@ class _StepInhalt extends StatelessWidget {
           maxLines: 5,
           maxLength: 2000,
           style: AppTypography.body(size: 14, color: AppColors.ink),
-          decoration: const InputDecoration(
-            labelText: 'Beschreibung',
+          decoration: InputDecoration(
+            labelText: 'create.description'.tr(),
             alignLabelWithHint: true,
           ),
         ),
@@ -660,14 +677,14 @@ class _StepInhalt extends StatelessWidget {
             FilteringTextInputFormatter.deny(
                 RegExp(r'[^a-zA-Z0-9äöüÄÖÜß ,_-]')),
           ],
-          decoration: const InputDecoration(
-            labelText: 'Tags (Komma-getrennt)',
-            hintText: 'einkaufen, senioren, samstag',
+          decoration: InputDecoration(
+            labelText: 'create.tagsCommaSeparated'.tr(),
+            hintText: 'create.tagsHint'.tr(),
           ),
         ),
         const SizedBox(height: 18),
         Text(
-          'Bilder (optional, max. 5)',
+          'create.imagesOptional'.tr(),
           style: AppTypography.label(size: 10),
         ),
         const SizedBox(height: 10),
@@ -739,7 +756,7 @@ class _StepInhalt extends StatelessWidget {
           onChanged: onToggleAnonymous,
           activeColor: AppColors.amber,
           title: Text(
-            'Anonym posten',
+            'create.postAnonymously'.tr(),
             style: AppTypography.body(
               size: 14,
               color: AppColors.ink,
@@ -747,7 +764,7 @@ class _StepInhalt extends StatelessWidget {
             ),
           ),
           subtitle: Text(
-            'Dein Name + Avatar werden nicht angezeigt.',
+            'create.anonymousSubtitle'.tr(),
             style: AppTypography.caption(),
           ),
         ),
@@ -780,7 +797,7 @@ class _IntentHint extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Vielleicht meinst du "${hint.type}"?',
+              'create.maybeMean'.tr(namedArgs: {'type': hint.type}),
               style: AppTypography.body(
                 size: 12,
                 color: AppColors.amber,
@@ -789,7 +806,7 @@ class _IntentHint extends StatelessWidget {
           ),
           TextButton(
             onPressed: onApply,
-            child: const Text('Übernehmen'),
+            child: Text('create.apply'.tr()),
           ),
         ],
       ),
@@ -827,13 +844,13 @@ class _StepKontakt extends StatelessWidget {
   final VoidCallback onUseGps;
   final void Function(AddressSuggestion) onAddressSelected;
 
-  static const List<String> _urgencyLabels = [
-    'Niedrig',
-    'Normal',
-    'Mittel',
-    'Hoch',
-    'Sehr hoch',
-  ];
+  static List<String> get _urgencyLabels => [
+        'create.urgencyLow'.tr(),
+        'create.urgencyNormal'.tr(),
+        'create.urgencyMedium'.tr(),
+        'create.urgencyHigh'.tr(),
+        'create.urgencyVeryHigh'.tr(),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -841,7 +858,7 @@ class _StepKontakt extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Wie können Nachbarn dich erreichen?',
+          'create.howReach'.tr(),
           style: AppTypography.display(size: 22, color: AppColors.ink),
         ),
         const SizedBox(height: 14),
@@ -850,8 +867,8 @@ class _StepKontakt extends StatelessWidget {
             Expanded(
               child: AddressAutocompleteField(
                 controller: locationCtrl,
-                label: 'Ort',
-                hint: 'Straße, PLZ oder Stadt',
+                label: 'create.addressLabel'.tr(),
+                hint: 'create.addressHint'.tr(),
                 onSelected: onAddressSelected,
               ),
             ),
@@ -861,7 +878,7 @@ class _StepKontakt extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onUseGps,
                 icon: const Icon(LucideIcons.locate, size: 16),
-                label: const Text('GPS'),
+                label: Text('create.gps'.tr()),
               ),
             ),
           ],
@@ -871,7 +888,7 @@ class _StepKontakt extends StatelessWidget {
           controller: phoneCtrl,
           keyboardType: TextInputType.phone,
           style: AppTypography.body(size: 14, color: AppColors.ink),
-          decoration: const InputDecoration(labelText: 'Telefon (optional)'),
+          decoration: InputDecoration(labelText: 'create.phoneOptional'.tr()),
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
@@ -879,7 +896,7 @@ class _StepKontakt extends StatelessWidget {
           onChanged: onTogglePhone,
           activeColor: AppColors.amber,
           title: Text(
-            'Telefon nur Eingeloggten zeigen',
+            'create.phoneShowLoggedIn'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.inkSoft),
           ),
         ),
@@ -888,7 +905,7 @@ class _StepKontakt extends StatelessWidget {
           controller: emailCtrl,
           keyboardType: TextInputType.emailAddress,
           style: AppTypography.body(size: 14, color: AppColors.ink),
-          decoration: const InputDecoration(labelText: 'E-Mail (optional)'),
+          decoration: InputDecoration(labelText: 'create.emailOptional'.tr()),
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
@@ -896,7 +913,7 @@ class _StepKontakt extends StatelessWidget {
           onChanged: onToggleEmail,
           activeColor: AppColors.amber,
           title: Text(
-            'E-Mail nur Eingeloggten zeigen',
+            'create.emailShowLoggedIn'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.inkSoft),
           ),
         ),
@@ -904,10 +921,10 @@ class _StepKontakt extends StatelessWidget {
         TextField(
           controller: whatsappCtrl,
           style: AppTypography.body(size: 14, color: AppColors.ink),
-          decoration: const InputDecoration(labelText: 'WhatsApp (optional)'),
+          decoration: InputDecoration(labelText: 'create.whatsappOptional'.tr()),
         ),
         const SizedBox(height: 18),
-        Text('Dringlichkeit', style: AppTypography.label(size: 10)),
+        Text('create.urgency'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 8),
         Wrap(
           spacing: 6,
@@ -980,8 +997,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
             ? widget.titleCtrl.text.trim()
             : widget.descCtrl.text.trim();
     if (input.isEmpty) {
-      setState(() => _error =
-          'Gib zuerst ein Thema, einen Titel oder eine Beschreibung ein.');
+      setState(() => _error = 'create.aiNeedInput'.tr());
       return;
     }
     setState(() {
@@ -998,8 +1014,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
       _loading = false;
       _suggestions = result;
       if (result == null || result.isEmpty) {
-        _error =
-            'KI ist gerade nicht erreichbar. Versuche es später noch einmal.';
+        _error = 'create.aiUnavailable'.tr();
       }
     });
   }
@@ -1026,7 +1041,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
               const Icon(LucideIcons.wand,
                   size: 14, color: AppColors.bronze),
               const SizedBox(width: 6),
-              Text('KI-Beitrags-Assistent',
+              Text('create.aiAssistant'.tr(),
                   style: AppTypography.label(
                       size: 10, color: AppColors.bronzeSoft)),
             ],
@@ -1043,7 +1058,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
                     isDense: true,
                     filled: true,
                     fillColor: AppColors.elevated,
-                    hintText: 'z.B. "Suche Pflegestelle Hund"',
+                    hintText: 'create.aiPromptHint'.tr(),
                     hintStyle: AppTypography.body(
                         size: 12, color: AppColors.mute),
                     border: OutlineInputBorder(
@@ -1087,7 +1102,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
           if (_suggestions != null && !_suggestions!.isEmpty) ...[
             const SizedBox(height: 12),
             if (_suggestions!.titles.isNotEmpty) ...[
-              Text('Titel-Vorschläge',
+              Text('create.aiTitleSuggestions'.tr(),
                   style: AppTypography.label(size: 9)),
               const SizedBox(height: 4),
               Wrap(
@@ -1120,7 +1135,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
             if (_suggestions!.description != null &&
                 _suggestions!.description!.isNotEmpty) ...[
               const SizedBox(height: 10),
-              Text('Beschreibungs-Vorschlag',
+              Text('create.aiDescriptionSuggestion'.tr(),
                   style: AppTypography.label(size: 9)),
               const SizedBox(height: 4),
               InkWell(
@@ -1146,7 +1161,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
                               color: AppColors.inkSoft,
                               height: 1.45)),
                       const SizedBox(height: 4),
-                      Text('Tippen zum Übernehmen',
+                      Text('create.aiTapToApply'.tr(),
                           style: AppTypography.label(
                               size: 8, color: AppColors.bronze)),
                     ],
