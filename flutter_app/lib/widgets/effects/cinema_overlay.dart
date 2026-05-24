@@ -36,7 +36,7 @@ class CinemaOverlay extends ConsumerWidget {
       children: [
         // 1. Hintergrund-Mesh-Gradient (cross-fade zwischen Phasen)
         AnimatedSwitcher(
-          duration: const Duration(seconds: 30),
+          duration: const Duration(seconds: 8),
           child: KeyedSubtree(
             key: ValueKey('bg_${phase.name}'),
             child: DecoratedBox(
@@ -59,14 +59,14 @@ class CinemaOverlay extends ConsumerWidget {
         // 3. Color-Grade-Tint (overlay)
         IgnorePointer(
           child: AnimatedContainer(
-            duration: const Duration(seconds: 30),
+            duration: const Duration(seconds: 8),
             color: spec.tintColor.withValues(alpha: spec.tintOpacity),
           ),
         ),
 
         // 4. Light-Leaks
         AnimatedSwitcher(
-          duration: const Duration(seconds: 30),
+          duration: const Duration(seconds: 8),
           child: KeyedSubtree(
             key: ValueKey('leaks_${phase.name}'),
             child: LightLeaksOverlay(spots: spec.leakSpots),
@@ -75,7 +75,7 @@ class CinemaOverlay extends ConsumerWidget {
 
         // 5. Vignette
         AnimatedSwitcher(
-          duration: const Duration(seconds: 30),
+          duration: const Duration(seconds: 8),
           child: KeyedSubtree(
             key: ValueKey('vig_${phase.name}'),
             child: VignetteOverlay(intensity: spec.vignetteIntensity),

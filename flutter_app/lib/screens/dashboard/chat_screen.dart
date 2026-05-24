@@ -188,7 +188,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _ctrl.removeListener(_onTextChanged);
     _ctrl.dispose();
     _scrollCtrl.dispose();
-    _typingChannel?.unsubscribe();
+    // BUG-FIX #13: Channel unsubscribe + removeChannel — sonst bleibt
+    // RealtimeChannel im Supabase-Client-Pool, fuehrt zu Memory-Leak +
+    // doppelten typing-Broadcasts bei schnellem Chat-Wechsel.
+    final ch = _typingChannel;
+    if (ch != null) {
+      try {
+        ch.unsubscribe();
+        sb.removeChannel(ch);
+      } catch (_) {}
+    }
+    _typingChannel = null;
     super.dispose();
   }
 
@@ -841,9 +851,12 @@ class _ReactionsPills extends ConsumerWidget {
               return InkWell(
                 onTap: () => onTap?.call(e.key),
                 borderRadius: BorderRadius.circular(999),
+                // BUG-FIX #6: 32dp min Touch-Target (mehr Tap-Sicherheit)
                 child: Container(
+                  constraints: const BoxConstraints(minHeight: 32),
+                  alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 2),
+                      horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: active
                         ? AppColors.bronze.withValues(alpha: 0.22)

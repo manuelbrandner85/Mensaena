@@ -203,7 +203,7 @@ class _BottomNav extends ConsumerWidget {
               Expanded(
                 child: _BottomItem(
                   icon: LucideIcons.bell,
-                  label: 'Bell',
+                  label: 'Mitteilungen',
                   route: '/dashboard/notifications',
                   active: currentRoute == '/dashboard/notifications',
                   badge: unreadNotif,
@@ -237,7 +237,11 @@ class _BottomItem extends StatelessWidget {
     final color = active ? AppColors.amber : AppColors.mute;
     return InkWell(
       onTap: () => context.go(route),
-      child: Stack(
+      // BUG-FIX #4: 48dp minimum Touch-Target (Material-Standard)
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+        alignment: Alignment.center,
+        child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
@@ -280,6 +284,7 @@ class _BottomItem extends StatelessWidget {
               ),
             ),
         ],
+      ),
       ),
     );
   }

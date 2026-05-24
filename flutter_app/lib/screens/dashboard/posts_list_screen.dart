@@ -16,6 +16,7 @@ import '../../widgets/shared/empty_state_card.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
 import '../../widgets/shared/module_search_bar.dart';
 import '../../widgets/shared/post_card.dart';
+import '../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
 /// Posts-Feed — 1:1-Spiegel von `src/app/dashboard/posts/page.tsx`.
@@ -341,19 +342,8 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
 
   Widget _buildList() {
     if (_loading) {
-      return ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: 6,
-        itemBuilder: (_, __) => Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          height: 110,
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.4),
-            border: Border.all(color: AppColors.line),
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+      // BUG-FIX #14: Shimmer-Skeleton statt statischer Box-Pulse
+      return const SkeletonList(count: 6, itemHeight: 110);
     }
     if (_items.isEmpty) {
       return ListView(

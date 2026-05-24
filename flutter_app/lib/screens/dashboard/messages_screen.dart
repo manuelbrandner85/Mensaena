@@ -9,6 +9,7 @@ import '../../config/theme/app_typography.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/presence_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Hub: 2 Tabs — Community (Channels gruppiert nach Kategorie)
@@ -109,15 +110,23 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
               ),
             ),
             Expanded(
-              child: RefreshIndicator(
-                color: AppColors.amber,
-                backgroundColor: AppColors.surface,
-                onRefresh: _refresh,
-                child: TabBarView(
-                  controller: _tab,
-                  children: [
-                    _ChannelListView(future: _channels),
-                    _DmListView(
+              // BUG-FIX #7: RefreshIndicator in EINZELNE Tab-Children,
+              // nicht ueber TabBarView — sonst kollidiert Pull-Gesture
+              // mit Tab-Swipe.
+              child: TabBarView(
+                controller: _tab,
+                children: [
+                  RefreshIndicator(
+                    color: AppColors.amber,
+                    backgroundColor: AppColors.surface,
+                    onRefresh: _refresh,
+                    child: _ChannelListView(future: _channels),
+                  ),
+                  RefreshIndicator(
+                    color: AppColors.amber,
+                    backgroundColor: AppColors.surface,
+                    onRefresh: _refresh,
+                    child: _DmListView(
                       future: _convs,
                       search: _searchDm,
                       onSearchChanged: (v) => setState(() => _searchDm = v),
@@ -126,8 +135,8 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                               .value ??
                           const <String>{},
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -148,9 +157,8 @@ class _ChannelListView extends StatelessWidget {
       future: future,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.amber),
-          );
+          // BUG-FIX #14: Skeleton-Loader statt Spinner
+          return const SkeletonList(count: 5, itemHeight: 76);
         }
         final list = snap.data ?? const <Map<String, dynamic>>[];
         if (list.isEmpty) {
@@ -302,9 +310,8 @@ class _DmListView extends StatelessWidget {
       future: future,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.amber),
-          );
+          // BUG-FIX #14: Skeleton-Loader statt Spinner
+          return const SkeletonList(count: 5, itemHeight: 76);
         }
         final all = snap.data ?? const <Map<String, dynamic>>[];
         // Nur DMs + Groups (channels raus)

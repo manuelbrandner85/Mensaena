@@ -29,6 +29,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   Future<Profile?>? _future;
   Profile? _profile;
   bool _saving = false;
+  // BUG-FIX #15: Form-Key fuer inline Validation
+  final _formKey = GlobalKey<FormState>();
 
   final _nameCtrl = TextEditingController();
   final _displayNameCtrl = TextEditingController();
@@ -103,6 +105,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   Future<void> _save() async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
+    // BUG-FIX #15: Form-Validation vor Submit
+    if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _saving = true);
     final patch = <String, dynamic>{
       'name': _nameCtrl.text.trim(),
@@ -115,7 +119,20 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     };
     if (_newAvatar != null) {
       final url = await _uploadAvatar();
-      if (url != null) patch['avatar_url'] = url;
+      if (!mounted) return; // BUG-FIX #2: Schutz vor disposed widget
+      if (url == null) {
+        // BUG-FIX #5: Avatar-Upload silent fail behoben → klare Error-UI
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(
+            'Avatar-Upload fehlgeschlagen — Profil wurde NICHT gespeichert.',
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+          ),
+        ));
+        return;
+      }
+      patch['avatar_url'] = url;
     }
     try {
       await ProfilesRepository.update(uid, patch);
@@ -158,7 +175,10 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 : (p?.avatarUrl ?? '').isEmpty
                     ? null
                     : p!.avatarUrl;
-            return ListView(
+            return Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
                 // Avatar-Picker
@@ -222,27 +242,33 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                           size: 10, color: AppColors.mute)),
                 ),
                 const SizedBox(height: 24),
-                // Felder
+                // Felder mit Validation
                 _Field(
                   label: 'Name',
                   controller: _nameCtrl,
                   hint: 'Dein voller Name',
+                  required: true,
+                  minLength: 2,
+                  maxLength: 80,
                 ),
                 _Field(
                   label: 'Anzeigename',
                   controller: _displayNameCtrl,
                   hint: 'Wie du angezeigt wirst',
+                  maxLength: 40,
                 ),
                 _Field(
                   label: 'Spitzname',
                   controller: _nicknameCtrl,
                   hint: '@spitzname',
+                  maxLength: 30,
                 ),
                 _Field(
                   label: 'Bio',
                   controller: _bioCtrl,
                   hint: 'Erzähl ein wenig über dich…',
                   multiline: true,
+                  maxLength: 300,
                 ),
                 _Field(
                   label: 'Standort',
@@ -285,6 +311,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 ),
                 const SizedBox(height: 40),
               ],
+            ),
             );
           },
         ),
@@ -300,6 +327,10 @@ class _Field extends StatelessWidget {
     required this.hint,
     this.multiline = false,
     this.keyboardType,
+    this.required = false,
+    this.minLength,
+    this.maxLength,
+    this.validator,
   });
 
   final String label;
@@ -307,6 +338,27 @@ class _Field extends StatelessWidget {
   final String hint;
   final bool multiline;
   final TextInputType? keyboardType;
+  final bool required;
+  final int? minLength;
+  final int? maxLength;
+  final String? Function(String?)? validator;
+
+  String? _defaultValidator(String? v) {
+    final s = v?.trim() ?? '';
+    if (required && s.isEmpty) return '$label ist erforderlich';
+    if (minLength != null && s.isNotEmpty && s.length < minLength!) {
+      return 'Mindestens $minLength Zeichen';
+    }
+    if (maxLength != null && s.length > maxLength!) {
+      return 'Maximal $maxLength Zeichen';
+    }
+    if (keyboardType == TextInputType.url &&
+        s.isNotEmpty &&
+        !RegExp(r'^https?://').hasMatch(s)) {
+      return 'URL muss mit https:// beginnen';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -315,14 +367,26 @@ class _Field extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label.toUpperCase(),
-              style: AppTypography.label(size: 9, color: AppColors.mute)),
+          Row(
+            children: [
+              Text(label.toUpperCase(),
+                  style: AppTypography.label(size: 9, color: AppColors.mute)),
+              if (required) ...[
+                const SizedBox(width: 4),
+                Text('*',
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.herzrotWarm)),
+              ],
+            ],
+          ),
           const SizedBox(height: 6),
-          TextField(
+          // BUG-FIX #15: TextFormField mit inline-validator
+          TextFormField(
             controller: controller,
             maxLines: multiline ? 4 : 1,
             minLines: multiline ? 3 : 1,
             keyboardType: keyboardType,
+            validator: validator ?? _defaultValidator,
             style: AppTypography.body(size: 14, color: AppColors.ink),
             decoration: InputDecoration(
               filled: true,
@@ -345,6 +409,12 @@ class _Field extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: AppColors.bronze),
               ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: AppColors.herzrot),
+              ),
+              errorStyle: AppTypography.label(
+                  size: 10, color: AppColors.herzrotWarm),
             ),
           ),
         ],

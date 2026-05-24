@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'supabase_service.dart';
@@ -162,12 +163,23 @@ class PushNotificationService {
   }
 
   /// FCM-Token holen + in Supabase `fcm_tokens` persistieren.
+  /// Letzter Registration-Fehler — fuer UI-Status-Anzeige
+  /// (z.B. Settings → Push-Status: "Fehler: <message>").
+  static String? lastRegisterError;
+
   static Future<String?> registerToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      if (token == null) return null;
+      if (token == null) {
+        lastRegisterError = 'FCM-Token konnte nicht geholt werden';
+        debugPrint('[Push] $lastRegisterError');
+        return null;
+      }
       final uid = SupabaseService.currentUser?.id;
-      if (uid == null) return token;
+      if (uid == null) {
+        // Token holen ohne User ist OK (vor Login)
+        return token;
+      }
 
       await sb.from('fcm_tokens').upsert(
         {
@@ -179,8 +191,13 @@ class PushNotificationService {
         },
         onConflict: 'user_id,token',
       );
+      lastRegisterError = null;
+      debugPrint('[Push] Token registriert fuer User $uid');
       return token;
-    } catch (_) {
+    } catch (e) {
+      // BUG-FIX #3: Vorher silent catch → User glaubte Push aktiviert
+      lastRegisterError = e.toString();
+      debugPrint('[Push] registerToken FAILED: $e');
       return null;
     }
   }

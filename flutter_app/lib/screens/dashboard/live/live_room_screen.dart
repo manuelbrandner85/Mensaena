@@ -168,6 +168,14 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   @override
   void dispose() {
+    // BUG-FIX #1: Host-Cleanup auch bei App-Close oder Navigation-Pop.
+    // Vorher: dispose() schloss nur Room + Listener, aber live_rooms.ended_at
+    // wurde nur in _leave() gesetzt. Bei App-Kill / Hot-Reload / Force-Navigate
+    // blieb live_rooms.status='live' fuer immer → Ghost-Banner.
+    if (widget.isHost) {
+      // Fire-and-forget — Future kann nicht awaited werden in dispose.
+      LiveStreamService.endChannelStream(widget.roomName);
+    }
     _listener?.dispose();
     _room?.dispose();
     super.dispose();

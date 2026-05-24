@@ -190,10 +190,13 @@ class Profile {
   factory Profile.fromJson(Map<String, dynamic> j) {
     return Profile(
       id: j['id'] as String,
+      // BUG-FIX #12: Fallback auf DateTime(2000) statt now() — signalisiert
+      // "unbekanntes Datum" eindeutig. Vorher fuehrte now() zu falschen
+      // Cache-Invalidations und "neuestem User"-Anzeige fuer alte Profile.
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime(2000),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime(2000),
       role: (j['role'] as String?) ?? 'user',
       donorTier: (j['donor_tier'] as num?)?.toInt() ?? 0,
       donationCount: (j['donation_count'] as num?)?.toInt() ?? 0,
