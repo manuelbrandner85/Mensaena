@@ -75,7 +75,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                               size: 10, color: AppColors.amber)),
                     )
                   else
-                    Text('Alle gelesen ✓',
+                    Text('notifications.allRead'.tr(),
                         style: AppTypography.caption()),
                   const Spacer(),
                   if (unread > 0)
@@ -96,7 +96,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       },
                       icon: const Icon(LucideIcons.checkCheck,
                           size: 14, color: AppColors.amber),
-                      label: Text('Alle gelesen',
+                      label: Text('notifications.markAllRead'.tr(),
                           style: AppTypography.label(
                               size: 10, color: AppColors.amber)),
                     ),
@@ -107,7 +107,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         context: context,
                         builder: (ctx) => AlertDialog(
                           backgroundColor: AppColors.surface,
-                          title: Text('Alle löschen?',
+                          title: Text('notifications.deleteAllTitle'.tr(),
                               style: AppTypography.body(
                                   size: 15,
                                   color: AppColors.ink,

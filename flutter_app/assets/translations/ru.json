@@ -25,7 +25,14 @@
     "today": "Сегодня",
     "yesterday": "Вчера",
     "now": "Сейчас",
-    "neighbour": "Сосед(ка)"
+    "neighbour": "Сосед(ка)",
+    "open": "Открыть",
+    "reset": "Сбросить",
+    "reject": "Отклонить",
+    "read": "Читать",
+    "or": "или",
+    "received": "Полученные",
+    "given": "Данные"
   },
   "nav": {
     "dashboard": "Панель",
@@ -131,7 +138,8 @@
     "fieldRequired": "Поле «{field}» обязательно",
     "minChars": "Минимум {n} символов",
     "maxChars": "Максимум {n} символов",
-    "urlMustStart": "URL должен начинаться с https://"
+    "urlMustStart": "URL должен начинаться с https://",
+    "nothingSaved": "Пока ничего не сохранено."
   },
   "settings": {
     "title": "Настройки",
@@ -299,7 +307,8 @@
     "nextTip": "Следующий совет",
     "exploreMap": "Изучить карту",
     "botName": "MensaenaBot",
-    "weatherSource": "Open-Meteo"
+    "weatherSource": "Open-Meteo",
+    "saveLocation": "Сохранить местоположение"
   },
   "matching": {
     "disabled": "Подбор отключён",
@@ -325,7 +334,11 @@
     "deleteEntry": "Удалить запись",
     "rawData": "Сырые данные",
     "deleteReportTitle": "Удалить жалобу?",
-    "deleteReportConfirm": "Это действие нельзя отменить."
+    "deleteReportConfirm": "Это действие нельзя отменить.",
+    "statsLoadFailed": "Не удалось загрузить статистику.",
+    "cockpit": "Админ-панель",
+    "cockpitSubtitle": "Обзор и модерация всех модулей.",
+    "statsLoadShort": "Не удалось загрузить статистику."
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",
@@ -478,7 +491,11 @@
     "urgCritical": "🔴 Критично",
     "urgHigh": "🟠 Высоко",
     "urgMedium": "🟡 Средне",
-    "urgLow": "🔵 Низко"
+    "urgLow": "🔵 Низко",
+    "locationUnavailable": "Местоположение недоступно.",
+    "categoryLabel": "Категория",
+    "urgency": "Срочность",
+    "errorWith": "Ошибка: {error}"
   },
   "posts": {
     "title": "Объявления",
@@ -560,7 +577,8 @@
     "searching": "Поиск {code} …",
     "productNotFound": "Продукт {code} не найден в Open Food Facts.",
     "type": "Тип",
-    "scanBarcode": "Сканировать штрих-код (продукты)"
+    "scanBarcode": "Сканировать штрих-код (продукты)",
+    "createListing": "Разместить"
   },
   "trust": {
     "rate": "Оценить {name}",
@@ -598,7 +616,10 @@
     "exportFailed": "Экспорт не удался.",
     "error": "Ошибка: {error}",
     "attendees": "{count} участников",
-    "attendeesWithMax": "{count} участников / макс. {max}"
+    "attendeesWithMax": "{count} участников / макс. {max}",
+    "create": "Создать событие",
+    "categoryLabel": "Категория",
+    "eventsInMonth": "События за месяц"
   },
   "challenges": {
     "create": "Создать челлендж",
@@ -628,7 +649,10 @@
     "catGemeinschaft": "🏘️ Сообщество",
     "diffEasy": "Лёгкий",
     "diffMedium": "Средний",
-    "diffHard": "Сложный"
+    "diffHard": "Сложный",
+    "title": "Челленджи",
+    "badges": "Бейджи",
+    "join": "Участвовать"
   },
   "invite": {
     "title": "Пригласить",
@@ -659,7 +683,9 @@
     "inviteSend": "Пригласить",
     "inviteSentTo": "Приглашение отправлено на {email}",
     "inviteFailed": "Не удалось отправить приглашение.",
-    "memberCount": "{count} участников"
+    "memberCount": "{count} участников",
+    "create": "Создать группу",
+    "categoryLabel": "Категория"
   },
   "board": {
     "title": "Заметка",
@@ -671,7 +697,10 @@
     "editPin": "Редактировать пин",
     "contentHint": "Чем хочешь поделиться?",
     "category": "Категория",
-    "color": "Цвет"
+    "color": "Цвет",
+    "pin": "Закрепить",
+    "colorLabel": "Цвет",
+    "categoryLabel": "Категория"
   },
   "messages": {
     "title": "Чат",
@@ -683,18 +712,24 @@
     "donate": "Пожертвовать",
     "donateUseTitle": "Как мы используем пожертвования",
     "donateTiersTitle": "Уровни поддержки",
-    "donateBankTitle": "Банковский перевод"
+    "donateBankTitle": "Банковский перевод",
+    "unsubscribeTitle": "Отписка",
+    "unsubscribeProcessing": "Обрабатываем отписку…"
   },
   "supply": {
     "farmCreateTitle": "Ферма / Прямой производитель",
     "farmIsBio": "Био-сертифицировано",
     "farmIsSeasonal": "Сезонное",
-    "farmSubmit": "Отправить запись"
+    "farmSubmit": "Отправить запись",
+    "farmNotFound": "Хозяйство не найдено.",
+    "products": "Продукты"
   },
   "knowledge": {
     "category": "Категория",
     "publicVisible": "Публично видимо",
-    "publishArticle": "Опубликовать статью"
+    "publishArticle": "Опубликовать статью",
+    "article": "Статья",
+    "writeArticle": "Написать статью"
   },
   "air": {
     "title": "Качество воздуха",
@@ -759,6 +794,72 @@
     "severityMinor": "Слабый",
     "instructionLabel": "Рекомендуемое действие",
     "sourceLabel": "Источник: {source}",
-    "fallbackTitle": "Оповещение"
+    "fallbackTitle": "Оповещение",
+    "meteoAlarm": "MeteoAlarm"
+  },
+  "wiki": {
+    "loading": "Загрузка Wikipedia …",
+    "source": "Источник: Wikipedia"
+  },
+  "bot": {
+    "name": "Mensaena-бот"
+  },
+  "update": {
+    "whatsNew": "Что нового"
+  },
+  "landing": {
+    "startFree": "Начать бесплатно",
+    "alreadyMember": "Уже с нами? Войти"
+  },
+  "misc": {
+    "toHome": "На главную"
+  },
+  "map": {
+    "locationUnavailable": "Не удалось определить местоположение."
+  },
+  "calendar": {
+    "noEvents": "В календаре нет событий."
+  },
+  "notifications": {
+    "allRead": "Все прочитаны ✓",
+    "markAllRead": "Отметить все прочитанными",
+    "deleteAllTitle": "Удалить все?"
+  },
+  "timebank": {
+    "history": "История",
+    "zeitbankConfirmation": "ПОДТВЕРЖДЕНИЕ БАНКА ВРЕМЕНИ"
+  },
+  "search": {
+    "minChars": "Введите минимум 2 символа",
+    "noResultsForQuery": "Нет совпадений по «{query}»",
+    "tryOther": "Попробуйте другие слова или меньше символов."
+  },
+  "skills": {
+    "offerSkill": "Предложить навык",
+    "free": "Бесплатно"
+  },
+  "wissen": {
+    "shareTitle": "Делиться знаниями"
+  },
+  "teilen": {
+    "hubTitle": "Делиться и обмениваться"
+  },
+  "organizations": {
+    "notFound": "Организация не найдена.",
+    "offers": "Предложения",
+    "suggestOrg": "Предложить организацию"
+  },
+  "live": {
+    "connectionFailed": "Сбой подключения",
+    "waitingParticipants": "Ожидание участников …"
+  },
+  "call": {
+    "incoming": "Входящий вызов"
+  },
+  "voice": {
+    "micDenied": "Доступ к микрофону запрещён."
+  },
+  "widgets": {
+    "config": "Настройка виджетов"
   }
 }

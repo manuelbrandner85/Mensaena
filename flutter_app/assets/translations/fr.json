@@ -25,7 +25,14 @@
     "today": "Aujourd'hui",
     "yesterday": "Hier",
     "now": "Maintenant",
-    "neighbour": "Voisin·e"
+    "neighbour": "Voisin·e",
+    "open": "Ouvrir",
+    "reset": "Réinitialiser",
+    "reject": "Refuser",
+    "read": "Lire",
+    "or": "ou",
+    "received": "Reçues",
+    "given": "Données"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -131,7 +138,8 @@
     "fieldRequired": "{field} est obligatoire",
     "minChars": "Au moins {n} caractères",
     "maxChars": "Au plus {n} caractères",
-    "urlMustStart": "L’URL doit commencer par https://"
+    "urlMustStart": "L’URL doit commencer par https://",
+    "nothingSaved": "Rien d'enregistré pour l'instant."
   },
   "settings": {
     "title": "Paramètres",
@@ -299,7 +307,8 @@
     "nextTip": "Astuce suivante",
     "exploreMap": "Explorer la carte",
     "botName": "MensaenaBot",
-    "weatherSource": "Open-Meteo"
+    "weatherSource": "Open-Meteo",
+    "saveLocation": "Enregistrer la position"
   },
   "matching": {
     "disabled": "Matching désactivé",
@@ -325,7 +334,11 @@
     "deleteEntry": "Supprimer l'entrée",
     "rawData": "Données brutes",
     "deleteReportTitle": "Supprimer le signalement ?",
-    "deleteReportConfirm": "Cette action est irréversible."
+    "deleteReportConfirm": "Cette action est irréversible.",
+    "statsLoadFailed": "Impossible de charger les statistiques.",
+    "cockpit": "Tableau de bord admin",
+    "cockpitSubtitle": "Vue d'ensemble et modération de tous les modules.",
+    "statsLoadShort": "Impossible de charger les stats."
   },
   "create": {
     "locationUnavailable": "Position non disponible.",
@@ -478,7 +491,11 @@
     "urgCritical": "🔴 Critique",
     "urgHigh": "🟠 Élevée",
     "urgMedium": "🟡 Moyenne",
-    "urgLow": "🔵 Faible"
+    "urgLow": "🔵 Faible",
+    "locationUnavailable": "Position non disponible.",
+    "categoryLabel": "Catégorie",
+    "urgency": "Urgence",
+    "errorWith": "Erreur : {error}"
   },
   "posts": {
     "title": "Publications",
@@ -560,7 +577,8 @@
     "searching": "Recherche de {code} …",
     "productNotFound": "Produit {code} introuvable dans Open Food Facts.",
     "type": "Type",
-    "scanBarcode": "Scanner le code-barres (aliments)"
+    "scanBarcode": "Scanner le code-barres (aliments)",
+    "createListing": "Mettre en vente"
   },
   "trust": {
     "rate": "Évaluer {name}",
@@ -598,7 +616,10 @@
     "exportFailed": "Échec de l'exportation.",
     "error": "Erreur : {error}",
     "attendees": "{count} participant·e·s",
-    "attendeesWithMax": "{count} participant·e·s / max. {max}"
+    "attendeesWithMax": "{count} participant·e·s / max. {max}",
+    "create": "Créer un événement",
+    "categoryLabel": "Catégorie",
+    "eventsInMonth": "Événements du mois"
   },
   "challenges": {
     "create": "Créer un défi",
@@ -628,7 +649,10 @@
     "catGemeinschaft": "🏘️ Communauté",
     "diffEasy": "Facile",
     "diffMedium": "Moyen",
-    "diffHard": "Difficile"
+    "diffHard": "Difficile",
+    "title": "Défis",
+    "badges": "Badges",
+    "join": "Participer"
   },
   "invite": {
     "title": "Inviter",
@@ -659,7 +683,9 @@
     "inviteSend": "Inviter",
     "inviteSentTo": "Invitation envoyée à {email}",
     "inviteFailed": "Échec de l’invitation.",
-    "memberCount": "{count} membres"
+    "memberCount": "{count} membres",
+    "create": "Créer un groupe",
+    "categoryLabel": "Catégorie"
   },
   "board": {
     "title": "Note",
@@ -671,7 +697,10 @@
     "editPin": "Modifier le pin",
     "contentHint": "Que souhaitez-vous partager ?",
     "category": "Catégorie",
-    "color": "Couleur"
+    "color": "Couleur",
+    "pin": "Épingler",
+    "colorLabel": "Couleur",
+    "categoryLabel": "Catégorie"
   },
   "messages": {
     "title": "Chat",
@@ -683,18 +712,24 @@
     "donate": "Faire un don",
     "donateUseTitle": "À quoi servent les dons",
     "donateTiersTitle": "Niveaux de soutien",
-    "donateBankTitle": "Par virement"
+    "donateBankTitle": "Par virement",
+    "unsubscribeTitle": "Désabonnement",
+    "unsubscribeProcessing": "Traitement de votre désabonnement…"
   },
   "supply": {
     "farmCreateTitle": "Ferme / Producteur direct",
     "farmIsBio": "Certifié bio",
     "farmIsSeasonal": "De saison",
-    "farmSubmit": "Envoyer l'entrée"
+    "farmSubmit": "Envoyer l'entrée",
+    "farmNotFound": "Ferme introuvable.",
+    "products": "Produits"
   },
   "knowledge": {
     "category": "Catégorie",
     "publicVisible": "Visible publiquement",
-    "publishArticle": "Publier l'article"
+    "publishArticle": "Publier l'article",
+    "article": "Article",
+    "writeArticle": "Écrire un article"
   },
   "air": {
     "title": "Qualité de l'air",
@@ -759,6 +794,72 @@
     "severityMinor": "Faible",
     "instructionLabel": "Conduite à tenir",
     "sourceLabel": "Source : {source}",
-    "fallbackTitle": "Alerte"
+    "fallbackTitle": "Alerte",
+    "meteoAlarm": "MeteoAlarm"
+  },
+  "wiki": {
+    "loading": "Chargement de Wikipédia …",
+    "source": "Source : Wikipédia"
+  },
+  "bot": {
+    "name": "Bot Mensaena"
+  },
+  "update": {
+    "whatsNew": "Nouveautés"
+  },
+  "landing": {
+    "startFree": "Commencer gratuitement",
+    "alreadyMember": "Déjà inscrit ? Se connecter"
+  },
+  "misc": {
+    "toHome": "Retour à l'accueil"
+  },
+  "map": {
+    "locationUnavailable": "Impossible de déterminer la position."
+  },
+  "calendar": {
+    "noEvents": "Aucun événement dans l'agenda."
+  },
+  "notifications": {
+    "allRead": "Tout lu ✓",
+    "markAllRead": "Tout marquer comme lu",
+    "deleteAllTitle": "Tout supprimer ?"
+  },
+  "timebank": {
+    "history": "Historique",
+    "zeitbankConfirmation": "CONFIRMATION BANQUE DE TEMPS"
+  },
+  "search": {
+    "minChars": "Saisissez au moins 2 caractères",
+    "noResultsForQuery": "Aucun résultat pour « {query} »",
+    "tryOther": "Essayez d'autres mots ou moins de caractères."
+  },
+  "skills": {
+    "offerSkill": "Proposer une compétence",
+    "free": "Gratuit"
+  },
+  "wissen": {
+    "shareTitle": "Partager le savoir"
+  },
+  "teilen": {
+    "hubTitle": "Partager et échanger"
+  },
+  "organizations": {
+    "notFound": "Organisation introuvable.",
+    "offers": "Offres",
+    "suggestOrg": "Suggérer une organisation"
+  },
+  "live": {
+    "connectionFailed": "Échec de la connexion",
+    "waitingParticipants": "En attente des participants …"
+  },
+  "call": {
+    "incoming": "Appel entrant"
+  },
+  "voice": {
+    "micDenied": "Autorisation du micro refusée."
+  },
+  "widgets": {
+    "config": "Configuration des widgets"
   }
 }

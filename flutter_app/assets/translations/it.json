@@ -25,7 +25,14 @@
     "today": "Oggi",
     "yesterday": "Ieri",
     "now": "Adesso",
-    "neighbour": "Vicino/a"
+    "neighbour": "Vicino/a",
+    "open": "Apri",
+    "reset": "Reimposta",
+    "reject": "Rifiuta",
+    "read": "Leggi",
+    "or": "oppure",
+    "received": "Ricevute",
+    "given": "Date"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -131,7 +138,8 @@
     "fieldRequired": "{field} è obbligatorio",
     "minChars": "Almeno {n} caratteri",
     "maxChars": "Massimo {n} caratteri",
-    "urlMustStart": "L’URL deve iniziare con https://"
+    "urlMustStart": "L’URL deve iniziare con https://",
+    "nothingSaved": "Ancora nulla salvato."
   },
   "settings": {
     "title": "Impostazioni",
@@ -299,7 +307,8 @@
     "nextTip": "Suggerimento successivo",
     "exploreMap": "Esplora la mappa",
     "botName": "MensaenaBot",
-    "weatherSource": "Open-Meteo"
+    "weatherSource": "Open-Meteo",
+    "saveLocation": "Salva posizione"
   },
   "matching": {
     "disabled": "Matching disattivato",
@@ -325,7 +334,11 @@
     "deleteEntry": "Elimina voce",
     "rawData": "Dati grezzi",
     "deleteReportTitle": "Eliminare la segnalazione?",
-    "deleteReportConfirm": "Questa azione non può essere annullata."
+    "deleteReportConfirm": "Questa azione non può essere annullata.",
+    "statsLoadFailed": "Impossibile caricare le statistiche.",
+    "cockpit": "Pannello admin",
+    "cockpitSubtitle": "Panoramica e moderazione di tutti i moduli.",
+    "statsLoadShort": "Impossibile caricare le statistiche."
   },
   "create": {
     "locationUnavailable": "Posizione non disponibile.",
@@ -478,7 +491,11 @@
     "urgCritical": "🔴 Critica",
     "urgHigh": "🟠 Alta",
     "urgMedium": "🟡 Media",
-    "urgLow": "🔵 Bassa"
+    "urgLow": "🔵 Bassa",
+    "locationUnavailable": "Posizione non disponibile.",
+    "categoryLabel": "Categoria",
+    "urgency": "Urgenza",
+    "errorWith": "Errore: {error}"
   },
   "posts": {
     "title": "Post",
@@ -560,7 +577,8 @@
     "searching": "Ricerca {code} …",
     "productNotFound": "Prodotto {code} non trovato in Open Food Facts.",
     "type": "Tipo",
-    "scanBarcode": "Scansiona codice a barre (alimenti)"
+    "scanBarcode": "Scansiona codice a barre (alimenti)",
+    "createListing": "Inserisci"
   },
   "trust": {
     "rate": "Valuta {name}",
@@ -598,7 +616,10 @@
     "exportFailed": "Esportazione non riuscita.",
     "error": "Errore: {error}",
     "attendees": "{count} partecipanti",
-    "attendeesWithMax": "{count} partecipanti / max. {max}"
+    "attendeesWithMax": "{count} partecipanti / max. {max}",
+    "create": "Crea evento",
+    "categoryLabel": "Categoria",
+    "eventsInMonth": "Eventi nel mese"
   },
   "challenges": {
     "create": "Crea sfida",
@@ -628,7 +649,10 @@
     "catGemeinschaft": "🏘️ Comunità",
     "diffEasy": "Facile",
     "diffMedium": "Media",
-    "diffHard": "Difficile"
+    "diffHard": "Difficile",
+    "title": "Sfide",
+    "badges": "Distintivi",
+    "join": "Partecipa"
   },
   "invite": {
     "title": "Invita",
@@ -659,7 +683,9 @@
     "inviteSend": "Invita",
     "inviteSentTo": "Invito inviato a {email}",
     "inviteFailed": "Invito non riuscito.",
-    "memberCount": "{count} membri"
+    "memberCount": "{count} membri",
+    "create": "Crea gruppo",
+    "categoryLabel": "Categoria"
   },
   "board": {
     "title": "Nota",
@@ -671,7 +697,10 @@
     "editPin": "Modifica pin",
     "contentHint": "Cosa vuoi condividere?",
     "category": "Categoria",
-    "color": "Colore"
+    "color": "Colore",
+    "pin": "Fissa",
+    "colorLabel": "Colore",
+    "categoryLabel": "Categoria"
   },
   "messages": {
     "title": "Chat",
@@ -683,18 +712,24 @@
     "donate": "Dona",
     "donateUseTitle": "Come usiamo le donazioni",
     "donateTiersTitle": "Livelli di sostenitore",
-    "donateBankTitle": "Bonifico bancario"
+    "donateBankTitle": "Bonifico bancario",
+    "unsubscribeTitle": "Annulla iscrizione",
+    "unsubscribeProcessing": "Elaborazione annullamento…"
   },
   "supply": {
     "farmCreateTitle": "Fattoria / Produttore diretto",
     "farmIsBio": "Certificato biologico",
     "farmIsSeasonal": "Stagionale",
-    "farmSubmit": "Invia voce"
+    "farmSubmit": "Invia voce",
+    "farmNotFound": "Fattoria non trovata.",
+    "products": "Prodotti"
   },
   "knowledge": {
     "category": "Categoria",
     "publicVisible": "Visibile pubblicamente",
-    "publishArticle": "Pubblica articolo"
+    "publishArticle": "Pubblica articolo",
+    "article": "Articolo",
+    "writeArticle": "Scrivi un articolo"
   },
   "air": {
     "title": "Qualità dell'aria",
@@ -759,6 +794,72 @@
     "severityMinor": "Lieve",
     "instructionLabel": "Indicazione operativa",
     "sourceLabel": "Fonte: {source}",
-    "fallbackTitle": "Avviso"
+    "fallbackTitle": "Avviso",
+    "meteoAlarm": "MeteoAlarm"
+  },
+  "wiki": {
+    "loading": "Caricamento Wikipedia …",
+    "source": "Fonte: Wikipedia"
+  },
+  "bot": {
+    "name": "Bot Mensaena"
+  },
+  "update": {
+    "whatsNew": "Novità"
+  },
+  "landing": {
+    "startFree": "Inizia gratis",
+    "alreadyMember": "Già registrato? Accedi"
+  },
+  "misc": {
+    "toHome": "Vai alla home"
+  },
+  "map": {
+    "locationUnavailable": "Impossibile determinare la posizione."
+  },
+  "calendar": {
+    "noEvents": "Nessun evento in calendario."
+  },
+  "notifications": {
+    "allRead": "Tutte lette ✓",
+    "markAllRead": "Segna tutte come lette",
+    "deleteAllTitle": "Eliminare tutte?"
+  },
+  "timebank": {
+    "history": "Storico",
+    "zeitbankConfirmation": "CONFERMA BANCA DEL TEMPO"
+  },
+  "search": {
+    "minChars": "Inserisci almeno 2 caratteri",
+    "noResultsForQuery": "Nessun risultato per «{query}»",
+    "tryOther": "Prova altri termini o meno caratteri."
+  },
+  "skills": {
+    "offerSkill": "Offri un'abilità",
+    "free": "Gratis"
+  },
+  "wissen": {
+    "shareTitle": "Condividi sapere"
+  },
+  "teilen": {
+    "hubTitle": "Condividi e scambia"
+  },
+  "organizations": {
+    "notFound": "Organizzazione non trovata.",
+    "offers": "Offerte",
+    "suggestOrg": "Suggerisci org."
+  },
+  "live": {
+    "connectionFailed": "Connessione fallita",
+    "waitingParticipants": "In attesa di partecipanti …"
+  },
+  "call": {
+    "incoming": "Chiamata in arrivo"
+  },
+  "voice": {
+    "micDenied": "Permesso microfono negato."
+  },
+  "widgets": {
+    "config": "Configurazione widget"
   }
 }

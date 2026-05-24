@@ -25,7 +25,14 @@
     "today": "Hoy",
     "yesterday": "Ayer",
     "now": "Ahora",
-    "neighbour": "Vecino/a"
+    "neighbour": "Vecino/a",
+    "open": "Abrir",
+    "reset": "Restablecer",
+    "reject": "Rechazar",
+    "read": "Leer",
+    "or": "o",
+    "received": "Recibidas",
+    "given": "Dadas"
   },
   "nav": {
     "dashboard": "Panel",
@@ -131,7 +138,8 @@
     "fieldRequired": "{field} es obligatorio",
     "minChars": "Mínimo {n} caracteres",
     "maxChars": "Máximo {n} caracteres",
-    "urlMustStart": "La URL debe empezar con https://"
+    "urlMustStart": "La URL debe empezar con https://",
+    "nothingSaved": "Aún no hay nada guardado."
   },
   "settings": {
     "title": "Ajustes",
@@ -299,7 +307,8 @@
     "nextTip": "Siguiente consejo",
     "exploreMap": "Explora el mapa",
     "botName": "MensaenaBot",
-    "weatherSource": "Open-Meteo"
+    "weatherSource": "Open-Meteo",
+    "saveLocation": "Guardar ubicación"
   },
   "matching": {
     "disabled": "Matching desactivado",
@@ -325,7 +334,11 @@
     "deleteEntry": "Eliminar entrada",
     "rawData": "Datos sin procesar",
     "deleteReportTitle": "¿Eliminar el reporte?",
-    "deleteReportConfirm": "Esta acción no se puede deshacer."
+    "deleteReportConfirm": "Esta acción no se puede deshacer.",
+    "statsLoadFailed": "No se pudieron cargar las estadísticas.",
+    "cockpit": "Panel de admin",
+    "cockpitSubtitle": "Resumen y moderación de todos los módulos.",
+    "statsLoadShort": "No se pudieron cargar las estadísticas."
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",
@@ -478,7 +491,11 @@
     "urgCritical": "🔴 Crítica",
     "urgHigh": "🟠 Alta",
     "urgMedium": "🟡 Media",
-    "urgLow": "🔵 Baja"
+    "urgLow": "🔵 Baja",
+    "locationUnavailable": "Ubicación no disponible.",
+    "categoryLabel": "Categoría",
+    "urgency": "Urgencia",
+    "errorWith": "Error: {error}"
   },
   "posts": {
     "title": "Publicaciones",
@@ -560,7 +577,8 @@
     "searching": "Buscando {code} …",
     "productNotFound": "Producto {code} no encontrado en Open Food Facts.",
     "type": "Tipo",
-    "scanBarcode": "Escanear código de barras (alimentos)"
+    "scanBarcode": "Escanear código de barras (alimentos)",
+    "createListing": "Publicar"
   },
   "trust": {
     "rate": "Valora a {name}",
@@ -598,7 +616,10 @@
     "exportFailed": "Exportación fallida.",
     "error": "Error: {error}",
     "attendees": "{count} asistentes",
-    "attendeesWithMax": "{count} asistentes / máx. {max}"
+    "attendeesWithMax": "{count} asistentes / máx. {max}",
+    "create": "Crear evento",
+    "categoryLabel": "Categoría",
+    "eventsInMonth": "Eventos en el mes"
   },
   "challenges": {
     "create": "Crear reto",
@@ -628,7 +649,10 @@
     "catGemeinschaft": "🏘️ Comunidad",
     "diffEasy": "Fácil",
     "diffMedium": "Media",
-    "diffHard": "Difícil"
+    "diffHard": "Difícil",
+    "title": "Retos",
+    "badges": "Insignias",
+    "join": "Participar"
   },
   "invite": {
     "title": "Invitar",
@@ -659,7 +683,9 @@
     "inviteSend": "Invitar",
     "inviteSentTo": "Invitación enviada a {email}",
     "inviteFailed": "Invitación fallida.",
-    "memberCount": "{count} miembros"
+    "memberCount": "{count} miembros",
+    "create": "Crear grupo",
+    "categoryLabel": "Categoría"
   },
   "board": {
     "title": "Nota",
@@ -671,7 +697,10 @@
     "editPin": "Editar pin",
     "contentHint": "¿Qué te gustaría compartir?",
     "category": "Categoría",
-    "color": "Color"
+    "color": "Color",
+    "pin": "Anclar",
+    "colorLabel": "Color",
+    "categoryLabel": "Categoría"
   },
   "messages": {
     "title": "Chat",
@@ -683,18 +712,24 @@
     "donate": "Donar",
     "donateUseTitle": "Cómo usamos las donaciones",
     "donateTiersTitle": "Niveles de apoyo",
-    "donateBankTitle": "Transferencia bancaria"
+    "donateBankTitle": "Transferencia bancaria",
+    "unsubscribeTitle": "Cancelar suscripción",
+    "unsubscribeProcessing": "Procesando tu baja…"
   },
   "supply": {
     "farmCreateTitle": "Granja / Productor directo",
     "farmIsBio": "Certificación ecológica",
     "farmIsSeasonal": "De temporada",
-    "farmSubmit": "Enviar entrada"
+    "farmSubmit": "Enviar entrada",
+    "farmNotFound": "Granja no encontrada.",
+    "products": "Productos"
   },
   "knowledge": {
     "category": "Categoría",
     "publicVisible": "Visible públicamente",
-    "publishArticle": "Publicar artículo"
+    "publishArticle": "Publicar artículo",
+    "article": "Artículo",
+    "writeArticle": "Escribir artículo"
   },
   "air": {
     "title": "Calidad del aire",
@@ -759,6 +794,72 @@
     "severityMinor": "Leve",
     "instructionLabel": "Recomendación de actuación",
     "sourceLabel": "Fuente: {source}",
-    "fallbackTitle": "Aviso"
+    "fallbackTitle": "Aviso",
+    "meteoAlarm": "MeteoAlarm"
+  },
+  "wiki": {
+    "loading": "Cargando Wikipedia …",
+    "source": "Fuente: Wikipedia"
+  },
+  "bot": {
+    "name": "Bot de Mensaena"
+  },
+  "update": {
+    "whatsNew": "Novedades"
+  },
+  "landing": {
+    "startFree": "Empezar gratis",
+    "alreadyMember": "¿Ya tienes cuenta? Inicia sesión"
+  },
+  "misc": {
+    "toHome": "Ir al inicio"
+  },
+  "map": {
+    "locationUnavailable": "No se pudo determinar la ubicación."
+  },
+  "calendar": {
+    "noEvents": "No hay eventos en el calendario."
+  },
+  "notifications": {
+    "allRead": "Todas leídas ✓",
+    "markAllRead": "Marcar todas como leídas",
+    "deleteAllTitle": "¿Eliminar todas?"
+  },
+  "timebank": {
+    "history": "Historial",
+    "zeitbankConfirmation": "CONFIRMACIÓN BANCO DE TIEMPO"
+  },
+  "search": {
+    "minChars": "Escribe al menos 2 caracteres",
+    "noResultsForQuery": "Sin resultados para «{query}»",
+    "tryOther": "Prueba con otros términos o menos caracteres."
+  },
+  "skills": {
+    "offerSkill": "Ofrecer habilidad",
+    "free": "Gratis"
+  },
+  "wissen": {
+    "shareTitle": "Comparte conocimiento"
+  },
+  "teilen": {
+    "hubTitle": "Comparte e intercambia"
+  },
+  "organizations": {
+    "notFound": "Organización no encontrada.",
+    "offers": "Ofertas",
+    "suggestOrg": "Sugerir organización"
+  },
+  "live": {
+    "connectionFailed": "Conexión fallida",
+    "waitingParticipants": "Esperando participantes …"
+  },
+  "call": {
+    "incoming": "Llamada entrante"
+  },
+  "voice": {
+    "micDenied": "Permiso de micrófono denegado."
+  },
+  "widgets": {
+    "config": "Configuración de widgets"
   }
 }

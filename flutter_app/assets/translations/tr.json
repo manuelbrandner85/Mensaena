@@ -25,7 +25,14 @@
     "today": "Bugün",
     "yesterday": "Dün",
     "now": "Şimdi",
-    "neighbour": "Komşu"
+    "neighbour": "Komşu",
+    "open": "Aç",
+    "reset": "Sıfırla",
+    "reject": "Reddet",
+    "read": "Oku",
+    "or": "veya",
+    "received": "Alınan",
+    "given": "Verilen"
   },
   "nav": {
     "dashboard": "Panel",
@@ -131,7 +138,8 @@
     "fieldRequired": "{field} gerekli",
     "minChars": "En az {n} karakter",
     "maxChars": "En fazla {n} karakter",
-    "urlMustStart": "URL https:// ile başlamalı"
+    "urlMustStart": "URL https:// ile başlamalı",
+    "nothingSaved": "Henüz kaydedilmedi."
   },
   "settings": {
     "title": "Ayarlar",
@@ -299,7 +307,8 @@
     "nextTip": "Sonraki ipucu",
     "exploreMap": "Haritayı keşfet",
     "botName": "MensaenaBot",
-    "weatherSource": "Open-Meteo"
+    "weatherSource": "Open-Meteo",
+    "saveLocation": "Konumu kaydet"
   },
   "matching": {
     "disabled": "Eşleşme devre dışı",
@@ -325,7 +334,11 @@
     "deleteEntry": "Kaydı sil",
     "rawData": "Ham veri",
     "deleteReportTitle": "Bildirimi sil?",
-    "deleteReportConfirm": "Bu işlem geri alınamaz."
+    "deleteReportConfirm": "Bu işlem geri alınamaz.",
+    "statsLoadFailed": "İstatistikler yüklenemedi.",
+    "cockpit": "Yönetici Paneli",
+    "cockpitSubtitle": "Tüm modüllerin genel görünümü ve denetimi.",
+    "statsLoadShort": "İstatistikler yüklenemedi."
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",
@@ -478,7 +491,11 @@
     "urgCritical": "🔴 Kritik",
     "urgHigh": "🟠 Yüksek",
     "urgMedium": "🟡 Orta",
-    "urgLow": "🔵 Düşük"
+    "urgLow": "🔵 Düşük",
+    "locationUnavailable": "Konum mevcut değil.",
+    "categoryLabel": "Kategori",
+    "urgency": "Aciliyet",
+    "errorWith": "Hata: {error}"
   },
   "posts": {
     "title": "Gönderiler",
@@ -560,7 +577,8 @@
     "searching": "{code} aranıyor …",
     "productNotFound": "{code} ürünü Open Food Facts'ta bulunamadı.",
     "type": "Tür",
-    "scanBarcode": "Barkod tara (gıda)"
+    "scanBarcode": "Barkod tara (gıda)",
+    "createListing": "İlan ver"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -598,7 +616,10 @@
     "exportFailed": "Dışa aktarma başarısız.",
     "error": "Hata: {error}",
     "attendees": "{count} katılımcı",
-    "attendeesWithMax": "{count} katılımcı / maks. {max}"
+    "attendeesWithMax": "{count} katılımcı / maks. {max}",
+    "create": "Etkinlik oluştur",
+    "categoryLabel": "Kategori",
+    "eventsInMonth": "Bu ayki etkinlikler"
   },
   "challenges": {
     "create": "Meydan okuma oluştur",
@@ -628,7 +649,10 @@
     "catGemeinschaft": "🏘️ Topluluk",
     "diffEasy": "Kolay",
     "diffMedium": "Orta",
-    "diffHard": "Zor"
+    "diffHard": "Zor",
+    "title": "Görevler",
+    "badges": "Rozetler",
+    "join": "Katıl"
   },
   "invite": {
     "title": "Davet et",
@@ -659,7 +683,9 @@
     "inviteSend": "Davet et",
     "inviteSentTo": "Davet gönderildi: {email}",
     "inviteFailed": "Davet başarısız oldu.",
-    "memberCount": "{count} üye"
+    "memberCount": "{count} üye",
+    "create": "Grup oluştur",
+    "categoryLabel": "Kategori"
   },
   "board": {
     "title": "Not",
@@ -671,7 +697,10 @@
     "editPin": "Pin düzenle",
     "contentHint": "Ne paylaşmak istersin?",
     "category": "Kategori",
-    "color": "Renk"
+    "color": "Renk",
+    "pin": "Sabitle",
+    "colorLabel": "Renk",
+    "categoryLabel": "Kategori"
   },
   "messages": {
     "title": "Sohbet",
@@ -683,18 +712,24 @@
     "donate": "Bağış yap",
     "donateUseTitle": "Bağışları nasıl kullanıyoruz",
     "donateTiersTitle": "Destekçi seviyeleri",
-    "donateBankTitle": "Banka havalesi"
+    "donateBankTitle": "Banka havalesi",
+    "unsubscribeTitle": "Abonelikten çık",
+    "unsubscribeProcessing": "Abonelikten çıkışınız işleniyor…"
   },
   "supply": {
     "farmCreateTitle": "Çiftlik / Doğrudan üretici",
     "farmIsBio": "Organik sertifikalı",
     "farmIsSeasonal": "Mevsimsel",
-    "farmSubmit": "Kaydı gönder"
+    "farmSubmit": "Kaydı gönder",
+    "farmNotFound": "Çiftlik bulunamadı.",
+    "products": "Ürünler"
   },
   "knowledge": {
     "category": "Kategori",
     "publicVisible": "Herkese açık",
-    "publishArticle": "Makaleyi yayınla"
+    "publishArticle": "Makaleyi yayınla",
+    "article": "Makale",
+    "writeArticle": "Makale yaz"
   },
   "air": {
     "title": "Hava kalitesi",
@@ -759,6 +794,72 @@
     "severityMinor": "Hafif",
     "instructionLabel": "Önerilen hareket",
     "sourceLabel": "Kaynak: {source}",
-    "fallbackTitle": "Uyarı"
+    "fallbackTitle": "Uyarı",
+    "meteoAlarm": "MeteoAlarm"
+  },
+  "wiki": {
+    "loading": "Wikipedia yükleniyor …",
+    "source": "Kaynak: Wikipedia"
+  },
+  "bot": {
+    "name": "Mensaena Bot"
+  },
+  "update": {
+    "whatsNew": "Yenilikler"
+  },
+  "landing": {
+    "startFree": "Ücretsiz başla",
+    "alreadyMember": "Zaten üye misiniz? Giriş yap"
+  },
+  "misc": {
+    "toHome": "Ana sayfaya dön"
+  },
+  "map": {
+    "locationUnavailable": "Konum belirlenemedi."
+  },
+  "calendar": {
+    "noEvents": "Takvimde etkinlik yok."
+  },
+  "notifications": {
+    "allRead": "Tümü okundu ✓",
+    "markAllRead": "Tümünü okundu işaretle",
+    "deleteAllTitle": "Tümünü sil?"
+  },
+  "timebank": {
+    "history": "Geçmiş",
+    "zeitbankConfirmation": "ZAMAN BANKASI ONAYI"
+  },
+  "search": {
+    "minChars": "En az 2 karakter girin",
+    "noResultsForQuery": "\"{query}\" için sonuç yok",
+    "tryOther": "Başka kelimeler veya daha az karakter deneyin."
+  },
+  "skills": {
+    "offerSkill": "Beceri öner",
+    "free": "Ücretsiz"
+  },
+  "wissen": {
+    "shareTitle": "Bilgiyi paylaş"
+  },
+  "teilen": {
+    "hubTitle": "Paylaş ve takas et"
+  },
+  "organizations": {
+    "notFound": "Kuruluş bulunamadı.",
+    "offers": "Teklifler",
+    "suggestOrg": "Kuruluş öner"
+  },
+  "live": {
+    "connectionFailed": "Bağlantı başarısız",
+    "waitingParticipants": "Katılımcılar bekleniyor …"
+  },
+  "call": {
+    "incoming": "Gelen arama"
+  },
+  "voice": {
+    "micDenied": "Mikrofon izni reddedildi."
+  },
+  "widgets": {
+    "config": "Widget yapılandırması"
   }
 }

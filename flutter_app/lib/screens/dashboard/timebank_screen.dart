@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -36,7 +37,7 @@ class TimebankScreen extends ConsumerWidget {
             children: [
               _BalanceCard(balance: balance),
               const SizedBox(height: 16),
-              Text('Historie', style: AppTypography.label(size: 10)),
+              Text('timebank.history'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 8),
               entries.when(
                 loading: () => const SkeletonList(count: 5, itemHeight: 96),
@@ -290,7 +291,7 @@ class _EntryTile extends ConsumerWidget {
                       ref.invalidate(timebankBalanceProvider);
                       ref.invalidate(timebankEntriesProvider);
                     },
-                    child: const Text('Bestätigen'),
+                    child: Text('common.confirm'.tr()),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -301,7 +302,7 @@ class _EntryTile extends ConsumerWidget {
                       ref.invalidate(timebankBalanceProvider);
                       ref.invalidate(timebankEntriesProvider);
                     },
-                    child: const Text('Ablehnen'),
+                    child: Text('common.reject'.tr()),
                   ),
                 ),
               ],

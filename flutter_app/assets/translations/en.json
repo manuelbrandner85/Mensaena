@@ -25,7 +25,14 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "now": "Now",
-    "neighbour": "Neighbour"
+    "neighbour": "Neighbour",
+    "open": "Open",
+    "reset": "Reset",
+    "reject": "Reject",
+    "read": "Read",
+    "or": "or",
+    "received": "Received",
+    "given": "Given"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -131,7 +138,8 @@
     "fieldRequired": "{field} is required",
     "minChars": "At least {n} characters",
     "maxChars": "At most {n} characters",
-    "urlMustStart": "URL must start with https://"
+    "urlMustStart": "URL must start with https://",
+    "nothingSaved": "Nothing saved yet."
   },
   "settings": {
     "title": "Settings",
@@ -299,7 +307,8 @@
     "nextTip": "Next tip",
     "exploreMap": "Explore the map",
     "botName": "MensaenaBot",
-    "weatherSource": "Open-Meteo"
+    "weatherSource": "Open-Meteo",
+    "saveLocation": "Save location"
   },
   "matching": {
     "disabled": "Matching is disabled",
@@ -325,7 +334,11 @@
     "deleteEntry": "Delete entry",
     "rawData": "Raw data",
     "deleteReportTitle": "Delete report?",
-    "deleteReportConfirm": "This action cannot be undone."
+    "deleteReportConfirm": "This action cannot be undone.",
+    "statsLoadFailed": "Stats could not be loaded.",
+    "cockpit": "Admin Cockpit",
+    "cockpitSubtitle": "Overview & moderation of all modules.",
+    "statsLoadShort": "Could not load stats."
   },
   "create": {
     "locationUnavailable": "Location unavailable.",
@@ -478,7 +491,11 @@
     "urgCritical": "🔴 Critical",
     "urgHigh": "🟠 High",
     "urgMedium": "🟡 Medium",
-    "urgLow": "🔵 Low"
+    "urgLow": "🔵 Low",
+    "locationUnavailable": "Location not available.",
+    "categoryLabel": "Category",
+    "urgency": "Urgency",
+    "errorWith": "Error: {error}"
   },
   "posts": {
     "title": "Posts",
@@ -560,7 +577,8 @@
     "searching": "Searching {code} …",
     "productNotFound": "Product {code} not found in Open Food Facts.",
     "type": "Type",
-    "scanBarcode": "Scan barcode (food)"
+    "scanBarcode": "Scan barcode (food)",
+    "createListing": "List item"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -598,7 +616,10 @@
     "exportFailed": "Export failed.",
     "error": "Error: {error}",
     "attendees": "{count} attendees",
-    "attendeesWithMax": "{count} attendees / max. {max}"
+    "attendeesWithMax": "{count} attendees / max. {max}",
+    "create": "Create event",
+    "categoryLabel": "Category",
+    "eventsInMonth": "Events this month"
   },
   "challenges": {
     "create": "Create challenge",
@@ -628,7 +649,10 @@
     "catGemeinschaft": "🏘️ Community",
     "diffEasy": "Easy",
     "diffMedium": "Medium",
-    "diffHard": "Hard"
+    "diffHard": "Hard",
+    "title": "Challenges",
+    "badges": "Badges",
+    "join": "Join"
   },
   "invite": {
     "title": "Invite",
@@ -659,7 +683,9 @@
     "inviteSend": "Invite",
     "inviteSentTo": "Invitation sent to {email}",
     "inviteFailed": "Invitation failed.",
-    "memberCount": "{count} members"
+    "memberCount": "{count} members",
+    "create": "Create group",
+    "categoryLabel": "Category"
   },
   "board": {
     "title": "Note",
@@ -671,7 +697,10 @@
     "editPin": "Edit pin",
     "contentHint": "What would you like to share?",
     "category": "Category",
-    "color": "Colour"
+    "color": "Colour",
+    "pin": "Pin",
+    "colorLabel": "Color",
+    "categoryLabel": "Category"
   },
   "messages": {
     "title": "Chat",
@@ -683,18 +712,24 @@
     "donate": "Donate",
     "donateUseTitle": "How we use donations",
     "donateTiersTitle": "Supporter tiers",
-    "donateBankTitle": "Bank transfer"
+    "donateBankTitle": "Bank transfer",
+    "unsubscribeTitle": "Unsubscribe",
+    "unsubscribeProcessing": "Processing your unsubscribe…"
   },
   "supply": {
     "farmCreateTitle": "Farm / Direct producer",
     "farmIsBio": "Organic certified",
     "farmIsSeasonal": "Seasonal",
-    "farmSubmit": "Submit entry"
+    "farmSubmit": "Submit entry",
+    "farmNotFound": "Farm not found.",
+    "products": "Products"
   },
   "knowledge": {
     "category": "Category",
     "publicVisible": "Publicly visible",
-    "publishArticle": "Publish article"
+    "publishArticle": "Publish article",
+    "article": "Article",
+    "writeArticle": "Write article"
   },
   "air": {
     "title": "Air quality",
@@ -759,6 +794,72 @@
     "severityMinor": "Minor",
     "instructionLabel": "Recommended action",
     "sourceLabel": "Source: {source}",
-    "fallbackTitle": "Alert"
+    "fallbackTitle": "Alert",
+    "meteoAlarm": "MeteoAlarm"
+  },
+  "wiki": {
+    "loading": "Loading Wikipedia …",
+    "source": "Source: Wikipedia"
+  },
+  "bot": {
+    "name": "Mensaena Bot"
+  },
+  "update": {
+    "whatsNew": "What's new"
+  },
+  "landing": {
+    "startFree": "Start free",
+    "alreadyMember": "Already a member? Sign in"
+  },
+  "misc": {
+    "toHome": "Back to home"
+  },
+  "map": {
+    "locationUnavailable": "Location could not be determined."
+  },
+  "calendar": {
+    "noEvents": "No events in calendar."
+  },
+  "notifications": {
+    "allRead": "All read ✓",
+    "markAllRead": "Mark all read",
+    "deleteAllTitle": "Delete all?"
+  },
+  "timebank": {
+    "history": "History",
+    "zeitbankConfirmation": "TIMEBANK CONFIRMATION"
+  },
+  "search": {
+    "minChars": "Type at least 2 characters",
+    "noResultsForQuery": "No matches for \"{query}\"",
+    "tryOther": "Try other terms or fewer characters."
+  },
+  "skills": {
+    "offerSkill": "Offer skill",
+    "free": "Free"
+  },
+  "wissen": {
+    "shareTitle": "Share knowledge"
+  },
+  "teilen": {
+    "hubTitle": "Share & swap"
+  },
+  "organizations": {
+    "notFound": "Organisation not found.",
+    "offers": "Offers",
+    "suggestOrg": "Suggest org."
+  },
+  "live": {
+    "connectionFailed": "Connection failed",
+    "waitingParticipants": "Waiting for participants …"
+  },
+  "call": {
+    "incoming": "Incoming call"
+  },
+  "voice": {
+    "micDenied": "Microphone permission denied."
+  },
+  "widgets": {
+    "config": "Widget configuration"
   }
 }

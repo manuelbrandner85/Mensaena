@@ -4,6 +4,7 @@
 library;
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,7 +60,7 @@ class _WikipediaBoxState extends State<WikipediaBox> {
           borderRadius: BorderRadius.circular(12),
         ),
         alignment: Alignment.centerLeft,
-        child: Text('Wikipedia wird geladen …',
+        child: Text('wiki.loading'.tr(),
             style: AppTypography.body(size: 12, color: AppColors.mute)),
       );
     }
@@ -148,7 +149,7 @@ class _WikipediaBoxState extends State<WikipediaBox> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Text('Quelle: Wikipedia',
+                Text('wiki.source'.tr(),
                     style: AppTypography.label(
                         size: 9, color: AppColors.mute)),
                 const Spacer(),
@@ -156,7 +157,7 @@ class _WikipediaBoxState extends State<WikipediaBox> {
                     size: 11,
                     color: AppColors.tealSoft.withValues(alpha: 0.7)),
                 const SizedBox(width: 4),
-                Text('Lesen',
+                Text('common.read'.tr(),
                     style: AppTypography.label(
                         size: 10, color: AppColors.tealSoft)),
               ],
