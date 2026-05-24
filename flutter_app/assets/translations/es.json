@@ -816,7 +816,12 @@
     "instructionLabel": "Recomendación de actuación",
     "sourceLabel": "Fuente: {source}",
     "fallbackTitle": "Aviso",
-    "meteoAlarm": "MeteoAlarm"
+    "meteoAlarm": "MeteoAlarm",
+    "ninaDeOnlyTitle": "NINA es solo para Alemania",
+    "ninaDeOnlyBody": "NINA está gestionada por la Oficina Federal Alemana de Protección Civil (BBK) y solo envía avisos para zonas de Alemania. Para tu país utiliza MeteoAlarm y tu protección civil nacional.",
+    "ninaDeOnlyHint": "Ves este aviso porque el idioma de la app no está configurado en alemán.",
+    "openMeteoAlarm": "Abrir MeteoAlarm",
+    "openCivilProtection": "Abrir protección civil"
   },
   "wiki": {
     "loading": "Cargando Wikipedia …",

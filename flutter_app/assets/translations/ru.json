@@ -816,7 +816,12 @@
     "instructionLabel": "Рекомендуемое действие",
     "sourceLabel": "Источник: {source}",
     "fallbackTitle": "Оповещение",
-    "meteoAlarm": "MeteoAlarm"
+    "meteoAlarm": "MeteoAlarm",
+    "ninaDeOnlyTitle": "NINA работает только по Германии",
+    "ninaDeOnlyBody": "NINA управляется Федеральным ведомством Германии по гражданской защите (BBK) и присылает оповещения только по территории Германии. Для своей страны используй MeteoAlarm и национальную службу гражданской защиты.",
+    "ninaDeOnlyHint": "Это сообщение появилось, потому что язык приложения не установлен на немецкий.",
+    "openMeteoAlarm": "Открыть MeteoAlarm",
+    "openCivilProtection": "Открыть гражданскую защиту"
   },
   "wiki": {
     "loading": "Загрузка Wikipedia …",

@@ -816,7 +816,12 @@
     "instructionLabel": "Handlungsempfehlung",
     "sourceLabel": "Quelle: {source}",
     "fallbackTitle": "Warnung",
-    "meteoAlarm": "MeteoAlarm"
+    "meteoAlarm": "MeteoAlarm",
+    "ninaDeOnlyTitle": "NINA ist nur für Deutschland",
+    "ninaDeOnlyBody": "NINA wird vom Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (BBK) betrieben und sendet ausschließlich Warnungen für deutsche Gebiete. Für dein Land nutze MeteoAlarm und den nationalen Zivilschutz.",
+    "ninaDeOnlyHint": "Du siehst diesen Hinweis, weil deine App-Sprache nicht auf Deutsch steht.",
+    "openMeteoAlarm": "MeteoAlarm öffnen",
+    "openCivilProtection": "Zivilschutz öffnen"
   },
   "wiki": {
     "loading": "Wikipedia wird geladen …",

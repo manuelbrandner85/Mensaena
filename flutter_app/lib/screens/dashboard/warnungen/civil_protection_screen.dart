@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/civil_protection_service.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class CivilProtectionScreen extends ConsumerStatefulWidget {
@@ -26,14 +27,6 @@ class CivilProtectionScreen extends ConsumerStatefulWidget {
 
 class _CivilProtectionScreenState
     extends ConsumerState<CivilProtectionScreen> {
-  static const Map<String, String> _localeToCountry = {
-    'it': 'IT',
-    'es': 'ES',
-    'fr': 'FR',
-    'tr': 'TR',
-    'ru': 'RU',
-  };
-
   static const Map<String, String> _countryNames = {
     'IT': 'Italia',
     'ES': 'España',
@@ -57,12 +50,9 @@ class _CivilProtectionScreenState
   }
 
   String _detectCountry() {
-    final loc = context.locale;
-    final c = loc.countryCode;
-    if (c != null && CivilProtectionService.isSupported(c)) {
-      return c.toUpperCase();
-    }
-    return _localeToCountry[loc.languageCode] ?? '';
+    final auto = LocaleCountryService.forContext(context);
+    if (CivilProtectionService.isSupported(auto)) return auto;
+    return '';
   }
 
   Future<void> _refresh() async {

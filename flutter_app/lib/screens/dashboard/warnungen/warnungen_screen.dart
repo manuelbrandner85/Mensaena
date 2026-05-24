@@ -8,6 +8,7 @@ import '../../../config/app_config.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/civil_protection_service.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../services/nina_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -23,24 +24,36 @@ class WarnungenScreen extends ConsumerStatefulWidget {
 }
 
 class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
-  static const Map<String, String> _localeToCountry = {
-    'it': 'IT',
-    'es': 'ES',
-    'fr': 'FR',
-    'tr': 'TR',
-    'ru': 'RU',
-  };
+  /// Länder in denen NINA tatsächlich Sinn ergibt (BBK-Quelle = Deutschland).
+  /// AT/CH user koennen NINA ebenfalls hilfreich finden (Grenzregionen).
+  static const _ninaCountries = {'DE', 'AT', 'CH'};
 
   Future<List<Map<String, dynamic>>>? _future;
   String get _ags => AppConfig.defaultAgs;
 
+  bool _ninaRelevantForLocale() {
+    final country = LocaleCountryService.forContext(context);
+    return _ninaCountries.contains(country);
+  }
+
   @override
   void initState() {
     super.initState();
-    _future = NinaService.instance.fetchDashboard(ags: _ags);
+    // Initiales Future erst lazy in didChangeDependencies, weil
+    // context.locale dort verfuegbar ist. Beim ersten Build pruefen
+    // wir die Locale; ist NINA nicht relevant, sparen wir den API-Call.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_future == null && _ninaRelevantForLocale()) {
+      _future = NinaService.instance.fetchDashboard(ags: _ags);
+    }
   }
 
   Future<void> _refresh() async {
+    if (!_ninaRelevantForLocale()) return;
     NinaService.instance.clearCache();
     final fresh = NinaService.instance.fetchDashboard(ags: _ags);
     setState(() => _future = fresh);
@@ -48,12 +61,9 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
   }
 
   String? _civilCountry() {
-    final loc = context.locale;
-    final c = loc.countryCode;
-    if (c != null && CivilProtectionService.isSupported(c)) {
-      return c.toUpperCase();
-    }
-    return _localeToCountry[loc.languageCode];
+    final country = LocaleCountryService.forContext(context);
+    if (CivilProtectionService.isSupported(country)) return country;
+    return null;
   }
 
   void _openDetail(Map<String, dynamic> w) {
@@ -73,6 +83,7 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
   @override
   Widget build(BuildContext context) {
     final civilCountry = _civilCountry();
+    final ninaRelevant = _ninaRelevantForLocale();
     return DashboardScaffold(
       title: 'civil.navTitle'.tr(),
       currentRoute: '/dashboard/warnungen',
@@ -85,14 +96,17 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
             future: _future,
             builder: (context, snap) {
               final list = snap.data ?? const <Map<String, dynamic>>[];
-              final loading = snap.connectionState != ConnectionState.done;
+              final loading =
+                  ninaRelevant && snap.connectionState != ConnectionState.done;
               return ListView(
                 padding: const EdgeInsets.all(16),
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   _OverviewGrid(civilCountry: civilCountry),
                   const SizedBox(height: 16),
-                  if (loading)
+                  if (!ninaRelevant)
+                    _NinaDeOnlyCard(civilCountry: civilCountry)
+                  else if (loading)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 40),
                       child: Center(
@@ -291,6 +305,79 @@ class _NinaEmpty extends StatelessWidget {
               color: AppColors.inkSoft,
               height: 1.5,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Hinweis-Card fuer non-DE-Locales: NINA ist ein deutscher Dienst
+/// und ohne deutsches AGS nicht sinnvoll. Verweist auf MeteoAlarm
+/// und (falls verfuegbar) auf den nationalen Zivilschutz.
+class _NinaDeOnlyCard extends StatelessWidget {
+  const _NinaDeOnlyCard({required this.civilCountry});
+  final String? civilCountry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.info,
+                  size: 22, color: AppColors.teal),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'civil.ninaDeOnlyTitle'.tr(),
+                  style: AppTypography.display(
+                    size: 16,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'civil.ninaDeOnlyBody'.tr(),
+            style: AppTypography.body(
+              size: 13,
+              color: AppColors.inkSoft,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => context.go('/dashboard/warnungen/meteo'),
+                icon: const Icon(LucideIcons.cloudLightning, size: 16),
+                label: Text('civil.openMeteoAlarm'.tr()),
+              ),
+              if (civilCountry != null)
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/dashboard/warnungen/civil'),
+                  icon: const Icon(LucideIcons.shieldAlert, size: 16),
+                  label: Text('civil.openCivilProtection'.tr()),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'civil.ninaDeOnlyHint'.tr(),
+            style: AppTypography.label(size: 9, color: AppColors.mute),
           ),
         ],
       ),

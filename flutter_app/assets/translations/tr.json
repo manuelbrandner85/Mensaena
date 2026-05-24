@@ -816,7 +816,12 @@
     "instructionLabel": "Önerilen hareket",
     "sourceLabel": "Kaynak: {source}",
     "fallbackTitle": "Uyarı",
-    "meteoAlarm": "MeteoAlarm"
+    "meteoAlarm": "MeteoAlarm",
+    "ninaDeOnlyTitle": "NINA yalnızca Almanya içindir",
+    "ninaDeOnlyBody": "NINA, Alman Federal Sivil Koruma Dairesi (BBK) tarafından işletilir ve yalnızca Almanya bölgeleri için uyarı gönderir. Senin ülken için MeteoAlarm'ı ve ulusal sivil savunmayı kullan.",
+    "ninaDeOnlyHint": "Bu uyarıyı görüyorsun çünkü uygulama dilin Almanca olarak ayarlı değil.",
+    "openMeteoAlarm": "MeteoAlarm'ı aç",
+    "openCivilProtection": "Sivil korumayı aç"
   },
   "wiki": {
     "loading": "Wikipedia yükleniyor …",

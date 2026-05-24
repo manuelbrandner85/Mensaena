@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/jobs_service.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 
@@ -24,16 +25,6 @@ class JobPortalsScreen extends ConsumerStatefulWidget {
 }
 
 class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
-  static const _localeCountry = {
-    'de': 'DE',
-    'en': 'GB',
-    'it': 'IT',
-    'es': 'ES',
-    'fr': 'FR',
-    'tr': 'TR',
-    'ru': 'RU',
-  };
-
   static const _countryNames = {
     'DE': 'Deutschland',
     'AT': 'Österreich',
@@ -55,12 +46,8 @@ class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
     _future = JobPortalsService.all();
   }
 
-  String _countryFor(BuildContext context) {
-    final loc = context.locale;
-    final c = loc.countryCode;
-    if (c != null && c.isNotEmpty) return c.toUpperCase();
-    return _localeCountry[loc.languageCode] ?? 'DE';
-  }
+  String _countryFor(BuildContext context) =>
+      LocaleCountryService.forContext(context);
 
   @override
   Widget build(BuildContext context) {

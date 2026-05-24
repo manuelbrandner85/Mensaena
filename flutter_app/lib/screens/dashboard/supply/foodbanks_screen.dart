@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/foodbanks_service.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 
@@ -22,16 +23,6 @@ class FoodbanksScreen extends ConsumerStatefulWidget {
 }
 
 class _FoodbanksScreenState extends ConsumerState<FoodbanksScreen> {
-  static const _localeCountry = {
-    'de': 'DE',
-    'en': 'GB',
-    'it': 'IT',
-    'es': 'ES',
-    'fr': 'FR',
-    'tr': 'TR',
-    'ru': 'RU',
-  };
-
   late Future<List<Foodbank>> _future;
 
   @override
@@ -40,12 +31,8 @@ class _FoodbanksScreenState extends ConsumerState<FoodbanksScreen> {
     _future = FoodbanksService.all();
   }
 
-  String _countryFor(BuildContext context) {
-    final loc = context.locale;
-    final c = loc.countryCode;
-    if (c != null && c.isNotEmpty) return c.toUpperCase();
-    return _localeCountry[loc.languageCode] ?? 'DE';
-  }
+  String _countryFor(BuildContext context) =>
+      LocaleCountryService.forContext(context);
 
   static const _countryNames = {
     'DE': 'Deutschland',

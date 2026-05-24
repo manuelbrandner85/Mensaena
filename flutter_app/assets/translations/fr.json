@@ -816,7 +816,12 @@
     "instructionLabel": "Conduite à tenir",
     "sourceLabel": "Source : {source}",
     "fallbackTitle": "Alerte",
-    "meteoAlarm": "MeteoAlarm"
+    "meteoAlarm": "MeteoAlarm",
+    "ninaDeOnlyTitle": "NINA est réservé à l'Allemagne",
+    "ninaDeOnlyBody": "NINA est géré par l'Office fédéral allemand de la protection civile (BBK) et n'émet d'alertes que pour le territoire allemand. Pour ton pays, utilise MeteoAlarm et ta protection civile nationale.",
+    "ninaDeOnlyHint": "Tu vois cet avis parce que la langue de l'app n'est pas réglée sur l'allemand.",
+    "openMeteoAlarm": "Ouvrir MeteoAlarm",
+    "openCivilProtection": "Ouvrir la protection civile"
   },
   "wiki": {
     "loading": "Chargement de Wikipédia …",

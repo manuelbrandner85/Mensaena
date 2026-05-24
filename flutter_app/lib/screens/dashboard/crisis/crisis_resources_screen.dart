@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/emergency_number.dart';
 import '../../../repositories/crisis_repository.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -26,16 +27,6 @@ class CrisisResourcesScreen extends ConsumerStatefulWidget {
 
 class _CrisisResourcesScreenState
     extends ConsumerState<CrisisResourcesScreen> {
-  static const _localeCountry = {
-    'de': 'DE',
-    'en': 'GB',
-    'it': 'IT',
-    'es': 'ES',
-    'fr': 'FR',
-    'tr': 'TR',
-    'ru': 'RU',
-  };
-
   // Alle Länder mit Daten in emergency_numbers (siehe Migration
   // emergency_numbers_expand_country_category).
   static const _allCountries = <_CountryOption>[
@@ -56,12 +47,9 @@ class _CrisisResourcesScreenState
 
   String _countryFor(BuildContext context) {
     if (_override != null) return _override!;
-    final loc = context.locale;
-    final c = loc.countryCode;
-    if (c != null && c.isNotEmpty && _allCountries.any((o) => o.code == c)) {
-      return c;
-    }
-    return _localeCountry[loc.languageCode] ?? 'DE';
+    final auto = LocaleCountryService.forContext(context);
+    if (_allCountries.any((o) => o.code == auto)) return auto;
+    return 'DE';
   }
 
   static const _categoryLabels = {

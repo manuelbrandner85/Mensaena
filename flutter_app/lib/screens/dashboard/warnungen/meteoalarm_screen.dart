@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../services/meteoalarm_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -22,16 +23,6 @@ class MeteoAlarmScreen extends ConsumerStatefulWidget {
 }
 
 class _MeteoAlarmScreenState extends ConsumerState<MeteoAlarmScreen> {
-  static const _localeCountry = {
-    'de': 'DE',
-    'en': 'GB',
-    'it': 'IT',
-    'es': 'ES',
-    'fr': 'FR',
-    'tr': 'TR',
-    'ru': 'RU',
-  };
-
   static const _countryNames = {
     'DE': 'Deutschland',
     'AT': 'Österreich',
@@ -65,12 +56,7 @@ class _MeteoAlarmScreenState extends ConsumerState<MeteoAlarmScreen> {
     _future = MeteoAlarmService.forCountry(_country);
   }
 
-  String _initialCountry() {
-    final loc = context.locale;
-    final c = loc.countryCode;
-    if (c != null && c.isNotEmpty) return c.toUpperCase();
-    return _localeCountry[loc.languageCode] ?? 'DE';
-  }
+  String _initialCountry() => LocaleCountryService.forContext(context);
 
   Future<void> _refresh() async {
     MeteoAlarmService.clearCache();
