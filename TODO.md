@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Hyperreal Cinema-Upgrade Wave 1+2 erledigt. E2 Sound + E3 Onboarding-Tour ausstehend.
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W2 ✅
-NEXT=E2 Sound-Design + E3 Onboarding-Tour
+OPEN=Hyperreal Cinema-Upgrade Wave 1-3 KOMPLETT (alle 23 Punkte). Frei für nächste Aufgaben.
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W3 ✅
+NEXT=Frei
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(cinema-hyperreal): Intensified all 6 phases (tints 2×, vignette 0.60 max, 5-stop mesh-gradient mit Hotspots + Drift, Sky-Body Sonne/Mond mit Bloom-Glow, Lens-Flare bei Dawn/Dusk, alle Phasen mit Light-Leaks, Chromatic-Aberration, Intensity-Multiplier setting), Glass-Card + Shimmer + Bloom + PulseBloom + ParallaxHero Helpers, Cinematic Page-Transitions (Fade-Through-Black), Haptics-Service, Dashboard-Fallbacks für Weather/Mini-Map, BottomNav mit PulseBloom-FAB + Haptics
+LAST_TASK=feat(cinema-w3): Sound-Service mit SystemSound (toggle in Settings), Onboarding-Tour (5 Steps mit Bloom-Animations, Radial-Gradient pro Step, Skip + Re-Watch-Button), Splash → Onboarding-Route bei Erstlogin
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

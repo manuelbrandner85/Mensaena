@@ -67,6 +67,7 @@ import '../../screens/dashboard/warnungen/warnungen_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
+import '../../screens/public/onboarding_tour_screen.dart';
 import '../../screens/public/splash_screen.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
@@ -108,6 +109,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         builder: (_, __) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (_, __) => const OnboardingTourScreen(),
       ),
       // ── Public ─────────────────────────────────────────────
       GoRoute(path: '/', builder: (_, __) => const LandingScreen()),
@@ -802,6 +807,7 @@ GoRoute _placeholder(String path, String title, {String phase = ''}) {
 /// wenn nicht eingeloggt.
 const Set<String> _publicRoutes = {
   '/',
+  '/onboarding',
   '/about',
   '/spenden',
   '/kontakt',

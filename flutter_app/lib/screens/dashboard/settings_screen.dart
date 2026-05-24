@@ -15,6 +15,7 @@ import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
 import '../../providers/cinema_provider.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -734,6 +735,23 @@ class _AppearanceTab extends ConsumerWidget {
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 8),
         _IntensityTiles(),
+        const SizedBox(height: 16),
+        Text('SOUND',
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        const _SoundToggle(),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/onboarding'),
+          icon: const Icon(LucideIcons.play, size: 14),
+          label: const Text('Onboarding-Tour erneut ansehen'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(
+                color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(14),
@@ -765,6 +783,46 @@ class _AppearanceTab extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SoundToggle extends ConsumerStatefulWidget {
+  const _SoundToggle();
+
+  @override
+  ConsumerState<_SoundToggle> createState() => _SoundToggleState();
+}
+
+class _SoundToggleState extends ConsumerState<_SoundToggle> {
+  bool? _enabled;
+
+  @override
+  void initState() {
+    super.initState();
+    SoundService.isEnabled().then((v) {
+      if (mounted) setState(() => _enabled = v);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final v = _enabled ?? true;
+    return SwitchListTile.adaptive(
+      contentPadding: EdgeInsets.zero,
+      value: v,
+      onChanged: (next) async {
+        await SoundService.setEnabled(next);
+        if (mounted) setState(() => _enabled = next);
+        if (next) SoundService.click();
+      },
+      activeColor: AppColors.bronze,
+      title: Text('UI-Sounds',
+          style: AppTypography.body(size: 14, color: AppColors.ink)),
+      subtitle: Text(
+        'Dezenter System-Klick bei Taps und Toggles.',
+        style: AppTypography.body(size: 12, color: AppColors.mute),
+      ),
     );
   }
 }

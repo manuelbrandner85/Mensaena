@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
+import 'onboarding_tour_screen.dart';
 
 /// SKILL: mensaena-design
 /// Cinematic Splash-Screen — Konzept "Aurora":
@@ -58,11 +59,16 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  void _navigate() {
+  Future<void> _navigate() async {
     if (!mounted) return;
-    final target =
-        SupabaseService.isLoggedIn ? '/dashboard' : '/auth';
-    context.go(target);
+    if (!SupabaseService.isLoggedIn) {
+      context.go('/auth');
+      return;
+    }
+    // Erstlogin → Onboarding-Tour zeigen.
+    final shouldOnboard = await OnboardingTourScreen.shouldShow();
+    if (!mounted) return;
+    context.go(shouldOnboard ? '/onboarding' : '/dashboard');
   }
 
   @override
