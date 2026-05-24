@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -64,7 +64,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Chat',
+      title: 'messages.title'.tr(),
       currentRoute: '/dashboard/messages',
       body: SafeArea(
         child: Column(
@@ -93,15 +93,15 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                 labelStyle: AppTypography.body(
                     size: 12, weight: FontWeight.w700),
                 unselectedLabelStyle: AppTypography.body(size: 12),
-                tabs: const [
+                tabs: [
                   Tab(
                     height: 36,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.hash, size: 14),
-                        SizedBox(width: 6),
-                        Text('Community'),
+                        const Icon(LucideIcons.hash, size: 14),
+                        const SizedBox(width: 6),
+                        Text('chat.communityTab'.tr()),
                       ],
                     ),
                   ),
@@ -110,9 +110,9 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.mail, size: 14),
-                        SizedBox(width: 6),
-                        Text('Nachrichten'),
+                        const Icon(LucideIcons.mail, size: 14),
+                        const SizedBox(width: 6),
+                        Text('chat.dmTab'.tr()),
                       ],
                     ),
                   ),
@@ -182,7 +182,7 @@ class _ChannelListView extends StatelessWidget {
                     const Icon(LucideIcons.hash,
                         size: 36, color: AppColors.mute),
                     const SizedBox(height: 10),
-                    Text('Keine Kanäle verfügbar.',
+                    Text('chat.noChannels'.tr(),
                         style: AppTypography.body(
                             size: 14, color: AppColors.mute)),
                   ],
@@ -195,7 +195,7 @@ class _ChannelListView extends StatelessWidget {
         final grouped = <String, List<Map<String, dynamic>>>{};
         for (final ch in list) {
           final cat = (ch['category'] as String?)?.trim();
-          final key = (cat == null || cat.isEmpty) ? 'Allgemein' : cat;
+          final key = (cat == null || cat.isEmpty) ? 'messages.categoryGeneral'.tr() : cat;
           grouped.putIfAbsent(key, () => []).add(ch);
         }
         final keys = grouped.keys.toList()..sort();
@@ -226,7 +226,7 @@ class _ChannelTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final convId = channel['conversation_id'] as String?;
-    final name = (channel['name'] as String?) ?? 'Kanal';
+    final name = (channel['name'] as String?) ?? 'messages.channelFallback'.tr();
     final emoji = (channel['emoji'] as String?) ?? '💬';
     final desc = channel['description'] as String?;
     final locked = channel['is_locked'] == true;
@@ -362,14 +362,14 @@ class _DmListView extends StatelessWidget {
                   children: [
                     const Text('💌', style: TextStyle(fontSize: 36)),
                     const SizedBox(height: 10),
-                    Text('Noch keine Nachrichten.',
+                    Text('chat.noConversations'.tr(),
                         style: AppTypography.body(
                             size: 14,
                             color: AppColors.ink,
                             weight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     Text(
-                        'Schreibe einem:r Nachbar:in über deren Profil oder Beitrag.',
+                        'chat.noConversationsHint'.tr(),
                         style: AppTypography.body(
                             size: 12, color: AppColors.mute),
                         textAlign: TextAlign.center),
@@ -400,7 +400,7 @@ class _DmListView extends StatelessWidget {
                 fillColor: AppColors.elevated,
                 prefixIcon: const Icon(LucideIcons.search,
                     size: 14, color: AppColors.mute),
-                hintText: 'Gespräche durchsuchen…',
+                hintText: 'chat.searchConversations'.tr(),
                 hintStyle:
                     AppTypography.body(size: 12, color: AppColors.mute),
                 isDense: true,
@@ -432,7 +432,7 @@ class _DmTile extends ConsumerWidget {
     final id = conv['id'] as String;
     final title = (conv['display_title'] as String?) ??
         (conv['title'] as String?) ??
-        'Konversation';
+        'messages.conversationFallback'.tr();
     final subtitle = conv['display_subtitle'] as String?;
     final avatarUrl = conv['peer_avatar_url'] as String?;
     final isDm = conv['is_dm'] == true;
@@ -550,7 +550,7 @@ class _DmTile extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Text('Online',
+                        Text('common.online'.tr(),
                             style: AppTypography.label(
                                 size: 9, color: AppColors.lebenSoft)),
                       ],

@@ -44,7 +44,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     final posts = ref.watch(groupPostsProvider(widget.groupId));
 
     return DashboardScaffold(
-      title: 'Gruppe',
+      title: 'groups.title'.tr(),
       currentRoute: '/dashboard/groups',
       body: SafeArea(
         child: group.when(
@@ -56,7 +56,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           data: (g) {
             if (g == null) {
               return Center(
-                child: Text('Gruppe nicht gefunden.',
+                child: Text('groups.notFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -110,7 +110,10 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                     const Icon(LucideIcons.users,
                                         size: 12, color: AppColors.mute),
                                     const SizedBox(width: 4),
-                                    Text('${g.memberCount} Mitglieder',
+                                    Text(
+                                        'groups.memberCount'.tr(namedArgs: {
+                                          'count': '${g.memberCount}'
+                                        }),
                                         style: AppTypography.caption()),
                                   ],
                                 ),
@@ -120,7 +123,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                           if (isMember.asData?.value == true) ...[
                             IconButton(
                               onPressed: () => _openInviteDialog(context, g.id),
-                              tooltip: 'Mitglied einladen',
+                              tooltip: 'groups.inviteMember'.tr(),
                               icon: const Icon(LucideIcons.userPlus,
                                   size: 18, color: AppColors.amber),
                             ),
@@ -132,7 +135,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                 ref.invalidate(groupDetailProvider(g.id));
                               },
                               icon: const Icon(LucideIcons.logOut, size: 14),
-                              label: const Text('Verlassen'),
+                              label: Text('groups.leave'.tr()),
                             ),
                           ]
                           else
@@ -144,7 +147,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                 ref.invalidate(groupDetailProvider(g.id));
                               },
                               icon: const Icon(LucideIcons.plus, size: 14),
-                              label: const Text('Beitreten'),
+                              label: Text('groups.join'.tr()),
                             ),
                         ],
                       ),
@@ -160,7 +163,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                         ),
                       ],
                       const SizedBox(height: 20),
-                      Text('Beiträge',
+                      Text('groups.posts'.tr(),
                           style: AppTypography.label(size: 10)),
                       const SizedBox(height: 8),
                       posts.when(
@@ -170,7 +173,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                         data: (list) {
                           if (list.isEmpty) {
                             return Text(
-                              'Noch keine Beitraege in der Gruppe.',
+                              'groups.noPostsYet'.tr(),
                               style: AppTypography.caption(),
                             );
                           }
@@ -235,8 +238,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                             maxLines: null,
                             style: AppTypography.body(
                                 size: 14, color: AppColors.ink),
-                            decoration: const InputDecoration(
-                              hintText: 'Beitrag schreiben…',
+                            decoration: InputDecoration(
+                              hintText: 'groups.writePost'.tr(),
                               isDense: true,
                             ),
                           ),
@@ -265,7 +268,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
       builder: (dlg) => StatefulBuilder(
         builder: (dlg, setLocal) => AlertDialog(
           backgroundColor: AppColors.surface,
-          title: Text('Mitglied einladen',
+          title: Text('groups.inviteMember'.tr(),
               style:
                   AppTypography.display(size: 18, color: AppColors.ink)),
           content: Column(
@@ -273,7 +276,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Eingabe der E-Mail-Adresse — die Einladung erscheint im Konto des Nachbarn:in.',
+                'groups.inviteEmailHint'.tr(),
                 style: AppTypography.caption(),
               ),
               const SizedBox(height: 12),
@@ -282,9 +285,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                 keyboardType: TextInputType.emailAddress,
                 autofocus: true,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: const InputDecoration(
-                  hintText: 'nachbarin@beispiel.at',
-                  prefixIcon: Icon(LucideIcons.mail,
+                decoration: InputDecoration(
+                  hintText: 'groups.inviteEmailPlaceholder'.tr(),
+                  prefixIcon: const Icon(LucideIcons.mail,
                       size: 16, color: AppColors.mute),
                   isDense: true,
                 ),
@@ -317,8 +320,8 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                           backgroundColor: AppColors.surface,
                           content: Text(
                             ok
-                                ? 'Einladung gesendet an $email'
-                                : 'Einladung fehlgeschlagen.',
+                                ? 'groups.inviteSentTo'.tr(namedArgs: {'email': email})
+                                : 'groups.inviteFailed'.tr(),
                             style: AppTypography.body(
                                 size: 13, color: AppColors.ink),
                           ),
@@ -334,7 +337,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                         color: AppColors.voidColor,
                       ),
                     )
-                  : const Text('Einladen'),
+                  : Text('groups.inviteSend'.tr()),
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,22 +87,22 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text('Link kopiert.',
+      content: Text('invite.linkCopied'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
   }
 
   Future<void> _share() async {
     await Share.share(
-      'Komm zu mir auf Mensaena — der Nachbarschaftshilfe-Plattform: $_inviteUrl',
-      subject: 'Einladung zu Mensaena',
+      'invite.shareMessage'.tr(namedArgs: {'url': _inviteUrl}),
+      subject: 'invite.shareSubject'.tr(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Einladen',
+      title: 'invite.title'.tr(),
       currentRoute: '/dashboard/invite',
       body: SafeArea(
         child: _loading
@@ -143,13 +144,13 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Nachbarn einladen',
+              Text('invite.header'.tr(),
                   style: AppTypography.display(
                     size: 22,
                     color: AppColors.ink,
                   )),
               Text(
-                'Teile deinen Link — wachst die Gemeinschaft.',
+                'invite.subtitle'.tr(),
                 style: AppTypography.caption(),
               ),
             ],
@@ -162,9 +163,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   Widget _statsRow() {
     return Row(
       children: [
-        Expanded(child: _stat('Angenommen', _accepted, AppColors.leben)),
+        Expanded(child: _stat('invite.accepted'.tr(), _accepted, AppColors.leben)),
         const SizedBox(width: 10),
-        Expanded(child: _stat('Offen', _pending, AppColors.amber)),
+        Expanded(child: _stat('invite.pending'.tr(), _pending, AppColors.amber)),
       ],
     );
   }
@@ -200,7 +201,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Dein persönlicher Link',
+          Text('invite.yourLink'.tr(),
               style: AppTypography.label(size: 10)),
           const SizedBox(height: 8),
           Container(
@@ -231,7 +232,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                   ),
                   onPressed: _copy,
                   icon: const Icon(LucideIcons.copy, size: 14),
-                  label: const Text('Kopieren'),
+                  label: Text('invite.copy'.tr()),
                 ),
               ),
               const SizedBox(width: 8),
@@ -243,7 +244,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                   ),
                   onPressed: _share,
                   icon: const Icon(LucideIcons.share2, size: 14),
-                  label: const Text('Teilen'),
+                  label: Text('invite.share'.tr()),
                 ),
               ),
             ],
@@ -269,7 +270,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               const Icon(LucideIcons.award,
                   color: AppColors.tealSoft, size: 16),
               const SizedBox(width: 8),
-              Text('So funktioniert es',
+              Text('invite.howItWorks'.tr(),
                   style: AppTypography.label(
                     size: 10,
                     color: AppColors.tealSoft,
@@ -278,9 +279,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '1. Link teilen — per WhatsApp, SMS oder E-Mail.\n'
-            '2. Wer sich registriert, wird automatisch deinem Konto zugeordnet.\n'
-            '3. Sammle Bronze, Silber, Gold & Legenden-Badges.',
+            'invite.howItWorksBody'.tr(),
             style: AppTypography.body(
               size: 12,
               color: AppColors.inkSoft,

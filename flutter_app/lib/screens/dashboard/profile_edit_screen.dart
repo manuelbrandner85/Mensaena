@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -86,7 +87,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text('Avatar gewählt — auf Speichern tippen zum Übernehmen.',
+      content: Text('profile.avatarChosen'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
   }
@@ -145,7 +146,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: AppColors.surface,
           content: Text(
-            'Avatar-Upload fehlgeschlagen — Profil wurde NICHT gespeichert.',
+            'profile.avatarUploadFailed'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
           ),
         ));
@@ -161,7 +162,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Profil gespeichert.',
+        content: Text('profile.profileSaved'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
       context.pop();
@@ -169,7 +170,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Speichern fehlgeschlagen: $e',
+        content: Text('profile.saveFailed'.tr(namedArgs: {'error': '$e'}),
             style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
       ));
     } finally {
@@ -180,7 +181,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Profil bearbeiten',
+      title: 'profile.editProfile'.tr(),
       currentRoute: '/dashboard/profile',
       body: SafeArea(
         child: FutureBuilder<Profile?>(
@@ -258,7 +259,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 ),
                 const SizedBox(height: 8),
                 Center(
-                  child: Text('Tippe für neues Avatar',
+                  child: Text('profile.tapForNewAvatar'.tr(),
                       style: AppTypography.label(
                           size: 10, color: AppColors.mute)),
                 ),
@@ -272,7 +273,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                             AvatarGenerator.defaultFor(
                                 p?.id ?? _nameCtrl.text)),
                         icon: const Icon(LucideIcons.shapes, size: 14),
-                        label: const Text('Identicon'),
+                        label: Text('profile.identicon'.tr()),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.tealSoft,
                           side: BorderSide(
@@ -288,7 +289,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                             AvatarGenerator.portraitFor(
                                 p?.id ?? _nameCtrl.text)),
                         icon: const Icon(LucideIcons.sparkles, size: 14),
-                        label: const Text('AI-Avatar'),
+                        label: Text('profile.aiAvatar'.tr()),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.amber,
                           side: BorderSide(
@@ -302,47 +303,47 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 const SizedBox(height: 24),
                 // Felder mit Validation
                 _Field(
-                  label: 'Name',
+                  label: 'profile.name'.tr(),
                   controller: _nameCtrl,
-                  hint: 'Dein voller Name',
+                  hint: 'profile.fullName'.tr(),
                   required: true,
                   minLength: 2,
                   maxLength: 80,
                 ),
                 _Field(
-                  label: 'Anzeigename',
+                  label: 'profile.displayName'.tr(),
                   controller: _displayNameCtrl,
-                  hint: 'Wie du angezeigt wirst',
+                  hint: 'profile.displayNameHint'.tr(),
                   maxLength: 40,
                 ),
                 _Field(
-                  label: 'Spitzname',
+                  label: 'profile.nickname'.tr(),
                   controller: _nicknameCtrl,
-                  hint: '@spitzname',
+                  hint: 'profile.nicknameHint'.tr(),
                   maxLength: 30,
                 ),
                 _Field(
-                  label: 'Bio',
+                  label: 'profile.bio'.tr(),
                   controller: _bioCtrl,
-                  hint: 'Erzähl ein wenig über dich…',
+                  hint: 'profile.bioHint'.tr(),
                   multiline: true,
                   maxLength: 300,
                 ),
                 _Field(
-                  label: 'Standort',
+                  label: 'profile.location'.tr(),
                   controller: _locationCtrl,
-                  hint: 'Stadt, Land',
+                  hint: 'profile.locationHint'.tr(),
                 ),
                 _Field(
-                  label: 'Telefon (optional)',
+                  label: 'profile.phoneOptional'.tr(),
                   controller: _phoneCtrl,
-                  hint: '+49…',
+                  hint: 'profile.phoneHint'.tr(),
                   keyboardType: TextInputType.phone,
                 ),
                 _Field(
-                  label: 'Homepage / Webseite',
+                  label: 'profile.homepageLabel'.tr(),
                   controller: _homepageCtrl,
-                  hint: 'https://…',
+                  hint: 'profile.homepageHint'.tr(),
                   keyboardType: TextInputType.url,
                 ),
                 const SizedBox(height: 28),
@@ -359,7 +360,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                                 color: AppColors.voidColor),
                           )
                         : const Icon(LucideIcons.save, size: 16),
-                    label: Text(_saving ? 'Speichere…' : 'Speichern'),
+                    label: Text(_saving ? 'profile.saving'.tr() : 'common.save'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.bronze,
                       foregroundColor: AppColors.voidColor,
@@ -401,17 +402,19 @@ class _Field extends StatelessWidget {
 
   String? _defaultValidator(String? v) {
     final s = v?.trim() ?? '';
-    if (required && s.isEmpty) return '$label ist erforderlich';
+    if (required && s.isEmpty) {
+      return 'profile.fieldRequired'.tr(namedArgs: {'field': label});
+    }
     if (minLength != null && s.isNotEmpty && s.length < minLength!) {
-      return 'Mindestens $minLength Zeichen';
+      return 'profile.minChars'.tr(namedArgs: {'n': '$minLength'});
     }
     if (maxLength != null && s.length > maxLength!) {
-      return 'Maximal $maxLength Zeichen';
+      return 'profile.maxChars'.tr(namedArgs: {'n': '$maxLength'});
     }
     if (keyboardType == TextInputType.url &&
         s.isNotEmpty &&
         !RegExp(r'^https?://').hasMatch(s)) {
-      return 'URL muss mit https:// beginnen';
+      return 'profile.urlMustStart'.tr();
     }
     return null;
   }

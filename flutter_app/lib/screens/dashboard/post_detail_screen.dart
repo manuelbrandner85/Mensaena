@@ -116,7 +116,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          ok ? 'Meldung eingereicht. Danke!' : 'Meldung fehlgeschlagen.',
+          ok ? 'posts.reportSubmitted'.tr() : 'posts.reportFailed'.tr(),
         ),
       ),
     );
@@ -130,9 +130,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          ok
-              ? 'Hilfe angeboten — der/die Ersteller:in wird benachrichtigt.'
-              : 'Konnte Hilfe-Angebot nicht senden.',
+          ok ? 'posts.helpOffered'.tr() : 'posts.helpFailed'.tr(),
         ),
       ),
     );
@@ -160,7 +158,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           final profile = root['profiles'] as Map<String, dynamic>?;
           _replyToAuthor = (profile?['display_name'] ??
               profile?['name'] ??
-              'Nachbar:in') as String;
+              'common.neighbour'.tr()) as String;
         }),
       ));
       final children = replies[root['id'] as String] ?? const [];
@@ -198,11 +196,11 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Beitrag löschen?',
+        title: Text('posts.deleteTitle'.tr(),
             style:
                 AppTypography.display(size: 18, color: AppColors.ink)),
         content: Text(
-          'Diese Aktion ist nicht rückgängig. Der Beitrag und alle Kommentare werden entfernt.',
+          'posts.deleteConfirm'.tr(),
           style:
               AppTypography.body(size: 13, color: AppColors.inkSoft),
         ),
@@ -228,7 +226,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Löschen fehlgeschlagen.',
+        content: Text('posts.deleteFailed'.tr(),
             style:
                 AppTypography.body(size: 13, color: AppColors.ink)),
       ));
@@ -240,13 +238,13 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     final isMyPost =
         _post != null && _post!.userId == SupabaseService.currentUser?.id;
     return DashboardScaffold(
-      title: 'Beitrag',
+      title: 'posts.detailTitle'.tr(),
       currentRoute: '/dashboard/posts',
       fab: isMyPost
           ? FloatingActionButton.small(
               backgroundColor: AppColors.herzrot,
               foregroundColor: AppColors.ink,
-              tooltip: 'Beitrag löschen',
+              tooltip: 'posts.deleteTooltip'.tr(),
               onPressed: _deletePost,
               child: const Icon(LucideIcons.trash2, size: 16),
             )
@@ -282,7 +280,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                             ),
                             const SizedBox(height: 24),
                             Text(
-                              'Kommentare (${_comments.length})',
+                              'posts.commentsCount'.tr(namedArgs: {'count': '${_comments.length}'}),
                               style: AppTypography.label(size: 10),
                             ),
                             const SizedBox(height: 8),
@@ -290,7 +288,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                               Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: Text(
-                                  'Noch keine Kommentare. Sei der/die Erste:r.',
+                                  'posts.noCommentsYet'.tr(),
                                   style: AppTypography.caption(),
                                 ),
                               )
@@ -318,7 +316,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
-                                  'Antwort an ${_replyToAuthor ?? "..."}',
+                                  'posts.replyTo'.tr(namedArgs: {
+                                    'name': _replyToAuthor ?? '...'
+                                  }),
                                   style: AppTypography.body(
                                       size: 11, color: AppColors.bronze),
                                 ),
@@ -488,25 +488,25 @@ class _TypeBadge extends StatelessWidget {
   static ({String label, String emoji, Color color}) _typeMap(String t) {
     switch (t) {
       case 'crisis':
-        return (label: 'Notfall', emoji: '🚨', color: AppColors.herzrot);
+        return (label: 'posts.typeCrisis'.tr().replaceAll('🚨 ', ''), emoji: '🚨', color: AppColors.herzrot);
       case 'help_request':
-        return (label: 'Hilfe gesucht', emoji: '🆘', color: AppColors.herzrot);
+        return (label: 'posts.typeHelpRequest'.tr().replaceAll('🆘 ', ''), emoji: '🆘', color: AppColors.herzrot);
       case 'help_offered':
-        return (label: 'Hilfe', emoji: '💚', color: AppColors.leben);
+        return (label: 'posts.typeHelpOffered'.tr().replaceAll('💚 ', ''), emoji: '💚', color: AppColors.leben);
       case 'animal':
-        return (label: 'Tier', emoji: '🐾', color: const Color(0xFFEC4899));
+        return (label: 'posts.typeAnimal'.tr().replaceAll('🐾 ', ''), emoji: '🐾', color: const Color(0xFFEC4899));
       case 'housing':
-        return (label: 'Wohnen', emoji: '🏡', color: const Color(0xFF60A5FA));
+        return (label: 'posts.typeHousing'.tr().replaceAll('🏡 ', ''), emoji: '🏡', color: const Color(0xFF60A5FA));
       case 'supply':
-        return (label: 'Versorgung', emoji: '🌾', color: const Color(0xFFFACC15));
+        return (label: 'posts.typeSupply'.tr().replaceAll('🌾 ', ''), emoji: '🌾', color: const Color(0xFFFACC15));
       case 'mobility':
-        return (label: 'Mobilität', emoji: '🚗', color: const Color(0xFF818CF8));
+        return (label: 'posts.typeMobility'.tr().replaceAll('🚗 ', ''), emoji: '🚗', color: const Color(0xFF818CF8));
       case 'sharing':
-        return (label: 'Teilen', emoji: '🔄', color: AppColors.teal);
+        return (label: 'posts.typeSharing'.tr().replaceAll('🔄 ', ''), emoji: '🔄', color: AppColors.teal);
       case 'rescue':
-        return (label: 'Retten', emoji: '🧡', color: const Color(0xFFFB923C));
+        return (label: 'posts.typeRescue'.tr().replaceAll('🧡 ', ''), emoji: '🧡', color: const Color(0xFFFB923C));
       default:
-        return (label: 'Beitrag', emoji: '📝', color: AppColors.amber);
+        return (label: 'posts.detailTitle'.tr(), emoji: '📝', color: AppColors.amber);
     }
   }
 }
@@ -552,7 +552,7 @@ class _ActionsBar extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: onHelp,
                 icon: const Icon(LucideIcons.helpingHand, size: 18),
-                label: const Text('Ich helfe'),
+                label: Text('posts.ihelp'.tr()),
               ),
             ),
             const SizedBox(height: 12),
@@ -647,7 +647,7 @@ class _CommentTile extends StatelessWidget {
     final profile = json['profiles'] as Map<String, dynamic>?;
     final author = (profile?['display_name'] ??
         profile?['name'] ??
-        'Nachbar:in') as String;
+        'common.neighbour'.tr()) as String;
     final avatar = profile?['avatar_url'] as String?;
     final content = json['content'] as String? ?? '';
     final createdAt = DateTime.tryParse(json['created_at'] as String? ?? '') ??
@@ -717,7 +717,7 @@ class _CommentTile extends StatelessWidget {
                   TextButton.icon(
                     onPressed: onReply,
                     icon: const Icon(LucideIcons.cornerUpLeft, size: 12),
-                    label: const Text('Antworten'),
+                    label: Text('posts.reply'.tr()),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.bronze,
                       padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -756,8 +756,8 @@ class _CommentInput extends StatelessWidget {
               child: TextField(
                 controller: ctrl,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: const InputDecoration(
-                  hintText: 'Antworten…',
+                decoration: InputDecoration(
+                  hintText: 'posts.replyHint'.tr(),
                   isDense: true,
                 ),
               ),
@@ -775,14 +775,14 @@ class _CommentInput extends StatelessWidget {
 }
 
 class _ReportSheet extends StatelessWidget {
-  static const List<String> _reasons = [
-    'Spam',
-    'Belästigung',
-    'Falsche Angaben',
-    'Anstößige Inhalte',
-    'Kommerzielles Angebot',
-    'Sonstiges',
-  ];
+  static List<({String value, String label})> _reasons() => [
+        (value: 'Spam', label: 'posts.reasonSpam'.tr()),
+        (value: 'Harassment', label: 'posts.reasonHarassment'.tr()),
+        (value: 'False', label: 'posts.reasonFalse'.tr()),
+        (value: 'Offensive', label: 'posts.reasonOffensive'.tr()),
+        (value: 'Commercial', label: 'posts.reasonCommercial'.tr()),
+        (value: 'Other', label: 'posts.reasonOther'.tr()),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -794,18 +794,18 @@ class _ReportSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Beitrag melden',
+              'posts.reportTitle'.tr(),
               style: AppTypography.display(size: 20, color: AppColors.ink),
             ),
             const SizedBox(height: 14),
-            for (final r in _reasons)
+            for (final r in _reasons())
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text(r,
+                title: Text(r.label,
                     style: AppTypography.body(size: 14, color: AppColors.ink)),
                 trailing: const Icon(LucideIcons.chevronRight,
                     size: 16, color: AppColors.mute),
-                onTap: () => Navigator.of(context).pop(r),
+                onTap: () => Navigator.of(context).pop(r.value),
               ),
           ],
         ),
@@ -824,13 +824,13 @@ class _NotFound extends StatelessWidget {
           const Icon(LucideIcons.fileX, size: 32, color: AppColors.mute),
           const SizedBox(height: 10),
           Text(
-            'Beitrag nicht gefunden.',
+            'posts.notFound'.tr(),
             style: AppTypography.body(color: AppColors.mute),
           ),
           const SizedBox(height: 16),
           OutlinedButton(
             onPressed: () => Navigator.of(context).maybePop(),
-            child: const Text('Zurück'),
+            child: Text('common.back'.tr()),
           ),
         ],
       ),

@@ -47,7 +47,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
     final pinned = ref.watch(boardIsPinnedProvider(widget.boardPostId));
 
     return DashboardScaffold(
-      title: 'Notiz',
+      title: 'board.title'.tr(),
       currentRoute: '/dashboard/board',
       body: SafeArea(
         child: post.when(
@@ -58,7 +58,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
           data: (p) {
             if (p == null) {
               return Center(
-                child: Text('Notiz nicht gefunden.',
+                child: Text('board.notFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -86,13 +86,13 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                           if (p.authorId ==
                               SupabaseService.currentUser?.id) ...[
                             IconButton(
-                              tooltip: 'Bearbeiten',
+                              tooltip: 'common.edit'.tr(),
                               icon: const Icon(LucideIcons.pencil,
                                   size: 16, color: AppColors.amber),
                               onPressed: () => _openEditModal(context, p),
                             ),
                             IconButton(
-                              tooltip: 'Löschen',
+                              tooltip: 'common.delete'.tr(),
                               icon: const Icon(LucideIcons.trash2,
                                   size: 16, color: AppColors.herzrot),
                               onPressed: () async {
@@ -100,7 +100,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                                   context: context,
                                   builder: (_) => AlertDialog(
                                     backgroundColor: AppColors.surface,
-                                    title: Text('Pin löschen?',
+                                    title: Text('board.deletePinTitle'.tr(),
                                         style: AppTypography.display(
                                             size: 18,
                                             color: AppColors.ink)),
@@ -189,7 +189,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                         style: AppTypography.caption(),
                       ),
                       const SizedBox(height: 20),
-                      Text('Kommentare', style: AppTypography.label(size: 10)),
+                      Text('board.comments'.tr(), style: AppTypography.label(size: 10)),
                       const SizedBox(height: 8),
                       comments.when(
                         loading: () => const SizedBox.shrink(),
@@ -198,7 +198,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                         data: (list) {
                           if (list.isEmpty) {
                             return Text(
-                              'Noch keine Kommentare.',
+                              'board.noComments'.tr(),
                               style: AppTypography.caption(),
                             );
                           }
@@ -252,8 +252,8 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                           controller: _commentCtrl,
                           style: AppTypography.body(
                               size: 14, color: AppColors.ink),
-                          decoration: const InputDecoration(
-                            hintText: 'Kommentar…',
+                          decoration: InputDecoration(
+                            hintText: 'board.commentHint'.tr(),
                             isDense: true,
                           ),
                         ),
@@ -307,7 +307,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                 ),
               ),
               const SizedBox(height: 14),
-              Text('Pin bearbeiten',
+              Text('board.editPin'.tr(),
                   style: AppTypography.display(
                       size: 20, color: AppColors.ink)),
               const SizedBox(height: 14),
@@ -320,7 +320,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: AppColors.elevated,
-                  hintText: 'Was möchtest du teilen?',
+                  hintText: 'board.contentHint'.tr(),
                   hintStyle: AppTypography.body(
                       size: 13, color: AppColors.mute),
                   border: OutlineInputBorder(
@@ -330,7 +330,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              Text('Kategorie', style: AppTypography.label(size: 10)),
+              Text('board.category'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
@@ -350,7 +350,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              Text('Farbe', style: AppTypography.label(size: 10)),
+              Text('board.color'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
