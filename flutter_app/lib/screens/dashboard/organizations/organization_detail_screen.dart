@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -28,7 +29,7 @@ class OrganizationDetailScreen extends ConsumerWidget {
           data: (o) {
             if (o == null) {
               return Center(
-                child: Text('Organisation nicht gefunden.',
+                child: Text('organizations.notFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -102,7 +103,7 @@ class OrganizationDetailScreen extends ConsumerWidget {
                   _ContactRow(icon: LucideIcons.clock, label: o.openingHours!),
                 if (o.services.isNotEmpty) ...[
                   const SizedBox(height: 14),
-                  Text('Angebote', style: AppTypography.label(size: 10)),
+                  Text('organizations.offers'.tr(), style: AppTypography.label(size: 10)),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,

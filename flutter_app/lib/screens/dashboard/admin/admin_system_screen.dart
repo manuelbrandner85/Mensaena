@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -38,7 +39,7 @@ class AdminSystemScreen extends ConsumerWidget {
                         color: AppColors.amber),
                   ),
                 ),
-                error: (_, __) => Text('Konnte Stats nicht laden.',
+                error: (_, __) => Text('admin.statsLoadShort'.tr(),
                     style: AppTypography.caption()),
                 data: (s) => Column(
                   children: [

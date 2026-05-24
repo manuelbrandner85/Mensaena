@@ -3,9 +3,9 @@
 /// 1:1 zu Web /ratings (lebt dort als Tab in Profile, hier als eigener Screen).
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -81,15 +81,15 @@ class _RatingsHubScreenState extends ConsumerState<RatingsHubScreen>
                 labelStyle:
                     AppTypography.body(size: 12, weight: FontWeight.w700),
                 unselectedLabelStyle: AppTypography.body(size: 12),
-                tabs: const [
+                tabs: [
                   Tab(
                     height: 36,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.inbox, size: 14),
-                        SizedBox(width: 6),
-                        Text('Erhalten'),
+                        const Icon(LucideIcons.inbox, size: 14),
+                        const SizedBox(width: 6),
+                        Text('ratings.received'.tr()),
                       ],
                     ),
                   ),
@@ -98,9 +98,9 @@ class _RatingsHubScreenState extends ConsumerState<RatingsHubScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.send, size: 14),
-                        SizedBox(width: 6),
-                        Text('Gegeben'),
+                        const Icon(LucideIcons.send, size: 14),
+                        const SizedBox(width: 6),
+                        Text('ratings.given'.tr()),
                       ],
                     ),
                   ),

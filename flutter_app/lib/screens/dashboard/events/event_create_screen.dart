@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -113,7 +114,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            Text('Kategorie', style: AppTypography.label(size: 10)),
+            Text('events.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,

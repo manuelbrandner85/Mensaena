@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -80,7 +81,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Text('Kategorie', style: AppTypography.label(size: 10)),
+            Text('board.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
@@ -122,7 +123,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
               }).toList(),
             ),
             const SizedBox(height: 14),
-            Text('Farbe', style: AppTypography.label(size: 10)),
+            Text('board.colorLabel'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Row(
               children: _colors.entries.map((e) {

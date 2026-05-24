@@ -44,7 +44,7 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
             final f = snap.data;
             if (f == null) {
               return Center(
-                child: Text('Hof nicht gefunden.',
+                child: Text('supply.farmNotFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -102,7 +102,7 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
                 ],
                 if (f.products.isNotEmpty) ...[
                   const SizedBox(height: 14),
-                  Text('Produkte', style: AppTypography.label(size: 10)),
+                  Text('supply.products'.tr(), style: AppTypography.label(size: 10)),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,

@@ -13,6 +13,7 @@
 library;
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
@@ -433,7 +434,7 @@ class _FailureView extends StatelessWidget {
                   size: 28, color: AppColors.herzrotWarm),
             ),
             const SizedBox(height: 14),
-            Text('Verbindung fehlgeschlagen',
+            Text('live.connectionFailed'.tr(),
                 style: AppTypography.body(
                     size: 14,
                     color: AppColors.ink,

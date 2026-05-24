@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -61,7 +62,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('/dashboard/skills/create'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Skill anbieten'),
+        label: Text('skills.offerSkill'.tr()),
       ),
       body: SafeArea(
         child: Column(
@@ -167,7 +168,7 @@ class _SkillTile extends StatelessWidget {
               ],
               const Spacer(),
               if (skill.isFree == true)
-                Text('Gratis',
+                Text('skills.free'.tr(),
                     style: AppTypography.label(
                       size: 9,
                       color: AppColors.lebenSoft,
