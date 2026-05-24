@@ -51,8 +51,8 @@ class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final highlight = _countryFor(context);
-    final countryLabel = _countryNames[highlight] ?? highlight;
+    final country = _countryFor(context);
+    final countryLabel = _countryNames[country] ?? country;
     return DashboardScaffold(
       title: 'jobs.portalsTitle'.tr(),
       currentRoute: '/dashboard/jobs',
@@ -70,19 +70,31 @@ class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
                 child: Text('${snap.error}', style: AppTypography.caption()),
               );
             }
+            // Nur Portale aus dem User-Land (+ EU-weite Portale wenn vorhanden).
+            // User-Vorgabe: nur eigenes Land + ergaenzend EU-Plattformen.
             final all = snap.data ?? const <JobPortal>[];
-            final groups = <String, List<JobPortal>>{};
-            for (final p in all) {
-              groups.putIfAbsent(p.country, () => []).add(p);
+            final local = all.where((p) => p.country == country).toList();
+            final eu = all.where((p) => p.country == 'EU').toList();
+            final list = [...local, ...eu];
+            if (list.isEmpty) {
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                children: [
+                  EditorialModuleHeader(
+                    metaIndex: '§ 22',
+                    metaCategory: 'jobs.portalsTitle'.tr(),
+                    title: 'jobs.portalsTitle'.tr(),
+                    subtitle: 'jobs.portalsSubtitle'
+                        .tr(namedArgs: {'country': countryLabel}),
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Text('jobs.noneInCountry'.tr(),
+                        style: AppTypography.caption()),
+                  ),
+                ],
+              );
             }
-            // Hervorgehobenes Land zuerst, dann EU, dann Rest alphabetisch.
-            final keys = <String>[
-              if (groups.containsKey(highlight)) highlight,
-              if (groups.containsKey('EU') && highlight != 'EU') 'EU',
-              ...(groups.keys.where((k) => k != highlight && k != 'EU').toList()
-                ..sort()),
-            ];
-
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
@@ -94,23 +106,11 @@ class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
                       .tr(namedArgs: {'country': countryLabel}),
                 ),
                 const SizedBox(height: 12),
-                for (final code in keys) ...[
-                  _CountryHeader(
-                    code: code,
-                    label: _countryNames[code] ?? code,
-                    isHighlighted: code == highlight,
+                for (final p in list)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _PortalCard(portal: p, isHighlighted: true),
                   ),
-                  const SizedBox(height: 8),
-                  for (final p in groups[code]!)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _PortalCard(
-                        portal: p,
-                        isHighlighted: code == highlight,
-                      ),
-                    ),
-                  const SizedBox(height: 6),
-                ],
                 const SizedBox(height: 6),
                 Text(
                   'jobs.portalsDisclaimer'.tr(),
@@ -121,56 +121,6 @@ class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
           },
         ),
       ),
-    );
-  }
-}
-
-class _CountryHeader extends StatelessWidget {
-  const _CountryHeader({
-    required this.code,
-    required this.label,
-    required this.isHighlighted,
-  });
-
-  final String code;
-  final String label;
-  final bool isHighlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: isHighlighted
-                ? AppColors.tealSoft.withValues(alpha: 0.18)
-                : AppColors.elevated,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: isHighlighted
-                  ? AppColors.tealSoft.withValues(alpha: 0.5)
-                  : AppColors.line,
-            ),
-          ),
-          child: Text(
-            code,
-            style: AppTypography.label(
-              size: 10,
-              color: isHighlighted ? AppColors.tealSoft : AppColors.inkSoft,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: AppTypography.body(
-            size: 14,
-            color: AppColors.ink,
-            weight: FontWeight.w600,
-          ),
-        ),
-      ],
     );
   }
 }

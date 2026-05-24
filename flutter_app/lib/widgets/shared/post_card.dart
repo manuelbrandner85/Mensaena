@@ -312,12 +312,16 @@ class _PostCardState extends State<PostCard> {
               ),
             ],
             // Phase 5.6: Multi-Image-Carousel mit Indicator-Dots
+            // Hero-Tag verbindet List-Image mit PostDetail-Image (smooth fly-in).
             if (post.allImageUrls.isNotEmpty) ...[
               const SizedBox(height: 10),
-              ImageCarousel(
-                urls: post.allImageUrls,
-                height: 180,
-                borderRadius: 10,
+              Hero(
+                tag: 'post-image-${post.id}',
+                child: ImageCarousel(
+                  urls: post.allImageUrls,
+                  height: 180,
+                  borderRadius: 10,
+                ),
               ),
             ],
             if (post.locationText != null && post.locationText!.isNotEmpty) ...[

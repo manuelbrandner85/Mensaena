@@ -546,7 +546,9 @@
     "reportButton": "Krizi bildir",
     "voiceHint": "Mikrofona dokun — özgürce konuş, biz yazarız.",
     "emergencyQuickAccess": "Acil numaraları aç",
-    "ctaPrimary": "Hızlı erişim"
+    "ctaPrimary": "Hızlı erişim",
+    "localCountryLabel": "{country} için acil numaralar",
+    "switchLanguageHint": "Diğer ülkeleri görmek için ayarlarda dili değiştirin"
   },
   "posts": {
     "title": "Gönderiler",
@@ -823,7 +825,8 @@
     "portalsDisclaimer": "Bağlantılar seçilen platformu tarayıcıda açar. Mensaena aracı değildir.",
     "officialBadge": "RESMİ",
     "openSearch": "İş ara",
-    "openPortal": "Portalı aç"
+    "openPortal": "Portalı aç",
+    "noneInCountry": "Ülkeniz için iş portalı bulunmuyor."
   },
   "civil": {
     "navTitle": "Uyarılar",

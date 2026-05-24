@@ -546,7 +546,9 @@
     "reportButton": "Krise melden",
     "voiceHint": "Tippe das Mikrofon — sprich frei, wir schreiben es auf.",
     "emergencyQuickAccess": "Notruf-Nummern öffnen",
-    "ctaPrimary": "Schnell-Zugriff"
+    "ctaPrimary": "Schnell-Zugriff",
+    "localCountryLabel": "Notruf-Nummern für {country}",
+    "switchLanguageHint": "Sprache wechseln in Einstellungen, um andere Länder zu sehen"
   },
   "posts": {
     "title": "Beiträge",
@@ -823,7 +825,8 @@
     "portalsDisclaimer": "Links öffnen die jeweilige Plattform im Browser. Mensaena ist kein Vermittler.",
     "officialBadge": "AMTLICH",
     "openSearch": "Jobs suchen",
-    "openPortal": "Portal öffnen"
+    "openPortal": "Portal öffnen",
+    "noneInCountry": "Keine Job-Portale für dein Land verfügbar."
   },
   "civil": {
     "navTitle": "Warnungen",

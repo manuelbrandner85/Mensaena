@@ -19,6 +19,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../services/weather_service.dart';
 import '../../widgets/dashboard/dashboard_hero_card.dart';
+import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/dashboard/location_onboarding_modal.dart';
 import '../../widgets/dashboard/onboarding_tour.dart';
 import '../../widgets/dashboard/safety_banners.dart';
@@ -495,15 +496,7 @@ class _Feed extends StatelessWidget {
       return Column(
         children: List.generate(
           3,
-          (_) => Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            height: 120,
-            decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.4),
-              border: Border.all(color: AppColors.line),
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
+          (i) => PostCardSkeleton(showImage: i.isEven),
         ),
       );
     }

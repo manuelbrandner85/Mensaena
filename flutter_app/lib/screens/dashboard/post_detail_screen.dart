@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../repositories/post_interactions_repository.dart';
 import '../../repositories/posts_repository.dart';
+import '../../services/haptics.dart';
 import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -83,6 +86,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   }
 
   Future<void> _toggleSave() async {
+    Haptics.tap();
     await SavedPostsRepository.toggle(widget.postId);
     setState(() => _saved = !_saved);
   }
@@ -127,6 +131,11 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       postId: widget.postId,
     );
     if (!mounted) return;
+    if (ok) {
+      unawaited(Haptics.success());
+    } else {
+      unawaited(Haptics.error());
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -356,11 +365,15 @@ class _Hero extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Phase 5.6: shared ImageCarousel mit Indicator-Dots + Lightbox-Tap
+        // Hero-Tag matched die PostCard-Liste (smooth fly-in beim Open).
         if (post.allImageUrls.isNotEmpty) ...[
-          ImageCarousel(
-            urls: post.allImageUrls,
-            height: 240,
-            borderRadius: 14,
+          Hero(
+            tag: 'post-image-${post.id}',
+            child: ImageCarousel(
+              urls: post.allImageUrls,
+              height: 240,
+              borderRadius: 14,
+            ),
           ),
           const SizedBox(height: 14),
         ],

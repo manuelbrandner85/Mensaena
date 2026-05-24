@@ -78,6 +78,7 @@ import '../../screens/public/onboarding_tour_screen.dart';
 import '../../screens/public/splash_screen.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
+import 'page_transitions.dart';
 
 /// SKILL: flutter-setup-declarative-routing
 /// Alle Routen der App. Public-Routen sind ohne Login zugaenglich,
@@ -226,8 +227,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':conversationId',
-            builder: (_, s) => ChatScreen(
-              conversationId: s.pathParameters['conversationId']!,
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: ChatScreen(
+                conversationId: s.pathParameters['conversationId']!,
+              ),
             ),
           ),
         ],
@@ -238,8 +242,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':id',
-            builder: (_, s) =>
-                PostDetailScreen(postId: s.pathParameters['id']!),
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: PostDetailScreen(postId: s.pathParameters['id']!),
+            ),
           ),
         ],
       ),
@@ -249,8 +255,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':userId',
-            builder: (_, s) =>
-                ProfileScreen(userId: s.pathParameters['userId']),
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: ProfileScreen(userId: s.pathParameters['userId']),
+            ),
           ),
         ],
       ),
@@ -423,8 +431,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: ':groupId',
-            builder: (_, s) => GroupDetailScreen(
-              groupId: s.pathParameters['groupId']!,
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: GroupDetailScreen(
+                groupId: s.pathParameters['groupId']!,
+              ),
             ),
           ),
         ],
@@ -439,8 +450,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: ':listingId',
-            builder: (_, s) => MarketplaceDetailScreen(
-              listingId: s.pathParameters['listingId']!,
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: MarketplaceDetailScreen(
+                listingId: s.pathParameters['listingId']!,
+              ),
             ),
           ),
         ],
@@ -455,8 +469,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: ':eventId',
-            builder: (_, s) => EventDetailScreen(
-              eventId: s.pathParameters['eventId']!,
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: EventDetailScreen(
+                eventId: s.pathParameters['eventId']!,
+              ),
             ),
           ),
         ],
@@ -526,8 +543,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: ':slug',
-            builder: (_, s) => FarmDetailScreen(
-              slug: s.pathParameters['slug']!,
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: FarmDetailScreen(
+                slug: s.pathParameters['slug']!,
+              ),
             ),
           ),
         ],
@@ -546,8 +566,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: ':crisisId',
-            builder: (_, s) => CrisisDetailScreen(
-              crisisId: s.pathParameters['crisisId']!,
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: CrisisDetailScreen(
+                crisisId: s.pathParameters['crisisId']!,
+              ),
             ),
           ),
         ],

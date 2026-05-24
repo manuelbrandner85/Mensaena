@@ -312,24 +312,28 @@ class _Tile extends ConsumerWidget {
                     ),
                     child: SizedBox(
                       width: double.infinity,
-                      child: firstImage != null
-                          ? Image.network(
-                              firstImage,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: AppColors.elevated,
-                                child: const Center(
-                                  child: Icon(LucideIcons.imageOff,
-                                      color: AppColors.mute),
+                      // Hero verbindet Tile-Image mit MarketplaceDetail-Image.
+                      child: Hero(
+                        tag: 'marketplace-image-${item.id}',
+                        child: firstImage != null
+                            ? Image.network(
+                                firstImage,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: AppColors.elevated,
+                                  child: const Center(
+                                    child: Icon(LucideIcons.imageOff,
+                                        color: AppColors.mute),
+                                  ),
                                 ),
+                              )
+                            : Container(
+                                color: AppColors.elevated,
+                                alignment: Alignment.center,
+                                child: const Icon(LucideIcons.package,
+                                    color: AppColors.mute, size: 32),
                               ),
-                            )
-                          : Container(
-                              color: AppColors.elevated,
-                              alignment: Alignment.center,
-                              child: const Icon(LucideIcons.package,
-                                  color: AppColors.mute, size: 32),
-                            ),
+                      ),
                     ),
                   ),
                   Positioned(

@@ -546,7 +546,9 @@
     "reportButton": "Report crisis",
     "voiceHint": "Tap the mic — speak freely, we'll write it down.",
     "emergencyQuickAccess": "Open emergency numbers",
-    "ctaPrimary": "Quick access"
+    "ctaPrimary": "Quick access",
+    "localCountryLabel": "Emergency numbers for {country}",
+    "switchLanguageHint": "Switch language in settings to see other countries"
   },
   "posts": {
     "title": "Posts",
@@ -823,7 +825,8 @@
     "portalsDisclaimer": "Links open the chosen platform in your browser. Mensaena is not an intermediary.",
     "officialBadge": "OFFICIAL",
     "openSearch": "Search jobs",
-    "openPortal": "Open portal"
+    "openPortal": "Open portal",
+    "noneInCountry": "No job portals available for your country."
   },
   "civil": {
     "navTitle": "Alerts",

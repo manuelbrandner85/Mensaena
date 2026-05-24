@@ -546,7 +546,9 @@
     "reportButton": "Сообщить",
     "voiceHint": "Нажмите микрофон — говорите, мы запишем.",
     "emergencyQuickAccess": "Экстренные номера",
-    "ctaPrimary": "Быстрый доступ"
+    "ctaPrimary": "Быстрый доступ",
+    "localCountryLabel": "Экстренные номера для {country}",
+    "switchLanguageHint": "Сменить язык в настройках, чтобы увидеть другие страны"
   },
   "posts": {
     "title": "Объявления",
@@ -823,7 +825,8 @@
     "portalsDisclaimer": "Ссылки открывают платформу в браузере. Mensaena не является посредником.",
     "officialBadge": "ОФИЦ.",
     "openSearch": "Найти вакансии",
-    "openPortal": "Открыть портал"
+    "openPortal": "Открыть портал",
+    "noneInCountry": "Для вашей страны нет порталов работы."
   },
   "civil": {
     "navTitle": "Оповещения",

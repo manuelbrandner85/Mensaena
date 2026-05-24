@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -43,10 +44,22 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     height: 240,
                     child: PageView.builder(
                       itemCount: l.images.length,
-                      itemBuilder: (context, i) => ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Image.network(l.images[i], fit: BoxFit.cover),
-                      ),
+                      // Hero auf das erste Image (matched MarketplaceCard).
+                      // Weitere Slides ohne Hero, da nur 1 Tag/Route gilt.
+                      itemBuilder: (context, i) {
+                        final img = ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child:
+                              Image.network(l.images[i], fit: BoxFit.cover),
+                        );
+                        if (i == 0) {
+                          return Hero(
+                            tag: 'marketplace-image-${l.id}',
+                            child: img,
+                          );
+                        }
+                        return img;
+                      },
                     ),
                   ),
                 const SizedBox(height: 14),
@@ -398,6 +411,7 @@ class _SaveButton extends ConsumerWidget {
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: () async {
+          Haptics.tap();
           await MarketplaceFavorites.toggle(listingId);
           ref.invalidate(savedListingIdsProvider);
         },

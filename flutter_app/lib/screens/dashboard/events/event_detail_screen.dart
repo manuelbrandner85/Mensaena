@@ -13,6 +13,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class EventDetailScreen extends ConsumerWidget {
@@ -179,6 +180,7 @@ class EventDetailScreen extends ConsumerWidget {
                       color: AppColors.leben,
                       active: rsvp.asData?.value == 'going',
                       onTap: () async {
+                        Haptics.tap();
                         await EventsRepository.rsvp(
                           eventId: eventId,
                           status: 'going',
@@ -192,6 +194,7 @@ class EventDetailScreen extends ConsumerWidget {
                       color: AppColors.amber,
                       active: rsvp.asData?.value == 'maybe',
                       onTap: () async {
+                        Haptics.tap();
                         await EventsRepository.rsvp(
                           eventId: eventId,
                           status: 'maybe',
@@ -205,6 +208,7 @@ class EventDetailScreen extends ConsumerWidget {
                       color: AppColors.mute,
                       active: rsvp.asData?.value == 'declined',
                       onTap: () async {
+                        Haptics.tap();
                         await EventsRepository.rsvp(
                           eventId: eventId,
                           status: 'declined',

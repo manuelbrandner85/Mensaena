@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/crisis.dart';
 import '../../../repositories/crisis_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -102,7 +103,10 @@ class _CrisisDashboardScreenState
     return DashboardScaffold(
       title: 'crisis.title'.tr(),
       currentRoute: '/dashboard/crisis',
-      fab: _PulsingSosFab(onPressed: () => _openSosModal(context)),
+      fab: _PulsingSosFab(onPressed: () {
+        Haptics.heavyImpact();
+        _openSosModal(context);
+      }),
       body: SafeArea(
         child: Column(
           children: [

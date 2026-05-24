@@ -16,6 +16,7 @@ import '../../providers/cinema_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/chat_context_service.dart';
 import '../../services/dm_call_service.dart';
+import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/voice_recorder_service.dart';
@@ -298,6 +299,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> _send() async {
     final text = _ctrl.text.trim();
     if (text.isEmpty) return;
+    Haptics.tap();
     _ctrl.clear();
     final reply = _replyTo;
     setState(() => _replyTo = null);
@@ -307,6 +309,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       replyToId: reply?['id'] as String?,
     );
     if (!ok && mounted) {
+      unawaited(Haptics.error());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('chat.messageNotSent'.tr())),
@@ -842,7 +845,10 @@ class _MessageBubble extends ConsumerWidget {
         : content;
 
     return GestureDetector(
-      onLongPress: () => _openActionsSheet(context),
+      onLongPress: () {
+        Haptics.longPress();
+        _openActionsSheet(context);
+      },
       child: Align(
         alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
@@ -1893,6 +1899,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
     final ok = await VoiceRecorderService.start();
     if (!ok) {
       if (!mounted) return;
+      unawaited(Haptics.error());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
@@ -1902,6 +1909,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
       ));
       return;
     }
+    Haptics.tap();
     setState(() {
       _recording = true;
       _startedAt = DateTime.now();
@@ -1934,6 +1942,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
     if (!mounted) return;
     setState(() => _uploading = false);
     if (url == null) {
+      unawaited(Haptics.error());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
@@ -1944,6 +1953,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
       ));
       return;
     }
+    unawaited(Haptics.success());
     await widget.onUploaded(url, result.durationSeconds);
   }
 

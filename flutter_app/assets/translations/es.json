@@ -546,7 +546,9 @@
     "reportButton": "Reportar crisis",
     "voiceHint": "Toca el micro — habla libremente, lo escribiremos.",
     "emergencyQuickAccess": "Abrir números de emergencia",
-    "ctaPrimary": "Acceso rápido"
+    "ctaPrimary": "Acceso rápido",
+    "localCountryLabel": "Números de emergencia para {country}",
+    "switchLanguageHint": "Cambia el idioma en ajustes para ver otros países"
   },
   "posts": {
     "title": "Publicaciones",
@@ -823,7 +825,8 @@
     "portalsDisclaimer": "Los enlaces abren la plataforma en el navegador. Mensaena no actúa como intermediario.",
     "officialBadge": "OFICIAL",
     "openSearch": "Buscar empleo",
-    "openPortal": "Abrir portal"
+    "openPortal": "Abrir portal",
+    "noneInCountry": "No hay portales de empleo para tu país."
   },
   "civil": {
     "navTitle": "Avisos",

@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -160,10 +161,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 onRefresh: () async =>
                     ref.invalidate(upcomingEventsProvider),
                 child: async.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(
-                        color: AppColors.amber),
-                  ),
+                  loading: () => const ListSkeleton(count: 4),
                   error: (e, _) => Center(
                       child: Text('$e', style: AppTypography.caption())),
                   data: (all) {

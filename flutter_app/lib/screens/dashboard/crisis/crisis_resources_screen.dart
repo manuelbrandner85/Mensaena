@@ -14,45 +14,20 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 /// SKILL: mensaena-features
 /// Notruf-Nummern + Resourcen-Page (emergency_numbers tabelle).
 ///
-/// Auto-Locale: bestimmt aus context.locale primaeres Land (de=DE, en=GB,
-/// it=IT, es=ES, fr=FR, tr=TR, ru=RU). Country-Override via Chip-Row
-/// fuer User die ein anderes Land sehen wollen (z.B. Reisende).
-class CrisisResourcesScreen extends ConsumerStatefulWidget {
+/// Zeigt ausschliesslich die Nummern fuer das durch User-Sprache
+/// abgeleitete Land. Wer reist oder ein anderes Land braucht, wechselt
+/// die App-Sprache in Settings. Kein manueller Country-Picker mehr
+/// (User-Feedback: "nur das eigene Land soll sichtbar sein").
+class CrisisResourcesScreen extends ConsumerWidget {
   const CrisisResourcesScreen({super.key});
 
-  @override
-  ConsumerState<CrisisResourcesScreen> createState() =>
-      _CrisisResourcesScreenState();
-}
+  static const _flagByCountry = {
+    'DE': '🇩🇪', 'AT': '🇦🇹', 'CH': '🇨🇭', 'IT': '🇮🇹', 'ES': '🇪🇸',
+    'FR': '🇫🇷', 'TR': '🇹🇷', 'RU': '🇷🇺', 'GB': '🇬🇧', 'US': '🇺🇸',
+    'IE': '🇮🇪',
+  };
 
-class _CrisisResourcesScreenState
-    extends ConsumerState<CrisisResourcesScreen> {
-  // Alle Länder mit Daten in emergency_numbers (siehe Migration
-  // emergency_numbers_expand_country_category).
-  static const _allCountries = <_CountryOption>[
-    _CountryOption('DE', '🇩🇪', 'Deutschland'),
-    _CountryOption('AT', '🇦🇹', 'Österreich'),
-    _CountryOption('CH', '🇨🇭', 'Schweiz'),
-    _CountryOption('IT', '🇮🇹', 'Italia'),
-    _CountryOption('ES', '🇪🇸', 'España'),
-    _CountryOption('FR', '🇫🇷', 'France'),
-    _CountryOption('TR', '🇹🇷', 'Türkiye'),
-    _CountryOption('RU', '🇷🇺', 'Россия'),
-    _CountryOption('GB', '🇬🇧', 'United Kingdom'),
-    _CountryOption('US', '🇺🇸', 'United States'),
-    _CountryOption('IE', '🇮🇪', 'Ireland'),
-  ];
-
-  String? _override;
-
-  String _countryFor(BuildContext context) {
-    if (_override != null) return _override!;
-    final auto = LocaleCountryService.forContext(context);
-    if (_allCountries.any((o) => o.code == auto)) return auto;
-    return 'DE';
-  }
-
-  static const _categoryLabels = {
+  static const _categoryEmoji = {
     'emergency': '🚨',
     'crisis': '💬',
     'children': '👶',
@@ -64,19 +39,55 @@ class _CrisisResourcesScreenState
   };
 
   @override
-  Widget build(BuildContext context) {
-    final country = _countryFor(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final country = LocaleCountryService.forContext(context);
     final async = ref.watch(emergencyNumbersProvider(country));
+    final flag = _flagByCountry[country] ?? '🌍';
+
     return DashboardScaffold(
       title: 'crisis.resourcesTitle'.tr(),
       currentRoute: '/dashboard/crisis',
       body: SafeArea(
         child: Column(
           children: [
-            _CountryChipBar(
-              options: _allCountries,
-              selected: country,
-              onTap: (c) => setState(() => _override = c),
+            // Country-Indicator-Banner (zeigt automatisch erkanntes Land)
+            Container(
+              margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.surface.withValues(alpha: 0.6),
+                border:
+                    Border.all(color: AppColors.line.withValues(alpha: 0.6)),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Text(flag, style: const TextStyle(fontSize: 22)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'crisis.localCountryLabel'
+                              .tr(namedArgs: {'country': country}),
+                          style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.ink,
+                            weight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'crisis.switchLanguageHint'.tr(),
+                          style: AppTypography.label(
+                              size: 9, color: AppColors.mute),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: async.when(
@@ -85,15 +96,20 @@ class _CrisisResourcesScreenState
                 ),
                 error: (e, _) => Center(
                   child: Text(
-                      'crisis.resourceError'.tr(namedArgs: {'error': '$e'}),
-                      style: AppTypography.caption()),
+                    'crisis.resourceError'.tr(namedArgs: {'error': '$e'}),
+                    style: AppTypography.caption(),
+                  ),
                 ),
                 data: (list) {
                   if (list.isEmpty) {
                     return Center(
-                      child: Text(
-                        'crisis.noResources'.tr(),
-                        style: AppTypography.caption(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          'crisis.noResources'.tr(),
+                          style: AppTypography.caption(),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     );
                   }
@@ -102,13 +118,14 @@ class _CrisisResourcesScreenState
                     groups.putIfAbsent(n.category, () => []).add(n);
                   }
                   return ListView(
-                    padding: const EdgeInsets.all(16),
+                    padding:
+                        const EdgeInsets.fromLTRB(16, 4, 16, 24),
                     children: [
                       for (final entry in groups.entries) ...[
                         Row(
                           children: [
                             Text(
-                              _categoryLabels[entry.key] ?? '📞',
+                              _categoryEmoji[entry.key] ?? '📞',
                               style: const TextStyle(fontSize: 16),
                             ),
                             const SizedBox(width: 6),
@@ -129,74 +146,6 @@ class _CrisisResourcesScreenState
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CountryOption {
-  const _CountryOption(this.code, this.flag, this.label);
-  final String code;
-  final String flag;
-  final String label;
-}
-
-class _CountryChipBar extends StatelessWidget {
-  const _CountryChipBar({
-    required this.options,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final List<_CountryOption> options;
-  final String selected;
-  final ValueChanged<String> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 44,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        itemCount: options.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 6),
-        itemBuilder: (context, i) {
-          final o = options[i];
-          final active = o.code == selected;
-          return GestureDetector(
-            onTap: () => onTap(o.code),
-            child: Container(
-              alignment: Alignment.center,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: active
-                    ? AppColors.herzrot.withValues(alpha: 0.20)
-                    : AppColors.surface.withValues(alpha: 0.5),
-                border: Border.all(
-                  color: active ? AppColors.herzrot : AppColors.line,
-                  width: active ? 1.5 : 1,
-                ),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(o.flag, style: const TextStyle(fontSize: 14)),
-                  const SizedBox(width: 6),
-                  Text(
-                    o.label,
-                    style: AppTypography.label(
-                      size: 10,
-                      color: active ? AppColors.herzrot : AppColors.inkSoft,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }

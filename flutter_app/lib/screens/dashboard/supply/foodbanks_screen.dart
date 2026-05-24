@@ -28,6 +28,7 @@ class _FoodbanksScreenState extends ConsumerState<FoodbanksScreen> {
   @override
   void initState() {
     super.initState();
+    // Lazy: laedt das ganze JSON, gefiltert wird im build().
     _future = FoodbanksService.all();
   }
 
@@ -50,8 +51,8 @@ class _FoodbanksScreenState extends ConsumerState<FoodbanksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final highlight = _countryFor(context);
-    final countryLabel = _countryNames[highlight] ?? highlight;
+    final country = _countryFor(context);
+    final countryLabel = _countryNames[country] ?? country;
     return DashboardScaffold(
       title: 'foodbanks.title'.tr(),
       currentRoute: '/dashboard/supply',
@@ -69,16 +70,29 @@ class _FoodbanksScreenState extends ConsumerState<FoodbanksScreen> {
                 child: Text('${snap.error}', style: AppTypography.caption()),
               );
             }
-            final all = snap.data ?? const <Foodbank>[];
-            // Gruppieren nach country, Highlight-Land zuerst.
-            final groups = <String, List<Foodbank>>{};
-            for (final fb in all) {
-              groups.putIfAbsent(fb.country, () => []).add(fb);
+            // Nur Foodbanks im User-Land zeigen (User-Vorgabe: nur eigenes Land).
+            final list = (snap.data ?? const <Foodbank>[])
+                .where((f) => f.country == country)
+                .toList(growable: false);
+            if (list.isEmpty) {
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                children: [
+                  EditorialModuleHeader(
+                    metaIndex: '§ 13',
+                    metaCategory: 'foodbanks.title'.tr(),
+                    title: 'foodbanks.title'.tr(),
+                    subtitle: 'foodbanks.subtitle'
+                        .tr(namedArgs: {'country': countryLabel}),
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Text('foodbanks.noneInCountry'.tr(),
+                        style: AppTypography.caption()),
+                  ),
+                ],
+              );
             }
-            final orderedKeys = <String>[
-              if (groups.containsKey(highlight)) highlight,
-              ...groups.keys.where((k) => k != highlight),
-            ];
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
@@ -89,79 +103,20 @@ class _FoodbanksScreenState extends ConsumerState<FoodbanksScreen> {
                   subtitle: 'foodbanks.subtitle'
                       .tr(namedArgs: {'country': countryLabel}),
                 ),
-                const SizedBox(height: 12),
-                for (final code in orderedKeys) ...[
-                  _CountryHeader(
-                    code: code,
-                    label: _countryNames[code] ?? code,
-                    isHighlighted: code == highlight,
-                  ),
-                  const SizedBox(height: 8),
-                  for (final fb in groups[code]!)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _FoodbankCard(
-                        foodbank: fb,
-                        isHighlighted: code == highlight,
-                      ),
+                const SizedBox(height: 16),
+                for (final fb in list)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _FoodbankCard(
+                      foodbank: fb,
+                      isHighlighted: true,
                     ),
-                  const SizedBox(height: 8),
-                ],
+                  ),
               ],
             );
           },
         ),
       ),
-    );
-  }
-}
-
-class _CountryHeader extends StatelessWidget {
-  const _CountryHeader({
-    required this.code,
-    required this.label,
-    required this.isHighlighted,
-  });
-
-  final String code;
-  final String label;
-  final bool isHighlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: isHighlighted
-                ? AppColors.amber.withValues(alpha: 0.2)
-                : AppColors.elevated,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: isHighlighted
-                  ? AppColors.amber.withValues(alpha: 0.5)
-                  : AppColors.line,
-            ),
-          ),
-          child: Text(
-            code,
-            style: AppTypography.label(
-              size: 10,
-              color: isHighlighted ? AppColors.amberSoft : AppColors.inkSoft,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: AppTypography.body(
-            size: 14,
-            color: AppColors.ink,
-            weight: FontWeight.w600,
-          ),
-        ),
-      ],
     );
   }
 }
