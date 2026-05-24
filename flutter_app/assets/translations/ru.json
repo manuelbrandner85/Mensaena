@@ -35,7 +35,8 @@
     "given": "Данные",
     "feedbackThanks": "Отзыв отправлен — спасибо!",
     "phone": "Телефон",
-    "description": "Описание"
+    "description": "Описание",
+    "share": "Поделиться"
   },
   "nav": {
     "home": "Главная",
@@ -669,6 +670,9 @@
     "etaMinutes": "Время прибытия (мин.)",
     "helpersActive": "Помощников активно: {count}",
     "helpersNeeded": "· нужно: {count}",
+    "share": "Поделиться",
+    "shareBody": "Нужна помощь: {title}\n\nРаспространи призыв на Mensaena: {url}",
+    "shareSubject": "Кризис на Mensaena: {title}",
     "noUpdatesYet": "Обновлений пока нет.",
     "youAreRegistered": "Ты записан — автор запроса видит тебя в реальном времени.",
     "couldNotRegister": "Не удалось записать помощь.",
@@ -895,7 +899,9 @@
     "categoryLabel": "Категория",
     "eventsInMonth": "События за месяц",
     "searchPlaceholder": "Поиск событий…",
-    "screenTitle": "События"
+    "screenTitle": "События",
+    "shareBody": "{title}\n\nНа Mensaena: {url}",
+    "shareSubject": "Событие Mensaena: {title}"
   },
   "challenges": {
     "create": "Создать челлендж",
@@ -964,7 +970,9 @@
     "create": "Создать группу",
     "categoryLabel": "Категория",
     "searchPlaceholder": "Поиск групп…",
-    "screenTitle": "Группы"
+    "screenTitle": "Группы",
+    "shareBody": "Присоединяйся к группе {title} на Mensaena: {url}",
+    "shareSubject": "Группа Mensaena: {title}"
   },
   "board": {
     "title": "Заметка",

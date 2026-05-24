@@ -35,7 +35,8 @@
     "given": "Verilen",
     "feedbackThanks": "Geri bildirim gönderildi — teşekkürler!",
     "phone": "Telefon",
-    "description": "Açıklama"
+    "description": "Açıklama",
+    "share": "Paylaş"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -669,6 +670,9 @@
     "etaMinutes": "Tahmini süre (dakika)",
     "helpersActive": "{count} yardımcı aktif",
     "helpersNeeded": "· gereken: {count}",
+    "share": "Paylaş",
+    "shareBody": "Yardım gerekli: {title}\n\nÇağrıyı Mensaena'da yay: {url}",
+    "shareSubject": "Mensaena krizi: {title}",
     "noUpdatesYet": "Henüz güncelleme yok.",
     "youAreRegistered": "Kaydoldun — talebi açan kişi seni canlı görüyor.",
     "couldNotRegister": "Yardım kaydedilemedi.",
@@ -895,7 +899,9 @@
     "categoryLabel": "Kategori",
     "eventsInMonth": "Bu ayki etkinlikler",
     "searchPlaceholder": "Etkinlik ara…",
-    "screenTitle": "Etkinlikler"
+    "screenTitle": "Etkinlikler",
+    "shareBody": "{title}\n\nMensaena'da: {url}",
+    "shareSubject": "Mensaena etkinliği: {title}"
   },
   "challenges": {
     "create": "Meydan okuma oluştur",
@@ -964,7 +970,9 @@
     "create": "Grup oluştur",
     "categoryLabel": "Kategori",
     "searchPlaceholder": "Grupları ara…",
-    "screenTitle": "Gruplar"
+    "screenTitle": "Gruplar",
+    "shareBody": "Mensaena'daki {title} grubuna katıl: {url}",
+    "shareSubject": "Mensaena grubu: {title}"
   },
   "board": {
     "title": "Not",

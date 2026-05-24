@@ -35,7 +35,8 @@
     "given": "Dadas",
     "feedbackThanks": "¡Comentarios enviados — gracias!",
     "phone": "Teléfono",
-    "description": "Descripción"
+    "description": "Descripción",
+    "share": "Compartir"
   },
   "nav": {
     "home": "Inicio",
@@ -669,6 +670,9 @@
     "etaMinutes": "Tiempo estimado en minutos",
     "helpersActive": "{count} ayudantes activos",
     "helpersNeeded": "· se necesitan: {count}",
+    "share": "Compartir",
+    "shareBody": "Se necesita ayuda: {title}\n\nDifunde la llamada en Mensaena: {url}",
+    "shareSubject": "Crisis en Mensaena: {title}",
     "noUpdatesYet": "Aún no hay actualizaciones.",
     "youAreRegistered": "Estás registrado — quien creó la solicitud te ve en directo.",
     "couldNotRegister": "No se pudo registrar la ayuda.",
@@ -895,7 +899,9 @@
     "categoryLabel": "Categoría",
     "eventsInMonth": "Eventos en el mes",
     "searchPlaceholder": "Buscar eventos…",
-    "screenTitle": "Eventos"
+    "screenTitle": "Eventos",
+    "shareBody": "{title}\n\nEn Mensaena: {url}",
+    "shareSubject": "Evento en Mensaena: {title}"
   },
   "challenges": {
     "create": "Crear reto",
@@ -964,7 +970,9 @@
     "create": "Crear grupo",
     "categoryLabel": "Categoría",
     "searchPlaceholder": "Buscar grupos…",
-    "screenTitle": "Grupos"
+    "screenTitle": "Grupos",
+    "shareBody": "Únete al grupo {title} en Mensaena: {url}",
+    "shareSubject": "Grupo en Mensaena: {title}"
   },
   "board": {
     "title": "Nota",

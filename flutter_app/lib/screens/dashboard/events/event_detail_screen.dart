@@ -262,8 +262,19 @@ class EventDetailScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     OutlinedButton.icon(
                       onPressed: () => _exportToCalendar(context, e),
-                      icon: const Icon(LucideIcons.share2, size: 14),
+                      icon: const Icon(LucideIcons.calendar, size: 14),
                       label: const Text('.ics'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.bronze,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _shareEvent(e),
+                      icon: const Icon(LucideIcons.share2, size: 14),
+                      label: Text('common.share'.tr()),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.bronze,
                         padding: const EdgeInsets.symmetric(
@@ -385,6 +396,19 @@ class EventDetailScreen extends ConsumerWidget {
                 size: 13, color: AppColors.ink)),
       ));
     }
+  }
+
+  /// Deep-Link Share auf www.mensaena.de/dashboard/events/{id}.
+  Future<void> _shareEvent(EventItem e) async {
+    final url = 'https://www.mensaena.de/dashboard/events/${e.id}';
+    await Share.share(
+      'events.shareBody'.tr(namedArgs: {
+        'title': e.title,
+        'url': url,
+      }),
+      subject:
+          'events.shareSubject'.tr(namedArgs: {'title': e.title}),
+    );
   }
 }
 

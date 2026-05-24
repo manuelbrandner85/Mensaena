@@ -35,7 +35,8 @@
     "given": "Given",
     "feedbackThanks": "Feedback sent — thanks!",
     "phone": "Phone",
-    "description": "Description"
+    "description": "Description",
+    "share": "Share"
   },
   "nav": {
     "home": "Home",
@@ -669,6 +670,9 @@
     "etaMinutes": "ETA in minutes",
     "helpersActive": "{count} helpers active",
     "helpersNeeded": "· needed: {count}",
+    "share": "Share",
+    "shareBody": "Help needed: {title}\n\nSpread the call on Mensaena: {url}",
+    "shareSubject": "Mensaena crisis: {title}",
     "noUpdatesYet": "No updates yet.",
     "youAreRegistered": "You're registered — the creator can see you live.",
     "couldNotRegister": "Could not register help.",
@@ -895,7 +899,9 @@
     "categoryLabel": "Category",
     "eventsInMonth": "Events this month",
     "searchPlaceholder": "Search events…",
-    "screenTitle": "Events"
+    "screenTitle": "Events",
+    "shareBody": "{title}\n\nOn Mensaena: {url}",
+    "shareSubject": "Mensaena event: {title}"
   },
   "challenges": {
     "create": "Create challenge",
@@ -964,7 +970,9 @@
     "create": "Create group",
     "categoryLabel": "Category",
     "searchPlaceholder": "Search groups…",
-    "screenTitle": "Groups"
+    "screenTitle": "Groups",
+    "shareBody": "Join the group {title} on Mensaena: {url}",
+    "shareSubject": "Mensaena group: {title}"
   },
   "board": {
     "title": "Note",

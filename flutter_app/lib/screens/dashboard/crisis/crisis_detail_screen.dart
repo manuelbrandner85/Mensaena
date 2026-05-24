@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -56,6 +57,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                   crisis: c,
                   helpers: helpers.asData?.value ?? const [],
                   onOffer: () => _offerHelp(context, ref, c),
+                  onShare: () => _shareCrisis(c),
                 ),
                 const SizedBox(height: 18),
                 Row(
@@ -208,6 +210,17 @@ class CrisisDetailScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// Deep-Link Share auf www.mensaena.de/dashboard/crisis/{id}.
+  /// Verbreitet den Notruf an die Nachbarschaft (WhatsApp, Signal, ...).
+  Future<void> _shareCrisis(Crisis c) async {
+    final url = 'https://www.mensaena.de/dashboard/crisis/${c.id}';
+    await Share.share(
+      'crisis.shareBody'.tr(namedArgs: {'title': c.title, 'url': url}),
+      subject:
+          'crisis.shareSubject'.tr(namedArgs: {'title': c.title}),
     );
   }
 
@@ -446,11 +459,13 @@ class _HelperBlock extends StatelessWidget {
     required this.crisis,
     required this.helpers,
     required this.onOffer,
+    required this.onShare,
   });
 
   final Crisis crisis;
   final List<CrisisHelper> helpers;
   final VoidCallback onOffer;
+  final VoidCallback onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -490,17 +505,31 @@ class _HelperBlock extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.leben,
-                foregroundColor: AppColors.voidColor,
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.leben,
+                    foregroundColor: AppColors.voidColor,
+                  ),
+                  onPressed: onOffer,
+                  icon: const Icon(LucideIcons.heart, size: 16),
+                  label: Text('crisis.iHelp'.tr()),
+                ),
               ),
-              onPressed: onOffer,
-              icon: const Icon(LucideIcons.heart, size: 16),
-              label: Text('crisis.iHelp'.tr()),
-            ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: onShare,
+                icon: const Icon(LucideIcons.share2, size: 14),
+                label: Text('crisis.share'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.leben,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 12),
+                ),
+              ),
+            ],
           ),
         ],
       ),

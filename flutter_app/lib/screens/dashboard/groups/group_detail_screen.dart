@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -153,6 +154,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                               ],
                             ),
                           ),
+                          IconButton(
+                            onPressed: () => _shareGroup(g.id, g.name),
+                            tooltip: 'common.share'.tr(),
+                            icon: const Icon(LucideIcons.share2,
+                                size: 18, color: AppColors.amber),
+                          ),
                           if (isMember.asData?.value == true) ...[
                             IconButton(
                               onPressed: () => _openInviteDialog(context, g.id),
@@ -290,6 +297,15 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           },
         ),
       ),
+    );
+  }
+
+  /// Deep-Link Share auf www.mensaena.de/dashboard/groups/{id}.
+  Future<void> _shareGroup(String id, String name) async {
+    final url = 'https://www.mensaena.de/dashboard/groups/$id';
+    await Share.share(
+      'groups.shareBody'.tr(namedArgs: {'title': name, 'url': url}),
+      subject: 'groups.shareSubject'.tr(namedArgs: {'title': name}),
     );
   }
 
