@@ -59,8 +59,7 @@ class ModuleCreateConfigs {
   static const animals = ModuleCreateConfig(
     moduleKey: 'animals',
     title: 'create.newAnimalPost',
-    description:
-        'Suche oder biete Tierhilfe, Pflegestelle oder Fundtier-Meldung.',
+    description: 'create.descriptions.animals',
     icon: LucideIcons.dog,
     accentColor: Color(0xFFEC4899),
     createTypes: [
@@ -85,7 +84,7 @@ class ModuleCreateConfigs {
   static const housing = ModuleCreateConfig(
     moduleKey: 'housing',
     title: 'create.newHousingPost',
-    description: 'Biete Wohnraum an oder suche Unterstützung.',
+    description: 'create.descriptions.housing',
     icon: LucideIcons.home,
     accentColor: Color(0xFF60A5FA),
     createTypes: [
@@ -103,7 +102,7 @@ class ModuleCreateConfigs {
   static const mobility = ModuleCreateConfig(
     moduleKey: 'mobility',
     title: 'create.newMobilityPost',
-    description: 'Biete Mitfahrt, Transport oder suche eine Fahrgemeinschaft.',
+    description: 'create.descriptions.mobility',
     icon: LucideIcons.car,
     accentColor: Color(0xFF818CF8),
     createTypes: [
@@ -122,7 +121,7 @@ class ModuleCreateConfigs {
   static const sharing = ModuleCreateConfig(
     moduleKey: 'sharing',
     title: 'create.newSharingPost',
-    description: 'Werkzeug, Bücher, Geräte verleihen oder ausleihen.',
+    description: 'create.descriptions.sharing',
     icon: LucideIcons.repeat,
     accentColor: AppColors.teal,
     createTypes: [
@@ -143,7 +142,7 @@ class ModuleCreateConfigs {
   static const harvest = ModuleCreateConfig(
     moduleKey: 'harvest',
     title: 'create.newHarvestPost',
-    description: 'Teile Ernte, suche Erntehelfer oder biete Lebensmittel an.',
+    description: 'create.descriptions.harvest',
     icon: LucideIcons.wheat,
     accentColor: AppColors.leben,
     createTypes: [
@@ -168,7 +167,7 @@ class ModuleCreateConfigs {
   static const community = ModuleCreateConfig(
     moduleKey: 'community',
     title: 'create.newCommunityPost',
-    description: 'Starte eine Diskussion, teile eine Idee oder stelle eine Frage.',
+    description: 'create.descriptions.community',
     icon: LucideIcons.users,
     accentColor: Color(0xFFC084FC),
     createTypes: [
@@ -185,7 +184,7 @@ class ModuleCreateConfigs {
   static const knowledge = ModuleCreateConfig(
     moduleKey: 'knowledge',
     title: 'create.newKnowledgePost',
-    description: 'Teile Wissen, erstelle Anleitungen oder biete Kurse an.',
+    description: 'create.descriptions.knowledge',
     icon: LucideIcons.bookOpen,
     accentColor: Color(0xFF6366F1),
     createTypes: [
@@ -209,7 +208,7 @@ class ModuleCreateConfigs {
   static const skills = ModuleCreateConfig(
     moduleKey: 'skills',
     title: 'create.newSkillPost',
-    description: 'Teile deine Fähigkeiten, suche Mentoren oder biete Workshops an.',
+    description: 'create.descriptions.skills',
     icon: LucideIcons.wrench,
     accentColor: AppColors.bronze,
     createTypes: [
@@ -231,8 +230,7 @@ class ModuleCreateConfigs {
   static const jobs = ModuleCreateConfig(
     moduleKey: 'jobs',
     title: 'create.newJobPost',
-    description:
-        'Biete einen Mini-Job, suche Tätigkeit oder organisiere ehrenamtliche Arbeit.',
+    description: 'create.descriptions.jobs',
     icon: LucideIcons.briefcase,
     accentColor: Color(0xFFA78BFA),
     createTypes: [
@@ -253,7 +251,7 @@ class ModuleCreateConfigs {
   static const rescuer = ModuleCreateConfig(
     moduleKey: 'rescuer',
     title: 'create.newRescuerPost',
-    description: 'Rette Lebensmittel, Kleidung oder Gegenstände vor dem Wegwerfen.',
+    description: 'create.descriptions.rescuer',
     icon: LucideIcons.lifeBuoy,
     accentColor: Color(0xFFFB923C),
     createTypes: [

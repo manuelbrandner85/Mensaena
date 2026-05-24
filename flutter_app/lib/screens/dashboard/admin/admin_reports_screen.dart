@@ -152,7 +152,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                           EmptyStateCard(
                             icon: LucideIcons.flag,
                             title: 'admin.noReports'.tr(),
-                            description: 'Andere Filter probieren.',
+                            description: 'admin.tryOtherFilters'.tr(),
                           ),
                         ],
                       );

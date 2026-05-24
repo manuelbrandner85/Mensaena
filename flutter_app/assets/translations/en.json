@@ -529,7 +529,8 @@
       "botScheduled": "Bot scheduled",
       "auditLog": "Audit log",
       "system": "System"
-    }
+    },
+    "tryOtherFilters": "Try different filters."
   },
   "create": {
     "locationUnavailable": "Location unavailable.",
@@ -633,7 +634,19 @@
     "newRescuerPost": "New rescue post",
     "scanFood": "Scan food",
     "marketplaceTitle": "Listing",
-    "farmCreateTitle": "Register farm"
+    "farmCreateTitle": "Register farm",
+    "descriptions": {
+      "animals": "Seek or offer animal help, foster care or found-animal report.",
+      "housing": "Offer housing or look for support.",
+      "mobility": "Offer a ride, transport, or look for a carpool.",
+      "sharing": "Lend or borrow tools, books, devices.",
+      "harvest": "Share harvest, find pickers, or offer food.",
+      "community": "Start a discussion, share an idea or ask a question.",
+      "knowledge": "Share knowledge, write guides or offer courses.",
+      "skills": "Share your skills, find mentors or offer workshops.",
+      "jobs": "Offer a mini-job, look for work or organise volunteer activity.",
+      "rescuer": "Rescue food, clothing or items from being thrown away."
+    }
   },
   "crisis": {
     "error": "Error: {error}",
@@ -1192,6 +1205,28 @@
       "successStory": "Success story",
       "botTip": "MensaenaBot tip",
       "nearYou": "Near you"
+    },
+    "descriptions": {
+      "greeting": "Personalised hero with time-of-day mood",
+      "safetyAlerts": "NINA + food recalls",
+      "startup": "Onboarding checklist for new neighbours",
+      "quickActions": "3 most important module shortcuts",
+      "stats": "Nearby, unread, active",
+      "smartMatch": "Top 3 AI suggestions",
+      "trust": "Trust score with level indicator",
+      "thanksReceived": "Latest trust ratings with stars",
+      "communityPulse": "24h activity in the neighbourhood",
+      "activity": "Live updates of your own interactions",
+      "map": "Mini-map with nearby posts",
+      "weekOverview": "Posts, help, messages over last 7 days",
+      "unreadMessages": "Chats with unread messages",
+      "weekChallenge": "Weekly prompts to join in",
+      "ratingReminder": "Pending ratings for completed help",
+      "weather": "Current weather + tip for the neighbourhood",
+      "holiday": "Notice of the next public holiday",
+      "successStory": "Inspiration from the community",
+      "botTip": "Daily neighbourhood prompt",
+      "nearYou": "Local posts nearby"
     }
   },
   "hubs": {
@@ -1265,5 +1300,15 @@
     "organization": "Organisation",
     "farm": "Farm",
     "mentalSupport": "Mental support"
+  },
+  "push": {
+    "channels": {
+      "crisisDesc": "Crisis warnings near you",
+      "messagesDesc": "Direct and community messages",
+      "activityDesc": "Reactions, comments, events, marketplace",
+      "generalDesc": "Badges, updates and notices",
+      "callsDesc": "High-priority push for incoming DM calls",
+      "fallbackDesc": "Messages, matches and general notifications"
+    }
   }
 }

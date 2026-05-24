@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
@@ -28,14 +29,16 @@ class PushNotificationService {
 
   static const _channelId = 'mensaena_default';
   static const _channelName = 'Mensaena Benachrichtigungen';
-  static const _channelDescription =
+  // Channel-Beschreibungen werden zur Laufzeit übersetzt
+  // (siehe init()), Default als Fallback wenn .tr() noch nicht verfügbar.
+  static const _channelDescriptionFallback =
       'Nachrichten, Matches und allgemeine Benachrichtigungen';
 
   // Separate high-priority channel for incoming calls — fullScreenIntent +
   // long vibration pattern, Importance.max so it always rings through.
   static const _callsChannelId = 'mensaena_calls';
   static const _callsChannelName = 'Eingehende Anrufe';
-  static const _callsChannelDescription =
+  static const _callsChannelDescriptionFallback =
       'Hochprioritaere Push fuer eingehende DM-Anrufe';
 
   static final _localNotifications =
@@ -84,38 +87,50 @@ class PushNotificationService {
       //   _chat    — DM/Channel-Nachrichten (HIGH + Sound)
       //   _social  — Reaktionen/Kommentare/Events/Marketplace (DEFAULT)
       //   _system  — Badges/Updates/Achievements (LOW + ohne Sound)
-      const androidChannel = AndroidNotificationChannel(
-        _channelId, _channelName, description: _channelDescription,
+      // Beschreibungen via tr() — Fallback wenn EasyLocalization noch nicht
+      // bereit ist (z.B. in Background-Isolate).
+      String trOr(String key, String fallback) {
+        try {
+          final translated = tr(key);
+          // tr() returns the key if not found
+          return translated == key ? fallback : translated;
+        } catch (_) {
+          return fallback;
+        }
+      }
+      final androidChannel = AndroidNotificationChannel(
+        _channelId, _channelName,
+        description: trOr('push.channels.fallbackDesc', _channelDescriptionFallback),
         importance: Importance.high, playSound: true, enableVibration: true,
       );
       final callsChannel = AndroidNotificationChannel(
         _callsChannelId, _callsChannelName,
-        description: _callsChannelDescription,
+        description: trOr('push.channels.callsDesc', _callsChannelDescriptionFallback),
         importance: Importance.max, playSound: true, enableVibration: true,
         vibrationPattern:
             Int64List.fromList(<int>[0, 1000, 500, 1000, 500, 1000]),
       );
       final crisisChannel = AndroidNotificationChannel(
         'mensaena_crisis', 'Notfälle & Krisen',
-        description: 'Krisen-Warnungen in deiner Nähe',
+        description: trOr('push.channels.crisisDesc', 'Krisen-Warnungen in deiner Nähe'),
         importance: Importance.max, playSound: true, enableVibration: true,
         vibrationPattern:
             Int64List.fromList(<int>[0, 800, 200, 800, 200, 800]),
       );
-      const chatChannel = AndroidNotificationChannel(
+      final chatChannel = AndroidNotificationChannel(
         'mensaena_chat', 'Nachrichten',
-        description: 'Direkt- und Community-Nachrichten',
+        description: trOr('push.channels.messagesDesc', 'Direkt- und Community-Nachrichten'),
         importance: Importance.high, playSound: true, enableVibration: true,
       );
-      const socialChannel = AndroidNotificationChannel(
+      final socialChannel = AndroidNotificationChannel(
         'mensaena_social', 'Community-Aktivität',
-        description: 'Reaktionen, Kommentare, Events, Marktplatz',
+        description: trOr('push.channels.activityDesc', 'Reaktionen, Kommentare, Events, Marktplatz'),
         importance: Importance.defaultImportance,
         playSound: true, enableVibration: true,
       );
-      const systemChannel = AndroidNotificationChannel(
+      final systemChannel = AndroidNotificationChannel(
         'mensaena_system', 'System & Achievements',
-        description: 'Badges, Updates und Hinweise',
+        description: trOr('push.channels.generalDesc', 'Badges, Updates und Hinweise'),
         importance: Importance.low, playSound: false, enableVibration: false,
       );
       final androidPlugin = _localNotifications

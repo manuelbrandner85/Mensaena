@@ -529,7 +529,8 @@
       "botScheduled": "Bot planifié",
       "auditLog": "Journal d'audit",
       "system": "Système"
-    }
+    },
+    "tryOtherFilters": "Essaie d'autres filtres."
   },
   "create": {
     "locationUnavailable": "Position non disponible.",
@@ -633,7 +634,19 @@
     "newRescuerPost": "Nouveau message sauvetage",
     "scanFood": "Scanner un aliment",
     "marketplaceTitle": "Annonce",
-    "farmCreateTitle": "Enregistrer une ferme"
+    "farmCreateTitle": "Enregistrer une ferme",
+    "descriptions": {
+      "animals": "Cherche ou propose aide animale, famille d'accueil ou signalement.",
+      "housing": "Propose un logement ou cherche du soutien.",
+      "mobility": "Propose un trajet, du transport ou cherche un covoiturage.",
+      "sharing": "Prêter ou emprunter outils, livres, appareils.",
+      "harvest": "Partage la récolte, cherche des cueilleurs ou offre des aliments.",
+      "community": "Lance une discussion, partage une idée ou pose une question.",
+      "knowledge": "Partage des connaissances, écris des guides ou propose des cours.",
+      "skills": "Partage tes compétences, trouve des mentors ou propose des ateliers.",
+      "jobs": "Propose un mini-boulot, cherche un travail ou organise du bénévolat.",
+      "rescuer": "Sauve aliments, vêtements ou objets de la poubelle."
+    }
   },
   "crisis": {
     "error": "Erreur : {error}",
@@ -1192,6 +1205,28 @@
       "successStory": "Réussite",
       "botTip": "Astuce MensaenaBot",
       "nearYou": "Près de toi"
+    },
+    "descriptions": {
+      "greeting": "En-tête personnalisé selon l'heure de la journée",
+      "safetyAlerts": "NINA + rappels alimentaires",
+      "startup": "Liste d'accueil pour les nouveaux voisins",
+      "quickActions": "3 raccourcis modules les plus importants",
+      "stats": "À proximité, non lus, actifs",
+      "smartMatch": "Top 3 suggestions IA",
+      "trust": "Trust score avec indicateur de niveau",
+      "thanksReceived": "Dernières évaluations avec étoiles",
+      "communityPulse": "Activité 24h dans le voisinage",
+      "activity": "Mises à jour en direct de tes interactions",
+      "map": "Mini-carte avec messages à proximité",
+      "weekOverview": "Posts, aides, messages des 7 derniers jours",
+      "unreadMessages": "Discussions avec messages non lus",
+      "weekChallenge": "Impulsions hebdomadaires pour participer",
+      "ratingReminder": "Évaluations en attente pour aides terminées",
+      "weather": "Météo actuelle + conseil pour le voisinage",
+      "holiday": "Indication du prochain jour férié",
+      "successStory": "Inspiration de la communauté",
+      "botTip": "Impulsion quotidienne du voisinage",
+      "nearYou": "Messages locaux à proximité"
     }
   },
   "hubs": {
@@ -1265,5 +1300,15 @@
     "organization": "Organisation",
     "farm": "Ferme",
     "mentalSupport": "Soutien mental"
+  },
+  "push": {
+    "channels": {
+      "crisisDesc": "Alertes de crise près de toi",
+      "messagesDesc": "Messages directs et communautaires",
+      "activityDesc": "Réactions, commentaires, événements, marché",
+      "generalDesc": "Badges, mises à jour et avis",
+      "callsDesc": "Push haute priorité pour appels DM entrants",
+      "fallbackDesc": "Messages, matchs et notifications générales"
+    }
   }
 }

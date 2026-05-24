@@ -529,7 +529,8 @@
       "botScheduled": "Bot Scheduled",
       "auditLog": "Audit Log",
       "system": "System"
-    }
+    },
+    "tryOtherFilters": "Andere Filter probieren."
   },
   "create": {
     "locationUnavailable": "Standort nicht verfügbar.",
@@ -633,7 +634,19 @@
     "newRescuerPost": "Neuer Rettungs-Beitrag",
     "scanFood": "Lebensmittel scannen",
     "marketplaceTitle": "Inserat",
-    "farmCreateTitle": "Bauernhof eintragen"
+    "farmCreateTitle": "Bauernhof eintragen",
+    "descriptions": {
+      "animals": "Suche oder biete Tierhilfe, Pflegestelle oder Fundtier-Meldung.",
+      "housing": "Biete Wohnraum an oder suche Unterstützung.",
+      "mobility": "Biete Mitfahrt, Transport oder suche eine Fahrgemeinschaft.",
+      "sharing": "Werkzeug, Bücher, Geräte verleihen oder ausleihen.",
+      "harvest": "Teile Ernte, suche Erntehelfer oder biete Lebensmittel an.",
+      "community": "Starte eine Diskussion, teile eine Idee oder stelle eine Frage.",
+      "knowledge": "Teile Wissen, erstelle Anleitungen oder biete Kurse an.",
+      "skills": "Teile deine Fähigkeiten, suche Mentoren oder biete Workshops an.",
+      "jobs": "Biete einen Mini-Job, suche Tätigkeit oder organisiere ehrenamtliche Arbeit.",
+      "rescuer": "Rette Lebensmittel, Kleidung oder Gegenstände vor dem Wegwerfen."
+    }
   },
   "crisis": {
     "error": "Fehler: {error}",
@@ -1192,6 +1205,28 @@
       "successStory": "Erfolgsgeschichte",
       "botTip": "MensaenaBot-Tipp",
       "nearYou": "In deiner Nähe"
+    },
+    "descriptions": {
+      "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
+      "safetyAlerts": "NINA + Lebensmittel-Rückrufe",
+      "startup": "Onboarding-Checkliste für neue Nachbarn",
+      "quickActions": "3 wichtigste Modul-Shortcuts",
+      "stats": "In-der-Nähe, Ungelesen, Aktiv",
+      "smartMatch": "Top 3 KI-Vorschläge",
+      "trust": "Trust-Score mit Level-Anzeige",
+      "thanksReceived": "Letzte Trust-Ratings mit Sternen",
+      "communityPulse": "24h-Aktivität in der Nachbarschaft",
+      "activity": "Live-Updates der eigenen Interaktionen",
+      "map": "Mini-Karte mit Posts in der Nähe",
+      "weekOverview": "Beiträge, Hilfen, Nachrichten letzte 7 Tage",
+      "unreadMessages": "Chats mit ungelesenen Nachrichten",
+      "weekChallenge": "Wöchentliche Impulse zum Mitmachen",
+      "ratingReminder": "Offene Bewertungen für abgeschlossene Hilfen",
+      "weather": "Aktuelles Wetter + Tipp für die Nachbarschaft",
+      "holiday": "Hinweis auf den nächsten Feiertag",
+      "successStory": "Inspiration aus der Community",
+      "botTip": "Täglicher Nachbarschafts-Impuls",
+      "nearYou": "Lokale Beiträge in Nähe"
     }
   },
   "hubs": {
@@ -1265,5 +1300,15 @@
     "organization": "Organisation",
     "farm": "Hof",
     "mentalSupport": "Mentale Unterstützung"
+  },
+  "push": {
+    "channels": {
+      "crisisDesc": "Krisen-Warnungen in deiner Nähe",
+      "messagesDesc": "Direkt- und Community-Nachrichten",
+      "activityDesc": "Reaktionen, Kommentare, Events, Marktplatz",
+      "generalDesc": "Badges, Updates und Hinweise",
+      "callsDesc": "Hochprioritäre Push für eingehende DM-Anrufe",
+      "fallbackDesc": "Nachrichten, Matches und allgemeine Benachrichtigungen"
+    }
   }
 }

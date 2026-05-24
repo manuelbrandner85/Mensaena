@@ -529,7 +529,8 @@
       "botScheduled": "Bot programado",
       "auditLog": "Registro de auditoría",
       "system": "Sistema"
-    }
+    },
+    "tryOtherFilters": "Prueba otros filtros."
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",
@@ -633,7 +634,19 @@
     "newRescuerPost": "Nueva publicación de rescate",
     "scanFood": "Escanear alimento",
     "marketplaceTitle": "Anuncio",
-    "farmCreateTitle": "Registrar granja"
+    "farmCreateTitle": "Registrar granja",
+    "descriptions": {
+      "animals": "Busca u ofrece ayuda animal, acogida o reporte de animal encontrado.",
+      "housing": "Ofrece vivienda o busca apoyo.",
+      "mobility": "Ofrece viaje, transporte o busca compartir coche.",
+      "sharing": "Prestar o tomar prestado herramientas, libros, dispositivos.",
+      "harvest": "Comparte cosecha, busca recolectores u ofrece alimentos.",
+      "community": "Inicia un debate, comparte una idea o haz una pregunta.",
+      "knowledge": "Comparte conocimiento, escribe guías u ofrece cursos.",
+      "skills": "Comparte tus habilidades, busca mentores u ofrece talleres.",
+      "jobs": "Ofrece un mini-empleo, busca trabajo u organiza voluntariado.",
+      "rescuer": "Rescata alimentos, ropa u objetos antes de tirarlos."
+    }
   },
   "crisis": {
     "error": "Error: {error}",
@@ -1192,6 +1205,28 @@
       "successStory": "Historia de éxito",
       "botTip": "Consejo de MensaenaBot",
       "nearYou": "Cerca de ti"
+    },
+    "descriptions": {
+      "greeting": "Hero personalizado con ambiente según la hora",
+      "safetyAlerts": "NINA + retiradas de alimentos",
+      "startup": "Lista de inicio para nuevos vecinos",
+      "quickActions": "3 atajos de módulos más importantes",
+      "stats": "Cerca, no leídos, activos",
+      "smartMatch": "Top 3 sugerencias de IA",
+      "trust": "Trust score con indicador de nivel",
+      "thanksReceived": "Últimas valoraciones con estrellas",
+      "communityPulse": "Actividad de 24h en el vecindario",
+      "activity": "Actualizaciones en vivo de tus interacciones",
+      "map": "Minimapa con publicaciones cercanas",
+      "weekOverview": "Publicaciones, ayudas, mensajes últimos 7 días",
+      "unreadMessages": "Chats con mensajes no leídos",
+      "weekChallenge": "Impulsos semanales para participar",
+      "ratingReminder": "Valoraciones pendientes para ayudas completadas",
+      "weather": "Tiempo actual + consejo para el vecindario",
+      "holiday": "Aviso del próximo festivo",
+      "successStory": "Inspiración de la comunidad",
+      "botTip": "Impulso diario del vecindario",
+      "nearYou": "Publicaciones locales cercanas"
     }
   },
   "hubs": {
@@ -1265,5 +1300,15 @@
     "organization": "Organización",
     "farm": "Granja",
     "mentalSupport": "Apoyo mental"
+  },
+  "push": {
+    "channels": {
+      "crisisDesc": "Avisos de crisis cerca de ti",
+      "messagesDesc": "Mensajes directos y comunitarios",
+      "activityDesc": "Reacciones, comentarios, eventos, mercado",
+      "generalDesc": "Insignias, actualizaciones y avisos",
+      "callsDesc": "Push de alta prioridad para llamadas DM entrantes",
+      "fallbackDesc": "Mensajes, coincidencias y notificaciones generales"
+    }
   }
 }

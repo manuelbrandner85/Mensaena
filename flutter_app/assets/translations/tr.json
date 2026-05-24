@@ -529,7 +529,8 @@
       "botScheduled": "Bot zamanlanmış",
       "auditLog": "Denetim günlüğü",
       "system": "Sistem"
-    }
+    },
+    "tryOtherFilters": "Farklı filtreler dene."
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",
@@ -633,7 +634,19 @@
     "newRescuerPost": "Yeni kurtarma gönderisi",
     "scanFood": "Gıda tara",
     "marketplaceTitle": "İlan",
-    "farmCreateTitle": "Çiftlik kaydet"
+    "farmCreateTitle": "Çiftlik kaydet",
+    "descriptions": {
+      "animals": "Hayvan yardımı, geçici bakım veya bulunan hayvan ihbarı sun ya da iste.",
+      "housing": "Konut sun ya da destek ara.",
+      "mobility": "Ortak yolculuk, taşıma sun ya da paylaşımlı araç ara.",
+      "sharing": "Alet, kitap, cihaz ödünç ver veya al.",
+      "harvest": "Hasadı paylaş, hasat yardımı ara veya gıda sun.",
+      "community": "Bir tartışma başlat, fikir paylaş veya soru sor.",
+      "knowledge": "Bilgi paylaş, rehber yaz veya kurs sun.",
+      "skills": "Becerilerini paylaş, mentor bul veya atölye sun.",
+      "jobs": "Yarı zamanlı iş sun, iş ara veya gönüllülük organize et.",
+      "rescuer": "Çöpe gitmeden gıda, kıyafet ya da eşyaları kurtar."
+    }
   },
   "crisis": {
     "error": "Hata: {error}",
@@ -1192,6 +1205,28 @@
       "successStory": "Başarı hikayesi",
       "botTip": "MensaenaBot ipucu",
       "nearYou": "Yakınında"
+    },
+    "descriptions": {
+      "greeting": "Günün saatine göre kişiselleştirilmiş karşılama",
+      "safetyAlerts": "NINA + gıda geri çağırma",
+      "startup": "Yeni komşular için başlangıç listesi",
+      "quickActions": "En önemli 3 modül kısayolu",
+      "stats": "Yakında, okunmadı, aktif",
+      "smartMatch": "En iyi 3 AI önerisi",
+      "trust": "Seviye göstergeli güven puanı",
+      "thanksReceived": "Yıldızlı son güven değerlendirmeleri",
+      "communityPulse": "Mahallede 24 saatlik etkinlik",
+      "activity": "Etkileşimlerin canlı güncellemeleri",
+      "map": "Yakındaki gönderilerle mini harita",
+      "weekOverview": "Son 7 günde gönderiler, yardımlar, mesajlar",
+      "unreadMessages": "Okunmamış mesajlı sohbetler",
+      "weekChallenge": "Katılmak için haftalık ilham",
+      "ratingReminder": "Tamamlanan yardımlar için bekleyen değerlendirmeler",
+      "weather": "Güncel hava durumu + mahalle önerisi",
+      "holiday": "Yaklaşan resmi tatil bilgisi",
+      "successStory": "Topluluktan ilham",
+      "botTip": "Günlük komşuluk ilhamı",
+      "nearYou": "Yakındaki yerel gönderiler"
     }
   },
   "hubs": {
@@ -1265,5 +1300,15 @@
     "organization": "Kuruluş",
     "farm": "Çiftlik",
     "mentalSupport": "Ruhsal destek"
+  },
+  "push": {
+    "channels": {
+      "crisisDesc": "Yakınındaki kriz uyarıları",
+      "messagesDesc": "Doğrudan ve topluluk mesajları",
+      "activityDesc": "Tepkiler, yorumlar, etkinlikler, pazaryeri",
+      "generalDesc": "Rozetler, güncellemeler ve bildirimler",
+      "callsDesc": "Gelen DM çağrıları için yüksek öncelikli push",
+      "fallbackDesc": "Mesajlar, eşleşmeler ve genel bildirimler"
+    }
   }
 }

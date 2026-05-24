@@ -290,7 +290,7 @@ class _ModuleCreatePostScreenState
                     metaIndex: '✦ Neu',
                     metaCategory: c.moduleKey.toUpperCase(),
                     title: c.title.tr(),
-                    subtitle: c.description,
+                    subtitle: c.description.tr(),
                   ),
                 ),
               ],

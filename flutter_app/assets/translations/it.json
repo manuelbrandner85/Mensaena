@@ -529,7 +529,8 @@
       "botScheduled": "Bot programmati",
       "auditLog": "Audit log",
       "system": "Sistema"
-    }
+    },
+    "tryOtherFilters": "Prova altri filtri."
   },
   "create": {
     "locationUnavailable": "Posizione non disponibile.",
@@ -633,7 +634,19 @@
     "newRescuerPost": "Nuovo post salvataggio",
     "scanFood": "Scansiona alimento",
     "marketplaceTitle": "Annuncio",
-    "farmCreateTitle": "Registra fattoria"
+    "farmCreateTitle": "Registra fattoria",
+    "descriptions": {
+      "animals": "Cerca o offri aiuto animali, stallo o segnalazione di ritrovamento.",
+      "housing": "Offri uno spazio abitativo o cerca supporto.",
+      "mobility": "Offri un passaggio, trasporto o cerca un'auto condivisa.",
+      "sharing": "Prestare o prendere in prestito attrezzi, libri, dispositivi.",
+      "harvest": "Condividi il raccolto, cerca aiuti o offri cibo.",
+      "community": "Avvia una discussione, condividi un'idea o fai una domanda.",
+      "knowledge": "Condividi conoscenze, scrivi guide o offri corsi.",
+      "skills": "Condividi le tue competenze, trova mentor o offri workshop.",
+      "jobs": "Offri un mini-job, cerca lavoro o organizza volontariato.",
+      "rescuer": "Salva cibo, vestiti o oggetti dallo spreco."
+    }
   },
   "crisis": {
     "error": "Errore: {error}",
@@ -1192,6 +1205,28 @@
       "successStory": "Storia di successo",
       "botTip": "Suggerimento di MensaenaBot",
       "nearYou": "Vicino a te"
+    },
+    "descriptions": {
+      "greeting": "Hero personalizzato in base al momento del giorno",
+      "safetyAlerts": "NINA + richiami alimentari",
+      "startup": "Checklist di onboarding per nuovi vicini",
+      "quickActions": "3 scorciatoie principali ai moduli",
+      "stats": "Nelle vicinanze, non letti, attivi",
+      "smartMatch": "Top 3 suggerimenti AI",
+      "trust": "Trust score con indicatore di livello",
+      "thanksReceived": "Ultime valutazioni con stelle",
+      "communityPulse": "Attività di 24h nel quartiere",
+      "activity": "Aggiornamenti live delle tue interazioni",
+      "map": "Mini-mappa con post nelle vicinanze",
+      "weekOverview": "Post, aiuti, messaggi degli ultimi 7 giorni",
+      "unreadMessages": "Chat con messaggi non letti",
+      "weekChallenge": "Spunti settimanali per partecipare",
+      "ratingReminder": "Valutazioni in sospeso per aiuti completati",
+      "weather": "Meteo attuale + consiglio per il quartiere",
+      "holiday": "Indicazione della prossima festività",
+      "successStory": "Ispirazione dalla community",
+      "botTip": "Spunto quotidiano dal quartiere",
+      "nearYou": "Post locali nelle vicinanze"
     }
   },
   "hubs": {
@@ -1265,5 +1300,15 @@
     "organization": "Organizzazione",
     "farm": "Fattoria",
     "mentalSupport": "Supporto mentale"
+  },
+  "push": {
+    "channels": {
+      "crisisDesc": "Avvisi di crisi nelle tue vicinanze",
+      "messagesDesc": "Messaggi diretti e di community",
+      "activityDesc": "Reazioni, commenti, eventi, mercato",
+      "generalDesc": "Badge, aggiornamenti e avvisi",
+      "callsDesc": "Push ad alta priorità per chiamate DM in arrivo",
+      "fallbackDesc": "Messaggi, match e notifiche generali"
+    }
   }
 }
