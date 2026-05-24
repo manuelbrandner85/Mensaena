@@ -1708,7 +1708,7 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                         fillColor: AppColors.elevated,
                         prefixIcon: const Icon(LucideIcons.search,
                             size: 14, color: AppColors.mute),
-                        hintText: 'Nachrichten durchsuchen…',
+                        hintText: 'chat.searchMessages'.tr(),
                         hintStyle: AppTypography.body(
                             size: 12, color: AppColors.mute),
                         isDense: true,
@@ -1992,7 +1992,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
                 style: AppTypography.mono(
                     size: 11, color: AppColors.herzrotWarm)),
             IconButton(
-              tooltip: 'Abbrechen',
+              tooltip: 'chat.tooltipCancel'.tr(),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
               onPressed: _cancel,
@@ -2000,7 +2000,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
                   size: 14, color: AppColors.mute),
             ),
             IconButton(
-              tooltip: 'Senden',
+              tooltip: 'chat.tooltipSend'.tr(),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
               onPressed: _stopAndSend,
@@ -2024,7 +2024,7 @@ class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
     }
     // Idle: mic icon — tap to start recording
     return IconButton(
-      tooltip: 'Sprachnachricht aufnehmen',
+      tooltip: 'chat.tooltipRecordVoice'.tr(),
       onPressed: _startRecord,
       icon: const Icon(LucideIcons.mic, color: AppColors.bronze),
     );

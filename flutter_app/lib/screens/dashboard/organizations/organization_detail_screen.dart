@@ -17,7 +17,7 @@ class OrganizationDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(organizationDetailProvider(orgId));
     return DashboardScaffold(
-      title: 'Organisation',
+      title: 'modules.organization'.tr(),
       currentRoute: '/dashboard/organizations',
       body: SafeArea(
         child: async.when(

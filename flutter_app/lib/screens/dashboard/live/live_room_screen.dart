@@ -399,7 +399,7 @@ class _ElegantHeader extends StatelessWidget {
             iconSize: 20,
             onPressed: onClose,
             icon: const Icon(LucideIcons.x, color: AppColors.inkSoft),
-            tooltip: 'Verlassen',
+            tooltip: 'live.tooltipLeave'.tr(),
           ),
         ],
       ),

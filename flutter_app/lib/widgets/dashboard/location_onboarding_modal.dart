@@ -177,8 +177,8 @@ class _LocationOnboardingModalState
             // GPS-Button
             _BigOptionButton(
               icon: LucideIcons.locate,
-              title: 'Standort per GPS',
-              subtitle: 'Schnell & präzise',
+              title: 'onboarding.gpsTitle'.tr(),
+              subtitle: 'onboarding.gpsSubtitle'.tr(),
               loading: _gpsLoading,
               done: _lat != null,
               onTap: _useGps,

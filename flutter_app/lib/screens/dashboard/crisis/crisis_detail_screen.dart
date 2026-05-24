@@ -27,7 +27,7 @@ class CrisisDetailScreen extends ConsumerWidget {
     final updates = ref.watch(crisisUpdatesStreamProvider(crisisId));
 
     return DashboardScaffold(
-      title: 'Krise',
+      title: 'modules.crisisDetail'.tr(),
       currentRoute: '/dashboard/crisis',
       body: SafeArea(
         child: crisis.when(

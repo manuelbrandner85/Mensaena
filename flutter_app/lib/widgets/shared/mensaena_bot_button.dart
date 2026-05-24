@@ -375,7 +375,7 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                             isDense: true,
                             filled: true,
                             fillColor: AppColors.elevated,
-                            hintText: 'Frag mich was…',
+                            hintText: 'bot.askMeHint'.tr(),
                             hintStyle: AppTypography.body(
                                 size: 13,
                                 color: AppColors.mute),

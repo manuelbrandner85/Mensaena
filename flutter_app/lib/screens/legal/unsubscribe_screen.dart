@@ -118,7 +118,7 @@ class _UnsubscribeScreenState extends State<UnsubscribeScreen> {
               _Status.success => _resultCard(
                   icon: LucideIcons.checkCircle2,
                   iconColor: AppColors.leben,
-                  title: 'Erfolgreich abgemeldet',
+                  title: 'misc.unsubscribeSuccess'.tr(),
                   message: _email == null
                       ? 'Dein E-Mail-Konto erhält keine weiteren Marketing-E-Mails von Mensaena mehr.'
                       : 'Die Adresse $_email erhält keine weiteren Marketing-E-Mails von Mensaena mehr.',
@@ -128,7 +128,7 @@ class _UnsubscribeScreenState extends State<UnsubscribeScreen> {
               _Status.error => _resultCard(
                   icon: LucideIcons.alertCircle,
                   iconColor: AppColors.herzrot,
-                  title: 'Abmeldung fehlgeschlagen',
+                  title: 'misc.unsubscribeFailed'.tr(),
                   message: _error ?? 'Unbekannter Fehler.',
                   hint:
                       'Bitte kontaktiere uns unter info@mensaena.de, wenn das Problem weiter besteht.',

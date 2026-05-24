@@ -31,7 +31,7 @@ class OrganizationsScreen extends ConsumerWidget {
     );
     final async = ref.watch(organizationsForUserProvider(args));
     return DashboardScaffold(
-      title: 'Organisationen',
+      title: 'organizations.organizationsTitle'.tr(),
       currentRoute: '/dashboard/organizations',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,

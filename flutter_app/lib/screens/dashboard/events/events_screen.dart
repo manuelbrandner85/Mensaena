@@ -93,7 +93,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 children: [
                   Expanded(
                     child: ModuleSearchBar(
-                      hintText: 'Events suchen…',
+                      hintText: 'events.searchPlaceholder'.tr(),
                       onChanged: (v) => setState(() => _search = v),
                     ),
                   ),

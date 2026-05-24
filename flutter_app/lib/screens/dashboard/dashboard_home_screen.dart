@@ -2006,7 +2006,7 @@ class _RatingPromptBannerState extends State<_RatingPromptBanner> {
                 ),
               ),
               IconButton(
-                tooltip: 'Später erinnern',
+                tooltip: 'home.tooltipRemindLater'.tr(),
                 icon:
                     const Icon(LucideIcons.x, size: 14, color: AppColors.mute),
                 onPressed: () => setState(() => _dismissed = true),
@@ -2462,7 +2462,7 @@ class _SuccessStoryCardState extends State<_SuccessStoryCard> {
                                 size: 9, color: AppColors.bronzeSoft)),
                         const Spacer(),
                         IconButton(
-                          tooltip: 'Andere Geschichte',
+                          tooltip: 'home.tooltipOtherStory'.tr(),
                           onPressed: _refresh,
                           icon: AnimatedRotation(
                             turns: _rotating ? 0.5 : 0,

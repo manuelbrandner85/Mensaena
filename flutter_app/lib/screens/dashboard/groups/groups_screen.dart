@@ -54,7 +54,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   Widget build(BuildContext context) {
     final async = ref.watch(groupsListProvider);
     return DashboardScaffold(
-      title: 'Gruppen',
+      title: 'groups.screenTitle'.tr(),
       currentRoute: '/dashboard/groups',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
@@ -66,19 +66,19 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 08',
-                metaCategory: 'Gruppen',
-                title: 'Nachbarschafts-Gruppen',
-                subtitle: 'Hobby, Sport, Eltern, Senioren, Umwelt',
+                metaCategory: 'groups.screenTitle'.tr(),
+                title: 'modules.groupsHero.title'.tr(),
+                subtitle: 'modules.groupsHero.subtitle'.tr(),
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: ModuleSearchBar(
-                hintText: 'Gruppen suchen…',
+                hintText: 'groups.searchPlaceholder'.tr(),
                 onChanged: (v) => setState(() => _search = v),
               ),
             ),

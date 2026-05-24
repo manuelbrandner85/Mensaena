@@ -41,7 +41,7 @@ class MatchingScreen extends ConsumerWidget {
     });
 
     return DashboardScaffold(
-      title: 'Matching',
+      title: 'matching.screenTitle'.tr(),
       currentRoute: '/dashboard/matching',
       fab: FloatingActionButton(
         backgroundColor: AppColors.amber,
@@ -62,10 +62,10 @@ class MatchingScreen extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const EditorialModuleHeader(
+              EditorialModuleHeader(
                 metaIndex: '§ 10',
-                metaCategory: 'Matching',
-                title: 'Smart-Match',
+                metaCategory: 'matching.screenTitle'.tr(),
+                title: 'modules.matchingHero.title'.tr(),
                 subtitle: 'KI-Vorschlaege fuer passende Beitraege',
               ),
               _header(

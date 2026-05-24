@@ -22,7 +22,7 @@ class ChallengesScreen extends ConsumerWidget {
     final progressAsync = ref.watch(myChallengeProgressProvider);
 
     return DashboardScaffold(
-      title: 'Challenges',
+      title: 'challenges.screenTitle'.tr(),
       currentRoute: '/dashboard/challenges',
       body: SafeArea(
         child: RefreshIndicator(

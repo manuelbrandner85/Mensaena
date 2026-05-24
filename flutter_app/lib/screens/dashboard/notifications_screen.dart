@@ -41,7 +41,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             .length ??
         0;
     return DashboardScaffold(
-      title: 'Benachrichtigungen',
+      title: 'notifications.screenTitle'.tr(),
       currentRoute: '/dashboard/notifications',
       body: SafeArea(
         child: Column(
@@ -50,8 +50,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 03',
-                metaCategory: 'Benachrichtigungen',
-                title: 'Aktivitäten',
+                metaCategory: 'notifications.screenTitle'.tr(),
+                title: 'notifications.activities'.tr(),
                 subtitle: unread > 0
                     ? '$unread ungelesen'
                     : 'Alle gelesen',
@@ -101,7 +101,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                               size: 10, color: AppColors.amber)),
                     ),
                   IconButton(
-                    tooltip: 'Alle löschen',
+                    tooltip: 'notifications.tooltipClearAll'.tr(),
                     onPressed: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,

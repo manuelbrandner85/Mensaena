@@ -377,7 +377,7 @@ class _SearchBarState extends State<_SearchBar> {
                 },
               )
             : null,
-        hintText: 'Artikel suchen…',
+        hintText: 'knowledge.searchPlaceholder'.tr(),
         hintStyle: AppTypography.body(size: 13, color: AppColors.mute),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

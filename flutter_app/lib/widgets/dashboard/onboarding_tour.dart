@@ -62,50 +62,44 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
   static const _steps = [
     (
       icon: LucideIcons.sparkles,
-      eyebrow: 'Willkommen',
-      title: 'Schön, dass du da bist.',
-      body:
-          'Mensaena ist dein Ort für gelebte Nachbarschaftshilfe. In sechs kurzen Schritten zeigen wir dir, wie du dich sicher und mühelos einfindest.',
+      eyebrowKey: 'onboarding.tour.step0.eyebrow',
+      titleKey: 'onboarding.tour.step0.title',
+      bodyKey: 'onboarding.tour.step0.body',
       tint: AppColors.teal,
     ),
     (
       icon: LucideIcons.compass,
-      eyebrow: 'Dein Dashboard',
-      title: 'Der Überblick auf einen Blick.',
-      body:
-          'Im Dashboard findest du alle wichtigen Informationen auf einen Blick: neue Anfragen, Angebote aus deiner Nachbarschaft und persönliche Empfehlungen.',
+      eyebrowKey: 'onboarding.tour.step1.eyebrow',
+      titleKey: 'onboarding.tour.step1.title',
+      bodyKey: 'onboarding.tour.step1.body',
       tint: AppColors.lebenSoft,
     ),
     (
       icon: LucideIcons.map,
-      eyebrow: 'Die Karte',
-      title: 'Hilfe in deiner Umgebung.',
-      body:
-          'Auf der interaktiven Karte siehst du, wo in deiner Nähe gerade Hilfe gebraucht oder angeboten wird. Tippe auf einen Pin und lerne deine Nachbarn kennen.',
+      eyebrowKey: 'onboarding.tour.step2.eyebrow',
+      titleKey: 'onboarding.tour.step2.title',
+      bodyKey: 'onboarding.tour.step2.body',
       tint: AppColors.tealSoft,
     ),
     (
       icon: LucideIcons.plusCircle,
-      eyebrow: 'Dein erster Beitrag',
-      title: 'Teile, was du bieten oder suchen kannst.',
-      body:
-          'Egal ob du Werkzeug verleihst, beim Einkauf helfen willst oder selbst Unterstützung brauchst – ein Beitrag ist in wenigen Sekunden erstellt.',
+      eyebrowKey: 'onboarding.tour.step3.eyebrow',
+      titleKey: 'onboarding.tour.step3.title',
+      bodyKey: 'onboarding.tour.step3.body',
       tint: AppColors.bronze,
     ),
     (
       icon: LucideIcons.messageCircle,
-      eyebrow: 'Nachrichten',
-      title: 'Direkt miteinander sprechen.',
-      body:
-          'Alles, was zwischen Nachbarn passiert, läuft über sichere Direktnachrichten. Freundlich, respektvoll, DSGVO-konform.',
+      eyebrowKey: 'onboarding.tour.step4.eyebrow',
+      titleKey: 'onboarding.tour.step4.title',
+      bodyKey: 'onboarding.tour.step4.body',
       tint: AppColors.leben,
     ),
     (
       icon: LucideIcons.users,
-      eyebrow: 'Gemeinschaft',
-      title: 'Gemeinsam stark.',
-      body:
-          'Mensaena lebt vom Miteinander. Sei respektvoll, hilfsbereit und offen – dann wirst du schnell merken, wie herzlich deine Nachbarschaft ist.',
+      eyebrowKey: 'onboarding.tour.step5.eyebrow',
+      titleKey: 'onboarding.tour.step5.title',
+      bodyKey: 'onboarding.tour.step5.body',
       tint: AppColors.amber,
     ),
   ];
@@ -198,7 +192,7 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        s.eyebrow.toUpperCase(),
+                        s.eyebrowKey.tr().toUpperCase(),
                         style: AppTypography.label(
                           size: 9,
                           color: s.tint,
@@ -210,7 +204,7 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
                   const SizedBox(height: 16),
                   // Title (Cinema-Serif)
                   Text(
-                    s.title,
+                    s.titleKey.tr(),
                     textAlign: TextAlign.center,
                     style: AppTypography.display(
                       size: 26,
@@ -221,7 +215,7 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
                   const SizedBox(height: 14),
                   // Body
                   Text(
-                    s.body,
+                    s.bodyKey.tr(),
                     textAlign: TextAlign.center,
                     style: AppTypography.body(
                       size: 14,
@@ -286,8 +280,8 @@ class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
                           ),
                           label: Text(
                             _step == _steps.length - 1
-                                ? 'Los geht\'s'
-                                : 'Weiter',
+                                ? 'onboarding.start'.tr()
+                                : 'onboarding.next'.tr(),
                           ),
                         ),
                       ),

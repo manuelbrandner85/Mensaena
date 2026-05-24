@@ -30,7 +30,7 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Hof',
+      title: 'modules.farm'.tr(),
       currentRoute: '/dashboard/supply',
       body: SafeArea(
         child: FutureBuilder<FarmListing?>(

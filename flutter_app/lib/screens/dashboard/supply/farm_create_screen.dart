@@ -178,7 +178,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Bauernhof eintragen',
+      title: 'create.farmCreateTitle'.tr(),
       currentRoute: '/dashboard/supply/farm/add',
       body: SafeArea(
         child: Form(

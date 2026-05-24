@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -21,7 +22,7 @@ class BadgesScreen extends ConsumerWidget {
     final mineAsync = ref.watch(myBadgesProvider);
 
     return DashboardScaffold(
-      title: 'Badges',
+      title: 'misc.badges'.tr(),
       currentRoute: '/dashboard/badges',
       body: SafeArea(
         child: RefreshIndicator(

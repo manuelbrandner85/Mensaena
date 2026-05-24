@@ -1434,7 +1434,7 @@ class _LanguageTab extends ConsumerWidget {
                   onPressed: () => notifier.refreshDetected(context),
                   icon: const Icon(LucideIcons.refreshCcw,
                       color: AppColors.bronze),
-                  tooltip: 'Neu erkennen',
+                  tooltip: 'settings.tooltipDetectAgain'.tr(),
                 ),
               ],
             ),
