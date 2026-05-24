@@ -25,9 +25,11 @@ class DmCallService {
   /// Initiiert einen Anruf an [calleeId] in einer existierenden Conversation.
   /// Bei Erfolg: success=true mit callId+roomName.
   /// Bei Fehler: success=false mit errorReason (UI zeigt Snackbar).
+  /// [callType] muss 'audio' oder 'video' sein — DB-Spalte ist NOT NULL.
   static Future<DmCallStartResult> start({
     required String conversationId,
     required String calleeId,
+    String callType = 'video',
   }) async {
     final caller = SupabaseService.currentUser?.id;
     if (caller == null) {
@@ -46,6 +48,7 @@ class DmCallService {
             'caller_id': caller,
             'callee_id': calleeId,
             'conversation_id': conversationId,
+            'call_type': callType,
             'status': 'ringing',
             'room_name': roomName,
           })
@@ -113,7 +116,8 @@ class DmCallService {
 class LiveStreamService {
   const LiveStreamService._();
 
-  /// Markiert einen Channel als Live. Returns room_name.
+  /// Markiert einen Channel als Live. Returns room_name oder null bei Fehler;
+  /// im Fehlerfall wird der echte Grund nach error_logs geschrieben.
   /// [conversationId] = chat_channels.conversation_id (FK).
   /// [channelSlug] fuer eindeutige room_name-Generierung.
   static Future<String?> startChannelStream({
@@ -122,7 +126,14 @@ class LiveStreamService {
     String? topic,
   }) async {
     final host = SupabaseService.currentUser?.id;
-    if (host == null) return null;
+    if (host == null) {
+      // ignore: discarded_futures
+      ErrorLogsRepository.log(
+        errorType: 'livestream_start_failed',
+        message: 'no current user',
+      );
+      return null;
+    }
     final roomName =
         'channel-$channelSlug-${DateTime.now().millisecondsSinceEpoch}';
     try {
@@ -147,7 +158,14 @@ class LiveStreamService {
         'started_at': DateTime.now().toUtc().toIso8601String(),
       });
       return roomName;
-    } catch (_) {
+    } catch (e, st) {
+      // ignore: discarded_futures
+      ErrorLogsRepository.log(
+        errorType: 'livestream_start_failed',
+        message: e.toString(),
+        stack: st.toString(),
+        deviceInfo: 'conversation_id=$conversationId; channelSlug=$channelSlug',
+      );
       return null;
     }
   }
