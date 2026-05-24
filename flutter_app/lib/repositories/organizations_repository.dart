@@ -2,12 +2,50 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/farm_listing.dart';
 import '../models/organization.dart';
+import '../services/location_service.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
+/// Organizations + Farms: User-Land + Umkreis-Filter.
+/// Posts/Beiträge bleiben global — diese Verzeichnisse sind lokal pro Land.
 class OrganizationsRepository {
   const OrganizationsRepository._();
 
+  /// Listet aktive Orgs für ein Land + optional gefiltert nach Umkreis.
+  /// [country] = ISO-2 (DE/AT/CH/...). [center] + [radiusKm] = optional
+  /// Client-Side Haversine-Filter. Wenn beides null → nur Land-Filter.
+  static Future<List<Organization>> listForUser({
+    required String country,
+    int limit = 200,
+    ({double lat, double lng})? center,
+    int? radiusKm,
+  }) async {
+    try {
+      final rows = await sb
+          .from('organizations')
+          .select()
+          .eq('is_active', true)
+          .eq('country', country)
+          .order('is_verified', ascending: false)
+          .order('name')
+          .limit(limit);
+      final all = (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(Organization.fromJson)
+          .toList();
+      if (center == null || radiusKm == null || radiusKm <= 0) return all;
+      return all.where((o) {
+        if (o.latitude == null || o.longitude == null) return true;
+        final d = LocationService.haversineKm(
+            center.lat, center.lng, o.latitude!, o.longitude!);
+        return d <= radiusKm;
+      }).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Behalten für Backward-Kompatibilität (z.B. Admin-Tools).
   static Future<List<Organization>> listActive({int limit = 100}) async {
     try {
       final rows = await sb
@@ -76,6 +114,38 @@ class OrganizationsRepository {
 
 class FarmsRepository {
   const FarmsRepository._();
+
+  /// Listet aktive Höfe für ein Land + optional Umkreis-Filter (Haversine).
+  static Future<List<FarmListing>> listForUser({
+    required String country,
+    int limit = 200,
+    ({double lat, double lng})? center,
+    int? radiusKm,
+  }) async {
+    try {
+      final rows = await sb
+          .from('farm_listings')
+          .select()
+          .eq('is_public', true)
+          .eq('country', country)
+          .order('is_verified', ascending: false)
+          .order('name')
+          .limit(limit);
+      final all = (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(FarmListing.fromJson)
+          .toList();
+      if (center == null || radiusKm == null || radiusKm <= 0) return all;
+      return all.where((f) {
+        if (f.latitude == null || f.longitude == null) return true;
+        final d = LocationService.haversineKm(
+            center.lat, center.lng, f.latitude!, f.longitude!);
+        return d <= radiusKm;
+      }).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
 
   static Future<List<FarmListing>> listActive({int limit = 100}) async {
     try {
@@ -204,7 +274,31 @@ final organizationsListProvider =
 final organizationDetailProvider = FutureProvider.family<Organization?, String>(
     (ref, id) => OrganizationsRepository.getById(id));
 
+/// Family-Provider mit Country + optional Center/Radius.
+/// Key-Format: `country` oder `country|lat,lng|radius` für eindeutigen Cache.
+final organizationsForUserProvider = FutureProvider.family<List<Organization>,
+    ({String country, double? lat, double? lng, int? radiusKm})>((ref, args) {
+  return OrganizationsRepository.listForUser(
+    country: args.country,
+    center: (args.lat != null && args.lng != null)
+        ? (lat: args.lat!, lng: args.lng!)
+        : null,
+    radiusKm: args.radiusKm,
+  );
+});
+
 final farmsListProvider =
     FutureProvider<List<FarmListing>>((ref) async => FarmsRepository.listActive());
 final farmDetailProvider =
     FutureProvider.family<FarmListing?, String>((ref, id) => FarmsRepository.getById(id));
+
+final farmsForUserProvider = FutureProvider.family<List<FarmListing>,
+    ({String country, double? lat, double? lng, int? radiusKm})>((ref, args) {
+  return FarmsRepository.listForUser(
+    country: args.country,
+    center: (args.lat != null && args.lng != null)
+        ? (lat: args.lat!, lng: args.lng!)
+        : null,
+    radiusKm: args.radiusKm,
+  );
+});

@@ -8,6 +8,8 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/organization.dart';
 import '../../../repositories/organizations_repository.dart';
+import '../../../repositories/profiles_repository.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class OrganizationsScreen extends ConsumerWidget {
@@ -15,7 +17,19 @@ class OrganizationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(organizationsListProvider);
+    final country = LocaleCountryService.forContext(context);
+    final myProfile = ref.watch(myProfileProvider).valueOrNull;
+    final radius =
+        myProfile?.notificationRadiusKm ?? myProfile?.radiusKm;
+    final lat = myProfile?.latitude ?? myProfile?.homeLat;
+    final lng = myProfile?.longitude ?? myProfile?.homeLng;
+    final args = (
+      country: country,
+      lat: lat,
+      lng: lng,
+      radiusKm: radius,
+    );
+    final async = ref.watch(organizationsForUserProvider(args));
     return DashboardScaffold(
       title: 'Organisationen',
       currentRoute: '/dashboard/organizations',
@@ -30,7 +44,8 @@ class OrganizationsScreen extends ConsumerWidget {
         child: RefreshIndicator(
           color: AppColors.amber,
           backgroundColor: AppColors.surface,
-          onRefresh: () async => ref.invalidate(organizationsListProvider),
+          onRefresh: () async =>
+              ref.invalidate(organizationsForUserProvider(args)),
           child: async.when(
             loading: () => const Center(
               child: CircularProgressIndicator(color: AppColors.amber),
@@ -49,7 +64,8 @@ class OrganizationsScreen extends ConsumerWidget {
                               size: 32, color: AppColors.mute),
                           const SizedBox(height: 10),
                           Text(
-                            'Noch keine Organisationen gelistet.',
+                            'organizations.emptyForRegion'.tr(
+                                namedArgs: {'country': country}),
                             style: AppTypography.body(
                               size: 14,
                               color: AppColors.mute,
