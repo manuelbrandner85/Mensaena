@@ -1,0 +1,135 @@
+/// SKILL: mensaena-features
+/// QuickActions — 4 prominente Action-Tiles (Post, Map, Chat, SOS).
+library;
+
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+
+import '../../config/theme/app_colors.dart';
+import '../../config/theme/app_typography.dart';
+import '../effects/bloom.dart';
+import '../effects/tilt_card.dart';
+
+class QuickActions extends StatelessWidget {
+  const QuickActions({super.key});
+
+  static const _items = <({
+    String i18n,
+    IconData icon,
+    Color accent,
+    String route,
+  })>[
+    (
+      i18n: 'home.qaPost',
+      icon: LucideIcons.plus,
+      accent: AppColors.amber,
+      route: '/dashboard/create',
+    ),
+    (
+      i18n: 'home.qaMap',
+      icon: LucideIcons.map,
+      accent: AppColors.teal,
+      route: '/dashboard/map',
+    ),
+    (
+      i18n: 'home.qaChat',
+      icon: LucideIcons.messageSquare,
+      accent: AppColors.leben,
+      route: '/dashboard/chat',
+    ),
+    (
+      i18n: 'home.qaSos',
+      icon: LucideIcons.alertTriangle,
+      accent: AppColors.herzrot,
+      route: '/dashboard/crisis',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 92,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _items.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (context, i) {
+          final it = _items[i];
+          final isSos = it.route == '/dashboard/crisis';
+          final tile = InkWell(
+            onTap: () => context.go(it.route),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: 108,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    it.accent.withValues(alpha: 0.20),
+                    it.accent.withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: it.accent.withValues(alpha: isSos ? 0.7 : 0.45),
+                  width: isSos ? 1.6 : 1,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: isSos
+                    ? [
+                        BoxShadow(
+                          color: it.accent.withValues(alpha: 0.22),
+                          blurRadius: 10,
+                          spreadRadius: -2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: it.accent.withValues(alpha: 0.22),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(it.icon, size: 18, color: it.accent),
+                  ),
+                  Text(
+                    it.i18n.tr(),
+                    style: AppTypography.body(
+                      size: 13,
+                      color: AppColors.ink,
+                      weight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+          final wrapped = TiltCard(
+            intensity: 0.5,
+            borderRadius: 16,
+            child: tile,
+          );
+          if (isSos) {
+            return Bloom(
+              color: AppColors.herzrot,
+              intensity: 0.55,
+              radius: 22,
+              child: wrapped,
+            );
+          }
+          return wrapped;
+        },
+      ),
+    );
+  }
+}
