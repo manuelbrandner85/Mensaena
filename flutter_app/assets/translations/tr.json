@@ -24,7 +24,8 @@
     "offline": "Çevrimdışı",
     "today": "Bugün",
     "yesterday": "Dün",
-    "now": "Şimdi"
+    "now": "Şimdi",
+    "neighbour": "Komşu"
   },
   "nav": {
     "dashboard": "Panel",
@@ -172,7 +173,34 @@
   "onboarding": {
     "skip": "Atla",
     "next": "İleri",
-    "start": "Başlayalım"
+    "start": "Başlayalım",
+    "steps": {
+      "dashboard": {
+        "title": "Panelin",
+        "subtitle": "Her şey bir bakışta.",
+        "body": "Hava, mahalle, etkinlikler, güven puanı ve daha fazlası — Mensaena günün saatine uyum sağlar ve şu an önemli olanı gösterir."
+      },
+      "map": {
+        "title": "Harita",
+        "subtitle": "Yakınında kimin yardıma ihtiyacı var?",
+        "body": "Etrafında hangi gönderiler, etkinlikler ve kriz uyarıları var, haritada gör. Yarıçap ve türe göre filtrele."
+      },
+      "create": {
+        "title": "Oluştur",
+        "subtitle": "İste ya da sun.",
+        "body": "Yardıma mı ihtiyacın var? Bir şey mi sunuyorsun? Fotoğraflar, konum ve 13 kategoriyle saniyeler içinde bir gönderi oluştur."
+      },
+      "chat": {
+        "title": "Sohbet & topluluk",
+        "subtitle": "Bağlantıda kal.",
+        "body": "Komşularla doğrudan mesajlar, bölgesel topluluk kanalları, canlı yayınlar. Sesli ve görüntülü mesajlar dahildir."
+      },
+      "notifications": {
+        "title": "Bildirimler",
+        "subtitle": "Önemli hiçbir şeyi kaçırma.",
+        "body": "Mesajlar, yardım talepleri, kriz uyarıları ve ağından gelen güncellemeler için push bildirimleri al."
+      }
+    }
   },
   "errors": {
     "generic": "Bir şeyler ters gitti.",

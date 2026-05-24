@@ -24,7 +24,8 @@
     "offline": "Offline",
     "today": "Today",
     "yesterday": "Yesterday",
-    "now": "Now"
+    "now": "Now",
+    "neighbour": "Neighbour"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -172,7 +173,34 @@
   "onboarding": {
     "skip": "Skip",
     "next": "Next",
-    "start": "Let's go"
+    "start": "Let's go",
+    "steps": {
+      "dashboard": {
+        "title": "Your dashboard",
+        "subtitle": "Everything at a glance.",
+        "body": "Weather, neighbourhood, activities, trust score and more — Mensaena adapts to your time of day and shows you what matters right now."
+      },
+      "map": {
+        "title": "The map",
+        "subtitle": "Who needs help near you?",
+        "body": "See on the map which posts, events and crisis reports are around you. Filter by radius and type."
+      },
+      "create": {
+        "title": "Create",
+        "subtitle": "Ask or offer.",
+        "body": "Need help? Offering something? Create a post in seconds with photos, location and 13 categories."
+      },
+      "chat": {
+        "title": "Chat & community",
+        "subtitle": "Stay connected.",
+        "body": "Direct messages with neighbours, regional community channels, livestreams. Voice and image messages included."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Never miss anything important.",
+        "body": "Receive push notifications for messages, helper requests, crisis alerts and updates from your network."
+      }
+    }
   },
   "errors": {
     "generic": "Something went wrong.",

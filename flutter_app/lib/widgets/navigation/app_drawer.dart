@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,233 +30,132 @@ import '../../services/supabase_service.dart';
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
+  // i18n: alle `label`-Strings sind translation-keys, .tr() in den Tiles.
   static const _NavLink _home = _NavLink(
     icon: LucideIcons.layoutDashboard,
-    label: 'Dashboard',
+    label: 'nav.dashboard',
     route: '/dashboard',
   );
   static const _NavLink _notifications = _NavLink(
     icon: LucideIcons.bell,
-    label: 'Benachrichtigungen',
+    label: 'nav.notifications',
     route: '/dashboard/notifications',
     badgeKey: 'unreadNotifications',
   );
 
   static const List<_NavGroup> _groups = [
     _NavGroup(
-      label: 'Kommunikation',
+      label: 'navGroups.communication',
       headIcon: LucideIcons.messageCircle,
       items: [
-        _NavLink(
-          icon: LucideIcons.mail,
-          label: 'Nachrichten',
-          route: '/dashboard/messages',
-          badgeKey: 'unreadMessages',
-        ),
-        _NavLink(
-          icon: LucideIcons.messageCircle,
-          label: 'Community-Chat',
-          route: '/dashboard/chat',
-        ),
-        _NavLink(
-          icon: LucideIcons.sparkles,
-          label: 'Matching',
-          route: '/dashboard/matching',
-          badgeKey: 'suggestedMatches',
-        ),
+        _NavLink(icon: LucideIcons.mail, label: 'nav.messages',
+            route: '/dashboard/messages', badgeKey: 'unreadMessages'),
+        _NavLink(icon: LucideIcons.messageCircle, label: 'nav.communityChat',
+            route: '/dashboard/chat'),
+        _NavLink(icon: LucideIcons.sparkles, label: 'nav.matching',
+            route: '/dashboard/matching', badgeKey: 'suggestedMatches'),
       ],
     ),
     _NavGroup(
-      label: 'Helfen & Finden',
+      label: 'navGroups.helpAndFind',
       headIcon: LucideIcons.heart,
       items: [
-        _NavLink(
-          icon: LucideIcons.map,
-          label: 'Karte',
-          route: '/dashboard/map',
-        ),
-        _NavLink(
-          icon: LucideIcons.fileText,
-          label: 'Beiträge',
-          route: '/dashboard/posts',
-        ),
-        _NavLink(
-          icon: LucideIcons.building2,
-          label: 'Organisationen',
-          route: '/dashboard/organizations',
-        ),
-        _NavLink(
-          icon: LucideIcons.helpingHand,
-          label: 'Interaktionen',
-          route: '/dashboard/interactions',
-          badgeKey: 'interactionRequests',
-        ),
-        _NavLink(
-          icon: LucideIcons.dog,
-          label: 'Tiere',
-          route: '/dashboard/animals',
-        ),
+        _NavLink(icon: LucideIcons.map, label: 'nav.map', route: '/dashboard/map'),
+        _NavLink(icon: LucideIcons.fileText, label: 'nav.posts',
+            route: '/dashboard/posts'),
+        _NavLink(icon: LucideIcons.building2, label: 'nav.organizations',
+            route: '/dashboard/organizations'),
+        _NavLink(icon: LucideIcons.helpingHand, label: 'nav.interactions',
+            route: '/dashboard/interactions', badgeKey: 'interactionRequests'),
+        _NavLink(icon: LucideIcons.dog, label: 'nav.animals',
+            route: '/dashboard/animals'),
       ],
     ),
     _NavGroup(
-      label: 'Notfall & Sicherheit',
+      label: 'navGroups.emergencyAndSafety',
       headIcon: LucideIcons.alertTriangle,
       items: [
-        _NavLink(
-          icon: LucideIcons.alertTriangle,
-          label: 'Krisenmodus',
-          route: '/dashboard/crisis',
-          variant: _NavVariant.crisis,
-          badgeKey: 'activeCrises',
-        ),
-        _NavLink(
-          icon: LucideIcons.brain,
-          label: 'Mentale Unterstützung',
-          route: '/dashboard/mental-support',
-        ),
+        _NavLink(icon: LucideIcons.alertTriangle, label: 'nav.crisis',
+            route: '/dashboard/crisis', variant: _NavVariant.crisis,
+            badgeKey: 'activeCrises'),
+        _NavLink(icon: LucideIcons.brain, label: 'nav.mentalSupport',
+            route: '/dashboard/mental-support'),
       ],
     ),
     _NavGroup(
-      label: 'Gemeinschaft',
+      label: 'navGroups.community',
       headIcon: LucideIcons.users,
       items: [
-        _NavLink(
-          icon: LucideIcons.users2,
-          label: 'Gruppen',
-          route: '/dashboard/groups',
-        ),
-        _NavLink(
-          icon: LucideIcons.calendar,
-          label: 'Events',
-          route: '/dashboard/events',
-        ),
-        _NavLink(
-          icon: LucideIcons.stickyNote,
-          label: 'Pinnwand',
-          route: '/dashboard/board',
-        ),
-        _NavLink(
-          icon: LucideIcons.trophy,
-          label: 'Challenges',
-          route: '/dashboard/challenges',
-        ),
+        _NavLink(icon: LucideIcons.users2, label: 'nav.groups',
+            route: '/dashboard/groups'),
+        _NavLink(icon: LucideIcons.calendar, label: 'nav.events',
+            route: '/dashboard/events'),
+        _NavLink(icon: LucideIcons.stickyNote, label: 'nav.board',
+            route: '/dashboard/board'),
+        _NavLink(icon: LucideIcons.trophy, label: 'nav.challenges',
+            route: '/dashboard/challenges'),
       ],
     ),
     _NavGroup(
-      label: 'Teilen & Ressourcen',
+      label: 'navGroups.shareAndResources',
       headIcon: LucideIcons.repeat,
       items: [
-        _NavLink(
-          icon: LucideIcons.repeat,
-          label: 'Teilen',
-          route: '/dashboard/sharing',
-        ),
-        _NavLink(
-          icon: LucideIcons.clock,
-          label: 'Zeitbank',
-          route: '/dashboard/timebank',
-        ),
-        _NavLink(
-          icon: LucideIcons.store,
-          label: 'Marktplatz',
-          route: '/dashboard/marketplace',
-        ),
-        _NavLink(
-          icon: LucideIcons.package,
-          label: 'Versorgung',
-          route: '/dashboard/supply',
-        ),
-        _NavLink(
-          icon: LucideIcons.wheat,
-          label: 'Ernte',
-          route: '/dashboard/harvest',
-        ),
-        _NavLink(
-          icon: LucideIcons.lifeBuoy,
-          label: 'Rettung',
-          route: '/dashboard/rescuer',
-        ),
-        _NavLink(
-          icon: LucideIcons.home,
-          label: 'Wohnen',
-          route: '/dashboard/housing',
-        ),
-        _NavLink(
-          icon: LucideIcons.car,
-          label: 'Mobilität',
-          route: '/dashboard/mobility',
-        ),
-        _NavLink(
-          icon: LucideIcons.briefcase,
-          label: 'Jobs',
-          route: '/dashboard/jobs',
-        ),
+        _NavLink(icon: LucideIcons.repeat, label: 'nav.sharing',
+            route: '/dashboard/sharing'),
+        _NavLink(icon: LucideIcons.clock, label: 'nav.timebank',
+            route: '/dashboard/timebank'),
+        _NavLink(icon: LucideIcons.store, label: 'nav.marketplace',
+            route: '/dashboard/marketplace'),
+        _NavLink(icon: LucideIcons.package, label: 'nav.supply',
+            route: '/dashboard/supply'),
+        _NavLink(icon: LucideIcons.wheat, label: 'nav.harvest',
+            route: '/dashboard/harvest'),
+        _NavLink(icon: LucideIcons.lifeBuoy, label: 'nav.rescuer',
+            route: '/dashboard/rescuer'),
+        _NavLink(icon: LucideIcons.home, label: 'nav.housing',
+            route: '/dashboard/housing'),
+        _NavLink(icon: LucideIcons.car, label: 'nav.mobility',
+            route: '/dashboard/mobility'),
+        _NavLink(icon: LucideIcons.briefcase, label: 'nav.jobs',
+            route: '/dashboard/jobs'),
       ],
     ),
     _NavGroup(
-      label: 'Wissen & Skills',
+      label: 'navGroups.knowledgeAndSkills',
       headIcon: LucideIcons.bookOpen,
       items: [
-        _NavLink(
-          icon: LucideIcons.bookOpen,
-          label: 'Wiki',
-          route: '/dashboard/wiki',
-        ),
-        _NavLink(
-          icon: LucideIcons.graduationCap,
-          label: 'Bildung',
-          route: '/dashboard/knowledge',
-        ),
-        _NavLink(
-          icon: LucideIcons.wrench,
-          label: 'Skills',
-          route: '/dashboard/skills',
-        ),
+        _NavLink(icon: LucideIcons.bookOpen, label: 'nav.wiki',
+            route: '/dashboard/wiki'),
+        _NavLink(icon: LucideIcons.graduationCap, label: 'nav.knowledge',
+            route: '/dashboard/knowledge'),
+        _NavLink(icon: LucideIcons.wrench, label: 'nav.skills',
+            route: '/dashboard/skills'),
       ],
     ),
     _NavGroup(
-      label: 'Mein Bereich',
+      label: 'navGroups.myArea',
       headIcon: LucideIcons.userCircle,
       items: [
-        _NavLink(
-          icon: LucideIcons.user,
-          label: 'Profil',
-          route: '/dashboard/profile',
-        ),
-        _NavLink(
-          icon: LucideIcons.share2,
-          label: 'Nachbarn einladen',
-          route: '/dashboard/invite',
-          variant: _NavVariant.highlight,
-        ),
-        _NavLink(
-          icon: LucideIcons.award,
-          label: 'Badges',
-          route: '/dashboard/badges',
-        ),
-        _NavLink(
-          icon: LucideIcons.calendar,
-          label: 'Kalender',
-          route: '/dashboard/calendar',
-        ),
-        _NavLink(
-          icon: LucideIcons.settings,
-          label: 'Einstellungen',
-          route: '/dashboard/settings',
-        ),
+        _NavLink(icon: LucideIcons.user, label: 'nav.profile',
+            route: '/dashboard/profile'),
+        _NavLink(icon: LucideIcons.share2, label: 'nav.invite',
+            route: '/dashboard/invite', variant: _NavVariant.highlight),
+        _NavLink(icon: LucideIcons.award, label: 'nav.badges',
+            route: '/dashboard/badges'),
+        _NavLink(icon: LucideIcons.calendar, label: 'nav.calendar',
+            route: '/dashboard/calendar'),
+        _NavLink(icon: LucideIcons.settings, label: 'nav.settings',
+            route: '/dashboard/settings'),
       ],
     ),
   ];
 
   static const _NavGroup _adminGroup = _NavGroup(
-    label: 'Admin-Bereich',
+    label: 'navGroups.adminArea',
     headIcon: LucideIcons.shieldCheck,
     items: [
-      _NavLink(
-        icon: LucideIcons.shieldCheck,
-        label: 'Admin-Dashboard',
-        route: '/dashboard/admin',
-      ),
+      _NavLink(icon: LucideIcons.shieldCheck, label: 'nav.admin',
+          route: '/dashboard/admin'),
     ],
   );
 
@@ -291,7 +191,7 @@ class AppDrawer extends ConsumerWidget {
                       size: 18,
                     ),
                     title: Text(
-                      'Abmelden',
+                      'common.logout'.tr(),
                       style: AppTypography.body(
                         size: 14,
                         color: AppColors.herzrotWarm,
@@ -347,7 +247,7 @@ class _ProfileHeader extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            displayName ?? 'Nachbar:in',
+            displayName ?? 'common.neighbour'.tr(),
             style: AppTypography.display(
               size: 18,
               color: AppColors.ink,
@@ -403,7 +303,7 @@ class _GroupSectionState extends State<_GroupSection> {
                 ],
                 Expanded(
                   child: Text(
-                    widget.group.label,
+                    widget.group.label.tr(),
                     style: AppTypography.label(
                       size: 10,
                       color: AppColors.mute,
@@ -490,7 +390,7 @@ class _LinkTile extends ConsumerWidget {
         child: Icon(link.icon, size: 18, color: color),
       ),
       title: Text(
-        link.label,
+        link.label.tr(),
         style: AppTypography.body(
           size: 14,
           color: textColor,

@@ -24,7 +24,8 @@
     "offline": "Hors ligne",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
-    "now": "Maintenant"
+    "now": "Maintenant",
+    "neighbour": "Voisin·e"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -172,7 +173,34 @@
   "onboarding": {
     "skip": "Ignorer",
     "next": "Suivant",
-    "start": "C'est parti"
+    "start": "C'est parti",
+    "steps": {
+      "dashboard": {
+        "title": "Votre tableau de bord",
+        "subtitle": "Tout en un coup d'œil.",
+        "body": "Météo, voisinage, activités, score de confiance et plus — Mensaena s'adapte à votre heure de la journée et vous montre ce qui compte maintenant."
+      },
+      "map": {
+        "title": "La carte",
+        "subtitle": "Qui a besoin d'aide près de chez vous ?",
+        "body": "Voyez sur la carte quelles publications, événements et alertes de crise se trouvent autour de vous. Filtrez par rayon et type."
+      },
+      "create": {
+        "title": "Créer",
+        "subtitle": "Demandez ou offrez.",
+        "body": "Besoin d'aide ? Vous offrez quelque chose ? Créez une publication en quelques secondes avec photos, lieu et 13 catégories."
+      },
+      "chat": {
+        "title": "Chat & communauté",
+        "subtitle": "Restez en contact.",
+        "body": "Messages directs avec vos voisins, canaux communautaires régionaux, livestreams. Messages vocaux et images inclus."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Ne ratez rien d'important.",
+        "body": "Recevez des notifications push pour les messages, demandes d'aide, alertes de crise et mises à jour de votre réseau."
+      }
+    }
   },
   "errors": {
     "generic": "Une erreur s'est produite.",

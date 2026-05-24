@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=i18n-Infrastruktur live (DE/EN/IT/ES/FR/TR/RU). Übersetzung weiterer Screens auf Bedarf.
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n-Foundation ✅
-NEXT=Schrittweise weitere Screen-Strings auf .tr() umstellen
+OPEN=i18n in Drawer/BottomNav/Settings/Auth/Onboarding live. Iterativ in weiteren Screens.
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n-Foundation + i18n-Priority-Screens ✅
+NEXT=Schrittweise restliche Screens auf .tr() umstellen (alle neuen Strings sofort i18n per CLAUDE.md-Pflicht)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(i18n): easy_localization + 7 JSON-Translations (de/en/it/es/fr/tr/ru) mit ~200 Core-Keys, LocaleProvider mit Manual + Auto-by-GPS-Mode, LocaleDetectionService (geocoding + Bounding-Box-Fallback, ISO-Country → unsere 7 Sprachen), Settings → neuer Sprache-Tab mit Auto-Toggle + 7 Flag-Tiles
+LAST_TASK=feat(i18n-w2): AppDrawer alle 38 Labels + 8 Gruppen via translation-keys, BottomNav 5 Items, Settings 8 Tabs, AuthScreen Mode-Labels, OnboardingTour 5 Steps (title+subtitle+body, alle 7 Sprachen), CLAUDE.md i18n-Pflicht-Regel
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

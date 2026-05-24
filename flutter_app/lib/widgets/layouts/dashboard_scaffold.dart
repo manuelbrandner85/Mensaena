@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:easy_localization/easy_localization.dart';
+
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/notifications_repository.dart';
@@ -150,7 +152,7 @@ class _BottomNav extends ConsumerWidget {
               Expanded(
                 child: _BottomItem(
                   icon: LucideIcons.layoutDashboard,
-                  label: 'Home',
+                  label: 'nav.dashboard'.tr(),
                   route: '/dashboard',
                   active: currentRoute == '/dashboard',
                 ),
@@ -158,7 +160,7 @@ class _BottomNav extends ConsumerWidget {
               Expanded(
                 child: _BottomItem(
                   icon: LucideIcons.map,
-                  label: 'Karte',
+                  label: 'nav.map'.tr(),
                   route: '/dashboard/map',
                   active: currentRoute == '/dashboard/map',
                 ),
@@ -198,7 +200,7 @@ class _BottomNav extends ConsumerWidget {
               Expanded(
                 child: _BottomItem(
                   icon: LucideIcons.messageCircle,
-                  label: 'Chat',
+                  label: 'nav.chat'.tr(),
                   route: '/dashboard/messages',
                   active: currentRoute.startsWith('/dashboard/messages') ||
                       currentRoute.startsWith('/dashboard/chat'),
@@ -207,7 +209,7 @@ class _BottomNav extends ConsumerWidget {
               Expanded(
                 child: _BottomItem(
                   icon: LucideIcons.bell,
-                  label: 'Mitteilungen',
+                  label: 'nav.notifications'.tr(),
                   route: '/dashboard/notifications',
                   active: currentRoute == '/dashboard/notifications',
                   badge: unreadNotif,

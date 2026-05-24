@@ -2,7 +2,34 @@
 
 ## Projekt
 Mensaena – Nachbarschaftshilfe-Plattform, live unter www.mensaena.de
-Version 1.0.0-beta | Sprache: Deutsch
+Version 1.0.0-beta | Sprache: Deutsch (Standard) + EN/IT/ES/FR/TR/RU
+
+## i18n-Pflicht (Flutter-App)
+**JEDER neue user-facing String MUSS via `easy_localization` übersetzt werden.**
+
+1. Schreibe NIEMALS hardcodierte UI-Strings wie `Text('Speichern')`.
+   Stattdessen `Text('common.save'.tr())` mit Key aus den 7 JSON-Files.
+2. Bei neuen Keys: füge die Übersetzung in ALLE 7 Files ein
+   (`flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json`).
+   Quelle ist `de.json`. Übersetzungen müssen präzise sein — keine
+   wörtlichen Maschinenübersetzungen, sondern natürliche Sprache pro Land.
+3. Akzeptable Ausnahmen ohne `.tr()`:
+   - Eigennamen ("Mensaena", "WhatsApp", "Supabase")
+   - Zahlen, Datumsformate (mit `intl` formatieren)
+   - SQL/API-Strings, Log-Messages, Debug-Output
+   - Storage-Keys, Routen-Pfade, Asset-Pfade
+4. Schlüssel-Konventionen:
+   - Kategorie-Namespaces: `common`, `nav`, `navGroups`, `auth`, `profile`,
+     `settings`, `chat`, `errors`, `onboarding`, `languages`.
+   - Neuer Screen → eigener Top-Level-Key (z. B. `marketplace.*`,
+     `events.*`, `crisis.*`).
+   - Parameter-Substitution mit `{var}` und `.tr(namedArgs: {'var': value})`.
+5. Pull-Request-Check (mental): Falls du irgendwo `Text(` mit deutschem
+   Stringliteral siehst, ist das ein Bug — sofort beheben.
+
+Imports: `import 'package:easy_localization/easy_localization.dart';`
+Provider/Settings: `lib/providers/locale_provider.dart`
+Translation-Files: `flutter_app/assets/translations/`
 
 ## Tech-Stack
 - Next.js 15.3.0 (App Router, SSR), React 19, TypeScript (strict, kein `any`)

@@ -4,6 +4,7 @@
 /// Icons. Wird nur beim allerersten Launch nach Auth gezeigt.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,42 +51,37 @@ class _OnboardingTourScreenState
   static const _steps = <_TourStep>[
     _TourStep(
       icon: LucideIcons.layoutDashboard,
-      title: 'Dein Dashboard',
-      subtitle: 'Alles auf einen Blick.',
-      body:
-          'Wetter, Nachbarschaft, Aktivitäten, Trust-Score und mehr — Mensaena passt sich deiner Tageszeit an und zeigt dir, was gerade wichtig ist.',
+      titleKey: 'onboarding.steps.dashboard.title',
+      subtitleKey: 'onboarding.steps.dashboard.subtitle',
+      bodyKey: 'onboarding.steps.dashboard.body',
       color: AppColors.amber,
     ),
     _TourStep(
       icon: LucideIcons.map,
-      title: 'Die Karte',
-      subtitle: 'Wer braucht Hilfe in deiner Nähe?',
-      body:
-          'Schaue auf der Karte, welche Beiträge, Veranstaltungen und Krisen-Meldungen es um dich gibt. Filter nach Radius und Typ.',
+      titleKey: 'onboarding.steps.map.title',
+      subtitleKey: 'onboarding.steps.map.subtitle',
+      bodyKey: 'onboarding.steps.map.body',
       color: AppColors.teal,
     ),
     _TourStep(
       icon: LucideIcons.plusCircle,
-      title: 'Erstellen',
-      subtitle: 'Frag oder biete an.',
-      body:
-          'Brauchst du Hilfe? Bietest du etwas an? Erstelle in wenigen Sekunden einen Beitrag mit Fotos, Standort und 13 Kategorien.',
+      titleKey: 'onboarding.steps.create.title',
+      subtitleKey: 'onboarding.steps.create.subtitle',
+      bodyKey: 'onboarding.steps.create.body',
       color: AppColors.bronze,
     ),
     _TourStep(
       icon: LucideIcons.messageCircle,
-      title: 'Chat & Community',
-      subtitle: 'Bleibe in Kontakt.',
-      body:
-          'Direkt-Nachrichten mit Nachbar:innen, regionale Community-Channels, Livestreams. Spracher- und Bildnachrichten inklusive.',
+      titleKey: 'onboarding.steps.chat.title',
+      subtitleKey: 'onboarding.steps.chat.subtitle',
+      bodyKey: 'onboarding.steps.chat.body',
       color: AppColors.lebenSoft,
     ),
     _TourStep(
       icon: LucideIcons.bell,
-      title: 'Benachrichtigungen',
-      subtitle: 'Verpasse nichts Wichtiges.',
-      body:
-          'Erhalte Push-Benachrichtigungen für Nachrichten, Helfer-Anfragen, Krisen-Warnungen und Updates aus deinem Netzwerk.',
+      titleKey: 'onboarding.steps.notifications.title',
+      subtitleKey: 'onboarding.steps.notifications.subtitle',
+      bodyKey: 'onboarding.steps.notifications.body',
       color: AppColors.herzrotWarm,
     ),
   ];
@@ -157,7 +153,7 @@ class _OnboardingTourScreenState
               right: 16,
               child: TextButton(
                 onPressed: _finish,
-                child: Text('Überspringen',
+                child: Text('onboarding.skip'.tr(),
                     style: AppTypography.label(
                         size: 11, color: AppColors.mute)),
               ),
@@ -208,8 +204,8 @@ class _OnboardingTourScreenState
                         ),
                         child: Text(
                           _index < _steps.length - 1
-                              ? 'Weiter'
-                              : 'Los geht\'s',
+                              ? 'onboarding.next'.tr()
+                              : 'onboarding.start'.tr(),
                           style: AppTypography.body(
                             size: 15,
                             color: AppColors.voidColor,
@@ -268,7 +264,7 @@ class _TourCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 48),
-          Text(step.title,
+          Text(step.titleKey.tr(),
               textAlign: TextAlign.center,
               style: AppTypography.display(
                 size: 32,
@@ -276,7 +272,7 @@ class _TourCard extends StatelessWidget {
                 height: 1.15,
               )),
           const SizedBox(height: 8),
-          Text(step.subtitle,
+          Text(step.subtitleKey.tr(),
               textAlign: TextAlign.center,
               style: AppTypography.body(
                 size: 16,
@@ -284,7 +280,7 @@ class _TourCard extends StatelessWidget {
                 weight: FontWeight.w600,
               )),
           const SizedBox(height: 18),
-          Text(step.body,
+          Text(step.bodyKey.tr(),
               textAlign: TextAlign.center,
               style: AppTypography.body(
                 size: 14,
@@ -301,15 +297,15 @@ class _TourCard extends StatelessWidget {
 class _TourStep {
   const _TourStep({
     required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.body,
+    required this.titleKey,
+    required this.subtitleKey,
+    required this.bodyKey,
     required this.color,
   });
 
   final IconData icon;
-  final String title;
-  final String subtitle;
-  final String body;
+  final String titleKey;
+  final String subtitleKey;
+  final String bodyKey;
   final Color color;
 }

@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n-Foundation (7 Sprachen DE/EN/IT/ES/FR/TR/RU mit Manual + Auto-GPS-Detection)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n Priority-Screens umgesetzt (Drawer/BottomNav/Settings/Auth/Onboarding in 7 Sprachen + CLAUDE.md i18n-Pflicht)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

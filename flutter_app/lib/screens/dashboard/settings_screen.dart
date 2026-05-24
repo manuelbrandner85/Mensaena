@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -57,7 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Einstellungen',
+      title: 'settings.title'.tr(),
       currentRoute: '/dashboard/settings',
       body: Column(
         children: [
@@ -70,15 +71,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               labelColor: AppColors.amber,
               unselectedLabelColor: AppColors.inkSoft,
               labelStyle: AppTypography.label(size: 11),
-              tabs: const [
-                Tab(text: 'Account'),
-                Tab(text: 'Privatsphäre'),
-                Tab(text: 'Sicherheit'),
-                Tab(text: 'Sprache'),
-                Tab(text: 'Benachrichtigungen'),
-                Tab(text: 'Standort'),
-                Tab(text: 'Erscheinungsbild'),
-                Tab(text: 'Konto'),
+              tabs: [
+                Tab(text: 'settings.tabs.account'.tr()),
+                Tab(text: 'settings.tabs.privacy'.tr()),
+                Tab(text: 'settings.tabs.security'.tr()),
+                Tab(text: 'settings.tabs.language'.tr()),
+                Tab(text: 'settings.tabs.notifications'.tr()),
+                Tab(text: 'settings.tabs.location'.tr()),
+                Tab(text: 'settings.tabs.appearance'.tr()),
+                Tab(text: 'settings.tabs.account2'.tr()),
               ],
             ),
           ),

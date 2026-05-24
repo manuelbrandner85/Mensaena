@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -164,10 +165,10 @@ class _AuthScreenState extends State<AuthScreen>
       };
 
   String _modeLabel() => switch (_mode) {
-        _AuthMode.login => 'Anmelden',
-        _AuthMode.register => 'Konto erstellen',
-        _AuthMode.forgot => 'Passwort vergessen',
-        _AuthMode.reset => 'Neues Passwort',
+        _AuthMode.login => 'auth.signIn'.tr(),
+        _AuthMode.register => 'auth.signUp'.tr(),
+        _AuthMode.forgot => 'settings.security.forgotPassword'.tr(),
+        _AuthMode.reset => 'settings.security.newPassword'.tr(),
       };
 
   String _heading() => switch (_mode) {

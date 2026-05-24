@@ -24,7 +24,8 @@
     "offline": "Sin conexión",
     "today": "Hoy",
     "yesterday": "Ayer",
-    "now": "Ahora"
+    "now": "Ahora",
+    "neighbour": "Vecino/a"
   },
   "nav": {
     "dashboard": "Panel",
@@ -172,7 +173,34 @@
   "onboarding": {
     "skip": "Saltar",
     "next": "Siguiente",
-    "start": "Vamos"
+    "start": "Vamos",
+    "steps": {
+      "dashboard": {
+        "title": "Tu panel",
+        "subtitle": "Todo de un vistazo.",
+        "body": "Clima, vecindario, actividades, puntuación de confianza y más — Mensaena se adapta a tu hora del día y te muestra lo importante ahora mismo."
+      },
+      "map": {
+        "title": "El mapa",
+        "subtitle": "¿Quién necesita ayuda cerca de ti?",
+        "body": "Mira en el mapa qué publicaciones, eventos y alertas de crisis hay a tu alrededor. Filtra por radio y tipo."
+      },
+      "create": {
+        "title": "Crear",
+        "subtitle": "Pide u ofrece.",
+        "body": "¿Necesitas ayuda? ¿Ofreces algo? Crea una publicación en segundos con fotos, ubicación y 13 categorías."
+      },
+      "chat": {
+        "title": "Chat y comunidad",
+        "subtitle": "Mantente conectado.",
+        "body": "Mensajes directos con vecinos, canales comunitarios regionales, livestreams. Mensajes de voz e imágenes incluidos."
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "subtitle": "No te pierdas nada importante.",
+        "body": "Recibe notificaciones push de mensajes, solicitudes de ayuda, alertas de crisis y actualizaciones de tu red."
+      }
+    }
   },
   "errors": {
     "generic": "Algo salió mal.",
