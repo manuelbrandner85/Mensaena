@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -11,12 +12,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../config/theme/cinema_accents.dart';
+import '../../providers/cinema_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/chat_context_service.dart';
 import '../../services/dm_call_service.dart';
 import '../../services/presence_service.dart';
 import '../../services/supabase_service.dart';
 import '../../services/voice_recorder_service.dart';
+import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/image_lightbox.dart';
 import '../../widgets/shared/voice_message_bubble.dart';
@@ -67,54 +71,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (mounted) setState(() => _context = ctx);
   }
 
-  Widget? _buildActionFab() {
-    final ctx = _context;
-    if (ctx == null) return null;
-    if (ctx.kind == ChatKind.dm) {
-      // Privat-Anruf-Button (Leben-Green = Phone-Call-Style)
-      return FloatingActionButton(
-        backgroundColor:
-            _activeCallId != null ? AppColors.amber : AppColors.leben,
-        foregroundColor: AppColors.voidColor,
-        tooltip: _activeCallId != null ? 'Anruf läuft' : 'Anrufen',
-        onPressed: _activeCallId != null
-            ? () async {
-                await DmCallService.cancel(_activeCallId!);
-                if (mounted) setState(() => _activeCallId = null);
-              }
-            : _startCall,
-        child: Icon(
-          _activeCallId != null
-              ? LucideIcons.phoneOff
-              : LucideIcons.phoneCall,
-        ),
-      );
-    }
-    if (ctx.kind == ChatKind.channel) {
-      // Livestream-Button (Bronze = Cinema-Style)
-      return FloatingActionButton(
-        backgroundColor: _activeStreamRoom != null
-            ? AppColors.herzrot
-            : AppColors.bronze,
-        foregroundColor: AppColors.voidColor,
-        tooltip: _activeStreamRoom != null
-            ? 'Stream beenden'
-            : 'Livestream starten',
-        onPressed: _activeStreamRoom != null
-            ? () async {
-                await LiveStreamService.endChannelStream(_activeStreamRoom!);
-                if (mounted) setState(() => _activeStreamRoom = null);
-              }
-            : _startStream,
-        child: Icon(
-          _activeStreamRoom != null
-              ? LucideIcons.video
-              : LucideIcons.radio,
-        ),
-      );
-    }
-    return null;
-  }
+  // Call/Stream-Buttons sind jetzt im _ChatTopBar integriert (eleganter
+  // statt grosser FAB unten rechts). Die Action-Handler bleiben unten.
 
   Future<void> _startCall() async {
     final ctx = _context;
@@ -402,12 +360,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return DashboardScaffold(
       title: titleText,
       currentRoute: '/dashboard/chat',
-      fab: _buildActionFab(),
       body: SafeArea(
         child: Column(
           children: [
-            // Search-Bar (slide-in) + Toggle-Button
-            _ChatHeaderBar(
+            // Eleganter Chat-Top-Bar: Avatar/Emoji + Name + Action-Icons.
+            // Ersetzt den grossen FAB unten rechts.
+            _ChatTopBar(
+              context: _context,
+              activeCallId: _activeCallId,
+              activeStreamRoom: _activeStreamRoom,
               searchOpen: _searchOpen,
               searchCtrl: _searchCtrl,
               onToggleSearch: () => setState(() {
@@ -418,11 +379,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 }
               }),
               onSearchChanged: (v) => setState(() => _searchQuery = v),
+              onStartCall: _startCall,
+              onCancelCall: () async {
+                if (_activeCallId == null) return;
+                await DmCallService.cancel(_activeCallId!);
+                if (mounted) setState(() => _activeCallId = null);
+              },
+              onStartStream: _startStream,
+              onEndStream: () async {
+                if (_activeStreamRoom == null) return;
+                await LiveStreamService.endChannelStream(_activeStreamRoom!);
+                if (mounted) setState(() => _activeStreamRoom = null);
+              },
             ),
-            // DM-Presence: Online-Status-Dot des Peers unter dem Header.
-            if (_context?.kind == ChatKind.dm &&
-                _context?.partnerId != null)
-              _DmPresenceBar(peerId: _context!.partnerId!),
             // Live-Banner — wenn jemand im Channel live ist, koennen
             // alle anderen beitreten.
             if (_context?.kind == ChatKind.channel)
@@ -1486,77 +1455,327 @@ class _PinnedMessagesPanel extends StatelessWidget {
 // In-Chat Search Bar — Toggle-Icon + slide-down input field.
 // 1:1 zu Web ChatView.tsx message-search.
 // ─────────────────────────────────────────────────────────────
-class _ChatHeaderBar extends StatelessWidget {
-  const _ChatHeaderBar({
+/// Eleganter Chat-Top-Bar — Avatar/Emoji + Name + Presence + Action-Icons.
+/// Ersetzt den grossen FAB unten rechts. Phase-aware via CinemaAccents.
+class _ChatTopBar extends ConsumerStatefulWidget {
+  const _ChatTopBar({
+    required this.context,
+    required this.activeCallId,
+    required this.activeStreamRoom,
     required this.searchOpen,
     required this.searchCtrl,
     required this.onToggleSearch,
     required this.onSearchChanged,
+    required this.onStartCall,
+    required this.onCancelCall,
+    required this.onStartStream,
+    required this.onEndStream,
   });
 
+  final ChatContext? context;
+  final String? activeCallId;
+  final String? activeStreamRoom;
   final bool searchOpen;
   final TextEditingController searchCtrl;
   final VoidCallback onToggleSearch;
   final ValueChanged<String> onSearchChanged;
+  final Future<void> Function() onStartCall;
+  final Future<void> Function() onCancelCall;
+  final Future<void> Function() onStartStream;
+  final Future<void> Function() onEndStream;
+
+  @override
+  ConsumerState<_ChatTopBar> createState() => _ChatTopBarState();
+}
+
+class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
+  @override
+  Widget build(BuildContext context) {
+    final ctx = widget.context;
+    final phase = ref.watch(effectiveCinemaPhaseProvider);
+    final accent = CinemaAccents.hue(phase);
+    final isDm = ctx?.kind == ChatKind.dm;
+    final isChannel = ctx?.kind == ChatKind.channel;
+    final isOnline = isDm && ctx?.partnerId != null
+        ? (ref.watch(onlineUsersProvider).value?.contains(ctx!.partnerId!) ??
+            false)
+        : false;
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.surface.withValues(alpha: 0.35),
+            AppColors.surface.withValues(alpha: 0.0),
+          ],
+        ),
+        border: Border(
+          bottom: BorderSide(
+            color: accent.withValues(alpha: 0.15),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Row 1 — Avatar/Emoji + Name/Subtitle + Action-Icons
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+            child: Row(
+              children: [
+                _LeadingBadge(ctx: ctx, isOnline: isOnline, accent: accent),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ctx?.title ?? 'Chat',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.body(
+                          size: 14,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        _subtitle(ctx, isOnline),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.label(
+                          size: 9,
+                          color: isOnline
+                              ? AppColors.lebenSoft
+                              : AppColors.mute,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Action-Icons je nach Kontext
+                if (isDm)
+                  _ActionIcon(
+                    icon: widget.activeCallId != null
+                        ? LucideIcons.phoneOff
+                        : LucideIcons.phone,
+                    label: widget.activeCallId != null
+                        ? 'Auflegen'
+                        : 'Anrufen',
+                    color: widget.activeCallId != null
+                        ? AppColors.herzrot
+                        : AppColors.leben,
+                    onTap: widget.activeCallId != null
+                        ? () async => widget.onCancelCall()
+                        : () async => widget.onStartCall(),
+                    pulse: widget.activeCallId != null,
+                  ),
+                if (isChannel)
+                  _ActionIcon(
+                    icon: widget.activeStreamRoom != null
+                        ? LucideIcons.videoOff
+                        : LucideIcons.radio,
+                    label: widget.activeStreamRoom != null
+                        ? 'Stream beenden'
+                        : 'Livestream',
+                    color: widget.activeStreamRoom != null
+                        ? AppColors.herzrot
+                        : AppColors.bronze,
+                    onTap: widget.activeStreamRoom != null
+                        ? () async => widget.onEndStream()
+                        : () async => widget.onStartStream(),
+                    pulse: widget.activeStreamRoom != null,
+                  ),
+                _ActionIcon(
+                  icon: widget.searchOpen
+                      ? LucideIcons.x
+                      : LucideIcons.search,
+                  label: widget.searchOpen ? 'Suche schließen' : 'Suchen',
+                  color: widget.searchOpen ? accent : AppColors.mute,
+                  onTap: () async => widget.onToggleSearch(),
+                ),
+              ],
+            ),
+          ),
+          // Slide-in Search-Field
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            child: widget.searchOpen
+                ? Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                    child: TextField(
+                      controller: widget.searchCtrl,
+                      autofocus: true,
+                      onChanged: widget.onSearchChanged,
+                      style: AppTypography.body(
+                          size: 13, color: AppColors.ink),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: AppColors.elevated,
+                        prefixIcon: const Icon(LucideIcons.search,
+                            size: 14, color: AppColors.mute),
+                        hintText: 'Nachrichten durchsuchen…',
+                        hintStyle: AppTypography.body(
+                            size: 12, color: AppColors.mute),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              BorderSide(color: accent, width: 1.5),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _subtitle(ChatContext? ctx, bool isOnline) {
+    if (ctx == null) return '';
+    if (ctx.kind == ChatKind.dm) {
+      return isOnline ? 'Online' : 'Offline';
+    }
+    if (ctx.kind == ChatKind.channel) {
+      return ctx.subtitle ?? 'Community-Kanal';
+    }
+    if (ctx.kind == ChatKind.group) return 'Gruppe';
+    return '';
+  }
+}
+
+class _LeadingBadge extends StatelessWidget {
+  const _LeadingBadge({
+    required this.ctx,
+    required this.isOnline,
+    required this.accent,
+  });
+
+  final ChatContext? ctx;
+  final bool isOnline;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final hasAvatar = ctx?.avatarUrl != null && ctx!.avatarUrl!.isNotEmpty;
+    final emoji = ctx?.emoji ?? '💬';
+    return Stack(
       children: [
-        // Compact toolbar with search-toggle button (right-aligned)
-        SizedBox(
-          height: 36,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                tooltip: searchOpen
-                    ? 'Suche schließen'
-                    : 'Im Chat suchen',
-                onPressed: onToggleSearch,
-                icon: Icon(
-                  searchOpen ? LucideIcons.x : LucideIcons.search,
-                  size: 18,
-                  color: searchOpen ? AppColors.bronze : AppColors.mute,
-                ),
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: hasAvatar
+                ? null
+                : RadialGradient(colors: [
+                    accent.withValues(alpha: 0.30),
+                    accent.withValues(alpha: 0.10),
+                  ]),
+            border: Border.all(
+              color: accent.withValues(alpha: 0.45),
+              width: 1.2,
+            ),
+            image: hasAvatar
+                ? DecorationImage(
+                    image: NetworkImage(ctx!.avatarUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+            boxShadow: [
+              BoxShadow(
+                color: accent.withValues(alpha: 0.20),
+                blurRadius: 10,
+                spreadRadius: -2,
               ),
             ],
           ),
+          alignment: Alignment.center,
+          child: hasAvatar
+              ? null
+              : Text(emoji, style: const TextStyle(fontSize: 18)),
         ),
-        // Slide-in search input (animated height)
-        AnimatedSize(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOut,
-          child: searchOpen
-              ? Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                  child: TextField(
-                    controller: searchCtrl,
-                    autofocus: true,
-                    onChanged: onSearchChanged,
-                    style: AppTypography.body(
-                        size: 13, color: AppColors.ink),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: AppColors.elevated,
-                      prefixIcon: const Icon(LucideIcons.search,
-                          size: 14, color: AppColors.mute),
-                      hintText: 'Nachrichten in diesem Chat suchen…',
-                      hintStyle: AppTypography.body(
-                          size: 12, color: AppColors.mute),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox(width: double.infinity),
-        ),
+        if (isOnline)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: AppColors.leben,
+                shape: BoxShape.circle,
+                border: Border.all(
+                    color: AppColors.voidColor, width: 2),
+              ),
+            ),
+          ),
       ],
+    );
+  }
+}
+
+class _ActionIcon extends StatelessWidget {
+  const _ActionIcon({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+    this.pulse = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Future<void> Function() onTap;
+  final bool pulse;
+
+  @override
+  Widget build(BuildContext context) {
+    final btn = Tooltip(
+      message: label,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 38,
+          height: 38,
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: pulse ? 0.22 : 0.14),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: color.withValues(alpha: 0.40),
+              width: 1,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 17, color: color),
+        ),
+      ),
+    );
+    if (!pulse) return btn;
+    return PulseBloom(
+      color: color,
+      radius: 18,
+      minIntensity: 0.4,
+      maxIntensity: 0.85,
+      child: btn,
     );
   }
 }
@@ -1750,40 +1969,4 @@ class _PinnedItem extends StatelessWidget {
   }
 }
 
-// ── DM-Presence-Bar — zeigt Online/Offline-Status des Peers ──────────
-class _DmPresenceBar extends ConsumerWidget {
-  const _DmPresenceBar({required this.peerId});
-  final String peerId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final online = ref.watch(onlineUsersProvider).value?.contains(peerId) ??
-        false;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      color: AppColors.surface.withValues(alpha: 0.3),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(
-              color: online ? AppColors.leben : AppColors.mute,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            online ? 'Online' : 'Offline',
-            style: AppTypography.label(
-              size: 9,
-              color: online ? AppColors.lebenSoft : AppColors.mute,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// DM-Presence-Bar wurde in _ChatTopBar integriert — kein separater Bar mehr.

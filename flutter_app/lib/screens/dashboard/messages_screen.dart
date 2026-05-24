@@ -6,6 +6,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../config/theme/cinema_accents.dart';
+import '../../providers/cinema_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/presence_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -217,41 +219,63 @@ class _ChannelListView extends StatelessWidget {
   }
 }
 
-class _ChannelTile extends StatelessWidget {
+class _ChannelTile extends ConsumerWidget {
   const _ChannelTile({required this.channel});
   final Map<String, dynamic> channel;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final convId = channel['conversation_id'] as String?;
     final name = (channel['name'] as String?) ?? 'Kanal';
     final emoji = (channel['emoji'] as String?) ?? '💬';
     final desc = channel['description'] as String?;
     final locked = channel['is_locked'] == true;
+    final phase = ref.watch(effectiveCinemaPhaseProvider);
+    final accent = CinemaAccents.hue(phase);
     return InkWell(
       onTap: convId == null
           ? null
           : () => context.go('/dashboard/messages/$convId'),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.5),
-          border: Border.all(color: AppColors.line),
-          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            colors: [
+              AppColors.surface.withValues(alpha: 0.55),
+              AppColors.surface.withValues(alpha: 0.30),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+              color: accent.withValues(alpha: 0.22), width: 1),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppColors.bronze.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(10),
+                gradient: RadialGradient(colors: [
+                  accent.withValues(alpha: 0.28),
+                  accent.withValues(alpha: 0.10),
+                ]),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: accent.withValues(alpha: 0.45), width: 1),
               ),
-              child: Text(emoji, style: const TextStyle(fontSize: 20)),
+              child: Text(emoji, style: const TextStyle(fontSize: 22)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -272,8 +296,9 @@ class _ChannelTile extends StatelessWidget {
                         ),
                       ),
                       if (locked)
-                        const Icon(LucideIcons.lock,
-                            size: 12, color: AppColors.mute),
+                        Icon(LucideIcons.lock,
+                            size: 12,
+                            color: accent.withValues(alpha: 0.7)),
                     ],
                   ),
                   if (desc != null && desc.isNotEmpty) ...[
@@ -289,8 +314,8 @@ class _ChannelTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight,
-                size: 14, color: AppColors.mute),
+            Icon(LucideIcons.chevronRight,
+                size: 14, color: accent.withValues(alpha: 0.6)),
           ],
         ),
       ),
@@ -397,13 +422,13 @@ class _DmListView extends StatelessWidget {
   }
 }
 
-class _DmTile extends StatelessWidget {
+class _DmTile extends ConsumerWidget {
   const _DmTile({required this.conv, required this.onlineUserIds});
   final Map<String, dynamic> conv;
   final Set<String> onlineUserIds;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final id = conv['id'] as String;
     final title = (conv['display_title'] as String?) ??
         (conv['title'] as String?) ??
@@ -416,17 +441,36 @@ class _DmTile extends StatelessWidget {
         DateTime.now();
     final peerId = conv['peer_user_id'] as String?;
     final online = peerId != null && onlineUserIds.contains(peerId);
+    final phase = ref.watch(effectiveCinemaPhaseProvider);
+    final accent = CinemaAccents.hue(phase);
 
     return InkWell(
       onTap: () => context.go('/dashboard/messages/$id'),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.5),
-          border: Border.all(color: AppColors.line),
-          borderRadius: BorderRadius.circular(12),
+          gradient: LinearGradient(
+            colors: [
+              AppColors.surface.withValues(alpha: 0.55),
+              AppColors.surface.withValues(alpha: 0.30),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+              color: (online ? AppColors.leben : accent)
+                  .withValues(alpha: 0.22),
+              width: 1),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [
