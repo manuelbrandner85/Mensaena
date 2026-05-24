@@ -15,6 +15,7 @@ import '../../services/haptics.dart';
 import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
 import '../navigation/language_picker.dart';
+import '../shared/smart_action_sheet.dart';
 import '../shared/fcm_foreground_listener.dart';
 import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
@@ -185,7 +186,7 @@ class _BottomNav extends ConsumerWidget {
                     return GestureDetector(
                       onTap: () {
                         Haptics.confirm();
-                        context.go('/dashboard/create');
+                        SmartActionSheet.show(context);
                       },
                       child: PulseBloom(
                         color: glow,

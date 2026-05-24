@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos + Push W1-W3 FULL-STACK (20 SQL-Trigger + 5 cron-Jobs + 6 Android-Channels + Edge Function Prefs-Filter + Settings-UI)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos + Push W1-W3 + Modul-Audit Sprint 1 (Smart-Action-Sheet, OSM/NINA-Imports, SOS-Banner)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/crisis.dart';
 import '../../../repositories/crisis_repository.dart';
+import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -110,6 +111,7 @@ class _CrisisDashboardScreenState
       body: SafeArea(
         child: Column(
           children: [
+            const _SosTopBanner(),
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
@@ -795,3 +797,125 @@ class _CrisisTile extends StatelessWidget {
 
 
 enum _CrisisView { list, map }
+
+// ── SOS Top-Banner — prominenter 112-Notruf + Safe-Check-In ───────────
+class _SosTopBanner extends StatelessWidget {
+  const _SosTopBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.herzrot, AppColors.herzrotWarm],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.herzrot.withValues(alpha: 0.35),
+            blurRadius: 14,
+            spreadRadius: -3,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Lebensgefahr?',
+                    style: AppTypography.body(
+                        size: 11,
+                        color: Colors.white,
+                        weight: FontWeight.w600,
+                        letterSpacing: 0.5)),
+                const SizedBox(height: 2),
+                Text('Sofort 112 anrufen',
+                    style: AppTypography.display(
+                        size: 18, color: Colors.white, height: 1.1)),
+              ],
+            ),
+          ),
+          // Safe-Check-In: schneller Status für Familie
+          OutlinedButton.icon(
+            onPressed: () => _sendSafeCheckIn(context),
+            icon: const Icon(LucideIcons.shieldCheck,
+                size: 14, color: Colors.white),
+            label: Text('Ich bin sicher',
+                style: AppTypography.label(
+                    size: 9, color: Colors.white)),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Colors.white.withValues(alpha: 0.6)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // 112-Call
+          InkWell(
+            onTap: () => launchUrl(Uri.parse('tel:112')),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 52,
+              height: 52,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.95),
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+              child: const Text('112',
+                  style: TextStyle(
+                    color: AppColors.herzrot,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  )),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _sendSafeCheckIn(BuildContext context) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    try {
+      // Status broadcast via user_status + thanks an Profil-Kontakte.
+      await sb.from('user_status').upsert({
+        'user_id': uid,
+        'status': 'safe',
+        'status_text':
+            '✅ Bin sicher (${DateTime.now().toLocal().toIso8601String().substring(11, 16)})',
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Safe-Check-In gesendet ✅',
+            style: AppTypography.body(size: 13, color: AppColors.leben)),
+      ));
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Fehler: $e',
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
+  }
+}

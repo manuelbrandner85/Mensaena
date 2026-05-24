@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Push komplett (Wave 1+2+3 mit cron-Reminders + Bot-Broadcast). CI deploy-supabase gefixed.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + 25 Extra-Repos + Push Full-Stack W1-W3 ✅
-NEXT=Frei
+OPEN=Modul-Audit Sprint 1 live (Smart-Action-Sheet, OSM/NINA-Import, SOS-Banner). Sprint 2-4 ausstehend.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Push W1-W3 + Modul-Audit Sprint 1 ✅
+NEXT=Sprint 2 (Modul-Konsolidierungen B1+B2 + Barcode-Scan + Food Facts + Marketplace-Scan)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(push-wave3): 5 pg_cron-Jobs (F1 event-reminders */5min, F2 challenge-reminders 09:00 täglich, F3 inactivity Mo 10:00, F4 daily-digest 07:00, G1 bot-broadcast jede Minute) + profile.timezone + profile.last_seen_at. PLUS: CI deploy-supabase Fix — delete-user + run-migrations Imports von '@2' auf '@2.45.4' gepinnt (esm.sh HTTP 522 bei unpinned Builds).
+LAST_TASK=feat(modul-audit Sprint 1): A1 Smart-Action-Sheet ersetzt generischen Erstellen-Screen (8 Aktionen direkt zu Modul-Create-Flows), A2 BottomNav-FAB öffnet jetzt das Sheet. C3 Edge Function import-farms-overpass + cron Mo 04:00 UTC (OSM-POIs für Bauernhof/Hofladen/Imkerei/Käserei/Mühle in DACH-BBox, upsert via slug-unique). C4 Edge Function import-nina-warnings + cron */30min (DWD+MOWAS+KATWARN+BIWAPP). E3 _SosTopBanner auf Crisis-Dashboard: herzrot-Gradient mit Pulse-Shadow, 112-Notruf-Kreis, "Ich bin sicher"-Check-In schreibt in user_status.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
