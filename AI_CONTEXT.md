@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 5 KOMPLETT: alle 7 Sub-Tasks (Voice-Recorder + Multi-Image-Carousel zusaetzlich)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-6 KOMPLETT — LiveKit-Secrets in private.push_config gesetzt, Calls/Livestreams live
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -196,6 +196,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-05-24 | feat(livekit): Phase 6 LiveKit-Secrets KOMPLETT — User hat KEY (APImsn6f2c8fd70b21c369) + SECRET (40-char MnKPrt1...Dy2) aus /opt/livekit/docker-compose.yaml extrahiert; INSERT in private.push_config; Edge-Function /functions/v1/livekit-token?check=1 zeigt has_key:true,has_secret:true; LiveKit-Server akzeptiert HMAC-Signature; Calls + Livestreams ab sofort funktional | DB-only — private.push_config Update |
 | 2026-05-24 | feat(flutter): Phase 5.6 Multi-Image-Carousel — ImageCarousel-Widget (PageView + Index-Counter + animated Indicator-Dots + Tap-zur-Lightbox); Post.imageUrls + allImageUrls Getter; PostCard zeigt Carousel zwischen Description und Action-Bar; Post-Detail Hero nutzt shared Widget | flutter_app/lib/widgets/shared/image_carousel.dart, flutter_app/lib/models/post.dart, flutter_app/lib/widgets/shared/post_card.dart, flutter_app/lib/screens/dashboard/post_detail_screen.dart |
 | 2026-05-24 | feat(flutter): Phase 5.2 Voice-Recorder — record:^5.1.2 + audioplayers:^6.0.0 (R7-Begruendung: 1:1 zu Web); VoiceRecorderService (start/stop/cancel/upload/encode/decode); chat-voice-messages Bucket mit RLS; VoiceMessageBubble (Play/Pause + Pseudo-Waveform 16 bars + Progress); _VoiceRecorderButton im Composer; Message-Format [VOICE:url:seconds] | flutter_app/lib/services/voice_recorder_service.dart, flutter_app/lib/widgets/shared/voice_message_bubble.dart, flutter_app/lib/screens/dashboard/chat_screen.dart, supabase Migration chat_voice_messages_bucket |
 | 2026-05-24 | feat(flutter): Phase 5.7 Comments-Reply-Nested — _buildCommentTree depth-1 (Roots + indented Replies via parent_id-Map); _CommentTile.onReply setzt _replyToParentId+_replyToAuthor; Reply-Banner ueber _CommentInput mit Author-Name + Cancel-X; PostCommentsRepository.add nimmt jetzt parentId | flutter_app/lib/screens/dashboard/post_detail_screen.dart |

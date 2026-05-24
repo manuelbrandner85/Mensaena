@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Phase 6 LiveKit-Secrets Setup (Hostinger KEY-Name fehlt) + freie Folge-Polish
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-5 ✅ (alle 7 Sub-Tasks)
-NEXT=User muss LIVEKIT_SELF_KEY in private.push_config setzen (siehe LIVEKIT_SETUP.md)
+OPEN=Frei für Polish + neue Web-Features
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-6 ✅ KOMPLETT
+NEXT=Frei — Hauptpfad fertig, freier User-Wunsch (z.B. Voice-Recorder-iOS-Pendant, weitere Trust-Profile-Anzeige im fremden Profil, Marketplace-Detail-Polish)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(flutter): Phase 5 KOMPLETT — Voice-Recorder (5.2) + Multi-Image-Carousel (5.6)
+LAST_TASK=feat(livekit): LIVEKIT_SELF_KEY in private.push_config gesetzt — Phase 6 KOMPLETT
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
@@ -53,7 +53,7 @@ LAST_TASK=feat(flutter): Phase 5 KOMPLETT — Voice-Recorder (5.2) + Multi-Image
 - [x] Phase 5.5 – Account-Deletion + Data-Export (2026-05-24): _DangerTab umgebaut zu StatefulWidget; _exportData parallel-fetch von profile/posts/comments/messages/interactions/trust_ratings/notifications/saved_posts/badges → JSON via Share.shareXFiles (DSGVO Art. 20); _deleteAccount 3-Stage-Flow (Warning → typed "LOESCHEN" → RPC delete_my_account mit Fallback auf is_banned/anonymize)
 - [x] Phase 5.6 – Multi-Image-Carousel in PostCard + Post-Detail (2026-05-24): ImageCarousel-Widget (PageView + Index-Counter top-right + animated Indicator-Dots bottom + Tap-zur-Lightbox); Post-Model um imageUrls erweitert (image_urls[] Spalte) + allImageUrls Getter (image_urls + media_urls merged); PostCard zeigt Carousel zwischen Description und Action-Bar; Post-Detail Hero nutzt jetzt shared ImageCarousel statt eigenes PageView
 - [x] Phase 5.7 – Comments-Reply-Nested (2026-05-24): _buildCommentTree depth-1 (Roots + indented Replies via parent_id-Map); _CommentTile.onReply setzt _replyToParentId+_replyToAuthor; Reply-Banner ueber _CommentInput mit Author-Name + X zum Abbrechen; PostCommentsRepository.add nimmt parentId
-- [ ] Phase 6 – LiveKit-Secrets Setup (Hostinger livekit.yaml Key-Name fehlt noch in private.push_config)
+- [x] Phase 6 – LiveKit-Secrets Setup (2026-05-24): User hat KEY+SECRET aus /opt/livekit/docker-compose.yaml via `docker compose config | awk '/keys:/{f=1;next}/redis:/{f=0}f'` extrahiert (Key APImsn6f2c8fd70b21c369, Secret 40-char). Verifikation gegen wss://livekit.mensaena.de: HMAC-Signature wird akzeptiert (Permission-denied bei CreateRoom ist erwartet, da Token nur roomJoin hat — fuer echte Calls reicht das). INSERT in private.push_config; Edge-Function-Diagnose zeigt has_key:true, has_secret:true.
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)
