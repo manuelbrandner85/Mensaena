@@ -232,7 +232,10 @@
     "reply": "Risposta",
     "view": "Vedi",
     "pinnedMessages": "Messaggi fissati",
-    "micPermissionDenied": "Permesso microfono negato."
+    "micPermissionDenied": "Permesso microfono negato.",
+    "messageHint": "Messaggio… (@ per menzionare)",
+    "send": "Invia",
+    "liveLabel": "LIVE"
   },
   "languages": {
     "de": "Tedesco",
@@ -313,7 +316,24 @@
     "exploreMap": "Esplora la mappa",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Salva posizione"
+    "saveLocation": "Salva posizione",
+    "statsTitle": "La tua panoramica",
+    "statNearby": "Nelle vicinanze",
+    "statUnread": "Non letti",
+    "statInteractions": "Interazioni",
+    "statTrust": "Fiducia",
+    "qaPost": "Pubblica",
+    "qaMap": "Mappa",
+    "qaChat": "Chat",
+    "qaSos": "SOS crisi",
+    "nearbyTitle": "Vicino a te",
+    "feedEmptyTitle": "Ancora nessun post nelle vicinanze.",
+    "feedEmptyBody": "Sii il primo — crea un post con il pulsante più.",
+    "feedEmptyCta": "Crea post",
+    "weatherUnlockTitle": "Sblocca meteo",
+    "weatherUnlockBody": "Imposta la tua posizione nelle impostazioni per vedere meteo e allerte locali.",
+    "dashboardTitle": "Panoramica",
+    "configureWidgets": "Configura widget"
   },
   "matching": {
     "disabled": "Matching disattivato",
@@ -514,7 +534,19 @@
     "cat_health": "Salute",
     "cat_poison": "Centro antiveleni",
     "cat_eu": "Hotline UE",
-    "cat_other": "Altro"
+    "cat_other": "Altro",
+    "createTitle": "Segnala una crisi",
+    "lifeDangerHint": "In caso di pericolo di vita, chiamare PRIMA il 112.",
+    "fieldTitleRequired": "Titolo e descrizione sono obbligatori.",
+    "saveFailed": "Impossibile salvare la crisi.",
+    "fieldTitle": "Titolo",
+    "fieldDescription": "Cosa è successo?",
+    "fieldLocation": "Luogo / indirizzo",
+    "sendingShort": "Invio…",
+    "reportButton": "Segnala crisi",
+    "voiceHint": "Tocca il microfono — parla liberamente, lo scriveremo noi.",
+    "emergencyQuickAccess": "Apri numeri di emergenza",
+    "ctaPrimary": "Accesso rapido"
   },
   "posts": {
     "title": "Post",

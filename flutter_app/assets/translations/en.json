@@ -232,7 +232,10 @@
     "reply": "Reply",
     "view": "View",
     "pinnedMessages": "Pinned messages",
-    "micPermissionDenied": "Microphone permission denied."
+    "micPermissionDenied": "Microphone permission denied.",
+    "messageHint": "Message… (@ to mention)",
+    "send": "Send",
+    "liveLabel": "LIVE"
   },
   "languages": {
     "de": "German",
@@ -313,7 +316,24 @@
     "exploreMap": "Explore the map",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Save location"
+    "saveLocation": "Save location",
+    "statsTitle": "Your overview",
+    "statNearby": "Nearby",
+    "statUnread": "Unread",
+    "statInteractions": "Interactions",
+    "statTrust": "Trust",
+    "qaPost": "Post",
+    "qaMap": "Map",
+    "qaChat": "Chat",
+    "qaSos": "Crisis SOS",
+    "nearbyTitle": "Near you",
+    "feedEmptyTitle": "No posts near you yet.",
+    "feedEmptyBody": "Be the first — create a post with the plus button.",
+    "feedEmptyCta": "Create post",
+    "weatherUnlockTitle": "Unlock weather",
+    "weatherUnlockBody": "Set your location in settings to see weather and local alerts.",
+    "dashboardTitle": "Overview",
+    "configureWidgets": "Configure widgets"
   },
   "matching": {
     "disabled": "Matching is disabled",
@@ -514,7 +534,19 @@
     "cat_health": "Health",
     "cat_poison": "Poison control",
     "cat_eu": "EU hotlines",
-    "cat_other": "Other"
+    "cat_other": "Other",
+    "createTitle": "Report a crisis",
+    "lifeDangerHint": "If lives are in immediate danger, call 112 FIRST.",
+    "fieldTitleRequired": "Title and description are required.",
+    "saveFailed": "Could not save crisis.",
+    "fieldTitle": "Title",
+    "fieldDescription": "What happened?",
+    "fieldLocation": "Location / address",
+    "sendingShort": "Sending…",
+    "reportButton": "Report crisis",
+    "voiceHint": "Tap the mic — speak freely, we'll write it down.",
+    "emergencyQuickAccess": "Open emergency numbers",
+    "ctaPrimary": "Quick access"
   },
   "posts": {
     "title": "Posts",

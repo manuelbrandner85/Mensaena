@@ -263,19 +263,19 @@ class _ChannelTile extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 48,
+              height: 48,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 gradient: RadialGradient(colors: [
-                  accent.withValues(alpha: 0.28),
+                  accent.withValues(alpha: 0.30),
                   accent.withValues(alpha: 0.10),
                 ]),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                     color: accent.withValues(alpha: 0.45), width: 1),
               ),
-              child: Text(emoji, style: const TextStyle(fontSize: 22)),
+              child: Text(emoji, style: const TextStyle(fontSize: 24)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -477,13 +477,13 @@ class _DmTile extends ConsumerWidget {
             Stack(
               children: [
                 CircleAvatar(
-                  radius: 20,
+                  radius: 22, // 44dp — empfohlene Touch-Affordanz
                   backgroundColor: AppColors.elevated,
                   backgroundImage:
                       avatarUrl != null ? NetworkImage(avatarUrl) : null,
                   child: avatarUrl == null
                       ? const Icon(LucideIcons.user,
-                          size: 18, color: AppColors.bronze)
+                          size: 20, color: AppColors.bronze)
                       : null,
                 ),
                 if (online && isDm)
@@ -491,13 +491,20 @@ class _DmTile extends ConsumerWidget {
                     right: 0,
                     bottom: 0,
                     child: Container(
-                      width: 11,
-                      height: 11,
+                      width: 12,
+                      height: 12,
                       decoration: BoxDecoration(
                         color: AppColors.leben,
                         shape: BoxShape.circle,
                         border: Border.all(
                             color: AppColors.surface, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                AppColors.leben.withValues(alpha: 0.45),
+                            blurRadius: 6,
+                          ),
+                        ],
                       ),
                     ),
                   ),

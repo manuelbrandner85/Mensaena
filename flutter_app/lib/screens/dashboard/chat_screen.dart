@@ -679,9 +679,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       maxLines: null,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
+                      onChanged: (_) => setState(() {}),
                       style: AppTypography.body(size: 14, color: AppColors.ink),
-                      decoration: const InputDecoration(
-                        hintText: 'Nachricht… (@ für Mention)',
+                      decoration: InputDecoration(
+                        hintText: 'chat.messageHint'.tr(),
                         isDense: true,
                       ),
                     ),
@@ -694,10 +695,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     conversationId: widget.conversationId,
                     onUploaded: _sendVoice,
                   ),
-                  const SizedBox(width: 4),
-                  IconButton(
+                  const SizedBox(width: 6),
+                  // Send-Button: aktiv = Bronze-Glow, inaktiv = opacity 0.3
+                  _SendButton(
+                    enabled: _ctrl.text.trim().isNotEmpty,
                     onPressed: _send,
-                    icon: const Icon(LucideIcons.send, color: AppColors.amber),
                   ),
                 ],
               ),
@@ -1241,6 +1243,62 @@ class _TypingDotsState extends State<_TypingDots>
 }
 
 // ─────────────────────────────────────────────────────────────
+// SendButton — Bronze-Glow bei aktiv, dimmed bei leer
+// ─────────────────────────────────────────────────────────────
+class _SendButton extends StatelessWidget {
+  const _SendButton({required this.enabled, required this.onPressed});
+
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'chat.send'.tr(),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: enabled
+              ? LinearGradient(
+                  colors: [
+                    AppColors.bronze,
+                    AppColors.bronze.withValues(alpha: 0.7),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: enabled ? null : AppColors.elevated,
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: AppColors.bronze.withValues(alpha: 0.5),
+                    blurRadius: 14,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          onPressed: enabled ? onPressed : null,
+          icon: Icon(
+            LucideIcons.send,
+            size: 20,
+            color: enabled
+                ? AppColors.voidColor
+                : AppColors.bronze.withValues(alpha: 0.3),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 // Live-Banner — zeigt sich nur wenn jemand im Channel live ist
 // Jeder kann tap'en um beizutreten (host=0 → guest)
 // ─────────────────────────────────────────────────────────────
@@ -1337,7 +1395,7 @@ class _LiveRoomBannerState extends State<_LiveRoomBanner>
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text('LIVE',
+                Text('chat.liveLabel'.tr(),
                     style: AppTypography.label(
                         size: 10, color: AppColors.herzrotWarm)),
                 const SizedBox(width: 8),

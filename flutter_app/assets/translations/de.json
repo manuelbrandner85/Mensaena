@@ -232,7 +232,10 @@
     "reply": "Antwort",
     "view": "Ansehen",
     "pinnedMessages": "Angepinnte Nachrichten",
-    "micPermissionDenied": "Mikrofon-Berechtigung verweigert."
+    "micPermissionDenied": "Mikrofon-Berechtigung verweigert.",
+    "messageHint": "Nachricht… (@ für Mention)",
+    "send": "Senden",
+    "liveLabel": "LIVE"
   },
   "languages": {
     "de": "Deutsch",
@@ -313,7 +316,24 @@
     "exploreMap": "Erkunde die Karte",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Standort speichern"
+    "saveLocation": "Standort speichern",
+    "statsTitle": "Dein Überblick",
+    "statNearby": "In der Nähe",
+    "statUnread": "Ungelesen",
+    "statInteractions": "Interaktionen",
+    "statTrust": "Trust",
+    "qaPost": "Posten",
+    "qaMap": "Karte",
+    "qaChat": "Chat",
+    "qaSos": "Krisen-SOS",
+    "nearbyTitle": "In deiner Nähe",
+    "feedEmptyTitle": "Noch keine Beiträge in deiner Nähe.",
+    "feedEmptyBody": "Sei der/die Erste — erstelle einen Beitrag mit dem Plus-Button.",
+    "feedEmptyCta": "Beitrag erstellen",
+    "weatherUnlockTitle": "Wetter freischalten",
+    "weatherUnlockBody": "Setze deinen Standort in den Einstellungen, um Wetter & lokale Warnungen zu sehen.",
+    "dashboardTitle": "Übersicht",
+    "configureWidgets": "Widgets konfigurieren"
   },
   "matching": {
     "disabled": "Matching ist deaktiviert",
@@ -514,7 +534,19 @@
     "cat_health": "Gesundheit",
     "cat_poison": "Vergiftung",
     "cat_eu": "EU-Hotlines",
-    "cat_other": "Sonstiges"
+    "cat_other": "Sonstiges",
+    "createTitle": "Krise melden",
+    "lifeDangerHint": "Bei akuter Lebensgefahr ZUERST 112 anrufen.",
+    "fieldTitleRequired": "Titel und Beschreibung sind Pflicht.",
+    "saveFailed": "Konnte Krise nicht speichern.",
+    "fieldTitle": "Titel",
+    "fieldDescription": "Was ist passiert?",
+    "fieldLocation": "Ort / Adresse",
+    "sendingShort": "Sende…",
+    "reportButton": "Krise melden",
+    "voiceHint": "Tippe das Mikrofon — sprich frei, wir schreiben es auf.",
+    "emergencyQuickAccess": "Notruf-Nummern öffnen",
+    "ctaPrimary": "Schnell-Zugriff"
   },
   "posts": {
     "title": "Beiträge",

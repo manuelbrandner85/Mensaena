@@ -10,9 +10,12 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/voice_dictation_button.dart';
 
 /// SKILL: mensaena-features
 /// Crisis-Create — Schnellformular fuer Notfallmeldung.
+/// UX-Polish: Voice-Diktat im Description-Feld, große Touch-Ziele (>=56dp),
+/// pulsierende Lebensgefahr-Warnung, eindeutige CTA.
 class CrisisCreateScreen extends ConsumerStatefulWidget {
   const CrisisCreateScreen({super.key});
 
@@ -21,7 +24,8 @@ class CrisisCreateScreen extends ConsumerStatefulWidget {
       _CrisisCreateScreenState();
 }
 
-class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
+class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
+    with SingleTickerProviderStateMixin {
   final _title = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
@@ -31,25 +35,36 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
   double? _lng;
   bool _submitting = false;
   String? _error;
+  late final AnimationController _pulse;
 
-  static const List<({String value, String label, String emoji})> _categories = [
-    (value: 'medical', label: 'Medizinisch', emoji: '🚑'),
-    (value: 'fire', label: 'Feuer', emoji: '🔥'),
-    (value: 'flood', label: 'Hochwasser', emoji: '🌊'),
-    (value: 'storm', label: 'Sturm', emoji: '⛈️'),
-    (value: 'missing', label: 'Vermisst', emoji: '🔍'),
-    (value: 'other', label: 'Sonstiges', emoji: '⚠️'),
+  static const List<({String value, String i18n})> _categories = [
+    (value: 'medical', i18n: 'crisis.catMedical'),
+    (value: 'fire', i18n: 'crisis.catFire'),
+    (value: 'flood', i18n: 'crisis.catFlood'),
+    (value: 'storm', i18n: 'crisis.catStorm'),
+    (value: 'missing_person', i18n: 'crisis.catMissing'),
+    (value: 'other', i18n: 'crisis.catOther'),
   ];
 
-  static const List<({String value, String label, Color color})> _urgencies = [
-    (value: 'critical', label: 'KRITISCH', color: AppColors.herzrot),
-    (value: 'high', label: 'HOCH', color: Color(0xFFFB923C)),
-    (value: 'medium', label: 'MITTEL', color: AppColors.amber),
-    (value: 'low', label: 'NIEDRIG', color: AppColors.teal),
+  static const List<({String value, String i18n, Color color})> _urgencies = [
+    (value: 'critical', i18n: 'crisis.urgCritical', color: AppColors.herzrot),
+    (value: 'high', i18n: 'crisis.urgHigh', color: Color(0xFFFB923C)),
+    (value: 'medium', i18n: 'crisis.urgMedium', color: AppColors.amber),
+    (value: 'low', i18n: 'crisis.urgLow', color: AppColors.teal),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat(reverse: true);
+  }
+
+  @override
   void dispose() {
+    _pulse.dispose();
     _title.dispose();
     _desc.dispose();
     _location.dispose();
@@ -78,7 +93,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
 
   Future<void> _submit() async {
     if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
-      setState(() => _error = 'Titel und Beschreibung sind Pflicht.');
+      setState(() => _error = 'crisis.fieldTitleRequired'.tr());
       return;
     }
     setState(() {
@@ -100,7 +115,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
     if (id == null) {
       setState(() {
         _submitting = false;
-        _error = 'Konnte Krise nicht speichern.';
+        _error = 'crisis.saveFailed'.tr();
       });
       return;
     }
@@ -110,102 +125,122 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Krise melden',
+      title: 'crisis.createTitle'.tr(),
       currentRoute: '/dashboard/crisis',
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.herzrot.withValues(alpha: 0.12),
-                border: Border.all(color: AppColors.herzrot),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  const Icon(LucideIcons.alertOctagon,
-                      color: AppColors.herzrot),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Bei akuter Lebensgefahr ZUERST 112 anrufen.',
-                      style: AppTypography.body(
-                        size: 13,
-                        color: AppColors.herzrotWarm,
-                        weight: FontWeight.w600,
-                      ),
+            // Pulsierender Lebensgefahr-Banner (auf dieser Seite sehr prominent)
+            AnimatedBuilder(
+              animation: _pulse,
+              builder: (context, _) {
+                final t = _pulse.value;
+                return Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.herzrot.withValues(alpha: 0.10 + t * 0.06),
+                    border: Border.all(
+                      color: AppColors.herzrot.withValues(alpha: 0.5 + t * 0.4),
+                      width: 1.6 + t * 0.6,
                     ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.herzrot
+                            .withValues(alpha: 0.08 + t * 0.18),
+                        blurRadius: 10 + t * 14,
+                        spreadRadius: t * 1.5,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.alertOctagon,
+                          color: AppColors.herzrot, size: 22),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'crisis.lifeDangerHint'.tr(),
+                          style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.herzrotWarm,
+                            weight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-            const SizedBox(height: 18),
-            Text('crisis.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 8),
+            const SizedBox(height: 20),
+            // Kategorie
+            Text('crisis.categoryLabel'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 10),
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: 8,
+              runSpacing: 8,
               children: _categories.map((c) {
                 final active = c.value == _category;
                 return GestureDetector(
                   onTap: () => setState(() => _category = c.value),
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                        horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: active
-                          ? AppColors.herzrot.withValues(alpha: 0.2)
+                          ? AppColors.herzrot.withValues(alpha: 0.22)
                           : AppColors.surface.withValues(alpha: 0.5),
                       border: Border.all(
-                        color: active ? AppColors.herzrot : AppColors.line,
+                        color:
+                            active ? AppColors.herzrot : AppColors.line,
+                        width: active ? 1.6 : 1,
                       ),
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(c.emoji, style: const TextStyle(fontSize: 14)),
-                        const SizedBox(width: 4),
-                        Text(c.label,
-                            style: AppTypography.label(
-                              size: 10,
-                              color: active
-                                  ? AppColors.herzrotWarm
-                                  : AppColors.inkSoft,
-                            )),
-                      ],
-                    ),
+                    child: Text(c.i18n.tr(),
+                        style: AppTypography.label(
+                          size: 11,
+                          color: active
+                              ? AppColors.herzrotWarm
+                              : AppColors.inkSoft,
+                        )),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 18),
+            // Dringlichkeit
             Text('crisis.urgency'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Wrap(
-              spacing: 6,
+              spacing: 8,
+              runSpacing: 8,
               children: _urgencies.map((u) {
                 final active = u.value == _urgency;
                 return GestureDetector(
                   onTap: () => setState(() => _urgency = u.value),
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                        horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: active
-                          ? u.color.withValues(alpha: 0.2)
+                          ? u.color.withValues(alpha: 0.22)
                           : AppColors.surface.withValues(alpha: 0.5),
                       border: Border.all(
                         color: active ? u.color : AppColors.line,
+                        width: active ? 1.8 : 1,
                       ),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      u.label,
+                      u.i18n.tr(),
                       style: AppTypography.label(
-                        size: 10,
+                        size: 11,
                         color: active ? u.color : AppColors.inkSoft,
                       ),
                     ),
@@ -213,64 +248,131 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+            // Titel
             TextField(
               controller: _title,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(labelText: 'Titel'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _desc,
-              maxLines: 5,
-              maxLength: 1500,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Was ist passiert?',
-                alignLabelWithHint: true,
+              decoration: InputDecoration(
+                labelText: 'crisis.fieldTitle'.tr(),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
+            // Beschreibung mit Voice-Diktat-Button rechts oben
+            Stack(
+              children: [
+                TextField(
+                  controller: _desc,
+                  maxLines: 5,
+                  maxLength: 1500,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'crisis.fieldDescription'.tr(),
+                    alignLabelWithHint: true,
+                    helperText: 'crisis.voiceHint'.tr(),
+                    helperStyle: AppTypography.caption(),
+                  ),
+                ),
+                Positioned(
+                  right: 4,
+                  top: 4,
+                  child: VoiceDictationButton(controller: _desc),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            // Ort + GPS — größere GPS-Taste
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _location,
                     style: AppTypography.body(size: 14, color: AppColors.ink),
-                    decoration:
-                        const InputDecoration(labelText: 'Ort / Adresse'),
+                    decoration: InputDecoration(
+                      labelText: 'crisis.fieldLocation'.tr(),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                OutlinedButton.icon(
-                  onPressed: _useGps,
-                  icon: const Icon(LucideIcons.locate, size: 16),
-                  label: const Text('GPS'),
+                SizedBox(
+                  height: 56,
+                  child: OutlinedButton.icon(
+                    onPressed: _useGps,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.bronze,
+                      side: BorderSide(
+                          color: AppColors.bronze.withValues(alpha: 0.5)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(LucideIcons.locate, size: 18),
+                    label: const Text('GPS'),
+                  ),
                 ),
               ],
             ),
             if (_error != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                _error!,
-                style: AppTypography.body(
-                  size: 13,
-                  color: AppColors.herzrotWarm,
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.herzrot.withValues(alpha: 0.10),
+                  border: Border.all(
+                      color: AppColors.herzrot.withValues(alpha: 0.5)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.alertCircle,
+                        color: AppColors.herzrotWarm, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _error!,
+                        style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.herzrotWarm,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
+            // Großer Senden-Button — mind. 60dp hoch
             SizedBox(
               width: double.infinity,
+              height: 60,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.herzrot,
                   foregroundColor: AppColors.ink,
+                  textStyle: AppTypography.body(
+                      size: 16, weight: FontWeight.w700),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ).copyWith(
+                  shadowColor:
+                      const WidgetStatePropertyAll(AppColors.herzrotGlow),
                 ),
                 onPressed: _submitting ? null : _submit,
-                icon: const Icon(LucideIcons.alertTriangle, size: 16),
-                label: Text(_submitting ? 'Sende…' : 'Krise melden'),
+                icon: _submitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.ink),
+                      )
+                    : const Icon(LucideIcons.alertTriangle, size: 20),
+                label: Text(_submitting
+                    ? 'crisis.sendingShort'.tr()
+                    : 'crisis.reportButton'.tr()),
               ),
             ),
           ],

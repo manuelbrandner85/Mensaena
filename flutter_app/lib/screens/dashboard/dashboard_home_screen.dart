@@ -112,13 +112,13 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
         DashboardWidgetConfig.defaultConfig;
     bool show(String id) => cfg.visible.contains(id);
     return DashboardScaffold(
-      title: 'Übersicht',
+      title: 'home.dashboardTitle'.tr(),
       currentRoute: '/dashboard',
       fab: FloatingActionButton.small(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.bronze,
         onPressed: () => WidgetSettingsSheet.show(context),
-        tooltip: 'Widgets konfigurieren',
+        tooltip: 'home.configureWidgets'.tr(),
         child: const Icon(LucideIcons.settings, size: 16),
       ),
       body: RefreshIndicator(
@@ -206,11 +206,10 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                         lng: data.profile!.longitude!,
                       )
                     else
-                      const _LocationCta(
+                      _LocationCta(
                         icon: '🌤️',
-                        title: 'Wetter freischalten',
-                        subtitle:
-                            'Setze deinen Standort in den Einstellungen, um Wetter & lokale Warnungen zu sehen.',
+                        title: 'home.weatherUnlockTitle'.tr(),
+                        subtitle: 'home.weatherUnlockBody'.tr(),
                       ),
                     const SizedBox(height: 16),
                   ],
@@ -255,7 +254,7 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                 Row(
                   children: [
                     Text(
-                      'In deiner Nähe',
+                      'home.nearbyTitle'.tr(),
                       style: AppTypography.display(
                         size: 20,
                         color: AppColors.ink,
@@ -279,7 +278,7 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
   }
 }
 
-// ── Stats-Row ────────────────────────────────────────────────────────────
+// ── Stats-Row — animierte Counter, Cinema-Bronze-Frame ───────────────────
 class _StatsRow extends StatelessWidget {
   const _StatsRow({required this.data, required this.loading});
   final _DashboardData? data;
@@ -298,30 +297,31 @@ class _StatsRow extends StatelessWidget {
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
           children: [
-            StatCard(
+            _AnimatedStatCard(
               icon: LucideIcons.mapPin,
-              label: 'In der Nähe',
-              value: '${data?.posts.length ?? 0}',
+              label: 'home.statNearby'.tr(),
+              value: data?.posts.length ?? 0,
+              accent: AppColors.bronze,
               loading: loading,
             ),
-            StatCard(
+            _AnimatedStatCard(
               icon: LucideIcons.bell,
-              label: 'Ungelesen',
-              value: '${data?.unreadCount ?? 0}',
+              label: 'home.statUnread'.tr(),
+              value: data?.unreadCount ?? 0,
               accent: AppColors.herzrot,
               loading: loading,
             ),
-            StatCard(
+            _AnimatedStatCard(
               icon: LucideIcons.helpingHand,
-              label: 'Interaktionen',
-              value: '${data?.activeInteractions ?? 0}',
+              label: 'home.statInteractions'.tr(),
+              value: data?.activeInteractions ?? 0,
               accent: AppColors.teal,
               loading: loading,
             ),
-            StatCard(
+            _AnimatedStatCard(
               icon: LucideIcons.star,
-              label: 'Trust',
-              value: '${data?.profile?.trustScore ?? 0}',
+              label: 'home.statTrust'.tr(),
+              value: data?.profile?.trustScore ?? 0,
               accent: AppColors.trust,
               loading: loading,
             ),
@@ -332,32 +332,78 @@ class _StatsRow extends StatelessWidget {
   }
 }
 
-// ── Quick-Actions ────────────────────────────────────────────────────────
+class _AnimatedStatCard extends StatelessWidget {
+  const _AnimatedStatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.accent,
+    required this.loading,
+  });
+
+  final IconData icon;
+  final String label;
+  final int value;
+  final Color accent;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) {
+      return StatCard(
+        icon: icon,
+        label: label,
+        value: '—',
+        accent: accent,
+        loading: true,
+      );
+    }
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: value.toDouble()),
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.easeOutCubic,
+      builder: (context, v, _) {
+        return StatCard(
+          icon: icon,
+          label: label,
+          value: '${v.round()}',
+          accent: accent,
+        );
+      },
+    );
+  }
+}
+
+// ── Quick-Actions — prominenter, größere Touch-Ziele ─────────────────────
 class _QuickActions extends StatelessWidget {
   const _QuickActions();
 
-  static const List<({String label, IconData icon, Color accent, String route})>
-      _items = [
+  static const _items = <({
+    String i18n,
+    IconData icon,
+    Color accent,
+    String route,
+  })>[
     (
-      label: 'Posten',
+      i18n: 'home.qaPost',
       icon: LucideIcons.plus,
       accent: AppColors.amber,
       route: '/dashboard/create',
     ),
     (
-      label: 'Karte',
+      i18n: 'home.qaMap',
       icon: LucideIcons.map,
       accent: AppColors.teal,
       route: '/dashboard/map',
     ),
     (
-      label: 'Chat',
+      i18n: 'home.qaChat',
       icon: LucideIcons.messageSquare,
       accent: AppColors.leben,
       route: '/dashboard/chat',
     ),
     (
-      label: 'Krisen-SOS',
+      i18n: 'home.qaSos',
       icon: LucideIcons.alertTriangle,
       accent: AppColors.herzrot,
       route: '/dashboard/crisis',
@@ -367,35 +413,64 @@ class _QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 80,
+      height: 92,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _items.length,
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, i) {
           final it = _items[i];
+          final isSos = it.route == '/dashboard/crisis';
           return InkWell(
             onTap: () => context.go(it.route),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(16),
             child: Container(
-              width: 100,
-              padding: const EdgeInsets.all(12),
+              width: 108,
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: it.accent.withValues(alpha: 0.12),
-                border: Border.all(color: it.accent.withValues(alpha: 0.4)),
-                borderRadius: BorderRadius.circular(14),
+                gradient: LinearGradient(
+                  colors: [
+                    it.accent.withValues(alpha: 0.20),
+                    it.accent.withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(
+                  color: it.accent.withValues(alpha: isSos ? 0.7 : 0.45),
+                  width: isSos ? 1.6 : 1,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: isSos
+                    ? [
+                        BoxShadow(
+                          color: it.accent.withValues(alpha: 0.22),
+                          blurRadius: 10,
+                          spreadRadius: -2,
+                        ),
+                      ]
+                    : null,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(it.icon, size: 18, color: it.accent),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: it.accent.withValues(alpha: 0.22),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(it.icon, size: 18, color: it.accent),
+                  ),
                   Text(
-                    it.label,
+                    it.i18n.tr(),
                     style: AppTypography.body(
                       size: 13,
                       color: AppColors.ink,
-                      weight: FontWeight.w600,
+                      weight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -436,34 +511,66 @@ class _Feed extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.4),
-          border: Border.all(color: AppColors.line),
-          borderRadius: BorderRadius.circular(14),
+          gradient: LinearGradient(
+            colors: [
+              AppColors.surface.withValues(alpha: 0.5),
+              AppColors.bronze.withValues(alpha: 0.06),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border:
+              Border.all(color: AppColors.bronze.withValues(alpha: 0.28)),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
-              LucideIcons.inbox,
-              size: 22,
-              color: AppColors.mute,
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.bronze.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(LucideIcons.inbox,
+                  size: 22, color: AppColors.bronze),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
-              'Noch keine Beiträge in deiner Nähe.',
+              'home.feedEmptyTitle'.tr(),
               style: AppTypography.body(
-                size: 14,
+                size: 15,
                 color: AppColors.ink,
-                weight: FontWeight.w600,
+                weight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              'Sei der/die Erste:r — erstelle einen Beitrag mit dem Plus-Button.',
+              'home.feedEmptyBody'.tr(),
               style: AppTypography.body(
                 size: 13,
                 color: AppColors.inkSoft,
                 height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () => context.go('/dashboard/create'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.bronze,
+                  foregroundColor: AppColors.voidColor,
+                  textStyle: AppTypography.body(
+                      size: 14, weight: FontWeight.w700),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(LucideIcons.plus, size: 18),
+                label: Text('home.feedEmptyCta'.tr()),
               ),
             ),
           ],

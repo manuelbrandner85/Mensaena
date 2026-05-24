@@ -108,25 +108,45 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Pseudo-Waveform (8 vertical bars, animated by progress)
+                // Pseudo-Waveform mit gradient + organischer Height
                 SizedBox(
-                  height: 18,
+                  height: 22,
                   child: Row(
-                    children: List.generate(16, (i) {
-                      final filled = (i / 16) < progress;
-                      // Pseudo-random height pattern (deterministic by index)
-                      final h = 4.0 + ((i * 7) % 12);
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: List.generate(20, (i) {
+                      final ratio = i / 20;
+                      final filled = ratio < progress;
+                      // Sinus-Wellenmuster für natürliche Optik
+                      final wave = 0.3 +
+                          0.7 *
+                              (0.5 +
+                                  0.5 *
+                                      (i.isEven
+                                          ? ((i * 31) % 11) / 11
+                                          : ((i * 17) % 13) / 13));
+                      final h = 4.0 + wave * 14.0;
                       return Expanded(
                         child: Padding(
                           padding:
                               const EdgeInsets.symmetric(horizontal: 1),
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 140),
                             height: h,
                             decoration: BoxDecoration(
+                              gradient: filled
+                                  ? LinearGradient(
+                                      colors: [
+                                        accent,
+                                        accent.withValues(alpha: 0.7),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    )
+                                  : null,
                               color: filled
-                                  ? accent
-                                  : accent.withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(1.5),
+                                  ? null
+                                  : accent.withValues(alpha: 0.22),
+                              borderRadius: BorderRadius.circular(2),
                             ),
                           ),
                         ),

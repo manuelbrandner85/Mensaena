@@ -232,7 +232,10 @@
     "reply": "Réponse",
     "view": "Voir",
     "pinnedMessages": "Messages épinglés",
-    "micPermissionDenied": "Autorisation du microphone refusée."
+    "micPermissionDenied": "Autorisation du microphone refusée.",
+    "messageHint": "Message… (@ pour mentionner)",
+    "send": "Envoyer",
+    "liveLabel": "EN DIRECT"
   },
   "languages": {
     "de": "Allemand",
@@ -313,7 +316,24 @@
     "exploreMap": "Explorer la carte",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Enregistrer la position"
+    "saveLocation": "Enregistrer la position",
+    "statsTitle": "Votre aperçu",
+    "statNearby": "À proximité",
+    "statUnread": "Non lus",
+    "statInteractions": "Interactions",
+    "statTrust": "Confiance",
+    "qaPost": "Publier",
+    "qaMap": "Carte",
+    "qaChat": "Chat",
+    "qaSos": "SOS crise",
+    "nearbyTitle": "Près de chez vous",
+    "feedEmptyTitle": "Aucune publication à proximité.",
+    "feedEmptyBody": "Soyez le premier — créez une publication avec le bouton plus.",
+    "feedEmptyCta": "Créer une publication",
+    "weatherUnlockTitle": "Activer la météo",
+    "weatherUnlockBody": "Définissez votre position pour voir la météo et les alertes locales.",
+    "dashboardTitle": "Aperçu",
+    "configureWidgets": "Configurer les widgets"
   },
   "matching": {
     "disabled": "Matching désactivé",
@@ -514,7 +534,19 @@
     "cat_health": "Santé",
     "cat_poison": "Centre antipoison",
     "cat_eu": "Hotlines UE",
-    "cat_other": "Autres"
+    "cat_other": "Autres",
+    "createTitle": "Signaler une crise",
+    "lifeDangerHint": "En cas de danger vital immédiat, appelez D'ABORD le 112.",
+    "fieldTitleRequired": "Le titre et la description sont obligatoires.",
+    "saveFailed": "Impossible d'enregistrer la crise.",
+    "fieldTitle": "Titre",
+    "fieldDescription": "Que s'est-il passé ?",
+    "fieldLocation": "Lieu / adresse",
+    "sendingShort": "Envoi…",
+    "reportButton": "Signaler la crise",
+    "voiceHint": "Touchez le micro — parlez librement, nous écrirons.",
+    "emergencyQuickAccess": "Ouvrir les numéros d'urgence",
+    "ctaPrimary": "Accès rapide"
   },
   "posts": {
     "title": "Publications",

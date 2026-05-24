@@ -232,7 +232,10 @@
     "reply": "Yanıt",
     "view": "Görüntüle",
     "pinnedMessages": "Sabitlenmiş mesajlar",
-    "micPermissionDenied": "Mikrofon izni reddedildi."
+    "micPermissionDenied": "Mikrofon izni reddedildi.",
+    "messageHint": "Mesaj… (@ ile bahset)",
+    "send": "Gönder",
+    "liveLabel": "CANLI"
   },
   "languages": {
     "de": "Almanca",
@@ -313,7 +316,24 @@
     "exploreMap": "Haritayı keşfet",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Konumu kaydet"
+    "saveLocation": "Konumu kaydet",
+    "statsTitle": "Genel bakış",
+    "statNearby": "Yakında",
+    "statUnread": "Okunmamış",
+    "statInteractions": "Etkileşim",
+    "statTrust": "Güven",
+    "qaPost": "Paylaş",
+    "qaMap": "Harita",
+    "qaChat": "Sohbet",
+    "qaSos": "Kriz SOS",
+    "nearbyTitle": "Yakınında",
+    "feedEmptyTitle": "Yakınında henüz gönderi yok.",
+    "feedEmptyBody": "İlk sen ol — artı düğmesi ile bir gönderi oluştur.",
+    "feedEmptyCta": "Gönderi oluştur",
+    "weatherUnlockTitle": "Hava durumunu aç",
+    "weatherUnlockBody": "Hava ve yerel uyarıları görmek için konumunu ayarlardan gir.",
+    "dashboardTitle": "Genel bakış",
+    "configureWidgets": "Widget'ları yapılandır"
   },
   "matching": {
     "disabled": "Eşleşme devre dışı",
@@ -514,7 +534,19 @@
     "cat_health": "Sağlık",
     "cat_poison": "Zehir danışma",
     "cat_eu": "AB hatları",
-    "cat_other": "Diğer"
+    "cat_other": "Diğer",
+    "createTitle": "Kriz bildir",
+    "lifeDangerHint": "Hayati tehlike varsa ÖNCE 112'yi arayın.",
+    "fieldTitleRequired": "Başlık ve açıklama zorunludur.",
+    "saveFailed": "Kriz kaydedilemedi.",
+    "fieldTitle": "Başlık",
+    "fieldDescription": "Ne oldu?",
+    "fieldLocation": "Konum / adres",
+    "sendingShort": "Gönderiliyor…",
+    "reportButton": "Krizi bildir",
+    "voiceHint": "Mikrofona dokun — özgürce konuş, biz yazarız.",
+    "emergencyQuickAccess": "Acil numaraları aç",
+    "ctaPrimary": "Hızlı erişim"
   },
   "posts": {
     "title": "Gönderiler",

@@ -102,13 +102,7 @@ class _CrisisDashboardScreenState
     return DashboardScaffold(
       title: 'crisis.title'.tr(),
       currentRoute: '/dashboard/crisis',
-      fab: FloatingActionButton.extended(
-        backgroundColor: AppColors.herzrot,
-        foregroundColor: AppColors.ink,
-        onPressed: () => _openSosModal(context),
-        icon: const Icon(LucideIcons.alertTriangle),
-        label: const Text('SOS'),
-      ),
+      fab: _PulsingSosFab(onPressed: () => _openSosModal(context)),
       body: SafeArea(
         child: Column(
           children: [
@@ -707,6 +701,8 @@ class _CrisisTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _urgencyColors[crisis.urgency] ?? AppColors.amber;
+    // Kritische Krisen bekommen 3.5dp-Border + Glow.
+    final isCritical = crisis.urgency == 'critical';
     return InkWell(
       onTap: () => context.go('/dashboard/crisis/${crisis.id}'),
       borderRadius: BorderRadius.circular(14),
@@ -714,10 +710,21 @@ class _CrisisTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          border:
-              Border.all(color: color.withValues(alpha: 0.5), width: 1.4),
+          color: color.withValues(alpha: isCritical ? 0.12 : 0.08),
+          border: Border.all(
+            color: color.withValues(alpha: isCritical ? 0.85 : 0.5),
+            width: isCritical ? 3.5 : 1.4,
+          ),
           borderRadius: BorderRadius.circular(14),
+          boxShadow: isCritical
+              ? [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -811,6 +818,77 @@ class _CrisisTile extends StatelessWidget {
 
 enum _CrisisView { list, map }
 
+// Pulsierender SOS-FAB — bei Notfall mit zitternder Hand maximal sichtbar.
+class _PulsingSosFab extends StatefulWidget {
+  const _PulsingSosFab({required this.onPressed});
+  final VoidCallback onPressed;
+
+  @override
+  State<_PulsingSosFab> createState() => _PulsingSosFabState();
+}
+
+class _PulsingSosFabState extends State<_PulsingSosFab>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        final wave = (0.5 + 0.5 * (_ctrl.value < 0.5
+            ? _ctrl.value * 2
+            : (1 - _ctrl.value) * 2));
+        return Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color:
+                    AppColors.herzrot.withValues(alpha: 0.35 + wave * 0.35),
+                blurRadius: 16 + wave * 22,
+                spreadRadius: wave * 4,
+              ),
+            ],
+          ),
+          child: FloatingActionButton.extended(
+            backgroundColor: AppColors.herzrot,
+            foregroundColor: AppColors.ink,
+            onPressed: widget.onPressed,
+            extendedPadding:
+                const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+            icon: const Icon(LucideIcons.alertTriangle, size: 22),
+            label: Text(
+              'SOS',
+              style: AppTypography.body(
+                size: 17,
+                color: AppColors.ink,
+                weight: FontWeight.w800,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 // ── SOS Top-Banner — prominenter 112-Notruf + Safe-Check-In ───────────
 class _SosTopBanner extends StatelessWidget {
   const _SosTopBanner();
@@ -851,6 +929,35 @@ class _SosTopBanner extends StatelessWidget {
                 Text('crisis.call112Now'.tr(),
                     style: AppTypography.display(
                         size: 18, color: Colors.white, height: 1.1)),
+                const SizedBox(height: 6),
+                // Quick-Link zu allen Notruf-Nummern (Polizei/Gift/Frauen/etc.)
+                InkWell(
+                  onTap: () => context.go('/dashboard/crisis/resources'),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.35)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(LucideIcons.phone,
+                            size: 11, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          'crisis.emergencyQuickAccess'.tr(),
+                          style: AppTypography.label(
+                              size: 9, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

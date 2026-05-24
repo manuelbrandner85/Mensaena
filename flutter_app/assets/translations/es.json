@@ -232,7 +232,10 @@
     "reply": "Respuesta",
     "view": "Ver",
     "pinnedMessages": "Mensajes fijados",
-    "micPermissionDenied": "Permiso de micrófono denegado."
+    "micPermissionDenied": "Permiso de micrófono denegado.",
+    "messageHint": "Mensaje… (@ para mencionar)",
+    "send": "Enviar",
+    "liveLabel": "EN VIVO"
   },
   "languages": {
     "de": "Alemán",
@@ -313,7 +316,24 @@
     "exploreMap": "Explora el mapa",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Guardar ubicación"
+    "saveLocation": "Guardar ubicación",
+    "statsTitle": "Tu resumen",
+    "statNearby": "Cerca",
+    "statUnread": "Sin leer",
+    "statInteractions": "Interacciones",
+    "statTrust": "Confianza",
+    "qaPost": "Publicar",
+    "qaMap": "Mapa",
+    "qaChat": "Chat",
+    "qaSos": "SOS crisis",
+    "nearbyTitle": "Cerca de ti",
+    "feedEmptyTitle": "Aún no hay publicaciones cerca.",
+    "feedEmptyBody": "Sé el primero — crea una publicación con el botón más.",
+    "feedEmptyCta": "Crear publicación",
+    "weatherUnlockTitle": "Desbloquear el clima",
+    "weatherUnlockBody": "Configura tu ubicación para ver el clima y las alertas locales.",
+    "dashboardTitle": "Resumen",
+    "configureWidgets": "Configurar widgets"
   },
   "matching": {
     "disabled": "Matching desactivado",
@@ -514,7 +534,19 @@
     "cat_health": "Salud",
     "cat_poison": "Toxicología",
     "cat_eu": "Líneas UE",
-    "cat_other": "Otros"
+    "cat_other": "Otros",
+    "createTitle": "Reportar una crisis",
+    "lifeDangerHint": "Si hay peligro inmediato para la vida, llama PRIMERO al 112.",
+    "fieldTitleRequired": "El título y la descripción son obligatorios.",
+    "saveFailed": "No se pudo guardar la crisis.",
+    "fieldTitle": "Título",
+    "fieldDescription": "¿Qué pasó?",
+    "fieldLocation": "Lugar / dirección",
+    "sendingShort": "Enviando…",
+    "reportButton": "Reportar crisis",
+    "voiceHint": "Toca el micro — habla libremente, lo escribiremos.",
+    "emergencyQuickAccess": "Abrir números de emergencia",
+    "ctaPrimary": "Acceso rápido"
   },
   "posts": {
     "title": "Publicaciones",

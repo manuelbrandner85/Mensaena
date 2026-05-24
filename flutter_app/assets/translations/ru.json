@@ -232,7 +232,10 @@
     "reply": "Ответ",
     "view": "Посмотреть",
     "pinnedMessages": "Закреплённые сообщения",
-    "micPermissionDenied": "Доступ к микрофону запрещён."
+    "micPermissionDenied": "Доступ к микрофону запрещён.",
+    "messageHint": "Сообщение… (@ для упоминания)",
+    "send": "Отправить",
+    "liveLabel": "ЭФИР"
   },
   "languages": {
     "de": "Немецкий",
@@ -313,7 +316,24 @@
     "exploreMap": "Изучить карту",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo",
-    "saveLocation": "Сохранить местоположение"
+    "saveLocation": "Сохранить местоположение",
+    "statsTitle": "Ваш обзор",
+    "statNearby": "Рядом",
+    "statUnread": "Непрочитанные",
+    "statInteractions": "Взаимодействия",
+    "statTrust": "Доверие",
+    "qaPost": "Опубликовать",
+    "qaMap": "Карта",
+    "qaChat": "Чат",
+    "qaSos": "Кризис SOS",
+    "nearbyTitle": "Рядом с вами",
+    "feedEmptyTitle": "Поблизости пока нет публикаций.",
+    "feedEmptyBody": "Будьте первым — создайте публикацию кнопкой плюс.",
+    "feedEmptyCta": "Создать",
+    "weatherUnlockTitle": "Включить погоду",
+    "weatherUnlockBody": "Укажите местоположение в настройках, чтобы видеть погоду и оповещения.",
+    "dashboardTitle": "Обзор",
+    "configureWidgets": "Настроить виджеты"
   },
   "matching": {
     "disabled": "Подбор отключён",
@@ -514,7 +534,19 @@
     "cat_health": "Здоровье",
     "cat_poison": "Токсикология",
     "cat_eu": "Горячие линии ЕС",
-    "cat_other": "Прочее"
+    "cat_other": "Прочее",
+    "createTitle": "Сообщить о кризисе",
+    "lifeDangerHint": "При угрозе жизни СНАЧАЛА звоните 112.",
+    "fieldTitleRequired": "Заголовок и описание обязательны.",
+    "saveFailed": "Не удалось сохранить.",
+    "fieldTitle": "Заголовок",
+    "fieldDescription": "Что случилось?",
+    "fieldLocation": "Место / адрес",
+    "sendingShort": "Отправка…",
+    "reportButton": "Сообщить",
+    "voiceHint": "Нажмите микрофон — говорите, мы запишем.",
+    "emergencyQuickAccess": "Экстренные номера",
+    "ctaPrimary": "Быстрый доступ"
   },
   "posts": {
     "title": "Объявления",
