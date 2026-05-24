@@ -102,6 +102,9 @@ dependencies:
   # XML-Parsing fuer MeteoAlarm Atom-Feeds (EU-Wetterwarnungen).
   xml: ^6.5.0
 
+  # Accelerometer/Gyroscope fuer 3D-Tilt-Cards (Cinematic Phase B).
+  sensors_plus: ^6.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

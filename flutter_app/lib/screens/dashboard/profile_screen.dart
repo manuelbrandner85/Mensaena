@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../widgets/effects/tilt_card.dart';
+
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
@@ -628,21 +630,25 @@ class _Header extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 36,
-              backgroundColor: AppColors.surface,
-              backgroundImage: profile.avatarUrl != null
-                  ? NetworkImage(profile.avatarUrl!)
-                  : null,
-              child: profile.avatarUrl == null
-                  ? Text(
-                      (profile.name ?? '?').substring(0, 1).toUpperCase(),
-                      style: AppTypography.display(
-                        size: 28,
-                        color: AppColors.amber,
-                      ),
-                    )
-                  : null,
+            TiltCard(
+              intensity: 1.2,
+              borderRadius: 999,
+              child: CircleAvatar(
+                radius: 36,
+                backgroundColor: AppColors.surface,
+                backgroundImage: profile.avatarUrl != null
+                    ? NetworkImage(profile.avatarUrl!)
+                    : null,
+                child: profile.avatarUrl == null
+                    ? Text(
+                        (profile.name ?? '?').substring(0, 1).toUpperCase(),
+                        style: AppTypography.display(
+                          size: 28,
+                          color: AppColors.amber,
+                        ),
+                      )
+                    : null,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(

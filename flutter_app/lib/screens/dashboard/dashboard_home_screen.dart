@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
+import '../../widgets/effects/tilt_card.dart';
 import '../../models/profile.dart';
 import '../../repositories/interactions_repository.dart';
 import '../../repositories/matching_repository.dart';
@@ -364,11 +365,14 @@ class _AnimatedStatCard extends StatelessWidget {
       duration: const Duration(milliseconds: 900),
       curve: Curves.easeOutCubic,
       builder: (context, v, _) {
-        return StatCard(
-          icon: icon,
-          label: label,
-          value: '${v.round()}',
-          accent: accent,
+        return TiltCard(
+          intensity: 0.7,
+          child: StatCard(
+            icon: icon,
+            label: label,
+            value: '${v.round()}',
+            accent: accent,
+          ),
         );
       },
     );
