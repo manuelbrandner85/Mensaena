@@ -1,10 +1,6 @@
-// LiveKit Token Edge Function v6 — liest Credentials primär aus
-// Supabase-Env-Secrets, fällt aber automatisch auf private.push_config
-// zurück (livekit_self_url / livekit_self_key / livekit_self_secret).
-// Damit ist die Function out-of-the-box konfiguriert sobald die Werte
-// in einer der zwei Quellen vorhanden sind.
-//
-// POST { roomName, displayName?, canPublish? } → { token, url }
+// LiveKit Token Edge Function v8 — nutzt public.get_livekit_creds()-RPC
+// (SECURITY DEFINER) statt direktem private-Schema-Zugriff (REST API
+// exposed 'private' nicht). Fallback: Env-Secrets.
 
 // deno-lint-ignore-file no-explicit-any
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
@@ -33,30 +29,22 @@ async function loadCreds(): Promise<{ url: string; key: string; secret: string }
     cached = { url: envUrl, key: envKey, secret: envSecret };
     return cached;
   }
-  // 2) Fallback: private.push_config via service_role.
+  // 2) Fallback: public.get_livekit_creds() RPC (SECURITY DEFINER).
   if (!SUPABASE_URL || !SERVICE_ROLE) {
     throw new Error('Weder Env-Secrets noch SERVICE_ROLE konfiguriert');
   }
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
     auth: { persistSession: false },
-    db: { schema: 'private' },
   });
-  const { data, error } = await admin
-    .from('push_config')
-    .select('key, value')
-    .in('key', ['livekit_self_url', 'livekit_self_key', 'livekit_self_secret']);
+  const { data, error } = await admin.rpc('get_livekit_creds');
   if (error) {
-    throw new Error('push_config-Lookup fehlgeschlagen: ' + error.message);
+    throw new Error('RPC get_livekit_creds fehlgeschlagen: ' + error.message);
   }
-  const m: Record<string, string> = {};
-  for (const r of data ?? []) {
-    m[(r as any).key] = (r as any).value as string;
-  }
-  const url    = m['livekit_self_url']    ?? '';
-  const key    = m['livekit_self_key']    ?? '';
-  const secret = m['livekit_self_secret'] ?? '';
+  const url    = (data?.url as string)    ?? '';
+  const key    = (data?.key as string)    ?? '';
+  const secret = (data?.secret as string) ?? '';
   if (!url || !key || !secret) {
-    throw new Error('LiveKit-Credentials fehlen in private.push_config');
+    throw new Error('LiveKit-Credentials in push_config leer');
   }
   cached = { url, key, secret };
   return cached;
@@ -129,7 +117,6 @@ serve(async (req) => {
     );
   }
 
-  // Auth via Supabase-Anon + User-JWT (vom Client weitergereicht).
   const auth = req.headers.get('Authorization') ?? '';
   const supabase = createClient(SUPABASE_URL, ANON_KEY, {
     global: { headers: { Authorization: auth } },
