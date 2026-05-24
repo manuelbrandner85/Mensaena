@@ -13,12 +13,19 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 /// SKILL: mensaena-features
 /// Notruf-Nummern + Resourcen-Page (emergency_numbers tabelle).
 ///
-/// Locale → Country-Mapping: bestimmt aus context.locale primaeres Land
-/// (de=DE, en=GB, it=IT, es=ES, fr=FR, tr=TR, ru=RU). Region-Override
-/// via context.locale.countryCode wenn explizit gesetzt (z.B. en_US).
-class CrisisResourcesScreen extends ConsumerWidget {
+/// Auto-Locale: bestimmt aus context.locale primaeres Land (de=DE, en=GB,
+/// it=IT, es=ES, fr=FR, tr=TR, ru=RU). Country-Override via Chip-Row
+/// fuer User die ein anderes Land sehen wollen (z.B. Reisende).
+class CrisisResourcesScreen extends ConsumerStatefulWidget {
   const CrisisResourcesScreen({super.key});
 
+  @override
+  ConsumerState<CrisisResourcesScreen> createState() =>
+      _CrisisResourcesScreenState();
+}
+
+class _CrisisResourcesScreenState
+    extends ConsumerState<CrisisResourcesScreen> {
   static const _localeCountry = {
     'de': 'DE',
     'en': 'GB',
@@ -29,59 +36,179 @@ class CrisisResourcesScreen extends ConsumerWidget {
     'ru': 'RU',
   };
 
+  // Alle Länder mit Daten in emergency_numbers (siehe Migration
+  // emergency_numbers_expand_country_category).
+  static const _allCountries = <_CountryOption>[
+    _CountryOption('DE', '🇩🇪', 'Deutschland'),
+    _CountryOption('AT', '🇦🇹', 'Österreich'),
+    _CountryOption('CH', '🇨🇭', 'Schweiz'),
+    _CountryOption('IT', '🇮🇹', 'Italia'),
+    _CountryOption('ES', '🇪🇸', 'España'),
+    _CountryOption('FR', '🇫🇷', 'France'),
+    _CountryOption('TR', '🇹🇷', 'Türkiye'),
+    _CountryOption('RU', '🇷🇺', 'Россия'),
+    _CountryOption('GB', '🇬🇧', 'United Kingdom'),
+    _CountryOption('US', '🇺🇸', 'United States'),
+    _CountryOption('IE', '🇮🇪', 'Ireland'),
+  ];
+
+  String? _override;
+
   String _countryFor(BuildContext context) {
+    if (_override != null) return _override!;
     final loc = context.locale;
-    // Explizite Region (z.B. en_US, de_AT, fr_BE) hat Vorrang
     final c = loc.countryCode;
-    if (c != null && c.isNotEmpty) return c;
+    if (c != null && c.isNotEmpty && _allCountries.any((o) => o.code == c)) {
+      return c;
+    }
     return _localeCountry[loc.languageCode] ?? 'DE';
   }
 
+  static const _categoryLabels = {
+    'emergency': '🚨',
+    'crisis': '💬',
+    'children': '👶',
+    'women': '🆘',
+    'health': '🏥',
+    'poison': '☠️',
+    'eu': '🇪🇺',
+    'other': '📞',
+  };
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final country = _countryFor(context);
     final async = ref.watch(emergencyNumbersProvider(country));
     return DashboardScaffold(
-      title: 'Notruf-Nummern',
+      title: 'crisis.resourcesTitle'.tr(),
       currentRoute: '/dashboard/crisis',
       body: SafeArea(
-        child: async.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.herzrot),
-          ),
-          error: (e, _) => Center(
-            child: Text('crisis.resourceError'.tr(namedArgs: {'error': '$e'}), style: AppTypography.caption()),
-          ),
-          data: (list) {
-            if (list.isEmpty) {
-              return Center(
-                child: Text(
-                  'Keine Notruf-Nummern hinterlegt.',
-                  style: AppTypography.caption(),
+        child: Column(
+          children: [
+            _CountryChipBar(
+              options: _allCountries,
+              selected: country,
+              onTap: (c) => setState(() => _override = c),
+            ),
+            Expanded(
+              child: async.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.herzrot),
                 ),
-              );
-            }
-            // Gruppieren nach Kategorie.
-            final groups = <String, List<EmergencyNumber>>{};
-            for (final n in list) {
-              groups.putIfAbsent(n.category, () => []).add(n);
-            }
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                for (final entry in groups.entries) ...[
-                  Text(
-                    entry.key.toUpperCase(),
-                    style: AppTypography.label(size: 10),
-                  ),
-                  const SizedBox(height: 6),
-                  ...entry.value.map(_Tile.new),
-                  const SizedBox(height: 16),
-                ],
-              ],
-            );
-          },
+                error: (e, _) => Center(
+                  child: Text(
+                      'crisis.resourceError'.tr(namedArgs: {'error': '$e'}),
+                      style: AppTypography.caption()),
+                ),
+                data: (list) {
+                  if (list.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'crisis.noResources'.tr(),
+                        style: AppTypography.caption(),
+                      ),
+                    );
+                  }
+                  final groups = <String, List<EmergencyNumber>>{};
+                  for (final n in list) {
+                    groups.putIfAbsent(n.category, () => []).add(n);
+                  }
+                  return ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      for (final entry in groups.entries) ...[
+                        Row(
+                          children: [
+                            Text(
+                              _categoryLabels[entry.key] ?? '📞',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'crisis.cat_${entry.key}'.tr(),
+                              style: AppTypography.label(size: 10),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        ...entry.value.map(_Tile.new),
+                        const SizedBox(height: 16),
+                      ],
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class _CountryOption {
+  const _CountryOption(this.code, this.flag, this.label);
+  final String code;
+  final String flag;
+  final String label;
+}
+
+class _CountryChipBar extends StatelessWidget {
+  const _CountryChipBar({
+    required this.options,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final List<_CountryOption> options;
+  final String selected;
+  final ValueChanged<String> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        itemCount: options.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, i) {
+          final o = options[i];
+          final active = o.code == selected;
+          return GestureDetector(
+            onTap: () => onTap(o.code),
+            child: Container(
+              alignment: Alignment.center,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: active
+                    ? AppColors.herzrot.withValues(alpha: 0.20)
+                    : AppColors.surface.withValues(alpha: 0.5),
+                border: Border.all(
+                  color: active ? AppColors.herzrot : AppColors.line,
+                  width: active ? 1.5 : 1,
+                ),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(o.flag, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text(
+                    o.label,
+                    style: AppTypography.label(
+                      size: 10,
+                      color: active ? AppColors.herzrot : AppColors.inkSoft,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -111,8 +238,8 @@ class _Tile extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 50,
-              height: 36,
+              width: 56,
+              height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppColors.herzrot,
@@ -160,7 +287,7 @@ class _Tile extends StatelessWidget {
                                     AppColors.leben.withValues(alpha: 0.18),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: Text('24h',
+                              child: Text('crisis.badge24h'.tr(),
                                   style: AppTypography.label(
                                       size: 8, color: AppColors.lebenSoft)),
                             ),
@@ -173,7 +300,7 @@ class _Tile extends StatelessWidget {
                                     AppColors.amber.withValues(alpha: 0.18),
                                 borderRadius: BorderRadius.circular(999),
                               ),
-                              child: Text('kostenlos',
+                              child: Text('crisis.badgeFree'.tr(),
                                   style: AppTypography.label(
                                       size: 8, color: AppColors.amber)),
                             ),

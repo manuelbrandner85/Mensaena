@@ -502,7 +502,19 @@
     "urgency": "Срочность",
     "errorWith": "Ошибка: {error}",
     "urgencyLabel": "Срочность",
-    "resourceError": "Ошибка: {error}"
+    "resourceError": "Ошибка: {error}",
+    "resourcesTitle": "Экстренные номера",
+    "noResources": "Для этой страны экстренные номера не указаны.",
+    "badge24h": "24ч",
+    "badgeFree": "бесплатно",
+    "cat_emergency": "Экстренная",
+    "cat_crisis": "Кризисная поддержка",
+    "cat_children": "Дети и подростки",
+    "cat_women": "Помощь женщинам",
+    "cat_health": "Здоровье",
+    "cat_poison": "Токсикология",
+    "cat_eu": "Горячие линии ЕС",
+    "cat_other": "Прочее"
   },
   "posts": {
     "title": "Объявления",

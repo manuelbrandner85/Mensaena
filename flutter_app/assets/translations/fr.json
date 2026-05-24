@@ -502,7 +502,19 @@
     "urgency": "Urgence",
     "errorWith": "Erreur : {error}",
     "urgencyLabel": "Urgence",
-    "resourceError": "Erreur : {error}"
+    "resourceError": "Erreur : {error}",
+    "resourcesTitle": "Numéros d'urgence",
+    "noResources": "Aucun numéro d'urgence disponible pour ce pays.",
+    "badge24h": "24h",
+    "badgeFree": "gratuit",
+    "cat_emergency": "Urgence",
+    "cat_crisis": "Soutien en crise",
+    "cat_children": "Enfants et jeunes",
+    "cat_women": "Aide aux femmes",
+    "cat_health": "Santé",
+    "cat_poison": "Centre antipoison",
+    "cat_eu": "Hotlines UE",
+    "cat_other": "Autres"
   },
   "posts": {
     "title": "Publications",

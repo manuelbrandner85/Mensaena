@@ -502,7 +502,19 @@
     "urgency": "Dringlichkeit",
     "errorWith": "Fehler: {error}",
     "urgencyLabel": "Dringlichkeit",
-    "resourceError": "Fehler: {error}"
+    "resourceError": "Fehler: {error}",
+    "resourcesTitle": "Notruf-Nummern",
+    "noResources": "Keine Notruf-Nummern für dieses Land hinterlegt.",
+    "badge24h": "24h",
+    "badgeFree": "kostenlos",
+    "cat_emergency": "Notruf",
+    "cat_crisis": "Krisenberatung",
+    "cat_children": "Kinder & Jugendliche",
+    "cat_women": "Frauenhilfe",
+    "cat_health": "Gesundheit",
+    "cat_poison": "Vergiftung",
+    "cat_eu": "EU-Hotlines",
+    "cat_other": "Sonstiges"
   },
   "posts": {
     "title": "Beiträge",

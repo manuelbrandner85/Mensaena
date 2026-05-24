@@ -502,7 +502,19 @@
     "urgency": "Aciliyet",
     "errorWith": "Hata: {error}",
     "urgencyLabel": "Aciliyet",
-    "resourceError": "Hata: {error}"
+    "resourceError": "Hata: {error}",
+    "resourcesTitle": "Acil numaralar",
+    "noResources": "Bu ülke için acil numara bulunmuyor.",
+    "badge24h": "24s",
+    "badgeFree": "ücretsiz",
+    "cat_emergency": "Acil",
+    "cat_crisis": "Kriz desteği",
+    "cat_children": "Çocuk ve gençler",
+    "cat_women": "Kadın yardımı",
+    "cat_health": "Sağlık",
+    "cat_poison": "Zehir danışma",
+    "cat_eu": "AB hatları",
+    "cat_other": "Diğer"
   },
   "posts": {
     "title": "Gönderiler",
