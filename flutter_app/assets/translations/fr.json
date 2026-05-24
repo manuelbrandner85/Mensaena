@@ -695,5 +695,17 @@
     "category": "Catégorie",
     "publicVisible": "Visible publiquement",
     "publishArticle": "Publier l'article"
+  },
+  "air": {
+    "title": "Qualité de l'air",
+    "subtitle": "Mesures actuelles à {city} ({country})",
+    "noStations": "Aucune station de mesure à proximité.",
+    "locationDenied": "Accès à la position refusé — impossible de charger.",
+    "levelExcellent": "Excellente",
+    "levelGood": "Bonne",
+    "levelModerate": "Modérée",
+    "levelPoor": "Mauvaise pour les sensibles",
+    "levelBad": "Mauvaise",
+    "levelHazardous": "Dangereuse"
   }
 }

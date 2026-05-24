@@ -695,5 +695,17 @@
     "category": "Category",
     "publicVisible": "Publicly visible",
     "publishArticle": "Publish article"
+  },
+  "air": {
+    "title": "Air quality",
+    "subtitle": "Current readings in {city} ({country})",
+    "noStations": "No measurement stations found nearby.",
+    "locationDenied": "Location access denied — cannot load air quality.",
+    "levelExcellent": "Excellent",
+    "levelGood": "Good",
+    "levelModerate": "Moderate",
+    "levelPoor": "Unhealthy for sensitive",
+    "levelBad": "Unhealthy",
+    "levelHazardous": "Hazardous"
   }
 }

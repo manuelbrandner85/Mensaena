@@ -695,5 +695,17 @@
     "category": "Kategori",
     "publicVisible": "Herkese açık",
     "publishArticle": "Makaleyi yayınla"
+  },
+  "air": {
+    "title": "Hava kalitesi",
+    "subtitle": "{city} ({country}) için güncel ölçümler",
+    "noStations": "Yakında ölçüm istasyonu bulunamadı.",
+    "locationDenied": "Konum erişimi reddedildi — yüklenemiyor.",
+    "levelExcellent": "Mükemmel",
+    "levelGood": "İyi",
+    "levelModerate": "Orta",
+    "levelPoor": "Hassas için zararlı",
+    "levelBad": "Sağlıksız",
+    "levelHazardous": "Tehlikeli"
   }
 }

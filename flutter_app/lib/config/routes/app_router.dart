@@ -64,6 +64,7 @@ import '../../screens/dashboard/settings_screen.dart';
 import '../../screens/legal/legal_page_screen.dart';
 import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
+import '../../screens/dashboard/warnungen/air_quality_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
 import '../../screens/dashboard/warnungen/warnungen_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
@@ -550,6 +551,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'food',
             builder: (_, __) => const FoodWarningsScreen(),
+          ),
+          GoRoute(
+            path: 'air',
+            builder: (_, __) => const AirQualityScreen(),
           ),
         ],
       ),

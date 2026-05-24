@@ -695,5 +695,17 @@
     "category": "Categoría",
     "publicVisible": "Visible públicamente",
     "publishArticle": "Publicar artículo"
+  },
+  "air": {
+    "title": "Calidad del aire",
+    "subtitle": "Mediciones actuales en {city} ({country})",
+    "noStations": "No se encontraron estaciones cercanas.",
+    "locationDenied": "Acceso a la ubicación denegado — no se puede cargar.",
+    "levelExcellent": "Excelente",
+    "levelGood": "Buena",
+    "levelModerate": "Moderada",
+    "levelPoor": "Insalubre para sensibles",
+    "levelBad": "Insalubre",
+    "levelHazardous": "Peligrosa"
   }
 }

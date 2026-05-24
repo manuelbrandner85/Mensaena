@@ -695,5 +695,17 @@
     "category": "Kategorie",
     "publicVisible": "Öffentlich sichtbar",
     "publishArticle": "Artikel veröffentlichen"
+  },
+  "air": {
+    "title": "Luftqualität",
+    "subtitle": "Aktuelle Werte in {city} ({country})",
+    "noStations": "Keine Messstationen in deiner Nähe gefunden.",
+    "locationDenied": "Standortzugriff verweigert — kann Luftqualität nicht laden.",
+    "levelExcellent": "Ausgezeichnet",
+    "levelGood": "Gut",
+    "levelModerate": "Mäßig",
+    "levelPoor": "Bedenklich",
+    "levelBad": "Schlecht",
+    "levelHazardous": "Gefährlich"
   }
 }

@@ -695,5 +695,17 @@
     "category": "Категория",
     "publicVisible": "Публично видимо",
     "publishArticle": "Опубликовать статью"
+  },
+  "air": {
+    "title": "Качество воздуха",
+    "subtitle": "Актуальные значения в {city} ({country})",
+    "noStations": "Поблизости станций измерения не найдено.",
+    "locationDenied": "Доступ к местоположению отклонён — загрузка невозможна.",
+    "levelExcellent": "Отличное",
+    "levelGood": "Хорошее",
+    "levelModerate": "Умеренное",
+    "levelPoor": "Вредно для чувствительных",
+    "levelBad": "Вредное",
+    "levelHazardous": "Опасное"
   }
 }
