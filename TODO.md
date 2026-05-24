@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=i18n in Drawer/BottomNav/Settings/Auth/Onboarding live. Iterativ in weiteren Screens.
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n-Foundation + i18n-Priority-Screens ✅
-NEXT=Schrittweise restliche Screens auf .tr() umstellen (alle neuen Strings sofort i18n per CLAUDE.md-Pflicht)
+OPEN=Cinema v3 (Readability-First) live. Atmosphäre nur Hintergrund, Buttons adaptiv phase-tinted. 4 neue atmosphärische Layer.
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal v3 + i18n W1-W2 ✅
+NEXT=i18n weitere Screens iterativ
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(i18n-w2): AppDrawer alle 38 Labels + 8 Gruppen via translation-keys, BottomNav 5 Items, Settings 8 Tabs, AuthScreen Mode-Labels, OnboardingTour 5 Steps (title+subtitle+body, alle 7 Sprachen), CLAUDE.md i18n-Pflicht-Regel
+LAST_TASK=refactor(cinema-v3): Tint-Layer komplett aus Content-Stack entfernt (war Lesbarkeit-Killer). Alle atmosphärischen Layer rein hinter Content. Neu: Starfield (Nacht), GroundFog (Dawn/Dusk/Evening), GodRays (Day-Phasen, volumetrisch vom Sky-Body), DustParticles (Dusk/Evening), AtmosphericHaze (Tiefen-Eindruck). CinemaAccents-Helper: Buttons/Cards greifen aktiv die Phase ab (tinted-Bronze/Amber statt überlagertem Tint). Vignette nur Eck-Falloff, Chromatic-Aberration nur Edge-Pixel. Tint-Opacity aller 6 Phasen auf 0.0.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

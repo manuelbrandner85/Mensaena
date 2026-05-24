@@ -1,20 +1,25 @@
 /// SKILL: mensaena-design
-/// CinemaOverlay v2 — Hyperrealistic Layer-Stack mit 9 Layers + Drift.
+/// CinemaOverlay v3 — Lesbarkeit-first.
 ///
-/// Layer (bottom → top):
-///   1. Base-Mesh-Gradient (5-stop, RadialGradient, langsame Drift 60s)
-///   2. Mesh-Hotspots (2 sekundäre Radial-Blobs, BlendMode für echte Mesh)
-///   3. Sky-Body (Sonne/Mond mit Bloom-Glow)
-///   4. Lens-Flare (nur Dawn/Dusk)
-///   5. Screen-Content (eigentliches UI)
-///   6. Color-Grade-Tint (overlay)
-///   7. Light-Leaks (pulsierend wo aktiviert)
-///   8. Vignette
-///   9. Film-Grain (animiert)
-///   10. Chromatic-Aberration (Edge-Shift, nur Nacht/Dusk)
+/// ARCHITEKTUR-ÄNDERUNG zu v2:
+///   * KEIN Tint mehr ÜBER dem Content (Buttons/Text waren überfärbt).
+///   * Atmosphäre vollständig HINTER dem Content:
+///     - Background-Mesh-Gradient (5-stop) mit langsamem Drift
+///     - Mesh-Hotspots (atmosphärische Wolken)
+///     - Atmosphärischer Tiefen-Haze
+///     - Starfield (Nacht) / God-Rays (Tag-Phasen) / Ground-Fog
+///     - Dust-Particles (Dusk/Evening)
+///     - Sky-Body (Sonne/Mond mit Bloom)
+///     - Lens-Flare (Dawn/Dusk)
+///     - Light-Leaks (Phase-spezifisch)
+///   * Über dem Content NUR:
+///     - Film-Grain (sehr subtil, Filmlook)
+///     - Vignette (nur Eck-Falloff, kein zentraler Verlust)
+///     - Chromatic-Aberration (nur Edge-Pixel)
 ///
-/// Alle Layer respektieren CinemaIntensity-Multiplier (full/reduced/minimal)
-/// und sind in RepaintBoundary verpackt — kein Repaint des Subtrees.
+/// Phasen-Akzentuierung der UI passiert über CinemaAccents.tinted()
+/// (Buttons/Cards greifen sich die Phase aktiv ab, statt überlagert
+/// zu werden).
 library;
 
 import 'package:flutter/material.dart';
@@ -22,6 +27,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/cinema_theme.dart';
 import '../../providers/cinema_provider.dart';
+import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
 import 'film_grain.dart';
 import 'lens_flare.dart';
@@ -46,7 +52,9 @@ class CinemaOverlay extends ConsumerWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // 1+2. Drifting Mesh-Gradient mit Hotspots
+        // ═══════════ BACKGROUND-STACK (alle hinter Content) ═══════════
+
+        // 1. Mesh-Gradient mit Drift
         RepaintBoundary(
           child: AnimatedSwitcher(
             duration: const Duration(seconds: 8),
@@ -57,7 +65,20 @@ class CinemaOverlay extends ConsumerWidget {
           ),
         ),
 
-        // 3. Sky-Body (Sonne/Mond)
+        // 2. Atmospheric Haze (Tiefen-Eindruck oben→unten)
+        RepaintBoundary(
+          child: AtmosphericHaze(
+            topColor: spec.bgStops.first,
+            bottomColor: spec.bgStops.last,
+            intensity: intensity,
+          ),
+        ),
+
+        // 3. Starfield (Nacht)
+        if (spec.hasStarfield)
+          RepaintBoundary(child: Starfield(intensity: intensity)),
+
+        // 4. Sky-Body (Sonne/Mond)
         RepaintBoundary(
           child: AnimatedSwitcher(
             duration: const Duration(seconds: 8),
@@ -69,71 +90,80 @@ class CinemaOverlay extends ConsumerWidget {
           ),
         ),
 
-        // 4. Lens-Flare (optional)
-        if (spec.lensFlare != null)
+        // 5. God-Rays vom Sky-Body
+        if (spec.hasGodRays)
           RepaintBoundary(
-            child: AnimatedSwitcher(
-              duration: const Duration(seconds: 8),
-              child: LensFlare(
-                key: ValueKey('flare_${phase.name}'),
-                spec: spec.lensFlare!,
-                intensity: intensity,
-              ),
+            child: GodRays(
+              source: spec.skyBody.alignment,
+              color: spec.skyBody.glow,
+              intensity: intensity * 0.85,
             ),
           ),
 
-        // 5. Screen-Content
-        child,
-
-        // 6. Color-Grade-Tint
-        IgnorePointer(
-          child: AnimatedContainer(
-            duration: const Duration(seconds: 8),
-            color: spec.tintColor
-                .withValues(alpha: spec.tintOpacity * intensity),
-          ),
-        ),
-
-        // 7. Light-Leaks
-        RepaintBoundary(
-          child: AnimatedSwitcher(
-            duration: const Duration(seconds: 8),
-            child: LightLeaksOverlay(
-              key: ValueKey('leaks_${phase.name}'),
-              spots: spec.leakSpots,
+        // 6. Lens-Flare
+        if (spec.lensFlare != null)
+          RepaintBoundary(
+            child: LensFlare(
+              spec: spec.lensFlare!,
               intensity: intensity,
             ),
           ),
-        ),
 
-        // 8. Vignette
+        // 7. Light-Leaks
         RepaintBoundary(
-          child: AnimatedSwitcher(
-            duration: const Duration(seconds: 8),
-            child: VignetteOverlay(
-              key: ValueKey('vig_${phase.name}'),
-              intensity: spec.vignetteIntensity * intensity,
-            ),
+          child: LightLeaksOverlay(
+            spots: spec.leakSpots,
+            intensity: intensity,
           ),
         ),
 
-        // 9. Film-Grain
+        // 8. Ground-Fog (vor Light-Leaks, kurz vor Content)
+        if (spec.hasGroundFog && spec.fogColor != null)
+          RepaintBoundary(
+            child: GroundFog(
+              color: spec.fogColor!,
+              intensity: intensity,
+            ),
+          ),
+
+        // 9. Dust-Particles (zwischen Atmosphäre und Content)
+        if (spec.hasDust && spec.dustColor != null)
+          RepaintBoundary(
+            child: DustParticles(
+              color: spec.dustColor!,
+              intensity: intensity,
+            ),
+          ),
+
+        // ═══════════ CONTENT (nie überlagert) ═══════════
+        child,
+
+        // ═══════════ ULTRA-SUBTLE TOP-LAYER (Filmlook) ═══════════
+
+        // 10. Vignette nur Eck-Falloff, KEIN zentraler Tint
         RepaintBoundary(
-          child: FilmGrainOverlay(opacity: spec.grainOpacity * intensity),
+          child: VignetteOverlay(
+            intensity: spec.vignetteIntensity * intensity,
+          ),
         ),
 
-        // 10. Chromatic-Aberration
+        // 11. Chromatic-Aberration (nur Edge-Pixel)
         RepaintBoundary(
           child: ChromaticAberration(
-              amount: spec.chromaticAberration * intensity),
+            amount: spec.chromaticAberration * intensity,
+          ),
+        ),
+
+        // 12. Film-Grain (sehr subtil)
+        RepaintBoundary(
+          child: FilmGrainOverlay(opacity: spec.grainOpacity * intensity),
         ),
       ],
     );
   }
 }
 
-/// Driftende Mesh-Gradient-Kombination aus Haupt-Gradient + Hotspots.
-/// Drift bewegt das Gradient-Zentrum langsam in einer 60-Sekunden-Schleife.
+/// Drift-Mesh wie in v2, aber leicht ruhiger (45s statt 60s, kleinere Drift).
 class _MeshBackground extends StatefulWidget {
   const _MeshBackground({required this.spec, super.key});
   final CinemaPhaseSpec spec;
@@ -151,7 +181,7 @@ class _MeshBackgroundState extends State<_MeshBackground>
     super.initState();
     _drift = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 60),
+      duration: const Duration(seconds: 45),
     )..repeat(reverse: true);
   }
 
@@ -167,13 +197,11 @@ class _MeshBackgroundState extends State<_MeshBackground>
       animation: _drift,
       builder: (_, __) {
         final t = _drift.value;
-        // Drift ±0.15 in beide Achsen
-        final cx = -0.2 + (t - 0.5) * 0.30;
-        final cy = -0.4 + (t - 0.5) * 0.25;
+        final cx = -0.2 + (t - 0.5) * 0.25;
+        final cy = -0.4 + (t - 0.5) * 0.20;
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Haupt-Gradient
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
@@ -185,7 +213,6 @@ class _MeshBackgroundState extends State<_MeshBackground>
               ),
               child: const SizedBox.expand(),
             ),
-            // Hotspots (driften gegenläufig)
             for (var i = 0; i < widget.spec.meshHotspots.length; i++)
               IgnorePointer(
                 child: _Hotspot(
@@ -209,8 +236,7 @@ class _Hotspot extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = MediaQuery.sizeOf(context);
     final diameter = media.shortestSide * hotspot.radius * 2;
-    // Drift ±0.1 vom Anker.
-    final shift = (driftPhase - 0.5) * 0.2;
+    final shift = (driftPhase - 0.5) * 0.15;
     final align = Alignment(
       hotspot.alignment.x + shift,
       hotspot.alignment.y - shift,

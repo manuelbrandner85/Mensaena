@@ -30,6 +30,11 @@ enum CinemaPhase {
 }
 
 /// Phase-Spezifikation — alle Cinema-Effekte parametrisiert.
+///
+/// WICHTIG (v3-Update): Tint wird NICHT mehr über den Content gelegt.
+/// `tintColor` + `tintOpacity` werden nur noch für die ATMOSPHÄRISCHE
+/// Haze-Schicht und Phase-Akzente verwendet. Buttons/Cards greifen die
+/// Phase aktiv via CinemaAccents.tinted() ab.
 class CinemaPhaseSpec {
   const CinemaPhaseSpec({
     required this.label,
@@ -45,6 +50,12 @@ class CinemaPhaseSpec {
     required this.skyBody,
     this.lensFlare,
     this.chromaticAberration = 0.0,
+    this.hasStarfield = false,
+    this.hasGroundFog = false,
+    this.hasGodRays = false,
+    this.hasDust = false,
+    this.fogColor,
+    this.dustColor,
   });
 
   final String label;
@@ -83,6 +94,22 @@ class CinemaPhaseSpec {
 
   /// 0.0–4.0 px Pixel-Shift für Chromatic-Aberration am Bildschirmrand.
   final double chromaticAberration;
+
+  /// Sternenhimmel (Nacht-Phase).
+  final bool hasStarfield;
+
+  /// Boden-Nebel (Dawn/Dusk/Evening).
+  final bool hasGroundFog;
+
+  /// Volumetrische God-Rays von Sky-Body (Dawn/Day/Dusk).
+  final bool hasGodRays;
+
+  /// Driftende Staub-Partikel (Dusk/Evening).
+  final bool hasDust;
+
+  /// Fog/Dust-Farben (optional, sonst tintColor).
+  final Color? fogColor;
+  final Color? dustColor;
 }
 
 /// Sekundärer Radial-Hotspot über dem Haupt-Gradient — wirkt wie
@@ -200,9 +227,9 @@ class CinemaTheme {
         ),
       ],
       tintColor: Color(0xFF2A3469),
-      tintOpacity: 0.10,
-      vignetteIntensity: 0.60,
-      grainOpacity: 0.045,
+      tintOpacity: 0.0, // V3: kein Content-Tint mehr — nur Haze.
+      vignetteIntensity: 0.45,
+      grainOpacity: 0.030,
       leakSpots: [
         LightLeakSpot(
           alignment: Alignment(-0.95, -0.95),
@@ -219,7 +246,9 @@ class CinemaTheme {
         glow: Color(0xFF8FB8FF),
         isMoon: true,
       ),
-      chromaticAberration: 1.5,
+      chromaticAberration: 1.0,
+      hasStarfield: true,
+      fogColor: Color(0xFF0A1228),
     ),
 
     // ── DAWN — Lavendel zu Pfirsich, aufgehende Sonne ─────────────
@@ -249,9 +278,9 @@ class CinemaTheme {
         ),
       ],
       tintColor: Color(0xFFFB923C),
-      tintOpacity: 0.18,
-      vignetteIntensity: 0.32,
-      grainOpacity: 0.035,
+      tintOpacity: 0.0,
+      vignetteIntensity: 0.22,
+      grainOpacity: 0.025,
       leakSpots: [
         LightLeakSpot(
           alignment: Alignment(0.95, 0.85),
@@ -279,7 +308,10 @@ class CinemaTheme {
         color: Color(0xFFFED7AA),
         intensity: 0.7,
       ),
-      chromaticAberration: 1.2,
+      chromaticAberration: 0.8,
+      hasGroundFog: true,
+      hasGodRays: true,
+      fogColor: Color(0xFF8A3B3E),
     ),
 
     // ── MORNING — Tageslicht, hohe Sonne, klarer Himmel ───────────
@@ -309,9 +341,9 @@ class CinemaTheme {
         ),
       ],
       tintColor: Color(0xFF7DD3FC),
-      tintOpacity: 0.12,
-      vignetteIntensity: 0.20,
-      grainOpacity: 0.025,
+      tintOpacity: 0.0,
+      vignetteIntensity: 0.15,
+      grainOpacity: 0.018,
       leakSpots: [
         LightLeakSpot(
           alignment: Alignment(-0.5, -0.92),
@@ -327,7 +359,8 @@ class CinemaTheme {
         glow: Color(0xFFFCD34D),
         isMoon: false,
       ),
-      chromaticAberration: 0.5,
+      chromaticAberration: 0.3,
+      hasGodRays: true,
     ),
 
     // ── DAY — Klar, lebendig ───────────────────────────────────────
@@ -357,9 +390,9 @@ class CinemaTheme {
         ),
       ],
       tintColor: Color(0xFFE5E7EB),
-      tintOpacity: 0.08,
-      vignetteIntensity: 0.18,
-      grainOpacity: 0.020,
+      tintOpacity: 0.0,
+      vignetteIntensity: 0.12,
+      grainOpacity: 0.014,
       leakSpots: [
         LightLeakSpot(
           alignment: Alignment(0.0, -0.95),
@@ -375,7 +408,8 @@ class CinemaTheme {
         glow: Color(0xFFFEF3C7),
         isMoon: false,
       ),
-      chromaticAberration: 0.3,
+      chromaticAberration: 0.2,
+      hasGodRays: true,
     ),
 
     // ── DUSK — Hyperreal Sunset, sinkende Sonne, Highlight-Phase ──
@@ -405,9 +439,9 @@ class CinemaTheme {
         ),
       ],
       tintColor: Color(0xFFF59E0B),
-      tintOpacity: 0.22,
-      vignetteIntensity: 0.30,
-      grainOpacity: 0.040,
+      tintOpacity: 0.0,
+      vignetteIntensity: 0.22,
+      grainOpacity: 0.028,
       leakSpots: [
         LightLeakSpot(
           alignment: Alignment(-0.95, 0.7),
@@ -441,7 +475,12 @@ class CinemaTheme {
         color: Color(0xFFFED7AA),
         intensity: 1.0,
       ),
-      chromaticAberration: 2.5,
+      chromaticAberration: 1.6,
+      hasGroundFog: true,
+      hasGodRays: true,
+      hasDust: true,
+      fogColor: Color(0xFFC8462A),
+      dustColor: Color(0xFFFED7AA),
     ),
 
     // ── EVENING — Bronze + Aubergine, aufgehender Mond ────────────
@@ -471,9 +510,9 @@ class CinemaTheme {
         ),
       ],
       tintColor: Color(0xFFA0763A),
-      tintOpacity: 0.16,
-      vignetteIntensity: 0.45,
-      grainOpacity: 0.035,
+      tintOpacity: 0.0,
+      vignetteIntensity: 0.32,
+      grainOpacity: 0.025,
       leakSpots: [
         LightLeakSpot(
           alignment: Alignment(0.95, -0.4),
@@ -496,7 +535,11 @@ class CinemaTheme {
         glow: Color(0xFFC79363),
         isMoon: true,
       ),
-      chromaticAberration: 2.0,
+      chromaticAberration: 1.2,
+      hasGroundFog: true,
+      hasDust: true,
+      fogColor: Color(0xFF52294E),
+      dustColor: Color(0xFFC79363),
     ),
   };
 

@@ -8,6 +8,8 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../config/theme/cinema_accents.dart';
+import '../../providers/cinema_provider.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../effects/bloom.dart';
@@ -165,36 +167,49 @@ class _BottomNav extends ConsumerWidget {
                   active: currentRoute == '/dashboard/map',
                 ),
               ),
-              // Zentraler Primary-FAB-Style fuer Erstellen mit Pulse-Bloom.
+              // Zentraler Primary-FAB-Style mit phase-getunten Akzent.
               SizedBox(
                 width: 64,
-                child: GestureDetector(
-                  onTap: () {
-                    Haptics.confirm();
-                    context.go('/dashboard/create');
-                  },
-                  child: PulseBloom(
-                    color: AppColors.amber,
-                    radius: 28,
-                    minIntensity: 0.55,
-                    maxIntensity: 1.0,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [AppColors.amber, AppColors.amberWarm],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                child: Consumer(
+                  builder: (ctx, r, _) {
+                    final phase = r.watch(effectiveCinemaPhaseProvider);
+                    final accent = CinemaAccents.tinted(
+                        AppColors.amber, phase,
+                        strength: 0.20);
+                    final accentWarm = CinemaAccents.tinted(
+                        AppColors.amberWarm, phase,
+                        strength: 0.20);
+                    final glow = CinemaAccents.glow(phase);
+                    return GestureDetector(
+                      onTap: () {
+                        Haptics.confirm();
+                        context.go('/dashboard/create');
+                      },
+                      child: PulseBloom(
+                        color: glow,
+                        radius: 28,
+                        minIntensity: 0.55,
+                        maxIntensity: 1.0,
+                        child: Container(
+                          margin:
+                              const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [accent, accentWarm],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: const Icon(
+                            LucideIcons.plusCircle,
+                            color: AppColors.voidColor,
+                            size: 24,
+                          ),
                         ),
                       ),
-                      child: const Icon(
-                        LucideIcons.plusCircle,
-                        color: AppColors.voidColor,
-                        size: 24,
-                      ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
               Expanded(
