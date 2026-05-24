@@ -23,6 +23,7 @@ import '../../services/voice_recorder_service.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/image_lightbox.dart';
+import '../../widgets/shared/voice_dictation_button.dart';
 import '../../widgets/shared/voice_message_bubble.dart';
 
 /// SKILL: mensaena-features
@@ -686,9 +687,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  // Voice-Recorder (Phase 5.2) — long-press to record,
-                  // release to send. Tap shows hint.
+                  // Voice-Diktat → Text-Composer.
+                  VoiceDictationButton(controller: _ctrl, localeId: 'de_DE'),
+                  const SizedBox(width: 2),
+                  // Voice-Recorder — long-press = recording, release = send.
                   _VoiceRecorderButton(
                     conversationId: widget.conversationId,
                     onUploaded: _sendVoice,
