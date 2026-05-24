@@ -33,21 +33,21 @@ class _ChallengeCreateScreenState
   int _days = 7;
   bool _busy = false;
 
-  static const _categories = <String, String>{
-    'umwelt': '🌱 Umwelt',
-    'sozial': '🤝 Sozial',
-    'fitness': '💪 Fitness',
-    'bildung': '📚 Bildung',
-    'kreativ': '🎨 Kreativ',
-    'ernaehrung': '🥗 Ernährung',
-    'gemeinschaft': '🏘️ Gemeinschaft',
-  };
+  Map<String, String> get _categories => {
+        'umwelt': 'challenges.catUmwelt'.tr(),
+        'sozial': 'challenges.catSozial'.tr(),
+        'fitness': 'challenges.catFitness'.tr(),
+        'bildung': 'challenges.catBildung'.tr(),
+        'kreativ': 'challenges.catKreativ'.tr(),
+        'ernaehrung': 'challenges.catErnaehrung'.tr(),
+        'gemeinschaft': 'challenges.catGemeinschaft'.tr(),
+      };
 
-  static const _difficulties = <String, String>{
-    'leicht': 'Leicht',
-    'mittel': 'Mittel',
-    'schwer': 'Schwer',
-  };
+  Map<String, String> get _difficulties => {
+        'leicht': 'challenges.diffEasy'.tr(),
+        'mittel': 'challenges.diffMedium'.tr(),
+        'schwer': 'challenges.diffHard'.tr(),
+      };
 
   @override
   void dispose() {
@@ -88,7 +88,7 @@ class _ChallengeCreateScreenState
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
-      title: 'Challenge erstellen',
+      title: 'challenges.create'.tr(),
       currentRoute: '/dashboard/challenges/create',
       body: SafeArea(
         child: Form(
@@ -108,11 +108,12 @@ class _ChallengeCreateScreenState
                 controller: _title,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 maxLength: 80,
-                decoration: _input('Titel', 'z. B. 7 Tage plastikfrei'),
+                decoration: _input(
+                    'challenges.fieldTitle'.tr(), 'challenges.titleHint'.tr()),
                 validator: (v) {
                   final t = v?.trim() ?? '';
-                  if (t.length < 5) return 'Mindestens 5 Zeichen.';
-                  if (t.length > 80) return 'Maximal 80 Zeichen.';
+                  if (t.length < 5) return 'challenges.minChars'.tr();
+                  if (t.length > 80) return 'challenges.maxChars'.tr();
                   return null;
                 },
               ),
@@ -122,8 +123,8 @@ class _ChallengeCreateScreenState
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 maxLength: 500,
                 maxLines: 4,
-                decoration: _input('Beschreibung (optional)',
-                    'Worum geht es bei dieser Challenge?'),
+                decoration: _input('challenges.fieldDescOpt'.tr(),
+                    'challenges.descHint'.tr()),
               ),
               const SizedBox(height: 18),
               Text('challenges.fieldCategory'.tr(),
@@ -165,22 +166,22 @@ class _ChallengeCreateScreenState
               ),
               const SizedBox(height: 18),
               _slider(
-                label: 'Punkte für Teilnehmer:innen',
+                label: 'challenges.pointsLabel'.tr(),
                 value: _points.toDouble(),
                 min: 10,
                 max: 500,
                 divisions: 49,
-                suffix: ' P',
+                suffix: 'challenges.pointsSuffix'.tr(),
                 onChanged: (v) => setState(() => _points = v.round()),
               ),
               const SizedBox(height: 12),
               _slider(
-                label: 'Dauer',
+                label: 'challenges.durationLabel'.tr(),
                 value: _days.toDouble(),
                 min: 1,
                 max: 90,
                 divisions: 89,
-                suffix: ' Tage',
+                suffix: 'challenges.daysSuffix'.tr(),
                 onChanged: (v) => setState(() => _days = v.round()),
               ),
               const SizedBox(height: 28),
