@@ -304,6 +304,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 channelTitle: _context!.title,
                 myUserId: SupabaseService.currentUser?.id,
               ),
+            // Pinned-Messages-Panel — nur in Channels
+            if (_context?.kind == ChatKind.channel)
+              _PinnedMessagesPanel(conversationId: widget.conversationId),
             Expanded(
               child: stream.when(
                 loading: () => const Center(
@@ -370,6 +373,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             : null,
                         onDelete: mine
                             ? () => _deleteMessage(m['id'] as String)
+                            : null,
+                        // Pin only for channels (DMs have no admin-mod model)
+                        onPin: _context?.kind == ChatKind.channel
+                            ? () async {
+                                final pinned = await MessagesRepository
+                                    .togglePin(
+                                  messageId: m['id'] as String,
+                                  conversationId: widget.conversationId,
+                                );
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: AppColors.surface,
+                                    content: Text(
+                                      pinned
+                                          ? '📌 Nachricht angepinnt.'
+                                          : 'Pin entfernt.',
+                                      style: AppTypography.body(
+                                          size: 13, color: AppColors.ink),
+                                    ),
+                                  ),
+                                );
+                              }
                             : null,
                       );
                     },
@@ -483,6 +509,7 @@ class _MessageBubble extends ConsumerWidget {
     this.onReply,
     this.onEdit,
     this.onDelete,
+    this.onPin,
   });
   final Map<String, dynamic> json;
   final bool mine;
@@ -493,6 +520,7 @@ class _MessageBubble extends ConsumerWidget {
   final VoidCallback? onReply;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
+  final VoidCallback? onPin;
 
   static const _reactionEmojis = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '✅'];
   static final _imgRegex =
@@ -544,6 +572,15 @@ class _MessageBubble extends ConsumerWidget {
                   onTap: () {
                     Navigator.pop(sheetCtx);
                     onReply!();
+                  },
+                ),
+              if (onPin != null)
+                _ActionTile(
+                  icon: LucideIcons.pin,
+                  label: 'Anpinnen / Lösen',
+                  onTap: () {
+                    Navigator.pop(sheetCtx);
+                    onPin!();
                   },
                 ),
               if (onEdit != null)
@@ -1111,6 +1148,139 @@ class _LiveRoomBannerState extends State<_LiveRoomBanner>
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Pinned-Messages-Panel — Channel only. 1:1 zu Web PinnedMessages.
+// ─────────────────────────────────────────────────────────────
+class _PinnedMessagesPanel extends StatelessWidget {
+  const _PinnedMessagesPanel({required this.conversationId});
+
+  final String conversationId;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: MessagesRepository.watchPinnedMessages(conversationId),
+      builder: (context, snap) {
+        final pins = snap.data ?? const <Map<String, dynamic>>[];
+        if (pins.isEmpty) return const SizedBox.shrink();
+        return Container(
+          margin: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.amber.withValues(alpha: 0.08),
+            border:
+                Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.pin, size: 14, color: AppColors.amber),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${pins.length} angepinnte ${pins.length == 1 ? 'Nachricht' : 'Nachrichten'}',
+                  style: AppTypography.body(
+                      size: 12,
+                      color: AppColors.amber,
+                      weight: FontWeight.w600),
+                ),
+              ),
+              TextButton(
+                onPressed: () => _showPinsSheet(context, pins),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  minimumSize: const Size(0, 28),
+                ),
+                child: Text('Ansehen',
+                    style: AppTypography.label(
+                        size: 10, color: AppColors.amber)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showPinsSheet(
+      BuildContext context, List<Map<String, dynamic>> pins) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scroll) => ListView(
+          controller: scroll,
+          padding: const EdgeInsets.all(20),
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                const Icon(LucideIcons.pin, color: AppColors.amber),
+                const SizedBox(width: 8),
+                Text('Angepinnte Nachrichten',
+                    style: AppTypography.display(
+                        size: 18, color: AppColors.ink)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            for (final p in pins)
+              _PinnedItem(messageId: p['message_id'] as String),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PinnedItem extends StatelessWidget {
+  const _PinnedItem({required this.messageId});
+  final String messageId;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: MessagesRepository.fetchById(messageId),
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const SizedBox(height: 40);
+        }
+        final m = snap.data;
+        if (m == null) return const SizedBox.shrink();
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            (m['content'] as String?) ?? '',
+            style: AppTypography.body(size: 13, color: AppColors.ink),
           ),
         );
       },

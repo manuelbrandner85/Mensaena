@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Flutter Phase 3.2+ (Map, Create, Posts, Chat, Messages, Notifications, Profile, Settings, Interactions)
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1 ✅, 3.1 ✅
-NEXT=Flutter Phase 3.2 – Map-Screen (flutter_map + get_nearby_posts RPC)
-LAST_SESSION=2026-05-22
-LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
+OPEN=Flutter Phase 5 – Admin-Tab-Vollparität + Chat-Voice + Mentions + Trust-Ratings-Flow
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-4 ✅, Wave 3 ✅, Auth-Reset ✅, Chat-Pins ✅, Admin-Tabs-Schema-Fix ✅
+NEXT=Flutter Voice-Recorder + @-Mention-Autocomplete + Trust-Rating-Modal
+LAST_SESSION=2026-05-24
+LAST_TASK=feat(flutter): Auth-Reset-Mode + Chat-Pinned-Messages + Admin-Tabs Schema-Fix (R6)
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
@@ -43,9 +43,17 @@ LAST_TASK=feat(flutter): Phase 3.1 – dashboard home + scaffold
   - [x] timebank_repository (listMine, balance, create, confirm, reject, watchUnseenNotifications Realtime-Stream)
   - [x] zeitbank_notification model
   - [x] TimebankScreen: Balance-Card (given/received/balance/pending), Historie mit Bestätigen/Ablehnen Inline-Buttons fuer Empfänger
-- [ ] Phase 4 – Restliche Module nach Brief-Reihenfolge
-- [ ] Phase 5 – Admin-Dashboard
-- [ ] Phase 6 – LiveKit (livekit_client wieder rein wenn flutter_webrtc 3.27-kompatibel ist)
+- [x] Phase 4.4 – Auth-Reset-Mode (2026-05-24): `_AuthMode.reset` + PASSWORD_RECOVERY-Listener + Confirm-Field + sb.auth.updateUser → signOut → back-to-login. Email-Enumeration-Schutz im forgot-Submit (generische Message). 1:1 zu Web src/app/auth/page.tsx.
+- [x] Phase 4.5 – Chat-Pinned-Messages (2026-05-24): MessagesRepository.watchPinnedMessages + togglePin + listAnnouncements. _PinnedMessagesPanel als Stream-Widget oben im Channel. Pin-Action im Bubble-Long-Press-Sheet (nur Channels). 1:1 zu Web ChatView.tsx PinnedMessages.
+- [x] Phase 4.6 – Admin-Tabs Schema-Fix (R6) (2026-05-24): crisis_situations→crises, farm_listings.is_bio entfernt, contact_messages/bot_feedback/marketing_campaigns gegen organization_suggestions/bot_scheduled_messages/audit_logs ersetzt (echte Tabellen aus AI_CONTEXT §4). Admin-Dashboard-Tiles entsprechend updated.
+- [ ] Phase 5.1 – Chat: @-Mention-Autocomplete (parse '@' in Composer → profiles-search → Insert)
+- [ ] Phase 5.2 – Chat: Voice-Recorder (record + audioplayers Packages noetig — Begruendung in Commit)
+- [ ] Phase 5.3 – Chat: In-Chat-Search (Lupe-Icon + Text-Filter)
+- [ ] Phase 5.4 – Trust-Ratings-Flow (RatingModal nach abgeschlossener Interaktion, calculate_trust_score RPC)
+- [ ] Phase 5.5 – Account-Deletion + Data-Export (GDPR, Settings → Konto)
+- [ ] Phase 5.6 – Multi-Image-Carousel in PostCard + Post-Detail
+- [ ] Phase 5.7 – Comments-Reply-Nested (post_comments parent_id, depth-1)
+- [ ] Phase 6 – LiveKit-Secrets Setup (Hostinger livekit.yaml Key-Name fehlt noch in private.push_config)
 
 ## Sofort-Massnahmen Top 5
 - [x] [!] A1 – CreatePostModal: Koordinaten+location_text+Bild-Upload+Rate-Limiting (alle 12+ Module)

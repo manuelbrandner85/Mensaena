@@ -219,6 +219,69 @@ class MessagesRepository {
     }
   }
 
+  /// Pinned messages for a channel/conversation.
+  /// 1:1 to web ChatView.tsx loadPinnedMessages.
+  static Stream<List<Map<String, dynamic>>> watchPinnedMessages(
+      String conversationId) {
+    return sb
+        .from('message_pins')
+        .stream(primaryKey: ['id'])
+        .eq('conversation_id', conversationId)
+        .map((rows) => rows
+            .map<Map<String, dynamic>>((r) =>
+                Map<String, dynamic>.from(r as Map))
+            .toList());
+  }
+
+  /// Pin or unpin a message (admin/mod only — RLS enforced server-side).
+  static Future<bool> togglePin({
+    required String messageId,
+    required String conversationId,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final existing = await sb
+          .from('message_pins')
+          .select('id')
+          .eq('message_id', messageId)
+          .maybeSingle();
+      if (existing != null) {
+        await sb
+            .from('message_pins')
+            .delete()
+            .eq('id', existing['id'] as Object);
+        return false;
+      }
+      await sb.from('message_pins').insert({
+        'message_id': messageId,
+        'conversation_id': conversationId,
+        'pinned_by': uid,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Channel announcements (admin pinned info banner).
+  /// 1:1 to web ChatView.tsx loadAnnouncements.
+  static Future<List<Map<String, dynamic>>> listAnnouncements(
+      String conversationId) async {
+    try {
+      final rows = await sb
+          .from('chat_announcements')
+          .select('id, content, type, created_at, author_id')
+          .eq('conversation_id', conversationId)
+          .eq('is_active', true)
+          .order('created_at', ascending: false)
+          .limit(3);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Lookup einer Single-Message (z.B. fuer Reply-to-Quote-Anzeige).
   static Future<Map<String, dynamic>?> fetchById(String messageId) async {
     try {

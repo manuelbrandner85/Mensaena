@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-04-30 | v1.0.0-beta | Bug4–7 ChatView + A1–A3 Admin/Mod LiveKit + #11–#13 Call-Features + #20 Anruf-Banner + #25 End-Ton + #27 Chat-Scroll + C2 Safe-Area + C3 Mobile-Header
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 4.4-4.6: Auth-Reset + Chat-Pinned-Messages + Admin-Tabs-Schema-Fix (R6)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -196,6 +196,9 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-05-24 | feat(flutter): Phase 4.6 Admin-Tab-Schema-Fix (R6) — crisis_situations→crises, farm_listings.is_bio→status, contact_messages/bot_feedback/marketing_campaigns→organization_suggestions/bot_scheduled_messages/audit_logs (echte Tabellen aus §4); Admin-Dashboard-Tiles entsprechend | flutter_app/lib/config/routes/app_router.dart, flutter_app/lib/screens/dashboard/admin/admin_dashboard_screen.dart |
+| 2026-05-24 | feat(flutter): Phase 4.5 Chat-Pinned-Messages — MessagesRepository.watchPinnedMessages + togglePin + listAnnouncements; _PinnedMessagesPanel Stream-Widget oben im Channel; Pin-Action im Bubble-Sheet (nur Channels); 1:1 zu Web ChatView.tsx PinnedMessages | flutter_app/lib/repositories/conversations_repository.dart, flutter_app/lib/screens/dashboard/chat_screen.dart |
+| 2026-05-24 | feat(flutter): Phase 4.4 Auth-Reset-Mode — _AuthMode.reset hinzugefuegt, sb.auth.onAuthStateChange Listener fuer PASSWORD_RECOVERY → setMode(reset), Confirm-Password-Field, sb.auth.updateUser + signOut + zurueck zu login. Email-Enumeration-Schutz im forgot-Submit (generische Message). 1:1 zu Web src/app/auth/page.tsx | flutter_app/lib/screens/public/auth_screen.dart |
 | 2026-04-30 | fix(calls): #23 — Kamera-Wechsel Schwarzbild: setTimeout 200→100ms, isFlipping-Prop in ParticipantTileProps, SwitchCamera-Spinner als Platzhalter beim lokalen Teilnehmer | src/components/chat/LiveRoomModal.tsx |
 | 2026-04-30 | perf(chat): B7 — Supabase-Queries parallelisiert: loadAnnouncements als useCallback, alle drei via Promise.all beim Mount (600-1500ms → ~500ms) | src/components/chat/ChatView.tsx |
 | 2026-04-30 | perf(chat): B5 — LiveRoomModal lazy: loading-Spinner (animate-spin + "Wird geladen…") zu dynamic()-Optionen in ChatView + GlobalCallListener ergänzt; ssr:false war bereits vorhanden | src/components/chat/ChatView.tsx, src/components/chat/GlobalCallListener.tsx |

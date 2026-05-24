@@ -1,15 +1,23 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show AuthChangeEvent, AuthState, UserAttributes;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 
-enum _AuthMode { login, register, forgot }
+/// Auth-Modi 1:1 zu Web src/app/auth/page.tsx:
+/// - login: E-Mail+Passwort
+/// - register: zusätzlich Nickname + AGB-Checkbox
+/// - forgot: nur E-Mail, sendet resetPasswordForEmail
+/// - reset: neues Passwort + Bestätigung (nach PASSWORD_RECOVERY-Event)
+enum _AuthMode { login, register, forgot, reset }
 
 /// SKILL: mensaena-design + mensaena-features
 /// 1:1-Spiegel von `src/app/auth/page.tsx` (Cinema-Dark + Bronze-Akzent).
@@ -33,6 +41,8 @@ class _AuthScreenState extends State<AuthScreen>
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  // For reset-mode: confirm new password
+  final _passwordConfirmCtrl = TextEditingController();
   bool _busy = false;
   bool _obscure = true;
   bool _agreed = false;
@@ -40,6 +50,10 @@ class _AuthScreenState extends State<AuthScreen>
   String? _info;
   int _failCount = 0;
   DateTime? _lockUntil;
+
+  /// Subscription for Supabase auth state — listens for PASSWORD_RECOVERY
+  /// events from magic-link deep-links and switches UI to reset mode.
+  StreamSubscription<AuthState>? _authSub;
 
   // Animation for fireflies
   late final AnimationController _fireflyCtrl;
@@ -50,6 +64,7 @@ class _AuthScreenState extends State<AuthScreen>
     _mode = switch (widget.mode) {
       'register' => _AuthMode.register,
       'forgot' => _AuthMode.forgot,
+      'reset' => _AuthMode.reset,
       _ => _AuthMode.login,
     };
     _passwordCtrl.addListener(() => mounted ? setState(() {}) : null);
@@ -57,13 +72,24 @@ class _AuthScreenState extends State<AuthScreen>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+
+    // Listen for PASSWORD_RECOVERY event (magic-link deep-link).
+    // 1:1 zu Web src/app/auth/page.tsx PASSWORD_RECOVERY-Listener.
+    _authSub = sb.auth.onAuthStateChange.listen((data) {
+      if (!mounted) return;
+      if (data.event == AuthChangeEvent.passwordRecovery) {
+        setState(() => _mode = _AuthMode.reset);
+      }
+    });
   }
 
   @override
   void dispose() {
+    _authSub?.cancel();
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _passwordConfirmCtrl.dispose();
     _fireflyCtrl.dispose();
     super.dispose();
   }
@@ -134,24 +160,28 @@ class _AuthScreenState extends State<AuthScreen>
         _AuthMode.login => '01',
         _AuthMode.register => '02',
         _AuthMode.forgot => '03',
+        _AuthMode.reset => '04',
       };
 
   String _modeLabel() => switch (_mode) {
         _AuthMode.login => 'Anmelden',
         _AuthMode.register => 'Konto erstellen',
         _AuthMode.forgot => 'Passwort vergessen',
+        _AuthMode.reset => 'Neues Passwort',
       };
 
   String _heading() => switch (_mode) {
         _AuthMode.login => 'Willkommen ',
         _AuthMode.register => 'Werde Teil der ',
         _AuthMode.forgot => 'Passwort ',
+        _AuthMode.reset => 'Neues ',
       };
 
   String _headingAccent() => switch (_mode) {
         _AuthMode.login => 'zurück.',
         _AuthMode.register => 'Nachbarschaft.',
         _AuthMode.forgot => 'vergessen?',
+        _AuthMode.reset => 'Passwort.',
       };
 
   String _subtitle() => switch (_mode) {
@@ -161,12 +191,15 @@ class _AuthScreenState extends State<AuthScreen>
           'Trag dich ein — wir helfen dir nicht mit Werbung, sondern mit echten Nachbarn.',
         _AuthMode.forgot =>
           'Wir senden dir einen Reset-Link per E-Mail. Klicke ihn, um ein neues Passwort zu setzen.',
+        _AuthMode.reset =>
+          'Wähle ein starkes neues Passwort. Du wirst danach automatisch abgemeldet und musst dich neu anmelden.',
       };
 
   String _submitLabel() => switch (_mode) {
         _AuthMode.login => 'Anmelden',
         _AuthMode.register => 'Konto erstellen',
         _AuthMode.forgot => 'Reset-Link senden',
+        _AuthMode.reset => 'Passwort speichern',
       };
 
   // ── Actions ────────────────────────────────────────────────
@@ -230,12 +263,36 @@ class _AuthScreenState extends State<AuthScreen>
               'Konto erstellt. Prüfe deine E-Mails zur Bestätigung.');
           break;
         case _AuthMode.forgot:
+          // Email-Enumeration-Schutz: gleicher Text egal ob Konto existiert.
           await sb.auth.resetPasswordForEmail(
             _emailCtrl.text.trim().toLowerCase(),
             redirectTo: 'https://www.mensaena.de/auth?mode=reset',
           );
           setState(() => _info =
-              'Wir haben dir einen Reset-Link geschickt. Prüfe dein Postfach.');
+              'Falls ein Konto mit dieser E-Mail existiert, haben wir dir einen Reset-Link geschickt. Prüfe dein Postfach.');
+          break;
+        case _AuthMode.reset:
+          // Passwort-Stärke Pflicht.
+          if (_pwScore < 3) {
+            setState(() => _error =
+                'Passwort zu schwach — mind. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl.');
+            return;
+          }
+          if (_passwordCtrl.text != _passwordConfirmCtrl.text) {
+            setState(() => _error = 'Passwörter stimmen nicht überein.');
+            return;
+          }
+          await sb.auth.updateUser(
+            UserAttributes(password: _passwordCtrl.text),
+          );
+          await sb.auth.signOut();
+          if (!mounted) return;
+          setState(() {
+            _info = 'Passwort gespeichert. Bitte neu anmelden.';
+            _mode = _AuthMode.login;
+            _passwordCtrl.clear();
+            _passwordConfirmCtrl.clear();
+          });
           break;
       }
     } catch (e) {
@@ -261,6 +318,7 @@ class _AuthScreenState extends State<AuthScreen>
   Widget build(BuildContext context) {
     final isRegister = _mode == _AuthMode.register;
     final isForgot = _mode == _AuthMode.forgot;
+    final isReset = _mode == _AuthMode.reset;
     final lockSeconds = _lockUntil == null
         ? 0
         : _lockUntil!.difference(DateTime.now()).inSeconds.clamp(0, 999);
@@ -371,7 +429,8 @@ class _AuthScreenState extends State<AuthScreen>
                                 const SizedBox(height: 16),
                               ],
 
-                              // E-Mail
+                              // E-Mail (hidden in reset-mode, session already set)
+                              if (!isReset) ...[
                               _FieldLabel('E-MAIL'),
                               _CinemaTextField(
                                 controller: _emailCtrl,
@@ -381,6 +440,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     TextInputType.emailAddress,
                                 validator: _validateEmail,
                               ),
+                              ],
 
                               // Passwort + Inline-Forgot-Link
                               if (!isForgot) ...[
@@ -428,7 +488,7 @@ class _AuthScreenState extends State<AuthScreen>
                                         () => _obscure = !_obscure),
                                   ),
                                 ),
-                                if (isRegister &&
+                                if ((isRegister || isReset) &&
                                     _passwordCtrl.text.isNotEmpty)
                                   _PasswordStrength(
                                     score: _pwScore,
@@ -436,6 +496,23 @@ class _AuthScreenState extends State<AuthScreen>
                                     label: _pwLabel(),
                                     checks: _checks,
                                   ),
+                                // Confirm-Field nur fuer Reset-Mode
+                                if (isReset) ...[
+                                  const SizedBox(height: 16),
+                                  _FieldLabel('PASSWORT BESTÄTIGEN'),
+                                  _CinemaTextField(
+                                    controller: _passwordConfirmCtrl,
+                                    hint: 'Neues Passwort wiederholen',
+                                    icon: LucideIcons.lock,
+                                    obscure: _obscure,
+                                    validator: (v) {
+                                      if (v != _passwordCtrl.text) {
+                                        return 'Passwörter stimmen nicht überein.';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ],
                               ],
 
                               // Agreement (register only)

@@ -592,10 +592,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/admin/crisis',
         builder: (_, __) => const AdminTableScreen(
+          // FIX R6: Tabelle heisst 'crises', nicht 'crisis_situations'
           title: 'Krisen',
-          tableName: 'crisis_situations',
+          tableName: 'crises',
           currentRoute: '/dashboard/admin/crisis',
-          subtitleFields: ['severity', 'status', 'crisis_type'],
+          subtitleFields: ['category', 'urgency', 'status'],
         ),
       ),
       GoRoute(
@@ -611,11 +612,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/admin/farms',
         builder: (_, __) => const AdminTableScreen(
+          // FIX R6: 'is_bio' existiert nicht — verwende 'status' aus farm_listings
           title: 'Farms',
           tableName: 'farm_listings',
           currentRoute: '/dashboard/admin/farms',
           titleField: 'name',
-          subtitleFields: ['category', 'city', 'is_bio'],
+          subtitleFields: ['category', 'address', 'status'],
         ),
       ),
       GoRoute(
@@ -635,50 +637,55 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/admin/challenges',
         builder: (_, __) => const AdminTableScreen(
+          // FIX R6: Spalten aus challenges-Schema (category/difficulty/points)
           title: 'Challenges',
           tableName: 'challenges',
           currentRoute: '/dashboard/admin/challenges',
-          subtitleFields: ['type', 'target_count', 'is_active'],
+          subtitleFields: ['category', 'difficulty', 'status'],
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/timebank',
         builder: (_, __) => const AdminTableScreen(
+          // FIX R6: timebank_entries hat type/hours, KEINE status-Spalte
           title: 'Zeitbank',
           tableName: 'timebank_entries',
           currentRoute: '/dashboard/admin/timebank',
           titleField: 'description',
-          subtitleFields: ['category', 'hours', 'status'],
+          subtitleFields: ['type', 'hours'],
         ),
       ),
       GoRoute(
-        path: '/dashboard/admin/contact',
+        path: '/dashboard/admin/bot-scheduled',
         builder: (_, __) => const AdminTableScreen(
-          title: 'Kontakt-Anfragen',
-          tableName: 'contact_messages',
-          currentRoute: '/dashboard/admin/contact',
-          titleField: 'subject',
-          subtitleFields: ['email', 'status', 'category'],
+          // FIX R6: korrekte Tabelle ist bot_scheduled_messages
+          title: 'Bot Scheduled',
+          tableName: 'bot_scheduled_messages',
+          currentRoute: '/dashboard/admin/bot-scheduled',
+          titleField: 'title',
+          subtitleFields: ['message_type', 'target_audience', 'status'],
         ),
       ),
       GoRoute(
-        path: '/dashboard/admin/bot-feedback',
+        path: '/dashboard/admin/suggestions',
         builder: (_, __) => const AdminTableScreen(
-          title: 'Bot Feedback',
-          tableName: 'bot_feedback',
-          currentRoute: '/dashboard/admin/bot-feedback',
-          titleField: 'message',
-          subtitleFields: ['rating', 'category'],
-        ),
-      ),
-      GoRoute(
-        path: '/dashboard/admin/marketing',
-        builder: (_, __) => const AdminTableScreen(
-          title: 'Marketing',
-          tableName: 'marketing_campaigns',
-          currentRoute: '/dashboard/admin/marketing',
+          // organization_suggestions ist eine echte Tabelle (R6 verifiziert)
+          title: 'Org-Vorschläge',
+          tableName: 'organization_suggestions',
+          currentRoute: '/dashboard/admin/suggestions',
           titleField: 'name',
-          subtitleFields: ['status', 'sent_count'],
+          subtitleFields: ['category', 'city', 'status'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/audit',
+        builder: (_, __) => const AdminTableScreen(
+          // audit_logs Tabelle existiert (R6 verifiziert)
+          title: 'Audit Log',
+          tableName: 'audit_logs',
+          currentRoute: '/dashboard/admin/audit',
+          titleField: 'action',
+          subtitleFields: ['target_type', 'actor_id'],
         ),
       ),
       GoRoute(

@@ -167,26 +167,28 @@ class _AdminGrid extends StatelessWidget {
         color: AppColors.tealSoft,
         route: '/dashboard/admin/timebank',
       ),
+      // FIX R6: Tabellen contact_messages/bot_feedback/marketing_campaigns
+      // existieren NICHT im Schema — durch real existierende ersetzt:
       const _AdminTile(
-        title: 'Kontakt',
+        title: 'Org-Vorschläge',
         count: 0,
-        icon: LucideIcons.mail,
+        icon: LucideIcons.building2,
         color: AppColors.tealSoft,
-        route: '/dashboard/admin/contact',
+        route: '/dashboard/admin/suggestions',
       ),
       const _AdminTile(
-        title: 'Bot Feedback',
+        title: 'Bot Scheduled',
         count: 0,
         icon: LucideIcons.bot,
         color: AppColors.lebenSoft,
-        route: '/dashboard/admin/bot-feedback',
+        route: '/dashboard/admin/bot-scheduled',
       ),
       const _AdminTile(
-        title: 'Marketing',
+        title: 'Audit Log',
         count: 0,
-        icon: LucideIcons.megaphone,
+        icon: LucideIcons.fileText,
         color: AppColors.amber,
-        route: '/dashboard/admin/marketing',
+        route: '/dashboard/admin/audit',
       ),
       const _AdminTile(
         title: 'System',
