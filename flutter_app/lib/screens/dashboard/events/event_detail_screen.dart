@@ -175,7 +175,7 @@ class EventDetailScreen extends ConsumerWidget {
                   spacing: 8,
                   children: [
                     _RsvpButton(
-                      label: 'Ich komme',
+                      label: 'events.rsvpGoing'.tr(),
                       icon: LucideIcons.checkCircle,
                       color: AppColors.leben,
                       active: rsvp.asData?.value == 'going',
@@ -188,7 +188,7 @@ class EventDetailScreen extends ConsumerWidget {
                       },
                     ),
                     _RsvpButton(
-                      label: 'Vielleicht',
+                      label: 'events.rsvpMaybe'.tr(),
                       icon: LucideIcons.helpCircle,
                       color: AppColors.amber,
                       active: rsvp.asData?.value == 'maybe',
@@ -201,7 +201,7 @@ class EventDetailScreen extends ConsumerWidget {
                       },
                     ),
                     _RsvpButton(
-                      label: 'Sage ab',
+                      label: 'events.rsvpDeclined'.tr(),
                       icon: LucideIcons.xCircle,
                       color: AppColors.mute,
                       active: rsvp.asData?.value == 'declined',
@@ -217,8 +217,13 @@ class EventDetailScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${e.attendeeCount} Teilnehmer:innen'
-                  '${e.maxAttendees != null ? ' / max. ${e.maxAttendees}' : ''}',
+                  e.maxAttendees != null
+                      ? 'events.attendeesWithMax'.tr(namedArgs: {
+                          'count': '${e.attendeeCount}',
+                          'max': '${e.maxAttendees}',
+                        })
+                      : 'events.attendees'.tr(
+                          namedArgs: {'count': '${e.attendeeCount}'}),
                   style: AppTypography.caption(),
                 ),
                 const SizedBox(height: 16),
@@ -228,7 +233,7 @@ class EventDetailScreen extends ConsumerWidget {
                       child: FilledButton.icon(
                         onPressed: () => _addToSystemCalendar(context, e),
                         icon: const Icon(LucideIcons.calendarPlus, size: 14),
-                        label: const Text('In Kalender'),
+                        label: Text('events.addToCalendar'.tr()),
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.bronze,
                           foregroundColor: AppColors.voidColor,
@@ -280,7 +285,7 @@ class EventDetailScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
-          ok ? '✓ Event geöffnet im Kalender' : 'Kalender konnte nicht geöffnet werden',
+          ok ? 'events.openedInCalendar'.tr() : 'events.calendarNotOpened'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink),
         ),
       ));
@@ -288,7 +293,7 @@ class EventDetailScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Fehler: $e',
+        content: Text('events.error'.tr(namedArgs: {'error': '$e'}),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
     }
@@ -357,7 +362,7 @@ class EventDetailScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Export fehlgeschlagen.',
+        content: Text('events.exportFailed'.tr(),
             style: AppTypography.body(
                 size: 13, color: AppColors.ink)),
       ));

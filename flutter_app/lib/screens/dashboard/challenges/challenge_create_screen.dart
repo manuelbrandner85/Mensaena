@@ -3,6 +3,7 @@
 /// Felder: Titel, Beschreibung, Kategorie, Schwierigkeit, Punkte, Dauer.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -71,14 +72,14 @@ class _ChallengeCreateScreenState
     if (id == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Challenge konnte nicht erstellt werden.',
+        content: Text('challenges.createFailed'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text('Challenge erstellt!',
+      content: Text('challenges.createSuccess'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.leben)),
     ));
     context.go('/dashboard/challenges');
@@ -95,11 +96,11 @@ class _ChallengeCreateScreenState
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
             children: [
-              Text('Neue Challenge',
+              Text('challenges.newChallenge'.tr(),
                   style: AppTypography.display(
                       size: 22, color: AppColors.ink)),
               const SizedBox(height: 4),
-              Text('Motiviere deine Nachbarschaft zu einer guten Sache.',
+              Text('challenges.motivate'.tr(),
                   style: AppTypography.body(
                       size: 13, color: AppColors.mute)),
               const SizedBox(height: 20),
@@ -125,7 +126,7 @@ class _ChallengeCreateScreenState
                     'Worum geht es bei dieser Challenge?'),
               ),
               const SizedBox(height: 18),
-              Text('Kategorie',
+              Text('challenges.fieldCategory'.tr(),
                   style: AppTypography.label(
                       size: 10, color: AppColors.mute)),
               const SizedBox(height: 8),
@@ -141,7 +142,7 @@ class _ChallengeCreateScreenState
                     .toList(),
               ),
               const SizedBox(height: 18),
-              Text('Schwierigkeit',
+              Text('challenges.fieldDifficulty'.tr(),
                   style: AppTypography.label(
                       size: 10, color: AppColors.mute)),
               const SizedBox(height: 8),
@@ -193,7 +194,7 @@ class _ChallengeCreateScreenState
                             strokeWidth: 2, color: AppColors.voidColor),
                       )
                     : const Icon(LucideIcons.trophy, size: 16),
-                label: const Text('Challenge starten'),
+                label: Text('challenges.start'.tr()),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.amber,
                   foregroundColor: AppColors.voidColor,

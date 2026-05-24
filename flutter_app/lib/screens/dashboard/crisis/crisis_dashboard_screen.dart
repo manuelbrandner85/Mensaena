@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,26 +35,27 @@ class CrisisDashboardScreen extends ConsumerStatefulWidget {
 class _CrisisDashboardScreenState
     extends ConsumerState<CrisisDashboardScreen> {
   // 11 Kategorien aus CRISIS_CATEGORY_CONFIG.
-  static const List<FilterOption<String>> _categories = [
-    FilterOption(value: 'medical', label: '🏥 Medizinisch'),
-    FilterOption(value: 'fire', label: '🔥 Brand'),
-    FilterOption(value: 'flood', label: '🌊 Hochwasser'),
-    FilterOption(value: 'storm', label: '⛈️ Unwetter'),
-    FilterOption(value: 'accident', label: '🚗 Unfall'),
-    FilterOption(value: 'violence', label: '🛡️ Gewalt'),
-    FilterOption(value: 'missing_person', label: '🔍 Vermisst'),
-    FilterOption(value: 'infrastructure', label: '🏗️ Infrastruktur'),
-    FilterOption(value: 'supply', label: '📦 Versorgung'),
-    FilterOption(value: 'evacuation', label: '🚨 Evakuierung'),
-    FilterOption(value: 'other', label: '❓ Sonstiges'),
-  ];
+  List<FilterOption<String>> get _categories => [
+        FilterOption(value: 'medical', label: 'crisis.catMedical'.tr()),
+        FilterOption(value: 'fire', label: 'crisis.catFire'.tr()),
+        FilterOption(value: 'flood', label: 'crisis.catFlood'.tr()),
+        FilterOption(value: 'storm', label: 'crisis.catStorm'.tr()),
+        FilterOption(value: 'accident', label: 'crisis.catAccident'.tr()),
+        FilterOption(value: 'violence', label: 'crisis.catViolence'.tr()),
+        FilterOption(value: 'missing_person', label: 'crisis.catMissing'.tr()),
+        FilterOption(
+            value: 'infrastructure', label: 'crisis.catInfrastructure'.tr()),
+        FilterOption(value: 'supply', label: 'crisis.catSupply'.tr()),
+        FilterOption(value: 'evacuation', label: 'crisis.catEvacuation'.tr()),
+        FilterOption(value: 'other', label: 'crisis.catOther'.tr()),
+      ];
 
-  static const List<FilterOption<String>> _urgencies = [
-    FilterOption(value: 'critical', label: '🔴 Kritisch'),
-    FilterOption(value: 'high', label: '🟠 Hoch'),
-    FilterOption(value: 'medium', label: '🟡 Mittel'),
-    FilterOption(value: 'low', label: '🔵 Niedrig'),
-  ];
+  List<FilterOption<String>> get _urgencies => [
+        FilterOption(value: 'critical', label: 'crisis.urgCritical'.tr()),
+        FilterOption(value: 'high', label: 'crisis.urgHigh'.tr()),
+        FilterOption(value: 'medium', label: 'crisis.urgMedium'.tr()),
+        FilterOption(value: 'low', label: 'crisis.urgLow'.tr()),
+      ];
 
   String _search = '';
   String? _category;
@@ -99,7 +101,7 @@ class _CrisisDashboardScreenState
   Widget build(BuildContext context) {
     final async = ref.watch(activeCrisesProvider);
     return DashboardScaffold(
-      title: 'Krisenmodus',
+      title: 'crisis.title'.tr(),
       currentRoute: '/dashboard/crisis',
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.herzrot,
@@ -112,13 +114,13 @@ class _CrisisDashboardScreenState
         child: Column(
           children: [
             const _SosTopBanner(),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 09',
-                metaCategory: 'Krisenmodus',
-                title: 'Krise & Hilfe',
-                subtitle: 'Akute Notlagen, Nachbarschafts-Mobilisierung',
+                metaCategory: 'crisis.title'.tr(),
+                title: 'crisis.moduleTitle'.tr(),
+                subtitle: 'crisis.moduleSubtitle'.tr(),
               ),
             ),
             Padding(
@@ -127,7 +129,7 @@ class _CrisisDashboardScreenState
                 children: [
                   Expanded(
                     child: ModuleSearchBar(
-                      hintText: 'Krisen durchsuchen…',
+                      hintText: 'crisis.searchPlaceholder'.tr(),
                       onChanged: (v) => setState(() => _search = v),
                     ),
                   ),
@@ -135,14 +137,14 @@ class _CrisisDashboardScreenState
                   ViewToggle<_CrisisView>(
                     value: _view,
                     onChanged: (v) => setState(() => _view = v),
-                    options: const [
+                    options: [
                       ViewToggleOption(
                           value: _CrisisView.list,
-                          label: 'Liste',
+                          label: 'crisis.viewList'.tr(),
                           icon: LucideIcons.list),
                       ViewToggleOption(
                           value: _CrisisView.map,
-                          label: 'Karte',
+                          label: 'crisis.viewMap'.tr(),
                           icon: LucideIcons.mapPin),
                     ],
                   ),
@@ -165,7 +167,7 @@ class _CrisisDashboardScreenState
               child: FilterChipBar<String>(
                 options: _urgencies,
                 selected: _urgency == null ? const <String>{} : {_urgency!},
-                allLabel: 'Alle Dringlichkeiten',
+                allLabel: 'crisis.allUrgencies'.tr(),
                 onChanged: (s) =>
                     setState(() => _urgency = s.isEmpty ? null : s.first),
               ),
@@ -209,8 +211,9 @@ class _CrisisDashboardScreenState
                         color: AppColors.herzrot),
                   ),
                   error: (e, _) => Center(
-                    child:
-                        Text('Fehler: $e', style: AppTypography.caption()),
+                    child: Text(
+                        'crisis.error'.tr(namedArgs: {'error': '$e'}),
+                        style: AppTypography.caption()),
                   ),
                   data: (all) {
                     final list = _apply(all);
@@ -249,7 +252,10 @@ class _CrisisDashboardScreenState
                         Row(
                           children: [
                             Text(
-                              '${list.length} Krise${list.length == 1 ? "" : "n"}',
+                              (list.length == 1
+                                      ? 'crisis.countOne'
+                                      : 'crisis.countOther')
+                                  .tr(namedArgs: {'count': '${list.length}'}),
                               style: AppTypography.label(size: 10),
                             ),
                             const Spacer(),
@@ -258,7 +264,7 @@ class _CrisisDashboardScreenState
                                   context.go('/dashboard/crisis/create'),
                               icon: const Icon(LucideIcons.plus,
                                   size: 12, color: AppColors.amber),
-                              label: Text('Melden',
+                              label: Text('crisis.report'.tr(),
                                   style: AppTypography.label(
                                       size: 10,
                                       color: AppColors.amber)),
@@ -271,14 +277,14 @@ class _CrisisDashboardScreenState
                             icon: LucideIcons.shieldCheck,
                             color: AppColors.leben,
                             title: _hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Aktuell keine aktiven Krisen.',
+                                ? 'crisis.noResults'.tr()
+                                : 'crisis.noActive'.tr(),
                             description: _hasFilters
-                                ? 'Andere Filter probieren.'
-                                : 'Im Notfall: 112. Krise hier melden — sammelt schnelle Hilfsangebote aus deiner Nachbarschaft.',
+                                ? 'crisis.tryOtherFilters'.tr()
+                                : 'crisis.emergencyHint'.tr(),
                             actionLabel: _hasFilters
-                                ? 'Filter zurücksetzen'
-                                : 'Krise melden',
+                                ? 'crisis.resetFilters'.tr()
+                                : 'crisis.reportCrisis'.tr(),
                             onAction: _hasFilters
                                 ? _reset
                                 : () =>
@@ -335,19 +341,19 @@ class _StatsBar extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: _stat('Aktiv', active, AppColors.herzrot,
+            child: _stat('crisis.statAktiv'.tr(), active, AppColors.herzrot,
                 LucideIcons.alertTriangle)),
         const SizedBox(width: 8),
         Expanded(
-            child: _stat('In Arbeit', inProgress, AppColors.amber,
+            child: _stat('crisis.statInArbeit'.tr(), inProgress, AppColors.amber,
                 LucideIcons.clock)),
         const SizedBox(width: 8),
         Expanded(
-            child: _stat('Kritisch', critical, AppColors.herzrotWarm,
+            child: _stat('crisis.statKritisch'.tr(), critical, AppColors.herzrotWarm,
                 LucideIcons.flame)),
         const SizedBox(width: 8),
         Expanded(
-            child: _stat('Helfer', helpers, AppColors.leben,
+            child: _stat('crisis.statHelfer'.tr(), helpers, AppColors.leben,
                 LucideIcons.helpingHand)),
       ],
     );
@@ -458,7 +464,10 @@ class _CriticalBannerState extends State<_CriticalBanner>
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${widget.count} kritische Krise${widget.count == 1 ? "" : "n"} aktiv — Hilfe wird gebraucht.',
+                  (widget.count == 1
+                          ? 'crisis.criticalActiveOne'
+                          : 'crisis.criticalActiveOther')
+                      .tr(namedArgs: {'count': '${widget.count}'}),
                   style: AppTypography.body(
                     size: 13,
                     color: AppColors.herzrotWarm,
@@ -500,51 +509,49 @@ class _SosSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Text('SOS – Soforthilfe',
+          Text('crisis.sosTitle'.tr(),
               style: AppTypography.display(
                   size: 22, color: AppColors.ink)),
           const SizedBox(height: 14),
           _SosRow(
             icon: LucideIcons.phone,
             iconBg: AppColors.herzrot,
-            title: '112 anrufen',
-            subtitle:
-                'EU-weit kostenlos, 24/7 – Feuerwehr & Rettung',
+            title: 'crisis.call112'.tr(),
+            subtitle: 'crisis.call112Sub'.tr(),
             onTap: () => launchUrl(Uri.parse('tel:112')),
             big: true,
           ),
           _SosRow(
             icon: LucideIcons.shieldCheck,
             iconBg: AppColors.teal,
-            title: 'Polizei: 110',
-            subtitle: 'Deutschlandweit kostenlos, 24/7',
+            title: 'crisis.police110'.tr(),
+            subtitle: 'crisis.police110Sub'.tr(),
             onTap: () => launchUrl(Uri.parse('tel:110')),
           ),
           _SosRow(
             icon: LucideIcons.alertTriangle,
             iconBg: AppColors.amber,
-            title: 'Krise melden',
-            subtitle:
-                'Nachbarn mobilisieren und Hilfe koordinieren',
+            title: 'crisis.sosReportTitle'.tr(),
+            subtitle: 'crisis.sosReportSub'.tr(),
             onTap: onReport,
           ),
           _SosRow(
             icon: LucideIcons.heart,
             iconBg: AppColors.tealSoft,
-            title: 'TelefonSeelsorge: 0800 111 0 111',
-            subtitle: 'Kostenlos, anonym, 24/7',
+            title: 'crisis.telSeelsorge'.tr(),
+            subtitle: 'crisis.telSeelsorgeSub'.tr(),
             onTap: () => launchUrl(Uri.parse('tel:08001110111')),
           ),
           _SosRow(
             icon: LucideIcons.stethoscope,
             iconBg: AppColors.amber,
-            title: 'Ärztlicher Bereitschaftsdienst: 116 117',
-            subtitle: 'DE — Krankenversicherung-Hilfe',
+            title: 'crisis.doctorOnCall'.tr(),
+            subtitle: 'crisis.doctorOnCallSub'.tr(),
             onTap: () => launchUrl(Uri.parse('tel:116117')),
           ),
           const SizedBox(height: 12),
           Text(
-            'Bei akuter Lebensgefahr immer zuerst 112 anrufen!',
+            'crisis.always112Hint'.tr(),
             textAlign: TextAlign.center,
             style: AppTypography.caption(),
           ),
@@ -650,7 +657,7 @@ class _ResourcesCta extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Notruf-Nummern',
+                    'crisis.emergencyNumbers'.tr(),
                     style: AppTypography.body(
                       size: 14,
                       color: AppColors.ink,
@@ -658,7 +665,7 @@ class _ResourcesCta extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '112 · 110 · 116117 · Telefonseelsorge 0800 1110111',
+                    'crisis.emergencyNumbersList'.tr(),
                     style: AppTypography.caption(),
                   ),
                 ],
@@ -683,12 +690,20 @@ class _CrisisTile extends StatelessWidget {
     'low': AppColors.teal,
   };
 
-  static const Map<String, String> _urgencyLabel = {
-    'critical': 'KRITISCH',
-    'high': 'HOCH',
-    'medium': 'MITTEL',
-    'low': 'NIEDRIG',
-  };
+  static String _urgencyLabel(String u) {
+    switch (u) {
+      case 'critical':
+        return 'crisis.urgencyCritical'.tr();
+      case 'high':
+        return 'crisis.urgencyHigh'.tr();
+      case 'medium':
+        return 'crisis.urgencyMedium'.tr();
+      case 'low':
+        return 'crisis.urgencyLow'.tr();
+      default:
+        return u.toUpperCase();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -718,8 +733,7 @@ class _CrisisTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    _urgencyLabel[crisis.urgency] ??
-                        crisis.urgency.toUpperCase(),
+                    _urgencyLabel(crisis.urgency),
                     style: AppTypography.label(
                       size: 9,
                       color: AppColors.voidColor,
@@ -767,7 +781,7 @@ class _CrisisTile extends StatelessWidget {
                     size: 12, color: AppColors.leben),
                 const SizedBox(width: 4),
                 Text(
-                  '${crisis.helperCount ?? 0} Helfer:in',
+                  'crisis.helpersCount'.tr(namedArgs: {'count': '${crisis.helperCount ?? 0}'}),
                   style: AppTypography.mono(
                       size: 11, color: AppColors.lebenSoft),
                 ),
@@ -828,14 +842,14 @@ class _SosTopBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Lebensgefahr?',
+                Text('crisis.lifeThreat'.tr(),
                     style: AppTypography.body(
                         size: 11,
                         color: Colors.white,
                         weight: FontWeight.w600,
                         letterSpacing: 0.5)),
                 const SizedBox(height: 2),
-                Text('Sofort 112 anrufen',
+                Text('crisis.call112Now'.tr(),
                     style: AppTypography.display(
                         size: 18, color: Colors.white, height: 1.1)),
               ],
@@ -846,7 +860,7 @@ class _SosTopBanner extends StatelessWidget {
             onPressed: () => _sendSafeCheckIn(context),
             icon: const Icon(LucideIcons.shieldCheck,
                 size: 14, color: Colors.white),
-            label: Text('Ich bin sicher',
+            label: Text('crisis.imSafe'.tr(),
                 style: AppTypography.label(
                     size: 9, color: Colors.white)),
             style: OutlinedButton.styleFrom(
@@ -899,21 +913,22 @@ class _SosTopBanner extends StatelessWidget {
       await sb.from('user_status').upsert({
         'user_id': uid,
         'status': 'safe',
-        'status_text':
-            '✅ Bin sicher (${DateTime.now().toLocal().toIso8601String().substring(11, 16)})',
+        'status_text': 'crisis.safeStatusText'.tr(namedArgs: {
+          'time': DateTime.now().toLocal().toIso8601String().substring(11, 16),
+        }),
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Safe-Check-In gesendet ✅',
+        content: Text('crisis.safeCheckSent'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.leben)),
       ));
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Fehler: $e',
+        content: Text('crisis.error'.tr(namedArgs: {'error': '$e'}),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
     }
