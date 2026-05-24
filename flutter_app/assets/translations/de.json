@@ -305,7 +305,13 @@
     "sendResetLink": "Reset-Link senden",
     "signOutOthersBtn": "Andere Sessions abmelden",
     "languageByLocation": "Sprache nach Standort",
-    "tooltipDetectAgain": "Neu erkennen"
+    "tooltipDetectAgain": "Neu erkennen",
+    "themeMode": {
+      "label": "Erscheinungsbild",
+      "system": "System",
+      "light": "Hell",
+      "dark": "Dunkel"
+    }
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",

@@ -305,7 +305,13 @@
     "sendResetLink": "Enviar enlace de restablecimiento",
     "signOutOthersBtn": "Cerrar otras sesiones",
     "languageByLocation": "Idioma según ubicación",
-    "tooltipDetectAgain": "Detectar de nuevo"
+    "tooltipDetectAgain": "Detectar de nuevo",
+    "themeMode": {
+      "label": "Apariencia",
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    }
   },
   "chat": {
     "writeMessage": "Escribe un mensaje …",

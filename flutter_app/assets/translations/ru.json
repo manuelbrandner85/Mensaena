@@ -305,7 +305,13 @@
     "sendResetLink": "Отправить ссылку для сброса",
     "signOutOthersBtn": "Выйти из других сеансов",
     "languageByLocation": "Язык по местоположению",
-    "tooltipDetectAgain": "Распознать заново"
+    "tooltipDetectAgain": "Распознать заново",
+    "themeMode": {
+      "label": "Оформление",
+      "system": "Система",
+      "light": "Светлое",
+      "dark": "Тёмное"
+    }
   },
   "chat": {
     "writeMessage": "Написать сообщение …",

@@ -305,7 +305,13 @@
     "sendResetLink": "Invia link di reset",
     "signOutOthersBtn": "Disconnetti altre sessioni",
     "languageByLocation": "Lingua in base alla posizione",
-    "tooltipDetectAgain": "Rileva di nuovo"
+    "tooltipDetectAgain": "Rileva di nuovo",
+    "themeMode": {
+      "label": "Aspetto",
+      "system": "Sistema",
+      "light": "Chiaro",
+      "dark": "Scuro"
+    }
   },
   "chat": {
     "writeMessage": "Scrivi un messaggio …",

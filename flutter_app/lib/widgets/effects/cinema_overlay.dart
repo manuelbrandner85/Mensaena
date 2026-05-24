@@ -27,6 +27,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/cinema_theme.dart';
 import '../../providers/cinema_provider.dart';
+import '../../providers/theme_mode_provider.dart';
 import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
 import 'film_grain.dart';
@@ -47,7 +48,12 @@ class CinemaOverlay extends ConsumerWidget {
       return child;
     }
     final spec = CinemaTheme.specFor(phase);
-    final intensity = ref.watch(cinemaIntensityProvider).multiplier;
+    final baseIntensity = ref.watch(cinemaIntensityProvider).multiplier;
+    // V20 Phase-6b: Im Light-Mode reduziert sich die Cinema-Intensitaet
+    // auf max. 0.3, damit der dunkle Atmospheric-Background den hellen
+    // Content nicht ueberlaegt.
+    final isLight = ref.watch(isLightModeProvider);
+    final intensity = isLight ? (baseIntensity * 0.3) : baseIntensity;
 
     return Stack(
       fit: StackFit.expand,

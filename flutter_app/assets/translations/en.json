@@ -305,7 +305,13 @@
     "sendResetLink": "Send reset link",
     "signOutOthersBtn": "Sign out other sessions",
     "languageByLocation": "Language by location",
-    "tooltipDetectAgain": "Detect again"
+    "tooltipDetectAgain": "Detect again",
+    "themeMode": {
+      "label": "Appearance",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    }
   },
   "chat": {
     "writeMessage": "Write a message …",

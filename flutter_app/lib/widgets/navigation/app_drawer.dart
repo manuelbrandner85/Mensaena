@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../providers/theme_mode_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../repositories/crisis_repository.dart';
 import '../../repositories/interactions_repository.dart';
@@ -205,6 +206,7 @@ class AppDrawer extends ConsumerWidget {
                             initiallyOpen: true),
                       ],
                       const Divider(color: AppColors.line, height: 16),
+                      const _ThemeToggleFooter(),
                       ListTile(
                         leading: const Icon(
                           LucideIcons.logOut,
@@ -533,6 +535,32 @@ class _LinkTile extends ConsumerWidget {
           context.go(link.route);
         },
       ),
+    );
+  }
+}
+
+/// V20 Phase-6b: Theme-Toggle im Drawer-Footer.
+/// Sun-Icon zeigt im Dark-Mode (Hint auf Wechsel zu Light),
+/// Moon-Icon im Light-Mode (Hint auf Wechsel zu Dark).
+class _ThemeToggleFooter extends ConsumerWidget {
+  const _ThemeToggleFooter();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLight = ref.watch(isLightModeProvider);
+    return ListTile(
+      leading: Icon(
+        isLight ? LucideIcons.moon : LucideIcons.sun,
+        size: 18,
+        color: AppColors.amber,
+      ),
+      title: Text(
+        isLight
+            ? 'settings.themeMode.dark'.tr()
+            : 'settings.themeMode.light'.tr(),
+        style: AppTypography.body(size: 14, color: AppColors.ink),
+      ),
+      onTap: () => ref.read(themeModeProvider.notifier).toggle(),
     );
   }
 }

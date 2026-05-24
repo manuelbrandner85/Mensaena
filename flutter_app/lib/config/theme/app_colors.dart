@@ -56,4 +56,28 @@ class AppColors {
   // ── Linien & Trenner ──────────────────────────────────────────────
   static const Color line = Color(0x12FFFFFF);
   static const Color lineActive = Color(0x33F59E0B);
+
+  // ════════════════════════════════════════════════════════════════
+  // LIGHT-THEME PENDANTS (V20 Phase-6b)
+  // Helle Counterparts fuer Dark/Light-Toggle. Bestehende
+  // Dark-Konstanten bleiben unveraendert — diese sind ZUSAETZLICH.
+  // ════════════════════════════════════════════════════════════════
+
+  // ── Light Flaechen (Tag) ──────────────────────────────────────────
+  static const Color lightVoid = Color(0xFFF5F5F0);     // App-Background (warmes Off-White)
+  static const Color lightDeep = Color(0xFFEFEFE9);     // Canvas (leicht waermer)
+  static const Color lightSurface = Color(0xFFFFFFFF);  // Card-Background
+  static const Color lightElevated = Color(0xFFFAFAF5); // Input-Background
+  static const Color lightRaised = Color(0xFFF0F0EB);   // Hover-Surface
+  static const Color lightOverlay = Color(0xFFE8E8E2);  // Sehr leichte Overlay-Schicht
+
+  // ── Light Text ────────────────────────────────────────────────────
+  static const Color lightInk = Color(0xFF1A1A1A);      // Primaer-Text
+  static const Color lightInkSoft = Color(0xFF3F3F46);  // Sekundaer-Text
+  static const Color lightMute = Color(0xFF71717A);     // Muted/Hint
+  static const Color lightGhost = Color(0xFFA1A1AA);    // Ghost/Placeholder
+
+  // ── Light Linien & Trenner ────────────────────────────────────────
+  static const Color lightLine = Color(0x14000000);     // 8% Black
+  static const Color lightLineActive = Color(0x33D97706); // Amber-Tint fuer Active
 }

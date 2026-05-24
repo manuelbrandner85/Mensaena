@@ -16,6 +16,7 @@ import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/locale_provider.dart';
+import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/sound_service.dart';
@@ -779,6 +780,12 @@ class _AppearanceTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        // V20 Phase-6b: Theme-Mode (Dark/Light/System) am oberen Rand.
+        Text('settings.themeMode.label'.tr().toUpperCase(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 8),
+        const _ThemeModeRow(),
+        const SizedBox(height: 20),
         // Live-Preview-Card
         Container(
           padding: const EdgeInsets.all(16),
@@ -905,6 +912,75 @@ class _AppearanceTab extends ConsumerWidget {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Theme-Mode-Auswahl (System / Hell / Dunkel) als SegmentedButton.
+class _ThemeModeRow extends ConsumerWidget {
+  const _ThemeModeRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(themeModeProvider);
+    final entries = <(ThemeMode, IconData, String)>[
+      (ThemeMode.system, LucideIcons.smartphone, 'settings.themeMode.system'),
+      (ThemeMode.light, LucideIcons.sun, 'settings.themeMode.light'),
+      (ThemeMode.dark, LucideIcons.moon, 'settings.themeMode.dark'),
+    ];
+    return Row(
+      children: [
+        for (final e in entries)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: InkWell(
+                onTap: () =>
+                    ref.read(themeModeProvider.notifier).set(e.$1),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: current == e.$1
+                        ? AppColors.amber.withValues(alpha: 0.18)
+                        : AppColors.elevated,
+                    border: Border.all(
+                      color: current == e.$1
+                          ? AppColors.amber
+                          : AppColors.line,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        e.$2,
+                        size: 16,
+                        color: current == e.$1
+                            ? AppColors.amber
+                            : AppColors.inkSoft,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        e.$3.tr(),
+                        style: AppTypography.body(
+                          size: 11,
+                          color: current == e.$1
+                              ? AppColors.amber
+                              : AppColors.inkSoft,
+                          weight: current == e.$1
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

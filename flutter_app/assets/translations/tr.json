@@ -305,7 +305,13 @@
     "sendResetLink": "Sıfırlama bağlantısı gönder",
     "signOutOthersBtn": "Diğer oturumları kapat",
     "languageByLocation": "Konuma göre dil",
-    "tooltipDetectAgain": "Yeniden algıla"
+    "tooltipDetectAgain": "Yeniden algıla",
+    "themeMode": {
+      "label": "Görünüm",
+      "system": "Sistem",
+      "light": "Açık",
+      "dark": "Koyu"
+    }
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",

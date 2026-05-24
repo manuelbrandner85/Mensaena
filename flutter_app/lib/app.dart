@@ -8,6 +8,7 @@ import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
 import 'providers/locale_provider.dart';
+import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/incoming_call_listener.dart';
@@ -21,12 +22,18 @@ class MensaenaApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isLight = ref.watch(isLightModeProvider);
+
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
+      SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF0A0F1C),
-        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness:
+            isLight ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor:
+            isLight ? const Color(0xFFF5F5F0) : const Color(0xFF0A0F1C),
+        systemNavigationBarIconBrightness:
+            isLight ? Brightness.dark : Brightness.light,
       ),
     );
 
@@ -38,9 +45,9 @@ class MensaenaApp extends ConsumerWidget {
     return MaterialApp.router(
       title: AppConfig.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.dark,
+      themeMode: themeMode,
       routerConfig: router,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -48,7 +55,7 @@ class MensaenaApp extends ConsumerWidget {
       // UpdateGate + IncomingCallListener wrappen alle Screens.
       // BetterFeedback umrahmt zusätzlich für Shake-to-Report (Sprint 5).
       builder: (context, navChild) => BetterFeedback(
-        themeMode: ThemeMode.dark,
+        themeMode: themeMode,
         darkTheme: FeedbackThemeData.dark(),
         child: UpdateGate(
           child: IncomingCallListener(
