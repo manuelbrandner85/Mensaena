@@ -736,5 +736,29 @@
     "officialBadge": "OFFICIAL",
     "openSearch": "Search jobs",
     "openPortal": "Open portal"
+  },
+  "civil": {
+    "navTitle": "Alerts",
+    "title": "Civil protection",
+    "subtitle": "Official agency notices for {country}. Source: {source}.",
+    "noAlerts": "No current notices from {source} for {country}.",
+    "sourceFallback": "Source: {source}. Mensaena only mirrors — the assessment is done by the authority.",
+    "coveredByNina": "Civil-protection alerts for your country are already covered by NINA (DE) and MeteoAlarm (EU). This screen is intended for IT, ES, FR, TR and RU.",
+    "coveredByMeteo": "MeteoAlarm provides weather warnings for all 30+ European countries in one place.",
+    "openSource": "Open original",
+    "tileNina": "NINA",
+    "tileMeteo": "Weather warnings (MeteoAlarm)",
+    "tileAir": "Air quality",
+    "tileFood": "Food alerts",
+    "tileCivil": "Civil protection {country}",
+    "ninaActiveCount": "{count} active NINA alert(s) — data from the federal office (15-min cache).",
+    "ninaEmpty": "No active NINA alerts. Data from the Federal Office for Civil Protection and Disaster Assistance.",
+    "severityExtreme": "Extreme",
+    "severitySevere": "Severe",
+    "severityModerate": "Moderate",
+    "severityMinor": "Minor",
+    "instructionLabel": "Recommended action",
+    "sourceLabel": "Source: {source}",
+    "fallbackTitle": "Alert"
   }
 }

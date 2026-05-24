@@ -736,5 +736,29 @@
     "officialBadge": "OFFICIEL",
     "openSearch": "Chercher un emploi",
     "openPortal": "Ouvrir le portail"
+  },
+  "civil": {
+    "navTitle": "Alertes",
+    "title": "Protection civile",
+    "subtitle": "Communications officielles pour {country}. Source : {source}.",
+    "noAlerts": "Aucune communication active de {source} pour {country}.",
+    "sourceFallback": "Source : {source}. Mensaena ne fait que relayer — l'évaluation incombe à l'autorité.",
+    "coveredByNina": "Les alertes de protection civile pour votre pays sont déjà couvertes par NINA (DE) et MeteoAlarm (UE). Cet écran est destiné à IT, ES, FR, TR et RU.",
+    "coveredByMeteo": "MeteoAlarm regroupe les avis météo de plus de 30 pays européens en un seul endroit.",
+    "openSource": "Ouvrir l'original",
+    "tileNina": "NINA",
+    "tileMeteo": "Avis météo (MeteoAlarm)",
+    "tileAir": "Qualité de l'air",
+    "tileFood": "Alertes alimentaires",
+    "tileCivil": "Protection civile {country}",
+    "ninaActiveCount": "{count} alerte(s) NINA active(s) — données de l'office fédéral (cache 15 min).",
+    "ninaEmpty": "Aucune alerte NINA active. Données de l'Office fédéral de la protection civile et de l'aide en cas de catastrophe.",
+    "severityExtreme": "Extrême",
+    "severitySevere": "Sévère",
+    "severityModerate": "Modéré",
+    "severityMinor": "Faible",
+    "instructionLabel": "Conduite à tenir",
+    "sourceLabel": "Source : {source}",
+    "fallbackTitle": "Alerte"
   }
 }

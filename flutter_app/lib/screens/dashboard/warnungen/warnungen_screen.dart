@@ -1,12 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/app_config.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../services/civil_protection_service.dart';
 import '../../../services/nina_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -22,6 +23,14 @@ class WarnungenScreen extends ConsumerStatefulWidget {
 }
 
 class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
+  static const Map<String, String> _localeToCountry = {
+    'it': 'IT',
+    'es': 'ES',
+    'fr': 'FR',
+    'tr': 'TR',
+    'ru': 'RU',
+  };
+
   Future<List<Map<String, dynamic>>>? _future;
   String get _ags => AppConfig.defaultAgs;
 
@@ -36,6 +45,15 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
     final fresh = NinaService.instance.fetchDashboard(ags: _ags);
     setState(() => _future = fresh);
     await fresh;
+  }
+
+  String? _civilCountry() {
+    final loc = context.locale;
+    final c = loc.countryCode;
+    if (c != null && CivilProtectionService.isSupported(c)) {
+      return c.toUpperCase();
+    }
+    return _localeToCountry[loc.languageCode];
   }
 
   void _openDetail(Map<String, dynamic> w) {
@@ -54,8 +72,9 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final civilCountry = _civilCountry();
     return DashboardScaffold(
-      title: 'NINA-Warnungen',
+      title: 'civil.navTitle'.tr(),
       currentRoute: '/dashboard/warnungen',
       body: SafeArea(
         child: RefreshIndicator(
@@ -65,109 +84,67 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
           child: FutureBuilder<List<Map<String, dynamic>>>(
             future: _future,
             builder: (context, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
-                );
-              }
-              final list = snap.data ?? const [];
-              if (list.isEmpty) {
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    const SizedBox(height: 60),
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          children: [
-                            const Icon(
-                              LucideIcons.shieldCheck,
-                              size: 40,
-                              color: AppColors.leben,
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
-                              'Keine aktiven Warnungen.',
-                              style: AppTypography.display(
-                                size: 22,
-                                color: AppColors.ink,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Daten vom Bundesamt für Bevölkerungsschutz '
-                              'und Katastrophenhilfe (NINA). Letzte Pruefung: '
-                              '${DateFormat('HH:mm').format(DateTime.now())}.',
-                              textAlign: TextAlign.center,
+              final list = snap.data ?? const <Map<String, dynamic>>[];
+              final loading = snap.connectionState != ConnectionState.done;
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  _OverviewGrid(civilCountry: civilCountry),
+                  const SizedBox(height: 16),
+                  if (loading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.amber),
+                      ),
+                    )
+                  else if (list.isEmpty)
+                    _NinaEmpty()
+                  else ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.herzrot.withValues(alpha: 0.1),
+                        border: Border.all(
+                          color: AppColors.herzrot.withValues(alpha: 0.4),
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.alertOctagon,
+                            size: 18,
+                            color: AppColors.herzrot,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'civil.ninaActiveCount'.tr(namedArgs: {
+                                'count': '${list.length}',
+                              }),
                               style: AppTypography.body(
                                 size: 13,
                                 color: AppColors.inkSoft,
-                                height: 1.55,
                               ),
                             ),
-                            const SizedBox(height: 24),
-                            OutlinedButton.icon(
-                              onPressed: () => context.go('/dashboard/warnungen/food'),
-                              icon: const Icon(LucideIcons.apple, size: 16),
-                              label:
-                                  const Text('Lebensmittelwarnungen (BVL)'),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...list.map(
+                      (w) => _WarningTile(
+                        warning: w,
+                        onTap: () => _openDetail(w),
                       ),
                     ),
                   ],
-                );
-              }
-              return ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.herzrot.withValues(alpha: 0.1),
-                      border: Border.all(
-                        color: AppColors.herzrot.withValues(alpha: 0.4),
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          LucideIcons.alertOctagon,
-                          size: 18,
-                          color: AppColors.herzrot,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '${list.length} aktive Warnung'
-                            '${list.length == 1 ? "" : "en"} — '
-                            'Daten vom Bundesamt (15 Min Cache).',
-                            style: AppTypography.body(
-                              size: 13,
-                              color: AppColors.inkSoft,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...list.map(
-                    (w) => _WarningTile(warning: w, onTap: () => _openDetail(w)),
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () =>
-                        context.go('/dashboard/warnungen/food'),
-                    icon: const Icon(LucideIcons.apple, size: 16),
-                    label: const Text('Lebensmittelwarnungen (BVL)'),
-                  ),
                 ],
               );
             },
@@ -178,30 +155,178 @@ class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
   }
 }
 
+class _OverviewGrid extends StatelessWidget {
+  const _OverviewGrid({required this.civilCountry});
+  final String? civilCountry;
+
+  @override
+  Widget build(BuildContext context) {
+    final tiles = <_TileSpec>[
+      const _TileSpec(
+        labelKey: 'civil.tileNina',
+        icon: LucideIcons.alertOctagon,
+        color: AppColors.herzrot,
+        // NINA-Screen ist diese Seite selbst — Tap fokussiert die Liste unten.
+        route: null,
+      ),
+      const _TileSpec(
+        labelKey: 'civil.tileMeteo',
+        icon: LucideIcons.cloudLightning,
+        color: AppColors.amber,
+        route: '/dashboard/warnungen/meteo',
+      ),
+      const _TileSpec(
+        labelKey: 'civil.tileAir',
+        icon: LucideIcons.wind,
+        color: AppColors.teal,
+        route: '/dashboard/warnungen/air',
+      ),
+      const _TileSpec(
+        labelKey: 'civil.tileFood',
+        icon: LucideIcons.apple,
+        color: AppColors.leben,
+        route: '/dashboard/warnungen/food',
+      ),
+      if (civilCountry != null)
+        _TileSpec(
+          labelKey: 'civil.tileCivil',
+          labelArgs: {'country': civilCountry!},
+          icon: LucideIcons.shieldAlert,
+          color: AppColors.amberWarm,
+          route: '/dashboard/warnungen/civil',
+        ),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 1.6,
+      children: tiles.map((t) => _Tile(spec: t)).toList(),
+    );
+  }
+}
+
+class _TileSpec {
+  const _TileSpec({
+    required this.labelKey,
+    required this.icon,
+    required this.color,
+    required this.route,
+    this.labelArgs,
+  });
+  final String labelKey;
+  final Map<String, String>? labelArgs;
+  final IconData icon;
+  final Color color;
+  final String? route;
+}
+
+class _Tile extends StatelessWidget {
+  const _Tile({required this.spec});
+  final _TileSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = spec.labelArgs == null
+        ? spec.labelKey.tr()
+        : spec.labelKey.tr(namedArgs: spec.labelArgs!);
+    return InkWell(
+      onTap: spec.route == null
+          ? null
+          : () => context.go(spec.route!),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: spec.color.withValues(alpha: 0.08),
+          border: Border.all(color: spec.color.withValues(alpha: 0.35)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(spec.icon, size: 22, color: spec.color),
+            Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.body(
+                size: 13,
+                color: AppColors.ink,
+                weight: FontWeight.w600,
+                height: 1.25,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NinaEmpty extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          const Icon(LucideIcons.shieldCheck,
+              size: 36, color: AppColors.leben),
+          const SizedBox(height: 10),
+          Text(
+            'civil.ninaEmpty'.tr(),
+            textAlign: TextAlign.center,
+            style: AppTypography.body(
+              size: 13,
+              color: AppColors.inkSoft,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _WarningTile extends StatelessWidget {
   const _WarningTile({required this.warning, required this.onTap});
   final Map<String, dynamic> warning;
   final VoidCallback onTap;
 
-  static const Map<String, ({Color color, String label})> _severities = {
-    'Extreme': (color: AppColors.herzrot, label: 'EXTREM'),
-    'Severe': (color: Color(0xFFFB923C), label: 'SCHWER'),
-    'Moderate': (color: AppColors.amber, label: 'MITTEL'),
-    'Minor': (color: AppColors.teal, label: 'GERING'),
+  static const Map<String, ({Color color, String key})> _severities = {
+    'Extreme': (color: AppColors.herzrot, key: 'civil.severityExtreme'),
+    'Severe': (color: Color(0xFFFB923C), key: 'civil.severitySevere'),
+    'Moderate': (color: AppColors.amber, key: 'civil.severityModerate'),
+    'Minor': (color: AppColors.teal, key: 'civil.severityMinor'),
   };
 
   @override
   Widget build(BuildContext context) {
     final payload = warning['payload'] as Map<String, dynamic>?;
     final data = payload?['data'] as Map<String, dynamic>? ?? warning;
-    final severity = (warning['severity'] ?? data['severity'])?.toString() ??
-        'Moderate';
+    final severity =
+        (warning['severity'] ?? data['severity'])?.toString() ?? 'Moderate';
     final cfg = _severities[severity] ??
-        (color: AppColors.amber, label: severity.toUpperCase());
-    final headline =
-        (warning['i18nTitle']?['de'] ?? data['headline'] ?? warning['headline'])
-                ?.toString() ??
-            'Warnung';
+        (color: AppColors.amber, key: 'civil.severityModerate');
+    final label = cfg.key.tr().toUpperCase();
+    final locale = context.locale.languageCode;
+    final i18nTitle = warning['i18nTitle'] as Map<String, dynamic>?;
+    final headline = (i18nTitle?[locale] ??
+                i18nTitle?['de'] ??
+                data['headline'] ??
+                warning['headline'])
+            ?.toString() ??
+        'civil.fallbackTitle'.tr();
     final sentRaw = warning['sent'] ?? data['sent'];
     final sent = sentRaw is String ? DateTime.tryParse(sentRaw) : null;
 
@@ -231,7 +356,7 @@ class _WarningTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    cfg.label,
+                    label,
                     style: AppTypography.label(
                       size: 9,
                       color: AppColors.voidColor,
@@ -296,7 +421,7 @@ class _DetailSheetState extends State<_DetailSheet> {
           final headline = d?['info']?[0]?['headline'] ??
               widget.summary['i18nTitle']?['de'] ??
               widget.summary['headline'] ??
-              'Warnung';
+              'civil.fallbackTitle'.tr();
           final description = d?['info']?[0]?['description'] ?? '';
           final instruction = d?['info']?[0]?['instruction'] ?? '';
           final sender = d?['sender'] ?? widget.summary['sender'];
@@ -340,8 +465,10 @@ class _DetailSheetState extends State<_DetailSheet> {
                   ),
                 if (instruction.toString().isNotEmpty) ...[
                   const SizedBox(height: 14),
-                  Text('Handlungsempfehlung',
-                      style: AppTypography.label(size: 10)),
+                  Text(
+                    'civil.instructionLabel'.tr(),
+                    style: AppTypography.label(size: 10),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     instruction.toString(),
@@ -356,7 +483,9 @@ class _DetailSheetState extends State<_DetailSheet> {
                 if (sender != null) ...[
                   const SizedBox(height: 16),
                   Text(
-                    'Quelle: $sender',
+                    'civil.sourceLabel'.tr(namedArgs: {
+                      'source': sender.toString(),
+                    }),
                     style: AppTypography.caption(),
                   ),
                 ],

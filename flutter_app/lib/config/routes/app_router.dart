@@ -67,6 +67,7 @@ import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
 import '../../screens/dashboard/jobs/job_portals_screen.dart';
 import '../../screens/dashboard/warnungen/air_quality_screen.dart';
+import '../../screens/dashboard/warnungen/civil_protection_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
 import '../../screens/dashboard/warnungen/meteoalarm_screen.dart';
 import '../../screens/dashboard/warnungen/warnungen_screen.dart';
@@ -566,6 +567,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'meteo',
             builder: (_, __) => const MeteoAlarmScreen(),
+          ),
+          GoRoute(
+            path: 'civil',
+            builder: (_, __) => const CivilProtectionScreen(),
           ),
         ],
       ),

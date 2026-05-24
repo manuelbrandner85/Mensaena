@@ -736,5 +736,29 @@
     "officialBadge": "AMTLICH",
     "openSearch": "Jobs suchen",
     "openPortal": "Portal öffnen"
+  },
+  "civil": {
+    "navTitle": "Warnungen",
+    "title": "Zivilschutz",
+    "subtitle": "Offizielle Behördenmeldungen für {country}. Quelle: {source}.",
+    "noAlerts": "Aktuell keine Meldungen von {source} für {country}.",
+    "sourceFallback": "Quelle: {source}. Mensaena spiegelt nur — Bewertung erfolgt durch die Behörde.",
+    "coveredByNina": "Für dein Land werden Zivilschutzmeldungen bereits über NINA (DE) bzw. MeteoAlarm (EU) abgedeckt. Dieser Screen ist für IT, ES, FR, TR und RU gedacht.",
+    "coveredByMeteo": "Wetterwarnungen liefert MeteoAlarm für alle 30+ europäischen Länder zentral.",
+    "openSource": "Original öffnen",
+    "tileNina": "NINA",
+    "tileMeteo": "Wetterwarnungen (MeteoAlarm)",
+    "tileAir": "Luftqualität",
+    "tileFood": "Lebensmittelwarnungen",
+    "tileCivil": "Zivilschutz {country}",
+    "ninaActiveCount": "{count} aktive NINA-Warnung(en) — Daten vom Bundesamt (15 Min Cache).",
+    "ninaEmpty": "Keine aktiven NINA-Warnungen. Daten vom Bundesamt für Bevölkerungsschutz und Katastrophenhilfe.",
+    "severityExtreme": "Extrem",
+    "severitySevere": "Schwer",
+    "severityModerate": "Mittel",
+    "severityMinor": "Gering",
+    "instructionLabel": "Handlungsempfehlung",
+    "sourceLabel": "Quelle: {source}",
+    "fallbackTitle": "Warnung"
   }
 }

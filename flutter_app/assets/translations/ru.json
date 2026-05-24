@@ -736,5 +736,29 @@
     "officialBadge": "ОФИЦ.",
     "openSearch": "Найти вакансии",
     "openPortal": "Открыть портал"
+  },
+  "civil": {
+    "navTitle": "Оповещения",
+    "title": "Гражданская защита",
+    "subtitle": "Официальные сообщения для {country}. Источник: {source}.",
+    "noAlerts": "Сейчас нет сообщений от {source} для {country}.",
+    "sourceFallback": "Источник: {source}. Mensaena лишь ретранслирует — оценку делает ведомство.",
+    "coveredByNina": "Оповещения гражданской защиты для твоей страны уже покрыты сервисами NINA (DE) и MeteoAlarm (ЕС). Этот экран предназначен для IT, ES, FR, TR и RU.",
+    "coveredByMeteo": "MeteoAlarm собирает метеопредупреждения для более чем 30 европейских стран в одном месте.",
+    "openSource": "Открыть оригинал",
+    "tileNina": "NINA",
+    "tileMeteo": "Метеопредупреждения (MeteoAlarm)",
+    "tileAir": "Качество воздуха",
+    "tileFood": "Пищевые предупреждения",
+    "tileCivil": "Гражданская защита {country}",
+    "ninaActiveCount": "Активных оповещений NINA: {count} — данные федерального ведомства (кэш 15 мин).",
+    "ninaEmpty": "Активных оповещений NINA нет. Данные Федерального ведомства по защите населения и помощи при катастрофах.",
+    "severityExtreme": "Экстремальный",
+    "severitySevere": "Серьёзный",
+    "severityModerate": "Средний",
+    "severityMinor": "Слабый",
+    "instructionLabel": "Рекомендуемое действие",
+    "sourceLabel": "Источник: {source}",
+    "fallbackTitle": "Оповещение"
   }
 }

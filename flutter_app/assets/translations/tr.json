@@ -736,5 +736,29 @@
     "officialBadge": "RESMİ",
     "openSearch": "İş ara",
     "openPortal": "Portalı aç"
+  },
+  "civil": {
+    "navTitle": "Uyarılar",
+    "title": "Sivil savunma",
+    "subtitle": "{country} için resmi bildirimler. Kaynak: {source}.",
+    "noAlerts": "{source} kaynağından {country} için güncel bildirim yok.",
+    "sourceFallback": "Kaynak: {source}. Mensaena sadece yansıtır — değerlendirmeyi yetkili kurum yapar.",
+    "coveredByNina": "Senin ülken için sivil savunma uyarıları zaten NINA (DE) ve MeteoAlarm (AB) üzerinden sağlanıyor. Bu ekran IT, ES, FR, TR ve RU içindir.",
+    "coveredByMeteo": "MeteoAlarm 30'dan fazla Avrupa ülkesinin meteoroloji uyarılarını tek yerde sunar.",
+    "openSource": "Orijinali aç",
+    "tileNina": "NINA",
+    "tileMeteo": "Hava uyarıları (MeteoAlarm)",
+    "tileAir": "Hava kalitesi",
+    "tileFood": "Gıda uyarıları",
+    "tileCivil": "Sivil savunma {country}",
+    "ninaActiveCount": "{count} etkin NINA uyarısı — federal kurum verisi (15 dk önbellek).",
+    "ninaEmpty": "Etkin NINA uyarısı yok. Federal Sivil Savunma ve Afet Yardım Ofisi verisi.",
+    "severityExtreme": "Aşırı",
+    "severitySevere": "Şiddetli",
+    "severityModerate": "Orta",
+    "severityMinor": "Hafif",
+    "instructionLabel": "Önerilen hareket",
+    "sourceLabel": "Kaynak: {source}",
+    "fallbackTitle": "Uyarı"
   }
 }
