@@ -130,7 +130,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (room == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Livestream konnte nicht gestartet werden.',
+        content: Text('chat.livestreamFailed'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
       return;
@@ -308,8 +308,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Nachricht konnte nicht gesendet werden.')),
+        SnackBar(
+            content: Text('chat.messageNotSent'.tr())),
       );
     }
   }
@@ -320,7 +320,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Nachricht bearbeiten',
+        title: Text('chat.editMessage'.tr(),
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
         content: TextField(
@@ -352,10 +352,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Nachricht löschen?',
+        title: Text('chat.deleteMessageTitle'.tr(),
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
-        content: Text('Die Nachricht wird für alle entfernt.',
+        content: Text('chat.deleteMessageBody'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
         actions: [
           TextButton(
@@ -572,7 +572,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Antworten auf',
+                          Text('chat.replyTo'.tr(),
                               style: AppTypography.label(
                                   size: 9, color: AppColors.bronzeSoft)),
                           const SizedBox(height: 2),
@@ -1000,7 +1000,7 @@ class _MessageBubble extends ConsumerWidget {
                   padding: hasImages
                       ? const EdgeInsets.symmetric(horizontal: 8)
                       : EdgeInsets.zero,
-                  child: Text('Gelesen',
+                  child: Text('chat.read'.tr(),
                       style: AppTypography.label(
                           size: 8, color: AppColors.tealSoft)),
                 ),
@@ -1050,7 +1050,7 @@ class _ReplyQuote extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Antwort',
+              Text('chat.reply'.tr(),
                   style: AppTypography.label(
                       size: 8, color: AppColors.bronzeSoft)),
               Text(
@@ -1419,7 +1419,7 @@ class _PinnedMessagesPanel extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   minimumSize: const Size(0, 28),
                 ),
-                child: Text('Ansehen',
+                child: Text('chat.view'.tr(),
                     style: AppTypography.label(
                         size: 10, color: AppColors.amber)),
               ),
@@ -1462,7 +1462,7 @@ class _PinnedMessagesPanel extends StatelessWidget {
               children: [
                 const Icon(LucideIcons.pin, color: AppColors.amber),
                 const SizedBox(width: 8),
-                Text('Angepinnte Nachrichten',
+                Text('chat.pinnedMessages'.tr(),
                     style: AppTypography.display(
                         size: 18, color: AppColors.ink)),
               ],

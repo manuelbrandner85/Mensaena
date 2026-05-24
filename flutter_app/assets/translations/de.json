@@ -188,7 +188,17 @@
     "incomingCall": "Eingehender Anruf",
     "accept": "Annehmen",
     "decline": "Ablehnen",
-    "callMissed": "Verpasster Anruf"
+    "callMissed": "Verpasster Anruf",
+    "livestreamFailed": "Livestream konnte nicht gestartet werden.",
+    "messageNotSent": "Nachricht konnte nicht gesendet werden.",
+    "editMessage": "Nachricht bearbeiten",
+    "deleteMessageTitle": "Nachricht löschen?",
+    "deleteMessageBody": "Die Nachricht wird für alle entfernt.",
+    "replyTo": "Antworten auf",
+    "read": "Gelesen",
+    "reply": "Antwort",
+    "view": "Ansehen",
+    "pinnedMessages": "Angepinnte Nachrichten"
   },
   "languages": {
     "de": "Deutsch",
@@ -304,5 +314,25 @@
     "noProfileVisible": "Kein Profil-Link, kein Name sichtbar",
     "urgency": "Dringlichkeit",
     "emailOnlyInterested": "E-Mail nur an Interessenten"
+  },
+  "crisis": {
+    "error": "Fehler: {error}",
+    "notFound": "Krise nicht gefunden.",
+    "updates": "Updates",
+    "postUpdate": "Update posten",
+    "postStatusUpdate": "Status-Update posten",
+    "whatChanged": "Was hat sich geändert?",
+    "severity": "Schwere",
+    "post": "Posten",
+    "offerHelp": "Hilfe anbieten",
+    "whatCanYouDo": "Was kannst du tun? (optional)",
+    "etaMinutes": "ETA in Minuten",
+    "helpersActive": "{count} Helfer:innen aktiv",
+    "helpersNeeded": "· benötigt: {count}",
+    "noUpdatesYet": "Noch keine Updates.",
+    "youAreRegistered": "Du bist eingetragen — die/der Ersteller:in sieht dich live.",
+    "couldNotRegister": "Konnte Hilfe nicht eintragen.",
+    "callBtn": "Anrufen",
+    "iHelp": "Ich helfe"
   }
 }

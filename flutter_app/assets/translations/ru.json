@@ -188,7 +188,17 @@
     "incomingCall": "Входящий звонок",
     "accept": "Принять",
     "decline": "Отклонить",
-    "callMissed": "Пропущенный звонок"
+    "callMissed": "Пропущенный звонок",
+    "livestreamFailed": "Не удалось запустить прямой эфир.",
+    "messageNotSent": "Не удалось отправить сообщение.",
+    "editMessage": "Редактировать сообщение",
+    "deleteMessageTitle": "Удалить сообщение?",
+    "deleteMessageBody": "Сообщение будет удалено у всех.",
+    "replyTo": "Ответ на",
+    "read": "Прочитано",
+    "reply": "Ответ",
+    "view": "Посмотреть",
+    "pinnedMessages": "Закреплённые сообщения"
   },
   "languages": {
     "de": "Немецкий",
@@ -304,5 +314,25 @@
     "noProfileVisible": "Без ссылки на профиль, без имени",
     "urgency": "Срочность",
     "emailOnlyInterested": "Показывать email только заинтересованным"
+  },
+  "crisis": {
+    "error": "Ошибка: {error}",
+    "notFound": "Кризис не найден.",
+    "updates": "Обновления",
+    "postUpdate": "Опубликовать обновление",
+    "postStatusUpdate": "Опубликовать обновление статуса",
+    "whatChanged": "Что изменилось?",
+    "severity": "Серьёзность",
+    "post": "Опубликовать",
+    "offerHelp": "Предложить помощь",
+    "whatCanYouDo": "Что ты можешь сделать? (по желанию)",
+    "etaMinutes": "Время прибытия (мин.)",
+    "helpersActive": "Помощников активно: {count}",
+    "helpersNeeded": "· нужно: {count}",
+    "noUpdatesYet": "Обновлений пока нет.",
+    "youAreRegistered": "Ты записан — автор запроса видит тебя в реальном времени.",
+    "couldNotRegister": "Не удалось записать помощь.",
+    "callBtn": "Позвонить",
+    "iHelp": "Я помогу"
   }
 }

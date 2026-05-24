@@ -188,7 +188,17 @@
     "incomingCall": "Chiamata in arrivo",
     "accept": "Accetta",
     "decline": "Rifiuta",
-    "callMissed": "Chiamata persa"
+    "callMissed": "Chiamata persa",
+    "livestreamFailed": "Impossibile avviare la diretta.",
+    "messageNotSent": "Impossibile inviare il messaggio.",
+    "editMessage": "Modifica messaggio",
+    "deleteMessageTitle": "Eliminare il messaggio?",
+    "deleteMessageBody": "Il messaggio verrà rimosso per tutti.",
+    "replyTo": "Rispondi a",
+    "read": "Letto",
+    "reply": "Risposta",
+    "view": "Vedi",
+    "pinnedMessages": "Messaggi fissati"
   },
   "languages": {
     "de": "Tedesco",
@@ -304,5 +314,25 @@
     "noProfileVisible": "Nessun link al profilo, nessun nome visibile",
     "urgency": "Urgenza",
     "emailOnlyInterested": "E-mail solo agli interessati"
+  },
+  "crisis": {
+    "error": "Errore: {error}",
+    "notFound": "Crisi non trovata.",
+    "updates": "Aggiornamenti",
+    "postUpdate": "Pubblica aggiornamento",
+    "postStatusUpdate": "Pubblica aggiornamento di stato",
+    "whatChanged": "Cosa è cambiato?",
+    "severity": "Gravità",
+    "post": "Pubblica",
+    "offerHelp": "Offri aiuto",
+    "whatCanYouDo": "Cosa puoi fare? (opzionale)",
+    "etaMinutes": "Tempo stimato in minuti",
+    "helpersActive": "{count} volontari attivi",
+    "helpersNeeded": "· richiesti: {count}",
+    "noUpdatesYet": "Ancora nessun aggiornamento.",
+    "youAreRegistered": "Sei registrato — chi ha creato la richiesta ti vede in tempo reale.",
+    "couldNotRegister": "Impossibile registrare l'aiuto.",
+    "callBtn": "Chiama",
+    "iHelp": "Aiuto io"
   }
 }

@@ -188,7 +188,17 @@
     "incomingCall": "Incoming call",
     "accept": "Accept",
     "decline": "Decline",
-    "callMissed": "Missed call"
+    "callMissed": "Missed call",
+    "livestreamFailed": "Could not start livestream.",
+    "messageNotSent": "Message could not be sent.",
+    "editMessage": "Edit message",
+    "deleteMessageTitle": "Delete message?",
+    "deleteMessageBody": "The message will be removed for everyone.",
+    "replyTo": "Reply to",
+    "read": "Read",
+    "reply": "Reply",
+    "view": "View",
+    "pinnedMessages": "Pinned messages"
   },
   "languages": {
     "de": "German",
@@ -304,5 +314,25 @@
     "noProfileVisible": "No profile link, no name visible",
     "urgency": "Urgency",
     "emailOnlyInterested": "Share email only with interested users"
+  },
+  "crisis": {
+    "error": "Error: {error}",
+    "notFound": "Crisis not found.",
+    "updates": "Updates",
+    "postUpdate": "Post update",
+    "postStatusUpdate": "Post status update",
+    "whatChanged": "What has changed?",
+    "severity": "Severity",
+    "post": "Post",
+    "offerHelp": "Offer help",
+    "whatCanYouDo": "What can you do? (optional)",
+    "etaMinutes": "ETA in minutes",
+    "helpersActive": "{count} helpers active",
+    "helpersNeeded": "· needed: {count}",
+    "noUpdatesYet": "No updates yet.",
+    "youAreRegistered": "You're registered — the creator can see you live.",
+    "couldNotRegister": "Could not register help.",
+    "callBtn": "Call",
+    "iHelp": "I'll help"
   }
 }

@@ -35,12 +35,13 @@ class CrisisDetailScreen extends ConsumerWidget {
             child: CircularProgressIndicator(color: AppColors.herzrot),
           ),
           error: (e, _) => Center(
-            child: Text('Fehler: $e', style: AppTypography.caption()),
+            child: Text('crisis.error'.tr(namedArgs: {'error': '$e'}),
+                style: AppTypography.caption()),
           ),
           data: (c) {
             if (c == null) {
               return Center(
-                child: Text('Krise nicht gefunden.',
+                child: Text('crisis.notFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -60,7 +61,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text('Updates',
+                      child: Text('crisis.updates'.tr(),
                           style: AppTypography.label(size: 10)),
                     ),
                     if (SupabaseService.currentUser?.id != null)
@@ -69,7 +70,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                             _openUpdateSheet(context, ref, c),
                         icon: const Icon(LucideIcons.plus,
                             size: 12, color: AppColors.bronze),
-                        label: Text('Update posten',
+                        label: Text('crisis.postUpdate'.tr(),
                             style: AppTypography.label(
                                 size: 10,
                                 color: AppColors.bronze)),
@@ -119,7 +120,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              Text('Status-Update posten',
+              Text('crisis.postStatusUpdate'.tr(),
                   style: AppTypography.display(
                       size: 20, color: AppColors.ink)),
               const SizedBox(height: 14),
@@ -132,7 +133,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: AppColors.elevated,
-                  hintText: 'Was hat sich geaendert?',
+                  hintText: 'crisis.whatChanged'.tr(),
                   hintStyle: AppTypography.body(
                       size: 13, color: AppColors.mute),
                   border: OutlineInputBorder(
@@ -142,7 +143,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text('Schwere', style: AppTypography.label(size: 10)),
+              Text('crisis.severity'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
@@ -201,7 +202,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                             strokeWidth: 2,
                             color: AppColors.voidColor),
                       )
-                    : const Text('Posten'),
+                    : Text('crisis.post'.tr()),
               ),
             ],
           ),
@@ -235,7 +236,7 @@ class CrisisDetailScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hilfe anbieten',
+            Text('crisis.offerHelp'.tr(),
                 style:
                     AppTypography.display(size: 22, color: AppColors.ink)),
             const SizedBox(height: 12),
@@ -243,8 +244,8 @@ class CrisisDetailScreen extends ConsumerWidget {
               controller: messageCtrl,
               maxLines: 3,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Was kannst du tun? (optional)',
+              decoration: InputDecoration(
+                labelText: 'crisis.whatCanYouDo'.tr(),
               ),
             ),
             const SizedBox(height: 12),
@@ -253,7 +254,7 @@ class CrisisDetailScreen extends ConsumerWidget {
               keyboardType: TextInputType.number,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration:
-                  const InputDecoration(labelText: 'ETA in Minuten'),
+                  InputDecoration(labelText: 'crisis.etaMinutes'.tr()),
             ),
             const SizedBox(height: 16),
             Row(
@@ -294,8 +295,8 @@ class CrisisDetailScreen extends ConsumerWidget {
       SnackBar(
         content: Text(
           ok
-              ? 'Du bist eingetragen — die/der Ersteller:in sieht dich live.'
-              : 'Konnte Hilfe nicht eintragen.',
+              ? 'crisis.youAreRegistered'.tr()
+              : 'crisis.couldNotRegister'.tr(),
         ),
       ),
     );
@@ -432,7 +433,7 @@ class _ContactBlock extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: _call,
               icon: const Icon(LucideIcons.phone, size: 14),
-              label: const Text('Anrufen'),
+              label: Text('crisis.callBtn'.tr()),
             ),
         ],
       ),
@@ -472,7 +473,7 @@ class _HelperBlock extends StatelessWidget {
               const Icon(LucideIcons.helpingHand, color: AppColors.leben),
               const SizedBox(width: 8),
               Text(
-                '$active Helfer:innen aktiv',
+                'crisis.helpersActive'.tr(namedArgs: {'count': '$active'}),
                 style: AppTypography.body(
                   size: 14,
                   color: AppColors.ink,
@@ -482,7 +483,7 @@ class _HelperBlock extends StatelessWidget {
               if (need > 0) ...[
                 const SizedBox(width: 6),
                 Text(
-                  '· benötigt: $need',
+                  'crisis.helpersNeeded'.tr(namedArgs: {'count': '$need'}),
                   style: AppTypography.caption(),
                 ),
               ],
@@ -498,7 +499,7 @@ class _HelperBlock extends StatelessWidget {
               ),
               onPressed: onOffer,
               icon: const Icon(LucideIcons.heart, size: 16),
-              label: const Text('Ich helfe'),
+              label: Text('crisis.iHelp'.tr()),
             ),
           ),
         ],
@@ -515,7 +516,7 @@ class _UpdatesFeed extends StatelessWidget {
   Widget build(BuildContext context) {
     if (updates.isEmpty) {
       return Text(
-        'Noch keine Updates.',
+        'crisis.noUpdatesYet'.tr(),
         style: AppTypography.caption(),
       );
     }

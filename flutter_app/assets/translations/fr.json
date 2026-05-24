@@ -188,7 +188,17 @@
     "incomingCall": "Appel entrant",
     "accept": "Accepter",
     "decline": "Refuser",
-    "callMissed": "Appel manqué"
+    "callMissed": "Appel manqué",
+    "livestreamFailed": "Impossible de démarrer le direct.",
+    "messageNotSent": "Le message n'a pas pu être envoyé.",
+    "editMessage": "Modifier le message",
+    "deleteMessageTitle": "Supprimer le message ?",
+    "deleteMessageBody": "Le message sera supprimé pour tout le monde.",
+    "replyTo": "Répondre à",
+    "read": "Lu",
+    "reply": "Réponse",
+    "view": "Voir",
+    "pinnedMessages": "Messages épinglés"
   },
   "languages": {
     "de": "Allemand",
@@ -304,5 +314,25 @@
     "noProfileVisible": "Aucun lien de profil, aucun nom visible",
     "urgency": "Urgence",
     "emailOnlyInterested": "E-mail uniquement aux personnes intéressées"
+  },
+  "crisis": {
+    "error": "Erreur : {error}",
+    "notFound": "Crise introuvable.",
+    "updates": "Mises à jour",
+    "postUpdate": "Publier une mise à jour",
+    "postStatusUpdate": "Publier un point de situation",
+    "whatChanged": "Qu'est-ce qui a changé ?",
+    "severity": "Gravité",
+    "post": "Publier",
+    "offerHelp": "Proposer mon aide",
+    "whatCanYouDo": "Que peux-tu faire ? (facultatif)",
+    "etaMinutes": "Temps estimé en minutes",
+    "helpersActive": "{count} aidant·e·s actif·ve·s",
+    "helpersNeeded": "· requis : {count}",
+    "noUpdatesYet": "Aucune mise à jour pour le moment.",
+    "youAreRegistered": "Tu es inscrit·e — l'auteur·rice te voit en direct.",
+    "couldNotRegister": "Impossible d'enregistrer ton aide.",
+    "callBtn": "Appeler",
+    "iHelp": "J'aide"
   }
 }

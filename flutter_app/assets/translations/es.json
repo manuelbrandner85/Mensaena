@@ -188,7 +188,17 @@
     "incomingCall": "Llamada entrante",
     "accept": "Aceptar",
     "decline": "Rechazar",
-    "callMissed": "Llamada perdida"
+    "callMissed": "Llamada perdida",
+    "livestreamFailed": "No se pudo iniciar la transmisión en directo.",
+    "messageNotSent": "No se pudo enviar el mensaje.",
+    "editMessage": "Editar mensaje",
+    "deleteMessageTitle": "¿Eliminar mensaje?",
+    "deleteMessageBody": "El mensaje se eliminará para todos.",
+    "replyTo": "Responder a",
+    "read": "Leído",
+    "reply": "Respuesta",
+    "view": "Ver",
+    "pinnedMessages": "Mensajes fijados"
   },
   "languages": {
     "de": "Alemán",
@@ -304,5 +314,25 @@
     "noProfileVisible": "Sin enlace de perfil, sin nombre visible",
     "urgency": "Urgencia",
     "emailOnlyInterested": "Compartir email solo con interesados"
+  },
+  "crisis": {
+    "error": "Error: {error}",
+    "notFound": "Crisis no encontrada.",
+    "updates": "Actualizaciones",
+    "postUpdate": "Publicar actualización",
+    "postStatusUpdate": "Publicar actualización de estado",
+    "whatChanged": "¿Qué ha cambiado?",
+    "severity": "Gravedad",
+    "post": "Publicar",
+    "offerHelp": "Ofrecer ayuda",
+    "whatCanYouDo": "¿Qué puedes hacer? (opcional)",
+    "etaMinutes": "Tiempo estimado en minutos",
+    "helpersActive": "{count} ayudantes activos",
+    "helpersNeeded": "· se necesitan: {count}",
+    "noUpdatesYet": "Aún no hay actualizaciones.",
+    "youAreRegistered": "Estás registrado — quien creó la solicitud te ve en directo.",
+    "couldNotRegister": "No se pudo registrar la ayuda.",
+    "callBtn": "Llamar",
+    "iHelp": "Yo ayudo"
   }
 }

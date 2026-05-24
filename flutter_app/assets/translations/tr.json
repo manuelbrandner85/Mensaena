@@ -188,7 +188,17 @@
     "incomingCall": "Gelen çağrı",
     "accept": "Kabul et",
     "decline": "Reddet",
-    "callMissed": "Cevapsız çağrı"
+    "callMissed": "Cevapsız çağrı",
+    "livestreamFailed": "Canlı yayın başlatılamadı.",
+    "messageNotSent": "Mesaj gönderilemedi.",
+    "editMessage": "Mesajı düzenle",
+    "deleteMessageTitle": "Mesaj silinsin mi?",
+    "deleteMessageBody": "Mesaj herkes için kaldırılacak.",
+    "replyTo": "Yanıt verilen",
+    "read": "Okundu",
+    "reply": "Yanıt",
+    "view": "Görüntüle",
+    "pinnedMessages": "Sabitlenmiş mesajlar"
   },
   "languages": {
     "de": "Almanca",
@@ -304,5 +314,25 @@
     "noProfileVisible": "Profil bağlantısı yok, isim görünmez",
     "urgency": "Aciliyet",
     "emailOnlyInterested": "E-postayı sadece ilgilenenlerle paylaş"
+  },
+  "crisis": {
+    "error": "Hata: {error}",
+    "notFound": "Kriz bulunamadı.",
+    "updates": "Güncellemeler",
+    "postUpdate": "Güncelleme paylaş",
+    "postStatusUpdate": "Durum güncellemesi paylaş",
+    "whatChanged": "Ne değişti?",
+    "severity": "Önem derecesi",
+    "post": "Paylaş",
+    "offerHelp": "Yardım teklif et",
+    "whatCanYouDo": "Ne yapabilirsin? (isteğe bağlı)",
+    "etaMinutes": "Tahmini süre (dakika)",
+    "helpersActive": "{count} yardımcı aktif",
+    "helpersNeeded": "· gereken: {count}",
+    "noUpdatesYet": "Henüz güncelleme yok.",
+    "youAreRegistered": "Kaydoldun — talebi açan kişi seni canlı görüyor.",
+    "couldNotRegister": "Yardım kaydedilemedi.",
+    "callBtn": "Ara",
+    "iHelp": "Yardım edeceğim"
   }
 }
