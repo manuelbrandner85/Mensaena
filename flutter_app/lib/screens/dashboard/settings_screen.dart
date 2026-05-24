@@ -96,7 +96,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 final p = snap.data;
                 if (p == null) {
                   return Center(
-                    child: Text('Profil nicht gefunden.',
+                    child: Text('settings.profileNotFound'.tr(),
                         style: AppTypography.caption()),
                   );
                 }
@@ -136,7 +136,7 @@ class _AccountTab extends StatelessWidget {
         Text(profile.email ?? '–',
             style: AppTypography.body(size: 14, color: AppColors.ink)),
         const SizedBox(height: 18),
-        Text('Name', style: AppTypography.label(size: 10)),
+        Text('settings.nameLabel'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 4),
         Text(profile.name ?? '–',
             style: AppTypography.body(size: 14, color: AppColors.ink)),
@@ -187,7 +187,7 @@ class _PrivacyTab extends StatelessWidget {
           onChanged: (v) => onPatch({'show_phone': v}),
         ),
         const SizedBox(height: 16),
-        Text('Profil-Sichtbarkeit', style: AppTypography.label(size: 10)),
+        Text('settings.profileVisibility'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 8),
         Wrap(
           spacing: 6,
@@ -258,7 +258,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
         child: CircularProgressIndicator(color: AppColors.amber),
       ),
       error: (e, _) => Center(
-        child: Text('Fehler: $e', style: AppTypography.caption()),
+        child: Text('settings.errorPrefix'.tr(namedArgs: {'error': e.toString()}), style: AppTypography.caption()),
       ),
       data: (p) {
         _local ??= p;
@@ -417,14 +417,14 @@ class _RegionTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('Standort', style: AppTypography.label(size: 10)),
+        Text('settings.locationLabel'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 4),
         Text(
           profile.location ?? 'Nicht gesetzt',
           style: AppTypography.body(size: 14, color: AppColors.ink),
         ),
         const SizedBox(height: 18),
-        Text('Radius: ${radius.toInt()} km',
+        Text('settings.radiusKm'.tr(namedArgs: {'km': radius.toInt().toString()}),
             style: AppTypography.label(size: 10)),
         Slider(
           activeColor: AppColors.amber,
@@ -499,14 +499,14 @@ class _DangerTabState extends State<_DangerTab> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Daten-Export erstellt (${(json.length / 1024).toStringAsFixed(1)} KB).',
+        content: Text('settings.exportCreated'.tr(namedArgs: {'size': (json.length / 1024).toStringAsFixed(1)}),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Export fehlgeschlagen: $e',
+        content: Text('settings.exportFailed'.tr(namedArgs: {'error': e.toString()}),
             style: AppTypography.body(
                 size: 13, color: AppColors.herzrotWarm)),
       ));
@@ -523,7 +523,7 @@ class _DangerTabState extends State<_DangerTab> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Konto unwiderruflich löschen?',
+        title: Text('settings.deleteAccountTitle'.tr(),
             style: AppTypography.body(
                 size: 16, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
@@ -538,11 +538,11 @@ class _DangerTabState extends State<_DangerTab> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Abbrechen')),
+              child: Text('common.cancel'.tr())),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
-            child: const Text('Weiter zur Bestätigung'),
+            child: Text('settings.continueToConfirm'.tr()),
           ),
         ],
       ),
@@ -582,7 +582,7 @@ class _DangerTabState extends State<_DangerTab> {
       setState(() => _deleting = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Löschen fehlgeschlagen: $e',
+        content: Text('settings.deleteFailed'.tr(namedArgs: {'error': e.toString()}),
             style: AppTypography.body(
                 size: 13, color: AppColors.herzrotWarm)),
       ));
@@ -598,7 +598,7 @@ class _DangerTabState extends State<_DangerTab> {
           final canDelete = ctrl.text.trim() == 'LÖSCHEN';
           return AlertDialog(
             backgroundColor: AppColors.surface,
-            title: Text('Letzte Bestätigung',
+            title: Text('settings.finalConfirmTitle'.tr(),
                 style: AppTypography.body(
                     size: 16,
                     color: AppColors.ink,
@@ -630,12 +630,12 @@ class _DangerTabState extends State<_DangerTab> {
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('Abbrechen')),
+                  child: Text('common.cancel'.tr())),
               TextButton(
                 onPressed: canDelete ? () => Navigator.pop(ctx, true) : null,
                 style:
                     TextButton.styleFrom(foregroundColor: AppColors.herzrot),
-                child: const Text('Konto endgültig löschen'),
+                child: Text('settings.deleteAccountFinal'.tr()),
               ),
             ],
           );
@@ -657,7 +657,7 @@ class _DangerTabState extends State<_DangerTab> {
             if (context.mounted) context.go('/');
           },
           icon: const Icon(LucideIcons.logOut, size: 16),
-          label: const Text('Abmelden'),
+          label: Text('common.logout'.tr()),
         ),
         const SizedBox(height: 24),
         Text('DATENSCHUTZ (DSGVO)', style: AppTypography.label(size: 10)),
@@ -802,7 +802,7 @@ class _AppearanceTab extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               if (spec == null)
-                Text('Aus — pures Cinema-Dark.',
+                Text('settings.themeOff'.tr(),
                     style: AppTypography.body(
                         size: 14, color: AppColors.ink))
               else ...[
@@ -818,7 +818,7 @@ class _AppearanceTab extends ConsumerWidget {
                           Text(spec.label,
                               style: AppTypography.display(
                                   size: 20, color: AppColors.ink)),
-                          Text('Cinema-Theme aktiv',
+                          Text('settings.themeActive'.tr(),
                               style: AppTypography.body(
                                   size: 12, color: AppColors.mute)),
                         ],
@@ -867,7 +867,7 @@ class _AppearanceTab extends ConsumerWidget {
         OutlinedButton.icon(
           onPressed: () => context.go('/onboarding'),
           icon: const Icon(LucideIcons.play, size: 14),
-          label: const Text('Onboarding-Tour erneut ansehen'),
+          label: Text('settings.replayOnboarding'.tr()),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.bronze,
             side: BorderSide(
@@ -891,7 +891,7 @@ class _AppearanceTab extends ConsumerWidget {
                   const Icon(LucideIcons.info,
                       size: 14, color: AppColors.mute),
                   const SizedBox(width: 6),
-                  Text('Was ist das?',
+                  Text('settings.whatIsThis'.tr(),
                       style: AppTypography.label(
                           size: 10, color: AppColors.mute)),
                 ],
@@ -1160,7 +1160,7 @@ class _SecurityTabState extends State<_SecurityTab> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Alle anderen Sessions abmelden?',
+        title: Text('settings.signOutOtherSessions'.tr(),
             style: AppTypography.body(
                 size: 15,
                 color: AppColors.ink,
@@ -1172,12 +1172,12 @@ class _SecurityTabState extends State<_SecurityTab> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Abbrechen')),
+              child: Text('common.cancel'.tr())),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style:
                 TextButton.styleFrom(foregroundColor: AppColors.herzrot),
-            child: const Text('Abmelden'),
+            child: Text('common.logout'.tr()),
           ),
         ],
       ),
@@ -1252,7 +1252,7 @@ class _SecurityTabState extends State<_SecurityTab> {
               onChanged: (v) => setState(() => _show = v ?? false),
               activeColor: AppColors.bronze,
             ),
-            Text('Passwort anzeigen',
+            Text('settings.showPassword'.tr(),
                 style: AppTypography.label(
                     size: 10, color: AppColors.mute)),
           ],
@@ -1261,7 +1261,7 @@ class _SecurityTabState extends State<_SecurityTab> {
         FilledButton.icon(
           onPressed: _busy ? null : _changePassword,
           icon: const Icon(LucideIcons.lock, size: 14),
-          label: const Text('Passwort ändern'),
+          label: Text('settings.changePassword'.tr()),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.bronze,
             foregroundColor: AppColors.voidColor,
@@ -1279,7 +1279,7 @@ class _SecurityTabState extends State<_SecurityTab> {
         OutlinedButton.icon(
           onPressed: _busy ? null : _sendPasswordResetMail,
           icon: const Icon(LucideIcons.mail, size: 14),
-          label: const Text('Reset-Link senden'),
+          label: Text('settings.sendResetLink'.tr()),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.amber,
             side: BorderSide(
@@ -1298,7 +1298,7 @@ class _SecurityTabState extends State<_SecurityTab> {
         OutlinedButton.icon(
           onPressed: _busy ? null : _signOutAllOtherSessions,
           icon: const Icon(LucideIcons.logOut, size: 14),
-          label: const Text('Andere Sessions abmelden'),
+          label: Text('settings.signOutOthersBtn'.tr()),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.herzrot,
             side: BorderSide(
@@ -1400,7 +1400,7 @@ class _LanguageTab extends ConsumerWidget {
           value: isAuto,
           activeColor: AppColors.bronze,
           onChanged: (v) => notifier.setAuto(v, context),
-          title: Text('Sprache nach Standort',
+          title: Text('settings.languageByLocation'.tr(),
               style: AppTypography.body(
                   size: 14, color: AppColors.ink)),
           subtitle: Text(
