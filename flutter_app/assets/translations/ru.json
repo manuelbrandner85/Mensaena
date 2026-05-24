@@ -32,7 +32,8 @@
     "read": "Читать",
     "or": "или",
     "received": "Полученные",
-    "given": "Данные"
+    "given": "Данные",
+    "feedbackThanks": "Отзыв отправлен — спасибо!"
   },
   "nav": {
     "dashboard": "Панель",
@@ -584,7 +585,8 @@
     "productNotFound": "Продукт {code} не найден в Open Food Facts.",
     "type": "Тип",
     "scanBarcode": "Сканировать штрих-код (продукты)",
-    "createListing": "Разместить"
+    "createListing": "Разместить",
+    "advertise": "Разместить"
   },
   "trust": {
     "rate": "Оценить {name}",

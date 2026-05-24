@@ -168,7 +168,7 @@ class _CivilProtectionScreenState
                   OutlinedButton.icon(
                     onPressed: () => context.go('/dashboard/warnungen/meteo'),
                     icon: const Icon(LucideIcons.cloudLightning, size: 16),
-                    label: const Text('MeteoAlarm'),
+                    label: Text('civil.meteoAlarm'.tr()),
                   ),
                 ],
               ),

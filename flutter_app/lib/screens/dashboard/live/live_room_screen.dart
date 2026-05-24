@@ -528,7 +528,7 @@ class _RoomGridState extends State<_RoomGrid> {
     ];
     if (participants.isEmpty) {
       return Center(
-        child: Text('Warte auf Teilnehmer:innen …',
+        child: Text('live.waitingParticipants'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
       );
     }

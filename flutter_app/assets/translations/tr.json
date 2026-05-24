@@ -32,7 +32,8 @@
     "read": "Oku",
     "or": "veya",
     "received": "Alınan",
-    "given": "Verilen"
+    "given": "Verilen",
+    "feedbackThanks": "Geri bildirim gönderildi — teşekkürler!"
   },
   "nav": {
     "dashboard": "Panel",
@@ -584,7 +585,8 @@
     "productNotFound": "{code} ürünü Open Food Facts'ta bulunamadı.",
     "type": "Tür",
     "scanBarcode": "Barkod tara (gıda)",
-    "createListing": "İlan ver"
+    "createListing": "İlan ver",
+    "advertise": "İlan ver"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -83,7 +84,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('/dashboard/marketplace/create'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Inserieren'),
+        label: Text('marketplace.advertise'.tr()),
       ),
       body: SafeArea(
         child: Column(

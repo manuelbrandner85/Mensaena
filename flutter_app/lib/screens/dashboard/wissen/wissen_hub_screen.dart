@@ -48,7 +48,7 @@ class WissenHubScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           children: [
-            Text('Wissen teilen',
+            Text('hubs.knowledge'.tr(),
                 style: AppTypography.display(
                     size: 26, color: AppColors.ink, height: 1.15)),
             const SizedBox(height: 4),

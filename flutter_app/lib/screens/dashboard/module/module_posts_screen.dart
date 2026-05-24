@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -101,7 +102,7 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
           context.go(moduleRoute);
         },
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Beitrag'),
+        label: Text('modules.post'.tr()),
       ),
       body: SafeArea(
         child: Column(

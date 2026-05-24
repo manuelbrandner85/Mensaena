@@ -3,6 +3,7 @@
 /// Funktioniert offline auf Android (Google Speech-Recognizer).
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -62,7 +63,7 @@ class _VoiceDictationButtonState extends State<VoiceDictationButton> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Mikrofon-Berechtigung verweigert.',
+        content: Text('voice.micDenied'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
       return;

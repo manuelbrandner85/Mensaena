@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -110,7 +110,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('${widget.routePath}/create'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Artikel'),
+        label: Text('knowledge.article'.tr()),
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -213,7 +213,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                               onPressed: () => context
                                   .go('${widget.routePath}/create'),
                               icon: const Icon(LucideIcons.plus, size: 14),
-                              label: const Text('Artikel schreiben'),
+                              label: Text('knowledge.writeArticle'.tr()),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.bronze,
                                 foregroundColor: AppColors.voidColor,

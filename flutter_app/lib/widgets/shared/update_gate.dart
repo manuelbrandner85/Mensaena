@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -164,7 +165,7 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Was ist neu',
+                        Text('update.whatsNew'.tr(),
                             style: AppTypography.label(size: 10)),
                         const SizedBox(height: 8),
                         Text(

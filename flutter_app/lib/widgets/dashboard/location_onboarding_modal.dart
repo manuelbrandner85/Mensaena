@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -192,7 +193,7 @@ class _LocationOnboardingModalState
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8),
-                  child: Text('oder',
+                  child: Text('common.or'.tr(),
                       style: AppTypography.label(
                           size: 9, color: AppColors.mute)),
                 ),
@@ -276,7 +277,7 @@ class _LocationOnboardingModalState
                             mainAxisAlignment:
                                 MainAxisAlignment.center,
                             children: [
-                              Text('Standort speichern',
+                              Text('home.saveLocation'.tr(),
                                   style: AppTypography.body(
                                     size: 14,
                                     color: AppColors.voidColor,

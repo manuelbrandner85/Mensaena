@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -60,7 +61,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('/dashboard/groups/create'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Gruppe erstellen'),
+        label: Text('groups.create'.tr()),
       ),
       body: SafeArea(
         child: Column(

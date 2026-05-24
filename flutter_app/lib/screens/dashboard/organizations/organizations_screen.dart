@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,7 @@ class OrganizationsScreen extends ConsumerWidget {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('/dashboard/organizations/suggest'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Org. vorschlagen'),
+        label: Text('organizations.suggestOrg'.tr()),
       ),
       body: SafeArea(
         child: RefreshIndicator(

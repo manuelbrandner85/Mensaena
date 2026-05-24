@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -71,7 +71,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('/dashboard/events/create'),
         icon: const Icon(LucideIcons.plus),
-        label: const Text('Event erstellen'),
+        label: Text('events.create'.tr()),
       ),
       body: SafeArea(
         child: Column(
@@ -333,7 +333,7 @@ class _CalendarView extends StatelessWidget {
         const SizedBox(height: 12),
         // ── Liste der Events im Monat ──
         if (events.isNotEmpty) ...[
-          Text('Events im Monat',
+          Text('events.eventsInMonth'.tr(),
               style: AppTypography.label(size: 10)),
           const SizedBox(height: 6),
           for (final e in events) _EventTile(event: e),

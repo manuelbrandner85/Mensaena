@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -207,7 +208,7 @@ class ActiveFilterStrip extends StatelessWidget {
               minimumSize: const Size(0, 30),
               padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
-            child: Text('Zurücksetzen',
+            child: Text('common.reset'.tr(),
                 style:
                     AppTypography.label(size: 9, color: AppColors.mute)),
           ),

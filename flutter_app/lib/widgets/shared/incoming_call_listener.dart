@@ -18,6 +18,7 @@ library;
 
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -324,7 +325,7 @@ class _IncomingCallDialogState extends State<_IncomingCallDialog>
                 },
               ),
               const SizedBox(height: 28),
-              Text('Eingehender Anruf',
+              Text('call.incoming'.tr(),
                   style: AppTypography.label(
                       size: 10, color: AppColors.mute)),
               const SizedBox(height: 6),

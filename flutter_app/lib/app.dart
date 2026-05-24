@@ -81,8 +81,8 @@ class _ShakeFeedbackListener extends StatelessWidget {
               'screenshot=${feedback.screenshot.length} bytes; user=${SupabaseService.currentUser?.id ?? "anon"}',
         );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Feedback gesendet — Danke!'),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('common.feedbackThanks'.tr()),
           ));
         }
       }),

@@ -50,7 +50,7 @@ class CrisisResourcesScreen extends ConsumerWidget {
             child: CircularProgressIndicator(color: AppColors.herzrot),
           ),
           error: (e, _) => Center(
-            child: Text('Fehler: $e', style: AppTypography.caption()),
+            child: Text('crisis.resourceError'.tr(namedArgs: {'error': '$e'}), style: AppTypography.caption()),
           ),
           data: (list) {
             if (list.isEmpty) {

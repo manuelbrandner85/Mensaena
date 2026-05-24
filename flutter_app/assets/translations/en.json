@@ -32,7 +32,8 @@
     "read": "Read",
     "or": "or",
     "received": "Received",
-    "given": "Given"
+    "given": "Given",
+    "feedbackThanks": "Feedback sent — thanks!"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -584,7 +585,8 @@
     "productNotFound": "Product {code} not found in Open Food Facts.",
     "type": "Type",
     "scanBarcode": "Scan barcode (food)",
-    "createListing": "List item"
+    "createListing": "List item",
+    "advertise": "List item"
   },
   "trust": {
     "rate": "Rate {name}",
