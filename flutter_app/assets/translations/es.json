@@ -1134,7 +1134,15 @@
     "tryOther": "Prueba con otros términos o menos caracteres.",
     "noResults": "Sin resultados para \"{query}\"",
     "hintPostsProfilesEvents": "Publicaciones, perfiles, eventos, organizaciones…",
-    "title": "Búsqueda"
+    "title": "Búsqueda",
+    "spotlight": "Búsqueda Spotlight",
+    "spotlightHint": "Buscar en Mensaena…",
+    "empty": "Empieza a escribir para encontrar publicaciones, personas, eventos y organizaciones.",
+    "noResultsShort": "Sin resultados.",
+    "posts": "PUBLICACIONES",
+    "profiles": "PERSONAS",
+    "events": "EVENTOS",
+    "organizations": "ORGANIZACIONES"
   },
   "skills": {
     "offerSkill": "Ofrecer habilidad",
@@ -1317,5 +1325,10 @@
       "callsDesc": "Push de alta prioridad para llamadas DM entrantes",
       "fallbackDesc": "Mensajes, coincidencias y notificaciones generales"
     }
+  },
+  "notif": {
+    "enable": "Activar notificaciones",
+    "bannerTitle": "No te pierdas nada",
+    "bannerBody": "Activa las notificaciones para ver llamadas, mensajes y peticiones al instante."
   }
 }

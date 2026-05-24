@@ -1134,7 +1134,15 @@
     "tryOther": "Başka kelimeler veya daha az karakter deneyin.",
     "noResults": "\"{query}\" için sonuç yok",
     "hintPostsProfilesEvents": "Gönderiler, profiller, etkinlikler, kuruluşlar…",
-    "title": "Arama"
+    "title": "Arama",
+    "spotlight": "Spotlight arama",
+    "spotlightHint": "Mensaena'da ara…",
+    "empty": "Gönderiler, profiller, etkinlikler ve kuruluşlar için yazmaya başla.",
+    "noResultsShort": "Sonuç yok.",
+    "posts": "GÖNDERİLER",
+    "profiles": "KİŞİLER",
+    "events": "ETKİNLİKLER",
+    "organizations": "KURULUŞLAR"
   },
   "skills": {
     "offerSkill": "Beceri öner",
@@ -1317,5 +1325,10 @@
       "callsDesc": "Gelen DM çağrıları için yüksek öncelikli push",
       "fallbackDesc": "Mesajlar, eşleşmeler ve genel bildirimler"
     }
+  },
+  "notif": {
+    "enable": "Bildirimleri aç",
+    "bannerTitle": "Hiçbir şeyi kaçırma",
+    "bannerBody": "Bildirimleri açarak çağrıları, mesajları ve yardım isteklerini anında gör."
   }
 }

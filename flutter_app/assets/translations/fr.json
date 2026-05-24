@@ -1134,7 +1134,15 @@
     "tryOther": "Essayez d'autres mots ou moins de caractères.",
     "noResults": "Aucun résultat pour « {query} »",
     "hintPostsProfilesEvents": "Posts, profils, événements, organisations…",
-    "title": "Recherche"
+    "title": "Recherche",
+    "spotlight": "Recherche Spotlight",
+    "spotlightHint": "Rechercher sur Mensaena…",
+    "empty": "Tapez pour trouver des publications, des profils, des événements et des organisations.",
+    "noResultsShort": "Aucun résultat.",
+    "posts": "PUBLICATIONS",
+    "profiles": "PROFILS",
+    "events": "ÉVÉNEMENTS",
+    "organizations": "ORGANISATIONS"
   },
   "skills": {
     "offerSkill": "Proposer une compétence",
@@ -1317,5 +1325,10 @@
       "callsDesc": "Push haute priorité pour appels DM entrants",
       "fallbackDesc": "Messages, matchs et notifications générales"
     }
+  },
+  "notif": {
+    "enable": "Activer les notifications",
+    "bannerTitle": "Restez informé",
+    "bannerBody": "Activez les notifications pour voir tout de suite les appels, messages et demandes."
   }
 }
