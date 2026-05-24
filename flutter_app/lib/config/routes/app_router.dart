@@ -45,6 +45,8 @@ import '../../screens/dashboard/knowledge/knowledge_create_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_screen.dart';
 import '../../screens/dashboard/module/module_posts_screen.dart';
 import '../../screens/dashboard/skills/skills_screen.dart';
+import '../../screens/dashboard/teilen/teilen_hub_screen.dart';
+import '../../screens/dashboard/wissen/wissen_hub_screen.dart';
 import '../../screens/dashboard/events/event_create_screen.dart';
 import '../../screens/dashboard/events/event_detail_screen.dart';
 import '../../screens/dashboard/events/events_screen.dart';
@@ -479,6 +481,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/skills',
         builder: (_, __) => const SkillsScreen(),
+      ),
+      // Modul-Audit Sprint 2 — Hub-Routes konsolidieren 3+3 Drawer-Items.
+      GoRoute(
+        path: '/dashboard/wissen',
+        builder: (_, __) => const WissenHubScreen(),
+      ),
+      GoRoute(
+        path: '/dashboard/teilen',
+        builder: (_, __) => const TeilenHubScreen(),
       ),
       GoRoute(
         path: '/dashboard/organizations',

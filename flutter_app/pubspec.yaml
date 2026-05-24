@@ -78,6 +78,13 @@ dependencies:
   # Auto-Detection via geocoding (Country-Code → primary language).
   easy_localization: ^3.0.7
 
+  # Barcode/QR-Scanner — Marketplace (Open Food Facts Lookup) + Org-Invites.
+  mobile_scanner: ^5.2.3
+  # Voice-Diktat im Chat-Composer + Create-Flows (Accessibility).
+  speech_to_text: ^7.0.0
+  # ICS-Kalender-Export für Events.
+  add_2_calendar: ^3.0.1
+
   # Shorebird OTA: liest die Patch-Nummer + meldet sich beim Server.
   # Patches selber werden automatisch beim Launch installiert.
   shorebird_code_push: ^2.0.6

@@ -6,7 +6,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../services/open_food_facts_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../shared/barcode_scanner_screen.dart';
 
 class MarketplaceCreateScreen extends ConsumerStatefulWidget {
   const MarketplaceCreateScreen({super.key});
@@ -55,6 +57,46 @@ class _MarketplaceCreateScreenState
     'gebraucht',
     'defekt',
   ];
+
+  /// Öffnet Barcode-Scanner → Open Food Facts Lookup → füllt Titel +
+  /// Beschreibung. Snackbar bei Erfolg/Fehler.
+  Future<void> _scanAndFillFromFood() async {
+    final code = await BarcodeScannerScreen.open(context,
+        title: 'Lebensmittel scannen');
+    if (code == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.elevated,
+      duration: const Duration(seconds: 1),
+      content: Text('Suche $code …',
+          style: AppTypography.body(size: 12, color: AppColors.inkSoft)),
+    ));
+    final p = await OpenFoodFactsService.lookup(code);
+    if (!mounted) return;
+    if (p == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Produkt $code nicht in Open Food Facts gefunden.',
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+      return;
+    }
+    setState(() {
+      _title.text = p.displayTitle ?? p.name;
+      final parts = <String>[
+        if (p.quantity != null && p.quantity!.isNotEmpty) 'Menge: ${p.quantity}',
+        if (p.ingredients != null && p.ingredients!.isNotEmpty)
+          'Zutaten: ${p.ingredients}',
+        if (p.categories != null && p.categories!.isNotEmpty)
+          'Kategorie: ${p.categories!.split(",").take(2).join(", ")}',
+      ];
+      if (parts.isNotEmpty) _desc.text = parts.join('\n\n');
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text('✓ ${p.name} eingefügt',
+          style: AppTypography.body(size: 13, color: AppColors.leben)),
+    ));
+  }
 
   Future<void> _submit() async {
     if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
@@ -139,6 +181,18 @@ class _MarketplaceCreateScreenState
               }).toList(),
             ),
             const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _scanAndFillFromFood,
+              icon: const Icon(LucideIcons.scanLine, size: 16),
+              label: const Text('Barcode scannen (Lebensmittel)'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.bronze,
+                side: BorderSide(
+                    color: AppColors.bronze.withValues(alpha: 0.5)),
+                minimumSize: const Size.fromHeight(44),
+              ),
+            ),
+            const SizedBox(height: 10),
             TextField(
               controller: _title,
               maxLength: 120,

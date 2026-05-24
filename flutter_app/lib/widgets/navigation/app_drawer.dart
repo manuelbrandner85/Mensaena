@@ -100,12 +100,9 @@ class AppDrawer extends ConsumerWidget {
       label: 'navGroups.shareAndResources',
       headIcon: LucideIcons.repeat,
       items: [
-        _NavLink(icon: LucideIcons.repeat, label: 'nav.sharing',
-            route: '/dashboard/sharing'),
-        _NavLink(icon: LucideIcons.clock, label: 'nav.timebank',
-            route: '/dashboard/timebank'),
-        _NavLink(icon: LucideIcons.store, label: 'nav.marketplace',
-            route: '/dashboard/marketplace'),
+        // Konsolidiert: Sharing + Marketplace + Timebank → 1 Hub.
+        _NavLink(icon: LucideIcons.repeat, label: 'navGroups.shareAndResources',
+            route: '/dashboard/teilen'),
         _NavLink(icon: LucideIcons.package, label: 'nav.supply',
             route: '/dashboard/supply'),
         _NavLink(icon: LucideIcons.wheat, label: 'nav.harvest',
@@ -124,12 +121,9 @@ class AppDrawer extends ConsumerWidget {
       label: 'navGroups.knowledgeAndSkills',
       headIcon: LucideIcons.bookOpen,
       items: [
-        _NavLink(icon: LucideIcons.bookOpen, label: 'nav.wiki',
-            route: '/dashboard/wiki'),
-        _NavLink(icon: LucideIcons.graduationCap, label: 'nav.knowledge',
-            route: '/dashboard/knowledge'),
-        _NavLink(icon: LucideIcons.wrench, label: 'nav.skills',
-            route: '/dashboard/skills'),
+        // Konsolidiert: Wiki + Bildung + Skills → 1 Hub.
+        _NavLink(icon: LucideIcons.bookOpen, label: 'navGroups.knowledgeAndSkills',
+            route: '/dashboard/wissen'),
       ],
     ),
     _NavGroup(
