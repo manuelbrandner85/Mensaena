@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -28,7 +29,14 @@ class PushNotificationService {
   static const _channelId = 'mensaena_default';
   static const _channelName = 'Mensaena Benachrichtigungen';
   static const _channelDescription =
-      'Nachrichten, Anrufe, Matches und Krisen-Warnungen';
+      'Nachrichten, Matches und allgemeine Benachrichtigungen';
+
+  // Separate high-priority channel for incoming calls — fullScreenIntent +
+  // long vibration pattern, Importance.max so it always rings through.
+  static const _callsChannelId = 'mensaena_calls';
+  static const _callsChannelName = 'Eingehende Anrufe';
+  static const _callsChannelDescription =
+      'Hochprioritaere Push fuer eingehende DM-Anrufe';
 
   static final _localNotifications =
       FlutterLocalNotificationsPlugin();
@@ -78,10 +86,23 @@ class PushNotificationService {
         playSound: true,
         enableVibration: true,
       );
-      await _localNotifications
+      // Calls-Channel — max importance, fullScreenIntent kompatibel,
+      // langes vibrationPattern damit es nicht uebersehen wird.
+      final callsChannel = AndroidNotificationChannel(
+        _callsChannelId,
+        _callsChannelName,
+        description: _callsChannelDescription,
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern:
+            Int64List.fromList(<int>[0, 1000, 500, 1000, 500, 1000]),
+      );
+      final androidPlugin = _localNotifications
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(androidChannel);
+              AndroidFlutterLocalNotificationsPlugin>();
+      await androidPlugin?.createNotificationChannel(androidChannel);
+      await androidPlugin?.createNotificationChannel(callsChannel);
 
       // Foreground-Listener — zeigt LOCAL Notification (falls keine UI sichtbar)
       // ZUSAETZLICH zum FcmForegroundListener-Widget (das Toasts zeigt).
@@ -229,46 +250,101 @@ class PushNotificationService {
 /// Wird in main.dart via FirebaseMessaging.onBackgroundMessage() registriert.
 @pragma('vm:entry-point')
 Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
-  // Wenn FCM-Payload `notification` enthaelt, zeigt Android System bereits
-  // automatisch die System-Notification — wir duerfen KEINE duplicate
-  // Local-Notification bauen (sonst sieht der User zwei Notifications,
-  // eine mit "Mensaena" Fallback).
-  // Nur bei DATA-ONLY Pushes (z.B. incoming_call) muessen wir selbst
-  // sichtbar machen.
-  final isDataOnly = m.notification == null;
-  if (!isDataOnly) {
-    return; // Android System hat schon Notification gerendert
-  }
+  final isCall = m.data['type'] == 'incoming_call';
+
+  // For non-call messages with notification field: Android renders the
+  // system notification itself — return to avoid duplicate.
+  if (!isCall && m.notification != null) return;
+
   try {
     await Firebase.initializeApp();
-    final title = (m.data['title'] as String?);
-    final body = (m.data['body'] as String?);
-    if (title == null && body == null) return;
-
     final plugin = FlutterLocalNotificationsPlugin();
     const androidInit =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     await plugin.initialize(
         const InitializationSettings(android: androidInit));
 
-    const androidChannel = AndroidNotificationChannel(
+    final androidPlugin = plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    if (isCall) {
+      // ── Incoming Call ─────────────────────────────────────────
+      // Separate channel with Importance.max + fullScreenIntent so the
+      // device shows the call UI on top of the lock-screen, even when
+      // the app is killed. 45s timeout = LiveKit room expiry default.
+      final callsChannel = AndroidNotificationChannel(
+        'mensaena_calls',
+        'Eingehende Anrufe',
+        description: 'Hochprioritaere Push fuer eingehende DM-Anrufe',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        vibrationPattern:
+            Int64List.fromList(<int>[0, 1000, 500, 1000, 500, 1000]),
+      );
+      await androidPlugin?.createNotificationChannel(callsChannel);
+
+      final callerName =
+          (m.data['caller_name'] as String?) ?? 'Nachbar:in';
+      final callId = (m.data['call_id'] as String?) ?? '';
+      final roomName = (m.data['room_name'] as String?) ?? '';
+      final peerEnc = Uri.encodeComponent(callerName);
+      final roomEnc = Uri.encodeComponent(roomName);
+      final deepLink = '/dashboard/call/$callId?room=$roomEnc&peer=$peerEnc';
+
+      final callDetails = AndroidNotificationDetails(
+        'mensaena_calls',
+        'Eingehende Anrufe',
+        channelDescription:
+            'Hochprioritaere Push fuer eingehende DM-Anrufe',
+        importance: Importance.max,
+        priority: Priority.max,
+        category: AndroidNotificationCategory.call,
+        fullScreenIntent: true,
+        playSound: true,
+        enableVibration: true,
+        ongoing: true,
+        autoCancel: false,
+        vibrationPattern:
+            Int64List.fromList(<int>[0, 1000, 500, 1000, 500, 1000]),
+        timeoutAfter: 45000,
+        icon: '@mipmap/ic_launcher',
+        visibility: NotificationVisibility.public,
+      );
+
+      await plugin.show(
+        callId.hashCode == 0
+            ? DateTime.now().millisecondsSinceEpoch
+            : callId.hashCode,
+        '$callerName ruft an',
+        'Tippe um anzunehmen',
+        NotificationDetails(android: callDetails),
+        payload: deepLink,
+      );
+      return;
+    }
+
+    // ── Regular (non-call) data-only message ─────────────────────
+    final title = (m.data['title'] as String?);
+    final body = (m.data['body'] as String?);
+    if (title == null && body == null) return;
+
+    const defaultChannel = AndroidNotificationChannel(
       'mensaena_default',
       'Mensaena Benachrichtigungen',
-      description: 'Nachrichten, Anrufe, Matches und Krisen-Warnungen',
+      description: 'Nachrichten, Matches und allgemeine Benachrichtigungen',
       importance: Importance.high,
       playSound: true,
       enableVibration: true,
     );
-    await plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(androidChannel);
+    await androidPlugin?.createNotificationChannel(defaultChannel);
 
-    const androidDetails = AndroidNotificationDetails(
+    const defaultDetails = AndroidNotificationDetails(
       'mensaena_default',
       'Mensaena Benachrichtigungen',
       channelDescription:
-          'Nachrichten, Anrufe, Matches und Krisen-Warnungen',
+          'Nachrichten, Matches und allgemeine Benachrichtigungen',
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
@@ -279,7 +355,7 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
       m.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch,
       title ?? 'Mensaena',
       body ?? '',
-      const NotificationDetails(android: androidDetails),
+      const NotificationDetails(android: defaultDetails),
       payload: m.data['url'] as String?,
     );
   } catch (_) {

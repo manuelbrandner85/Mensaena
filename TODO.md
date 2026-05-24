@@ -5,10 +5,10 @@
 
 ## CACHE
 OPEN=Frei für Polish + neue Web-Features
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-6 ✅ KOMPLETT
-NEXT=Frei — Hauptpfad fertig, freier User-Wunsch (z.B. Voice-Recorder-iOS-Pendant, weitere Trust-Profile-Anzeige im fremden Profil, Marketplace-Detail-Polish)
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 ✅ KOMPLETT (Calls/Livestream production-ready)
+NEXT=Frei
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(livekit): LIVEKIT_SELF_KEY in private.push_config gesetzt — Phase 6 KOMPLETT
+LAST_TASK=feat(calls): production-ready IncomingCallListener + notify-call Edge Function + DB-Webhook + Android USE_FULL_SCREEN_INTENT
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

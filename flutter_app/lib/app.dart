@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
+import 'widgets/shared/incoming_call_listener.dart';
 import 'widgets/shared/update_gate.dart';
 
 /// SKILL: mensaena-architektur
@@ -42,8 +43,12 @@ class MensaenaApp extends ConsumerWidget {
       locale: const Locale('de', 'DE'),
       // UpdateGate wickelt jede Seite — bei mandatory Update wird ALLES
       // blockiert bis APK heruntergeladen ist.
+      // IncomingCallListener wickelt das Navigator-Child damit eingehende
+      // DM-Calls als Fullscreen-Dialog ueberall sichtbar werden.
       builder: (context, navChild) => UpdateGate(
-        child: navChild ?? const SizedBox.shrink(),
+        child: IncomingCallListener(
+          child: navChild ?? const SizedBox.shrink(),
+        ),
       ),
     );
   }
