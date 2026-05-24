@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -108,14 +109,14 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                                       TextButton(
                                           onPressed: () => Navigator.pop(
                                               context, false),
-                                          child: const Text('Abbrechen')),
+                                          child: Text('common.cancel'.tr())),
                                       FilledButton(
                                         style: FilledButton.styleFrom(
                                             backgroundColor:
                                                 AppColors.herzrot),
                                         onPressed: () => Navigator.pop(
                                             context, true),
-                                        child: const Text('Löschen'),
+                                        child: Text('common.delete'.tr()),
                                       ),
                                     ],
                                   ),
@@ -410,7 +411,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                           color: AppColors.voidColor,
                         ),
                       )
-                    : const Text('Speichern'),
+                    : Text('common.save'.tr()),
               ),
             ],
           ),

@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../widgets/navigation/language_picker.dart';
 
 class UnsubscribeScreen extends StatefulWidget {
   const UnsubscribeScreen({super.key, this.token});
@@ -96,6 +97,7 @@ class _UnsubscribeScreenState extends State<UnsubscribeScreen> {
         ),
         title: Text('Abmeldung',
             style: AppTypography.display(size: 18, color: AppColors.ink)),
+        actions: const [LanguagePicker(), SizedBox(width: 4)],
       ),
       body: SafeArea(
         child: Center(

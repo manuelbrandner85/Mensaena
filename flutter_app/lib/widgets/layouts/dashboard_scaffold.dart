@@ -14,6 +14,7 @@ import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
+import '../navigation/language_picker.dart';
 import '../shared/fcm_foreground_listener.dart';
 import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
@@ -97,6 +98,7 @@ class DashboardScaffold extends ConsumerWidget {
       appBar: AppBar(
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
+          const LanguagePicker(),
           NotificationBell(unreadCount: unread),
           const SizedBox(width: 4),
         ],

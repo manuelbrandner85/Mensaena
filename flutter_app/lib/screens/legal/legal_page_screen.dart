@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../widgets/navigation/language_picker.dart';
 import 'legal_content.dart';
 
 class LegalPageScreen extends StatelessWidget {
@@ -43,6 +44,7 @@ class LegalPageScreen extends StatelessWidget {
           title,
           style: AppTypography.display(size: 18, color: AppColors.ink),
         ),
+        actions: const [LanguagePicker(), SizedBox(width: 4)],
       ),
       body: SafeArea(
         child: Markdown(
@@ -127,6 +129,7 @@ class SpendenScreen extends StatelessWidget {
         ),
         title: Text('Spenden',
             style: AppTypography.display(size: 18, color: AppColors.ink)),
+        actions: const [LanguagePicker(), SizedBox(width: 4)],
       ),
       body: SafeArea(
         child: ListView(

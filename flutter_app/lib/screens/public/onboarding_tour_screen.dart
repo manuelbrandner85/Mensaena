@@ -16,6 +16,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/haptics.dart';
 import '../../widgets/effects/bloom.dart';
+import '../../widgets/navigation/language_picker.dart';
 
 const _onboardingShownKey = 'onboarding_tour_v1_shown';
 const _storage = FlutterSecureStorage();
@@ -148,6 +149,11 @@ class _OnboardingTourScreenState
               itemBuilder: (_, i) => _TourCard(step: _steps[i]),
             ),
             // Top-Right Skip
+            const Positioned(
+              top: 12,
+              left: 12,
+              child: LanguagePicker(),
+            ),
             Positioned(
               top: 16,
               right: 16,

@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart'
     show AuthChangeEvent, AuthState, UserAttributes;
 
 import '../../config/theme/app_colors.dart';
+import '../../widgets/navigation/language_picker.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 
@@ -328,6 +329,12 @@ class _AuthScreenState extends State<AuthScreen>
       backgroundColor: AppColors.voidColor,
       body: Stack(
         children: [
+          // Language-Picker top-right
+          const Positioned(
+            top: 12,
+            right: 12,
+            child: SafeArea(child: LanguagePicker()),
+          ),
           // Hero-Orb 1 (Bronze, top-left)
           const _HeroOrb(
             color: AppColors.bronze,

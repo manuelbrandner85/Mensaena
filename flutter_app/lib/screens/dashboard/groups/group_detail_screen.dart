@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -295,7 +296,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
             TextButton(
               onPressed:
                   sending ? null : () => Navigator.pop(dlg),
-              child: const Text('Abbrechen'),
+              child: Text('common.cancel'.tr()),
             ),
             FilledButton(
               style: FilledButton.styleFrom(

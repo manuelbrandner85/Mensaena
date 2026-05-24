@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Cinema v3 (Readability-First) live. Atmosphäre nur Hintergrund, Buttons adaptiv phase-tinted. 4 neue atmosphärische Layer.
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal v3 + i18n W1-W2 ✅
-NEXT=i18n weitere Screens iterativ
+OPEN=Sprach-Picker im Header jedes Screens + Auto-Default. Bulk-Translation iterativ weiter.
+COUNT=200+ Web | Flutter: Phase 1-7 + Parität W1-W2 + Cinema v3 + i18n W3 ✅
+NEXT=Restliche Screen-Strings auf .tr() umstellen (CLAUDE.md-Pflicht)
 LAST_SESSION=2026-05-24
-LAST_TASK=refactor(cinema-v3): Tint-Layer komplett aus Content-Stack entfernt (war Lesbarkeit-Killer). Alle atmosphärischen Layer rein hinter Content. Neu: Starfield (Nacht), GroundFog (Dawn/Dusk/Evening), GodRays (Day-Phasen, volumetrisch vom Sky-Body), DustParticles (Dusk/Evening), AtmosphericHaze (Tiefen-Eindruck). CinemaAccents-Helper: Buttons/Cards greifen aktiv die Phase ab (tinted-Bronze/Amber statt überlagertem Tint). Vignette nur Eck-Falloff, Chromatic-Aberration nur Edge-Pixel. Tint-Opacity aller 6 Phasen auf 0.0.
+LAST_TASK=feat(i18n-w3): Auto-by-Standort ist neuer DEFAULT (Erstlauncher detectet automatisch + Device-Locale-Fallback), LanguagePicker-Widget (Flag + Auto-Indicator + Bottom-Sheet) in jedem Screen-Header (DashboardScaffold, LegalPage, SpendenScreen, UnsubscribeScreen, OnboardingTour, AuthScreen). Bulk-Patch der Common-Buttons (Abbrechen/Speichern/Löschen/Senden/Weiter/Schließen/Bestätigen/OK) in 10 High-Traffic-Screens.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

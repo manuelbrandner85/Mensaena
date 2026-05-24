@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -261,7 +262,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(ctx).pop(false),
-                    child: const Text('Abbrechen'),
+                    child: Text('common.cancel'.tr()),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -272,7 +273,7 @@ class CrisisDetailScreen extends ConsumerWidget {
                       foregroundColor: AppColors.ink,
                     ),
                     onPressed: () => Navigator.of(ctx).pop(true),
-                    child: const Text('Bestätigen'),
+                    child: Text('common.confirm'.tr()),
                   ),
                 ),
               ],

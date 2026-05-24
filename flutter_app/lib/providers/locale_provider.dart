@@ -73,7 +73,9 @@ class LocaleState {
 class LocaleNotifier extends StateNotifier<LocaleState> {
   LocaleNotifier()
       : super(const LocaleState(
-          mode: LocaleMode.manual,
+          // Default: Auto — Sprache nach Standort. User kann später manuell
+          // wechseln. Bevor GPS-Detect läuft → Device-Locale als Fallback.
+          mode: LocaleMode.auto,
           activeLocale: kFallbackLocale,
         )) {
     _load();
@@ -81,19 +83,39 @@ class LocaleNotifier extends StateNotifier<LocaleState> {
 
   Future<void> _load() async {
     try {
-      final mode = LocaleModeX.fromKey(await _storage.read(key: _modeKey));
+      final storedMode = await _storage.read(key: _modeKey);
+      // Erster Launch (kein gespeicherter Mode) → Auto + Device-Locale.
+      final isFirstLaunch = storedMode == null;
+      final mode = isFirstLaunch
+          ? LocaleMode.auto
+          : LocaleModeX.fromKey(storedMode);
       final manualLang =
           await _storage.read(key: _manualLangKey) ?? 'de';
       final manualLocale = _localeForCode(manualLang);
-      state = LocaleState(
-        mode: mode,
-        activeLocale: manualLocale,
-      );
-      // Bei Auto: GPS-Detect im Hintergrund auslösen.
+
       if (mode == LocaleMode.auto) {
+        // Sofort als Fallback Device-Locale nehmen, dann GPS-Detect.
+        final deviceLocale = _deviceLocaleOrFallback();
+        state = LocaleState(
+          mode: LocaleMode.auto,
+          activeLocale: deviceLocale,
+        );
         await _runDetect(applyToActive: true);
+      } else {
+        state = LocaleState(
+          mode: LocaleMode.manual,
+          activeLocale: manualLocale,
+        );
       }
     } catch (_) {/* default state ok */}
+  }
+
+  Locale _deviceLocaleOrFallback() {
+    final sys = WidgetsBinding.instance.platformDispatcher.locale;
+    for (final s in kSupportedLocales) {
+      if (s.languageCode == sys.languageCode) return s;
+    }
+    return kFallbackLocale;
   }
 
   /// User wählt manuell eine Sprache.
