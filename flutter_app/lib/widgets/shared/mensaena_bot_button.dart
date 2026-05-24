@@ -7,6 +7,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/bot_service.dart';
+import '../../services/haptics.dart';
+import '../effects/bloom.dart';
+import '../effects/glass_card.dart';
 
 /// SKILL: mensaena-design
 /// 1:1-Pendant zu `src/components/bot/MensaenaBot.tsx` —
@@ -38,9 +41,11 @@ class _MensaenaBotButtonState extends State<MensaenaBotButton>
   }
 
   void _openChat(BuildContext context) {
+    Haptics.tap();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const _BotChatSheet(),
     );
@@ -134,14 +139,19 @@ class _BotChatSheet extends ConsumerStatefulWidget {
 class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
   final _ctrl = TextEditingController();
   final _scrollCtrl = ScrollController();
-  final List<BotMessage> _messages = [
-    const BotMessage(
-      role: 'assistant',
-      content:
-          'Hallo! 👋 Ich bin der Mensaena-Bot. Wie kann ich helfen? Frag mich nach Modulen, Hilfe, Funktionen — oder sag mir, was du suchst.',
-    ),
-  ];
+  late final List<BotMessage> _messages;
   bool _sending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _messages = [
+      BotMessage(
+        role: 'assistant',
+        content: 'bot.welcomeMessage'.tr(),
+      ),
+    ];
+  }
 
   @override
   void dispose() {
@@ -150,9 +160,10 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
     super.dispose();
   }
 
-  Future<void> _send() async {
-    final text = _ctrl.text.trim();
+  Future<void> _send([String? overrideText]) async {
+    final text = (overrideText ?? _ctrl.text).trim();
     if (text.isEmpty || _sending) return;
+    Haptics.tap();
     setState(() {
       _messages.add(BotMessage(role: 'user', content: text));
       _messages.add(const BotMessage(role: 'assistant', content: ''));
@@ -180,14 +191,36 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
     final last = _messages.last;
     if (last.content.isEmpty) {
       setState(() {
-        _messages[_messages.length - 1] = const BotMessage(
+        _messages[_messages.length - 1] = BotMessage(
           role: 'assistant',
-          content:
-              'Hm, das hat nicht geklappt. Versuch es bitte später noch einmal — oder schau in den Einstellungen nach.',
+          content: _mockReply(text),
         );
       });
     }
     setState(() => _sending = false);
+  }
+
+  /// Lokales Mock-Fallback, falls Backend nicht antwortet — Keyword-basiert.
+  String _mockReply(String userText) {
+    final t = userText.toLowerCase();
+    if (t.contains('karte') || t.contains('map')) {
+      return 'Tipp: Über die Karte siehst du Hilfe-Angebote und -Gesuche '
+          'in deiner Nachbarschaft. Tipp auf einen Marker für Details.';
+    }
+    if (t.contains('hilfe')) {
+      return 'Du kannst Hilfe anbieten oder eine Bitte erstellen — '
+          'einfach unten Mitte auf „Erstellen" tippen.';
+    }
+    if (t.contains('profil')) {
+      return 'Dein Profil findest du im Menü unter „Profil". Dort kannst '
+          'du Avatar, Bio und Skills bearbeiten.';
+    }
+    if (t.contains('krise') || t.contains('notfall')) {
+      return 'Für Krisen / Notfälle gibt es das Crisis-Modul — schnell '
+          'erreichbar über die Notruf-Schaltfläche.';
+    }
+    return 'Hm, das hat nicht geklappt. Versuch es bitte später noch '
+        'einmal — oder schau in den Einstellungen nach.';
   }
 
   void _scrollToBottom() {
@@ -202,6 +235,12 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
     });
   }
 
+  void _navigate(String path) {
+    Haptics.tap();
+    Navigator.of(context).pop();
+    context.go(path);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -209,9 +248,9 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: DraggableScrollableSheet(
-        initialChildSize: 0.85,
+        initialChildSize: 0.80,
         minChildSize: 0.5,
-        maxChildSize: 0.95,
+        maxChildSize: 0.80,
         expand: false,
         builder: (_, scrollCtrl) {
           return Container(
@@ -237,49 +276,70 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Container(
-                        width: 38,
-                        height: 38,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.bronze,
-                              AppColors.bronzeSoft,
-                            ],
+                      // Bot-Avatar mit Bloom
+                      Bloom(
+                        color: AppColors.bronze,
+                        radius: 14,
+                        intensity: 0.4,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.bronze,
+                                AppColors.bronzeSoft,
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
                           ),
-                          shape: BoxShape.circle,
+                          child: const Icon(
+                            LucideIcons.bot,
+                            size: 20,
+                            color: AppColors.voidColor,
+                          ),
                         ),
-                        child: const Icon(LucideIcons.sparkles,
-                            size: 18,
-                            color: AppColors.voidColor),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
                           children: [
-                            Text('bot.name'.tr(),
-                                style: AppTypography.display(
-                                    size: 18,
-                                    color: AppColors.ink)),
+                            Text(
+                              'bot.title'.tr(),
+                              style: AppTypography.display(
+                                  size: 18, color: AppColors.ink),
+                            ),
+                            const SizedBox(height: 2),
                             Row(
                               children: [
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.leben,
-                                    shape: BoxShape.circle,
+                                // Online-Dot mit subtle Bloom
+                                Bloom(
+                                  color: AppColors.leben,
+                                  radius: 6,
+                                  intensity: 0.6,
+                                  child: Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.leben,
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(width: 5),
-                                Text('common.online'.tr(),
-                                    style: AppTypography.label(
-                                        size: 9,
-                                        color:
-                                            AppColors.lebenSoft)),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _sending
+                                      ? 'bot.typing'.tr()
+                                      : 'common.online'.tr(),
+                                  style: AppTypography.label(
+                                      size: 10,
+                                      color: AppColors.lebenSoft),
+                                ),
                               ],
                             ),
                           ],
@@ -288,7 +348,10 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                       IconButton(
                         icon: const Icon(LucideIcons.x,
                             size: 18, color: AppColors.mute),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          Haptics.tap();
+                          Navigator.pop(context);
+                        },
                       ),
                     ],
                   ),
@@ -306,47 +369,39 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                         _MessageBubble(message: _messages[i]),
                   ),
                 ),
-                // Quick Prompts
+                // Quick Suggestions — horizontal scrollable Chips
                 if (_messages.length <= 1) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 4),
-                    child: Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                  SizedBox(
+                    height: 40,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       children: [
-                        for (final p in const [
-                          'Was kann ich hier?',
-                          'Hilfe melden',
-                          'Wie funktioniert Matching?',
-                          'Krise melden',
-                        ])
-                          GestureDetector(
-                            onTap: () {
-                              _ctrl.text = p;
-                              _send();
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.bronze
-                                    .withValues(alpha: 0.10),
-                                border: Border.all(
-                                    color: AppColors.bronze
-                                        .withValues(alpha: 0.3)),
-                                borderRadius:
-                                    BorderRadius.circular(999),
-                              ),
-                              child: Text(p,
-                                  style: AppTypography.label(
-                                      size: 10,
-                                      color: AppColors.bronze)),
-                            ),
-                          ),
+                        _SuggestionChip(
+                          icon: LucideIcons.map,
+                          label: 'bot.suggestionMap'.tr(),
+                          onTap: () => _navigate('/dashboard/map'),
+                        ),
+                        _SuggestionChip(
+                          icon: LucideIcons.heartHandshake,
+                          label: 'bot.suggestionHelp'.tr(),
+                          onTap: () => _navigate(
+                              '/dashboard/create?type=help_offered'),
+                        ),
+                        _SuggestionChip(
+                          icon: LucideIcons.user,
+                          label: 'bot.suggestionProfile'.tr(),
+                          onTap: () => _navigate('/dashboard/profile/edit'),
+                        ),
+                        _SuggestionChip(
+                          icon: LucideIcons.alertTriangle,
+                          label: 'bot.suggestionCrisis'.tr(),
+                          onTap: () => _navigate('/dashboard/crisis/create'),
+                        ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 4),
                 ],
                 // Input
                 Container(
@@ -375,7 +430,7 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                             isDense: true,
                             filled: true,
                             fillColor: AppColors.elevated,
-                            hintText: 'bot.askMeHint'.tr(),
+                            hintText: 'bot.hint'.tr(),
                             hintStyle: AppTypography.body(
                                 size: 13,
                                 color: AppColors.mute),
@@ -396,7 +451,7 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                         shape: const CircleBorder(),
                         child: InkWell(
                           customBorder: const CircleBorder(),
-                          onTap: _sending ? null : _send,
+                          onTap: _sending ? null : () => _send(),
                           child: Container(
                             width: 40,
                             height: 40,
@@ -429,6 +484,124 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Suggestion-Chip — horizontal scrollende Quick-Prompts
+// ─────────────────────────────────────────────────────────────
+class _SuggestionChip extends StatelessWidget {
+  const _SuggestionChip({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.bronze.withValues(alpha: 0.10),
+              border: Border.all(
+                  color: AppColors.bronze.withValues(alpha: 0.35)),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 12, color: AppColors.bronze),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: AppTypography.label(
+                      size: 11, color: AppColors.bronze),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Bot-Typing-Dots — 3 sequenziell pulsierende Bronze-Dots (1200ms)
+// ─────────────────────────────────────────────────────────────
+class _BotTypingDots extends StatefulWidget {
+  const _BotTypingDots();
+
+  @override
+  State<_BotTypingDots> createState() => _BotTypingDotsState();
+}
+
+class _BotTypingDotsState extends State<_BotTypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 12,
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(3, (i) {
+              // Phase je Dot um 0.33 versetzt
+              final phase = (_ctrl.value + i * 0.33) % 1.0;
+              // Pulse-Kurve: 0 → 1 → 0 über die Phase
+              final t = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+              final scale = 0.6 + t * 0.6;
+              final alpha = 0.35 + t * 0.55;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Transform.scale(
+                  scale: scale,
+                  child: Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: AppColors.bronze.withValues(alpha: alpha),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _MessageBubble extends StatelessWidget {
   const _MessageBubble({required this.message});
   final BotMessage message;
@@ -436,57 +609,63 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mine = message.role == 'user';
+    final maxWidth = MediaQuery.of(context).size.width * 0.75;
+
+    // Bot-Bubble = GlassCard.subtle für cinematic Feel
+    if (!mine) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: GlassCard.subtle(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 12, vertical: 10),
+            borderRadius: 14,
+            phaseTinted: false,
+            child: message.content.isEmpty
+                ? const _BotTypingDots()
+                : Text(
+                    message.content,
+                    style: AppTypography.body(
+                      size: 14,
+                      color: AppColors.ink,
+                      height: 1.45,
+                    ),
+                  ),
+          ),
+        ),
+      );
+    }
+
+    // User-Bubble = Bronze-Tinted (passt zum Mensaena-Bronze-Theme)
     return Align(
-      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: Alignment.centerRight,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
+        constraints: BoxConstraints(maxWidth: maxWidth),
         decoration: BoxDecoration(
-          color: mine
-              ? AppColors.bronze.withValues(alpha: 0.18)
-              : AppColors.elevated,
+          color: AppColors.bronze.withValues(alpha: 0.20),
           border: Border.all(
-            color: mine
-                ? AppColors.bronze.withValues(alpha: 0.4)
-                : Colors.white.withValues(alpha: 0.05),
+            color: AppColors.bronze.withValues(alpha: 0.45),
           ),
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(14),
-            topRight: const Radius.circular(14),
-            bottomLeft: Radius.circular(mine ? 14 : 4),
-            bottomRight: Radius.circular(mine ? 4 : 14),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(14),
+            topRight: Radius.circular(14),
+            bottomLeft: Radius.circular(14),
+            bottomRight: Radius.circular(4),
           ),
         ),
-        child: message.content.isEmpty
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(
-                  3,
-                  (i) => AnimatedContainer(
-                    duration: Duration(milliseconds: 400 + i * 100),
-                    width: 6,
-                    height: 6,
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: const BoxDecoration(
-                      color: AppColors.bronze,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              )
-            : Text(
-                message.content,
-                style: AppTypography.body(
-                  size: 14,
-                  color: AppColors.ink,
-                  height: 1.45,
-                ),
-              ),
+        child: Text(
+          message.content,
+          style: AppTypography.body(
+            size: 14,
+            color: AppColors.ink,
+            height: 1.45,
+          ),
+        ),
       ),
     );
   }

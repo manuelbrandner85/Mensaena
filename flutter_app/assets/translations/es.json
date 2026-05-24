@@ -1094,8 +1094,16 @@
   },
   "bot": {
     "name": "Bot de Mensaena",
+    "title": "MensaenaBot",
     "online": "En línea",
-    "askMeHint": "Pregúntame algo…"
+    "askMeHint": "Pregúntame algo…",
+    "hint": "¿Cómo puedo ayudarte?",
+    "typing": "escribiendo …",
+    "welcomeMessage": "¡Hola! Soy tu asistente Mensaena. Pídeme ayuda, consejos o navegación.",
+    "suggestionMap": "Abrir mapa",
+    "suggestionHelp": "Ofrecer ayuda",
+    "suggestionProfile": "Editar perfil",
+    "suggestionCrisis": "Reportar crisis"
   },
   "update": {
     "whatsNew": "Novedades"

@@ -1094,8 +1094,16 @@
   },
   "bot": {
     "name": "Mensaena-бот",
+    "title": "MensaenaBot",
     "online": "В сети",
-    "askMeHint": "Спроси меня…"
+    "askMeHint": "Спроси меня…",
+    "hint": "Чем могу помочь?",
+    "typing": "печатает …",
+    "welcomeMessage": "Привет! Я твой помощник Mensaena. Спроси меня о помощи, советах или навигации.",
+    "suggestionMap": "Открыть карту",
+    "suggestionHelp": "Предложить помощь",
+    "suggestionProfile": "Изменить профиль",
+    "suggestionCrisis": "Сообщить о кризисе"
   },
   "update": {
     "whatsNew": "Что нового"

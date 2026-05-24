@@ -1094,8 +1094,16 @@
   },
   "bot": {
     "name": "Mensaena Bot",
+    "title": "MensaenaBot",
     "online": "Çevrimiçi",
-    "askMeHint": "Bana bir şey sor…"
+    "askMeHint": "Bana bir şey sor…",
+    "hint": "Sana nasıl yardımcı olabilirim?",
+    "typing": "yazıyor …",
+    "welcomeMessage": "Merhaba! Ben senin Mensaena asistanınım. Yardım, ipucu veya yönlendirme iste.",
+    "suggestionMap": "Haritayı aç",
+    "suggestionHelp": "Yardım sun",
+    "suggestionProfile": "Profili düzenle",
+    "suggestionCrisis": "Kriz bildir"
   },
   "update": {
     "whatsNew": "Yenilikler"
