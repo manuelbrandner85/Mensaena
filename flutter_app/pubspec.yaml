@@ -34,8 +34,10 @@ dependencies:
   permission_handler: ^11.3.0
 
   # Voice-Messages — 1:1 zu Web VoiceRecorder.tsx
-  # record: Audio aufnehmen (AAC m4a), audioplayers: Wiedergabe in Chat-Bubble
-  record: ^5.1.2
+  # record: Audio aufnehmen (AAC m4a), audioplayers: Wiedergabe in Chat-Bubble.
+  # Pinned auf 5.0.5: 5.1+ pulls broken record_linux 0.7.2 mit fehlendem
+  # startStream-Override, das Android-Build laesst sich nicht kompilieren.
+  record: 5.0.5
   audioplayers: ^6.0.0
 
   # Push Notifications
@@ -92,6 +94,13 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   mockito: ^5.4.4
   flutter_launcher_icons: ^0.14.1
+
+# record 5.x pulls record_linux 0.7.2 (Dart-Compile-Error: fehlende
+# startStream-Override). Force record_platform_interface zur Version die
+# record_linux 0.7.2 erwartet (Pre-1.6 ohne startStream). Android-Build
+# kompiliert nicht record_linux.dart sondern nur record_android — alles ok.
+dependency_overrides:
+  record_platform_interface: 1.1.0
 
 # Generiert die Android-Launcher-Icons aus assets/launcher/icon.png.
 # Aufruf in CI nach `flutter pub get`:

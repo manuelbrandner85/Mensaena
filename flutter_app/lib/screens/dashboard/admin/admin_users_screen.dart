@@ -6,6 +6,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/skeleton_card.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 
@@ -93,10 +94,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                   future: _future,
                   builder: (context, snap) {
                     if (snap.connectionState != ConnectionState.done) {
-                      return const Center(
-                        child:
-                            CircularProgressIndicator(color: AppColors.amber),
-                      );
+                      return const SkeletonList(count: 5, itemHeight: 96);
                     }
                     final rows = _apply(snap.data ?? const []);
                     if (rows.isEmpty) {

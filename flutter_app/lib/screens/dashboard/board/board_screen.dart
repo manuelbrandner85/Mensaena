@@ -11,6 +11,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/board_post.dart';
 import '../../../repositories/board_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/skeleton_card.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
@@ -138,10 +139,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                 backgroundColor: AppColors.surface,
                 onRefresh: () async => ref.invalidate(boardPostsProvider),
                 child: async.when(
-                  loading: () => const Center(
-                    child:
-                        CircularProgressIndicator(color: AppColors.amber),
-                  ),
+                  loading: () => const SkeletonList(count: 5, itemHeight: 96),
                   error: (e, _) => Center(
                       child: Text('$e', style: AppTypography.caption())),
                   data: (all) {

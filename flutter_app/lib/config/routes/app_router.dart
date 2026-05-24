@@ -13,6 +13,7 @@ import '../../screens/dashboard/admin/admin_users_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
+import '../../screens/dashboard/global_search_screen.dart';
 import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
@@ -123,7 +124,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       _placeholder('/nutzungsbedingungen', 'Nutzungsbedingungen'),
       _placeholder('/community-guidelines', 'Community-Guidelines'),
       _placeholder('/download', 'Download'),
-      _placeholder('/search', 'Suche'),
+      GoRoute(
+        path: '/search',
+        builder: (_, s) => GlobalSearchScreen(
+          initialQuery: s.uri.queryParameters['q'],
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/search',
+        builder: (_, s) => GlobalSearchScreen(
+          initialQuery: s.uri.queryParameters['q'],
+        ),
+      ),
       _placeholder('/unsubscribe', 'Abmeldung'),
       _placeholder('/live-ended', 'Session beendet'),
       _placeholder('/ratings', 'Bewertungen'),

@@ -8,6 +8,7 @@ import '../../../models/badge.dart';
 import '../../../models/user_badge.dart';
 import '../../../repositories/challenges_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
 /// Badges-Gallery — alle Badges der Plattform, eigene markiert.
@@ -32,9 +33,7 @@ class BadgesScreen extends ConsumerWidget {
             await ref.read(allBadgesProvider.future);
           },
           child: allAsync.when(
-            loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.amber),
-            ),
+            loading: () => const SkeletonList(count: 5, itemHeight: 96),
             error: (_, __) => _empty('Fehler beim Laden.'),
             data: (badges) {
               if (badges.isEmpty) {

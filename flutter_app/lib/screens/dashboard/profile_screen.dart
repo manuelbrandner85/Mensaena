@@ -9,6 +9,7 @@ import '../../models/post.dart';
 import '../../models/profile.dart';
 import '../../repositories/challenges_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../repositories/trust_ratings_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/post_card.dart';
@@ -661,7 +662,8 @@ class _Header extends StatelessWidget {
                   const SizedBox(height: 8),
                   _TrustBadge(
                       score: profile.trustScore,
-                      count: profile.trustScoreCount),
+                      count: profile.trustScoreCount,
+                      userId: profile.id),
                 ],
               ),
             ),
@@ -705,9 +707,14 @@ class _Header extends StatelessWidget {
 }
 
 class _TrustBadge extends StatelessWidget {
-  const _TrustBadge({required this.score, required this.count});
+  const _TrustBadge({
+    required this.score,
+    required this.count,
+    required this.userId,
+  });
   final int score;
   final int count;
+  final String userId;
 
   @override
   Widget build(BuildContext context) {
@@ -716,24 +723,199 @@ class _TrustBadge extends StatelessWidget {
         : score >= 3
             ? AppColors.amber
             : AppColors.mute;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.18),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-        borderRadius: BorderRadius.circular(999),
+    return InkWell(
+      onTap: () => _showBreakdown(context),
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.18),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.star, size: 12, color: color),
+            const SizedBox(width: 4),
+            Text(
+              'Trust $score · $count Bewertungen',
+              style: AppTypography.label(size: 10, color: color),
+            ),
+            const SizedBox(width: 4),
+            Icon(LucideIcons.info, size: 10, color: color),
+          ],
+        ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(LucideIcons.star, size: 12, color: color),
-          const SizedBox(width: 4),
-          Text(
-            'Trust $score · $count Bewertungen',
-            style: AppTypography.label(size: 10, color: color),
+    );
+  }
+
+  void _showBreakdown(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _TrustBreakdownSheet(userId: userId),
+    );
+  }
+}
+
+class _TrustBreakdownSheet extends StatefulWidget {
+  const _TrustBreakdownSheet({required this.userId});
+  final String userId;
+
+  @override
+  State<_TrustBreakdownSheet> createState() => _TrustBreakdownSheetState();
+}
+
+class _TrustBreakdownSheetState extends State<_TrustBreakdownSheet> {
+  Future<Map<String, dynamic>?>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = TrustRatingsRepository.getBreakdown(widget.userId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _future,
+      builder: (context, snap) {
+        final loading = snap.connectionState != ConnectionState.done;
+        final data = snap.data ?? const <String, dynamic>{};
+        final avg = (data['avg_score'] as num?)?.toDouble() ??
+            (data['average_score'] as num?)?.toDouble() ??
+            0;
+        final total = (data['total_ratings'] as int?) ?? 0;
+        final dist = data['score_distribution'] as Map<String, dynamic>?;
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  const Icon(LucideIcons.shieldCheck,
+                      size: 18, color: AppColors.trust),
+                  const SizedBox(width: 8),
+                  Text('Trust-Breakdown',
+                      style: AppTypography.display(
+                          size: 18, color: AppColors.ink)),
+                ],
+              ),
+              const SizedBox(height: 14),
+              if (loading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: CircularProgressIndicator(
+                        color: AppColors.amber),
+                  ),
+                )
+              else if (total == 0)
+                Text(
+                  'Noch keine Bewertungen für diesen Nutzer.',
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.mute),
+                )
+              else ...[
+                Row(
+                  children: [
+                    Text(
+                      avg.toStringAsFixed(1),
+                      style: AppTypography.display(
+                          size: 38, color: AppColors.amber),
+                    ),
+                    const SizedBox(width: 6),
+                    Text('/ 5',
+                        style: AppTypography.body(
+                            size: 14, color: AppColors.mute)),
+                    const SizedBox(width: 12),
+                    Text('aus $total Bewertungen',
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.inkSoft)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (dist != null)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [5, 4, 3, 2, 1].map((star) {
+                      final count = (dist['$star'] as int?) ?? 0;
+                      final pct = total > 0 ? count / total : 0.0;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              child: Row(
+                                children: [
+                                  Text('$star',
+                                      style: AppTypography.body(
+                                          size: 12,
+                                          color: AppColors.inkSoft)),
+                                  const SizedBox(width: 2),
+                                  const Icon(LucideIcons.star,
+                                      size: 10,
+                                      color: AppColors.amber),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: pct,
+                                  minHeight: 6,
+                                  backgroundColor: AppColors.elevated,
+                                  valueColor:
+                                      const AlwaysStoppedAnimation(
+                                          AppColors.amber),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 32,
+                              child: Text('$count',
+                                  textAlign: TextAlign.end,
+                                  style: AppTypography.mono(
+                                      size: 11,
+                                      color: AppColors.mute)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                const SizedBox(height: 16),
+                Text(
+                  'Trust-Score wird automatisch berechnet aus allen abgeschlossenen Interaktionen.',
+                  style: AppTypography.body(
+                      size: 11, color: AppColors.mute, height: 1.4),
+                ),
+              ],
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

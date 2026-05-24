@@ -9,6 +9,7 @@ import '../../models/timebank_entry.dart';
 import '../../repositories/timebank_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
 /// Zeitbank-Screen: Stundenkonto + Eintraege-Historie + Bestaetigungs-System.
@@ -38,9 +39,7 @@ class TimebankScreen extends ConsumerWidget {
               Text('Historie', style: AppTypography.label(size: 10)),
               const SizedBox(height: 8),
               entries.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
-                ),
+                loading: () => const SkeletonList(count: 5, itemHeight: 96),
                 error: (e, _) => Text(
                   'Fehler: $e',
                   style: AppTypography.caption(),
@@ -103,9 +102,7 @@ class _BalanceCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: balance.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.amber),
-        ),
+        loading: () => const SkeletonList(count: 5, itemHeight: 96),
         error: (e, _) =>
             Text('$e', style: AppTypography.caption()),
         data: (b) => Column(
