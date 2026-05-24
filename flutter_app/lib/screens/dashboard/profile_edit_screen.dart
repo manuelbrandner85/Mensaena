@@ -11,6 +11,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/profile.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/avatar_generator_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -41,6 +42,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   final _homepageCtrl = TextEditingController();
 
   File? _newAvatar;
+  String? _generatedAvatarUrl;
 
   @override
   void initState() {
@@ -70,6 +72,23 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     _phoneCtrl.dispose();
     _homepageCtrl.dispose();
     super.dispose();
+  }
+
+  /// Generierten Avatar (DiceBear/Pollinations) als avatar_url direkt setzen
+  /// — kein Storage-Upload nötig, URLs sind permanent cached server-side.
+  Future<void> _useGeneratedAvatar(String url) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    setState(() {
+      _generatedAvatarUrl = url;
+      _newAvatar = null;
+    });
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text('Avatar gewählt — auf Speichern tippen zum Übernehmen.',
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
   }
 
   Future<void> _pickAvatar() async {
@@ -133,6 +152,9 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         return;
       }
       patch['avatar_url'] = url;
+    } else if (_generatedAvatarUrl != null) {
+      // DiceBear/Pollinations-URLs sind permanent — kein Storage-Upload.
+      patch['avatar_url'] = _generatedAvatarUrl;
     }
     try {
       await ProfilesRepository.update(uid, patch);
@@ -172,9 +194,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
             final p = _profile ?? snap.data;
             final avatarUrl = _newAvatar != null
                 ? null
-                : (p?.avatarUrl ?? '').isEmpty
-                    ? null
-                    : p!.avatarUrl;
+                : (_generatedAvatarUrl ??
+                    ((p?.avatarUrl ?? '').isEmpty ? null : p!.avatarUrl));
             return Form(
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -240,6 +261,43 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   child: Text('Tippe für neues Avatar',
                       style: AppTypography.label(
                           size: 10, color: AppColors.mute)),
+                ),
+                const SizedBox(height: 14),
+                // AI-Avatar + Identicon-Quick-Picks.
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _useGeneratedAvatar(
+                            AvatarGenerator.defaultFor(
+                                p?.id ?? _nameCtrl.text)),
+                        icon: const Icon(LucideIcons.shapes, size: 14),
+                        label: const Text('Identicon'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.tealSoft,
+                          side: BorderSide(
+                              color: AppColors.tealSoft
+                                  .withValues(alpha: 0.5)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _useGeneratedAvatar(
+                            AvatarGenerator.portraitFor(
+                                p?.id ?? _nameCtrl.text)),
+                        icon: const Icon(LucideIcons.sparkles, size: 14),
+                        label: const Text('AI-Avatar'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.amber,
+                          side: BorderSide(
+                              color:
+                                  AppColors.amber.withValues(alpha: 0.5)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 // Felder mit Validation

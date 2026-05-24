@@ -199,6 +199,11 @@
         "title": "Bildirimler",
         "subtitle": "Önemli hiçbir şeyi kaçırma.",
         "body": "Mesajlar, yardım talepleri, kriz uyarıları ve ağından gelen güncellemeler için push bildirimleri al."
+      },
+      "language": {
+        "title": "Dil",
+        "subtitle": "7 dil mevcut",
+        "body": "Mensaena 7 dil konuşuyor. Konuma göre otomatik algılama varsayılan olarak açık — her ekranın üstündeki bayrak düğmesinden istediğin zaman değiştirebilirsin."
       }
     }
   },

@@ -199,6 +199,11 @@
         "title": "Notifications",
         "subtitle": "Never miss anything important.",
         "body": "Receive push notifications for messages, helper requests, crisis alerts and updates from your network."
+      },
+      "language": {
+        "title": "Language",
+        "subtitle": "7 languages available",
+        "body": "Mensaena speaks 7 languages. Auto-detection by location is on by default — change anytime via the flag button at the top of every screen."
       }
     }
   },

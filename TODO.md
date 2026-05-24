@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Modul-Audit Sprint 1 live (Smart-Action-Sheet, OSM/NINA-Import, SOS-Banner). Sprint 2-4 ausstehend.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Push W1-W3 + Modul-Audit Sprint 1 ✅
-NEXT=Sprint 2 (Modul-Konsolidierungen B1+B2 + Barcode-Scan + Food Facts + Marketplace-Scan)
+OPEN=Modul-Audit Sprints 1+2+3+4 KOMPLETT (alle 30+ Vorschläge). Frei für nächste Aufgaben.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Push W1-W3 + Modul-Audit S1-S4 ✅
+NEXT=Frei (optional: weitere UX-Polish + ML-Kit-Translation als Sprint 5)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(modul-audit Sprint 1): A1 Smart-Action-Sheet ersetzt generischen Erstellen-Screen (8 Aktionen direkt zu Modul-Create-Flows), A2 BottomNav-FAB öffnet jetzt das Sheet. C3 Edge Function import-farms-overpass + cron Mo 04:00 UTC (OSM-POIs für Bauernhof/Hofladen/Imkerei/Käserei/Mühle in DACH-BBox, upsert via slug-unique). C4 Edge Function import-nina-warnings + cron */30min (DWD+MOWAS+KATWARN+BIWAPP). E3 _SosTopBanner auf Crisis-Dashboard: herzrot-Gradient mit Pulse-Shadow, 112-Notruf-Kreis, "Ich bin sicher"-Check-In schreibt in user_status.
+LAST_TASK=feat(modul-audit Sprint 2+3+4): B1 Wissen-Hub + B2 Teilen-Hub Launcher (Drawer 6 Items → 2), D1 mobile_scanner BarcodeScannerScreen, C6 OpenFoodFactsService + Marketplace-Create-Scan-Button, C2 HolidaysService date.nager.at, C5 JobsService Bundesagentur-API, D2 VoiceDictationButton speech_to_text im Chat, C8 WikipediaService REST-Summary, C9 LibreTranslateService (3-Mirror-Fallback), C10 AvatarGenerator (DiceBear + Pollinations.ai) + Profile-Edit-Buttons "Identicon" / "AI-Avatar". 6. Onboarding-Step "Sprache" mit allen 7 i18n-Übersetzungen. Add_2_calendar in pubspec für künftigen 1-Tap-Kalender-Add. Total: 7 neue Services, 4 neue Screens, 2 neue Hubs, 7 neue Packages, ~30 vorgeschlagene Items aus Modul-Audit umgesetzt.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos + Push W1-W3 + Modul-Audit Sprint 1 (Smart-Action-Sheet, OSM/NINA-Imports, SOS-Banner)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos + Push W1-W3 + Modul-Audit Sprints 1-4 KOMPLETT (Smart-Action-Sheet, OSM/NINA-Imports, SOS-Banner, Wissen+Teilen-Hubs, Barcode+Food-Facts, Holidays+Jobs+Wikipedia+LibreTranslate+DiceBear+Pollinations AI-Avatars, Voice-Diktat, Sprache-Onboarding)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

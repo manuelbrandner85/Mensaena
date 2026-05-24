@@ -199,6 +199,11 @@
         "title": "Notifiche",
         "subtitle": "Non perdere nulla di importante.",
         "body": "Ricevi notifiche push per messaggi, richieste di aiuto, allerte di crisi e aggiornamenti dalla tua rete."
+      },
+      "language": {
+        "title": "Lingua",
+        "subtitle": "7 lingue disponibili",
+        "body": "Mensaena parla 7 lingue. Il rilevamento automatico in base alla posizione è attivo di default — modificalo in qualsiasi momento tramite il pulsante bandiera in alto in ogni schermata."
       }
     }
   },

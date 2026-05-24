@@ -85,6 +85,13 @@ class _OnboardingTourScreenState
       bodyKey: 'onboarding.steps.notifications.body',
       color: AppColors.herzrotWarm,
     ),
+    _TourStep(
+      icon: LucideIcons.languages,
+      titleKey: 'onboarding.steps.language.title',
+      subtitleKey: 'onboarding.steps.language.subtitle',
+      bodyKey: 'onboarding.steps.language.body',
+      color: AppColors.tealSoft,
+    ),
   ];
 
   @override

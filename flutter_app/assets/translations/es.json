@@ -199,6 +199,11 @@
         "title": "Notificaciones",
         "subtitle": "No te pierdas nada importante.",
         "body": "Recibe notificaciones push de mensajes, solicitudes de ayuda, alertas de crisis y actualizaciones de tu red."
+      },
+      "language": {
+        "title": "Idioma",
+        "subtitle": "7 idiomas disponibles",
+        "body": "Mensaena habla 7 idiomas. La detección automática por ubicación está activada por defecto — cámbiala en cualquier momento mediante el botón de bandera en la parte superior de cada pantalla."
       }
     }
   },

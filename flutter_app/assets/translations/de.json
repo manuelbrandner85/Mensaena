@@ -199,6 +199,11 @@
         "title": "Benachrichtigungen",
         "subtitle": "Verpasse nichts Wichtiges.",
         "body": "Erhalte Push-Benachrichtigungen für Nachrichten, Helfer-Anfragen, Krisen-Warnungen und Updates aus deinem Netzwerk."
+      },
+      "language": {
+        "title": "Sprache",
+        "subtitle": "7 Sprachen verfügbar",
+        "body": "Mensaena spricht 7 Sprachen. Auto-Erkennung nach Standort ist standardmäßig an — ändere jederzeit über den Flag-Button oben in jedem Screen."
       }
     }
   },
