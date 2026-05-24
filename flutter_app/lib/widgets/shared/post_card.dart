@@ -10,6 +10,7 @@ import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
 import '../../repositories/content_reports_repository.dart';
+import 'image_carousel.dart';
 
 /// SKILL: mensaena-design + mensaena-features
 /// PostCard fuer Listen-Ansichten. Zeigt Typ-Badge, Titel,
@@ -308,6 +309,15 @@ class _PostCardState extends State<PostCard> {
                   color: AppColors.inkSoft,
                   height: 1.45,
                 ),
+              ),
+            ],
+            // Phase 5.6: Multi-Image-Carousel mit Indicator-Dots
+            if (post.allImageUrls.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              ImageCarousel(
+                urls: post.allImageUrls,
+                height: 180,
+                borderRadius: 10,
               ),
             ],
             if (post.locationText != null && post.locationText!.isNotEmpty) ...[

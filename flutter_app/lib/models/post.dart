@@ -26,6 +26,7 @@ class Post {
     this.availabilityEnd,
     this.reactionCount = 0,
     this.mediaUrls = const [],
+    this.imageUrls = const [],
     this.tags = const [],
     this.privacyPhone = false,
     this.privacyEmail = false,
@@ -58,6 +59,11 @@ class Post {
   final String? availabilityEnd;
   final int reactionCount;
   final List<String> mediaUrls;
+  final List<String> imageUrls;
+
+  /// All image-like URLs from both columns (image_urls + mediaUrls).
+  /// Used for carousel rendering.
+  List<String> get allImageUrls => [...imageUrls, ...mediaUrls];
   final List<String> tags;
   final bool privacyPhone;
   final bool privacyEmail;
@@ -98,6 +104,9 @@ class Post {
       likeCount: (j['like_count'] as num?)?.toInt(),
       commentCount: (j['comment_count'] as num?)?.toInt(),
       saveCount: (j['save_count'] as num?)?.toInt(),
+      imageUrls: (j['image_urls'] is List)
+          ? (j['image_urls'] as List).whereType<String>().toList()
+          : const [],
       mediaUrls: (j['media_urls'] is List)
           ? (j['media_urls'] as List).whereType<String>().toList()
           : const [],
@@ -133,6 +142,7 @@ class Post {
         'availability_start': availabilityStart,
         'availability_end': availabilityEnd,
         'reaction_count': reactionCount,
+        'image_urls': imageUrls,
         'media_urls': mediaUrls,
         'tags': tags,
         'privacy_phone': privacyPhone,

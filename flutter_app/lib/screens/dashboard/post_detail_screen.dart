@@ -12,6 +12,7 @@ import '../../repositories/posts_repository.dart';
 import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/image_carousel.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
 /// Post-Detail: Hero (Typ-Badge, Bilder, Titel, Beschreibung), Author,
@@ -353,37 +354,12 @@ class _Hero extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (post.mediaUrls.isNotEmpty) ...[
-          SizedBox(
-            height: 220,
-            child: PageView.builder(
-              itemCount: post.mediaUrls.length,
-              itemBuilder: (context, i) => ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Image.network(
-                  post.mediaUrls[i],
-                  fit: BoxFit.cover,
-                  loadingBuilder: (_, child, prog) {
-                    if (prog == null) return child;
-                    return Container(
-                      color: AppColors.surface,
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.amber,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (_, __, ___) => Container(
-                    color: AppColors.surface,
-                    child: const Icon(
-                      LucideIcons.imageOff,
-                      color: AppColors.mute,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        // Phase 5.6: shared ImageCarousel mit Indicator-Dots + Lightbox-Tap
+        if (post.allImageUrls.isNotEmpty) ...[
+          ImageCarousel(
+            urls: post.allImageUrls,
+            height: 240,
+            borderRadius: 14,
           ),
           const SizedBox(height: 14),
         ],

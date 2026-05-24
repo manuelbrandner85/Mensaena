@@ -33,6 +33,11 @@ dependencies:
   # Runtime-Permissions (Mic/Cam fuer Calls + Livestreams)
   permission_handler: ^11.3.0
 
+  # Voice-Messages — 1:1 zu Web VoiceRecorder.tsx
+  # record: Audio aufnehmen (AAC m4a), audioplayers: Wiedergabe in Chat-Bubble
+  record: ^5.1.2
+  audioplayers: ^6.0.0
+
   # Push Notifications
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3

@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Flutter Phase 5.2 (Voice-Recorder, neue Packages noetig) + 5.6 (Multi-Image-Carousel) + Phase 6 LiveKit-Setup
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-4 ✅, Wave 3 ✅, Phase 5.1/5.3/5.4/5.5/5.7 ✅
-NEXT=Flutter Phase 5.2 Voice-Recorder + Phase 5.6 Multi-Image-Carousel in PostCard
+OPEN=Phase 6 LiveKit-Secrets Setup (Hostinger KEY-Name fehlt) + freie Folge-Polish
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-5 ✅ (alle 7 Sub-Tasks)
+NEXT=User muss LIVEKIT_SELF_KEY in private.push_config setzen (siehe LIVEKIT_SETUP.md)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(flutter): Phase 5 — @-Mentions + In-Chat-Search + Trust-Rating-Modal + Account-Deletion/GDPR-Export + Comment-Reply-Nested
+LAST_TASK=feat(flutter): Phase 5 KOMPLETT — Voice-Recorder (5.2) + Multi-Image-Carousel (5.6)
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
@@ -47,11 +47,11 @@ LAST_TASK=feat(flutter): Phase 5 — @-Mentions + In-Chat-Search + Trust-Rating-
 - [x] Phase 4.5 – Chat-Pinned-Messages (2026-05-24): MessagesRepository.watchPinnedMessages + togglePin + listAnnouncements. _PinnedMessagesPanel als Stream-Widget oben im Channel. Pin-Action im Bubble-Long-Press-Sheet (nur Channels). 1:1 zu Web ChatView.tsx PinnedMessages.
 - [x] Phase 4.6 – Admin-Tabs Schema-Fix (R6) (2026-05-24): crisis_situations→crises, farm_listings.is_bio entfernt, contact_messages/bot_feedback/marketing_campaigns gegen organization_suggestions/bot_scheduled_messages/audit_logs ersetzt (echte Tabellen aus AI_CONTEXT §4). Admin-Dashboard-Tiles entsprechend updated.
 - [x] Phase 5.1 – Chat: @-Mention-Autocomplete (2026-05-24): _detectMention mit 150ms-Debounce, _loadMentionSuggestions via profiles.or(nickname/name/display_name.ilike), Dropdown-List ueber Composer mit Avatar+Name+@nick, _insertMention ersetzt @token im Cursor-Bereich
-- [ ] Phase 5.2 – Chat: Voice-Recorder (record + audioplayers Packages noetig — Begruendung in Commit)
+- [x] Phase 5.2 – Chat: Voice-Recorder (2026-05-24): record:^5.1.2 + audioplayers:^6.0.0 Packages (R7-Begruendung: 1:1 zu Web VoiceRecorder.tsx — keine Alternative); VoiceRecorderService (start/stop/cancel/upload/encode/decode); chat-voice-messages Storage-Bucket mit RLS (own-folder INSERT, public READ); VoiceMessageBubble mit Play/Pause + Pseudo-Waveform (16 vertical bars + Progress); _VoiceRecorderButton im Composer (Tap startet, Stop/Cancel waehrend Aufnahme); Message-Format `[VOICE:url:seconds]`
 - [x] Phase 5.3 – Chat: In-Chat-Search (2026-05-24): _ChatHeaderBar mit Search-Toggle, AnimatedSize slide-in TextField, lokaler msg.content.contains(query) Filter ueber Stream-Daten
 - [x] Phase 5.4 – Trust-Ratings-Flow (2026-05-24): TrustRatingsRepository.rate + myPendingToRate + getBreakdown; TrustRatingModal (5 Sterne + Kategorien-Chips + Comment + Helpful/Recommend-Toggles + Submit mit calculate_trust_score RPC); _RateButton in interactions_screen wenn status='completed' + partner not yet rated
 - [x] Phase 5.5 – Account-Deletion + Data-Export (2026-05-24): _DangerTab umgebaut zu StatefulWidget; _exportData parallel-fetch von profile/posts/comments/messages/interactions/trust_ratings/notifications/saved_posts/badges → JSON via Share.shareXFiles (DSGVO Art. 20); _deleteAccount 3-Stage-Flow (Warning → typed "LOESCHEN" → RPC delete_my_account mit Fallback auf is_banned/anonymize)
-- [ ] Phase 5.6 – Multi-Image-Carousel in PostCard + Post-Detail
+- [x] Phase 5.6 – Multi-Image-Carousel in PostCard + Post-Detail (2026-05-24): ImageCarousel-Widget (PageView + Index-Counter top-right + animated Indicator-Dots bottom + Tap-zur-Lightbox); Post-Model um imageUrls erweitert (image_urls[] Spalte) + allImageUrls Getter (image_urls + media_urls merged); PostCard zeigt Carousel zwischen Description und Action-Bar; Post-Detail Hero nutzt jetzt shared ImageCarousel statt eigenes PageView
 - [x] Phase 5.7 – Comments-Reply-Nested (2026-05-24): _buildCommentTree depth-1 (Roots + indented Replies via parent_id-Map); _CommentTile.onReply setzt _replyToParentId+_replyToAuthor; Reply-Banner ueber _CommentInput mit Author-Name + X zum Abbrechen; PostCommentsRepository.add nimmt parentId
 - [ ] Phase 6 – LiveKit-Secrets Setup (Hostinger livekit.yaml Key-Name fehlt noch in private.push_config)
 

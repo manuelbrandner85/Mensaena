@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 5: @-Mentions + In-Chat-Search + Trust-Rating-Modal + Account-Deletion/GDPR-Export + Comment-Reply-Nested
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 5 KOMPLETT: alle 7 Sub-Tasks (Voice-Recorder + Multi-Image-Carousel zusaetzlich)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -196,6 +196,8 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-05-24 | feat(flutter): Phase 5.6 Multi-Image-Carousel — ImageCarousel-Widget (PageView + Index-Counter + animated Indicator-Dots + Tap-zur-Lightbox); Post.imageUrls + allImageUrls Getter; PostCard zeigt Carousel zwischen Description und Action-Bar; Post-Detail Hero nutzt shared Widget | flutter_app/lib/widgets/shared/image_carousel.dart, flutter_app/lib/models/post.dart, flutter_app/lib/widgets/shared/post_card.dart, flutter_app/lib/screens/dashboard/post_detail_screen.dart |
+| 2026-05-24 | feat(flutter): Phase 5.2 Voice-Recorder — record:^5.1.2 + audioplayers:^6.0.0 (R7-Begruendung: 1:1 zu Web); VoiceRecorderService (start/stop/cancel/upload/encode/decode); chat-voice-messages Bucket mit RLS; VoiceMessageBubble (Play/Pause + Pseudo-Waveform 16 bars + Progress); _VoiceRecorderButton im Composer; Message-Format [VOICE:url:seconds] | flutter_app/lib/services/voice_recorder_service.dart, flutter_app/lib/widgets/shared/voice_message_bubble.dart, flutter_app/lib/screens/dashboard/chat_screen.dart, supabase Migration chat_voice_messages_bucket |
 | 2026-05-24 | feat(flutter): Phase 5.7 Comments-Reply-Nested — _buildCommentTree depth-1 (Roots + indented Replies via parent_id-Map); _CommentTile.onReply setzt _replyToParentId+_replyToAuthor; Reply-Banner ueber _CommentInput mit Author-Name + Cancel-X; PostCommentsRepository.add nimmt jetzt parentId | flutter_app/lib/screens/dashboard/post_detail_screen.dart |
 | 2026-05-24 | feat(flutter): Phase 5.5 Account-Deletion + GDPR-Export — _DangerTab Stateful umgebaut; _exportData parallel-fetch (profile/posts/comments/messages/interactions/trust_ratings/notifications/saved_posts/badges) → JSON via Share.shareXFiles (DSGVO Art. 20); _deleteAccount 3-Stage-Flow (Warning → typed "LOESCHEN" → RPC delete_my_account mit Fallback auf is_banned/anonymize); imports path_provider+share_plus | flutter_app/lib/screens/dashboard/settings_screen.dart |
 | 2026-05-24 | feat(flutter): Phase 5.4 Trust-Ratings-Flow — TrustRatingsRepository (rate, myPendingToRate, getBreakdown via calculate_trust_score+get_trust_breakdown RPCs); TrustRatingModal mit 5-Sterne-Selector + Kategorien-Chips + Comment + Helpful/Recommend-Toggles + Submit; _RateButton in interactions_screen wenn status='completed' + partner noch nicht bewertet | flutter_app/lib/repositories/trust_ratings_repository.dart, flutter_app/lib/widgets/shared/trust_rating_modal.dart, flutter_app/lib/screens/dashboard/interactions_screen.dart |

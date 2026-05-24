@@ -14,8 +14,10 @@ import '../../repositories/conversations_repository.dart';
 import '../../services/chat_context_service.dart';
 import '../../services/dm_call_service.dart';
 import '../../services/supabase_service.dart';
+import '../../services/voice_recorder_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/image_lightbox.dart';
+import '../../widgets/shared/voice_message_bubble.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Screen mit Realtime-Messages via Supabase Stream.
@@ -295,6 +297,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     }
     _typingChannel = null;
     super.dispose();
+  }
+
+  /// Sends a voice-message as `[VOICE:url:seconds]` text.
+  /// The bubble parses this on render and shows VoiceMessageBubble.
+  Future<void> _sendVoice(String url, int durationSeconds) async {
+    final encoded = VoiceRecorderService.encodeMessage(
+        url: url, durationSeconds: durationSeconds);
+    await MessagesRepository.send(
+      conversationId: widget.conversationId,
+      content: encoded,
+    );
   }
 
   Future<void> _send() async {
@@ -673,7 +686,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
+                  // Voice-Recorder (Phase 5.2) — long-press to record,
+                  // release to send. Tap shows hint.
+                  _VoiceRecorderButton(
+                    conversationId: widget.conversationId,
+                    onUploaded: _sendVoice,
+                  ),
+                  const SizedBox(width: 4),
                   IconButton(
                     onPressed: _send,
                     icon: const Icon(LucideIcons.send, color: AppColors.amber),
@@ -808,6 +828,9 @@ class _MessageBubble extends ConsumerWidget {
     final replyToId = json['reply_to_id'] as String?;
     final deleted = json['deleted_at'] != null;
 
+    // Voice-Message-Detection (Phase 5.2): [VOICE:url:seconds]
+    final voiceMsg = VoiceRecorderService.decodeMessage(content);
+
     // Inline-Image-Match: ![](url) → URL extrahieren, rest = Text
     final imageMatches = _imgRegex.allMatches(content).toList();
     final hasImages = imageMatches.isNotEmpty;
@@ -905,6 +928,13 @@ class _MessageBubble extends ConsumerWidget {
                         color: AppColors.mute,
                         height: 1.4),
                   ),
+                )
+              else if (voiceMsg != null)
+                // Voice-Message-Bubble statt Text-Render
+                VoiceMessageBubble(
+                  url: voiceMsg.url,
+                  durationSeconds: voiceMsg.durationSeconds,
+                  mine: mine,
                 )
               else if (textWithoutImages.isNotEmpty)
                 Padding(
@@ -1521,6 +1551,163 @@ class _ChatHeaderBar extends StatelessWidget {
               : const SizedBox(width: double.infinity),
         ),
       ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Voice-Recorder-Button (Phase 5.2) — long-press to record,
+// release to send. Tap shows hint. 1:1 zu Web VoiceRecorder.tsx.
+// ─────────────────────────────────────────────────────────────
+class _VoiceRecorderButton extends StatefulWidget {
+  const _VoiceRecorderButton({
+    required this.conversationId,
+    required this.onUploaded,
+  });
+
+  final String conversationId;
+  final Future<void> Function(String url, int durationSeconds) onUploaded;
+
+  @override
+  State<_VoiceRecorderButton> createState() => _VoiceRecorderButtonState();
+}
+
+class _VoiceRecorderButtonState extends State<_VoiceRecorderButton> {
+  bool _recording = false;
+  bool _uploading = false;
+  DateTime? _startedAt;
+  Timer? _ticker;
+  int _elapsed = 0;
+
+  Future<void> _startRecord() async {
+    if (_recording || _uploading) return;
+    final ok = await VoiceRecorderService.start();
+    if (!ok) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          'Mikrofon-Berechtigung erforderlich.',
+          style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+        ),
+      ));
+      return;
+    }
+    setState(() {
+      _recording = true;
+      _startedAt = DateTime.now();
+      _elapsed = 0;
+    });
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() => _elapsed =
+          DateTime.now().difference(_startedAt!).inSeconds);
+    });
+  }
+
+  Future<void> _stopAndSend() async {
+    _ticker?.cancel();
+    final result = await VoiceRecorderService.stop();
+    if (!mounted) return;
+    setState(() => _recording = false);
+    if (result == null || result.durationSeconds < 1) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          'Aufnahme zu kurz.',
+          style: AppTypography.body(size: 13, color: AppColors.mute),
+        ),
+      ));
+      return;
+    }
+    setState(() => _uploading = true);
+    final url = await VoiceRecorderService.upload(result.path);
+    if (!mounted) return;
+    setState(() => _uploading = false);
+    if (url == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          'Upload fehlgeschlagen.',
+          style: AppTypography.body(
+              size: 13, color: AppColors.herzrotWarm),
+        ),
+      ));
+      return;
+    }
+    await widget.onUploaded(url, result.durationSeconds);
+  }
+
+  Future<void> _cancel() async {
+    _ticker?.cancel();
+    await VoiceRecorderService.cancel();
+    if (!mounted) return;
+    setState(() => _recording = false);
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_recording) {
+      // Recording state: timer + cancel + send
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.herzrot.withValues(alpha: 0.18),
+          border:
+              Border.all(color: AppColors.herzrot.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.circle,
+                size: 10, color: AppColors.herzrot),
+            const SizedBox(width: 4),
+            Text('${_elapsed}s',
+                style: AppTypography.mono(
+                    size: 11, color: AppColors.herzrotWarm)),
+            IconButton(
+              tooltip: 'Abbrechen',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              onPressed: _cancel,
+              icon: const Icon(LucideIcons.x,
+                  size: 14, color: AppColors.mute),
+            ),
+            IconButton(
+              tooltip: 'Senden',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              onPressed: _stopAndSend,
+              icon: const Icon(LucideIcons.send,
+                  size: 14, color: AppColors.amber),
+            ),
+          ],
+        ),
+      );
+    }
+    if (_uploading) {
+      return const Padding(
+        padding: EdgeInsets.all(10),
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child:
+              CircularProgressIndicator(strokeWidth: 2, color: AppColors.amber),
+        ),
+      );
+    }
+    // Idle: mic icon — tap to start recording
+    return IconButton(
+      tooltip: 'Sprachnachricht aufnehmen',
+      onPressed: _startRecord,
+      icon: const Icon(LucideIcons.mic, color: AppColors.bronze),
     );
   }
 }
