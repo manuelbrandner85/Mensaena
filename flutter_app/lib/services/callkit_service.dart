@@ -23,16 +23,29 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 class CallkitService {
   const CallkitService._();
 
-  /// Plugin-Initialisierung. Aktuell nur Stub — flutter_callkit_incoming
-  /// braucht keine explizite init(). Hier kann spaeter Plugin-Config rein.
+  /// Plugin-Initialisierung. Wichtig: NICHT endAllCalls() hier, sonst
+  /// werden Cold-Start-Calls (User tappt CallKit-Accept aus geschlossener
+  /// App heraus) abgewuergt BEVOR der Listener das Accept-Event sieht.
+  /// Cleanup laufender Calls passiert nur explizit beim Logout via
+  /// [endAllCalls].
   static Future<void> initialize() async {
-    // Cleanup: alle alten/haengenden Calls beim App-Start beenden,
-    // sonst zeigt das System eventuell eine Geister-Notification.
+    // No-op stub. Plugin braucht keine explizite init().
+  }
+
+  /// Bei Cold-Start (App via CallKit-Accept aus killed-State gestartet):
+  /// queries active calls vom Plugin. Wenn einer existiert, liefert
+  /// die call_id zurueck damit der Caller das Navigations-Intent setzen kann.
+  static Future<Map<String, dynamic>?> recoverPendingCall() async {
     try {
-      await FlutterCallkitIncoming.endAllCalls();
+      final calls = await FlutterCallkitIncoming.activeCalls();
+      if (calls is List && calls.isNotEmpty) {
+        final first = calls.first;
+        if (first is Map) return Map<String, dynamic>.from(first);
+      }
     } catch (e) {
-      debugPrint('[CallkitService] endAllCalls on init failed: $e');
+      debugPrint('[CallkitService] recoverPendingCall failed: $e');
     }
+    return null;
   }
 
   /// Zeigt die native eingehende Anruf-UI.

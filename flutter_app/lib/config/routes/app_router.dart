@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -82,12 +83,18 @@ import '../../widgets/shared/filter_chip_bar.dart';
 import 'page_transitions.dart';
 
 /// SKILL: flutter-setup-declarative-routing
+/// Globaler RootNavigator-Key — von CallkitService/IncomingCallListener
+/// genutzt um aus jedem Kontext (auch wenn das BuildContext nicht im Tree
+/// ist) auf den Call-Screen zu navigieren, insbesondere im Cold-Start-Fall.
+final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
 /// Alle Routen der App. Public-Routen sind ohne Login zugaenglich,
 /// alle anderen werden bei nicht-Login zu /auth umgeleitet.
 /// initialLocation = /splash: Splash-Screen ist der erste Screen.
 /// Splash navigiert nach ~1.6s zum Dashboard (wenn eingeloggt) oder /auth.
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     debugLogDiagnostics: kDebugMode,
     redirect: (context, state) {

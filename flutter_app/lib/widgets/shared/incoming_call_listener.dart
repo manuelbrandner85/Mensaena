@@ -24,6 +24,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
 
+import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../services/callkit_service.dart';
 import '../../services/supabase_service.dart';
 
@@ -54,11 +55,42 @@ class _IncomingCallListenerState
     super.initState();
     _setupListeners();
     _setupCallkitListener();
+    // Cold-Start-Recovery: wenn User die App via CallKit-Accept aus dem
+    // Killed-State gestartet hat, hat das Accept-Event vor Listener-Mount
+    // gefeuert. Wir holen den aktiven Call ueber das Plugin und triggern
+    // die Navigation manuell, sobald GoRouter ready ist.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _recoverColdStart());
     // Re-subscribe whenever auth state changes (login/logout).
     _authSub = sb.auth.onAuthStateChange.listen((_) {
       _teardownSubs();
       _setupListeners();
     });
+  }
+
+  Future<void> _recoverColdStart() async {
+    if (!mounted) return;
+    final pending = await CallkitService.recoverPendingCall();
+    if (pending == null || !mounted) return;
+    final callId = pending['id'] as String?;
+    if (callId == null) return;
+    final extra = pending['extra'];
+    final extraMap = (extra is Map)
+        ? Map<String, dynamic>.from(extra)
+        : <String, dynamic>{};
+    final ctx = _CallContext(
+      callId: callId,
+      roomName: (extraMap['room_name'] as String?) ?? '',
+      callerName: (extraMap['caller_name'] as String?) ?? 'Nachbar:in',
+      conversationId: extraMap['conversation_id'] as String?,
+    );
+    _callContexts[callId] = ctx;
+    // Wenn der Call schon "accepted" ist (User hat schon getappt),
+    // direkt navigieren. Sonst ist es noch ringing und der Event-Stream
+    // uebernimmt den Rest.
+    final state = pending['state'] as String?;
+    if (state == 'accepted' || state == 'connected') {
+      await _onAccept(ctx);
+    }
   }
 
   void _setupListeners() {
@@ -235,14 +267,36 @@ class _IncomingCallListenerState
   Future<void> _onAccept(_CallContext ctx) async {
     await _updateStatus(ctx.callId, 'active', answered: true);
     _callContexts.remove(ctx.callId);
-    if (!mounted) return;
     final encName = Uri.encodeComponent(ctx.callerName);
     final encRoom = Uri.encodeComponent(ctx.roomName);
-    // Verwende GoRouter-globalen Context.
-    try {
-      context.push('/dashboard/call/${ctx.callId}?room=$encRoom&peer=$encName');
-    } catch (_) {/* falls Context nicht mounted: Cold-Start-Navigation
-                    folgt nach App-Resume via App-Router-Redirect */}
+    final route =
+        '/dashboard/call/${ctx.callId}?room=$encRoom&peer=$encName';
+    // Cold-Start-festes Routing via rootNavigatorKey statt context.push:
+    // - Warm-Start: GoRouter ist bereits ready → push klappt sofort.
+    // - Cold-Start: GoRouter braucht noch ein paar Frames → wir warten
+    //   bis der NavigatorState mounted ist + retryen alle 100 ms.
+    final navState = rootNavigatorKey.currentState;
+    if (navState != null) {
+      try {
+        // ignore: use_build_context_synchronously
+        navState.context.push(route);
+        return;
+      } catch (_) {}
+    }
+    // Retry-Loop bis 3 s — sichert Cold-Start-Navigation ab.
+    var tries = 0;
+    Timer.periodic(const Duration(milliseconds: 100), (t) {
+      final n = rootNavigatorKey.currentState;
+      tries++;
+      if (n != null) {
+        try {
+          n.context.push(route);
+          t.cancel();
+          return;
+        } catch (_) {}
+      }
+      if (tries > 30) t.cancel();
+    });
   }
 
   Future<void> _onDecline(_CallContext ctx) async {
