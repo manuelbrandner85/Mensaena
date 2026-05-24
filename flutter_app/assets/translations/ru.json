@@ -267,5 +267,16 @@
     "exploreMap": "Изучить карту",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo"
+  },
+  "matching": {
+    "disabled": "Подбор отключён",
+    "open": "Открыть",
+    "openChat": "Открыть чат",
+    "breakdown": "Детали совпадения",
+    "settings": "Настройки подбора",
+    "enable": "Включить подбор",
+    "maxDistanceKm": "Максимальный радиус: {km} км",
+    "maxMatchesPerDay": "Макс. совпадений в день: {n}",
+    "minTrustScore": "Минимальный балл доверия: {n}"
   }
 }

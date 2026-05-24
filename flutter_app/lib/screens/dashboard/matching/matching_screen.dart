@@ -140,7 +140,7 @@ class MatchingScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Matching ist deaktiviert',
+                Text('matching.disabled'.tr(),
                     style: AppTypography.body(
                       size: 13,
                       color: AppColors.amber,
@@ -155,7 +155,7 @@ class MatchingScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => _openPreferences(context, ref),
-            child: Text('Öffnen',
+            child: Text('matching.open'.tr(),
                 style: AppTypography.label(
                     size: 10, color: AppColors.amber)),
           ),
@@ -234,7 +234,7 @@ class MatchingScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Matching',
+              Text('nav.matching'.tr(),
                   style: AppTypography.display(
                     size: 22,
                     color: AppColors.ink,
@@ -493,7 +493,7 @@ class _MatchCard extends StatelessWidget {
                 ),
                 onPressed: onOpenChat,
                 icon: const Icon(LucideIcons.messageCircle, size: 16),
-                label: const Text('Chat öffnen'),
+                label: Text('matching.openChat'.tr()),
               ),
             )
           else if (!myResponded)
@@ -510,7 +510,7 @@ class _MatchCard extends StatelessWidget {
                     onPressed: onDecline,
                     icon:
                         const Icon(LucideIcons.x, size: 14),
-                    label: const Text('Ablehnen'),
+                    label: Text('chat.decline'.tr()),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -522,7 +522,7 @@ class _MatchCard extends StatelessWidget {
                     ),
                     onPressed: onAccept,
                     icon: const Icon(LucideIcons.check, size: 14),
-                    label: const Text('Annehmen'),
+                    label: Text('chat.accept'.tr()),
                   ),
                 ),
               ],
@@ -733,7 +733,7 @@ class _MatchDetailSheet extends StatelessWidget {
               ),
               onPressed: onOpenChat,
               icon: const Icon(LucideIcons.messageCircle, size: 16),
-              label: const Text('Chat öffnen'),
+              label: Text('matching.openChat'.tr()),
             )
           else if (!myResponded)
             Row(
@@ -748,7 +748,7 @@ class _MatchDetailSheet extends StatelessWidget {
                     ),
                     onPressed: onDecline,
                     icon: const Icon(LucideIcons.x, size: 14),
-                    label: const Text('Ablehnen'),
+                    label: Text('chat.decline'.tr()),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -760,7 +760,7 @@ class _MatchDetailSheet extends StatelessWidget {
                     ),
                     onPressed: onAccept,
                     icon: const Icon(LucideIcons.check, size: 14),
-                    label: const Text('Annehmen'),
+                    label: Text('chat.accept'.tr()),
                   ),
                 ),
               ],
@@ -853,7 +853,7 @@ class _MatchDetailSheet extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Match-Aufschlüsselung',
+          Text('matching.breakdown'.tr(),
               style: AppTypography.label(size: 10)),
           const SizedBox(height: 8),
           for (final r in rows) ...[
@@ -960,7 +960,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                Text('Matching-Einstellungen',
+                Text('matching.settings'.tr(),
                     style: AppTypography.display(
                         size: 20, color: AppColors.ink)),
                 const SizedBox(height: 14),
@@ -971,7 +971,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                   }),
                   activeColor: AppColors.amber,
                   contentPadding: EdgeInsets.zero,
-                  title: Text('Matching aktivieren',
+                  title: Text('matching.enable'.tr(),
                       style: AppTypography.body(
                         size: 14,
                         color: AppColors.ink,
@@ -989,7 +989,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                   }),
                   activeColor: AppColors.amber,
                   contentPadding: EdgeInsets.zero,
-                  title: Text('Benachrichtigungen',
+                  title: Text('settings.tabs.notifications'.tr(),
                       style: AppTypography.body(
                         size: 14,
                         color: AppColors.ink,
@@ -1001,7 +1001,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                Text('Maximaler Umkreis: ${p.maxDistanceKm} km',
+                Text('matching.maxDistanceKm'.tr(namedArgs: {'km': '${p.maxDistanceKm}'}),
                     style: AppTypography.label(size: 10)),
                 Slider(
                   value: p.maxDistanceKm.toDouble(),
@@ -1016,7 +1016,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                   }),
                 ),
                 const SizedBox(height: 6),
-                Text('Max. Matches pro Tag: ${p.maxMatchesPerDay}',
+                Text('matching.maxMatchesPerDay'.tr(namedArgs: {'n': '${p.maxMatchesPerDay}'}),
                     style: AppTypography.label(size: 10)),
                 Slider(
                   value: p.maxMatchesPerDay.toDouble(),
@@ -1031,7 +1031,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                   }),
                 ),
                 const SizedBox(height: 6),
-                Text('Mindest-Vertrauenswert: ${p.minTrustScore}',
+                Text('matching.minTrustScore'.tr(namedArgs: {'n': '${p.minTrustScore}'}),
                     style: AppTypography.label(size: 10)),
                 Slider(
                   value: p.minTrustScore.toDouble(),

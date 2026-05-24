@@ -267,5 +267,16 @@
     "exploreMap": "Explorer la carte",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo"
+  },
+  "matching": {
+    "disabled": "Matching désactivé",
+    "open": "Ouvrir",
+    "openChat": "Ouvrir le chat",
+    "breakdown": "Détail du match",
+    "settings": "Paramètres de matching",
+    "enable": "Activer le matching",
+    "maxDistanceKm": "Rayon maximal : {km} km",
+    "maxMatchesPerDay": "Matchs max. par jour : {n}",
+    "minTrustScore": "Score de confiance minimum : {n}"
   }
 }

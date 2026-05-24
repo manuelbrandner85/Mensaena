@@ -267,5 +267,16 @@
     "exploreMap": "Haritayı keşfet",
     "botName": "MensaenaBot",
     "weatherSource": "Open-Meteo"
+  },
+  "matching": {
+    "disabled": "Eşleşme devre dışı",
+    "open": "Aç",
+    "openChat": "Sohbeti aç",
+    "breakdown": "Eşleşme detayı",
+    "settings": "Eşleşme ayarları",
+    "enable": "Eşleşmeyi etkinleştir",
+    "maxDistanceKm": "En fazla yarıçap: {km} km",
+    "maxMatchesPerDay": "Günlük maks. eşleşme: {n}",
+    "minTrustScore": "Asgari güven puanı: {n}"
   }
 }
