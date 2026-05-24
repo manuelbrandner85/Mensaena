@@ -278,5 +278,18 @@
     "maxDistanceKm": "En fazla yarıçap: {km} km",
     "maxMatchesPerDay": "Günlük maks. eşleşme: {n}",
     "minTrustScore": "Asgari güven puanı: {n}"
+  },
+  "admin": {
+    "statusSetTo": "Durum \"{s}\" olarak ayarlandı.",
+    "statusUpdateFailed": "Durum güncellemesi başarısız.",
+    "actionFailed": "İşlem başarısız.",
+    "deleteConfirmTitle": "Silinsin mi?",
+    "entryDeleted": "Kayıt silindi.",
+    "deleteFailed": "Silme başarısız.",
+    "tableName": "Tablo: {name}",
+    "status": "Durum",
+    "profileActions": "Profil işlemleri",
+    "deleteEntry": "Kaydı sil",
+    "rawData": "Ham veri"
   }
 }

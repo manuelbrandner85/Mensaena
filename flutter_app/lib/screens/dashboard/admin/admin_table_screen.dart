@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -327,13 +328,13 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     setState(() => _busy = false);
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Status auf "$s" gesetzt.')),
+        SnackBar(content: Text('admin.statusSetTo'.tr(namedArgs: {'s': s}))),
       );
       widget.onChanged();
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Status-Update fehlgeschlagen.')),
+        SnackBar(content: Text('admin.statusUpdateFailed'.tr())),
       );
     }
   }
@@ -357,7 +358,7 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aktion fehlgeschlagen.')),
+        SnackBar(content: Text('admin.actionFailed'.tr())),
       );
     }
   }
@@ -368,7 +369,7 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Löschen?',
+        title: Text('admin.deleteConfirmTitle'.tr(),
             style: AppTypography.body(
                 size: 16, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
@@ -378,12 +379,12 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Abbrechen'),
+            child: Text('common.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
-            child: const Text('Löschen'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
@@ -398,13 +399,13 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     setState(() => _busy = false);
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Eintrag gelöscht.')),
+        SnackBar(content: Text('admin.entryDeleted'.tr())),
       );
       widget.onChanged();
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Löschen fehlgeschlagen.')),
+        SnackBar(content: Text('admin.deleteFailed'.tr())),
       );
     }
   }
@@ -432,13 +433,13 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
         Text(widget.title,
             style: AppTypography.display(size: 18, color: AppColors.ink)),
         const SizedBox(height: 4),
-        Text('Tabelle: ${widget.tableName}',
+        Text('admin.tableName'.tr(namedArgs: {'name': widget.tableName}),
             style: AppTypography.label(size: 9, color: AppColors.mute)),
         const SizedBox(height: 14),
 
         // ── Aktionen ────────────────────────────────────────────
         if (_hasStatusField && _availableStatuses.isNotEmpty) ...[
-          Text('Status', style: AppTypography.label(size: 10)),
+          Text('admin.status'.tr(), style: AppTypography.label(size: 10)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
@@ -465,7 +466,7 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
 
         // ── Profile-spezifisch (Ban/Admin-Toggle) ───────────────
         if (_isProfilesTable) ...[
-          Text('Profil-Aktionen', style: AppTypography.label(size: 10)),
+          Text('admin.profileActions'.tr(), style: AppTypography.label(size: 10)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -521,7 +522,7 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
           child: OutlinedButton.icon(
             onPressed: _busy || _id == null ? null : _delete,
             icon: const Icon(LucideIcons.trash2, size: 14),
-            label: const Text('Eintrag löschen'),
+            label: Text('admin.deleteEntry'.tr()),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.herzrot,
               side: BorderSide(
@@ -532,7 +533,7 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
         const SizedBox(height: 20),
 
         // ── Roh-Daten ───────────────────────────────────────────
-        Text('Rohdaten', style: AppTypography.label(size: 10)),
+        Text('admin.rawData'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(12),

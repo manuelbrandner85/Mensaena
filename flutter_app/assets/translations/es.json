@@ -278,5 +278,18 @@
     "maxDistanceKm": "Radio máximo: {km} km",
     "maxMatchesPerDay": "Máx. matches por día: {n}",
     "minTrustScore": "Puntuación mínima de confianza: {n}"
+  },
+  "admin": {
+    "statusSetTo": "Estado establecido en \"{s}\".",
+    "statusUpdateFailed": "Error al actualizar el estado.",
+    "actionFailed": "Acción fallida.",
+    "deleteConfirmTitle": "¿Eliminar?",
+    "entryDeleted": "Entrada eliminada.",
+    "deleteFailed": "Error al eliminar.",
+    "tableName": "Tabla: {name}",
+    "status": "Estado",
+    "profileActions": "Acciones del perfil",
+    "deleteEntry": "Eliminar entrada",
+    "rawData": "Datos sin procesar"
   }
 }

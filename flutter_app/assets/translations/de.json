@@ -278,5 +278,18 @@
     "maxDistanceKm": "Maximaler Umkreis: {km} km",
     "maxMatchesPerDay": "Max. Matches pro Tag: {n}",
     "minTrustScore": "Mindest-Vertrauenswert: {n}"
+  },
+  "admin": {
+    "statusSetTo": "Status auf \"{s}\" gesetzt.",
+    "statusUpdateFailed": "Status-Update fehlgeschlagen.",
+    "actionFailed": "Aktion fehlgeschlagen.",
+    "deleteConfirmTitle": "Löschen?",
+    "entryDeleted": "Eintrag gelöscht.",
+    "deleteFailed": "Löschen fehlgeschlagen.",
+    "tableName": "Tabelle: {name}",
+    "status": "Status",
+    "profileActions": "Profil-Aktionen",
+    "deleteEntry": "Eintrag löschen",
+    "rawData": "Rohdaten"
   }
 }

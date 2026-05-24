@@ -278,5 +278,18 @@
     "maxDistanceKm": "Rayon maximal : {km} km",
     "maxMatchesPerDay": "Matchs max. par jour : {n}",
     "minTrustScore": "Score de confiance minimum : {n}"
+  },
+  "admin": {
+    "statusSetTo": "Statut défini sur « {s} ».",
+    "statusUpdateFailed": "Échec de la mise à jour du statut.",
+    "actionFailed": "Échec de l'action.",
+    "deleteConfirmTitle": "Supprimer ?",
+    "entryDeleted": "Entrée supprimée.",
+    "deleteFailed": "Échec de la suppression.",
+    "tableName": "Table : {name}",
+    "status": "Statut",
+    "profileActions": "Actions du profil",
+    "deleteEntry": "Supprimer l'entrée",
+    "rawData": "Données brutes"
   }
 }

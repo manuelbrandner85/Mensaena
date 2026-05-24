@@ -278,5 +278,18 @@
     "maxDistanceKm": "Maximum radius: {km} km",
     "maxMatchesPerDay": "Max. matches per day: {n}",
     "minTrustScore": "Minimum trust score: {n}"
+  },
+  "admin": {
+    "statusSetTo": "Status set to \"{s}\".",
+    "statusUpdateFailed": "Status update failed.",
+    "actionFailed": "Action failed.",
+    "deleteConfirmTitle": "Delete?",
+    "entryDeleted": "Entry deleted.",
+    "deleteFailed": "Deletion failed.",
+    "tableName": "Table: {name}",
+    "status": "Status",
+    "profileActions": "Profile actions",
+    "deleteEntry": "Delete entry",
+    "rawData": "Raw data"
   }
 }

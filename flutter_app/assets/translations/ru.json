@@ -278,5 +278,18 @@
     "maxDistanceKm": "Максимальный радиус: {km} км",
     "maxMatchesPerDay": "Макс. совпадений в день: {n}",
     "minTrustScore": "Минимальный балл доверия: {n}"
+  },
+  "admin": {
+    "statusSetTo": "Статус установлен на «{s}».",
+    "statusUpdateFailed": "Не удалось обновить статус.",
+    "actionFailed": "Не удалось выполнить действие.",
+    "deleteConfirmTitle": "Удалить?",
+    "entryDeleted": "Запись удалена.",
+    "deleteFailed": "Не удалось удалить.",
+    "tableName": "Таблица: {name}",
+    "status": "Статус",
+    "profileActions": "Действия с профилем",
+    "deleteEntry": "Удалить запись",
+    "rawData": "Сырые данные"
   }
 }

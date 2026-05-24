@@ -278,5 +278,18 @@
     "maxDistanceKm": "Raggio massimo: {km} km",
     "maxMatchesPerDay": "Match massimi al giorno: {n}",
     "minTrustScore": "Punteggio fiducia minimo: {n}"
+  },
+  "admin": {
+    "statusSetTo": "Stato impostato su \"{s}\".",
+    "statusUpdateFailed": "Aggiornamento stato non riuscito.",
+    "actionFailed": "Azione non riuscita.",
+    "deleteConfirmTitle": "Eliminare?",
+    "entryDeleted": "Voce eliminata.",
+    "deleteFailed": "Eliminazione non riuscita.",
+    "tableName": "Tabella: {name}",
+    "status": "Stato",
+    "profileActions": "Azioni profilo",
+    "deleteEntry": "Elimina voce",
+    "rawData": "Dati grezzi"
   }
 }
