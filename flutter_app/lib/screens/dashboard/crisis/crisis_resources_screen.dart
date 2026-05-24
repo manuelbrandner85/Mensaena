@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -11,12 +12,35 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
 /// Notruf-Nummern + Resourcen-Page (emergency_numbers tabelle).
+///
+/// Locale → Country-Mapping: bestimmt aus context.locale primaeres Land
+/// (de=DE, en=GB, it=IT, es=ES, fr=FR, tr=TR, ru=RU). Region-Override
+/// via context.locale.countryCode wenn explizit gesetzt (z.B. en_US).
 class CrisisResourcesScreen extends ConsumerWidget {
   const CrisisResourcesScreen({super.key});
 
+  static const _localeCountry = {
+    'de': 'DE',
+    'en': 'GB',
+    'it': 'IT',
+    'es': 'ES',
+    'fr': 'FR',
+    'tr': 'TR',
+    'ru': 'RU',
+  };
+
+  String _countryFor(BuildContext context) {
+    final loc = context.locale;
+    // Explizite Region (z.B. en_US, de_AT, fr_BE) hat Vorrang
+    final c = loc.countryCode;
+    if (c != null && c.isNotEmpty) return c;
+    return _localeCountry[loc.languageCode] ?? 'DE';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(emergencyNumbersProvider('DE'));
+    final country = _countryFor(context);
+    final async = ref.watch(emergencyNumbersProvider(country));
     return DashboardScaffold(
       title: 'Notruf-Nummern',
       currentRoute: '/dashboard/crisis',
