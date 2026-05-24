@@ -1,11 +1,21 @@
 import '../models/post.dart';
 import '../services/supabase_service.dart';
+import 'user_blocks_repository.dart';
 
 /// SKILL: supabase + mensaena-features
 /// Posts-Repository: nearby (RPC), search_posts (RPC), feed, get-by-id.
 /// 1:1 zum Web — gleiche RPC-Signaturen.
 class PostsRepository {
   const PostsRepository._();
+
+  /// Memoized blocked-IDs für einen Request-Zyklus.
+  /// Wird vor jeder Feed-Liste neu geladen (lazy, single roundtrip).
+  static Future<List<Post>> _filterBlocked(List<Post> posts) async {
+    if (posts.isEmpty) return posts;
+    final blocked = await UserBlocksRepository.myBlockedIds();
+    if (blocked.isEmpty) return posts;
+    return posts.where((p) => !blocked.contains(p.userId)).toList();
+  }
 
   /// Posts in einem Umkreis um (lat, lng). Nutzt get_nearby_posts RPC.
   static Future<List<Post>> getNearby({
@@ -28,10 +38,11 @@ class PostsRepository {
         },
       );
       if (result is List) {
-        return result
+        final posts = result
             .whereType<Map<String, dynamic>>()
             .map(Post.fromJson)
             .toList();
+        return _filterBlocked(posts);
       }
       return const [];
     } catch (_) {
@@ -62,10 +73,11 @@ class PostsRepository {
         'p_offset': offset,
       });
       if (res is List) {
-        return res
+        final posts = res
             .whereType<Map<String, dynamic>>()
             .map(Post.fromJson)
             .toList();
+        return _filterBlocked(posts);
       }
       return const [];
     } catch (_) {
@@ -97,10 +109,11 @@ class PostsRepository {
       final rows = await q
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
-      return (rows as List)
+      final posts = (rows as List)
           .whereType<Map<String, dynamic>>()
           .map(Post.fromJson)
           .toList();
+      return _filterBlocked(posts);
     } catch (_) {
       return const [];
     }
@@ -114,10 +127,11 @@ class PostsRepository {
           .eq('status', 'active')
           .order('created_at', ascending: false)
           .limit(limit);
-      return (rows as List)
+      final posts = (rows as List)
           .whereType<Map<String, dynamic>>()
           .map(Post.fromJson)
           .toList();
+      return _filterBlocked(posts);
     } catch (_) {
       return const [];
     }
