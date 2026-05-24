@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Sprach-Picker im Header jedes Screens + Auto-Default. Bulk-Translation iterativ weiter.
-COUNT=200+ Web | Flutter: Phase 1-7 + Parität W1-W2 + Cinema v3 + i18n W3 ✅
-NEXT=Restliche Screen-Strings auf .tr() umstellen (CLAUDE.md-Pflicht)
+OPEN=Supabase-Datenintegrität auditiert + 2 kritische Bugs gefixed. Alle 52 Flutter-Tabellen-Refs gegen Supabase verifiziert.
+COUNT=200+ Web | Flutter: Phase 1-7 + Parität W1-W2 + Cinema v3 + i18n W3 + Datenintegrität-Audit ✅
+NEXT=Iterativ i18n in restliche Screens
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(i18n-w3): Auto-by-Standort ist neuer DEFAULT (Erstlauncher detectet automatisch + Device-Locale-Fallback), LanguagePicker-Widget (Flag + Auto-Indicator + Bottom-Sheet) in jedem Screen-Header (DashboardScaffold, LegalPage, SpendenScreen, UnsubscribeScreen, OnboardingTour, AuthScreen). Bulk-Patch der Common-Buttons (Abbrechen/Speichern/Löschen/Senden/Weiter/Schließen/Bestätigen/OK) in 10 High-Traffic-Screens.
+LAST_TASK=fix(supabase-audit): 1) marketplace_repository.dart nutzte nicht-existente Tabelle `saved_listings` → auf `marketplace_favorites` korrigiert (Marketplace-Favoriten waren komplett kaputt). 2) dashboard_home_screen.dart _ThanksReceived._loadRatings nutzte nicht-existente Spalte `rated_user_id` → auf `rated_id` korrigiert (ThanksReceived-Widget zeigte nie etwas). Vollständiger Cross-Check: alle 52 Tabellen-Referenzen des Flutter-Codes existieren in Supabase.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

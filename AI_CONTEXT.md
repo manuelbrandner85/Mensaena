@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 (Auto-Default + Header-Picker in jedem Screen, 7 Sprachen)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + Datenintegrität-Audit (2 Supabase-Bugs gefixed: saved_listings→marketplace_favorites, rated_user_id→rated_id)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

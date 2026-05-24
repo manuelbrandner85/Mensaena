@@ -91,7 +91,7 @@ final marketplaceDetailProvider =
     FutureProvider.family<MarketplaceListing?, String>(
         (ref, id) => MarketplaceRepository.getById(id));
 
-/// Favoriten-Helpers — `saved_listings` Pendant zu Web.
+/// Favoriten-Helpers — `marketplace_favorites` Tabelle (1:1 zu Web).
 class MarketplaceFavorites {
   const MarketplaceFavorites._();
 
@@ -101,19 +101,19 @@ class MarketplaceFavorites {
     if (uid == null) return false;
     try {
       final existing = await sb
-          .from('saved_listings')
+          .from('marketplace_favorites')
           .select('id')
           .eq('listing_id', listingId)
           .eq('user_id', uid)
           .maybeSingle();
       if (existing != null) {
         await sb
-            .from('saved_listings')
+            .from('marketplace_favorites')
             .delete()
             .eq('id', existing['id'] as Object);
         return false;
       }
-      await sb.from('saved_listings').insert({
+      await sb.from('marketplace_favorites').insert({
         'listing_id': listingId,
         'user_id': uid,
       });
@@ -129,7 +129,7 @@ class MarketplaceFavorites {
     if (uid == null) return const {};
     try {
       final rows = await sb
-          .from('saved_listings')
+          .from('marketplace_favorites')
           .select('listing_id')
           .eq('user_id', uid);
       return (rows as List)

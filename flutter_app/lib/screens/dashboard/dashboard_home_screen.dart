@@ -1022,7 +1022,7 @@ class _ThanksReceived extends ConsumerWidget {
       final rows = await sb
           .from('trust_ratings')
           .select()
-          .eq('rated_user_id', userId)
+          .eq('rated_id', userId)
           .order('created_at', ascending: false)
           .limit(5);
       return (rows as List).whereType<Map<String, dynamic>>().toList();
