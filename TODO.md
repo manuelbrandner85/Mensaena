@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Push-Triggers Wave 2 live (20 neue Trigger). UI für Quiet-Hours/Type-Filter + 4 Notif-Channels in Flutter ausstehend.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Audit + 25 Extra-Repos + Push-Wave-2-Triggers ✅
-NEXT=Flutter PushNotificationService auf 4 Channels (chat/social/system/crisis) + Settings-UI für user_notification_prefs + send-push Edge Function muss Prefs+Quiet-Hours respektieren
+OPEN=Push-Wave-2 KOMPLETT (SQL + Flutter + Edge Function + Settings). F-Reminders cron-Jobs ausstehend.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Audit + 25 Extra-Repos + Push-Wave-2 Full-Stack ✅
+NEXT=Optional pg_cron F1-F4 (Reminders) + G1 (Bot-Broadcast)
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(push-wave2): 20 neue SQL-Trigger nach Weltenbibliothek-Vorbild (A Crisis: nearby/helper/resource/report, B Community: volunteer/event/attendee/rideshare/livestream/match/badge, C Group: post-reaction/poll/event, D Marketplace: new/reserved, E Profile: org-review/added-to-chat/message-reaction/message-pinned). Plus user_notification_prefs-Tabelle (RLS) mit Master-Switch + 6 Type-Toggles + Quiet-Hours-Range + critical-override. Helper public.notify_user() als zentrale Push-Funktion.
+LAST_TASK=feat(push-wave2-flutter): 6 Android-Channels (mensaena_default/calls/crisis/chat/social/system), Foreground-Handler routet per category+priority+type zum richtigen Channel, send-push v22 mit user_notification_prefs-Filter (master + 6 type-toggles + quiet-hours mit UTC+1-DACH-Heuristik + critical-override), NotifPrefs-Repo + Settings-Tab mit kategorie-spezifischen Toggles und Hour-Slidern für Quiet-Hours. Trigger notify_push_on_new_notification leitet jetzt category+priority weiter.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

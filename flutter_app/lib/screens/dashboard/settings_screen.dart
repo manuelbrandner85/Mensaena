@@ -16,6 +16,7 @@ import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/locale_provider.dart';
+import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
@@ -237,52 +238,170 @@ class _PrivacyTab extends StatelessWidget {
   }
 }
 
-class _NotifTab extends StatelessWidget {
+class _NotifTab extends ConsumerStatefulWidget {
   const _NotifTab({required this.profile, required this.onPatch});
   final Profile profile;
   final Future<void> Function(Map<String, dynamic>) onPatch;
 
   @override
+  ConsumerState<_NotifTab> createState() => _NotifTabState();
+}
+
+class _NotifTabState extends ConsumerState<_NotifTab> {
+  NotifPrefs? _local;
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        _BoolTile(
-          label: 'Nachrichten',
-          value: profile.notifyNewMessages,
-          onChanged: (v) => onPatch({'notify_new_messages': v}),
-        ),
-        _BoolTile(
-          label: 'Interaktionen',
-          value: profile.notifyNewInteractions,
-          onChanged: (v) => onPatch({'notify_new_interactions': v}),
-        ),
-        _BoolTile(
-          label: 'Beiträge in der Nähe',
-          value: profile.notifyNearbyPosts,
-          onChanged: (v) => onPatch({'notify_nearby_posts': v}),
-        ),
-        _BoolTile(
-          label: 'Trust-Bewertungen',
-          value: profile.notifyTrustRatings,
-          onChanged: (v) => onPatch({'notify_trust_ratings': v}),
-        ),
-        _BoolTile(
-          label: 'System',
-          value: profile.notifySystem,
-          onChanged: (v) => onPatch({'notify_system': v}),
-        ),
-        _BoolTile(
-          label: 'Push-Notifications',
-          value: profile.notifyPush,
-          onChanged: (v) => onPatch({'notify_push': v}),
-        ),
-        _BoolTile(
-          label: 'E-Mail-Benachrichtigungen',
-          value: profile.notifyEmail,
-          onChanged: (v) => onPatch({'notify_email': v}),
-        ),
-      ],
+    final async = ref.watch(myNotifPrefsProvider);
+    return async.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.amber),
+      ),
+      error: (e, _) => Center(
+        child: Text('Fehler: $e', style: AppTypography.caption()),
+      ),
+      data: (p) {
+        _local ??= p;
+        final prefs = _local!;
+        return ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text('PUSH-BENACHRICHTIGUNGEN',
+                style: AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            _BoolTile(
+              label: 'Push aktiviert',
+              value: prefs.enabled,
+              onChanged: (v) => _update(prefs.copyWith(enabled: v)),
+            ),
+            const SizedBox(height: 18),
+            Text('KATEGORIEN',
+                style: AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            _BoolTile(
+              label: '💬 Nachrichten (Chat + DM)',
+              value: prefs.chat,
+              onChanged: (v) => _update(prefs.copyWith(chat: v)),
+            ),
+            _BoolTile(
+              label: '👥 Community (Reaktionen, Kommentare, Matches)',
+              value: prefs.social,
+              onChanged: (v) => _update(prefs.copyWith(social: v)),
+            ),
+            _BoolTile(
+              label: '🎉 Events',
+              value: prefs.events,
+              onChanged: (v) => _update(prefs.copyWith(events: v)),
+            ),
+            _BoolTile(
+              label: '🛒 Marktplatz',
+              value: prefs.marketplace,
+              onChanged: (v) => _update(prefs.copyWith(marketplace: v)),
+            ),
+            _BoolTile(
+              label: '⚠️ Krisen & Notfälle',
+              value: prefs.crisis,
+              onChanged: (v) => _update(prefs.copyWith(crisis: v)),
+            ),
+            _BoolTile(
+              label: '🏆 System (Badges, Updates)',
+              value: prefs.system,
+              onChanged: (v) => _update(prefs.copyWith(system: v)),
+            ),
+            const SizedBox(height: 18),
+            Text('NACHT-MODUS',
+                style: AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            _BoolTile(
+              label: 'Quiet Hours aktivieren',
+              value: prefs.quietHoursEnabled,
+              onChanged: (v) =>
+                  _update(prefs.copyWith(quietHoursEnabled: v)),
+            ),
+            if (prefs.quietHoursEnabled) ...[
+              const SizedBox(height: 4),
+              _HourRow(
+                label: 'Von',
+                value: prefs.quietStartHour,
+                onChanged: (h) =>
+                    _update(prefs.copyWith(quietStartHour: h)),
+              ),
+              _HourRow(
+                label: 'Bis',
+                value: prefs.quietEndHour,
+                onChanged: (h) =>
+                    _update(prefs.copyWith(quietEndHour: h)),
+              ),
+              const SizedBox(height: 4),
+              _BoolTile(
+                label: 'Krisen dürfen Quiet-Hours durchbrechen',
+                value: prefs.quietAllowCritical,
+                onChanged: (v) =>
+                    _update(prefs.copyWith(quietAllowCritical: v)),
+              ),
+            ],
+            const SizedBox(height: 24),
+            Text(
+              'Profil-Settings (E-Mail-Notifications, Push-Token-Lifecycle) '
+              'bleiben separat im Konto-Bereich.',
+              style: AppTypography.caption(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _update(NotifPrefs next) async {
+    setState(() => _local = next);
+    await NotificationPrefsRepository.save(next);
+    ref.invalidate(myNotifPrefsProvider);
+  }
+}
+
+class _HourRow extends StatelessWidget {
+  const _HourRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+  final String label;
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(label,
+                style: AppTypography.body(size: 13, color: AppColors.ink)),
+          ),
+          Expanded(
+            child: Slider(
+              value: value.toDouble(),
+              min: 0,
+              max: 23,
+              divisions: 23,
+              activeColor: AppColors.bronze,
+              inactiveColor: AppColors.line,
+              label: '${value.toString().padLeft(2, '0')}:00',
+              onChanged: (v) => onChanged(v.round()),
+            ),
+          ),
+          SizedBox(
+            width: 50,
+            child: Text(
+              '${value.toString().padLeft(2, '0')}:00',
+              textAlign: TextAlign.right,
+              style: AppTypography.mono(size: 13, color: AppColors.bronze),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

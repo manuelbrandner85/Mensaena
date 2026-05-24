@@ -77,32 +77,56 @@ class PushNotificationService {
         ),
       );
 
-      // Android-Notification-Channel erstellen (Pflicht ab Android 8.0)
+      // 6 Android-Notification-Channels nach Kategorie (Weltenbibliothek-Stil):
+      //   _default — Fallback (HIGH)
+      //   _calls   — Anruf-Notifications (MAX + fullscreen-fähig)
+      //   _crisis  — Krisen / Notfall (MAX + lange Vibration)
+      //   _chat    — DM/Channel-Nachrichten (HIGH + Sound)
+      //   _social  — Reaktionen/Kommentare/Events/Marketplace (DEFAULT)
+      //   _system  — Badges/Updates/Achievements (LOW + ohne Sound)
       const androidChannel = AndroidNotificationChannel(
-        _channelId,
-        _channelName,
-        description: _channelDescription,
-        importance: Importance.high,
-        playSound: true,
-        enableVibration: true,
+        _channelId, _channelName, description: _channelDescription,
+        importance: Importance.high, playSound: true, enableVibration: true,
       );
-      // Calls-Channel — max importance, fullScreenIntent kompatibel,
-      // langes vibrationPattern damit es nicht uebersehen wird.
       final callsChannel = AndroidNotificationChannel(
-        _callsChannelId,
-        _callsChannelName,
+        _callsChannelId, _callsChannelName,
         description: _callsChannelDescription,
-        importance: Importance.max,
-        playSound: true,
-        enableVibration: true,
+        importance: Importance.max, playSound: true, enableVibration: true,
         vibrationPattern:
             Int64List.fromList(<int>[0, 1000, 500, 1000, 500, 1000]),
+      );
+      final crisisChannel = AndroidNotificationChannel(
+        'mensaena_crisis', 'Notfälle & Krisen',
+        description: 'Krisen-Warnungen in deiner Nähe',
+        importance: Importance.max, playSound: true, enableVibration: true,
+        vibrationPattern:
+            Int64List.fromList(<int>[0, 800, 200, 800, 200, 800]),
+      );
+      const chatChannel = AndroidNotificationChannel(
+        'mensaena_chat', 'Nachrichten',
+        description: 'Direkt- und Community-Nachrichten',
+        importance: Importance.high, playSound: true, enableVibration: true,
+      );
+      const socialChannel = AndroidNotificationChannel(
+        'mensaena_social', 'Community-Aktivität',
+        description: 'Reaktionen, Kommentare, Events, Marktplatz',
+        importance: Importance.defaultImportance,
+        playSound: true, enableVibration: true,
+      );
+      const systemChannel = AndroidNotificationChannel(
+        'mensaena_system', 'System & Achievements',
+        description: 'Badges, Updates und Hinweise',
+        importance: Importance.low, playSound: false, enableVibration: false,
       );
       final androidPlugin = _localNotifications
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
       await androidPlugin?.createNotificationChannel(androidChannel);
       await androidPlugin?.createNotificationChannel(callsChannel);
+      await androidPlugin?.createNotificationChannel(crisisChannel);
+      await androidPlugin?.createNotificationChannel(chatChannel);
+      await androidPlugin?.createNotificationChannel(socialChannel);
+      await androidPlugin?.createNotificationChannel(systemChannel);
 
       // Foreground-Listener — zeigt LOCAL Notification (falls keine UI sichtbar)
       // ZUSAETZLICH zum FcmForegroundListener-Widget (das Toasts zeigt).
@@ -131,12 +155,32 @@ class PushNotificationService {
     final title = (m.data['title'] as String?) ?? n?.title;
     final body = (m.data['body'] as String?) ?? n?.body;
     if (title == null && body == null) return;
+    final category = m.data['category'] as String? ?? 'social';
+    final priority = m.data['priority'] as String? ?? 'normal';
+    final type = m.data['type'] as String?;
     await _showLocalNotification(
       id: m.messageId?.hashCode ?? DateTime.now().millisecondsSinceEpoch,
       title: title ?? 'Mensaena',
       body: body ?? '',
       payload: m.data['url'] as String? ?? m.data['link'] as String?,
+      channelId: _channelForCategory(category, priority, type),
     );
+  }
+
+  /// Mapped category+priority+type auf eine der 6 Notification-Channels.
+  /// Spiegel der channelFor()-Logik in send-push v22.
+  static String _channelForCategory(
+      String category, String priority, String? type) {
+    if (type == 'incoming_call') return 'mensaena_calls';
+    if (category == 'crisis' || priority == 'high') return 'mensaena_crisis';
+    if (category == 'chat') return 'mensaena_chat';
+    if (category == 'system') return 'mensaena_system';
+    if (category == 'events' ||
+        category == 'marketplace' ||
+        category == 'social') {
+      return 'mensaena_social';
+    }
+    return _channelId;
   }
 
   /// Tap-Handler — wenn User Notification klickt (App war im Background
@@ -155,30 +199,41 @@ class PushNotificationService {
     required String title,
     required String body,
     String? payload,
+    String channelId = _channelId,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
-      _channelId,
-      _channelName,
-      channelDescription: _channelDescription,
-      importance: Importance.high,
-      priority: Priority.high,
-      playSound: true,
-      enableVibration: true,
+    // Channel-spezifische Importance/Priority — muss zum erstellten Channel passen.
+    final importance = switch (channelId) {
+      'mensaena_calls'  => Importance.max,
+      'mensaena_crisis' => Importance.max,
+      'mensaena_chat'   => Importance.high,
+      'mensaena_social' => Importance.defaultImportance,
+      'mensaena_system' => Importance.low,
+      _                 => Importance.high,
+    };
+    final priority = switch (channelId) {
+      'mensaena_calls'  => Priority.max,
+      'mensaena_crisis' => Priority.max,
+      'mensaena_chat'   => Priority.high,
+      'mensaena_social' => Priority.defaultPriority,
+      'mensaena_system' => Priority.low,
+      _                 => Priority.high,
+    };
+    final silent = channelId == 'mensaena_system';
+    final androidDetails = AndroidNotificationDetails(
+      channelId,
+      channelId,
+      importance: importance,
+      priority: priority,
+      playSound: !silent,
+      enableVibration: !silent,
       icon: '@mipmap/ic_launcher',
     );
     const iosDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
+      presentAlert: true, presentBadge: true, presentSound: true,
     );
     await _localNotifications.show(
-      id,
-      title,
-      body,
-      const NotificationDetails(
-        android: androidDetails,
-        iOS: iosDetails,
-      ),
+      id, title, body,
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
       payload: payload,
     );
   }
