@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -476,16 +477,33 @@ class _DmTile extends ConsumerWidget {
           children: [
             Stack(
               children: [
-                CircleAvatar(
-                  radius: 22, // 44dp — empfohlene Touch-Affordanz
-                  backgroundColor: AppColors.elevated,
-                  backgroundImage:
-                      avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                  child: avatarUrl == null
-                      ? const Icon(LucideIcons.user,
-                          size: 20, color: AppColors.bronze)
-                      : null,
-                ),
+                if (avatarUrl != null)
+                  CachedNetworkImage(
+                    imageUrl: avatarUrl,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    imageBuilder: (_, img) => CircleAvatar(
+                      radius: 22,
+                      backgroundColor: AppColors.elevated,
+                      backgroundImage: img,
+                    ),
+                    placeholder: (_, __) => const CircleAvatar(
+                      radius: 22,
+                      backgroundColor: AppColors.elevated,
+                    ),
+                    errorWidget: (_, __, ___) => const CircleAvatar(
+                      radius: 22,
+                      backgroundColor: AppColors.elevated,
+                      child: Icon(LucideIcons.user,
+                          size: 20, color: AppColors.bronze),
+                    ),
+                  )
+                else
+                  const CircleAvatar(
+                    radius: 22, // 44dp — empfohlene Touch-Affordanz
+                    backgroundColor: AppColors.elevated,
+                    child: Icon(LucideIcons.user,
+                        size: 20, color: AppColors.bronze),
+                  ),
                 if (online && isDm)
                   Positioned(
                     right: 0,

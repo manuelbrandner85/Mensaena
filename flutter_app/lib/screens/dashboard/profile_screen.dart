@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -633,22 +634,42 @@ class _Header extends StatelessWidget {
             TiltCard(
               intensity: 1.2,
               borderRadius: 999,
-              child: CircleAvatar(
-                radius: 36,
-                backgroundColor: AppColors.surface,
-                backgroundImage: profile.avatarUrl != null
-                    ? NetworkImage(profile.avatarUrl!)
-                    : null,
-                child: profile.avatarUrl == null
-                    ? Text(
+              child: profile.avatarUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: profile.avatarUrl!,
+                      fadeInDuration: const Duration(milliseconds: 200),
+                      imageBuilder: (_, img) => CircleAvatar(
+                        radius: 36,
+                        backgroundColor: AppColors.surface,
+                        backgroundImage: img,
+                      ),
+                      placeholder: (_, __) => const CircleAvatar(
+                        radius: 36,
+                        backgroundColor: AppColors.surface,
+                      ),
+                      errorWidget: (_, __, ___) => CircleAvatar(
+                        radius: 36,
+                        backgroundColor: AppColors.surface,
+                        child: Text(
+                          (profile.name ?? '?').substring(0, 1).toUpperCase(),
+                          style: AppTypography.display(
+                            size: 28,
+                            color: AppColors.amber,
+                          ),
+                        ),
+                      ),
+                    )
+                  : CircleAvatar(
+                      radius: 36,
+                      backgroundColor: AppColors.surface,
+                      child: Text(
                         (profile.name ?? '?').substring(0, 1).toUpperCase(),
                         style: AppTypography.display(
                           size: 28,
                           color: AppColors.amber,
                         ),
-                      )
-                    : null,
-              ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 16),
             Expanded(

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -316,15 +318,21 @@ class _Tile extends ConsumerWidget {
                       child: Hero(
                         tag: 'marketplace-image-${item.id}',
                         child: firstImage != null
-                            ? Image.network(
-                                firstImage,
+                            ? CachedNetworkImage(
+                                imageUrl: firstImage,
+                                fadeInDuration:
+                                    const Duration(milliseconds: 200),
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
+                                placeholder: (_, __) => const ShimmerBox(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  borderRadius: 0,
+                                ),
+                                errorWidget: (_, __, ___) => Container(
                                   color: AppColors.elevated,
-                                  child: const Center(
-                                    child: Icon(LucideIcons.imageOff,
-                                        color: AppColors.mute),
-                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(LucideIcons.imageOff,
+                                      size: 20, color: AppColors.mute),
                                 ),
                               )
                             : Container(

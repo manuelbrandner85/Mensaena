@@ -3,6 +3,7 @@
 /// 1:1 zu Web /ratings (lebt dort als Tab in Profile, hier als eigener Screen).
 library;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -220,16 +221,33 @@ class _RatingTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.elevated,
-                backgroundImage:
-                    avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl == null
-                    ? const Icon(LucideIcons.user,
-                        size: 16, color: AppColors.bronze)
-                    : null,
-              ),
+              if (avatarUrl != null)
+                CachedNetworkImage(
+                  imageUrl: avatarUrl,
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  imageBuilder: (_, img) => CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.elevated,
+                    backgroundImage: img,
+                  ),
+                  placeholder: (_, __) => const CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.elevated,
+                  ),
+                  errorWidget: (_, __, ___) => const CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.elevated,
+                    child: Icon(LucideIcons.user,
+                        size: 16, color: AppColors.bronze),
+                  ),
+                )
+              else
+                const CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.elevated,
+                  child: Icon(LucideIcons.user,
+                      size: 16, color: AppColors.bronze),
+                ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

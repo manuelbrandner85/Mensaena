@@ -6,6 +6,7 @@ library;
 
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/organizations_repository.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class FarmCreateScreen extends ConsumerStatefulWidget {
@@ -402,12 +404,18 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  _mediaUrls[i],
+                child: CachedNetworkImage(
+                  imageUrl: _mediaUrls[i],
+                  fadeInDuration: const Duration(milliseconds: 200),
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  placeholder: (_, __) => const ShimmerBox(
+                    width: 80,
+                    height: 80,
+                    borderRadius: 8,
+                  ),
+                  errorWidget: (_, __, ___) => Container(
                     width: 80,
                     height: 80,
                     color: AppColors.elevated,

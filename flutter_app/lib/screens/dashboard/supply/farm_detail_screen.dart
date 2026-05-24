@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/farm_listing.dart';
 import '../../../repositories/organizations_repository.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class FarmDetailScreen extends ConsumerStatefulWidget {
@@ -54,8 +56,25 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
                 if (f.imageUrl != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child: Image.network(f.imageUrl!,
-                        height: 220, width: double.infinity, fit: BoxFit.cover),
+                    child: CachedNetworkImage(
+                      imageUrl: f.imageUrl!,
+                      fadeInDuration: const Duration(milliseconds: 200),
+                      height: 220,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => const ShimmerBox(
+                        width: double.infinity,
+                        height: 220,
+                        borderRadius: 14,
+                      ),
+                      errorWidget: (_, __, ___) => Container(
+                        color: AppColors.elevated,
+                        height: 220,
+                        alignment: Alignment.center,
+                        child: const Icon(LucideIcons.imageOff,
+                            size: 20, color: AppColors.mute),
+                      ),
+                    ),
                   ),
                 const SizedBox(height: 14),
                 Row(

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -256,20 +257,43 @@ class _ProfileHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: AppColors.surface,
-            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-            child: avatarUrl == null
-                ? Text(
-                    (displayName ?? '?').substring(0, 1).toUpperCase(),
-                    style: AppTypography.display(
-                      size: 22,
-                      color: AppColors.amber,
-                    ),
-                  )
-                : null,
-          ),
+          if (avatarUrl != null)
+            CachedNetworkImage(
+              imageUrl: avatarUrl,
+              fadeInDuration: const Duration(milliseconds: 200),
+              imageBuilder: (_, img) => CircleAvatar(
+                radius: 28,
+                backgroundColor: AppColors.surface,
+                backgroundImage: img,
+              ),
+              placeholder: (_, __) => const CircleAvatar(
+                radius: 28,
+                backgroundColor: AppColors.surface,
+              ),
+              errorWidget: (_, __, ___) => CircleAvatar(
+                radius: 28,
+                backgroundColor: AppColors.surface,
+                child: Text(
+                  (displayName ?? '?').substring(0, 1).toUpperCase(),
+                  style: AppTypography.display(
+                    size: 22,
+                    color: AppColors.amber,
+                  ),
+                ),
+              ),
+            )
+          else
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: AppColors.surface,
+              child: Text(
+                (displayName ?? '?').substring(0, 1).toUpperCase(),
+                style: AppTypography.display(
+                  size: 22,
+                  color: AppColors.amber,
+                ),
+              ),
+            ),
           const SizedBox(height: 12),
           Text(
             displayName ?? 'common.neighbour'.tr(),

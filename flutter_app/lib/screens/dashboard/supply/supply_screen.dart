@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import '../../../models/farm_listing.dart';
 import '../../../repositories/organizations_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/locale_country_service.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -309,18 +311,23 @@ class _FarmTile extends StatelessWidget {
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(11)),
-                child: Image.network(
-                  farm.imageUrl!,
+                child: CachedNetworkImage(
+                  imageUrl: farm.imageUrl!,
+                  fadeInDuration: const Duration(milliseconds: 200),
                   height: 130,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  placeholder: (_, __) => const ShimmerBox(
+                    width: double.infinity,
+                    height: 130,
+                    borderRadius: 0,
+                  ),
+                  errorWidget: (_, __, ___) => Container(
                     color: AppColors.elevated,
                     height: 130,
-                    child: const Center(
-                      child:
-                          Icon(LucideIcons.imageOff, color: AppColors.mute),
-                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(LucideIcons.imageOff,
+                        size: 20, color: AppColors.mute),
                   ),
                 ),
               ),

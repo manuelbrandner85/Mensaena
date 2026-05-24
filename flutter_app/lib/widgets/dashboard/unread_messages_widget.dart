@@ -2,6 +2,7 @@
 /// UnreadMessagesWidget — Liste ungelesener Direktnachrichten.
 library;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -174,24 +175,45 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 14,
-                          backgroundColor: AppColors.elevated,
-                          backgroundImage: (m.senderAvatar != null &&
-                                  m.senderAvatar!.isNotEmpty)
-                              ? NetworkImage(m.senderAvatar!)
-                              : null,
-                          child: (m.senderAvatar == null ||
-                                  m.senderAvatar!.isEmpty)
-                              ? Text(
-                                  m.senderName.isNotEmpty
-                                      ? m.senderName[0].toUpperCase()
-                                      : '?',
-                                  style: AppTypography.mono(
-                                      size: 12, color: AppColors.bronze),
-                                )
-                              : null,
-                        ),
+                        if (m.senderAvatar != null &&
+                            m.senderAvatar!.isNotEmpty)
+                          CachedNetworkImage(
+                            imageUrl: m.senderAvatar!,
+                            fadeInDuration:
+                                const Duration(milliseconds: 200),
+                            imageBuilder: (_, img) => CircleAvatar(
+                              radius: 14,
+                              backgroundColor: AppColors.elevated,
+                              backgroundImage: img,
+                            ),
+                            placeholder: (_, __) => const CircleAvatar(
+                              radius: 14,
+                              backgroundColor: AppColors.elevated,
+                            ),
+                            errorWidget: (_, __, ___) => CircleAvatar(
+                              radius: 14,
+                              backgroundColor: AppColors.elevated,
+                              child: Text(
+                                m.senderName.isNotEmpty
+                                    ? m.senderName[0].toUpperCase()
+                                    : '?',
+                                style: AppTypography.mono(
+                                    size: 12, color: AppColors.bronze),
+                              ),
+                            ),
+                          )
+                        else
+                          CircleAvatar(
+                            radius: 14,
+                            backgroundColor: AppColors.elevated,
+                            child: Text(
+                              m.senderName.isNotEmpty
+                                  ? m.senderName[0].toUpperCase()
+                                  : '?',
+                              style: AppTypography.mono(
+                                  size: 12, color: AppColors.bronze),
+                            ),
+                          ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(

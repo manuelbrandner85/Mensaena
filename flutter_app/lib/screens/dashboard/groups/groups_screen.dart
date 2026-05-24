@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -194,16 +195,33 @@ class _Tile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 22,
-              backgroundColor: AppColors.elevated,
-              backgroundImage:
-                  avatarUrl != null ? NetworkImage(avatarUrl) : null,
-              child: avatarUrl == null
-                  ? const Icon(LucideIcons.users2,
-                      size: 18, color: AppColors.amber)
-                  : null,
-            ),
+            if (avatarUrl != null)
+              CachedNetworkImage(
+                imageUrl: avatarUrl,
+                fadeInDuration: const Duration(milliseconds: 200),
+                imageBuilder: (_, img) => CircleAvatar(
+                  radius: 22,
+                  backgroundColor: AppColors.elevated,
+                  backgroundImage: img,
+                ),
+                placeholder: (_, __) => const CircleAvatar(
+                  radius: 22,
+                  backgroundColor: AppColors.elevated,
+                ),
+                errorWidget: (_, __, ___) => const CircleAvatar(
+                  radius: 22,
+                  backgroundColor: AppColors.elevated,
+                  child: Icon(LucideIcons.users2,
+                      size: 18, color: AppColors.amber),
+                ),
+              )
+            else
+              const CircleAvatar(
+                radius: 22,
+                backgroundColor: AppColors.elevated,
+                child: Icon(LucideIcons.users2,
+                    size: 18, color: AppColors.amber),
+              ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class MarketplaceDetailScreen extends ConsumerWidget {
@@ -49,8 +51,23 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                       itemBuilder: (context, i) {
                         final img = ClipRRect(
                           borderRadius: BorderRadius.circular(14),
-                          child:
-                              Image.network(l.images[i], fit: BoxFit.cover),
+                          child: CachedNetworkImage(
+                            imageUrl: l.images[i],
+                            fadeInDuration:
+                                const Duration(milliseconds: 200),
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => const ShimmerBox(
+                              width: double.infinity,
+                              height: 240,
+                              borderRadius: 14,
+                            ),
+                            errorWidget: (_, __, ___) => Container(
+                              color: AppColors.elevated,
+                              alignment: Alignment.center,
+                              child: const Icon(LucideIcons.imageOff,
+                                  size: 20, color: AppColors.mute),
+                            ),
+                          ),
                         );
                         if (i == 0) {
                           return Hero(

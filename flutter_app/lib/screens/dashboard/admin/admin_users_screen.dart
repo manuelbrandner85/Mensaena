@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -166,21 +167,43 @@ class _UserRow extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.elevated,
-                backgroundImage:
-                    avatar != null ? NetworkImage(avatar) : null,
-                child: avatar == null
-                    ? Text(
-                        (name.isNotEmpty ? name : '?')
-                            .substring(0, 1)
-                            .toUpperCase(),
-                        style: AppTypography.mono(
-                            size: 14, color: AppColors.amber),
-                      )
-                    : null,
-              ),
+              if (avatar != null)
+                CachedNetworkImage(
+                  imageUrl: avatar,
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  imageBuilder: (_, img) => CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.elevated,
+                    backgroundImage: img,
+                  ),
+                  placeholder: (_, __) => const CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.elevated,
+                  ),
+                  errorWidget: (_, __, ___) => CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.elevated,
+                    child: Text(
+                      (name.isNotEmpty ? name : '?')
+                          .substring(0, 1)
+                          .toUpperCase(),
+                      style: AppTypography.mono(
+                          size: 14, color: AppColors.amber),
+                    ),
+                  ),
+                )
+              else
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.elevated,
+                  child: Text(
+                    (name.isNotEmpty ? name : '?')
+                        .substring(0, 1)
+                        .toUpperCase(),
+                    style: AppTypography.mono(
+                        size: 14, color: AppColors.amber),
+                  ),
+                ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(

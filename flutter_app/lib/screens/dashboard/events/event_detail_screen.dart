@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:add_2_calendar/add_2_calendar.dart' as a2c;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
 import '../../../repositories/events_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class EventDetailScreen extends ConsumerWidget {
@@ -49,11 +51,24 @@ class EventDetailScreen extends ConsumerWidget {
                 if (e.imageUrl != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child: Image.network(
-                      e.imageUrl!,
+                    child: CachedNetworkImage(
+                      imageUrl: e.imageUrl!,
+                      fadeInDuration: const Duration(milliseconds: 200),
                       height: 200,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      placeholder: (_, __) => const ShimmerBox(
+                        width: double.infinity,
+                        height: 200,
+                        borderRadius: 14,
+                      ),
+                      errorWidget: (_, __, ___) => Container(
+                        color: AppColors.elevated,
+                        height: 200,
+                        alignment: Alignment.center,
+                        child: const Icon(LucideIcons.imageOff,
+                            size: 20, color: AppColors.mute),
+                      ),
                     ),
                   ),
                 const SizedBox(height: 14),

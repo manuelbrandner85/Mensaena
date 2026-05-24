@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -625,23 +626,46 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             horizontal: 12, vertical: 8),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              radius: 14,
-                              backgroundColor: AppColors.elevated,
-                              backgroundImage: avatarUrl != null
-                                  ? NetworkImage(avatarUrl)
-                                  : null,
-                              child: avatarUrl == null
-                                  ? Text(
-                                      name.isNotEmpty
-                                          ? name[0].toUpperCase()
-                                          : '?',
-                                      style: AppTypography.mono(
-                                          size: 11,
-                                          color: AppColors.bronze),
-                                    )
-                                  : null,
-                            ),
+                            if (avatarUrl != null)
+                              CachedNetworkImage(
+                                imageUrl: avatarUrl,
+                                fadeInDuration:
+                                    const Duration(milliseconds: 200),
+                                imageBuilder: (_, img) => CircleAvatar(
+                                  radius: 14,
+                                  backgroundColor: AppColors.elevated,
+                                  backgroundImage: img,
+                                ),
+                                placeholder: (_, __) => const CircleAvatar(
+                                  radius: 14,
+                                  backgroundColor: AppColors.elevated,
+                                ),
+                                errorWidget: (_, __, ___) => CircleAvatar(
+                                  radius: 14,
+                                  backgroundColor: AppColors.elevated,
+                                  child: Text(
+                                    name.isNotEmpty
+                                        ? name[0].toUpperCase()
+                                        : '?',
+                                    style: AppTypography.mono(
+                                        size: 11,
+                                        color: AppColors.bronze),
+                                  ),
+                                ),
+                              )
+                            else
+                              CircleAvatar(
+                                radius: 14,
+                                backgroundColor: AppColors.elevated,
+                                child: Text(
+                                  name.isNotEmpty
+                                      ? name[0].toUpperCase()
+                                      : '?',
+                                  style: AppTypography.mono(
+                                      size: 11,
+                                      color: AppColors.bronze),
+                                ),
+                              ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Column(
@@ -918,12 +942,6 @@ class _LeadingBadge extends StatelessWidget {
               color: accent.withValues(alpha: 0.45),
               width: 1.2,
             ),
-            image: hasAvatar
-                ? DecorationImage(
-                    image: NetworkImage(ctx!.avatarUrl!),
-                    fit: BoxFit.cover,
-                  )
-                : null,
             boxShadow: [
               BoxShadow(
                 color: accent.withValues(alpha: 0.20),
@@ -934,7 +952,24 @@ class _LeadingBadge extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: hasAvatar
-              ? null
+              ? ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: ctx!.avatarUrl!,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    width: 38,
+                    height: 38,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                      color: AppColors.elevated,
+                    ),
+                    errorWidget: (_, __, ___) => Container(
+                      color: AppColors.elevated,
+                      alignment: Alignment.center,
+                      child: Text(emoji,
+                          style: const TextStyle(fontSize: 18)),
+                    ),
+                  ),
+                )
               : Text(emoji, style: const TextStyle(fontSize: 18)),
         ),
         if (isOnline)

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1019,25 +1020,32 @@ class _Hero extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: onPickCover,
-              child: Container(
+              child: SizedBox(
                 height: 220,
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.elevated,
-                  image: coverFile != null
-                      ? DecorationImage(
-                          image: FileImage(coverFile!),
-                          fit: BoxFit.cover,
-                        )
-                      : coverUrl != null
-                          ? DecorationImage(
-                              image: NetworkImage(coverUrl!),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                ),
-                child: (coverFile == null && coverUrl == null)
-                    ? Center(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(color: AppColors.elevated),
+                    if (coverFile != null)
+                      Image.file(coverFile!, fit: BoxFit.cover)
+                    else if (coverUrl != null)
+                      CachedNetworkImage(
+                        imageUrl: coverUrl!,
+                        fadeInDuration: const Duration(milliseconds: 200),
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => Container(
+                          color: AppColors.elevated,
+                        ),
+                        errorWidget: (_, __, ___) => Container(
+                          color: AppColors.elevated,
+                          alignment: Alignment.center,
+                          child: const Icon(LucideIcons.imageOff,
+                              size: 20, color: AppColors.mute),
+                        ),
+                      )
+                    else
+                      Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -1049,8 +1057,9 @@ class _Hero extends StatelessWidget {
                                     size: 10, color: AppColors.mute)),
                           ],
                         ),
-                      )
-                    : null,
+                      ),
+                  ],
+                ),
               ),
             ),
             Positioned(
@@ -1083,17 +1092,33 @@ class _Hero extends StatelessWidget {
                                   image: FileImage(avatarFile!),
                                   fit: BoxFit.cover,
                                 )
-                              : avatarUrl != null
-                                  ? DecorationImage(
-                                      image: NetworkImage(avatarUrl!),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
+                              : null,
                         ),
-                        child: (avatarFile == null && avatarUrl == null)
-                            ? const Icon(LucideIcons.user,
-                                size: 36, color: AppColors.mute)
-                            : null,
+                        child: avatarFile != null
+                            ? null
+                            : avatarUrl != null
+                                ? ClipOval(
+                                    child: CachedNetworkImage(
+                                      imageUrl: avatarUrl!,
+                                      fadeInDuration: const Duration(
+                                          milliseconds: 200),
+                                      fit: BoxFit.cover,
+                                      width: 88,
+                                      height: 88,
+                                      placeholder: (_, __) => Container(
+                                        color: AppColors.elevated,
+                                      ),
+                                      errorWidget: (_, __, ___) => Container(
+                                        color: AppColors.elevated,
+                                        alignment: Alignment.center,
+                                        child: const Icon(LucideIcons.user,
+                                            size: 36,
+                                            color: AppColors.mute),
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(LucideIcons.user,
+                                    size: 36, color: AppColors.mute),
                       ),
                       Positioned(
                         right: 0,

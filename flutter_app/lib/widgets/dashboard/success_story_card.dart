@@ -2,6 +2,7 @@
 /// SuccessStoryCard — Rotierende anonyme Erfolgsgeschichten.
 library;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -9,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
+import '../effects/shimmer_skeleton.dart';
 
 class SuccessStoryCard extends StatefulWidget {
   const SuccessStoryCard({super.key});
@@ -106,10 +108,21 @@ class _SuccessStoryCardState extends State<SuccessStoryCard> {
                 SizedBox(
                   height: 140,
                   width: double.infinity,
-                  child: Image.network(
-                    image,
+                  child: CachedNetworkImage(
+                    imageUrl: image,
+                    fadeInDuration: const Duration(milliseconds: 200),
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    placeholder: (_, __) => const ShimmerBox(
+                      width: double.infinity,
+                      height: 140,
+                      borderRadius: 0,
+                    ),
+                    errorWidget: (_, __, ___) => Container(
+                      color: AppColors.elevated,
+                      alignment: Alignment.center,
+                      child: const Icon(LucideIcons.imageOff,
+                          size: 20, color: AppColors.mute),
+                    ),
                   ),
                 ),
               Padding(

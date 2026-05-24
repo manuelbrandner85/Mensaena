@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -170,18 +171,31 @@ class DashboardHeroCard extends StatelessWidget {
                         child: p?.avatarUrl != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(14),
-                                child: Image.network(
-                                  p!.avatarUrl!,
+                                child: CachedNetworkImage(
+                                  imageUrl: p!.avatarUrl!,
+                                  fadeInDuration:
+                                      const Duration(milliseconds: 200),
                                   fit: BoxFit.cover,
                                   width: 64,
                                   height: 64,
-                                  errorBuilder: (_, __, ___) => Text(
-                                    initialsShort.isEmpty
-                                        ? 'N'
-                                        : initialsShort,
-                                    style: AppTypography.display(
-                                      size: 22,
-                                      color: AppColors.bronze,
+                                  placeholder: (_, __) => Container(
+                                    width: 64,
+                                    height: 64,
+                                    color: AppColors.elevated,
+                                  ),
+                                  errorWidget: (_, __, ___) => Container(
+                                    width: 64,
+                                    height: 64,
+                                    color: AppColors.elevated,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      initialsShort.isEmpty
+                                          ? 'N'
+                                          : initialsShort,
+                                      style: AppTypography.display(
+                                        size: 22,
+                                        color: AppColors.bronze,
+                                      ),
                                     ),
                                   ),
                                 ),

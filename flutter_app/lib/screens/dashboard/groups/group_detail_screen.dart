@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/groups_repository.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class GroupDetailScreen extends ConsumerStatefulWidget {
@@ -69,27 +71,58 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                       if (g.bannerUrl != null)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
-                          child: Image.network(
-                            g.bannerUrl!,
+                          child: CachedNetworkImage(
+                            imageUrl: g.bannerUrl!,
+                            fadeInDuration:
+                                const Duration(milliseconds: 200),
                             height: 140,
                             width: double.infinity,
                             fit: BoxFit.cover,
+                            placeholder: (_, __) => const ShimmerBox(
+                              width: double.infinity,
+                              height: 140,
+                              borderRadius: 14,
+                            ),
+                            errorWidget: (_, __, ___) => Container(
+                              color: AppColors.elevated,
+                              height: 140,
+                              alignment: Alignment.center,
+                              child: const Icon(LucideIcons.imageOff,
+                                  size: 20, color: AppColors.mute),
+                            ),
                           ),
                         ),
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: AppColors.elevated,
-                            backgroundImage: g.avatarUrl != null
-                                ? NetworkImage(g.avatarUrl!)
-                                : null,
-                            child: g.avatarUrl == null
-                                ? const Icon(LucideIcons.users2,
-                                    color: AppColors.amber)
-                                : null,
-                          ),
+                          if (g.avatarUrl != null)
+                            CachedNetworkImage(
+                              imageUrl: g.avatarUrl!,
+                              fadeInDuration:
+                                  const Duration(milliseconds: 200),
+                              imageBuilder: (_, img) => CircleAvatar(
+                                radius: 24,
+                                backgroundColor: AppColors.elevated,
+                                backgroundImage: img,
+                              ),
+                              placeholder: (_, __) => const CircleAvatar(
+                                radius: 24,
+                                backgroundColor: AppColors.elevated,
+                              ),
+                              errorWidget: (_, __, ___) => const CircleAvatar(
+                                radius: 24,
+                                backgroundColor: AppColors.elevated,
+                                child: Icon(LucideIcons.users2,
+                                    color: AppColors.amber),
+                              ),
+                            )
+                          else
+                            const CircleAvatar(
+                              radius: 24,
+                              backgroundColor: AppColors.elevated,
+                              child: Icon(LucideIcons.users2,
+                                  color: AppColors.amber),
+                            ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
