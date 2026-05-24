@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -67,7 +68,7 @@ class _MarketplaceCreateScreenState
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.elevated,
       duration: const Duration(seconds: 1),
-      content: Text('Suche $code …',
+      content: Text('marketplace.searching'.tr(namedArgs: {'code': code}),
           style: AppTypography.body(size: 12, color: AppColors.inkSoft)),
     ));
     final p = await OpenFoodFactsService.lookup(code);
@@ -75,7 +76,7 @@ class _MarketplaceCreateScreenState
     if (p == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('Produkt $code nicht in Open Food Facts gefunden.',
+        content: Text('marketplace.productNotFound'.tr(namedArgs: {'code': code}),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
       return;
@@ -140,7 +141,7 @@ class _MarketplaceCreateScreenState
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Text('Art', style: AppTypography.label(size: 10)),
+            Text('marketplace.type'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
@@ -184,7 +185,7 @@ class _MarketplaceCreateScreenState
             OutlinedButton.icon(
               onPressed: _scanAndFillFromFood,
               icon: const Icon(LucideIcons.scanLine, size: 16),
-              label: const Text('Barcode scannen (Lebensmittel)'),
+              label: Text('marketplace.scanBarcode'.tr()),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.bronze,
                 side: BorderSide(

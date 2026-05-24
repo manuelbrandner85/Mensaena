@@ -6,6 +6,7 @@ library;
 
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -185,7 +186,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
             children: [
-              Text('Bauernhof / Direktvermarkter',
+              Text('supply.farmCreateTitle'.tr(),
                   style: AppTypography.display(
                       size: 22, color: AppColors.ink)),
               const SizedBox(height: 4),
@@ -273,7 +274,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               SwitchListTile.adaptive(
                 value: _isBio,
                 onChanged: (v) => setState(() => _isBio = v),
-                title: Text('Bio-zertifiziert',
+                title: Text('supply.farmIsBio'.tr(),
                     style: AppTypography.body(
                         size: 14, color: AppColors.ink)),
                 activeColor: AppColors.leben,
@@ -282,7 +283,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               SwitchListTile.adaptive(
                 value: _isSeasonal,
                 onChanged: (v) => setState(() => _isSeasonal = v),
-                title: Text('Saisonal',
+                title: Text('supply.farmIsSeasonal'.tr(),
                     style: AppTypography.body(
                         size: 14, color: AppColors.ink)),
                 activeColor: AppColors.amber,
@@ -302,7 +303,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
                             strokeWidth: 2, color: AppColors.voidColor),
                       )
                     : const Icon(LucideIcons.send, size: 16),
-                label: const Text('Eintrag absenden'),
+                label: Text('supply.farmSubmit'.tr()),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.bronze,
                   foregroundColor: AppColors.voidColor,

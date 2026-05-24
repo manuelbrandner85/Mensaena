@@ -323,7 +323,9 @@
     "status": "Durum",
     "profileActions": "Profil işlemleri",
     "deleteEntry": "Kaydı sil",
-    "rawData": "Ham veri"
+    "rawData": "Ham veri",
+    "deleteReportTitle": "Bildirimi sil?",
+    "deleteReportConfirm": "Bu işlem geri alınamaz."
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",
@@ -532,7 +534,11 @@
     "reasonFalse": "Yanlış bilgi",
     "reasonOffensive": "Saldırgan içerik",
     "reasonCommercial": "Ticari teklif",
-    "reasonOther": "Diğer"
+    "reasonOther": "Diğer",
+    "blockUserTitle": "Kullanıcıyı engelle?",
+    "blockUserConfirm": "Bu kullanıcının gönderilerini ve mesajlarını artık görmeyeceksin.",
+    "blockButton": "Engelle",
+    "chooseReason": "Bir sebep seç:"
   },
   "marketplace": {
     "listing": "İlan",
@@ -550,7 +556,11 @@
     "postedOn": "Yayımlandı: {date}",
     "chatTitle": "Pazar: {title}",
     "shareBody": "{title}\n\nMensaena üzerinde: {url}",
-    "shareSubject": "Mensaena: {title}"
+    "shareSubject": "Mensaena: {title}",
+    "searching": "{code} aranıyor …",
+    "productNotFound": "{code} ürünü Open Food Facts'ta bulunamadı.",
+    "type": "Tür",
+    "scanBarcode": "Barkod tara (gıda)"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -668,5 +678,22 @@
     "channelFallback": "Kanal",
     "conversationFallback": "Konuşma",
     "categoryGeneral": "Genel"
+  },
+  "legal": {
+    "donate": "Bağış yap",
+    "donateUseTitle": "Bağışları nasıl kullanıyoruz",
+    "donateTiersTitle": "Destekçi seviyeleri",
+    "donateBankTitle": "Banka havalesi"
+  },
+  "supply": {
+    "farmCreateTitle": "Çiftlik / Doğrudan üretici",
+    "farmIsBio": "Organik sertifikalı",
+    "farmIsSeasonal": "Mevsimsel",
+    "farmSubmit": "Kaydı gönder"
+  },
+  "knowledge": {
+    "category": "Kategori",
+    "publicVisible": "Herkese açık",
+    "publishArticle": "Makaleyi yayınla"
   }
 }

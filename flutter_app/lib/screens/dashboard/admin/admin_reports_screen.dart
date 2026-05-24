@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -73,18 +73,18 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Meldung löschen?',
+        title: Text('admin.deleteReportTitle'.tr(),
             style: AppTypography.display(size: 18, color: AppColors.ink)),
-        content: Text('Diese Aktion ist nicht rückgängig.',
+        content: Text('admin.deleteReportConfirm'.tr(),
             style: AppTypography.body(size: 14, color: AppColors.inkSoft)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Abbrechen')),
+              child: Text('common.cancel'.tr())),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.herzrot),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Löschen'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),

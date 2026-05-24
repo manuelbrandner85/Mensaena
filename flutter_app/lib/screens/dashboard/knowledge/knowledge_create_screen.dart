@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -168,7 +169,7 @@ class _KnowledgeCreateScreenState
               ),
             ),
             const SizedBox(height: 12),
-            Text('Kategorie', style: AppTypography.label(size: 10)),
+            Text('knowledge.category'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
@@ -215,7 +216,7 @@ class _KnowledgeCreateScreenState
               onChanged: (v) => setState(() => _isPublic = v),
               activeColor: AppColors.bronze,
               contentPadding: EdgeInsets.zero,
-              title: Text('Öffentlich sichtbar',
+              title: Text('knowledge.publicVisible'.tr(),
                   style: AppTypography.body(
                     size: 13,
                     color: AppColors.inkSoft,
@@ -261,7 +262,7 @@ class _KnowledgeCreateScreenState
                       ),
                     )
                   : const Icon(LucideIcons.send, size: 16),
-              label: const Text('Artikel veröffentlichen'),
+              label: Text('knowledge.publishArticle'.tr()),
             ),
             const SizedBox(height: 10),
             OutlinedButton(
@@ -270,7 +271,7 @@ class _KnowledgeCreateScreenState
                 side: const BorderSide(color: AppColors.line),
               ),
               onPressed: () => context.go(widget.routePath),
-              child: const Text('Abbrechen'),
+              child: Text('common.cancel'.tr()),
             ),
           ],
         ),

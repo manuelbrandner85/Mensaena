@@ -323,7 +323,9 @@
     "status": "Статус",
     "profileActions": "Действия с профилем",
     "deleteEntry": "Удалить запись",
-    "rawData": "Сырые данные"
+    "rawData": "Сырые данные",
+    "deleteReportTitle": "Удалить жалобу?",
+    "deleteReportConfirm": "Это действие нельзя отменить."
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",
@@ -532,7 +534,11 @@
     "reasonFalse": "Ложная информация",
     "reasonOffensive": "Оскорбительный контент",
     "reasonCommercial": "Коммерческое предложение",
-    "reasonOther": "Другое"
+    "reasonOther": "Другое",
+    "blockUserTitle": "Заблокировать пользователя?",
+    "blockUserConfirm": "Вы больше не будете видеть посты и сообщения этого пользователя.",
+    "blockButton": "Заблокировать",
+    "chooseReason": "Выберите причину:"
   },
   "marketplace": {
     "listing": "Объявление",
@@ -550,7 +556,11 @@
     "postedOn": "Опубликовано {date}",
     "chatTitle": "Маркет: {title}",
     "shareBody": "{title}\n\nНа Mensaena: {url}",
-    "shareSubject": "Mensaena: {title}"
+    "shareSubject": "Mensaena: {title}",
+    "searching": "Поиск {code} …",
+    "productNotFound": "Продукт {code} не найден в Open Food Facts.",
+    "type": "Тип",
+    "scanBarcode": "Сканировать штрих-код (продукты)"
   },
   "trust": {
     "rate": "Оценить {name}",
@@ -668,5 +678,22 @@
     "channelFallback": "Канал",
     "conversationFallback": "Беседа",
     "categoryGeneral": "Общее"
+  },
+  "legal": {
+    "donate": "Пожертвовать",
+    "donateUseTitle": "Как мы используем пожертвования",
+    "donateTiersTitle": "Уровни поддержки",
+    "donateBankTitle": "Банковский перевод"
+  },
+  "supply": {
+    "farmCreateTitle": "Ферма / Прямой производитель",
+    "farmIsBio": "Био-сертифицировано",
+    "farmIsSeasonal": "Сезонное",
+    "farmSubmit": "Отправить запись"
+  },
+  "knowledge": {
+    "category": "Категория",
+    "publicVisible": "Публично видимо",
+    "publishArticle": "Опубликовать статью"
   }
 }

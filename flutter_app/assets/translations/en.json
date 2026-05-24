@@ -323,7 +323,9 @@
     "status": "Status",
     "profileActions": "Profile actions",
     "deleteEntry": "Delete entry",
-    "rawData": "Raw data"
+    "rawData": "Raw data",
+    "deleteReportTitle": "Delete report?",
+    "deleteReportConfirm": "This action cannot be undone."
   },
   "create": {
     "locationUnavailable": "Location unavailable.",
@@ -532,7 +534,11 @@
     "reasonFalse": "False information",
     "reasonOffensive": "Offensive content",
     "reasonCommercial": "Commercial offer",
-    "reasonOther": "Other"
+    "reasonOther": "Other",
+    "blockUserTitle": "Block user?",
+    "blockUserConfirm": "You will no longer see posts and messages from this user.",
+    "blockButton": "Block",
+    "chooseReason": "Choose a reason:"
   },
   "marketplace": {
     "listing": "Listing",
@@ -550,7 +556,11 @@
     "postedOn": "Listed on {date}",
     "chatTitle": "Marketplace: {title}",
     "shareBody": "{title}\n\nOn Mensaena: {url}",
-    "shareSubject": "Mensaena: {title}"
+    "shareSubject": "Mensaena: {title}",
+    "searching": "Searching {code} …",
+    "productNotFound": "Product {code} not found in Open Food Facts.",
+    "type": "Type",
+    "scanBarcode": "Scan barcode (food)"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -668,5 +678,22 @@
     "channelFallback": "Channel",
     "conversationFallback": "Conversation",
     "categoryGeneral": "General"
+  },
+  "legal": {
+    "donate": "Donate",
+    "donateUseTitle": "How we use donations",
+    "donateTiersTitle": "Supporter tiers",
+    "donateBankTitle": "Bank transfer"
+  },
+  "supply": {
+    "farmCreateTitle": "Farm / Direct producer",
+    "farmIsBio": "Organic certified",
+    "farmIsSeasonal": "Seasonal",
+    "farmSubmit": "Submit entry"
+  },
+  "knowledge": {
+    "category": "Category",
+    "publicVisible": "Publicly visible",
+    "publishArticle": "Publish article"
   }
 }

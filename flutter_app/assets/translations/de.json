@@ -323,7 +323,9 @@
     "status": "Status",
     "profileActions": "Profil-Aktionen",
     "deleteEntry": "Eintrag löschen",
-    "rawData": "Rohdaten"
+    "rawData": "Rohdaten",
+    "deleteReportTitle": "Meldung löschen?",
+    "deleteReportConfirm": "Diese Aktion ist nicht rückgängig."
   },
   "create": {
     "locationUnavailable": "Standort nicht verfügbar.",
@@ -532,7 +534,11 @@
     "reasonFalse": "Falsche Angaben",
     "reasonOffensive": "Anstößige Inhalte",
     "reasonCommercial": "Kommerzielles Angebot",
-    "reasonOther": "Sonstiges"
+    "reasonOther": "Sonstiges",
+    "blockUserTitle": "Nutzer:in blockieren?",
+    "blockUserConfirm": "Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.",
+    "blockButton": "Blockieren",
+    "chooseReason": "Wähle einen Grund:"
   },
   "marketplace": {
     "listing": "Inserat",
@@ -550,7 +556,11 @@
     "postedOn": "Inseriert am {date}",
     "chatTitle": "Marktplatz: {title}",
     "shareBody": "{title}\n\nAuf Mensaena: {url}",
-    "shareSubject": "Mensaena: {title}"
+    "shareSubject": "Mensaena: {title}",
+    "searching": "Suche {code} …",
+    "productNotFound": "Produkt {code} nicht in Open Food Facts gefunden.",
+    "type": "Art",
+    "scanBarcode": "Barcode scannen (Lebensmittel)"
   },
   "trust": {
     "rate": "Bewerte {name}",
@@ -668,5 +678,22 @@
     "channelFallback": "Kanal",
     "conversationFallback": "Konversation",
     "categoryGeneral": "Allgemein"
+  },
+  "legal": {
+    "donate": "Spenden",
+    "donateUseTitle": "Wofür wir Spenden verwenden",
+    "donateTiersTitle": "Unterstützer-Stufen",
+    "donateBankTitle": "Per Überweisung"
+  },
+  "supply": {
+    "farmCreateTitle": "Bauernhof / Direktvermarkter",
+    "farmIsBio": "Bio-zertifiziert",
+    "farmIsSeasonal": "Saisonal",
+    "farmSubmit": "Eintrag absenden"
+  },
+  "knowledge": {
+    "category": "Kategorie",
+    "publicVisible": "Öffentlich sichtbar",
+    "publishArticle": "Artikel veröffentlichen"
   }
 }

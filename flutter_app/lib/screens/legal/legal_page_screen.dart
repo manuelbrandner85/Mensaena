@@ -5,6 +5,7 @@
 /// /about, /kontakt.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -127,7 +128,7 @@ class SpendenScreen extends StatelessWidget {
             }
           },
         ),
-        title: Text('Spenden',
+        title: Text('legal.donate'.tr(),
             style: AppTypography.display(size: 18, color: AppColors.ink)),
         actions: const [LanguagePicker(), SizedBox(width: 4)],
       ),
@@ -151,7 +152,7 @@ class SpendenScreen extends StatelessWidget {
             const SizedBox(height: 24),
             _bankCard(context),
             const SizedBox(height: 24),
-            Text('Wofür wir Spenden verwenden',
+            Text('legal.donateUseTitle'.tr(),
                 style: AppTypography.display(
                     size: 18, color: AppColors.amber)),
             const SizedBox(height: 8),
@@ -160,7 +161,7 @@ class SpendenScreen extends StatelessWidget {
             _transparencyRow('SMS-Verifikation', '~0,05 €/Nutzer:in'),
             _transparencyRow('Entwicklung', 'ehrenamtlich'),
             const SizedBox(height: 24),
-            Text('Unterstützer-Stufen',
+            Text('legal.donateTiersTitle'.tr(),
                 style: AppTypography.display(
                     size: 18, color: AppColors.amber)),
             const SizedBox(height: 8),
@@ -216,7 +217,7 @@ class SpendenScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Per Überweisung',
+          Text('legal.donateBankTitle'.tr(),
               style: AppTypography.display(size: 16, color: AppColors.bronze)),
           const SizedBox(height: 12),
           _bankRow(context, 'Empfänger', _empfaenger),

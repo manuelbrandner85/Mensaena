@@ -135,11 +135,11 @@ class _PostCardState extends State<PostCard> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Nutzer:in blockieren?',
+        title: Text('posts.blockUserTitle'.tr(),
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
-            'Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.',
+            'posts.blockUserConfirm'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
         actions: [
           TextButton(
@@ -149,7 +149,7 @@ class _PostCardState extends State<PostCard> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
-            child: const Text('Blockieren'),
+            child: Text('posts.blockButton'.tr()),
           ),
         ],
       ),
@@ -178,13 +178,13 @@ class _PostCardState extends State<PostCard> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Beitrag melden',
+        title: Text('posts.reportTitle'.tr(),
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Wähle einen Grund:',
+            Text('posts.chooseReason'.tr(),
                 style: AppTypography.body(
                     size: 13, color: AppColors.inkSoft)),
             const SizedBox(height: 10),
