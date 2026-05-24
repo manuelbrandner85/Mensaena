@@ -716,5 +716,25 @@
     "emailBtn": "E-Mail",
     "websiteBtn": "Webseite",
     "noneInCountry": "Für dieses Land ist noch keine Foodbank hinterlegt."
+  },
+  "meteo": {
+    "title": "Wetterwarnungen",
+    "subtitle": "{count} aktive Warnungen für {country}. Quelle: MeteoAlarm (EUMETNET).",
+    "noWarnings": "Aktuell keine offiziellen Wetterwarnungen für {country}.",
+    "severityExtreme": "Extrem",
+    "severitySevere": "Schwer",
+    "severityModerate": "Mäßig",
+    "severityMinor": "Gering",
+    "areaLabel": "Gebiet: {area}",
+    "expiresLabel": "Gültig bis: {time}",
+    "openSource": "Quelle öffnen"
+  },
+  "jobs": {
+    "portalsTitle": "Jobportale",
+    "portalsSubtitle": "Stellenangebote in {country} — offizielle Arbeitsämter und seriöse Plattformen.",
+    "portalsDisclaimer": "Links öffnen die jeweilige Plattform im Browser. Mensaena ist kein Vermittler.",
+    "officialBadge": "AMTLICH",
+    "openSearch": "Jobs suchen",
+    "openPortal": "Portal öffnen"
   }
 }

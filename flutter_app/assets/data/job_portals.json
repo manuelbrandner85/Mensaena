@@ -1,0 +1,192 @@
+[
+  {
+    "country": "DE",
+    "name": "Bundesagentur für Arbeit",
+    "operator": "Bundesagentur für Arbeit",
+    "website": "https://www.arbeitsagentur.de/jobsuche/",
+    "search_url": "https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=1",
+    "description_de": "Größtes amtliches Job-Portal Deutschlands mit über 1,5 Mio. offenen Stellen.",
+    "description_en": "Germany's largest official employment portal with over 1.5 million job listings.",
+    "official": true
+  },
+  {
+    "country": "DE",
+    "name": "StepStone",
+    "operator": "StepStone GmbH",
+    "website": "https://www.stepstone.de",
+    "search_url": "https://www.stepstone.de/jobs",
+    "description_de": "Eine der größten privaten Job-Plattformen für Fach- und Führungskräfte in DACH.",
+    "description_en": "One of the largest private job platforms for professionals in the DACH region.",
+    "official": false
+  },
+  {
+    "country": "AT",
+    "name": "AMS – Arbeitsmarktservice",
+    "operator": "Arbeitsmarktservice Österreich",
+    "website": "https://www.ams.at",
+    "search_url": "https://jobs.ams.at",
+    "description_de": "Offizielles österreichisches Arbeitsmarktservice mit eJob-Room.",
+    "description_en": "Official Austrian public employment service with eJob-Room.",
+    "official": true
+  },
+  {
+    "country": "AT",
+    "name": "karriere.at",
+    "operator": "karriere.at GmbH",
+    "website": "https://www.karriere.at",
+    "search_url": "https://www.karriere.at/jobs",
+    "description_de": "Größte private Jobplattform Österreichs.",
+    "description_en": "Largest private job platform in Austria.",
+    "official": false
+  },
+  {
+    "country": "CH",
+    "name": "Job-Room (RAV)",
+    "operator": "SECO – Staatssekretariat für Wirtschaft",
+    "website": "https://www.job-room.ch",
+    "search_url": "https://www.job-room.ch/job-search",
+    "description_de": "Offizielles Stellenportal des Schweizer SECO mit RAV-Meldepflichtangeboten.",
+    "description_en": "Official Swiss SECO job portal with regulated job offers.",
+    "official": true
+  },
+  {
+    "country": "CH",
+    "name": "jobs.ch",
+    "operator": "JobCloud AG",
+    "website": "https://www.jobs.ch",
+    "search_url": "https://www.jobs.ch/de/stellenangebote/",
+    "description_de": "Eine der größten privaten Jobplattformen der Schweiz.",
+    "description_en": "One of Switzerland's largest private job platforms.",
+    "official": false
+  },
+  {
+    "country": "IT",
+    "name": "Cliclavoro",
+    "operator": "Ministero del Lavoro e delle Politiche Sociali",
+    "website": "https://www.cliclavoro.gov.it",
+    "search_url": "https://www.cliclavoro.gov.it/Cittadini/Pagine/Cercare-lavoro.aspx",
+    "description_de": "Offizielles Portal des italienischen Arbeitsministeriums.",
+    "description_en": "Official portal of the Italian Ministry of Labour.",
+    "official": true
+  },
+  {
+    "country": "IT",
+    "name": "Indeed Italia",
+    "operator": "Indeed Italy S.r.l.",
+    "website": "https://it.indeed.com",
+    "search_url": "https://it.indeed.com/jobs",
+    "description_de": "Größte private Jobsuchmaschine in Italien.",
+    "description_en": "Largest private job search engine in Italy.",
+    "official": false
+  },
+  {
+    "country": "ES",
+    "name": "Empléate (SEPE)",
+    "operator": "Servicio Público de Empleo Estatal",
+    "website": "https://www.empleate.gob.es",
+    "search_url": "https://www.empleate.gob.es/empleo/#/buscarofertas",
+    "description_de": "Offizielles staatliches Jobportal Spaniens (SEPE).",
+    "description_en": "Official Spanish state employment portal (SEPE).",
+    "official": true
+  },
+  {
+    "country": "ES",
+    "name": "InfoJobs",
+    "operator": "InfoJobs (Adevinta)",
+    "website": "https://www.infojobs.net",
+    "search_url": "https://www.infojobs.net/ofertas-trabajo",
+    "description_de": "Mit über 4 Mio. Nutzern eine der größten privaten Jobplattformen Spaniens.",
+    "description_en": "One of Spain's largest private job platforms with over 4 million users.",
+    "official": false
+  },
+  {
+    "country": "FR",
+    "name": "France Travail",
+    "operator": "France Travail (ex Pôle emploi)",
+    "website": "https://www.francetravail.fr",
+    "search_url": "https://candidat.francetravail.fr/offres/recherche",
+    "description_de": "Offizielles französisches Jobportal (vormals Pôle emploi).",
+    "description_en": "Official French public employment portal (formerly Pôle emploi).",
+    "official": true
+  },
+  {
+    "country": "FR",
+    "name": "Indeed France",
+    "operator": "Indeed France",
+    "website": "https://fr.indeed.com",
+    "search_url": "https://fr.indeed.com/emplois",
+    "description_de": "Größte private Jobsuchmaschine in Frankreich.",
+    "description_en": "Largest private job search engine in France.",
+    "official": false
+  },
+  {
+    "country": "TR",
+    "name": "İŞKUR",
+    "operator": "Türkiye İş Kurumu",
+    "website": "https://www.iskur.gov.tr",
+    "search_url": "https://esube.iskur.gov.tr/Istihdam/AcikIsIlanAra.aspx",
+    "description_de": "Offizielles türkisches Arbeitsamt İŞKUR.",
+    "description_en": "Official Turkish public employment agency İŞKUR.",
+    "official": true
+  },
+  {
+    "country": "TR",
+    "name": "Kariyer.net",
+    "operator": "Kariyer.net Elektronik Yayıncılık",
+    "website": "https://www.kariyer.net",
+    "search_url": "https://www.kariyer.net/is-ilanlari",
+    "description_de": "Größte private Jobplattform der Türkei.",
+    "description_en": "Largest private job platform in Turkey.",
+    "official": false
+  },
+  {
+    "country": "RU",
+    "name": "Trudvsem (Работа России)",
+    "operator": "Роструд (Federal Labour Service)",
+    "website": "https://trudvsem.ru",
+    "search_url": "https://trudvsem.ru/vacancy/search",
+    "description_de": "Offizielles staatliches Jobportal Russlands (Роструд).",
+    "description_en": "Official state-run Russian job portal (Rostrud).",
+    "official": true
+  },
+  {
+    "country": "RU",
+    "name": "hh.ru",
+    "operator": "HeadHunter Group",
+    "website": "https://hh.ru",
+    "search_url": "https://hh.ru/search/vacancy",
+    "description_de": "Größte private Jobplattform Russlands und der GUS-Staaten.",
+    "description_en": "Largest private job platform in Russia and CIS countries.",
+    "official": false
+  },
+  {
+    "country": "GB",
+    "name": "Find a job (gov.uk)",
+    "operator": "Department for Work and Pensions",
+    "website": "https://www.gov.uk/find-a-job",
+    "search_url": "https://findajob.dwp.gov.uk/search",
+    "description_de": "Offizielles UK-Jobportal des britischen DWP.",
+    "description_en": "Official UK job portal run by the Department for Work and Pensions.",
+    "official": true
+  },
+  {
+    "country": "GB",
+    "name": "Indeed UK",
+    "operator": "Indeed UK",
+    "website": "https://uk.indeed.com",
+    "search_url": "https://uk.indeed.com/jobs",
+    "description_de": "Größte private Jobsuchmaschine in Großbritannien.",
+    "description_en": "Largest private job search engine in the United Kingdom.",
+    "official": false
+  },
+  {
+    "country": "EU",
+    "name": "EURES",
+    "operator": "European Commission – DG EMPL",
+    "website": "https://eures.europa.eu",
+    "search_url": "https://europa.eu/eures/portal/jv-se/search",
+    "description_de": "EU-weites Jobportal in 31 Ländern, betrieben von der EU-Kommission.",
+    "description_en": "EU-wide job portal across 31 countries, run by the European Commission.",
+    "official": true
+  }
+]

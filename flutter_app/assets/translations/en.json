@@ -716,5 +716,25 @@
     "emailBtn": "Email",
     "websiteBtn": "Website",
     "noneInCountry": "No food bank listed for this country yet."
+  },
+  "meteo": {
+    "title": "Weather Warnings",
+    "subtitle": "{count} active warnings for {country}. Source: MeteoAlarm (EUMETNET).",
+    "noWarnings": "No official weather warnings for {country} right now.",
+    "severityExtreme": "Extreme",
+    "severitySevere": "Severe",
+    "severityModerate": "Moderate",
+    "severityMinor": "Minor",
+    "areaLabel": "Area: {area}",
+    "expiresLabel": "Valid until: {time}",
+    "openSource": "Open source"
+  },
+  "jobs": {
+    "portalsTitle": "Job portals",
+    "portalsSubtitle": "Find vacancies in {country} — official employment agencies and trusted platforms.",
+    "portalsDisclaimer": "Links open the chosen platform in your browser. Mensaena is not an intermediary.",
+    "officialBadge": "OFFICIAL",
+    "openSearch": "Search jobs",
+    "openPortal": "Open portal"
   }
 }

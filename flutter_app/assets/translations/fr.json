@@ -716,5 +716,25 @@
     "emailBtn": "E-mail",
     "websiteBtn": "Site web",
     "noneInCountry": "Aucune banque alimentaire n'est encore référencée pour ce pays."
+  },
+  "meteo": {
+    "title": "Alertes météo",
+    "subtitle": "{count} alertes actives pour {country}. Source : MeteoAlarm (EUMETNET).",
+    "noWarnings": "Aucune alerte météo officielle pour {country} pour le moment.",
+    "severityExtreme": "Extrême",
+    "severitySevere": "Sévère",
+    "severityModerate": "Modérée",
+    "severityMinor": "Faible",
+    "areaLabel": "Zone : {area}",
+    "expiresLabel": "Valable jusqu’au : {time}",
+    "openSource": "Ouvrir la source"
+  },
+  "jobs": {
+    "portalsTitle": "Portails d’emploi",
+    "portalsSubtitle": "Offres d’emploi en {country} — services publics et plateformes de confiance.",
+    "portalsDisclaimer": "Les liens ouvrent la plateforme dans le navigateur. Mensaena n’est pas un intermédiaire.",
+    "officialBadge": "OFFICIEL",
+    "openSearch": "Chercher un emploi",
+    "openPortal": "Ouvrir le portail"
   }
 }

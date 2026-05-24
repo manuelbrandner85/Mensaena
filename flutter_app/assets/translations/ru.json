@@ -716,5 +716,25 @@
     "emailBtn": "Эл. почта",
     "websiteBtn": "Веб-сайт",
     "noneInCountry": "Для этой страны пока нет данных о продовольственном банке."
+  },
+  "meteo": {
+    "title": "Погодные предупреждения",
+    "subtitle": "{count} активных предупреждений для {country}. Источник: MeteoAlarm (EUMETNET).",
+    "noWarnings": "Сейчас нет официальных погодных предупреждений для {country}.",
+    "severityExtreme": "Экстремальная",
+    "severitySevere": "Сильная",
+    "severityModerate": "Умеренная",
+    "severityMinor": "Слабая",
+    "areaLabel": "Регион: {area}",
+    "expiresLabel": "Действительно до: {time}",
+    "openSource": "Открыть источник"
+  },
+  "jobs": {
+    "portalsTitle": "Порталы вакансий",
+    "portalsSubtitle": "Вакансии в {country} — официальные службы занятости и проверенные платформы.",
+    "portalsDisclaimer": "Ссылки открывают платформу в браузере. Mensaena не является посредником.",
+    "officialBadge": "ОФИЦ.",
+    "openSearch": "Найти вакансии",
+    "openPortal": "Открыть портал"
   }
 }

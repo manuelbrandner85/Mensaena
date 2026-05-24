@@ -716,5 +716,25 @@
     "emailBtn": "E-posta",
     "websiteBtn": "Web sitesi",
     "noneInCountry": "Bu ülke için henüz kayıtlı gıda bankası yok."
+  },
+  "meteo": {
+    "title": "Hava durumu uyarıları",
+    "subtitle": "{country} için {count} aktif uyarı. Kaynak: MeteoAlarm (EUMETNET).",
+    "noWarnings": "{country} için şu anda resmi hava durumu uyarısı yok.",
+    "severityExtreme": "Aşırı",
+    "severitySevere": "Şiddetli",
+    "severityModerate": "Orta",
+    "severityMinor": "Hafif",
+    "areaLabel": "Bölge: {area}",
+    "expiresLabel": "Geçerlilik: {time}",
+    "openSource": "Kaynağı aç"
+  },
+  "jobs": {
+    "portalsTitle": "İş portalları",
+    "portalsSubtitle": "{country} ülkesindeki iş ilanları — resmi iş kurumları ve güvenilir platformlar.",
+    "portalsDisclaimer": "Bağlantılar seçilen platformu tarayıcıda açar. Mensaena aracı değildir.",
+    "officialBadge": "RESMİ",
+    "openSearch": "İş ara",
+    "openPortal": "Portalı aç"
   }
 }

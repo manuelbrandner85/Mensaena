@@ -716,5 +716,25 @@
     "emailBtn": "Email",
     "websiteBtn": "Sito web",
     "noneInCountry": "Nessun banco alimentare registrato per questo paese."
+  },
+  "meteo": {
+    "title": "Allerta meteo",
+    "subtitle": "{count} avvisi attivi per {country}. Fonte: MeteoAlarm (EUMETNET).",
+    "noWarnings": "Nessuna allerta meteo ufficiale per {country} al momento.",
+    "severityExtreme": "Estrema",
+    "severitySevere": "Grave",
+    "severityModerate": "Moderata",
+    "severityMinor": "Lieve",
+    "areaLabel": "Zona: {area}",
+    "expiresLabel": "Valida fino: {time}",
+    "openSource": "Apri fonte"
+  },
+  "jobs": {
+    "portalsTitle": "Portali di lavoro",
+    "portalsSubtitle": "Offerte di lavoro in {country} — agenzie pubbliche e piattaforme affidabili.",
+    "portalsDisclaimer": "I link aprono la piattaforma nel browser. Mensaena non è un intermediario.",
+    "officialBadge": "UFFICIALE",
+    "openSearch": "Cerca lavoro",
+    "openPortal": "Apri portale"
   }
 }
