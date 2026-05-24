@@ -433,7 +433,8 @@
     "generic": "Etwas ist schief gelaufen.",
     "network": "Verbindung fehlgeschlagen. Bist du online?",
     "notFound": "Nicht gefunden.",
-    "permissionDenied": "Berechtigung verweigert."
+    "permissionDenied": "Berechtigung verweigert.",
+    "noApkUrl": "Keine APK-URL hinterlegt."
   },
   "home": {
     "quickActions": "Schnell-Aktionen",
@@ -1114,7 +1115,22 @@
     "suggestionCrisis": "Krise melden"
   },
   "update": {
-    "whatsNew": "Was ist neu"
+    "whatsNew": "Was ist neu",
+    "title": "Neue Version verfügbar",
+    "cta": "Jetzt aktualisieren",
+    "later": "Später",
+    "bannerTitle": "Update verfügbar",
+    "bannerSubtitle": "Tap zum Installieren",
+    "downloading": "Lade Update herunter …",
+    "installing": "Installiere …",
+    "releaseNotesTitle": "Was ist neu?",
+    "downloadComplete": "Download abgeschlossen",
+    "openInstaller": "Installer erneut öffnen",
+    "mandatoryDescription": "Diese Version ist verpflichtend. Lade sie direkt in der App und installiere sie — kein Browser nötig.",
+    "optionalDescription": "Eine neue Version steht bereit. Aktualisiere jetzt für die neuesten Funktionen und Verbesserungen.",
+    "installerHint": "Android öffnet jetzt den System-Installer. Tippe \"Installieren\" um zu aktualisieren. Falls der Dialog nicht erscheint, drücke unten erneut.",
+    "unknownSourcesHint": "Android fragt beim ersten Update evtl. nach \"Apps aus unbekannten Quellen installieren\" — bitte für Mensaena erlauben.",
+    "failed": "Update fehlgeschlagen."
   },
   "landing": {
     "startFree": "Kostenlos starten",

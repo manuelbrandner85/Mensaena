@@ -433,7 +433,8 @@
     "generic": "Something went wrong.",
     "network": "Connection failed. Are you online?",
     "notFound": "Not found.",
-    "permissionDenied": "Permission denied."
+    "permissionDenied": "Permission denied.",
+    "noApkUrl": "No APK URL configured."
   },
   "home": {
     "quickActions": "Quick Actions",
@@ -1114,7 +1115,22 @@
     "suggestionCrisis": "Report crisis"
   },
   "update": {
-    "whatsNew": "What's new"
+    "whatsNew": "What's new",
+    "title": "New version available",
+    "cta": "Update now",
+    "later": "Later",
+    "bannerTitle": "Update available",
+    "bannerSubtitle": "Tap to install",
+    "downloading": "Downloading update …",
+    "installing": "Installing …",
+    "releaseNotesTitle": "What's new?",
+    "downloadComplete": "Download complete",
+    "openInstaller": "Open installer again",
+    "mandatoryDescription": "This version is required. Download it right in the app and install — no browser needed.",
+    "optionalDescription": "A new version is ready. Update now for the latest features and improvements.",
+    "installerHint": "Android is opening the system installer now. Tap \"Install\" to update. If the dialog doesn't appear, press the button again.",
+    "unknownSourcesHint": "Android may ask for \"Install from unknown sources\" on first update — please allow it for Mensaena.",
+    "failed": "Update failed."
   },
   "landing": {
     "startFree": "Start free",

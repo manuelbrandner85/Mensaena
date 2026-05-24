@@ -433,7 +433,8 @@
     "generic": "Algo salió mal.",
     "network": "Conexión fallida. ¿Estás en línea?",
     "notFound": "No encontrado.",
-    "permissionDenied": "Permiso denegado."
+    "permissionDenied": "Permiso denegado.",
+    "noApkUrl": "No hay URL de APK configurada."
   },
   "home": {
     "quickActions": "Acciones rápidas",
@@ -1114,7 +1115,22 @@
     "suggestionCrisis": "Reportar crisis"
   },
   "update": {
-    "whatsNew": "Novedades"
+    "whatsNew": "Novedades",
+    "title": "Nueva versión disponible",
+    "cta": "Actualizar ahora",
+    "later": "Más tarde",
+    "bannerTitle": "Actualización disponible",
+    "bannerSubtitle": "Toca para instalar",
+    "downloading": "Descargando actualización …",
+    "installing": "Instalando …",
+    "releaseNotesTitle": "¿Qué hay de nuevo?",
+    "downloadComplete": "Descarga completada",
+    "openInstaller": "Volver a abrir el instalador",
+    "mandatoryDescription": "Esta versión es obligatoria. Descárgala dentro de la app e instálala — sin necesidad de navegador.",
+    "optionalDescription": "Hay una nueva versión lista. Actualiza ahora para disfrutar de las últimas funciones y mejoras.",
+    "installerHint": "Android está abriendo el instalador del sistema. Toca \"Instalar\" para actualizar. Si no aparece el diálogo, pulsa de nuevo el botón.",
+    "unknownSourcesHint": "Android puede pedirte \"Instalar desde orígenes desconocidos\" en la primera actualización — permítelo para Mensaena.",
+    "failed": "La actualización falló."
   },
   "landing": {
     "startFree": "Empezar gratis",

@@ -433,7 +433,8 @@
     "generic": "Bir şeyler ters gitti.",
     "network": "Bağlantı başarısız. Çevrimiçi misin?",
     "notFound": "Bulunamadı.",
-    "permissionDenied": "İzin reddedildi."
+    "permissionDenied": "İzin reddedildi.",
+    "noApkUrl": "APK URL'si tanımlanmamış."
   },
   "home": {
     "quickActions": "Hızlı işlemler",
@@ -1114,7 +1115,22 @@
     "suggestionCrisis": "Kriz bildir"
   },
   "update": {
-    "whatsNew": "Yenilikler"
+    "whatsNew": "Yenilikler",
+    "title": "Yeni sürüm mevcut",
+    "cta": "Şimdi güncelle",
+    "later": "Daha sonra",
+    "bannerTitle": "Güncelleme mevcut",
+    "bannerSubtitle": "Yüklemek için dokunun",
+    "downloading": "Güncelleme indiriliyor …",
+    "installing": "Yükleniyor …",
+    "releaseNotesTitle": "Yenilikler",
+    "downloadComplete": "İndirme tamamlandı",
+    "openInstaller": "Yükleyiciyi yeniden aç",
+    "mandatoryDescription": "Bu sürüm zorunludur. Doğrudan uygulamada indir ve yükle — tarayıcıya gerek yok.",
+    "optionalDescription": "Yeni bir sürüm hazır. En son özellikler ve iyileştirmeler için şimdi güncelle.",
+    "installerHint": "Android sistem yükleyicisini açıyor. Güncellemek için \"Yükle\"ye dokun. Diyalog görünmezse düğmeye tekrar bas.",
+    "unknownSourcesHint": "Android ilk güncellemede \"Bilinmeyen kaynaklardan yüklemeye izin ver\" sorabilir — lütfen Mensaena için izin ver.",
+    "failed": "Güncelleme başarısız."
   },
   "landing": {
     "startFree": "Ücretsiz başla",

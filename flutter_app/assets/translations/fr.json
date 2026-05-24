@@ -433,7 +433,8 @@
     "generic": "Une erreur s'est produite.",
     "network": "Échec de la connexion. Êtes-vous en ligne ?",
     "notFound": "Non trouvé.",
-    "permissionDenied": "Autorisation refusée."
+    "permissionDenied": "Autorisation refusée.",
+    "noApkUrl": "Aucune URL APK configurée."
   },
   "home": {
     "quickActions": "Actions rapides",
@@ -1114,7 +1115,22 @@
     "suggestionCrisis": "Signaler une crise"
   },
   "update": {
-    "whatsNew": "Nouveautés"
+    "whatsNew": "Nouveautés",
+    "title": "Nouvelle version disponible",
+    "cta": "Mettre à jour",
+    "later": "Plus tard",
+    "bannerTitle": "Mise à jour disponible",
+    "bannerSubtitle": "Touchez pour installer",
+    "downloading": "Téléchargement en cours …",
+    "installing": "Installation …",
+    "releaseNotesTitle": "Quoi de neuf ?",
+    "downloadComplete": "Téléchargement terminé",
+    "openInstaller": "Rouvrir l'installeur",
+    "mandatoryDescription": "Cette version est obligatoire. Téléchargez-la directement dans l'app et installez-la — pas besoin de navigateur.",
+    "optionalDescription": "Une nouvelle version est prête. Mettez à jour maintenant pour profiter des dernières fonctionnalités.",
+    "installerHint": "Android ouvre l'installeur système. Touchez \"Installer\" pour mettre à jour. Si la boîte de dialogue n'apparaît pas, appuyez à nouveau.",
+    "unknownSourcesHint": "Lors de la première mise à jour, Android peut demander \"Installer depuis des sources inconnues\" — autorisez-le pour Mensaena.",
+    "failed": "Échec de la mise à jour."
   },
   "landing": {
     "startFree": "Commencer gratuitement",

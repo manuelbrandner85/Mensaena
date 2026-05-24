@@ -433,7 +433,8 @@
     "generic": "Qualcosa è andato storto.",
     "network": "Connessione fallita. Sei online?",
     "notFound": "Non trovato.",
-    "permissionDenied": "Autorizzazione negata."
+    "permissionDenied": "Autorizzazione negata.",
+    "noApkUrl": "Nessun URL APK configurato."
   },
   "home": {
     "quickActions": "Azioni rapide",
@@ -1114,7 +1115,22 @@
     "suggestionCrisis": "Segnala crisi"
   },
   "update": {
-    "whatsNew": "Novità"
+    "whatsNew": "Novità",
+    "title": "Nuova versione disponibile",
+    "cta": "Aggiorna ora",
+    "later": "Più tardi",
+    "bannerTitle": "Aggiornamento disponibile",
+    "bannerSubtitle": "Tocca per installare",
+    "downloading": "Download aggiornamento …",
+    "installing": "Installazione …",
+    "releaseNotesTitle": "Novità",
+    "downloadComplete": "Download completato",
+    "openInstaller": "Riapri installer",
+    "mandatoryDescription": "Questa versione è obbligatoria. Scaricala direttamente dall'app e installala — senza browser.",
+    "optionalDescription": "È pronta una nuova versione. Aggiorna ora per le ultime funzionalità e miglioramenti.",
+    "installerHint": "Android sta aprendo l'installer di sistema. Tocca \"Installa\" per aggiornare. Se la finestra non appare, premi di nuovo il pulsante.",
+    "unknownSourcesHint": "Al primo aggiornamento Android potrebbe chiedere \"Installa da fonti sconosciute\" — autorizzalo per Mensaena.",
+    "failed": "Aggiornamento non riuscito."
   },
   "landing": {
     "startFree": "Inizia gratis",

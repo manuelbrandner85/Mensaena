@@ -1,7 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -9,44 +12,134 @@ import '../../config/theme/app_typography.dart';
 import '../../models/app_release.dart';
 import '../../repositories/app_releases_repository.dart';
 import '../../services/apk_installer_service.dart';
+import '../effects/bloom.dart';
+import '../effects/cinema_overlay.dart';
+import '../effects/glass_card.dart';
+import '../effects/vignette.dart';
 
-/// SKILL: mensaena-architektur + mensaena-features
-/// UpdateGate — wickelt die ganze App.
-/// - Mandatory APK-Release: blockierender Vollbild-Screen mit
-///   IN-APP Download (Progress-Bar) → triggert direkt Android-
-///   Installer-Intent ueber OpenFilex/FileProvider. User muss
-///   nicht raus, kein Browser, kein manueller Download.
-/// - Shorebird-Patches: passieren transparent beim App-Launch, kein UI.
-class UpdateGate extends ConsumerWidget {
+/// SKILL: mensaena-architektur + mensaena-features + mensaena-design
+/// UpdateGate v7 — Cinematic-Polish.
+///
+/// Visuelle Architektur (Mandatory-Screen):
+///   - CinemaOverlay als ambient Wrapper (Sky-Body + Phasen-Atmosphäre)
+///   - Vignette unten dezent (Lesbarkeit-first)
+///   - Zentriertes Launcher-Logo mit Bloom-Glow (amber, intensity 0.6)
+///   - Release-Notes-Card als GlassCard.strong, scrollable, max 240dp
+///   - Bronze-Gradient Circular Progress (80dp) während Download
+///   - Cinema-Buttons: "Jetzt aktualisieren" (bronze) + "Später" (mute)
+///
+/// Banner-Modus (optionales Update + User wählt "Später"):
+///   - 56dp Top-Banner mit Icon + Title/Subtitle + Close-X
+///   - Persistiert via flutter_secure_storage Key
+///     `mensaena_update_dismissed_v<version>` — gleiche Version
+///     öffnet im selben Cycle nicht erneut den Vollbild-Screen.
+///
+/// Bestehende Funktionen 1:1 erhalten:
+///   - APK-Download mit Progress (ApkInstallerService)
+///   - Install via open_filex / PackageInstaller-Intent
+///   - Mandatory-Flag-Check (blockiert, kein "Später")
+///   - Shorebird-Patches passieren transparent (kein UI)
+class UpdateGate extends ConsumerStatefulWidget {
   const UpdateGate({required this.child, super.key});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<UpdateGate> createState() => _UpdateGateState();
+}
+
+class _UpdateGateState extends ConsumerState<UpdateGate> {
+  static const _storage = FlutterSecureStorage();
+  static const _dismissKeyPrefix = 'mensaena_update_dismissed_v';
+
+  bool _dismissed = false;
+  String? _dismissedVersion;
+
+  Future<void> _dismissForVersion(String version) async {
+    await _storage.write(
+      key: '$_dismissKeyPrefix$version',
+      value: '1',
+    );
+    if (!mounted) return;
+    setState(() {
+      _dismissed = true;
+      _dismissedVersion = version;
+    });
+  }
+
+  Future<bool> _isDismissed(String version) async {
+    if (_dismissedVersion == version) return _dismissed;
+    final v = await _storage.read(key: '$_dismissKeyPrefix$version');
+    return v == '1';
+  }
+
+  Future<void> _reopen() async {
+    setState(() {
+      _dismissed = false;
+      _dismissedVersion = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final check = ref.watch(updateCheckProvider);
     return check.when(
-      loading: () => child,
-      error: (_, __) => child,
+      loading: () => widget.child,
+      error: (_, __) => widget.child,
       data: (c) {
-        if (c.isMandatory && c.latest != null) {
-          return _MandatoryUpdateScreen(release: c.latest!);
+        final latest = c.latest;
+        if (!c.hasUpdate || latest == null) return widget.child;
+
+        if (c.isMandatory) {
+          return _UpdateFullScreen(
+            release: latest,
+            isMandatory: true,
+            onLater: null,
+          );
         }
-        return child;
+
+        // Optionales Update — Banner-Modus möglich
+        return FutureBuilder<bool>(
+          future: _isDismissed(latest.version),
+          builder: (context, snap) {
+            final dismissed = snap.data ?? _dismissed;
+            if (dismissed) {
+              return _BannerWrapper(
+                release: latest,
+                onTap: _reopen,
+                onClose: () => _dismissForVersion(latest.version),
+                child: widget.child,
+              );
+            }
+            return _UpdateFullScreen(
+              release: latest,
+              isMandatory: false,
+              onLater: () => _dismissForVersion(latest.version),
+            );
+          },
+        );
       },
     );
   }
 }
 
-class _MandatoryUpdateScreen extends StatefulWidget {
-  const _MandatoryUpdateScreen({required this.release});
+/// Cinema-Vollbild-Update-Screen (mandatory oder optional).
+class _UpdateFullScreen extends StatefulWidget {
+  const _UpdateFullScreen({
+    required this.release,
+    required this.isMandatory,
+    required this.onLater,
+  });
+
   final AppRelease release;
+  final bool isMandatory;
+  final VoidCallback? onLater;
 
   @override
-  State<_MandatoryUpdateScreen> createState() => _MandatoryUpdateScreenState();
+  State<_UpdateFullScreen> createState() => _UpdateFullScreenState();
 }
 
-class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
+class _UpdateFullScreenState extends State<_UpdateFullScreen> {
   double _progress = 0;
   bool _busy = false;
   String? _error;
@@ -55,7 +148,7 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
   Future<void> _downloadAndInstall() async {
     final url = widget.release.apkUrl;
     if (url == null || url.isEmpty) {
-      setState(() => _error = 'Keine APK-URL hinterlegt.');
+      setState(() => _error = 'errors.noApkUrl'.tr());
       return;
     }
     setState(() {
@@ -84,7 +177,7 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
     } else {
       setState(() {
         _busy = false;
-        _error = result.errorMessage ?? 'Update fehlgeschlagen.';
+        _error = result.errorMessage ?? 'update.failed'.tr();
       });
     }
   }
@@ -97,175 +190,224 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
         statusBarIconBrightness: Brightness.light,
       ),
     );
+
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Material(
         color: AppColors.voidColor,
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-            child: Column(
-              children: [
-                const Spacer(),
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.amber.withValues(alpha: 0.18),
-                    shape: BoxShape.circle,
+        // CinemaOverlay als ambient Hintergrund-Wrapper
+        child: CinemaOverlay(
+          child: Stack(
+            children: [
+              // Dezente Vignette unten für Tiefe
+              const Positioned.fill(
+                child: VignetteOverlay(intensity: 0.18),
+              ),
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 28,
                   ),
-                  child: Icon(
-                    _waitingInstaller
-                        ? LucideIcons.checkCircle2
-                        : LucideIcons.download,
-                    color:
-                        _waitingInstaller ? AppColors.leben : AppColors.amber,
-                    size: 36,
-                  ),
+                  child: _buildContent(context),
                 ),
-                const SizedBox(height: 28),
-                Text(
-                  _waitingInstaller
-                      ? 'Download abgeschlossen'
-                      : 'Update verfügbar',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.display(
-                    size: 30,
-                    color: AppColors.ink,
-                    height: 1.15,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Version ${widget.release.version}',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.mono(size: 14),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  _waitingInstaller
-                      ? 'Android öffnet jetzt den System-Installer. Tippe "Installieren" um zu aktualisieren. Falls der Dialog nicht erscheint, drücke unten erneut.'
-                      : 'Diese Version ist verpflichtend. Lade sie direkt in der App und installiere sie — kein Browser nötig.',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.body(
-                    size: 14,
-                    color: AppColors.inkSoft,
-                    height: 1.6,
-                  ),
-                ),
-                if (_changelogPreview() != null) ...[
-                  const SizedBox(height: 18),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface.withValues(alpha: 0.5),
-                      border: Border.all(color: AppColors.line),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('update.whatsNew'.tr(),
-                            style: AppTypography.label(size: 10)),
-                        const SizedBox(height: 8),
-                        Text(
-                          _changelogPreview()!,
-                          style: AppTypography.body(
-                            size: 13,
-                            color: AppColors.inkSoft,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                if (_busy) ...[
-                  const SizedBox(height: 24),
-                  Column(
-                    children: [
-                      LinearProgressIndicator(
-                        value: _progress > 0 ? _progress : null,
-                        backgroundColor: AppColors.elevated,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.amber,
-                        ),
-                        minHeight: 6,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _progress > 0
-                            ? '${(_progress * 100).toStringAsFixed(0)} %'
-                            : 'Starte Download…',
-                        style: AppTypography.mono(
-                          size: 12,
-                          color: AppColors.amber,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                if (_error != null) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.herzrot.withValues(alpha: 0.12),
-                      border: Border.all(color: AppColors.herzrot),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      _error!,
-                      style: AppTypography.body(
-                        size: 12,
-                        color: AppColors.herzrotWarm,
-                      ),
-                    ),
-                  ),
-                ],
-                const Spacer(),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _busy ? null : _downloadAndInstall,
-                    icon: Icon(
-                      _waitingInstaller
-                          ? LucideIcons.refreshCw
-                          : LucideIcons.download,
-                      size: 18,
-                    ),
-                    label: Text(
-                      _busy
-                          ? 'Lade…'
-                          : _waitingInstaller
-                              ? 'Installer erneut öffnen'
-                              : 'Update herunterladen',
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Android fragt bei erstem Update evtl. nach Berechtigung '
-                  '"Apps aus unbekannten Quellen installieren" — bitte für '
-                  'Mensaena erlauben.',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.caption(),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  Widget _buildContent(BuildContext context) {
+    return Column(
+      children: [
+        const Spacer(),
+        // Zentriertes Logo mit Bloom-Glow (amber)
+        Bloom(
+          color: AppColors.amber,
+          intensity: 0.6,
+          radius: 30,
+          child: ClipOval(
+            child: Container(
+              width: 92,
+              height: 92,
+              color: AppColors.voidColor,
+              child: _waitingInstaller
+                  ? const Icon(
+                      LucideIcons.checkCircle2,
+                      color: AppColors.leben,
+                      size: 44,
+                    )
+                  : Image.asset(
+                      'assets/launcher/icon.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        LucideIcons.download,
+                        color: AppColors.amber,
+                        size: 44,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+        Text(
+          _waitingInstaller
+              ? 'update.downloadComplete'.tr()
+              : 'update.title'.tr(),
+          textAlign: TextAlign.center,
+          style: AppTypography.display(
+            size: 28,
+            color: AppColors.ink,
+            height: 1.15,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'v${widget.release.version}',
+          textAlign: TextAlign.center,
+          style: AppTypography.mono(size: 13, color: AppColors.amberWarm),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          _waitingInstaller
+              ? 'update.installerHint'.tr()
+              : (widget.isMandatory
+                  ? 'update.mandatoryDescription'.tr()
+                  : 'update.optionalDescription'.tr()),
+          textAlign: TextAlign.center,
+          style: AppTypography.body(
+            size: 14,
+            color: AppColors.inkSoft,
+            height: 1.55,
+          ),
+        ),
+        if (_changelogPreview() != null) ...[
+          const SizedBox(height: 18),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 240),
+            child: GlassCard.strong(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.sparkles,
+                        size: 14,
+                        color: AppColors.amberWarm,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'update.releaseNotesTitle'.tr(),
+                        style: AppTypography.label(size: 10),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        _changelogPreview()!,
+                        style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.inkSoft,
+                          height: 1.55,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        if (_busy) ...[
+          const SizedBox(height: 28),
+          _BronzeCircularProgress(progress: _progress),
+          const SizedBox(height: 12),
+          Text(
+            _progress > 0
+                ? '${(_progress * 100).toStringAsFixed(0)} %'
+                : 'update.downloading'.tr(),
+            style: AppTypography.mono(
+              size: 12,
+              color: AppColors.bronzeSoft,
+            ),
+          ),
+        ],
+        if (_error != null) ...[
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.herzrot.withValues(alpha: 0.12),
+              border: Border.all(color: AppColors.herzrot),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              _error!,
+              style: AppTypography.body(
+                size: 12,
+                color: AppColors.herzrotWarm,
+              ),
+            ),
+          ),
+        ],
+        const Spacer(),
+        // CTA — Bronze gradient FilledButton
+        _BronzeCtaButton(
+          onPressed: _busy ? null : _downloadAndInstall,
+          icon: _busy
+              ? LucideIcons.loader
+              : _waitingInstaller
+                  ? LucideIcons.refreshCw
+                  : LucideIcons.download,
+          label: _busy
+              ? 'update.downloading'.tr()
+              : _waitingInstaller
+                  ? 'update.openInstaller'.tr()
+                  : 'update.cta'.tr(),
+        ),
+        if (!widget.isMandatory && widget.onLater != null && !_busy) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: widget.onLater,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(
+                  color: AppColors.mute.withValues(alpha: 0.4),
+                ),
+                foregroundColor: AppColors.inkSoft,
+              ),
+              child: Text(
+                'update.later'.tr(),
+                style: AppTypography.body(
+                  size: 14,
+                  color: AppColors.inkSoft,
+                ),
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 10),
+        Text(
+          'update.unknownSourcesHint'.tr(),
+          textAlign: TextAlign.center,
+          style: AppTypography.caption(),
+        ),
+      ],
+    );
+  }
+
   String? _changelogPreview() {
     final cl = widget.release.changelog;
     if (cl.isEmpty) return null;
-    // flutter.yml schreibt: { entries: [{ type, title, description }] }
     final entries = cl['entries'];
     if (entries is List && entries.isNotEmpty) {
       final lines = <String>[];
@@ -278,22 +420,280 @@ class _MandatoryUpdateScreenState extends State<_MandatoryUpdateScreen> {
         if (desc.isNotEmpty && desc != title) {
           lines.add('  $desc');
         }
-        if (lines.length >= 8) break;
+        if (lines.length >= 16) break;
       }
       if (lines.isNotEmpty) {
-        final joined = lines.join('\n');
-        return joined.length > 400 ? '${joined.substring(0, 397)}…' : joined;
+        return lines.join('\n');
       }
     }
-    // Fallback: notes/summary/de (vor Workflow-Format-Change moeglich).
     final notes = cl['notes'] ?? cl['summary'] ?? cl['de'];
     if (notes is String && notes.isNotEmpty) {
-      return notes.length > 240 ? '${notes.substring(0, 237)}…' : notes;
+      return notes;
     }
     if (notes is List) {
-      final lines = notes.whereType<String>().take(4).map((s) => '• $s');
+      final lines = notes.whereType<String>().take(6).map((s) => '• $s');
       return lines.join('\n');
     }
     return null;
+  }
+}
+
+/// Bronze-Gradient Circular Progress (80dp Diameter).
+/// Linear sweep mit 4-color stops: bronzeDeep → bronze → bronzeSoft → amberWarm.
+class _BronzeCircularProgress extends StatelessWidget {
+  const _BronzeCircularProgress({required this.progress});
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: CustomPaint(
+        painter: _BronzeArcPainter(progress: progress),
+        child: const Center(
+          child: Bloom(
+            color: AppColors.bronze,
+            intensity: 0.4,
+            radius: 14,
+            child: Icon(
+              LucideIcons.download,
+              size: 22,
+              color: AppColors.bronzeSoft,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BronzeArcPainter extends CustomPainter {
+  _BronzeArcPainter({required this.progress});
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (math.min(size.width, size.height) - 6) / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    // Track
+    final track = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round
+      ..color = AppColors.elevated.withValues(alpha: 0.6);
+    canvas.drawCircle(center, radius, track);
+
+    // Bronze-Gradient sweep
+    const gradient = SweepGradient(
+      startAngle: -math.pi / 2,
+      endAngle: 3 * math.pi / 2,
+      colors: <Color>[
+        AppColors.bronzeDeep,
+        AppColors.bronze,
+        AppColors.bronzeSoft,
+        AppColors.amberWarm,
+      ],
+      stops: <double>[0.0, 0.4, 0.75, 1.0],
+    );
+    final arc = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round
+      ..shader = gradient.createShader(rect);
+
+    final sweep = progress > 0
+        ? progress.clamp(0.0, 1.0) * 2 * math.pi
+        : 0.45 * 2 * math.pi; // indeterminate-Stub
+
+    canvas.drawArc(rect, -math.pi / 2, sweep, false, arc);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BronzeArcPainter old) =>
+      old.progress != progress;
+}
+
+/// Bronze-Gradient CTA-Button — FilledButton-Look mit Bloom.
+class _BronzeCtaButton extends StatelessWidget {
+  const _BronzeCtaButton({
+    required this.onPressed,
+    required this.icon,
+    required this.label,
+  });
+
+  final VoidCallback? onPressed;
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onPressed != null;
+    return SizedBox(
+      width: double.infinity,
+      child: Bloom(
+        color: AppColors.bronze,
+        intensity: enabled ? 0.45 : 0.0,
+        radius: 22,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: enabled
+                  ? const [
+                      AppColors.bronze,
+                      AppColors.bronzeDeep,
+                    ]
+                  : [
+                      AppColors.elevated,
+                      AppColors.surface,
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: AppColors.bronzeSoft.withValues(alpha: 0.35),
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: onPressed,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 18,
+                      color: enabled
+                          ? AppColors.inkWarm
+                          : AppColors.mute,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      label,
+                      style: AppTypography.body(
+                        size: 15,
+                        color: enabled
+                            ? AppColors.inkWarm
+                            : AppColors.mute,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Banner-Modus — 56dp Top-Banner über dem Child-Content.
+class _BannerWrapper extends StatelessWidget {
+  const _BannerWrapper({
+    required this.release,
+    required this.onTap,
+    required this.onClose,
+    required this.child,
+  });
+
+  final AppRelease release;
+  final VoidCallback onTap;
+  final VoidCallback onClose;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Material(
+        color: AppColors.voidColor,
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: GestureDetector(
+                onTap: onTap,
+                child: Container(
+                  height: 56,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        AppColors.bronzeDeep.withValues(alpha: 0.95),
+                        AppColors.bronze.withValues(alpha: 0.85),
+                      ],
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: AppColors.bronzeSoft.withValues(alpha: 0.35),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Bloom(
+                        color: AppColors.amber,
+                        intensity: 0.4,
+                        radius: 10,
+                        child: Icon(
+                          LucideIcons.arrowDownCircle,
+                          color: AppColors.inkWarm,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'update.bannerTitle'.tr(),
+                              style: AppTypography.body(
+                                size: 13,
+                                color: AppColors.inkWarm,
+                              ),
+                            ),
+                            Text(
+                              'update.bannerSubtitle'.tr(),
+                              style: AppTypography.caption(
+                                color: AppColors.bronzeSoft,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: onClose,
+                        icon: const Icon(
+                          LucideIcons.x,
+                          color: AppColors.inkSoft,
+                          size: 18,
+                        ),
+                        splashRadius: 18,
+                        tooltip: 'common.close'.tr(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(child: child),
+          ],
+        ),
+      ),
+    );
   }
 }
