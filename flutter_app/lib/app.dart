@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,8 @@ import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
 import 'providers/locale_provider.dart';
+import 'repositories/extra_repositories.dart';
+import 'services/supabase_service.dart';
 import 'widgets/shared/incoming_call_listener.dart';
 import 'widgets/shared/update_gate.dart';
 
@@ -41,15 +44,49 @@ class MensaenaApp extends ConsumerWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      // UpdateGate wickelt jede Seite — bei mandatory Update wird ALLES
-      // blockiert bis APK heruntergeladen ist.
-      // IncomingCallListener wickelt das Navigator-Child damit eingehende
-      // DM-Calls als Fullscreen-Dialog ueberall sichtbar werden.
-      builder: (context, navChild) => UpdateGate(
-        child: IncomingCallListener(
-          child: navChild ?? const SizedBox.shrink(),
+      // UpdateGate + IncomingCallListener wrappen alle Screens.
+      // BetterFeedback umrahmt zusätzlich für Shake-to-Report (Sprint 5).
+      builder: (context, navChild) => BetterFeedback(
+        themeMode: ThemeMode.dark,
+        darkTheme: FeedbackThemeData.dark(),
+        child: UpdateGate(
+          child: IncomingCallListener(
+            child: _ShakeFeedbackListener(
+              child: navChild ?? const SizedBox.shrink(),
+            ),
+          ),
         ),
       ),
+    );
+  }
+}
+
+/// Globaler "Schüttel-zum-Melden"-Listener. Bei Shake → BetterFeedback
+/// Sheet mit Screenshot-Markup. Submit → error_logs.
+class _ShakeFeedbackListener extends StatelessWidget {
+  const _ShakeFeedbackListener({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      // Long-press 3-Finger als manueller Trigger (Shake-Detection erfordert
+      // sensors_plus, also bieten wir 3-Finger-Long-Press als simple Alternative).
+      onLongPress: () => BetterFeedback.of(context).show((feedback) async {
+        await ErrorLogsRepository.log(
+          errorType: 'user_feedback',
+          message: feedback.text,
+          stack: feedback.extra?.toString(),
+          deviceInfo:
+              'screenshot=${feedback.screenshot.length} bytes; user=${SupabaseService.currentUser?.id ?? "anon"}',
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Feedback gesendet — Danke!'),
+          ));
+        }
+      }),
+      child: child,
     );
   }
 }

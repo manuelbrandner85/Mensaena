@@ -14,6 +14,7 @@ import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/image_carousel.dart';
+import '../../widgets/shared/wikipedia_box.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
 /// Post-Detail: Hero (Typ-Badge, Bilder, Titel, Beschreibung), Author,
@@ -415,6 +416,13 @@ class _Hero extends StatelessWidget {
             ],
           ],
         ),
+        // Wikipedia-Box: Such-Term aus erstem Tag oder Titel-Keyword.
+        if (post.tags.isNotEmpty || post.type == 'animal') ...[
+          const SizedBox(height: 14),
+          WikipediaBox(
+            term: post.tags.isNotEmpty ? post.tags.first : post.title,
+          ),
+        ],
         if (post.tags.isNotEmpty) ...[
           const SizedBox(height: 10),
           Wrap(

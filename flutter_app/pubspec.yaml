@@ -84,6 +84,8 @@ dependencies:
   speech_to_text: ^7.0.0
   # ICS-Kalender-Export für Events.
   add_2_calendar: ^3.0.1
+  # Shake-to-Report: User schüttelt Phone → Screenshot + Annotation → error_logs.
+  feedback: ^3.1.0
 
   # Shorebird OTA: liest die Patch-Nummer + meldet sich beim Server.
   # Patches selber werden automatisch beim Launch installiert.

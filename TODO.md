@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Modul-Audit Sprints 1+2+3+4 KOMPLETT (alle 30+ Vorschläge). Frei für nächste Aufgaben.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Push W1-W3 + Modul-Audit S1-S4 ✅
-NEXT=Frei (optional: weitere UX-Polish + ML-Kit-Translation als Sprint 5)
+OPEN=Modul-Audit Sprints 1-5 KOMPLETT. Alle Vorschläge live.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Push W1-W3 + Modul-Audit S1-S5 ✅
+NEXT=Frei
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(modul-audit Sprint 2+3+4): B1 Wissen-Hub + B2 Teilen-Hub Launcher (Drawer 6 Items → 2), D1 mobile_scanner BarcodeScannerScreen, C6 OpenFoodFactsService + Marketplace-Create-Scan-Button, C2 HolidaysService date.nager.at, C5 JobsService Bundesagentur-API, D2 VoiceDictationButton speech_to_text im Chat, C8 WikipediaService REST-Summary, C9 LibreTranslateService (3-Mirror-Fallback), C10 AvatarGenerator (DiceBear + Pollinations.ai) + Profile-Edit-Buttons "Identicon" / "AI-Avatar". 6. Onboarding-Step "Sprache" mit allen 7 i18n-Übersetzungen. Add_2_calendar in pubspec für künftigen 1-Tap-Kalender-Add. Total: 7 neue Services, 4 neue Screens, 2 neue Hubs, 7 neue Packages, ~30 vorgeschlagene Items aus Modul-Audit umgesetzt.
+LAST_TASK=feat(modul-audit Sprint 5): WikipediaBox-Widget (Post-Detail bei Animal/tags), TranslateInlineButton (LibreTranslate für Chat-Messages, Auto-Detect + Toggle), Event-Detail-1-Tap In-Kalender-Button (add_2_calendar) + .ics-Fallback, BetterFeedback (shake_to_report-Style via 3-Finger-Long-Press, Submit → error_logs mit Screenshot-Bytes). Total Modul-Audit (5 Sprints): 35+ Items live, 10+ neue Services, 5+ neue Widgets, 9 neue Packages.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

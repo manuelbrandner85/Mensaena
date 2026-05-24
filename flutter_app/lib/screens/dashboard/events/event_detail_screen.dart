@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:add_2_calendar/add_2_calendar.dart' as a2c;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -220,10 +221,32 @@ class EventDetailScreen extends ConsumerWidget {
                   style: AppTypography.caption(),
                 ),
                 const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: () => _exportToCalendar(context, e),
-                  icon: const Icon(LucideIcons.calendarPlus, size: 14),
-                  label: const Text('Zum Kalender hinzufügen'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => _addToSystemCalendar(context, e),
+                        icon: const Icon(LucideIcons.calendarPlus, size: 14),
+                        label: const Text('In Kalender'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.bronze,
+                          foregroundColor: AppColors.voidColor,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _exportToCalendar(context, e),
+                      icon: const Icon(LucideIcons.share2, size: 14),
+                      label: const Text('.ics'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.bronze,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -231,6 +254,43 @@ class EventDetailScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// 1-Tap: System-Kalender öffnen mit vorbefülltem Event.
+  Future<void> _addToSystemCalendar(BuildContext context, EventItem e) async {
+    try {
+      final endDate = e.endDate ?? e.startDate.add(const Duration(hours: 2));
+      final location = [e.locationName, e.locationAddress]
+          .whereType<String>()
+          .where((s) => s.isNotEmpty)
+          .join(', ');
+      final entry = a2c.Event(
+        title: e.title,
+        description: e.description ?? '',
+        location: location.isEmpty ? null : location,
+        startDate: e.startDate,
+        endDate: endDate,
+        iosParams: const a2c.IOSParams(reminder: Duration(minutes: 60)),
+        androidParams:
+            const a2c.AndroidParams(emailInvites: <String>[]),
+      );
+      final ok = await a2c.Add2Calendar.addEvent2Cal(entry);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          ok ? '✓ Event geöffnet im Kalender' : 'Kalender konnte nicht geöffnet werden',
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+      ));
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Fehler: $e',
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
   }
 
   /// ICS (iCalendar) Export — Pendant zu Web `event-to-ics` Util.
