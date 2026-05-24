@@ -1126,7 +1126,9 @@
     "zeitbankConfirmation": "ZAMAN BANKASI ONAYI",
     "reject": "Reddet",
     "confirm": "Onayla",
-    "screenTitle": "Zaman bankası"
+    "screenTitle": "Zaman bankası",
+    "confirmHelpQuestion": "Bu yardımı aldın mı?",
+    "confirmHelpHint": "Bir komşun, harcanan saatleri onaylamanı istiyor."
   },
   "search": {
     "minChars": "En az 2 karakter girin",
@@ -1199,6 +1201,10 @@
   "widgets": {
     "config": "Widget yapılandırması",
     "reset": "Sıfırla",
+    "dragHint": "Widget'ları yeniden sıralamak için sürükleyip bırak; göster veya gizle.",
+    "show": "Göster",
+    "hide": "Gizle",
+    "resetDefault": "Varsayılanlara dön",
     "titles": {
       "greeting": "Karşılama",
       "safetyAlerts": "Güvenlik uyarıları",

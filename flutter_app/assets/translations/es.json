@@ -1126,7 +1126,9 @@
     "zeitbankConfirmation": "CONFIRMACIÓN BANCO DE TIEMPO",
     "reject": "Rechazar",
     "confirm": "Confirmar",
-    "screenTitle": "Banco de tiempo"
+    "screenTitle": "Banco de tiempo",
+    "confirmHelpQuestion": "¿Recibiste esta ayuda?",
+    "confirmHelpHint": "Una persona vecina te pide confirmar las horas dedicadas."
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",
@@ -1199,6 +1201,10 @@
   "widgets": {
     "config": "Configuración de widgets",
     "reset": "Restablecer",
+    "dragHint": "Arrastra para reordenar los widgets y mostrar u ocultar cada uno.",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "resetDefault": "Restaurar valores predeterminados",
     "titles": {
       "greeting": "Saludo",
       "safetyAlerts": "Alertas de seguridad",

@@ -1126,7 +1126,9 @@
     "zeitbankConfirmation": "ZEITBANK-BESTÄTIGUNG",
     "reject": "Ablehnen",
     "confirm": "Bestätigen",
-    "screenTitle": "Zeitbank"
+    "screenTitle": "Zeitbank",
+    "confirmHelpQuestion": "Hast du diese Hilfe erhalten?",
+    "confirmHelpHint": "Ein:e Nachbar:in bittet um Bestätigung für die geleisteten Stunden."
   },
   "search": {
     "minChars": "Mindestens 2 Zeichen eingeben",
@@ -1199,6 +1201,10 @@
   "widgets": {
     "config": "Widget-Konfiguration",
     "reset": "Zurücksetzen",
+    "dragHint": "Sortiere die Widgets per Drag & Drop und blende sie ein oder aus.",
+    "show": "Anzeigen",
+    "hide": "Ausblenden",
+    "resetDefault": "Standard wiederherstellen",
     "titles": {
       "greeting": "Begrüßung",
       "safetyAlerts": "Sicherheits-Warnungen",

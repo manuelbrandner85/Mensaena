@@ -5,15 +5,19 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../config/theme/cinema_theme.dart';
+import '../effects/glass_card.dart';
+import '../effects/lens_flare.dart';
 
 /// SKILL: mensaena-design
-/// 1:1-Pendant zu `src/components/shared/OnboardingTour.tsx`.
-/// 6-Step Cinema-Tour, gated auf flutter_secure_storage Key
-/// `onboarding-completed-v1`.
+/// 6-Step Cinematic Onboarding-Tour mit Spotlight-Overlay, frosted-glass
+/// Tooltip-Box, LensFlare auf dem Highlight und Bronze-Step-Dots.
+///
+/// Persistenz via flutter_secure_storage Flag `mensaena_onboarding_v2_done`.
 class OnboardingTour {
   const OnboardingTour._();
 
-  static const _key = 'mensaena_onboarding_completed_v1';
+  static const _key = 'mensaena_onboarding_v2_done';
   static const _storage = FlutterSecureStorage();
 
   /// Zeigt die Tour, falls noch nicht gesehen.
@@ -27,8 +31,8 @@ class OnboardingTour {
       context: context,
       barrierLabel: 'OnboardingTour',
       barrierDismissible: false,
-      barrierColor: AppColors.voidColor.withValues(alpha: 0.92),
-      transitionDuration: const Duration(milliseconds: 300),
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (_, __, ___) => const _OnboardingTourSheet(),
       transitionBuilder: (_, anim, __, child) => FadeTransition(
         opacity: anim,
@@ -40,6 +44,7 @@ class OnboardingTour {
     } catch (_) {}
   }
 
+  /// Manuell erneut anzeigen (z. B. aus Settings).
   static Future<void> replay(BuildContext context) async {
     try {
       await _storage.delete(key: _key);
@@ -49,6 +54,24 @@ class OnboardingTour {
   }
 }
 
+/// Statisches Step-Modell.
+class _TourStep {
+  const _TourStep({
+    required this.icon,
+    required this.titleKey,
+    required this.bodyKey,
+    required this.tint,
+    required this.spotlight,
+  });
+  final IconData icon;
+  final String titleKey;
+  final String bodyKey;
+  final Color tint;
+
+  /// Position des Spotlight-Lochs (Alignment im Screen-Koordinatensystem).
+  final Alignment spotlight;
+}
+
 class _OnboardingTourSheet extends StatefulWidget {
   const _OnboardingTourSheet();
 
@@ -56,243 +79,313 @@ class _OnboardingTourSheet extends StatefulWidget {
   State<_OnboardingTourSheet> createState() => _OnboardingTourSheetState();
 }
 
-class _OnboardingTourSheetState extends State<_OnboardingTourSheet> {
+class _OnboardingTourSheetState extends State<_OnboardingTourSheet>
+    with SingleTickerProviderStateMixin {
   int _step = 0;
 
-  static const _steps = [
-    (
-      icon: LucideIcons.sparkles,
-      eyebrowKey: 'onboarding.tour.step0.eyebrow',
+  static const List<_TourStep> _steps = [
+    _TourStep(
+      icon: LucideIcons.map,
       titleKey: 'onboarding.tour.step0.title',
       bodyKey: 'onboarding.tour.step0.body',
       tint: AppColors.teal,
+      spotlight: Alignment.center,
     ),
-    (
-      icon: LucideIcons.compass,
-      eyebrowKey: 'onboarding.tour.step1.eyebrow',
+    _TourStep(
+      icon: LucideIcons.plusCircle,
       titleKey: 'onboarding.tour.step1.title',
       bodyKey: 'onboarding.tour.step1.body',
-      tint: AppColors.lebenSoft,
+      tint: AppColors.bronze,
+      spotlight: Alignment(0.0, 0.85),
     ),
-    (
-      icon: LucideIcons.map,
-      eyebrowKey: 'onboarding.tour.step2.eyebrow',
+    _TourStep(
+      icon: LucideIcons.messageCircle,
       titleKey: 'onboarding.tour.step2.title',
       bodyKey: 'onboarding.tour.step2.body',
-      tint: AppColors.tealSoft,
+      tint: AppColors.leben,
+      spotlight: Alignment(0.55, 0.85),
     ),
-    (
-      icon: LucideIcons.plusCircle,
-      eyebrowKey: 'onboarding.tour.step3.eyebrow',
+    _TourStep(
+      icon: LucideIcons.userCircle,
       titleKey: 'onboarding.tour.step3.title',
       bodyKey: 'onboarding.tour.step3.body',
-      tint: AppColors.bronze,
+      tint: AppColors.tealSoft,
+      spotlight: Alignment(0.85, 0.85),
     ),
-    (
-      icon: LucideIcons.messageCircle,
-      eyebrowKey: 'onboarding.tour.step4.eyebrow',
+    _TourStep(
+      icon: LucideIcons.users,
       titleKey: 'onboarding.tour.step4.title',
       bodyKey: 'onboarding.tour.step4.body',
-      tint: AppColors.leben,
+      tint: AppColors.amber,
+      spotlight: Alignment(-0.6, -0.5),
     ),
-    (
-      icon: LucideIcons.users,
-      eyebrowKey: 'onboarding.tour.step5.eyebrow',
+    _TourStep(
+      icon: LucideIcons.shieldAlert,
       titleKey: 'onboarding.tour.step5.title',
       bodyKey: 'onboarding.tour.step5.body',
-      tint: AppColors.amber,
+      tint: AppColors.herzrot,
+      spotlight: Alignment(0.9, -0.9),
     ),
   ];
 
   void _next() {
     if (_step >= _steps.length - 1) {
-      Navigator.of(context).pop();
+      _complete();
       return;
     }
     setState(() => _step++);
   }
 
-  void _back() {
-    if (_step == 0) return;
-    setState(() => _step--);
-  }
+  void _skip() => _complete();
 
-  void _skip() => Navigator.of(context).pop();
+  Future<void> _complete() async {
+    try {
+      await const FlutterSecureStorage()
+          .write(key: OnboardingTour._key, value: '1');
+    } catch (_) {}
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = _steps[_step];
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Skip-Button rechts oben
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton.icon(
-                      onPressed: _skip,
-                      icon: const Icon(LucideIcons.x,
-                          size: 14, color: AppColors.mute),
-                      label: Text('onboarding.skip'.tr(),
-                          style: AppTypography.label(
-                              size: 10, color: AppColors.mute)),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  // Tint-Glow + Icon
-                  Container(
-                    width: 96,
-                    height: 96,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        colors: [
-                          s.tint.withValues(alpha: 0.28),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: s.tint.withValues(alpha: 0.18),
-                        border: Border.all(
-                            color: s.tint.withValues(alpha: 0.5)),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: s.tint.withValues(alpha: 0.32),
-                            blurRadius: 20,
-                          ),
-                        ],
-                      ),
-                      child: Icon(s.icon, size: 28, color: s.tint),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Eyebrow
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: s.tint.withValues(alpha: 0.10),
-                        border: Border.all(
-                            color: s.tint.withValues(alpha: 0.3)),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        s.eyebrowKey.tr().toUpperCase(),
-                        style: AppTypography.label(
-                          size: 9,
-                          color: s.tint,
-                          letterSpacing: 0.30,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Title (Cinema-Serif)
-                  Text(
-                    s.titleKey.tr(),
-                    textAlign: TextAlign.center,
-                    style: AppTypography.display(
-                      size: 26,
-                      color: AppColors.ink,
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  // Body
-                  Text(
-                    s.bodyKey.tr(),
-                    textAlign: TextAlign.center,
-                    style: AppTypography.body(
-                      size: 14,
-                      color: AppColors.inkSoft,
-                      height: 1.6,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  // Progress-Dots
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(_steps.length, (i) {
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 240),
-                        margin:
-                            const EdgeInsets.symmetric(horizontal: 3),
-                        width: i == _step ? 22 : 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: i == _step
-                              ? AppColors.bronze
-                              : AppColors.line,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 22),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.inkSoft,
-                            side:
-                                const BorderSide(color: AppColors.line),
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12),
-                          ),
-                          onPressed: _step == 0 ? null : _back,
-                          icon: const Icon(LucideIcons.arrowLeft,
-                              size: 14),
-                          label: Text('common.back'.tr()),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        flex: 2,
-                        child: FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.bronze,
-                            foregroundColor: AppColors.voidColor,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 14),
-                          ),
-                          onPressed: _next,
-                          icon: Icon(
-                            _step == _steps.length - 1
-                                ? LucideIcons.checkCircle
-                                : LucideIcons.arrowRight,
-                            size: 16,
-                          ),
-                          label: Text(
-                            _step == _steps.length - 1
-                                ? 'onboarding.start'.tr()
-                                : 'onboarding.next'.tr(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          // Spotlight-Overlay (dunkler Hintergrund mit Loch).
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 380),
+              child: CustomPaint(
+                key: ValueKey('spot-$_step'),
+                painter: _SpotlightPainter(
+                  alignment: s.spotlight,
+                  holeRadius: 92,
+                  haloColor: s.tint,
+                ),
+                size: Size.infinite,
               ),
             ),
           ),
-        ),
+
+          // LensFlare auf dem hervorgehobenen Element.
+          Positioned.fill(
+            child: LensFlare(
+              key: ValueKey('flare-$_step'),
+              spec: LensFlareSpec(
+                alignment: s.spotlight,
+                color: s.tint,
+                intensity: 0.8,
+              ),
+              intensity: 0.8,
+            ),
+          ),
+
+          // Frosted-Glass Tooltip-Box.
+          SafeArea(
+            child: Align(
+              alignment: _tooltipAlignment(s.spotlight),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: GlassCard.strong(
+                    padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+                    borderColor: s.tint.withValues(alpha: 0.5),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: s.tint.withValues(alpha: 0.18),
+                                border: Border.all(
+                                    color: s.tint.withValues(alpha: 0.55)),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: s.tint.withValues(alpha: 0.35),
+                                    blurRadius: 12,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(s.icon, size: 18, color: s.tint),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                s.titleKey.tr(),
+                                style: AppTypography.display(
+                                  size: 18,
+                                  color: AppColors.ink,
+                                  height: 1.2,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          s.bodyKey.tr(),
+                          style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.inkSoft,
+                            height: 1.45,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            // Bronze-Dots
+                            Expanded(
+                              child: Row(
+                                children: List.generate(
+                                  _steps.length,
+                                  (i) => Padding(
+                                    padding:
+                                        const EdgeInsets.only(right: 6),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                          milliseconds: 240),
+                                      width: i == _step ? 18 : 6,
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: i == _step
+                                            ? AppColors.bronze
+                                            : AppColors.bronzeSoft
+                                                .withValues(alpha: 0.4),
+                                        borderRadius:
+                                            BorderRadius.circular(999),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: _skip,
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.mute,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10),
+                              ),
+                              child: Text('onboarding.skip'.tr(),
+                                  style: AppTypography.label(
+                                      size: 11, color: AppColors.mute)),
+                            ),
+                            const SizedBox(width: 6),
+                            FilledButton.icon(
+                              onPressed: _next,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: s.tint,
+                                foregroundColor: AppColors.voidColor,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 10),
+                              ),
+                              icon: Icon(
+                                _step == _steps.length - 1
+                                    ? LucideIcons.checkCircle
+                                    : LucideIcons.arrowRight,
+                                size: 14,
+                              ),
+                              label: Text(
+                                _step == _steps.length - 1
+                                    ? 'onboarding.start'.tr()
+                                    : 'onboarding.next'.tr(),
+                                style: AppTypography.label(
+                                  size: 12,
+                                  color: AppColors.voidColor,
+                                  weight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  /// Tooltip soll moeglichst gegenueber dem Spotlight liegen, damit beides
+  /// gleichzeitig sichtbar bleibt.
+  Alignment _tooltipAlignment(Alignment spot) {
+    // Wenn Spotlight unten → Tooltip oben, sonst unten.
+    if (spot.y >= 0.5) return Alignment.topCenter;
+    if (spot.y <= -0.5) return Alignment.bottomCenter;
+    return Alignment.bottomCenter;
+  }
+}
+
+/// CustomPainter: zeichnet einen dunklen Schleier mit einem runden Loch
+/// um die Spotlight-Position. Zusaetzlich ein weicher tint-farbiger Halo
+/// am Rand des Loches.
+class _SpotlightPainter extends CustomPainter {
+  _SpotlightPainter({
+    required this.alignment,
+    required this.holeRadius,
+    required this.haloColor,
+  });
+
+  final Alignment alignment;
+  final double holeRadius;
+  final Color haloColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width * (alignment.x + 1) / 2;
+    final cy = size.height * (alignment.y + 1) / 2;
+    final center = Offset(cx, cy);
+
+    // 1) Dunkler Schleier mit Loch (BlendMode.dstOut).
+    canvas.saveLayer(Offset.zero & size, Paint());
+    final scrim = Paint()
+      ..color = AppColors.voidColor.withValues(alpha: 0.78);
+    canvas.drawRect(Offset.zero & size, scrim);
+
+    final holePaint = Paint()..blendMode = BlendMode.dstOut;
+    holePaint.shader = const RadialGradient(
+      colors: [
+        Colors.black,
+        Colors.black,
+        Colors.transparent,
+      ],
+      stops: [0.0, 0.65, 1.0],
+    ).createShader(
+      Rect.fromCircle(center: center, radius: holeRadius * 1.4),
+    );
+    canvas.drawCircle(center, holeRadius * 1.4, holePaint);
+    canvas.restore();
+
+    // 2) Halo-Ring (tint-farbig) am Rand des Loches.
+    final haloPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..color = haloColor.withValues(alpha: 0.55)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawCircle(center, holeRadius * 1.05, haloPaint);
+  }
+
+  @override
+  bool shouldRepaint(_SpotlightPainter old) =>
+      old.alignment != alignment ||
+      old.holeRadius != holeRadius ||
+      old.haloColor != haloColor;
 }

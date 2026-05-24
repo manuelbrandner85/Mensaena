@@ -8,6 +8,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../effects/glass_card.dart';
+import '../effects/tilt_card.dart';
 
 /// SKILL: mensaena-features
 /// Pendant zu Web `dashboardWidgetStore`. Erlaubt Sichtbarkeit + Reihenfolge
@@ -22,7 +24,7 @@ class DashboardWidgetConfig {
   final List<String> order;
   final Set<String> visible;
 
-  static const _key = 'mensaena_widget_config_v1';
+  static const _key = 'mensaena_widget_grid_v1';
   static const _storage = FlutterSecureStorage();
 
   /// Default-Reihenfolge — 1:1 zum Web src/app/dashboard/page.tsx.
@@ -332,7 +334,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
                         .reset(),
                     icon: const Icon(LucideIcons.rotateCcw,
                         size: 12, color: AppColors.mute),
-                    label: Text('common.reset'.tr(),
+                    label: Text('widgets.resetDefault'.tr(),
                         style: AppTypography.label(
                             size: 9, color: AppColors.mute)),
                   ),
@@ -343,7 +345,7 @@ class WidgetSettingsSheet extends ConsumerWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Text(
-                'Sortiere die Widgets durch Drag & Drop und blende sie ein/aus.',
+                'widgets.dragHint'.tr(),
                 style: AppTypography.body(
                     size: 12, color: AppColors.mute, height: 1.5),
               ),
@@ -363,34 +365,35 @@ class WidgetSettingsSheet extends ConsumerWidget {
                       .map((id) => byId[id])
                       .whereType<DashboardWidgetMeta>()
                       .toList();
-                  return ReorderableListView(
+                  return ReorderableListView.builder(
                     scrollController: scrollCtrl,
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                     onReorder: (oldI, newI) => ref
                         .read(dashboardWidgetConfigProvider.notifier)
                         .reorder(oldI, newI),
+                    itemCount: widgets.length,
                     proxyDecorator: (child, _, __) => Material(
                       color: Colors.transparent,
                       elevation: 8,
                       borderRadius: BorderRadius.circular(12),
                       shadowColor:
                           AppColors.bronze.withValues(alpha: 0.6),
-                      child: child,
+                      // Tilt-Card sorgt fuer subtilen 3D-Effekt beim Drag.
+                      child: TiltCard(intensity: 0.6, child: child),
                     ),
-                    children: [
-                      for (final w in widgets)
-                        _WidgetRow(
-                          key: ValueKey(w.id),
-                          meta: w,
-                          visible: cfg.visible.contains(w.id),
-                          onToggle: w.removable
-                              ? () => ref
-                                  .read(dashboardWidgetConfigProvider
-                                      .notifier)
-                                  .toggleVisible(w.id)
-                              : null,
-                        ),
-                    ],
+                    itemBuilder: (_, i) {
+                      final w = widgets[i];
+                      return _WidgetRow(
+                        key: ValueKey(w.id),
+                        meta: w,
+                        visible: cfg.visible.contains(w.id),
+                        onToggle: w.removable
+                            ? () => ref
+                                .read(dashboardWidgetConfigProvider.notifier)
+                                .toggleVisible(w.id)
+                            : null,
+                      );
+                    },
                   );
                 },
               ),
@@ -416,79 +419,111 @@ class _WidgetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: visible
-            ? AppColors.elevated
-            : AppColors.surface.withValues(alpha: 0.5),
-        border: Border.all(
-          color: visible
-              ? Colors.white.withValues(alpha: 0.07)
-              : Colors.white.withValues(alpha: 0.03),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GlassCard.subtle(
+        padding: const EdgeInsets.all(12),
+        borderRadius: 12,
+        phaseTinted: false,
+        tint: visible
+            ? AppColors.elevated.withValues(alpha: 0.55)
+            : AppColors.surface.withValues(alpha: 0.35),
+        borderColor: visible
+            ? Colors.white.withValues(alpha: 0.07)
+            : Colors.white.withValues(alpha: 0.03),
+        child: Row(
+          children: [
+            const Icon(
+              LucideIcons.gripVertical,
+              size: 16,
+              color: AppColors.mute,
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: visible
+                    ? AppColors.bronze.withValues(alpha: 0.18)
+                    : AppColors.surface,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                meta.icon,
+                size: 14,
+                color: visible ? AppColors.bronze : AppColors.mute,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(meta.title.tr(),
+                      style: AppTypography.body(
+                        size: 13,
+                        color: visible ? AppColors.ink : AppColors.mute,
+                        weight: FontWeight.w600,
+                      )),
+                  const SizedBox(height: 2),
+                  Text(meta.description.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.caption()),
+                ],
+              ),
+            ),
+            if (onToggle != null)
+              Tooltip(
+                message: visible
+                    ? 'widgets.hide'.tr()
+                    : 'widgets.show'.tr(),
+                child: Switch(
+                  value: visible,
+                  onChanged: (_) => onToggle!(),
+                  activeColor: AppColors.bronze,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              )
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(LucideIcons.lock,
+                    size: 12, color: AppColors.mute),
+              ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            LucideIcons.gripVertical,
-            size: 16,
-            color: AppColors.mute,
-          ),
-          const SizedBox(width: 10),
-          Container(
-            width: 32,
-            height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: visible
-                  ? AppColors.bronze.withValues(alpha: 0.18)
-                  : AppColors.surface,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              meta.icon,
-              size: 14,
-              color: visible ? AppColors.bronze : AppColors.mute,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(meta.title.tr(),
-                    style: AppTypography.body(
-                      size: 13,
-                      color: visible ? AppColors.ink : AppColors.mute,
-                      weight: FontWeight.w600,
-                    )),
-                const SizedBox(height: 2),
-                Text(meta.description.tr(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.caption()),
-              ],
-            ),
-          ),
-          if (onToggle != null)
-            Switch(
-              value: visible,
-              onChanged: (_) => onToggle!(),
-              activeColor: AppColors.bronze,
-              materialTapTargetSize:
-                  MaterialTapTargetSize.shrinkWrap,
-            )
-          else
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(LucideIcons.lock,
-                  size: 12, color: AppColors.mute),
-            ),
-        ],
       ),
     );
+  }
+}
+
+/// Service-Klasse fuer den Read-Pfad — andere Module (z.B. DashboardHome)
+/// koennen die persistierte Config laden ohne Riverpod-Abhaengigkeit.
+class WidgetGridConfigService {
+  const WidgetGridConfigService._();
+
+  /// Persistierten Storage-Key (`mensaena_widget_grid_v1`) lesen und in
+  /// `DashboardWidgetConfig` deserialisieren. Liefert `defaultConfig`, wenn
+  /// keine Config gespeichert ist oder das JSON beschaedigt ist.
+  static Future<DashboardWidgetConfig> load() => DashboardWidgetConfig.load();
+
+  /// Convenience: nur die Reihenfolge zurueckgeben.
+  static Future<List<String>> loadOrder() async {
+    final cfg = await DashboardWidgetConfig.load();
+    return cfg.order;
+  }
+
+  /// Convenience: nur die sichtbaren IDs zurueckgeben.
+  static Future<Set<String>> loadVisible() async {
+    final cfg = await DashboardWidgetConfig.load();
+    return cfg.visible;
+  }
+
+  /// True, wenn `id` aktuell als sichtbar konfiguriert ist.
+  static Future<bool> isVisible(String id) async {
+    final cfg = await DashboardWidgetConfig.load();
+    return cfg.visible.contains(id);
   }
 }

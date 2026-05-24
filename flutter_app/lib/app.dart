@@ -11,6 +11,7 @@ import 'providers/locale_provider.dart';
 import 'repositories/extra_repositories.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/incoming_call_listener.dart';
+import 'widgets/shared/notification_permission_banner.dart';
 import 'widgets/shared/update_gate.dart';
 
 /// SKILL: mensaena-architektur
@@ -52,7 +53,19 @@ class MensaenaApp extends ConsumerWidget {
         child: UpdateGate(
           child: IncomingCallListener(
             child: _ShakeFeedbackListener(
-              child: navChild ?? const SizedBox.shrink(),
+              child: Stack(
+                children: [
+                  navChild ?? const SizedBox.shrink(),
+                  // Globaler Push-Permission-Soft-Prompt — slidet 5s nach
+                  // Start ein, falls Status notDetermined/denied ist.
+                  const Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: NotificationPermissionBanner(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1126,7 +1126,9 @@
     "zeitbankConfirmation": "TIMEBANK CONFIRMATION",
     "reject": "Decline",
     "confirm": "Confirm",
-    "screenTitle": "Timebank"
+    "screenTitle": "Timebank",
+    "confirmHelpQuestion": "Did you receive this help?",
+    "confirmHelpHint": "A neighbour is asking you to confirm the hours they provided."
   },
   "search": {
     "minChars": "Type at least 2 characters",
@@ -1199,6 +1201,10 @@
   "widgets": {
     "config": "Widget configuration",
     "reset": "Reset",
+    "dragHint": "Drag and drop to reorder widgets and toggle their visibility.",
+    "show": "Show",
+    "hide": "Hide",
+    "resetDefault": "Restore defaults",
     "titles": {
       "greeting": "Greeting",
       "safetyAlerts": "Safety alerts",
