@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,6 +39,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String? _activeCallId;
   String? _activeStreamRoom;
   Map<String, dynamic>? _replyTo;
+  // @-Mention state (1:1 to Web ChatView.tsx mention-autocomplete)
+  List<Map<String, dynamic>> _mentionSuggestions = const [];
+  String? _mentionQuery;
+  Timer? _mentionDebounce;
+  // In-Chat search state (1:1 to Web ChatView.tsx message-search)
+  bool _searchOpen = false;
+  String _searchQuery = '';
+  final _searchCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -170,21 +180,106 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   void _onTextChanged() {
     final uid = SupabaseService.currentUser?.id;
-    if (uid == null || _typingChannel == null) return;
-    final now = DateTime.now();
-    if (now.difference(_lastTypingBroadcast) <
-        const Duration(milliseconds: 1500)) {
+    // Typing broadcast
+    if (uid != null && _typingChannel != null) {
+      final now = DateTime.now();
+      if (now.difference(_lastTypingBroadcast) >=
+          const Duration(milliseconds: 1500)) {
+        _lastTypingBroadcast = now;
+        _typingChannel!.sendBroadcastMessage(
+          event: 'typing',
+          payload: {'from': uid, 'typing': _ctrl.text.isNotEmpty},
+        );
+      }
+    }
+    // @-Mention detection (debounced 150ms to keep input responsive)
+    _mentionDebounce?.cancel();
+    _mentionDebounce = Timer(const Duration(milliseconds: 150), _detectMention);
+  }
+
+  /// Detects an active '@xxx' token at the cursor position and triggers
+  /// a profile lookup. Closes suggestions if no '@' or space after it.
+  void _detectMention() {
+    final text = _ctrl.text;
+    final cursor = _ctrl.selection.baseOffset;
+    if (cursor < 0 || cursor > text.length) {
+      _closeMentionSuggestions();
       return;
     }
-    _lastTypingBroadcast = now;
-    _typingChannel!.sendBroadcastMessage(
-      event: 'typing',
-      payload: {'from': uid, 'typing': _ctrl.text.isNotEmpty},
+    final before = text.substring(0, cursor);
+    final atIdx = before.lastIndexOf('@');
+    if (atIdx < 0) {
+      _closeMentionSuggestions();
+      return;
+    }
+    // Token must not have whitespace between @ and cursor.
+    final token = before.substring(atIdx + 1);
+    if (token.contains(' ') || token.contains('\n')) {
+      _closeMentionSuggestions();
+      return;
+    }
+    _mentionQuery = token;
+    _loadMentionSuggestions(token);
+  }
+
+  Future<void> _loadMentionSuggestions(String query) async {
+    try {
+      // Empty query → show recent contacts (skip for now, just hide)
+      if (query.isEmpty) {
+        if (mounted) setState(() => _mentionSuggestions = const []);
+        return;
+      }
+      final rows = await sb
+          .from('profiles')
+          .select('id, name, display_name, nickname, avatar_url')
+          .or('nickname.ilike.$query%,name.ilike.$query%,display_name.ilike.$query%')
+          .limit(6);
+      if (!mounted) return;
+      setState(() => _mentionSuggestions =
+          (rows as List).whereType<Map<String, dynamic>>().toList());
+    } catch (_) {
+      if (mounted) setState(() => _mentionSuggestions = const []);
+    }
+  }
+
+  void _closeMentionSuggestions() {
+    if (_mentionSuggestions.isEmpty && _mentionQuery == null) return;
+    if (mounted) {
+      setState(() {
+        _mentionSuggestions = const [];
+        _mentionQuery = null;
+      });
+    }
+  }
+
+  /// Inserts the selected mention into the composer text and closes
+  /// the suggestion list. Replaces only the '@token' substring at cursor.
+  void _insertMention(Map<String, dynamic> profile) {
+    final text = _ctrl.text;
+    final cursor = _ctrl.selection.baseOffset;
+    if (cursor < 0) return;
+    final before = text.substring(0, cursor);
+    final after = text.substring(cursor);
+    final atIdx = before.lastIndexOf('@');
+    if (atIdx < 0) return;
+    final mentionName =
+        (profile['nickname'] as String?)?.replaceAll(' ', '_') ??
+            (profile['display_name'] as String?)?.replaceAll(' ', '_') ??
+            (profile['name'] as String?)?.replaceAll(' ', '_') ??
+            'user';
+    final newText = '${before.substring(0, atIdx)}@$mentionName $after';
+    final newCursor = atIdx + mentionName.length + 2; // @ + name + space
+    _ctrl.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursor),
     );
+    _closeMentionSuggestions();
   }
 
   @override
   void dispose() {
+    _mentionDebounce?.cancel();
+    _searchCtrl.dispose();
     _ctrl.removeListener(_onTextChanged);
     _ctrl.dispose();
     _scrollCtrl.dispose();
@@ -296,6 +391,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Search-Bar (slide-in) + Toggle-Button
+            _ChatHeaderBar(
+              searchOpen: _searchOpen,
+              searchCtrl: _searchCtrl,
+              onToggleSearch: () => setState(() {
+                _searchOpen = !_searchOpen;
+                if (!_searchOpen) {
+                  _searchQuery = '';
+                  _searchCtrl.clear();
+                }
+              }),
+              onSearchChanged: (v) => setState(() => _searchQuery = v),
+            ),
             // Live-Banner — wenn jemand im Channel live ist, koennen
             // alle anderen beitreten.
             if (_context?.kind == ChatKind.channel)
@@ -318,11 +426,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     style: AppTypography.caption(),
                   ),
                 ),
-                data: (msgs) {
+                data: (msgsRaw) {
+                  // In-Chat-Search: lokaler Filter ueber content
+                  final q = _searchQuery.trim().toLowerCase();
+                  final msgs = q.isEmpty
+                      ? msgsRaw
+                      : msgsRaw.where((m) {
+                          final c = (m['content'] as String? ?? '')
+                              .toLowerCase();
+                          return c.contains(q);
+                        }).toList();
                   if (msgs.isEmpty) {
                     return Center(
                       child: Text(
-                        'Schreib die erste Nachricht.',
+                        q.isEmpty
+                            ? 'Schreib die erste Nachricht.'
+                            : 'Keine Treffer für „$_searchQuery".',
                         style: AppTypography.caption(),
                       ),
                     );
@@ -462,6 +581,77 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ],
                 ),
               ),
+            // @-Mention-Vorschlaege (max 6 Treffer, scrollable falls noetig)
+            if (_mentionSuggestions.isNotEmpty)
+              Container(
+                constraints: const BoxConstraints(maxHeight: 220),
+                decoration: const BoxDecoration(
+                  color: AppColors.surface,
+                  border: Border(
+                    top: BorderSide(color: AppColors.line),
+                    bottom: BorderSide(color: AppColors.line),
+                  ),
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _mentionSuggestions.length,
+                  itemBuilder: (context, i) {
+                    final p = _mentionSuggestions[i];
+                    final name = (p['display_name'] as String?) ??
+                        (p['name'] as String?) ??
+                        'Nutzer:in';
+                    final nick = p['nickname'] as String?;
+                    final avatarUrl = p['avatar_url'] as String?;
+                    return InkWell(
+                      onTap: () => _insertMention(p),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 14,
+                              backgroundColor: AppColors.elevated,
+                              backgroundImage: avatarUrl != null
+                                  ? NetworkImage(avatarUrl)
+                                  : null,
+                              child: avatarUrl == null
+                                  ? Text(
+                                      name.isNotEmpty
+                                          ? name[0].toUpperCase()
+                                          : '?',
+                                      style: AppTypography.mono(
+                                          size: 11,
+                                          color: AppColors.bronze),
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(name,
+                                      style: AppTypography.body(
+                                          size: 13,
+                                          color: AppColors.ink,
+                                          weight: FontWeight.w600)),
+                                  if (nick != null && nick.isNotEmpty)
+                                    Text('@$nick',
+                                        style: AppTypography.body(
+                                            size: 11,
+                                            color: AppColors.mute)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
@@ -478,7 +668,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       onSubmitted: (_) => _send(),
                       style: AppTypography.body(size: 14, color: AppColors.ink),
                       decoration: const InputDecoration(
-                        hintText: 'Nachricht…',
+                        hintText: 'Nachricht… (@ für Mention)',
                         isDense: true,
                       ),
                     ),
@@ -1252,6 +1442,85 @@ class _PinnedMessagesPanel extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// In-Chat Search Bar — Toggle-Icon + slide-down input field.
+// 1:1 zu Web ChatView.tsx message-search.
+// ─────────────────────────────────────────────────────────────
+class _ChatHeaderBar extends StatelessWidget {
+  const _ChatHeaderBar({
+    required this.searchOpen,
+    required this.searchCtrl,
+    required this.onToggleSearch,
+    required this.onSearchChanged,
+  });
+
+  final bool searchOpen;
+  final TextEditingController searchCtrl;
+  final VoidCallback onToggleSearch;
+  final ValueChanged<String> onSearchChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Compact toolbar with search-toggle button (right-aligned)
+        SizedBox(
+          height: 36,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                tooltip: searchOpen
+                    ? 'Suche schließen'
+                    : 'Im Chat suchen',
+                onPressed: onToggleSearch,
+                icon: Icon(
+                  searchOpen ? LucideIcons.x : LucideIcons.search,
+                  size: 18,
+                  color: searchOpen ? AppColors.bronze : AppColors.mute,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Slide-in search input (animated height)
+        AnimatedSize(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          child: searchOpen
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                  child: TextField(
+                    controller: searchCtrl,
+                    autofocus: true,
+                    onChanged: onSearchChanged,
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.elevated,
+                      prefixIcon: const Icon(LucideIcons.search,
+                          size: 14, color: AppColors.mute),
+                      hintText: 'Nachrichten in diesem Chat suchen…',
+                      hintStyle: AppTypography.body(
+                          size: 12, color: AppColors.mute),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
+      ],
     );
   }
 }

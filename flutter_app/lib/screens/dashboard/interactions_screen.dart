@@ -9,6 +9,7 @@ import '../../models/interaction.dart';
 import '../../repositories/interactions_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/trust_rating_modal.dart';
 
 /// SKILL: mensaena-features
 /// Interactions-Screen: alle aktiven Hilfeanfragen des Users.
@@ -124,6 +125,15 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                           status: it.status,
                           isHelper:
                               it.helperId == SupabaseService.currentUser?.id,
+                          // Partner = whoever is NOT me in this interaction
+                          partnerId: it.helperId ==
+                                  SupabaseService.currentUser?.id
+                              ? it.helpedId
+                              : it.helperId,
+                          alreadyRated: (it.helperId ==
+                                      SupabaseService.currentUser?.id)
+                              ? it.helperRated
+                              : it.helpedRated,
                           onChanged: () {
                             ref.invalidate(activeInteractionsCountProvider);
                             ref.invalidate(interactionsStreamProvider);
@@ -183,21 +193,33 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-class _StatusActions extends StatelessWidget {
+class _StatusActions extends ConsumerWidget {
   const _StatusActions({
     required this.interactionId,
     required this.status,
     required this.isHelper,
     required this.onChanged,
+    this.partnerId,
+    this.alreadyRated = false,
   });
 
   final String interactionId;
   final String status;
   final bool isHelper;
   final VoidCallback onChanged;
+  final String? partnerId;
+  final bool alreadyRated;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Trust-Rating-CTA bei abgeschlossener Interaktion (Phase 5.4)
+    if (status == 'completed' && partnerId != null && !alreadyRated) {
+      return _RateButton(
+        partnerId: partnerId!,
+        interactionId: interactionId,
+        onRated: onChanged,
+      );
+    }
     final next = _nextSteps(status, isHelper);
     if (next.isEmpty) return const SizedBox.shrink();
     return Wrap(
@@ -314,6 +336,75 @@ class _ActionPill extends StatelessWidget {
                 style: AppTypography.label(size: 10, color: color)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Trust-Rating-CTA bei abgeschlossener Interaktion (Phase 5.4)
+// ─────────────────────────────────────────────────────────────
+class _RateButton extends StatefulWidget {
+  const _RateButton({
+    required this.partnerId,
+    required this.interactionId,
+    required this.onRated,
+  });
+  final String partnerId;
+  final String interactionId;
+  final VoidCallback onRated;
+
+  @override
+  State<_RateButton> createState() => _RateButtonState();
+}
+
+class _RateButtonState extends State<_RateButton> {
+  String? _partnerName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPartner();
+  }
+
+  Future<void> _loadPartner() async {
+    try {
+      final p = await sb
+          .from('profiles')
+          .select('name, display_name')
+          .eq('id', widget.partnerId)
+          .maybeSingle();
+      if (!mounted) return;
+      setState(() => _partnerName = (p?['display_name'] as String?) ??
+          (p?['name'] as String?) ??
+          'Nachbar:in');
+    } catch (_) {
+      if (mounted) setState(() => _partnerName = 'Nachbar:in');
+    }
+  }
+
+  Future<void> _openRatingModal() async {
+    final result = await TrustRatingModal.show(
+      context,
+      ratedUserId: widget.partnerId,
+      ratedUserName: _partnerName ?? 'Nachbar:in',
+      interactionId: widget.interactionId,
+    );
+    if (result == true) widget.onRated();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: _partnerName == null ? null : _openRatingModal,
+      icon: const Icon(LucideIcons.star, size: 14),
+      label: Text(_partnerName == null
+          ? 'Lädt…'
+          : 'Bewerten: ${_partnerName!}'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.amber,
+        foregroundColor: AppColors.voidColor,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       ),
     );
   }

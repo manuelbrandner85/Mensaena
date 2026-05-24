@@ -33,6 +33,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   int _score = 0;
   List<Map<String, dynamic>> _comments = const [];
   final _commentCtrl = TextEditingController();
+  // Phase 5.7: optional parent for nested-reply (depth-1)
+  String? _replyToParentId;
+  String? _replyToAuthor;
 
   @override
   void initState() {
@@ -133,14 +136,55 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
+  /// Builds depth-1 nested comment tree (1:1 to Web PostDetailPage).
+  /// Roots (parent_id=null) at top, each followed by its replies indented.
+  List<Widget> _buildCommentTree() {
+    final roots = _comments
+        .where((c) => c['parent_id'] == null)
+        .toList();
+    final replies = <String, List<Map<String, dynamic>>>{};
+    for (final c in _comments) {
+      final pid = c['parent_id'] as String?;
+      if (pid != null) {
+        replies.putIfAbsent(pid, () => []).add(c);
+      }
+    }
+    final tiles = <Widget>[];
+    for (final root in roots) {
+      tiles.add(_CommentTile(
+        root,
+        onReply: () => setState(() {
+          _replyToParentId = root['id'] as String?;
+          final profile = root['profiles'] as Map<String, dynamic>?;
+          _replyToAuthor = (profile?['display_name'] ??
+              profile?['name'] ??
+              'Nachbar:in') as String;
+        }),
+      ));
+      final children = replies[root['id'] as String] ?? const [];
+      for (final child in children) {
+        tiles.add(Padding(
+          padding: const EdgeInsets.only(left: 32),
+          child: _CommentTile(child),
+        ));
+      }
+    }
+    return tiles;
+  }
+
   Future<void> _addComment() async {
     final text = _commentCtrl.text.trim();
     if (text.isEmpty) return;
     final ok = await PostCommentsRepository.add(
       postId: widget.postId,
       content: text,
+      parentId: _replyToParentId,
     );
     if (!ok || !mounted) return;
+    setState(() {
+      _replyToParentId = null;
+      _replyToAuthor = null;
+    });
     _commentCtrl.clear();
     final fresh = await PostCommentsRepository.listFor(widget.postId);
     if (mounted) setState(() => _comments = fresh);
@@ -249,10 +293,45 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                 ),
                               )
                             else
-                              ..._comments.map(_CommentTile.new),
+                              ..._buildCommentTree(),
                           ],
                         ),
                       ),
+                      if (_replyToParentId != null)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.bronze.withValues(alpha: 0.10),
+                            border: Border.all(
+                                color: AppColors.bronze
+                                    .withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(LucideIcons.cornerUpLeft,
+                                  size: 12, color: AppColors.bronze),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  'Antwort an ${_replyToAuthor ?? "..."}',
+                                  style: AppTypography.body(
+                                      size: 11, color: AppColors.bronze),
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => setState(() {
+                                  _replyToParentId = null;
+                                  _replyToAuthor = null;
+                                }),
+                                icon: const Icon(LucideIcons.x,
+                                    size: 12, color: AppColors.mute),
+                              ),
+                            ],
+                          ),
+                        ),
                       _CommentInput(
                         ctrl: _commentCtrl,
                         onSubmit: _addComment,
@@ -575,8 +654,9 @@ class _ActionIcon extends StatelessWidget {
 
 // ── Comments ─────────────────────────────────────────────────────────────
 class _CommentTile extends StatelessWidget {
-  const _CommentTile(this.json);
+  const _CommentTile(this.json, {this.onReply});
   final Map<String, dynamic> json;
+  final VoidCallback? onReply;
 
   @override
   Widget build(BuildContext context) {
@@ -648,6 +728,20 @@ class _CommentTile extends StatelessWidget {
                     height: 1.5,
                   ),
                 ),
+                if (onReply != null) ...[
+                  const SizedBox(height: 4),
+                  TextButton.icon(
+                    onPressed: onReply,
+                    icon: const Icon(LucideIcons.cornerUpLeft, size: 12),
+                    label: const Text('Antworten'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.bronze,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      minimumSize: const Size(0, 24),
+                      textStyle: AppTypography.label(size: 10),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

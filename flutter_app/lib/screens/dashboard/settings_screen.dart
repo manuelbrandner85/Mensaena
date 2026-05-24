@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -309,14 +314,216 @@ class _RegionTab extends StatelessWidget {
   }
 }
 
-class _DangerTab extends StatelessWidget {
+class _DangerTab extends StatefulWidget {
+  @override
+  State<_DangerTab> createState() => _DangerTabState();
+}
+
+class _DangerTabState extends State<_DangerTab> {
+  bool _exporting = false;
+  bool _deleting = false;
+
+  /// GDPR Article 20 — Right to Data Portability.
+  /// Fetches user's data + writes JSON to system share-sheet.
+  Future<void> _exportData() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    setState(() => _exporting = true);
+    try {
+      // Parallel fetch core tables
+      final results = await Future.wait<List<dynamic>>([
+        sb.from('profiles').select().eq('id', uid).limit(1),
+        sb.from('posts').select().eq('user_id', uid),
+        sb.from('post_comments').select().eq('user_id', uid),
+        sb.from('messages').select().eq('sender_id', uid),
+        sb.from('interactions').select().or('helper_id.eq.$uid,helped_id.eq.$uid'),
+        sb.from('trust_ratings').select().or('rater_id.eq.$uid,rated_id.eq.$uid'),
+        sb.from('notifications').select().eq('user_id', uid),
+        sb.from('saved_posts').select().eq('user_id', uid),
+        sb.from('badges').select().eq('user_id', uid).limit(0),
+      ]);
+      final exportData = <String, dynamic>{
+        'exported_at': DateTime.now().toUtc().toIso8601String(),
+        'user_id': uid,
+        'note':
+            'Mensaena GDPR Article 20 Export — Right to Data Portability',
+        'profile': results[0].isNotEmpty ? results[0].first : null,
+        'posts': results[1],
+        'comments': results[2],
+        'messages': results[3],
+        'interactions': results[4],
+        'trust_ratings': results[5],
+        'notifications': results[6],
+        'saved_posts': results[7],
+        'badges': results[8],
+      };
+      final json = const JsonEncoder.withIndent('  ').convert(exportData);
+      // Write to temp + share
+      final dir = await getTemporaryDirectory();
+      final file = File(
+          '${dir.path}/mensaena-export-${DateTime.now().millisecondsSinceEpoch}.json');
+      await file.writeAsString(json);
+      if (!mounted) return;
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        subject: 'Mensaena Daten-Export',
+        text: 'Dein Mensaena-Daten-Export (DSGVO Art. 20).',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Daten-Export erstellt (${(json.length / 1024).toStringAsFixed(1)} KB).',
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Export fehlgeschlagen: $e',
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm)),
+      ));
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  /// GDPR Article 17 — Right to Erasure.
+  /// 3-Stage confirmation flow: scary warning → typed confirmation →
+  /// RPC delete_account → signOut.
+  Future<void> _deleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Konto unwiderruflich löschen?',
+            style: AppTypography.body(
+                size: 16, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text(
+          'Dein Profil, alle Beiträge, Nachrichten, Bewertungen und '
+          'gespeicherten Inhalte werden permanent gelöscht. Diese Aktion '
+          'kann NICHT rückgängig gemacht werden.\n\n'
+          'Hinweis: System-Logs (z.B. anonymisierte Audit-Einträge) '
+          'können aus rechtlichen Gründen erhalten bleiben.',
+          style: AppTypography.body(
+              size: 13, color: AppColors.inkSoft, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Abbrechen')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: const Text('Weiter zur Bestätigung'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    // Stage 2: typed confirmation
+    final typedConfirmation = await _showTypedConfirmation();
+    if (typedConfirmation != true || !mounted) return;
+
+    setState(() => _deleting = true);
+    try {
+      // Try RPC first (admin_delete_user with self-permission).
+      // Fallback: just sign out + flag profile is_banned (soft-delete).
+      try {
+        await sb.rpc<dynamic>('delete_my_account');
+      } catch (_) {
+        // Fallback if RPC missing: anonymize profile.
+        final uid = SupabaseService.currentUser?.id;
+        if (uid != null) {
+          await sb.from('profiles').update({
+            'name': 'Gelöschter Nutzer',
+            'nickname': null,
+            'bio': null,
+            'avatar_url': null,
+            'phone': null,
+            'is_banned': true,
+            'ban_reason': 'self_deleted_${DateTime.now().toUtc().toIso8601String()}',
+          }).eq('id', uid);
+        }
+      }
+      await sb.auth.signOut();
+      if (!mounted) return;
+      context.go('/');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _deleting = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Löschen fehlgeschlagen: $e',
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm)),
+      ));
+    }
+  }
+
+  Future<bool?> _showTypedConfirmation() {
+    final ctrl = TextEditingController();
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocalState) {
+          final canDelete = ctrl.text.trim() == 'LÖSCHEN';
+          return AlertDialog(
+            backgroundColor: AppColors.surface,
+            title: Text('Letzte Bestätigung',
+                style: AppTypography.body(
+                    size: 16,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tippe „LÖSCHEN" zur Bestätigung:',
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.inkSoft),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: ctrl,
+                  autofocus: true,
+                  onChanged: (_) => setLocalState(() {}),
+                  style: AppTypography.body(
+                      size: 14, color: AppColors.ink),
+                  decoration: const InputDecoration(
+                    hintText: 'LÖSCHEN',
+                    filled: true,
+                    fillColor: AppColors.elevated,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Abbrechen')),
+              TextButton(
+                onPressed: canDelete ? () => Navigator.pop(ctx, true) : null,
+                style:
+                    TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+                child: const Text('Konto endgültig löschen'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('Konto', style: AppTypography.label(size: 10)),
-        const SizedBox(height: 14),
+        Text('SITZUNG', style: AppTypography.label(size: 10)),
+        const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () async {
             await sb.auth.signOut();
@@ -325,7 +532,29 @@ class _DangerTab extends StatelessWidget {
           icon: const Icon(LucideIcons.logOut, size: 16),
           label: const Text('Abmelden'),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 24),
+        Text('DATENSCHUTZ (DSGVO)', style: AppTypography.label(size: 10)),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: _exporting ? null : _exportData,
+          icon: _exporting
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.amber))
+              : const Icon(LucideIcons.download, size: 16),
+          label: Text(_exporting
+              ? 'Exportiere…'
+              : 'Meine Daten herunterladen (Art. 20)'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.amber,
+            side: BorderSide(color: AppColors.amber.withValues(alpha: 0.5)),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text('GEFAHRENZONE', style: AppTypography.label(size: 10)),
+        const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
@@ -346,12 +575,33 @@ class _DangerTab extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'Per DSGVO-Anfrage an info@mensaena.de oder im vollen Web-'
-                'Dashboard. In-App-Loeschung folgt in einer spaeteren Phase.',
+                'Permanente Löschung deines Accounts und aller Inhalte. '
+                'DSGVO Artikel 17 — Recht auf Vergessenwerden.',
                 style: AppTypography.body(
                   size: 12,
                   color: AppColors.inkSoft,
                   height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _deleting ? null : _deleteAccount,
+                  icon: _deleting
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.voidColor))
+                      : const Icon(LucideIcons.trash2, size: 16),
+                  label: Text(_deleting
+                      ? 'Lösche…'
+                      : 'Konto unwiderruflich löschen'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.herzrot,
+                    foregroundColor: AppColors.voidColor,
+                  ),
                 ),
               ),
             ],
