@@ -1,5 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// ignore: depend_on_referenced_packages
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 import 'package:go_router/go_router.dart';
 import 'package:livekit_client/livekit_client.dart' as lk;
 import 'package:lucide_icons/lucide_icons.dart';
@@ -10,6 +13,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/effects/bloom.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-DM-Anruf (Audio + optional Video) via LiveKit.
@@ -39,11 +43,39 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   bool _micEnabled = true;
   bool _camEnabled = false;
   String? _error;
+  String? _peerAvatarUrl;
 
   @override
   void initState() {
     super.initState();
     _connect();
+    _loadPeerAvatar();
+  }
+
+  Future<void> _loadPeerAvatar() async {
+    // Versuch: ermittle Peer-ID via dm_calls + lade Profil-Bild.
+    try {
+      final me = SupabaseService.currentUser?.id;
+      if (me == null) return;
+      final call = await sb
+          .from('dm_calls')
+          .select('caller_id, callee_id')
+          .eq('id', widget.callId)
+          .maybeSingle();
+      if (call == null) return;
+      final peerId = call['caller_id'] == me
+          ? call['callee_id'] as String?
+          : call['caller_id'] as String?;
+      if (peerId == null) return;
+      final p = await sb
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', peerId)
+          .maybeSingle();
+      if (mounted) {
+        setState(() => _peerAvatarUrl = p?['avatar_url'] as String?);
+      }
+    } catch (_) {}
   }
 
   Future<void> _connect() async {
@@ -176,25 +208,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                 style: AppTypography.body(
                     size: 13, color: AppColors.inkSoft)),
             const Spacer(),
-            // Peer-Avatar (Platzhalter — TODO: aus Profile laden)
-            Container(
-              width: 140,
-              height: 140,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.bronze.withValues(alpha: 0.18),
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: AppColors.bronze.withValues(alpha: 0.4),
-                    width: 2),
-              ),
-              child: Text(
-                widget.peerName.isNotEmpty
-                    ? widget.peerName[0].toUpperCase()
-                    : '?',
-                style: AppTypography.display(
-                    size: 56, color: AppColors.bronze),
-              ),
+            // Wenn Remote-Video vorhanden: zeige Video. Sonst: großer Avatar.
+            _PeerVideoOrAvatar(
+              room: _room,
+              peerName: widget.peerName,
+              avatarUrl: _peerAvatarUrl,
             ),
             if (_state == _CallState.failed && _error != null) ...[
               const SizedBox(height: 16),
@@ -307,4 +325,120 @@ class _CircleAction extends StatelessWidget {
       ],
     );
   }
+}
+
+// ── PeerVideoOrAvatar — zeigt Remote-Video oder großen Avatar ──────
+class _PeerVideoOrAvatar extends StatefulWidget {
+  const _PeerVideoOrAvatar({
+    required this.room,
+    required this.peerName,
+    required this.avatarUrl,
+  });
+
+  final lk.Room? room;
+  final String peerName;
+  final String? avatarUrl;
+
+  @override
+  State<_PeerVideoOrAvatar> createState() => _PeerVideoOrAvatarState();
+}
+
+class _PeerVideoOrAvatarState extends State<_PeerVideoOrAvatar> {
+  lk.EventsListener<lk.RoomEvent>? _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    final r = widget.room;
+    if (r != null) {
+      _listener = r.createListener()
+        ..on<lk.TrackSubscribedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackUnsubscribedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackMutedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackUnmutedEvent>((_) {
+          if (mounted) setState(() {});
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    _listener?.dispose();
+    super.dispose();
+  }
+
+  lk.VideoTrack? _findPeerVideo() {
+    final r = widget.room;
+    if (r == null) return null;
+    for (final p in r.remoteParticipants.values) {
+      for (final pub in p.videoTrackPublications) {
+        if (pub.muted || !pub.subscribed) continue;
+        final t = pub.track;
+        if (t is lk.VideoTrack) return t;
+      }
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final video = _findPeerVideo();
+    if (video != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: SizedBox(
+          width: 240,
+          height: 320,
+          child: lk.VideoTrackRenderer(
+            video,
+            fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+          ),
+        ),
+      );
+    }
+    final initial = widget.peerName.isNotEmpty
+        ? widget.peerName[0].toUpperCase()
+        : '?';
+    return PulseBloom(
+      color: AppColors.bronze,
+      radius: 38,
+      minIntensity: 0.4,
+      maxIntensity: 0.8,
+      child: Container(
+        width: 180,
+        height: 180,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.bronze.withValues(alpha: 0.22),
+          border: Border.all(
+            color: AppColors.bronze.withValues(alpha: 0.55),
+            width: 3,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: widget.avatarUrl!,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => _initial(initial),
+                errorWidget: (_, __, ___) => _initial(initial),
+              )
+            : _initial(initial),
+      ),
+    );
+  }
+
+  Widget _initial(String letter) => Container(
+        color: AppColors.bronze.withValues(alpha: 0.18),
+        alignment: Alignment.center,
+        child: Text(letter,
+            style:
+                AppTypography.display(size: 72, color: AppColors.bronze)),
+      );
 }

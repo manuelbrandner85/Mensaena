@@ -1,20 +1,43 @@
+import '../repositories/extra_repositories.dart';
 import 'supabase_service.dart';
 
 /// SKILL: mensaena-features
 /// Pendant zu Web `/api/dm-calls/*`. Erstellt einen DM-Call-Eintrag in
 /// `dm_calls` der via Supabase-Realtime den callee benachrichtigt
 /// (IncomingCallListener auf der Empfaengerseite zeigt Vollbild-Sheet).
+class DmCallStartResult {
+  const DmCallStartResult({
+    required this.success,
+    this.callId,
+    this.roomName,
+    this.errorReason,
+  });
+
+  final bool success;
+  final String? callId;
+  final String? roomName;
+  final String? errorReason;
+}
+
 class DmCallService {
   const DmCallService._();
 
   /// Initiiert einen Anruf an [calleeId] in einer existierenden Conversation.
-  /// Returns (callId, roomName) bei Erfolg.
-  static Future<({String callId, String roomName})?> start({
+  /// Bei Erfolg: success=true mit callId+roomName.
+  /// Bei Fehler: success=false mit errorReason (UI zeigt Snackbar).
+  static Future<DmCallStartResult> start({
     required String conversationId,
     required String calleeId,
   }) async {
     final caller = SupabaseService.currentUser?.id;
-    if (caller == null || caller == calleeId) return null;
+    if (caller == null) {
+      return const DmCallStartResult(
+          success: false, errorReason: 'Nicht eingeloggt');
+    }
+    if (caller == calleeId) {
+      return const DmCallStartResult(
+          success: false, errorReason: 'Du kannst dich nicht selbst anrufen');
+    }
     final roomName = 'dm-${DateTime.now().millisecondsSinceEpoch}';
     try {
       final row = await sb
@@ -29,21 +52,37 @@ class DmCallService {
           .select('id, room_name')
           .single();
       final id = row['id'] as String?;
-      if (id == null) return null;
-      return (callId: id, roomName: (row['room_name'] as String?) ?? roomName);
-    } catch (_) {
-      return null;
+      if (id == null) {
+        return const DmCallStartResult(
+            success: false, errorReason: 'Keine Call-ID zurückgegeben');
+      }
+      return DmCallStartResult(
+        success: true,
+        callId: id,
+        roomName: (row['room_name'] as String?) ?? roomName,
+      );
+    } catch (e, st) {
+      // Log nach error_logs damit wir den echten Grund sehen.
+      // ignore: discarded_futures
+      ErrorLogsRepository.log(
+        errorType: 'dm_call_start_failed',
+        message: e.toString(),
+        stack: st.toString(),
+      );
+      return DmCallStartResult(
+        success: false,
+        errorReason: 'Anruf abgelehnt vom Server: ${e.toString()}',
+      );
     }
   }
 
-  /// Legacy-kompatibler Wrapper — nur call_id (fuer Stellen die nichts mit
-  /// roomName anfangen koennen).
+  /// Legacy: nur callId.
   static Future<String?> startCallId({
     required String conversationId,
     required String calleeId,
   }) async {
     final r = await start(conversationId: conversationId, calleeId: calleeId);
-    return r?.callId;
+    return r.success ? r.callId : null;
   }
 
   /// Bricht eigenen Anruf ab.

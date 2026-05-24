@@ -76,19 +76,44 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Future<void> _startCall() async {
     final ctx = _context;
-    if (ctx == null || ctx.kind != ChatKind.dm || ctx.partnerId == null) {
+    if (ctx == null) {
+      _showCallError('Chat lädt noch …');
+      return;
+    }
+    if (ctx.kind != ChatKind.dm) {
+      _showCallError('Anrufe nur in privaten Chats möglich');
+      return;
+    }
+    if (ctx.partnerId == null) {
+      _showCallError('Gesprächspartner nicht gefunden');
       return;
     }
     final result = await DmCallService.start(
       conversationId: widget.conversationId,
       calleeId: ctx.partnerId!,
     );
-    if (result == null || !mounted) return;
+    if (!mounted) return;
+    if (!result.success || result.callId == null || result.roomName == null) {
+      _showCallError(result.errorReason ?? 'Anruf konnte nicht gestartet werden');
+      return;
+    }
     setState(() => _activeCallId = result.callId);
-    // Navigation in CallScreen — startet LiveKit-Verbindung.
     final peer = Uri.encodeComponent(ctx.title);
-    final room = Uri.encodeComponent(result.roomName);
+    final room = Uri.encodeComponent(result.roomName!);
     context.push('/dashboard/call/${result.callId}?room=$room&peer=$peer');
+  }
+
+  void _showCallError(String msg) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Row(children: [
+        const Icon(LucideIcons.phoneOff, size: 16, color: AppColors.herzrot),
+        const SizedBox(width: 8),
+        Expanded(child: Text(msg,
+            style: AppTypography.body(size: 13, color: AppColors.ink))),
+      ]),
+    ));
   }
 
   Future<void> _startStream() async {
@@ -1577,10 +1602,10 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                   _ActionIcon(
                     icon: widget.activeStreamRoom != null
                         ? LucideIcons.videoOff
-                        : LucideIcons.radio,
+                        : LucideIcons.video,
                     label: widget.activeStreamRoom != null
                         ? 'Stream beenden'
-                        : 'Livestream',
+                        : 'Livestream starten',
                     color: widget.activeStreamRoom != null
                         ? AppColors.herzrot
                         : AppColors.bronze,
