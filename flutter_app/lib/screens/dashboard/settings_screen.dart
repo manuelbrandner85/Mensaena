@@ -729,6 +729,11 @@ class _AppearanceTab extends ConsumerWidget {
             onTap: () =>
                 ref.read(cinemaModeProvider.notifier).set(m),
           ),
+        const SizedBox(height: 16),
+        Text('EFFEKT-STÄRKE',
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 8),
+        _IntensityTiles(),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(14),
@@ -759,6 +764,55 @@ class _AppearanceTab extends ConsumerWidget {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _IntensityTiles extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(cinemaIntensityProvider);
+    return Row(
+      children: [
+        for (final i in CinemaIntensity.values)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: InkWell(
+                onTap: () =>
+                    ref.read(cinemaIntensityProvider.notifier).set(i),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: current == i
+                        ? AppColors.amber.withValues(alpha: 0.18)
+                        : AppColors.elevated,
+                    border: Border.all(
+                      color: current == i
+                          ? AppColors.amber
+                          : AppColors.line,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    i.label.split(' ').first,
+                    style: AppTypography.body(
+                      size: 11,
+                      color: current == i
+                          ? AppColors.amber
+                          : AppColors.inkSoft,
+                      weight: current == i
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }

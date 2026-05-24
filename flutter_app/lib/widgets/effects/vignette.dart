@@ -1,12 +1,14 @@
+/// SKILL: mensaena-design
+/// Cinema-Vignette — dramatischer dunkler Rand-Fall via 3-Stop-RadialGradient.
+/// Intensität phasenabhängig (Nacht ~0.60, Tag ~0.20).
+library;
+
 import 'package:flutter/material.dart';
 
-/// SKILL: mensaena-design
-/// Cinema-Vignette — subtile dunkle Raender via RadialGradient.
-/// Intensitaet phasenabhaengig (Nacht ~0.4, Tag ~0.05).
 class VignetteOverlay extends StatelessWidget {
   const VignetteOverlay({required this.intensity, super.key});
 
-  /// 0.0 (keine Vignette) bis 0.5 (sehr dunkler Rand).
+  /// 0.0 – 0.7. Höhere Werte = dunklerer Rand.
   final double intensity;
 
   @override
@@ -17,13 +19,14 @@ class VignetteOverlay extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment.center,
-            radius: 1.2,
+            radius: 1.15,
             colors: [
               Colors.transparent,
-              Colors.black.withValues(alpha: intensity * 0.5),
+              Colors.black.withValues(alpha: intensity * 0.30),
+              Colors.black.withValues(alpha: intensity * 0.65),
               Colors.black.withValues(alpha: intensity),
             ],
-            stops: const [0.4, 0.8, 1.0],
+            stops: const [0.35, 0.65, 0.85, 1.0],
           ),
         ),
         child: const SizedBox.expand(),

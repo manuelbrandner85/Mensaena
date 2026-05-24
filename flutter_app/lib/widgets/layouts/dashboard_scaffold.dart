@@ -7,6 +7,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/notifications_repository.dart';
+import '../../services/haptics.dart';
+import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
 import '../shared/fcm_foreground_listener.dart';
 import '../shared/incoming_call_listener.dart';
@@ -161,32 +163,34 @@ class _BottomNav extends ConsumerWidget {
                   active: currentRoute == '/dashboard/map',
                 ),
               ),
-              // Zentraler Primary-FAB-Style fuer Erstellen.
+              // Zentraler Primary-FAB-Style fuer Erstellen mit Pulse-Bloom.
               SizedBox(
                 width: 64,
                 child: GestureDetector(
-                  onTap: () => context.go('/dashboard/create'),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [AppColors.amber, AppColors.amberWarm],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.amberGlow,
-                          blurRadius: 16,
-                          spreadRadius: -2,
+                  onTap: () {
+                    Haptics.confirm();
+                    context.go('/dashboard/create');
+                  },
+                  child: PulseBloom(
+                    color: AppColors.amber,
+                    radius: 28,
+                    minIntensity: 0.55,
+                    maxIntensity: 1.0,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [AppColors.amber, AppColors.amberWarm],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: const Icon(
-                      LucideIcons.plusCircle,
-                      color: AppColors.voidColor,
-                      size: 24,
+                      ),
+                      child: const Icon(
+                        LucideIcons.plusCircle,
+                        color: AppColors.voidColor,
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),
@@ -236,7 +240,10 @@ class _BottomItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = active ? AppColors.amber : AppColors.mute;
     return InkWell(
-      onTap: () => context.go(route),
+      onTap: () {
+        Haptics.select();
+        context.go(route);
+      },
       // BUG-FIX #4: 48dp minimum Touch-Target (Material-Standard)
       child: Container(
         constraints: const BoxConstraints(minWidth: 48, minHeight: 48),

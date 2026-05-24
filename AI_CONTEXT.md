@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität Wave 1+2 KOMPLETT (Wave 2: Challenge-Create, Farm-Create mit Foto-Upload, Settings Security-Tab, Chat DM-Presence-Bar)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität W1-W2 + Cinema-Hyperreal W1-W2 (Sky-Body/Lens-Flare/Mesh-Drift/Chromatic-Aberration/Bloom/Haptics/Page-Transitions, Dashboard-Fallback-Tiles)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

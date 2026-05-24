@@ -197,13 +197,20 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                     _ThanksReceived(userId: data!.profile!.id),
                     const SizedBox(height: 16),
                   ],
-                  if (show('weather') &&
-                      data!.profile?.latitude != null &&
-                      data.profile?.longitude != null) ...[
-                    _WeatherWidget(
-                      lat: data.profile!.latitude!,
-                      lng: data.profile!.longitude!,
-                    ),
+                  if (show('weather')) ...[
+                    if (data!.profile?.latitude != null &&
+                        data.profile?.longitude != null)
+                      _WeatherWidget(
+                        lat: data.profile!.latitude!,
+                        lng: data.profile!.longitude!,
+                      )
+                    else
+                      const _LocationCta(
+                        icon: '🌤️',
+                        title: 'Wetter freischalten',
+                        subtitle:
+                            'Setze deinen Standort in den Einstellungen, um Wetter & lokale Warnungen zu sehen.',
+                      ),
                     const SizedBox(height: 16),
                   ],
                   if (show('holiday_badge') &&
@@ -223,8 +230,11 @@ class _DashboardHomeScreenState extends ConsumerState<DashboardHomeScreen> {
                     const _ActivityFeedWidget(),
                     const SizedBox(height: 16),
                   ],
-                  if (show('mini_map') && data!.posts.isNotEmpty) ...[
-                    _MiniMapWidget(posts: data.posts.take(20).toList()),
+                  if (show('mini_map')) ...[
+                    if (data!.posts.isNotEmpty)
+                      _MiniMapWidget(posts: data.posts.take(20).toList())
+                    else
+                      const _MapEmptyTile(),
                     const SizedBox(height: 16),
                   ],
                   if (show('success_story')) ...[
@@ -2504,6 +2514,122 @@ class _BotTipCardState extends State<_BotTipCard> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Fallback-Widgets — garantieren dass alle Dashboard-Slots etwas zeigen ─
+
+class _LocationCta extends StatelessWidget {
+  const _LocationCta({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => context.go('/dashboard/settings'),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+              color: AppColors.bronze.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 28)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700,
+                      )),
+                  const SizedBox(height: 2),
+                  Text(subtitle,
+                      style: AppTypography.body(
+                          size: 12,
+                          color: AppColors.inkSoft,
+                          height: 1.4)),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight,
+                size: 16, color: AppColors.mute),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MapEmptyTile extends StatelessWidget {
+  const _MapEmptyTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => context.go('/dashboard/map'),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.bronze.withValues(alpha: 0.15),
+              AppColors.amber.withValues(alpha: 0.10),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+              color: AppColors.bronze.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.map,
+                size: 36, color: AppColors.bronze),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Erkunde die Karte',
+                      style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700,
+                      )),
+                  const SizedBox(height: 2),
+                  Text(
+                    'In deiner Nähe ist noch nichts los — schaue auf der Karte, was es weiter draußen gibt.',
+                    style: AppTypography.body(
+                        size: 12,
+                        color: AppColors.inkSoft,
+                        height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight,
+                size: 16, color: AppColors.mute),
+          ],
+        ),
       ),
     );
   }

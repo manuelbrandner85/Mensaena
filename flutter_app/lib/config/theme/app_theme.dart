@@ -138,6 +138,58 @@ class AppTheme {
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.amber,
       ),
+      // Cinematic Page-Transitions: Fade-Through-Black auf allen Plattformen.
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: _CinematicFadeTransitionBuilder(),
+          TargetPlatform.iOS: _CinematicFadeTransitionBuilder(),
+          TargetPlatform.linux: _CinematicFadeTransitionBuilder(),
+          TargetPlatform.macOS: _CinematicFadeTransitionBuilder(),
+          TargetPlatform.windows: _CinematicFadeTransitionBuilder(),
+          TargetPlatform.fuchsia: _CinematicFadeTransitionBuilder(),
+        },
+      ),
+    );
+  }
+}
+
+/// Fade-Through-Black: 180 ms fade-out → 180 ms fade-in. Wie Kino-Schnitt.
+class _CinematicFadeTransitionBuilder extends PageTransitionsBuilder {
+  const _CinematicFadeTransitionBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final fade = CurvedAnimation(
+      parent: animation,
+      curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+    );
+    final scale = Tween<double>(begin: 1.02, end: 1.0).animate(
+      CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+    );
+    final secondary = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: secondaryAnimation,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
+      ),
+    );
+    return Stack(
+      children: [
+        // Black-fade-through (only during 0-50% of forward animation)
+        FadeTransition(
+          opacity: secondary,
+          child: const ColoredBox(color: Colors.black),
+        ),
+        FadeTransition(
+          opacity: fade,
+          child: ScaleTransition(scale: scale, child: child),
+        ),
+      ],
     );
   }
 }

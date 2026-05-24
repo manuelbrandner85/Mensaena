@@ -1,17 +1,16 @@
-import 'dart:async';
+/// SKILL: mensaena-design
+/// Cinema-Theme Riverpod-Provider — verwaltet Phase, Mode + Intensity.
+library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/theme/cinema_theme.dart';
 
-/// SKILL: mensaena-design
-/// Cinema-Theme Riverpod-Provider — verwaltet aktuelle Phase + User-Override.
-
 const _modeStorageKey = 'cinema_mode_v1';
+const _intensityStorageKey = 'cinema_intensity_v1';
 const _storage = FlutterSecureStorage();
 
-/// User-Override-Mode (persistiert in flutter_secure_storage).
 class CinemaModeNotifier extends StateNotifier<CinemaMode> {
   CinemaModeNotifier() : super(CinemaMode.auto) {
     _load();
@@ -21,9 +20,7 @@ class CinemaModeNotifier extends StateNotifier<CinemaMode> {
     try {
       final raw = await _storage.read(key: _modeStorageKey);
       state = CinemaModeX.fromKey(raw);
-    } catch (_) {
-      // ignore — default ist auto
-    }
+    } catch (_) {}
   }
 
   Future<void> set(CinemaMode mode) async {
@@ -35,9 +32,32 @@ class CinemaModeNotifier extends StateNotifier<CinemaMode> {
 }
 
 final cinemaModeProvider =
-    StateNotifierProvider<CinemaModeNotifier, CinemaMode>((ref) {
-  return CinemaModeNotifier();
-});
+    StateNotifierProvider<CinemaModeNotifier, CinemaMode>(
+        (ref) => CinemaModeNotifier());
+
+class CinemaIntensityNotifier extends StateNotifier<CinemaIntensity> {
+  CinemaIntensityNotifier() : super(CinemaIntensity.full) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final raw = await _storage.read(key: _intensityStorageKey);
+      state = CinemaIntensityX.fromKey(raw);
+    } catch (_) {}
+  }
+
+  Future<void> set(CinemaIntensity intensity) async {
+    state = intensity;
+    try {
+      await _storage.write(key: _intensityStorageKey, value: intensity.key);
+    } catch (_) {}
+  }
+}
+
+final cinemaIntensityProvider =
+    StateNotifierProvider<CinemaIntensityNotifier, CinemaIntensity>(
+        (ref) => CinemaIntensityNotifier());
 
 /// Aktuelle Phase basierend auf Uhrzeit. Refresht alle 60s.
 final cinemaPhaseProvider = StreamProvider<CinemaPhase>((ref) async* {
@@ -48,8 +68,8 @@ final cinemaPhaseProvider = StreamProvider<CinemaPhase>((ref) async* {
   }
 });
 
-/// Effektive Phase (User-Override gewinnt ueber Auto).
-/// Liefert null wenn Mode = off (Effekte komplett aus).
+/// Effektive Phase (User-Override gewinnt über Auto).
+/// Liefert null wenn Mode = off.
 final effectiveCinemaPhaseProvider = Provider<CinemaPhase?>((ref) {
   final mode = ref.watch(cinemaModeProvider);
   switch (mode) {
