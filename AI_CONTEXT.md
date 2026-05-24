@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos (alle Supabase-Tabellen abgedeckt) + globaler Crash-Reporter zu error_logs
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Cinema-Hyperreal v3 + i18n W3 + 25 Extra-Repos + Push-Wave-2 (20 neue Trigger nach Weltenbibliothek-Vorbild + user_notification_prefs Quiet-Hours/Type-Filter)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 

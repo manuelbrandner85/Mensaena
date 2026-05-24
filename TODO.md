@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=25 Extra-Repos für alle ungenutzten Supabase-Tabellen live (Foundation). UI-Integration iterativ.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Audit + 25 Extra-Repos ✅
-NEXT=UI-Integration der wichtigsten Extra-Features (post_reactions auf PostCard, organization_reviews auf OrgDetail, group_post_comments+reactions auf GroupDetail, channel_polls in Chat, etc.)
+OPEN=Push-Triggers Wave 2 live (20 neue Trigger). UI für Quiet-Hours/Type-Filter + 4 Notif-Channels in Flutter ausstehend.
+COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Audit + 25 Extra-Repos + Push-Wave-2-Triggers ✅
+NEXT=Flutter PushNotificationService auf 4 Channels (chat/social/system/crisis) + Settings-UI für user_notification_prefs + send-push Edge Function muss Prefs+Quiet-Hours respektieren
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(extra-repos): extra_repositories.dart mit 25 Repository-Klassen für alle bisher ungenutzten Supabase-Tabellen (post_reactions/tags/drafts/templates, organization_reviews+members+invites, group_post_comments/reactions/invitations, event_rsvps/rideshares, marketplace_messages/reports, farm_favorites, channel_polls/poll_votes/events, crisis_reports/resources, interaction_updates, volunteer_signups, user_status, thanks, regions, testimonials, contact_messages, bot_feedback, feature_flags, app_settings, widget_configs, error_logs, audit_logs). Globaler FlutterError + PlatformDispatcher Crash-Reporter in main.dart → automatisches Logging in error_logs.
+LAST_TASK=feat(push-wave2): 20 neue SQL-Trigger nach Weltenbibliothek-Vorbild (A Crisis: nearby/helper/resource/report, B Community: volunteer/event/attendee/rideshare/livestream/match/badge, C Group: post-reaction/poll/event, D Marketplace: new/reserved, E Profile: org-review/added-to-chat/message-reaction/message-pinned). Plus user_notification_prefs-Tabelle (RLS) mit Master-Switch + 6 Type-Toggles + Quiet-Hours-Range + critical-override. Helper public.notify_user() als zentrale Push-Funktion.
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB
