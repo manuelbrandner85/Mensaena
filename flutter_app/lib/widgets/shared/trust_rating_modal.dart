@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -63,14 +64,34 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
   final Set<String> _categories = {};
   bool _submitting = false;
 
+  // Stable IDs persisted in DB; UI label via _categoryLabel().
   static const _categoryOptions = [
-    'Freundlich',
-    'Pünktlich',
-    'Hilfsbereit',
-    'Zuverlässig',
-    'Kommunikativ',
-    'Empathisch',
+    'friendly',
+    'punctual',
+    'helpful',
+    'reliable',
+    'communicative',
+    'empathic',
   ];
+
+  String _categoryLabel(String k) {
+    switch (k) {
+      case 'friendly':
+        return 'trust.catFriendly'.tr();
+      case 'punctual':
+        return 'trust.catPunctual'.tr();
+      case 'helpful':
+        return 'trust.catHelpful'.tr();
+      case 'reliable':
+        return 'trust.catReliable'.tr();
+      case 'communicative':
+        return 'trust.catCommunicative'.tr();
+      case 'empathic':
+        return 'trust.catEmpathic'.tr();
+      default:
+        return k;
+    }
+  }
 
   @override
   void dispose() {
@@ -99,7 +120,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
-          'Danke — deine Bewertung wurde gespeichert.',
+          'trust.thanks'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink),
         ),
       ));
@@ -107,7 +128,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
-          'Bewertung fehlgeschlagen. Bitte später erneut versuchen.',
+          'trust.failed'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
         ),
       ));
@@ -136,11 +157,11 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
             ),
           ),
           const SizedBox(height: 14),
-          Text('Bewerte ${widget.ratedUserName}',
+          Text('trust.rate'.tr(namedArgs: {'name': widget.ratedUserName}),
               style: AppTypography.display(
                   size: 22, color: AppColors.ink)),
           const SizedBox(height: 6),
-          Text('Wie war die Interaktion?',
+          Text('trust.howWasInteraction'.tr(),
               style: AppTypography.body(
                   size: 13, color: AppColors.inkSoft)),
           const SizedBox(height: 20),
@@ -164,7 +185,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
           ),
           const SizedBox(height: 20),
           // Categories (multi-select chips)
-          Text('Was war besonders gut?',
+          Text('trust.whatWasGreat'.tr(),
               style: AppTypography.label(
                   size: 10, color: AppColors.mute)),
           const SizedBox(height: 8),
@@ -174,7 +195,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
             children: _categoryOptions.map((c) {
               final active = _categories.contains(c);
               return FilterChip(
-                label: Text(c),
+                label: Text(_categoryLabel(c)),
                 selected: active,
                 onSelected: (_) => setState(() {
                   if (active) {
@@ -194,7 +215,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
           ),
           const SizedBox(height: 18),
           // Comment (optional)
-          Text('Kommentar (optional)',
+          Text('trust.commentOptional'.tr(),
               style: AppTypography.label(
                   size: 10, color: AppColors.mute)),
           const SizedBox(height: 6),
@@ -206,7 +227,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
             decoration: InputDecoration(
               filled: true,
               fillColor: AppColors.elevated,
-              hintText: 'Was möchtest du teilen?',
+              hintText: 'trust.whatShare'.tr(),
               hintStyle:
                   AppTypography.body(size: 12, color: AppColors.mute),
               border: OutlineInputBorder(
@@ -220,7 +241,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
           SwitchListTile(
             value: _helpful,
             onChanged: (v) => setState(() => _helpful = v),
-            title: Text('Hilfreich',
+            title: Text('trust.helpful'.tr(),
                 style:
                     AppTypography.body(size: 13, color: AppColors.ink)),
             activeColor: AppColors.lebenSoft,
@@ -229,7 +250,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
           SwitchListTile(
             value: _wouldRecommend,
             onChanged: (v) => setState(() => _wouldRecommend = v),
-            title: Text('Würde weiterempfehlen',
+            title: Text('trust.wouldRecommend'.tr(),
                 style:
                     AppTypography.body(size: 13, color: AppColors.ink)),
             activeColor: AppColors.lebenSoft,
@@ -249,7 +270,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
                           strokeWidth: 2, color: AppColors.voidColor),
                     )
                   : const Icon(LucideIcons.send, size: 16),
-              label: Text(_submitting ? 'Sende…' : 'Bewertung abschicken'),
+              label: Text(_submitting ? 'trust.sending'.tr() : 'trust.submit'.tr()),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.bronze,
                 foregroundColor: AppColors.voidColor,
@@ -263,7 +284,7 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
           const SizedBox(height: 12),
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Später',
+            child: Text('trust.later'.tr(),
                 style: AppTypography.body(
                     size: 13, color: AppColors.mute)),
           ),

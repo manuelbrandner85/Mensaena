@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:add_2_calendar/add_2_calendar.dart' as a2c;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ class EventDetailScreen extends ConsumerWidget {
     final rsvp = ref.watch(myRsvpProvider(eventId));
 
     return DashboardScaffold(
-      title: 'Event',
+      title: 'events.title'.tr(),
       currentRoute: '/dashboard/events',
       body: SafeArea(
         child: ev.when(
@@ -38,7 +39,7 @@ class EventDetailScreen extends ConsumerWidget {
           data: (e) {
             if (e == null) {
               return Center(
-                child: Text('Event nicht gefunden.',
+                child: Text('events.notFound'.tr(),
                     style: AppTypography.caption()),
               );
             }
@@ -127,7 +128,7 @@ class EventDetailScreen extends ConsumerWidget {
                       mode: LaunchMode.externalApplication,
                     ),
                     icon: const Icon(LucideIcons.video, size: 16),
-                    label: const Text('Online-Link öffnen'),
+                    label: Text('events.openOnlineLink'.tr()),
                   ),
                 ],
                 const SizedBox(height: 16),
@@ -142,7 +143,7 @@ class EventDetailScreen extends ConsumerWidget {
                   ),
                 if (e.whatToBring != null && e.whatToBring!.isNotEmpty) ...[
                   const SizedBox(height: 14),
-                  Text('Mitbringen', style: AppTypography.label(size: 10)),
+                  Text('events.bring'.tr(), style: AppTypography.label(size: 10)),
                   const SizedBox(height: 4),
                   Text(
                     e.whatToBring!,
@@ -168,7 +169,7 @@ class EventDetailScreen extends ConsumerWidget {
                   ),
                 ],
                 const SizedBox(height: 20),
-                Text('Zusage', style: AppTypography.label(size: 10)),
+                Text('events.rsvp'.tr(), style: AppTypography.label(size: 10)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
