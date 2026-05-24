@@ -102,7 +102,13 @@
     "blockTitle": "Kullanıcı engellensin mi?",
     "blockBody": "Bu kullanıcının gönderilerini ve mesajlarını artık göremeyeceksin.",
     "reportTitle": "Kullanıcıyı bildir",
-    "reportPickReason": "Bir sebep seç:"
+    "reportPickReason": "Bir sebep seç:",
+    "about": "Hakkında",
+    "noPosts": "Henüz gönderi yok.",
+    "noRatings": "Henüz değerlendirme yok.",
+    "loadError": "Yükleme başarısız.",
+    "noBadges": "Henüz rozet kazanılmadı.",
+    "trustBreakdown": "Güven dökümü"
   },
   "settings": {
     "title": "Ayarlar",

@@ -102,7 +102,13 @@
     "blockTitle": "¿Bloquear usuario?",
     "blockBody": "Ya no verás las publicaciones ni los mensajes de este usuario.",
     "reportTitle": "Reportar usuario",
-    "reportPickReason": "Elige un motivo:"
+    "reportPickReason": "Elige un motivo:",
+    "about": "Acerca de",
+    "noPosts": "Aún no hay publicaciones.",
+    "noRatings": "Aún no hay valoraciones.",
+    "loadError": "Error al cargar.",
+    "noBadges": "Aún no has obtenido insignias.",
+    "trustBreakdown": "Detalle de confianza"
   },
   "settings": {
     "title": "Ajustes",

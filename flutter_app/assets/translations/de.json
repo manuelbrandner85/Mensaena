@@ -102,7 +102,13 @@
     "blockTitle": "Nutzer:in blockieren?",
     "blockBody": "Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.",
     "reportTitle": "Nutzer:in melden",
-    "reportPickReason": "Wähle einen Grund:"
+    "reportPickReason": "Wähle einen Grund:",
+    "about": "Über",
+    "noPosts": "Noch keine Posts.",
+    "noRatings": "Noch keine Bewertungen.",
+    "loadError": "Fehler beim Laden.",
+    "noBadges": "Noch keine Badges erworben.",
+    "trustBreakdown": "Trust-Breakdown"
   },
   "settings": {
     "title": "Einstellungen",

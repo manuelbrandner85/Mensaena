@@ -102,7 +102,13 @@
     "blockTitle": "Bloquer l'utilisateur ?",
     "blockBody": "Vous ne verrez plus les publications et messages de cet utilisateur.",
     "reportTitle": "Signaler l'utilisateur",
-    "reportPickReason": "Choisissez un motif :"
+    "reportPickReason": "Choisissez un motif :",
+    "about": "À propos",
+    "noPosts": "Aucune publication pour l'instant.",
+    "noRatings": "Aucune évaluation pour l'instant.",
+    "loadError": "Échec du chargement.",
+    "noBadges": "Aucun badge obtenu pour l'instant.",
+    "trustBreakdown": "Détail de la confiance"
   },
   "settings": {
     "title": "Paramètres",

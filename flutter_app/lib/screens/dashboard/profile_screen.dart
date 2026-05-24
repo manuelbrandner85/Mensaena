@@ -128,7 +128,7 @@ class _AboutTab extends StatelessWidget {
         _ProfileStatsBar(userId: p.id),
         const SizedBox(height: 18),
         if (p.bio != null && p.bio!.isNotEmpty) ...[
-          Text('Über', style: AppTypography.label(size: 10)),
+          Text('profile.about'.tr(), style: AppTypography.label(size: 10)),
           const SizedBox(height: 6),
           Text(
             p.bio!,
@@ -143,7 +143,7 @@ class _AboutTab extends StatelessWidget {
         _StatsGrid(profile: p),
         const SizedBox(height: 18),
         if (p.skills.isNotEmpty) ...[
-          Text('Skills', style: AppTypography.label(size: 10)),
+          Text('nav.skills'.tr(), style: AppTypography.label(size: 10)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
@@ -175,7 +175,7 @@ class _AboutTab extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: () => context.go('/dashboard/settings'),
             icon: const Icon(LucideIcons.settings, size: 16),
-            label: const Text('Einstellungen'),
+            label: Text('common.settings'.tr()),
           ),
         ],
       ],
@@ -437,7 +437,7 @@ class _PostsTabState extends State<_PostsTab> {
         final list = snap.data ?? const <Post>[];
         if (list.isEmpty) {
           return Center(
-            child: Text('Noch keine Posts.',
+            child: Text('profile.noPosts'.tr(),
                 style: AppTypography.caption()),
           );
         }
@@ -497,7 +497,7 @@ class _RatingsTabState extends State<_RatingsTab> {
         final list = snap.data ?? const [];
         if (list.isEmpty) {
           return Center(
-            child: Text('Noch keine Bewertungen.',
+            child: Text('profile.noRatings'.tr(),
                 style: AppTypography.caption()),
           );
         }
@@ -560,12 +560,12 @@ class _BadgesTab extends ConsumerWidget {
         child: CircularProgressIndicator(color: AppColors.amber),
       ),
       error: (_, __) => Center(
-        child: Text('Fehler beim Laden.', style: AppTypography.caption()),
+        child: Text('profile.loadError'.tr(), style: AppTypography.caption()),
       ),
       data: (mine) {
         if (mine.isEmpty) {
           return Center(
-            child: Text('Noch keine Badges erworben.',
+            child: Text('profile.noBadges'.tr(),
                 style: AppTypography.caption()),
           );
         }
@@ -680,7 +680,7 @@ class _Header extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => context.go('/dashboard/profile/edit'),
                   icon: const Icon(LucideIcons.edit2, size: 14),
-                  label: const Text('Profil bearbeiten'),
+                  label: Text('profile.editProfile'.tr()),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.bronze,
                     side: BorderSide(
@@ -693,7 +693,7 @@ class _Header extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => context.go('/dashboard/profile/saved'),
                   icon: const Icon(LucideIcons.bookmark, size: 14),
-                  label: const Text('Gespeichert'),
+                  label: Text('profile.saved'.tr()),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.amber,
                     side: BorderSide(
@@ -730,11 +730,11 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Nutzer:in blockieren?',
+        title: Text('profile.blockTitle'.tr(),
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
-            'Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.',
+            'profile.blockBody'.tr(),
             style:
                 AppTypography.body(size: 13, color: AppColors.inkSoft)),
         actions: [
@@ -746,7 +746,7 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
             onPressed: () => Navigator.pop(ctx, true),
             style:
                 TextButton.styleFrom(foregroundColor: AppColors.herzrot),
-            child: const Text('Blockieren'),
+            child: Text('profile.block'.tr()),
           ),
         ],
       ),
@@ -777,13 +777,13 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Text('Nutzer:in melden',
+        title: Text('profile.reportTitle'.tr(),
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Wähle einen Grund:',
+            Text('profile.reportPickReason'.tr(),
                 style: AppTypography.body(
                     size: 13, color: AppColors.inkSoft)),
             const SizedBox(height: 10),
@@ -831,7 +831,7 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
           child: OutlinedButton.icon(
             onPressed: _busy ? null : _showReportDialog,
             icon: const Icon(LucideIcons.flag, size: 14),
-            label: const Text('Melden'),
+            label: Text('profile.report'.tr()),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.amber,
               side: BorderSide(
@@ -844,7 +844,7 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
           child: OutlinedButton.icon(
             onPressed: _busy ? null : _confirmBlock,
             icon: const Icon(LucideIcons.ban, size: 14),
-            label: const Text('Blockieren'),
+            label: Text('profile.block'.tr()),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.herzrot,
               side: BorderSide(
@@ -964,7 +964,7 @@ class _TrustBreakdownSheetState extends State<_TrustBreakdownSheet> {
                   const Icon(LucideIcons.shieldCheck,
                       size: 18, color: AppColors.trust),
                   const SizedBox(width: 8),
-                  Text('Trust-Breakdown',
+                  Text('profile.trustBreakdown'.tr(),
                       style: AppTypography.display(
                           size: 18, color: AppColors.ink)),
                 ],

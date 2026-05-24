@@ -102,7 +102,13 @@
     "blockTitle": "Block user?",
     "blockBody": "You will no longer see this user's posts or messages.",
     "reportTitle": "Report user",
-    "reportPickReason": "Pick a reason:"
+    "reportPickReason": "Pick a reason:",
+    "about": "About",
+    "noPosts": "No posts yet.",
+    "noRatings": "No ratings yet.",
+    "loadError": "Failed to load.",
+    "noBadges": "No badges earned yet.",
+    "trustBreakdown": "Trust breakdown"
   },
   "settings": {
     "title": "Settings",
