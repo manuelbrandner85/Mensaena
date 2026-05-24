@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+// flutter_webrtc kommt transitiv via livekit_client (patched 0.13.1+hotfix.1
+// per CI-Script). Direkter Import nur für den RTCVideoViewObjectFit-Enum.
+// ignore: depend_on_referenced_packages
+import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
 import 'package:livekit_client/livekit_client.dart' as lk;
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -36,8 +40,10 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   lk.Room? _room;
   lk.EventsListener<lk.RoomEvent>? _listener;
   _RoomState _state = _RoomState.connecting;
+  // Default-Tracks: Mic AN (du willst gehört werden), Kamera AUS (Privacy).
+  // User toggelt explizit via _SquareAction.
   bool _micEnabled = true;
-  bool _camEnabled = true;
+  bool _camEnabled = false;
   String? _error;
   int _participantCount = 0;
 
@@ -49,6 +55,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   Future<void> _connect() async {
     if (widget.isHost) {
+      // Nur Mikro requesten — Kamera wird beim ersten _toggleCam abgefragt.
       final mic = await Permission.microphone.request();
       if (mic.isDenied || mic.isPermanentlyDenied) {
         if (!mounted) return;
@@ -58,7 +65,6 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
         });
         return;
       }
-      await Permission.camera.request();
     }
 
     final myId = SupabaseService.currentUser?.id ?? 'guest';
@@ -118,8 +124,9 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     try {
       await room.connect(tok.url, tok.token);
       if (widget.isHost) {
-        await room.localParticipant?.setMicrophoneEnabled(true);
-        await room.localParticipant?.setCameraEnabled(true);
+        // Standard: nur Mikro an. Kamera lässt User später aktiv ein.
+        await room.localParticipant?.setMicrophoneEnabled(_micEnabled);
+        // Kamera bewusst NICHT auto-enable.
       }
       if (!mounted) return;
       setState(() {
@@ -147,8 +154,30 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     final lp = _room?.localParticipant;
     if (lp == null) return;
     final next = !_camEnabled;
-    await lp.setCameraEnabled(next);
-    setState(() => _camEnabled = next);
+    if (next) {
+      // Permission erst beim ersten Aktivieren der Kamera requesten.
+      final cam = await Permission.camera.request();
+      if (cam.isDenied || cam.isPermanentlyDenied) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('Kamera-Berechtigung verweigert.',
+              style: AppTypography.body(size: 13, color: AppColors.ink)),
+        ));
+        return;
+      }
+    }
+    try {
+      await lp.setCameraEnabled(next);
+      if (mounted) setState(() => _camEnabled = next);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('Kamera-Fehler: $e',
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
   }
 
   Future<void> _leave() async {
@@ -320,13 +349,78 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   }
 }
 
-class _RoomGrid extends StatelessWidget {
+/// Wickelt jeden Participant in StreamBuilder über RoomEvents damit
+/// neue Track-Publikationen (z. B. nach setCameraEnabled true) sofort
+/// neu gerendert werden — sonst bleibt der Slot leer/grau.
+class _RoomGrid extends StatefulWidget {
   const _RoomGrid({required this.room});
   final lk.Room? room;
 
   @override
+  State<_RoomGrid> createState() => _RoomGridState();
+}
+
+class _RoomGridState extends State<_RoomGrid> {
+  lk.EventsListener<lk.RoomEvent>? _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    final r = widget.room;
+    if (r != null) {
+      _listener = r.createListener()
+        ..on<lk.TrackPublishedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackUnpublishedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackSubscribedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackUnsubscribedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackMutedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.TrackUnmutedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.LocalTrackPublishedEvent>((_) {
+          if (mounted) setState(() {});
+        })
+        ..on<lk.LocalTrackUnpublishedEvent>((_) {
+          if (mounted) setState(() {});
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    _listener?.dispose();
+    super.dispose();
+  }
+
+  /// Findet einen sichtbaren Video-Track:
+  ///   * Local-Participant: nutzt nur unmuted Local-Publication.
+  ///   * Remote-Participant: nutzt subscribed + unmuted.
+  /// Liefert null wenn keiner verfügbar → wir zeigen Avatar-Fallback.
+  lk.VideoTrack? _videoTrackFor(lk.Participant p) {
+    for (final pub in p.videoTrackPublications) {
+      if (pub.muted) continue;
+      final track = pub.track;
+      if (track == null) continue;
+      if (track is! lk.VideoTrack) continue;
+      if (p is lk.RemoteParticipant && !pub.subscribed) continue;
+      return track;
+    }
+    return null;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final r = room;
+    final r = widget.room;
     if (r == null) return const SizedBox.shrink();
     final participants = <lk.Participant>[
       if (r.localParticipant != null) r.localParticipant!,
@@ -349,13 +443,8 @@ class _RoomGrid extends StatelessWidget {
       itemCount: participants.length,
       itemBuilder: (context, i) {
         final p = participants[i];
-        final track = p.videoTrackPublications
-            .firstWhere(
-              (t) => t.subscribed && !(t.muted),
-              orElse: () => p.videoTrackPublications.isEmpty
-                  ? throw StateError('no track')
-                  : p.videoTrackPublications.first,
-            );
+        final videoTrack = _videoTrackFor(p);
+        final name = p.name.isNotEmpty ? p.name : p.identity;
         return Container(
           decoration: BoxDecoration(
             color: AppColors.elevated,
@@ -364,14 +453,15 @@ class _RoomGrid extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
+            fit: StackFit.expand,
             children: [
-              if (track.track is lk.VideoTrack)
-                lk.VideoTrackRenderer(track.track! as lk.VideoTrack)
+              if (videoTrack != null)
+                lk.VideoTrackRenderer(
+                  videoTrack,
+                  fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                )
               else
-                const Center(
-                  child: Icon(LucideIcons.user,
-                      size: 40, color: AppColors.mute),
-                ),
+                _AvatarFallback(name: name),
               Positioned(
                 left: 6,
                 bottom: 6,
@@ -383,16 +473,66 @@ class _RoomGrid extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    p.name.isNotEmpty ? p.name : p.identity,
+                    name,
                     style: AppTypography.body(
                         size: 11, color: AppColors.ink),
                   ),
                 ),
               ),
+              if (videoTrack == null)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.voidColor.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(LucideIcons.videoOff,
+                        size: 12, color: AppColors.mute),
+                  ),
+                ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  const _AvatarFallback({required this.name});
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+    return Container(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          colors: [
+            AppColors.bronze.withValues(alpha: 0.25),
+            AppColors.deep,
+          ],
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Container(
+        width: 84,
+        height: 84,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.bronze.withValues(alpha: 0.18),
+          border: Border.all(
+              color: AppColors.bronze.withValues(alpha: 0.5), width: 2),
+        ),
+        child: Text(
+          initial,
+          style: AppTypography.display(size: 38, color: AppColors.bronze),
+        ),
+      ),
     );
   }
 }
