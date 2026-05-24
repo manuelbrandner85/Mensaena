@@ -101,15 +101,30 @@ class CrisisResourcesScreen extends ConsumerWidget {
                   ),
                 ),
                 data: (list) {
+                  Future<void> onRefresh() async {
+                    ref.invalidate(emergencyNumbersProvider(country));
+                    await Future<void>.delayed(
+                        const Duration(milliseconds: 400));
+                  }
+
                   if (list.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          'crisis.noResources'.tr(),
-                          style: AppTypography.caption(),
-                          textAlign: TextAlign.center,
-                        ),
+                    return RefreshIndicator(
+                      color: AppColors.amber,
+                      backgroundColor: AppColors.surface,
+                      onRefresh: onRefresh,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          const SizedBox(height: 120),
+                          Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Text(
+                              'crisis.noResources'.tr(),
+                              style: AppTypography.caption(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
@@ -117,7 +132,12 @@ class CrisisResourcesScreen extends ConsumerWidget {
                   for (final n in list) {
                     groups.putIfAbsent(n.category, () => []).add(n);
                   }
-                  return ListView(
+                  return RefreshIndicator(
+                    color: AppColors.amber,
+                    backgroundColor: AppColors.surface,
+                    onRefresh: onRefresh,
+                    child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding:
                         const EdgeInsets.fromLTRB(16, 4, 16, 24),
                     children: [
@@ -140,6 +160,7 @@ class CrisisResourcesScreen extends ConsumerWidget {
                         const SizedBox(height: 16),
                       ],
                     ],
+                    ),
                   );
                 },
               ),

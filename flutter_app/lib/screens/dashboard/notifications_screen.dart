@@ -206,10 +206,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 data: (all) {
                   final filtered = _filter(all);
                   if (filtered.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                    return RefreshIndicator(
+                      color: AppColors.amber,
+                      backgroundColor: AppColors.surface,
+                      onRefresh: () async {
+                        ref.invalidate(notificationsStreamProvider);
+                        await Future<void>.delayed(
+                            const Duration(milliseconds: 400));
+                      },
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         children: [
+                          const SizedBox(height: 120),
                           const Icon(
                             LucideIcons.bellOff,
                             size: 32,
@@ -218,6 +226,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           const SizedBox(height: 10),
                           Text(
                             'Keine Benachrichtigungen.',
+                            textAlign: TextAlign.center,
                             style: AppTypography.body(
                               size: 14,
                               color: AppColors.mute,
@@ -227,7 +236,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       ),
                     );
                   }
-                  return ListView.builder(
+                  return RefreshIndicator(
+                    color: AppColors.amber,
+                    backgroundColor: AppColors.surface,
+                    onRefresh: () async {
+                      ref.invalidate(notificationsStreamProvider);
+                      await Future<void>.delayed(
+                          const Duration(milliseconds: 400));
+                    },
+                    child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(12),
                     itemCount: filtered.length,
                     itemBuilder: (context, i) {
@@ -267,6 +285,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         child: _NotificationTile(notif: n),
                       );
                     },
+                    ),
                   );
                 },
               ),

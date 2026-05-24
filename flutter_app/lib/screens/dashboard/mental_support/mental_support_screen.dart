@@ -167,7 +167,15 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
       title: 'modules.mentalSupport'.tr(),
       currentRoute: '/dashboard/mental-support',
       body: SafeArea(
-        child: ListView(
+        child: RefreshIndicator(
+          color: AppColors.amber,
+          backgroundColor: AppColors.surface,
+          onRefresh: () async {
+            await Future<void>.delayed(const Duration(milliseconds: 400));
+            if (mounted) setState(() {});
+          },
+          child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           children: [
             _Banner(),
@@ -184,6 +192,7 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
             const SizedBox(height: 18),
             _EmergencyFooter(),
           ],
+          ),
         ),
       ),
     );
