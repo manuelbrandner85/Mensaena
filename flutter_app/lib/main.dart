@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
+import 'providers/locale_provider.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 
@@ -22,11 +24,23 @@ Future<void> main() async {
   // 1. Supabase Session-Restore (kritisch, blockierend, ~100-300ms)
   await SupabaseService.init();
 
+  // 1b. EasyLocalization — JSON-Translations vorladen.
+  await EasyLocalization.ensureInitialized();
+
   // 2. Background-Handler-Registration (top-level @pragma function)
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
 
   // 3. App SOFORT rendern — kein await auf Firebase/FCM/Listener!
-  runApp(const ProviderScope(child: MensaenaApp()));
+  runApp(
+    EasyLocalization(
+      supportedLocales: kSupportedLocales,
+      path: 'assets/translations',
+      fallbackLocale: kFallbackLocale,
+      startLocale: kFallbackLocale,
+      useOnlyLangCode: true,
+      child: const ProviderScope(child: MensaenaApp()),
+    ),
+  );
 
   // 4. Nach erstem Frame: alles andere im Background initialisieren.
   // Wenn Firebase nicht konfiguriert ist (Dev-Build) faellt das

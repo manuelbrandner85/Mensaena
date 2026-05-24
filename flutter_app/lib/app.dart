@@ -1,11 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
+import 'providers/locale_provider.dart';
 import 'widgets/shared/incoming_call_listener.dart';
 import 'widgets/shared/update_gate.dart';
 
@@ -26,6 +27,9 @@ class MensaenaApp extends ConsumerWidget {
     );
 
     final router = ref.watch(goRouterProvider);
+    // localeProvider mountet den Notifier — der ruft persistierten
+    // Mode + ggf. GPS-Detect ab und triggert context.setLocale().
+    ref.watch(localeProvider);
 
     return MaterialApp.router(
       title: AppConfig.appName,
@@ -34,13 +38,9 @@ class MensaenaApp extends ConsumerWidget {
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
       routerConfig: router,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('de', 'DE'), Locale('en', 'US')],
-      locale: const Locale('de', 'DE'),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       // UpdateGate wickelt jede Seite — bei mandatory Update wird ALLES
       // blockiert bis APK heruntergeladen ist.
       // IncomingCallListener wickelt das Navigator-Child damit eingehende

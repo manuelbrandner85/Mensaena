@@ -74,6 +74,10 @@ dependencies:
   flutter_markdown: ^0.7.3
   crypto: ^3.0.5
 
+  # i18n — JSON-basierte Übersetzungen für DE/EN/IT/ES/RU/TR/FR.
+  # Auto-Detection via geocoding (Country-Code → primary language).
+  easy_localization: ^3.0.7
+
   # Shorebird OTA: liest die Patch-Nummer + meldet sich beim Server.
   # Patches selber werden automatisch beim Launch installiert.
   shorebird_code_push: ^2.0.6
@@ -119,3 +123,4 @@ flutter:
   assets:
     - assets/images/
     - assets/launcher/
+    - assets/translations/

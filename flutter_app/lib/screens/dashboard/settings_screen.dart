@@ -14,6 +14,7 @@ import '../../config/theme/app_typography.dart';
 import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
 import '../../providers/cinema_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
@@ -36,7 +37,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 7, vsync: this);
+    _tab = TabController(length: 8, vsync: this);
     _future = ProfilesRepository.getMine();
   }
 
@@ -73,6 +74,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                 Tab(text: 'Account'),
                 Tab(text: 'Privatsphäre'),
                 Tab(text: 'Sicherheit'),
+                Tab(text: 'Sprache'),
                 Tab(text: 'Benachrichtigungen'),
                 Tab(text: 'Standort'),
                 Tab(text: 'Erscheinungsbild'),
@@ -102,6 +104,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     _AccountTab(profile: p),
                     _PrivacyTab(profile: p, onPatch: _patch),
                     const _SecurityTab(),
+                    const _LanguageTab(),
                     _NotifTab(profile: p, onPatch: _patch),
                     _RegionTab(profile: p, onPatch: _patch),
                     const _AppearanceTab(),
@@ -1230,6 +1233,211 @@ class _SecurityTabState extends State<_SecurityTab> {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: AppColors.bronze),
+      ),
+    );
+  }
+}
+
+// ── Language-Tab — manuelle Auswahl + Auto-Detect-Toggle ────────────────
+class _LanguageTab extends ConsumerWidget {
+  const _LanguageTab();
+
+  static const _flags = <String, String>{
+    'de': '🇩🇪',
+    'en': '🇬🇧',
+    'it': '🇮🇹',
+    'es': '🇪🇸',
+    'fr': '🇫🇷',
+    'tr': '🇹🇷',
+    'ru': '🇷🇺',
+  };
+
+  static const _names = <String, String>{
+    'de': 'Deutsch',
+    'en': 'English',
+    'it': 'Italiano',
+    'es': 'Español',
+    'fr': 'Français',
+    'tr': 'Türkçe',
+    'ru': 'Русский',
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(localeProvider);
+    final notifier = ref.read(localeProvider.notifier);
+    final isAuto = state.mode == LocaleMode.auto;
+    final detectedLang = state.detectedLocale?.languageCode;
+
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Text('AUTOMATIK',
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        SwitchListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          value: isAuto,
+          activeColor: AppColors.bronze,
+          onChanged: (v) => notifier.setAuto(v, context),
+          title: Text('Sprache nach Standort',
+              style: AppTypography.body(
+                  size: 14, color: AppColors.ink)),
+          subtitle: Text(
+            'Die App passt sich an die Sprache des Landes an, in dem du dich befindest.',
+            style: AppTypography.body(
+                size: 12, color: AppColors.mute, height: 1.4),
+          ),
+        ),
+        if (isAuto && detectedLang != null) ...[
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.elevated,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Text(_flags[detectedLang] ?? '🌐',
+                    style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                Text(
+                  'Aktuell erkannt: ${_names[detectedLang] ?? detectedLang}',
+                  style: AppTypography.body(
+                      size: 12, color: AppColors.inkSoft),
+                ),
+                const Spacer(),
+                IconButton(
+                  iconSize: 16,
+                  onPressed: () => notifier.refreshDetected(context),
+                  icon: const Icon(LucideIcons.refreshCcw,
+                      color: AppColors.bronze),
+                  tooltip: 'Neu erkennen',
+                ),
+              ],
+            ),
+          ),
+        ],
+        if (isAuto && detectedLang == null) ...[
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.elevated,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                  color: AppColors.herzrot.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.alertCircle,
+                    size: 14, color: AppColors.herzrotWarm),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Kein Standort verfügbar — Deutsch wird verwendet.',
+                    style: AppTypography.body(
+                        size: 12, color: AppColors.inkSoft, height: 1.4),
+                  ),
+                ),
+                IconButton(
+                  iconSize: 16,
+                  onPressed: () => notifier.refreshDetected(context),
+                  icon: const Icon(LucideIcons.refreshCcw,
+                      color: AppColors.bronze),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+        Text('MANUELL WÄHLEN',
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 8),
+        for (final l in kSupportedLocales)
+          _LangTile(
+            code: l.languageCode,
+            flag: _flags[l.languageCode] ?? '🌐',
+            name: _names[l.languageCode] ?? l.languageCode,
+            active: state.activeLocale.languageCode == l.languageCode,
+            disabled: isAuto,
+            onTap: () => notifier.setManual(l, context),
+          ),
+        if (isAuto) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Manuelle Auswahl ist deaktiviert solange Automatik aktiv ist.',
+            style: AppTypography.label(size: 10, color: AppColors.mute),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _LangTile extends StatelessWidget {
+  const _LangTile({
+    required this.code,
+    required this.flag,
+    required this.name,
+    required this.active,
+    required this.disabled,
+    required this.onTap,
+  });
+
+  final String code;
+  final String flag;
+  final String name;
+  final bool active;
+  final bool disabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: disabled ? 0.4 : 1.0,
+      child: InkWell(
+        onTap: disabled ? null : onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.bronze.withValues(alpha: 0.15)
+                : AppColors.elevated,
+            border: Border.all(
+              color: active ? AppColors.bronze : AppColors.line,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 22)),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(name,
+                    style: AppTypography.body(
+                      size: 14,
+                      color: active ? AppColors.bronze : AppColors.ink,
+                      weight: active
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    )),
+              ),
+              Text(code.toUpperCase(),
+                  style: AppTypography.mono(
+                      size: 11, color: AppColors.mute)),
+              if (active) ...[
+                const SizedBox(width: 8),
+                const Icon(LucideIcons.checkCircle2,
+                    size: 16, color: AppColors.bronze),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }

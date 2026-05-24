@@ -4,11 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Hyperreal Cinema-Upgrade Wave 1-3 KOMPLETT (alle 23 Punkte). Frei für nächste Aufgaben.
-COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W3 ✅
-NEXT=Frei
+OPEN=i18n-Infrastruktur live (DE/EN/IT/ES/FR/TR/RU). Übersetzung weiterer Screens auf Bedarf.
+COUNT=200+ Web (alle kritischen erledigt) | Flutter: Phase 1-7 + Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n-Foundation ✅
+NEXT=Schrittweise weitere Screen-Strings auf .tr() umstellen
 LAST_SESSION=2026-05-24
-LAST_TASK=feat(cinema-w3): Sound-Service mit SystemSound (toggle in Settings), Onboarding-Tour (5 Steps mit Bloom-Animations, Radial-Gradient pro Step, Skip + Re-Watch-Button), Splash → Onboarding-Route bei Erstlogin
+LAST_TASK=feat(i18n): easy_localization + 7 JSON-Translations (de/en/it/es/fr/tr/ru) mit ~200 Core-Keys, LocaleProvider mit Manual + Auto-by-GPS-Mode, LocaleDetectionService (geocoding + Bounding-Box-Fallback, ISO-Country → unsere 7 Sprachen), Settings → neuer Sprache-Tab mit Auto-Toggle + 7 Flag-Tiles
 
 ## Flutter-Migration
 - [x] Phase 1 – Setup (Theme, Router, 48 Models, 12 Services, Landing+Auth) — flutter analyze 0 issues, APK 18.3 MB

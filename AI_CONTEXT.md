@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität W1-W2 + Cinema-Hyperreal W1-W3 KOMPLETT (alle 23 Vorschläge umgesetzt: Sky-Body, Lens-Flare, Mesh-Drift, Chromatic-Aberration, Glass-Card, Shimmer, Bloom, Haptics, Page-Transitions, Sound-Service, Onboarding-Tour, Dashboard-Fallbacks)
+> Aktualisiert: 2026-05-24 | v1.0.0-beta | Flutter Phase 1-7 + Web-Parität W1-W2 + Cinema-Hyperreal W1-W3 + i18n-Foundation (7 Sprachen DE/EN/IT/ES/FR/TR/RU mit Manual + Auto-GPS-Detection)
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
