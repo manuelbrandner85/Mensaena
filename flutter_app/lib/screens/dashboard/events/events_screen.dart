@@ -76,8 +76,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 07',
                 metaCategory: 'Events',

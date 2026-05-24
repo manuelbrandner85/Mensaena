@@ -65,8 +65,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 08',
                 metaCategory: 'Gruppen',

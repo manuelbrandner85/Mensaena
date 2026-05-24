@@ -330,7 +330,6 @@ class _Field extends StatelessWidget {
     this.required = false,
     this.minLength,
     this.maxLength,
-    this.validator,
   });
 
   final String label;
@@ -341,7 +340,6 @@ class _Field extends StatelessWidget {
   final bool required;
   final int? minLength;
   final int? maxLength;
-  final String? Function(String?)? validator;
 
   String? _defaultValidator(String? v) {
     final s = v?.trim() ?? '';
@@ -386,7 +384,7 @@ class _Field extends StatelessWidget {
             maxLines: multiline ? 4 : 1,
             minLines: multiline ? 3 : 1,
             keyboardType: keyboardType,
-            validator: validator ?? _defaultValidator,
+            validator: _defaultValidator,
             style: AppTypography.body(size: 14, color: AppColors.ink),
             decoration: InputDecoration(
               filled: true,

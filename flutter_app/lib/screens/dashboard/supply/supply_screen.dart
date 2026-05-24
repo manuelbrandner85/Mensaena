@@ -63,8 +63,8 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 13',
                 metaCategory: 'Versorgung',

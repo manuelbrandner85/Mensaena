@@ -240,8 +240,8 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                         width: 38,
                         height: 38,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
                             colors: [
                               AppColors.bronze,
                               AppColors.bronzeSoft,

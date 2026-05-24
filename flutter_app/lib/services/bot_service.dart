@@ -90,8 +90,8 @@ class BotMessage {
   const BotMessage({
     required this.role,
     required this.content,
-    DateTime? at,
-  }) : at = at;
+    this.at,
+  });
 
   final String role; // 'user' | 'assistant' | 'system'
   final String content;

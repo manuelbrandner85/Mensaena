@@ -182,7 +182,7 @@ class _IncomingCallSheetState extends State<_IncomingCallSheet>
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
             AppColors.deep,
@@ -191,7 +191,7 @@ class _IncomingCallSheetState extends State<_IncomingCallSheet>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        borderRadius: const BorderRadius.vertical(
+        borderRadius: BorderRadius.vertical(
           top: Radius.circular(20),
         ),
       ),

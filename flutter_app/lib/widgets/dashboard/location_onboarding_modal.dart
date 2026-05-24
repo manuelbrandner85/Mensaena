@@ -149,8 +149,8 @@ class _LocationOnboardingModalState
                   color: AppColors.ink,
                   height: 1.15,
                 ),
-                children: [
-                  const TextSpan(text: 'Wo bist du '),
+                children: const [
+                  TextSpan(text: 'Wo bist du '),
                   TextSpan(
                     text: 'zu Hause',
                     style: TextStyle(
@@ -158,7 +158,7 @@ class _LocationOnboardingModalState
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const TextSpan(text: '?'),
+                  TextSpan(text: '?'),
                 ],
               ),
             ),
@@ -390,7 +390,7 @@ class _BigOptionButton extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(LucideIcons.chevronRight,
+              const Icon(LucideIcons.chevronRight,
                   size: 16, color: AppColors.mute),
             ],
           ),

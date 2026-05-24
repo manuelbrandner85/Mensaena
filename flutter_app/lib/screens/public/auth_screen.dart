@@ -419,7 +419,7 @@ class _AuthScreenState extends State<AuthScreen>
 
                               // Name (register only)
                               if (isRegister) ...[
-                                _FieldLabel('NAME'),
+                                const _FieldLabel('NAME'),
                                 _CinemaTextField(
                                   controller: _nameCtrl,
                                   hint: 'Wie sollen dich Nachbarn nennen?',
@@ -431,7 +431,7 @@ class _AuthScreenState extends State<AuthScreen>
 
                               // E-Mail (hidden in reset-mode, session already set)
                               if (!isReset) ...[
-                              _FieldLabel('E-MAIL'),
+                              const _FieldLabel('E-MAIL'),
                               _CinemaTextField(
                                 controller: _emailCtrl,
                                 hint: 'nachbarin@beispiel.at',
@@ -449,7 +449,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    _FieldLabel('PASSWORT'),
+                                    const _FieldLabel('PASSWORT'),
                                     if (_mode == _AuthMode.login)
                                       GestureDetector(
                                         onTap: () => setState(() {
@@ -499,7 +499,7 @@ class _AuthScreenState extends State<AuthScreen>
                                 // Confirm-Field nur fuer Reset-Mode
                                 if (isReset) ...[
                                   const SizedBox(height: 16),
-                                  _FieldLabel('PASSWORT BESTÄTIGEN'),
+                                  const _FieldLabel('PASSWORT BESTÄTIGEN'),
                                   _CinemaTextField(
                                     controller: _passwordConfirmCtrl,
                                     hint: 'Neues Passwort wiederholen',
@@ -780,7 +780,7 @@ class _CinemaHeading extends StatelessWidget {
           TextSpan(text: base),
           TextSpan(
             text: accent,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.bronze,
               fontStyle: FontStyle.italic,
             ),
@@ -880,7 +880,7 @@ class _CinemaTextField extends StatelessWidget {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.herzrot, width: 1.4),
+          borderSide: const BorderSide(color: AppColors.herzrot, width: 1.4),
         ),
       ),
     );
@@ -1007,22 +1007,22 @@ class _AgreementCheckbox extends StatelessWidget {
                     color: AppColors.mute,
                     height: 1.5,
                   ),
-                  children: [
-                    const TextSpan(text: 'Ich stimme den '),
+                  children: const [
+                    TextSpan(text: 'Ich stimme den '),
                     TextSpan(
                       text: 'Nutzungsbedingungen',
                       style: TextStyle(
                           color: AppColors.bronze,
                           fontWeight: FontWeight.w600),
                     ),
-                    const TextSpan(text: ' und der '),
+                    TextSpan(text: ' und der '),
                     TextSpan(
                       text: 'Datenschutzerklärung',
                       style: TextStyle(
                           color: AppColors.bronze,
                           fontWeight: FontWeight.w600),
                     ),
-                    const TextSpan(text: ' zu.'),
+                    TextSpan(text: ' zu.'),
                   ],
                 ),
               ),

@@ -43,6 +43,7 @@ class OnboardingTour {
     try {
       await _storage.delete(key: _key);
     } catch (_) {}
+    if (!context.mounted) return;
     return maybeShow(context);
   }
 }

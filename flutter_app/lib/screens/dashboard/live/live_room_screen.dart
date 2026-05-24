@@ -368,7 +368,7 @@ class _RoomGrid extends StatelessWidget {
               if (track.track is lk.VideoTrack)
                 lk.VideoTrackRenderer(track.track! as lk.VideoTrack)
               else
-                Center(
+                const Center(
                   child: Icon(LucideIcons.user,
                       size: 40, color: AppColors.mute),
                 ),

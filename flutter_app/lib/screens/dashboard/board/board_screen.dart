@@ -83,8 +83,8 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
                 metaIndex: '§ 06',
                 metaCategory: 'Schwarzes Brett',

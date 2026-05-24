@@ -139,7 +139,7 @@ class _KnowledgeCreateScreenState
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            EditorialModuleHeader(
+            const EditorialModuleHeader(
               metaIndex: '✦ Neu',
               metaCategory: 'WISSEN',
               title: 'Neuer Wissens-Artikel',

@@ -382,7 +382,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                   messageId: m['id'] as String,
                                   conversationId: widget.conversationId,
                                 );
-                                if (!mounted) return;
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: AppColors.surface,

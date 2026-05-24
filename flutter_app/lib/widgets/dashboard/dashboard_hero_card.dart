@@ -237,7 +237,7 @@ class DashboardHeroCard extends StatelessWidget {
                               TextSpan(text: '${g.greeting} '),
                               TextSpan(
                                 text: g.accent,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: AppColors.bronze,
                                   fontStyle: FontStyle.italic,
                                 ),

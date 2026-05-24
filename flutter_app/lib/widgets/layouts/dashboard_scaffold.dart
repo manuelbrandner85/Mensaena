@@ -111,10 +111,10 @@ class DashboardScaffold extends ConsumerWidget {
                 ),
                 // MensaenaBot Floating-Button (links unten, oberhalb BottomNav)
                 // Nicht ueberlappen mit dem regulaeren FAB (rechts unten).
-                Positioned(
+                const Positioned(
                   left: 16,
                   bottom: 16,
-                  child: SafeArea(child: const MensaenaBotButton()),
+                  child: SafeArea(child: MensaenaBotButton()),
                 ),
               ],
             ),

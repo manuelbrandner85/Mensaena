@@ -61,7 +61,7 @@ class MatchingScreen extends ConsumerWidget {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              EditorialModuleHeader(
+              const EditorialModuleHeader(
                 metaIndex: '§ 10',
                 metaCategory: 'Matching',
                 title: 'Smart-Match',

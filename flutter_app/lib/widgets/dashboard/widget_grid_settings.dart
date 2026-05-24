@@ -431,7 +431,7 @@ class _WidgetRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             LucideIcons.gripVertical,
             size: 16,
             color: AppColors.mute,
