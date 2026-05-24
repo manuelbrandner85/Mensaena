@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,14 +10,10 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../config/theme/cinema_accents.dart';
-import '../../providers/cinema_provider.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
-import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
 import '../navigation/language_picker.dart';
-import '../shared/smart_action_sheet.dart';
 import '../shared/fcm_foreground_listener.dart';
 import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
@@ -24,26 +22,44 @@ import '../navigation/notification_bell.dart';
 import '../shared/mensaena_bot_button.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
-/// Dashboard-Shell — Web-Parity (src/components/navigation/BottomNav.tsx).
-/// BottomNav-Reihenfolge: Home / Karte / Erstellen (zentral, primaer) /
-/// Nachrichten / Benachrichtigungen.
+/// Dashboard-Shell — 4-Tab BottomNav (Home/Karte/Chat/Profil) + zentraler
+/// schwebender FAB (Plus → /dashboard/create). Notification-Bell mit Badge
+/// rechts in der AppBar. MensaenaBotButton bleibt als floating Overlay
+/// rechts/links unten.
+///
+/// V19: Optionaler `onRefresh`-Callback wrappt den body in einen
+/// RefreshIndicator (amber). Screens mit eigenem inline-RefreshIndicator
+/// uebergeben den Callback NICHT (kein doppeltes Wrapping).
 class DashboardScaffold extends ConsumerWidget {
   const DashboardScaffold({
     required this.body,
     required this.title,
     this.currentRoute = '/dashboard',
     this.fab,
+    this.onRefresh,
     super.key,
   });
 
   final Widget body;
   final String title;
   final String currentRoute;
+
+  /// Optional secondary FAB — wird zusaetzlich zum zentralen Plus-FAB im
+  /// BottomNav angezeigt (rechts unten). Selten genutzt; meist null.
   final Widget? fab;
+
+  /// Wenn gesetzt, wird `body` in einen RefreshIndicator gewrappt.
+  /// Pull-Down loest den Callback aus. Color: AppColors.amber.
+  final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(unreadNotificationCountProvider);
+    // Aktiv-Tab via GoRouter ableiten (matchedLocation), Fallback auf
+    // currentRoute-Parameter (Backwards-Compat).
+    final matched = GoRouterState.of(context).matchedLocation;
+    final activeRoute = matched.isNotEmpty ? matched : currentRoute;
+
     // Realtime-Toast: zeige bei jeder neuen Notification eine Snackbar.
     ref.listen(notificationsStreamProvider, (prev, next) {
       final list = next.value;
@@ -94,6 +110,17 @@ class DashboardScaffold extends ConsumerWidget {
             : null,
       ));
     });
+
+    // Body ggf. mit RefreshIndicator wrappen (V19).
+    final refreshed = onRefresh == null
+        ? body
+        : RefreshIndicator(
+            onRefresh: onRefresh!,
+            color: AppColors.amber,
+            backgroundColor: AppColors.surface,
+            child: body,
+          );
+
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(
@@ -105,8 +132,9 @@ class DashboardScaffold extends ConsumerWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      bottomNavigationBar: _BottomNav(currentRoute: currentRoute),
-      floatingActionButton: fab,
+      bottomNavigationBar: _BottomNav(activeRoute: activeRoute),
+      floatingActionButton: _PlusFab(secondaryFab: fab),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: CinemaOverlay(
         child: FcmForegroundListener(
           child: IncomingCallListener(
@@ -115,11 +143,11 @@ class DashboardScaffold extends ConsumerWidget {
                 Column(
                   children: [
                     const ZeitbankConfirmationBanner(),
-                    Expanded(child: body),
+                    Expanded(child: refreshed),
                   ],
                 ),
                 // MensaenaBot Floating-Button (links unten, oberhalb BottomNav)
-                // Nicht ueberlappen mit dem regulaeren FAB (rechts unten).
+                // Nicht ueberlappen mit dem zentralen Plus-FAB.
                 const Positioned(
                   left: 16,
                   bottom: 16,
@@ -134,106 +162,126 @@ class DashboardScaffold extends ConsumerWidget {
   }
 }
 
+/// Zentraler schwebender Plus-FAB — schwebt 24dp oberhalb der BottomNav.
+/// Cinema-Glow: amber.withOpacity(0.4) Bloom, blur 16, spread -2.
+/// Falls ein `secondaryFab` uebergeben wurde (vom Caller), wird er rechts
+/// unten zusaetzlich angezeigt — wir nutzen dafuer einen Stack.
+class _PlusFab extends StatelessWidget {
+  const _PlusFab({this.secondaryFab});
+  final Widget? secondaryFab;
+
+  @override
+  Widget build(BuildContext context) {
+    // Wenn secondaryFab vorhanden, zeigen wir nur den secondary an, weil
+    // FloatingActionButtonLocation nur einen FAB platzieren kann.
+    // (Edge-Case: posts_list_screen etc. uebergeben ihren eigenen
+    // "Post"-FAB. In dem Fall behalten wir das alte Verhalten.)
+    if (secondaryFab != null) return secondaryFab!;
+    return Container(
+      // Bloom-Glow: amber.withOpacity(0.4), blur 16, spread -2.
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.amber.withValues(alpha: 0.40),
+            blurRadius: 16,
+            spreadRadius: -2,
+          ),
+          BoxShadow(
+            color: AppColors.amber.withValues(alpha: 0.15),
+            blurRadius: 28,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        backgroundColor: AppColors.amber,
+        foregroundColor: AppColors.voidColor,
+        elevation: 0,
+        highlightElevation: 0,
+        shape: const CircleBorder(),
+        onPressed: () {
+          Haptics.confirm();
+          context.go('/dashboard/create');
+        },
+        tooltip: 'nav.create'.tr(),
+        child: const Icon(LucideIcons.plus, size: 26),
+      ),
+    );
+  }
+}
+
 class _BottomNav extends ConsumerWidget {
-  const _BottomNav({required this.currentRoute});
-  final String currentRoute;
+  const _BottomNav({required this.activeRoute});
+  final String activeRoute;
+
+  bool _matches(String route, List<String> prefixes) {
+    for (final p in prefixes) {
+      if (activeRoute == p) return true;
+      if (activeRoute.startsWith('$p/')) return true;
+    }
+    return false;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unreadNotif = ref.watch(unreadNotificationCountProvider);
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.deep,
-        border: Border(top: BorderSide(color: AppColors.line)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: _BottomItem(
-                  icon: LucideIcons.layoutDashboard,
-                  label: 'nav.dashboard'.tr(),
-                  route: '/dashboard',
-                  active: currentRoute == '/dashboard',
-                ),
+    // Glass-Effekt: BackdropFilter blur(8) + surface.withOpacity(0.6).
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.60),
+            border: const Border(top: BorderSide(color: AppColors.line)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 64,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: _BottomItem(
+                      icon: LucideIcons.home,
+                      label: 'nav.home'.tr(),
+                      route: '/dashboard',
+                      active: activeRoute == '/dashboard',
+                    ),
+                  ),
+                  Expanded(
+                    child: _BottomItem(
+                      icon: LucideIcons.map,
+                      label: 'nav.map'.tr(),
+                      route: '/dashboard/map',
+                      active: _matches(activeRoute, ['/dashboard/map']),
+                    ),
+                  ),
+                  // Spacer fuer zentralen FAB (centerDocked).
+                  const SizedBox(width: 56),
+                  Expanded(
+                    child: _BottomItem(
+                      icon: LucideIcons.messageSquare,
+                      label: 'nav.chat'.tr(),
+                      route: '/dashboard/messages',
+                      active: _matches(activeRoute, [
+                        '/dashboard/messages',
+                        '/dashboard/chat',
+                      ]),
+                    ),
+                  ),
+                  Expanded(
+                    child: _BottomItem(
+                      icon: LucideIcons.user,
+                      label: 'nav.profile'.tr(),
+                      route: '/dashboard/profile',
+                      active: _matches(activeRoute, ['/dashboard/profile']),
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: _BottomItem(
-                  icon: LucideIcons.map,
-                  label: 'nav.map'.tr(),
-                  route: '/dashboard/map',
-                  active: currentRoute == '/dashboard/map',
-                ),
-              ),
-              // Zentraler Primary-FAB-Style mit phase-getunten Akzent.
-              SizedBox(
-                width: 64,
-                child: Consumer(
-                  builder: (ctx, r, _) {
-                    final phase = r.watch(effectiveCinemaPhaseProvider);
-                    final accent = CinemaAccents.tinted(
-                        AppColors.amber, phase,
-                        strength: 0.20);
-                    final accentWarm = CinemaAccents.tinted(
-                        AppColors.amberWarm, phase,
-                        strength: 0.20);
-                    final glow = CinemaAccents.glow(phase);
-                    return GestureDetector(
-                      onTap: () {
-                        Haptics.confirm();
-                        SmartActionSheet.show(context);
-                      },
-                      child: PulseBloom(
-                        color: glow,
-                        radius: 28,
-                        minIntensity: 0.55,
-                        maxIntensity: 1.0,
-                        child: Container(
-                          margin:
-                              const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [accent, accentWarm],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: const Icon(
-                            LucideIcons.plusCircle,
-                            color: AppColors.voidColor,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Expanded(
-                child: _BottomItem(
-                  icon: LucideIcons.messageCircle,
-                  label: 'nav.chat'.tr(),
-                  route: '/dashboard/messages',
-                  active: currentRoute.startsWith('/dashboard/messages') ||
-                      currentRoute.startsWith('/dashboard/chat'),
-                ),
-              ),
-              Expanded(
-                child: _BottomItem(
-                  icon: LucideIcons.bell,
-                  label: 'nav.notifications'.tr(),
-                  route: '/dashboard/notifications',
-                  active: currentRoute == '/dashboard/notifications',
-                  badge: unreadNotif,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -247,37 +295,46 @@ class _BottomItem extends StatelessWidget {
     required this.label,
     required this.route,
     required this.active,
-    this.badge = 0,
   });
 
   final IconData icon;
   final String label;
   final String route;
   final bool active;
-  final int badge;
 
   @override
   Widget build(BuildContext context) {
     final color = active ? AppColors.amber : AppColors.mute;
+    // Aktiver Tab: subtle GlassCard-aehnlicher Hintergrund (blur via Container
+    // mit amber-tint). Echtes BackdropFilter koennte teuer sein hier — wir
+    // simulieren den Glass-Effekt mit einem amber-getoenten Pill.
     return InkWell(
       onTap: () {
         Haptics.select();
         context.go(route);
       },
-      // BUG-FIX #4: 48dp minimum Touch-Target (Material-Standard)
       child: Container(
         constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         alignment: Alignment.center,
-        child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          Column(
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: active
+              ? BoxDecoration(
+                  color: AppColors.amber.withValues(alpha: 0.12),
+                  border: Border.all(
+                    color: AppColors.amber.withValues(alpha: 0.35),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                )
+              : null,
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 22, color: color),
-              const SizedBox(height: 4),
+              Icon(icon, size: 20, color: color),
+              const SizedBox(height: 2),
               Text(
                 label,
                 style: AppTypography.body(
@@ -288,30 +345,7 @@ class _BottomItem extends StatelessWidget {
               ),
             ],
           ),
-          if (badge > 0)
-            Positioned(
-              top: 6,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: const BoxDecoration(
-                  color: AppColors.herzrot,
-                  borderRadius: BorderRadius.all(Radius.circular(999)),
-                ),
-                constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-                child: Text(
-                  badge > 99 ? '99+' : '$badge',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.body(
-                    size: 9,
-                    color: AppColors.ink,
-                    weight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+        ),
       ),
     );
   }

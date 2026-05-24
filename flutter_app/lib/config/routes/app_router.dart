@@ -124,114 +124,175 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // ── Splash ─────────────────────────────────────────────
       GoRoute(
         path: '/splash',
-        builder: (_, __) => const SplashScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const SplashScreen(),
+        ),
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (_, __) => const OnboardingTourScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const OnboardingTourScreen(),
+        ),
       ),
       // ── Public ─────────────────────────────────────────────
-      GoRoute(path: '/', builder: (_, __) => const LandingScreen()),
+      GoRoute(
+        path: '/',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LandingScreen(),
+        ),
+      ),
       GoRoute(
         path: '/auth',
-        builder: (_, s) => AuthScreen(
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: AuthScreen(
           mode: s.uri.queryParameters['mode'] ?? 'login',
+        ),
         ),
       ),
       GoRoute(path: '/login', redirect: (_, __) => '/auth?mode=login'),
       GoRoute(path: '/register', redirect: (_, __) => '/auth?mode=register'),
       GoRoute(
         path: '/about',
-        builder: (_, __) => const LegalPageScreen(contentKey: 'about'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'about'),
+        ),
       ),
       GoRoute(
         path: '/spenden',
-        builder: (_, __) => const SpendenScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const SpendenScreen(),
+        ),
       ),
       GoRoute(
         path: '/kontakt',
-        builder: (_, __) => const LegalPageScreen(contentKey: 'kontakt'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'kontakt'),
+        ),
       ),
       GoRoute(
         path: '/impressum',
-        builder: (_, __) => const LegalPageScreen(contentKey: 'impressum'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'impressum'),
+        ),
       ),
       GoRoute(
         path: '/datenschutz',
-        builder: (_, __) =>
-            const LegalPageScreen(contentKey: 'datenschutz'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'datenschutz'),
+        ),
       ),
       GoRoute(
         path: '/agb',
-        builder: (_, __) => const LegalPageScreen(contentKey: 'agb'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'agb'),
+        ),
       ),
       GoRoute(
         path: '/haftungsausschluss',
-        builder: (_, __) =>
-            const LegalPageScreen(contentKey: 'haftungsausschluss'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'haftungsausschluss'),
+        ),
       ),
       GoRoute(
         path: '/nutzungsbedingungen',
-        builder: (_, __) =>
-            const LegalPageScreen(contentKey: 'nutzungsbedingungen'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'nutzungsbedingungen'),
+        ),
       ),
       GoRoute(
         path: '/community-guidelines',
-        builder: (_, __) =>
-            const LegalPageScreen(contentKey: 'community-guidelines'),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LegalPageScreen(contentKey: 'community-guidelines'),
+        ),
       ),
       _placeholder('/download', 'Download'),
       GoRoute(
         path: '/search',
-        builder: (_, s) => GlobalSearchScreen(
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: GlobalSearchScreen(
           initialQuery: s.uri.queryParameters['q'],
+        ),
         ),
       ),
       GoRoute(
         path: '/dashboard/search',
-        builder: (_, s) => GlobalSearchScreen(
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: GlobalSearchScreen(
           initialQuery: s.uri.queryParameters['q'],
+        ),
         ),
       ),
       GoRoute(
         path: '/unsubscribe',
-        builder: (_, s) =>
-            UnsubscribeScreen(token: s.uri.queryParameters['token']),
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: UnsubscribeScreen(token: s.uri.queryParameters['token']),
+        ),
       ),
       _placeholder('/live-ended', 'Session beendet'),
       GoRoute(
         path: '/ratings',
-        builder: (_, __) => const RatingsHubScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const RatingsHubScreen(),
+        ),
       ),
 
       // ── Dashboard ──────────────────────────────────────────
       GoRoute(
         path: '/dashboard',
-        builder: (_, __) => const DashboardHomeScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const DashboardHomeScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/map',
-        builder: (_, __) => const MapScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const MapScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/create',
-        builder: (_, s) => CreatePostScreen(
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: CreatePostScreen(
           initialType: s.uri.queryParameters['type'],
+        ),
         ),
       ),
       GoRoute(
         path: '/dashboard/chat',
-        builder: (_, s) {
+        pageBuilder: (_, s) {
           final conv = s.uri.queryParameters['conv'];
-          if (conv != null) {
-            return ChatScreen(conversationId: conv);
-          }
-          return const MessagesScreen(initialTab: 0);
+          final Widget child = conv != null
+              ? ChatScreen(conversationId: conv)
+              : const MessagesScreen(initialTab: 0);
+          return mensaenaTransition<void>(key: s.pageKey, child: child);
         },
       ),
       GoRoute(
         path: '/dashboard/messages',
-        builder: (_, __) => const MessagesScreen(initialTab: 1),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const MessagesScreen(initialTab: 1),
+        ),
         routes: [
           GoRoute(
             path: ':conversationId',
@@ -246,7 +307,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/posts',
-        builder: (_, __) => const PostsListScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const PostsListScreen(),
+        ),
         routes: [
           GoRoute(
             path: ':id',
@@ -259,7 +323,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/profile',
-        builder: (_, __) => const ProfileScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ProfileScreen(),
+        ),
         routes: [
           GoRoute(
             path: ':userId',
@@ -272,74 +339,115 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/settings',
-        builder: (_, __) => const SettingsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const SettingsScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/notifications',
-        builder: (_, __) => const NotificationsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const NotificationsScreen(),
+        ),
       ),
       // ── Module-spezifische Create-Pages (1:1 zu Web
       //    /dashboard/<module>/create) ───────────────────────
       GoRoute(
         path: '/dashboard/animals/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.animals),
+        ),
       ),
       GoRoute(
         path: '/dashboard/housing/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.housing),
+        ),
       ),
       GoRoute(
         path: '/dashboard/mobility/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.mobility),
+        ),
       ),
       GoRoute(
         path: '/dashboard/sharing/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.sharing),
+        ),
       ),
       GoRoute(
         path: '/dashboard/harvest/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.harvest),
+        ),
       ),
       GoRoute(
         path: '/dashboard/community/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.community),
+        ),
       ),
       // Wissen/Wiki nutzt eigenes Schema `knowledge_articles`
       // (kein posts-Entry) — daher dedicated Create-Screen.
       GoRoute(
         path: '/dashboard/knowledge/create',
-        builder: (_, __) => const KnowledgeCreateScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const KnowledgeCreateScreen(
             routePath: '/dashboard/knowledge'),
+        ),
       ),
       GoRoute(
         path: '/dashboard/wiki/create',
-        builder: (_, __) => const KnowledgeCreateScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const KnowledgeCreateScreen(
             routePath: '/dashboard/wiki'),
+        ),
       ),
       GoRoute(
         path: '/dashboard/skills/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.skills),
+        ),
       ),
       GoRoute(
         path: '/dashboard/jobs/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.jobs),
+        ),
       ),
       GoRoute(
         path: '/dashboard/rescuer/create',
-        builder: (_, __) => const ModuleCreatePostScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.rescuer),
+        ),
       ),
       GoRoute(
         path: '/dashboard/animals',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'nav.animals'.tr(),
           emoji: '🐾',
           postType: 'animal',
@@ -352,10 +460,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'adoption', label: '❤️ Adoption'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/housing',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'nav.housing'.tr(),
           emoji: '🏡',
           postType: 'housing',
@@ -368,10 +479,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'emergency', label: '🚨 Notunterkunft'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/mobility',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'nav.mobility'.tr(),
           emoji: '🚗',
           postType: 'mobility',
@@ -383,10 +497,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'transport', label: '📦 Transport'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/harvest',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'nav.harvest'.tr(),
           emoji: '🌾',
           postType: 'supply',
@@ -399,10 +516,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'eggs', label: '🥚 Eier/Milch'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/community',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'navGroups.community'.tr(),
           emoji: '🗳️',
           postType: 'community',
@@ -414,28 +534,41 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'announcement', label: '📣 Ankündigung'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/wiki',
-        builder: (_, __) => KnowledgeScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: KnowledgeScreen(
           title: 'modules.wiki'.tr(),
           routePath: '/dashboard/wiki',
+        ),
         ),
       ),
       GoRoute(
         path: '/dashboard/knowledge',
-        builder: (_, __) => KnowledgeScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: KnowledgeScreen(
           title: 'nav.knowledge'.tr(),
           routePath: '/dashboard/knowledge',
+        ),
         ),
       ),
       GoRoute(
         path: '/dashboard/groups',
-        builder: (_, __) => const GroupsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const GroupsScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'create',
-            builder: (_, __) => const GroupCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const GroupCreateScreen(),
+            ),
           ),
           GoRoute(
             path: ':groupId',
@@ -450,11 +583,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/marketplace',
-        builder: (_, __) => const MarketplaceScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const MarketplaceScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'create',
-            builder: (_, __) => const MarketplaceCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const MarketplaceCreateScreen(),
+            ),
           ),
           GoRoute(
             path: ':listingId',
@@ -469,11 +608,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/events',
-        builder: (_, __) => const EventsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const EventsScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'create',
-            builder: (_, __) => const EventCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const EventCreateScreen(),
+            ),
           ),
           GoRoute(
             path: ':eventId',
@@ -488,66 +633,108 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/calendar',
-        builder: (_, __) => const CalendarScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const CalendarScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/challenges',
-        builder: (_, __) => const ChallengesScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ChallengesScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'create',
-            builder: (_, __) => const ChallengeCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const ChallengeCreateScreen(),
+            ),
           ),
         ],
       ),
       GoRoute(
         path: '/dashboard/badges',
-        builder: (_, __) => const BadgesScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const BadgesScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/timebank',
-        builder: (_, __) => const TimebankScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const TimebankScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/skills',
-        builder: (_, __) => const SkillsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const SkillsScreen(),
+        ),
       ),
       // Modul-Audit Sprint 2 — Hub-Routes konsolidieren 3+3 Drawer-Items.
       GoRoute(
         path: '/dashboard/wissen',
-        builder: (_, __) => const WissenHubScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const WissenHubScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/teilen',
-        builder: (_, __) => const TeilenHubScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const TeilenHubScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/organizations',
-        builder: (_, __) => const OrganizationsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const OrganizationsScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'suggest',
-            builder: (_, __) => const OrganizationSuggestScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const OrganizationSuggestScreen(),
+            ),
           ),
           GoRoute(
             path: ':orgId',
-            builder: (_, s) => OrganizationDetailScreen(
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: OrganizationDetailScreen(
               orgId: s.pathParameters['orgId']!,
+            ),
             ),
           ),
         ],
       ),
       GoRoute(
         path: '/dashboard/supply',
-        builder: (_, __) => const SupplyScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const SupplyScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'farm/add',
-            builder: (_, __) => const FarmCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const FarmCreateScreen(),
+            ),
           ),
           GoRoute(
             path: 'foodbanks',
-            builder: (_, __) => const FoodbanksScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const FoodbanksScreen(),
+            ),
           ),
           GoRoute(
             path: ':slug',
@@ -562,15 +749,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/crisis',
-        builder: (_, __) => const CrisisDashboardScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const CrisisDashboardScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'create',
-            builder: (_, __) => const CrisisCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const CrisisCreateScreen(),
+            ),
           ),
           GoRoute(
             path: 'resources',
-            builder: (_, __) => const CrisisResourcesScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const CrisisResourcesScreen(),
+            ),
           ),
           GoRoute(
             path: ':crisisId',
@@ -585,53 +781,85 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/warnungen',
-        builder: (_, __) => const WarnungenScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const WarnungenScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'food',
-            builder: (_, __) => const FoodWarningsScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const FoodWarningsScreen(),
+            ),
           ),
           GoRoute(
             path: 'air',
-            builder: (_, __) => const AirQualityScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const AirQualityScreen(),
+            ),
           ),
           GoRoute(
             path: 'meteo',
-            builder: (_, __) => const MeteoAlarmScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const MeteoAlarmScreen(),
+            ),
           ),
           GoRoute(
             path: 'civil',
-            builder: (_, __) => const CivilProtectionScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const CivilProtectionScreen(),
+            ),
           ),
         ],
       ),
       GoRoute(
         path: '/dashboard/board',
-        builder: (_, __) => const BoardScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const BoardScreen(),
+        ),
         routes: [
           GoRoute(
             path: 'create',
-            builder: (_, __) => const BoardCreateScreen(),
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const BoardCreateScreen(),
+            ),
           ),
           GoRoute(
             path: ':boardPostId',
-            builder: (_, s) => BoardDetailScreen(
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: BoardDetailScreen(
               boardPostId: s.pathParameters['boardPostId']!,
+            ),
             ),
           ),
         ],
       ),
       GoRoute(
         path: '/dashboard/mental-support',
-        builder: (_, __) => const MentalSupportScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const MentalSupportScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/matching',
-        builder: (_, __) => const MatchingScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const MatchingScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/rescuer',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'modules.rescue'.tr(),
           emoji: '🛟',
           postType: 'rescue',
@@ -643,10 +871,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'sharing', label: '📦 Gegenstände'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/sharing',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'modules.sharingTitle'.tr(),
           emoji: '🔄',
           postType: 'sharing',
@@ -660,14 +891,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'sports', label: '⚽ Sport'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/jobs-portals',
-        builder: (_, __) => const JobPortalsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const JobPortalsScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/jobs',
-        builder: (_, __) => ModulePostsScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: ModulePostsScreen(
           title: 'nav.jobs'.tr(),
           emoji: '💼',
           postType: 'job',
@@ -680,75 +917,105 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             FilterOption(value: 'volunteer', label: '❤️ Ehrenamt'),
           ],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/invite',
-        builder: (_, __) => const InviteScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const InviteScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/interactions',
-        builder: (_, __) => const InteractionsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const InteractionsScreen(),
+        ),
       ),
 
       // ── Admin (Phase 5) ────────────────────────────────────
       GoRoute(
         path: '/dashboard/admin',
-        builder: (_, __) => const AdminDashboardScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminDashboardScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/users',
-        builder: (_, __) => const AdminUsersScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminUsersScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/posts',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           title: 'admin.tiles.posts'.tr(),
           tableName: 'posts',
           currentRoute: '/dashboard/admin/posts',
           subtitleFields: const ['type', 'category', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/events',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           title: 'admin.tiles.events'.tr(),
           tableName: 'events',
           currentRoute: '/dashboard/admin/events',
           subtitleFields: const ['location_name', 'category'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/board',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           title: 'admin.tiles.board'.tr(),
           tableName: 'board_posts',
           currentRoute: '/dashboard/admin/board',
           subtitleFields: const ['category', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/crisis',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // FIX R6: Tabelle heisst 'crises', nicht 'crisis_situations'
           title: 'admin.tiles.crisis'.tr(),
           tableName: 'crises',
           currentRoute: '/dashboard/admin/crisis',
           subtitleFields: const ['category', 'urgency', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/organizations',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           title: 'admin.tiles.organizations'.tr(),
           tableName: 'organizations',
           currentRoute: '/dashboard/admin/organizations',
           titleField: 'name',
           subtitleFields: const ['category', 'city', 'is_verified'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/farms',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // FIX R6: 'is_bio' existiert nicht — verwende 'status' aus farm_listings
           title: 'admin.tiles.farms'.tr(),
           tableName: 'farm_listings',
@@ -756,34 +1023,46 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           titleField: 'name',
           subtitleFields: const ['category', 'address', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/chat-moderation',
-        builder: (_, __) => const AdminReportsScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminReportsScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/groups',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           title: 'admin.tiles.groups'.tr(),
           tableName: 'groups',
           currentRoute: '/dashboard/admin/groups',
           titleField: 'name',
           subtitleFields: const ['category', 'is_private'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/challenges',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // FIX R6: Spalten aus challenges-Schema (category/difficulty/points)
           title: 'admin.tiles.challenges'.tr(),
           tableName: 'challenges',
           currentRoute: '/dashboard/admin/challenges',
           subtitleFields: const ['category', 'difficulty', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/timebank',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // FIX R6: timebank_entries hat type/hours, KEINE status-Spalte
           title: 'admin.tiles.timebank'.tr(),
           tableName: 'timebank_entries',
@@ -791,10 +1070,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           titleField: 'description',
           subtitleFields: const ['type', 'hours'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/bot-scheduled',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // FIX R6: korrekte Tabelle ist bot_scheduled_messages
           title: 'admin.tiles.botScheduled'.tr(),
           tableName: 'bot_scheduled_messages',
@@ -802,10 +1084,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           titleField: 'title',
           subtitleFields: const ['message_type', 'target_audience', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/suggestions',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // organization_suggestions ist eine echte Tabelle (R6 verifiziert)
           title: 'admin.tiles.suggestions'.tr(),
           tableName: 'organization_suggestions',
@@ -813,10 +1098,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           titleField: 'name',
           subtitleFields: const ['category', 'city', 'status'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/audit',
-        builder: (_, __) => AdminTableScreen(
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: AdminTableScreen(
           // audit_logs Tabelle existiert (R6 verifiziert)
           title: 'admin.tiles.auditLog'.tr(),
           tableName: 'audit_logs',
@@ -824,35 +1112,51 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           titleField: 'action',
           subtitleFields: const ['target_type', 'actor_id'],
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/admin/system',
-        builder: (_, __) => const AdminSystemScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminSystemScreen(),
+        ),
       ),
       // Profile-Edit + Saved-Posts
       GoRoute(
         path: '/dashboard/profile/edit',
-        builder: (_, __) => const ProfileEditScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ProfileEditScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/profile/saved',
-        builder: (_, __) => const ProfileSavedScreen(),
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ProfileSavedScreen(),
+        ),
       ),
       // LiveKit Call + Live-Room Screens (DM-Call / Channel-Stream)
       GoRoute(
         path: '/dashboard/call/:callId',
-        builder: (ctx, st) => CallScreen(
+        pageBuilder: (ctx, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: CallScreen(
           callId: st.pathParameters['callId']!,
           roomName: st.uri.queryParameters['room'] ?? '',
           peerName: st.uri.queryParameters['peer'] ?? 'Anruf',
         ),
+        ),
       ),
       GoRoute(
         path: '/dashboard/live/:roomName',
-        builder: (ctx, st) => LiveRoomScreen(
+        pageBuilder: (ctx, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: LiveRoomScreen(
           roomName: st.pathParameters['roomName']!,
           channelTitle: st.uri.queryParameters['title'] ?? '',
           isHost: st.uri.queryParameters['host'] == '1',
+        ),
         ),
       ),
     ],
@@ -866,7 +1170,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 GoRoute _placeholder(String path, String title, {String phase = ''}) {
   return GoRoute(
     path: path,
-    builder: (_, __) => PlaceholderScreen(title: title, phase: phase),
+    pageBuilder: (_, state) => mensaenaTransition<void>(
+      key: state.pageKey,
+      child: PlaceholderScreen(title: title, phase: phase),
+    ),
   );
 }
 

@@ -1,10 +1,9 @@
 /// SKILL: mensaena-design
-/// Page-Transitions — Cinematic-Foundation Phase A.
+/// Page-Transitions — Cinematic-Foundation Phase A (V23).
 ///
-/// `mensaenaTransition` ist die Standard-Transition für Detail-Routen:
-/// Slide-Up (16px) + Fade in 300ms mit `Curves.easeOutCubic`.
-/// Genug "Schwung" um das Detail als neues Layer einzuführen,
-/// ohne zu lange zu wirken.
+/// `mensaenaTransition` ist die Standard-Transition fuer ALLE Routen:
+/// Fade-In + subtiler Scale (0.97 → 1.0) in 300ms `Curves.easeOutCubic`.
+/// Cinematic, ohne zu lange zu wirken.
 ///
 /// Anwendung über `go_router` mit `pageBuilder`:
 /// ```dart
@@ -21,7 +20,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Standard-Mensaena-Detail-Transition (Slide-Up + Fade, 300ms easeOutCubic).
+/// Standard-Mensaena-Transition (Fade + Scale 0.97 → 1.0, 300ms easeOutCubic).
 CustomTransitionPage<T> mensaenaTransition<T>({
   required LocalKey key,
   required Widget child,
@@ -39,14 +38,14 @@ CustomTransitionPage<T> mensaenaTransition<T>({
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeInCubic,
       );
-      final slide = Tween<Offset>(
-        begin: const Offset(0, 0.04),
-        end: Offset.zero,
+      final scale = Tween<double>(
+        begin: 0.97,
+        end: 1.0,
       ).animate(curved);
       return FadeTransition(
         opacity: curved,
-        child: SlideTransition(
-          position: slide,
+        child: ScaleTransition(
+          scale: scale,
           child: child,
         ),
       );

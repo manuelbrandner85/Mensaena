@@ -38,6 +38,7 @@
     "description": "Descripción"
   },
   "nav": {
+    "home": "Inicio",
     "dashboard": "Panel",
     "map": "Mapa",
     "create": "Crear",

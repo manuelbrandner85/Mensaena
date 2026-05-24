@@ -38,6 +38,7 @@
     "description": "Açıklama"
   },
   "nav": {
+    "home": "Ana Sayfa",
     "dashboard": "Panel",
     "map": "Harita",
     "create": "Oluştur",

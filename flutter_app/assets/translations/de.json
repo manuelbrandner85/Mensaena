@@ -38,6 +38,7 @@
     "description": "Beschreibung"
   },
   "nav": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "map": "Karte",
     "create": "Erstellen",
