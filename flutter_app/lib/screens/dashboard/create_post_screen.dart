@@ -19,6 +19,7 @@ import '../../services/location_service.dart';
 import '../../services/post_draft_service.dart';
 import '../../services/rate_limit_service.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/effects/celebrate_burst.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/address_autocomplete_field.dart';
 
@@ -307,6 +308,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       final id = inserted['id'] as String;
       await PostDraftService.clear();
       if (!mounted) return;
+      // F4 Micro-Interaction: kurzer Konfetti-Burst zum Feiern.
+      CelebrateBurst.fire(context);
       context.go('/dashboard/posts/$id');
     } catch (e) {
       if (!mounted) return;

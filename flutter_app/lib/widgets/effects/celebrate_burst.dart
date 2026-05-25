@@ -1,0 +1,98 @@
+/// SKILL: mensaena-design
+/// Wiederverwendbarer Konfetti-Burst (F4) fuer Milestone-Momente:
+/// Streak-7/30/100, erfolgreicher Post, erstes Trust-Rating.
+///
+/// Nutzung:
+/// ```dart
+/// CelebrateBurst.fire(context);
+/// ```
+/// Triggert ein 1.5s langes Konfetti-Schauer von der Bildschirmmitte aus,
+/// plus Haptics.success(). Auto-disposed.
+library;
+
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:confetti/confetti.dart';
+import 'package:flutter/material.dart';
+
+import '../../config/theme/app_colors.dart';
+import '../../services/haptics.dart';
+
+class CelebrateBurst {
+  const CelebrateBurst._();
+
+  /// Feuert ein einmaliges Konfetti-Overlay im aktuellen Navigator.
+  /// Default 1.5s. Haptics.success() laeuft parallel.
+  static void fire(
+    BuildContext context, {
+    Duration duration = const Duration(milliseconds: 1500),
+  }) {
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) return;
+    unawaited(Haptics.success());
+
+    late OverlayEntry entry;
+    entry = OverlayEntry(builder: (_) => _CelebrationLayer(
+          duration: duration,
+          onDone: () => entry.remove(),
+        ));
+    overlay.insert(entry);
+  }
+}
+
+class _CelebrationLayer extends StatefulWidget {
+  const _CelebrationLayer({required this.duration, required this.onDone});
+
+  final Duration duration;
+  final VoidCallback onDone;
+
+  @override
+  State<_CelebrationLayer> createState() => _CelebrationLayerState();
+}
+
+class _CelebrationLayerState extends State<_CelebrationLayer> {
+  late final ConfettiController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = ConfettiController(duration: widget.duration);
+    _ctrl.play();
+    // Ein Tick nach Ende → Overlay entfernen.
+    Timer(widget.duration + const Duration(milliseconds: 800), widget.onDone);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: ConfettiWidget(
+          confettiController: _ctrl,
+          blastDirection: math.pi / 2, // nach unten
+          blastDirectionality: BlastDirectionality.explosive,
+          shouldLoop: false,
+          numberOfParticles: 24,
+          maxBlastForce: 28,
+          minBlastForce: 12,
+          emissionFrequency: 0.05,
+          gravity: 0.25,
+          colors: const [
+            AppColors.bronze,
+            AppColors.amber,
+            AppColors.teal,
+            AppColors.lebenSoft,
+            AppColors.herzrotWarm,
+          ],
+        ),
+      ),
+    );
+  }
+}
