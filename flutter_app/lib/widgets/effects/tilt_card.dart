@@ -30,8 +30,12 @@ const _sensitivity = 0.08;
 /// 0.15 = 85% Smoothing pro Frame.
 const _smoothing = 0.15;
 
-/// Sensor-Sampling-Period — 60 fps = 16ms reicht voellig.
-const _sampleInterval = SensorInterval.uiInterval;
+/// Sensor-Sampling-Period — normalInterval (200ms) statt uiInterval (16ms).
+/// Performance-Hot-Fix: 5 TiltCards in Dashboard-Stats + 1 in Profile-Avatar
+/// liefen mit 60fps Sensor-Updates pro Card = 360 Frame-Triggers/Sek auf
+/// dem Main-Thread → Frame-Drops + Haenger bei Tab-Wechsel. 200ms reicht
+/// fuer das Schweben-Gefuehl (5 Hz Tilt-Update = ~10x weniger Last).
+const _sampleInterval = SensorInterval.normalInterval;
 
 class TiltCard extends ConsumerStatefulWidget {
   const TiltCard({

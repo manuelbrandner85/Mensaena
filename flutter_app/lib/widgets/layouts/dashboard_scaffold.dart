@@ -241,7 +241,9 @@ class _BottomNav extends ConsumerWidget {
     // Glass-Effekt: BackdropFilter blur(8) + surface.withOpacity(0.6).
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        // sigma 3 statt 8 — auf mittleren Geraeten reicht das fuers Glass-
+        // Gefuehl + halbiert die GPU-Last beim Scroll/Transition.
+        filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.surface.withValues(alpha: 0.60),

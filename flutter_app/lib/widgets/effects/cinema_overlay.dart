@@ -160,10 +160,12 @@ class CinemaOverlay extends ConsumerWidget {
           ),
         ),
 
-        // 12. Film-Grain (sehr subtil)
-        RepaintBoundary(
-          child: FilmGrainOverlay(opacity: spec.grainOpacity * intensity),
-        ),
+        // 12. Film-Grain — teurster animierter Effekt. Bei intensity < 0.6
+        // komplett ueberspringen (= reduced/minimal Mode).
+        if (intensity >= 0.6)
+          RepaintBoundary(
+            child: FilmGrainOverlay(opacity: spec.grainOpacity * intensity),
+          ),
       ],
     );
   }

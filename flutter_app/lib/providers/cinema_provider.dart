@@ -36,7 +36,11 @@ final cinemaModeProvider =
         (ref) => CinemaModeNotifier());
 
 class CinemaIntensityNotifier extends StateNotifier<CinemaIntensity> {
-  CinemaIntensityNotifier() : super(CinemaIntensity.full) {
+  /// Default = reduced (50% intensity) statt full — Performance-Hot-Fix.
+  /// Auf mittleren Android-Phones war full zu GPU-lastig + verursachte
+  /// Frame-Drops + Haenger bei Page-Transitions. User kann via Settings
+  /// auf full hochsetzen wenn die Performance ausreicht.
+  CinemaIntensityNotifier() : super(CinemaIntensity.reduced) {
     _load();
   }
 
