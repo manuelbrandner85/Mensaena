@@ -608,6 +608,31 @@
       "pageInfo": "Page {page} sur {total}",
       "prev": "Retour",
       "next": "Suivant"
+    },
+    "chatMod": {
+      "title": "Modération du chat",
+      "communityChat": "Chat communautaire",
+      "locked": "Verrouillé",
+      "open": "Ouvert",
+      "reasonLabel": "Motif du verrouillage",
+      "lock": "Verrouiller",
+      "unlock": "Déverrouiller",
+      "lockSuccess": "Chat verrouillé.",
+      "unlockSuccess": "Chat déverrouillé.",
+      "actionFailed": "Action échouée.",
+      "adminOnly": "Seuls les administrateurs peuvent verrouiller le chat.",
+      "usersTitle": "Utilisateurs ({n})",
+      "noUsers": "Aucun utilisateur.",
+      "ban": "Bloquer",
+      "unban": "Débloquer",
+      "bannedBadge": "Bloqué",
+      "banSuccess": "Utilisateur bloqué.",
+      "unbanSuccess": "Utilisateur débloqué.",
+      "messagesTitle": "Messages ({n})",
+      "noMessages": "Aucun message.",
+      "deletedBadge": "Supprimé",
+      "deletedMsgPlaceholder": "Message supprimé",
+      "deletedMsg": "Message supprimé."
     }
   },
   "create": {

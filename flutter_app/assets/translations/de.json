@@ -608,7 +608,32 @@
     "subActive": "{n} aktiv",
     "subUpcoming": "{n} bevorstehend",
     "subVerified": "{n} verifiziert",
-    "subConversations": "{n} Threads"
+    "subConversations": "{n} Threads",
+    "chatMod": {
+      "title": "Chat-Moderation",
+      "communityChat": "Community Chat",
+      "locked": "Gesperrt",
+      "open": "Offen",
+      "reasonLabel": "Sperrungsgrund",
+      "lock": "Sperren",
+      "unlock": "Entsperren",
+      "lockSuccess": "Chat gesperrt.",
+      "unlockSuccess": "Chat entsperrt.",
+      "actionFailed": "Aktion fehlgeschlagen.",
+      "adminOnly": "Nur Admins können den Chat sperren.",
+      "usersTitle": "Nutzer ({n})",
+      "noUsers": "Keine Nutzer.",
+      "ban": "Sperren",
+      "unban": "Entsperren",
+      "bannedBadge": "Gesperrt",
+      "banSuccess": "Nutzer gesperrt.",
+      "unbanSuccess": "Nutzer entsperrt.",
+      "messagesTitle": "Nachrichten ({n})",
+      "noMessages": "Keine Nachrichten.",
+      "deletedBadge": "Gelöscht",
+      "deletedMsgPlaceholder": "Nachricht gelöscht",
+      "deletedMsg": "Nachricht gelöscht."
+    }
   },
   "create": {
     "locationUnavailable": "Standort nicht verfügbar.",

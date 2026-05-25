@@ -608,6 +608,31 @@
       "pageInfo": "{total} sayfadan {page}. sayfa",
       "prev": "Geri",
       "next": "İleri"
+    },
+    "chatMod": {
+      "title": "Sohbet moderasyonu",
+      "communityChat": "Topluluk sohbeti",
+      "locked": "Kilitli",
+      "open": "Açık",
+      "reasonLabel": "Kilitleme nedeni",
+      "lock": "Kilitle",
+      "unlock": "Kilidi aç",
+      "lockSuccess": "Sohbet kilitlendi.",
+      "unlockSuccess": "Sohbetin kilidi açıldı.",
+      "actionFailed": "İşlem başarısız.",
+      "adminOnly": "Sohbeti yalnızca yöneticiler kilitleyebilir.",
+      "usersTitle": "Kullanıcılar ({n})",
+      "noUsers": "Kullanıcı yok.",
+      "ban": "Yasakla",
+      "unban": "Yasağı kaldır",
+      "bannedBadge": "Yasaklı",
+      "banSuccess": "Kullanıcı yasaklandı.",
+      "unbanSuccess": "Kullanıcının yasağı kaldırıldı.",
+      "messagesTitle": "Mesajlar ({n})",
+      "noMessages": "Mesaj yok.",
+      "deletedBadge": "Silindi",
+      "deletedMsgPlaceholder": "Mesaj silindi",
+      "deletedMsg": "Mesaj silindi."
     }
   },
   "create": {

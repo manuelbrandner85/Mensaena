@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
+import '../../screens/dashboard/admin/admin_chat_moderation_screen.dart';
 import '../../screens/dashboard/admin/admin_dashboard_screen.dart';
-import '../../screens/dashboard/admin/admin_reports_screen.dart';
 import '../../screens/dashboard/admin/admin_system_screen.dart';
 import '../../screens/dashboard/admin/admin_table_screen.dart';
 import '../../screens/dashboard/admin/admin_users_screen.dart';
@@ -1029,7 +1029,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/admin/chat-moderation',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: const AdminReportsScreen(),
+          child: const AdminChatModerationScreen(),
         ),
       ),
       GoRoute(

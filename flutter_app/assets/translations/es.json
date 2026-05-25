@@ -608,6 +608,31 @@
       "pageInfo": "Página {page} de {total}",
       "prev": "Atrás",
       "next": "Siguiente"
+    },
+    "chatMod": {
+      "title": "Moderación del chat",
+      "communityChat": "Chat de la comunidad",
+      "locked": "Bloqueado",
+      "open": "Abierto",
+      "reasonLabel": "Motivo del bloqueo",
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
+      "lockSuccess": "Chat bloqueado.",
+      "unlockSuccess": "Chat desbloqueado.",
+      "actionFailed": "Acción fallida.",
+      "adminOnly": "Solo los administradores pueden bloquear el chat.",
+      "usersTitle": "Usuarios ({n})",
+      "noUsers": "Sin usuarios.",
+      "ban": "Bloquear",
+      "unban": "Desbloquear",
+      "bannedBadge": "Bloqueado",
+      "banSuccess": "Usuario bloqueado.",
+      "unbanSuccess": "Usuario desbloqueado.",
+      "messagesTitle": "Mensajes ({n})",
+      "noMessages": "Sin mensajes.",
+      "deletedBadge": "Eliminado",
+      "deletedMsgPlaceholder": "Mensaje eliminado",
+      "deletedMsg": "Mensaje eliminado."
     }
   },
   "create": {
