@@ -1,20 +1,24 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
+import '../../../services/supabase_service.dart';
+import '../../../widgets/confirm_dialog.dart';
+import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
-import '../../../widgets/shared/skeleton_card.dart';
-import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 
 /// SKILL: mensaena-features (Admin Phase 5)
-/// 1:1 zu `src/app/dashboard/admin/components/UsersTab.tsx`.
-/// User-Liste mit Ban/Unban + Verify-Toggle + Make-Admin-Toggle.
+/// Nutzerverwaltung — Pagination, Rollen-Filter, Edit-Sheet, Ban-Dialog,
+/// Delete-Confirm, Self-Role-Permission-Guard.
 class AdminUsersScreen extends ConsumerStatefulWidget {
   const AdminUsersScreen({super.key});
 
@@ -24,56 +28,456 @@ class AdminUsersScreen extends ConsumerStatefulWidget {
 
 class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   String _search = '';
-  Future<List<Map<String, dynamic>>>? _future;
+  String? _roleFilter; // null = all roles
+  int _page = 0;
+  static const int _pageSize = 20;
+
+  List<Map<String, dynamic>> _users = const [];
+  int _total = 0;
+  bool _loading = true;
+
+  Timer? _searchDebounce;
+
+  // Edit-state
+  Map<String, dynamic>? _editUser;
+  final TextEditingController _editNameCtrl = TextEditingController();
+  final TextEditingController _editNicknameCtrl = TextEditingController();
+  String _editRole = 'user';
+  bool _editSaving = false;
+
+  // Self-Role for permission guard
+  String? _myRole;
 
   @override
   void initState() {
     super.initState();
+    _loadMyRole();
     _load();
   }
 
-  void _load() {
-    setState(() {
-      _future = AdminRepository.listUsersViaRpc(search: _search);
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _editNameCtrl.dispose();
+    _editNicknameCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMyRole() async {
+    try {
+      final uid = SupabaseService.currentUser?.id;
+      if (uid == null) return;
+      final row = await sb
+          .from('profiles')
+          .select('role')
+          .eq('id', uid)
+          .maybeSingle();
+      if (!mounted) return;
+      setState(() => _myRole = row?['role'] as String?);
+    } catch (_) {
+      // ignore; default guard = restrictive
+    }
+  }
+
+  bool get _isAdmin => _myRole == 'admin';
+  bool get _isModerator => _myRole == 'moderator' || _isAdmin;
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final all = await AdminRepository.listUsersViaRpc(search: _search);
+      var filtered = all;
+      if (_roleFilter != null && _roleFilter!.isNotEmpty) {
+        filtered = filtered.where((u) => u['role'] == _roleFilter).toList();
+      }
+      _total = filtered.length;
+      final start = _page * _pageSize;
+      if (start >= _total) {
+        _page = 0;
+      }
+      final pageStart = _page * _pageSize;
+      _users = filtered.skip(pageStart).take(_pageSize).toList();
+    } catch (_) {
+      _users = const [];
+      _total = 0;
+    }
+    if (!mounted) return;
+    setState(() => _loading = false);
+  }
+
+  void _onSearchChanged(String v) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      setState(() {
+        _search = v;
+        _page = 0;
+      });
+      _load();
     });
   }
 
-  List<Map<String, dynamic>> _apply(List<Map<String, dynamic>> all) {
-    final q = _search.trim().toLowerCase();
-    if (q.isEmpty) return all;
-    return all.where((u) {
-      final name = (u['display_name'] ?? u['name'] ?? '').toString();
-      final email = (u['email'] ?? '').toString();
-      return name.toLowerCase().contains(q) ||
-          email.toLowerCase().contains(q);
-    }).toList();
+  void _setRoleFilter(String? v) {
+    setState(() {
+      _roleFilter = v;
+      _page = 0;
+    });
+    _load();
   }
 
-  Future<void> _toggleField(
-    Map<String, dynamic> user,
-    String column,
-    String label,
-  ) async {
-    final current = user[column] == true;
-    final ok = await AdminRepository.updateField(
-      table: 'profiles',
-      id: user['id'] as String,
-      column: column,
-      value: !current,
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  // ---------------- Edit ----------------
+
+  void _openEdit(Map<String, dynamic> user) {
+    setState(() {
+      _editUser = user;
+      _editNameCtrl.text = (user['name'] ?? '').toString();
+      _editNicknameCtrl.text = (user['nickname'] ?? '').toString();
+      _editRole = (user['role'] ?? 'user').toString();
+      _editSaving = false;
+    });
+
+    showModalBottomSheet<void>(
+      context: context,
       backgroundColor: AppColors.surface,
-      content: Text(
-        ok ? '$label ${current ? "entfernt" : "gesetzt"}' : 'Fehler.',
-        style: AppTypography.body(size: 13, color: AppColors.ink),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-    ));
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 12,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.line,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'admin.users.editTitle'.tr(),
+                    style: AppTypography.display(size: 18),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _editNameCtrl,
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      labelText: 'admin.users.name'.tr(),
+                      labelStyle: AppTypography.caption(),
+                      filled: true,
+                      fillColor: AppColors.elevated,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.line),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.line),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _editNicknameCtrl,
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      labelText: 'admin.users.nickname'.tr(),
+                      labelStyle: AppTypography.caption(),
+                      filled: true,
+                      fillColor: AppColors.elevated,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.line),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.line),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.line),
+                    ),
+                    child: DropdownButton<String>(
+                      value: _editRole,
+                      isExpanded: true,
+                      dropdownColor: AppColors.elevated,
+                      underline: const SizedBox.shrink(),
+                      style:
+                          AppTypography.body(size: 14, color: AppColors.ink),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'user',
+                          child: Text('admin.users.roleUser'.tr()),
+                        ),
+                        DropdownMenuItem(
+                          value: 'moderator',
+                          child: Text('admin.users.roleModerator'.tr()),
+                        ),
+                        DropdownMenuItem(
+                          value: 'admin',
+                          child: Text('admin.users.roleAdmin'.tr()),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        if (v == null) return;
+                        setSheetState(() => _editRole = v);
+                        setState(() => _editRole = v);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      OutlinedButton(
+                        onPressed: _editSaving
+                            ? null
+                            : () => Navigator.of(ctx).pop(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.inkSoft,
+                          side: const BorderSide(color: AppColors.line),
+                        ),
+                        child: Text('common.cancel'.tr()),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        onPressed: _editSaving
+                            ? null
+                            : () async {
+                                setSheetState(() => _editSaving = true);
+                                setState(() => _editSaving = true);
+                                final ok = await _saveEdit();
+                                if (!ctx.mounted) return;
+                                if (ok) {
+                                  Navigator.of(ctx).pop();
+                                }
+                              },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.amber,
+                          foregroundColor: AppColors.surface,
+                        ),
+                        child: Text('common.save'.tr()),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() {
+      if (!mounted) return;
+      setState(() {
+        _editUser = null;
+        _editSaving = false;
+      });
+    });
+  }
+
+  Future<bool> _saveEdit() async {
+    final user = _editUser;
+    if (user == null) return false;
+    final uid = user['id'] as String?;
+    if (uid == null) return false;
+
+    final originalRole = (user['role'] ?? 'user').toString();
+    bool allOk = true;
+
+    try {
+      if (_editRole != originalRole) {
+        final roleOk =
+            await AdminRepository.changeUserRole(uid, _editRole);
+        allOk = allOk && roleOk;
+      }
+      final nameOk = await AdminRepository.updateField(
+        table: 'profiles',
+        id: uid,
+        column: 'name',
+        value: _editNameCtrl.text.trim(),
+      );
+      allOk = allOk && nameOk;
+      final nickOk = await AdminRepository.updateField(
+        table: 'profiles',
+        id: uid,
+        column: 'nickname',
+        value: _editNicknameCtrl.text.trim().isEmpty
+            ? null
+            : _editNicknameCtrl.text.trim(),
+      );
+      allOk = allOk && nickOk;
+    } catch (_) {
+      allOk = false;
+    }
+
+    if (!mounted) return allOk;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          allOk
+              ? 'admin.users.editSaved'.tr()
+              : 'admin.users.editError'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+      ),
+    );
+    if (allOk) {
+      _load();
+    }
+    return allOk;
+  }
+
+  // ---------------- Ban / Unban ----------------
+
+  void _openBan(Map<String, dynamic> user) {
+    final reasonCtrl = TextEditingController();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(
+            'admin.users.banConfirmTitle'.tr(),
+            style: AppTypography.body(
+              size: 16,
+              color: AppColors.ink,
+              weight: FontWeight.w700,
+            ),
+          ),
+          content: TextField(
+            controller: reasonCtrl,
+            autofocus: true,
+            style: AppTypography.body(size: 14, color: AppColors.ink),
+            decoration: InputDecoration(
+              hintText: 'admin.users.banReason'.tr(),
+              hintStyle: AppTypography.caption(),
+              filled: true,
+              fillColor: AppColors.elevated,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: AppColors.line),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: AppColors.line),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('common.cancel'.tr()),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+              onPressed: () async {
+                final reason = reasonCtrl.text.trim();
+                if (reason.isEmpty) return;
+                Navigator.of(ctx).pop();
+                final uid = user['id'] as String?;
+                if (uid == null) return;
+                final ok =
+                    await AdminRepository.banUser(uid, reason, days: 30);
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.surface,
+                    content: Text(
+                      ok
+                          ? 'admin.users.banSuccess'.tr()
+                          : 'admin.users.editError'.tr(),
+                      style:
+                          AppTypography.body(size: 13, color: AppColors.ink),
+                    ),
+                  ),
+                );
+                if (ok) _load();
+              },
+              child: Text('admin.users.banAction'.tr()),
+            ),
+          ],
+        );
+      },
+    ).whenComplete(reasonCtrl.dispose);
+  }
+
+  Future<void> _unban(Map<String, dynamic> user) async {
+    final uid = user['id'] as String?;
+    if (uid == null) return;
+    final ok = await AdminRepository.unbanUser(uid);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          ok
+              ? 'admin.users.unbanSuccess'.tr()
+              : 'admin.users.editError'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+      ),
+    );
     if (ok) _load();
   }
 
+  // ---------------- Delete ----------------
+
+  Future<void> _openDelete(Map<String, dynamic> user) async {
+    final uid = user['id'] as String?;
+    if (uid == null) return;
+    final ok = await ConfirmDialog.show(
+      context,
+      title: 'admin.users.deleteConfirmTitle'.tr(),
+      message: 'admin.users.deleteConfirmMsg'.tr(),
+      confirmLabel: 'common.delete'.tr(),
+      danger: true,
+    );
+    if (!ok) return;
+    final done = await AdminRepository.deleteUser(uid);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          done
+              ? 'admin.users.deleteSuccess'.tr()
+              : 'admin.users.editError'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+      ),
+    );
+    if (done) _load();
+  }
+
+  // ---------------- Build ----------------
+
   @override
   Widget build(BuildContext context) {
+    final pages = (_total / _pageSize).ceil().clamp(1, 9999);
     return DashboardScaffold(
       title: 'admin.usersTitle'.tr(),
       currentRoute: '/dashboard/admin/users',
@@ -81,49 +485,78 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
-              child: ModuleSearchBar(
-                hintText: 'admin.searchUsersHint'.tr(),
-                onChanged: (v) => setState(() => _search = v),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ModuleSearchBar(
+                      hintText: 'admin.searchUsersHint'.tr(),
+                      onChanged: _onSearchChanged,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _RoleDropdown(
+                    value: _roleFilter,
+                    onChanged: _setRoleFilter,
+                  ),
+                ],
               ),
             ),
-            Expanded(
-              child: RefreshIndicator(
-                color: AppColors.amber,
-                backgroundColor: AppColors.surface,
-                onRefresh: () async => _load(),
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _future,
-                  builder: (context, snap) {
-                    if (snap.connectionState != ConnectionState.done) {
-                      return const SkeletonList(count: 5, itemHeight: 96);
-                    }
-                    final rows = _apply(snap.data ?? const []);
-                    if (rows.isEmpty) {
-                      return ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(16),
-                        children: [
-                          const SizedBox(height: 60),
-                          EmptyStateCard(
-                            icon: LucideIcons.users,
-                            title: 'admin.noUsers'.tr(),
-                          ),
-                        ],
-                      );
-                    }
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: rows.length,
-                      itemBuilder: (context, i) => _UserRow(
-                        row: rows[i],
-                        onToggleField: _toggleField,
-                      ),
-                    );
-                  },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'admin.users.totalCount'.tr(namedArgs: {'n': '$_total'}),
+                  style: AppTypography.label(size: 10, color: AppColors.mute),
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: _loading
+                  ? const _UsersSkeleton(count: 5)
+                  : _users.isEmpty
+                      ? Center(
+                          child: Text(
+                            'admin.users.empty'.tr(),
+                            style: AppTypography.caption(),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          itemCount: _users.length,
+                          itemBuilder: (ctx, i) => _UserRow(
+                            user: _users[i],
+                            canEdit: _isAdmin,
+                            canBan: _isAdmin,
+                            canDelete: _isAdmin,
+                            isModerator: _isModerator,
+                            onEdit: () => _openEdit(_users[i]),
+                            onBan: () => _openBan(_users[i]),
+                            onUnban: () => _unban(_users[i]),
+                            onDelete: () => _openDelete(_users[i]),
+                          ),
+                        ),
+            ),
+            if (_total > _pageSize)
+              _PaginationBar(
+                page: _page,
+                totalPages: pages,
+                onPrev: _page > 0
+                    ? () {
+                        setState(() => _page--);
+                        _load();
+                      }
+                    : null,
+                onNext: (_page + 1) * _pageSize < _total
+                    ? () {
+                        setState(() => _page++);
+                        _load();
+                      }
+                    : null,
+              ),
           ],
         ),
       ),
@@ -131,33 +564,112 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   }
 }
 
-class _UserRow extends StatelessWidget {
-  const _UserRow({required this.row, required this.onToggleField});
+// ============================================================================
+// Sub-Widgets
+// ============================================================================
 
-  final Map<String, dynamic> row;
-  final Future<void> Function(
-      Map<String, dynamic> user, String column, String label) onToggleField;
+class _RoleDropdown extends StatelessWidget {
+  const _RoleDropdown({required this.value, required this.onChanged});
+
+  final String? value;
+  final ValueChanged<String?> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final name = (row['display_name'] ?? row['name'] ?? '—').toString();
-    final email = (row['email'] ?? '').toString();
-    final city = (row['home_city'] ?? '').toString();
-    final isBanned = row['is_banned'] == true;
-    final isVerified = row['is_verified'] == true;
-    final isAdmin = row['is_admin'] == true;
-    final avatar = row['avatar_url'] as String?;
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String?>(
+          value: value,
+          dropdownColor: AppColors.elevated,
+          icon: const Icon(LucideIcons.chevronDown,
+              size: 14, color: AppColors.mute),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+          items: [
+            DropdownMenuItem<String?>(
+              value: null,
+              child: Text('admin.users.allRoles'.tr()),
+            ),
+            DropdownMenuItem<String?>(
+              value: 'user',
+              child: Text('admin.users.roleUser'.tr()),
+            ),
+            DropdownMenuItem<String?>(
+              value: 'moderator',
+              child: Text('admin.users.roleModerator'.tr()),
+            ),
+            DropdownMenuItem<String?>(
+              value: 'admin',
+              child: Text('admin.users.roleAdmin'.tr()),
+            ),
+          ],
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+}
+
+class _UserRow extends StatelessWidget {
+  const _UserRow({
+    required this.user,
+    required this.canEdit,
+    required this.canBan,
+    required this.canDelete,
+    required this.isModerator,
+    required this.onEdit,
+    required this.onBan,
+    required this.onUnban,
+    required this.onDelete,
+  });
+
+  final Map<String, dynamic> user;
+  final bool canEdit;
+  final bool canBan;
+  final bool canDelete;
+  final bool isModerator;
+  final VoidCallback onEdit;
+  final VoidCallback onBan;
+  final VoidCallback onUnban;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = (user['name'] ?? user['display_name'] ?? '—').toString();
+    final nickname = (user['nickname'] ?? '').toString();
+    final email = (user['email'] ?? '').toString();
+    final role = (user['role'] ?? 'user').toString();
+    final isAdminUser = role == 'admin';
+    final isBanned = user['is_banned'] == true;
+    final isVerifiedEmail =
+        user['verified_email'] == true || user['email_confirmed_at'] != null;
+    final avatar = user['avatar_url'] as String?;
+    final homeCity = (user['home_city'] ?? '').toString();
+    final trustScore = user['trust_score'];
+    final createdAt = user['created_at']?.toString();
+    DateTime? created;
+    if (createdAt != null) {
+      created = DateTime.tryParse(createdAt);
+    }
+
+    final initial = (name.isNotEmpty ? name : '?').substring(0, 1).toUpperCase();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: isBanned
             ? AppColors.herzrot.withValues(alpha: 0.08)
-            : AppColors.surface.withValues(alpha: 0.5),
+            : AppColors.surface,
         border: Border.all(
           color: isBanned
-              ? AppColors.herzrot.withValues(alpha: 0.5)
+              ? AppColors.herzrot.withValues(alpha: 0.4)
               : AppColors.line,
         ),
         borderRadius: BorderRadius.circular(12),
@@ -166,52 +678,49 @@ class _UserRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (avatar != null)
+              if (avatar != null && avatar.isNotEmpty)
                 CachedNetworkImage(
                   imageUrl: avatar,
                   fadeInDuration: const Duration(milliseconds: 200),
                   imageBuilder: (_, img) => CircleAvatar(
-                    radius: 18,
+                    radius: 24,
                     backgroundColor: AppColors.elevated,
                     backgroundImage: img,
                   ),
                   placeholder: (_, __) => const CircleAvatar(
-                    radius: 18,
+                    radius: 24,
                     backgroundColor: AppColors.elevated,
                   ),
                   errorWidget: (_, __, ___) => CircleAvatar(
-                    radius: 18,
+                    radius: 24,
                     backgroundColor: AppColors.elevated,
                     child: Text(
-                      (name.isNotEmpty ? name : '?')
-                          .substring(0, 1)
-                          .toUpperCase(),
+                      initial,
                       style: AppTypography.mono(
-                          size: 14, color: AppColors.amber),
+                          size: 16, color: AppColors.amber),
                     ),
                   ),
                 )
               else
                 CircleAvatar(
-                  radius: 18,
+                  radius: 24,
                   backgroundColor: AppColors.elevated,
                   child: Text(
-                    (name.isNotEmpty ? name : '?')
-                        .substring(0, 1)
-                        .toUpperCase(),
+                    initial,
                     style: AppTypography.mono(
-                        size: 14, color: AppColors.amber),
+                        size: 16, color: AppColors.amber),
                   ),
                 ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Expanded(
+                        Flexible(
                           child: Text(
                             name,
                             maxLines: 1,
@@ -223,37 +732,26 @@ class _UserRow extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (isAdmin)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppColors.amber.withValues(alpha: 0.18),
-                              borderRadius: BorderRadius.circular(999),
+                        if (nickname.isNotEmpty) ...[
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              '@$nickname',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.caption(),
                             ),
-                            child: Text('ADMIN',
-                                style: AppTypography.label(
-                                    size: 7, color: AppColors.amber)),
                           ),
-                        if (isVerified) ...[
-                          const SizedBox(width: 4),
-                          const Icon(LucideIcons.badgeCheck,
-                              size: 12, color: AppColors.tealSoft),
-                        ],
-                        if (isBanned) ...[
-                          const SizedBox(width: 4),
-                          const Icon(LucideIcons.ban,
-                              size: 12, color: AppColors.herzrot),
                         ],
                       ],
                     ),
                     if (email.isNotEmpty)
-                      Text(email,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.caption()),
-                    if (city.isNotEmpty)
-                      Text(city, style: AppTypography.caption()),
+                      Text(
+                        email,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.caption(),
+                      ),
                   ],
                 ),
               ),
@@ -262,37 +760,127 @@ class _UserRow extends StatelessWidget {
           const SizedBox(height: 8),
           Wrap(
             spacing: 6,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (isAdminUser)
+                const _MicroBadge(color: AppColors.amber, label: 'ADMIN'),
+              if (isVerifiedEmail)
+                _MicroBadge(
+                  color: AppColors.tealSoft,
+                  label: 'admin.verifiedBadge'.tr(),
+                ),
+              if (isBanned)
+                _MicroBadge(
+                  color: AppColors.herzrot,
+                  label: 'admin.bannedBadge'.tr(),
+                ),
+              Text(
+                _roleLabel(role),
+                style: AppTypography.label(size: 9, color: AppColors.mute),
+              ),
+              if (homeCity.isNotEmpty)
+                Text('· $homeCity', style: AppTypography.caption()),
+              if (trustScore != null)
+                Text(
+                  '· Trust $trustScore',
+                  style: AppTypography.caption(),
+                ),
+              if (created != null)
+                Text(
+                  '· ${DateFormat('dd.MM.yyyy').format(created)}',
+                  style: AppTypography.caption(),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
             runSpacing: 6,
             children: [
-              _Btn(
-                icon: isBanned ? LucideIcons.unlock : LucideIcons.ban,
-                label: isBanned ? 'Entsperren' : 'Sperren',
-                color: AppColors.herzrot,
-                onTap: () => onToggleField(row, 'is_banned', 'Sperre'),
-              ),
-              _Btn(
-                icon: LucideIcons.badgeCheck,
-                label: isVerified ? 'Unverifizieren' : 'Verifizieren',
+              _ActionPill(
+                icon: LucideIcons.eye,
+                label: 'admin.users.profile'.tr(),
                 color: AppColors.tealSoft,
-                onTap: () =>
-                    onToggleField(row, 'is_verified', 'Verifizierung'),
+                onTap: () {
+                  final uid = user['id'] as String?;
+                  if (uid != null) {
+                    context.go('/dashboard/profile/$uid');
+                  }
+                },
               ),
-              _Btn(
-                icon: LucideIcons.shield,
-                label: isAdmin ? 'Admin entfernen' : 'Admin',
-                color: AppColors.amber,
-                onTap: () => onToggleField(row, 'is_admin', 'Admin'),
-              ),
+              if (canEdit)
+                _ActionPill(
+                  icon: LucideIcons.edit3,
+                  label: 'common.edit'.tr(),
+                  color: AppColors.amber,
+                  onTap: onEdit,
+                ),
+              if (canBan)
+                if (isBanned)
+                  _ActionPill(
+                    icon: LucideIcons.unlock,
+                    label: 'admin.users.unban'.tr(),
+                    color: AppColors.leben,
+                    onTap: onUnban,
+                  )
+                else
+                  _ActionPill(
+                    icon: LucideIcons.ban,
+                    label: 'admin.users.ban'.tr(),
+                    color: AppColors.herzrot,
+                    onTap: onBan,
+                  ),
+              if (canDelete)
+                _ActionPill(
+                  icon: LucideIcons.trash2,
+                  label: 'common.delete'.tr(),
+                  color: AppColors.herzrot,
+                  onTap: onDelete,
+                ),
             ],
           ),
         ],
       ),
     );
   }
+
+  String _roleLabel(String role) {
+    switch (role) {
+      case 'admin':
+        return 'admin.users.roleAdmin'.tr().toUpperCase();
+      case 'moderator':
+        return 'admin.users.roleModerator'.tr().toUpperCase();
+      default:
+        return 'admin.users.roleUser'.tr().toUpperCase();
+    }
+  }
 }
 
-class _Btn extends StatelessWidget {
-  const _Btn({
+class _MicroBadge extends StatelessWidget {
+  const _MicroBadge({required this.color, required this.label});
+
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.label(size: 8, color: color),
+      ),
+    );
+  }
+}
+
+class _ActionPill extends StatelessWidget {
+  const _ActionPill({
     required this.icon,
     required this.label,
     required this.color,
@@ -309,7 +897,7 @@ class _Btn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.14),
           border: Border.all(color: color.withValues(alpha: 0.4)),
@@ -318,11 +906,88 @@ class _Btn extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 11, color: color),
-            const SizedBox(width: 4),
-            Text(label, style: AppTypography.label(size: 9, color: color)),
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: AppTypography.label(size: 10, color: color),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _UsersSkeleton extends StatelessWidget {
+  const _UsersSkeleton({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: count,
+      itemBuilder: (_, __) => const Padding(
+        padding: EdgeInsets.only(bottom: 8),
+        child: ShimmerBox(height: 80, borderRadius: 12),
+      ),
+    );
+  }
+}
+
+class _PaginationBar extends StatelessWidget {
+  const _PaginationBar({
+    required this.page,
+    required this.totalPages,
+    required this.onPrev,
+    required this.onNext,
+  });
+
+  final int page;
+  final int totalPages;
+  final VoidCallback? onPrev;
+  final VoidCallback? onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: Row(
+        children: [
+          OutlinedButton.icon(
+            onPressed: onPrev,
+            icon: const Icon(LucideIcons.chevronLeft, size: 14),
+            label: Text('admin.users.prev'.tr()),
+            style: OutlinedButton.styleFrom(
+              foregroundColor:
+                  onPrev == null ? AppColors.mute : AppColors.inkSoft,
+              side: const BorderSide(color: AppColors.line),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            'admin.users.pageInfo'.tr(namedArgs: {
+              'page': '${page + 1}',
+              'total': '$totalPages',
+            }),
+            style: AppTypography.caption(),
+          ),
+          const Spacer(),
+          FilledButton.icon(
+            onPressed: onNext,
+            icon: Text('admin.users.next'.tr()),
+            label: const Icon(LucideIcons.chevronRight, size: 14),
+            style: FilledButton.styleFrom(
+              backgroundColor:
+                  onNext == null ? AppColors.elevated : AppColors.amber,
+              foregroundColor:
+                  onNext == null ? AppColors.mute : AppColors.surface,
+            ),
+          ),
+        ],
       ),
     );
   }
