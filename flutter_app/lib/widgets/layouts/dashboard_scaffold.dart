@@ -151,9 +151,21 @@ class DashboardScaffold extends ConsumerWidget {
             child: body,
           );
 
+    // Smart-Back-Button: wenn die Navigation einen Pop erlaubt (Detail-
+    // Routes wie Post-Detail, Profile, etc.), zeige Pfeil. Bei Top-Level-
+    // Tabs (Home/Karte/Chat/Profil) zeige Drawer-Icon. Vorher zeigte
+    // Flutter automatic-back nicht zuverlaessig auf Push-Routes.
+    final canPop = GoRouter.maybeOf(context)?.canPop() ?? false;
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(
+        leading: canPop
+            ? IconButton(
+                tooltip: 'common.back'.tr(),
+                onPressed: () => context.pop(),
+                icon: const Icon(LucideIcons.arrowLeft, size: 22),
+              )
+            : null, // sonst Drawer-Hamburger (automatisch von Scaffold)
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
           const LanguagePicker(),
@@ -161,7 +173,7 @@ class DashboardScaffold extends ConsumerWidget {
           const SizedBox(width: 4),
         ],
       ),
-      drawer: const AppDrawer(),
+      drawer: canPop ? null : const AppDrawer(),
       bottomNavigationBar: _BottomNav(activeRoute: activeRoute),
       floatingActionButton: _PlusFab(secondaryFab: fab),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
