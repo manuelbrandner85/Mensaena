@@ -184,6 +184,18 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.onThisDay',
       icon: LucideIcons.scroll,
     ),
+    DashboardWidgetMeta(
+      id: 'mood',
+      title: 'widgets.titles.mood',
+      description: 'widgets.descriptions.mood',
+      icon: LucideIcons.heart,
+    ),
+    DashboardWidgetMeta(
+      id: 'sun',
+      title: 'widgets.titles.sun',
+      description: 'widgets.descriptions.sun',
+      icon: LucideIcons.sun,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

@@ -100,6 +100,18 @@ dependencies:
   path_provider: ^2.1.5
   open_filex: ^4.5.0
 
+  # Phase 4 Mega-Wave Dependencies (alle aktiv genutzt, siehe Services):
+  # skeletonizer — Auto-Skeleton-Loading aus echten Widgets (F7)
+  skeletonizer: ^1.4.0
+  # confetti — Konfetti bei Streak/Achievement/Post-Erstellen (F4/F38)
+  confetti: ^0.7.0
+  # sentiment_dart — Offline Sentiment-Analyse fuer Post-Moderation (F23/F35)
+  sentiment_dart: ^0.0.5
+  # local_auth — Fingerprint/Face-ID Login (F15)
+  local_auth: ^2.3.0
+  # tutorial_coach_mark — Spotlight-Onboarding-Tour (F18)
+  tutorial_coach_mark: ^1.3.3
+
   # XML-Parsing fuer MeteoAlarm Atom-Feeds (EU-Wetterwarnungen).
   xml: ^6.5.0
 

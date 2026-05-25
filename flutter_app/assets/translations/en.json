@@ -1785,6 +1785,27 @@
     "joined": "🙋 {name} joined",
     "left": "{name} left"
   },
+  "mood": {
+    "title": "How are you today?",
+    "howAreYou": "Pick how you feel right now.",
+    "note": "Optional note …",
+    "save": "Save",
+    "saveFailed": "Couldn't save.",
+    "chartTitle": "Mood trend (7d)",
+    "logNow": "Log",
+    "loadError": "Couldn't load history.",
+    "empty": "No entries yet. Tap Log to start.",
+    "helpTitle": "You are not alone 💚",
+    "helpHint": "You've reported a heavy mood the last few days. If you'd like to talk: Telefonseelsorge is free and anonymous, 24/7.",
+    "callTelefonseelsorge": "Call 0800 111 0 111"
+  },
+  "sun": {
+    "title": "Sun",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "dayLength": "Daylight",
+    "goldenHour": "✨ Golden Hour"
+  },
   "callHistory": {
     "title": "Call history",
     "emptyTitle": "No calls yet",
@@ -1885,7 +1906,9 @@
       "books": "Book recommendations",
       "health": "Health tip",
       "nasaApod": "NASA Picture of the Day",
-      "onThisDay": "On this day"
+      "onThisDay": "On this day",
+      "mood": "Mood tracker",
+      "sun": "Sun"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1912,7 +1935,9 @@
       "books": "Book picks for community & sustainability",
       "health": "A small daily prompt for your health",
       "nasaApod": "Daily astronomy photo + explanation",
-      "onThisDay": "What happened today in history?"
+      "onThisDay": "What happened today in history?",
+      "mood": "Daily mood check-in + 7-day trend",
+      "sun": "Sunrise/sunset + Golden Hour"
     }
   },
   "hubs": {

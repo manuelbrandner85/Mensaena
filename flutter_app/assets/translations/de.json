@@ -1784,6 +1784,27 @@
     "joined": "🙋 {name} ist dabei",
     "left": "{name} hat verlassen"
   },
+  "mood": {
+    "title": "Wie geht's dir heute?",
+    "howAreYou": "Wähle dein Gefühl aus.",
+    "note": "Optionale Notiz …",
+    "save": "Speichern",
+    "saveFailed": "Konnte nicht gespeichert werden.",
+    "chartTitle": "Stimmungs-Verlauf (7T)",
+    "logNow": "Eintragen",
+    "loadError": "Konnte Verlauf nicht laden.",
+    "empty": "Noch keine Einträge. Tippe „Eintragen“ oben rechts.",
+    "helpTitle": "Du bist nicht allein 💚",
+    "helpHint": "Du hast die letzten Tage schwere Stimmung eingetragen. Wenn du reden möchtest: Die Telefonseelsorge ist kostenlos und anonym 24/7 erreichbar.",
+    "callTelefonseelsorge": "0800 111 0 111 anrufen"
+  },
+  "sun": {
+    "title": "Sonne",
+    "sunrise": "Aufgang",
+    "sunset": "Untergang",
+    "dayLength": "Taglicht",
+    "goldenHour": "✨ Golden Hour"
+  },
   "callHistory": {
     "title": "Anrufverlauf",
     "emptyTitle": "Noch keine Anrufe",
@@ -1884,7 +1905,9 @@
       "books": "Bücher-Empfehlungen",
       "health": "Gesundheits-Tipp",
       "nasaApod": "NASA Bild des Tages",
-      "onThisDay": "Heute in der Geschichte"
+      "onThisDay": "Heute in der Geschichte",
+      "mood": "Stimmungs-Tracker",
+      "sun": "Sonne"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1911,7 +1934,9 @@
       "books": "Buchempfehlungen für Gemeinschaft & Nachhaltigkeit",
       "health": "Ein kleiner Impuls pro Tag für deine Gesundheit",
       "nasaApod": "Tägliches astronomisches Foto + Erklärung",
-      "onThisDay": "Was geschah heute vor Jahren?"
+      "onThisDay": "Was geschah heute vor Jahren?",
+      "mood": "Tägliches Stimmungs-Check-in mit 7-Tage-Verlauf",
+      "sun": "Sonnenauf-/-untergang + Golden Hour"
     }
   },
   "hubs": {
