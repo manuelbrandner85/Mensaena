@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/supabase_service.dart';
@@ -384,6 +386,7 @@ class AdminRepository {
   static Future<Map<String, dynamic>?> runScheduledCleanup() async {
     try {
       final result = await sb.rpc<dynamic>('run_scheduled_cleanup');
+      unawaited(_logAdminAction('cleanup'));
       if (result is Map<String, dynamic>) return result;
       if (result is Map) return Map<String, dynamic>.from(result);
       return {'ok': true};
@@ -396,6 +399,7 @@ class AdminRepository {
   static Future<bool> deleteUser(String userId) async {
     try {
       await sb.rpc<dynamic>('admin_delete_user', params: {'p_user_id': userId});
+      unawaited(_logAdminAction('delete_user', targetId: userId));
       return true;
     } catch (_) {
       return false;
@@ -409,11 +413,18 @@ class AdminRepository {
         'p_user_id': userId,
         'p_new_role': newRole,
       });
+      unawaited(_logAdminAction('role_change',
+          targetId: userId, details: {'new_role': newRole}));
       return true;
     } catch (_) {
       // Fallback: direct update via updateField
-      return updateField(
+      final ok = await updateField(
           table: 'profiles', id: userId, column: 'role', value: newRole);
+      if (ok) {
+        unawaited(_logAdminAction('role_change_fallback',
+            targetId: userId, details: {'new_role': newRole}));
+      }
+      return ok;
     }
   }
 
@@ -430,6 +441,9 @@ class AdminRepository {
         'banned_until': until,
         'ban_reason': reason,
       }).eq('id', userId);
+      unawaited(_logAdminAction('ban',
+          targetId: userId,
+          details: {'reason': reason, 'days': days, 'until': until}));
       return true;
     } catch (_) {
       return false;
@@ -444,10 +458,29 @@ class AdminRepository {
         'banned_until': null,
         'ban_reason': null,
       }).eq('id', userId);
+      unawaited(_logAdminAction('unban', targetId: userId));
       return true;
     } catch (_) {
       return false;
     }
+  }
+
+  /// Fire-and-forget Audit-Log via log_admin_action RPC. Schluckt Fehler
+  /// damit fehlgeschlagenes Logging nicht die eigentliche Aktion blockt.
+  static Future<void> _logAdminAction(
+    String action, {
+    String? targetId,
+    String? tableName,
+    Map<String, dynamic>? details,
+  }) async {
+    try {
+      await sb.rpc<dynamic>('log_admin_action', params: {
+        'p_action': action,
+        if (targetId != null) 'p_target_id': targetId,
+        if (tableName != null) 'p_table_name': tableName,
+        'p_details': details ?? <String, dynamic>{},
+      });
+    } catch (_) {/* fail-silent */}
   }
 
   /// Find the global community chat room.
