@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +11,7 @@ import '../../providers/theme_mode_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../repositories/crisis_repository.dart';
 import '../../repositories/interactions_repository.dart';
+import '../shared/sized_avatar_image.dart';
 import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../repositories/profiles_repository.dart';
@@ -258,29 +258,10 @@ class _ProfileHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (avatarUrl != null)
-            CachedNetworkImage(
-              imageUrl: avatarUrl,
-              fadeInDuration: const Duration(milliseconds: 200),
-              imageBuilder: (_, img) => CircleAvatar(
-                radius: 28,
-                backgroundColor: AppColors.surface,
-                backgroundImage: img,
-              ),
-              placeholder: (_, __) => const CircleAvatar(
-                radius: 28,
-                backgroundColor: AppColors.surface,
-              ),
-              errorWidget: (_, __, ___) => CircleAvatar(
-                radius: 28,
-                backgroundColor: AppColors.surface,
-                child: Text(
-                  (displayName ?? '?').substring(0, 1).toUpperCase(),
-                  style: AppTypography.display(
-                    size: 22,
-                    color: AppColors.amber,
-                  ),
-                ),
-              ),
+            SizedAvatarImage(
+              url: avatarUrl,
+              size: 56,
+              fallbackInitial: displayName,
             )
           else
             CircleAvatar(

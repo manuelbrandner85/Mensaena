@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import '../../widgets/shared/sized_avatar_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -837,30 +837,10 @@ class _CommentTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (avatar != null)
-            CachedNetworkImage(
-              imageUrl: avatar,
-              fadeInDuration: const Duration(milliseconds: 200),
-              imageBuilder: (_, img) => CircleAvatar(
-                radius: 14,
-                backgroundColor: AppColors.elevated,
-                backgroundImage: img,
-              ),
-              placeholder: (_, __) => const CircleAvatar(
-                radius: 14,
-                backgroundColor: AppColors.elevated,
-              ),
-              errorWidget: (_, __, ___) => CircleAvatar(
-                radius: 14,
-                backgroundColor: AppColors.elevated,
-                child: Text(
-                  author.substring(0, 1).toUpperCase(),
-                  style: AppTypography.body(
-                    size: 12,
-                    color: AppColors.amber,
-                    weight: FontWeight.w700,
-                  ),
-                ),
-              ),
+            SizedAvatarImage(
+              url: avatar,
+              size: 28,
+              fallbackInitial: author,
             )
           else
             CircleAvatar(

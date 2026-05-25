@@ -2,7 +2,7 @@
 /// Zeigt Teilnehmer eines Events gruppiert nach Status mit expand/collapse.
 library;
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'shared/sized_avatar_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -211,15 +211,10 @@ class _EventAttendeesSectionState extends ConsumerState<EventAttendeesSection> {
 
   Widget _buildAvatar(String? url, String label) {
     if (url != null && url.isNotEmpty) {
-      return ClipOval(
-        child: CachedNetworkImage(
-          imageUrl: url,
-          width: 36,
-          height: 36,
-          fit: BoxFit.cover,
-          placeholder: (_, __) => _initialAvatar(label),
-          errorWidget: (_, __, ___) => _initialAvatar(label),
-        ),
+      return SizedAvatarImage(
+        url: url,
+        size: 36,
+        fallbackInitial: label,
       );
     }
     return _initialAvatar(label);

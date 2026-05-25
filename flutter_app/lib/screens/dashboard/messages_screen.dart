@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +11,7 @@ import '../../providers/cinema_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/presence_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/sized_avatar_image.dart';
 import '../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
@@ -478,24 +478,10 @@ class _DmTile extends ConsumerWidget {
             Stack(
               children: [
                 if (avatarUrl != null)
-                  CachedNetworkImage(
-                    imageUrl: avatarUrl,
-                    fadeInDuration: const Duration(milliseconds: 200),
-                    imageBuilder: (_, img) => CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppColors.elevated,
-                      backgroundImage: img,
-                    ),
-                    placeholder: (_, __) => const CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppColors.elevated,
-                    ),
-                    errorWidget: (_, __, ___) => const CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppColors.elevated,
-                      child: Icon(LucideIcons.user,
-                          size: 20, color: AppColors.bronze),
-                    ),
+                  SizedAvatarImage(
+                    url: avatarUrl,
+                    size: 44,
+                    fallbackInitial: title.isNotEmpty ? title[0] : null,
                   )
                 else
                   const CircleAvatar(
