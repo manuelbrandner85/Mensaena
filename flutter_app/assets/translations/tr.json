@@ -874,7 +874,17 @@
     "createListing": "İlan ver",
     "advertise": "İlan ver",
     "searchPlaceholder": "İlanları ara…",
-    "screenTitle": "Pazaryeri"
+    "screenTitle": "Pazaryeri",
+    "reservation": {
+      "activeOwner": "Rezervasyon aktif",
+      "confirmTitle": "Devir onaylansın mı?",
+      "confirmMsg": "İlan verildi olarak işaretlenir — diğer kullanıcılar artık rezerve edemez.",
+      "confirmBtn": "Devri onayla",
+      "cancelBtn": "Rezervasyonu iptal et",
+      "forYou": "Senin için rezerve",
+      "forYouHint": "Satıcı ilanı senin için tutuyor. En kısa sürede iletişime geç.",
+      "alreadyReserved": "Zaten rezerve"
+    }
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",

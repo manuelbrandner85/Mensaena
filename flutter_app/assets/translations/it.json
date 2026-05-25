@@ -874,7 +874,17 @@
     "createListing": "Inserisci",
     "advertise": "Pubblica",
     "searchPlaceholder": "Cerca annunci…",
-    "screenTitle": "Mercato"
+    "screenTitle": "Mercato",
+    "reservation": {
+      "activeOwner": "Prenotazione attiva",
+      "confirmTitle": "Confermare la consegna?",
+      "confirmMsg": "Contrassegna l'annuncio come ceduto — gli altri utenti non potranno più prenotarlo.",
+      "confirmBtn": "Conferma consegna",
+      "cancelBtn": "Annulla prenotazione",
+      "forYou": "Riservato per te",
+      "forYouHint": "L'inserzionista tiene l'annuncio per te. Fatti sentire presto.",
+      "alreadyReserved": "Già prenotato"
+    }
   },
   "trust": {
     "rate": "Valuta {name}",

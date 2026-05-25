@@ -874,7 +874,17 @@
     "createListing": "Publicar",
     "advertise": "Publicar",
     "searchPlaceholder": "Buscar anuncios…",
-    "screenTitle": "Mercado"
+    "screenTitle": "Mercado",
+    "reservation": {
+      "activeOwner": "Reserva activa",
+      "confirmTitle": "¿Confirmar entrega?",
+      "confirmMsg": "Marca el anuncio como entregado — otras personas ya no podrán reservarlo.",
+      "confirmBtn": "Confirmar entrega",
+      "cancelBtn": "Cancelar reserva",
+      "forYou": "Reservado para ti",
+      "forYouHint": "La persona vendedora te lo está reservando. Ponte en contacto pronto.",
+      "alreadyReserved": "Ya reservado"
+    }
   },
   "trust": {
     "rate": "Valora a {name}",

@@ -874,7 +874,17 @@
     "createListing": "List item",
     "advertise": "List item",
     "searchPlaceholder": "Search listings…",
-    "screenTitle": "Marketplace"
+    "screenTitle": "Marketplace",
+    "reservation": {
+      "activeOwner": "Reservation active",
+      "confirmTitle": "Confirm handover?",
+      "confirmMsg": "Marks the listing as taken — other users will no longer be able to reserve it.",
+      "confirmBtn": "Confirm handover",
+      "cancelBtn": "Cancel reservation",
+      "forYou": "Reserved for you",
+      "forYouHint": "The seller is holding this listing for you. Please get in touch soon.",
+      "alreadyReserved": "Already reserved"
+    }
   },
   "trust": {
     "rate": "Rate {name}",

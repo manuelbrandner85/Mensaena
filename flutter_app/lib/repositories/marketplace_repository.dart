@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../models/marketplace_listing.dart';
 import '../services/supabase_service.dart';
@@ -81,6 +84,96 @@ class MarketplaceRepository {
       return null;
     }
   }
+
+  /// Mark a listing as 'claimed' (given away). Owner only.
+  static Future<bool> markAsClaimed(String listingId) async {
+    try {
+      await sb.from('marketplace_listings').update({
+        'status': 'claimed',
+      }).eq('id', listingId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Reserve a listing for a user. Status set to 'reserved'. Owner only.
+  static Future<bool> reserveListing({
+    required String listingId,
+    required String userId,
+  }) async {
+    try {
+      await sb.from('marketplace_listings').update({
+        'reserved_for': userId,
+        'status': 'reserved',
+      }).eq('id', listingId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Lift a reservation. Status returns to 'active'.
+  static Future<bool> unreserveListing(String listingId) async {
+    try {
+      await sb.from('marketplace_listings').update({
+        'reserved_for': null,
+        'status': 'active',
+      }).eq('id', listingId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Counts for the list header: active listings, of which free, claimed.
+  /// 'free' = price_type == 'free' OR listing_type == 'giveaway' OR price == 0.
+  static Future<Map<String, int>> countStats() async {
+    try {
+      final all = await sb
+          .from('marketplace_listings')
+          .select('status, price_type, listing_type, price');
+      final list = (all as List).whereType<Map<String, dynamic>>().toList();
+      final active = list
+          .where((r) => r['status'] == 'active' || r['status'] == 'reserved')
+          .length;
+      final free = list.where((r) =>
+          (r['status'] == 'active' || r['status'] == 'reserved') &&
+          (r['price_type'] == 'free' ||
+              r['listing_type'] == 'giveaway' ||
+              (r['price'] as num?) == 0)).length;
+      final claimed = list
+          .where((r) => r['status'] == 'claimed' || r['status'] == 'sold')
+          .length;
+      return {'active': active, 'free': free, 'claimed': claimed};
+    } catch (_) {
+      return const {'active': 0, 'free': 0, 'claimed': 0};
+    }
+  }
+
+  /// Upload image bytes to Supabase Storage. Returns public URL or null.
+  /// Bucket order: 'marketplace-images' → fallback 'chat-images'.
+  static Future<String?> uploadListingImage({
+    required Uint8List bytes,
+    required String userId,
+    required String fileExt, // 'jpg'/'png'/'webp'
+  }) async {
+    final filename = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    final path = '$userId/$filename';
+    for (final bucket in const ['marketplace-images', 'chat-images']) {
+      try {
+        await sb.storage.from(bucket).uploadBinary(
+              path,
+              bytes,
+              fileOptions: FileOptions(contentType: 'image/$fileExt'),
+            );
+        return sb.storage.from(bucket).getPublicUrl(path);
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
+  }
 }
 
 final marketplaceListingsProvider =
@@ -90,6 +183,10 @@ final marketplaceListingsProvider =
 final marketplaceDetailProvider =
     FutureProvider.family<MarketplaceListing?, String>(
         (ref, id) => MarketplaceRepository.getById(id));
+
+final marketplaceStatsProvider = FutureProvider<Map<String, int>>(
+  (ref) => MarketplaceRepository.countStats(),
+);
 
 /// Favoriten-Helpers — `marketplace_favorites` Tabelle (1:1 zu Web).
 class MarketplaceFavorites {

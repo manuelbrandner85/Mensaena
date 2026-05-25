@@ -874,7 +874,17 @@
     "createListing": "Inserieren",
     "advertise": "Inserieren",
     "searchPlaceholder": "Inserate durchsuchen…",
-    "screenTitle": "Marktplatz"
+    "screenTitle": "Marktplatz",
+    "reservation": {
+      "activeOwner": "Reservierung aktiv",
+      "confirmTitle": "Verkauf bestätigen?",
+      "confirmMsg": "Markiert das Inserat als vergeben — andere Nutzer:innen können es nicht mehr reservieren.",
+      "confirmBtn": "Verkauf bestätigen",
+      "cancelBtn": "Reservierung aufheben",
+      "forYou": "Reserviert für dich",
+      "forYouHint": "Die Anbieter:in hält das Inserat für dich frei. Melde dich bald.",
+      "alreadyReserved": "Bereits reserviert"
+    }
   },
   "trust": {
     "rate": "Bewerte {name}",

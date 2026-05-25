@@ -874,7 +874,17 @@
     "createListing": "Mettre en vente",
     "advertise": "Publier",
     "searchPlaceholder": "Rechercher des annonces…",
-    "screenTitle": "Marché"
+    "screenTitle": "Marché",
+    "reservation": {
+      "activeOwner": "Réservation active",
+      "confirmTitle": "Confirmer la remise ?",
+      "confirmMsg": "Marque l'annonce comme cédée — les autres utilisateurs ne pourront plus la réserver.",
+      "confirmBtn": "Confirmer la remise",
+      "cancelBtn": "Annuler la réservation",
+      "forYou": "Réservé pour toi",
+      "forYouHint": "Le vendeur garde l'annonce pour toi. Contacte-le rapidement.",
+      "alreadyReserved": "Déjà réservé"
+    }
   },
   "trust": {
     "rate": "Évaluer {name}",
