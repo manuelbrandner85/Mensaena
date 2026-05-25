@@ -152,9 +152,13 @@ class DashboardScaffold extends ConsumerWidget {
           );
 
     // Smart-Back-Button: wenn die Navigation einen Pop erlaubt (Detail-
-    // Routes wie Post-Detail, Profile, etc.), zeige Pfeil. Bei Top-Level-
-    // Tabs (Home/Karte/Chat/Profil) zeige Drawer-Icon. Vorher zeigte
-    // Flutter automatic-back nicht zuverlaessig auf Push-Routes.
+    // Routes wie Post-Detail, Profile, etc.), zeige Pfeil als leading —
+    // sonst zeigt Scaffold den Hamburger fuer den Drawer.
+    //
+    // WICHTIG: Drawer wird IMMER gesetzt, NICHT konditional. Vorher
+    // hatte "drawer: canPop ? null : AppDrawer()" einen Bug — wenn
+    // canPop nach Navigation auf true wechselte und der Drawer offen war,
+    // konnte er nicht mehr geschlossen werden + UI flackerte bei jedem Tap.
     final canPop = GoRouter.maybeOf(context)?.canPop() ?? false;
     return Scaffold(
       backgroundColor: AppColors.voidColor,
@@ -165,7 +169,7 @@ class DashboardScaffold extends ConsumerWidget {
                 onPressed: () => context.pop(),
                 icon: const Icon(LucideIcons.arrowLeft, size: 22),
               )
-            : null, // sonst Drawer-Hamburger (automatisch von Scaffold)
+            : null, // automatic-hamburger falls drawer gesetzt
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
           const LanguagePicker(),
@@ -173,7 +177,7 @@ class DashboardScaffold extends ConsumerWidget {
           const SizedBox(width: 4),
         ],
       ),
-      drawer: canPop ? null : const AppDrawer(),
+      drawer: const AppDrawer(),
       bottomNavigationBar: _BottomNav(activeRoute: activeRoute),
       floatingActionButton: _PlusFab(secondaryFab: fab),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
