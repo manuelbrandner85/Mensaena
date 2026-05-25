@@ -1918,7 +1918,8 @@
       "quote": "Quote of the day",
       "streak": "Login streak",
       "gratitude": "Gratitude",
-      "karma": "Karma & level"
+      "karma": "Karma & level",
+      "recap": "Weekly recap"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1951,7 +1952,8 @@
       "quote": "Daily quote for reflection",
       "streak": "Consecutive days in the app",
       "gratitude": "What are you thankful for today?",
-      "karma": "Your karma points and current level"
+      "karma": "Your karma points and current level",
+      "recap": "Your last 7 days vs the week before"
     }
   },
   "hubs": {
@@ -2052,6 +2054,13 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "recap": {
+    "title": "Your weekly recap",
+    "subtitle": "Activity in the past 7 days",
+    "helps": "helps",
+    "posts": "posts",
+    "comments": "comments"
   },
   "karma": {
     "title": "Karma",

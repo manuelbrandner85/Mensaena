@@ -38,6 +38,7 @@ import '../../../widgets/dashboard/on_this_day_widget.dart';
 import '../../../widgets/dashboard/gratitude_widget.dart';
 import '../../../widgets/dashboard/karma_widget.dart';
 import '../../../widgets/dashboard/streak_widget.dart';
+import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
@@ -474,6 +475,10 @@ class _DashboardHomeScreenState
           break;
         case 'karma':
           out.add(const KarmaWidget());
+          addSpacing();
+          break;
+        case 'recap':
+          out.add(const WeeklyRecapWidget());
           addSpacing();
           break;
         case 'nearby_posts':

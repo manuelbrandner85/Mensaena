@@ -1831,6 +1831,13 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "recap": {
+    "title": "Ton récap de la semaine",
+    "subtitle": "Activité des 7 derniers jours",
+    "helps": "aides",
+    "posts": "publications",
+    "comments": "commentaires"
+  },
   "karma": {
     "title": "Karma",
     "toNext": "Encore {count} points pour le niveau suivant",

@@ -1831,6 +1831,13 @@
     "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
     "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
   },
+  "recap": {
+    "title": "Tu resumen semanal",
+    "subtitle": "Actividad de los últimos 7 días",
+    "helps": "ayudas",
+    "posts": "publicaciones",
+    "comments": "comentarios"
+  },
   "karma": {
     "title": "Karma",
     "toNext": "{count} puntos más para el siguiente nivel",

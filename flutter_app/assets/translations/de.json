@@ -1917,7 +1917,8 @@
       "quote": "Zitat des Tages",
       "streak": "Login-Streak",
       "gratitude": "Dankbarkeit",
-      "karma": "Karma & Level"
+      "karma": "Karma & Level",
+      "recap": "Wochenrückblick"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1950,7 +1951,8 @@
       "quote": "Tägliches Zitat zum Innehalten",
       "streak": "Aufeinanderfolgende Tage in der App",
       "gratitude": "Wofür bist du heute dankbar?",
-      "karma": "Deine Karma-Punkte und dein aktuelles Level"
+      "karma": "Deine Karma-Punkte und dein aktuelles Level",
+      "recap": "Deine letzten 7 Tage im Vergleich zur Vorwoche"
     }
   },
   "hubs": {
@@ -2051,6 +2053,13 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "recap": {
+    "title": "Dein Wochenrückblick",
+    "subtitle": "Aktivität der letzten 7 Tage",
+    "helps": "Hilfen",
+    "posts": "Beiträge",
+    "comments": "Kommentare"
   },
   "karma": {
     "title": "Karma",

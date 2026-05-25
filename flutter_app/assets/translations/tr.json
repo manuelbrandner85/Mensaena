@@ -1830,6 +1830,13 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "recap": {
+    "title": "Haftalık özetin",
+    "subtitle": "Son 7 günün aktivitesi",
+    "helps": "yardım",
+    "posts": "gönderi",
+    "comments": "yorum"
+  },
   "karma": {
     "title": "Karma",
     "toNext": "Sonraki seviye için {count} puan daha",

@@ -220,6 +220,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.karma',
       icon: LucideIcons.award,
     ),
+    DashboardWidgetMeta(
+      id: 'recap',
+      title: 'widgets.titles.recap',
+      description: 'widgets.descriptions.recap',
+      icon: LucideIcons.trendingUp,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das
