@@ -1479,7 +1479,19 @@
   },
   "map": {
     "locationUnavailable": "Standort konnte nicht ermittelt werden.",
-    "screenTitle": "Karte"
+    "screenTitle": "Karte",
+    "searchHint": "Beiträge suchen …",
+    "loadFailed": "Konnte Beiträge nicht laden.",
+    "searchFailed": "Suche fehlgeschlagen.",
+    "distanceKm": "{km} km entfernt",
+    "urgent": "Dringend",
+    "minutesAgo": "vor {n} Min.",
+    "hoursAgo": "vor {n} Std.",
+    "daysAgo": "vor {n} Tagen",
+    "monthsAgo": "vor {n} Monaten",
+    "gpsOffTitle": "Standort nicht verfügbar",
+    "gpsOffBody": "Aktiviere GPS für Posts in deiner Nähe",
+    "gpsActivate": "Aktivieren"
   },
   "calendar": {
     "noEvents": "Keine Events im Kalender.",

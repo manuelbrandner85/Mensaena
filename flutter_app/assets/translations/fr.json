@@ -1480,7 +1480,19 @@
   },
   "map": {
     "locationUnavailable": "Impossible de déterminer la position.",
-    "screenTitle": "Carte"
+    "screenTitle": "Carte",
+    "searchHint": "Rechercher des publications …",
+    "loadFailed": "Échec du chargement.",
+    "searchFailed": "Recherche échouée.",
+    "distanceKm": "à {km} km",
+    "urgent": "Urgent",
+    "minutesAgo": "il y a {n} min",
+    "hoursAgo": "il y a {n}h",
+    "daysAgo": "il y a {n} jours",
+    "monthsAgo": "il y a {n} mois",
+    "gpsOffTitle": "Position indisponible",
+    "gpsOffBody": "Active le GPS pour voir les posts proches",
+    "gpsActivate": "Activer"
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",

@@ -1479,7 +1479,19 @@
   },
   "map": {
     "locationUnavailable": "Не удалось определить местоположение.",
-    "screenTitle": "Карта"
+    "screenTitle": "Карта",
+    "searchHint": "Поиск постов …",
+    "loadFailed": "Не удалось загрузить.",
+    "searchFailed": "Поиск не удался.",
+    "distanceKm": "{km} км",
+    "urgent": "Срочно",
+    "minutesAgo": "{n} мин назад",
+    "hoursAgo": "{n} ч назад",
+    "daysAgo": "{n} дн назад",
+    "monthsAgo": "{n} мес назад",
+    "gpsOffTitle": "Геолокация недоступна",
+    "gpsOffBody": "Включи GPS, чтобы видеть ближайшие посты",
+    "gpsActivate": "Включить"
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",

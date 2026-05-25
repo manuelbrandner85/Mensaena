@@ -1480,7 +1480,19 @@
   },
   "map": {
     "locationUnavailable": "Location could not be determined.",
-    "screenTitle": "Map"
+    "screenTitle": "Map",
+    "searchHint": "Search posts …",
+    "loadFailed": "Could not load posts.",
+    "searchFailed": "Search failed.",
+    "distanceKm": "{km} km away",
+    "urgent": "Urgent",
+    "minutesAgo": "{n} min ago",
+    "hoursAgo": "{n}h ago",
+    "daysAgo": "{n} days ago",
+    "monthsAgo": "{n} months ago",
+    "gpsOffTitle": "Location unavailable",
+    "gpsOffBody": "Enable GPS to see nearby posts",
+    "gpsActivate": "Activate"
   },
   "calendar": {
     "noEvents": "No events in calendar.",

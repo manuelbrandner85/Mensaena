@@ -1479,7 +1479,19 @@
   },
   "map": {
     "locationUnavailable": "Konum belirlenemedi.",
-    "screenTitle": "Harita"
+    "screenTitle": "Harita",
+    "searchHint": "Gönderi ara …",
+    "loadFailed": "Gönderiler yüklenemedi.",
+    "searchFailed": "Arama başarısız.",
+    "distanceKm": "{km} km uzakta",
+    "urgent": "Acil",
+    "minutesAgo": "{n} dk önce",
+    "hoursAgo": "{n} saat önce",
+    "daysAgo": "{n} gün önce",
+    "monthsAgo": "{n} ay önce",
+    "gpsOffTitle": "Konum yok",
+    "gpsOffBody": "Yakındaki gönderiler için GPS'i aç",
+    "gpsActivate": "Aç"
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",
