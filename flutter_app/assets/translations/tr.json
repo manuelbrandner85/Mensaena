@@ -96,7 +96,20 @@
     "forgotPassword": "Şifreni mi unuttun?",
     "resetLinkSent": "Sıfırlama bağlantısı gönderildi",
     "loggedOut": "Çıkış yapıldı",
-    "wrongCredentials": "E-posta veya şifre hatalı"
+    "wrongCredentials": "E-posta veya şifre hatalı",
+    "emailRequired": "E-posta gerekli.",
+    "emailInvalid": "Geçerli bir e-posta girin.",
+    "nameTooShort": "En az 2 karakter.",
+    "passwordTooShort": "En az 8 karakter.",
+    "pwRequirementsNotMet": "Şifre tüm gereksinimleri karşılamıyor.",
+    "acceptTerms": "Devam etmek için şartları kabul edin.",
+    "pwCheckLength": "En az 8 karakter",
+    "pwCheckCase": "Büyük + küçük harf",
+    "pwCheckNumber": "En az bir rakam",
+    "pwStrengthWeak": "zayıf",
+    "pwStrengthMedium": "orta",
+    "pwStrengthGood": "iyi",
+    "pwStrengthStrong": "güçlü"
   },
   "profile": {
     "myProfile": "Profilim",

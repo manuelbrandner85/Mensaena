@@ -58,4 +58,5 @@ class AiPostSuggestions {
 
   bool get isEmpty =>
       titles.isEmpty && (description == null || description!.isEmpty);
+  bool get isNotEmpty => !isEmpty;
 }

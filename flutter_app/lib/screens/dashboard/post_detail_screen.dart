@@ -322,12 +322,13 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       ),
     );
     if (confirm != true || !mounted) return;
-    try {
-      await sb.from('posts').delete().eq('id', _post!.id);
-      if (!mounted) return;
+    final ok = await PostsRepository.delete(_post!.id);
+    if (!mounted) return;
+    if (ok) {
       context.go('/dashboard/posts');
-    } catch (_) {
-      if (!mounted) return;
+      return;
+    }
+    {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text('posts.deleteFailed'.tr(),

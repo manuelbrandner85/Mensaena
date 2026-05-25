@@ -219,6 +219,17 @@ class PostsRepository {
       return const [];
     }
   }
+
+  /// Loescht einen eigenen Post (RLS pruef caller-id == author).
+  /// Returns true bei Erfolg.
+  static Future<bool> delete(String postId) async {
+    try {
+      await sb.from('posts').delete().eq('id', postId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 /// Populaere Tags — 1:1 aus `src/app/dashboard/posts/page.tsx` Z. 12.

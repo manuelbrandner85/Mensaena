@@ -1099,7 +1099,7 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
                 style: AppTypography.caption()
                     .copyWith(color: AppColors.herzrotWarm)),
           ],
-          if (_suggestions != null && !_suggestions!.isEmpty) ...[
+          if (_suggestions != null && _suggestions!.isNotEmpty) ...[
             const SizedBox(height: 12),
             if (_suggestions!.titles.isNotEmpty) ...[
               Text('create.aiTitleSuggestions'.tr(),

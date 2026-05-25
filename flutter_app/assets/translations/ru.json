@@ -96,7 +96,20 @@
     "forgotPassword": "Забыли пароль?",
     "resetLinkSent": "Ссылка для сброса отправлена",
     "loggedOut": "Вы вышли",
-    "wrongCredentials": "Неверная почта или пароль"
+    "wrongCredentials": "Неверная почта или пароль",
+    "emailRequired": "Требуется email.",
+    "emailInvalid": "Введите действительный email.",
+    "nameTooShort": "Минимум 2 символа.",
+    "passwordTooShort": "Минимум 8 символов.",
+    "pwRequirementsNotMet": "Пароль не соответствует всем требованиям.",
+    "acceptTerms": "Примите условия для продолжения.",
+    "pwCheckLength": "Минимум 8 символов",
+    "pwCheckCase": "Заглавная + строчная буква",
+    "pwCheckNumber": "Минимум одна цифра",
+    "pwStrengthWeak": "слабый",
+    "pwStrengthMedium": "средний",
+    "pwStrengthGood": "хороший",
+    "pwStrengthStrong": "сильный"
   },
   "profile": {
     "myProfile": "Мой профиль",

@@ -96,7 +96,20 @@
     "forgotPassword": "Mot de passe oublié ?",
     "resetLinkSent": "Lien de réinitialisation envoyé",
     "loggedOut": "Déconnecté",
-    "wrongCredentials": "E-mail ou mot de passe incorrect"
+    "wrongCredentials": "E-mail ou mot de passe incorrect",
+    "emailRequired": "L'e-mail est requis.",
+    "emailInvalid": "Veuillez saisir un e-mail valide.",
+    "nameTooShort": "Au moins 2 caractères.",
+    "passwordTooShort": "Au moins 8 caractères.",
+    "pwRequirementsNotMet": "Le mot de passe ne remplit pas toutes les exigences.",
+    "acceptTerms": "Veuillez accepter les conditions pour continuer.",
+    "pwCheckLength": "Au moins 8 caractères",
+    "pwCheckCase": "Majuscule + minuscule",
+    "pwCheckNumber": "Au moins un chiffre",
+    "pwStrengthWeak": "faible",
+    "pwStrengthMedium": "moyen",
+    "pwStrengthGood": "bon",
+    "pwStrengthStrong": "fort"
   },
   "profile": {
     "myProfile": "Mon profil",

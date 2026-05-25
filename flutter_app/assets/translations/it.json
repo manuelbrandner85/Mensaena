@@ -96,7 +96,20 @@
     "forgotPassword": "Hai dimenticato la password?",
     "resetLinkSent": "Link di reset inviato",
     "loggedOut": "Disconnesso",
-    "wrongCredentials": "E-mail o password errate"
+    "wrongCredentials": "E-mail o password errate",
+    "emailRequired": "L'email è obbligatoria.",
+    "emailInvalid": "Inserisci un'email valida.",
+    "nameTooShort": "Almeno 2 caratteri.",
+    "passwordTooShort": "Almeno 8 caratteri.",
+    "pwRequirementsNotMet": "La password non soddisfa tutti i requisiti.",
+    "acceptTerms": "Accetta i termini per continuare.",
+    "pwCheckLength": "Almeno 8 caratteri",
+    "pwCheckCase": "Maiuscola + minuscola",
+    "pwCheckNumber": "Almeno un numero",
+    "pwStrengthWeak": "debole",
+    "pwStrengthMedium": "media",
+    "pwStrengthGood": "buona",
+    "pwStrengthStrong": "forte"
   },
   "profile": {
     "myProfile": "Il mio profilo",

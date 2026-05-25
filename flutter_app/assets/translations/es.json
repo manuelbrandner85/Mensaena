@@ -96,7 +96,20 @@
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetLinkSent": "Enlace de restablecimiento enviado",
     "loggedOut": "Sesión cerrada",
-    "wrongCredentials": "Correo o contraseña incorrectos"
+    "wrongCredentials": "Correo o contraseña incorrectos",
+    "emailRequired": "Falta el correo electrónico.",
+    "emailInvalid": "Introduce un correo válido.",
+    "nameTooShort": "Mínimo 2 caracteres.",
+    "passwordTooShort": "Mínimo 8 caracteres.",
+    "pwRequirementsNotMet": "La contraseña no cumple todos los requisitos.",
+    "acceptTerms": "Acepta los términos para continuar.",
+    "pwCheckLength": "Mínimo 8 caracteres",
+    "pwCheckCase": "Mayúscula + minúscula",
+    "pwCheckNumber": "Mínimo un dígito",
+    "pwStrengthWeak": "débil",
+    "pwStrengthMedium": "media",
+    "pwStrengthGood": "buena",
+    "pwStrengthStrong": "fuerte"
   },
   "profile": {
     "myProfile": "Mi perfil",

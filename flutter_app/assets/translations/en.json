@@ -96,7 +96,20 @@
     "forgotPassword": "Forgot password?",
     "resetLinkSent": "Reset link sent",
     "loggedOut": "Signed out",
-    "wrongCredentials": "Incorrect email or password"
+    "wrongCredentials": "Incorrect email or password",
+    "emailRequired": "Email is required.",
+    "emailInvalid": "Please enter a valid email.",
+    "nameTooShort": "At least 2 characters.",
+    "passwordTooShort": "At least 8 characters.",
+    "pwRequirementsNotMet": "Password does not meet all requirements.",
+    "acceptTerms": "Please accept the terms to continue.",
+    "pwCheckLength": "At least 8 characters",
+    "pwCheckCase": "Uppercase + lowercase letter",
+    "pwCheckNumber": "At least one digit",
+    "pwStrengthWeak": "weak",
+    "pwStrengthMedium": "medium",
+    "pwStrengthGood": "good",
+    "pwStrengthStrong": "strong"
   },
   "profile": {
     "myProfile": "My Profile",

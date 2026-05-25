@@ -99,22 +99,22 @@ class _AuthScreenState extends State<AuthScreen>
   // ── Validators ─────────────────────────────────────────────
   String? _validateEmail(String? v) {
     final s = v?.trim() ?? '';
-    if (s.isEmpty) return 'E-Mail fehlt.';
+    if (s.isEmpty) return 'auth.emailRequired'.tr();
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(s)) {
-      return 'Bitte gib eine gültige E-Mail ein.';
+      return 'auth.emailInvalid'.tr();
     }
     return null;
   }
 
   String? _validateName(String? v) {
     final s = v?.trim() ?? '';
-    if (s.length < 2) return 'Mindestens 2 Zeichen.';
+    if (s.length < 2) return 'auth.nameTooShort'.tr();
     return null;
   }
 
   String? _validatePassword(String? v) {
     final s = v ?? '';
-    if (s.length < 8) return 'Mindestens 8 Zeichen.';
+    if (s.length < 8) return 'auth.passwordTooShort'.tr();
     return null;
   }
 
@@ -122,12 +122,12 @@ class _AuthScreenState extends State<AuthScreen>
   List<({String label, bool ok})> get _checks {
     final p = _passwordCtrl.text;
     return [
-      (label: 'Mindestens 8 Zeichen', ok: p.length >= 8),
+      (label: 'auth.pwCheckLength'.tr(), ok: p.length >= 8),
       (
-        label: 'Großbuchstabe + Kleinbuchstabe',
+        label: 'auth.pwCheckCase'.tr(),
         ok: RegExp(r'[a-z]').hasMatch(p) && RegExp(r'[A-Z]').hasMatch(p),
       ),
-      (label: 'Mindestens eine Zahl', ok: RegExp(r'\d').hasMatch(p)),
+      (label: 'auth.pwCheckNumber'.tr(), ok: RegExp(r'\d').hasMatch(p)),
     ];
   }
 
@@ -152,10 +152,10 @@ class _AuthScreenState extends State<AuthScreen>
 
   String _pwLabel() {
     final s = _pwScore;
-    if (s <= 1) return 'schwach';
-    if (s == 2) return 'mittel';
-    if (s == 3) return 'gut';
-    return 'stark';
+    if (s <= 1) return 'auth.pwStrengthWeak'.tr();
+    if (s == 2) return 'auth.pwStrengthMedium'.tr();
+    if (s == 3) return 'auth.pwStrengthGood'.tr();
+    return 'auth.pwStrengthStrong'.tr();
   }
 
   String _modeIndex() => switch (_mode) {
@@ -209,13 +209,11 @@ class _AuthScreenState extends State<AuthScreen>
     if (!_formKey.currentState!.validate()) return;
     if (_mode == _AuthMode.register) {
       if (!_checks.every((c) => c.ok)) {
-        setState(() => _error =
-            'Passwort erfüllt nicht alle Anforderungen.');
+        setState(() => _error = 'auth.pwRequirementsNotMet'.tr());
         return;
       }
       if (!_agreed) {
-        setState(() => _error =
-            'Bitte stimme den Bedingungen zu, um fortzufahren.');
+        setState(() => _error = 'auth.acceptTerms'.tr());
         return;
       }
     }
