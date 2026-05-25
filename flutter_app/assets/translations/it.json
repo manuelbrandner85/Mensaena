@@ -369,7 +369,13 @@
     "pinToggle": "Fissa / Sblocca",
     "edit": "Modifica",
     "delete": "Elimina",
-    "noSearchResults": "Nessun risultato per \"{q}\"."
+    "noSearchResults": "Nessun risultato per \"{q}\".",
+    "clearHistoryAction": "Cancella cronologia chat",
+    "clearHistoryConfirmTitle": "Cancellare davvero la cronologia?",
+    "clearHistoryConfirmBody": "Tutti i messaggi di questa chat verranno eliminati definitivamente da Mensaena per te E per il tuo interlocutore. Non può essere annullato.",
+    "clearHistoryConfirmAction": "Elimina definitivamente",
+    "clearHistoryOk": "Eliminati {count} messaggi.",
+    "clearHistoryFailed": "Eliminazione fallita. Riprova."
   },
   "languages": {
     "de": "Tedesco",

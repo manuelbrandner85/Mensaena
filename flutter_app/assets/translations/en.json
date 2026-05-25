@@ -369,7 +369,13 @@
     "pinToggle": "Pin / Unpin",
     "edit": "Edit",
     "delete": "Delete",
-    "noSearchResults": "No results for \"{q}\"."
+    "noSearchResults": "No results for \"{q}\".",
+    "clearHistoryAction": "Clear chat history",
+    "clearHistoryConfirmTitle": "Really clear chat history?",
+    "clearHistoryConfirmBody": "All messages in this chat will be permanently deleted from Mensaena for you AND your conversation partner. This cannot be undone.",
+    "clearHistoryConfirmAction": "Delete permanently",
+    "clearHistoryOk": "Deleted {count} messages.",
+    "clearHistoryFailed": "Failed to clear. Please try again."
   },
   "languages": {
     "de": "German",

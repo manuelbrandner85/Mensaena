@@ -369,7 +369,13 @@
     "pinToggle": "Épingler / Détacher",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "noSearchResults": "Aucun résultat pour « {q} »."
+    "noSearchResults": "Aucun résultat pour « {q} ».",
+    "clearHistoryAction": "Effacer l'historique",
+    "clearHistoryConfirmTitle": "Vraiment effacer l'historique ?",
+    "clearHistoryConfirmBody": "Tous les messages de ce chat seront supprimés définitivement de Mensaena pour vous ET votre interlocuteur. Action irréversible.",
+    "clearHistoryConfirmAction": "Supprimer définitivement",
+    "clearHistoryOk": "{count} messages supprimés.",
+    "clearHistoryFailed": "Échec de la suppression. Réessayez."
   },
   "languages": {
     "de": "Allemand",

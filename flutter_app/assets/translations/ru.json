@@ -368,7 +368,13 @@
     "pinToggle": "Закрепить / Открепить",
     "edit": "Редактировать",
     "delete": "Удалить",
-    "noSearchResults": "Нет результатов для «{q}»."
+    "noSearchResults": "Нет результатов для «{q}».",
+    "clearHistoryAction": "Очистить историю",
+    "clearHistoryConfirmTitle": "Очистить историю чата?",
+    "clearHistoryConfirmBody": "Все сообщения этого чата будут безвозвратно удалены из Mensaena для вас И вашего собеседника. Отменить нельзя.",
+    "clearHistoryConfirmAction": "Удалить навсегда",
+    "clearHistoryOk": "Удалено сообщений: {count}.",
+    "clearHistoryFailed": "Не удалось очистить. Попробуйте ещё раз."
   },
   "languages": {
     "de": "Немецкий",

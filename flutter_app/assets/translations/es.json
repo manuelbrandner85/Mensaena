@@ -369,7 +369,13 @@
     "pinToggle": "Fijar / Desfijar",
     "edit": "Editar",
     "delete": "Eliminar",
-    "noSearchResults": "Sin resultados para «{q}»."
+    "noSearchResults": "Sin resultados para «{q}».",
+    "clearHistoryAction": "Borrar historial",
+    "clearHistoryConfirmTitle": "¿Borrar realmente el historial?",
+    "clearHistoryConfirmBody": "Todos los mensajes de este chat se eliminarán de Mensaena de forma permanente para ti Y tu interlocutor. No se puede deshacer.",
+    "clearHistoryConfirmAction": "Eliminar definitivamente",
+    "clearHistoryOk": "Se borraron {count} mensajes.",
+    "clearHistoryFailed": "No se pudo borrar. Inténtalo de nuevo."
   },
   "languages": {
     "de": "Alemán",

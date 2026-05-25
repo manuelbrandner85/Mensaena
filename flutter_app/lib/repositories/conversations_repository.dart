@@ -223,6 +223,21 @@ class MessagesRepository {
     }
   }
 
+  /// Hard-DELETE alle Messages dieser DM-Conversation aus Supabase.
+  /// Wirkt fuer BEIDE Teilnehmer (echte Loeschung, kein Soft-Delete).
+  /// Returns Anzahl geloeschter Messages, oder null bei Fehler.
+  static Future<int?> clearDmHistory(String conversationId) async {
+    try {
+      final result = await sb.rpc<dynamic>('clear_dm_history',
+          params: {'p_conversation_id': conversationId});
+      if (result is int) return result;
+      if (result is num) return result.toInt();
+      return 0;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Pinned messages for a channel/conversation.
   /// 1:1 to web ChatView.tsx loadPinnedMessages.
   static Stream<List<Map<String, dynamic>>> watchPinnedMessages(

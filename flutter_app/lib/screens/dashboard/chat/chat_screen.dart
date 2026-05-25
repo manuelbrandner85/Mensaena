@@ -299,6 +299,47 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// Sends a voice-message as `[VOICE:url:seconds]` text.
   /// The bubble parses this on render and shows VoiceMessageBubble.
+  /// DM-Chat-History komplett aus DB loeschen. Wirkt fuer BEIDE Teilnehmer
+  /// (HARD DELETE via clear_dm_history RPC mit Membership-Check).
+  Future<void> _clearDmHistory() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('chat.clearHistoryConfirmTitle'.tr(),
+            style: AppTypography.body(
+                size: 16, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text('chat.clearHistoryConfirmBody'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.inkSoft, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: Text('chat.clearHistoryConfirmAction'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final count =
+        await MessagesRepository.clearDmHistory(widget.conversationId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        count != null
+            ? 'chat.clearHistoryOk'.tr(namedArgs: {'count': '$count'})
+            : 'chat.clearHistoryFailed'.tr(),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
   Future<void> _sendVoice(String url, int durationSeconds) async {
     final encoded = VoiceRecorderService.encodeMessage(
         url: url, durationSeconds: durationSeconds);
@@ -438,6 +479,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 await LiveStreamService.endChannelStream(_activeStreamRoom!);
                 if (mounted) setState(() => _activeStreamRoom = null);
               },
+              onClearDmHistory: _clearDmHistory,
             ),
             // Live-Banner — wenn jemand im Channel live ist, koennen
             // alle anderen beitreten.
@@ -742,6 +784,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
     required this.onCancelCall,
     required this.onStartStream,
     required this.onEndStream,
+    required this.onClearDmHistory,
   });
 
   final ChatContext? context;
@@ -755,6 +798,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
   final Future<void> Function() onCancelCall;
   final Future<void> Function() onStartStream;
   final Future<void> Function() onEndStream;
+  final Future<void> Function() onClearDmHistory;
 
   @override
   ConsumerState<_ChatTopBar> createState() => _ChatTopBarState();
@@ -860,6 +904,13 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                         ? () async => widget.onEndStream()
                         : () async => widget.onStartStream(),
                     pulse: widget.activeStreamRoom != null,
+                  ),
+                if (isDm)
+                  _ActionIcon(
+                    icon: LucideIcons.trash2,
+                    label: 'chat.clearHistoryAction'.tr(),
+                    color: AppColors.mute,
+                    onTap: widget.onClearDmHistory,
                   ),
                 _ActionIcon(
                   icon: widget.searchOpen

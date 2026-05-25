@@ -368,7 +368,13 @@
     "pinToggle": "Sabitle / Kaldır",
     "edit": "Düzenle",
     "delete": "Sil",
-    "noSearchResults": "\"{q}\" için sonuç yok."
+    "noSearchResults": "\"{q}\" için sonuç yok.",
+    "clearHistoryAction": "Sohbet geçmişini sil",
+    "clearHistoryConfirmTitle": "Sohbet geçmişi gerçekten silinsin mi?",
+    "clearHistoryConfirmBody": "Bu sohbetin tüm mesajları siz VE muhatabınız için Mensaena'dan kalıcı olarak silinecek. Geri alınamaz.",
+    "clearHistoryConfirmAction": "Kalıcı olarak sil",
+    "clearHistoryOk": "{count} mesaj silindi.",
+    "clearHistoryFailed": "Silme başarısız. Tekrar deneyin."
   },
   "languages": {
     "de": "Almanca",

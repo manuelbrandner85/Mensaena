@@ -368,7 +368,13 @@
     "pinToggle": "Anpinnen / Lösen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
-    "noSearchResults": "Keine Treffer für „{q}\"."
+    "noSearchResults": "Keine Treffer für „{q}\".",
+    "clearHistoryAction": "Chat-Verlauf löschen",
+    "clearHistoryConfirmTitle": "Chat-Verlauf wirklich löschen?",
+    "clearHistoryConfirmBody": "Alle Nachrichten dieses Chats werden bei dir UND beim Gesprächspartner unwiderruflich aus Mensaena gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "clearHistoryConfirmAction": "Endgültig löschen",
+    "clearHistoryOk": "{count} Nachrichten gelöscht.",
+    "clearHistoryFailed": "Löschen fehlgeschlagen. Bitte erneut versuchen."
   },
   "languages": {
     "de": "Deutsch",
