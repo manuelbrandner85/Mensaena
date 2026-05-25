@@ -63,14 +63,12 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
   Widget build(BuildContext context) {
     final country = LocaleCountryService.forContext(context);
     final myProfile = ref.watch(myProfileProvider).valueOrNull;
-    // BUG-FIX: notification_radius_km ist SPEZIFISCH fuer Push-Notifications
-    // (z.B. 10km Radius fuer Benachrichtigungen). radius_km ist der
-    // allgemeine Such-Radius. Vorher wurde notification_radius zuerst genutzt
-    // → User mit 10km Push-Radius sahen "Keine Hoefe in deiner Region"
-    // obwohl 100+ Bauernhoefe im 50km-Umkreis existierten.
-    // Fallback: 50km wenn beide null sind.
-    final radius =
-        myProfile?.radiusKm ?? myProfile?.notificationRadiusKm ?? 50;
+    // Bauernhoefe-Directory zeigt ALLE Hoefe im Land — kein restriktiver
+    // Radius. User wollen browsen, nicht nur "neben mir". Radius bleibt
+    // verfuegbar als Sortierung (naheste zuerst) via location-Filter im
+    // Repo, aber alle anderen sind weiter sichtbar.
+    // null = kein Radius-Filter, alle 500+ Farms im Land sichtbar.
+    const int? radius = null;
     final lat = myProfile?.latitude ?? myProfile?.homeLat;
     final lng = myProfile?.longitude ?? myProfile?.homeLng;
     final args = (

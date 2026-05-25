@@ -8,6 +8,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../config/theme/cinema_accents.dart';
 import '../../providers/cinema_provider.dart';
+import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
@@ -828,8 +829,13 @@ class _NewDmPickerSheetState extends State<_NewDmPickerSheet> {
       return;
     }
     if (!mounted) return;
+    // BUG-FIX: Navigator.pop schliesst das Sheet → der lokale `context`
+    // ist danach TOT. context.push() danach passiert auf disposed
+    // context → kein Effekt. Loesung: NavigatorState ueber den
+    // rootNavigatorKey holen und dort pushen, NACHDEM das Sheet zu ist.
     Navigator.pop(context);
-    context.push('/dashboard/messages/$convId');
+    // Nach Sheet-Close auf root-navigator pushen (lebt unabhaengig).
+    rootNavigatorKey.currentState?.context.push('/dashboard/messages/$convId');
   }
 
   @override
