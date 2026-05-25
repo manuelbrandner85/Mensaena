@@ -375,17 +375,24 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _saving = true);
 
+    // Empty-String → null Helper. DB-Constraints (chk_profiles_phone_format,
+    // chk_profiles_email_format, chk_profiles_avatar_url) lassen NULL durch,
+    // werfen aber bei einem leeren String "" weil das weder NULL noch der
+    // erwartete Format ist. Vorher: Speichern fehlgeschlagen sobald Telefon
+    // leer war.
+    String? n(String s) => s.trim().isEmpty ? null : s.trim();
+
     final patch = <String, dynamic>{
-      'name': _nameCtrl.text.trim(),
-      'display_name': _displayNameCtrl.text.trim(),
-      'nickname': _nicknameCtrl.text.trim(),
-      'bio': _bioCtrl.text.trim(),
-      'username': _usernameCtrl.text.trim(),
-      'phone': _phoneCtrl.text.trim(),
-      'homepage': _homepageCtrl.text.trim(),
-      'address': _addressCtrl.text.trim(),
-      'home_city': _cityCtrl.text.trim(),
-      'home_postal_code': _postalCtrl.text.trim(),
+      'name': n(_nameCtrl.text),
+      'display_name': n(_displayNameCtrl.text),
+      'nickname': n(_nicknameCtrl.text),
+      'bio': n(_bioCtrl.text),
+      'username': n(_usernameCtrl.text),
+      'phone': n(_phoneCtrl.text),
+      'homepage': n(_homepageCtrl.text),
+      'address': n(_addressCtrl.text),
+      'home_city': n(_cityCtrl.text),
+      'home_postal_code': n(_postalCtrl.text),
       'country': _country,
       if (_lat != null) 'latitude': _lat,
       if (_lng != null) 'longitude': _lng,

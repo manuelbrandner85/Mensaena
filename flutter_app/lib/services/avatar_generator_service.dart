@@ -4,6 +4,8 @@
 /// Caller verwendet CachedNetworkImage(generated_url).
 library;
 
+import 'dart:math' as math;
+
 class AvatarGenerator {
   const AvatarGenerator._();
 
@@ -41,11 +43,33 @@ class AvatarGenerator {
         '?width=$size&height=$size&seed=$s&nologo=true';
   }
 
-  /// Lifelike Portrait per Pollinations (sanfter Default-Prompt).
-  static String portraitFor(String userId,
-      {String hint = 'friendly neighborhood portrait, soft warm light'}) {
+  /// 8 Prompt-Varianten mit gemischten Gender/Alter/Ethnien um die
+  /// Pollinations/Stable-Diffusion Default-Bias zu durchbrechen (die
+  /// liefert sonst fast nur junge Frauen).
+  static const List<String> _portraitVariants = [
+    'friendly middle-aged man portrait photo, warm smile, soft natural light, neighborhood vibe',
+    'friendly young woman portrait photo, warm smile, soft natural light, neighborhood vibe',
+    'friendly elderly man portrait photo, kind eyes, soft natural light, neighborhood vibe',
+    'friendly elderly woman portrait photo, kind eyes, soft natural light, neighborhood vibe',
+    'friendly bearded man portrait photo, warm smile, soft natural light, neighborhood vibe',
+    'friendly woman with curly hair portrait photo, warm smile, soft natural light, neighborhood vibe',
+    'friendly non-binary person portrait photo, warm expression, soft natural light, neighborhood vibe',
+    'friendly young man portrait photo, warm smile, soft natural light, neighborhood vibe',
+  ];
+
+  /// Lifelike Portrait per Pollinations. Bei jedem Aufruf andere Variante
+  /// + frischer Random-Seed, damit Tap-zu-Tap echt unterschiedliche Bilder
+  /// rauskommen. Vorher: deterministischer Hash → User sah immer dasselbe
+  /// Frauen-Portrait weil der Default-Prompt + SD-Bias keinen Mann erzeugt
+  /// hat. Jetzt: rotierende Prompts + neuer Seed = volle Vielfalt.
+  static String portraitFor(String userId, {int? variantIndex, int? seed}) {
+    final rng = math.Random();
+    final idx =
+        variantIndex ?? rng.nextInt(_portraitVariants.length);
+    final s = seed ?? rng.nextInt(1000000);
     return pollinations(
-      prompt: '$hint, seed-${userId.substring(0, userId.length.clamp(0, 8))}',
+      prompt: _portraitVariants[idx % _portraitVariants.length],
+      seed: s,
       size: 512,
     );
   }
