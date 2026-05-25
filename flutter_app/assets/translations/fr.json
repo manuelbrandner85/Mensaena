@@ -1831,6 +1831,18 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "moon": {
+    "title": "Lune",
+    "illumination": "Illumination",
+    "newMoon": "Nouvelle lune",
+    "waxingCrescent": "Premier croissant",
+    "firstQuarter": "Premier quartier",
+    "waxingGibbous": "Gibbeuse croissante",
+    "fullMoon": "Pleine lune",
+    "waningGibbous": "Gibbeuse décroissante",
+    "lastQuarter": "Dernier quartier",
+    "waningCrescent": "Dernier croissant"
+  },
   "helpStreak": {
     "title": "Série d'entraide",
     "days": "{count} jours à aider d'affilée",

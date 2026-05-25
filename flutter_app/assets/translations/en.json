@@ -1922,7 +1922,8 @@
       "recap": "Weekly recap",
       "heatmap": "Activity heatmap",
       "quickNote": "Quick note",
-      "helpStreak": "Help streak"
+      "helpStreak": "Help streak",
+      "moon": "Moon phase"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1959,7 +1960,8 @@
       "recap": "Your last 7 days vs the week before",
       "heatmap": "12-week overview of your daily activity",
       "quickNote": "Personal sticky note, lives only on your device",
-      "helpStreak": "Consecutive days where you've helped"
+      "helpStreak": "Consecutive days where you've helped",
+      "moon": "Today's moon phase and illumination"
     }
   },
   "hubs": {
@@ -2060,6 +2062,18 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "moon": {
+    "title": "Moon",
+    "illumination": "Illumination",
+    "newMoon": "New moon",
+    "waxingCrescent": "Waxing crescent",
+    "firstQuarter": "First quarter",
+    "waxingGibbous": "Waxing gibbous",
+    "fullMoon": "Full moon",
+    "waningGibbous": "Waning gibbous",
+    "lastQuarter": "Last quarter",
+    "waningCrescent": "Waning crescent"
   },
   "helpStreak": {
     "title": "Help streak",

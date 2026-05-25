@@ -1830,6 +1830,18 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "moon": {
+    "title": "Ay",
+    "illumination": "Aydınlanma",
+    "newMoon": "Yeni ay",
+    "waxingCrescent": "İlk hilal",
+    "firstQuarter": "İlk dördün",
+    "waxingGibbous": "Büyüyen ay",
+    "fullMoon": "Dolunay",
+    "waningGibbous": "Küçülen ay",
+    "lastQuarter": "Son dördün",
+    "waningCrescent": "Son hilal"
+  },
   "helpStreak": {
     "title": "Yardım serisi",
     "days": "{count} gün üst üste yardım",

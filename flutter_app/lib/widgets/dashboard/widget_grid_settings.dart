@@ -244,6 +244,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.helpStreak',
       icon: LucideIcons.helpingHand,
     ),
+    DashboardWidgetMeta(
+      id: 'moon',
+      title: 'widgets.titles.moon',
+      description: 'widgets.descriptions.moon',
+      icon: LucideIcons.moon,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

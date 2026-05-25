@@ -1921,7 +1921,8 @@
       "recap": "Wochenrückblick",
       "heatmap": "Aktivitäts-Heatmap",
       "quickNote": "Notizzettel",
-      "helpStreak": "Hilfe-Streak"
+      "helpStreak": "Hilfe-Streak",
+      "moon": "Mondphase"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1958,7 +1959,8 @@
       "recap": "Deine letzten 7 Tage im Vergleich zur Vorwoche",
       "heatmap": "12-Wochen-Übersicht deiner täglichen Aktivität",
       "quickNote": "Privater Notizzettel, nur auf deinem Gerät",
-      "helpStreak": "Aufeinanderfolgende Tage, an denen du geholfen hast"
+      "helpStreak": "Aufeinanderfolgende Tage, an denen du geholfen hast",
+      "moon": "Heutige Mondphase und Beleuchtungsgrad"
     }
   },
   "hubs": {
@@ -2059,6 +2061,18 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "moon": {
+    "title": "Mond",
+    "illumination": "Beleuchtung",
+    "newMoon": "Neumond",
+    "waxingCrescent": "Zunehmende Sichel",
+    "firstQuarter": "Erstes Viertel",
+    "waxingGibbous": "Zunehmender Mond",
+    "fullMoon": "Vollmond",
+    "waningGibbous": "Abnehmender Mond",
+    "lastQuarter": "Letztes Viertel",
+    "waningCrescent": "Abnehmende Sichel"
   },
   "helpStreak": {
     "title": "Hilfe-Streak",

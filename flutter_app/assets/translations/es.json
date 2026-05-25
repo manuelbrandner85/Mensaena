@@ -1831,6 +1831,18 @@
     "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
     "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
   },
+  "moon": {
+    "title": "Luna",
+    "illumination": "Iluminación",
+    "newMoon": "Luna nueva",
+    "waxingCrescent": "Creciente cóncava",
+    "firstQuarter": "Cuarto creciente",
+    "waxingGibbous": "Gibosa creciente",
+    "fullMoon": "Luna llena",
+    "waningGibbous": "Gibosa menguante",
+    "lastQuarter": "Cuarto menguante",
+    "waningCrescent": "Menguante cóncava"
+  },
   "helpStreak": {
     "title": "Racha de ayuda",
     "days": "{count} días ayudando seguidos",
