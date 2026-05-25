@@ -1757,7 +1757,7 @@
     "videoAction": "Video-Anruf",
     "postCallNoteTitle": "Notiz zum Gespräch?",
     "postCallNoteHint": "Wird als Chat-Notiz gespeichert.",
-    "postCallNotePlaceholder": "z. B. „Treffen am Samstag um 14 Uhr"."
+    "postCallNotePlaceholder": "z. B. „Treffen am Samstag um 14 Uhr“."
   },
   "quickReply": {
     "title": "Antwort an {name} senden?",
