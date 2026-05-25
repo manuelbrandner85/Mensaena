@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/notification_model.dart';
 import '../services/supabase_service.dart';
@@ -29,17 +30,19 @@ class NotificationsRepository {
   }
 
   /// Ungelesene Anzahl (Snapshot, kein Stream).
+  /// V2: Server-seitiger Count statt alle Rows laden + client-side zaehlen.
   static Future<int> unreadCount() async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return 0;
     try {
-      final rows = await sb
+      final res = await sb
           .from('notifications')
           .select('id')
           .eq('user_id', uid)
           .filter('read_at', 'is', null)
-          .filter('deleted_at', 'is', null);
-      return (rows as List).length;
+          .filter('deleted_at', 'is', null)
+          .count(CountOption.exact);
+      return res.count;
     } catch (_) {
       return 0;
     }
