@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show debugPrint;
+
 import '../models/post.dart';
 import '../services/supabase_service.dart';
 import 'user_blocks_repository.dart';
@@ -18,6 +20,9 @@ class PostsRepository {
   }
 
   /// Posts in einem Umkreis um (lat, lng). Nutzt get_nearby_posts RPC.
+  /// HINWEIS: Die RPC existiert in der DB aktuell nicht (nur get_nearby_crises).
+  /// Bis die Funktion angelegt wird, fallen Calls immer auf _latestActive
+  /// zurueck — wir loggen den Fehler aber damit man im LogCat sieht warum.
   static Future<List<Post>> getNearby({
     double? lat,
     double? lng,
@@ -45,7 +50,8 @@ class PostsRepository {
         return _filterBlocked(posts);
       }
       return const [];
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[PostsRepository] get_nearby_posts RPC failed: $e');
       return _latestActive(limit: limit);
     }
   }
@@ -53,9 +59,17 @@ class PostsRepository {
   /// Volltext-/Geo-Suche via `search_posts` RPC — gleicher Aufruf wie auf
   /// www.mensaena.de (`posts/page.tsx` Z. 130-148). Liefert Posts nach
   /// Relevanz sortiert; ggf. filterbar via [type] und [radiusKm].
+  ///
+  /// Wichtig: ALLE Parameter der DB-Signatur (p_query, p_category, p_type,
+  /// p_urgency, p_lat, p_lng, p_radius_km, p_limit, p_offset) muessen
+  /// gesendet werden bzw. explizit als null. Bei Supabase ist das mit Named-
+  /// Params zwar nicht zwingend (Defaults greifen), aber das Web-Frontend
+  /// sendet alle 9 — wir spiegeln das hier 1:1 um Drift zu vermeiden.
   static Future<List<Post>> search({
     String query = '',
     String? type,
+    String? category,
+    String? urgency,
     double? lat,
     double? lng,
     int radiusKm = 50,
@@ -64,8 +78,10 @@ class PostsRepository {
   }) async {
     try {
       final res = await sb.rpc<dynamic>('search_posts', params: {
-        'p_query': query,
+        'p_query': query.trim().isEmpty ? null : query.trim(),
+        'p_category': category,
         'p_type': (type == null || type == 'all') ? null : type,
+        'p_urgency': urgency,
         'p_lat': lat,
         'p_lng': lng,
         'p_radius_km': radiusKm,
@@ -80,7 +96,8 @@ class PostsRepository {
         return _filterBlocked(posts);
       }
       return const [];
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[PostsRepository] search_posts RPC failed: $e');
       return _filterFallback(
         type: type,
         query: query,
@@ -114,7 +131,8 @@ class PostsRepository {
           .map(Post.fromJson)
           .toList();
       return _filterBlocked(posts);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[PostsRepository] _filterFallback failed: $e');
       return const [];
     }
   }
@@ -132,7 +150,8 @@ class PostsRepository {
           .map(Post.fromJson)
           .toList();
       return _filterBlocked(posts);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[PostsRepository] _latestActive failed: $e');
       return const [];
     }
   }

@@ -105,11 +105,23 @@ class _DashboardHomeScreenState
   }
 
   Future<_DashboardData> _loadAll() async {
+    // Profil zuerst — wir brauchen lat/lng + radius_km fuer den Nearby-Call.
+    // Ohne Koordinaten fiel getNearby() blind auf _latestActive(limit:10)
+    // zurueck — geografisches Ranking war ausgeschaltet.
+    final profile = await ProfilesRepository.getMine();
+    final lat = profile?.latitude ?? profile?.homeLat;
+    final lng = profile?.longitude ?? profile?.homeLng;
+    final radiusKm = profile?.radiusKm ?? 25;
     final results = await Future.wait<dynamic>([
-      ProfilesRepository.getMine(),
+      Future<Profile?>.value(profile),
       NotificationsRepository.unreadCount(),
       InteractionsRepository.activeCount(),
-      PostsRepository.getNearby(),
+      PostsRepository.getNearby(
+        lat: lat,
+        lng: lng,
+        radiusKm: radiusKm,
+        limit: 15,
+      ),
     ]);
     return _DashboardData(
       profile: results[0] as Profile?,
