@@ -1817,5 +1817,16 @@
     "enable": "Bildirimleri aç",
     "bannerTitle": "Hiçbir şeyi kaçırma",
     "bannerBody": "Bildirimleri açarak çağrıları, mesajları ve yardım isteklerini anında gör."
+  },
+  "detox": {
+    "section": "Dijital iyi oluş",
+    "toggleTitle": "Detoks hatırlatıcı",
+    "toggleSubtitle": "Günlük sınırına ulaştığında nazik bir uyarı",
+    "thresholdLabel": "Günlük limit: {min} dk",
+    "todayUsed": "Bugün uygulamada zaten {min} dk",
+    "title": "Mola zamanı",
+    "message": "Bugün Mensaena'da {min} dk geçirdin. Biraz güneş, kısa bir yürüyüş ya da sohbete ne dersin?",
+    "continue": "Yine de devam et",
+    "pause": "Uygulamayı kapat"
   }
 }

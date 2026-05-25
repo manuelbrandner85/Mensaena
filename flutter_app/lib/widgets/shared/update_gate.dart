@@ -14,7 +14,9 @@ import '../../models/app_release.dart';
 import '../../providers/shorebird_patch_provider.dart';
 import '../../repositories/app_releases_repository.dart';
 import '../../services/apk_installer_service.dart';
+import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
+import 'detox_reminder_dialog.dart';
 import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
 import '../effects/glass_card.dart';
@@ -74,6 +76,9 @@ class _UpdateGateState extends ConsumerState<UpdateGate>
       (_) => unawaited(
           ShorebirdPatchService.instance.checkAndDownloadPatch()),
     );
+    // F41 Detox: erste Session beginnt sobald UpdateGate mountet.
+    ScreenTimeService.startSession();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkDetoxReminder());
   }
 
   @override
@@ -92,7 +97,29 @@ class _UpdateGateState extends ConsumerState<UpdateGate>
       unawaited(ShorebirdPatchService.instance.checkAndDownloadPatch());
       // Auch das App-Release neu pruefen (mandatory APK).
       ref.invalidate(updateCheckProvider);
+      // F41 Detox: neue Session beginnt — Timer starten, dann pruefen ob
+      // der heutige Threshold schon erreicht ist (durch frueheres Hin-
+      // und Herwischen) und ggf. Reminder zeigen.
+      ScreenTimeService.startSession();
+      _checkDetoxReminder();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // Session-Ende → addiert die Dauer zum heutigen Total.
+      unawaited(ScreenTimeService.endSession());
     }
+  }
+
+  Future<void> _checkDetoxReminder() async {
+    // Mini-Delay damit der UpdateGate-Block (mandatory APK) Vorrang hat.
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    if (!await ScreenTimeService.shouldRemind()) return;
+    if (!mounted) return;
+    final minutes = await ScreenTimeService.getTodayMinutes();
+    if (!mounted) return;
+    await ScreenTimeService.markRemindedToday();
+    if (!mounted) return;
+    await DetoxReminderDialog.show(context, minutes);
   }
 
   Future<void> _dismissForVersion(String version) async {

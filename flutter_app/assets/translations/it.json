@@ -1818,5 +1818,16 @@
     "enable": "Attiva le notifiche",
     "bannerTitle": "Resta aggiornato",
     "bannerBody": "Attiva le push per vedere subito chiamate, messaggi e richieste."
+  },
+  "detox": {
+    "section": "Benessere digitale",
+    "toggleTitle": "Promemoria detox",
+    "toggleSubtitle": "Un gentile richiamo quando raggiungi il limite giornaliero",
+    "thresholdLabel": "Limite giornaliero: {min} min",
+    "todayUsed": "Oggi già {min} min nell'app",
+    "title": "Pausa meritata",
+    "message": "Oggi hai passato {min} min su Mensaena. Che ne dici di un po' di sole, una passeggiata o una chiacchierata?",
+    "continue": "Continua comunque",
+    "pause": "Chiudi app"
   }
 }

@@ -2033,5 +2033,16 @@
     "enable": "Benachrichtigungen aktivieren",
     "bannerTitle": "Bleib auf dem Laufenden",
     "bannerBody": "Aktiviere Push, damit du Anrufe, Nachrichten und Hilferufe sofort siehst."
+  },
+  "detox": {
+    "section": "Digitales Wohlbefinden",
+    "toggleTitle": "Detox-Erinnerung",
+    "toggleSubtitle": "Sanfter Hinweis, wenn du dein Tageslimit erreichst",
+    "thresholdLabel": "Tageslimit: {min} Min.",
+    "todayUsed": "Heute bereits {min} Min. in der App",
+    "title": "Zeit für eine Pause",
+    "message": "Du bist heute schon {min} Min. in Mensaena. Wie wäre es mit etwas Sonne, einem Spaziergang oder einem Gespräch?",
+    "continue": "Trotzdem weiter",
+    "pause": "App schließen"
   }
 }

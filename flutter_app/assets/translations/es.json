@@ -1818,5 +1818,16 @@
     "enable": "Activar notificaciones",
     "bannerTitle": "No te pierdas nada",
     "bannerBody": "Activa las notificaciones para ver llamadas, mensajes y peticiones al instante."
+  },
+  "detox": {
+    "section": "Bienestar digital",
+    "toggleTitle": "Recordatorio de desconexión",
+    "toggleSubtitle": "Un aviso amable cuando alcances tu límite diario",
+    "thresholdLabel": "Límite diario: {min} min",
+    "todayUsed": "Hoy ya llevas {min} min en la app",
+    "title": "Hora de un descanso",
+    "message": "Ya llevas {min} min en Mensaena hoy. ¿Qué tal un poco de sol, un paseo o una charla?",
+    "continue": "Seguir igualmente",
+    "pause": "Cerrar app"
   }
 }

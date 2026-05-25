@@ -21,6 +21,7 @@ import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
@@ -1013,6 +1014,11 @@ class _AppearanceTab extends ConsumerWidget {
             minimumSize: const Size.fromHeight(44),
           ),
         ),
+        const SizedBox(height: 16),
+        Text('detox.section'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        const _DetoxSection(),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(14),
@@ -1765,6 +1771,104 @@ class _LangTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DetoxSection extends StatefulWidget {
+  const _DetoxSection();
+
+  @override
+  State<_DetoxSection> createState() => _DetoxSectionState();
+}
+
+class _DetoxSectionState extends State<_DetoxSection> {
+  bool _enabled = true;
+  int _thresholdMin = 60;
+  int _todayMin = 0;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final en = await ScreenTimeService.isEnabled();
+    final th = await ScreenTimeService.getThresholdMin();
+    final today = await ScreenTimeService.getTodayMinutes();
+    if (!mounted) return;
+    setState(() {
+      _enabled = en;
+      _thresholdMin = th;
+      _todayMin = today;
+      _loaded = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.leaf,
+                  size: 16, color: AppColors.leben),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('detox.toggleTitle'.tr(),
+                    style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.ink,
+                        weight: FontWeight.w600)),
+              ),
+              Switch(
+                value: _enabled,
+                activeColor: AppColors.leben,
+                onChanged: (v) async {
+                  await ScreenTimeService.setEnabled(v);
+                  if (mounted) setState(() => _enabled = v);
+                },
+              ),
+            ],
+          ),
+          if (_enabled) ...[
+            const SizedBox(height: 6),
+            Text(
+              'detox.thresholdLabel'
+                  .tr(namedArgs: {'min': '$_thresholdMin'}),
+              style: AppTypography.body(
+                  size: 12, color: AppColors.inkSoft),
+            ),
+            Slider(
+              value: _thresholdMin.toDouble(),
+              min: 15,
+              max: 180,
+              divisions: 11,
+              activeColor: AppColors.leben,
+              onChanged: (v) =>
+                  setState(() => _thresholdMin = v.round()),
+              onChangeEnd: (v) =>
+                  ScreenTimeService.setThresholdMin(v.round()),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'detox.todayUsed'.tr(namedArgs: {'min': '$_todayMin'}),
+              style: AppTypography.caption(),
+            ),
+          ],
+        ],
       ),
     );
   }

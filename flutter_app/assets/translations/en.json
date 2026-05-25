@@ -2034,5 +2034,16 @@
     "enable": "Enable notifications",
     "bannerTitle": "Stay in the loop",
     "bannerBody": "Turn on push so you see calls, messages, and requests right away."
+  },
+  "detox": {
+    "section": "Digital wellbeing",
+    "toggleTitle": "Detox reminder",
+    "toggleSubtitle": "A gentle nudge when you hit your daily limit",
+    "thresholdLabel": "Daily limit: {min} min",
+    "todayUsed": "Already {min} min in the app today",
+    "title": "Time for a break",
+    "message": "You've spent {min} min in Mensaena today. How about some sun, a walk, or a chat?",
+    "continue": "Keep going",
+    "pause": "Close app"
   }
 }

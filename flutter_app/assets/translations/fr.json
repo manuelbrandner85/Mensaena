@@ -1818,5 +1818,16 @@
     "enable": "Activer les notifications",
     "bannerTitle": "Restez informé",
     "bannerBody": "Activez les notifications pour voir tout de suite les appels, messages et demandes."
+  },
+  "detox": {
+    "section": "Bien-être numérique",
+    "toggleTitle": "Rappel de déconnexion",
+    "toggleSubtitle": "Un signal doux quand tu atteins ta limite quotidienne",
+    "thresholdLabel": "Limite quotidienne : {min} min",
+    "todayUsed": "Déjà {min} min dans l'app aujourd'hui",
+    "title": "Le temps d'une pause",
+    "message": "Tu as passé {min} min sur Mensaena aujourd'hui. Et si tu profitais d'un peu de soleil, d'une promenade ou d'une discussion ?",
+    "continue": "Continuer quand même",
+    "pause": "Fermer l'app"
   }
 }
