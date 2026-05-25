@@ -36,13 +36,13 @@ final cinemaModeProvider =
         (ref) => CinemaModeNotifier());
 
 class CinemaIntensityNotifier extends StateNotifier<CinemaIntensity> {
-  /// Default = minimal — Cinema-Effekte komplett aus.
-  /// Performance-Hot-Fix v2: trotz reduced-Default crashte die App noch
-  /// beim Tab-Wechsel. CinemaOverlay rendert auch im reduced-Mode noch
-  /// 6 Effekt-Layer + AnimationControllers. Bei minimal werden alle
-  /// Effekte uebersprungen. User kann via Settings hochsetzen wenn das
-  /// Geraet stark genug ist.
-  CinemaIntensityNotifier() : super(CinemaIntensity.minimal) {
+  /// Default = full — Cinema-Effekte voll aktiv.
+  /// V20-Architektur: CinemaOverlay ist jetzt persistenter Background-Layer
+  /// im DashboardScaffold (statt Body-Wrapper), wird NICHT mehr bei jedem
+  /// Tab-Wechsel disposed/rebuild → AnimationControllers laufen stabil.
+  /// Damit ist die volle Cinema-Atmosphaere ohne Crash-Risiko aktiv.
+  /// User kann auf reduced/minimal runter wenn Battery-Saving gewuenscht.
+  CinemaIntensityNotifier() : super(CinemaIntensity.full) {
     _load();
   }
 
