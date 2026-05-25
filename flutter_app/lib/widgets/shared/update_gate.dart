@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
@@ -13,6 +14,7 @@ import '../../models/app_release.dart';
 import '../../providers/shorebird_patch_provider.dart';
 import '../../repositories/app_releases_repository.dart';
 import '../../services/apk_installer_service.dart';
+import '../../services/shorebird_patch_service.dart';
 import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
 import '../effects/glass_card.dart';
@@ -49,12 +51,49 @@ class UpdateGate extends ConsumerStatefulWidget {
   ConsumerState<UpdateGate> createState() => _UpdateGateState();
 }
 
-class _UpdateGateState extends ConsumerState<UpdateGate> {
+class _UpdateGateState extends ConsumerState<UpdateGate>
+    with WidgetsBindingObserver {
   static const _storage = FlutterSecureStorage();
   static const _dismissKeyPrefix = 'mensaena_update_dismissed_v';
 
   bool _dismissed = false;
   String? _dismissedVersion;
+  Timer? _periodicPatchCheck;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Bei jedem Foreground-Resume + alle 3min: Patch-Server fragen.
+    // Shorebird's auto_update lief frueher als alleinige Quelle, das
+    // war zu spaet — der User sah den Restart-Banner oft erst beim
+    // naechsten Cold-Start (also nie). Jetzt zwingt der Timer einen
+    // aktiven Check + Download waehrend die App offen ist.
+    _periodicPatchCheck = Timer.periodic(
+      const Duration(minutes: 3),
+      (_) => unawaited(
+          ShorebirdPatchService.instance.checkAndDownloadPatch()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _periodicPatchCheck?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Beim Resume: Patch-Check sofort. Vor allem wichtig wenn die App
+      // im Background lange offen war — der frische Cold-Start-Trigger
+      // ist dann veraltet.
+      unawaited(ShorebirdPatchService.instance.checkAndDownloadPatch());
+      // Auch das App-Release neu pruefen (mandatory APK).
+      ref.invalidate(updateCheckProvider);
+    }
+  }
 
   Future<void> _dismissForVersion(String version) async {
     await _storage.write(

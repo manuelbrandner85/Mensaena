@@ -152,18 +152,13 @@ Future<void> _initBackgroundServices() async {
   // bestehende notify-Sound-Praeferenz des Users (kSoundEnabledKey).
   unawaited(_playStartupOncePerDay());
 
-  // Shorebird OTA-Patch: pruefe ob ein Patch verfuegbar ist. Shorebird
-  // laedt ihn automatisch im Hintergrund — die UpdateGate zeigt dann
-  // den Restart-Banner sobald der provider naechstes Mal evaluiert.
-  try {
-    final hasPatch = await ShorebirdPatchService.checkForUpdate();
-    if (hasPatch) {
-      debugPrint(
-          '[Shorebird] Neuer Patch verfuegbar — Restart-Banner wird gezeigt.');
-    }
-  } catch (_) {
-    // Shorebird nicht verfuegbar (Debug-Build ohne Engine) — OK.
-  }
+  // Shorebird OTA-Patch: Check + Download im Background. Wenn ein neuer
+  // Patch verfuegbar ist, laedt Shorebird ihn jetzt aktiv herunter
+  // (vorher wurde nur checkForUpdate() aufgerufen → der Patch blieb auf
+  // dem Server, der Client sah ihn nie). Nach erfolgreichem Download
+  // feuert der Service ein onPatchReady-Event, die UpdateGate zeigt
+  // dann den gruenen Restart-Banner.
+  unawaited(ShorebirdPatchService.instance.checkAndDownloadPatch());
 }
 
 /// Spielt assets/sounds/startup.mp3 maximal 1x pro Kalendertag.

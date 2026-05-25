@@ -1,39 +1,139 @@
 /// SKILL: mensaena-architektur
-/// ShorebirdPatchService — Wrapper um ShorebirdUpdater fuer OTA-Patches.
+/// ShorebirdPatchService — OTA-Patch Download + Ready-Detection.
 ///
-/// Shorebird laedt Patches automatisch im Hintergrund. Damit sie aktiv
-/// werden, muss die App neugestartet werden. Dieses Service liefert
-/// die Info ob ein Restart noetig ist und welcher Patch aktuell aktiv ist.
+/// Pendant zum Weltenbibliothek-Pattern. Wichtiger Unterschied zur vorherigen
+/// Mensaena-Implementierung:
+///   - Vorher: nur `checkForUpdate()` → liefert UpdateStatus.outdated wenn der
+///     Shorebird-Server einen neuen Patch hat. Aber: der Patch wurde NIE
+///     wirklich heruntergeladen. Resultat: User sah nie einen Restart-Banner.
+///   - Jetzt: `checkAndDownloadPatch()` ruft `_shorebird.update()` auf wenn
+///     outdated → echter Download. Danach feuert der Service ein Event auf
+///     dem `onPatchReady` Broadcast-Stream, sobald `readNextPatch()` einen
+///     pending Patch zeigt. UpdateGate hoert mit und zeigt den Restart-Banner.
+///
+/// Lifecycle:
+///   - main.dart _initBackgroundServices → checkAndDownloadPatch() im Background
+///   - UpdateGate.initState → Stream-Listener auf onPatchReady
+///   - UpdateGate.didChangeAppLifecycleState(resumed) → re-trigger
 library;
 
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'dart:async';
+
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:shorebird_code_push/shorebird_code_push.dart';
+
+/// Ergebnis eines Patch-Ready-Checks.
+class PatchCheckResult {
+  const PatchCheckResult({
+    this.patchReady = false,
+    this.currentPatchNumber,
+    this.nextPatchNumber,
+  });
+
+  /// true wenn ein Patch heruntergeladen ist und beim naechsten App-Start
+  /// aktiv wird.
+  final bool patchReady;
+
+  /// Aktuell installierte Patch-Nummer (null bei kein Patch / Debug).
+  final int? currentPatchNumber;
+
+  /// Nummer des wartenden Patches (null wenn kein Patch wartet).
+  final int? nextPatchNumber;
+
+  static const empty = PatchCheckResult();
+}
 
 class ShorebirdPatchService {
   ShorebirdPatchService._();
-  static final ShorebirdUpdater _updater = ShorebirdUpdater();
+  static final ShorebirdPatchService instance = ShorebirdPatchService._();
 
-  /// Nummer des aktuell installierten Patches (null = kein Patch /
-  /// Debug-Build ohne Shorebird-Engine).
-  static Future<int?> currentPatchNumber() async {
+  final ShorebirdUpdater _updater = ShorebirdUpdater();
+
+  /// Stream der feuert sobald ein Patch heruntergeladen ist und beim
+  /// naechsten Start aktiv wird. UpdateGate hoert hier zu und zeigt den
+  /// Restart-Banner. Broadcast damit mehrere Widgets parallel zuhoeren
+  /// koennen ohne sich gegenseitig zu blockieren.
+  final StreamController<PatchCheckResult> _patchReadyController =
+      StreamController<PatchCheckResult>.broadcast();
+
+  Stream<PatchCheckResult> get onPatchReady => _patchReadyController.stream;
+
+  /// Nummer des aktuell installierten Patches.
+  /// null = kein Patch installiert ODER Debug-Build ohne Shorebird-Engine.
+  Future<int?> currentPatchNumber() async {
     try {
+      if (!_updater.isAvailable) return null;
       final patch = await _updater.readCurrentPatch();
       return patch?.number;
     } catch (e) {
-      debugPrint('[Shorebird] readCurrentPatch failed: $e');
+      if (kDebugMode) debugPrint('[Shorebird] readCurrentPatch failed: $e');
       return null;
     }
   }
 
-  /// true wenn ein neuer Patch verfuegbar ist (Download passiert
-  /// automatisch durch Shorebird; Restart noetig um zu aktivieren).
-  static Future<bool> checkForUpdate() async {
+  /// Prueft ohne Netzwerk-Call ob bereits ein heruntergeladener Patch
+  /// wartet (z.B. weil Shorebird ihn beim letzten Start auto-downloaded
+  /// hat aber wir noch nicht neugestartet haben).
+  Future<PatchCheckResult> checkPatchReady() async {
     try {
-      final status = await _updater.checkForUpdate();
-      return status == UpdateStatus.outdated;
+      if (!_updater.isAvailable) return PatchCheckResult.empty;
+      final current = await _updater.readCurrentPatch();
+      final next = await _updater.readNextPatch();
+      if (next == null) {
+        return PatchCheckResult(currentPatchNumber: current?.number);
+      }
+      final ready = current == null || next.number != current.number;
+      return PatchCheckResult(
+        patchReady: ready,
+        currentPatchNumber: current?.number,
+        nextPatchNumber: next.number,
+      );
     } catch (e) {
-      debugPrint('[Shorebird] checkForUpdate failed: $e');
-      return false;
+      if (kDebugMode) debugPrint('[Shorebird] checkPatchReady failed: $e');
+      return PatchCheckResult.empty;
     }
+  }
+
+  /// Fragt den Shorebird-Server aktiv nach einem neuen Patch und LAEDT ihn
+  /// runter wenn outdated. Nach erfolgreichem Download feuert der Service
+  /// ein Event auf [onPatchReady].
+  ///
+  /// Das war der Kern-Bug der vorherigen Implementierung: hier wurde nur
+  /// `checkForUpdate()` aufgerufen ohne `update()` — daher wurde der Patch
+  /// nie geladen und der Banner nie gezeigt.
+  Future<void> checkAndDownloadPatch() async {
+    try {
+      if (!_updater.isAvailable) {
+        if (kDebugMode) {
+          debugPrint('[Shorebird] not available (debug build?) — skipping');
+        }
+        return;
+      }
+      // Vor dem Download: bereits ein Patch heruntergeladen? Dann sofort
+      // den Stream feuern und nicht weitermachen.
+      final pre = await checkPatchReady();
+      if (pre.patchReady) {
+        if (!_patchReadyController.isClosed) {
+          _patchReadyController.add(pre);
+        }
+        return;
+      }
+      final status = await _updater.checkForUpdate();
+      if (status != UpdateStatus.outdated) return;
+      await _updater.update();
+      // Re-check: jetzt sollte readNextPatch != null sein.
+      final post = await checkPatchReady();
+      if (post.patchReady && !_patchReadyController.isClosed) {
+        _patchReadyController.add(post);
+      }
+    } on UpdateException catch (e) {
+      if (kDebugMode) debugPrint('[Shorebird] update failed: ${e.message}');
+    } catch (e) {
+      if (kDebugMode) debugPrint('[Shorebird] checkAndDownload failed: $e');
+    }
+  }
+
+  void dispose() {
+    _patchReadyController.close();
   }
 }
