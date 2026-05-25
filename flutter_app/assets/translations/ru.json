@@ -948,6 +948,26 @@
       "min60": "За 1 ч",
       "min120": "За 2 ч",
       "oneDay": "За 1 день"
+    },
+    "organizer": "Организатор",
+    "eventCancelled": "Событие отменено",
+    "joinEvent": "Участвовать",
+    "attendanceSheet": {
+      "title": "Выберите статус",
+      "signOff": "Отказаться от участия"
+    },
+    "authorActions": {
+      "title": "Управление",
+      "edit": "Редактировать",
+      "editComingSoon": "Редактирование скоро появится",
+      "cancel": "Отменить событие",
+      "delete": "Удалить событие",
+      "cancelConfirm": "Действительно отменить событие?",
+      "cancelConfirmMessage": "Участники получат уведомление.",
+      "deleteConfirm": "Удалить событие безвозвратно?",
+      "deleteConfirmMessage": "Это действие невозможно отменить.",
+      "cancelled": "Событие отменено",
+      "deleted": "Событие удалено"
     }
   },
   "challenges": {

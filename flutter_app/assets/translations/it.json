@@ -948,6 +948,26 @@
       "min60": "1 ora prima",
       "min120": "2 ore prima",
       "oneDay": "1 giorno prima"
+    },
+    "organizer": "Organizzatore",
+    "eventCancelled": "Evento annullato",
+    "joinEvent": "Partecipa",
+    "attendanceSheet": {
+      "title": "Scegli lo stato",
+      "signOff": "Annulla partecipazione"
+    },
+    "authorActions": {
+      "title": "Gestione",
+      "edit": "Modifica",
+      "editComingSoon": "Modifica in arrivo",
+      "cancel": "Annulla evento",
+      "delete": "Elimina evento",
+      "cancelConfirm": "Annullare davvero l'evento?",
+      "cancelConfirmMessage": "I partecipanti riceveranno una notifica.",
+      "deleteConfirm": "Eliminare definitivamente l'evento?",
+      "deleteConfirmMessage": "Questa azione non può essere annullata.",
+      "cancelled": "Evento annullato",
+      "deleted": "Evento eliminato"
     }
   },
   "challenges": {

@@ -1,3 +1,11 @@
+/// SKILL: mensaena-features
+/// Event-Detail-Screen — Komplett-Overhaul (Phase E3).
+/// Hero-Image mit Gradient + Kategorie-Badge, Countdown, Date/Time/Location,
+/// Author-Zeile, Description, Attendance-Sheet, Reminder-Widget,
+/// Attendees-Sektion, Action-Bar (Calendar/Share) + Author-Actions
+/// (Bearbeiten/Absagen/Loeschen) mit ConfirmDialog.
+library;
+
 import 'dart:io';
 
 import 'package:add_2_calendar/add_2_calendar.dart' as a2c;
@@ -5,6 +13,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -13,10 +22,77 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
+import '../../../models/profile.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../services/supabase_service.dart';
+import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
+import '../../../widgets/event_attendees_section.dart';
+import '../../../widgets/event_countdown.dart';
+import '../../../widgets/event_reminder_widget.dart';
+import '../../../widgets/event_share_sheet.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/empty_state_card.dart';
+
+// Akzent-Farben fuer Event-Kategorien (Hero-Border + Badge).
+const Map<String, Color> _categoryAccent = {
+  'community': Color(0xFF1EAAA6),
+  'sports': Color(0xFF3B82F6),
+  'sport': Color(0xFF3B82F6),
+  'culture': Color(0xFF8B5CF6),
+  'kultur': Color(0xFF8B5CF6),
+  'education': Color(0xFFF59E0B),
+  'workshop': Color(0xFFF59E0B),
+  'nature': Color(0xFF10B981),
+  'food': Color(0xFFEF4444),
+  'music': Color(0xFFEC4899),
+  'volunteer': Color(0xFF1EAAA6),
+  'kids': Color(0xFFF97316),
+  'familie': Color(0xFFF97316),
+  'other': Color(0xFF4F6D8A),
+  'sonstiges': Color(0xFF4F6D8A),
+};
+
+Color _categoryColor(String? cat) =>
+    _categoryAccent[cat ?? ''] ?? AppColors.amber;
+
+String _categoryLabel(String? cat) {
+  switch (cat) {
+    case 'community':
+      return 'Community';
+    case 'sports':
+    case 'sport':
+      return 'Sport';
+    case 'culture':
+    case 'kultur':
+      return 'Kultur';
+    case 'education':
+    case 'workshop':
+      return 'Workshop';
+    case 'nature':
+      return 'Natur';
+    case 'food':
+      return 'Essen';
+    case 'music':
+      return 'Musik';
+    case 'volunteer':
+      return 'Ehrenamt';
+    case 'kids':
+    case 'familie':
+      return 'Familie';
+    default:
+      return 'Sonstiges';
+  }
+}
+
+/// Provider fuer Profil eines beliebigen Users (fuer Author-Zeile).
+final _authorProfileProvider =
+    FutureProvider.family<Profile?, String>((ref, userId) async {
+  if (userId.isEmpty) return null;
+  return ProfilesRepository.getById(userId);
+});
 
 class EventDetailScreen extends ConsumerWidget {
   const EventDetailScreen({required this.eventId, super.key});
@@ -25,273 +101,496 @@ class EventDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ev = ref.watch(eventDetailProvider(eventId));
-    final rsvp = ref.watch(myRsvpProvider(eventId));
 
     return DashboardScaffold(
-      title: 'events.title'.tr(),
+      title: ev.asData?.value?.title ?? 'events.title'.tr(),
       currentRoute: '/dashboard/events',
       body: SafeArea(
         child: ev.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.amber),
-          ),
-          error: (e, _) => Center(
-            child: Text('$e', style: AppTypography.caption()),
+          loading: () => const _DetailSkeleton(),
+          error: (e, _) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: EmptyStateCard(
+              title: 'events.notFound'.tr(),
+              description: '$e',
+              icon: LucideIcons.alertTriangle,
+            ),
           ),
           data: (e) {
             if (e == null) {
-              return Center(
-                child: Text('events.notFound'.tr(),
-                    style: AppTypography.caption()),
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: EmptyStateCard(
+                  title: 'events.notFound'.tr(),
+                  icon: LucideIcons.calendarX,
+                ),
               );
             }
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                if (e.imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: CachedNetworkImage(
-                      imageUrl: e.imageUrl!,
-                      fadeInDuration: const Duration(milliseconds: 200),
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => const ShimmerBox(
-                        width: double.infinity,
-                        height: 200,
-                        borderRadius: 14,
-                      ),
-                      errorWidget: (_, __, ___) => Container(
-                        color: AppColors.elevated,
-                        height: 200,
-                        alignment: Alignment.center,
-                        child: const Icon(LucideIcons.imageOff,
-                            size: 20, color: AppColors.mute),
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 14),
-                Text(
-                  e.title,
-                  style: AppTypography.display(
-                    size: 26,
-                    color: AppColors.ink,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(LucideIcons.calendar,
-                        size: 14, color: AppColors.amber),
-                    const SizedBox(width: 6),
-                    Text(
-                      DateFormat('EEEE, dd.MM.yyyy', 'de').format(e.startDate),
-                      style: AppTypography.body(
-                        size: 14,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                  ],
-                ),
-                if (!e.isAllDay)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Row(
-                      children: [
-                        const Icon(LucideIcons.clock,
-                            size: 14, color: AppColors.amber),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${DateFormat('HH:mm').format(e.startDate)}${e.endDate != null ? " – ${DateFormat('HH:mm').format(e.endDate!)}" : ""}',
-                          style: AppTypography.body(
-                            size: 14,
-                            color: AppColors.inkSoft,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                if (e.locationName != null) ...[
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(LucideIcons.mapPin,
-                          size: 14, color: AppColors.amber),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          [e.locationName, e.locationAddress]
-                              .whereType<String>()
-                              .where((s) => s.isNotEmpty)
-                              .join(' · '),
-                          style: AppTypography.body(
-                            size: 13,
-                            color: AppColors.inkSoft,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                if (e.isOnline && e.onlineUrl != null) ...[
-                  const SizedBox(height: 10),
-                  OutlinedButton.icon(
-                    onPressed: () => launchUrl(
-                      Uri.parse(e.onlineUrl!),
-                      mode: LaunchMode.externalApplication,
-                    ),
-                    icon: const Icon(LucideIcons.video, size: 16),
-                    label: Text('events.openOnlineLink'.tr()),
-                  ),
-                ],
-                const SizedBox(height: 16),
-                if (e.description != null && e.description!.isNotEmpty)
-                  Text(
-                    e.description!,
-                    style: AppTypography.body(
-                      size: 14,
-                      color: AppColors.inkSoft,
-                      height: 1.55,
-                    ),
-                  ),
-                if (e.whatToBring != null && e.whatToBring!.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Text('events.bring'.tr(), style: AppTypography.label(size: 10)),
-                  const SizedBox(height: 4),
-                  Text(
-                    e.whatToBring!,
-                    style:
-                        AppTypography.body(size: 13, color: AppColors.inkSoft),
-                  ),
-                ],
-                if (e.cost != null && e.cost!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Icon(LucideIcons.euro,
-                          size: 14, color: AppColors.amber),
-                      const SizedBox(width: 6),
-                      Text(
-                        e.cost!,
-                        style: AppTypography.body(
-                          size: 13,
-                          color: AppColors.ink,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 20),
-                Text('events.rsvp'.tr(), style: AppTypography.label(size: 10)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    _RsvpButton(
-                      label: 'events.rsvpGoing'.tr(),
-                      icon: LucideIcons.checkCircle,
-                      color: AppColors.leben,
-                      active: rsvp.asData?.value == 'going',
-                      onTap: () async {
-                        Haptics.tap();
-                        await EventsRepository.rsvp(
-                          eventId: eventId,
-                          status: 'going',
-                        );
-                        ref.invalidate(myRsvpProvider(eventId));
-                      },
-                    ),
-                    _RsvpButton(
-                      label: 'events.rsvpMaybe'.tr(),
-                      icon: LucideIcons.helpCircle,
-                      color: AppColors.amber,
-                      active: rsvp.asData?.value == 'maybe',
-                      onTap: () async {
-                        Haptics.tap();
-                        await EventsRepository.rsvp(
-                          eventId: eventId,
-                          status: 'maybe',
-                        );
-                        ref.invalidate(myRsvpProvider(eventId));
-                      },
-                    ),
-                    _RsvpButton(
-                      label: 'events.rsvpDeclined'.tr(),
-                      icon: LucideIcons.xCircle,
-                      color: AppColors.mute,
-                      active: rsvp.asData?.value == 'declined',
-                      onTap: () async {
-                        Haptics.tap();
-                        await EventsRepository.rsvp(
-                          eventId: eventId,
-                          status: 'declined',
-                        );
-                        ref.invalidate(myRsvpProvider(eventId));
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  e.maxAttendees != null
-                      ? 'events.attendeesWithMax'.tr(namedArgs: {
-                          'count': '${e.attendeeCount}',
-                          'max': '${e.maxAttendees}',
-                        })
-                      : 'events.attendees'.tr(
-                          namedArgs: {'count': '${e.attendeeCount}'}),
-                  style: AppTypography.caption(),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => _addToSystemCalendar(context, e),
-                        icon: const Icon(LucideIcons.calendarPlus, size: 14),
-                        label: Text('events.addToCalendar'.tr()),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.bronze,
-                          foregroundColor: AppColors.voidColor,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    OutlinedButton.icon(
-                      onPressed: () => _exportToCalendar(context, e),
-                      icon: const Icon(LucideIcons.calendar, size: 14),
-                      label: const Text('.ics'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.bronze,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    OutlinedButton.icon(
-                      onPressed: () => _shareEvent(e),
-                      icon: const Icon(LucideIcons.share2, size: 14),
-                      label: Text('common.share'.tr()),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.bronze,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            );
+            return _EventDetailBody(event: e);
           },
         ),
       ),
     );
   }
+}
 
-  /// 1-Tap: System-Kalender öffnen mit vorbefülltem Event.
+class _EventDetailBody extends ConsumerWidget {
+  const _EventDetailBody({required this.event});
+  final EventItem event;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accent = _categoryColor(event.category);
+    final now = DateTime.now();
+    final isUpcoming = event.startDate.isAfter(now);
+    final isCancelled = event.status == 'cancelled';
+    final isFull = event.maxAttendees != null &&
+        event.attendeeCount >= (event.maxAttendees ?? 0);
+    final myUid = SupabaseService.currentUser?.id;
+    final isAuthor = myUid != null && myUid == event.authorId;
+    final rsvpAsync = ref.watch(myRsvpProvider(event.id));
+    final rsvp = rsvpAsync.asData?.value;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── 1) Hero ──────────────────────────────────────────────
+          _HeroBlock(event: event, accent: accent),
+
+          // ── 2) Status-Badges ─────────────────────────────────────
+          if (isCancelled || isFull) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Row(
+                children: [
+                  if (isCancelled)
+                    _StatusPill(
+                      icon: LucideIcons.xCircle,
+                      label: 'events.eventCancelled'.tr(),
+                      color: AppColors.herzrot,
+                    ),
+                  if (isCancelled && isFull) const SizedBox(width: 8),
+                  if (isFull)
+                    _StatusPill(
+                      icon: LucideIcons.users,
+                      label: 'events.attendeesWithMax'.tr(namedArgs: {
+                        'count': '${event.attendeeCount}',
+                        'max': '${event.maxAttendees}',
+                      }),
+                      color: AppColors.amberDeep,
+                    ),
+                ],
+              ),
+            ),
+          ],
+
+          // ── 3) Countdown ─────────────────────────────────────────
+          if (isUpcoming && !isCancelled) ...[
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: EventCountdown(startsAt: event.startDate),
+            ),
+          ],
+
+          // ── 4) Date/Time/Location ────────────────────────────────
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _DateTimeBlock(event: event),
+          ),
+
+          // ── 5) Author-Info ───────────────────────────────────────
+          if (event.authorId.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _AuthorRow(authorId: event.authorId),
+            ),
+          ],
+
+          // ── 6) Description ───────────────────────────────────────
+          if (event.description != null && event.description!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                event.description!,
+                style: AppTypography.body(
+                  size: 14,
+                  color: AppColors.inkSoft,
+                  height: 1.55,
+                ),
+              ),
+            ),
+          ],
+
+          // ── 7) Mitbringen / Cost ─────────────────────────────────
+          if (event.whatToBring != null && event.whatToBring!.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('events.bring'.tr(),
+                      style: AppTypography.label(size: 10)),
+                  const SizedBox(height: 4),
+                  Text(
+                    event.whatToBring!,
+                    style: AppTypography.body(
+                      size: 13,
+                      color: AppColors.inkSoft,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          if (event.cost != null && event.cost!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.euro,
+                      size: 14, color: AppColors.amber),
+                  const SizedBox(width: 6),
+                  Text(
+                    event.cost!,
+                    style: AppTypography.body(
+                      size: 13,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // ── 8) Attendance ────────────────────────────────────────
+          if (!isCancelled) ...[
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _AttendanceBlock(
+                event: event,
+                rsvp: rsvp,
+                accent: accent,
+                onOpenSheet: () => _openAttendanceSheet(
+                  context,
+                  ref,
+                  eventId: event.id,
+                  currentRsvp: rsvp,
+                ),
+              ),
+            ),
+          ],
+
+          // ── 9) Reminder ──────────────────────────────────────────
+          if (rsvp == 'going' && isUpcoming && !isCancelled) ...[
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: EventReminderWidget(
+                eventId: event.id,
+                initialReminderMinutes: null,
+              ),
+            ),
+          ],
+
+          // ── 10) Attendees ────────────────────────────────────────
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: EventAttendeesSection(eventId: event.id),
+          ),
+
+          // ── 11) Action-Bar ───────────────────────────────────────
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () => _addToSystemCalendar(context, event),
+                    icon: const Icon(LucideIcons.calendarPlus, size: 14),
+                    label: Text('events.addToCalendar'.tr()),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.bronze,
+                      foregroundColor: AppColors.voidColor,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton.icon(
+                  onPressed: () => _exportToCalendar(context, event),
+                  icon: const Icon(LucideIcons.calendar, size: 14),
+                  label: const Text('.ics'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: 'events.share'.tr(),
+                  onPressed: () => EventShareSheet.show(
+                    context,
+                    eventId: event.id,
+                    title: event.title,
+                    startsAt: event.startDate,
+                  ),
+                  icon: const Icon(LucideIcons.share2, size: 18),
+                  color: AppColors.bronze,
+                ),
+              ],
+            ),
+          ),
+
+          // ── 12) Author-Actions ───────────────────────────────────
+          if (isAuthor) ...[
+            const SizedBox(height: 24),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: AppColors.line)),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'events.authorActions.title'.tr(),
+                    style: AppTypography.label(size: 10),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      // Placeholder: Edit-Screen
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        backgroundColor: AppColors.surface,
+                        content: Text(
+                          'events.authorActions.editComingSoon'.tr(),
+                          style: AppTypography.body(
+                              size: 13, color: AppColors.ink),
+                        ),
+                      ));
+                    },
+                    icon: const Icon(LucideIcons.edit3, size: 14),
+                    label: Text('events.authorActions.edit'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  if (!isCancelled)
+                    OutlinedButton.icon(
+                      onPressed: () => _confirmCancel(context, ref, event),
+                      icon: const Icon(LucideIcons.xCircle, size: 14),
+                      label: Text('events.authorActions.cancel'.tr()),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.mute,
+                        side: const BorderSide(color: AppColors.line),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: () => _confirmDelete(context, ref, event),
+                    icon: const Icon(LucideIcons.trash2, size: 14),
+                    label: Text('events.authorActions.delete'.tr()),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.herzrot,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  // ── Attendance-BottomSheet ─────────────────────────────────────
+  Future<void> _openAttendanceSheet(
+    BuildContext context,
+    WidgetRef ref, {
+    required String eventId,
+    required String? currentRsvp,
+  }) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'events.attendanceSheet.title'.tr(),
+                      style: AppTypography.label(size: 11),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _AttendanceTile(
+                  icon: LucideIcons.checkCircle,
+                  color: AppColors.leben,
+                  label: 'events.attendStatus.going'.tr(),
+                  active: currentRsvp == 'going',
+                  onTap: () async {
+                    Haptics.tap();
+                    Navigator.pop(ctx);
+                    await EventsRepository.setAttendance(
+                      eventId: eventId,
+                      status: 'going',
+                    );
+                    ref.invalidate(myRsvpProvider(eventId));
+                    ref.invalidate(eventAttendeesProvider(eventId));
+                    ref.invalidate(eventDetailProvider(eventId));
+                  },
+                ),
+                _AttendanceTile(
+                  icon: LucideIcons.helpCircle,
+                  color: AppColors.amber,
+                  label: 'events.attendStatus.interested'.tr(),
+                  active: currentRsvp == 'interested',
+                  onTap: () async {
+                    Haptics.tap();
+                    Navigator.pop(ctx);
+                    await EventsRepository.setAttendance(
+                      eventId: eventId,
+                      status: 'interested',
+                    );
+                    ref.invalidate(myRsvpProvider(eventId));
+                    ref.invalidate(eventAttendeesProvider(eventId));
+                    ref.invalidate(eventDetailProvider(eventId));
+                  },
+                ),
+                _AttendanceTile(
+                  icon: LucideIcons.xCircle,
+                  color: AppColors.mute,
+                  label: 'events.attendStatus.declined'.tr(),
+                  active: currentRsvp == 'declined',
+                  onTap: () async {
+                    Haptics.tap();
+                    Navigator.pop(ctx);
+                    await EventsRepository.setAttendance(
+                      eventId: eventId,
+                      status: 'declined',
+                    );
+                    ref.invalidate(myRsvpProvider(eventId));
+                    ref.invalidate(eventAttendeesProvider(eventId));
+                    ref.invalidate(eventDetailProvider(eventId));
+                  },
+                ),
+                if (currentRsvp != null)
+                  _AttendanceTile(
+                    icon: LucideIcons.userMinus,
+                    color: AppColors.herzrot,
+                    label: 'events.attendanceSheet.signOff'.tr(),
+                    active: false,
+                    onTap: () async {
+                      Haptics.tap();
+                      Navigator.pop(ctx);
+                      await EventsRepository.removeAttendance(eventId);
+                      ref.invalidate(myRsvpProvider(eventId));
+                      ref.invalidate(eventAttendeesProvider(eventId));
+                      ref.invalidate(eventDetailProvider(eventId));
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Author-Actions ─────────────────────────────────────────────
+  Future<void> _confirmCancel(
+    BuildContext context,
+    WidgetRef ref,
+    EventItem e,
+  ) async {
+    final ok = await ConfirmDialog.show(
+      context,
+      title: 'events.authorActions.cancelConfirm'.tr(),
+      message: 'events.authorActions.cancelConfirmMessage'.tr(),
+      danger: true,
+    );
+    if (!ok || !context.mounted) return;
+    final success = await EventsRepository.cancelEvent(e.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        success
+            ? 'events.authorActions.cancelled'.tr()
+            : 'events.error'.tr(namedArgs: {'error': '500'}),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+    if (success) {
+      ref.invalidate(eventDetailProvider(e.id));
+      if (context.mounted) context.pop();
+    }
+  }
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    EventItem e,
+  ) async {
+    final ok = await ConfirmDialog.show(
+      context,
+      title: 'events.authorActions.deleteConfirm'.tr(),
+      message: 'events.authorActions.deleteConfirmMessage'.tr(),
+      danger: true,
+    );
+    if (!ok || !context.mounted) return;
+    final success = await EventsRepository.deleteEvent(e.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        success
+            ? 'events.authorActions.deleted'.tr()
+            : 'events.error'.tr(namedArgs: {'error': '500'}),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+    if (success && context.mounted) {
+      context.pop();
+    }
+  }
+
+  // ── Calendar (unveraendert: add_2_calendar + share_plus .ics) ──
   Future<void> _addToSystemCalendar(BuildContext context, EventItem e) async {
     try {
       final endDate = e.endDate ?? e.startDate.add(const Duration(hours: 2));
@@ -306,31 +605,31 @@ class EventDetailScreen extends ConsumerWidget {
         startDate: e.startDate,
         endDate: endDate,
         iosParams: const a2c.IOSParams(reminder: Duration(minutes: 60)),
-        androidParams:
-            const a2c.AndroidParams(emailInvites: <String>[]),
+        androidParams: const a2c.AndroidParams(emailInvites: <String>[]),
       );
       final ok = await a2c.Add2Calendar.addEvent2Cal(entry);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
-          ok ? 'events.openedInCalendar'.tr() : 'events.calendarNotOpened'.tr(),
+          ok
+              ? 'events.openedInCalendar'.tr()
+              : 'events.calendarNotOpened'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink),
         ),
       ));
-    } catch (e) {
+    } catch (err) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('events.error'.tr(namedArgs: {'error': '$e'}),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
+        content: Text(
+          'events.error'.tr(namedArgs: {'error': '$err'}),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
       ));
     }
   }
 
-  /// ICS (iCalendar) Export — Pendant zu Web `event-to-ics` Util.
-  /// Generiert RFC-5545 konforme .ics-Datei und teilt sie via Share-Sheet.
-  /// Apple Kalender / Google Kalender / Outlook erkennen das Format automatisch.
   Future<void> _exportToCalendar(BuildContext context, EventItem e) async {
     String fmt(DateTime d) {
       final utc = d.toUtc();
@@ -343,11 +642,11 @@ class EventDetailScreen extends ConsumerWidget {
       return '$y$m${dd}T$hh$mm${ss}Z';
     }
 
-    String esc(String s) =>
-        s.replaceAll(r'\', r'\\')
-            .replaceAll(',', r'\,')
-            .replaceAll(';', r'\;')
-            .replaceAll('\n', r'\n');
+    String esc(String s) => s
+        .replaceAll(r'\', r'\\')
+        .replaceAll(',', r'\,')
+        .replaceAll(';', r'\;')
+        .replaceAll('\n', r'\n');
 
     final start = fmt(e.startDate);
     final end = fmt(e.endDate ?? e.startDate.add(const Duration(hours: 2)));
@@ -391,70 +690,519 @@ class EventDetailScreen extends ConsumerWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text('events.exportFailed'.tr(),
-            style: AppTypography.body(
-                size: 13, color: AppColors.ink)),
+        content: Text(
+          'events.exportFailed'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
       ));
     }
   }
+}
 
-  /// Deep-Link Share auf www.mensaena.de/dashboard/events/{id}.
-  Future<void> _shareEvent(EventItem e) async {
-    final url = 'https://www.mensaena.de/dashboard/events/${e.id}';
-    final body =
-        '${'events.shareBody'.tr(namedArgs: {'title': e.title})}\n$url';
-    await Share.share(
-      body,
-      subject:
-          'events.shareSubject'.tr(namedArgs: {'title': e.title}),
+// ──────────────────────────────────────────────────────────────────
+// Hero
+// ──────────────────────────────────────────────────────────────────
+class _HeroBlock extends StatelessWidget {
+  const _HeroBlock({required this.event, required this.accent});
+  final EventItem event;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    if (event.imageUrl == null || event.imageUrl!.isEmpty) {
+      // Kein Hero-Image → Titel-Block mit Akzent
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: 0.08),
+          border: Border(bottom: BorderSide(color: accent, width: 2)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _CategoryBadge(category: event.category, accent: accent),
+            const SizedBox(height: 12),
+            Text(
+              event.title,
+              style: AppTypography.display(
+                size: 26,
+                color: AppColors.ink,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: accent, width: 2)),
+      ),
+      child: Stack(
+        children: [
+          SizedBox(
+            height: 240,
+            width: double.infinity,
+            child: CachedNetworkImage(
+              imageUrl: event.imageUrl!,
+              fit: BoxFit.cover,
+              fadeInDuration: const Duration(milliseconds: 200),
+              placeholder: (_, __) => const ShimmerBox(
+                height: 240,
+                width: double.infinity,
+                borderRadius: 0,
+              ),
+              errorWidget: (_, __, ___) => Container(
+                color: AppColors.elevated,
+                alignment: Alignment.center,
+                child: const Icon(LucideIcons.imageOff,
+                    size: 28, color: AppColors.mute),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.60),
+                    ],
+                    stops: const [0.0, 0.45, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: _CategoryBadge(category: event.category, accent: accent),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 14,
+            child: Text(
+              event.title,
+              style: AppTypography.display(
+                size: 26,
+                color: Colors.white,
+                height: 1.2,
+                weight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _RsvpButton extends StatelessWidget {
-  const _RsvpButton({
+class _CategoryBadge extends StatelessWidget {
+  const _CategoryBadge({required this.category, required this.accent});
+  final String? category;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: accent,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        _categoryLabel(category),
+        style: AppTypography.label(
+          size: 10,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Status-Pill
+// ──────────────────────────────────────────────────────────────────
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({
+    required this.icon,
     required this.label,
+    required this.color,
+  });
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.45)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: AppTypography.label(size: 10, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Date/Time/Location
+// ──────────────────────────────────────────────────────────────────
+class _DateTimeBlock extends StatelessWidget {
+  const _DateTimeBlock({required this.event});
+  final EventItem event;
+
+  @override
+  Widget build(BuildContext context) {
+    String formattedDate;
+    try {
+      formattedDate =
+          DateFormat('EEEE, dd. MMMM yyyy', context.locale.languageCode)
+              .format(event.startDate);
+    } catch (_) {
+      formattedDate = DateFormat('EEEE, dd.MM.yyyy').format(event.startDate);
+    }
+    final timeStr = event.isAllDay
+        ? null
+        : '${DateFormat('HH:mm').format(event.startDate)}${event.endDate != null ? " – ${DateFormat('HH:mm').format(event.endDate!)}" : ""}';
+    final locationStr = [event.locationName, event.locationAddress]
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .join(' · ');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(LucideIcons.calendar,
+                size: 14, color: AppColors.amber),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                formattedDate,
+                style: AppTypography.body(
+                  size: 14,
+                  color: AppColors.ink,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (timeStr != null) ...[
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(LucideIcons.clock,
+                  size: 14, color: AppColors.amber),
+              const SizedBox(width: 8),
+              Text(
+                timeStr,
+                style: AppTypography.body(
+                  size: 14,
+                  color: AppColors.inkSoft,
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (locationStr.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: Icon(LucideIcons.mapPin,
+                    size: 14, color: AppColors.amber),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  locationStr,
+                  style: AppTypography.body(
+                    size: 13,
+                    color: AppColors.inkSoft,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+        if (event.isOnline &&
+            event.onlineUrl != null &&
+            event.onlineUrl!.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () => launchUrl(
+              Uri.parse(event.onlineUrl!),
+              mode: LaunchMode.externalApplication,
+            ),
+            icon: const Icon(LucideIcons.video, size: 16),
+            label: Text('events.openOnlineLink'.tr()),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Author-Row
+// ──────────────────────────────────────────────────────────────────
+class _AuthorRow extends ConsumerWidget {
+  const _AuthorRow({required this.authorId});
+  final String authorId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(_authorProfileProvider(authorId));
+    final p = profileAsync.asData?.value;
+    final name = p?.displayName ?? p?.name ?? p?.username ?? '—';
+    final avatar = p?.avatarUrl;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () => context.push('/dashboard/profile/$authorId'),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.line),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.elevated,
+              backgroundImage:
+                  (avatar != null && avatar.isNotEmpty)
+                      ? CachedNetworkImageProvider(avatar)
+                      : null,
+              child: (avatar == null || avatar.isEmpty)
+                  ? const Icon(LucideIcons.user,
+                      size: 14, color: AppColors.mute)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: AppTypography.body(
+                      size: 12,
+                      color: AppColors.ink,
+                      weight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'events.organizer'.tr(),
+                    style: AppTypography.caption(),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight,
+                size: 14, color: AppColors.mute),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Attendance-Block
+// ──────────────────────────────────────────────────────────────────
+class _AttendanceBlock extends StatelessWidget {
+  const _AttendanceBlock({
+    required this.event,
+    required this.rsvp,
+    required this.accent,
+    required this.onOpenSheet,
+  });
+  final EventItem event;
+  final String? rsvp;
+  final Color accent;
+  final VoidCallback onOpenSheet;
+
+  @override
+  Widget build(BuildContext context) {
+    if (rsvp == null) {
+      return SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: FilledButton.icon(
+          onPressed: onOpenSheet,
+          icon: const Icon(LucideIcons.userPlus, size: 16),
+          label: Text(
+            'events.joinEvent'.tr(),
+            style: AppTypography.body(
+              size: 14,
+              color: AppColors.voidColor,
+              weight: FontWeight.w700,
+            ),
+          ),
+          style: FilledButton.styleFrom(
+            backgroundColor: accent,
+            foregroundColor: AppColors.voidColor,
+          ),
+        ),
+      );
+    }
+    final (icon, label, color) = _statusMeta(rsvp!);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              style: AppTypography.body(
+                size: 14,
+                color: color,
+                weight: FontWeight.w700,
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'events.attendanceSheet.title'.tr(),
+            onPressed: onOpenSheet,
+            icon: const Icon(LucideIcons.chevronDown,
+                size: 18, color: AppColors.inkSoft),
+          ),
+        ],
+      ),
+    );
+  }
+
+  (IconData, String, Color) _statusMeta(String s) {
+    switch (s) {
+      case 'going':
+        return (
+          LucideIcons.checkCircle,
+          'events.attendStatus.going'.tr(),
+          AppColors.leben
+        );
+      case 'interested':
+      case 'maybe':
+        return (
+          LucideIcons.helpCircle,
+          'events.attendStatus.interested'.tr(),
+          AppColors.amber
+        );
+      case 'declined':
+      default:
+        return (
+          LucideIcons.xCircle,
+          'events.attendStatus.declined'.tr(),
+          AppColors.mute
+        );
+    }
+  }
+}
+
+class _AttendanceTile extends StatelessWidget {
+  const _AttendanceTile({
     required this.icon,
     required this.color,
+    required this.label,
     required this.active,
     required this.onTap,
   });
-  final String label;
   final IconData icon;
   final Color color;
+  final String label;
   final bool active;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return ListTile(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: active
-              ? color.withValues(alpha: 0.2)
-              : AppColors.surface.withValues(alpha: 0.5),
-          border: Border.all(
-            color: active ? color : AppColors.line,
-            width: active ? 1.5 : 1,
-          ),
-          borderRadius: BorderRadius.circular(999),
+      leading: Icon(icon, color: color, size: 20),
+      title: Text(
+        label,
+        style: AppTypography.body(
+          size: 14,
+          color: AppColors.ink,
+          weight: active ? FontWeight.w700 : FontWeight.w500,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: AppTypography.label(
-                size: 10,
-                color: active ? color : AppColors.inkSoft,
-              ),
+      ),
+      trailing: active
+          ? const Icon(LucideIcons.check, size: 16, color: AppColors.amber)
+          : null,
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Skeleton-Loading
+// ──────────────────────────────────────────────────────────────────
+class _DetailSkeleton extends StatelessWidget {
+  const _DetailSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerBox(height: 240, width: double.infinity, borderRadius: 0),
+          SizedBox(height: 16),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ShimmerBox(height: 14, width: 220),
+                SizedBox(height: 10),
+                ShimmerBox(height: 12, width: 160),
+                SizedBox(height: 8),
+                ShimmerBox(height: 12, width: 200),
+                SizedBox(height: 24),
+                ShimmerBox(height: 48, borderRadius: 12),
+                SizedBox(height: 10),
+                ShimmerBox(height: 48, borderRadius: 12),
+                SizedBox(height: 10),
+                ShimmerBox(height: 48, borderRadius: 12),
+                SizedBox(height: 10),
+                ShimmerBox(height: 48, borderRadius: 12),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

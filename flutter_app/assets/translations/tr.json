@@ -948,6 +948,26 @@
       "min60": "1 saat önce",
       "min120": "2 saat önce",
       "oneDay": "1 gün önce"
+    },
+    "organizer": "Düzenleyen",
+    "eventCancelled": "Etkinlik iptal edildi",
+    "joinEvent": "Katıl",
+    "attendanceSheet": {
+      "title": "Durum seç",
+      "signOff": "Katılımı geri al"
+    },
+    "authorActions": {
+      "title": "Yönetim",
+      "edit": "Düzenle",
+      "editComingSoon": "Düzenleme yakında",
+      "cancel": "Etkinliği iptal et",
+      "delete": "Etkinliği sil",
+      "cancelConfirm": "Etkinlik gerçekten iptal edilsin mi?",
+      "cancelConfirmMessage": "Katılımcılara bildirim gönderilir.",
+      "deleteConfirm": "Etkinlik kalıcı olarak silinsin mi?",
+      "deleteConfirmMessage": "Bu işlem geri alınamaz.",
+      "cancelled": "Etkinlik iptal edildi",
+      "deleted": "Etkinlik silindi"
     }
   },
   "challenges": {

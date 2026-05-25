@@ -948,6 +948,26 @@
       "min60": "1 h antes",
       "min120": "2 h antes",
       "oneDay": "1 día antes"
+    },
+    "organizer": "Organizador",
+    "eventCancelled": "Evento cancelado",
+    "joinEvent": "Apuntarme",
+    "attendanceSheet": {
+      "title": "Elegir estado",
+      "signOff": "Darme de baja"
+    },
+    "authorActions": {
+      "title": "Gestión",
+      "edit": "Editar",
+      "editComingSoon": "Edición disponible próximamente",
+      "cancel": "Cancelar evento",
+      "delete": "Eliminar evento",
+      "cancelConfirm": "¿Cancelar realmente el evento?",
+      "cancelConfirmMessage": "Se notificará a los asistentes.",
+      "deleteConfirm": "¿Eliminar el evento de forma definitiva?",
+      "deleteConfirmMessage": "Esta acción no se puede deshacer.",
+      "cancelled": "Evento cancelado",
+      "deleted": "Evento eliminado"
     }
   },
   "challenges": {

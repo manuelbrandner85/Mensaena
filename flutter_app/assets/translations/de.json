@@ -948,6 +948,26 @@
       "min60": "1 Std vorher",
       "min120": "2 Std vorher",
       "oneDay": "1 Tag vorher"
+    },
+    "organizer": "Veranstalter",
+    "eventCancelled": "Event abgesagt",
+    "joinEvent": "Teilnehmen",
+    "attendanceSheet": {
+      "title": "Status wählen",
+      "signOff": "Abmelden"
+    },
+    "authorActions": {
+      "title": "Verwaltung",
+      "edit": "Bearbeiten",
+      "editComingSoon": "Bearbeiten folgt bald",
+      "cancel": "Event absagen",
+      "delete": "Event löschen",
+      "cancelConfirm": "Event wirklich absagen?",
+      "cancelConfirmMessage": "Teilnehmer werden benachrichtigt.",
+      "deleteConfirm": "Event endgültig löschen?",
+      "deleteConfirmMessage": "Dieser Vorgang kann nicht rückgängig gemacht werden.",
+      "cancelled": "Event abgesagt",
+      "deleted": "Event gelöscht"
     }
   },
   "challenges": {
