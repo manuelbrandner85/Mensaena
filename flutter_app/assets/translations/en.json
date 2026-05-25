@@ -1696,6 +1696,15 @@
     "start": "Start",
     "cameraDenied": "Camera permission denied."
   },
+  "systemCall": {
+    "ended": "Audio call",
+    "missed": "Missed call",
+    "cancelled": "Call cancelled",
+    "declined": "Call declined",
+    "duration": "Duration: {d}",
+    "callback": "Call back",
+    "callbackFailed": "Callback failed"
+  },
   "time": {
     "justNow": "just now",
     "minutesShort": "{n} min ago",

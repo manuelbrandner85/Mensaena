@@ -3,11 +3,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/conversations_repository.dart';
+import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
@@ -58,6 +60,24 @@ class ChatMessageBubble extends ConsumerWidget {
     final editedAt = json['edited_at'] as String?;
     final replyToId = json['reply_to_id'] as String?;
     final deleted = json['deleted_at'] != null;
+
+    // System-Call-Cards — Pattern [SYSTEM_CALL:type:callId:durationSec:peerName]
+    // wird als zentrierte Karte mit Icon/Label/Dauer/Rueckruf-Button gerendert.
+    // MUSS vor der generischen SYSTEM-Detection laufen weil die Regex
+    // ansonsten "SYSTEM_CALL" als type interpretieren wuerde.
+    final callMatch = RegExp(
+            r'^\[SYSTEM_CALL:([a-z]+):([^:]*):([0-9]+):([^\]]*)\]$')
+        .firstMatch(content.trim());
+    if (callMatch != null && !deleted) {
+      return _SystemCallCard(
+        type: callMatch.group(1) ?? 'ended',
+        callId: callMatch.group(2) ?? '',
+        durationSec: int.tryParse(callMatch.group(3) ?? '0') ?? 0,
+        peerName: callMatch.group(4) ?? '',
+        conversationId: conversationId,
+        viewerIsMine: mine,
+      );
+    }
 
     // #15 System-Messages — Pattern [SYSTEM:type] body wird als zentrierte
     // gedimmte Pill gerendert statt normale Bubble.
@@ -474,6 +494,192 @@ class _ReactionsPills extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ── System-Call-Card (zentriert, mit Icon + optional Rueckruf) ──────
+class _SystemCallCard extends StatelessWidget {
+  const _SystemCallCard({
+    required this.type,
+    required this.callId,
+    required this.durationSec,
+    required this.peerName,
+    required this.conversationId,
+    required this.viewerIsMine,
+  });
+
+  final String type;
+  final String callId;
+  final int durationSec;
+  final String peerName;
+  final String conversationId;
+
+  /// True wenn der Viewer der urspruengliche Anrufer war. Wird nur
+  /// genutzt um den Rueckruf-Button bei verpassten Anrufen zu
+  /// unterdruecken (wenn DU angerufen hast und der andere verpasste,
+  /// dann wuerdest du dich beim Tap selbst nochmal anrufen).
+  final bool viewerIsMine;
+
+  IconData get _icon {
+    switch (type) {
+      case 'missed':
+        return LucideIcons.phoneMissed;
+      case 'cancelled':
+      case 'declined':
+        return LucideIcons.phoneOff;
+      default:
+        return LucideIcons.phone;
+    }
+  }
+
+  Color get _color {
+    switch (type) {
+      case 'missed':
+        return AppColors.herzrot;
+      case 'cancelled':
+        return AppColors.amber;
+      case 'declined':
+        return AppColors.mute;
+      default:
+        return AppColors.lebenSoft;
+    }
+  }
+
+  String _label() {
+    switch (type) {
+      case 'missed':
+        return 'systemCall.missed'.tr();
+      case 'cancelled':
+        return 'systemCall.cancelled'.tr();
+      case 'declined':
+        return 'systemCall.declined'.tr();
+      default:
+        return 'systemCall.ended'.tr();
+    }
+  }
+
+  String _formatDuration(int s) {
+    final m = (s ~/ 60).toString().padLeft(2, '0');
+    final ss = (s % 60).toString().padLeft(2, '0');
+    return '$m:$ss';
+  }
+
+  Future<void> _callBack(BuildContext context) async {
+    Haptics.tap();
+    // Peer-ID via dm_calls lookup — sicherer als den Namen zu nutzen.
+    String? peerId;
+    try {
+      final me = SupabaseService.currentUser?.id;
+      final row = await sb
+          .from('dm_calls')
+          .select('caller_id, callee_id, call_type')
+          .eq('id', callId)
+          .maybeSingle();
+      if (row != null && me != null) {
+        peerId = (row['caller_id'] == me)
+            ? row['callee_id'] as String?
+            : row['caller_id'] as String?;
+      }
+      final callType = (row?['call_type'] as String?) ?? 'audio';
+      if (peerId == null || peerId.isEmpty) return;
+      final result = await DmCallService.start(
+        conversationId: conversationId,
+        calleeId: peerId,
+        callType: callType,
+      );
+      if (!context.mounted) return;
+      if (!result.success ||
+          result.callId == null ||
+          result.roomName == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(result.errorReason ?? 'systemCall.callbackFailed'.tr(),
+              style: AppTypography.body(size: 13, color: AppColors.ink)),
+        ));
+        return;
+      }
+      final encPeer = Uri.encodeComponent(peerName);
+      final encRoom = Uri.encodeComponent(result.roomName!);
+      context.push(
+          '/dashboard/call/${result.callId}?room=$encRoom&peer=$encPeer');
+    } catch (_) {/* fail-silent */}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final showCallback = type == 'missed' && !viewerIsMine;
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        decoration: BoxDecoration(
+          color: AppColors.elevated.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: _color.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(_icon, size: 18, color: _color),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _label(),
+                  style: AppTypography.body(
+                    size: 12,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700,
+                  ),
+                ),
+                if (durationSec > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1),
+                    child: Text(
+                      'systemCall.duration'
+                          .tr(namedArgs: {'d': _formatDuration(durationSec)}),
+                      style:
+                          AppTypography.label(size: 9, color: AppColors.mute),
+                    ),
+                  ),
+              ],
+            ),
+            if (showCallback) ...[
+              const SizedBox(width: 12),
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _callBack(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColors.leben.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: AppColors.leben.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(LucideIcons.phone,
+                          size: 11, color: AppColors.leben),
+                      const SizedBox(width: 4),
+                      Text(
+                        'systemCall.callback'.tr(),
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.leben),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

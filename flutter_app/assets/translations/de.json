@@ -1695,6 +1695,15 @@
     "start": "Starten",
     "cameraDenied": "Kamera-Berechtigung verweigert."
   },
+  "systemCall": {
+    "ended": "Audioanruf",
+    "missed": "Verpasster Anruf",
+    "cancelled": "Anruf abgebrochen",
+    "declined": "Anruf abgelehnt",
+    "duration": "Dauer: {d}",
+    "callback": "Zurückrufen",
+    "callbackFailed": "Rückruf fehlgeschlagen"
+  },
   "time": {
     "justNow": "gerade eben",
     "minutesShort": "vor {n} Min",
