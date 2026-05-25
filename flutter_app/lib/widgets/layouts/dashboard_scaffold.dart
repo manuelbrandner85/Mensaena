@@ -57,8 +57,17 @@ class DashboardScaffold extends ConsumerWidget {
     final unread = ref.watch(unreadNotificationCountProvider);
     // Aktiv-Tab via GoRouter ableiten (matchedLocation), Fallback auf
     // currentRoute-Parameter (Backwards-Compat).
-    final matched = GoRouterState.of(context).matchedLocation;
-    final activeRoute = matched.isNotEmpty ? matched : currentRoute;
+    // Bug-Fix: GoRouterState.of(context) wirft wenn der Context AUSSERHALB
+    // des GoRouter-Subtrees liegt (z.B. waehrend Page-Transitions oder in
+    // Bottom-Sheets). Try/catch verhindert Crash + faellt auf
+    // currentRoute-Parameter zurueck.
+    String activeRoute;
+    try {
+      final matched = GoRouterState.of(context).matchedLocation;
+      activeRoute = matched.isNotEmpty ? matched : currentRoute;
+    } catch (_) {
+      activeRoute = currentRoute;
+    }
 
     // Realtime-Toast: zeige bei jeder neuen Notification eine Snackbar.
     ref.listen(notificationsStreamProvider, (prev, next) {

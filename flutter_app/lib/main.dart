@@ -40,7 +40,11 @@ Future<void> main() async {
       message: error.toString(),
       stack: stack.toString(),
     );
-    return false;
+    // Critical: return true so Flutter marks the error as handled and the
+    // Engine does NOT eskaliert to native crash. Returning false caused
+    // RealtimeSubscribeException + sensors_plus "No active stream"
+    // exceptions to kill the whole App during screen-transitions.
+    return true;
   };
 
   // 1. Supabase Session-Restore (kritisch, blockierend, ~100-300ms)

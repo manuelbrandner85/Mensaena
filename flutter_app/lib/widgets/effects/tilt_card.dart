@@ -73,9 +73,26 @@ class _TiltCardState extends ConsumerState<TiltCard> {
   }
 
   void _start() {
-    _sub?.cancel();
-    _sub = accelerometerEventStream(samplingPeriod: _sampleInterval)
-        .listen(_onSample, onError: (_) {});
+    _cancelSub();
+    try {
+      _sub = accelerometerEventStream(samplingPeriod: _sampleInterval)
+          .listen(_onSample, onError: (_) {});
+    } catch (_) {
+      // Sensor not available — gracefully degrade (no tilt animation).
+      _sub = null;
+    }
+  }
+
+  /// Robust cancel: sensors_plus throws "No active stream to cancel" on
+  /// Android when the stream wasn't actually active. Swallow that — it
+  /// crashes the framework if uncaught during dispose.
+  void _cancelSub() {
+    final s = _sub;
+    if (s == null) return;
+    _sub = null;
+    try {
+      s.cancel();
+    } catch (_) {}
   }
 
   void _onSample(AccelerometerEvent e) {
@@ -99,7 +116,7 @@ class _TiltCardState extends ConsumerState<TiltCard> {
 
   @override
   void dispose() {
-    _sub?.cancel();
+    _cancelSub();
     super.dispose();
   }
 

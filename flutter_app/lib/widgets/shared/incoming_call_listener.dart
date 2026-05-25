@@ -98,17 +98,27 @@ class _IncomingCallListenerState
     if (uid == null) return;
 
     // 1. Supabase Realtime — primary source while online + app open.
+    // Mit onError + cancelOnError:false damit Timeouts/Network-Drops die
+    // App nicht crashen (RealtimeSubscribeException war vorher uncaught).
     try {
       _realtimeSub = sb
           .from('dm_calls')
           .stream(primaryKey: ['id'])
           .eq('callee_id', uid)
-          .listen(_handleRealtimeBatch);
+          .listen(
+            _handleRealtimeBatch,
+            onError: (_) {/* swallow timeouts / network drops */},
+            cancelOnError: false,
+          );
     } catch (_) {/* fail-open */}
 
     // 2. FCM Foreground — secondary source (faster on cold-start race).
     try {
-      _fcmSub = FirebaseMessaging.onMessage.listen(_handleFcmMessage);
+      _fcmSub = FirebaseMessaging.onMessage.listen(
+        _handleFcmMessage,
+        onError: (_) {},
+        cancelOnError: false,
+      );
     } catch (_) {/* fail-open */}
   }
 
