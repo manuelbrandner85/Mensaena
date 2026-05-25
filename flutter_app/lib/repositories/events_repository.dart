@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../models/event.dart';
 import '../services/supabase_service.dart';
@@ -180,47 +183,87 @@ class EventsRepository {
     }
   }
 
+  /// Erstellt ein Event mit allen Feldern. Returns event-id bei Erfolg, null sonst.
   static Future<String?> create({
     required String title,
+    String? description,
     required String category,
     required DateTime startDate,
     DateTime? endDate,
-    String? description,
+    bool isAllDay = false,
     String? locationName,
     String? locationAddress,
     double? latitude,
     double? longitude,
+    String? imageUrl,
     int? maxAttendees,
+    String? cost,
+    String? whatToBring,
+    String? contactInfo,
+    bool isRecurring = false,
+    String? recurringPattern, // 'daily' | 'weekly' | 'monthly'
     bool isOnline = false,
     String? onlineUrl,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
     try {
-      final row = await sb
-          .from('events')
-          .insert({
-            'author_id': uid,
-            'title': title,
-            'category': category,
-            'start_date': startDate.toUtc().toIso8601String(),
-            if (endDate != null) 'end_date': endDate.toUtc().toIso8601String(),
-            'description': description,
-            'location_name': locationName,
-            'location_address': locationAddress,
-            'latitude': latitude,
-            'longitude': longitude,
-            'max_attendees': maxAttendees,
-            'is_online': isOnline,
-            'online_url': onlineUrl,
-            'status': 'active',
-          })
-          .select()
-          .single();
+      final row = await sb.from('events').insert({
+        'author_id': uid,
+        'title': title,
+        if (description != null && description.isNotEmpty)
+          'description': description,
+        'category': category,
+        'start_date': startDate.toUtc().toIso8601String(),
+        if (endDate != null) 'end_date': endDate.toUtc().toIso8601String(),
+        'is_all_day': isAllDay,
+        if (locationName != null && locationName.isNotEmpty)
+          'location_name': locationName,
+        if (locationAddress != null && locationAddress.isNotEmpty)
+          'location_address': locationAddress,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
+        if (imageUrl != null) 'image_url': imageUrl,
+        if (maxAttendees != null) 'max_attendees': maxAttendees,
+        if (cost != null && cost.isNotEmpty) 'cost': cost,
+        if (whatToBring != null && whatToBring.isNotEmpty)
+          'what_to_bring': whatToBring,
+        if (contactInfo != null && contactInfo.isNotEmpty)
+          'contact_info': contactInfo,
+        'is_recurring': isRecurring,
+        if (recurringPattern != null) 'recurring_pattern': recurringPattern,
+        'is_online': isOnline,
+        if (onlineUrl != null && onlineUrl.isNotEmpty) 'online_url': onlineUrl,
+        'status': 'active',
+      }).select('id').single();
       return row['id'] as String?;
     } catch (_) {
       return null;
     }
+  }
+
+  /// Bild-Upload zu Supabase Storage. Returns public-URL oder null bei Fehler.
+  /// Bucket order: 'event-images' → fallback 'chat-images'.
+  static Future<String?> uploadEventImage({
+    required Uint8List bytes,
+    required String userId,
+    required String fileExt, // 'jpg' | 'png' | 'webp'
+  }) async {
+    final filename = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    final path = '$userId/$filename';
+    for (final bucket in const ['event-images', 'chat-images']) {
+      try {
+        await sb.storage.from(bucket).uploadBinary(
+              path,
+              bytes,
+              fileOptions: FileOptions(contentType: 'image/$fileExt'),
+            );
+        return sb.storage.from(bucket).getPublicUrl(path);
+      } catch (_) {
+        continue;
+      }
+    }
+    return null;
   }
 }
 
