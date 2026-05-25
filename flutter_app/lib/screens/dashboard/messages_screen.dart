@@ -513,28 +513,32 @@ class _DmTile extends ConsumerWidget {
         ),
         child: Row(
           children: [
+            // R1: 44 → 52px Avatar fuer mehr visuelles Gewicht.
             Stack(
               children: [
                 if (avatarUrl != null)
                   SizedAvatarImage(
                     url: avatarUrl,
-                    size: 44,
+                    size: 52,
                     fallbackInitial: title.isNotEmpty ? title[0] : null,
                   )
                 else
-                  const CircleAvatar(
-                    radius: 22, // 44dp — empfohlene Touch-Affordanz
+                  CircleAvatar(
+                    radius: 26,
                     backgroundColor: AppColors.elevated,
-                    child: Icon(LucideIcons.user,
-                        size: 20, color: AppColors.bronze),
+                    child: Text(
+                      title.isNotEmpty ? title[0].toUpperCase() : '?',
+                      style: AppTypography.display(
+                          size: 20, color: AppColors.bronze),
+                    ),
                   ),
                 if (online && isDm)
                   Positioned(
                     right: 0,
                     bottom: 0,
                     child: Container(
-                      width: 12,
-                      height: 12,
+                      width: 14,
+                      height: 14,
                       decoration: BoxDecoration(
                         color: AppColors.leben,
                         shape: BoxShape.circle,
