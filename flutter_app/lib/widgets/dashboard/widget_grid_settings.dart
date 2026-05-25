@@ -202,6 +202,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.quote',
       icon: LucideIcons.quote,
     ),
+    DashboardWidgetMeta(
+      id: 'streak',
+      title: 'widgets.titles.streak',
+      description: 'widgets.descriptions.streak',
+      icon: LucideIcons.flame,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

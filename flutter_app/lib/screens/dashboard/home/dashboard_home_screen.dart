@@ -35,6 +35,7 @@ import '../../../widgets/dashboard/health_widget.dart';
 import '../../../widgets/dashboard/mood_chart_widget.dart';
 import '../../../widgets/dashboard/nasa_apod_widget.dart';
 import '../../../widgets/dashboard/on_this_day_widget.dart';
+import '../../../widgets/dashboard/streak_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
@@ -459,6 +460,10 @@ class _DashboardHomeScreenState
           break;
         case 'quote':
           out.add(const DailyQuoteWidget());
+          addSpacing();
+          break;
+        case 'streak':
+          out.add(const StreakWidget());
           addSpacing();
           break;
         case 'nearby_posts':

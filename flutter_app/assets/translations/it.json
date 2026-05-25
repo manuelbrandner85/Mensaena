@@ -1819,6 +1819,11 @@
     "bannerTitle": "Resta aggiornato",
     "bannerBody": "Attiva le push per vedere subito chiamate, messaggi e richieste."
   },
+  "streak": {
+    "title": "Continua così",
+    "days": "{count} giorni di fila",
+    "best": "Record"
+  },
   "detox": {
     "section": "Benessere digitale",
     "toggleTitle": "Promemoria detox",

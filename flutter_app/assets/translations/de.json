@@ -1914,7 +1914,8 @@
       "onThisDay": "Heute in der Geschichte",
       "mood": "Stimmungs-Tracker",
       "sun": "Sonne",
-      "quote": "Zitat des Tages"
+      "quote": "Zitat des Tages",
+      "streak": "Login-Streak"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1944,7 +1945,8 @@
       "onThisDay": "Was geschah heute vor Jahren?",
       "mood": "Tägliches Stimmungs-Check-in mit 7-Tage-Verlauf",
       "sun": "Sonnenauf-/-untergang + Golden Hour",
-      "quote": "Tägliches Zitat zum Innehalten"
+      "quote": "Tägliches Zitat zum Innehalten",
+      "streak": "Aufeinanderfolgende Tage in der App"
     }
   },
   "hubs": {
@@ -2033,6 +2035,11 @@
     "enable": "Benachrichtigungen aktivieren",
     "bannerTitle": "Bleib auf dem Laufenden",
     "bannerBody": "Aktiviere Push, damit du Anrufe, Nachrichten und Hilferufe sofort siehst."
+  },
+  "streak": {
+    "title": "Dranbleiben",
+    "days": "{count} Tage in Folge",
+    "best": "Rekord"
   },
   "detox": {
     "section": "Digitales Wohlbefinden",

@@ -16,6 +16,7 @@ import '../../repositories/app_releases_repository.dart';
 import '../../services/apk_installer_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
+import '../../services/streak_service.dart';
 import 'detox_reminder_dialog.dart';
 import '../effects/bloom.dart';
 import '../effects/cinema_overlay.dart';
@@ -79,6 +80,8 @@ class _UpdateGateState extends ConsumerState<UpdateGate>
     // F41 Detox: erste Session beginnt sobald UpdateGate mountet.
     ScreenTimeService.startSession();
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkDetoxReminder());
+    // F38 Streak: Tages-Open verbuchen.
+    unawaited(StreakService.recordOpen());
   }
 
   @override
@@ -102,6 +105,8 @@ class _UpdateGateState extends ConsumerState<UpdateGate>
       // und Herwischen) und ggf. Reminder zeigen.
       ScreenTimeService.startSession();
       _checkDetoxReminder();
+      // F38 Streak: auch bei Resume nochmal pruefen (Datumswechsel ueber Nacht).
+      unawaited(StreakService.recordOpen());
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       // Session-Ende → addiert die Dauer zum heutigen Total.

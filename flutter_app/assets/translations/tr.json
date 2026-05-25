@@ -1818,6 +1818,11 @@
     "bannerTitle": "Hiçbir şeyi kaçırma",
     "bannerBody": "Bildirimleri açarak çağrıları, mesajları ve yardım isteklerini anında gör."
   },
+  "streak": {
+    "title": "Devam et",
+    "days": "{count} gün üst üste",
+    "best": "Rekor"
+  },
   "detox": {
     "section": "Dijital iyi oluş",
     "toggleTitle": "Detoks hatırlatıcı",

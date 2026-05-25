@@ -1819,6 +1819,11 @@
     "bannerTitle": "No te pierdas nada",
     "bannerBody": "Activa las notificaciones para ver llamadas, mensajes y peticiones al instante."
   },
+  "streak": {
+    "title": "Sigue así",
+    "days": "{count} días seguidos",
+    "best": "Récord"
+  },
   "detox": {
     "section": "Bienestar digital",
     "toggleTitle": "Recordatorio de desconexión",

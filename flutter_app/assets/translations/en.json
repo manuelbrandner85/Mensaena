@@ -1915,7 +1915,8 @@
       "onThisDay": "On this day",
       "mood": "Mood tracker",
       "sun": "Sun",
-      "quote": "Quote of the day"
+      "quote": "Quote of the day",
+      "streak": "Login streak"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1945,7 +1946,8 @@
       "onThisDay": "What happened today in history?",
       "mood": "Daily mood check-in + 7-day trend",
       "sun": "Sunrise/sunset + Golden Hour",
-      "quote": "Daily quote for reflection"
+      "quote": "Daily quote for reflection",
+      "streak": "Consecutive days in the app"
     }
   },
   "hubs": {
@@ -2034,6 +2036,11 @@
     "enable": "Enable notifications",
     "bannerTitle": "Stay in the loop",
     "bannerBody": "Turn on push so you see calls, messages, and requests right away."
+  },
+  "streak": {
+    "title": "Keep it going",
+    "days": "{count} days in a row",
+    "best": "Best"
   },
   "detox": {
     "section": "Digital wellbeing",

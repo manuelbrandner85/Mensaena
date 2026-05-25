@@ -1819,6 +1819,11 @@
     "bannerTitle": "Restez informé",
     "bannerBody": "Activez les notifications pour voir tout de suite les appels, messages et demandes."
   },
+  "streak": {
+    "title": "Continue",
+    "days": "{count} jours d'affilée",
+    "best": "Record"
+  },
   "detox": {
     "section": "Bien-être numérique",
     "toggleTitle": "Rappel de déconnexion",
