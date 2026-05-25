@@ -1831,6 +1831,13 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "quickNote": {
+    "title": "Note rapide",
+    "prompt": "Touche pour écrire quelque chose à ne pas oublier.",
+    "sheetTitle": "Ma note",
+    "placeholder": "Liste de courses, un numéro, une idée…",
+    "clear": "Effacer"
+  },
   "heatmap": {
     "title": "Carte d'activité",
     "totalCount": "{count} actions en 12 semaines",

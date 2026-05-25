@@ -232,6 +232,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.heatmap',
       icon: LucideIcons.calendarDays,
     ),
+    DashboardWidgetMeta(
+      id: 'quickNote',
+      title: 'widgets.titles.quickNote',
+      description: 'widgets.descriptions.quickNote',
+      icon: LucideIcons.stickyNote,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

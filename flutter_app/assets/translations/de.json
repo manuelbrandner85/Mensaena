@@ -1919,7 +1919,8 @@
       "gratitude": "Dankbarkeit",
       "karma": "Karma & Level",
       "recap": "Wochenrückblick",
-      "heatmap": "Aktivitäts-Heatmap"
+      "heatmap": "Aktivitäts-Heatmap",
+      "quickNote": "Notizzettel"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1954,7 +1955,8 @@
       "gratitude": "Wofür bist du heute dankbar?",
       "karma": "Deine Karma-Punkte und dein aktuelles Level",
       "recap": "Deine letzten 7 Tage im Vergleich zur Vorwoche",
-      "heatmap": "12-Wochen-Übersicht deiner täglichen Aktivität"
+      "heatmap": "12-Wochen-Übersicht deiner täglichen Aktivität",
+      "quickNote": "Privater Notizzettel, nur auf deinem Gerät"
     }
   },
   "hubs": {
@@ -2055,6 +2057,13 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "quickNote": {
+    "title": "Notizzettel",
+    "prompt": "Tippe und schreib dir etwas, das du nicht vergessen willst.",
+    "sheetTitle": "Mein Notizzettel",
+    "placeholder": "Einkaufsliste, Telefonnummer, Idee…",
+    "clear": "Löschen"
   },
   "heatmap": {
     "title": "Aktivitäts-Heatmap",

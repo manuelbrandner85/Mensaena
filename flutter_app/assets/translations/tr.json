@@ -1830,6 +1830,13 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "quickNote": {
+    "title": "Hızlı not",
+    "prompt": "Unutmak istemediğin bir şeyi yazmak için dokun.",
+    "sheetTitle": "Notum",
+    "placeholder": "Alışveriş listesi, telefon, fikir…",
+    "clear": "Sil"
+  },
   "heatmap": {
     "title": "Aktivite haritası",
     "totalCount": "12 haftada {count} eylem",
