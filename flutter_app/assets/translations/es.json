@@ -886,9 +886,18 @@
       "confirmMsg": "Marca el anuncio como entregado — otras personas ya no podrán reservarlo.",
       "confirmBtn": "Confirmar entrega",
       "cancelBtn": "Cancelar reserva",
+      "reserveBtn": "Reservar para alguien",
       "forYou": "Reservado para ti",
       "forYouHint": "La persona vendedora te lo está reservando. Ponte en contacto pronto.",
       "alreadyReserved": "Ya reservado"
+    },
+    "create": {
+      "images": "Imágenes (máx. 5)",
+      "addImage": "Añadir imagen",
+      "pickGallery": "Desde la galería",
+      "pickCamera": "Cámara",
+      "uploading": "Subiendo imágenes...",
+      "uploadFailed": "No se pudo subir la imagen"
     }
   },
   "trust": {

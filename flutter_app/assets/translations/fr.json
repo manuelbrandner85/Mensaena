@@ -886,9 +886,18 @@
       "confirmMsg": "Marque l'annonce comme cédée — les autres utilisateurs ne pourront plus la réserver.",
       "confirmBtn": "Confirmer la remise",
       "cancelBtn": "Annuler la réservation",
+      "reserveBtn": "Réserver pour quelqu'un",
       "forYou": "Réservé pour toi",
       "forYouHint": "Le vendeur garde l'annonce pour toi. Contacte-le rapidement.",
       "alreadyReserved": "Déjà réservé"
+    },
+    "create": {
+      "images": "Images (max. 5)",
+      "addImage": "Ajouter une image",
+      "pickGallery": "Depuis la galerie",
+      "pickCamera": "Appareil photo",
+      "uploading": "Téléversement des images...",
+      "uploadFailed": "Impossible de téléverser l'image"
     }
   },
   "trust": {

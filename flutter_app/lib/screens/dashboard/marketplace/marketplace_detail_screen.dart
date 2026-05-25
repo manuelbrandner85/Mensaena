@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +14,11 @@ import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/marketplace_reservation.dart';
+import '../../../widgets/shared/image_carousel.dart';
 
 class MarketplaceDetailScreen extends ConsumerWidget {
   const MarketplaceDetailScreen({required this.listingId, super.key});
@@ -38,47 +43,17 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     style: AppTypography.caption()),
               );
             }
+            final me = SupabaseService.currentUser?.id;
+            final ownerId = l.userId.isNotEmpty
+                ? l.userId
+                : (l.sellerId ?? '');
+            final isOwner = me != null && me == ownerId;
+            final isClaimed = l.status == 'claimed' || l.status == 'sold';
+
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                if (l.images.isNotEmpty)
-                  SizedBox(
-                    height: 240,
-                    child: PageView.builder(
-                      itemCount: l.images.length,
-                      // Hero auf das erste Image (matched MarketplaceCard).
-                      // Weitere Slides ohne Hero, da nur 1 Tag/Route gilt.
-                      itemBuilder: (context, i) {
-                        final img = ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: CachedNetworkImage(
-                            imageUrl: l.images[i],
-                            fadeInDuration:
-                                const Duration(milliseconds: 200),
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => const ShimmerBox(
-                              width: double.infinity,
-                              height: 240,
-                              borderRadius: 14,
-                            ),
-                            errorWidget: (_, __, ___) => Container(
-                              color: AppColors.elevated,
-                              alignment: Alignment.center,
-                              child: const Icon(LucideIcons.imageOff,
-                                  size: 20, color: AppColors.mute),
-                            ),
-                          ),
-                        );
-                        if (i == 0) {
-                          return Hero(
-                            tag: 'marketplace-image-${l.id}',
-                            child: img,
-                          );
-                        }
-                        return img;
-                      },
-                    ),
-                  ),
+                _buildHero(l, isClaimed),
                 const SizedBox(height: 14),
                 Row(
                   children: [
@@ -148,7 +123,14 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ],
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
+                // Reservation-Widget (4 Konstellationen).
+                MarketplaceReservation(
+                  listingId: l.id,
+                  ownerId: ownerId,
+                  reservedFor: l.reservedFor,
+                ),
+                const SizedBox(height: 14),
                 // Action-Bar
                 Row(
                   children: [
@@ -173,26 +155,38 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     _SaveButton(listingId: l.id),
-                    if (l.userId == SupabaseService.currentUser?.id) ...[
-                      const SizedBox(width: 8),
-                      _CircleIconButton(
-                        icon: l.status == 'reserved'
-                            ? LucideIcons.unlock
-                            : LucideIcons.lock,
-                        color: AppColors.amber,
-                        onTap: () =>
-                            _toggleReserved(context, ref, l),
-                      ),
-                      const SizedBox(width: 8),
-                      _CircleIconButton(
-                        icon: LucideIcons.checkCircle,
-                        color: AppColors.leben,
-                        onTap: () => _markSold(context, ref, l),
-                      ),
-                    ],
                   ],
                 ),
-                if (l.status == 'reserved') ...[
+                // Owner-Aktionen (nur sichtbar, wenn aktiv & nicht reserved).
+                if (isOwner &&
+                    l.status == 'active' &&
+                    l.reservedFor == null) ...[
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () => _reserveDirect(context, ref, l),
+                    icon: const Icon(LucideIcons.bookmark, size: 14),
+                    label: Text('marketplace.reservation.reserveBtn'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.amber,
+                      side: BorderSide(
+                        color: AppColors.amber.withValues(alpha: 0.5),
+                      ),
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton.icon(
+                    onPressed: () => _markClaimed(context, ref, l),
+                    icon: const Icon(LucideIcons.checkCircle, size: 14),
+                    label: Text('marketplace.claimedBadge'.tr()),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.herzrot,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                  ),
+                ],
+                if (l.status == 'reserved' && !isOwner) ...[
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -217,31 +211,6 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
-                if (l.status == 'sold') ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.leben.withValues(alpha: 0.10),
-                      border: Border.all(
-                          color: AppColors.leben
-                              .withValues(alpha: 0.4)),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(LucideIcons.checkCircle,
-                            size: 14,
-                            color: AppColors.lebenSoft),
-                        const SizedBox(width: 8),
-                        Text('marketplace.sold'.tr(),
-                            style: AppTypography.label(
-                                size: 10,
-                                color: AppColors.lebenSoft)),
-                      ],
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 18),
                 Text(
                   'marketplace.postedOn'.tr(namedArgs: {
@@ -253,6 +222,89 @@ class MarketplaceDetailScreen extends ConsumerWidget {
             );
           },
         ),
+      ),
+    );
+  }
+
+  /// Hero-Bereich: Carousel falls >1 Bild, sonst Single-Image-Hero.
+  /// Bei status=claimed/sold zusätzlich BackdropFilter + Badge.
+  Widget _buildHero(MarketplaceListing l, bool isClaimed) {
+    Widget? base;
+    if (l.images.length > 1) {
+      base = Hero(
+        tag: 'marketplace-image-${l.id}',
+        child: ImageCarousel(
+          urls: l.images,
+          height: 280,
+          borderRadius: 0,
+        ),
+      );
+    } else if (l.images.isNotEmpty) {
+      base = SizedBox(
+        height: 240,
+        child: Hero(
+          tag: 'marketplace-image-${l.id}',
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: CachedNetworkImage(
+              imageUrl: l.images.first,
+              fadeInDuration: const Duration(milliseconds: 200),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              placeholder: (_, __) => const ShimmerBox(
+                width: double.infinity,
+                height: 240,
+                borderRadius: 14,
+              ),
+              errorWidget: (_, __, ___) => Container(
+                color: AppColors.elevated,
+                alignment: Alignment.center,
+                child: const Icon(LucideIcons.imageOff,
+                    size: 20, color: AppColors.mute),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    if (base == null) {
+      return const SizedBox.shrink();
+    }
+    if (!isClaimed) return base;
+    // Claimed-Overlay: blur + zentrale herzrote Badge.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(l.images.length > 1 ? 0 : 14),
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: [
+          base,
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.15),
+                alignment: Alignment.center,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.herzrot.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'marketplace.claimedBadge'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -325,61 +377,55 @@ class MarketplaceDetailScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _toggleReserved(
+  /// Owner-Aktion: Direkt-Reservierung (vereinfachter Flow).
+  /// Setzt status='claimed' (= vergeben) ohne User-Selektion.
+  Future<void> _reserveDirect(
       BuildContext context, WidgetRef ref, MarketplaceListing l) async {
-    final next = l.status == 'reserved' ? 'active' : 'reserved';
-    try {
-      await sb.from('marketplace_listings').update({
-        'status': next,
-      }).eq('id', l.id);
+    final ok = await ConfirmDialog.show(
+      context,
+      title: 'marketplace.markAsSoldQuestion'.tr(),
+      message: 'marketplace.markAsSoldDescription'.tr(),
+      confirmLabel: 'marketplace.markSold'.tr(),
+    );
+    if (!ok) return;
+    final success = await MarketplaceRepository.markAsClaimed(l.id);
+    if (!context.mounted) return;
+    if (success) {
       ref.invalidate(marketplaceDetailProvider(l.id));
-      if (!context.mounted) return;
+      ref.invalidate(marketplaceStatsProvider);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
-        content: Text(
-          next == 'reserved'
-              ? 'marketplace.markedReserved'.tr()
-              : 'marketplace.reservationLifted'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
+        content: Text('marketplace.markedReserved'.tr(),
+            style:
+                AppTypography.body(size: 13, color: AppColors.ink)),
       ));
-    } catch (_) {}
+    }
   }
 
-  Future<void> _markSold(
+  /// Owner-Aktion: Als vergeben markieren via ConfirmDialog → markAsClaimed.
+  Future<void> _markClaimed(
       BuildContext context, WidgetRef ref, MarketplaceListing l) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text('marketplace.markAsSoldQuestion'.tr(),
-            style:
-                AppTypography.display(size: 18, color: AppColors.ink)),
-        content: Text(
-          'marketplace.markAsSoldDescription'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.inkSoft),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('common.cancel'.tr())),
-          FilledButton(
-            style: FilledButton.styleFrom(
-                backgroundColor: AppColors.leben,
-                foregroundColor: AppColors.voidColor),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('marketplace.markSold'.tr()),
-          ),
-        ],
-      ),
+    final ok = await ConfirmDialog.show(
+      context,
+      title: 'marketplace.markAsSoldQuestion'.tr(),
+      message: 'marketplace.markAsSoldDescription'.tr(),
+      confirmLabel: 'marketplace.markSold'.tr(),
+      danger: true,
     );
-    if (confirm != true) return;
-    try {
-      await sb.from('marketplace_listings').update({
-        'status': 'sold',
-      }).eq('id', l.id);
+    if (!ok) return;
+    Haptics.tap();
+    final success = await MarketplaceRepository.markAsClaimed(l.id);
+    if (!context.mounted) return;
+    if (success) {
       ref.invalidate(marketplaceDetailProvider(l.id));
-    } catch (_) {}
+      ref.invalidate(marketplaceStatsProvider);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('marketplace.sold'.tr(),
+            style:
+                AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
   }
 }
 
@@ -387,16 +433,13 @@ class _CircleIconButton extends StatelessWidget {
   const _CircleIconButton({
     required this.icon,
     required this.onTap,
-    this.color,
   });
 
   final IconData icon;
   final VoidCallback onTap;
-  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? AppColors.inkSoft;
     return Material(
       color: AppColors.elevated,
       shape: const CircleBorder(),
@@ -406,7 +449,7 @@ class _CircleIconButton extends StatelessWidget {
         child: SizedBox(
           width: 44,
           height: 44,
-          child: Icon(icon, size: 16, color: c),
+          child: Icon(icon, size: 16, color: AppColors.inkSoft),
         ),
       ),
     );

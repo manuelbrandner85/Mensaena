@@ -886,9 +886,18 @@
       "confirmMsg": "Marks the listing as taken — other users will no longer be able to reserve it.",
       "confirmBtn": "Confirm handover",
       "cancelBtn": "Cancel reservation",
+      "reserveBtn": "Reserve for someone",
       "forYou": "Reserved for you",
       "forYouHint": "The seller is holding this listing for you. Please get in touch soon.",
       "alreadyReserved": "Already reserved"
+    },
+    "create": {
+      "images": "Images (max 5)",
+      "addImage": "Add image",
+      "pickGallery": "From gallery",
+      "pickCamera": "Camera",
+      "uploading": "Uploading images...",
+      "uploadFailed": "Image could not be uploaded"
     }
   },
   "trust": {

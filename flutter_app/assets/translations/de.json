@@ -886,9 +886,18 @@
       "confirmMsg": "Markiert das Inserat als vergeben — andere Nutzer:innen können es nicht mehr reservieren.",
       "confirmBtn": "Verkauf bestätigen",
       "cancelBtn": "Reservierung aufheben",
+      "reserveBtn": "Für jemanden reservieren",
       "forYou": "Reserviert für dich",
       "forYouHint": "Die Anbieter:in hält das Inserat für dich frei. Melde dich bald.",
       "alreadyReserved": "Bereits reserviert"
+    },
+    "create": {
+      "images": "Bilder (max 5)",
+      "addImage": "Bild hinzufügen",
+      "pickGallery": "Aus Galerie",
+      "pickCamera": "Kamera",
+      "uploading": "Lade Bilder hoch...",
+      "uploadFailed": "Bild konnte nicht hochgeladen werden"
     }
   },
   "trust": {

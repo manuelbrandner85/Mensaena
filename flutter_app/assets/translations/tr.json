@@ -886,9 +886,18 @@
       "confirmMsg": "İlan verildi olarak işaretlenir — diğer kullanıcılar artık rezerve edemez.",
       "confirmBtn": "Devri onayla",
       "cancelBtn": "Rezervasyonu iptal et",
+      "reserveBtn": "Biri için rezerve et",
       "forYou": "Senin için rezerve",
       "forYouHint": "Satıcı ilanı senin için tutuyor. En kısa sürede iletişime geç.",
       "alreadyReserved": "Zaten rezerve"
+    },
+    "create": {
+      "images": "Görseller (en fazla 5)",
+      "addImage": "Görsel ekle",
+      "pickGallery": "Galeriden",
+      "pickCamera": "Kamera",
+      "uploading": "Görseller yükleniyor...",
+      "uploadFailed": "Görsel yüklenemedi"
     }
   },
   "trust": {

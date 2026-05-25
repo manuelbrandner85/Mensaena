@@ -886,9 +886,18 @@
       "confirmMsg": "Contrassegna l'annuncio come ceduto — gli altri utenti non potranno più prenotarlo.",
       "confirmBtn": "Conferma consegna",
       "cancelBtn": "Annulla prenotazione",
+      "reserveBtn": "Prenota per qualcuno",
       "forYou": "Riservato per te",
       "forYouHint": "L'inserzionista tiene l'annuncio per te. Fatti sentire presto.",
       "alreadyReserved": "Già prenotato"
+    },
+    "create": {
+      "images": "Immagini (max 5)",
+      "addImage": "Aggiungi immagine",
+      "pickGallery": "Dalla galleria",
+      "pickCamera": "Fotocamera",
+      "uploading": "Caricamento immagini...",
+      "uploadFailed": "Impossibile caricare l'immagine"
     }
   },
   "trust": {

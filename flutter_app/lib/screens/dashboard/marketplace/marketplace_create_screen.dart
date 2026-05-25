@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/open_food_facts_service.dart';
+import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../shared/barcode_scanner_screen.dart';
 
@@ -29,7 +33,11 @@ class _MarketplaceCreateScreenState
   String _category = 'haushalt';
   String _condition = 'gut';
   bool _submitting = false;
+  bool _uploading = false;
   String? _error;
+  final List<File> _images = [];
+  static const int _maxImages = 5;
+  final ImagePicker _picker = ImagePicker();
 
   static const List<({String value, String label, String emoji})> _types = [
     (value: 'verschenken', label: 'Verschenken', emoji: '🎁'),
@@ -99,6 +107,70 @@ class _MarketplaceCreateScreenState
     ));
   }
 
+  /// Bottom-Sheet mit Gallery/Camera-Optionen. Picked Image → _images.
+  Future<void> _pickImage() async {
+    if (_images.length >= _maxImages) return;
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.line,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(LucideIcons.image,
+                  color: AppColors.amber),
+              title: Text('marketplace.create.pickGallery'.tr(),
+                  style:
+                      AppTypography.body(size: 14, color: AppColors.ink)),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.camera,
+                  color: AppColors.amber),
+              title: Text('marketplace.create.pickCamera'.tr(),
+                  style:
+                      AppTypography.body(size: 14, color: AppColors.ink)),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (source == null || !mounted) return;
+    try {
+      final picked = await _picker.pickImage(
+        source: source,
+        maxWidth: 1920,
+        imageQuality: 85,
+      );
+      if (picked == null || !mounted) return;
+      setState(() => _images.add(File(picked.path)));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('marketplace.create.uploadFailed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
+  }
+
   Future<void> _submit() async {
     if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
       setState(() => _error = 'Titel und Beschreibung sind Pflicht.');
@@ -108,6 +180,30 @@ class _MarketplaceCreateScreenState
       _submitting = true;
       _error = null;
     });
+
+    // Upload images first (if any).
+    final imageUrls = <String>[];
+    final uid = SupabaseService.currentUser?.id;
+    if (_images.isNotEmpty && uid != null) {
+      setState(() => _uploading = true);
+      for (final file in _images) {
+        try {
+          final bytes = await file.readAsBytes();
+          final ext = file.path.split('.').last.toLowerCase();
+          final url = await MarketplaceRepository.uploadListingImage(
+            bytes: bytes,
+            userId: uid,
+            fileExt: ext,
+          );
+          if (url != null) imageUrls.add(url);
+        } catch (_) {
+          // skip failed individual uploads; continue with the rest.
+        }
+      }
+      if (mounted) setState(() => _uploading = false);
+    }
+
+    // Create listing.
     final id = await MarketplaceRepository.create(
       title: _title.text.trim(),
       description: _desc.text.trim(),
@@ -121,6 +217,7 @@ class _MarketplaceCreateScreenState
           ? null
           : _location.text.trim(),
     );
+
     if (!mounted) return;
     if (id == null) {
       setState(() {
@@ -129,6 +226,18 @@ class _MarketplaceCreateScreenState
       });
       return;
     }
+
+    // Patch images into the row (separated from create() to keep its API
+    // stable). Failure here is non-fatal — the listing exists either way.
+    if (imageUrls.isNotEmpty) {
+      try {
+        await sb.from('marketplace_listings').update({
+          'images': imageUrls,
+        }).eq('id', id);
+      } catch (_) {/* ignore */}
+    }
+
+    if (!mounted) return;
     context.go('/dashboard/marketplace/$id');
   }
 
@@ -211,6 +320,87 @@ class _MarketplaceCreateScreenState
               ),
             ),
             const SizedBox(height: 12),
+            // ── Bilder (max 5) ──────────────────────────────────────────
+            Text('marketplace.create.images'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ..._images.asMap().entries.map((e) {
+                  final i = e.key;
+                  final f = e.value;
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          f,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        top: -4,
+                        right: -4,
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _images.removeAt(i)),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.herzrot,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.surface, width: 2),
+                            ),
+                            padding: const EdgeInsets.all(2),
+                            child: const Icon(
+                              LucideIcons.x,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+                if (_images.length < _maxImages)
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.elevated,
+                        border: Border.all(
+                          color: AppColors.line,
+                          style: BorderStyle.solid,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(LucideIcons.plus,
+                              size: 20, color: AppColors.amber),
+                          const SizedBox(height: 2),
+                          Text(
+                            'marketplace.create.addImage'.tr(),
+                            style: AppTypography.label(
+                                size: 8, color: AppColors.inkSoft),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _category,
               decoration: InputDecoration(labelText: 'create.categoryLabel'.tr()),
@@ -257,6 +447,25 @@ class _MarketplaceCreateScreenState
                   size: 13,
                   color: AppColors.herzrotWarm,
                 ),
+              ),
+            ],
+            if (_uploading) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.amber,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text('marketplace.create.uploading'.tr(),
+                      style: AppTypography.body(
+                          size: 13, color: AppColors.inkSoft)),
+                ],
               ),
             ],
             const SizedBox(height: 16),
