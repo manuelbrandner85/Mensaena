@@ -43,6 +43,10 @@ class _IncomingCallListenerState
     _setupListeners();
     _authSub = sb.auth.onAuthStateChange.listen((_) {
       _teardownSubs();
+      // Bei Login/Logout: handled-CallIds + global Bus-Dedupe clearen,
+      // damit User A's gehandelte Calls nicht User B's gleiche IDs blocken.
+      _handledCallIds.clear();
+      CallEventBus.clearHandled();
       _setupListeners();
     });
   }

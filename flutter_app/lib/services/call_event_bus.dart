@@ -15,8 +15,7 @@ library;
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show debugPrint;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:go_router/go_router.dart';
 
@@ -24,6 +23,10 @@ import '../config/routes/app_router.dart' show rootNavigatorKey;
 import 'callkit_service.dart';
 import 'dm_call_service.dart';
 import 'supabase_service.dart';
+
+void _logDev(String msg) {
+  if (kDebugMode) debugPrint(msg);
+}
 
 class CallContext {
   const CallContext({
@@ -84,8 +87,15 @@ class CallEventBus {
         await _onAccept(ctx);
       }
     } catch (e) {
-      debugPrint('[CallEventBus] recoverColdStart failed: $e');
+      _logDev('[CallEventBus] recoverColdStart failed: $e');
     }
+  }
+
+  /// Beim Logout: Dedupe-Sets clearen damit der naechste User
+  /// nicht mit den callIds des vorherigen kollidiert.
+  static void clearHandled() {
+    _handledAccepts.clear();
+    _contexts.clear();
   }
 
   static void _handle(CallEvent? event) {
@@ -130,17 +140,36 @@ class CallEventBus {
   }
 
   /// Missed-Call-Callback: User tappt "Zurueckrufen" in der Missed-Call-
-  /// Notification. Startet neuen Outgoing-Call an caller_id.
+  /// Notification. Validiert caller_id gegen DB-Row bevor neuer Call
+  /// gestartet wird — verhindert Call-Spoofing via crafted FCM-Payload.
   static Future<void> _onCallback(Map<String, dynamic> extraMap) async {
     try {
-      final callerId = extraMap['caller_id'] as String?;
-      final conversationId = extraMap['conversation_id'] as String?;
-      final callType = (extraMap['call_type'] as String?) ?? 'audio';
-      if (callerId == null || conversationId == null) return;
+      final callId = extraMap['id'] as String?;
+      final claimedCallerId = extraMap['caller_id'] as String?;
+      if (callId == null || claimedCallerId == null) return;
+
+      // Security: caller_id aus FCM-extras MUSS mit DB-Row uebereinstimmen.
+      // Sonst koennte Angreifer crafted Push schicken der Opfer dazu bringt
+      // einen beliebigen User anzurufen.
+      final row = await sb
+          .from('dm_calls')
+          .select('caller_id, conversation_id, call_type')
+          .eq('id', callId)
+          .maybeSingle();
+      if (row == null) return;
+      final dbCallerId = row['caller_id'] as String?;
+      if (dbCallerId == null || dbCallerId != claimedCallerId) {
+        _logDev('[CallEventBus] callback caller_id mismatch — rejected');
+        return;
+      }
+
+      final conversationId = row['conversation_id'] as String?;
+      final callType = (row['call_type'] as String?) ?? 'audio';
+      if (conversationId == null) return;
 
       final result = await DmCallService.start(
         conversationId: conversationId,
-        calleeId: callerId,
+        calleeId: dbCallerId,
         callType: callType,
       );
       if (!result.success || result.callId == null) return;
@@ -156,13 +185,14 @@ class CallEventBus {
         } catch (_) {}
       }
     } catch (e) {
-      debugPrint('[CallEventBus] callback failed: $e');
+      _logDev('[CallEventBus] callback failed: $e');
     }
   }
 
   static Future<void> _onAccept(CallContext ctx) async {
-    if (_handledAccepts.contains(ctx.callId)) return;
-    _handledAccepts.add(ctx.callId);
+    // Atomic check-and-add: Set.add() liefert false wenn schon vorhanden.
+    // Verhindert Doppel-Accept-Race wenn User auf Lock-Screen zwei mal tappt.
+    if (!_handledAccepts.add(ctx.callId)) return;
 
     // Critical: status=active SOFORT setzen. Sonst hoert Caller ewig
     // Ringback. Vor Navigation — selbst wenn Navigation fehlschlaegt,

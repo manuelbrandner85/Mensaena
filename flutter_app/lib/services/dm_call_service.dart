@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import '../repositories/extra_repositories.dart';
 import 'supabase_service.dart';
 
@@ -42,7 +44,13 @@ class DmCallService {
     }
     // JWT kann abgelaufen sein (Background, lange Idle) → refresh.
     await SupabaseService.ensureFreshSession();
-    final roomName = 'dm-${DateTime.now().millisecondsSinceEpoch}';
+    // Timestamp + 6-Zeichen-Random verhindert Kollision bei Spam-Tap
+    // (1ms-Window war zu eng — zwei rapid Starts kollidierten).
+    final rng = math.Random.secure();
+    final suffix = List.generate(
+        6, (_) => 'abcdefghijklmnopqrstuvwxyz0123456789'[rng.nextInt(36)]).join();
+    final roomName =
+        'dm-${DateTime.now().millisecondsSinceEpoch}-$suffix';
     try {
       final row = await sb
           .from('dm_calls')

@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/push_notification_service.dart';
+import '../../services/safe_url.dart';
 
 /// SKILL: mensaena-features
 /// Listener-Widget — abonniert FirebaseMessaging.onMessage und zeigt
@@ -43,7 +44,10 @@ class _FcmForegroundListenerState extends State<FcmForegroundListener> {
     final notif = m.notification;
     final title = notif?.title ?? m.data['title'] as String?;
     final body = notif?.body ?? m.data['body'] as String?;
-    final url = m.data['url'] as String? ?? m.data['link'] as String?;
+    // Security: FCM-Payload-URL gegen Whitelist validieren —
+    // verhindert Navigation zu beliebigen Routen via crafted Push.
+    final rawUrl = m.data['url'] as String? ?? m.data['link'] as String?;
+    final url = safeInternalRoute(rawUrl);
     final type = m.data['type'] as String? ?? 'system';
     if (title == null && body == null) return;
 

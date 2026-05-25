@@ -556,6 +556,9 @@ class _DangerTabState extends State<_DangerTab> {
 
     setState(() => _deleting = true);
     try {
+      // Account-Delete ist irreversibel — JWT muss frisch sein, sonst
+      // schlaegt RPC silent fehl bei abgelaufenem Token.
+      await SupabaseService.ensureFreshSession();
       // Try RPC first (admin_delete_user with self-permission).
       // Fallback: just sign out + flag profile is_banned (soft-delete).
       try {

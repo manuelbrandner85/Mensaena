@@ -301,19 +301,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final text = _ctrl.text.trim();
     if (text.isEmpty) return;
     Haptics.tap();
-    _ctrl.clear();
     final reply = _replyTo;
-    setState(() => _replyTo = null);
     final ok = await MessagesRepository.send(
       conversationId: widget.conversationId,
       content: text,
       replyToId: reply?['id'] as String?,
     );
-    if (!ok && mounted) {
+    if (!mounted) return;
+    if (ok) {
+      // Erst nach Success clearen — bei Fail behaelt der User den Text
+      // und kann nochmal senden.
+      _ctrl.clear();
+      setState(() => _replyTo = null);
+    } else {
       unawaited(Haptics.error());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('chat.messageNotSent'.tr())),
+        SnackBar(content: Text('chat.messageNotSent'.tr())),
       );
     }
   }

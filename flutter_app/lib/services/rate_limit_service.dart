@@ -18,7 +18,9 @@ class RateLimitService {
     int maxPerHour = defaultPerHour,
   }) async {
     final uid = userId ?? SupabaseService.currentUser?.id;
-    if (uid == null) return true; // not logged in — nothing to limit yet
+    // Fail-closed wenn kein User: write-Aktionen ohne Auth sollten
+    // ohnehin nicht passieren — wenn doch, blocken statt durchlassen.
+    if (uid == null) return false;
     try {
       final result = await sb.rpc<dynamic>(
         'check_rate_limit',
