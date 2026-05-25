@@ -1753,7 +1753,36 @@
     "confirmStart": "Anrufen",
     "ringingCountdown": "Klingelt noch {n}s …",
     "active": "Anruf läuft – {name}",
-    "videoAction": "Video-Anruf"
+    "miniPlayerActive": "Anruf läuft",
+    "videoAction": "Video-Anruf",
+    "postCallNoteTitle": "Notiz zum Gespräch?",
+    "postCallNoteHint": "Wird als Chat-Notiz gespeichert.",
+    "postCallNotePlaceholder": "z. B. „Treffen am Samstag um 14 Uhr"."
+  },
+  "quickReply": {
+    "title": "Antwort an {name} senden?",
+    "subtitle": "Damit die andere Person nicht im Dunkeln tappt.",
+    "in5Min": "Bin in 5 Min zurück 🙏",
+    "busy": "Kann gerade leider nicht — ich melde mich.",
+    "willCallBack": "Ich rufe dich gleich zurück 📞"
+  },
+  "livePoll": {
+    "create": "Umfrage starten",
+    "questionHint": "Deine Frage …",
+    "option": "Option {n}",
+    "addOption": "Option hinzufügen",
+    "start": "Umfrage starten",
+    "totalVotes": "{n} Stimmen insgesamt"
+  },
+  "liveSubtitle": {
+    "hint": "Untertitel tippen — wird live übersetzt …"
+  },
+  "watchers": {
+    "title": "Zuschauer ({n})",
+    "empty": "Noch niemand zugeschaut.",
+    "show": "Zuschauer-Liste",
+    "joined": "🙋 {name} ist dabei",
+    "left": "{name} hat verlassen"
   },
   "callHistory": {
     "title": "Anrufverlauf",

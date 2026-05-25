@@ -25,6 +25,7 @@ import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
 import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
+import '../shared/active_call_mini_player.dart';
 import '../shared/mensaena_bot_button.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
@@ -236,9 +237,6 @@ class DashboardScaffold extends ConsumerWidget {
                   Column(
                     children: [
                       const ZeitbankConfirmationBanner(),
-                      if (activeCall != null &&
-                          !activeRoute.startsWith('/dashboard/call/'))
-                        _ActiveCallBanner(info: activeCall),
                       Expanded(child: refreshed),
                     ],
                   ),
@@ -247,6 +245,11 @@ class DashboardScaffold extends ConsumerWidget {
                     bottom: 16,
                     child: SafeArea(child: MensaenaBotButton()),
                   ),
+                  // Picture-in-Picture-Mini-Player fuer laufenden Call.
+                  // Draggable, ersetzt den frueheren 36dp-Top-Banner.
+                  if (activeCall != null &&
+                      !activeRoute.startsWith('/dashboard/call/'))
+                    ActiveCallMiniPlayer(info: activeCall),
                 ],
               ),
             ),
@@ -476,95 +479,6 @@ class _BottomItem extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Schmaler gruener Banner der erscheint sobald ein DM-Call connected ist,
-/// aber der User NICHT auf dem Call-Screen ist. Tap fuehrt zurueck in den
-/// Call. Verschwindet automatisch wenn der Call aufgelegt wird.
-class _ActiveCallBanner extends StatefulWidget {
-  const _ActiveCallBanner({required this.info});
-
-  final ActiveCallInfo info;
-
-  @override
-  State<_ActiveCallBanner> createState() => _ActiveCallBannerState();
-}
-
-class _ActiveCallBannerState extends State<_ActiveCallBanner> {
-  Timer? _ticker;
-
-  @override
-  void initState() {
-    super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
-  }
-
-  String _fmt(Duration d) {
-    final m = d.inMinutes.toString().padLeft(2, '0');
-    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final info = widget.info;
-    final elapsed = DateTime.now().difference(info.startedAt);
-    return Material(
-      color: AppColors.leben,
-      child: InkWell(
-        onTap: () {
-          final encRoom = Uri.encodeComponent(info.roomName);
-          final encPeer = Uri.encodeComponent(info.peerName);
-          context.push(
-              '/dashboard/call/${info.callId}?room=$encRoom&peer=$encPeer');
-        },
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Container(
-            height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                const Icon(LucideIcons.phone, size: 14, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'call.active'.tr(namedArgs: {'name': info.peerName}),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.body(
-                      size: 12,
-                      color: Colors.white,
-                      weight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Text(
-                  _fmt(elapsed),
-                  style: AppTypography.mono(
-                      size: 12,
-                      color: Colors.white,
-                      weight: FontWeight.w700),
-                ),
-                const SizedBox(width: 8),
-                const Icon(LucideIcons.chevronRight,
-                    size: 14, color: Colors.white70),
-              ],
-            ),
           ),
         ),
       ),

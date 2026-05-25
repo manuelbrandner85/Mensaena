@@ -1754,7 +1754,36 @@
     "confirmStart": "Call",
     "ringingCountdown": "Ringing for {n}s …",
     "active": "Call in progress – {name}",
-    "videoAction": "Video call"
+    "miniPlayerActive": "Call in progress",
+    "videoAction": "Video call",
+    "postCallNoteTitle": "Note about this call?",
+    "postCallNoteHint": "Saved as chat note.",
+    "postCallNotePlaceholder": "e.g. \"Meeting Saturday at 2pm\""
+  },
+  "quickReply": {
+    "title": "Reply to {name}?",
+    "subtitle": "So the other person isn't left guessing.",
+    "in5Min": "Back in 5 min 🙏",
+    "busy": "Can't right now — I'll get back to you.",
+    "willCallBack": "I'll call you right back 📞"
+  },
+  "livePoll": {
+    "create": "Start poll",
+    "questionHint": "Your question …",
+    "option": "Option {n}",
+    "addOption": "Add option",
+    "start": "Start poll",
+    "totalVotes": "{n} votes total"
+  },
+  "liveSubtitle": {
+    "hint": "Type subtitle — live-translated …"
+  },
+  "watchers": {
+    "title": "Watchers ({n})",
+    "empty": "No one watching yet.",
+    "show": "Watcher list",
+    "joined": "🙋 {name} joined",
+    "left": "{name} left"
   },
   "callHistory": {
     "title": "Call history",

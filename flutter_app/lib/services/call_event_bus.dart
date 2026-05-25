@@ -48,6 +48,12 @@ class CallEventBus {
   static StreamSubscription<CallEvent?>? _sub;
   static final Map<String, CallContext> _contexts = <String, CallContext>{};
   static final Set<String> _handledAccepts = <String>{};
+  // Post-Decline-Stream: feuert wenn User einen Anruf abgelehnt hat,
+  // damit die UI ein Quick-Reply-Sheet zeigen kann ("Bin in 5 Min" etc).
+  static final StreamController<CallContext> _postDeclineCtrl =
+      StreamController<CallContext>.broadcast();
+
+  static Stream<CallContext> get onPostDecline => _postDeclineCtrl.stream;
 
   /// Muss in main.dart vor runApp() aufgerufen werden.
   static void init() {
@@ -237,6 +243,12 @@ class CallEventBus {
   static Future<void> _onDecline(CallContext ctx) async {
     await _updateStatus(ctx.callId, 'cancelled');
     _contexts.remove(ctx.callId);
+    // UI-Schicht (IncomingCallListener) hoert hier und zeigt ein
+    // Quick-Reply-Sheet damit der Anrufer eine kontextuelle Auto-Antwort
+    // bekommt statt nur "verpasst".
+    if (!_postDeclineCtrl.isClosed) {
+      _postDeclineCtrl.add(ctx);
+    }
   }
 
   static Future<void> _onTimeout(CallContext ctx) async {

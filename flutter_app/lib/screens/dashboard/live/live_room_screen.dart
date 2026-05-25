@@ -12,6 +12,8 @@
 ///   * Glass-Card-Tiles für jeden Teilnehmer mit Mic-Mute-Indikator.
 library;
 
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -27,8 +29,13 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/livekit_token_service.dart';
+import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
+import '../../../widgets/shared/floating_reactions_layer.dart';
+import '../../../widgets/shared/live_poll_overlay.dart';
+import '../../../widgets/shared/live_subtitle_overlay.dart';
+import '../../../widgets/shared/watcher_panel.dart';
 
 class LiveRoomScreen extends ConsumerStatefulWidget {
   const LiveRoomScreen({
@@ -58,6 +65,25 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   int _participantCount = 0;
   // Cache: identity → profile (name + avatar_url) für Avatar-Fallback.
   final Map<String, _ParticipantProfile> _profiles = {};
+  // Room-Events Bus (Reactions/Polls/Highlights/Subtitles via DataChannel)
+  RoomEventsService? _events;
+  StreamSubscription<RoomEvent>? _eventsSub;
+  // Floating-Hearts
+  final FloatingReactionsController _reactionsCtrl =
+      FloatingReactionsController();
+  // Live-Poll-State (nur einer aktiv gleichzeitig)
+  LivePoll? _activePoll;
+  // Watcher-Panel sichtbar?
+  bool _watchersOpen = false;
+  // Subtitle-State
+  SubtitleData? _currentSubtitle;
+  Timer? _subtitleFadeTimer;
+  // Watcher join/leave Toast-Queue
+  String? _toastName;
+  JoinLeaveKind? _toastKind;
+  Timer? _toastTimer;
+  // Highlights (host-collected)
+  final List<DateTime> _highlights = [];
 
   @override
   void initState() {
@@ -130,11 +156,21 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
         if (!mounted) return;
         setState(() =>
             _participantCount = (_room?.remoteParticipants.length ?? 0) + 1);
+        _showJoinLeaveToast(
+            e.participant.name.isNotEmpty
+                ? e.participant.name
+                : 'Nachbar:in',
+            JoinLeaveKind.join);
       })
-      ..on<lk.ParticipantDisconnectedEvent>((_) {
+      ..on<lk.ParticipantDisconnectedEvent>((e) {
         if (!mounted) return;
         setState(() =>
             _participantCount = (_room?.remoteParticipants.length ?? 0) + 1);
+        _showJoinLeaveToast(
+            e.participant.name.isNotEmpty
+                ? e.participant.name
+                : 'Nachbar:in',
+            JoinLeaveKind.leave);
       });
 
     try {
@@ -150,6 +186,9 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
         _state = _RoomState.connected;
         _participantCount = room.remoteParticipants.length + 1;
       });
+      // Events-Bus initialisieren (Reactions/Polls/Highlights/Subtitles).
+      _events = RoomEventsService(room: room);
+      _eventsSub = _events!.stream.listen(_onRoomEvent);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -238,10 +277,13 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     if (widget.isHost) {
       LiveStreamService.endChannelStream(widget.roomName);
     }
+    _eventsSub?.cancel();
+    _events?.dispose();
+    _reactionsCtrl.dispose();
+    _subtitleFadeTimer?.cancel();
+    _toastTimer?.cancel();
     _listener?.dispose();
     _listener = null;
-    // Explizites disconnect vor dispose — falls connect() noch nicht
-    // fertig war, beendet das die pending future sauber.
     try {
       _room?.disconnect();
     } catch (_) {}
@@ -250,8 +292,169 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     super.dispose();
   }
 
+  // ─── Room-Events Handler ─────────────────────────────────────────
+  void _onRoomEvent(RoomEvent ev) {
+    switch (ev.type) {
+      case RoomEventType.reaction:
+        final emoji = ev.data['emoji'] as String?;
+        if (emoji != null) _reactionsCtrl.spawn(emoji);
+        break;
+      case RoomEventType.pollStart:
+        final id = ev.data['id'] as String?;
+        final q = ev.data['question'] as String?;
+        final opts = (ev.data['options'] as List?)?.cast<String>();
+        if (id != null && q != null && opts != null && opts.isNotEmpty) {
+          setState(() => _activePoll = LivePoll(
+              id: id, question: q, options: opts));
+        }
+        break;
+      case RoomEventType.pollVote:
+        final pollId = ev.data['pollId'] as String?;
+        final optionIndex = (ev.data['optionIndex'] as num?)?.toInt();
+        if (pollId != null &&
+            optionIndex != null &&
+            _activePoll?.id == pollId) {
+          setState(() {
+            // Vorherigen Vote des Senders entfernen (re-vote moeglich)
+            for (final s in _activePoll!.votes.values) {
+              s.remove(ev.senderIdentity);
+            }
+            _activePoll!.votes
+                .putIfAbsent(optionIndex, () => <String>{})
+                .add(ev.senderIdentity);
+          });
+        }
+        break;
+      case RoomEventType.pollClose:
+        setState(() => _activePoll = null);
+        break;
+      case RoomEventType.highlight:
+        // Host hat einen Wichtig-Moment markiert — alle Zuschauer sehen
+        // einen kurzen Toast.
+        _showJoinLeaveToast('🔖 Highlight!', JoinLeaveKind.join);
+        break;
+      case RoomEventType.subtitle:
+        final text = ev.data['text'] as String?;
+        final lang = ev.data['lang'] as String? ?? 'de';
+        if (text != null && text.isNotEmpty) {
+          setState(() => _currentSubtitle = SubtitleData(
+                text: text,
+                sourceLang: lang,
+                timestamp: DateTime.now(),
+              ));
+          _subtitleFadeTimer?.cancel();
+          _subtitleFadeTimer = Timer(const Duration(seconds: 9), () {
+            if (mounted) setState(() => _currentSubtitle = null);
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _showJoinLeaveToast(String name, JoinLeaveKind kind) {
+    _toastTimer?.cancel();
+    setState(() {
+      _toastName = name;
+      _toastKind = kind;
+    });
+    _toastTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() {
+        _toastName = null;
+        _toastKind = null;
+      });
+    });
+  }
+
+  void _sendReaction(String emoji) {
+    _reactionsCtrl.spawn(emoji);
+    _events?.send(RoomEventType.reaction, {'emoji': emoji}, reliable: false);
+  }
+
+  Future<void> _hostStartPoll() async {
+    final poll = await CreatePollSheet.show(context);
+    if (poll == null || !mounted) return;
+    setState(() => _activePoll = poll);
+    await _events?.send(RoomEventType.pollStart, {
+      'id': poll.id,
+      'question': poll.question,
+      'options': poll.options,
+    });
+  }
+
+  Future<void> _vote(int optionIndex) async {
+    final poll = _activePoll;
+    if (poll == null) return;
+    final me = _room?.localParticipant?.identity ?? '';
+    if (me.isEmpty) return;
+    setState(() {
+      for (final s in poll.votes.values) {
+        s.remove(me);
+      }
+      poll.votes.putIfAbsent(optionIndex, () => <String>{}).add(me);
+    });
+    await _events?.send(
+        RoomEventType.pollVote, {'pollId': poll.id, 'optionIndex': optionIndex});
+  }
+
+  Future<void> _hostClosePoll() async {
+    final poll = _activePoll;
+    if (poll == null) return;
+    setState(() => _activePoll = null);
+    await _events?.send(RoomEventType.pollClose, {'pollId': poll.id});
+  }
+
+  Future<void> _markHighlight() async {
+    _highlights.add(DateTime.now());
+    _showJoinLeaveToast('🔖 Highlight gesetzt', JoinLeaveKind.join);
+    await _events?.send(RoomEventType.highlight, {
+      'ts': DateTime.now().toIso8601String(),
+    });
+  }
+
+  Future<void> _sendSubtitle(String text) async {
+    final lang = Localizations.localeOf(context).languageCode;
+    setState(() => _currentSubtitle = SubtitleData(
+        text: text, sourceLang: lang, timestamp: DateTime.now()));
+    _subtitleFadeTimer?.cancel();
+    _subtitleFadeTimer = Timer(const Duration(seconds: 9), () {
+      if (mounted) setState(() => _currentSubtitle = null);
+    });
+    await _events?.send(RoomEventType.subtitle, {
+      'text': text,
+      'lang': lang,
+    });
+  }
+
+  List<WatcherEntry> _buildWatcherList() {
+    final out = <WatcherEntry>[];
+    final r = _room;
+    if (r == null) return out;
+    final lp = r.localParticipant;
+    if (lp != null) {
+      out.add(WatcherEntry(
+        identity: lp.identity,
+        name: lp.name.isNotEmpty ? lp.name : 'Ich',
+        avatarUrl: _profiles[lp.identity]?.avatarUrl,
+      ));
+    }
+    for (final p in r.remoteParticipants.values) {
+      out.add(WatcherEntry(
+        identity: p.identity,
+        name: p.name.isNotEmpty
+            ? p.name
+            : (_profiles[p.identity]?.name ?? p.identity),
+        avatarUrl: _profiles[p.identity]?.avatarUrl,
+      ));
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final targetLang = Localizations.localeOf(context).languageCode;
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       body: SafeArea(
@@ -277,6 +480,8 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   participantCount: _participantCount,
                   connected: _state == _RoomState.connected,
                   onClose: _leave,
+                  onToggleWatchers: () =>
+                      setState(() => _watchersOpen = !_watchersOpen),
                 ),
                 Expanded(
                   child: _state == _RoomState.connecting
@@ -292,16 +497,71 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                               myMicEnabled: _micEnabled,
                             ),
                 ),
+                // Live-Poll (falls aktiv) ueber dem ActionBar.
+                if (_activePoll != null)
+                  LivePollOverlay(
+                    poll: _activePoll!,
+                    onVote: _vote,
+                    onClose: _hostClosePoll,
+                    isHost: widget.isHost,
+                    myIdentity:
+                        _room?.localParticipant?.identity ?? '',
+                  ),
+                // Subtitle-Display unten ueber dem ActionBar.
+                SubtitleDisplay(
+                  subtitle: _currentSubtitle,
+                  targetLang: targetLang,
+                ),
+                // Host-Subtitle-Composer (nur fuer Host).
+                if (widget.isHost && _state == _RoomState.connected)
+                  SubtitleComposer(onSend: _sendSubtitle),
+                // Reaction-Picker fuer alle Teilnehmer.
+                if (_state == _RoomState.connected)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Center(
+                      child: ReactionPickerBar(onPick: _sendReaction),
+                    ),
+                  ),
                 _ActionBar(
                   micEnabled: _micEnabled,
                   camEnabled: _camEnabled,
                   enabled: _state == _RoomState.connected,
+                  isHost: widget.isHost,
                   onMicTap: _toggleMic,
                   onCamTap: _toggleCam,
                   onLeaveTap: _leave,
+                  onStartPoll: widget.isHost && _activePoll == null
+                      ? _hostStartPoll
+                      : null,
+                  onHighlight: widget.isHost ? _markHighlight : null,
                 ),
               ],
             ),
+            // Floating-Reactions ueber dem ganzen Video-Bereich.
+            Positioned.fill(
+              child: IgnorePointer(
+                child:
+                    FloatingReactionsLayer(controller: _reactionsCtrl),
+              ),
+            ),
+            // Join/Leave-Toasts oben mittig.
+            if (_toastName != null && _toastKind != null)
+              Positioned(
+                top: 70,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: JoinLeaveToast(
+                      name: _toastName!, kind: _toastKind!),
+                ),
+              ),
+            // Side-Panel Watcher-Liste.
+            if (_watchersOpen)
+              WatcherPanel(
+                watchers: _buildWatcherList(),
+                onClose: () => setState(() => _watchersOpen = false),
+              ),
           ],
         ),
       ),
@@ -316,12 +576,14 @@ class _ElegantHeader extends StatelessWidget {
     required this.participantCount,
     required this.connected,
     required this.onClose,
+    required this.onToggleWatchers,
   });
 
   final String channelTitle;
   final int participantCount;
   final bool connected;
   final VoidCallback onClose;
+  final VoidCallback onToggleWatchers;
 
   @override
   Widget build(BuildContext context) {
@@ -401,6 +663,13 @@ class _ElegantHeader extends StatelessWidget {
                   ),
               ],
             ),
+          ),
+          IconButton(
+            iconSize: 18,
+            onPressed: onToggleWatchers,
+            icon: const Icon(LucideIcons.users,
+                color: AppColors.bronze),
+            tooltip: 'watchers.show'.tr(),
           ),
           IconButton(
             iconSize: 20,
@@ -737,14 +1006,20 @@ class _ActionBar extends StatelessWidget {
     required this.onMicTap,
     required this.onCamTap,
     required this.onLeaveTap,
+    this.isHost = false,
+    this.onStartPoll,
+    this.onHighlight,
   });
 
   final bool micEnabled;
   final bool camEnabled;
   final bool enabled;
+  final bool isHost;
   final VoidCallback onMicTap;
   final VoidCallback onCamTap;
   final VoidCallback onLeaveTap;
+  final VoidCallback? onStartPoll;
+  final VoidCallback? onHighlight;
 
   @override
   Widget build(BuildContext context) {
@@ -775,6 +1050,20 @@ class _ActionBar extends StatelessWidget {
             color: camEnabled ? AppColors.bronze : AppColors.mute,
             onTap: enabled ? onCamTap : null,
           ),
+          if (isHost && onStartPoll != null)
+            _RoundAction(
+              icon: LucideIcons.barChart3,
+              label: 'Umfrage',
+              color: AppColors.bronze,
+              onTap: onStartPoll,
+            ),
+          if (isHost && onHighlight != null)
+            _RoundAction(
+              icon: LucideIcons.bookmark,
+              label: 'Highlight',
+              color: AppColors.amber,
+              onTap: onHighlight,
+            ),
           _RoundAction(
             icon: LucideIcons.phoneOff,
             label: 'Verlassen',

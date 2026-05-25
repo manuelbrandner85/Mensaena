@@ -20,8 +20,10 @@ import '../../../providers/active_call_provider.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
+import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
+import '../../../widgets/shared/floating_reactions_layer.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-DM-Anruf (Audio + optional Video) via LiveKit.
@@ -72,6 +74,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   Timer? _ticker;
   // Mini-Cam-Preview-Position (draggable).
   Offset _camPreviewPos = const Offset(16, 100);
+  // Floating Reactions + Room-Events (DataChannel-Wrapper).
+  final FloatingReactionsController _reactionsCtrl =
+      FloatingReactionsController();
+  RoomEventsService? _events;
+  StreamSubscription<RoomEvent>? _eventsSub;
 
   @override
   void initState() {
@@ -356,6 +363,17 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         peerName: widget.peerName,
         startedAt: DateTime.now(),
       );
+      // Room-Events-Bus: Floating-Reactions + Cheer-Pings.
+      _events = RoomEventsService(room: room);
+      _eventsSub = _events!.stream.listen((ev) {
+        if (ev.type == RoomEventType.reaction) {
+          final emoji = ev.data['emoji'] as String?;
+          if (emoji != null && emoji.isNotEmpty) {
+            _reactionsCtrl.spawn(emoji);
+            HapticFeedback.selectionClick();
+          }
+        }
+      });
       // Critical: tell CallKit/Telecom the call connected. Without this,
       // iOS auto-ends after 30s "no answer" and Android's ConnectionService
       // stays in a half-ringing state.
@@ -408,6 +426,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     if (ref.read(activeCallProvider)?.callId == widget.callId) {
       ref.read(activeCallProvider.notifier).state = null;
     }
+    // Post-Call-Note: zeigt sich vor der Navigation, async.
+    await _maybeShowPostCallNote();
     if (!mounted) return;
     if (context.canPop()) {
       context.pop();
@@ -428,9 +448,109 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       _ringback?.stop();
       _ringback?.dispose();
     } catch (_) {}
+    _eventsSub?.cancel();
+    _events?.dispose();
+    _reactionsCtrl.dispose();
     _listener?.dispose();
     _room?.dispose();
     super.dispose();
+  }
+
+  void _sendReaction(String emoji) {
+    _reactionsCtrl.spawn(emoji);
+    HapticFeedback.lightImpact();
+    _events?.send(RoomEventType.reaction, {'emoji': emoji}, reliable: false);
+  }
+
+  Future<void> _maybeShowPostCallNote() async {
+    // Sheet erscheint NUR wenn der Call laenger als 10s ging.
+    if (_stopwatch.elapsed.inSeconds < 10) return;
+    if (!mounted) return;
+    final note = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final ctrl = TextEditingController();
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('call.postCallNoteTitle'.tr(),
+                    style: AppTypography.display(
+                        size: 16, color: AppColors.ink)),
+                const SizedBox(height: 4),
+                Text('call.postCallNoteHint'.tr(),
+                    style: AppTypography.caption()),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: ctrl,
+                  maxLines: 3,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'call.postCallNotePlaceholder'.tr(),
+                    filled: true,
+                    fillColor: AppColors.elevated,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  style: AppTypography.body(size: 13, color: AppColors.ink),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text('common.skip'.tr()),
+                    ),
+                    const Spacer(),
+                    FilledButton.icon(
+                      icon: const Icon(LucideIcons.send, size: 14),
+                      label: Text('common.save'.tr()),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.bronze,
+                      ),
+                      onPressed: () =>
+                          Navigator.pop(ctx, ctrl.text.trim()),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    if (note == null || note.isEmpty) return;
+    // Notiz als SYSTEM-Chat-Message speichern. Conv-ID per Call-Lookup.
+    try {
+      final call = await sb
+          .from('dm_calls')
+          .select('conversation_id')
+          .eq('id', widget.callId)
+          .maybeSingle();
+      final convId = call?['conversation_id'] as String?;
+      if (convId == null) return;
+      final me = SupabaseService.currentUser?.id;
+      if (me == null) return;
+      await sb.from('messages').insert({
+        'conversation_id': convId,
+        'sender_id': me,
+        'content': '[SYSTEM_NOTE:$note]',
+      });
+    } catch (_) {/* fail-silent */}
   }
 
   @override
@@ -451,6 +571,21 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       body: Stack(
         children: [
           SafeArea(child: _buildBody()),
+          // Floating-Reactions ueber dem Video/Avatar — andere Seite sieht
+          // gesendete Reaktionen automatisch via Stream.
+          Positioned.fill(
+            child: FloatingReactionsLayer(controller: _reactionsCtrl),
+          ),
+          // Reaktions-Picker oben mittig
+          if (_state == _CallState.connected)
+            Positioned(
+              top: 80,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ReactionPickerBar(onPick: _sendReaction),
+              ),
+            ),
           if (_camEnabled && _room != null)
             Positioned(
               left: _camPreviewPos.dx,
@@ -810,6 +945,9 @@ class _PeerVideoOrAvatar extends StatefulWidget {
 
 class _PeerVideoOrAvatarState extends State<_PeerVideoOrAvatar> {
   lk.EventsListener<lk.RoomEvent>? _listener;
+  // Sprecher-Aura: wenn peer-Participant gerade spricht, bekommt der Avatar
+  // einen pulsierenden Bronze-Glow (via PulseBloom-Intensity).
+  bool _peerSpeaking = false;
 
   @override
   void initState() {
@@ -828,6 +966,14 @@ class _PeerVideoOrAvatarState extends State<_PeerVideoOrAvatar> {
         })
         ..on<lk.TrackUnmutedEvent>((_) {
           if (mounted) setState(() {});
+        })
+        ..on<lk.ActiveSpeakersChangedEvent>((ev) {
+          if (!mounted) return;
+          final remoteSpeaking = ev.speakers.any(
+              (p) => p.identity != r.localParticipant?.identity);
+          if (remoteSpeaking != _peerSpeaking) {
+            setState(() => _peerSpeaking = remoteSpeaking);
+          }
         });
     }
   }
@@ -870,11 +1016,12 @@ class _PeerVideoOrAvatarState extends State<_PeerVideoOrAvatar> {
     final initial = widget.peerName.isNotEmpty
         ? widget.peerName[0].toUpperCase()
         : '?';
+    // Wenn peer spricht: Glow staerker, sonst dezent.
     return PulseBloom(
       color: AppColors.bronze,
-      radius: 38,
-      minIntensity: 0.4,
-      maxIntensity: 0.8,
+      radius: _peerSpeaking ? 56 : 38,
+      minIntensity: _peerSpeaking ? 0.7 : 0.4,
+      maxIntensity: _peerSpeaking ? 1.0 : 0.8,
       child: Container(
         width: 180,
         height: 180,

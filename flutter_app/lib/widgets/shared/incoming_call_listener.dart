@@ -10,11 +10,16 @@ library;
 
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
 
+import '../../config/routes/app_router.dart' show rootNavigatorKey;
+import '../../config/theme/app_colors.dart';
+import '../../config/theme/app_typography.dart';
 import '../../services/call_event_bus.dart';
 import '../../services/callkit_service.dart';
 import '../../services/supabase_service.dart';
@@ -34,6 +39,7 @@ class _IncomingCallListenerState
   StreamSubscription<List<Map<String, dynamic>>>? _realtimeSub;
   StreamSubscription<RemoteMessage>? _fcmSub;
   StreamSubscription<AuthState>? _authSub;
+  StreamSubscription<CallContext>? _postDeclineSub;
   // Deduplicate same call_id from Realtime + FCM (whoever wins first).
   final Set<String> _handledCallIds = <String>{};
 
@@ -41,14 +47,109 @@ class _IncomingCallListenerState
   void initState() {
     super.initState();
     _setupListeners();
+    _postDeclineSub =
+        CallEventBus.onPostDecline.listen(_showQuickReplySheet);
     _authSub = sb.auth.onAuthStateChange.listen((_) {
       _teardownSubs();
-      // Bei Login/Logout: handled-CallIds + global Bus-Dedupe clearen,
-      // damit User A's gehandelte Calls nicht User B's gleiche IDs blocken.
       _handledCallIds.clear();
       CallEventBus.clearHandled();
       _setupListeners();
     });
+  }
+
+  /// Nach Decline: kleines Bottom-Sheet mit 3 Quick-Reply-Buttons.
+  /// User-Tap → sendet Auto-Chat-Message + erspart "verpasst"-Wirkung.
+  Future<void> _showQuickReplySheet(CallContext ctx) async {
+    if (ctx.conversationId == null) return;
+    final nav = rootNavigatorKey.currentState;
+    if (nav == null) return;
+    final overlayContext = nav.context;
+    if (!overlayContext.mounted) return;
+    // Kurz warten damit CallKit-UI sicher verschwunden ist.
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (!overlayContext.mounted) return;
+    final picked = await showModalBottomSheet<String>(
+      context: overlayContext,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) {
+        final replies = <String>[
+          'quickReply.in5Min'.tr(),
+          'quickReply.busy'.tr(),
+          'quickReply.willCallBack'.tr(),
+        ];
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(LucideIcons.messageSquare,
+                        size: 18, color: AppColors.bronze),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'quickReply.title'
+                            .tr(namedArgs: {'name': ctx.callerName}),
+                        style: AppTypography.body(
+                            size: 14,
+                            color: AppColors.ink,
+                            weight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('quickReply.subtitle'.tr(),
+                    style: AppTypography.caption()),
+                const SizedBox(height: 14),
+                for (final r in replies)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(sheetCtx, r),
+                        style: OutlinedButton.styleFrom(
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 14),
+                          foregroundColor: AppColors.bronze,
+                          side: BorderSide(
+                              color: AppColors.bronze
+                                  .withValues(alpha: 0.5)),
+                          alignment: Alignment.centerLeft,
+                        ),
+                        child: Text(r,
+                            style: AppTypography.body(
+                                size: 14, color: AppColors.ink)),
+                      ),
+                    ),
+                  ),
+                TextButton(
+                  onPressed: () => Navigator.pop(sheetCtx),
+                  child: Text('common.skip'.tr()),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    if (picked == null) return;
+    final me = SupabaseService.currentUser?.id;
+    if (me == null) return;
+    try {
+      await sb.from('messages').insert({
+        'conversation_id': ctx.conversationId,
+        'sender_id': me,
+        'content': picked,
+      });
+    } catch (_) {}
   }
 
   void _setupListeners() {
@@ -182,6 +283,7 @@ class _IncomingCallListenerState
   @override
   void dispose() {
     _authSub?.cancel();
+    _postDeclineSub?.cancel();
     _teardownSubs();
     super.dispose();
   }
