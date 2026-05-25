@@ -151,25 +151,46 @@ class DashboardScaffold extends ConsumerWidget {
             child: body,
           );
 
-    // Smart-Back-Button: wenn die Navigation einen Pop erlaubt (Detail-
-    // Routes wie Post-Detail, Profile, etc.), zeige Pfeil als leading —
-    // sonst zeigt Scaffold den Hamburger fuer den Drawer.
+    // Back-Button-Logik: Top-Level-Tabs (Home/Karte/Chat/Profil) zeigen
+    // den Hamburger fuer den Drawer. ALLE anderen Screens — egal ob via
+    // push() oder go() angefahren — zeigen einen Zurueck-Pfeil.
     //
-    // WICHTIG: Drawer wird IMMER gesetzt, NICHT konditional. Vorher
-    // hatte "drawer: canPop ? null : AppDrawer()" einen Bug — wenn
-    // canPop nach Navigation auf true wechselte und der Drawer offen war,
-    // konnte er nicht mehr geschlossen werden + UI flackerte bei jedem Tap.
+    // canPop() reicht NICHT als Indikator: context.go() ersetzt den Stack,
+    // dann ist canPop=false obwohl der User durch klar-erkennbare
+    // Detail-Routes navigiert hat (z.B. Settings → Profile-Edit). Daher
+    // pruefen wir explizit gegen die Top-Level-Routes.
+    //
+    // WICHTIG: Drawer wird IMMER gesetzt. Vorher hatte
+    // "drawer: canPop ? null : AppDrawer()" einen Bug — wenn der Drawer
+    // offen war und canPop flippte, war er gesperrt.
+    const topLevelRoutes = {
+      '/dashboard',
+      '/dashboard/map',
+      '/dashboard/chat',
+      '/dashboard/messages',
+      '/dashboard/profile',
+    };
+    final isTopLevel = topLevelRoutes.contains(activeRoute);
     final canPop = GoRouter.maybeOf(context)?.canPop() ?? false;
+    final showBack = !isTopLevel;
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(
-        leading: canPop
+        leading: showBack
             ? IconButton(
                 tooltip: 'common.back'.tr(),
-                onPressed: () => context.pop(),
+                onPressed: () {
+                  // Wenn Stack pop-bar → pop. Sonst sauberer Fallback zum
+                  // Dashboard statt App-Exit.
+                  if (canPop) {
+                    context.pop();
+                  } else {
+                    context.go('/dashboard');
+                  }
+                },
                 icon: const Icon(LucideIcons.arrowLeft, size: 22),
               )
-            : null, // automatic-hamburger falls drawer gesetzt
+            : null, // Top-Level: automatic-hamburger
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
           const LanguagePicker(),
