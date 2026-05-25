@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
+import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features (Admin Phase 5)
@@ -415,6 +416,8 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     final currentStatus = widget.row['status'] as String?;
     final isBanned = widget.row['is_banned'] == true;
     final isAdmin = widget.row['role'] == 'admin';
+    // Self-Guard: keine Role-Toggle / Ban-Toggle auf eigenes Profil.
+    final isSelf = widget.row['id'] == SupabaseService.currentUser?.id;
     return ListView(
       controller: widget.scroll,
       padding: const EdgeInsets.all(20),
@@ -491,7 +494,7 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: _busy
+                onPressed: (_busy || isSelf)
                     ? null
                     : () => _setField(
                           'role',

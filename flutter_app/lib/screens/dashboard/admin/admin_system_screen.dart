@@ -27,6 +27,24 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
   DateTime? _lastCleanupAt;
 
   Future<void> _runCleanup() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('admin.system.cleanupConfirmTitle'.tr()),
+        content: Text('admin.system.cleanupConfirmBody'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('admin.system.cleanupConfirmAction'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
     setState(() => _cleanupRunning = true);
     final result = await AdminRepository.runScheduledCleanup();
     if (!mounted) return;

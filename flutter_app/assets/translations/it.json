@@ -673,8 +673,12 @@
       "linkSupabase": "Dashboard Supabase",
       "linkSql": "Editor SQL Supabase",
       "linkCloudflare": "Dashboard Cloudflare",
-      "linkGitHub": "Repository GitHub"
-    }
+      "linkGitHub": "Repository GitHub",
+      "cleanupConfirmTitle": "Avviare la pulizia?",
+      "cleanupConfirmBody": "Questa azione rimuove post scaduti, sessioni e voci nella cache. Non può essere annullata.",
+      "cleanupConfirmAction": "Avvia"
+    },
+    "cannotActOnSelf": "Non puoi eseguire questa azione su te stesso."
   },
   "create": {
     "locationUnavailable": "Posizione non disponibile.",

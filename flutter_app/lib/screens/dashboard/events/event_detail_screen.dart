@@ -875,16 +875,20 @@ class _DateTimeBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String formattedDate;
+    // UTC->Local: Events sind in DB als UTC gespeichert. Ohne .toLocal()
+    // wird ein Berliner 19:00-Termin als 17:00 angezeigt (Sommerzeit).
+    final localStart = event.startDate.toLocal();
+    final localEnd = event.endDate?.toLocal();
     try {
       formattedDate =
           DateFormat('EEEE, dd. MMMM yyyy', context.locale.languageCode)
-              .format(event.startDate);
+              .format(localStart);
     } catch (_) {
-      formattedDate = DateFormat('EEEE, dd.MM.yyyy').format(event.startDate);
+      formattedDate = DateFormat('EEEE, dd.MM.yyyy').format(localStart);
     }
     final timeStr = event.isAllDay
         ? null
-        : '${DateFormat('HH:mm').format(event.startDate)}${event.endDate != null ? " – ${DateFormat('HH:mm').format(event.endDate!)}" : ""}';
+        : '${DateFormat('HH:mm').format(localStart)}${localEnd != null ? " – ${DateFormat('HH:mm').format(localEnd)}" : ""}';
     final locationStr = [event.locationName, event.locationAddress]
         .whereType<String>()
         .where((s) => s.isNotEmpty)

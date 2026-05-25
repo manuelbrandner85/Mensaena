@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'providers/locale_provider.dart';
+import 'providers/role_provider.dart';
 import 'repositories/extra_repositories.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
@@ -110,19 +111,22 @@ Future<void> _initBackgroundServices() async {
   // Boot gefeuert). Wir queryen activeCalls und triggern Accept manuell.
   unawaited(CallEventBus.recoverColdStart());
 
-  // FCM-Token bei aktuellem Login direkt registrieren
+  // FCM-Token + Role bei aktuellem Login direkt registrieren
   if (SupabaseService.isLoggedIn) {
     unawaited(PushNotificationService.registerToken());
+    unawaited(UserRoleCache.reload());
   }
 
-  // Auth-State-Listener: bei Login/Logout Token-Lifecycle managen
+  // Auth-State-Listener: bei Login/Logout Token + Rolle lifecycle managen
   sb.auth.onAuthStateChange.listen((event) {
     switch (event.event) {
       case AuthChangeEvent.signedIn:
         unawaited(PushNotificationService.registerToken());
+        unawaited(UserRoleCache.reload());
         break;
       case AuthChangeEvent.signedOut:
         unawaited(PushNotificationService.unregisterToken());
+        UserRoleCache.clear();
         break;
       default:
         break;

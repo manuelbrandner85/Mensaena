@@ -673,8 +673,12 @@
       "linkSupabase": "Tableau de bord Supabase",
       "linkSql": "Éditeur SQL Supabase",
       "linkCloudflare": "Tableau de bord Cloudflare",
-      "linkGitHub": "Dépôt GitHub"
-    }
+      "linkGitHub": "Dépôt GitHub",
+      "cleanupConfirmTitle": "Démarrer le nettoyage ?",
+      "cleanupConfirmBody": "Cette action supprime les publications, sessions et entrées de cache expirées. Elle ne peut pas être annulée.",
+      "cleanupConfirmAction": "Démarrer"
+    },
+    "cannotActOnSelf": "Vous ne pouvez pas effectuer cette action sur vous-même."
   },
   "create": {
     "locationUnavailable": "Position non disponible.",

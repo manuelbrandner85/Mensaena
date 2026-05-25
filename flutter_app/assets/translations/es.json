@@ -673,8 +673,12 @@
       "linkSupabase": "Panel de Supabase",
       "linkSql": "Editor SQL de Supabase",
       "linkCloudflare": "Panel de Cloudflare",
-      "linkGitHub": "Repositorio en GitHub"
-    }
+      "linkGitHub": "Repositorio en GitHub",
+      "cleanupConfirmTitle": "¿Iniciar limpieza?",
+      "cleanupConfirmBody": "Esta acción elimina publicaciones, sesiones y entradas de caché caducadas. No se puede deshacer.",
+      "cleanupConfirmAction": "Iniciar"
+    },
+    "cannotActOnSelf": "No puedes realizar esta acción sobre ti mismo."
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",

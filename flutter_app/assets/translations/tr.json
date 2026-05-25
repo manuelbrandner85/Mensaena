@@ -672,8 +672,12 @@
       "linkSupabase": "Supabase Paneli",
       "linkSql": "Supabase SQL Editörü",
       "linkCloudflare": "Cloudflare Paneli",
-      "linkGitHub": "GitHub Deposu"
-    }
+      "linkGitHub": "GitHub Deposu",
+      "cleanupConfirmTitle": "Temizliği başlat?",
+      "cleanupConfirmBody": "Bu işlem süresi geçmiş gönderileri, oturumları ve önbellek girdilerini siler. Geri alınamaz.",
+      "cleanupConfirmAction": "Başlat"
+    },
+    "cannotActOnSelf": "Bu işlemi kendinize uygulayamazsınız."
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",

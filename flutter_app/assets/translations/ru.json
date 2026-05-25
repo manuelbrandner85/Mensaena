@@ -672,8 +672,12 @@
       "linkSupabase": "Панель Supabase",
       "linkSql": "SQL-редактор Supabase",
       "linkCloudflare": "Панель Cloudflare",
-      "linkGitHub": "Репозиторий GitHub"
-    }
+      "linkGitHub": "Репозиторий GitHub",
+      "cleanupConfirmTitle": "Запустить очистку?",
+      "cleanupConfirmBody": "Это действие удалит просроченные посты, сессии и записи кеша. Отменить нельзя.",
+      "cleanupConfirmAction": "Запустить"
+    },
+    "cannotActOnSelf": "Вы не можете выполнить это действие над собой."
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",

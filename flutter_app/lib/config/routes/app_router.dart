@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/role_provider.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
@@ -122,6 +123,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       }
       if (loggedIn && (isAuthRoute || loc == '/')) {
         return '/dashboard';
+      }
+      // Admin-Route-Guard: nur fuer admin/moderator. Defense-in-depth
+      // gegen RLS-Luecken. UserRoleCache wird beim Login geladen.
+      if (loc.startsWith('/dashboard/admin')) {
+        if (!UserRoleCache.isModerator) {
+          return '/dashboard';
+        }
       }
       return null;
     },

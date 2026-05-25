@@ -354,6 +354,15 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   // ---------------- Ban / Unban ----------------
 
   void _openBan(Map<String, dynamic> user) {
+    // Self-Guard: Admin darf sich nicht selbst bannen.
+    if (user['id'] == SupabaseService.currentUser?.id) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('admin.cannotActOnSelf'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
+      return;
+    }
     final reasonCtrl = TextEditingController();
     showDialog<void>(
       context: context,
@@ -449,6 +458,14 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   Future<void> _openDelete(Map<String, dynamic> user) async {
     final uid = user['id'] as String?;
     if (uid == null) return;
+    if (uid == SupabaseService.currentUser?.id) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('admin.cannotActOnSelf'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
+      return;
+    }
     final ok = await ConfirmDialog.show(
       context,
       title: 'admin.users.deleteConfirmTitle'.tr(),

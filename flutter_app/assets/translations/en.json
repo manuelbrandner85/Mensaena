@@ -673,8 +673,12 @@
       "linkSupabase": "Supabase Dashboard",
       "linkSql": "Supabase SQL Editor",
       "linkCloudflare": "Cloudflare Dashboard",
-      "linkGitHub": "GitHub Repository"
-    }
+      "linkGitHub": "GitHub Repository",
+      "cleanupConfirmTitle": "Start cleanup now?",
+      "cleanupConfirmBody": "This action removes expired posts, sessions, and cache entries. It cannot be undone.",
+      "cleanupConfirmAction": "Start"
+    },
+    "cannotActOnSelf": "You cannot perform this action on yourself."
   },
   "create": {
     "locationUnavailable": "Location unavailable.",

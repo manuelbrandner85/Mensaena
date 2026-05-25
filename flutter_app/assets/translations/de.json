@@ -672,8 +672,12 @@
       "linkSupabase": "Supabase Dashboard",
       "linkSql": "Supabase SQL Editor",
       "linkCloudflare": "Cloudflare Dashboard",
-      "linkGitHub": "GitHub Repository"
-    }
+      "linkGitHub": "GitHub Repository",
+      "cleanupConfirmTitle": "Cleanup wirklich starten?",
+      "cleanupConfirmBody": "Diese Aktion entfernt abgelaufene Posts, Sessions und Cache-Einträge. Sie kann nicht rückgängig gemacht werden.",
+      "cleanupConfirmAction": "Starten"
+    },
+    "cannotActOnSelf": "Du kannst diese Aktion nicht auf dich selbst anwenden."
   },
   "create": {
     "locationUnavailable": "Standort nicht verfügbar.",
