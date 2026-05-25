@@ -18,6 +18,19 @@ import '../../../widgets/shared/post_card.dart';
 /// Generischer Modul-Screen — 1:1 zu `src/components/shared/ModulePage.tsx`.
 /// Filtert posts nach Type. Pro Modul: Title, Emoji, Subtitle, PostType,
 /// optionale Sub-Filter-Pills (z.B. animals: lost/found/care).
+class ModuleQuickAction {
+  const ModuleQuickAction({
+    required this.icon,
+    required this.label,
+    required this.route,
+    this.color,
+  });
+  final IconData icon;
+  final String label;
+  final String route;
+  final Color? color;
+}
+
 class ModulePostsScreen extends ConsumerStatefulWidget {
   const ModulePostsScreen({
     required this.title,
@@ -26,6 +39,7 @@ class ModulePostsScreen extends ConsumerStatefulWidget {
     required this.route,
     this.subtitle,
     this.subFilters = const [],
+    this.quickActions = const [],
     super.key,
   });
 
@@ -35,6 +49,10 @@ class ModulePostsScreen extends ConsumerStatefulWidget {
   final String route;
   final String? subtitle;
   final List<FilterOption<String>> subFilters;
+
+  /// Feature-Buttons direkt unter dem Header — z.B. "Tier bestimmen"
+  /// fuer Animals oder "Wildfruechte" fuer Harvest. Tap → context.go(route).
+  final List<ModuleQuickAction> quickActions;
 
   @override
   ConsumerState<ModulePostsScreen> createState() => _ModulePostsScreenState();
@@ -146,6 +164,19 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
                 onChanged: (v) => setState(() => _search = v),
               ),
             ),
+            if (widget.quickActions.isNotEmpty)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                child: Row(
+                  children: [
+                    for (final a in widget.quickActions) ...[
+                      _QuickActionChip(action: a),
+                      const SizedBox(width: 8),
+                    ],
+                  ],
+                ),
+              ),
             if (widget.subFilters.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
@@ -260,5 +291,36 @@ String _moduleCreateRouteFor(String postType) {
       return '/dashboard/jobs/create';
     default:
       return '/dashboard/create?type=$postType';
+  }
+}
+
+class _QuickActionChip extends StatelessWidget {
+  const _QuickActionChip({required this.action});
+  final ModuleQuickAction action;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = action.color ?? AppColors.bronze;
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: () => context.push(action.route),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: c.withValues(alpha: 0.15),
+          border: Border.all(color: c.withValues(alpha: 0.45)),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(action.icon, size: 14, color: c),
+            const SizedBox(width: 6),
+            Text(action.label.tr(),
+                style: AppTypography.label(size: 11, color: c)),
+          ],
+        ),
+      ),
+    );
   }
 }

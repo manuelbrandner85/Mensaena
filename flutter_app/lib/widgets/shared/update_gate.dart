@@ -123,13 +123,16 @@ class _UpdateGateState extends ConsumerState<UpdateGate>
   /// Wenn kein APK-Update vorliegt: pruefe ob ein Shorebird-OTA-Patch
   /// heruntergeladen wurde. Wenn ja → blende oben den Restart-Banner ein.
   Widget _maybePatchBanner() {
-    final patchCheck = ref.watch(shorebirdPatchAvailableProvider);
+    final patchCheck = ref.watch(shorebirdPatchCheckProvider);
     return patchCheck.when(
       loading: () => widget.child,
       error: (_, __) => widget.child,
-      data: (hasPatch) {
-        if (!hasPatch) return widget.child;
-        return _PatchRestartBanner(child: widget.child);
+      data: (result) {
+        if (!result.patchReady) return widget.child;
+        return _PatchRestartBanner(
+          patchNumber: result.nextPatchNumber,
+          child: widget.child,
+        );
       },
     );
   }
@@ -874,19 +877,37 @@ class _MandatoryLoadingPlaceholder extends StatelessWidget {
 /// Gruener nicht-blockierender Banner wenn ein Shorebird OTA-Patch
 /// bereitsteht und ein App-Restart noetig ist.
 class _PatchRestartBanner extends StatefulWidget {
-  const _PatchRestartBanner({required this.child});
+  const _PatchRestartBanner({required this.child, this.patchNumber});
   final Widget child;
+  final int? patchNumber;
 
   @override
   State<_PatchRestartBanner> createState() => _PatchRestartBannerState();
 }
 
 class _PatchRestartBannerState extends State<_PatchRestartBanner> {
-  bool _dismissed = false;
+  int? _dismissedPatchNumber;
+
+  @override
+  void didUpdateWidget(covariant _PatchRestartBanner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Wenn eine NEUE Patch-Nummer vorliegt: dismissed-State resetten,
+    // damit der Banner auch nach mehrfachem Schliessen bei jedem neuen
+    // Patch wieder erscheint. Verhindert "Patch verpasst weil ich X
+    // getippt habe"-Falle.
+    if (oldWidget.patchNumber != widget.patchNumber) {
+      if (_dismissedPatchNumber != widget.patchNumber) {
+        _dismissedPatchNumber = null;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (_dismissed) return widget.child;
+    if (_dismissedPatchNumber != null &&
+        _dismissedPatchNumber == widget.patchNumber) {
+      return widget.child;
+    }
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -968,7 +989,8 @@ class _PatchRestartBannerState extends State<_PatchRestartBanner> {
                     ),
                     const SizedBox(width: 4),
                     IconButton(
-                      onPressed: () => setState(() => _dismissed = true),
+                      onPressed: () => setState(
+                          () => _dismissedPatchNumber = widget.patchNumber),
                       icon: const Icon(LucideIcons.x,
                           color: Colors.white70, size: 18),
                       splashRadius: 18,

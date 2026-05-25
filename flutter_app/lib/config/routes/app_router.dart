@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../providers/role_provider.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
@@ -489,6 +490,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'animal',
           route: '/dashboard/animals',
           subtitle: 'modules.animals.subtitle'.tr(),
+          quickActions: const [
+            ModuleQuickAction(
+              icon: LucideIcons.camera,
+              label: 'identify.title',
+              route: '/dashboard/identify',
+              color: Color(0xFF7BD389),
+            ),
+          ],
           subFilters: const [
             FilterOption(value: 'lost', label: '😢 Vermisst'),
             FilterOption(value: 'found', label: '🔍 Gefunden'),
@@ -527,6 +536,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           postType: 'mobility',
           route: '/dashboard/mobility',
           subtitle: 'modules.mobility.subtitle'.tr(),
+          quickActions: const [
+            ModuleQuickAction(
+              icon: LucideIcons.zap,
+              label: 'charge.title',
+              route: '/dashboard/charge-stations',
+              color: Color(0xFF66C7C8),
+            ),
+          ],
           subFilters: const [
             FilterOption(value: 'rideshare', label: '🚗 Mitfahrt'),
             FilterOption(value: 'carpool', label: '👥 Fahrgemeinschaft'),
@@ -544,6 +561,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           emoji: '🌾',
           postType: 'supply',
           route: '/dashboard/harvest',
+          quickActions: const [
+            ModuleQuickAction(
+              icon: LucideIcons.apple,
+              label: 'wildPicks.title',
+              route: '/dashboard/harvest-wild',
+              color: Color(0xFF7BD389),
+            ),
+          ],
           subtitle: 'modules.harvest.subtitle'.tr(),
           subFilters: const [
             FilterOption(value: 'fruit', label: '🍎 Obst'),
