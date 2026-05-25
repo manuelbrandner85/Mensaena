@@ -25,6 +25,7 @@ class ChatMessageBubble extends ConsumerWidget {
     required this.conversationId,
     this.showReadReceipt = false,
     this.readByPeer = false,
+    this.clustered = false,
     this.onReact,
     this.onReply,
     this.onEdit,
@@ -37,6 +38,9 @@ class ChatMessageBubble extends ConsumerWidget {
   final String conversationId;
   final bool showReadReceipt;
   final bool readByPeer;
+  /// True wenn die vorherige Message vom selben Sender innerhalb 60s
+  /// kam — Bubble wird enger gestaped (#2 Message-Clustering).
+  final bool clustered;
   final Future<bool> Function(String emoji)? onReact;
   final VoidCallback? onReply;
   final VoidCallback? onEdit;
@@ -95,7 +99,10 @@ class ChatMessageBubble extends ConsumerWidget {
       child: Align(
         alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 6),
+          // #2 Clustering: enger Abstand wenn selber Sender < 60s.
+          // Plus zusaetzlich top-corner-radius reduzieren bei clustered
+          // damit die Bubbles wie eine zusammenhaengende Gruppe wirken.
+          margin: EdgeInsets.only(bottom: clustered ? 2 : 6),
           padding: hasImages
               ? const EdgeInsets.all(4)
               : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -116,8 +123,10 @@ class ChatMessageBubble extends ConsumerWidget {
                       : AppColors.line,
             ),
             borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(14),
-              topRight: const Radius.circular(14),
+              // Bei clustered: top-corner auf der Side des Senders reduziert
+              // damit Bubbles visuell zusammenhaengen.
+              topLeft: Radius.circular(clustered && mine ? 14 : (clustered ? 4 : 14)),
+              topRight: Radius.circular(clustered && !mine ? 14 : (clustered ? 4 : 14)),
               bottomLeft: Radius.circular(mine ? 14 : 4),
               bottomRight: Radius.circular(mine ? 4 : 14),
             ),

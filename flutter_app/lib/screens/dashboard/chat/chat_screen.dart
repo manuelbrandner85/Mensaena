@@ -604,6 +604,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           prevDay.month != mAt.month ||
                           prevDay.day != mAt.day;
                       final showUnreadDivider = i == firstUnreadIdx;
+                      // #2 Clustering: vorherige Message vom selben Sender,
+                      // gleicher Tag, < 60s Diff, KEIN Day-Header und KEIN
+                      // Unread-Divider dazwischen.
+                      bool clustered = false;
+                      if (i > 0 && !showDayHeader && !showUnreadDivider) {
+                        final prev = msgs[i - 1];
+                        if (prev['sender_id'] == m['sender_id']) {
+                          final prevAt = DateTime.tryParse(
+                              prev['created_at'] as String? ?? '');
+                          if (prevAt != null) {
+                            clustered =
+                                mAt.difference(prevAt.toLocal()).inSeconds < 60;
+                          }
+                        }
+                      }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -612,6 +627,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           ChatMessageBubble(
                         json: m,
                         mine: mine,
+                        clustered: clustered,
                         showReadReceipt: mine && isLast,
                         readByPeer: readByPeer,
                         conversationId: widget.conversationId,
