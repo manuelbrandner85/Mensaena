@@ -196,6 +196,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.sun',
       icon: LucideIcons.sun,
     ),
+    DashboardWidgetMeta(
+      id: 'quote',
+      title: 'widgets.titles.quote',
+      description: 'widgets.descriptions.quote',
+      icon: LucideIcons.quote,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

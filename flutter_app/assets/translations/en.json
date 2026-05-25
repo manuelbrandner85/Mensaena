@@ -1806,6 +1806,12 @@
     "dayLength": "Daylight",
     "goldenHour": "✨ Golden Hour"
   },
+  "quote": {
+    "title": "Quote of the day",
+    "share": "Share quote",
+    "error": "Couldn't load quote.",
+    "empty": "No quote available today."
+  },
   "callHistory": {
     "title": "Call history",
     "emptyTitle": "No calls yet",
@@ -1908,7 +1914,8 @@
       "nasaApod": "NASA Picture of the Day",
       "onThisDay": "On this day",
       "mood": "Mood tracker",
-      "sun": "Sun"
+      "sun": "Sun",
+      "quote": "Quote of the day"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1937,7 +1944,8 @@
       "nasaApod": "Daily astronomy photo + explanation",
       "onThisDay": "What happened today in history?",
       "mood": "Daily mood check-in + 7-day trend",
-      "sun": "Sunrise/sunset + Golden Hour"
+      "sun": "Sunrise/sunset + Golden Hour",
+      "quote": "Daily quote for reflection"
     }
   },
   "hubs": {
