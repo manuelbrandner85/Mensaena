@@ -1830,6 +1830,12 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "heatmap": {
+    "title": "Aktivite haritası",
+    "totalCount": "12 haftada {count} eylem",
+    "less": "az",
+    "more": "çok"
+  },
   "recap": {
     "title": "Haftalık özetin",
     "subtitle": "Son 7 günün aktivitesi",

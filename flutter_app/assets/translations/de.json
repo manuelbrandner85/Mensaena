@@ -1918,7 +1918,8 @@
       "streak": "Login-Streak",
       "gratitude": "Dankbarkeit",
       "karma": "Karma & Level",
-      "recap": "Wochenrückblick"
+      "recap": "Wochenrückblick",
+      "heatmap": "Aktivitäts-Heatmap"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1952,7 +1953,8 @@
       "streak": "Aufeinanderfolgende Tage in der App",
       "gratitude": "Wofür bist du heute dankbar?",
       "karma": "Deine Karma-Punkte und dein aktuelles Level",
-      "recap": "Deine letzten 7 Tage im Vergleich zur Vorwoche"
+      "recap": "Deine letzten 7 Tage im Vergleich zur Vorwoche",
+      "heatmap": "12-Wochen-Übersicht deiner täglichen Aktivität"
     }
   },
   "hubs": {
@@ -2053,6 +2055,12 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "heatmap": {
+    "title": "Aktivitäts-Heatmap",
+    "totalCount": "{count} Aktionen in 12 Wochen",
+    "less": "weniger",
+    "more": "mehr"
   },
   "recap": {
     "title": "Dein Wochenrückblick",

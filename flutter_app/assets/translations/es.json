@@ -1831,6 +1831,12 @@
     "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
     "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
   },
+  "heatmap": {
+    "title": "Mapa de actividad",
+    "totalCount": "{count} acciones en 12 semanas",
+    "less": "menos",
+    "more": "más"
+  },
   "recap": {
     "title": "Tu resumen semanal",
     "subtitle": "Actividad de los últimos 7 días",

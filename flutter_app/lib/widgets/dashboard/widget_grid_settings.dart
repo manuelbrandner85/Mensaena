@@ -226,6 +226,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.recap',
       icon: LucideIcons.trendingUp,
     ),
+    DashboardWidgetMeta(
+      id: 'heatmap',
+      title: 'widgets.titles.heatmap',
+      description: 'widgets.descriptions.heatmap',
+      icon: LucideIcons.calendarDays,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

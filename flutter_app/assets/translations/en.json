@@ -1919,7 +1919,8 @@
       "streak": "Login streak",
       "gratitude": "Gratitude",
       "karma": "Karma & level",
-      "recap": "Weekly recap"
+      "recap": "Weekly recap",
+      "heatmap": "Activity heatmap"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1953,7 +1954,8 @@
       "streak": "Consecutive days in the app",
       "gratitude": "What are you thankful for today?",
       "karma": "Your karma points and current level",
-      "recap": "Your last 7 days vs the week before"
+      "recap": "Your last 7 days vs the week before",
+      "heatmap": "12-week overview of your daily activity"
     }
   },
   "hubs": {
@@ -2054,6 +2056,12 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "heatmap": {
+    "title": "Activity heatmap",
+    "totalCount": "{count} actions in 12 weeks",
+    "less": "less",
+    "more": "more"
   },
   "recap": {
     "title": "Your weekly recap",
