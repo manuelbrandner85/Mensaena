@@ -1162,7 +1162,22 @@
     "publishArticle": "Pubblica articolo",
     "article": "Articolo",
     "writeArticle": "Scrivi un articolo",
-    "searchPlaceholder": "Cerca articoli…"
+    "searchPlaceholder": "Cerca articoli…",
+    "featured": "In evidenza",
+    "readingTime": "{min} min di lettura",
+    "createArticle": "Crea articolo",
+    "publish": "Pubblica",
+    "titleField": "Titolo",
+    "summary": "Breve descrizione (opzionale)",
+    "tags": "Tag (separati da virgola)",
+    "content": "Contenuto",
+    "markdownHint": "Markdown supportato — **grassetto**, *corsivo*, # Titoli, [Link](url), `Codice`, > Citazione",
+    "livePreview": "Mostra anteprima dal vivo",
+    "featuredToggle": "Contrassegna come in evidenza",
+    "coverImage": "Immagine di copertina",
+    "validationTitle": "Il titolo deve avere almeno 5 caratteri.",
+    "validationContent": "Il contenuto deve avere almeno 50 caratteri.",
+    "publishFailed": "Pubblicazione fallita."
   },
   "air": {
     "title": "Qualità dell'aria",

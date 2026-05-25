@@ -1162,7 +1162,22 @@
     "publishArticle": "Artikel veröffentlichen",
     "article": "Artikel",
     "writeArticle": "Artikel schreiben",
-    "searchPlaceholder": "Artikel suchen…"
+    "searchPlaceholder": "Artikel suchen…",
+    "featured": "Empfohlen",
+    "readingTime": "{min} Min. Lesezeit",
+    "createArticle": "Artikel erstellen",
+    "publish": "Veröffentlichen",
+    "titleField": "Titel",
+    "summary": "Kurzbeschreibung (optional)",
+    "tags": "Tags (komma-getrennt)",
+    "content": "Inhalt",
+    "markdownHint": "Markdown wird unterstützt — **fett**, *kursiv*, # Überschriften, [Links](url), `Code`, > Zitat",
+    "livePreview": "Live-Vorschau anzeigen",
+    "featuredToggle": "Als empfohlen markieren",
+    "coverImage": "Cover-Bild",
+    "validationTitle": "Titel min. 5 Zeichen.",
+    "validationContent": "Inhalt min. 50 Zeichen.",
+    "publishFailed": "Veröffentlichung fehlgeschlagen."
   },
   "air": {
     "title": "Luftqualität",

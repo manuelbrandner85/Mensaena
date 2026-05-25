@@ -1162,7 +1162,22 @@
     "publishArticle": "Publish article",
     "article": "Article",
     "writeArticle": "Write article",
-    "searchPlaceholder": "Search articles…"
+    "searchPlaceholder": "Search articles…",
+    "featured": "Featured",
+    "readingTime": "{min} min read",
+    "createArticle": "Create article",
+    "publish": "Publish",
+    "titleField": "Title",
+    "summary": "Short description (optional)",
+    "tags": "Tags (comma-separated)",
+    "content": "Content",
+    "markdownHint": "Markdown supported — **bold**, *italic*, # Headings, [Links](url), `Code`, > Quote",
+    "livePreview": "Show live preview",
+    "featuredToggle": "Mark as featured",
+    "coverImage": "Cover image",
+    "validationTitle": "Title must be at least 5 characters.",
+    "validationContent": "Content must be at least 50 characters.",
+    "publishFailed": "Publishing failed."
   },
   "air": {
     "title": "Air quality",

@@ -1,14 +1,23 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/knowledge_article.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+
+/// Lesezeit-Helper. Annahme: 200 Woerter / Minute.
+int _readingTimeMin(String? content) {
+  if (content == null || content.isEmpty) return 0;
+  final words = content.trim().split(RegExp(r'\s+')).length;
+  return (words / 200).ceil().clamp(1, 999);
+}
 
 /// Wissen / Wiki — knowledge_articles tabelle.
 /// 1:1 zu Web src/app/dashboard/wiki/page.tsx — Suche, Kategorie-Filter,
@@ -54,6 +63,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
   Future<List<KnowledgeArticle>>? _future;
   String _search = '';
   String _filterCat = 'all';
+  final Set<String> _selectedTags = {};
 
   @override
   void initState() {
@@ -87,6 +97,10 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
 
   bool _matches(KnowledgeArticle a) {
     if (_filterCat != 'all' && a.category != _filterCat) return false;
+    if (_selectedTags.isNotEmpty) {
+      final hasAny = a.tags.any(_selectedTags.contains);
+      if (!hasAny) return false;
+    }
     if (_search.isNotEmpty) {
       final q = _search.toLowerCase();
       final t = a.title.toLowerCase();
@@ -110,7 +124,7 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
         foregroundColor: AppColors.voidColor,
         onPressed: () => context.go('${widget.routePath}/create'),
         icon: const Icon(LucideIcons.plus),
-        label: Text('knowledge.article'.tr()),
+        label: Text('knowledge.createArticle'.tr()),
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -135,6 +149,22 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                 if (c == null) continue;
                 catCounts[c] = (catCounts[c] ?? 0) + 1;
               }
+
+              // Tag-Counts (alle unique tags aus allen Artikeln)
+              final tagCounts = <String, int>{};
+              for (final a in all) {
+                for (final t in a.tags) {
+                  final tag = t.trim();
+                  if (tag.isEmpty) continue;
+                  tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+                }
+              }
+              final sortedTags = tagCounts.keys.toList()
+                ..sort((a, b) => (tagCounts[b] ?? 0).compareTo(tagCounts[a] ?? 0));
+
+              // Featured-Highlight: erster Artikel mit is_featured=true im
+              // gefilterten Set bekommt den goldenen Rahmen.
+              KnowledgeArticle? highlightedFeatured;
 
               return ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -178,6 +208,38 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                                 _filterCat == c.value ? 'all' : c.value),
                           ),
                       ],
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+
+                  // Tag-Filter (horizontal scrollende Chip-Row)
+                  if (sortedTags.isNotEmpty) ...[
+                    SizedBox(
+                      height: 32,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.zero,
+                        physics: const BouncingScrollPhysics(),
+                        children: [
+                          _TagChip(
+                            label: 'Alle',
+                            active: _selectedTags.isEmpty,
+                            onTap: () => setState(() => _selectedTags.clear()),
+                          ),
+                          for (final tag in sortedTags.take(40))
+                            _TagChip(
+                              label: '#$tag',
+                              active: _selectedTags.contains(tag),
+                              onTap: () => setState(() {
+                                if (_selectedTags.contains(tag)) {
+                                  _selectedTags.remove(tag);
+                                } else {
+                                  _selectedTags.add(tag);
+                                }
+                              }),
+                            ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 12),
                   ],
@@ -227,7 +289,14 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                     for (final a in filtered)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: _ArticleTile(article: a),
+                        child: _ArticleTile(
+                          article: a,
+                          isFeaturedHighlight: () {
+                            if (!a.isFeatured) return false;
+                            highlightedFeatured ??= a;
+                            return identical(highlightedFeatured, a);
+                          }(),
+                        ),
                       ),
                 ],
               );
@@ -455,8 +524,12 @@ class _CategoryChip extends StatelessWidget {
 
 // ── Article Tile ─────────────────────────────────────────────────
 class _ArticleTile extends StatelessWidget {
-  const _ArticleTile({required this.article});
+  const _ArticleTile({
+    required this.article,
+    this.isFeaturedHighlight = false,
+  });
   final KnowledgeArticle article;
+  final bool isFeaturedHighlight;
 
   String _categoryEmoji(String? cat) {
     if (cat == null) return '📋';
@@ -468,6 +541,10 @@ class _ArticleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final minutes = _readingTimeMin(article.content);
+    final borderColor =
+        isFeaturedHighlight ? AppColors.amber : AppColors.line;
+    final borderWidth = isFeaturedHighlight ? 2.0 : 1.0;
     return InkWell(
       onTap: () {
         showModalBottomSheet<void>(
@@ -485,92 +562,190 @@ class _ArticleTile extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.surface.withValues(alpha: 0.5),
-          border: Border.all(color: AppColors.line),
+          border: Border.all(color: borderColor, width: borderWidth),
           borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.bronze.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(_categoryEmoji(article.category),
-                  style: const TextStyle(fontSize: 18)),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    article.title,
-                    style: AppTypography.body(
-                      size: 14,
-                      color: AppColors.ink,
-                      weight: FontWeight.w700,
-                      height: 1.3,
-                    ),
+          boxShadow: isFeaturedHighlight
+              ? [
+                  BoxShadow(
+                    color: AppColors.amber.withValues(alpha: 0.30),
+                    blurRadius: 14,
+                    spreadRadius: -2,
                   ),
-                  if (article.summary != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      article.summary!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.body(
-                        size: 12,
-                        color: AppColors.inkSoft,
-                      ),
-                    ),
-                  ] else ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      article.content.length > 120
-                          ? '${article.content.substring(0, 120)}…'
-                          : article.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.body(
-                          size: 12, color: AppColors.inkSoft),
-                    ),
-                  ],
-                  const SizedBox(height: 6),
-                  Row(
+                ]
+              : null,
+        ),
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.bronze.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(_categoryEmoji(article.category),
+                      style: const TextStyle(fontSize: 18)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (article.category != null)
+                      if (isFeaturedHighlight) ...[
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                              horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.elevated,
+                            color: AppColors.amber.withValues(alpha: 0.18),
+                            border: Border.all(
+                                color: AppColors.amber.withValues(alpha: 0.5)),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: Text(article.category!,
-                              style: AppTypography.label(
-                                  size: 8, color: AppColors.bronzeSoft)),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(LucideIcons.star,
+                                  size: 10, color: AppColors.amber),
+                              const SizedBox(width: 4),
+                              Text(
+                                'knowledge.featured'.tr(),
+                                style: AppTypography.label(
+                                    size: 8, color: AppColors.amber),
+                              ),
+                            ],
+                          ),
                         ),
-                      const Spacer(),
-                      const Icon(LucideIcons.clock,
-                          size: 10, color: AppColors.mute),
-                      const SizedBox(width: 3),
+                        const SizedBox(height: 6),
+                      ],
                       Text(
-                        DateFormat('dd.MM.yyyy').format(article.createdAt),
-                        style: AppTypography.caption(),
+                        article.title,
+                        style: AppTypography.body(
+                          size: 14,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700,
+                          height: 1.3,
+                        ),
+                      ),
+                      if (article.summary != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          article.summary!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.body(
+                            size: 12,
+                            color: AppColors.inkSoft,
+                          ),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          article.content.length > 120
+                              ? '${article.content.substring(0, 120)}…'
+                              : article.content,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.body(
+                              size: 12, color: AppColors.inkSoft),
+                        ),
+                      ],
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          if (article.category != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.elevated,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(article.category!,
+                                  style: AppTypography.label(
+                                      size: 8, color: AppColors.bronzeSoft)),
+                            ),
+                          const SizedBox(width: 6),
+                          if (minutes > 0) ...[
+                            const Icon(LucideIcons.clock,
+                                size: 10, color: AppColors.mute),
+                            const SizedBox(width: 3),
+                            Text(
+                              'knowledge.readingTime'.tr(
+                                  namedArgs: {'min': '$minutes'}),
+                              style: AppTypography.caption(),
+                            ),
+                          ],
+                          const Spacer(),
+                          Text(
+                            DateFormat('dd.MM.yyyy').format(article.createdAt),
+                            style: AppTypography.caption(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(LucideIcons.chevronRight,
+                    size: 14, color: AppColors.mute),
+              ],
             ),
-            const SizedBox(width: 6),
-            const Icon(LucideIcons.chevronRight,
-                size: 14, color: AppColors.mute),
+            if (isFeaturedHighlight)
+              const Positioned(
+                top: 0,
+                right: 24,
+                child: Icon(LucideIcons.star,
+                    size: 16, color: AppColors.amber),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Tag Chip (horizontal scrolling) ──────────────────────────────
+class _TagChip extends StatelessWidget {
+  const _TagChip({
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.teal.withValues(alpha: 0.20)
+                : AppColors.elevated,
+            border: Border.all(
+              color: active ? AppColors.teal : AppColors.line,
+              width: active ? 1.2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            label,
+            style: AppTypography.body(
+              size: 11,
+              color: active ? AppColors.teal : AppColors.inkSoft,
+              weight: active ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
         ),
       ),
     );
@@ -590,8 +765,48 @@ class _ArticleSheet extends StatelessWidget {
     return cat;
   }
 
+  MarkdownStyleSheet _markdownStyles(BuildContext context) {
+    return MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+      p: AppTypography.body(
+          size: 14, color: AppColors.inkSoft, height: 1.65),
+      h1: AppTypography.display(
+          size: 22, color: AppColors.ink, weight: FontWeight.w800),
+      h1Padding: const EdgeInsets.only(top: 4, bottom: 8),
+      h2: AppTypography.display(
+          size: 18, color: AppColors.ink, weight: FontWeight.w700),
+      h2Padding: const EdgeInsets.only(top: 16, bottom: 6),
+      h3: AppTypography.body(
+          size: 16, color: AppColors.ink, weight: FontWeight.w700),
+      h3Padding: const EdgeInsets.only(top: 12, bottom: 4),
+      strong: AppTypography.body(
+          size: 14, color: AppColors.ink, weight: FontWeight.w700),
+      em: AppTypography.body(size: 14, color: AppColors.inkSoft)
+          .copyWith(fontStyle: FontStyle.italic),
+      listBullet: AppTypography.body(size: 14, color: AppColors.bronze),
+      code: AppTypography.mono(size: 12, color: AppColors.amber),
+      codeblockDecoration: BoxDecoration(
+        color: AppColors.elevated,
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      codeblockPadding: const EdgeInsets.all(10),
+      blockquote: AppTypography.body(size: 14, color: AppColors.inkSoft)
+          .copyWith(fontStyle: FontStyle.italic),
+      blockquoteDecoration: BoxDecoration(
+        color: AppColors.amber.withValues(alpha: 0.05),
+        border: const Border(
+          left: BorderSide(color: AppColors.amber, width: 3),
+        ),
+      ),
+      blockquotePadding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      a: AppTypography.body(size: 14, color: AppColors.teal)
+          .copyWith(decoration: TextDecoration.underline),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final minutes = _readingTimeMin(article.content);
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.4,
@@ -634,6 +849,26 @@ class _ArticleSheet extends StatelessWidget {
                 DateFormat('dd. MMMM yyyy', 'de_DE').format(article.createdAt),
                 style: AppTypography.caption(),
               ),
+              if (minutes > 0) ...[
+                const SizedBox(width: 10),
+                Container(
+                  width: 3,
+                  height: 3,
+                  decoration: const BoxDecoration(
+                    color: AppColors.mute,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Icon(LucideIcons.clock,
+                    size: 11, color: AppColors.mute),
+                const SizedBox(width: 4),
+                Text(
+                  'knowledge.readingTime'
+                      .tr(namedArgs: {'min': '$minutes'}),
+                  style: AppTypography.caption(),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 14),
@@ -654,13 +889,16 @@ class _ArticleSheet extends StatelessWidget {
             ),
             const SizedBox(height: 14),
           ],
-          Text(
-            article.content,
-            style: AppTypography.body(
-              size: 14,
-              color: AppColors.inkSoft,
-              height: 1.7,
-            ),
+          MarkdownBody(
+            data: article.content,
+            selectable: true,
+            styleSheet: _markdownStyles(context),
+            onTapLink: (text, href, title) async {
+              if (href == null) return;
+              final uri = Uri.tryParse(href);
+              if (uri == null) return;
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            },
           ),
           if (article.tags.isNotEmpty) ...[
             const SizedBox(height: 18),

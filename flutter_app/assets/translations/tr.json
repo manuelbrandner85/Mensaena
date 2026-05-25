@@ -1162,7 +1162,22 @@
     "publishArticle": "Makaleyi yayınla",
     "article": "Makale",
     "writeArticle": "Makale yaz",
-    "searchPlaceholder": "Makale ara…"
+    "searchPlaceholder": "Makale ara…",
+    "featured": "Öne çıkan",
+    "readingTime": "{min} dk okuma",
+    "createArticle": "Makale oluştur",
+    "publish": "Yayınla",
+    "titleField": "Başlık",
+    "summary": "Kısa açıklama (isteğe bağlı)",
+    "tags": "Etiketler (virgülle ayrılmış)",
+    "content": "İçerik",
+    "markdownHint": "Markdown destekleniyor — **kalın**, *italik*, # Başlıklar, [Bağlantılar](url), `Kod`, > Alıntı",
+    "livePreview": "Canlı önizlemeyi göster",
+    "featuredToggle": "Öne çıkan olarak işaretle",
+    "coverImage": "Kapak resmi",
+    "validationTitle": "Başlık en az 5 karakter olmalı.",
+    "validationContent": "İçerik en az 50 karakter olmalı.",
+    "publishFailed": "Yayınlama başarısız oldu."
   },
   "air": {
     "title": "Hava kalitesi",
