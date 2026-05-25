@@ -946,16 +946,26 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                         ),
                       ),
                       const SizedBox(height: 1),
-                      Text(
-                        _subtitle(ctx, isOnline),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.label(
-                          size: 9,
-                          color: isOnline
-                              ? AppColors.lebenSoft
-                              : AppColors.mute,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              _subtitle(ctx, isOnline),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.label(
+                                size: 9,
+                                color: isOnline
+                                    ? AppColors.lebenSoft
+                                    : AppColors.mute,
+                              ),
+                            ),
+                          ),
+                          // R14: 6h-Purge-Countdown in Channel-Header.
+                          // Transparenz wann Messages automatisch geloescht werden.
+                          if (isChannel) const _PurgeCountdownPill(),
+                        ],
                       ),
                     ],
                   ),
@@ -1399,6 +1409,78 @@ class _ChatEmptyState extends StatelessWidget {
                 color: AppColors.mute,
                 height: 1.5,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── R14: 6h-Purge-Countdown-Pill ──────────────────────────────────────
+/// Zeigt im Channel-Header die Zeit bis zum naechsten Auto-Purge
+/// (alle 6h um 00/06/12/18 UTC). Updated alle 30s.
+class _PurgeCountdownPill extends StatefulWidget {
+  const _PurgeCountdownPill();
+
+  @override
+  State<_PurgeCountdownPill> createState() => _PurgeCountdownPillState();
+}
+
+class _PurgeCountdownPillState extends State<_PurgeCountdownPill> {
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  Duration _untilNextPurge() {
+    final now = DateTime.now().toUtc();
+    // Naechster 6h-Slot: 00/06/12/18 UTC
+    final nextHour = ((now.hour ~/ 6) + 1) * 6;
+    final next = DateTime.utc(now.year, now.month, now.day, nextHour);
+    return next.difference(now);
+  }
+
+  String _format(Duration d) {
+    final h = d.inHours;
+    final m = d.inMinutes % 60;
+    if (h > 0) return '${h}h ${m}m';
+    return '${m}m';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final d = _untilNextPurge();
+    return Padding(
+      padding: const EdgeInsets.only(left: 6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: AppColors.bronze.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+              color: AppColors.bronze.withValues(alpha: 0.3), width: 0.5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.timer,
+                size: 9, color: AppColors.bronzeSoft),
+            const SizedBox(width: 3),
+            Text(
+              _format(d),
+              style: AppTypography.label(size: 8, color: AppColors.bronzeSoft),
             ),
           ],
         ),
