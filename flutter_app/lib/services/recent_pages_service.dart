@@ -59,6 +59,10 @@ class RecentPagesService {
         RouteMeta(title: 'nav.animals', icon: LucideIcons.dog),
     '/dashboard/jobs':
         RouteMeta(title: 'nav.jobs', icon: LucideIcons.briefcase),
+    '/dashboard/jobs-portals':
+        RouteMeta(title: 'jobs.portalsTitle', icon: LucideIcons.briefcase),
+    '/dashboard/jobs-search':
+        RouteMeta(title: 'jobs.liveSearchTitle', icon: LucideIcons.search),
     '/dashboard/housing':
         RouteMeta(title: 'nav.housing', icon: LucideIcons.home),
     '/dashboard/mobility':

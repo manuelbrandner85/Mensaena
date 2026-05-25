@@ -1400,7 +1400,25 @@
     "officialBadge": "OFFICIAL",
     "openSearch": "Search jobs",
     "openPortal": "Open portal",
-    "noneInCountry": "No job portals available for your country."
+    "noneInCountry": "No job portals available for your country.",
+    "liveSearchTitle": "Live job search (German Employment Agency)",
+    "liveSearchSubtitle": "Real-time vacancies from Germany's largest official database.",
+    "searchHint": "Job title or keyword …",
+    "radiusKm": "Radius: {km} km",
+    "enterPlzPrompt": "Please enter a postal code to find nearby jobs.",
+    "noneFound": "No results",
+    "noneFoundHint": "Try a larger radius or a different keyword."
+  },
+  "nasaApod": {
+    "title": "Picture of the day",
+    "error": "NASA image could not be loaded.",
+    "empty": "No picture available today."
+  },
+  "onThisDay": {
+    "title": "On this day",
+    "yearsAgo": "{n} years ago",
+    "error": "Wikipedia could not be loaded.",
+    "empty": "No events for today."
   },
   "civil": {
     "navTitle": "Alerts",
@@ -1790,7 +1808,9 @@
       "nearYou": "Near you",
       "traffic": "Traffic",
       "books": "Book recommendations",
-      "health": "Health tip"
+      "health": "Health tip",
+      "nasaApod": "NASA Picture of the Day",
+      "onThisDay": "On this day"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1815,7 +1835,9 @@
       "nearYou": "Local posts nearby",
       "traffic": "Top warnings on major motorways",
       "books": "Book picks for community & sustainability",
-      "health": "A small daily prompt for your health"
+      "health": "A small daily prompt for your health",
+      "nasaApod": "Daily astronomy photo + explanation",
+      "onThisDay": "What happened today in history?"
     }
   },
   "hubs": {

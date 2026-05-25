@@ -1399,7 +1399,25 @@
     "officialBadge": "AMTLICH",
     "openSearch": "Jobs suchen",
     "openPortal": "Portal öffnen",
-    "noneInCountry": "Keine Job-Portale für dein Land verfügbar."
+    "noneInCountry": "Keine Job-Portale für dein Land verfügbar.",
+    "liveSearchTitle": "Live-Jobsuche (Bundesagentur)",
+    "liveSearchSubtitle": "Echtzeit-Stellen aus der größten amtlichen Datenbank.",
+    "searchHint": "Beruf oder Stichwort …",
+    "radiusKm": "Umkreis: {km} km",
+    "enterPlzPrompt": "Bitte Postleitzahl eingeben, um Stellen in der Nähe zu finden.",
+    "noneFound": "Keine Treffer",
+    "noneFoundHint": "Versuche einen größeren Umkreis oder ein anderes Stichwort."
+  },
+  "nasaApod": {
+    "title": "Bild des Tages",
+    "error": "NASA-Bild konnte nicht geladen werden.",
+    "empty": "Heute kein Bild verfügbar."
+  },
+  "onThisDay": {
+    "title": "Heute in der Geschichte",
+    "yearsAgo": "vor {n} Jahren",
+    "error": "Wikipedia konnte nicht geladen werden.",
+    "empty": "Keine Ereignisse für heute."
   },
   "civil": {
     "navTitle": "Warnungen",
@@ -1789,7 +1807,9 @@
       "nearYou": "In deiner Nähe",
       "traffic": "Verkehrslage",
       "books": "Bücher-Empfehlungen",
-      "health": "Gesundheits-Tipp"
+      "health": "Gesundheits-Tipp",
+      "nasaApod": "NASA Bild des Tages",
+      "onThisDay": "Heute in der Geschichte"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1814,7 +1834,9 @@
       "nearYou": "Lokale Beiträge in Nähe",
       "traffic": "Top-Meldungen auf den großen Autobahnen",
       "books": "Buchempfehlungen für Gemeinschaft & Nachhaltigkeit",
-      "health": "Ein kleiner Impuls pro Tag für deine Gesundheit"
+      "health": "Ein kleiner Impuls pro Tag für deine Gesundheit",
+      "nasaApod": "Tägliches astronomisches Foto + Erklärung",
+      "onThisDay": "Was geschah heute vor Jahren?"
     }
   },
   "hubs": {

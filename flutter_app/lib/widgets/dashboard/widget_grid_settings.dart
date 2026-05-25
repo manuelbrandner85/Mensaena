@@ -172,11 +172,28 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.health',
       icon: LucideIcons.heart,
     ),
+    DashboardWidgetMeta(
+      id: 'nasa_apod',
+      title: 'widgets.titles.nasaApod',
+      description: 'widgets.descriptions.nasaApod',
+      icon: LucideIcons.image,
+    ),
+    DashboardWidgetMeta(
+      id: 'on_this_day',
+      title: 'widgets.titles.onThisDay',
+      description: 'widgets.descriptions.onThisDay',
+      icon: LucideIcons.scroll,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das
   /// Widget-Grid-Settings-Sheet vom User selbst aktiviert.
-  static const Set<String> _defaultHidden = {'traffic', 'books', 'health'};
+  ///
+  /// Books + Health werden jetzt standardmaessig angezeigt — User-Feedback:
+  /// "lieferten keine Daten" weil sie versteckt waren. Traffic bleibt aus,
+  /// weil 9 Autobahn-API-Calls bei jedem Open kostspielig sind.
+  /// NASA APOD + OnThisDay sind neu, default-an fuer Discovery-Effekt.
+  static const Set<String> _defaultHidden = {'traffic'};
 
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(
         order: all.map((w) => w.id).toList(),

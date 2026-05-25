@@ -75,6 +75,7 @@ import '../../screens/legal/legal_page_screen.dart';
 import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
 import '../../screens/dashboard/jobs/job_portals_screen.dart';
+import '../../screens/dashboard/jobs/live_jobs_screen.dart';
 import '../../screens/dashboard/warnungen/air_quality_screen.dart';
 import '../../screens/dashboard/warnungen/civil_protection_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
@@ -930,6 +931,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const JobPortalsScreen(),
+        ),
+      ),
+      // Live-Jobsuche via Bundesagentur (nur DE, brauchbar mit PLZ).
+      GoRoute(
+        path: '/dashboard/jobs-search',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const LiveJobsScreen(),
         ),
       ),
       GoRoute(

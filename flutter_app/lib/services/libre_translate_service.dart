@@ -58,12 +58,45 @@ class LibreTranslateService {
     );
     if (myMemory != null) return myMemory;
 
-    // Fallback auf LibreTranslate (auch wenn flaky — manchmal sind die wieder up).
+    // Fallback Schicht 2: Lingva (Google-Translate-Mirror, gratis, kein Key).
+    final lingva = await _tryLingva(
+      text: clean,
+      source: myMemorySource,
+      target: target,
+    );
+    if (lingva != null) return lingva;
+
+    // Fallback Schicht 3: LibreTranslate offiziell (auch wenn flaky).
     return _tryLibreTranslate(
       text: clean,
       source: source,
       target: target,
     );
+  }
+
+  /// Lingva Translate — Google-Translate-Wrapper ohne Key.
+  /// Endpoint: /api/v1/{source}/{target}/{text}
+  static Future<TranslationResult?> _tryLingva({
+    required String text,
+    required String source,
+    required String target,
+  }) async {
+    try {
+      final uri = Uri.parse(
+          'https://lingva.ml/api/v1/$source/$target/${Uri.encodeComponent(text)}');
+      final r = await http.get(uri).timeout(const Duration(seconds: 10));
+      if (r.statusCode != 200) return null;
+      final j = json.decode(r.body) as Map<String, dynamic>;
+      final translated = j['translation'] as String?;
+      if (translated == null || translated.isEmpty) return null;
+      return TranslationResult(
+        text: translated,
+        detectedSource: source,
+      );
+    } catch (e) {
+      if (kDebugMode) debugPrint('[Translate] Lingva failed: $e');
+      return null;
+    }
   }
 
   static Future<TranslationResult?> _tryMyMemory({

@@ -7,6 +7,7 @@ library;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -105,7 +106,56 @@ class _JobPortalsScreenState extends ConsumerState<JobPortalsScreen> {
                   subtitle: 'jobs.portalsSubtitle'
                       .tr(namedArgs: {'country': countryLabel}),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
+                // Live-Search (nur DE — Bundesagentur-API ist DE-only)
+                if (country == 'DE')
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => context.push('/dashboard/jobs-search'),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.bronze.withValues(alpha: 0.25),
+                              AppColors.bronze.withValues(alpha: 0.10),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: AppColors.bronze.withValues(alpha: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(LucideIcons.search,
+                                size: 20, color: AppColors.bronze),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('jobs.liveSearchTitle'.tr(),
+                                      style: AppTypography.body(
+                                          size: 14,
+                                          color: AppColors.ink,
+                                          weight: FontWeight.w700)),
+                                  const SizedBox(height: 2),
+                                  Text('jobs.liveSearchSubtitle'.tr(),
+                                      style: AppTypography.body(
+                                          size: 12,
+                                          color: AppColors.inkSoft)),
+                                ],
+                              ),
+                            ),
+                            const Icon(LucideIcons.arrowRight,
+                                size: 16, color: AppColors.bronze),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 for (final p in list)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),

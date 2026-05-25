@@ -31,6 +31,8 @@ import '../../../widgets/dashboard/books_widget.dart';
 import '../../../widgets/dashboard/bot_tip_card.dart';
 import '../../../widgets/dashboard/community_pulse.dart';
 import '../../../widgets/dashboard/health_widget.dart';
+import '../../../widgets/dashboard/nasa_apod_widget.dart';
+import '../../../widgets/dashboard/on_this_day_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
 import '../../../widgets/dashboard/holiday_badge.dart';
@@ -434,6 +436,14 @@ class _DashboardHomeScreenState
           break;
         case 'health':
           out.add(const HealthWidget());
+          addSpacing();
+          break;
+        case 'nasa_apod':
+          out.add(const NasaApodWidget());
+          addSpacing();
+          break;
+        case 'on_this_day':
+          out.add(const OnThisDayWidget());
           addSpacing();
           break;
         case 'nearby_posts':
