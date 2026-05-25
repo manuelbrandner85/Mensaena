@@ -1313,7 +1313,17 @@
     "reasonSpam": "Spam",
     "reasonAbuse": "Abusivo",
     "reasonFake": "Engañoso",
-    "reasonOther": "Otro"
+    "reasonOther": "Otro",
+    "submitSuggestion": "Enviar sugerencia",
+    "suggestionSuccess": "¡Gracias! Tu sugerencia se ha enviado y será revisada por nuestro equipo.",
+    "anotherSuggestion": "Enviar otra sugerencia",
+    "suggestSubtitle": "¿Conoces un lugar que falta aquí? Propónlo — lo revisamos y lo añadimos al directorio.",
+    "nameRequired": "Introduce un nombre con al menos 3 caracteres.",
+    "descRequired": "Describe la organización (mínimo 20 caracteres).",
+    "categoryRequired": "Selecciona una categoría.",
+    "pickCategory": "Elegir categoría",
+    "country": "País",
+    "email": "Correo"
   },
   "live": {
     "connectionFailed": "Conexión fallida",

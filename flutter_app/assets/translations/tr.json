@@ -1313,7 +1313,17 @@
     "reasonSpam": "Spam",
     "reasonAbuse": "Hakaret",
     "reasonFake": "Yanıltıcı",
-    "reasonOther": "Diğer"
+    "reasonOther": "Diğer",
+    "submitSuggestion": "Öneri gönder",
+    "suggestionSuccess": "Teşekkürler! Önerin gönderildi ve ekibimiz tarafından incelenecek.",
+    "anotherSuggestion": "Başka bir öneri gönder",
+    "suggestSubtitle": "Burada eksik olan bir kurum biliyor musun? Öner — inceleyip dizine ekleyelim.",
+    "nameRequired": "Lütfen en az 3 karakterli bir ad gir.",
+    "descRequired": "Lütfen kurumu açıkla (en az 20 karakter).",
+    "categoryRequired": "Lütfen bir kategori seç.",
+    "pickCategory": "Kategori seç",
+    "country": "Ülke",
+    "email": "E-posta"
   },
   "live": {
     "connectionFailed": "Bağlantı başarısız",

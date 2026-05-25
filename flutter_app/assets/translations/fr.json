@@ -1313,7 +1313,17 @@
     "reasonSpam": "Spam",
     "reasonAbuse": "Abusif",
     "reasonFake": "Trompeur",
-    "reasonOther": "Autre"
+    "reasonOther": "Autre",
+    "submitSuggestion": "Envoyer la suggestion",
+    "suggestionSuccess": "Merci ! Ta suggestion a été envoyée et sera examinée par notre équipe.",
+    "anotherSuggestion": "Envoyer une autre suggestion",
+    "suggestSubtitle": "Tu connais une organisation absente ici ? Propose-la — nous la vérifions et l'ajoutons au répertoire.",
+    "nameRequired": "Saisis un nom d'au moins 3 caractères.",
+    "descRequired": "Décris l'organisation (au moins 20 caractères).",
+    "categoryRequired": "Sélectionne une catégorie.",
+    "pickCategory": "Choisir une catégorie",
+    "country": "Pays",
+    "email": "E-mail"
   },
   "live": {
     "connectionFailed": "Échec de la connexion",

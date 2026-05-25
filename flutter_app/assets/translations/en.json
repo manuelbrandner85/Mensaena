@@ -1313,7 +1313,17 @@
     "reasonSpam": "Spam",
     "reasonAbuse": "Abusive",
     "reasonFake": "Misleading",
-    "reasonOther": "Other"
+    "reasonOther": "Other",
+    "submitSuggestion": "Submit suggestion",
+    "suggestionSuccess": "Thank you! Your suggestion has been submitted and will be reviewed by our team.",
+    "anotherSuggestion": "Submit another suggestion",
+    "suggestSubtitle": "Know a place that's missing here? Suggest it — we'll review and add it to the directory.",
+    "nameRequired": "Please enter a name with at least 3 characters.",
+    "descRequired": "Please describe the organization (at least 20 characters).",
+    "categoryRequired": "Please select a category.",
+    "pickCategory": "Choose category",
+    "country": "Country",
+    "email": "Email"
   },
   "live": {
     "connectionFailed": "Connection failed",
