@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_webrtc/flutter_webrtc.dart' as rtc;
@@ -282,6 +283,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       await room.localParticipant?.setMicrophoneEnabled(true);
       if (!mounted) return;
       setState(() => _state = _CallState.connected);
+      // Critical: tell CallKit/Telecom the call connected. Without this,
+      // iOS auto-ends after 30s "no answer" and Android's ConnectionService
+      // stays in a half-ringing state.
+      try {
+        await FlutterCallkitIncoming.setCallConnected(widget.callId);
+      } catch (_) {}
     } catch (e) {
       if (!mounted) return;
       setState(() {

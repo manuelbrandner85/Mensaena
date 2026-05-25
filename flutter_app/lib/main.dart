@@ -2,12 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
 import 'providers/locale_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
@@ -56,6 +58,12 @@ Future<void> main() async {
   // 2. Background-Handler-Registration (top-level @pragma function)
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundMessageHandler);
 
+  // 2b. CallEventBus VOR runApp — kritisch fuer Cold-Start. Ein Accept-
+  // Event aus killed-State feuert bevor irgendein Widget mountet, also
+  // muss der Listener jetzt schon hoeren. Sonst Accept → Dashboard statt
+  // Call-Screen.
+  CallEventBus.init();
+
   // 3. App SOFORT rendern — kein await auf Firebase/FCM/Listener!
   runApp(
     EasyLocalization(
@@ -86,6 +94,21 @@ Future<void> _initBackgroundServices() async {
   try {
     await CallkitService.initialize();
   } catch (_) {}
+
+  // Android 14+: Full-Screen-Intent fuer eingehende Calls braucht
+  // Runtime-Permission. Ohne das zeigt das System nur eine Heads-Up-
+  // Notification statt der Lockscreen-Vollbild-UI.
+  try {
+    final canUse = await FlutterCallkitIncoming.canUseFullScreenIntent();
+    if (canUse != true) {
+      await FlutterCallkitIncoming.requestFullIntentPermission();
+    }
+  } catch (_) {/* nicht auf allen Android-Versionen verfuegbar */}
+
+  // Cold-Start-Recovery: wenn die App via CallKit-Accept aus killed-State
+  // gestartet wurde, hat _handle() ggf. das Event verpasst (vor Engine-
+  // Boot gefeuert). Wir queryen activeCalls und triggern Accept manuell.
+  unawaited(CallEventBus.recoverColdStart());
 
   // FCM-Token bei aktuellem Login direkt registrieren
   if (SupabaseService.isLoggedIn) {
