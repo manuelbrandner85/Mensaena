@@ -61,9 +61,14 @@ class CinemaOverlay extends ConsumerWidget {
     final isLight = ref.watch(isLightModeProvider);
     final intensity = isLight ? (baseIntensity * 0.3) : baseIntensity;
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
+    // V20: TickerMode.of — wenn der CinemaOverlay nicht sichtbar ist
+    // (z.B. Screen im Background), pausiere alle AnimationControllers
+    // automatisch. Flutter macht das via TickerMode im Navigator, aber
+    // nur wenn RepaintBoundary korrekt gesetzt ist.
+    return RepaintBoundary(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
         // ═══════════ BACKGROUND-STACK (alle hinter Content) ═══════════
 
         // 1. Mesh-Gradient mit Drift
@@ -173,6 +178,7 @@ class CinemaOverlay extends ConsumerWidget {
             child: FilmGrainOverlay(opacity: spec.grainOpacity * intensity),
           ),
       ],
+      ),
     );
   }
 }
