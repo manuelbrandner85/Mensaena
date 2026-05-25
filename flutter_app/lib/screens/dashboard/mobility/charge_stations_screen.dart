@@ -1,6 +1,9 @@
 /// SKILL: mensaena-features + mensaena-design
 /// E-Auto-Ladestationen-Karte via OSM Overpass.
+/// Viewport-basiert: bei jedem Map-Move wird neu geladen was sichtbar ist.
 library;
+
+import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +18,6 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/charge_stations_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
-import '../../../widgets/shared/editorial_module_header.dart';
-import '../../../widgets/shared/empty_state_card.dart';
 
 class ChargeStationsScreen extends ConsumerStatefulWidget {
   const ChargeStationsScreen({super.key});
@@ -30,7 +31,8 @@ class _ChargeStationsScreenState
   final _mapCtrl = MapController();
   LatLng _center = const LatLng(51.1657, 10.4515);
   final double _zoom = 12;
-  int _radiusKm = 15;
+  LatLng? _userPos;
+  Timer? _moveDebounce;
   List<ChargeStation> _stations = const [];
   bool _loading = true;
 
@@ -43,6 +45,7 @@ class _ChargeStationsScreenState
   @override
   void dispose() {
     _mapCtrl.dispose();
+    _moveDebounce?.cancel();
     super.dispose();
   }
 
@@ -50,12 +53,27 @@ class _ChargeStationsScreenState
     try {
       final pos = await LocationService.getCurrentPosition(
           accuracy: LocationAccuracy.medium);
+      final ll = LatLng(pos.latitude, pos.longitude);
       if (mounted) {
-        setState(() => _center = LatLng(pos.latitude, pos.longitude));
+        setState(() {
+          _center = ll;
+          _userPos = ll;
+        });
         _mapCtrl.move(_center, _zoom);
       }
     } catch (_) {}
     await _load();
+  }
+
+  /// Lade-Radius wird aus Zoom-Level abgeleitet. Je weiter rausgezoomt,
+  /// desto groesser der Radius — Karten-Sicht passt zur Datenmenge.
+  int _radiusFromZoom() {
+    final z = _mapCtrl.camera.zoom;
+    if (z >= 14) return 5;
+    if (z >= 12) return 15;
+    if (z >= 10) return 40;
+    if (z >= 8) return 100;
+    return 200;
   }
 
   Future<void> _load() async {
@@ -63,7 +81,7 @@ class _ChargeStationsScreenState
     final list = await ChargeStationsService.nearby(
       lat: _center.latitude,
       lng: _center.longitude,
-      radiusKm: _radiusKm,
+      radiusKm: _radiusFromZoom(),
     );
     if (!mounted) return;
     setState(() {
@@ -72,126 +90,187 @@ class _ChargeStationsScreenState
     });
   }
 
+  void _onMapEvent(MapEvent event) {
+    if (event is MapEventMoveEnd) {
+      _moveDebounce?.cancel();
+      _moveDebounce = Timer(const Duration(milliseconds: 600), () {
+        if (!mounted) return;
+        _center = _mapCtrl.camera.center;
+        _load();
+      });
+    }
+  }
+
+  Future<void> _recenterGps() async {
+    try {
+      final pos = await LocationService.getCurrentPosition(
+          accuracy: LocationAccuracy.high);
+      final ll = LatLng(pos.latitude, pos.longitude);
+      if (!mounted) return;
+      setState(() {
+        _userPos = ll;
+        _center = ll;
+      });
+      _mapCtrl.move(_center, 14);
+      _load();
+    } catch (_) {}
+  }
+
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
       title: 'charge.title'.tr(),
       currentRoute: '/dashboard/mobility/charge',
+      fab: FloatingActionButton(
+        backgroundColor: AppColors.tealSoft,
+        foregroundColor: AppColors.voidColor,
+        onPressed: _recenterGps,
+        tooltip: 'charge.recenter'.tr(),
+        child: const Icon(LucideIcons.locate),
+      ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 18',
-                metaCategory: 'charge.section'.tr(),
-                title: 'charge.title'.tr(),
-                subtitle: 'charge.subtitle'.tr(),
+            // Karte — IMMER sichtbar
+            FlutterMap(
+              mapController: _mapCtrl,
+              options: MapOptions(
+                initialCenter: _center,
+                initialZoom: _zoom,
+                minZoom: 3,
+                maxZoom: 18,
+                onMapEvent: _onMapEvent,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                children: [
-                  Text('charge.radius'.tr(namedArgs: {'km': '$_radiusKm'}),
-                      style: AppTypography.label(size: 10)),
-                  Expanded(
-                    child: Slider(
-                      value: _radiusKm.toDouble(),
-                      min: 3,
-                      max: 50,
-                      divisions: 9,
-                      activeColor: AppColors.tealSoft,
-                      onChanged: (v) =>
-                          setState(() => _radiusKm = v.round()),
-                      onChangeEnd: (_) => _load(),
-                    ),
-                  ),
-                  Text('${_stations.length}',
-                      style: AppTypography.mono(
-                          size: 12, color: AppColors.tealSoft)),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _stations.isEmpty && !_loading
-                  ? Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: EmptyStateCard(
-                        icon: LucideIcons.zap,
-                        title: 'charge.none'.tr(),
-                        description: 'charge.noneHint'.tr(),
-                      ),
-                    )
-                  : Stack(
-                      children: [
-                        FlutterMap(
-                          mapController: _mapCtrl,
-                          options: MapOptions(
-                            initialCenter: _center,
-                            initialZoom: _zoom,
-                            minZoom: 3,
-                            maxZoom: 18,
-                            onMapEvent: (event) {
-                              if (event is MapEventMoveEnd) {
-                                _center = _mapCtrl.camera.center;
-                              }
-                            },
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'de.mensaena.app',
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                for (final s in _stations)
-                                  Marker(
-                                    point: LatLng(s.lat, s.lng),
-                                    width: 32,
-                                    height: 32,
-                                    child: GestureDetector(
-                                      onTap: () => _openSheet(s),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.tealSoft,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: AppColors.voidColor,
-                                              width: 2),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: const Icon(LucideIcons.zap,
-                                            size: 14, color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        if (_loading)
-                          const Positioned(
-                            top: 12,
-                            right: 12,
-                            child: Card(
-                              color: AppColors.deep,
-                              child: Padding(
-                                padding: EdgeInsets.all(8),
-                                child: SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.tealSoft),
-                                ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'de.mensaena.app',
+                ),
+                if (_userPos != null)
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: _userPos!,
+                        width: 24,
+                        height: 24,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4285F4),
+                            shape: BoxShape.circle,
+                            border:
+                                Border.all(color: Colors.white, width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF4285F4)
+                                    .withValues(alpha: 0.4),
+                                blurRadius: 12,
+                                spreadRadius: 4,
                               ),
-                            ),
+                            ],
                           ),
-                      ],
-                    ),
+                        ),
+                      ),
+                    ],
+                  ),
+                MarkerLayer(
+                  markers: [
+                    for (final s in _stations)
+                      Marker(
+                        point: LatLng(s.lat, s.lng),
+                        width: 32,
+                        height: 32,
+                        child: GestureDetector(
+                          onTap: () => _openSheet(s),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.tealSoft,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.voidColor, width: 2),
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(LucideIcons.zap,
+                                size: 14, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ),
+            // Top-Pill: Anzahl / Loading
+            Positioned(
+              top: 8,
+              left: 12,
+              right: 12,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.deep.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                        color: AppColors.tealSoft.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_loading)
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.tealSoft),
+                        )
+                      else
+                        const Icon(LucideIcons.zap,
+                            size: 12, color: AppColors.tealSoft),
+                      const SizedBox(width: 6),
+                      Text(
+                        _loading
+                            ? 'charge.loading'.tr()
+                            : 'charge.count'
+                                .tr(namedArgs: {'n': '${_stations.length}'}),
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.ink),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Empty-Hint nur wenn nichts gefunden — als kleine Pill, NICHT
+            // Vollbild. Karte bleibt sichtbar.
+            if (!_loading && _stations.isEmpty)
+              Positioned(
+                bottom: 100,
+                left: 24,
+                right: 24,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.deep.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.info,
+                          size: 14, color: AppColors.mute),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'charge.noneHint'.tr(),
+                          style: AppTypography.body(
+                              size: 12, color: AppColors.inkSoft),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),

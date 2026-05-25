@@ -1,7 +1,9 @@
 /// SKILL: mensaena-features + mensaena-design
 /// Karte mit Wildfruchte-Spots + Verschenk-Schraenken via OSM Overpass.
-/// Mundraub-Pattern als Free-Alternative (mundraub.org-API ist down).
+/// Viewport-basiert: bei jedem Map-Move wird neu geladen was sichtbar ist.
 library;
+
+import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +18,6 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/location_service.dart';
 import '../../../services/mundraub_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
-import '../../../widgets/shared/editorial_module_header.dart';
-import '../../../widgets/shared/empty_state_card.dart';
 
 class WildPicksScreen extends ConsumerStatefulWidget {
   const WildPicksScreen({super.key});
@@ -29,8 +29,9 @@ class WildPicksScreen extends ConsumerStatefulWidget {
 class _WildPicksScreenState extends ConsumerState<WildPicksScreen> {
   final _mapCtrl = MapController();
   LatLng _center = const LatLng(51.1657, 10.4515);
-  final double _zoom = 11;
-  int _radiusKm = 10;
+  final double _zoom = 12;
+  LatLng? _userPos;
+  Timer? _moveDebounce;
   List<FreePickSpot> _spots = const [];
   bool _loading = true;
   final Set<FreePickKind> _filter = {
@@ -48,6 +49,7 @@ class _WildPicksScreenState extends ConsumerState<WildPicksScreen> {
   @override
   void dispose() {
     _mapCtrl.dispose();
+    _moveDebounce?.cancel();
     super.dispose();
   }
 
@@ -55,12 +57,28 @@ class _WildPicksScreenState extends ConsumerState<WildPicksScreen> {
     try {
       final pos = await LocationService.getCurrentPosition(
           accuracy: LocationAccuracy.medium);
+      final ll = LatLng(pos.latitude, pos.longitude);
       if (mounted) {
-        setState(() => _center = LatLng(pos.latitude, pos.longitude));
+        setState(() {
+          _center = ll;
+          _userPos = ll;
+        });
         _mapCtrl.move(_center, _zoom);
       }
     } catch (_) {}
     await _load();
+  }
+
+  /// Lade-Radius wird aus Zoom-Level abgeleitet. Je weiter rausgezoomt,
+  /// desto groesser der Radius — so passt die gefundene Datenmenge zur
+  /// Karten-Sicht ohne expliziten Slider.
+  int _radiusFromZoom() {
+    final z = _mapCtrl.camera.zoom;
+    if (z >= 14) return 3;
+    if (z >= 12) return 8;
+    if (z >= 10) return 25;
+    if (z >= 8) return 60;
+    return 120;
   }
 
   Future<void> _load() async {
@@ -68,13 +86,39 @@ class _WildPicksScreenState extends ConsumerState<WildPicksScreen> {
     final spots = await MundraubService.nearby(
       lat: _center.latitude,
       lng: _center.longitude,
-      radiusKm: _radiusKm,
+      radiusKm: _radiusFromZoom(),
     );
     if (!mounted) return;
     setState(() {
       _spots = spots;
       _loading = false;
     });
+  }
+
+  void _onMapEvent(MapEvent event) {
+    if (event is MapEventMoveEnd) {
+      _moveDebounce?.cancel();
+      _moveDebounce = Timer(const Duration(milliseconds: 600), () {
+        if (!mounted) return;
+        _center = _mapCtrl.camera.center;
+        _load();
+      });
+    }
+  }
+
+  Future<void> _recenterGps() async {
+    try {
+      final pos = await LocationService.getCurrentPosition(
+          accuracy: LocationAccuracy.high);
+      final ll = LatLng(pos.latitude, pos.longitude);
+      if (!mounted) return;
+      setState(() {
+        _userPos = ll;
+        _center = ll;
+      });
+      _mapCtrl.move(_center, 14);
+      _load();
+    } catch (_) {/* GPS denied */}
   }
 
   List<FreePickSpot> get _filtered =>
@@ -108,146 +152,186 @@ class _WildPicksScreenState extends ConsumerState<WildPicksScreen> {
     return DashboardScaffold(
       title: 'wildPicks.title'.tr(),
       currentRoute: '/dashboard/harvest/wild',
+      fab: FloatingActionButton(
+        backgroundColor: AppColors.leben,
+        foregroundColor: AppColors.voidColor,
+        onPressed: _recenterGps,
+        tooltip: 'wildPicks.recenter'.tr(),
+        child: const Icon(LucideIcons.locate),
+      ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 12',
-                metaCategory: 'wildPicks.section'.tr(),
-                title: 'wildPicks.title'.tr(),
-                subtitle: 'wildPicks.subtitle'.tr(),
+            // Layer 1: Karte — IMMER sichtbar, fuellt den ganzen Body.
+            FlutterMap(
+              mapController: _mapCtrl,
+              options: MapOptions(
+                initialCenter: _center,
+                initialZoom: _zoom,
+                minZoom: 3,
+                maxZoom: 18,
+                onMapEvent: _onMapEvent,
               ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'de.mensaena.app',
+                ),
+                // User-GPS-Punkt (blau, mit Glow)
+                if (_userPos != null)
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: _userPos!,
+                        width: 24,
+                        height: 24,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4285F4),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF4285F4)
+                                    .withValues(alpha: 0.4),
+                                blurRadius: 12,
+                                spreadRadius: 4,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                // Spot-Marker
+                MarkerLayer(
+                  markers: [
+                    for (final s in spots)
+                      Marker(
+                        point: LatLng(s.lat, s.lng),
+                        width: 34,
+                        height: 34,
+                        child: GestureDetector(
+                          onTap: () => _openSheet(s),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _color(s.kind),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.voidColor, width: 2),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(_icon(s.kind),
+                                size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ),
-            // Filter-Chips
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Wrap(
-                spacing: 6,
-                children: FreePickKind.values
-                    .map((k) => _FilterChip(
-                          icon: _icon(k),
-                          label: 'wildPicks.kind.${k.name}'.tr(),
-                          color: _color(k),
-                          active: _filter.contains(k),
-                          onToggle: () => setState(() {
-                            if (_filter.contains(k)) {
-                              _filter.remove(k);
-                            } else {
-                              _filter.add(k);
-                            }
-                          }),
-                        ))
-                    .toList(),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
+            // Layer 2: Filter-Bar + Loading-Indikator (Top)
+            Positioned(
+              top: 8,
+              left: 12,
+              right: 12,
+              child: Column(
                 children: [
-                  Text('wildPicks.radius'.tr(namedArgs: {'km': '$_radiusKm'}),
-                      style: AppTypography.label(size: 10)),
-                  Expanded(
-                    child: Slider(
-                      value: _radiusKm.toDouble(),
-                      min: 2,
-                      max: 50,
-                      divisions: 12,
-                      activeColor: AppColors.leben,
-                      onChanged: (v) =>
-                          setState(() => _radiusKm = v.round()),
-                      onChangeEnd: (_) => _load(),
+                  // Karten-Info-Pill
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.deep.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                          color: AppColors.leben.withValues(alpha: 0.4)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_loading)
+                          const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.leben),
+                          )
+                        else
+                          const Icon(LucideIcons.mapPin,
+                              size: 12, color: AppColors.leben),
+                        const SizedBox(width: 6),
+                        Text(
+                          _loading
+                              ? 'wildPicks.loading'.tr()
+                              : 'wildPicks.count'
+                                  .tr(namedArgs: {'n': '${spots.length}'}),
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.ink),
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: _loading ? null : _load,
-                    icon: const Icon(LucideIcons.refreshCw,
-                        size: 18, color: AppColors.leben),
+                  const SizedBox(height: 8),
+                  // Filter-Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: FreePickKind.values
+                          .map((k) => Padding(
+                                padding: const EdgeInsets.only(right: 6),
+                                child: _FilterChip(
+                                  icon: _icon(k),
+                                  label:
+                                      'wildPicks.kind.${k.name}'.tr(),
+                                  color: _color(k),
+                                  active: _filter.contains(k),
+                                  onToggle: () => setState(() {
+                                    if (_filter.contains(k)) {
+                                      _filter.remove(k);
+                                    } else {
+                                      _filter.add(k);
+                                    }
+                                  }),
+                                ),
+                              ))
+                          .toList(),
+                    ),
                   ),
                 ],
               ),
             ),
-            Expanded(
-              child: spots.isEmpty && !_loading
-                  ? Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: EmptyStateCard(
-                        icon: LucideIcons.mapPin,
-                        title: 'wildPicks.none'.tr(),
-                        description: 'wildPicks.noneHint'.tr(),
-                      ),
-                    )
-                  : Stack(
-                      children: [
-                        FlutterMap(
-                          mapController: _mapCtrl,
-                          options: MapOptions(
-                            initialCenter: _center,
-                            initialZoom: _zoom,
-                            minZoom: 3,
-                            maxZoom: 18,
-                            onMapEvent: (event) {
-                              if (event is MapEventMoveEnd) {
-                                _center = _mapCtrl.camera.center;
-                              }
-                            },
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'de.mensaena.app',
-                            ),
-                            MarkerLayer(
-                              markers: [
-                                for (final s in spots)
-                                  Marker(
-                                    point: LatLng(s.lat, s.lng),
-                                    width: 34,
-                                    height: 34,
-                                    child: GestureDetector(
-                                      onTap: () => _openSheet(s),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: _color(s.kind),
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: AppColors.voidColor,
-                                              width: 2),
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Icon(_icon(s.kind),
-                                            size: 16, color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
+            // Layer 3: Empty-Hint nur wenn nichts gefunden — als kleine
+            // unauffaellige Pill, NICHT Vollbild. Karte bleibt sichtbar.
+            if (!_loading && spots.isEmpty)
+              Positioned(
+                bottom: 100,
+                left: 24,
+                right: 24,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.deep.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.info,
+                          size: 14, color: AppColors.mute),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'wildPicks.none'.tr(),
+                          style: AppTypography.body(
+                              size: 12, color: AppColors.inkSoft),
                         ),
-                        if (_loading)
-                          const Positioned(
-                            top: 12,
-                            right: 12,
-                            child: Card(
-                              color: AppColors.deep,
-                              child: Padding(
-                                padding: EdgeInsets.all(8),
-                                child: SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.leben),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -322,11 +406,11 @@ class _FilterChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       onTap: onToggle,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: active
-              ? color.withValues(alpha: 0.18)
-              : AppColors.elevated,
+              ? color.withValues(alpha: 0.85)
+              : AppColors.deep.withValues(alpha: 0.85),
           border: Border.all(
               color: active ? color : AppColors.line, width: 1),
           borderRadius: BorderRadius.circular(999),
@@ -334,11 +418,14 @@ class _FilterChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: active ? color : AppColors.mute),
+            Icon(icon,
+                size: 12,
+                color: active ? AppColors.voidColor : AppColors.mute),
             const SizedBox(width: 4),
             Text(label,
                 style: AppTypography.label(
-                    size: 10, color: active ? color : AppColors.mute)),
+                    size: 10,
+                    color: active ? AppColors.voidColor : AppColors.mute)),
           ],
         ),
       ),
