@@ -240,7 +240,9 @@
       "neighbors": "Vicini",
       "private": "Privato"
     },
-    "savedTitle": "Salvati"
+    "savedTitle": "Salvati",
+    "otherProfile": "Profilo",
+    "notLoggedIn": "Sei disconnesso. Accedi di nuovo per vedere il tuo profilo."
   },
   "settings": {
     "title": "Impostazioni",

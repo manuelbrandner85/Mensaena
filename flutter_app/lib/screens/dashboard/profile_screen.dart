@@ -41,10 +41,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _future = widget.userId == null
+    // Bug-Fix: leerer/ungueltiger userId-Param wurde als "fremdes Profil"
+    // interpretiert, getById('') gab null zurueck → "Profil nicht gefunden".
+    // Jetzt: leerer String == eigenes Profil.
+    final uid = widget.userId;
+    final isOwn = uid == null || uid.isEmpty;
+    _future = isOwn
         ? ProfilesRepository.getMine()
-        : ProfilesRepository.getById(widget.userId!);
+        : ProfilesRepository.getById(uid);
     _tab = TabController(length: 4, vsync: this);
+  }
+
+  bool get _isOwnProfile {
+    final uid = widget.userId;
+    return uid == null || uid.isEmpty;
   }
 
   @override
@@ -55,8 +65,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isMe = _isOwnProfile;
     return DashboardScaffold(
-      title: widget.userId == null ? 'Mein Profil' : 'Profil',
+      title:
+          isMe ? 'profile.myProfile'.tr() : 'profile.otherProfile'.tr(),
       currentRoute: '/dashboard/profile',
       body: SafeArea(
         child: FutureBuilder<Profile?>(
@@ -69,14 +81,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             }
             final p = snap.data;
             if (p == null) {
+              // Wenn eigenes Profil + nicht gefunden: vermutlich JWT abgelaufen
+              // oder profile-Row fehlt. Biete Retry-Button + Logout-Hinweis.
+              final notLoggedIn =
+                  SupabaseService.currentUser == null;
               return Center(
-                child: Text(
-                  'Profil nicht gefunden.',
-                  style: AppTypography.caption(),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(LucideIcons.userX,
+                          size: 32, color: AppColors.mute),
+                      const SizedBox(height: 12),
+                      Text(
+                        notLoggedIn
+                            ? 'profile.notLoggedIn'.tr()
+                            : 'profile.loadError'.tr(),
+                        style: AppTypography.body(
+                            size: 14, color: AppColors.inkSoft),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 14),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          // Session refresh + retry
+                          await SupabaseService.ensureFreshSession();
+                          setState(() {
+                            _future = isMe
+                                ? ProfilesRepository.getMine()
+                                : ProfilesRepository.getById(widget.userId!);
+                          });
+                        },
+                        icon: const Icon(LucideIcons.refreshCw, size: 16),
+                        label: Text('common.retry'.tr()),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
-            final isMe = widget.userId == null;
             return Column(
               children: [
                 Padding(

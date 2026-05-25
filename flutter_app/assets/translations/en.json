@@ -99,7 +99,7 @@
     "wrongCredentials": "Incorrect email or password"
   },
   "profile": {
-    "myProfile": "My profile",
+    "myProfile": "My Profile",
     "editProfile": "Edit profile",
     "saved": "Saved",
     "name": "Name",
@@ -240,7 +240,9 @@
       "neighbors": "Neighbours",
       "private": "Private"
     },
-    "savedTitle": "Saved"
+    "savedTitle": "Saved",
+    "otherProfile": "Profile",
+    "notLoggedIn": "You're signed out. Sign in again to see your profile."
   },
   "settings": {
     "title": "Settings",

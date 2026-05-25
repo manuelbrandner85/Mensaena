@@ -240,7 +240,9 @@
       "neighbors": "Komşular",
       "private": "Özel"
     },
-    "savedTitle": "Kaydedildi"
+    "savedTitle": "Kaydedildi",
+    "otherProfile": "Profil",
+    "notLoggedIn": "Oturumun kapalı. Profilini görmek için tekrar giriş yap."
   },
   "settings": {
     "title": "Ayarlar",

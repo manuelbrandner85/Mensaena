@@ -240,7 +240,9 @@
       "neighbors": "Voisins",
       "private": "Privé"
     },
-    "savedTitle": "Enregistrés"
+    "savedTitle": "Enregistrés",
+    "otherProfile": "Profil",
+    "notLoggedIn": "Vous êtes déconnecté. Reconnectez-vous pour voir votre profil."
   },
   "settings": {
     "title": "Paramètres",

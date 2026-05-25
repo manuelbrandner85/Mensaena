@@ -240,7 +240,9 @@
       "neighbors": "Vecinos",
       "private": "Privado"
     },
-    "savedTitle": "Guardados"
+    "savedTitle": "Guardados",
+    "otherProfile": "Perfil",
+    "notLoggedIn": "Has cerrado sesión. Inicia sesión de nuevo para ver tu perfil."
   },
   "settings": {
     "title": "Ajustes",

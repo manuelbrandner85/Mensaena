@@ -240,7 +240,9 @@
       "neighbors": "Nachbarn",
       "private": "Privat"
     },
-    "savedTitle": "Gespeichert"
+    "savedTitle": "Gespeichert",
+    "otherProfile": "Profil",
+    "notLoggedIn": "Du bist abgemeldet. Bitte melde dich neu an, um dein Profil zu sehen."
   },
   "settings": {
     "title": "Einstellungen",
