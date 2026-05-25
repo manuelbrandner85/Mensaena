@@ -633,6 +633,32 @@
       "deletedBadge": "Deleted",
       "deletedMsgPlaceholder": "Message deleted",
       "deletedMsg": "Message deleted."
+    },
+    "system": {
+      "cleanupTitle": "System cleanup",
+      "cleanupSubtitle": "Removes expired posts, old notifications and orphaned data.",
+      "cleanupStart": "Run cleanup",
+      "cleanupRunning": "Running …",
+      "cleanupOk": "Cleanup completed.",
+      "cleanupFail": "Cleanup failed.",
+      "cleanupLastRun": "Last run: {time}",
+      "auditTitle": "Audit log",
+      "auditError": "Audit log could not be loaded.",
+      "auditEmpty": "No audit entries yet.",
+      "act": {
+        "banUser": "User banned",
+        "unbanUser": "User unbanned",
+        "deleteUser": "User deleted",
+        "changeRole": "Role changed",
+        "deletePost": "Post deleted",
+        "resolveReport": "Report resolved",
+        "cleanup": "System cleanup"
+      },
+      "quickLinks": "External tools",
+      "linkSupabase": "Supabase Dashboard",
+      "linkSql": "Supabase SQL Editor",
+      "linkCloudflare": "Cloudflare Dashboard",
+      "linkGitHub": "GitHub Repository"
     }
   },
   "create": {

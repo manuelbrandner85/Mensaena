@@ -633,6 +633,32 @@
       "deletedBadge": "Удалено",
       "deletedMsgPlaceholder": "Сообщение удалено",
       "deletedMsg": "Сообщение удалено."
+    },
+    "system": {
+      "cleanupTitle": "Очистка системы",
+      "cleanupSubtitle": "Удаляет просроченные публикации, старые уведомления и осиротевшие данные.",
+      "cleanupStart": "Запустить очистку",
+      "cleanupRunning": "Выполняется …",
+      "cleanupOk": "Очистка завершена.",
+      "cleanupFail": "Не удалось выполнить очистку.",
+      "cleanupLastRun": "Последний запуск: {time}",
+      "auditTitle": "Журнал аудита",
+      "auditError": "Не удалось загрузить журнал аудита.",
+      "auditEmpty": "Записей аудита пока нет.",
+      "act": {
+        "banUser": "Пользователь заблокирован",
+        "unbanUser": "Блокировка снята",
+        "deleteUser": "Пользователь удалён",
+        "changeRole": "Роль изменена",
+        "deletePost": "Публикация удалена",
+        "resolveReport": "Жалоба обработана",
+        "cleanup": "Очистка системы"
+      },
+      "quickLinks": "Внешние инструменты",
+      "linkSupabase": "Панель Supabase",
+      "linkSql": "SQL-редактор Supabase",
+      "linkCloudflare": "Панель Cloudflare",
+      "linkGitHub": "Репозиторий GitHub"
     }
   },
   "create": {

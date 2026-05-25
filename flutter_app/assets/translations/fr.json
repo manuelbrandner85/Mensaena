@@ -633,6 +633,32 @@
       "deletedBadge": "Supprimé",
       "deletedMsgPlaceholder": "Message supprimé",
       "deletedMsg": "Message supprimé."
+    },
+    "system": {
+      "cleanupTitle": "Nettoyage du système",
+      "cleanupSubtitle": "Supprime les publications expirées, les anciennes notifications et les données orphelines.",
+      "cleanupStart": "Lancer le nettoyage",
+      "cleanupRunning": "En cours …",
+      "cleanupOk": "Nettoyage terminé.",
+      "cleanupFail": "Le nettoyage a échoué.",
+      "cleanupLastRun": "Dernière exécution : {time}",
+      "auditTitle": "Journal d'audit",
+      "auditError": "Impossible de charger le journal d'audit.",
+      "auditEmpty": "Aucune entrée d'audit pour le moment.",
+      "act": {
+        "banUser": "Utilisateur banni",
+        "unbanUser": "Utilisateur débanni",
+        "deleteUser": "Utilisateur supprimé",
+        "changeRole": "Rôle modifié",
+        "deletePost": "Publication supprimée",
+        "resolveReport": "Signalement traité",
+        "cleanup": "Nettoyage du système"
+      },
+      "quickLinks": "Outils externes",
+      "linkSupabase": "Tableau de bord Supabase",
+      "linkSql": "Éditeur SQL Supabase",
+      "linkCloudflare": "Tableau de bord Cloudflare",
+      "linkGitHub": "Dépôt GitHub"
     }
   },
   "create": {

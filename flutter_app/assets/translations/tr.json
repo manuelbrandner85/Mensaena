@@ -633,6 +633,32 @@
       "deletedBadge": "Silindi",
       "deletedMsgPlaceholder": "Mesaj silindi",
       "deletedMsg": "Mesaj silindi."
+    },
+    "system": {
+      "cleanupTitle": "Sistem temizliği",
+      "cleanupSubtitle": "Süresi dolan gönderileri, eski bildirimleri ve sahipsiz verileri temizler.",
+      "cleanupStart": "Temizliği başlat",
+      "cleanupRunning": "Çalışıyor …",
+      "cleanupOk": "Temizlik tamamlandı.",
+      "cleanupFail": "Temizlik başarısız oldu.",
+      "cleanupLastRun": "Son çalıştırma: {time}",
+      "auditTitle": "Denetim günlüğü",
+      "auditError": "Denetim günlüğü yüklenemedi.",
+      "auditEmpty": "Henüz denetim kaydı yok.",
+      "act": {
+        "banUser": "Kullanıcı yasaklandı",
+        "unbanUser": "Kullanıcının yasağı kaldırıldı",
+        "deleteUser": "Kullanıcı silindi",
+        "changeRole": "Rol değiştirildi",
+        "deletePost": "Gönderi silindi",
+        "resolveReport": "Şikayet işlendi",
+        "cleanup": "Sistem temizliği"
+      },
+      "quickLinks": "Harici araçlar",
+      "linkSupabase": "Supabase Paneli",
+      "linkSql": "Supabase SQL Editörü",
+      "linkCloudflare": "Cloudflare Paneli",
+      "linkGitHub": "GitHub Deposu"
     }
   },
   "create": {
