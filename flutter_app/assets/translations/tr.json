@@ -1219,7 +1219,45 @@
     "phone": "Telefon",
     "website": "Web sitesi",
     "suggestTitle": "Org. öner",
-    "organizationsTitle": "Kuruluşlar"
+    "organizationsTitle": "Kuruluşlar",
+    "subtitle": "Çevrenizdeki doğrulanmış kuruluşlar – hayvan barınakları, gıda bankaları, sosyal yardım ve daha fazlası.",
+    "filter": "Filtrele",
+    "sort": "Sırala",
+    "sortName": "Ad (A–Z)",
+    "sortRating": "En yüksek puan",
+    "sortNewest": "En yeni",
+    "sortDistance": "En yakın",
+    "verified": "Doğrulanmış",
+    "emergency": "Acil",
+    "nowOpen": "Açık",
+    "nowClosed": "Kapalı",
+    "allCountries": "Tüm ülkeler",
+    "allCategories": "Tüm kategoriler",
+    "resetFilters": "Sıfırla",
+    "view": {
+      "list": "Liste",
+      "map": "Harita"
+    },
+    "stats": {
+      "total": "Kayıt",
+      "verified": "Doğrulanmış",
+      "reviews": "Yorumlu",
+      "avgRating": "Ort. puan"
+    },
+    "actions": {
+      "call": "Ara",
+      "web": "Web",
+      "mail": "E-posta",
+      "map": "Harita",
+      "details": "Ayrıntılar"
+    },
+    "empty": {
+      "title": "Kuruluş bulunamadı",
+      "description": "Filtreleri değiştir ya da yeni bir kuruluş öner."
+    },
+    "useGps": "Konumumu kullan",
+    "gpsError": "Konumun alınamadı.",
+    "searchPlaceholder": "Ad, şehir veya kategori ara…"
   },
   "live": {
     "connectionFailed": "Bağlantı başarısız",

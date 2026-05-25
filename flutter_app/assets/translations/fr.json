@@ -1219,7 +1219,45 @@
     "phone": "Téléphone",
     "website": "Site web",
     "suggestTitle": "Suggérer une org.",
-    "organizationsTitle": "Organisations"
+    "organizationsTitle": "Organisations",
+    "subtitle": "Structures vérifiées près de chez toi – refuges, banques alimentaires, associations et plus.",
+    "filter": "Filtres",
+    "sort": "Trier",
+    "sortName": "Nom (A–Z)",
+    "sortRating": "Mieux notées",
+    "sortNewest": "Plus récentes",
+    "sortDistance": "Plus proches",
+    "verified": "Vérifiée",
+    "emergency": "Urgence",
+    "nowOpen": "Ouvert",
+    "nowClosed": "Fermé",
+    "allCountries": "Tous les pays",
+    "allCategories": "Toutes les catégories",
+    "resetFilters": "Réinitialiser",
+    "view": {
+      "list": "Liste",
+      "map": "Carte"
+    },
+    "stats": {
+      "total": "Entrées",
+      "verified": "Vérifiées",
+      "reviews": "Avec avis",
+      "avgRating": "Note moy."
+    },
+    "actions": {
+      "call": "Appeler",
+      "web": "Web",
+      "mail": "Email",
+      "map": "Carte",
+      "details": "Détails"
+    },
+    "empty": {
+      "title": "Aucune organisation trouvée",
+      "description": "Ajuste tes filtres ou propose toi-même une nouvelle entrée."
+    },
+    "useGps": "Utiliser ma position",
+    "gpsError": "Impossible d'obtenir ta position.",
+    "searchPlaceholder": "Rechercher nom, ville ou catégorie…"
   },
   "live": {
     "connectionFailed": "Échec de la connexion",

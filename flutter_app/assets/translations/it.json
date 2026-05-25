@@ -1219,7 +1219,45 @@
     "phone": "Telefono",
     "website": "Sito web",
     "suggestTitle": "Suggerisci org.",
-    "organizationsTitle": "Organizzazioni"
+    "organizationsTitle": "Organizzazioni",
+    "subtitle": "Servizi locali verificati vicino a te – canili, mense sociali, enti benefici e altro.",
+    "filter": "Filtri",
+    "sort": "Ordina",
+    "sortName": "Nome (A–Z)",
+    "sortRating": "Più votate",
+    "sortNewest": "Più recenti",
+    "sortDistance": "Più vicine",
+    "verified": "Verificata",
+    "emergency": "Emergenza",
+    "nowOpen": "Aperto",
+    "nowClosed": "Chiuso",
+    "allCountries": "Tutti i paesi",
+    "allCategories": "Tutte le categorie",
+    "resetFilters": "Reimposta",
+    "view": {
+      "list": "Elenco",
+      "map": "Mappa"
+    },
+    "stats": {
+      "total": "Voci",
+      "verified": "Verificate",
+      "reviews": "Con recensioni",
+      "avgRating": "Voto medio"
+    },
+    "actions": {
+      "call": "Chiama",
+      "web": "Sito",
+      "mail": "Email",
+      "map": "Mappa",
+      "details": "Dettagli"
+    },
+    "empty": {
+      "title": "Nessuna organizzazione trovata",
+      "description": "Modifica i filtri o suggerisci tu stesso un nuovo ente."
+    },
+    "useGps": "Usa la mia posizione",
+    "gpsError": "Impossibile rilevare la posizione.",
+    "searchPlaceholder": "Cerca per nome, città o categoria…"
   },
   "live": {
     "connectionFailed": "Connessione fallita",

@@ -1219,7 +1219,45 @@
     "phone": "Phone",
     "website": "Website",
     "suggestTitle": "Suggest org.",
-    "organizationsTitle": "Organisations"
+    "organizationsTitle": "Organisations",
+    "subtitle": "Verified local services near you – animal shelters, food banks, social charities and more.",
+    "filter": "Filter",
+    "sort": "Sort",
+    "sortName": "Name (A–Z)",
+    "sortRating": "Top rated",
+    "sortNewest": "Newest",
+    "sortDistance": "Nearest",
+    "verified": "Verified",
+    "emergency": "Emergency",
+    "nowOpen": "Open now",
+    "nowClosed": "Closed",
+    "allCountries": "All countries",
+    "allCategories": "All categories",
+    "resetFilters": "Reset",
+    "view": {
+      "list": "List",
+      "map": "Map"
+    },
+    "stats": {
+      "total": "Listings",
+      "verified": "Verified",
+      "reviews": "With reviews",
+      "avgRating": "Avg. rating"
+    },
+    "actions": {
+      "call": "Call",
+      "web": "Web",
+      "mail": "Email",
+      "map": "Map",
+      "details": "Details"
+    },
+    "empty": {
+      "title": "No organisations found",
+      "description": "Adjust your filters or suggest a new entry yourself."
+    },
+    "useGps": "Use my location",
+    "gpsError": "Could not get your location.",
+    "searchPlaceholder": "Search by name, city or category…"
   },
   "live": {
     "connectionFailed": "Connection failed",

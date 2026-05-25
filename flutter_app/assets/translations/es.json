@@ -1219,7 +1219,45 @@
     "phone": "Teléfono",
     "website": "Sitio web",
     "suggestTitle": "Sugerir org.",
-    "organizationsTitle": "Organizaciones"
+    "organizationsTitle": "Organizaciones",
+    "subtitle": "Servicios verificados cerca de ti – refugios, bancos de alimentos, entidades sociales y más.",
+    "filter": "Filtros",
+    "sort": "Ordenar",
+    "sortName": "Nombre (A–Z)",
+    "sortRating": "Mejor valoradas",
+    "sortNewest": "Más recientes",
+    "sortDistance": "Más cercanas",
+    "verified": "Verificada",
+    "emergency": "Emergencia",
+    "nowOpen": "Abierto",
+    "nowClosed": "Cerrado",
+    "allCountries": "Todos los países",
+    "allCategories": "Todas las categorías",
+    "resetFilters": "Restablecer",
+    "view": {
+      "list": "Lista",
+      "map": "Mapa"
+    },
+    "stats": {
+      "total": "Entradas",
+      "verified": "Verificadas",
+      "reviews": "Con reseñas",
+      "avgRating": "Valoración media"
+    },
+    "actions": {
+      "call": "Llamar",
+      "web": "Web",
+      "mail": "Email",
+      "map": "Mapa",
+      "details": "Detalles"
+    },
+    "empty": {
+      "title": "No se encontraron organizaciones",
+      "description": "Ajusta tus filtros o sugiere una nueva entrada."
+    },
+    "useGps": "Usar mi ubicación",
+    "gpsError": "No se pudo obtener tu ubicación.",
+    "searchPlaceholder": "Buscar por nombre, ciudad o categoría…"
   },
   "live": {
     "connectionFailed": "Conexión fallida",

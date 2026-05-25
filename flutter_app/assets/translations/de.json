@@ -1219,7 +1219,45 @@
     "phone": "Telefon",
     "website": "Webseite",
     "suggestTitle": "Org. vorschlagen",
-    "organizationsTitle": "Organisationen"
+    "organizationsTitle": "Organisationen",
+    "subtitle": "Verifizierte Anlaufstellen in deiner Nähe – Tierheime, Tafeln, Sozialeinrichtungen und mehr.",
+    "filter": "Filter",
+    "sort": "Sortieren",
+    "sortName": "Name (A–Z)",
+    "sortRating": "Beste Bewertung",
+    "sortNewest": "Neueste",
+    "sortDistance": "Nächste",
+    "verified": "Verifiziert",
+    "emergency": "Notfall",
+    "nowOpen": "Geöffnet",
+    "nowClosed": "Geschlossen",
+    "allCountries": "Alle Länder",
+    "allCategories": "Alle Kategorien",
+    "resetFilters": "Zurücksetzen",
+    "view": {
+      "list": "Liste",
+      "map": "Karte"
+    },
+    "stats": {
+      "total": "Einträge",
+      "verified": "Verifiziert",
+      "reviews": "Mit Bewertung",
+      "avgRating": "Ø Sterne"
+    },
+    "actions": {
+      "call": "Anrufen",
+      "web": "Web",
+      "mail": "Mail",
+      "map": "Karte",
+      "details": "Details"
+    },
+    "empty": {
+      "title": "Keine Einträge gefunden",
+      "description": "Passe deine Filter an oder schlage selbst eine Organisation vor."
+    },
+    "useGps": "Standort verwenden",
+    "gpsError": "Standort konnte nicht ermittelt werden.",
+    "searchPlaceholder": "Name, Stadt oder Kategorie suchen…"
   },
   "live": {
     "connectionFailed": "Verbindung fehlgeschlagen",
