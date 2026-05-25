@@ -401,11 +401,10 @@ class EventDetailScreen extends ConsumerWidget {
   /// Deep-Link Share auf www.mensaena.de/dashboard/events/{id}.
   Future<void> _shareEvent(EventItem e) async {
     final url = 'https://www.mensaena.de/dashboard/events/${e.id}';
+    final body =
+        '${'events.shareBody'.tr(namedArgs: {'title': e.title})}\n$url';
     await Share.share(
-      'events.shareBody'.tr(namedArgs: {
-        'title': e.title,
-        'url': url,
-      }),
+      body,
       subject:
           'events.shareSubject'.tr(namedArgs: {'title': e.title}),
     );

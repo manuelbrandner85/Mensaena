@@ -918,8 +918,37 @@
     "eventsInMonth": "Bu ayki etkinlikler",
     "searchPlaceholder": "Etkinlik ara…",
     "screenTitle": "Etkinlikler",
-    "shareBody": "{title}\n\nMensaena'da: {url}",
-    "shareSubject": "Mensaena etkinliği: {title}"
+    "shareBody": "Mensaena'daki bu etkinliğe göz at: {title}",
+    "shareSubject": "Mensaena etkinliği: {title}",
+    "countdown": {
+      "days": "Gün",
+      "hours": "Saat",
+      "minutes": "Dk",
+      "seconds": "Sn"
+    },
+    "attendeesEmpty": "Henüz kayıt yok.",
+    "attendStatus": {
+      "going": "Geliyorum",
+      "interested": "İlgileniyorum",
+      "declined": "Gelmiyorum"
+    },
+    "showAll": "Tümünü göster ({n})",
+    "showLess": "Daha az göster",
+    "share": "Paylaş",
+    "shareLink": "Bağlantıyı kopyala",
+    "shareText": "Metni kopyala",
+    "shareNative": "Paylaş…",
+    "linkCopied": "Bağlantı kopyalandı",
+    "textCopied": "Metin kopyalandı",
+    "reminder": {
+      "setBtn": "Hatırlatıcı kur",
+      "activeLabel": "Hatırlatıcı aktif",
+      "min15": "15 dk önce",
+      "min30": "30 dk önce",
+      "min60": "1 saat önce",
+      "min120": "2 saat önce",
+      "oneDay": "1 gün önce"
+    }
   },
   "challenges": {
     "create": "Meydan okuma oluştur",

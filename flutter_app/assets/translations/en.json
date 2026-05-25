@@ -918,8 +918,37 @@
     "eventsInMonth": "Events this month",
     "searchPlaceholder": "Search events…",
     "screenTitle": "Events",
-    "shareBody": "{title}\n\nOn Mensaena: {url}",
-    "shareSubject": "Mensaena event: {title}"
+    "shareBody": "Check out this event on Mensaena: {title}",
+    "shareSubject": "Mensaena event: {title}",
+    "countdown": {
+      "days": "Days",
+      "hours": "Hrs",
+      "minutes": "Min",
+      "seconds": "Sec"
+    },
+    "attendeesEmpty": "No signups yet.",
+    "attendStatus": {
+      "going": "Going",
+      "interested": "Interested",
+      "declined": "Declined"
+    },
+    "showAll": "Show all {n}",
+    "showLess": "Show less",
+    "share": "Share",
+    "shareLink": "Copy link",
+    "shareText": "Copy text",
+    "shareNative": "Share via…",
+    "linkCopied": "Link copied",
+    "textCopied": "Text copied",
+    "reminder": {
+      "setBtn": "Set reminder",
+      "activeLabel": "Reminder active",
+      "min15": "15 min before",
+      "min30": "30 min before",
+      "min60": "1 hr before",
+      "min120": "2 hrs before",
+      "oneDay": "1 day before"
+    }
   },
   "challenges": {
     "create": "Create challenge",

@@ -918,8 +918,37 @@
     "eventsInMonth": "События за месяц",
     "searchPlaceholder": "Поиск событий…",
     "screenTitle": "События",
-    "shareBody": "{title}\n\nНа Mensaena: {url}",
-    "shareSubject": "Событие Mensaena: {title}"
+    "shareBody": "Посмотри это событие на Mensaena: {title}",
+    "shareSubject": "Событие Mensaena: {title}",
+    "countdown": {
+      "days": "Дн.",
+      "hours": "Ч",
+      "minutes": "Мин",
+      "seconds": "Сек"
+    },
+    "attendeesEmpty": "Записей пока нет.",
+    "attendStatus": {
+      "going": "Иду",
+      "interested": "Интересно",
+      "declined": "Не пойду"
+    },
+    "showAll": "Показать всех ({n})",
+    "showLess": "Свернуть",
+    "share": "Поделиться",
+    "shareLink": "Скопировать ссылку",
+    "shareText": "Скопировать текст",
+    "shareNative": "Поделиться…",
+    "linkCopied": "Ссылка скопирована",
+    "textCopied": "Текст скопирован",
+    "reminder": {
+      "setBtn": "Поставить напоминание",
+      "activeLabel": "Напоминание активно",
+      "min15": "За 15 мин",
+      "min30": "За 30 мин",
+      "min60": "За 1 ч",
+      "min120": "За 2 ч",
+      "oneDay": "За 1 день"
+    }
   },
   "challenges": {
     "create": "Создать челлендж",
