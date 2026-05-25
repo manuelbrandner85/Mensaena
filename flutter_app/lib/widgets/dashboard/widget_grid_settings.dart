@@ -152,11 +152,38 @@ class DashboardWidgetConfig {
       icon: LucideIcons.list,
       removable: false,
     ),
+    // Phase 4 (Wave 4 Web-Paritaet): externe Widgets — standardmaessig
+    // ausgeschaltet, damit kein API-Call beim First-Open passiert.
+    DashboardWidgetMeta(
+      id: 'traffic',
+      title: 'widgets.titles.traffic',
+      description: 'widgets.descriptions.traffic',
+      icon: LucideIcons.alertOctagon,
+    ),
+    DashboardWidgetMeta(
+      id: 'books',
+      title: 'widgets.titles.books',
+      description: 'widgets.descriptions.books',
+      icon: LucideIcons.bookOpen,
+    ),
+    DashboardWidgetMeta(
+      id: 'health',
+      title: 'widgets.titles.health',
+      description: 'widgets.descriptions.health',
+      icon: LucideIcons.heart,
+    ),
   ];
+
+  /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das
+  /// Widget-Grid-Settings-Sheet vom User selbst aktiviert.
+  static const Set<String> _defaultHidden = {'traffic', 'books', 'health'};
 
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(
         order: all.map((w) => w.id).toList(),
-        visible: all.map((w) => w.id).toSet(),
+        visible: all
+            .where((w) => !_defaultHidden.contains(w.id))
+            .map((w) => w.id)
+            .toSet(),
       );
 
   static Future<DashboardWidgetConfig> load() async {

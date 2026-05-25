@@ -1728,6 +1728,22 @@
     "pinnedSection": "📌 Angepinnt",
     "recentSection": "🕐 Zuletzt"
   },
+  "traffic": {
+    "title": "Verkehrslage",
+    "error": "Verkehrsdaten konnten nicht geladen werden.",
+    "empty": "Keine Meldungen auf den großen Autobahnen."
+  },
+  "books": {
+    "title": "Bücher-Empfehlungen",
+    "source": "Open Library",
+    "error": "Empfehlungen konnten nicht geladen werden.",
+    "empty": "Aktuell keine Empfehlungen."
+  },
+  "health": {
+    "title": "Gesundheits-Tipp des Tages",
+    "error": "Tipp konnte nicht geladen werden.",
+    "empty": "Heute kein Tipp verfügbar."
+  },
   "time": {
     "justNow": "gerade eben",
     "minutesShort": "vor {n} Min",
@@ -1764,7 +1780,10 @@
       "holiday": "Feiertag",
       "successStory": "Erfolgsgeschichte",
       "botTip": "MensaenaBot-Tipp",
-      "nearYou": "In deiner Nähe"
+      "nearYou": "In deiner Nähe",
+      "traffic": "Verkehrslage",
+      "books": "Bücher-Empfehlungen",
+      "health": "Gesundheits-Tipp"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1786,7 +1805,10 @@
       "holiday": "Hinweis auf den nächsten Feiertag",
       "successStory": "Inspiration aus der Community",
       "botTip": "Täglicher Nachbarschafts-Impuls",
-      "nearYou": "Lokale Beiträge in Nähe"
+      "nearYou": "Lokale Beiträge in Nähe",
+      "traffic": "Top-Meldungen auf den großen Autobahnen",
+      "books": "Buchempfehlungen für Gemeinschaft & Nachhaltigkeit",
+      "health": "Ein kleiner Impuls pro Tag für deine Gesundheit"
     }
   },
   "hubs": {

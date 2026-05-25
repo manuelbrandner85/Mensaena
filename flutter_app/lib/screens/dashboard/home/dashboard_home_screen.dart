@@ -27,8 +27,11 @@ import '../../../repositories/notifications_repository.dart';
 import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
+import '../../../widgets/dashboard/books_widget.dart';
 import '../../../widgets/dashboard/bot_tip_card.dart';
 import '../../../widgets/dashboard/community_pulse.dart';
+import '../../../widgets/dashboard/health_widget.dart';
+import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
 import '../../../widgets/dashboard/holiday_badge.dart';
 import '../../../widgets/dashboard/location_onboarding_modal.dart';
@@ -408,6 +411,18 @@ class _DashboardHomeScreenState
             out.add(WeeklyDigest(profile: profile));
             addSpacing(24);
           }
+          break;
+        case 'traffic':
+          out.add(const TrafficInfoWidget());
+          addSpacing();
+          break;
+        case 'books':
+          out.add(const BooksWidget());
+          addSpacing();
+          break;
+        case 'health':
+          out.add(const HealthWidget());
+          addSpacing();
           break;
         case 'nearby_posts':
           // Wird unten gerendert (immer am Ende).

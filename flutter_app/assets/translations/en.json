@@ -1729,6 +1729,22 @@
     "pinnedSection": "📌 Pinned",
     "recentSection": "🕐 Recent"
   },
+  "traffic": {
+    "title": "Traffic",
+    "error": "Traffic data could not be loaded.",
+    "empty": "No incidents on major motorways."
+  },
+  "books": {
+    "title": "Book recommendations",
+    "source": "Open Library",
+    "error": "Recommendations could not be loaded.",
+    "empty": "No recommendations right now."
+  },
+  "health": {
+    "title": "Health tip of the day",
+    "error": "Tip could not be loaded.",
+    "empty": "No tip available today."
+  },
   "time": {
     "justNow": "just now",
     "minutesShort": "{n} min ago",
@@ -1765,7 +1781,10 @@
       "holiday": "Holiday",
       "successStory": "Success story",
       "botTip": "MensaenaBot tip",
-      "nearYou": "Near you"
+      "nearYou": "Near you",
+      "traffic": "Traffic",
+      "books": "Book recommendations",
+      "health": "Health tip"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1787,7 +1806,10 @@
       "holiday": "Notice of the next public holiday",
       "successStory": "Inspiration from the community",
       "botTip": "Daily neighbourhood prompt",
-      "nearYou": "Local posts nearby"
+      "nearYou": "Local posts nearby",
+      "traffic": "Top warnings on major motorways",
+      "books": "Book picks for community & sustainability",
+      "health": "A small daily prompt for your health"
     }
   },
   "hubs": {
