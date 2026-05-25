@@ -1823,6 +1823,16 @@
     "days": "{count} gün üst üste",
     "best": "Rekor"
   },
+  "biometric": {
+    "section": "Parmak izi / yüz ile uygulama kilidi",
+    "subtitle": "3 dk arka planda kaldıktan sonra Mensaena tekrar açıldığında parmak izi veya yüzünü ister.",
+    "unsupported": "Bu cihaz biyometrik kilit açmayı desteklemiyor.",
+    "lockTitle": "Mensaena kilitli",
+    "lockHint": "Uygulamayı parmak izi veya yüz tanıma ile aç.",
+    "lockReason": "Mensaena'yı aç",
+    "activateReason": "Kilidi etkinleştirmek için kimliğini doğrula.",
+    "unlock": "Kilidi aç"
+  },
   "detox": {
     "section": "Dijital iyi oluş",
     "toggleTitle": "Detoks hatırlatıcı",

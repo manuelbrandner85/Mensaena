@@ -1824,6 +1824,16 @@
     "days": "{count} jours d'affilée",
     "best": "Record"
   },
+  "biometric": {
+    "section": "Verrouillage par empreinte / visage",
+    "subtitle": "Après 3 min en arrière-plan, Mensaena te redemandera ton empreinte ou ton visage.",
+    "unsupported": "Cet appareil ne prend pas en charge le déverrouillage biométrique.",
+    "lockTitle": "Mensaena est verrouillée",
+    "lockHint": "Déverrouille l'app par empreinte ou reconnaissance faciale.",
+    "lockReason": "Déverrouiller Mensaena",
+    "activateReason": "Confirme-toi pour activer le verrouillage.",
+    "unlock": "Déverrouiller"
+  },
   "detox": {
     "section": "Bien-être numérique",
     "toggleTitle": "Rappel de déconnexion",

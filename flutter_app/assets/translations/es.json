@@ -1824,6 +1824,16 @@
     "days": "{count} días seguidos",
     "best": "Récord"
   },
+  "biometric": {
+    "section": "Bloqueo de la app con huella / cara",
+    "subtitle": "Después de 3 min en segundo plano, Mensaena pedirá tu huella o tu cara al volver a abrir.",
+    "unsupported": "Este dispositivo no admite desbloqueo biométrico.",
+    "lockTitle": "Mensaena está bloqueada",
+    "lockHint": "Desbloquea la app con huella o reconocimiento facial.",
+    "lockReason": "Desbloquear Mensaena",
+    "activateReason": "Confirma tu identidad para activar el bloqueo.",
+    "unlock": "Desbloquear"
+  },
   "detox": {
     "section": "Bienestar digital",
     "toggleTitle": "Recordatorio de desconexión",

@@ -2042,6 +2042,16 @@
     "days": "{count} days in a row",
     "best": "Best"
   },
+  "biometric": {
+    "section": "App lock with fingerprint / face",
+    "subtitle": "After 3 min in the background, Mensaena will ask for your fingerprint or face the next time you open it.",
+    "unsupported": "This device doesn't support biometric unlock.",
+    "lockTitle": "Mensaena is locked",
+    "lockHint": "Unlock the app with fingerprint or face recognition.",
+    "lockReason": "Unlock Mensaena",
+    "activateReason": "Confirm to enable the app lock.",
+    "unlock": "Unlock"
+  },
   "detox": {
     "section": "Digital wellbeing",
     "toggleTitle": "Detox reminder",

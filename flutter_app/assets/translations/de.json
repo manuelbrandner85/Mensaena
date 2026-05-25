@@ -2041,6 +2041,16 @@
     "days": "{count} Tage in Folge",
     "best": "Rekord"
   },
+  "biometric": {
+    "section": "App-Sperre per Fingerabdruck / Gesicht",
+    "subtitle": "Nach 3 Min. im Hintergrund verlangt Mensaena beim nächsten Öffnen deinen Fingerabdruck oder dein Gesicht.",
+    "unsupported": "Dieses Gerät unterstützt keine biometrische Entsperrung.",
+    "lockTitle": "Mensaena ist gesperrt",
+    "lockHint": "Entsperre die App mit Fingerabdruck oder Gesichtserkennung.",
+    "lockReason": "Mensaena entsperren",
+    "activateReason": "Bestätige dich, um die App-Sperre zu aktivieren.",
+    "unlock": "Entsperren"
+  },
   "detox": {
     "section": "Digitales Wohlbefinden",
     "toggleTitle": "Detox-Erinnerung",

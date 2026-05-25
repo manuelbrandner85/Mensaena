@@ -21,6 +21,7 @@ import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/biometric_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
 import '../../services/sound_service.dart';
@@ -1520,6 +1521,8 @@ class _SecurityTabState extends State<_SecurityTab> {
           ),
         ),
         const SizedBox(height: 28),
+        const _BiometricSection(),
+        const SizedBox(height: 28),
         _label('Zwei-Faktor-Authentisierung'),
         Container(
           padding: const EdgeInsets.all(12),
@@ -1868,6 +1871,102 @@ class _DetoxSectionState extends State<_DetoxSection> {
               style: AppTypography.caption(),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// F15 Biometric: Fingerprint/Face-Lock fuer App-Start.
+// ─────────────────────────────────────────────────────────────
+class _BiometricSection extends StatefulWidget {
+  const _BiometricSection();
+
+  @override
+  State<_BiometricSection> createState() => _BiometricSectionState();
+}
+
+class _BiometricSectionState extends State<_BiometricSection> {
+  bool _supported = false;
+  bool _enabled = false;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final supported = await BiometricService.canAuthenticate();
+    final enabled = await BiometricService.isEnabled();
+    if (!mounted) return;
+    setState(() {
+      _supported = supported;
+      _enabled = enabled;
+      _loading = false;
+    });
+  }
+
+  Future<void> _toggle(bool v) async {
+    if (v) {
+      // Vor dem Aktivieren: einmal authentifizieren — sonst koennte ein
+      // Fremder den Switch hier flippen.
+      final ok = await BiometricService.authenticate(
+        reason: 'biometric.activateReason'.tr(),
+      );
+      if (!ok) return;
+    }
+    await BiometricService.setEnabled(v);
+    if (!mounted) return;
+    setState(() => _enabled = v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.fingerprint,
+                  size: 18, color: AppColors.bronze),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'biometric.section'.tr(),
+                  style: AppTypography.body(
+                    size: 14,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (_supported)
+                Switch(
+                  value: _enabled,
+                  onChanged: _toggle,
+                  activeColor: AppColors.bronze,
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            _supported
+                ? 'biometric.subtitle'.tr()
+                : 'biometric.unsupported'.tr(),
+            style: AppTypography.body(
+                size: 12, color: AppColors.inkSoft, height: 1.4),
+          ),
         ],
       ),
     );

@@ -1824,6 +1824,16 @@
     "days": "{count} giorni di fila",
     "best": "Record"
   },
+  "biometric": {
+    "section": "Blocco app con impronta / volto",
+    "subtitle": "Dopo 3 min in background Mensaena richiederà l'impronta o il volto alla prossima apertura.",
+    "unsupported": "Questo dispositivo non supporta lo sblocco biometrico.",
+    "lockTitle": "Mensaena è bloccata",
+    "lockHint": "Sblocca l'app con impronta o riconoscimento facciale.",
+    "lockReason": "Sblocca Mensaena",
+    "activateReason": "Conferma la tua identità per attivare il blocco.",
+    "unlock": "Sblocca"
+  },
   "detox": {
     "section": "Benessere digitale",
     "toggleTitle": "Promemoria detox",
