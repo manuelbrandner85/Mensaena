@@ -16,7 +16,9 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../providers/active_call_provider.dart';
 import '../../../services/dm_call_service.dart';
+import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
@@ -62,6 +64,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   AudioPlayer? _ringback;
   Timer? _ringbackHaptic;
   Timer? _ringingTimeout;
+  Timer? _ringingTicker;
+  int _ringingElapsed = 0;
   StreamSubscription<List<Map<String, dynamic>>>? _callStatusSub;
   // Call-Duration-Timer — startet bei connected.
   final Stopwatch _stopwatch = Stopwatch();
@@ -100,6 +104,22 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         }
         _startRingback();
         _watchCallStatus();
+        // Ringing-Countdown: 45s totale Klingelzeit, jede Sekunde
+        // ein setState damit der OutgoingRingingView den Counter neu rendert.
+        _ringingElapsed = 0;
+        _ringingTicker?.cancel();
+        _ringingTicker =
+            Timer.periodic(const Duration(seconds: 1), (_) {
+          if (!mounted) {
+            _ringingTicker?.cancel();
+            return;
+          }
+          if (_state != _CallState.outgoingRinging) {
+            _ringingTicker?.cancel();
+            return;
+          }
+          setState(() => _ringingElapsed++);
+        });
         // 45s Timeout (parallel zur Callee-Seite).
         _ringingTimeout = Timer(const Duration(seconds: 45), () {
           if (_state == _CallState.outgoingRinging) {
@@ -168,7 +188,13 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   Future<void> _onPeerUnreachable({String status = 'missed'}) async {
     _ringingTimeout?.cancel();
+    _ringingTicker?.cancel();
     await _stopRingback();
+    await EndToneService.play();
+    // Active-Call-Banner clearen falls noch gesetzt.
+    if (ref.read(activeCallProvider)?.callId == widget.callId) {
+      ref.read(activeCallProvider.notifier).state = null;
+    }
     if (status == 'missed') {
       try {
         await sb.from('dm_calls').update({
@@ -195,7 +221,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   Future<void> _cancelOutgoing() async {
     _ringingTimeout?.cancel();
+    _ringingTicker?.cancel();
     await _stopRingback();
+    await EndToneService.play();
+    if (ref.read(activeCallProvider)?.callId == widget.callId) {
+      ref.read(activeCallProvider.notifier).state = null;
+    }
     await DmCallService.cancel(widget.callId);
     if (!mounted) return;
     if (context.canPop()) {
@@ -291,6 +322,10 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         setState(() => _state = _CallState.ended);
         _stopwatch.stop();
         _ticker?.cancel();
+        await EndToneService.play();
+        if (ref.read(activeCallProvider)?.callId == widget.callId) {
+          ref.read(activeCallProvider.notifier).state = null;
+        }
       })
       ..on<lk.RoomReconnectingEvent>((_) {
         if (!mounted) return;
@@ -313,6 +348,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
         if (mounted) setState(() {});
       });
+      // Active-Call-Banner: ab jetzt weiss die App-Shell vom laufenden
+      // Call, so kann der User wegnavigieren ohne den Call zu verlieren.
+      ref.read(activeCallProvider.notifier).state = ActiveCallInfo(
+        callId: widget.callId,
+        roomName: widget.roomName,
+        peerName: widget.peerName,
+        startedAt: DateTime.now(),
+      );
       // Critical: tell CallKit/Telecom the call connected. Without this,
       // iOS auto-ends after 30s "no answer" and Android's ConnectionService
       // stays in a half-ringing state.
@@ -361,6 +404,10 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       await _room?.disconnect();
     } catch (_) {}
     await DmCallService.end(widget.callId);
+    await EndToneService.play();
+    if (ref.read(activeCallProvider)?.callId == widget.callId) {
+      ref.read(activeCallProvider.notifier).state = null;
+    }
     if (!mounted) return;
     if (context.canPop()) {
       context.pop();
@@ -372,6 +419,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   @override
   void dispose() {
     _ringingTimeout?.cancel();
+    _ringingTicker?.cancel();
     _ringbackHaptic?.cancel();
     _callStatusSub?.cancel();
     _ticker?.cancel();
@@ -389,9 +437,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   Widget build(BuildContext context) {
     // Outgoing-Ringing-Sonder-UI: Avatar mit Pulse-Ring + Cancel-Button.
     if (_state == _CallState.outgoingRinging) {
+      // 45s totale Klingelzeit, _ringingElapsed steigt um 1/s via Ticker.
+      final remaining = (45 - _ringingElapsed).clamp(0, 45);
       return _OutgoingRingingView(
         peerName: widget.peerName,
         avatarUrl: _peerAvatarUrl,
+        remainingSeconds: remaining,
         onCancel: _cancelOutgoing,
       );
     }
@@ -531,11 +582,13 @@ class _OutgoingRingingView extends StatefulWidget {
   const _OutgoingRingingView({
     required this.peerName,
     required this.onCancel,
+    required this.remainingSeconds,
     this.avatarUrl,
   });
 
   final String peerName;
   final String? avatarUrl;
+  final int remainingSeconds;
   final VoidCallback onCancel;
 
   @override
@@ -644,8 +697,17 @@ class _OutgoingRingingViewState extends State<_OutgoingRingingView>
             ),
             const SizedBox(height: 8),
             Text(
-              'call.calling'.tr(),
-              style: AppTypography.body(size: 14, color: AppColors.inkSoft),
+              'call.ringingCountdown'.tr(
+                  namedArgs: {'n': '${widget.remainingSeconds}'}),
+              style: AppTypography.body(
+                size: 14,
+                color: widget.remainingSeconds < 10
+                    ? AppColors.herzrot
+                    : AppColors.inkSoft,
+                weight: widget.remainingSeconds < 10
+                    ? FontWeight.w700
+                    : FontWeight.w400,
+              ),
             ),
             const Spacer(),
             Padding(

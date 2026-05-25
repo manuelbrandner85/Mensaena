@@ -1669,7 +1669,38 @@
     "callMissed": "Missed call",
     "callBack": "Call back",
     "callEnded": "Call ended",
-    "notReachable": "Could not be reached"
+    "notReachable": "Could not be reached",
+    "confirmTitle": "Start call?",
+    "confirmBody": "Call {name}?",
+    "confirmStart": "Call",
+    "ringingCountdown": "Ringing for {n}s …",
+    "active": "Call in progress – {name}",
+    "videoAction": "Video call"
+  },
+  "callHistory": {
+    "title": "Call history",
+    "emptyTitle": "No calls yet",
+    "emptyDescription": "Your last 30 DM calls will appear here.",
+    "unknownPeer": "Unknown",
+    "statusMissed": "Missed",
+    "statusCancelled": "Cancelled",
+    "statusRinging": "Ringing …",
+    "statusEnded": "Ended",
+    "callbackNoConv": "No conversation found",
+    "callbackFailed": "Callback failed",
+    "openHistory": "Open call history"
+  },
+  "videoPreview": {
+    "title": "Video call to {name}",
+    "subtitle": "Check camera and lighting before you start.",
+    "start": "Start",
+    "cameraDenied": "Camera permission denied."
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesShort": "{n} min ago",
+    "hoursShort": "{n} h ago",
+    "daysShort": "{n} d ago"
   },
   "voice": {
     "micDenied": "Microphone permission denied."

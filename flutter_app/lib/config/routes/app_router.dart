@@ -19,6 +19,7 @@ import '../../screens/dashboard/admin/admin_table_screen.dart';
 import '../../screens/dashboard/admin/admin_users_screen.dart';
 import '../../screens/dashboard/admin/admin_zeitbank_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
+import '../../screens/dashboard/call/call_history_screen.dart';
 import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
 import '../../screens/dashboard/global_search_screen.dart';
@@ -1145,6 +1146,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       // LiveKit Call + Live-Room Screens (DM-Call / Channel-Stream)
+      GoRoute(
+        path: '/dashboard/call-history',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const CallHistoryScreen(),
+        ),
+      ),
       GoRoute(
         path: '/dashboard/call/:callId',
         pageBuilder: (ctx, st) => mensaenaTransition<void>(

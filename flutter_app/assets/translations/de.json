@@ -1668,7 +1668,38 @@
     "callMissed": "Nicht erreicht",
     "callBack": "Zurückrufen",
     "callEnded": "Anruf beendet",
-    "notReachable": "Konnte nicht erreicht werden"
+    "notReachable": "Konnte nicht erreicht werden",
+    "confirmTitle": "Anruf starten?",
+    "confirmBody": "{name} anrufen?",
+    "confirmStart": "Anrufen",
+    "ringingCountdown": "Klingelt noch {n}s …",
+    "active": "Anruf läuft – {name}",
+    "videoAction": "Video-Anruf"
+  },
+  "callHistory": {
+    "title": "Anrufverlauf",
+    "emptyTitle": "Noch keine Anrufe",
+    "emptyDescription": "Hier siehst du deine letzten 30 DM-Anrufe.",
+    "unknownPeer": "Unbekannt",
+    "statusMissed": "Verpasst",
+    "statusCancelled": "Abgebrochen",
+    "statusRinging": "Klingelt …",
+    "statusEnded": "Beendet",
+    "callbackNoConv": "Keine Konversation gefunden",
+    "callbackFailed": "Rückruf fehlgeschlagen",
+    "openHistory": "Anrufverlauf öffnen"
+  },
+  "videoPreview": {
+    "title": "Videoanruf an {name}",
+    "subtitle": "Prüfe Kamera und Licht, bevor du startest.",
+    "start": "Starten",
+    "cameraDenied": "Kamera-Berechtigung verweigert."
+  },
+  "time": {
+    "justNow": "gerade eben",
+    "minutesShort": "vor {n} Min",
+    "hoursShort": "vor {n} Std",
+    "daysShort": "vor {n} T"
   },
   "voice": {
     "micDenied": "Mikrofon-Berechtigung verweigert."

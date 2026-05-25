@@ -433,26 +433,39 @@ class _DmListView extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.fromLTRB(12, 6, 12, 24),
           children: [
-            // Suche-Input
-            TextField(
-              onChanged: onSearchChanged,
-              style: AppTypography.body(size: 13, color: AppColors.ink),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.elevated,
-                prefixIcon: const Icon(LucideIcons.search,
-                    size: 14, color: AppColors.mute),
-                hintText: 'chat.searchConversations'.tr(),
-                hintStyle:
-                    AppTypography.body(size: 12, color: AppColors.mute),
-                isDense: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+            // Suche + Anrufverlauf-Button in einer Zeile.
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: onSearchChanged,
+                    style: AppTypography.body(size: 13, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.elevated,
+                      prefixIcon: const Icon(LucideIcons.search,
+                          size: 14, color: AppColors.mute),
+                      hintText: 'chat.searchConversations'.tr(),
+                      hintStyle:
+                          AppTypography.body(size: 12, color: AppColors.mute),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: 'callHistory.openHistory'.tr(),
+                  icon: const Icon(LucideIcons.history,
+                      size: 18, color: AppColors.bronze),
+                  onPressed: () => context.push('/dashboard/call-history'),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             for (final c in filtered)

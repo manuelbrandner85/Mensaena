@@ -22,6 +22,7 @@ import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/video_preview_modal.dart';
 import 'chat_input_bar.dart';
 import 'chat_live_banner.dart';
 import 'chat_message_bubble.dart';
@@ -82,7 +83,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   // Call/Stream-Buttons sind jetzt im _ChatTopBar integriert (eleganter
   // statt grosser FAB unten rechts). Die Action-Handler bleiben unten.
 
-  Future<void> _startCall() async {
+  Future<void> _startCall({String callType = 'audio'}) async {
     final ctx = _context;
     if (ctx == null) {
       _showCallError('Chat lädt noch …');
@@ -96,9 +97,47 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _showCallError('Gesprächspartner nicht gefunden');
       return;
     }
+    // Confirm-Dialog (Audio) bzw. Video-Preview-Sheet (Video) BEVOR der
+    // Call in DB angelegt wird — sonst sieht der Callee ein kurzes
+    // Klingel-FlackerEvent obwohl der Anrufer abbricht.
+    if (callType == 'video') {
+      final ok = await VideoPreviewModal.show(context, peerName: ctx.title);
+      if (!ok || !mounted) return;
+    } else {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (dCtx) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'call.confirmTitle'.tr(),
+            style: AppTypography.body(
+                size: 16, color: AppColors.ink, weight: FontWeight.w700),
+          ),
+          content: Text(
+            'call.confirmBody'.tr(namedArgs: {'name': ctx.title}),
+            style: AppTypography.body(size: 14, color: AppColors.inkSoft),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dCtx, false),
+              child: Text('common.cancel'.tr()),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dCtx, true),
+              style: TextButton.styleFrom(foregroundColor: AppColors.leben),
+              child: Text('call.confirmStart'.tr()),
+            ),
+          ],
+        ),
+      );
+      if (ok != true || !mounted) return;
+    }
     final result = await DmCallService.start(
       conversationId: widget.conversationId,
       calleeId: ctx.partnerId!,
+      callType: callType,
     );
     if (!mounted) return;
     if (!result.success || result.callId == null || result.roomName == null) {
@@ -500,7 +539,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 }
               }),
               onSearchChanged: (v) => setState(() => _searchQuery = v),
-              onStartCall: _startCall,
+              onStartCall: () => _startCall(callType: 'audio'),
+              onStartVideoCall: () => _startCall(callType: 'video'),
               onCancelCall: () async {
                 if (_activeCallId == null) return;
                 await DmCallService.cancel(_activeCallId!);
@@ -869,6 +909,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
     required this.onToggleSearch,
     required this.onSearchChanged,
     required this.onStartCall,
+    required this.onStartVideoCall,
     required this.onCancelCall,
     required this.onStartStream,
     required this.onEndStream,
@@ -883,6 +924,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
   final VoidCallback onToggleSearch;
   final ValueChanged<String> onSearchChanged;
   final Future<void> Function() onStartCall;
+  final Future<void> Function() onStartVideoCall;
   final Future<void> Function() onCancelCall;
   final Future<void> Function() onStartStream;
   final Future<void> Function() onEndStream;
@@ -986,6 +1028,13 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                         ? () async => widget.onCancelCall()
                         : () async => widget.onStartCall(),
                     pulse: widget.activeCallId != null,
+                  ),
+                if (isDm && widget.activeCallId == null)
+                  _ActionIcon(
+                    icon: LucideIcons.video,
+                    label: 'call.videoAction'.tr(),
+                    color: AppColors.bronze,
+                    onTap: () async => widget.onStartVideoCall(),
                   ),
                 if (isChannel)
                   _ActionIcon(
