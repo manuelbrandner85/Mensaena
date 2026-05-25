@@ -330,6 +330,7 @@
     "accept": "Accetta",
     "decline": "Rifiuta",
     "callMissed": "Chiamata persa",
+    "callBack": "Richiama",
     "livestreamFailed": "Impossibile avviare la diretta.",
     "messageNotSent": "Impossibile inviare il messaggio.",
     "editMessage": "Modifica messaggio",
@@ -1593,6 +1594,7 @@
     "cancelCall": "Annulla chiamata",
     "callDeclined": "Chiamata rifiutata",
     "callMissed": "Chiamata persa",
+    "callBack": "Richiama",
     "callEnded": "Chiamata terminata",
     "notReachable": "Non è stato possibile contattarlo"
   },

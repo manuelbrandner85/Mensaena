@@ -1593,6 +1593,7 @@
     "cancelCall": "Anruf abbrechen",
     "callDeclined": "Anruf abgelehnt",
     "callMissed": "Nicht erreicht",
+    "callBack": "Zurückrufen",
     "callEnded": "Anruf beendet",
     "notReachable": "Konnte nicht erreicht werden"
   },

@@ -330,6 +330,7 @@
     "accept": "Accepter",
     "decline": "Refuser",
     "callMissed": "Appel manqué",
+    "callBack": "Rappeler",
     "livestreamFailed": "Impossible de démarrer le direct.",
     "messageNotSent": "Le message n'a pas pu être envoyé.",
     "editMessage": "Modifier le message",
@@ -1593,6 +1594,7 @@
     "cancelCall": "Annuler l'appel",
     "callDeclined": "Appel refusé",
     "callMissed": "Appel manqué",
+    "callBack": "Rappeler",
     "callEnded": "Appel terminé",
     "notReachable": "Personne injoignable"
   },

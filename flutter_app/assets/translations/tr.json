@@ -1593,6 +1593,7 @@
     "cancelCall": "Aramayı iptal et",
     "callDeclined": "Arama reddedildi",
     "callMissed": "Cevapsız arama",
+    "callBack": "Geri ara",
     "callEnded": "Arama sona erdi",
     "notReachable": "Ulaşılamadı"
   },

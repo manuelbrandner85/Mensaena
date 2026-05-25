@@ -73,8 +73,9 @@ class CallkitService {
         textDecline: _tr('chat.decline', 'Ablehnen'),
         missedCallNotification: NotificationParams(
           showNotification: true,
-          isShowCallback: false,
+          isShowCallback: true,
           subtitle: _tr('call.callMissed', 'Nicht erreicht'),
+          callbackText: _tr('call.callBack', 'Zurückrufen'),
         ),
         // Extra-Felder werden beim Accept-Event mitgeliefert
         // → Deep-Link Navigation kann darauf zugreifen.

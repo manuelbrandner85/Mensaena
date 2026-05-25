@@ -330,6 +330,7 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "callMissed": "Llamada perdida",
+    "callBack": "Devolver llamada",
     "livestreamFailed": "No se pudo iniciar la transmisión en directo.",
     "messageNotSent": "No se pudo enviar el mensaje.",
     "editMessage": "Editar mensaje",
@@ -1593,6 +1594,7 @@
     "cancelCall": "Cancelar llamada",
     "callDeclined": "Llamada rechazada",
     "callMissed": "Llamada perdida",
+    "callBack": "Devolver llamada",
     "callEnded": "Llamada finalizada",
     "notReachable": "No se ha podido contactar"
   },

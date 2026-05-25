@@ -22,6 +22,7 @@ import 'package:go_router/go_router.dart';
 
 import '../config/routes/app_router.dart' show rootNavigatorKey;
 import 'callkit_service.dart';
+import 'dm_call_service.dart';
 import 'supabase_service.dart';
 
 class CallContext {
@@ -120,8 +121,42 @@ class CallEventBus {
       case Event.actionCallEnded:
         _onEnded(ctx);
         break;
+      case Event.actionCallCallback:
+        _onCallback(extraMap);
+        break;
       default:
         break;
+    }
+  }
+
+  /// Missed-Call-Callback: User tappt "Zurueckrufen" in der Missed-Call-
+  /// Notification. Startet neuen Outgoing-Call an caller_id.
+  static Future<void> _onCallback(Map<String, dynamic> extraMap) async {
+    try {
+      final callerId = extraMap['caller_id'] as String?;
+      final conversationId = extraMap['conversation_id'] as String?;
+      final callType = (extraMap['call_type'] as String?) ?? 'audio';
+      if (callerId == null || conversationId == null) return;
+
+      final result = await DmCallService.start(
+        conversationId: conversationId,
+        calleeId: callerId,
+        callType: callType,
+      );
+      if (!result.success || result.callId == null) return;
+
+      final peerName = (extraMap['caller_name'] as String?) ?? 'Nachbar:in';
+      final route =
+          '/dashboard/call/${result.callId}?room=${Uri.encodeComponent(result.roomName ?? '')}&peer=${Uri.encodeComponent(peerName)}';
+      final nav = rootNavigatorKey.currentState;
+      if (nav != null) {
+        try {
+          // ignore: use_build_context_synchronously
+          nav.context.push(route);
+        } catch (_) {}
+      }
+    } catch (e) {
+      debugPrint('[CallEventBus] callback failed: $e');
     }
   }
 

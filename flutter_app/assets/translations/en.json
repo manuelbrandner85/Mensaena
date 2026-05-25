@@ -330,6 +330,7 @@
     "accept": "Accept",
     "decline": "Decline",
     "callMissed": "Missed call",
+    "callBack": "Call back",
     "livestreamFailed": "Could not start livestream.",
     "messageNotSent": "Message could not be sent.",
     "editMessage": "Edit message",
@@ -1593,6 +1594,7 @@
     "cancelCall": "Cancel call",
     "callDeclined": "Call declined",
     "callMissed": "Missed call",
+    "callBack": "Call back",
     "callEnded": "Call ended",
     "notReachable": "Could not be reached"
   },

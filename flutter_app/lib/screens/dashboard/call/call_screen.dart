@@ -40,7 +40,14 @@ class CallScreen extends ConsumerStatefulWidget {
   ConsumerState<CallScreen> createState() => _CallScreenState();
 }
 
-enum _CallState { outgoingRinging, connecting, connected, ended, failed }
+enum _CallState {
+  outgoingRinging,
+  connecting,
+  connected,
+  reconnecting,
+  ended,
+  failed,
+}
 
 class _CallScreenState extends ConsumerState<CallScreen> {
   lk.Room? _room;
@@ -48,15 +55,19 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   _CallState _state = _CallState.connecting;
   bool _micEnabled = true;
   bool _camEnabled = false;
+  bool _speakerOn = false;
   String? _error;
   String? _peerAvatarUrl;
-  // Outgoing-Call (Caller-Side): wir warten auf Status='active' bevor
-  // wir LiveKit verbinden. Ringback-Tone laeuft solange.
   bool _isCaller = false;
   AudioPlayer? _ringback;
   Timer? _ringbackHaptic;
   Timer? _ringingTimeout;
   StreamSubscription<List<Map<String, dynamic>>>? _callStatusSub;
+  // Call-Duration-Timer — startet bei connected.
+  final Stopwatch _stopwatch = Stopwatch();
+  Timer? _ticker;
+  // Mini-Cam-Preview-Position (draggable).
+  Offset _camPreviewPos = const Offset(16, 100);
 
   @override
   void initState() {
@@ -275,7 +286,19 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _listener = room.createListener()
       ..on<lk.RoomDisconnectedEvent>((_) async {
         if (!mounted) return;
+        // Wenn waehrend Reconnecting der Server endgueltig aufgibt,
+        // kommt RoomDisconnectedEvent. Sonst war's ein sauberer Hangup.
         setState(() => _state = _CallState.ended);
+        _stopwatch.stop();
+        _ticker?.cancel();
+      })
+      ..on<lk.RoomReconnectingEvent>((_) {
+        if (!mounted) return;
+        setState(() => _state = _CallState.reconnecting);
+      })
+      ..on<lk.RoomReconnectedEvent>((_) {
+        if (!mounted) return;
+        setState(() => _state = _CallState.connected);
       });
 
     try {
@@ -283,6 +306,13 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       await room.localParticipant?.setMicrophoneEnabled(true);
       if (!mounted) return;
       setState(() => _state = _CallState.connected);
+      // Call-Duration-Timer starten.
+      _stopwatch
+        ..reset()
+        ..start();
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) setState(() {});
+      });
       // Critical: tell CallKit/Telecom the call connected. Without this,
       // iOS auto-ends after 30s "no answer" and Android's ConnectionService
       // stays in a half-ringing state.
@@ -318,6 +348,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     setState(() => _camEnabled = next);
   }
 
+  Future<void> _toggleSpeaker() async {
+    final next = !_speakerOn;
+    try {
+      await lk.Hardware.instance.setSpeakerphoneOn(next);
+      setState(() => _speakerOn = next);
+    } catch (_) {/* Hardware-Plattform-Bridge fehlt evtl. */}
+  }
+
   Future<void> _hangUp() async {
     try {
       await _room?.disconnect();
@@ -336,6 +374,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _ringingTimeout?.cancel();
     _ringbackHaptic?.cancel();
     _callStatusSub?.cancel();
+    _ticker?.cancel();
+    _stopwatch.stop();
     try {
       _ringback?.stop();
       _ringback?.dispose();
@@ -357,8 +397,29 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     }
     return Scaffold(
       backgroundColor: AppColors.voidColor,
-      body: SafeArea(
-        child: Column(
+      body: Stack(
+        children: [
+          SafeArea(child: _buildBody()),
+          if (_camEnabled && _room != null)
+            Positioned(
+              left: _camPreviewPos.dx,
+              top: _camPreviewPos.dy,
+              child: GestureDetector(
+                onPanUpdate: (d) {
+                  setState(() {
+                    _camPreviewPos += d.delta;
+                  });
+                },
+                child: _LocalCamPreview(room: _room!),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Column(
           children: [
             const SizedBox(height: 24),
             Text(
@@ -390,7 +451,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
               ),
             ],
             const Spacer(),
-            // Action Bar
+            // Action Bar — 4 Buttons: Mic, Speaker, Hangup, Cam.
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
               child: Row(
@@ -405,6 +466,15 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         ? AppColors.bronze
                         : AppColors.herzrotWarm,
                     onTap: _state == _CallState.connected ? _toggleMic : null,
+                  ),
+                  _CircleAction(
+                    icon: _speakerOn
+                        ? LucideIcons.volume2
+                        : LucideIcons.volumeX,
+                    label: _speakerOn ? 'Lautspr.' : 'Hörer',
+                    color: _speakerOn ? AppColors.bronze : AppColors.mute,
+                    onTap:
+                        _state == _CallState.connected ? _toggleSpeaker : null,
                   ),
                   _CircleAction(
                     icon: LucideIcons.phoneOff,
@@ -427,9 +497,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        );
   }
 
   String _subtitle() {
@@ -439,12 +507,20 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       case _CallState.connecting:
         return 'Verbinde…';
       case _CallState.connected:
-        return 'Verbunden';
+        return _formatDuration(_stopwatch.elapsed);
+      case _CallState.reconnecting:
+        return 'Verbindung wird wiederhergestellt…';
       case _CallState.ended:
         return 'call.callEnded'.tr();
       case _CallState.failed:
         return 'Verbindung fehlgeschlagen';
     }
+  }
+
+  String _formatDuration(Duration d) {
+    final m = d.inMinutes.toString().padLeft(2, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 }
 
@@ -768,4 +844,67 @@ class _PeerVideoOrAvatarState extends State<_PeerVideoOrAvatar> {
             style:
                 AppTypography.display(size: 72, color: AppColors.bronze)),
       );
+}
+
+// ── LocalCamPreview — eigenes Kamerabild als kleines draggable Tile ──
+class _LocalCamPreview extends StatefulWidget {
+  const _LocalCamPreview({required this.room});
+  final lk.Room room;
+
+  @override
+  State<_LocalCamPreview> createState() => _LocalCamPreviewState();
+}
+
+class _LocalCamPreviewState extends State<_LocalCamPreview> {
+  lk.EventsListener<lk.RoomEvent>? _listener;
+
+  @override
+  void initState() {
+    super.initState();
+    _listener = widget.room.createListener()
+      ..on<lk.LocalTrackPublishedEvent>((_) {
+        if (mounted) setState(() {});
+      })
+      ..on<lk.LocalTrackUnpublishedEvent>((_) {
+        if (mounted) setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _listener?.dispose();
+    super.dispose();
+  }
+
+  lk.VideoTrack? _findLocalVideo() {
+    final lp = widget.room.localParticipant;
+    if (lp == null) return null;
+    for (final pub in lp.videoTrackPublications) {
+      final t = pub.track;
+      if (t is lk.VideoTrack) return t;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final video = _findLocalVideo();
+    if (video == null) return const SizedBox.shrink();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 100,
+        height: 140,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.bronze.withValues(alpha: 0.5)),
+        ),
+        child: lk.VideoTrackRenderer(
+          video,
+          fit: rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+          mirrorMode: lk.VideoViewMirrorMode.mirror,
+        ),
+      ),
+    );
+  }
 }
