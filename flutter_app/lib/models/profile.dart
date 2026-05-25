@@ -188,19 +188,43 @@ class Profile {
   final String? coverUrl;
 
   factory Profile.fromJson(Map<String, dynamic> j) {
+    // Postgres NUMERIC kommt via PostgREST manchmal als String (z.B.
+    // "50.00") statt num — `as num?` waere TypeError. Helper parsed
+    // beides defensiv. Selbe Logik fuer int.
+    double nd(dynamic v) {
+      if (v == null) return 0.0;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0.0;
+      return 0.0;
+    }
+    int ni(dynamic v) {
+      if (v == null) return 0;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? 0;
+      return 0;
+    }
+    double? dn(dynamic v) {
+      if (v == null) return null;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v);
+      return null;
+    }
+    int? inn(dynamic v) {
+      if (v == null) return null;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v);
+      return null;
+    }
     return Profile(
       id: j['id'] as String,
-      // BUG-FIX #12: Fallback auf DateTime(2000) statt now() — signalisiert
-      // "unbekanntes Datum" eindeutig. Vorher fuehrte now() zu falschen
-      // Cache-Invalidations und "neuestem User"-Anzeige fuer alte Profile.
       createdAt:
           DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime(2000),
       updatedAt:
           DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime(2000),
       role: (j['role'] as String?) ?? 'user',
-      donorTier: (j['donor_tier'] as num?)?.toInt() ?? 0,
-      donationCount: (j['donation_count'] as num?)?.toInt() ?? 0,
-      donationTotal: (j['donation_total'] as num?)?.toDouble() ?? 0.0,
+      donorTier: ni(j['donor_tier']),
+      donationCount: ni(j['donation_count']),
+      donationTotal: nd(j['donation_total']),
       name: j['name'] as String?,
       nickname: j['nickname'] as String?,
       email: j['email'] as String?,
@@ -210,8 +234,8 @@ class Profile {
           : const [],
       avatarUrl: j['avatar_url'] as String?,
       bio: j['bio'] as String?,
-      trustScore: (j['trust_score'] as num?)?.toInt() ?? 0,
-      impactScore: (j['impact_score'] as num?)?.toInt() ?? 0,
+      trustScore: ni(j['trust_score']),
+      impactScore: ni(j['impact_score']),
       notifyEmail: (j['notify_email'] as bool?) ?? true,
       notifyMessages: (j['notify_messages'] as bool?) ?? true,
       notifyInteractions: (j['notify_interactions'] as bool?) ?? true,
@@ -223,16 +247,16 @@ class Profile {
       privacyPublic: (j['privacy_public'] as bool?) ?? true,
       homePostalCode: j['home_postal_code'] as String?,
       homeCity: j['home_city'] as String?,
-      homeLat: (j['home_lat'] as num?)?.toDouble(),
-      homeLng: (j['home_lng'] as num?)?.toDouble(),
+      homeLat: dn(j['home_lat']),
+      homeLng: dn(j['home_lng']),
       country: j['country'] as String?,
       region: j['region'] as String?,
       preferredModules: (j['preferred_modules'] is List)
           ? (j['preferred_modules'] as List).whereType<String>().toList()
           : const [],
-      karmaPoints: (j['karma_points'] as num?)?.toInt() ?? 0,
+      karmaPoints: ni(j['karma_points']),
       level: j['level'] as String?,
-      points: (j['points'] as num?)?.toInt() ?? 0,
+      points: ni(j['points']),
       verifiedEmail: (j['verified_email'] as bool?) ?? false,
       verifiedPhone: (j['verified_phone'] as bool?) ?? false,
       verifiedCommunity: (j['verified_community'] as bool?) ?? false,
@@ -245,9 +269,9 @@ class Profile {
           ? DateTime.tryParse(j['last_login_at'] as String)
           : null,
       inactiveReminderCount:
-          (j['inactive_reminder_count'] as num?)?.toInt() ?? 0,
-      trustScoreCount: (j['trust_score_count'] as num?)?.toInt() ?? 0,
-      trustLevel: (j['trust_level'] as num?)?.toInt() ?? 0,
+          ni(j['inactive_reminder_count']),
+      trustScoreCount: ni(j['trust_score_count']),
+      trustLevel: ni(j['trust_level']),
       trustUpdatedAt: j['trust_updated_at'] != null
           ? DateTime.tryParse(j['trust_updated_at'] as String)
           : null,
@@ -266,9 +290,9 @@ class Profile {
       banReason: j['ban_reason'] as String?,
       displayName: j['display_name'] as String?,
       phone: j['phone'] as String?,
-      latitude: (j['latitude'] as num?)?.toDouble(),
-      longitude: (j['longitude'] as num?)?.toDouble(),
-      radiusKm: (j['radius_km'] as num?)?.toInt(),
+      latitude: dn(j['latitude']),
+      longitude: dn(j['longitude']),
+      radiusKm: inn(j['radius_km']),
       username: j['username'] as String?,
       homepage: j['homepage'] as String?,
       address: j['address'] as String?,
@@ -278,7 +302,7 @@ class Profile {
       notifyTrustRatings: (j['notify_trust_ratings'] as bool?) ?? true,
       notifySystem: (j['notify_system'] as bool?) ?? true,
       notifyPush: (j['notify_push'] as bool?) ?? true,
-      notificationRadiusKm: (j['notification_radius_km'] as num?)?.toInt(),
+      notificationRadiusKm: inn(j['notification_radius_km']),
       notifyInactivityReminder:
           (j['notify_inactivity_reminder'] as bool?) ?? true,
       showOnlineStatus: (j['show_online_status'] as bool?) ?? true,
