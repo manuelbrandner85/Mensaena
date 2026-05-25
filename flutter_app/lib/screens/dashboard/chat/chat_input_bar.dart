@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -30,43 +31,59 @@ class ChatInputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: const BoxDecoration(
-        color: AppColors.deep,
-        border: Border(top: BorderSide(color: AppColors.line)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              maxLines: null,
-              textInputAction: TextInputAction.send,
-              onSubmitted: (_) => onSend(),
-              onChanged: (_) => onTextChanged(),
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                hintText: 'chat.messageHint'.tr(),
-                isDense: true,
+    // #19 Glass-Effect Input-Bar: leichter BackdropFilter ueber dem
+    // unteren Rand, halbtransparenter Background, Bronze-Top-Border.
+    // RepaintBoundary isoliert den Blur damit Scrolling nicht
+    // permanent neu blurred.
+    return RepaintBoundary(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.deep.withValues(alpha: 0.72),
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.bronze.withValues(alpha: 0.18),
+                ),
               ),
             ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    maxLines: null,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => onSend(),
+                    onChanged: (_) => onTextChanged(),
+                    style: AppTypography.body(
+                        size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      hintText: 'chat.messageHint'.tr(),
+                      isDense: true,
+                    ),
+                  ),
+                ),
+                // Voice-Diktat → Text-Composer.
+                VoiceDictationButton(controller: controller, localeId: 'de_DE'),
+                const SizedBox(width: 2),
+                // Voice-Recorder — long-press = recording, release = send.
+                ChatVoiceRecorderButton(
+                  conversationId: conversationId,
+                  onUploaded: onVoiceUploaded,
+                ),
+                const SizedBox(width: 6),
+                // Send-Button: aktiv = Bronze-Glow, inaktiv = opacity 0.3
+                ChatSendButton(
+                  enabled: controller.text.trim().isNotEmpty,
+                  onPressed: onSend,
+                ),
+              ],
+            ),
           ),
-          // Voice-Diktat → Text-Composer.
-          VoiceDictationButton(controller: controller, localeId: 'de_DE'),
-          const SizedBox(width: 2),
-          // Voice-Recorder — long-press = recording, release = send.
-          ChatVoiceRecorderButton(
-            conversationId: conversationId,
-            onUploaded: onVoiceUploaded,
-          ),
-          const SizedBox(width: 6),
-          // Send-Button: aktiv = Bronze-Glow, inaktiv = opacity 0.3
-          ChatSendButton(
-            enabled: controller.text.trim().isNotEmpty,
-            onPressed: onSend,
-          ),
-        ],
+        ),
       ),
     );
   }

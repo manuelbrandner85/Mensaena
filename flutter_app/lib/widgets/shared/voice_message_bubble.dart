@@ -26,13 +26,14 @@ class VoiceMessageBubble extends StatefulWidget {
   State<VoiceMessageBubble> createState() => _VoiceMessageBubbleState();
 }
 
-class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
+class _VoiceMessageBubbleState extends State<VoiceMessageBubble>
+    with SingleTickerProviderStateMixin {
   late final AudioPlayer _player;
+  // #20 Pulse-Animation fuer Waveform waehrend Playback.
+  late final AnimationController _pulse;
   bool _playing = false;
   Duration _position = Duration.zero;
   Duration? _total;
-  // Stream-Subscriptions: vorher .listen() ohne Variable → 3 Streams pro
-  // Bubble nie cancelled → Listener-Leak in Chat-Scrolls.
   StreamSubscription<PlayerState>? _stateSub;
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration>? _durationSub;
@@ -40,10 +41,20 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
   @override
   void initState() {
     super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     _player = AudioPlayer();
     _stateSub = _player.onPlayerStateChanged.listen((s) {
       if (!mounted) return;
+      final wasPlaying = _playing;
       setState(() => _playing = s == PlayerState.playing);
+      if (_playing && !wasPlaying) {
+        _pulse.repeat(reverse: true);
+      } else if (!_playing && wasPlaying) {
+        _pulse.stop();
+      }
       if (s == PlayerState.completed) {
         setState(() => _position = Duration.zero);
       }
@@ -61,6 +72,7 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
     _stateSub?.cancel();
     _positionSub?.cancel();
     _durationSub?.cancel();
+    _pulse.dispose();
     _player.dispose();
     super.dispose();
   }
@@ -118,15 +130,17 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Pseudo-Waveform mit gradient + organischer Height
+                // #20 Pseudo-Waveform mit gradient + Pulse-Animation
+                // waehrend Playback (subtile Hoehen-Modulation).
                 SizedBox(
                   height: 22,
-                  child: Row(
+                  child: AnimatedBuilder(
+                    animation: _pulse,
+                    builder: (_, __) => Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: List.generate(20, (i) {
                       final ratio = i / 20;
                       final filled = ratio < progress;
-                      // Sinus-Wellenmuster für natürliche Optik
                       final wave = 0.3 +
                           0.7 *
                               (0.5 +
@@ -134,7 +148,15 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
                                       (i.isEven
                                           ? ((i * 31) % 11) / 11
                                           : ((i * 17) % 13) / 13));
-                      final h = 4.0 + wave * 14.0;
+                      // Pulse-Modifier: bars in der Naehe der aktuellen
+                      // Wiedergabe-Position pulsen leicht groesser.
+                      var h = 4.0 + wave * 14.0;
+                      if (_playing) {
+                        final dist = (ratio - progress).abs();
+                        final boost = (1.0 - (dist * 4).clamp(0.0, 1.0)) *
+                            _pulse.value * 4.0;
+                        h += boost;
+                      }
                       return Expanded(
                         child: Padding(
                           padding:
@@ -162,6 +184,7 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
                         ),
                       );
                     }),
+                  ),
                   ),
                 ),
                 const SizedBox(height: 2),

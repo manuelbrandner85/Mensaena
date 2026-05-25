@@ -382,7 +382,9 @@
     "emptyTitle": "Ancora nessun messaggio.",
     "emptySubtitle": "Lancia il primo sasso — scrivi un messaggio e inizia la conversazione. 🌊",
     "copy": "Copia testo",
-    "copied": "Copiato."
+    "copied": "Copiato.",
+    "welcomeChannelTitle": "Benvenuto in #{name}",
+    "welcomeChannelBody": "Dove si incontrano i vicini. Sii rispettoso, aiuta dove puoi — i messaggi vengono rimossi automaticamente ogni 6 ore. 🌊"
   },
   "languages": {
     "de": "Tedesco",

@@ -59,6 +59,36 @@ class ChatMessageBubble extends ConsumerWidget {
     final replyToId = json['reply_to_id'] as String?;
     final deleted = json['deleted_at'] != null;
 
+    // #15 System-Messages — Pattern [SYSTEM:type] body wird als zentrierte
+    // gedimmte Pill gerendert statt normale Bubble.
+    final sysMatch = RegExp(r'^\[SYSTEM(?::([\w_]+))?\]\s*(.*)$')
+        .firstMatch(content);
+    if (sysMatch != null && !deleted) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.elevated.withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                  color: AppColors.line.withValues(alpha: 0.5), width: 0.5),
+            ),
+            child: Text(
+              sysMatch.group(2) ?? '',
+              style: AppTypography.label(
+                size: 10,
+                color: AppColors.mute,
+                letterSpacing: 0.2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
+    }
+
     // Voice-Message-Detection (Phase 5.2): [VOICE:url:seconds]
     final voiceMsg = VoiceRecorderService.decodeMessage(content);
 
@@ -69,7 +99,27 @@ class ChatMessageBubble extends ConsumerWidget {
         ? content.replaceAll(_imgRegex, '').trim()
         : content;
 
-    return GestureDetector(
+    // #4 Swipe-to-Reply: nach RECHTS wischen → Reply-Modus mit Haptic.
+    // Dismissible mit confirmDismiss=false damit Widget nicht entfernt
+    // wird, dafuer onUpdate haptisch + onDismissed-like fuer reply.
+    return Dismissible(
+      key: ValueKey('msg_swipe_${json['id']}'),
+      direction: onReply != null
+          ? DismissDirection.startToEnd
+          : DismissDirection.none,
+      dismissThresholds: const {DismissDirection.startToEnd: 0.25},
+      confirmDismiss: (_) async {
+        Haptics.tap();
+        onReply?.call();
+        return false; // keep widget
+      },
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Icon(LucideIcons.cornerUpLeft,
+            size: 18, color: AppColors.bronze.withValues(alpha: 0.7)),
+      ),
+      child: GestureDetector(
       onLongPress: () {
         Haptics.longPress();
         ChatActionSheet.open(
@@ -277,6 +327,7 @@ class ChatMessageBubble extends ConsumerWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

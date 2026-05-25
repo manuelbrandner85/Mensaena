@@ -382,7 +382,9 @@
     "emptyTitle": "Pas encore de messages.",
     "emptySubtitle": "Lance le premier galet — écris un message et lance la conversation. 🌊",
     "copy": "Copier le texte",
-    "copied": "Copié."
+    "copied": "Copié.",
+    "welcomeChannelTitle": "Bienvenue dans #{name}",
+    "welcomeChannelBody": "Où se rencontrent les voisin·es. Sois respectueux, aide quand tu peux — les messages sont supprimés automatiquement toutes les 6 h. 🌊"
   },
   "languages": {
     "de": "Allemand",

@@ -381,7 +381,9 @@
     "emptyTitle": "Noch keine Nachrichten.",
     "emptySubtitle": "Wirf den ersten Stein ins Wasser — schreib eine Nachricht und starte das Gespräch. 🌊",
     "copy": "Text kopieren",
-    "copied": "Kopiert."
+    "copied": "Kopiert.",
+    "welcomeChannelTitle": "Willkommen in #{name}",
+    "welcomeChannelBody": "Hier treffen sich Nachbar:innen. Sei respektvoll, hilf wo du kannst — und denk dran: Nachrichten werden alle 6 Stunden automatisch entfernt. 🌊"
   },
   "languages": {
     "de": "Deutsch",

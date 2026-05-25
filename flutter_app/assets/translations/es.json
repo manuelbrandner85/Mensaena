@@ -382,7 +382,9 @@
     "emptyTitle": "Aún no hay mensajes.",
     "emptySubtitle": "Tira la primera piedra — escribe un mensaje y empieza la conversación. 🌊",
     "copy": "Copiar texto",
-    "copied": "Copiado."
+    "copied": "Copiado.",
+    "welcomeChannelTitle": "Bienvenido a #{name}",
+    "welcomeChannelBody": "Donde se encuentran los vecinos. Sé respetuoso, ayuda en lo que puedas — los mensajes se eliminan automáticamente cada 6 horas. 🌊"
   },
   "languages": {
     "de": "Alemán",

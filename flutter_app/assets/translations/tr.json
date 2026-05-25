@@ -381,7 +381,9 @@
     "emptyTitle": "Henüz mesaj yok.",
     "emptySubtitle": "İlk taşı at — bir mesaj yaz ve sohbeti başlat. 🌊",
     "copy": "Metni kopyala",
-    "copied": "Kopyalandı."
+    "copied": "Kopyalandı.",
+    "welcomeChannelTitle": "#{name} kanalına hoş geldin",
+    "welcomeChannelBody": "Komşuların buluştuğu yer. Saygılı ol, elinden geleni yap — mesajlar her 6 saatte bir otomatik silinir. 🌊"
   },
   "languages": {
     "de": "Almanca",

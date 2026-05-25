@@ -540,6 +540,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     return _ChatEmptyState(
                       isSearch: q.isNotEmpty,
                       searchQuery: _searchQuery,
+                      isChannel: _context?.kind == ChatKind.channel,
+                      channelTitle: _context?.title,
                     );
                   }
                   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1313,9 +1315,16 @@ class _ChatBubbleSkeleton extends StatelessWidget {
 
 // ── Empty-State (#17) ─────────────────────────────────────────────────
 class _ChatEmptyState extends StatelessWidget {
-  const _ChatEmptyState({required this.isSearch, required this.searchQuery});
+  const _ChatEmptyState({
+    required this.isSearch,
+    required this.searchQuery,
+    this.isChannel = false,
+    this.channelTitle,
+  });
   final bool isSearch;
   final String searchQuery;
+  final bool isChannel;
+  final String? channelTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -1360,7 +1369,9 @@ class _ChatEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'chat.emptyTitle'.tr(),
+              isChannel && channelTitle != null
+                  ? 'chat.welcomeChannelTitle'.tr(namedArgs: {'name': channelTitle!})
+                  : 'chat.emptyTitle'.tr(),
               textAlign: TextAlign.center,
               style: AppTypography.body(
                 size: 15,
@@ -1371,7 +1382,9 @@ class _ChatEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'chat.emptySubtitle'.tr(),
+              isChannel
+                  ? 'chat.welcomeChannelBody'.tr()
+                  : 'chat.emptySubtitle'.tr(),
               textAlign: TextAlign.center,
               style: AppTypography.body(
                 size: 12,
