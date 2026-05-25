@@ -42,7 +42,12 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
     (value: 'fire', i18n: 'crisis.catFire'),
     (value: 'flood', i18n: 'crisis.catFlood'),
     (value: 'storm', i18n: 'crisis.catStorm'),
+    (value: 'accident', i18n: 'crisis.catAccident'),
+    (value: 'violence', i18n: 'crisis.catViolence'),
     (value: 'missing_person', i18n: 'crisis.catMissing'),
+    (value: 'infrastructure', i18n: 'crisis.catInfrastructure'),
+    (value: 'supply', i18n: 'crisis.catSupply'),
+    (value: 'evacuation', i18n: 'crisis.catEvacuation'),
     (value: 'other', i18n: 'crisis.catOther'),
   ];
 
