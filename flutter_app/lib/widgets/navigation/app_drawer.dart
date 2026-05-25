@@ -15,6 +15,8 @@ import '../shared/sized_avatar_image.dart';
 import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/haptics.dart';
+import '../../services/recent_pages_service.dart';
 import '../../services/supabase_service.dart';
 
 /// SKILL: flutter-setup-declarative-routing + mensaena-design
@@ -195,6 +197,8 @@ class AppDrawer extends ConsumerWidget {
                       _LinkTile(link: _home, currentLoc: currentLoc),
                       _LinkTile(
                           link: _notifications, currentLoc: currentLoc),
+                      const _PinnedSection(),
+                      const _RecentSection(),
                       const Divider(color: AppColors.line, height: 16),
                       for (final g in _groups)
                         _GroupSection(
@@ -539,6 +543,20 @@ class _LinkTile extends ConsumerWidget {
           Navigator.of(context).pop();
           context.go(link.route);
         },
+        // Long-Press: Pin/Unpin diese Route in der Drawer-Top-Section.
+        onLongPress: () async {
+          Haptics.tap();
+          final pinned = await RecentPagesService.togglePin(link.route);
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: AppColors.surface,
+            duration: const Duration(seconds: 2),
+            content: Text(
+              pinned ? 'drawer.pinned'.tr() : 'drawer.unpinned'.tr(),
+              style: AppTypography.body(size: 13, color: AppColors.ink),
+            ),
+          ));
+        },
       ),
     );
   }
@@ -598,4 +616,125 @@ class _NavLink {
   /// one of: 'unreadMessages' | 'unreadNotifications' | 'activeCrises' |
   /// 'suggestedMatches' | 'interactionRequests'
   final String? badgeKey;
+}
+
+// ── Pinned / Recent Sections ─────────────────────────────────────
+// Beide rendern nur wenn die Liste nicht leer ist. Tap → Navigate.
+// Pinned hat zusaetzlich ein Unpin-X am Trailing.
+
+class _PinnedSection extends StatefulWidget {
+  const _PinnedSection();
+
+  @override
+  State<_PinnedSection> createState() => _PinnedSectionState();
+}
+
+class _PinnedSectionState extends State<_PinnedSection> {
+  late Future<List<String>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = RecentPagesService.getPinned();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<String>>(
+      future: _future,
+      builder: (context, snap) {
+        final list = snap.data ?? const <String>[];
+        if (list.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 12, 4),
+                child: Text(
+                  'drawer.pinnedSection'.tr().toUpperCase(),
+                  style: AppTypography.label(size: 9, color: AppColors.mute),
+                ),
+              ),
+              for (final r in list)
+                _QuickLinkTile(
+                  route: r,
+                  trailing: IconButton(
+                    icon: const Icon(LucideIcons.x,
+                        size: 14, color: AppColors.mute),
+                    onPressed: () async {
+                      await RecentPagesService.togglePin(r);
+                      setState(() {
+                        _future = RecentPagesService.getPinned();
+                      });
+                    },
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _RecentSection extends StatelessWidget {
+  const _RecentSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<String>>(
+      future: RecentPagesService.getRecent(),
+      builder: (context, snap) {
+        final list = snap.data ?? const <String>[];
+        if (list.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 12, 4),
+                child: Text(
+                  'drawer.recentSection'.tr().toUpperCase(),
+                  style: AppTypography.label(size: 9, color: AppColors.mute),
+                ),
+              ),
+              for (final r in list) _QuickLinkTile(route: r),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _QuickLinkTile extends StatelessWidget {
+  const _QuickLinkTile({required this.route, this.trailing});
+  final String route;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = RecentPagesService.routeMeta[route];
+    return ListTile(
+      dense: true,
+      visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: Icon(meta?.icon ?? LucideIcons.fileText,
+            size: 16, color: AppColors.bronze.withValues(alpha: 0.75)),
+      ),
+      title: Text(
+        (meta?.title ?? route).tr(),
+        style: AppTypography.body(size: 12, color: AppColors.inkSoft),
+      ),
+      trailing: trailing,
+      onTap: () {
+        Navigator.of(context).pop();
+        context.go(route);
+      },
+    );
+  }
 }

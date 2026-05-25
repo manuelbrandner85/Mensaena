@@ -1704,6 +1704,21 @@
     "callback": "Zurückrufen",
     "callbackFailed": "Rückruf fehlgeschlagen"
   },
+  "sos": {
+    "title": "Notfall-Hilfe",
+    "subtitle": "Tippe eine Nummer an, um sofort anzurufen.",
+    "tooltip": "Notruf",
+    "reportCrisis": "Krise melden",
+    "is24h": "24/7",
+    "isFree": "Kostenlos",
+    "empty": "Keine Notrufnummern für dein Land hinterlegt."
+  },
+  "drawer": {
+    "pinned": "Angeheftet",
+    "unpinned": "Lösung entfernt",
+    "pinnedSection": "📌 Angepinnt",
+    "recentSection": "🕐 Zuletzt"
+  },
   "time": {
     "justNow": "gerade eben",
     "minutesShort": "vor {n} Min",

@@ -11,10 +11,12 @@ import 'app.dart';
 import 'providers/locale_provider.dart';
 import 'providers/role_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// SKILL: mensaena-architektur
 /// Bootstrap — Performance-optimiert:
@@ -144,6 +146,27 @@ Future<void> _initBackgroundServices() async {
   PushNotificationService.onTokenRefresh.listen((_) {
     unawaited(PushNotificationService.registerToken());
   });
+
+  // Startup-Sound: einmal pro Kalendertag, leise. Respektiert die
+  // bestehende notify-Sound-Praeferenz des Users (kSoundEnabledKey).
+  unawaited(_playStartupOncePerDay());
+}
+
+/// Spielt assets/sounds/startup.mp3 maximal 1x pro Kalendertag.
+/// Tracked via flutter_secure_storage damit es auch nach App-Restart
+/// nicht erneut feuert.
+Future<void> _playStartupOncePerDay() async {
+  const storage = FlutterSecureStorage();
+  const key = 'mensaena_startup_played_v1';
+  try {
+    final now = DateTime.now();
+    final today =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final last = await storage.read(key: key);
+    if (last == today) return;
+    await storage.write(key: key, value: today);
+    await AudioFeedbackService.instance.playStartupMelody();
+  } catch (_) {/* fail-silent */}
 }
 
 /// Fire-and-forget helper.

@@ -1705,6 +1705,21 @@
     "callback": "Call back",
     "callbackFailed": "Callback failed"
   },
+  "sos": {
+    "title": "Emergency",
+    "subtitle": "Tap a number to call instantly.",
+    "tooltip": "Emergency",
+    "reportCrisis": "Report crisis",
+    "is24h": "24/7",
+    "isFree": "Free",
+    "empty": "No emergency numbers configured for your country."
+  },
+  "drawer": {
+    "pinned": "Pinned",
+    "unpinned": "Unpinned",
+    "pinnedSection": "📌 Pinned",
+    "recentSection": "🕐 Recent"
+  },
   "time": {
     "justNow": "just now",
     "minutesShort": "{n} min ago",

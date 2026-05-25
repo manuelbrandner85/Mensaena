@@ -12,9 +12,12 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/active_call_provider.dart';
+import '../../providers/unread_counts_provider.dart';
 import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
+import '../../services/recent_pages_service.dart';
+import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
 import '../navigation/language_picker.dart';
 import '../shared/fcm_foreground_listener.dart';
@@ -176,6 +179,13 @@ class DashboardScaffold extends ConsumerWidget {
     final isTopLevel = topLevelRoutes.contains(activeRoute);
     final canPop = GoRouter.maybeOf(context)?.canPop() ?? false;
     final showBack = !isTopLevel;
+
+    // Recent-Pages-Tracking: jede Dashboard-Navigation wird in
+    // SecureStorage protokolliert, damit der Drawer "Zuletzt"-Section
+    // aufpoppen kann. Post-frame damit es nicht im Build-Cycle laeuft.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      RecentPagesService.addRecent(activeRoute);
+    });
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(
@@ -196,6 +206,7 @@ class DashboardScaffold extends ConsumerWidget {
             : null, // Top-Level: automatic-hamburger
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
+          const SOSButton(),
           const LanguagePicker(),
           NotificationBell(unreadCount: unread),
           const SizedBox(width: 4),
@@ -304,6 +315,7 @@ class _BottomNav extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingMatches =
         ref.watch(matchingCountsProvider).value?.pending ?? 0;
+    final unreadDm = ref.watch(unreadDmCountProvider).value ?? 0;
     return RepaintBoundary(
       child: ClipRect(
         child: BackdropFilter(
@@ -350,6 +362,7 @@ class _BottomNav extends ConsumerWidget {
                           '/dashboard/messages',
                           '/dashboard/chat',
                         ]),
+                        badgeCount: unreadDm,
                       ),
                     ),
                     Expanded(
