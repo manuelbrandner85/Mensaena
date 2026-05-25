@@ -633,8 +633,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   /// V12 — Marker mit PulseBloom-Effekt fuer Notfaelle.
   Marker _buildMarker(Post p) {
     final color = _markerColor(p.type);
-    final isUrgent = p.type == 'crisis' ||
-        (p.urgency != null && p.urgency! > 2);
+    // urgency ist jetzt String — PostUrgencyX-Extension liefert int-Level.
+    final isUrgent = p.type == 'crisis' || p.urgencyLevel > 2;
     final pin = GestureDetector(
       onTap: () => _openPostSheet(p),
       child: Container(
@@ -1102,7 +1102,7 @@ class _PostBottomSheet extends StatelessWidget {
     final firstImage = post.allImageUrls.isNotEmpty
         ? post.allImageUrls.first
         : null;
-    final isUrgent = post.urgency != null && post.urgency! > 0;
+    final isUrgent = post.hasUrgency;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),

@@ -277,7 +277,17 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             'contact_whatsapp': _whatsappCtrl.text.trim().isEmpty
                 ? null
                 : _whatsappCtrl.text.trim(),
-            'urgency': _urgency,
+            // DB-Spalte ist TEXT mit Enum 'low'|'medium'|'high'|'critical'.
+            // 5er-UI-Slider (Niedrig/Normal/Mittel/Hoch/Sehr hoch) wird auf
+            // die 4 DB-Werte gemappt — 'normal' und 'low' beide → 'low',
+            // 'sehr hoch' → 'critical'. Falls 0 (kein Urgency) → NULL.
+            'urgency': _urgency <= 1
+                ? 'low'
+                : _urgency == 2
+                    ? 'medium'
+                    : _urgency == 3
+                        ? 'high'
+                        : 'critical',
             'privacy_phone': _privacyPhone,
             'privacy_email': _privacyEmail,
             'is_anonymous': _isAnonymous,

@@ -398,7 +398,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                   ),
                 ),
                 const Spacer(),
-                if (post.urgency != null && post.urgency! >= 3)
+                if (post.urgencyLevel >= 3)
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6, vertical: 2),

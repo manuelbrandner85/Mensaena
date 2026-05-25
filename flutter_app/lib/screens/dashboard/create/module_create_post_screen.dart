@@ -225,7 +225,14 @@ class _ModuleCreatePostScreenState
             'contact_whatsapp': _whatsappCtrl.text.trim().isEmpty
                 ? null
                 : _whatsappCtrl.text.trim(),
-            'urgency': _urgency,
+            // DB-Spalte ist TEXT (Enum 'low'|'medium'|'high'|'critical').
+            'urgency': _urgency <= 1
+                ? 'low'
+                : _urgency == 2
+                    ? 'medium'
+                    : _urgency == 3
+                        ? 'high'
+                        : 'critical',
             'privacy_phone': _privacyPhone,
             'privacy_email': _privacyEmail,
             'is_anonymous': _isAnonymous,

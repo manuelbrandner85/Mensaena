@@ -49,7 +49,12 @@ class Post {
   final String? contactPhone;
   final String? contactEmail;
   final String? contactWhatsapp;
-  final int? urgency;
+  /// urgency-Spalte ist TEXT in der DB mit Werten 'low' | 'medium' | 'high' |
+  /// 'critical'. Vorher castete der Code auf int → TypeError fuer jeden
+  /// Post mit gesetztem urgency → die gesamte map-Iteration brach ab →
+  /// User sah leere Beitragsliste. Helper-Methoden (urgencyLevel,
+  /// urgencyEmoji, urgencyLabel) siehe PostUrgencyX-Extension am Datei-Ende.
+  final String? urgency;
   final DateTime? updatedAt;
   final bool isAnonymous;
   final bool isRecurring;
@@ -88,7 +93,9 @@ class Post {
       contactPhone: j['contact_phone'] as String?,
       contactEmail: j['contact_email'] as String?,
       contactWhatsapp: j['contact_whatsapp'] as String?,
-      urgency: (j['urgency'] as num?)?.toInt(),
+      // Defensiv: toString() handhabt String UND num UND null ohne Cast.
+      // Spalte ist TEXT in der DB — frueherer Code crashte mit TypeError.
+      urgency: j['urgency']?.toString(),
       updatedAt: j['updated_at'] != null
           ? DateTime.tryParse(j['updated_at'] as String)
           : null,
@@ -148,4 +155,63 @@ class Post {
         'privacy_phone': privacyPhone,
         'privacy_email': privacyEmail,
       };
+}
+
+/// Helper-Methoden fuer urgency. Bleibt Extension damit Post selbst
+/// immutable + lean bleibt, und das Mapping zwischen DB-Werten
+/// ('low','medium','high','critical') und UI-Darstellung an einer
+/// Stelle steht.
+extension PostUrgencyX on Post {
+  /// Numerischer Level fuer Sortierung — hoeher = dringender.
+  /// 0 = kein urgency gesetzt.
+  int get urgencyLevel {
+    switch (urgency) {
+      case 'critical':
+        return 4;
+      case 'high':
+        return 3;
+      case 'medium':
+        return 2;
+      case 'low':
+        return 1;
+      default:
+        return 0;
+    }
+  }
+
+  /// Lokalisierbares Label fuer die UI (DE-Default — Caller kann via
+  /// .tr()-Key uebersetzen falls noetig).
+  String get urgencyLabel {
+    switch (urgency) {
+      case 'critical':
+        return 'KRITISCH';
+      case 'high':
+        return 'HOCH';
+      case 'medium':
+        return 'MITTEL';
+      case 'low':
+        return 'NIEDRIG';
+      default:
+        return '';
+    }
+  }
+
+  /// Badge-Emoji fuer kompakte Darstellung.
+  String get urgencyEmoji {
+    switch (urgency) {
+      case 'critical':
+        return '🔴';
+      case 'high':
+        return '🟠';
+      case 'medium':
+        return '🟡';
+      case 'low':
+        return '🔵';
+      default:
+        return '';
+    }
+  }
+
+  /// true wenn urgency angezeigt werden soll.
+  bool get hasUrgency => urgency != null && urgency!.isNotEmpty;
 }
