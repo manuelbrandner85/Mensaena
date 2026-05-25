@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show SignOutScope, UserAttributes;
@@ -16,6 +17,7 @@ import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/locale_provider.dart';
+import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
@@ -169,7 +171,56 @@ class _AccountTab extends StatelessWidget {
           '(www.mensaena.de) bearbeiten — In-App folgt in einer spaeteren Phase.',
           style: AppTypography.caption(),
         ),
+        const SizedBox(height: 24),
+        const Divider(color: AppColors.line),
+        const SizedBox(height: 12),
+        Text('settings.appVersionLabel'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 8),
+        const _AppVersionInfo(),
       ],
+    );
+  }
+}
+
+/// Info-Zeile mit App-Version + Build-Number + Shorebird-Patch-Nr.
+/// Erlaubt Support/User schnell zu sagen welche Version laeuft.
+class _AppVersionInfo extends ConsumerWidget {
+  const _AppVersionInfo();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final patchAsync = ref.watch(currentPatchNumberProvider);
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snap) {
+        if (!snap.hasData) return const SizedBox.shrink();
+        final info = snap.data!;
+        final patchStr = patchAsync.when(
+          loading: () => '',
+          error: (_, __) => '',
+          data: (n) => n != null ? ' · Patch #$n' : '',
+        );
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.info, size: 16, color: AppColors.mute),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'v${info.version} (Build ${info.buildNumber})$patchStr',
+                  style: AppTypography.mono(size: 13, color: AppColors.ink),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

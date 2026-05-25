@@ -301,6 +301,7 @@
     },
     "profileNotFound": "Perfil no encontrado.",
     "nameLabel": "Nombre",
+    "appVersionLabel": "VERSIÓN DE LA APP",
     "errorPrefix": "Error: {error}",
     "profileVisibility": "Visibilidad del perfil",
     "locationLabel": "Ubicación",
@@ -1464,7 +1465,12 @@
     "optionalDescription": "Hay una nueva versión lista. Actualiza ahora para disfrutar de las últimas funciones y mejoras.",
     "installerHint": "Android está abriendo el instalador del sistema. Toca \"Instalar\" para actualizar. Si no aparece el diálogo, pulsa de nuevo el botón.",
     "unknownSourcesHint": "Android puede pedirte \"Instalar desde orígenes desconocidos\" en la primera actualización — permítelo para Mensaena.",
-    "failed": "La actualización falló."
+    "failed": "La actualización falló.",
+    "patchBannerTitle": "Mejora lista",
+    "patchBannerSubtitle": "Reinicia para aplicar la última actualización",
+    "patchRestart": "Reiniciar",
+    "closeApp": "Cerrar app",
+    "installManualHint": "Tras la instalación la app se abrirá actualizada. Si el instalador no aparece, cierra la app y abre el archivo descargado manualmente."
   },
   "landing": {
     "startFree": "Empezar gratis",

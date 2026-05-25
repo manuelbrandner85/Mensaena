@@ -301,6 +301,7 @@
     },
     "profileNotFound": "Profil introuvable.",
     "nameLabel": "Nom",
+    "appVersionLabel": "VERSION DE L'APP",
     "errorPrefix": "Erreur : {error}",
     "profileVisibility": "Visibilité du profil",
     "locationLabel": "Localisation",
@@ -1464,7 +1465,12 @@
     "optionalDescription": "Une nouvelle version est prête. Mettez à jour maintenant pour profiter des dernières fonctionnalités.",
     "installerHint": "Android ouvre l'installeur système. Touchez \"Installer\" pour mettre à jour. Si la boîte de dialogue n'apparaît pas, appuyez à nouveau.",
     "unknownSourcesHint": "Lors de la première mise à jour, Android peut demander \"Installer depuis des sources inconnues\" — autorisez-le pour Mensaena.",
-    "failed": "Échec de la mise à jour."
+    "failed": "Échec de la mise à jour.",
+    "patchBannerTitle": "Amélioration prête",
+    "patchBannerSubtitle": "Redémarrez pour la dernière mise à jour",
+    "patchRestart": "Redémarrer",
+    "closeApp": "Fermer l'app",
+    "installManualHint": "Après l'installation, l'application redémarre à jour. Si l'installeur n'apparaît pas, fermez l'app et ouvrez le fichier téléchargé manuellement."
   },
   "landing": {
     "startFree": "Commencer gratuitement",

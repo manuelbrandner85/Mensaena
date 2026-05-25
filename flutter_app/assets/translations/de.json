@@ -301,6 +301,7 @@
     },
     "profileNotFound": "Profil nicht gefunden.",
     "nameLabel": "Name",
+    "appVersionLabel": "APP-VERSION",
     "errorPrefix": "Fehler: {error}",
     "profileVisibility": "Profil-Sichtbarkeit",
     "locationLabel": "Standort",
@@ -1463,7 +1464,12 @@
     "optionalDescription": "Eine neue Version steht bereit. Aktualisiere jetzt für die neuesten Funktionen und Verbesserungen.",
     "installerHint": "Android öffnet jetzt den System-Installer. Tippe \"Installieren\" um zu aktualisieren. Falls der Dialog nicht erscheint, drücke unten erneut.",
     "unknownSourcesHint": "Android fragt beim ersten Update evtl. nach \"Apps aus unbekannten Quellen installieren\" — bitte für Mensaena erlauben.",
-    "failed": "Update fehlgeschlagen."
+    "failed": "Update fehlgeschlagen.",
+    "patchBannerTitle": "Verbesserung bereit",
+    "patchBannerSubtitle": "Neustart für das neueste Update",
+    "patchRestart": "Neustarten",
+    "closeApp": "App schließen",
+    "installManualHint": "Nach der Installation startet die App automatisch aktualisiert. Falls der Installer nicht erscheint, schließe die App und öffne die heruntergeladene Datei manuell."
   },
   "landing": {
     "startFree": "Kostenlos starten",

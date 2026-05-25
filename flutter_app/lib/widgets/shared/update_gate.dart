@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/app_release.dart';
+import '../../providers/shorebird_patch_provider.dart';
 import '../../repositories/app_releases_repository.dart';
 import '../../services/apk_installer_service.dart';
 import '../effects/bloom.dart';
@@ -80,15 +81,35 @@ class _UpdateGateState extends ConsumerState<UpdateGate> {
     });
   }
 
+  /// Wenn kein APK-Update vorliegt: pruefe ob ein Shorebird-OTA-Patch
+  /// heruntergeladen wurde. Wenn ja → blende oben den Restart-Banner ein.
+  Widget _maybePatchBanner() {
+    final patchCheck = ref.watch(shorebirdPatchAvailableProvider);
+    return patchCheck.when(
+      loading: () => widget.child,
+      error: (_, __) => widget.child,
+      data: (hasPatch) {
+        if (!hasPatch) return widget.child;
+        return _PatchRestartBanner(child: widget.child);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final check = ref.watch(updateCheckProvider);
     return check.when(
-      loading: () => widget.child,
+      // Waehrend updateCheckProvider laeuft (100-500ms Supabase-Roundtrip):
+      // NICHT widget.child zeigen — bei pending mandatory wuerde der User
+      // sonst kurz die App benutzen koennen bevor der Block-Screen kommt.
+      loading: () => const _MandatoryLoadingPlaceholder(),
       error: (_, __) => widget.child,
       data: (c) {
         final latest = c.latest;
-        if (!c.hasUpdate || latest == null) return widget.child;
+        if (!c.hasUpdate || latest == null) {
+          // Kein APK-Update → Shorebird-OTA-Patch-Check.
+          return _maybePatchBanner();
+        }
 
         if (c.isMandatory) {
           return _UpdateFullScreen(
@@ -184,6 +205,13 @@ class _UpdateFullScreenState extends State<_UpdateFullScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Mandatory: System-Navigation komplett verstecken. immersiveSticky
+    // bringt sie kurz wieder wenn der User vom Rand wischt, blendet sie
+    // aber nach 2-3s automatisch wieder aus — der User kann nicht
+    // dauerhaft zum Home wechseln ohne aktive Bedienung.
+    if (widget.isMandatory) {
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    }
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -191,28 +219,36 @@ class _UpdateFullScreenState extends State<_UpdateFullScreen> {
       ),
     );
 
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Material(
-        color: AppColors.voidColor,
-        // CinemaOverlay als ambient Hintergrund-Wrapper
-        child: CinemaOverlay(
-          child: Stack(
-            children: [
-              // Dezente Vignette unten für Tiefe
-              const Positioned.fill(
-                child: VignetteOverlay(intensity: 0.18),
-              ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 28,
-                  ),
-                  child: _buildContent(context),
+    return PopScope(
+      // Hardware-Back-Button komplett tot. Bei isMandatory ist das
+      // zwingend: User darf den Block-Screen nicht durch Back-Tap
+      // entkommen. Bei optionalem Update bleibt es ebenfalls aus, weil
+      // der Screen sonst weg waere und der User keine Chance haette
+      // "Spaeter" zu tippen — er waere wieder im App-Inhalt.
+      canPop: false,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Material(
+          color: AppColors.voidColor,
+          // CinemaOverlay als ambient Hintergrund-Wrapper
+          child: CinemaOverlay(
+            child: Stack(
+              children: [
+                // Dezente Vignette unten für Tiefe
+                const Positioned.fill(
+                  child: VignetteOverlay(intensity: 0.18),
                 ),
-              ),
-            ],
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 28,
+                    ),
+                    child: _buildContent(context),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -348,12 +384,29 @@ class _UpdateFullScreenState extends State<_UpdateFullScreen> {
               border: Border.all(color: AppColors.herzrot),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Text(
-              _error!,
-              style: AppTypography.body(
-                size: 12,
-                color: AppColors.herzrotWarm,
-              ),
+            child: Column(
+              children: [
+                Text(
+                  _error!,
+                  style: AppTypography.body(
+                    size: 12,
+                    color: AppColors.herzrotWarm,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _downloadAndInstall,
+                    icon: const Icon(LucideIcons.refreshCw, size: 14),
+                    label: Text('common.retry'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.herzrotWarm,
+                      side: const BorderSide(color: AppColors.herzrot),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -393,6 +446,33 @@ class _UpdateFullScreenState extends State<_UpdateFullScreen> {
                 ),
               ),
             ),
+          ),
+        ],
+        // Nach erfolgreichem Download: "App schliessen" + Hinweistext.
+        // Wenn der User den PackageInstaller versehentlich abgebrochen
+        // hat, hat er hiermit eine saubere Exit-Option statt im
+        // _waitingInstaller-Zustand festzuhaengen.
+        if (_waitingInstaller) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => SystemNavigator.pop(),
+              icon: const Icon(LucideIcons.power, size: 16),
+              label: Text('update.closeApp'.tr()),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: BorderSide(
+                    color: AppColors.mute.withValues(alpha: 0.4)),
+                foregroundColor: AppColors.inkSoft,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'update.installManualHint'.tr(),
+            textAlign: TextAlign.center,
+            style: AppTypography.caption(),
           ),
         ],
         const SizedBox(height: 10),
@@ -691,6 +771,175 @@ class _BannerWrapper extends StatelessWidget {
               ),
             ),
             Expanded(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Neutraler Lade-Screen waehrend updateCheckProvider noch laeuft.
+/// Verhindert dass der User kurz die App benutzt bevor ein mandatory
+/// Update den Block-Screen zeigt.
+class _MandatoryLoadingPlaceholder extends StatelessWidget {
+  const _MandatoryLoadingPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Material(
+        color: AppColors.voidColor,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Bloom(
+                color: AppColors.amber,
+                intensity: 0.4,
+                radius: 20,
+                child: ClipOval(
+                  child: Container(
+                    width: 72,
+                    height: 72,
+                    color: AppColors.voidColor,
+                    child: Image.asset(
+                      'assets/launcher/icon.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        LucideIcons.shield,
+                        color: AppColors.amber,
+                        size: 36,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.bronze,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Gruener nicht-blockierender Banner wenn ein Shorebird OTA-Patch
+/// bereitsteht und ein App-Restart noetig ist.
+class _PatchRestartBanner extends StatefulWidget {
+  const _PatchRestartBanner({required this.child});
+  final Widget child;
+
+  @override
+  State<_PatchRestartBanner> createState() => _PatchRestartBannerState();
+}
+
+class _PatchRestartBannerState extends State<_PatchRestartBanner> {
+  bool _dismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_dismissed) return widget.child;
+
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Material(
+        color: AppColors.voidColor,
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppColors.leben.withValues(alpha: 0.95),
+                      AppColors.leben.withValues(alpha: 0.80),
+                    ],
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: AppColors.lebenSoft.withValues(alpha: 0.35),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Bloom(
+                      color: AppColors.leben,
+                      intensity: 0.4,
+                      radius: 10,
+                      child: Icon(
+                        LucideIcons.refreshCw,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'update.patchBannerTitle'.tr(),
+                            style: AppTypography.body(
+                              size: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            'update.patchBannerSubtitle'.tr(),
+                            style: AppTypography.caption(color: Colors.white70),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => SystemNavigator.pop(),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white24,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                      ),
+                      child: Text(
+                        'update.patchRestart'.tr(),
+                        style: AppTypography.label(
+                          size: 10,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      onPressed: () => setState(() => _dismissed = true),
+                      icon: const Icon(LucideIcons.x,
+                          color: Colors.white70, size: 18),
+                      splashRadius: 18,
+                      tooltip: 'common.close'.tr(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(child: widget.child),
           ],
         ),
       ),

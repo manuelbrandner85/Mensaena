@@ -301,6 +301,7 @@
     },
     "profileNotFound": "Profil bulunamadı.",
     "nameLabel": "İsim",
+    "appVersionLabel": "UYGULAMA SÜRÜMÜ",
     "errorPrefix": "Hata: {error}",
     "profileVisibility": "Profil görünürlüğü",
     "locationLabel": "Konum",
@@ -1463,7 +1464,12 @@
     "optionalDescription": "Yeni bir sürüm hazır. En son özellikler ve iyileştirmeler için şimdi güncelle.",
     "installerHint": "Android sistem yükleyicisini açıyor. Güncellemek için \"Yükle\"ye dokun. Diyalog görünmezse düğmeye tekrar bas.",
     "unknownSourcesHint": "Android ilk güncellemede \"Bilinmeyen kaynaklardan yüklemeye izin ver\" sorabilir — lütfen Mensaena için izin ver.",
-    "failed": "Güncelleme başarısız."
+    "failed": "Güncelleme başarısız.",
+    "patchBannerTitle": "İyileştirme hazır",
+    "patchBannerSubtitle": "En son güncelleme için yeniden başlat",
+    "patchRestart": "Yeniden başlat",
+    "closeApp": "Uygulamayı kapat",
+    "installManualHint": "Yüklemeden sonra uygulama güncel olarak başlar. Yükleyici görünmüyorsa uygulamayı kapat ve indirilen dosyayı elle aç."
   },
   "landing": {
     "startFree": "Ücretsiz başla",

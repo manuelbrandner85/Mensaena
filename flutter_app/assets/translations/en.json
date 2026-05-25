@@ -301,6 +301,7 @@
     },
     "profileNotFound": "Profile not found.",
     "nameLabel": "Name",
+    "appVersionLabel": "APP VERSION",
     "errorPrefix": "Error: {error}",
     "profileVisibility": "Profile visibility",
     "locationLabel": "Location",
@@ -1464,7 +1465,12 @@
     "optionalDescription": "A new version is ready. Update now for the latest features and improvements.",
     "installerHint": "Android is opening the system installer now. Tap \"Install\" to update. If the dialog doesn't appear, press the button again.",
     "unknownSourcesHint": "Android may ask for \"Install from unknown sources\" on first update — please allow it for Mensaena.",
-    "failed": "Update failed."
+    "failed": "Update failed.",
+    "patchBannerTitle": "Improvement ready",
+    "patchBannerSubtitle": "Restart for the latest update",
+    "patchRestart": "Restart",
+    "closeApp": "Close app",
+    "installManualHint": "After installation, the app will start with the latest version. If the installer doesn't appear, close the app and open the downloaded file manually."
   },
   "landing": {
     "startFree": "Start free",

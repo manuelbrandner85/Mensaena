@@ -15,6 +15,7 @@ import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
 import 'services/push_notification_service.dart';
+import 'services/shorebird_patch_service.dart';
 import 'services/supabase_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -150,6 +151,19 @@ Future<void> _initBackgroundServices() async {
   // Startup-Sound: einmal pro Kalendertag, leise. Respektiert die
   // bestehende notify-Sound-Praeferenz des Users (kSoundEnabledKey).
   unawaited(_playStartupOncePerDay());
+
+  // Shorebird OTA-Patch: pruefe ob ein Patch verfuegbar ist. Shorebird
+  // laedt ihn automatisch im Hintergrund — die UpdateGate zeigt dann
+  // den Restart-Banner sobald der provider naechstes Mal evaluiert.
+  try {
+    final hasPatch = await ShorebirdPatchService.checkForUpdate();
+    if (hasPatch) {
+      debugPrint(
+          '[Shorebird] Neuer Patch verfuegbar — Restart-Banner wird gezeigt.');
+    }
+  } catch (_) {
+    // Shorebird nicht verfuegbar (Debug-Build ohne Engine) — OK.
+  }
 }
 
 /// Spielt assets/sounds/startup.mp3 maximal 1x pro Kalendertag.
