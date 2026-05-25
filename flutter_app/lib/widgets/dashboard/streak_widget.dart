@@ -44,7 +44,7 @@ class _StreakWidgetState extends ConsumerState<StreakWidget> {
     } catch (_) {}
     if (!mounted) return;
     _firedThisMount = true;
-    CelebrateBurst.fire(context);
+    CelebrateBurst.fire(context, ref: ref);
   }
 
   @override

@@ -1824,6 +1824,14 @@
     "days": "{count} jours d'affilée",
     "best": "Record"
   },
+  "a11y": {
+    "section": "Accessibilité",
+    "textScale": "Taille du texte : {pct} %",
+    "reduceMotion": "Réduire les animations",
+    "reduceMotionHint": "Désactive confettis, pulsations et grandes animations.",
+    "highContrast": "Contraste élevé",
+    "highContrastHint": "Bordures plus marquées et couleurs de texte plus fortes."
+  },
   "biometric": {
     "section": "Verrouillage par empreinte / visage",
     "subtitle": "Après 3 min en arrière-plan, Mensaena te redemandera ton empreinte ou ton visage.",

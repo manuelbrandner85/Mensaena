@@ -1824,6 +1824,14 @@
     "days": "{count} días seguidos",
     "best": "Récord"
   },
+  "a11y": {
+    "section": "Accesibilidad",
+    "textScale": "Tamaño del texto: {pct}%",
+    "reduceMotion": "Reducir movimiento",
+    "reduceMotionHint": "Desactiva confeti, brillos pulsantes y animaciones grandes.",
+    "highContrast": "Alto contraste",
+    "highContrastHint": "Bordes más marcados y colores de texto más intensos."
+  },
   "biometric": {
     "section": "Bloqueo de la app con huella / cara",
     "subtitle": "Después de 3 min en segundo plano, Mensaena pedirá tu huella o tu cara al volver a abrir.",

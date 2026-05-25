@@ -15,6 +15,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../config/theme/cinema_theme.dart';
 import '../../models/profile.dart';
+import '../../providers/accessibility_provider.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../providers/shorebird_patch_provider.dart';
@@ -1016,6 +1017,11 @@ class _AppearanceTab extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
+        Text('a11y.section'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        const _A11ySection(),
+        const SizedBox(height: 16),
         Text('detox.section'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 4),
@@ -1966,6 +1972,94 @@ class _BiometricSectionState extends State<_BiometricSection> {
                 : 'biometric.unsupported'.tr(),
             style: AppTypography.body(
                 size: 12, color: AppColors.inkSoft, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// F20 Accessibility-Suite: TextScale, Reduce-Motion, High-Contrast.
+// ─────────────────────────────────────────────────────────────
+class _A11ySection extends ConsumerWidget {
+  const _A11ySection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final a11y = ref.watch(a11yProvider);
+    final notifier = ref.read(a11yProvider.notifier);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // TextScale
+          Row(
+            children: [
+              const Icon(LucideIcons.type,
+                  size: 16, color: AppColors.bronze),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'a11y.textScale'
+                      .tr(namedArgs: {
+                    'pct': (a11y.textScale * 100).round().toString(),
+                  }),
+                  style: AppTypography.body(
+                    size: 13,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Slider(
+            value: a11y.textScale,
+            min: 0.85,
+            max: 1.3,
+            divisions: 9,
+            activeColor: AppColors.bronze,
+            label: '${(a11y.textScale * 100).round()}%',
+            onChanged: (v) => notifier.setTextScale(v),
+          ),
+          const SizedBox(height: 8),
+          // Reduce Motion
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: a11y.reduceMotion,
+            onChanged: notifier.setReduceMotion,
+            activeColor: AppColors.bronze,
+            title: Text('a11y.reduceMotion'.tr(),
+                style: AppTypography.body(
+                  size: 13,
+                  color: AppColors.ink,
+                  weight: FontWeight.w600,
+                )),
+            subtitle: Text('a11y.reduceMotionHint'.tr(),
+                style: AppTypography.caption()),
+          ),
+          const SizedBox(height: 4),
+          // High Contrast
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: a11y.highContrast,
+            onChanged: notifier.setHighContrast,
+            activeColor: AppColors.bronze,
+            title: Text('a11y.highContrast'.tr(),
+                style: AppTypography.body(
+                  size: 13,
+                  color: AppColors.ink,
+                  weight: FontWeight.w600,
+                )),
+            subtitle: Text('a11y.highContrastHint'.tr(),
+                style: AppTypography.caption()),
           ),
         ],
       ),

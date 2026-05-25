@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
+import 'providers/accessibility_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
@@ -55,7 +56,16 @@ class MensaenaApp extends ConsumerWidget {
       locale: context.locale,
       // UpdateGate + IncomingCallListener wrappen alle Screens.
       // BetterFeedback umrahmt zusätzlich für Shake-to-Report (Sprint 5).
-      builder: (context, navChild) => BetterFeedback(
+      builder: (context, navChild) {
+        // F20 a11y: globale TextScale-Override aus User-Pref.
+        final a11y = ref.watch(a11yProvider);
+        final media = MediaQuery.of(context);
+        final scaled = media.copyWith(
+          textScaler: TextScaler.linear(a11y.textScale),
+        );
+        return MediaQuery(
+          data: scaled,
+          child: BetterFeedback(
         themeMode: themeMode,
         darkTheme: FeedbackThemeData.dark(),
         child: UpdateGate(
@@ -79,7 +89,9 @@ class MensaenaApp extends ConsumerWidget {
             ),
           ),
         ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1823,6 +1823,14 @@
     "days": "{count} gün üst üste",
     "best": "Rekor"
   },
+  "a11y": {
+    "section": "Erişilebilirlik",
+    "textScale": "Metin boyutu: %{pct}",
+    "reduceMotion": "Hareketi azalt",
+    "reduceMotionHint": "Konfeti, nabız parıltıları ve büyük animasyonları kapatır.",
+    "highContrast": "Yüksek kontrast",
+    "highContrastHint": "Daha belirgin kenarlıklar ve canlı metin renkleri."
+  },
   "biometric": {
     "section": "Parmak izi / yüz ile uygulama kilidi",
     "subtitle": "3 dk arka planda kaldıktan sonra Mensaena tekrar açıldığında parmak izi veya yüzünü ister.",

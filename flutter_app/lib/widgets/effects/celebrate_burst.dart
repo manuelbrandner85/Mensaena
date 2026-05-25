@@ -15,8 +15,10 @@ import 'dart:math' as math;
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../../providers/accessibility_provider.dart';
 import '../../services/haptics.dart';
 
 class CelebrateBurst {
@@ -24,13 +26,18 @@ class CelebrateBurst {
 
   /// Feuert ein einmaliges Konfetti-Overlay im aktuellen Navigator.
   /// Default 1.5s. Haptics.success() laeuft parallel.
+  /// Wenn der User Reduce-Motion aktiviert hat: nur Haptics, kein Konfetti.
   static void fire(
     BuildContext context, {
+    WidgetRef? ref,
     Duration duration = const Duration(milliseconds: 1500),
   }) {
     final overlay = Overlay.maybeOf(context);
     if (overlay == null) return;
     unawaited(Haptics.success());
+    if (ref != null && ref.read(a11yProvider).reduceMotion) {
+      return;
+    }
 
     late OverlayEntry entry;
     entry = OverlayEntry(builder: (_) => _CelebrationLayer(

@@ -2042,6 +2042,14 @@
     "days": "{count} days in a row",
     "best": "Best"
   },
+  "a11y": {
+    "section": "Accessibility",
+    "textScale": "Text size: {pct}%",
+    "reduceMotion": "Reduce motion",
+    "reduceMotionHint": "Disables confetti, pulse glows and large animations.",
+    "highContrast": "High contrast",
+    "highContrastHint": "Stronger borders and bolder text colours."
+  },
   "biometric": {
     "section": "App lock with fingerprint / face",
     "subtitle": "After 3 min in the background, Mensaena will ask for your fingerprint or face the next time you open it.",

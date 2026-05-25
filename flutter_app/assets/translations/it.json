@@ -1824,6 +1824,14 @@
     "days": "{count} giorni di fila",
     "best": "Record"
   },
+  "a11y": {
+    "section": "Accessibilità",
+    "textScale": "Dimensione testo: {pct}%",
+    "reduceMotion": "Riduci animazioni",
+    "reduceMotionHint": "Disattiva coriandoli, bagliori pulsanti e grandi animazioni.",
+    "highContrast": "Contrasto elevato",
+    "highContrastHint": "Bordi più marcati e colori del testo più intensi."
+  },
   "biometric": {
     "section": "Blocco app con impronta / volto",
     "subtitle": "Dopo 3 min in background Mensaena richiederà l'impronta o il volto alla prossima apertura.",

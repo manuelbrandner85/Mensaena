@@ -2041,6 +2041,14 @@
     "days": "{count} Tage in Folge",
     "best": "Rekord"
   },
+  "a11y": {
+    "section": "Barrierefreiheit",
+    "textScale": "Textgröße: {pct} %",
+    "reduceMotion": "Bewegung reduzieren",
+    "reduceMotionHint": "Schaltet Konfetti, Pulse-Glows und große Animationen aus.",
+    "highContrast": "Hoher Kontrast",
+    "highContrastHint": "Stärkere Ränder und kräftigere Textfarben."
+  },
   "biometric": {
     "section": "App-Sperre per Fingerabdruck / Gesicht",
     "subtitle": "Nach 3 Min. im Hintergrund verlangt Mensaena beim nächsten Öffnen deinen Fingerabdruck oder dein Gesicht.",
