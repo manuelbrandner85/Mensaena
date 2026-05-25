@@ -149,6 +149,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   /// Builds depth-1 nested comment tree (1:1 to Web PostDetailPage).
   /// Roots (parent_id=null) at top, each followed by its replies indented.
   List<Widget> _buildCommentTree() {
+    final currentUid = SupabaseService.currentUser?.id;
     final roots = _comments
         .where((c) => c['parent_id'] == null)
         .toList();
@@ -161,8 +162,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     }
     final tiles = <Widget>[];
     for (final root in roots) {
+      final isOwn = currentUid != null && root['user_id'] == currentUid;
       tiles.add(_CommentTile(
         root,
+        isOwn: isOwn,
         onReply: () => setState(() {
           _replyToParentId = root['id'] as String?;
           final profile = root['profiles'] as Map<String, dynamic>?;
@@ -170,16 +173,107 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               profile?['name'] ??
               'common.neighbour'.tr()) as String;
         }),
+        onEdit: isOwn ? () => _editComment(root) : null,
+        onDelete: isOwn ? () => _deleteComment(root) : null,
       ));
       final children = replies[root['id'] as String] ?? const [];
       for (final child in children) {
+        final childOwn = currentUid != null && child['user_id'] == currentUid;
         tiles.add(Padding(
           padding: const EdgeInsets.only(left: 32),
-          child: _CommentTile(child),
+          child: _CommentTile(
+            child,
+            isOwn: childOwn,
+            onEdit: childOwn ? () => _editComment(child) : null,
+            onDelete: childOwn ? () => _deleteComment(child) : null,
+          ),
         ));
       }
     }
     return tiles;
+  }
+
+  Future<void> _editComment(Map<String, dynamic> c) async {
+    final id = c['id'] as String?;
+    if (id == null) return;
+    final ctrl = TextEditingController(text: c['content'] as String? ?? '');
+    final newText = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('posts.editCommentTitle'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: 4,
+          style: AppTypography.body(size: 14, color: AppColors.ink),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+            child: Text('common.save'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (newText == null || newText.isEmpty || !mounted) return;
+    final ok = await PostCommentsRepository.edit(
+      commentId: id,
+      newContent: newText,
+    );
+    if (!mounted) return;
+    if (ok) {
+      ref.invalidate(postCommentsProvider(widget.postId));
+      ref.invalidate(postCommentCountProvider(widget.postId));
+      final fresh = await PostCommentsRepository.listFor(widget.postId);
+      if (mounted) setState(() => _comments = fresh);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('common.error'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
+  }
+
+  Future<void> _deleteComment(Map<String, dynamic> c) async {
+    final id = c['id'] as String?;
+    if (id == null) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('posts.deleteCommentTitle'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: Text('posts.deleteCommentConfirm'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.herzrot),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('common.delete'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    final ok = await PostCommentsRepository.deleteComment(id);
+    if (!mounted) return;
+    if (ok) {
+      ref.invalidate(postCommentsProvider(widget.postId));
+      ref.invalidate(postCommentCountProvider(widget.postId));
+      final fresh = await PostCommentsRepository.listFor(widget.postId);
+      if (mounted) setState(() => _comments = fresh);
+    }
   }
 
   Future<void> _addComment() async {
@@ -652,9 +746,71 @@ class _ActionIcon extends StatelessWidget {
 
 // ── Comments ─────────────────────────────────────────────────────────────
 class _CommentTile extends StatelessWidget {
-  const _CommentTile(this.json, {this.onReply});
+  const _CommentTile(
+    this.json, {
+    this.onReply,
+    this.isOwn = false,
+    this.onEdit,
+    this.onDelete,
+  });
   final Map<String, dynamic> json;
   final VoidCallback? onReply;
+  final bool isOwn;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  Future<void> _showActionSheet(BuildContext context) async {
+    if (!isOwn) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.line,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (onEdit != null)
+              ListTile(
+                leading: const Icon(LucideIcons.edit3,
+                    size: 18, color: AppColors.ink),
+                title: Text('common.edit'.tr(),
+                    style:
+                        AppTypography.body(size: 14, color: AppColors.ink)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onEdit!();
+                },
+              ),
+            if (onDelete != null)
+              ListTile(
+                leading: const Icon(LucideIcons.trash2,
+                    size: 18, color: AppColors.herzrot),
+                title: Text('common.delete'.tr(),
+                    style: AppTypography.body(
+                        size: 14, color: AppColors.herzrot)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onDelete!();
+                },
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -666,7 +822,9 @@ class _CommentTile extends StatelessWidget {
     final content = json['content'] as String? ?? '';
     final createdAt = DateTime.tryParse(json['created_at'] as String? ?? '') ??
         DateTime.now();
-    return Container(
+    return GestureDetector(
+      onLongPress: isOwn ? () => _showActionSheet(context) : null,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -768,6 +926,7 @@ class _CommentTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

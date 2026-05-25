@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
@@ -38,6 +40,49 @@ class PostCommentsRepository {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  /// Eigenen Kommentar editieren (Soft via is_edited + updated_at).
+  static Future<bool> edit({
+    required String commentId,
+    required String newContent,
+  }) async {
+    try {
+      await sb.from('post_comments').update({
+        'content': newContent.trim(),
+        'is_edited': true,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', commentId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Soft-Delete (setzt deleted_at), behaelt parent_id-Threads intakt.
+  static Future<bool> deleteComment(String commentId) async {
+    try {
+      await sb.from('post_comments').update({
+        'deleted_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', commentId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Anzahl der nicht-geloeschten Kommentare.
+  static Future<int> count(String postId) async {
+    try {
+      final rows = await sb
+          .from('post_comments')
+          .select('id')
+          .eq('post_id', postId)
+          .filter('deleted_at', 'is', null);
+      return (rows as List).length;
+    } catch (_) {
+      return 0;
     }
   }
 }
@@ -100,6 +145,26 @@ class PostVotesRepository {
         }, onConflict: 'post_id,user_id');
       }
     } catch (_) {}
+  }
+
+  /// Up/Down-Counts separat.
+  static Future<({int up, int down})> counts(String postId) async {
+    try {
+      final rows =
+          await sb.from('post_votes').select('vote').eq('post_id', postId);
+      int up = 0, down = 0;
+      for (final r in (rows as List)) {
+        final v = ((r as Map)['vote'] as num?)?.toInt();
+        if (v == 1) {
+          up++;
+        } else if (v == -1) {
+          down++;
+        }
+      }
+      return (up: up, down: down);
+    } catch (_) {
+      return (up: 0, down: 0);
+    }
   }
 }
 
@@ -192,3 +257,27 @@ class InteractionsCreateRepository {
     }
   }
 }
+
+// ── Riverpod Provider ──────────────────────────────────────
+
+final postCommentsProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, String>(
+  (ref, postId) => PostCommentsRepository.listFor(postId),
+);
+
+final postCommentCountProvider = FutureProvider.family<int, String>(
+  (ref, postId) => PostCommentsRepository.count(postId),
+);
+
+final postMyVoteProvider = FutureProvider.family<int?, String>(
+  (ref, postId) => PostVotesRepository.myVote(postId),
+);
+
+final postVoteCountsProvider =
+    FutureProvider.family<({int up, int down}), String>(
+  (ref, postId) => PostVotesRepository.counts(postId),
+);
+
+final postVoteScoreProvider = FutureProvider.family<int, String>(
+  (ref, postId) => PostVotesRepository.totalScore(postId),
+);

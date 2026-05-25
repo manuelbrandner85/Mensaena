@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,6 +8,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
+import '../../repositories/post_interactions_repository.dart'
+    hide ContentReportsRepository;
 import '../../repositories/posts_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
 import '../../repositories/content_reports_repository.dart';
@@ -17,16 +20,16 @@ import 'image_carousel.dart';
 /// Beschreibung, Standort, Zeit. Tippen → Detail-Seite.
 /// 1:1 Action-Parität zu Web PostCard.tsx: Save / Share / Menü
 /// (Blocken, Melden).
-class PostCard extends StatefulWidget {
+class PostCard extends ConsumerStatefulWidget {
   const PostCard({required this.post, super.key});
 
   final Post post;
 
   @override
-  State<PostCard> createState() => _PostCardState();
+  ConsumerState<PostCard> createState() => _PostCardState();
 }
 
-class _PostCardState extends State<PostCard> {
+class _PostCardState extends ConsumerState<PostCard> {
   bool _saved = false;
   bool _savedKnown = false;
 
@@ -362,8 +365,22 @@ class _PostCardState extends State<PostCard> {
                 ),
                 const SizedBox(width: 14),
                 _PostCardAction(
+                  icon: LucideIcons.arrowUp,
+                  label: ref.watch(postVoteScoreProvider(post.id)).when(
+                        loading: () => '…',
+                        data: (v) => '$v',
+                        error: (_, __) => '?',
+                      ),
+                  color: AppColors.amber,
+                ),
+                const SizedBox(width: 14),
+                _PostCardAction(
                   icon: LucideIcons.messageCircle,
-                  label: '${post.commentCount ?? 0}',
+                  label: ref.watch(postCommentCountProvider(post.id)).when(
+                        loading: () => '…',
+                        data: (v) => '$v',
+                        error: (_, __) => '?',
+                      ),
                   color: AppColors.tealSoft,
                 ),
                 const SizedBox(width: 14),

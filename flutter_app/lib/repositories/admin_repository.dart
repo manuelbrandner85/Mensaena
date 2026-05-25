@@ -23,7 +23,7 @@ class AdminRepository {
       count('posts'),
       count('events'),
       count('board_posts'),
-      count('crisis_situations'),
+      count('crises'),
       count('organizations'),
       count('farm_listings'),
       count('content_reports'),
