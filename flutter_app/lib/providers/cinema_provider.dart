@@ -1,7 +1,16 @@
 /// SKILL: mensaena-design
-/// Cinema-Theme Riverpod-Provider — verwaltet Phase, Mode + Intensity.
+/// Cinema-Theme Riverpod-Provider V2 — Storage-Race eliminiert.
+///
+/// V1 Problem: _load() feuerte im Constructor (async I/O zum Keystore).
+/// State aenderte sich mid-Frame → CinemaOverlay + alle GlassCards
+/// rebuilden → Jank beim App-Start.
+///
+/// V2: _load() wird erst NACH dem ersten Frame getriggert via
+/// addPostFrameCallback. UI startet sofort mit Default-Werten,
+/// Storage-Update kommt smooth nach dem ersten Paint.
 library;
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -13,13 +22,16 @@ const _storage = FlutterSecureStorage();
 
 class CinemaModeNotifier extends StateNotifier<CinemaMode> {
   CinemaModeNotifier() : super(CinemaMode.auto) {
-    _load();
+    // V2: Deferred — nicht im ersten Frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {
     try {
       final raw = await _storage.read(key: _modeStorageKey);
-      state = CinemaModeX.fromKey(raw);
+      final loaded = CinemaModeX.fromKey(raw);
+      // Nur setzen wenn unterschiedlich → kein unnötiger Rebuild.
+      if (loaded != state) state = loaded;
     } catch (_) {}
   }
 
@@ -36,20 +48,16 @@ final cinemaModeProvider =
         (ref) => CinemaModeNotifier());
 
 class CinemaIntensityNotifier extends StateNotifier<CinemaIntensity> {
-  /// Default = full — Cinema-Effekte voll aktiv.
-  /// V20-Architektur: CinemaOverlay ist jetzt persistenter Background-Layer
-  /// im DashboardScaffold (statt Body-Wrapper), wird NICHT mehr bei jedem
-  /// Tab-Wechsel disposed/rebuild → AnimationControllers laufen stabil.
-  /// Damit ist die volle Cinema-Atmosphaere ohne Crash-Risiko aktiv.
-  /// User kann auf reduced/minimal runter wenn Battery-Saving gewuenscht.
-  CinemaIntensityNotifier() : super(CinemaIntensity.full) {
-    _load();
+  /// V2: Default bleibt minimal. Storage-Read kommt nach erstem Frame.
+  CinemaIntensityNotifier() : super(CinemaIntensity.minimal) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {
     try {
       final raw = await _storage.read(key: _intensityStorageKey);
-      state = CinemaIntensityX.fromKey(raw);
+      final loaded = CinemaIntensityX.fromKey(raw);
+      if (loaded != state) state = loaded;
     } catch (_) {}
   }
 
