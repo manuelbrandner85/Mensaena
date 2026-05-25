@@ -354,6 +354,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final count =
         await MessagesRepository.clearDmHistory(widget.conversationId);
     if (!mounted) return;
+    // Supabase Realtime DELETE-Events propagieren bei .stream() nicht
+    // immer zuverlaessig (siehe https://github.com/supabase/supabase/issues).
+    // Provider invalidieren → fresh re-subscribe + initial-query holt
+    // den leeren State garantiert.
+    if (count != null && count > 0) {
+      ref.invalidate(messagesStreamProvider(widget.conversationId));
+      ref.invalidate(peerLastReadProvider(widget.conversationId));
+    }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text(
