@@ -773,7 +773,22 @@
     "emergencyQuickAccess": "Notruf-Nummern öffnen",
     "ctaPrimary": "Schnell-Zugriff",
     "localCountryLabel": "Notruf-Nummern für {country}",
-    "switchLanguageHint": "Sprache wechseln in Einstellungen, um andere Länder zu sehen"
+    "switchLanguageHint": "Sprache wechseln in Einstellungen, um andere Länder zu sehen",
+    "moreCountries": "Mehr Länder",
+    "selectCountry": "Land wählen",
+    "offlineHint": "Offline-Daten — prüfe die Nummern vor Ort.",
+    "countryEmergency": "Notruf",
+    "countryPolice": "Polizei",
+    "countryFire": "Feuerwehr",
+    "countryAmbulance": "Rettungsdienst",
+    "mentalHealth": "Mentale Hilfe",
+    "childHelp": "Kinder- & Jugendtelefon",
+    "womenHelp": "Hilfetelefon Gewalt gegen Frauen",
+    "poisonHelp": "Giftnotruf",
+    "allNumbers": "Alle Notrufnummern",
+    "reportCrisisProminent": "Krise melden",
+    "reportCrisisHint": "Nachbarn mobilisieren, Hilfe koordinieren",
+    "callNow": "Sofort wählen"
   },
   "posts": {
     "title": "Beiträge",

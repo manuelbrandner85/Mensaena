@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/emergency_numbers_config.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/crisis.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -481,148 +483,590 @@ class _CriticalBannerState extends State<_CriticalBanner>
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// SOS-Sheet (1:1 SOSModal.tsx)
+// SOS-Sheet — Dynamisch, country-aware, max 2 Taps zum Anruf.
 // ─────────────────────────────────────────────────────────────────────────
-class _SosSheet extends StatelessWidget {
+class _SosSheet extends StatefulWidget {
   const _SosSheet({required this.onReport});
   final VoidCallback onReport;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.line,
-                borderRadius: BorderRadius.circular(2),
+  State<_SosSheet> createState() => _SosSheetState();
+}
+
+class _SosSheetState extends State<_SosSheet> {
+  String? _selectedCountry;
+
+  String get _country {
+    return _selectedCountry ?? LocaleCountryService.forContext(context);
+  }
+
+  Future<void> _dial(String number) async {
+    Haptics.heavyImpact();
+    final sanitized = number.replaceAll(RegExp(r'[\s\-()]'), '');
+    await launchUrl(Uri.parse('tel:$sanitized'));
+  }
+
+  void _openCountryPicker() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (_, scrollController) => Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text('crisis.selectCountry'.tr(),
+                        style: AppTypography.display(
+                            size: 18, color: AppColors.ink)),
+                  ),
+                  IconButton(
+                    icon: const Icon(LucideIcons.x, color: AppColors.mute),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
               ),
             ),
+            const Divider(height: 1, color: AppColors.line),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: kCountryEmergencyConfigs.length,
+                itemBuilder: (_, i) {
+                  final cfg = kCountryEmergencyConfigs[i];
+                  final active = cfg.code == _country;
+                  return ListTile(
+                    leading: Text(cfg.flag,
+                        style: const TextStyle(fontSize: 24)),
+                    title: Text(cfg.label,
+                        style: AppTypography.body(
+                          size: 14,
+                          color: AppColors.ink,
+                          weight: active
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        )),
+                    subtitle: Text('${cfg.code} · ${cfg.emergency}',
+                        style: AppTypography.caption()),
+                    trailing: active
+                        ? const Icon(LucideIcons.check,
+                            color: AppColors.amber)
+                        : null,
+                    onTap: () {
+                      setState(() => _selectedCountry = cfg.code);
+                      Navigator.pop(ctx);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final country = _country;
+    final config = getCountryConfig(country) ??
+        getCountryConfig('DE')!; // Hard fallback DE
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      minChildSize: 0.5,
+      expand: false,
+      builder: (_, scrollController) {
+        return SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Drag-Handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('crisis.sosTitle'.tr(),
+                  style: AppTypography.display(
+                      size: 22, color: AppColors.ink)),
+              const SizedBox(height: 12),
+              // Country-Chip-Row: DACH + Mehr Länder
+              _CountryChipRow(
+                selected: country,
+                onSelect: (c) => setState(() => _selectedCountry = c),
+                onMore: _openCountryPicker,
+              ),
+              const SizedBox(height: 16),
+              // ── Großer Notruf-Button ───────────────────────────
+              _BigEmergencyButton(
+                number: config.emergency,
+                onTap: () => _dial(config.emergency),
+              ),
+              const SizedBox(height: 10),
+              // ── Polizei ───────────────────────────────────────
+              _MediumActionButton(
+                icon: LucideIcons.shield,
+                iconColor: AppColors.teal,
+                number: config.police,
+                label: 'crisis.countryPolice'.tr(),
+                onTap: () => _dial(config.police),
+              ),
+              const SizedBox(height: 10),
+              // ── Krise melden (prominent) ──────────────────────
+              _ReportCrisisButton(onTap: widget.onReport),
+              const SizedBox(height: 10),
+              // ── Mental Health ─────────────────────────────────
+              if (config.crisisHotline != null)
+                _SmallSosRow(
+                  icon: LucideIcons.heart,
+                  iconBg: AppColors.tealSoft,
+                  number: config.crisisHotline!,
+                  title: 'crisis.mentalHealth'.tr(),
+                  subtitle: config.crisisHotlineLabel,
+                  onTap: () => _dial(config.crisisHotline!),
+                  height: 56,
+                ),
+              if (config.childHotline != null)
+                _SmallSosRow(
+                  icon: LucideIcons.baby,
+                  iconBg: AppColors.amber,
+                  number: config.childHotline!,
+                  title: 'crisis.childHelp'.tr(),
+                  onTap: () => _dial(config.childHotline!),
+                  height: 48,
+                ),
+              if (config.womenHotline != null)
+                _SmallSosRow(
+                  icon: LucideIcons.users,
+                  iconBg: AppColors.herzrotWarm,
+                  number: config.womenHotline!,
+                  title: 'crisis.womenHelp'.tr(),
+                  onTap: () => _dial(config.womenHotline!),
+                  height: 48,
+                ),
+              if (config.poisonHotline != null)
+                _SmallSosRow(
+                  icon: LucideIcons.flaskConical,
+                  iconBg: AppColors.leben,
+                  number: config.poisonHotline!,
+                  title: 'crisis.poisonHelp'.tr(),
+                  onTap: () => _dial(config.poisonHotline!),
+                  height: 48,
+                ),
+              const SizedBox(height: 14),
+              Center(
+                child: TextButton.icon(
+                  icon: const Icon(LucideIcons.list,
+                      size: 14, color: AppColors.amber),
+                  label: Text('crisis.allNumbers'.tr(),
+                      style: AppTypography.label(
+                          size: 11, color: AppColors.amber)),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push('/dashboard/crisis/resources');
+                  },
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 14),
-          Text('crisis.sosTitle'.tr(),
-              style: AppTypography.display(
-                  size: 22, color: AppColors.ink)),
-          const SizedBox(height: 14),
-          _SosRow(
-            icon: LucideIcons.phone,
-            iconBg: AppColors.herzrot,
-            title: 'crisis.call112'.tr(),
-            subtitle: 'crisis.call112Sub'.tr(),
-            onTap: () => launchUrl(Uri.parse('tel:112')),
-            big: true,
-          ),
-          _SosRow(
-            icon: LucideIcons.shieldCheck,
-            iconBg: AppColors.teal,
-            title: 'crisis.police110'.tr(),
-            subtitle: 'crisis.police110Sub'.tr(),
-            onTap: () => launchUrl(Uri.parse('tel:110')),
-          ),
-          _SosRow(
-            icon: LucideIcons.alertTriangle,
-            iconBg: AppColors.amber,
-            title: 'crisis.sosReportTitle'.tr(),
-            subtitle: 'crisis.sosReportSub'.tr(),
-            onTap: onReport,
-          ),
-          _SosRow(
-            icon: LucideIcons.heart,
-            iconBg: AppColors.tealSoft,
-            title: 'crisis.telSeelsorge'.tr(),
-            subtitle: 'crisis.telSeelsorgeSub'.tr(),
-            onTap: () => launchUrl(Uri.parse('tel:08001110111')),
-          ),
-          _SosRow(
-            icon: LucideIcons.stethoscope,
-            iconBg: AppColors.amber,
-            title: 'crisis.doctorOnCall'.tr(),
-            subtitle: 'crisis.doctorOnCallSub'.tr(),
-            onTap: () => launchUrl(Uri.parse('tel:116117')),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'crisis.always112Hint'.tr(),
-            textAlign: TextAlign.center,
-            style: AppTypography.caption(),
-          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Country-Chip-Row (DACH + "Mehr Länder") ─────────────────────────────
+class _CountryChipRow extends StatelessWidget {
+  const _CountryChipRow({
+    required this.selected,
+    required this.onSelect,
+    required this.onMore,
+  });
+
+  final String selected;
+  final ValueChanged<String> onSelect;
+  final VoidCallback onMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 38,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        children: [
+          for (final cfg in kDachCountries) ...[
+            _CountryChip(
+              flag: cfg.flag,
+              label: cfg.code,
+              active: cfg.code == selected,
+              onTap: () => onSelect(cfg.code),
+            ),
+            const SizedBox(width: 6),
+          ],
+          // "Mehr Länder" mit aktivem Land falls nicht DACH
+          () {
+            final isDach =
+                selected == 'DE' || selected == 'AT' || selected == 'CH';
+            final cfg = getCountryConfig(selected);
+            if (!isDach && cfg != null) {
+              return _CountryChip(
+                flag: cfg.flag,
+                label: cfg.code,
+                active: true,
+                onTap: onMore,
+              );
+            }
+            return _CountryChip(
+              flag: '🌍',
+              label: 'crisis.moreCountries'.tr(),
+              active: false,
+              onTap: onMore,
+            );
+          }(),
         ],
       ),
     );
   }
 }
 
-class _SosRow extends StatelessWidget {
-  const _SosRow({
-    required this.icon,
-    required this.iconBg,
-    required this.title,
-    required this.subtitle,
+class _CountryChip extends StatelessWidget {
+  const _CountryChip({
+    required this.flag,
+    required this.label,
+    required this.active,
     required this.onTap,
-    this.big = false,
   });
 
-  final IconData icon;
-  final Color iconBg;
-  final String title;
-  final String subtitle;
+  final String flag;
+  final String label;
+  final bool active;
   final VoidCallback onTap;
-  final bool big;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(999),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.elevated,
+          color: active
+              ? AppColors.amber.withValues(alpha: 0.20)
+              : AppColors.surface,
           border: Border.all(
-            color: big
-                ? AppColors.herzrot.withValues(alpha: 0.5)
+            color: active
+                ? AppColors.amber.withValues(alpha: 0.7)
                 : AppColors.line,
-            width: big ? 1.5 : 1,
+            width: active ? 1.4 : 1,
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 6),
+            Text(label,
+                style: AppTypography.label(
+                  size: 11,
+                  color: active ? AppColors.amber : AppColors.mute,
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Big Emergency-Button (88dp, gradient herzrot) ───────────────────────
+class _BigEmergencyButton extends StatelessWidget {
+  const _BigEmergencyButton({required this.number, required this.onTap});
+
+  final String number;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: double.infinity,
+        height: 88,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppColors.herzrot, AppColors.herzrotWarm],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.herzrot.withValues(alpha: 0.45),
+              blurRadius: 14,
+              spreadRadius: -2,
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Container(
-              width: big ? 50 : 38,
-              height: big ? 50 : 38,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: iconBg,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon,
-                  color: AppColors.voidColor, size: big ? 22 : 16),
-            ),
-            const SizedBox(width: 12),
+            const Icon(LucideIcons.phone, color: Colors.white, size: 32),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: AppTypography.body(
-                        size: big ? 16 : 14,
-                        color: AppColors.ink,
-                        weight: FontWeight.w700,
+                  Text(number,
+                      style: AppTypography.mono(
+                        size: 36,
+                        color: Colors.white,
+                        weight: FontWeight.w800,
                       )),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: AppTypography.caption()),
+                  Text('crisis.callNow'.tr(),
+                      style: AppTypography.label(
+                          size: 10, color: Colors.white)),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Medium Button (64dp): Polizei ───────────────────────────────────────
+class _MediumActionButton extends StatelessWidget {
+  const _MediumActionButton({
+    required this.icon,
+    required this.iconColor,
+    required this.number,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String number;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.line),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.18),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(number,
+                      style: AppTypography.mono(
+                        size: 18,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700,
+                      )),
+                  Text(label, style: AppTypography.caption()),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.phone, color: AppColors.mute, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── "Krise melden"-Button (prominent, amber-tint) ───────────────────────
+class _ReportCrisisButton extends StatelessWidget {
+  const _ReportCrisisButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: AppColors.amber.withValues(alpha: 0.16),
+          border: Border.all(
+            color: AppColors.amber.withValues(alpha: 0.6),
+            width: 1.4,
+          ),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: AppColors.amber,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(LucideIcons.alertTriangle,
+                  color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('crisis.reportCrisisProminent'.tr(),
+                      style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700,
+                      )),
+                  Text('crisis.reportCrisisHint'.tr(),
+                      style: AppTypography.caption()),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight,
+                color: AppColors.amber, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Small Row (Mental/Children/Women/Poison) ────────────────────────────
+class _SmallSosRow extends StatelessWidget {
+  const _SmallSosRow({
+    required this.icon,
+    required this.iconBg,
+    required this.number,
+    required this.title,
+    required this.onTap,
+    required this.height,
+    this.subtitle,
+  });
+
+  final IconData icon;
+  final Color iconBg;
+  final String number;
+  final String title;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: iconBg.withValues(alpha: 0.22),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: iconBg, size: 16),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.ink,
+                          weight: FontWeight.w600,
+                        )),
+                    if (subtitle != null)
+                      Text(subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.caption()),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(number,
+                  style: AppTypography.mono(
+                    size: 12,
+                    color: AppColors.amber,
+                    weight: FontWeight.w700,
+                  )),
+              const SizedBox(width: 4),
+              const Icon(LucideIcons.phone,
+                  size: 14, color: AppColors.mute),
+            ],
+          ),
         ),
       ),
     );
@@ -893,12 +1337,17 @@ class _PulsingSosFabState extends State<_PulsingSosFab>
   }
 }
 
-// ── SOS Top-Banner — prominenter 112-Notruf + Safe-Check-In ───────────
+// ── SOS Top-Banner — prominenter Country-Notruf + Safe-Check-In ──────
 class _SosTopBanner extends StatelessWidget {
   const _SosTopBanner();
 
   @override
   Widget build(BuildContext context) {
+    // Dynamische Country-spezifische Emergency-Nummer.
+    final country = LocaleCountryService.forContext(context);
+    final config = getCountryConfig(country);
+    final emergency = config?.emergency ?? '112';
+    final flag = config?.flag ?? '🌍';
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -923,14 +1372,21 @@ class _SosTopBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('crisis.lifeThreat'.tr(),
-                    style: AppTypography.body(
-                        size: 11,
-                        color: Colors.white,
-                        weight: FontWeight.w600,
-                        letterSpacing: 0.5)),
+                Row(
+                  children: [
+                    Text(flag, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 5),
+                    Text('crisis.lifeThreat'.tr(),
+                        style: AppTypography.body(
+                            size: 11,
+                            color: Colors.white,
+                            weight: FontWeight.w600,
+                            letterSpacing: 0.5)),
+                  ],
+                ),
                 const SizedBox(height: 2),
-                Text('crisis.call112Now'.tr(),
+                Text(
+                    'crisis.call112Now'.tr().replaceAll('112', emergency),
                     style: AppTypography.display(
                         size: 18, color: Colors.white, height: 1.1)),
                 const SizedBox(height: 6),
@@ -983,9 +1439,9 @@ class _SosTopBanner extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // 112-Call
+          // Country-spezifischer Emergency-Call
           InkWell(
-            onTap: () => launchUrl(Uri.parse('tel:112')),
+            onTap: () => launchUrl(Uri.parse('tel:$emergency')),
             borderRadius: BorderRadius.circular(999),
             child: Container(
               width: 52,
@@ -1002,8 +1458,8 @@ class _SosTopBanner extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Text('112',
-                  style: TextStyle(
+              child: Text(emergency,
+                  style: const TextStyle(
                     color: AppColors.herzrot,
                     fontSize: 16,
                     fontWeight: FontWeight.w900,

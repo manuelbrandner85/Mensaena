@@ -773,7 +773,22 @@
     "emergencyQuickAccess": "Acil numaraları aç",
     "ctaPrimary": "Hızlı erişim",
     "localCountryLabel": "{country} için acil numaralar",
-    "switchLanguageHint": "Diğer ülkeleri görmek için ayarlarda dili değiştirin"
+    "switchLanguageHint": "Diğer ülkeleri görmek için ayarlarda dili değiştirin",
+    "moreCountries": "Daha fazla ülke",
+    "selectCountry": "Ülke seç",
+    "offlineHint": "Çevrimdışı veri — numaraları yerinde doğrula.",
+    "countryEmergency": "Acil çağrı",
+    "countryPolice": "Polis",
+    "countryFire": "İtfaiye",
+    "countryAmbulance": "Ambulans",
+    "mentalHealth": "Ruh sağlığı desteği",
+    "childHelp": "Çocuk ve gençlik hattı",
+    "womenHelp": "Kadına yönelik şiddet hattı",
+    "poisonHelp": "Zehir danışma",
+    "allNumbers": "Tüm acil numaraları",
+    "reportCrisisProminent": "Krizi bildir",
+    "reportCrisisHint": "Komşuları seferber et, yardımı koordine et",
+    "callNow": "Hemen ara"
   },
   "posts": {
     "title": "Gönderiler",

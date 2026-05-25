@@ -773,7 +773,22 @@
     "emergencyQuickAccess": "Open emergency numbers",
     "ctaPrimary": "Quick access",
     "localCountryLabel": "Emergency numbers for {country}",
-    "switchLanguageHint": "Switch language in settings to see other countries"
+    "switchLanguageHint": "Switch language in settings to see other countries",
+    "moreCountries": "More countries",
+    "selectCountry": "Choose country",
+    "offlineHint": "Offline data — verify numbers locally.",
+    "countryEmergency": "Emergency",
+    "countryPolice": "Police",
+    "countryFire": "Fire brigade",
+    "countryAmbulance": "Ambulance",
+    "mentalHealth": "Mental health support",
+    "childHelp": "Child & youth helpline",
+    "womenHelp": "Women’s helpline",
+    "poisonHelp": "Poison control",
+    "allNumbers": "All emergency numbers",
+    "reportCrisisProminent": "Report crisis",
+    "reportCrisisHint": "Rally neighbors, coordinate help",
+    "callNow": "Call now"
   },
   "posts": {
     "title": "Posts",

@@ -773,7 +773,22 @@
     "emergencyQuickAccess": "Экстренные номера",
     "ctaPrimary": "Быстрый доступ",
     "localCountryLabel": "Экстренные номера для {country}",
-    "switchLanguageHint": "Сменить язык в настройках, чтобы увидеть другие страны"
+    "switchLanguageHint": "Сменить язык в настройках, чтобы увидеть другие страны",
+    "moreCountries": "Другие страны",
+    "selectCountry": "Выберите страну",
+    "offlineHint": "Офлайн-данные — проверьте номера на месте.",
+    "countryEmergency": "Экстренная служба",
+    "countryPolice": "Полиция",
+    "countryFire": "Пожарная служба",
+    "countryAmbulance": "Скорая помощь",
+    "mentalHealth": "Психологическая помощь",
+    "childHelp": "Телефон доверия для детей",
+    "womenHelp": "Помощь женщинам",
+    "poisonHelp": "Токсикологический центр",
+    "allNumbers": "Все экстренные номера",
+    "reportCrisisProminent": "Сообщить о кризисе",
+    "reportCrisisHint": "Мобилизуйте соседей, координируйте помощь",
+    "callNow": "Позвонить сейчас"
   },
   "posts": {
     "title": "Объявления",
