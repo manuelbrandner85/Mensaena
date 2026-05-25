@@ -443,6 +443,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
             decoration: InputDecoration(
               labelText: 'create.title'.tr(),
             ),
+            onChanged: (_) => setState(() {/* triggert Submit-Button-State */}),
           ),
           const SizedBox(height: 6),
           TextField(
@@ -863,10 +864,11 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   }
 
   Widget _submitButton() {
+    final canSubmit = !_submitting && _titleCtrl.text.trim().isNotEmpty;
     return SizedBox(
       height: 60,
       child: FilledButton.icon(
-        onPressed: _submitting ? null : _submit,
+        onPressed: canSubmit ? _submit : null,
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.amber,
           foregroundColor: AppColors.voidColor,

@@ -361,7 +361,14 @@
     "searchMessages": "Mesajları ara…",
     "tooltipCancel": "İptal",
     "tooltipSend": "Gönder",
-    "tooltipRecordVoice": "Sesli mesaj kaydet"
+    "tooltipRecordVoice": "Sesli mesaj kaydet",
+    "writeFirstMessage": "İlk mesajı yaz.",
+    "messageDeleted": "Mesaj silindi",
+    "recordingTooShort": "Kayıt çok kısa.",
+    "pinToggle": "Sabitle / Kaldır",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "noSearchResults": "\"{q}\" için sonuç yok."
   },
   "languages": {
     "de": "Almanca",
@@ -677,7 +684,8 @@
       "cleanupConfirmBody": "Bu işlem süresi geçmiş gönderileri, oturumları ve önbellek girdilerini siler. Geri alınamaz.",
       "cleanupConfirmAction": "Başlat"
     },
-    "cannotActOnSelf": "Bu işlemi kendinize uygulayamazsınız."
+    "cannotActOnSelf": "Bu işlemi kendinize uygulayamazsınız.",
+    "deleteEntryConfirm": "\"{table}\" tablosundaki bu giriş kalıcı olarak silinsin mi?"
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",
@@ -1179,7 +1187,8 @@
       "volunteer": "Gönüllülük",
       "kids": "Çocuklar",
       "other": "Diğer"
-    }
+    },
+    "attendeesCount": "{count} katılıyor"
   },
   "challenges": {
     "create": "Meydan okuma oluştur",

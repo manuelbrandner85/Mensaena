@@ -499,7 +499,9 @@ class _EventTile extends StatelessWidget {
                       const SizedBox(width: 6),
                       if (event.attendeeCount > 0)
                         Text(
-                          '${event.attendeeCount} Zusagen',
+                          'events.attendeesCount'.tr(namedArgs: {
+                            'count': '${event.attendeeCount}'
+                          }),
                           style: AppTypography.caption(),
                         ),
                     ],

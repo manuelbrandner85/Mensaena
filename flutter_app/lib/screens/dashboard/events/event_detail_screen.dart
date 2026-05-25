@@ -279,12 +279,16 @@ class _EventDetailBody extends ConsumerWidget {
                 event: event,
                 rsvp: rsvp,
                 accent: accent,
-                onOpenSheet: () => _openAttendanceSheet(
-                  context,
-                  ref,
-                  eventId: event.id,
-                  currentRsvp: rsvp,
-                ),
+                // Capacity-Full + noch keine RSVP → Button gesperrt, sonst
+                // koennte User tippen + Server reject ohne UI-Feedback.
+                onOpenSheet: (isFull && rsvp == null)
+                    ? null
+                    : () => _openAttendanceSheet(
+                          context,
+                          ref,
+                          eventId: event.id,
+                          currentRsvp: rsvp,
+                        ),
               ),
             ),
           ],
@@ -1052,7 +1056,7 @@ class _AttendanceBlock extends StatelessWidget {
   final EventItem event;
   final String? rsvp;
   final Color accent;
-  final VoidCallback onOpenSheet;
+  final VoidCallback? onOpenSheet;
 
   @override
   Widget build(BuildContext context) {

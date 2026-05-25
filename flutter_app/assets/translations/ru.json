@@ -361,7 +361,14 @@
     "searchMessages": "Поиск сообщений…",
     "tooltipCancel": "Отмена",
     "tooltipSend": "Отправить",
-    "tooltipRecordVoice": "Записать голосовое сообщение"
+    "tooltipRecordVoice": "Записать голосовое сообщение",
+    "writeFirstMessage": "Напишите первое сообщение.",
+    "messageDeleted": "Сообщение удалено",
+    "recordingTooShort": "Запись слишком короткая.",
+    "pinToggle": "Закрепить / Открепить",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "noSearchResults": "Нет результатов для «{q}»."
   },
   "languages": {
     "de": "Немецкий",
@@ -677,7 +684,8 @@
       "cleanupConfirmBody": "Это действие удалит просроченные посты, сессии и записи кеша. Отменить нельзя.",
       "cleanupConfirmAction": "Запустить"
     },
-    "cannotActOnSelf": "Вы не можете выполнить это действие над собой."
+    "cannotActOnSelf": "Вы не можете выполнить это действие над собой.",
+    "deleteEntryConfirm": "Удалить эту запись из \"{table}\" безвозвратно?"
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",
@@ -1179,7 +1187,8 @@
       "volunteer": "Волонтёрство",
       "kids": "Дети",
       "other": "Прочее"
-    }
+    },
+    "attendeesCount": "{count} участников"
   },
   "challenges": {
     "create": "Создать челлендж",

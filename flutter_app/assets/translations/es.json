@@ -362,7 +362,14 @@
     "searchMessages": "Buscar mensajes…",
     "tooltipCancel": "Cancelar",
     "tooltipSend": "Enviar",
-    "tooltipRecordVoice": "Grabar mensaje de voz"
+    "tooltipRecordVoice": "Grabar mensaje de voz",
+    "writeFirstMessage": "Escribe el primer mensaje.",
+    "messageDeleted": "Mensaje eliminado",
+    "recordingTooShort": "Grabación demasiado corta.",
+    "pinToggle": "Fijar / Desfijar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "noSearchResults": "Sin resultados para «{q}»."
   },
   "languages": {
     "de": "Alemán",
@@ -678,7 +685,8 @@
       "cleanupConfirmBody": "Esta acción elimina publicaciones, sesiones y entradas de caché caducadas. No se puede deshacer.",
       "cleanupConfirmAction": "Iniciar"
     },
-    "cannotActOnSelf": "No puedes realizar esta acción sobre ti mismo."
+    "cannotActOnSelf": "No puedes realizar esta acción sobre ti mismo.",
+    "deleteEntryConfirm": "¿Eliminar permanentemente esta entrada de \"{table}\"?"
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",
@@ -1180,7 +1188,8 @@
       "volunteer": "Voluntariado",
       "kids": "Niños",
       "other": "Otros"
-    }
+    },
+    "attendeesCount": "{count} asistentes"
   },
   "challenges": {
     "create": "Crear reto",

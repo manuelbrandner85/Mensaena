@@ -376,7 +376,8 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
             style: AppTypography.body(
                 size: 16, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
-          'Soll dieser Eintrag aus "${widget.tableName}" unwiderruflich gelöscht werden?',
+          'admin.deleteEntryConfirm'
+              .tr(namedArgs: {'table': widget.tableName}),
           style: AppTypography.body(size: 13, color: AppColors.inkSoft),
         ),
         actions: [

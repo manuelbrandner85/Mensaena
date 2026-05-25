@@ -158,7 +158,7 @@ class ChatMessageBubble extends ConsumerWidget {
                       ? const EdgeInsets.fromLTRB(8, 4, 8, 4)
                       : EdgeInsets.zero,
                   child: Text(
-                    'Nachricht gelöscht',
+                    'chat.messageDeleted'.tr(),
                     style: AppTypography.body(
                         size: 13,
                         color: AppColors.mute,

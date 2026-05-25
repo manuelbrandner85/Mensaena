@@ -191,7 +191,7 @@ class _ChatVoiceRecorderButtonState extends State<ChatVoiceRecorderButton> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
-          'Aufnahme zu kurz.',
+          'chat.recordingTooShort'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.mute),
         ),
       ));

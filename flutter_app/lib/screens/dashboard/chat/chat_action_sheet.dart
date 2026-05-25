@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -59,7 +60,7 @@ class ChatActionSheet {
               if (onReply != null)
                 _ActionTile(
                   icon: LucideIcons.cornerUpLeft,
-                  label: 'Antworten',
+                  label: 'chat.reply'.tr(),
                   onTap: () {
                     Navigator.pop(sheetCtx);
                     onReply();
@@ -68,7 +69,7 @@ class ChatActionSheet {
               if (onPin != null)
                 _ActionTile(
                   icon: LucideIcons.pin,
-                  label: 'Anpinnen / Lösen',
+                  label: 'chat.pinToggle'.tr(),
                   onTap: () {
                     Navigator.pop(sheetCtx);
                     onPin();
@@ -77,7 +78,7 @@ class ChatActionSheet {
               if (onEdit != null)
                 _ActionTile(
                   icon: LucideIcons.edit2,
-                  label: 'Bearbeiten',
+                  label: 'chat.edit'.tr(),
                   onTap: () {
                     Navigator.pop(sheetCtx);
                     onEdit();
@@ -86,7 +87,7 @@ class ChatActionSheet {
               if (onDelete != null)
                 _ActionTile(
                   icon: LucideIcons.trash2,
-                  label: 'Löschen',
+                  label: 'chat.delete'.tr(),
                   color: AppColors.herzrot,
                   onTap: () {
                     Navigator.pop(sheetCtx);

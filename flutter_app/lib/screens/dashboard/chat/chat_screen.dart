@@ -302,10 +302,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
+  bool _sending = false;
+
   Future<void> _send() async {
+    // Lock: Spam-Tap auf Send → nur einer in flight.
+    if (_sending) return;
     final text = _ctrl.text.trim();
     if (text.isEmpty) return;
     Haptics.tap();
+    setState(() => _sending = true);
     final reply = _replyTo;
     final ok = await MessagesRepository.send(
       conversationId: widget.conversationId,
@@ -313,9 +318,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       replyToId: reply?['id'] as String?,
     );
     if (!mounted) return;
+    setState(() => _sending = false);
     if (ok) {
-      // Erst nach Success clearen — bei Fail behaelt der User den Text
-      // und kann nochmal senden.
       _ctrl.clear();
       setState(() => _replyTo = null);
     } else {
@@ -465,8 +469,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     return Center(
                       child: Text(
                         q.isEmpty
-                            ? 'Schreib die erste Nachricht.'
-                            : 'Keine Treffer für „$_searchQuery".',
+                            ? 'chat.writeFirstMessage'.tr()
+                            : 'chat.noSearchResults'.tr(namedArgs: {'q': _searchQuery}),
                         style: AppTypography.caption(),
                       ),
                     );

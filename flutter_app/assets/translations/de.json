@@ -361,7 +361,14 @@
     "searchMessages": "Nachrichten durchsuchen…",
     "tooltipCancel": "Abbrechen",
     "tooltipSend": "Senden",
-    "tooltipRecordVoice": "Sprachnachricht aufnehmen"
+    "tooltipRecordVoice": "Sprachnachricht aufnehmen",
+    "writeFirstMessage": "Schreib die erste Nachricht.",
+    "messageDeleted": "Nachricht gelöscht",
+    "recordingTooShort": "Aufnahme zu kurz.",
+    "pinToggle": "Anpinnen / Lösen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "noSearchResults": "Keine Treffer für „{q}\"."
   },
   "languages": {
     "de": "Deutsch",
@@ -677,7 +684,8 @@
       "cleanupConfirmBody": "Diese Aktion entfernt abgelaufene Posts, Sessions und Cache-Einträge. Sie kann nicht rückgängig gemacht werden.",
       "cleanupConfirmAction": "Starten"
     },
-    "cannotActOnSelf": "Du kannst diese Aktion nicht auf dich selbst anwenden."
+    "cannotActOnSelf": "Du kannst diese Aktion nicht auf dich selbst anwenden.",
+    "deleteEntryConfirm": "Soll dieser Eintrag aus \"{table}\" unwiderruflich gelöscht werden?"
   },
   "create": {
     "locationUnavailable": "Standort nicht verfügbar.",
@@ -1179,7 +1187,8 @@
       "volunteer": "Ehrenamt",
       "kids": "Kinder",
       "other": "Sonstiges"
-    }
+    },
+    "attendeesCount": "{count} Zusagen"
   },
   "challenges": {
     "create": "Challenge erstellen",

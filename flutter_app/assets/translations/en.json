@@ -362,7 +362,14 @@
     "searchMessages": "Search messages…",
     "tooltipCancel": "Cancel",
     "tooltipSend": "Send",
-    "tooltipRecordVoice": "Record voice message"
+    "tooltipRecordVoice": "Record voice message",
+    "writeFirstMessage": "Write the first message.",
+    "messageDeleted": "Message deleted",
+    "recordingTooShort": "Recording too short.",
+    "pinToggle": "Pin / Unpin",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noSearchResults": "No results for \"{q}\"."
   },
   "languages": {
     "de": "German",
@@ -678,7 +685,8 @@
       "cleanupConfirmBody": "This action removes expired posts, sessions, and cache entries. It cannot be undone.",
       "cleanupConfirmAction": "Start"
     },
-    "cannotActOnSelf": "You cannot perform this action on yourself."
+    "cannotActOnSelf": "You cannot perform this action on yourself.",
+    "deleteEntryConfirm": "Permanently delete this entry from \"{table}\"?"
   },
   "create": {
     "locationUnavailable": "Location unavailable.",
@@ -1180,7 +1188,8 @@
       "volunteer": "Volunteer",
       "kids": "Kids",
       "other": "Other"
-    }
+    },
+    "attendeesCount": "{count} attending"
   },
   "challenges": {
     "create": "Create challenge",
