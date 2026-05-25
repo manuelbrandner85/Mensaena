@@ -145,6 +145,12 @@ class _DashboardHomeScreenState
           builder: (context, snap) {
             final loading = snap.connectionState != ConnectionState.done;
             final data = snap.data;
+            // UX: bei Cold-Start (data noch null + loading) zeigen wir
+            // ein Skeleton statt weisser Flaeche. Sobald data da ist,
+            // rendert die echte Liste.
+            if (loading && data == null) {
+              return const ListSkeleton(count: 5);
+            }
             final children = _buildChildren(cfg, data, loading);
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),

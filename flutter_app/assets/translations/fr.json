@@ -36,7 +36,8 @@
     "feedbackThanks": "Commentaires envoyés — merci !",
     "phone": "Téléphone",
     "description": "Description",
-    "share": "Partager"
+    "share": "Partager",
+    "errorGeneric": "Une erreur s'est produite."
   },
   "nav": {
     "home": "Accueil",
@@ -983,7 +984,8 @@
     "blockUserTitle": "Bloquer l'utilisateur ?",
     "blockUserConfirm": "Vous ne verrez plus les publications et messages de cet utilisateur.",
     "blockButton": "Bloquer",
-    "chooseReason": "Choisis un motif :"
+    "chooseReason": "Choisis un motif :",
+    "openMenu": "Ouvrir le menu"
   },
   "marketplace": {
     "listing": "Annonce",

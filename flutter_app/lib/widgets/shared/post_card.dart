@@ -281,10 +281,13 @@ class _PostCardState extends ConsumerState<PostCard> {
                   ),
                 ),
                 IconButton(
+                  // A11y: Tooltip + groesseres Hit-Target (44x44 Material-Spec)
+                  // Tooltip wird vom Screen-Reader als Label vorgelesen.
+                  tooltip: 'posts.openMenu'.tr(),
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
-                      minWidth: 28, minHeight: 28),
+                      minWidth: 44, minHeight: 44),
                   onPressed: _openMenu,
                   icon: const Icon(LucideIcons.moreVertical,
                       size: 16, color: AppColors.mute),

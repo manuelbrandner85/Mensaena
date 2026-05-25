@@ -36,7 +36,8 @@
     "feedbackThanks": "Feedback inviato — grazie!",
     "phone": "Telefono",
     "description": "Descrizione",
-    "share": "Condividi"
+    "share": "Condividi",
+    "errorGeneric": "Qualcosa è andato storto."
   },
   "nav": {
     "home": "Home",
@@ -983,7 +984,8 @@
     "blockUserTitle": "Bloccare l'utente?",
     "blockUserConfirm": "Non vedrai più post e messaggi di questo utente.",
     "blockButton": "Blocca",
-    "chooseReason": "Scegli un motivo:"
+    "chooseReason": "Scegli un motivo:",
+    "openMenu": "Apri menu"
   },
   "marketplace": {
     "listing": "Annuncio",

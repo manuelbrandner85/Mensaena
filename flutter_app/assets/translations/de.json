@@ -36,7 +36,8 @@
     "feedbackThanks": "Feedback gesendet — Danke!",
     "phone": "Telefon",
     "description": "Beschreibung",
-    "share": "Teilen"
+    "share": "Teilen",
+    "errorGeneric": "Etwas ist schiefgelaufen."
   },
   "nav": {
     "home": "Home",
@@ -982,7 +983,8 @@
     "blockUserTitle": "Nutzer:in blockieren?",
     "blockUserConfirm": "Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.",
     "blockButton": "Blockieren",
-    "chooseReason": "Wähle einen Grund:"
+    "chooseReason": "Wähle einen Grund:",
+    "openMenu": "Menü öffnen"
   },
   "marketplace": {
     "listing": "Inserat",

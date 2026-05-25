@@ -36,7 +36,8 @@
     "feedbackThanks": "Geri bildirim gönderildi — teşekkürler!",
     "phone": "Telefon",
     "description": "Açıklama",
-    "share": "Paylaş"
+    "share": "Paylaş",
+    "errorGeneric": "Bir şeyler ters gitti."
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -982,7 +983,8 @@
     "blockUserTitle": "Kullanıcıyı engelle?",
     "blockUserConfirm": "Bu kullanıcının gönderilerini ve mesajlarını artık görmeyeceksin.",
     "blockButton": "Engelle",
-    "chooseReason": "Bir sebep seç:"
+    "chooseReason": "Bir sebep seç:",
+    "openMenu": "Menüyü aç"
   },
   "marketplace": {
     "listing": "İlan",
