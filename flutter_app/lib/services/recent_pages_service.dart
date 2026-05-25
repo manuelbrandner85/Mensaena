@@ -63,6 +63,12 @@ class RecentPagesService {
         RouteMeta(title: 'jobs.portalsTitle', icon: LucideIcons.briefcase),
     '/dashboard/jobs-search':
         RouteMeta(title: 'jobs.liveSearchTitle', icon: LucideIcons.search),
+    '/dashboard/identify':
+        RouteMeta(title: 'identify.title', icon: LucideIcons.camera),
+    '/dashboard/harvest-wild':
+        RouteMeta(title: 'wildPicks.title', icon: LucideIcons.apple),
+    '/dashboard/charge-stations':
+        RouteMeta(title: 'charge.title', icon: LucideIcons.zap),
     '/dashboard/housing':
         RouteMeta(title: 'nav.housing', icon: LucideIcons.home),
     '/dashboard/mobility':

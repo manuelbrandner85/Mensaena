@@ -302,6 +302,10 @@
     "profileNotFound": "Profile not found.",
     "nameLabel": "Name",
     "appVersionLabel": "APP VERSION",
+    "checkForUpdate": "Check for update",
+    "checkingForUpdate": "Checking for updates …",
+    "patchReady": "Patch #{n} ready — please restart the app",
+    "noUpdate": "You're on the latest version",
     "errorPrefix": "Error: {error}",
     "profileVisibility": "Profile visibility",
     "locationLabel": "Location",
@@ -1419,6 +1423,42 @@
     "yearsAgo": "{n} years ago",
     "error": "Wikipedia could not be loaded.",
     "empty": "No events for today."
+  },
+  "identify": {
+    "section": "Identify",
+    "title": "Identify a plant or animal",
+    "subtitle": "Take or upload a photo — iNaturalist AI recognises the species.",
+    "takePhoto": "Take photo",
+    "fromGallery": "From gallery",
+    "noPhoto": "No photo yet",
+    "results": "IDENTIFICATION",
+    "noResults": "Couldn't identify. Try a different photo.",
+    "disclaimer": "AI-based (iNaturalist). For edible plants, never rely on AI alone."
+  },
+  "wildPicks": {
+    "section": "Foraging spots",
+    "title": "Wild fruits & sharing boxes",
+    "subtitle": "Fruit trees, giveaway boxes and book-cases nearby — data from OpenStreetMap.",
+    "radius": "Radius: {km} km",
+    "none": "No spots found",
+    "noneHint": "Try a bigger radius or another map position.",
+    "source": "Source: OpenStreetMap (tags produce, give_box, public_bookcase).",
+    "kind": {
+      "fruit": "Fruit tree",
+      "giveBox": "Giveaway box",
+      "bookcase": "Book-case"
+    }
+  },
+  "charge": {
+    "section": "E-mobility",
+    "title": "EV charging stations",
+    "subtitle": "Public chargers nearby — data from OpenStreetMap.",
+    "radius": "Radius: {km} km",
+    "none": "No stations found",
+    "noneHint": "Increase the radius or move the map.",
+    "unnamed": "Charging station",
+    "fee": "Paid",
+    "free": "Free"
   },
   "civil": {
     "navTitle": "Alerts",

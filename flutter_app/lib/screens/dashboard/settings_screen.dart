@@ -21,6 +21,7 @@ import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../services/shorebird_patch_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -201,24 +202,78 @@ class _AppVersionInfo extends ConsumerWidget {
           error: (_, __) => '',
           data: (n) => n != null ? ' · Patch #$n' : '',
         );
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.elevated,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            children: [
-              const Icon(LucideIcons.info, size: 16, color: AppColors.mute),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'v${info.version} (Build ${info.buildNumber})$patchStr',
-                  style: AppTypography.mono(size: 13, color: AppColors.ink),
-                ),
+        final hasPatch = patchAsync.value != null;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.elevated,
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
-          ),
+              child: Row(
+                children: [
+                  Icon(
+                    hasPatch
+                        ? LucideIcons.checkCircle2
+                        : LucideIcons.info,
+                    size: 16,
+                    color: hasPatch ? AppColors.leben : AppColors.mute,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'v${info.version} (Build ${info.buildNumber})$patchStr',
+                      style:
+                          AppTypography.mono(size: 13, color: AppColors.ink),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Manuell "Nach Update suchen" — triggert die gesamte
+            // Pipeline (Shorebird-Check + Download + Stream-Event) und
+            // gibt sofortiges Feedback via SnackBar.
+            OutlinedButton.icon(
+              icon: const Icon(LucideIcons.refreshCw, size: 14),
+              label: Text('settings.checkForUpdate'.tr()),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.bronze,
+                side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: () async {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: AppColors.surface,
+                  duration: const Duration(seconds: 2),
+                  content: Text('settings.checkingForUpdate'.tr(),
+                      style: AppTypography.body(
+                          size: 13, color: AppColors.ink)),
+                ));
+                await ShorebirdPatchService.instance.checkAndDownloadPatch();
+                ref.invalidate(currentPatchNumberProvider);
+                if (!context.mounted) return;
+                // Status-Check: ist nach dem Versuch ein neuer Patch da?
+                final ready = await ShorebirdPatchService.instance
+                    .checkPatchReady();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: AppColors.surface,
+                  duration: const Duration(seconds: 4),
+                  content: Text(
+                    ready.patchReady
+                        ? 'settings.patchReady'.tr(namedArgs: {
+                            'n': '${ready.nextPatchNumber ?? "?"}'
+                          })
+                        : 'settings.noUpdate'.tr(),
+                    style: AppTypography.body(size: 13, color: AppColors.ink),
+                  ),
+                ));
+              },
+            ),
+          ],
         );
       },
     );

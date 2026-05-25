@@ -74,8 +74,11 @@ import '../../screens/dashboard/settings_screen.dart';
 import '../../screens/legal/legal_page_screen.dart';
 import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
+import '../../screens/dashboard/harvest/wild_picks_screen.dart';
 import '../../screens/dashboard/jobs/job_portals_screen.dart';
 import '../../screens/dashboard/jobs/live_jobs_screen.dart';
+import '../../screens/dashboard/mobility/charge_stations_screen.dart';
+import '../../screens/dashboard/species/identify_species_screen.dart';
 import '../../screens/dashboard/warnungen/air_quality_screen.dart';
 import '../../screens/dashboard/warnungen/civil_protection_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
@@ -939,6 +942,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const LiveJobsScreen(),
+        ),
+      ),
+      // Foto-Bestimmung via iNaturalist (Animals + Wissen)
+      GoRoute(
+        path: '/dashboard/identify',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const IdentifySpeciesScreen(),
+        ),
+      ),
+      // Wildfruchte + Verschenk-Schraenke (OSM-Overpass)
+      GoRoute(
+        path: '/dashboard/harvest-wild',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const WildPicksScreen(),
+        ),
+      ),
+      // E-Auto-Ladestationen (OSM-Overpass)
+      GoRoute(
+        path: '/dashboard/charge-stations',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ChargeStationsScreen(),
         ),
       ),
       GoRoute(

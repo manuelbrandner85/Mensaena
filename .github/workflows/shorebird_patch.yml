@@ -225,12 +225,18 @@ jobs:
               changelog: { entries: [{ type: "improvement", title: $title, description: $body }] }
             }')
 
+          # PostgREST INSERT — bei Conflict NICHT ueberschreiben.
+          # Sonst wuerde der Patch-Insert eine bereits existierende APK-Row
+          # (von flutter.yml) ueberschreiben: is_patch=true und
+          # mandatory=false → User sehen weder Pflichtupdate noch das richtige
+          # apk_url. Patches haben keine eigene Row noetig — die Changelog-
+          # Info aus dem Commit wird auf die APK-Row gemappt (selbe Version).
           HTTP_CODE=$(curl -sS -o /tmp/ar_resp.json -w "%{http_code}" \
             -X POST "${SUPABASE_URL}/rest/v1/app_releases?on_conflict=version" \
             -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
             -H "Content-Type: application/json" \
-            -H "Prefer: resolution=merge-duplicates,return=representation" \
+            -H "Prefer: resolution=ignore-duplicates,return=representation" \
             -d "$PAYLOAD")
 
           if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then

@@ -562,13 +562,20 @@ jobs:
               changelog: { entries: [{ type: "feature", title: $title, description: $body }] }
             }')
 
-          # PostgREST upsert via on_conflict-Param (Pendant zu psql ON CONFLICT)
+          # PostgREST INSERT — bei Conflict NICHT ueberschreiben.
+          # Vorher: resolution=merge-duplicates → JEDER Push (auch ein Patch-
+          # only Commit ohne pubspec-Bump) hat die existierende Row mit dem
+          # aktuellen Stand uebersrieben. Bei Commits ohne [mandatory]-Keyword
+          # wurde dadurch mandatory=true → false zurueckgesetzt → User sahen
+          # kein Pflicht-Update mehr.
+          # Jetzt: ignore-duplicates → erste INSERT-Row pro Version gewinnt.
+          # Wenn man eine Row nachtraeglich aendern will, manuell via SQL.
           HTTP_CODE=$(curl -sS -o /tmp/ar_resp.json -w "%{http_code}" \
             -X POST "${SUPABASE_URL}/rest/v1/app_releases?on_conflict=version" \
             -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
             -H "Content-Type: application/json" \
-            -H "Prefer: resolution=merge-duplicates,return=representation" \
+            -H "Prefer: resolution=ignore-duplicates,return=representation" \
             -d "$PAYLOAD")
 
           if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then

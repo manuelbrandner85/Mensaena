@@ -15,6 +15,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/theme/cinema_theme.dart';
+import '../repositories/profiles_repository.dart';
+import '../services/sunrise_sunset_service.dart';
 
 const _modeStorageKey = 'cinema_mode_v1';
 const _intensityStorageKey = 'cinema_intensity_v1';
@@ -76,14 +78,61 @@ final cinemaIntensityProvider =
     StateNotifierProvider<CinemaIntensityNotifier, CinemaIntensity>(
         (ref) => CinemaIntensityNotifier());
 
-/// Aktuelle Phase basierend auf Uhrzeit. Refresht alle 60s.
+/// Aktuelle Phase basierend auf echter Sonne (wenn GPS verfuegbar) oder
+/// Uhrzeit (Fallback). Refresht alle 60s.
+///
+/// Sonnen-Modus: dawn = civil_twilight_begin..sunrise,
+/// morning = sunrise..solar_noon-2h,
+/// day = solar_noon-2h..sunset-2h,
+/// dusk = sunset-2h..civil_twilight_end,
+/// evening = civil_twilight_end..civil_twilight_begin+8h,
+/// night = sonst.
 final cinemaPhaseProvider = StreamProvider<CinemaPhase>((ref) async* {
-  yield CinemaTheme.resolveForTime(DateTime.now());
+  Future<CinemaPhase> resolve() async {
+    try {
+      final p = await ProfilesRepository.getMine();
+      final lat = p?.latitude ?? p?.homeLat;
+      final lng = p?.longitude ?? p?.homeLng;
+      if (lat != null && lng != null) {
+        final sun = await SunriseSunsetService.forLocation(lat: lat, lng: lng);
+        if (sun != null) {
+          return _phaseFromSun(DateTime.now(), sun);
+        }
+      }
+    } catch (_) {/* fall back to time */}
+    return CinemaTheme.resolveForTime(DateTime.now());
+  }
+
+  yield await resolve();
   final timer = Stream<void>.periodic(const Duration(seconds: 60));
   await for (final _ in timer) {
-    yield CinemaTheme.resolveForTime(DateTime.now());
+    yield await resolve();
   }
 });
+
+CinemaPhase _phaseFromSun(DateTime now, SunTimes sun) {
+  final n = now;
+  if (n.isAfter(sun.civilTwilightBegin) && n.isBefore(sun.sunrise)) {
+    return CinemaPhase.dawn;
+  }
+  if (n.isAfter(sun.sunrise) &&
+      n.isBefore(sun.solarNoon.subtract(const Duration(hours: 2)))) {
+    return CinemaPhase.morning;
+  }
+  if (n.isAfter(sun.solarNoon.subtract(const Duration(hours: 2))) &&
+      n.isBefore(sun.sunset.subtract(const Duration(hours: 2)))) {
+    return CinemaPhase.day;
+  }
+  if (n.isAfter(sun.sunset.subtract(const Duration(hours: 2))) &&
+      n.isBefore(sun.civilTwilightEnd)) {
+    return CinemaPhase.dusk;
+  }
+  if (n.isAfter(sun.civilTwilightEnd) &&
+      n.isBefore(sun.civilTwilightEnd.add(const Duration(hours: 3)))) {
+    return CinemaPhase.evening;
+  }
+  return CinemaPhase.night;
+}
 
 /// Effektive Phase (User-Override gewinnt über Auto).
 /// Liefert null wenn Mode = off.

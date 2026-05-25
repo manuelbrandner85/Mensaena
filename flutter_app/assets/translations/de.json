@@ -302,6 +302,10 @@
     "profileNotFound": "Profil nicht gefunden.",
     "nameLabel": "Name",
     "appVersionLabel": "APP-VERSION",
+    "checkForUpdate": "Nach Update suchen",
+    "checkingForUpdate": "Suche nach Updates …",
+    "patchReady": "Patch #{n} bereit — bitte App neustarten",
+    "noUpdate": "Du bist auf dem neuesten Stand",
     "errorPrefix": "Fehler: {error}",
     "profileVisibility": "Profil-Sichtbarkeit",
     "locationLabel": "Standort",
@@ -1418,6 +1422,42 @@
     "yearsAgo": "vor {n} Jahren",
     "error": "Wikipedia konnte nicht geladen werden.",
     "empty": "Keine Ereignisse für heute."
+  },
+  "identify": {
+    "section": "Bestimmung",
+    "title": "Tier oder Pflanze bestimmen",
+    "subtitle": "Foto aufnehmen oder hochladen — KI von iNaturalist erkennt die Art.",
+    "takePhoto": "Foto aufnehmen",
+    "fromGallery": "Aus Galerie",
+    "noPhoto": "Noch kein Foto",
+    "results": "BESTIMMUNG",
+    "noResults": "Keine Bestimmung möglich. Probiere ein anderes Foto.",
+    "disclaimer": "Bestimmungen sind KI-basiert (iNaturalist). Bei essbaren Pflanzen niemals nur auf die KI verlassen."
+  },
+  "wildPicks": {
+    "section": "Sammelplätze",
+    "title": "Wildfrüchte & Verschenk-Schränke",
+    "subtitle": "Obstbäume, Sharing-Boxen und Bücherschränke in der Nähe — Daten aus OpenStreetMap.",
+    "radius": "Umkreis: {km} km",
+    "none": "Keine Sammelpunkte gefunden",
+    "noneHint": "Versuche einen größeren Umkreis oder eine andere Karten-Position.",
+    "source": "Quelle: OpenStreetMap (Tags produce, give_box, public_bookcase).",
+    "kind": {
+      "fruit": "Obstbaum",
+      "giveBox": "Verschenk-Schrank",
+      "bookcase": "Bücherschrank"
+    }
+  },
+  "charge": {
+    "section": "E-Mobilität",
+    "title": "E-Auto-Ladestationen",
+    "subtitle": "Öffentliche Ladepunkte in der Nähe — Daten aus OpenStreetMap.",
+    "radius": "Umkreis: {km} km",
+    "none": "Keine Ladestationen gefunden",
+    "noneHint": "Vergrößere den Suchradius oder verschiebe die Karte.",
+    "unnamed": "Ladestation",
+    "fee": "Kostenpflichtig",
+    "free": "Kostenlos"
   },
   "civil": {
     "navTitle": "Warnungen",
