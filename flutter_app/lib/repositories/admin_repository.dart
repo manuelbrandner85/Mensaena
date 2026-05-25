@@ -18,7 +18,67 @@ class AdminRepository {
   }
 
   static Future<AdminStats> stats() async {
-    final results = await Future.wait([
+    // Phase 1: try aggregated RPC for performance.
+    try {
+      final res = await sb.rpc<dynamic>('get_admin_dashboard_stats');
+      if (res is Map) {
+        final m = Map<String, dynamic>.from(res);
+        int i(String k) {
+          final v = m[k];
+          if (v is int) return v;
+          if (v is num) return v.toInt();
+          if (v is String) return int.tryParse(v) ?? 0;
+          return 0;
+        }
+
+        double d(String k) {
+          final v = m[k];
+          if (v is double) return v;
+          if (v is num) return v.toDouble();
+          if (v is String) return double.tryParse(v) ?? 0.0;
+          return 0.0;
+        }
+
+        return AdminStats(
+          users: i('users'),
+          posts: i('posts'),
+          events: i('events'),
+          boardPosts: i('board_posts'),
+          crises: i('crises'),
+          organizations: i('organizations'),
+          farms: i('farms'),
+          reports: i('reports'),
+          activeUsers30d: i('active_users_30d'),
+          newUsers7d: i('new_users_7d'),
+          newPosts7d: i('new_posts_7d'),
+          activePosts: i('active_posts'),
+          totalMessages: i('total_messages'),
+          totalConversations: i('total_conversations'),
+          upcomingEvents: i('upcoming_events'),
+          activeBoardPosts: i('active_board_posts'),
+          activeCrises: i('active_crises'),
+          verifiedOrganizations: i('verified_organizations'),
+          verifiedFarms: i('verified_farms'),
+          totalTrustRatings: i('total_trust_ratings'),
+          avgTrustScore: d('avg_trust_score'),
+          totalGroups: i('total_groups'),
+          activeGroups: i('active_groups'),
+          totalChallenges: i('total_challenges'),
+          activeChallenges: i('active_challenges'),
+          totalTimebankHours: d('total_timebank_hours'),
+          totalTimebankEntries: i('total_timebank_entries'),
+          totalNotifications: i('total_notifications'),
+          unreadNotifications: i('unread_notifications'),
+          totalSavedPosts: i('total_saved_posts'),
+          openReports: i('open_reports'),
+        );
+      }
+    } catch (_) {
+      // fall-through to count-based fallback
+    }
+
+    // Phase 2: defensive count-based fallback.
+    final base = await Future.wait([
       count('profiles'),
       count('posts'),
       count('events'),
@@ -27,16 +87,175 @@ class AdminRepository {
       count('organizations'),
       count('farm_listings'),
       count('content_reports'),
+      count('messages'),
+      count('conversations'),
+      count('groups'),
+      count('challenges'),
+      count('timebank_entries'),
+      count('notifications'),
+      count('saved_posts'),
+      count('trust_ratings'),
     ]);
+
+    int verifiedOrganizations = 0;
+    try {
+      final rows =
+          await sb.from('organizations').select('id').eq('is_verified', true);
+      verifiedOrganizations = (rows as List).length;
+    } catch (_) {}
+
+    int verifiedFarms = 0;
+    try {
+      final rows =
+          await sb.from('farm_listings').select('id').eq('is_verified', true);
+      verifiedFarms = (rows as List).length;
+    } catch (_) {}
+
+    int upcomingEvents = 0;
+    try {
+      final now = DateTime.now().toUtc().toIso8601String();
+      final rows =
+          await sb.from('events').select('id').gte('start_date', now);
+      upcomingEvents = (rows as List).length;
+    } catch (_) {}
+
+    int activeBoardPosts = 0;
+    try {
+      final rows =
+          await sb.from('board_posts').select('id').eq('status', 'active');
+      activeBoardPosts = (rows as List).length;
+    } catch (_) {}
+
+    int activeCrises = 0;
+    try {
+      final rows = await sb.from('crises').select('id').eq('status', 'active');
+      activeCrises = (rows as List).length;
+    } catch (_) {}
+
+    int activePosts = 0;
+    try {
+      final rows = await sb.from('posts').select('id').eq('status', 'active');
+      activePosts = (rows as List).length;
+    } catch (_) {}
+
+    int activeChallenges = 0;
+    try {
+      final rows =
+          await sb.from('challenges').select('id').eq('status', 'active');
+      activeChallenges = (rows as List).length;
+    } catch (_) {}
+
+    int activeGroups = 0;
+    try {
+      final rows = await sb.from('groups').select('id').eq('is_active', true);
+      activeGroups = (rows as List).length;
+    } catch (_) {}
+
+    int openReports = 0;
+    try {
+      final rows =
+          await sb.from('content_reports').select('id').eq('status', 'pending');
+      openReports = (rows as List).length;
+    } catch (_) {}
+
+    int newUsers7d = 0;
+    try {
+      final since = DateTime.now()
+          .subtract(const Duration(days: 7))
+          .toUtc()
+          .toIso8601String();
+      final rows = await sb.from('profiles').select('id').gte('created_at', since);
+      newUsers7d = (rows as List).length;
+    } catch (_) {}
+
+    int newPosts7d = 0;
+    try {
+      final since = DateTime.now()
+          .subtract(const Duration(days: 7))
+          .toUtc()
+          .toIso8601String();
+      final rows = await sb.from('posts').select('id').gte('created_at', since);
+      newPosts7d = (rows as List).length;
+    } catch (_) {}
+
+    int activeUsers30d = 0;
+    try {
+      final since = DateTime.now()
+          .subtract(const Duration(days: 30))
+          .toUtc()
+          .toIso8601String();
+      final rows =
+          await sb.from('profiles').select('id').gte('last_seen_at', since);
+      activeUsers30d = (rows as List).length;
+    } catch (_) {}
+
+    int unreadNotifications = 0;
+    try {
+      final rows =
+          await sb.from('notifications').select('id').eq('is_read', false);
+      unreadNotifications = (rows as List).length;
+    } catch (_) {}
+
+    double avgTrustScore = 0.0;
+    try {
+      final rows = await sb.from('trust_ratings').select('score').limit(2000);
+      final list = (rows as List).whereType<Map<String, dynamic>>().toList();
+      if (list.isNotEmpty) {
+        double sum = 0;
+        int n = 0;
+        for (final r in list) {
+          final v = r['score'];
+          if (v is num) {
+            sum += v.toDouble();
+            n++;
+          }
+        }
+        if (n > 0) avgTrustScore = sum / n;
+      }
+    } catch (_) {}
+
+    double totalTimebankHours = 0.0;
+    try {
+      final rows = await sb.from('timebank_entries').select('hours').limit(2000);
+      final list = (rows as List).whereType<Map<String, dynamic>>().toList();
+      for (final r in list) {
+        final v = r['hours'];
+        if (v is num) totalTimebankHours += v.toDouble();
+      }
+    } catch (_) {}
+
     return AdminStats(
-      users: results[0],
-      posts: results[1],
-      events: results[2],
-      boardPosts: results[3],
-      crises: results[4],
-      organizations: results[5],
-      farms: results[6],
-      reports: results[7],
+      users: base[0],
+      posts: base[1],
+      events: base[2],
+      boardPosts: base[3],
+      crises: base[4],
+      organizations: base[5],
+      farms: base[6],
+      reports: base[7],
+      totalMessages: base[8],
+      totalConversations: base[9],
+      totalGroups: base[10],
+      totalChallenges: base[11],
+      totalTimebankEntries: base[12],
+      totalNotifications: base[13],
+      totalSavedPosts: base[14],
+      totalTrustRatings: base[15],
+      activeUsers30d: activeUsers30d,
+      newUsers7d: newUsers7d,
+      newPosts7d: newPosts7d,
+      activePosts: activePosts,
+      upcomingEvents: upcomingEvents,
+      activeBoardPosts: activeBoardPosts,
+      activeCrises: activeCrises,
+      verifiedOrganizations: verifiedOrganizations,
+      verifiedFarms: verifiedFarms,
+      avgTrustScore: avgTrustScore,
+      activeGroups: activeGroups,
+      activeChallenges: activeChallenges,
+      totalTimebankHours: totalTimebankHours,
+      unreadNotifications: unreadNotifications,
+      openReports: openReports,
     );
   }
 
@@ -129,6 +348,219 @@ class AdminRepository {
       return recent('profiles', orderBy: 'created_at');
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Web parity: audit log, reports, cleanup, user moderation, chat moderation.
+  // ---------------------------------------------------------------------------
+
+  /// Most recent audit-log entries with actor profile (best-effort).
+  static Future<List<Map<String, dynamic>>> loadAuditLogs({int limit = 50}) async {
+    try {
+      final rows = await sb
+          .from('audit_logs')
+          .select('*, profiles!audit_logs_actor_id_fkey(name)')
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Count of currently pending content reports.
+  static Future<int> openReportsCount() async {
+    try {
+      final rows = await sb
+          .from('content_reports')
+          .select('id')
+          .eq('status', 'pending');
+      return (rows as List).length;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  /// Trigger the scheduled cleanup RPC (returns summary map if available).
+  static Future<Map<String, dynamic>?> runScheduledCleanup() async {
+    try {
+      final result = await sb.rpc<dynamic>('run_scheduled_cleanup');
+      if (result is Map<String, dynamic>) return result;
+      if (result is Map) return Map<String, dynamic>.from(result);
+      return {'ok': true};
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Hard-delete a user via admin RPC (cascades auth + profile).
+  static Future<bool> deleteUser(String userId) async {
+    try {
+      await sb.rpc<dynamic>('admin_delete_user', params: {'p_user_id': userId});
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Change a user's role via RPC; falls back to direct profile update.
+  static Future<bool> changeUserRole(String userId, String newRole) async {
+    try {
+      await sb.rpc<dynamic>('admin_change_user_role', params: {
+        'p_user_id': userId,
+        'p_new_role': newRole,
+      });
+      return true;
+    } catch (_) {
+      // Fallback: direct update via updateField
+      return updateField(
+          table: 'profiles', id: userId, column: 'role', value: newRole);
+    }
+  }
+
+  /// Ban a user for [days] (default 30) with a German-language reason.
+  static Future<bool> banUser(String userId, String reason,
+      {int days = 30}) async {
+    try {
+      final until = DateTime.now()
+          .add(Duration(days: days))
+          .toUtc()
+          .toIso8601String();
+      await sb.from('profiles').update({
+        'is_banned': true,
+        'banned_until': until,
+        'ban_reason': reason,
+      }).eq('id', userId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Lift a user ban.
+  static Future<bool> unbanUser(String userId) async {
+    try {
+      await sb.from('profiles').update({
+        'is_banned': false,
+        'banned_until': null,
+        'ban_reason': null,
+      }).eq('id', userId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Find the global community chat room.
+  static Future<Map<String, dynamic>?> getCommunityRoom() async {
+    try {
+      final row = await sb
+          .from('conversations')
+          .select('id, is_locked, locked_reason')
+          .eq('type', 'system')
+          .eq('title', 'Community Chat')
+          .maybeSingle();
+      if (row != null) return row;
+    } catch (_) {}
+    try {
+      final row = await sb
+          .from('conversations')
+          .select('id, is_locked, locked_reason')
+          .eq('type', 'system')
+          .or('title.eq.Allgemein,title.ilike.%community%')
+          .maybeSingle();
+      return row;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Most recent chat messages for a conversation (newest first).
+  static Future<List<Map<String, dynamic>>> getChatMessages(
+    String conversationId, {
+    int limit = 100,
+  }) async {
+    try {
+      final rows = await sb
+          .from('messages')
+          .select(
+              'id, content, created_at, deleted_at, sender_id, conversation_id, profiles(name, email)')
+          .eq('conversation_id', conversationId)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Lock or unlock a conversation (sets locked_by/at/reason accordingly).
+  static Future<bool> toggleChatLock(
+    String conversationId,
+    bool lock, {
+    String? reason,
+  }) async {
+    try {
+      final uid = sb.auth.currentUser?.id;
+      await sb.from('conversations').update({
+        'is_locked': lock,
+        'locked_by': lock ? uid : null,
+        'locked_at': lock ? DateTime.now().toUtc().toIso8601String() : null,
+        'locked_reason': lock ? reason : null,
+      }).eq('id', conversationId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Remove a message: prefer hard-delete RPC, fall back to soft-delete column.
+  static Future<bool> softDeleteMessage(String messageId) async {
+    try {
+      await sb.rpc<dynamic>('admin_hard_delete_message',
+          params: {'p_message_id': messageId});
+      return true;
+    } catch (_) {
+      try {
+        await sb.from('messages').update({
+          'deleted_at': DateTime.now().toUtc().toIso8601String(),
+        }).eq('id', messageId);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
+
+  /// List users banned from the chat (joined to their profiles).
+  static Future<List<Map<String, dynamic>>> getChatBannedUsers() async {
+    try {
+      final rows = await sb
+          .from('chat_banned_users')
+          .select('user_id, profiles(id, name, email)');
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Toggle a chat-ban for [userId]; pass current state to avoid extra read.
+  static Future<bool> toggleChatBan(String userId, bool currentlyBanned) async {
+    try {
+      if (currentlyBanned) {
+        await sb.from('chat_banned_users').delete().eq('user_id', userId);
+      } else {
+        final uid = sb.auth.currentUser?.id;
+        await sb.from('chat_banned_users').insert({
+          'user_id': userId,
+          'banned_by': uid,
+          'reason': 'Admin-Entscheidung',
+        });
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 class AdminStats {
@@ -141,6 +573,29 @@ class AdminStats {
     required this.organizations,
     required this.farms,
     required this.reports,
+    this.activeUsers30d = 0,
+    this.newUsers7d = 0,
+    this.newPosts7d = 0,
+    this.activePosts = 0,
+    this.totalMessages = 0,
+    this.totalConversations = 0,
+    this.upcomingEvents = 0,
+    this.activeBoardPosts = 0,
+    this.activeCrises = 0,
+    this.verifiedOrganizations = 0,
+    this.verifiedFarms = 0,
+    this.totalTrustRatings = 0,
+    this.avgTrustScore = 0.0,
+    this.totalGroups = 0,
+    this.activeGroups = 0,
+    this.totalChallenges = 0,
+    this.activeChallenges = 0,
+    this.totalTimebankHours = 0.0,
+    this.totalTimebankEntries = 0,
+    this.totalNotifications = 0,
+    this.unreadNotifications = 0,
+    this.totalSavedPosts = 0,
+    this.openReports = 0,
   });
 
   final int users;
@@ -151,8 +606,39 @@ class AdminStats {
   final int organizations;
   final int farms;
   final int reports;
+  final int activeUsers30d;
+  final int newUsers7d;
+  final int newPosts7d;
+  final int activePosts;
+  final int totalMessages;
+  final int totalConversations;
+  final int upcomingEvents;
+  final int activeBoardPosts;
+  final int activeCrises;
+  final int verifiedOrganizations;
+  final int verifiedFarms;
+  final int totalTrustRatings;
+  final double avgTrustScore;
+  final int totalGroups;
+  final int activeGroups;
+  final int totalChallenges;
+  final int activeChallenges;
+  final double totalTimebankHours;
+  final int totalTimebankEntries;
+  final int totalNotifications;
+  final int unreadNotifications;
+  final int totalSavedPosts;
+  final int openReports;
 }
 
 final adminStatsProvider = FutureProvider<AdminStats>((ref) async {
   return AdminRepository.stats();
 });
+
+final adminAuditLogsProvider = FutureProvider<List<Map<String, dynamic>>>(
+  (ref) => AdminRepository.loadAuditLogs(),
+);
+
+final adminOpenReportsProvider = FutureProvider<int>(
+  (ref) => AdminRepository.openReportsCount(),
+);
