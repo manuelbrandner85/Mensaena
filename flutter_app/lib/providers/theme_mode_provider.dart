@@ -18,20 +18,23 @@ const _storage = FlutterSecureStorage();
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   ThemeModeNotifier() : super(ThemeMode.system) {
-    _load();
+    // Deferred — analog cinema_provider V2. Storage-Read im Constructor
+    // (sync I/O) verursachte Mid-Frame-State-Changes beim App-Start.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {
     try {
       final raw = await _storage.read(key: _storageKey);
-      state = _fromKey(raw);
-    } catch (_) {
-      // Default state ok bei Storage-Fehler (Web/Tests ohne Plugin).
-    }
+      final loaded = _fromKey(raw);
+      if (!mounted) return;
+      if (loaded != state) state = loaded;
+    } catch (_) {/* default state ok */}
   }
 
   /// Setzt den Theme-Mode und persistiert.
   Future<void> set(ThemeMode mode) async {
+    if (!mounted) return;
     state = mode;
     try {
       await _storage.write(key: _storageKey, value: _toKey(mode));
@@ -40,6 +43,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 
   /// Toggle dark <-> light (System wird in dark gewechselt).
   Future<void> toggle() async {
+    if (!mounted) return;
     switch (state) {
       case ThemeMode.dark:
         await set(ThemeMode.light);

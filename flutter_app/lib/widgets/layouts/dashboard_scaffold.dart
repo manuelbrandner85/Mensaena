@@ -50,27 +50,21 @@ import '../shared/mensaena_bot_button.dart';
 /// BottomNav: BackdropFilter sigma von 3 auf 2 reduziert (kaum sichtbar,
 /// spart ~25% GPU pro Frame).
 
-// ──────────────────────────────────────────────────────────────
-// Dedizierter Provider: nur die ID der neuesten ungelesenen Notification.
-// ──────────────────────────────────────────────────────────────
-final _newestUnreadIdProvider = Provider<String?>((ref) {
+// Konsolidierter Provider: liefert die neueste ungelesene Notification
+// als Record. Vorher 3 separate Provider die jeweils notificationsStreamProvider
+// beobachteten → 3× Rebuild-Cascade pro Stream-Event. Jetzt 1×.
+typedef _NewestUnread = ({String? id, String title, String? link});
+
+final _newestUnreadProvider = Provider<_NewestUnread>((ref) {
   final list = ref.watch(notificationsStreamProvider).asData?.value;
-  if (list == null || list.isEmpty) return null;
+  if (list == null || list.isEmpty) {
+    return (id: null, title: '', link: null);
+  }
   final newest = list.first;
-  if (newest.read || newest.readAt != null) return null;
-  return newest.id;
-});
-
-final _newestUnreadTitleProvider = Provider<String>((ref) {
-  final list = ref.watch(notificationsStreamProvider).asData?.value;
-  if (list == null || list.isEmpty) return '';
-  return list.first.title;
-});
-
-final _newestUnreadLinkProvider = Provider<String?>((ref) {
-  final list = ref.watch(notificationsStreamProvider).asData?.value;
-  if (list == null || list.isEmpty) return null;
-  return list.first.link;
+  if (newest.read || newest.readAt != null) {
+    return (id: null, title: newest.title, link: newest.link);
+  }
+  return (id: newest.id, title: newest.title, link: newest.link);
 });
 
 class DashboardScaffold extends ConsumerWidget {
@@ -101,13 +95,14 @@ class DashboardScaffold extends ConsumerWidget {
       activeRoute = currentRoute;
     }
 
-    // V20: Listener auf leichtgewichtigen Provider statt ganzen Stream.
-    ref.listen(_newestUnreadIdProvider, (prev, next) {
-      if (next == null || next == prev) return;
+    // Listener auf konsolidierten Record-Provider. Snackbar nur wenn die
+    // ungelesene ID sich aendert (nicht bei jedem read-status-toggle).
+    ref.listen(_newestUnreadProvider, (prev, next) {
+      if (next.id == null || next.id == prev?.id) return;
       HapticFeedback.mediumImpact();
       SystemSound.play(SystemSoundType.click);
-      final title = ref.read(_newestUnreadTitleProvider);
-      final link = ref.read(_newestUnreadLinkProvider);
+      final title = next.title;
+      final link = next.link;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.raised,
         duration: const Duration(seconds: 4),

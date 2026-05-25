@@ -44,28 +44,28 @@ class CinemaOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final phase = ref.watch(effectiveCinemaPhaseProvider);
-    if (phase == null) {
-      return child;
-    }
     final baseIntensity = ref.watch(cinemaIntensityProvider).multiplier;
-    // CRITICAL Performance-Fix: bei minimal-Mode (Default) ueberspring
-    // den kompletten Effekt-Stack. Spart 6× CustomPaint + 4× Animation
-    // Controllers + Mesh-Drift pro Frame. App lief vorher sehr langsam.
-    if (baseIntensity <= 0.01) {
-      return child;
-    }
-    final spec = CinemaTheme.specFor(phase);
-    // V20 Phase-6b: Im Light-Mode reduziert sich die Cinema-Intensitaet
-    // auf max. 0.3, damit der dunkle Atmospheric-Background den hellen
-    // Content nicht ueberlaegt.
     final isLight = ref.watch(isLightModeProvider);
+
+    // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
+    // ergeben strukturell SEHR unterschiedliche Widget-Trees (SizedBox vs
+    // RepaintBoundary > Stack > 9+ AnimationControllers). Beim Toggle
+    // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
+    // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
+    // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
+    if (phase == null || baseIntensity <= 0.01) {
+      return KeyedSubtree(
+        key: const ValueKey('cinema_overlay_off'),
+        child: child,
+      );
+    }
+
+    final spec = CinemaTheme.specFor(phase);
     final intensity = isLight ? (baseIntensity * 0.3) : baseIntensity;
 
-    // V20: TickerMode.of — wenn der CinemaOverlay nicht sichtbar ist
-    // (z.B. Screen im Background), pausiere alle AnimationControllers
-    // automatisch. Flutter macht das via TickerMode im Navigator, aber
-    // nur wenn RepaintBoundary korrekt gesetzt ist.
-    return RepaintBoundary(
+    return KeyedSubtree(
+      key: const ValueKey('cinema_overlay_on'),
+      child: RepaintBoundary(
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -178,6 +178,7 @@ class CinemaOverlay extends ConsumerWidget {
             child: FilmGrainOverlay(opacity: spec.grainOpacity * intensity),
           ),
       ],
+      ),
       ),
     );
   }

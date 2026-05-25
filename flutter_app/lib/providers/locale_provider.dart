@@ -157,6 +157,7 @@ class LocaleNotifier extends StateNotifier<LocaleState> {
   Future<void> _runDetect(
       {required bool applyToActive, BuildContext? context}) async {
     final detected = await LocaleDetectionService.detect();
+    if (!mounted) return;
     if (detected == null) {
       state = state.copyWith(detectedLocale: null);
       return;

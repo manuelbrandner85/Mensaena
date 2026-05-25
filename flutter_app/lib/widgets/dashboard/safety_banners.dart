@@ -112,8 +112,10 @@ final ninaWarningsProvider = FutureProvider.autoDispose.family<
         if (geo.lng != null) 'lng': geo.lng.toString(),
       },
     );
-    final res =
-        await http.get(uri).timeout(const Duration(seconds: 4));
+    final res = await http
+        .get(uri)
+        .timeout(const Duration(seconds: 4))
+        .catchError((_) => http.Response('[]', 504));
     if (res.statusCode != 200) return const [];
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     final list = (data['warnings'] as List?) ?? const [];
@@ -322,8 +324,10 @@ final foodWarningsProvider =
     FutureProvider.autoDispose<List<FoodWarning>>((ref) async {
   try {
     final uri = Uri.parse('https://www.mensaena.de/api/food-warnings');
-    final res =
-        await http.get(uri).timeout(const Duration(seconds: 4));
+    final res = await http
+        .get(uri)
+        .timeout(const Duration(seconds: 4))
+        .catchError((_) => http.Response('[]', 504));
     if (res.statusCode != 200) return const [];
     final data = jsonDecode(res.body);
     final list = data is List ? data : ((data['warnings'] as List?) ?? []);

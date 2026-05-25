@@ -30,12 +30,13 @@ class CinemaModeNotifier extends StateNotifier<CinemaMode> {
     try {
       final raw = await _storage.read(key: _modeStorageKey);
       final loaded = CinemaModeX.fromKey(raw);
-      // Nur setzen wenn unterschiedlich → kein unnötiger Rebuild.
+      if (!mounted) return;
       if (loaded != state) state = loaded;
     } catch (_) {}
   }
 
   Future<void> set(CinemaMode mode) async {
+    if (!mounted) return;
     state = mode;
     try {
       await _storage.write(key: _modeStorageKey, value: mode.key);
@@ -57,11 +58,13 @@ class CinemaIntensityNotifier extends StateNotifier<CinemaIntensity> {
     try {
       final raw = await _storage.read(key: _intensityStorageKey);
       final loaded = CinemaIntensityX.fromKey(raw);
+      if (!mounted) return;
       if (loaded != state) state = loaded;
     } catch (_) {}
   }
 
   Future<void> set(CinemaIntensity intensity) async {
+    if (!mounted) return;
     state = intensity;
     try {
       await _storage.write(key: _intensityStorageKey, value: intensity.key);

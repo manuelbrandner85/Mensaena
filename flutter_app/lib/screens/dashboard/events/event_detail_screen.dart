@@ -89,7 +89,7 @@ String _categoryLabel(String? cat) {
 
 /// Provider fuer Profil eines beliebigen Users (fuer Author-Zeile).
 final _authorProfileProvider =
-    FutureProvider.family<Profile?, String>((ref, userId) async {
+    FutureProvider.autoDispose.family<Profile?, String>((ref, userId) async {
   if (userId.isEmpty) return null;
   return ProfilesRepository.getById(userId);
 });
