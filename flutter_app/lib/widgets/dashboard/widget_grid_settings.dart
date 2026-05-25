@@ -238,6 +238,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.quickNote',
       icon: LucideIcons.stickyNote,
     ),
+    DashboardWidgetMeta(
+      id: 'helpStreak',
+      title: 'widgets.titles.helpStreak',
+      description: 'widgets.descriptions.helpStreak',
+      icon: LucideIcons.helpingHand,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

@@ -1921,7 +1921,8 @@
       "karma": "Karma & level",
       "recap": "Weekly recap",
       "heatmap": "Activity heatmap",
-      "quickNote": "Quick note"
+      "quickNote": "Quick note",
+      "helpStreak": "Help streak"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1957,7 +1958,8 @@
       "karma": "Your karma points and current level",
       "recap": "Your last 7 days vs the week before",
       "heatmap": "12-week overview of your daily activity",
-      "quickNote": "Personal sticky note, lives only on your device"
+      "quickNote": "Personal sticky note, lives only on your device",
+      "helpStreak": "Consecutive days where you've helped"
     }
   },
   "hubs": {
@@ -2058,6 +2060,12 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "helpStreak": {
+    "title": "Help streak",
+    "days": "{count} days helping in a row",
+    "today": "today ✓",
+    "notYetToday": "Not today yet — one help keeps the streak alive."
   },
   "quickNote": {
     "title": "Quick note",

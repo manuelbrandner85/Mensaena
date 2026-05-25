@@ -1920,7 +1920,8 @@
       "karma": "Karma & Level",
       "recap": "Wochenrückblick",
       "heatmap": "Aktivitäts-Heatmap",
-      "quickNote": "Notizzettel"
+      "quickNote": "Notizzettel",
+      "helpStreak": "Hilfe-Streak"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1956,7 +1957,8 @@
       "karma": "Deine Karma-Punkte und dein aktuelles Level",
       "recap": "Deine letzten 7 Tage im Vergleich zur Vorwoche",
       "heatmap": "12-Wochen-Übersicht deiner täglichen Aktivität",
-      "quickNote": "Privater Notizzettel, nur auf deinem Gerät"
+      "quickNote": "Privater Notizzettel, nur auf deinem Gerät",
+      "helpStreak": "Aufeinanderfolgende Tage, an denen du geholfen hast"
     }
   },
   "hubs": {
@@ -2057,6 +2059,12 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "helpStreak": {
+    "title": "Hilfe-Streak",
+    "days": "{count} Tage in Folge geholfen",
+    "today": "heute ✓",
+    "notYetToday": "Heute noch nicht — eine Hilfe hält dich im Lauf."
   },
   "quickNote": {
     "title": "Notizzettel",

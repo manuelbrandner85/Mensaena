@@ -1831,6 +1831,12 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "helpStreak": {
+    "title": "Série d'entraide",
+    "days": "{count} jours à aider d'affilée",
+    "today": "aujourd'hui ✓",
+    "notYetToday": "Pas encore aujourd'hui — un coup de main maintient la série."
+  },
   "quickNote": {
     "title": "Note rapide",
     "prompt": "Touche pour écrire quelque chose à ne pas oublier.",

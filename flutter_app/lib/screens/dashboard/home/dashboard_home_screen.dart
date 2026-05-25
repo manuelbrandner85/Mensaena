@@ -39,6 +39,7 @@ import '../../../widgets/dashboard/gratitude_widget.dart';
 import '../../../widgets/dashboard/karma_widget.dart';
 import '../../../widgets/dashboard/streak_widget.dart';
 import '../../../widgets/dashboard/activity_heatmap_widget.dart';
+import '../../../widgets/dashboard/help_streak_widget.dart';
 import '../../../widgets/dashboard/quick_note_widget.dart';
 import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
@@ -489,6 +490,10 @@ class _DashboardHomeScreenState
           break;
         case 'quickNote':
           out.add(const QuickNoteWidget());
+          addSpacing();
+          break;
+        case 'helpStreak':
+          out.add(const HelpStreakWidget());
           addSpacing();
           break;
         case 'nearby_posts':

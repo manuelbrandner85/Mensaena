@@ -1831,6 +1831,12 @@
     "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
     "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
   },
+  "helpStreak": {
+    "title": "Racha de ayuda",
+    "days": "{count} días ayudando seguidos",
+    "today": "hoy ✓",
+    "notYetToday": "Hoy aún no — una ayuda mantiene viva la racha."
+  },
   "quickNote": {
     "title": "Nota rápida",
     "prompt": "Toca para anotar algo que no quieras olvidar.",
