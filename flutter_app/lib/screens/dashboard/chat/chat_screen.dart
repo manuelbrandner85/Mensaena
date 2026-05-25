@@ -58,10 +58,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   bool _searchOpen = false;
   String _searchQuery = '';
   final _searchCtrl = TextEditingController();
+  // Snapshot des last_read_at-Werts BEIM OEFFNEN — danach faengt
+  // markRead() bereits zu aktualisieren an, daher merken wir den
+  // Ausgangswert fuer den Unread-Divider (#3).
+  DateTime? _myLastReadAtOpen;
 
   @override
   void initState() {
     super.initState();
+    _captureLastReadAtOpen();
     MessagesRepository.markRead(widget.conversationId);
     _setupPresence();
     _ctrl.addListener(_onTextChanged);
@@ -299,6 +304,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   /// Sends a voice-message as `[VOICE:url:seconds]` text.
   /// The bubble parses this on render and shows VoiceMessageBubble.
+  /// Liest last_read_at vor markRead aus, damit der Unread-Divider die
+  /// korrekte Stelle anzeigt (sonst waere die Markierung schon vor dem
+  /// ersten Frame ueberschrieben).
+  Future<void> _captureLastReadAtOpen() async {
+    try {
+      final uid = SupabaseService.currentUser?.id;
+      if (uid == null) return;
+      final row = await sb
+          .from('conversation_members')
+          .select('last_read_at')
+          .eq('conversation_id', widget.conversationId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      final raw = row?['last_read_at'] as String?;
+      if (raw != null && mounted) {
+        setState(() => _myLastReadAtOpen = DateTime.tryParse(raw)?.toUtc());
+      }
+    } catch (_) {/* fail-silent */}
+  }
+
   /// DM-Chat-History komplett aus DB loeschen. Wirkt fuer BEIDE Teilnehmer
   /// (HARD DELETE via clear_dm_history RPC mit Membership-Check).
   Future<void> _clearDmHistory() async {
@@ -494,9 +519,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ChatPinnedMessagesPanel(conversationId: widget.conversationId),
             Expanded(
               child: stream.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
-                ),
+                loading: () => const _ChatBubbleSkeleton(count: 6),
                 error: (e, _) => Center(
                   child: Text(
                     'Fehler: $e',
@@ -514,13 +537,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           return c.contains(q);
                         }).toList();
                   if (msgs.isEmpty) {
-                    return Center(
-                      child: Text(
-                        q.isEmpty
-                            ? 'chat.writeFirstMessage'.tr()
-                            : 'chat.noSearchResults'.tr(namedArgs: {'q': _searchQuery}),
-                        style: AppTypography.caption(),
-                      ),
+                    return _ChatEmptyState(
+                      isSearch: q.isNotEmpty,
+                      searchQuery: _searchQuery,
                     );
                   }
                   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -533,14 +552,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     }
                   });
                   final peerLastRead = peerReadAsync.value;
+                  // Erster ungelesener Index fuer Unread-Divider (#3).
+                  // Zeigt rote Linie ueber der ersten Nachricht die nach
+                  // unserem last-read von einem anderen User kam.
+                  final myUid = SupabaseService.currentUser?.id;
+                  int firstUnreadIdx = -1;
+                  final myLastRead = _myLastReadAtOpen;
+                  if (myLastRead != null) {
+                    for (int i = 0; i < msgs.length; i++) {
+                      final m = msgs[i];
+                      if (m['sender_id'] == myUid) continue;
+                      final ts = DateTime.tryParse(
+                          m['created_at'] as String? ?? '');
+                      if (ts != null && ts.isAfter(myLastRead)) {
+                        firstUnreadIdx = i;
+                        break;
+                      }
+                    }
+                  }
                   return ListView.builder(
                     controller: _scrollCtrl,
                     padding: const EdgeInsets.all(12),
                     itemCount: msgs.length,
                     itemBuilder: (context, i) {
                       final m = msgs[i];
-                      final mine =
-                          m['sender_id'] == SupabaseService.currentUser?.id;
+                      final mine = m['sender_id'] == myUid;
                       final isLast = i == msgs.length - 1;
                       bool readByPeer = false;
                       if (mine && peerLastRead != null) {
@@ -549,7 +585,31 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         readByPeer =
                             ts != null && !ts.isAfter(peerLastRead);
                       }
-                      return ChatMessageBubble(
+                      // Day-Separator (#1) zeigen wenn:
+                      // - erste Nachricht ODER
+                      // - vorherige Nachricht an einem anderen Tag war.
+                      final mAt = (DateTime.tryParse(
+                                  m['created_at'] as String? ?? '') ??
+                              DateTime.now())
+                          .toLocal();
+                      final prevDay = i == 0
+                          ? null
+                          : (DateTime.tryParse(
+                                      msgs[i - 1]['created_at'] as String? ??
+                                          '') ??
+                                  DateTime.now())
+                              .toLocal();
+                      final showDayHeader = prevDay == null ||
+                          prevDay.year != mAt.year ||
+                          prevDay.month != mAt.month ||
+                          prevDay.day != mAt.day;
+                      final showUnreadDivider = i == firstUnreadIdx;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (showDayHeader) _DaySeparator(date: mAt),
+                          if (showUnreadDivider) const _UnreadDivider(),
+                          ChatMessageBubble(
                         json: m,
                         mine: mine,
                         showReadReceipt: mine && isLast,
@@ -593,6 +653,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 );
                               }
                             : null,
+                      ),
+                        ],
                       );
                     },
                   );
@@ -1110,6 +1172,200 @@ class _ActionIcon extends StatelessWidget {
       minIntensity: 0.4,
       maxIntensity: 0.85,
       child: btn,
+    );
+  }
+}
+
+// ── Day-Separator (#1) ────────────────────────────────────────────────
+class _DaySeparator extends StatelessWidget {
+  const _DaySeparator({required this.date});
+  final DateTime date;
+
+  String _label(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final d = DateTime(date.year, date.month, date.day);
+    final diff = today.difference(d).inDays;
+    if (diff == 0) return 'chat.today'.tr();
+    if (diff == 1) return 'chat.yesterday'.tr();
+    try {
+      return DateFormat('EEEE, d. MMMM', context.locale.languageCode)
+          .format(date);
+    } catch (_) {
+      return DateFormat('dd.MM.yyyy').format(date);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColors.elevated.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: AppColors.line,
+              width: 0.5,
+            ),
+          ),
+          child: Text(
+            _label(context),
+            style: AppTypography.label(size: 9, color: AppColors.mute),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Unread-Divider (#3) ────────────────────────────────────────────────
+class _UnreadDivider extends StatelessWidget {
+  const _UnreadDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 1,
+              color: AppColors.herzrot.withValues(alpha: 0.4),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'chat.newMessages'.tr(),
+              style: AppTypography.label(
+                size: 9,
+                color: AppColors.herzrot,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: AppColors.herzrot.withValues(alpha: 0.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Chat-Bubble-Skeleton (#16) ────────────────────────────────────────
+class _ChatBubbleSkeleton extends StatelessWidget {
+  const _ChatBubbleSkeleton({this.count = 6});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(12),
+      itemCount: count,
+      itemBuilder: (_, i) {
+        final mine = i.isEven;
+        final w = 120 + (i * 23) % 130.0;
+        return Align(
+          alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            width: w,
+            height: 36 + (i * 7) % 20.0,
+            decoration: BoxDecoration(
+              color: AppColors.elevated.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(14),
+                topRight: const Radius.circular(14),
+                bottomLeft: Radius.circular(mine ? 14 : 4),
+                bottomRight: Radius.circular(mine ? 4 : 14),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Empty-State (#17) ─────────────────────────────────────────────────
+class _ChatEmptyState extends StatelessWidget {
+  const _ChatEmptyState({required this.isSearch, required this.searchQuery});
+  final bool isSearch;
+  final String searchQuery;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isSearch) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'chat.noSearchResults'.tr(namedArgs: {'q': searchQuery}),
+            textAlign: TextAlign.center,
+            style: AppTypography.body(
+                size: 13, color: AppColors.mute, height: 1.5),
+          ),
+        ),
+      );
+    }
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.bronze.withValues(alpha: 0.18),
+                    AppColors.amber.withValues(alpha: 0.08),
+                  ],
+                ),
+                border: Border.all(
+                  color: AppColors.bronze.withValues(alpha: 0.3),
+                ),
+              ),
+              child: const Text('🌊', style: TextStyle(fontSize: 28)),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'chat.emptyTitle'.tr(),
+              textAlign: TextAlign.center,
+              style: AppTypography.body(
+                size: 15,
+                color: AppColors.ink,
+                weight: FontWeight.w700,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'chat.emptySubtitle'.tr(),
+              textAlign: TextAlign.center,
+              style: AppTypography.body(
+                size: 12,
+                color: AppColors.mute,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

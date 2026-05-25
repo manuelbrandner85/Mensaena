@@ -375,7 +375,14 @@
     "clearHistoryConfirmBody": "All messages in this chat will be permanently deleted from Mensaena for you AND your conversation partner. This cannot be undone.",
     "clearHistoryConfirmAction": "Delete permanently",
     "clearHistoryOk": "Deleted {count} messages.",
-    "clearHistoryFailed": "Failed to clear. Please try again."
+    "clearHistoryFailed": "Failed to clear. Please try again.",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "newMessages": "NEW MESSAGES",
+    "emptyTitle": "No messages yet.",
+    "emptySubtitle": "Throw the first stone — write a message and start the conversation. 🌊",
+    "copy": "Copy text",
+    "copied": "Copied."
   },
   "languages": {
     "de": "German",

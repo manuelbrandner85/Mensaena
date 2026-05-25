@@ -375,7 +375,14 @@
     "clearHistoryConfirmBody": "Tous les messages de ce chat seront supprimés définitivement de Mensaena pour vous ET votre interlocuteur. Action irréversible.",
     "clearHistoryConfirmAction": "Supprimer définitivement",
     "clearHistoryOk": "{count} messages supprimés.",
-    "clearHistoryFailed": "Échec de la suppression. Réessayez."
+    "clearHistoryFailed": "Échec de la suppression. Réessayez.",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "newMessages": "NOUVEAUX MESSAGES",
+    "emptyTitle": "Pas encore de messages.",
+    "emptySubtitle": "Lance le premier galet — écris un message et lance la conversation. 🌊",
+    "copy": "Copier le texte",
+    "copied": "Copié."
   },
   "languages": {
     "de": "Allemand",

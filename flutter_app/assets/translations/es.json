@@ -375,7 +375,14 @@
     "clearHistoryConfirmBody": "Todos los mensajes de este chat se eliminarán de Mensaena de forma permanente para ti Y tu interlocutor. No se puede deshacer.",
     "clearHistoryConfirmAction": "Eliminar definitivamente",
     "clearHistoryOk": "Se borraron {count} mensajes.",
-    "clearHistoryFailed": "No se pudo borrar. Inténtalo de nuevo."
+    "clearHistoryFailed": "No se pudo borrar. Inténtalo de nuevo.",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "newMessages": "MENSAJES NUEVOS",
+    "emptyTitle": "Aún no hay mensajes.",
+    "emptySubtitle": "Tira la primera piedra — escribe un mensaje y empieza la conversación. 🌊",
+    "copy": "Copiar texto",
+    "copied": "Copiado."
   },
   "languages": {
     "de": "Alemán",

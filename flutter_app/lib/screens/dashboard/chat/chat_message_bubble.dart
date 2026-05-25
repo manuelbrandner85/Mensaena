@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -74,6 +75,21 @@ class ChatMessageBubble extends ConsumerWidget {
           onEdit: onEdit,
           onDelete: onDelete,
           onPin: onPin,
+          // #5 Copy: nur wenn nicht deleted + textWithoutImages nicht leer.
+          onCopy: (!deleted && textWithoutImages.trim().isNotEmpty)
+              ? () async {
+                  await Clipboard.setData(
+                      ClipboardData(text: textWithoutImages.trim()));
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: AppColors.surface,
+                    duration: const Duration(seconds: 1),
+                    content: Text('chat.copied'.tr(),
+                        style: AppTypography.body(
+                            size: 13, color: AppColors.ink)),
+                  ));
+                }
+              : null,
         );
       },
       child: Align(
@@ -177,13 +193,22 @@ class ChatMessageBubble extends ConsumerWidget {
                   padding: hasImages
                       ? const EdgeInsets.fromLTRB(8, 4, 8, 0)
                       : EdgeInsets.zero,
+                  // #6 Emoji-Only Large: wenn die ganze Nachricht nur aus
+                  // Emojis besteht (max 3), groesser darstellen ohne
+                  // Bubble-Begrenzung. Wirkt wie iMessage/Telegram.
                   child: Text(
                     textWithoutImages,
-                    style: AppTypography.body(
-                      size: 14,
-                      color: AppColors.ink,
-                      height: 1.4,
-                    ),
+                    style: _isEmojiOnly(textWithoutImages)
+                        ? AppTypography.body(
+                            size: 32,
+                            color: AppColors.ink,
+                            height: 1.2,
+                          )
+                        : AppTypography.body(
+                            size: 14,
+                            color: AppColors.ink,
+                            height: 1.4,
+                          ),
                   ),
                 ),
               const SizedBox(height: 2),
@@ -391,4 +416,20 @@ class _ReactionsPills extends ConsumerWidget {
       },
     );
   }
+}
+
+/// Heuristik fuer Emoji-Only-Nachrichten (#6): ohne Buchstaben/Zahlen,
+/// und max 3 Glyphen Laenge. Variations-Selectors / ZWJ werden ignoriert
+/// fuer die Laengen-Pruefung.
+bool _isEmojiOnly(String s) {
+  final trimmed = s.trim();
+  if (trimmed.isEmpty) return false;
+  if (trimmed.length > 12) return false; // 3 Emojis × max 4 Codepoints
+  // Wenn Buchstaben oder Zahlen drin: kein Pure-Emoji.
+  if (RegExp(r'[\p{L}\p{N}]', unicode: true).hasMatch(trimmed)) return false;
+  // Mind. ein Symbol/Pictographic-Charakter pruefen.
+  if (!RegExp(r'\p{Extended_Pictographic}', unicode: true).hasMatch(trimmed)) {
+    return false;
+  }
+  return true;
 }

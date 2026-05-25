@@ -18,6 +18,7 @@ class ChatActionSheet {
     VoidCallback? onEdit,
     VoidCallback? onDelete,
     VoidCallback? onPin,
+    VoidCallback? onCopy,
   }) {
     showModalBottomSheet<void>(
       context: context,
@@ -64,6 +65,15 @@ class ChatActionSheet {
                   onTap: () {
                     Navigator.pop(sheetCtx);
                     onReply();
+                  },
+                ),
+              if (onCopy != null)
+                _ActionTile(
+                  icon: LucideIcons.copy,
+                  label: 'chat.copy'.tr(),
+                  onTap: () {
+                    Navigator.pop(sheetCtx);
+                    onCopy();
                   },
                 ),
               if (onPin != null)

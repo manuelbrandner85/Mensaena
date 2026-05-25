@@ -374,7 +374,14 @@
     "clearHistoryConfirmBody": "Alle Nachrichten dieses Chats werden bei dir UND beim Gesprächspartner unwiderruflich aus Mensaena gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
     "clearHistoryConfirmAction": "Endgültig löschen",
     "clearHistoryOk": "{count} Nachrichten gelöscht.",
-    "clearHistoryFailed": "Löschen fehlgeschlagen. Bitte erneut versuchen."
+    "clearHistoryFailed": "Löschen fehlgeschlagen. Bitte erneut versuchen.",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "newMessages": "NEUE NACHRICHTEN",
+    "emptyTitle": "Noch keine Nachrichten.",
+    "emptySubtitle": "Wirf den ersten Stein ins Wasser — schreib eine Nachricht und starte das Gespräch. 🌊",
+    "copy": "Text kopieren",
+    "copied": "Kopiert."
   },
   "languages": {
     "de": "Deutsch",

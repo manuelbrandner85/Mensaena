@@ -374,7 +374,14 @@
     "clearHistoryConfirmBody": "Bu sohbetin tüm mesajları siz VE muhatabınız için Mensaena'dan kalıcı olarak silinecek. Geri alınamaz.",
     "clearHistoryConfirmAction": "Kalıcı olarak sil",
     "clearHistoryOk": "{count} mesaj silindi.",
-    "clearHistoryFailed": "Silme başarısız. Tekrar deneyin."
+    "clearHistoryFailed": "Silme başarısız. Tekrar deneyin.",
+    "today": "Bugün",
+    "yesterday": "Dün",
+    "newMessages": "YENİ MESAJLAR",
+    "emptyTitle": "Henüz mesaj yok.",
+    "emptySubtitle": "İlk taşı at — bir mesaj yaz ve sohbeti başlat. 🌊",
+    "copy": "Metni kopyala",
+    "copied": "Kopyalandı."
   },
   "languages": {
     "de": "Almanca",
