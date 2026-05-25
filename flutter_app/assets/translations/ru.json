@@ -1451,7 +1451,8 @@
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",
-    "screenTitle": "Календарь"
+    "screenTitle": "Календарь",
+    "daySectionSr": "{date}, событий: {count}"
   },
   "notifications": {
     "allRead": "Все прочитаны ✓",

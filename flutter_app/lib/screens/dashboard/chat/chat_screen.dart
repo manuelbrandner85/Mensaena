@@ -215,9 +215,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _loadMentionSuggestions(token);
   }
 
+  // Aktiver Query-Token gegen out-of-order responses: wenn User waehrend
+  // einer noch-pending Query weiter tippt, sehen wir nach await ob die
+  // query noch die aktuelle ist — sonst wegwerfen.
+  String _activeMentionQuery = '';
+
   Future<void> _loadMentionSuggestions(String query) async {
+    _activeMentionQuery = query;
     try {
-      // Empty query → show recent contacts (skip for now, just hide)
       if (query.isEmpty) {
         if (mounted) setState(() => _mentionSuggestions = const []);
         return;
@@ -227,7 +232,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           .select('id, name, display_name, nickname, avatar_url')
           .or('nickname.ilike.$query%,name.ilike.$query%,display_name.ilike.$query%')
           .limit(6);
-      if (!mounted) return;
+      // Out-of-order-Guard: nur uebernehmen wenn query immer noch aktuell.
+      if (!mounted || query != _activeMentionQuery) return;
       setState(() => _mentionSuggestions =
           (rows as List).whereType<Map<String, dynamic>>().toList());
     } catch (_) {

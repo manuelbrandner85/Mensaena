@@ -1451,7 +1451,8 @@
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",
-    "screenTitle": "Takvim"
+    "screenTitle": "Takvim",
+    "daySectionSr": "{date}, {count} etkinlik"
   },
   "notifications": {
     "allRead": "Tümü okundu ✓",

@@ -271,8 +271,15 @@ class _ReplyQuote extends StatelessWidget {
           );
         }
         final row = snap.data;
-        if (row == null) return const SizedBox.shrink();
-        final c = (row['content'] as String?) ?? '';
+        // Wenn die Reply-Quelle null oder soft-deleted ist, zeige
+        // expliziten Fallback statt einfach nichts. Sonst wirkt der
+        // Reply wie eine zusammenhanglose Nachricht.
+        final isDeleted = row == null ||
+            row['deleted_at'] != null ||
+            ((row['content'] as String?) ?? '').isEmpty;
+        final c = isDeleted
+            ? 'chat.messageDeleted'.tr()
+            : (row['content'] as String? ?? '');
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -291,7 +298,8 @@ class _ReplyQuote extends StatelessWidget {
               Text(
                 c.length > 80 ? '${c.substring(0, 80)}…' : c,
                 style: AppTypography.body(
-                    size: 11, color: AppColors.inkSoft),
+                    size: 11,
+                    color: isDeleted ? AppColors.mute : AppColors.inkSoft),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

@@ -90,19 +90,26 @@ class _DaySection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.amber.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: AppColors.amber.withValues(alpha: 0.4)),
-            ),
-            child: Text(
-              df.format(date),
-              style: AppTypography.label(
-                size: 10,
-                color: AppColors.amber,
-                letterSpacing: 0.15,
+          Semantics(
+            header: true,
+            label: 'calendar.daySectionSr'.tr(namedArgs: {
+              'date': df.format(date),
+              'count': '${events.length}',
+            }),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.amber.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: AppColors.amber.withValues(alpha: 0.4)),
+              ),
+              child: Text(
+                df.format(date),
+                style: AppTypography.label(
+                  size: 10,
+                  color: AppColors.amber,
+                  letterSpacing: 0.15,
+                ),
               ),
             ),
           ),

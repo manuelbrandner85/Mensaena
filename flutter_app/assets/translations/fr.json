@@ -1452,7 +1452,8 @@
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",
-    "screenTitle": "Calendrier"
+    "screenTitle": "Calendrier",
+    "daySectionSr": "{date}, {count} événements"
   },
   "notifications": {
     "allRead": "Tout lu ✓",
