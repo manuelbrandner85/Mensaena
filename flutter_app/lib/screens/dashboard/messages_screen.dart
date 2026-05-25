@@ -9,7 +9,9 @@ import '../../config/theme/app_typography.dart';
 import '../../config/theme/cinema_accents.dart';
 import '../../providers/cinema_provider.dart';
 import '../../repositories/conversations_repository.dart';
+import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
+import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
 import '../../widgets/shared/skeleton_card.dart';
@@ -62,11 +64,45 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     await Future.wait([_convs!, _channels!]);
   }
 
+  /// F2c: User-Picker fuer neue DM. Sucht in profiles, tap → get_or_create_dm.
+  Future<void> _openNewDmPicker(BuildContext context) async {
+    Haptics.tap();
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (_, scrollCtrl) =>
+            _NewDmPickerSheet(scrollCtrl: scrollCtrl),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
       title: 'messages.title'.tr(),
       currentRoute: '/dashboard/messages',
+      // F2c: FAB "Neue DM" oeffnet User-Picker. Nur im DM-Tab sichtbar.
+      fab: AnimatedBuilder(
+        animation: _tab,
+        builder: (_, __) => _tab.index == 1
+            ? FloatingActionButton(
+                backgroundColor: AppColors.bronze,
+                foregroundColor: AppColors.voidColor,
+                tooltip: 'messages.newDm'.tr(),
+                onPressed: () => _openNewDmPicker(context),
+                child: const Icon(LucideIcons.messageSquarePlus, size: 24),
+              )
+            : const SizedBox.shrink(),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -447,6 +483,8 @@ class _DmTile extends ConsumerWidget {
 
     return InkWell(
       onTap: () => context.go('/dashboard/messages/$id'),
+      // F1c: Long-Press → Action-Sheet mit Verstecken + Endgueltig loeschen
+      onLongPress: isDm ? () => _showDmActions(context, ref, id, title) : null,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -575,6 +613,317 @@ class _DmTile extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── F1c: DM-Aktionen Sheet (Verstecken / Endgueltig loeschen) ──────
+void _showDmActions(
+    BuildContext context, WidgetRef ref, String convId, String title) {
+  Haptics.longPress();
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (sheetCtx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.line,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              title,
+              style: AppTypography.body(
+                  size: 14, color: AppColors.inkSoft, height: 1.3),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(LucideIcons.eyeOff, color: AppColors.mute),
+            title: Text('messages.hideForMe'.tr(),
+                style: AppTypography.body(size: 14, color: AppColors.ink)),
+            subtitle: Text('messages.hideForMeHint'.tr(),
+                style: AppTypography.caption()),
+            onTap: () async {
+              Navigator.pop(sheetCtx);
+              final ok =
+                  await ConversationsRepository.hideDmForMe(convId);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: AppColors.surface,
+                content: Text(ok
+                    ? 'messages.hidden'.tr()
+                    : 'messages.hideFailed'.tr()),
+              ));
+              if (ok) ref.invalidate(conversationsProvider);
+            },
+          ),
+          ListTile(
+            leading:
+                const Icon(LucideIcons.trash2, color: AppColors.herzrot),
+            title: Text('messages.deleteForBoth'.tr(),
+                style: AppTypography.body(
+                    size: 14, color: AppColors.herzrot)),
+            subtitle: Text('messages.deleteForBothHint'.tr(),
+                style: AppTypography.caption()),
+            onTap: () async {
+              Navigator.pop(sheetCtx);
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (dCtx) => AlertDialog(
+                  backgroundColor: AppColors.surface,
+                  title: Text('messages.deleteForBothConfirmTitle'.tr(),
+                      style: AppTypography.body(
+                          size: 15,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700)),
+                  content: Text('messages.deleteForBothConfirmBody'.tr(),
+                      style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.inkSoft,
+                          height: 1.4)),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dCtx, false),
+                      child: Text('common.cancel'.tr()),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(dCtx, true),
+                      style: TextButton.styleFrom(
+                          foregroundColor: AppColors.herzrot),
+                      child: Text('messages.deleteForBothAction'.tr()),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm != true || !context.mounted) return;
+              final ok = await ConversationsRepository.deleteDmForBoth(
+                  convId);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: AppColors.surface,
+                content: Text(ok
+                    ? 'messages.deletedForBoth'.tr()
+                    : 'messages.deleteFailed'.tr()),
+              ));
+              if (ok) ref.invalidate(conversationsProvider);
+            },
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    ),
+  );
+}
+
+// ── F2c: User-Picker fuer "Neue DM" ──────────────────────────────────
+class _NewDmPickerSheet extends StatefulWidget {
+  const _NewDmPickerSheet({required this.scrollCtrl});
+  final ScrollController scrollCtrl;
+
+  @override
+  State<_NewDmPickerSheet> createState() => _NewDmPickerSheetState();
+}
+
+class _NewDmPickerSheetState extends State<_NewDmPickerSheet> {
+  final _searchCtrl = TextEditingController();
+  String _q = '';
+  Future<List<Map<String, dynamic>>>? _future;
+  bool _creating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _load() {
+    _future = _fetch(_q);
+  }
+
+  Future<List<Map<String, dynamic>>> _fetch(String q) async {
+    try {
+      final myId = SupabaseService.currentUser?.id;
+      var query = sb
+          .from('profiles')
+          .select('id, display_name, name, nickname, avatar_url, location')
+          .neq('id', myId ?? '00000000-0000-0000-0000-000000000000')
+          .filter('is_banned', 'eq', false);
+      if (q.trim().isNotEmpty) {
+        final esc = q.trim().replaceAll('%', r'\%');
+        query = query.or(
+            'display_name.ilike.%$esc%,name.ilike.%$esc%,nickname.ilike.%$esc%');
+      }
+      final rows = await query.order('display_name').limit(50);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<void> _startChat(String otherId, String name) async {
+    if (_creating) return;
+    setState(() => _creating = true);
+    final convId = await ConversationsRepository.getOrCreateDm(otherId);
+    if (!mounted) return;
+    setState(() => _creating = false);
+    if (convId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('messages.newDmFailed'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm)),
+      ));
+      return;
+    }
+    if (!mounted) return;
+    Navigator.pop(context);
+    context.push('/dashboard/messages/$convId');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 12),
+        Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: AppColors.line,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              const Icon(LucideIcons.messageSquarePlus,
+                  color: AppColors.bronze),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text('messages.newDmTitle'.tr(),
+                    style: AppTypography.body(
+                        size: 16,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextField(
+            controller: _searchCtrl,
+            autofocus: true,
+            onChanged: (v) => setState(() {
+              _q = v;
+              _load();
+            }),
+            style: AppTypography.body(size: 14, color: AppColors.ink),
+            decoration: InputDecoration(
+              hintText: 'messages.searchUser'.tr(),
+              hintStyle: AppTypography.caption(),
+              prefixIcon: const Icon(LucideIcons.search,
+                  size: 16, color: AppColors.mute),
+              filled: true,
+              fillColor: AppColors.elevated,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              isDense: true,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+            future: _future,
+            builder: (context, snap) {
+              if (snap.connectionState != ConnectionState.done) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.amber),
+                );
+              }
+              final users = snap.data ?? const <Map<String, dynamic>>[];
+              if (users.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      _q.isEmpty
+                          ? 'messages.noUsersFound'.tr()
+                          : 'messages.noUsersForQuery'.tr(),
+                      style: AppTypography.body(
+                          size: 13, color: AppColors.mute),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              }
+              return ListView.builder(
+                controller: widget.scrollCtrl,
+                itemCount: users.length,
+                itemBuilder: (_, i) {
+                  final u = users[i];
+                  final name = (u['display_name'] as String?) ??
+                      (u['name'] as String?) ??
+                      (u['nickname'] as String?) ??
+                      'Nachbar:in';
+                  final avatar = u['avatar_url'] as String?;
+                  final loc = u['location'] as String?;
+                  return ListTile(
+                    leading: SizedAvatarImage(
+                      url: avatar,
+                      size: 40,
+                      fallbackInitial: name,
+                    ),
+                    title: Text(name,
+                        style: AppTypography.body(
+                            size: 14, color: AppColors.ink)),
+                    subtitle: loc != null && loc.isNotEmpty
+                        ? Text(loc, style: AppTypography.caption())
+                        : null,
+                    trailing: _creating
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.bronze),
+                          )
+                        : const Icon(LucideIcons.chevronRight,
+                            size: 16, color: AppColors.mute),
+                    onTap: () => _startChat(u['id'] as String, name),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

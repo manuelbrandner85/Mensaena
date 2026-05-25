@@ -30,9 +30,10 @@ class ConversationsRepository {
     try {
       final memberships = await sb
           .from('conversation_members')
-          .select('conversation_id, last_read_at, '
+          .select('conversation_id, last_read_at, hidden_at, '
               'conversations(id,type,title,updated_at,created_at)')
-          .eq('user_id', uid);
+          .eq('user_id', uid)
+          .filter('hidden_at', 'is', null);
       final rows = (memberships as List).whereType<Map<String, dynamic>>();
       final result = <Map<String, dynamic>>[];
       final convIds = <String>[];
@@ -142,6 +143,45 @@ class ConversationsRepository {
       return result;
     } catch (_) {
       return const [];
+    }
+  }
+
+  /// F1c (soft): Versteckt die Konversation nur fuer den Caller. Andere
+  /// Teilnehmer sehen sie weiter. Sobald jemand wieder schreibt, taucht
+  /// sie wieder auf (Realtime-Trigger setzt updated_at, get_or_create_dm
+  /// resettet hidden_at beim naechsten Open).
+  static Future<bool> hideDmForMe(String conversationId) async {
+    try {
+      final r = await sb.rpc<dynamic>('hide_dm_for_me',
+          params: {'p_conversation_id': conversationId});
+      return r == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// F1c (hard): HARD DELETE der ganzen Konversation inkl. messages,
+  /// reactions, pins, members (alles CASCADE). Wirkt fuer BEIDE.
+  static Future<bool> deleteDmForBoth(String conversationId) async {
+    try {
+      final r = await sb.rpc<dynamic>('delete_dm_for_both',
+          params: {'p_conversation_id': conversationId});
+      return r == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// F2: Startet eine 1:1-Konversation oder gibt existierende zurueck.
+  /// Setzt hidden_at vom Caller zurueck wenn vorher versteckt.
+  /// Returns die conversation_id oder null bei Fehler.
+  static Future<String?> getOrCreateDm(String otherUserId) async {
+    try {
+      final r = await sb.rpc<dynamic>('get_or_create_dm',
+          params: {'p_other_user_id': otherUserId});
+      return r as String?;
+    } catch (_) {
+      return null;
     }
   }
 }
