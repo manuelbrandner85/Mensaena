@@ -1,6 +1,18 @@
 /// SKILL: mensaena-features
-/// Air Quality Index via OpenAQ — global, gratis, ohne API-Key.
-/// Liefert PM2.5/PM10/O3/NO2/SO2/CO-Werte rund um GPS-Punkt.
+/// Air Quality via Open-Meteo Air Quality API — global, gratis, KEIN API-Key.
+///
+/// Migration: Bis 2024 wurde OpenAQ v3 genutzt — der Dienst verlangt
+/// seither einen `X-API-Key`-Header (siehe HTTP 401 bei keyless calls).
+/// Open-Meteo liefert dieselben Schadstoffe (PM2.5, PM10, O3, NO2, SO2, CO)
+/// PLUS einen vorgefertigten European-AQI-Score, hat keine Key-Pflicht und
+/// einen sehr großzügigen kostenlosen Tier.
+///
+/// API: https://open-meteo.com/en/docs/air-quality-api
+/// Beispiel:
+///   GET https://air-quality-api.open-meteo.com/v1/air-quality
+///        ?latitude=52.52&longitude=13.405
+///        &current=european_aqi,pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,
+///                  sulphur_dioxide,ozone
 library;
 
 import 'dart:async';
@@ -72,62 +84,64 @@ class AirQualitySample {
 class AirQualityService {
   const AirQualityService._();
 
-  /// OpenAQ v3 — public, no key needed.
-  /// Liefert die letzten Messungen für die nächstgelegenen Stationen.
+  // Open-Meteo nutzt API-Feldnamen die sich von WHO-Codes unterscheiden:
+  static const Map<String, String> _apiToCode = {
+    'pm2_5': 'pm25',
+    'pm10': 'pm10',
+    'ozone': 'o3',
+    'nitrogen_dioxide': 'no2',
+    'sulphur_dioxide': 'so2',
+    'carbon_monoxide': 'co',
+  };
+
+  /// Liefert die aktuellen Messwerte am gegebenen GPS-Punkt. Open-Meteo
+  /// liefert EINE virtuelle Station (auf 0.1° gerastert) — daher gibt diese
+  /// Methode normalerweise 6 Samples zurueck (je ein Sample pro Parameter).
+  ///
+  /// `radiusKm` und `limit` werden aus API-Kompatibilitaet beibehalten,
+  /// haben aber bei Open-Meteo keine direkte Entsprechung.
   static Future<List<AirQualitySample>> nearby({
     required double lat,
     required double lng,
     int radiusKm = 25,
     int limit = 20,
   }) async {
+    final fields = _apiToCode.keys.join(',');
     final uri = Uri.parse(
-      'https://api.openaq.org/v3/locations'
-      '?coordinates=$lat,$lng'
-      '&radius=${radiusKm * 1000}'
-      '&limit=$limit'
-      '&order_by=distance'
-      '&sort_order=asc',
+      'https://air-quality-api.open-meteo.com/v1/air-quality'
+      '?latitude=$lat&longitude=$lng'
+      '&current=$fields',
     );
     try {
       final r = await http.get(uri).timeout(const Duration(seconds: 10));
       if (r.statusCode != 200) return const [];
       final j = json.decode(r.body) as Map<String, dynamic>;
-      final results = j['results'] as List? ?? const [];
+      final current = j['current'] as Map<String, dynamic>? ?? const {};
+      final units = j['current_units'] as Map<String, dynamic>? ?? const {};
+      final timeIso = current['time'] as String?;
+      final measuredAt =
+          DateTime.tryParse(timeIso ?? '') ?? DateTime.now();
+      final stationLat = (j['latitude'] as num?)?.toDouble() ?? lat;
+      final stationLng = (j['longitude'] as num?)?.toDouble() ?? lng;
+
       final out = <AirQualitySample>[];
-      for (final loc in results.whereType<Map<String, dynamic>>()) {
-        final sensors = loc['sensors'] as List? ?? const [];
-        final coords = loc['coordinates'] as Map<String, dynamic>? ?? const {};
-        final lat = (coords['latitude'] as num?)?.toDouble();
-        final lng = (coords['longitude'] as num?)?.toDouble();
-        if (lat == null || lng == null) continue;
-        for (final s in sensors.whereType<Map<String, dynamic>>()) {
-          final param = s['parameter'] as Map<String, dynamic>? ?? const {};
-          final name = param['name'] as String? ?? '';
-          if (!const ['pm25', 'pm10', 'o3', 'no2', 'so2', 'co'].contains(name)) {
-            continue;
-          }
-          final latest = s['latest'] as Map<String, dynamic>?;
-          if (latest == null) continue;
-          final value = (latest['value'] as num?)?.toDouble();
-          final ts = latest['datetime'] as Map<String, dynamic>?;
-          final utc = ts?['utc'] as String?;
-          if (value == null || utc == null) continue;
-          out.add(AirQualitySample(
-            location: (loc['name'] as String?) ?? 'Station',
-            city: loc['city'] as String?,
-            country:
-                (loc['country'] as Map<String, dynamic>?)?['code'] as String? ??
-                    '',
-            parameter: name,
-            value: value,
-            unit: (param['units'] as String?) ?? 'µg/m³',
-            measuredAt: DateTime.tryParse(utc) ?? DateTime.now(),
-            lat: lat,
-            lng: lng,
-          ));
-        }
+      for (final entry in _apiToCode.entries) {
+        final raw = current[entry.key];
+        if (raw == null) continue;
+        final value = (raw as num).toDouble();
+        out.add(AirQualitySample(
+          location: 'Open-Meteo Grid',
+          city: null,
+          country: '',
+          parameter: entry.value,
+          value: value,
+          unit: (units[entry.key] as String?) ?? 'µg/m³',
+          measuredAt: measuredAt,
+          lat: stationLat,
+          lng: stationLng,
+        ));
       }
-      return out;
+      return out.take(limit).toList();
     } catch (_) {
       return const [];
     }

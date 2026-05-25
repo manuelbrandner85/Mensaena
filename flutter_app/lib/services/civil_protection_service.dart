@@ -1,15 +1,27 @@
 /// SKILL: mensaena-features
-/// Civil-Protection-Alerts fuer IT/ES/FR/TR/RU — nationale Behoerden-Feeds
-/// als RSS/XML. IT-alert / ES-Alert / FR-Alert (Cell-Broadcast) haben
-/// keine oeffentlichen APIs, daher nutzen wir die offiziellen Behoerden-
-/// RSS-Feeds als Pull-Quelle.
+/// Civil-Protection-Alerts fuer IT/ES/FR/TR/RU.
 ///
-/// Quellen:
-///  - IT  Protezione Civile      http://www.protezionecivile.gov.it/feed/comunicati
-///  - ES  Proteccion Civil       https://www.proteccioncivil.es/feeds/avisos.xml
-///  - FR  Meteo-France Vigilance https://vigilance.meteofrance.fr/data/NXFR33_LFPW_.xml
-///  - TR  AFAD                   https://www.afad.gov.tr/rss/duyurular.xml
-///  - RU  МЧС России             https://www.mchs.gov.ru/rss/news.xml
+/// Migration: Die ehemaligen nationalen Direkt-Feeds sind groesstenteils
+/// gestorben (alle 404 bzw. CMS-Migration zu SPAs ohne RSS):
+///   - protezionecivile.gov.it/feed/comunicati  → 404 (Site jetzt React-SPA)
+///   - proteccioncivil.es/feeds/avisos.xml      → 404 (CMS-Wechsel)
+///   - vigilance.meteofrance.fr/data/...xml     → 404 (HTML-Wrapper nur)
+///   - afad.gov.tr/rss/duyurular.xml            → 404 (Layout-Refresh)
+///
+/// Neue Strategie: Wir nutzen die paneuropaeischen MeteoAlarm-Feeds
+/// (https://feeds.meteoalarm.org) als verlaesslichen Ersatz fuer IT/ES/FR.
+/// Diese Feeds sind im offiziellen CAP-Format und werden von genau den
+/// nationalen Wetterdiensten gespeist, die fuer Naturgefahren-Warnungen
+/// zustaendig sind. Fuer RU laeuft МЧС RSS weiter (✅ funktioniert). Fuer
+/// TR fehlt es einen stabilen offiziellen Feed — wir nutzen die Kandilli
+/// Observatory Earthquake-Liste (KOERI Bogazici) als Erdbeben-Warnsignal.
+///
+/// Quellen (Stand 2026-05):
+///  - IT  MeteoAlarm Italien
+///  - ES  MeteoAlarm Spanien
+///  - FR  MeteoAlarm Frankreich
+///  - TR  Kandilli Observatory (Erdbeben)
+///  - RU  МЧС России (RSS funktioniert weiterhin)
 ///
 /// 15 Min Memory-Cache, Fail-Silent (leere Liste bei Netzfehler).
 library;
@@ -47,20 +59,25 @@ class CivilProtectionService {
 
   static const Map<String, _FeedConfig> _feeds = {
     'IT': _FeedConfig(
-      url: 'http://www.protezionecivile.gov.it/feed/comunicati',
-      source: 'Protezione Civile',
+      url:
+          'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-italy',
+      source: 'MeteoAlarm Italy',
     ),
     'ES': _FeedConfig(
-      url: 'https://www.proteccioncivil.es/feeds/avisos.xml',
-      source: 'Proteccion Civil',
+      url:
+          'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain',
+      source: 'MeteoAlarm Spain',
     ),
     'FR': _FeedConfig(
-      url: 'https://vigilance.meteofrance.fr/data/NXFR33_LFPW_.xml',
-      source: 'Meteo-France Vigilance',
+      url:
+          'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-france',
+      source: 'MeteoAlarm France',
     ),
     'TR': _FeedConfig(
-      url: 'https://www.afad.gov.tr/rss/duyurular.xml',
-      source: 'AFAD',
+      // Kandilli Observatory: HTML-Seite mit Erdbeben-Liste der letzten Tage.
+      // Wird im Parser per Heuristik in Items zerlegt — siehe _parseKandilli().
+      url: 'http://www.koeri.boun.edu.tr/scripts/lst0.asp',
+      source: 'Kandilli Observatory',
     ),
     'RU': _FeedConfig(
       url: 'https://www.mchs.gov.ru/rss/news.xml',
@@ -138,6 +155,12 @@ class CivilProtectionService {
     String country,
     String source,
   ) {
+    // Sonderfall TR: Kandilli liefert kein XML sondern eine HTML-Seite mit
+    // fixed-width Erdbeben-Tabelle in <pre>. Parser ist eigen.
+    if (country == 'TR' && body.contains('<pre>')) {
+      return _parseKandilli(body, source);
+    }
+
     XmlDocument doc;
     try {
       doc = XmlDocument.parse(body);
@@ -151,20 +174,74 @@ class CivilProtectionService {
       return _parseRss(items, country, source);
     }
 
-    // Atom (<feed><entry>)
+    // Atom (<feed><entry>) — MeteoAlarm IT/ES/FR seit 2026 (siehe oben)
     final entries = doc.findAllElements('entry').toList();
     if (entries.isNotEmpty) {
       return _parseAtom(entries, country, source);
     }
 
-    // CAP (Meteo-France Vigilance ist meist CAP/JSON; XML-Variante hat
-    // <info>-Bloecke). Wir extrahieren defensiv was wir finden.
+    // CAP (alte Meteo-France Vigilance + andere CAP-1.2-Feeds).
     final infos = doc.findAllElements('info').toList();
     if (infos.isNotEmpty) {
       return _parseCap(infos, country, source);
     }
 
     return const [];
+  }
+
+  /// Kandilli Observatory (TR) — keine RSS, sondern HTML-Tabelle in <pre>.
+  /// Format pro Zeile (fixed-width, Leerzeichen-getrennt):
+  ///   YYYY.MM.DD HH:MM:SS  LAT     LNG     DEPTH  MD  ML  Mw   LOCATION  SOLUTION
+  /// Wir filtern auf Mag >= 3.0 (alles darunter ist meist nicht spuerbar).
+  static List<CivilProtectionAlert> _parseKandilli(
+      String body, String source) {
+    // <pre>-Block extrahieren.
+    final preMatch =
+        RegExp(r'<pre>(.*?)</pre>', dotAll: true, caseSensitive: false)
+            .firstMatch(body);
+    if (preMatch == null) return const [];
+    final pre = preMatch.group(1) ?? '';
+    // Zeilen die mit YYYY.MM.DD beginnen.
+    final lineRe = RegExp(
+      r'^(\d{4}\.\d{2}\.\d{2})\s+(\d{2}:\d{2}:\d{2})\s+'
+      r'(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+'
+      r'([-.\d]+)\s+([-.\d]+)\s+([-.\d]+)\s+(.+?)\s{2,}',
+      multiLine: true,
+    );
+    final out = <CivilProtectionAlert>[];
+    for (final m in lineRe.allMatches(pre)) {
+      final date = m.group(1)!.replaceAll('.', '-');
+      final time = m.group(2)!;
+      final lat = double.tryParse(m.group(3) ?? '');
+      final lng = double.tryParse(m.group(4) ?? '');
+      final depth = double.tryParse(m.group(5) ?? '');
+      // 3 Magnitude-Spalten: MD, ML, Mw — wir nehmen die hoechste.
+      double? bestMag;
+      for (final raw in [m.group(6), m.group(7), m.group(8)]) {
+        final cleaned = raw?.replaceAll(RegExp(r'[^\d.]'), '');
+        final v = double.tryParse(cleaned ?? '');
+        if (v != null && v > 0 && (bestMag == null || v > bestMag)) {
+          bestMag = v;
+        }
+      }
+      if (bestMag == null || bestMag < 3.0) continue;
+      final location = m.group(9)?.trim() ?? '';
+      final dt = DateTime.tryParse('${date}T${time}Z');
+      out.add(CivilProtectionAlert(
+        id: 'TR_kandilli_${date}_$time',
+        country: 'TR',
+        title: 'M ${bestMag.toStringAsFixed(1)} · $location',
+        description: depth != null
+            ? 'Erdbeben — Tiefe ${depth.toStringAsFixed(1)} km'
+                ' · ${lat?.toStringAsFixed(2)},${lng?.toStringAsFixed(2)}'
+            : 'Erdbeben',
+        link: 'http://www.koeri.boun.edu.tr/scripts/lst0.asp',
+        publishedAt: dt,
+        source: source,
+      ));
+      if (out.length >= 30) break;
+    }
+    return out;
   }
 
   static List<CivilProtectionAlert> _parseRss(
