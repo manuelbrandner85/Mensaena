@@ -42,6 +42,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _ctrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   RealtimeChannel? _typingChannel;
+  Timer? _peerTypingResetTimer;
   bool _peerTyping = false;
   DateTime _lastTypingBroadcast = DateTime.fromMillisecondsSinceEpoch(0);
 
@@ -155,9 +156,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           final isTyping = payload['typing'] as bool? ?? false;
           if (from == null || from == uid) return;
           if (!mounted) return;
+          // Cancellable Timer statt free-floating Future.delayed —
+          // jeder neue typing-Event resettet die Auto-Off-Frist sauber.
+          _peerTypingResetTimer?.cancel();
           setState(() => _peerTyping = isTyping);
           if (isTyping) {
-            Future.delayed(const Duration(seconds: 4), () {
+            _peerTypingResetTimer = Timer(const Duration(seconds: 4), () {
               if (!mounted) return;
               setState(() => _peerTyping = false);
             });
@@ -272,6 +276,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _ctrl.removeListener(_onTextChanged);
     _ctrl.dispose();
     _scrollCtrl.dispose();
+    _peerTypingResetTimer?.cancel();
     // BUG-FIX #13: Channel unsubscribe + removeChannel — sonst bleibt
     // RealtimeChannel im Supabase-Client-Pool, fuehrt zu Memory-Leak +
     // doppelten typing-Broadcasts bei schnellem Chat-Wechsel.

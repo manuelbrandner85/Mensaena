@@ -127,12 +127,16 @@ class ConversationsRepository {
         }
       }
       result.sort((a, b) {
-        final ta = DateTime.tryParse(
-                (a['updated_at'] ?? a['created_at']) as String? ?? '') ??
-            DateTime(2000);
-        final tb = DateTime.tryParse(
-                (b['updated_at'] ?? b['created_at']) as String? ?? '') ??
-            DateTime(2000);
+        // Explizit UTC normalisieren — DB liefert ISO mit "Z", aber
+        // bei fehlendem Z parst Dart als local. .toUtc() fixt das.
+        final ta = (DateTime.tryParse(
+                    (a['updated_at'] ?? a['created_at']) as String? ?? '') ??
+                DateTime.utc(2000))
+            .toUtc();
+        final tb = (DateTime.tryParse(
+                    (b['updated_at'] ?? b['created_at']) as String? ?? '') ??
+                DateTime.utc(2000))
+            .toUtc();
         return tb.compareTo(ta);
       });
       return result;

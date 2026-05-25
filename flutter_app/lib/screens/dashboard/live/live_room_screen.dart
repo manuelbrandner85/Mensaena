@@ -239,7 +239,14 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
       LiveStreamService.endChannelStream(widget.roomName);
     }
     _listener?.dispose();
+    _listener = null;
+    // Explizites disconnect vor dispose — falls connect() noch nicht
+    // fertig war, beendet das die pending future sauber.
+    try {
+      _room?.disconnect();
+    } catch (_) {}
     _room?.dispose();
+    _room = null;
     super.dispose();
   }
 

@@ -296,7 +296,9 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
   List<String> get _availableStatuses {
     switch (widget.tableName) {
       case 'content_reports':
-        return const ['open', 'reviewing', 'resolved', 'dismissed'];
+        // Canonical statuses match admin_reports_screen + DB-Count in
+        // admin_repository (status='pending').
+        return const ['pending', 'reviewed', 'resolved', 'dismissed'];
       case 'crisis_situations':
       case 'crises':
         return const ['active', 'resolved', 'archived'];
