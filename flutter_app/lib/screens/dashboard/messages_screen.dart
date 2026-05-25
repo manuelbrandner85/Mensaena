@@ -181,6 +181,8 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                               .watch(onlineUsersProvider)
                               .value ??
                           const <String>{},
+                      // F1c-Fix: nach Hide/Delete eigene _convs neu laden.
+                      onChanged: () => setState(_load),
                     ),
                   ),
                 ],
@@ -367,12 +369,14 @@ class _DmListView extends StatelessWidget {
     required this.search,
     required this.onSearchChanged,
     required this.onlineUserIds,
+    required this.onChanged,
   });
 
   final Future<List<Map<String, dynamic>>>? future;
   final String search;
   final ValueChanged<String> onSearchChanged;
   final Set<String> onlineUserIds;
+  final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -451,7 +455,11 @@ class _DmListView extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             for (final c in filtered)
-              _DmTile(conv: c, onlineUserIds: onlineUserIds),
+              _DmTile(
+                conv: c,
+                onlineUserIds: onlineUserIds,
+                onChanged: onChanged,
+              ),
           ],
         );
       },
@@ -460,7 +468,12 @@ class _DmListView extends StatelessWidget {
 }
 
 class _DmTile extends ConsumerWidget {
-  const _DmTile({required this.conv, required this.onlineUserIds});
+  const _DmTile({
+    required this.conv,
+    required this.onlineUserIds,
+    required this.onChanged,
+  });
+  final VoidCallback onChanged;
   final Map<String, dynamic> conv;
   final Set<String> onlineUserIds;
 
@@ -484,7 +497,10 @@ class _DmTile extends ConsumerWidget {
     return InkWell(
       onTap: () => context.go('/dashboard/messages/$id'),
       // F1c: Long-Press → Action-Sheet mit Verstecken + Endgueltig loeschen
-      onLongPress: isDm ? () => _showDmActions(context, ref, id, title) : null,
+      onLongPress: isDm
+          ? () => _showDmActions(context, ref, id, title,
+              onRemoved: onChanged)
+          : null,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -622,8 +638,14 @@ class _DmTile extends ConsumerWidget {
 }
 
 // ── F1c: DM-Aktionen Sheet (Verstecken / Endgueltig loeschen) ──────
+/// `onRemoved` wird nach erfolgreicher Loeschung gerufen damit der
+/// aufrufende Screen seine eigene Future neu laden kann. Vorher wurde
+/// nur ref.invalidate(conversationsProvider) gerufen — das hilft nicht
+/// weil messages_screen.dart eine eigene _convs-Future nutzt, keinen
+/// Provider — Conv verschwand zwar in DB aber blieb in UI sichtbar.
 void _showDmActions(
-    BuildContext context, WidgetRef ref, String convId, String title) {
+    BuildContext context, WidgetRef ref, String convId, String title,
+    {required VoidCallback onRemoved}) {
   Haptics.longPress();
   showModalBottomSheet<void>(
     context: context,
@@ -672,7 +694,10 @@ void _showDmActions(
                     ? 'messages.hidden'.tr()
                     : 'messages.hideFailed'.tr()),
               ));
-              if (ok) ref.invalidate(conversationsProvider);
+              if (ok) {
+                ref.invalidate(conversationsProvider);
+                onRemoved();
+              }
             },
           ),
           ListTile(
@@ -723,7 +748,10 @@ void _showDmActions(
                     ? 'messages.deletedForBoth'.tr()
                     : 'messages.deleteFailed'.tr()),
               ));
-              if (ok) ref.invalidate(conversationsProvider);
+              if (ok) {
+                ref.invalidate(conversationsProvider);
+                onRemoved();
+              }
             },
           ),
           const SizedBox(height: 8),

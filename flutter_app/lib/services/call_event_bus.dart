@@ -194,11 +194,14 @@ class CallEventBus {
     // Verhindert Doppel-Accept-Race wenn User auf Lock-Screen zwei mal tappt.
     if (!_handledAccepts.add(ctx.callId)) return;
 
-    // Critical: status=active SOFORT setzen. Sonst hoert Caller ewig
-    // Ringback. Vor Navigation — selbst wenn Navigation fehlschlaegt,
-    // ist die Server-Seite konsistent.
-    await _updateStatus(ctx.callId, 'active', answered: true);
     _contexts.remove(ctx.callId);
+
+    // SPEED: Status-Update + Navigation parallel. Vorher wurde 200-500ms
+    // auf DB-Update gewartet bevor navigiert wird → User sah lange weiss.
+    // Jetzt: Navigation startet sofort (Call-Screen kann sich aufbauen),
+    // DB-Update laeuft fire-and-forget. Bei Fehler ist DB-State suboptimal
+    // aber Call-Screen kann LiveKit trotzdem joinen.
+    unawaited(_updateStatus(ctx.callId, 'active', answered: true));
 
     final encName = Uri.encodeComponent(ctx.callerName);
     final encRoom = Uri.encodeComponent(ctx.roomName);
@@ -214,8 +217,10 @@ class CallEventBus {
       } catch (_) {}
     }
     // Cold-Start-Retry: GoRouter braucht ein paar Frames bis ready.
+    // Aggressiveres Polling (50ms statt 100ms) damit User schneller im
+    // Call landet — total max 5s bis Aufgeben.
     var tries = 0;
-    Timer.periodic(const Duration(milliseconds: 100), (t) {
+    Timer.periodic(const Duration(milliseconds: 50), (t) {
       tries++;
       final n = rootNavigatorKey.currentState;
       if (n != null) {
@@ -225,7 +230,7 @@ class CallEventBus {
           return;
         } catch (_) {}
       }
-      if (tries > 30) t.cancel(); // 3s max
+      if (tries > 100) t.cancel(); // 5s max
     });
   }
 
