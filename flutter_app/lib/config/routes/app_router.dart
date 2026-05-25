@@ -7,11 +7,16 @@ import 'package:go_router/go_router.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
+import '../../screens/dashboard/admin/admin_bot_feedback_screen.dart';
+import '../../screens/dashboard/admin/admin_challenges_screen.dart';
 import '../../screens/dashboard/admin/admin_chat_moderation_screen.dart';
+import '../../screens/dashboard/admin/admin_contact_screen.dart';
 import '../../screens/dashboard/admin/admin_dashboard_screen.dart';
+import '../../screens/dashboard/admin/admin_groups_screen.dart';
 import '../../screens/dashboard/admin/admin_system_screen.dart';
 import '../../screens/dashboard/admin/admin_table_screen.dart';
 import '../../screens/dashboard/admin/admin_users_screen.dart';
+import '../../screens/dashboard/admin/admin_zeitbank_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
@@ -1036,40 +1041,35 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/admin/groups',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: AdminTableScreen(
-          title: 'admin.tiles.groups'.tr(),
-          tableName: 'groups',
-          currentRoute: '/dashboard/admin/groups',
-          titleField: 'name',
-          subtitleFields: const ['category', 'is_private'],
-        ),
+          child: const AdminGroupsScreen(),
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/challenges',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: AdminTableScreen(
-          // FIX R6: Spalten aus challenges-Schema (category/difficulty/points)
-          title: 'admin.tiles.challenges'.tr(),
-          tableName: 'challenges',
-          currentRoute: '/dashboard/admin/challenges',
-          subtitleFields: const ['category', 'difficulty', 'status'],
-        ),
+          child: const AdminChallengesScreen(),
         ),
       ),
       GoRoute(
         path: '/dashboard/admin/timebank',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: AdminTableScreen(
-          // FIX R6: timebank_entries hat type/hours, KEINE status-Spalte
-          title: 'admin.tiles.timebank'.tr(),
-          tableName: 'timebank_entries',
-          currentRoute: '/dashboard/admin/timebank',
-          titleField: 'description',
-          subtitleFields: const ['type', 'hours'],
+          child: const AdminZeitbankScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/bot-feedback',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminBotFeedbackScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/contact',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminContactScreen(),
         ),
       ),
       GoRoute(
