@@ -875,6 +875,11 @@
     "advertise": "İlan ver",
     "searchPlaceholder": "İlanları ara…",
     "screenTitle": "Pazaryeri",
+    "statsActive": "{n} ilan",
+    "statsFree": "{n} ücretsiz",
+    "statsClaimed": "{n} verildi",
+    "claimedBadge": "Verildi",
+    "reservedBadge": "Rezerve",
     "reservation": {
       "activeOwner": "Rezervasyon aktif",
       "confirmTitle": "Devir onaylansın mı?",

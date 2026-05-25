@@ -875,6 +875,11 @@
     "advertise": "Publicar",
     "searchPlaceholder": "Buscar anuncios…",
     "screenTitle": "Mercado",
+    "statsActive": "{n} anuncios",
+    "statsFree": "{n} gratis",
+    "statsClaimed": "{n} entregados",
+    "claimedBadge": "Entregado",
+    "reservedBadge": "Reservado",
     "reservation": {
       "activeOwner": "Reserva activa",
       "confirmTitle": "¿Confirmar entrega?",

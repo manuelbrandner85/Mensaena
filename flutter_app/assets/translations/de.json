@@ -875,6 +875,11 @@
     "advertise": "Inserieren",
     "searchPlaceholder": "Inserate durchsuchen…",
     "screenTitle": "Marktplatz",
+    "statsActive": "{n} Anzeigen",
+    "statsFree": "{n} gratis",
+    "statsClaimed": "{n} vergeben",
+    "claimedBadge": "Vergeben",
+    "reservedBadge": "Reserviert",
     "reservation": {
       "activeOwner": "Reservierung aktiv",
       "confirmTitle": "Verkauf bestätigen?",

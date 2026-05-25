@@ -15,9 +15,14 @@ class MarketplaceRepository {
   static Future<List<MarketplaceListing>> listActive({
     String? listingType,
     int limit = 100,
+    bool includeClaimed = false,
   }) async {
     try {
-      var query = sb.from('marketplace_listings').select().eq('status', 'active');
+      var query = sb.from('marketplace_listings').select();
+      if (!includeClaimed) {
+        // active + reserved (default Marketplace view)
+        query = query.inFilter('status', const ['active', 'reserved']);
+      }
       if (listingType != null && listingType != 'all') {
         query = query.eq('listing_type', listingType);
       }
@@ -179,6 +184,15 @@ class MarketplaceRepository {
 final marketplaceListingsProvider =
     FutureProvider.family<List<MarketplaceListing>, String>(
         (ref, type) => MarketplaceRepository.listActive(listingType: type));
+
+/// Family-Variante mit includeClaimed-Flag — key: (type, includeClaimed).
+final marketplaceListingsFilteredProvider = FutureProvider.family<
+    List<MarketplaceListing>, ({String type, bool includeClaimed})>(
+  (ref, key) => MarketplaceRepository.listActive(
+    listingType: key.type,
+    includeClaimed: key.includeClaimed,
+  ),
+);
 
 final marketplaceDetailProvider =
     FutureProvider.family<MarketplaceListing?, String>(

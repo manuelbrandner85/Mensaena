@@ -875,6 +875,11 @@
     "advertise": "Pubblica",
     "searchPlaceholder": "Cerca annunci…",
     "screenTitle": "Mercato",
+    "statsActive": "{n} annunci",
+    "statsFree": "{n} gratis",
+    "statsClaimed": "{n} assegnati",
+    "claimedBadge": "Assegnato",
+    "reservedBadge": "Prenotato",
     "reservation": {
       "activeOwner": "Prenotazione attiva",
       "confirmTitle": "Confermare la consegna?",

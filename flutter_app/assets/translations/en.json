@@ -875,6 +875,11 @@
     "advertise": "List item",
     "searchPlaceholder": "Search listings…",
     "screenTitle": "Marketplace",
+    "statsActive": "{n} listings",
+    "statsFree": "{n} free",
+    "statsClaimed": "{n} claimed",
+    "claimedBadge": "Claimed",
+    "reservedBadge": "Reserved",
     "reservation": {
       "activeOwner": "Reservation active",
       "confirmTitle": "Confirm handover?",

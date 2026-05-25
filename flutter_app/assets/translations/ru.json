@@ -875,6 +875,11 @@
     "advertise": "Разместить",
     "searchPlaceholder": "Поиск объявлений…",
     "screenTitle": "Маркетплейс",
+    "statsActive": "{n} объявлений",
+    "statsFree": "{n} бесплатно",
+    "statsClaimed": "{n} отдано",
+    "claimedBadge": "Отдано",
+    "reservedBadge": "Забронировано",
     "reservation": {
       "activeOwner": "Бронь активна",
       "confirmTitle": "Подтвердить передачу?",

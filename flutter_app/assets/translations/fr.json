@@ -875,6 +875,11 @@
     "advertise": "Publier",
     "searchPlaceholder": "Rechercher des annonces…",
     "screenTitle": "Marché",
+    "statsActive": "{n} annonces",
+    "statsFree": "{n} gratuits",
+    "statsClaimed": "{n} attribués",
+    "claimedBadge": "Attribué",
+    "reservedBadge": "Réservé",
     "reservation": {
       "activeOwner": "Réservation active",
       "confirmTitle": "Confirmer la remise ?",
