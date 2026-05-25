@@ -13,6 +13,8 @@
 /// Call-ring is played as a looping stream until [stopCallRing] is invoked.
 library;
 
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -67,20 +69,36 @@ class AudioFeedbackService {
 
   /// Plays a single asset and disposes the player when finished. Safe to
   /// call when assets are missing — swallows all errors.
+  ///
+  /// Hat einen 10s-Timeout-Fallback: wenn onPlayerComplete nie feuert
+  /// (z.B. corrupt asset, network stall), wird der Player trotzdem
+  /// disposed → kein AudioPlayer-Leak.
   Future<void> _playOnce(String assetPath) async {
     if (!await isSoundEnabled()) return;
     final player = AudioPlayer();
+    bool disposed = false;
+    void disposeOnce() {
+      if (disposed) return;
+      disposed = true;
+      try {
+        player.dispose();
+      } catch (_) {/* ignore */}
+    }
     try {
       await player.play(AssetSource(assetPath));
-      // Auto-dispose after playback ends so we don't leak players.
-      player.onPlayerComplete.listen((_) {
-        player.dispose();
+      late final StreamSubscription<void> sub;
+      sub = player.onPlayerComplete.listen((_) {
+        sub.cancel();
+        disposeOnce();
+      });
+      // Safety-Net: max 10s, dann hart disposen.
+      Future<void>.delayed(const Duration(seconds: 10), () {
+        sub.cancel();
+        disposeOnce();
       });
     } catch (e) {
       debugPrint('AudioFeedbackService: asset "$assetPath" failed: $e');
-      try {
-        await player.dispose();
-      } catch (_) {/* ignore */}
+      disposeOnce();
     }
   }
 

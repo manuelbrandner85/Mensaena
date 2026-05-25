@@ -45,9 +45,15 @@ class PushNotificationService {
   static final _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  // Doppel-Init-Guard: ohne den wuerde jeder Hot-Reload + jeder
+  // re-init-Aufruf einen neuen onMessage-Listener anhaengen → Leak.
+  static bool _initialized = false;
+
   /// Bootstrap — Firebase init, Permissions, Channel-Setup, Listener.
   /// Wird in main.dart aufgerufen BEVOR runApp().
   static Future<void> init() async {
+    if (_initialized) return;
+    _initialized = true;
     try {
       await Firebase.initializeApp();
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -29,28 +31,36 @@ class _VoiceMessageBubbleState extends State<VoiceMessageBubble> {
   bool _playing = false;
   Duration _position = Duration.zero;
   Duration? _total;
+  // Stream-Subscriptions: vorher .listen() ohne Variable → 3 Streams pro
+  // Bubble nie cancelled → Listener-Leak in Chat-Scrolls.
+  StreamSubscription<PlayerState>? _stateSub;
+  StreamSubscription<Duration>? _positionSub;
+  StreamSubscription<Duration>? _durationSub;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    _player.onPlayerStateChanged.listen((s) {
+    _stateSub = _player.onPlayerStateChanged.listen((s) {
       if (!mounted) return;
       setState(() => _playing = s == PlayerState.playing);
       if (s == PlayerState.completed) {
         setState(() => _position = Duration.zero);
       }
     });
-    _player.onPositionChanged.listen((p) {
+    _positionSub = _player.onPositionChanged.listen((p) {
       if (mounted) setState(() => _position = p);
     });
-    _player.onDurationChanged.listen((d) {
+    _durationSub = _player.onDurationChanged.listen((d) {
       if (mounted) setState(() => _total = d);
     });
   }
 
   @override
   void dispose() {
+    _stateSub?.cancel();
+    _positionSub?.cancel();
+    _durationSub?.cancel();
     _player.dispose();
     super.dispose();
   }
