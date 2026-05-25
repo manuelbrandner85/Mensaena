@@ -47,8 +47,14 @@ class CinemaOverlay extends ConsumerWidget {
     if (phase == null) {
       return child;
     }
-    final spec = CinemaTheme.specFor(phase);
     final baseIntensity = ref.watch(cinemaIntensityProvider).multiplier;
+    // CRITICAL Performance-Fix: bei minimal-Mode (Default) ueberspring
+    // den kompletten Effekt-Stack. Spart 6× CustomPaint + 4× Animation
+    // Controllers + Mesh-Drift pro Frame. App lief vorher sehr langsam.
+    if (baseIntensity <= 0.01) {
+      return child;
+    }
+    final spec = CinemaTheme.specFor(phase);
     // V20 Phase-6b: Im Light-Mode reduziert sich die Cinema-Intensitaet
     // auf max. 0.3, damit der dunkle Atmospheric-Background den hellen
     // Content nicht ueberlaegt.

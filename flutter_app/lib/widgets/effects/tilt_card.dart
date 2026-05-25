@@ -1,12 +1,15 @@
 /// SKILL: mensaena-design
 /// 3D-Tilt-Card — Accelerometer-getriebener Parallax-Effekt.
 ///
-/// Liest das Geraet-Tilting via `sensors_plus.accelerometerEventStream`
-/// und kippt den Child-Widget leicht in X/Y-Achse. Subtle (max 6 Grad),
-/// damit nicht ablenkend. Ideal fuer Hero-Bilder, Profil-Avatare,
-/// Stat-Cards die hervorstechen sollen.
+/// CRITICAL: shared singleton accelerometer subscription via
+/// _SharedAccelerometer.stream. Vorher hatten N TiltCards jeweils
+/// eigene accelerometerEventStream-Subscriptions auf den nativen
+/// sensors_plus EventChannel → race conditions beim dispose → die
+/// nächste Card cancel'te einen schon-toten Stream → PlatformException
+/// "No active stream to cancel" mit Engine-Crash.
 ///
-/// Reagiert NICHT bei Cinema-Intensity = minimal (Battery-Save).
+/// Jetzt: 1 native subscription. Jede TiltCard hört nur den broadcast
+/// stream — kein direkter sensor-channel mehr.
 library;
 
 import 'dart:async';
@@ -19,23 +22,54 @@ import 'package:sensors_plus/sensors_plus.dart';
 import '../../config/theme/cinema_theme.dart';
 import '../../providers/cinema_provider.dart';
 
-/// Maximaler Kipp-Winkel in Radianten (~6 Grad pro Achse).
 const _maxTiltRad = 0.105;
-
-/// Wie stark der Sensor-Wert auf die Animation einschlaegt.
-/// Niedriger = ruhiger, hoeher = sportlicher. 0.08 fuehlt sich natuerlich an.
 const _sensitivity = 0.08;
-
-/// Wie schnell die Tilt-Werte auf Sensor-Aenderungen reagieren (Low-Pass).
-/// 0.15 = 85% Smoothing pro Frame.
 const _smoothing = 0.15;
-
-/// Sensor-Sampling-Period — normalInterval (200ms) statt uiInterval (16ms).
-/// Performance-Hot-Fix: 5 TiltCards in Dashboard-Stats + 1 in Profile-Avatar
-/// liefen mit 60fps Sensor-Updates pro Card = 360 Frame-Triggers/Sek auf
-/// dem Main-Thread → Frame-Drops + Haenger bei Tab-Wechsel. 200ms reicht
-/// fuer das Schweben-Gefuehl (5 Hz Tilt-Update = ~10x weniger Last).
 const _sampleInterval = SensorInterval.normalInterval;
+
+/// Singleton broadcast stream über sensors_plus. Nur EINE native
+/// subscription für alle TiltCards.
+class _SharedAccelerometer {
+  static StreamController<AccelerometerEvent>? _controller;
+  static StreamSubscription<AccelerometerEvent>? _nativeSub;
+  static int _listenerCount = 0;
+
+  /// Lazy-init und ref-counted: schliesst die native subscription
+  /// erst wenn der letzte Listener weg ist.
+  static Stream<AccelerometerEvent> stream() {
+    _controller ??= StreamController<AccelerometerEvent>.broadcast(
+      onListen: _attach,
+      onCancel: _maybeDetach,
+    );
+    return _controller!.stream;
+  }
+
+  static void _attach() {
+    _listenerCount++;
+    if (_nativeSub != null) return;
+    try {
+      _nativeSub = accelerometerEventStream(samplingPeriod: _sampleInterval)
+          .listen(
+            (e) => _controller?.add(e),
+            onError: (_) {},
+            cancelOnError: false,
+          );
+    } catch (e) {
+      debugPrint('[TiltCard] native sensor unavailable: $e');
+    }
+  }
+
+  static void _maybeDetach() {
+    _listenerCount--;
+    if (_listenerCount > 0) return;
+    final s = _nativeSub;
+    _nativeSub = null;
+    // Fire-and-forget cancel. catchError statt try/catch weil
+    // cancel() ein Future zurückgibt und der "No active stream to
+    // cancel"-Error ASYNCHRON kommt.
+    s?.cancel().catchError((_) {});
+  }
+}
 
 class TiltCard extends ConsumerStatefulWidget {
   const TiltCard({
@@ -46,19 +80,9 @@ class TiltCard extends ConsumerStatefulWidget {
     super.key,
   });
 
-  /// Inhalts-Widget (Bild, Card, Container).
   final Widget child;
-
-  /// 0.0–1.5 globale Multiplier; <1.0 fuer subtile Effekte, >1.0 fuer
-  /// auffaellige Hero-Bereiche (Profile-Cover). Default 1.0.
   final double intensity;
-
-  /// Perspektive-Tiefe der 3D-Projektion. 0.0015 ist ein guter
-  /// Mittelwert, niedriger = flacher, hoeher = staerker.
   final double perspective;
-
-  /// Border-Radius fuer Hit-Test-Clip — damit der Tilt-Effekt nicht
-  /// ueber die Card-Kanten hinaus geht.
   final double borderRadius;
 
   @override
@@ -73,44 +97,27 @@ class _TiltCardState extends ConsumerState<TiltCard> {
   @override
   void initState() {
     super.initState();
-    _start();
+    _subscribe();
   }
 
-  void _start() {
-    _cancelSub();
+  void _subscribe() {
     try {
-      _sub = accelerometerEventStream(samplingPeriod: _sampleInterval)
-          .listen(_onSample, onError: (_) {});
+      _sub = _SharedAccelerometer.stream().listen(
+        _onSample,
+        onError: (_) {},
+        cancelOnError: false,
+      );
     } catch (_) {
-      // Sensor not available — gracefully degrade (no tilt animation).
       _sub = null;
     }
   }
 
-  /// Robust cancel: sensors_plus throws "No active stream to cancel" on
-  /// Android when the stream wasn't actually active. Swallow that — it
-  /// crashes the framework if uncaught during dispose.
-  void _cancelSub() {
-    final s = _sub;
-    if (s == null) return;
-    _sub = null;
-    try {
-      s.cancel();
-    } catch (_) {}
-  }
-
   void _onSample(AccelerometerEvent e) {
-    // Geraet-Achsen: y = lange Hochkant-Achse (top↑ pos), x = quer (right↑ pos).
-    // Negation, damit Card sich beim Vorne-Kippen nach hinten kippt (Parallax).
-    final targetX = (-e.y * _sensitivity)
-        .clamp(-_maxTiltRad, _maxTiltRad)
-        .toDouble();
-    final targetY = (e.x * _sensitivity)
-        .clamp(-_maxTiltRad, _maxTiltRad)
-        .toDouble();
+    if (!mounted) return;
+    final targetX = (-e.y * _sensitivity).clamp(-_maxTiltRad, _maxTiltRad).toDouble();
+    final targetY = (e.x * _sensitivity).clamp(-_maxTiltRad, _maxTiltRad).toDouble();
     final nx = _tiltX + (targetX - _tiltX) * _smoothing;
     final ny = _tiltY + (targetY - _tiltY) * _smoothing;
-    if (!mounted) return;
     if ((nx - _tiltX).abs() < 0.0005 && (ny - _tiltY).abs() < 0.0005) return;
     setState(() {
       _tiltX = nx;
@@ -120,28 +127,28 @@ class _TiltCardState extends ConsumerState<TiltCard> {
 
   @override
   void dispose() {
-    _cancelSub();
+    // Cancel ist auf einem broadcast-stream sicher — kein native
+    // channel-cancel. Trotzdem fire-and-forget + catchError.
+    _sub?.cancel().catchError((_) {});
+    _sub = null;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final intensity = ref.watch(cinemaIntensityProvider);
-    // Battery-Save / Minimal-Modus → kein Tilt
     if (intensity == CinemaIntensity.minimal) {
       return widget.child;
     }
     final mult = widget.intensity * intensity.multiplier;
     final rx = _tiltX * mult;
     final ry = _tiltY * mult;
-
     return Transform(
       alignment: Alignment.center,
       transform: Matrix4.identity()
         ..setEntry(3, 2, widget.perspective)
         ..rotateX(rx)
         ..rotateY(ry)
-        // Leichte Translation gibt das "schwebt"-Gefuehl
         ..translate(math.sin(ry) * 4.0, -math.sin(rx) * 4.0),
       child: widget.child,
     );

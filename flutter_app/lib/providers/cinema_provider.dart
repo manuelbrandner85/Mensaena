@@ -36,11 +36,13 @@ final cinemaModeProvider =
         (ref) => CinemaModeNotifier());
 
 class CinemaIntensityNotifier extends StateNotifier<CinemaIntensity> {
-  /// Default = reduced (50% intensity) statt full — Performance-Hot-Fix.
-  /// Auf mittleren Android-Phones war full zu GPU-lastig + verursachte
-  /// Frame-Drops + Haenger bei Page-Transitions. User kann via Settings
-  /// auf full hochsetzen wenn die Performance ausreicht.
-  CinemaIntensityNotifier() : super(CinemaIntensity.reduced) {
+  /// Default = minimal — Cinema-Effekte komplett aus.
+  /// Performance-Hot-Fix v2: trotz reduced-Default crashte die App noch
+  /// beim Tab-Wechsel. CinemaOverlay rendert auch im reduced-Mode noch
+  /// 6 Effekt-Layer + AnimationControllers. Bei minimal werden alle
+  /// Effekte uebersprungen. User kann via Settings hochsetzen wenn das
+  /// Geraet stark genug ist.
+  CinemaIntensityNotifier() : super(CinemaIntensity.minimal) {
     _load();
   }
 
