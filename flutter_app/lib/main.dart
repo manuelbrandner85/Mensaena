@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -95,6 +96,12 @@ Future<void> _initBackgroundServices() async {
   try {
     await CallkitService.initialize();
   } catch (_) {}
+
+  // Tile-Cache fuer flutter_map initialisieren (Background, non-blocking).
+  try {
+    await FMTCObjectBoxBackend().initialise();
+    await const FMTCStore('mensaena_tiles').manage.create();
+  } catch (_) {/* FMTC nicht verfuegbar — Tiles werden ohne Cache geladen */}
 
   // Android 14+: Full-Screen-Intent fuer eingehende Calls braucht
   // Runtime-Permission. Ohne das zeigt das System nur eine Heads-Up-

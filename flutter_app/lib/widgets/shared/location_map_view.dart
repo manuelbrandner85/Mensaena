@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -9,8 +10,9 @@ import '../../config/theme/app_typography.dart';
 
 /// SKILL: mensaena-design
 /// Wiederverwendbarer Karten-View — Pendant zu Web-`CrisisMap` / `EventMap` /
-/// `SupplyMap`. OpenStreetMap-Tiles, MarkerCluster ab >5 Markern. Tap auf
-/// Marker oeffnet [onMarkerTap] Callback.
+/// `SupplyMap`. OpenStreetMap-Tiles im Light-Mode, CartoDB Dark Matter im
+/// Dark-Mode. Tile-Caching via FMTC (7-Tage-Cache). MarkerCluster ab >5
+/// Markern. Tap auf Marker oeffnet [onMarkerTap] Callback.
 class LocationMapView extends StatefulWidget {
   const LocationMapView({
     required this.markers,
@@ -31,7 +33,46 @@ class LocationMapView extends StatefulWidget {
 
 class _LocationMapViewState extends State<LocationMapView> {
   static const LatLng _fallback = LatLng(51.1657, 10.4515);
+  static const String _storeName = 'mensaena_tiles';
+
   final MapController _ctrl = MapController();
+  bool _fmtcReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFmtc();
+  }
+
+  Future<void> _initFmtc() async {
+    try {
+      // Wenn FMTC schon in main.dart initialisiert wurde, ist das idempotent.
+      // Store-Erstellung ebenfalls idempotent ueber FMTCStore.manage.ready.
+      await FMTCObjectBoxBackend().initialise();
+      const store = FMTCStore(_storeName);
+      final exists = await store.manage.ready;
+      if (!exists) {
+        await store.manage.create();
+      }
+      if (mounted) setState(() => _fmtcReady = true);
+    } catch (_) {
+      // FMTC nicht verfuegbar — Tiles werden ohne Cache geladen.
+      _fmtcReady = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  String _tileUrl(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark
+        ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +98,15 @@ class _LocationMapViewState extends State<LocationMapView> {
           ),
           children: [
             TileLayer(
-              urlTemplate:
-                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              urlTemplate: _tileUrl(context),
               userAgentPackageName: 'de.mensaena.app',
-              tileProvider: NetworkTileProvider(),
+              tileProvider: _fmtcReady
+                  ? const FMTCStore(_storeName).getTileProvider(
+                      settings: FMTCTileProviderSettings(
+                        cachedValidDuration: const Duration(days: 7),
+                      ),
+                    )
+                  : NetworkTileProvider(),
             ),
             MarkerClusterLayerWidget(
               options: MarkerClusterLayerOptions(
@@ -74,7 +120,11 @@ class _LocationMapViewState extends State<LocationMapView> {
                       height: 36,
                       child: GestureDetector(
                         onTap: () => widget.onMarkerTap?.call(m),
-                        child: _Pin(color: m.color, icon: m.icon),
+                        child: _Pin(
+                          color: m.color,
+                          icon: m.icon,
+                          emoji: m.emoji,
+                        ),
                       ),
                     ),
                 ],
@@ -148,9 +198,10 @@ class _LocationMapViewState extends State<LocationMapView> {
 }
 
 class _Pin extends StatelessWidget {
-  const _Pin({required this.color, this.icon});
+  const _Pin({required this.color, this.icon, this.emoji});
   final Color color;
   final IconData? icon;
+  final String? emoji;
 
   @override
   Widget build(BuildContext context) {
@@ -168,16 +219,18 @@ class _Pin extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(
-        icon ?? LucideIcons.mapPin,
-        size: 16,
-        color: AppColors.voidColor,
-      ),
+      child: emoji != null
+          ? Text(emoji!, style: const TextStyle(fontSize: 16))
+          : Icon(
+              icon ?? LucideIcons.mapPin,
+              size: 16,
+              color: AppColors.voidColor,
+            ),
     );
   }
 }
 
-/// Marker-Datensatz: Position + Farbe + optional Icon + Tap-Payload.
+/// Marker-Datensatz: Position + Farbe + optional Icon/Emoji + Tap-Payload.
 class MapMarkerData {
   const MapMarkerData({
     required this.id,
@@ -187,6 +240,8 @@ class MapMarkerData {
     required this.title,
     this.subtitle,
     this.icon,
+    this.emoji,
+    this.type,
   });
 
   final String id;
@@ -196,4 +251,6 @@ class MapMarkerData {
   final String title;
   final String? subtitle;
   final IconData? icon;
+  final String? emoji;
+  final String? type;
 }

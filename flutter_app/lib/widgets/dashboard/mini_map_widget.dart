@@ -1,5 +1,6 @@
 /// SKILL: mensaena-features
 /// MiniMapWidget — kleine Karte mit Posts in der Naehe.
+/// V7/V8: farbige Marker je Post-Typ + Emoji statt einheitlich Amber.
 library;
 
 import 'package:easy_localization/easy_localization.dart';
@@ -15,6 +16,65 @@ import '../shared/location_map_view.dart';
 class MiniMapWidget extends StatelessWidget {
   const MiniMapWidget({super.key, required this.posts});
   final List<Post> posts;
+
+  /// Farbe je Post-Typ (1:1 zur map_screen-Logik).
+  static Color _markerColor(String type) {
+    switch (type) {
+      case 'crisis':
+      case 'help_request':
+        return AppColors.herzrot;
+      case 'help_offered':
+        return AppColors.leben;
+      case 'rescue':
+        return const Color(0xFFFB923C);
+      case 'animal':
+        return const Color(0xFFEC4899);
+      case 'housing':
+        return const Color(0xFF60A5FA);
+      case 'mobility':
+        return const Color(0xFF818CF8);
+      case 'sharing':
+        return AppColors.teal;
+      case 'mental':
+        return AppColors.tealSoft;
+      default:
+        return AppColors.amber;
+    }
+  }
+
+  /// Emoji je Post-Typ.
+  static String _markerEmoji(String type) {
+    switch (type) {
+      case 'rescue':
+        return '🧡';
+      case 'animal':
+        return '🐾';
+      case 'housing':
+        return '🏡';
+      case 'supply':
+        return '🌾';
+      case 'mobility':
+        return '🚗';
+      case 'sharing':
+        return '🔄';
+      case 'community':
+        return '🗳️';
+      case 'crisis':
+        return '🚨';
+      case 'help_request':
+        return '🆘';
+      case 'help_offered':
+        return '💚';
+      case 'skill':
+        return '🎯';
+      case 'knowledge':
+        return '📚';
+      case 'mental':
+        return '🧠';
+      default:
+        return '📍';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +124,9 @@ class MiniMapWidget extends StatelessWidget {
                       id: p.id,
                       lat: p.latitude,
                       lng: p.longitude,
-                      color: AppColors.amber,
+                      color: _markerColor(p.type),
+                      emoji: _markerEmoji(p.type),
+                      type: p.type,
                       title: p.title,
                     ),
                 ],
