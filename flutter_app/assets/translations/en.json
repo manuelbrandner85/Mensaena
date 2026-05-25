@@ -1917,7 +1917,8 @@
       "sun": "Sun",
       "quote": "Quote of the day",
       "streak": "Login streak",
-      "gratitude": "Gratitude"
+      "gratitude": "Gratitude",
+      "karma": "Karma & level"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1949,7 +1950,8 @@
       "sun": "Sunrise/sunset + Golden Hour",
       "quote": "Daily quote for reflection",
       "streak": "Consecutive days in the app",
-      "gratitude": "What are you thankful for today?"
+      "gratitude": "What are you thankful for today?",
+      "karma": "Your karma points and current level"
     }
   },
   "hubs": {
@@ -2050,6 +2052,22 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "karma": {
+    "title": "Karma",
+    "toNext": "{count} more points to the next level",
+    "maxLevel": "Top level reached — thank you for all you give!",
+    "helps": "helps",
+    "posts": "posts",
+    "ratings": "top ratings",
+    "comments": "comments",
+    "levels": {
+      "neighbor": "Neighbour",
+      "helper": "Helper",
+      "pillar": "Pillar",
+      "anchor": "Anchor",
+      "beacon": "Beacon"
+    }
   },
   "a11y": {
     "section": "Accessibility",

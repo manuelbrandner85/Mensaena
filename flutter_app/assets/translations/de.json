@@ -1916,7 +1916,8 @@
       "sun": "Sonne",
       "quote": "Zitat des Tages",
       "streak": "Login-Streak",
-      "gratitude": "Dankbarkeit"
+      "gratitude": "Dankbarkeit",
+      "karma": "Karma & Level"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1948,7 +1949,8 @@
       "sun": "Sonnenauf-/-untergang + Golden Hour",
       "quote": "Tägliches Zitat zum Innehalten",
       "streak": "Aufeinanderfolgende Tage in der App",
-      "gratitude": "Wofür bist du heute dankbar?"
+      "gratitude": "Wofür bist du heute dankbar?",
+      "karma": "Deine Karma-Punkte und dein aktuelles Level"
     }
   },
   "hubs": {
@@ -2049,6 +2051,22 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "karma": {
+    "title": "Karma",
+    "toNext": "Noch {count} Punkte bis zum nächsten Level",
+    "maxLevel": "Höchstes Level erreicht — danke für alles, was du gibst!",
+    "helps": "Hilfen",
+    "posts": "Beiträge",
+    "ratings": "Top-Bewertungen",
+    "comments": "Kommentare",
+    "levels": {
+      "neighbor": "Nachbar:in",
+      "helper": "Helfer:in",
+      "pillar": "Stütze",
+      "anchor": "Anker",
+      "beacon": "Leuchtturm"
+    }
   },
   "a11y": {
     "section": "Barrierefreiheit",

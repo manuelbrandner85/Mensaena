@@ -1830,6 +1830,22 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "karma": {
+    "title": "Karma",
+    "toNext": "Sonraki seviye için {count} puan daha",
+    "maxLevel": "En yüksek seviyeye ulaştın — verdiğin her şey için teşekkürler!",
+    "helps": "yardım",
+    "posts": "gönderi",
+    "ratings": "yüksek puan",
+    "comments": "yorum",
+    "levels": {
+      "neighbor": "Komşu",
+      "helper": "Yardımcı",
+      "pillar": "Direk",
+      "anchor": "Çapa",
+      "beacon": "Fener"
+    }
+  },
   "a11y": {
     "section": "Erişilebilirlik",
     "textScale": "Metin boyutu: %{pct}",

@@ -214,6 +214,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.gratitude',
       icon: LucideIcons.heart,
     ),
+    DashboardWidgetMeta(
+      id: 'karma',
+      title: 'widgets.titles.karma',
+      description: 'widgets.descriptions.karma',
+      icon: LucideIcons.award,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

@@ -1831,6 +1831,22 @@
     "sheetHint": "Una frase basta. Solo tu vedi queste note — restano sul tuo dispositivo.",
     "placeholder": "es. una chiamata gentile, il sole, una mano amica…"
   },
+  "karma": {
+    "title": "Karma",
+    "toNext": "Ancora {count} punti per il livello successivo",
+    "maxLevel": "Livello massimo raggiunto — grazie per tutto ciò che dai!",
+    "helps": "aiuti",
+    "posts": "post",
+    "ratings": "valutazioni alte",
+    "comments": "commenti",
+    "levels": {
+      "neighbor": "Vicino/a",
+      "helper": "Aiutante",
+      "pillar": "Pilastro",
+      "anchor": "Àncora",
+      "beacon": "Faro"
+    }
+  },
   "a11y": {
     "section": "Accessibilità",
     "textScale": "Dimensione testo: {pct}%",
