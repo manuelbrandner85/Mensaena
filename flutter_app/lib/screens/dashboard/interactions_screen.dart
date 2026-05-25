@@ -8,6 +8,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/interaction.dart';
 import '../../repositories/interactions_repository.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/trust_rating_modal.dart';
 
@@ -49,8 +50,11 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
             future: _future,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
+                // F7: Shimmer-Skeleton statt Spinner.
+                return ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+                  itemCount: 6,
+                  itemBuilder: (_, __) => const NotificationTileSkeleton(),
                 );
               }
               final all = snap.data ?? const <Interaction>[];

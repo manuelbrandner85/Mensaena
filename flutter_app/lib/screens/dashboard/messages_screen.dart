@@ -15,7 +15,7 @@ import '../../services/presence_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
-import '../../widgets/shared/skeleton_card.dart';
+import '../../widgets/effects/shimmer_skeleton.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Hub: 2 Tabs — Community (Channels gruppiert nach Kategorie)
@@ -207,8 +207,12 @@ class _ChannelListView extends StatelessWidget {
       future: future,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          // BUG-FIX #14: Skeleton-Loader statt Spinner
-          return const SkeletonList(count: 5, itemHeight: 76);
+          // F7: Bronze-Shimmer Conversation-Skeletons (1:1 Tile-Layout).
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            itemCount: 6,
+            itemBuilder: (_, __) => const ConversationTileSkeleton(),
+          );
         }
         final list = snap.data ?? const <Map<String, dynamic>>[];
         if (list.isEmpty) {
@@ -385,8 +389,12 @@ class _DmListView extends StatelessWidget {
       future: future,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          // BUG-FIX #14: Skeleton-Loader statt Spinner
-          return const SkeletonList(count: 5, itemHeight: 76);
+          // F7: Bronze-Shimmer Conversation-Skeletons (1:1 Tile-Layout).
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            itemCount: 6,
+            itemBuilder: (_, __) => const ConversationTileSkeleton(),
+          );
         }
         final all = snap.data ?? const <Map<String, dynamic>>[];
         // Nur DMs + Groups (channels raus)

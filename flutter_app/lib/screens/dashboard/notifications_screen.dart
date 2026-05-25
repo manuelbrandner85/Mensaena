@@ -10,6 +10,7 @@ import '../../widgets/shared/editorial_module_header.dart';
 import '../../models/notification_model.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/notification_service.dart';
+import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -194,8 +195,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ),
             Expanded(
               child: stream.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
+                loading: () => ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+                  itemCount: 6,
+                  itemBuilder: (_, __) => const NotificationTileSkeleton(),
                 ),
                 error: (e, _) => Center(
                   child: Text(

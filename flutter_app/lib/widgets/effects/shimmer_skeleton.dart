@@ -175,6 +175,95 @@ class PostCardSkeleton extends StatelessWidget {
   }
 }
 
+/// Replica einer Notification-Tile — Icon-Box + 2 Text-Zeilen + Zeit-Stempel.
+/// Layout matched `screens/dashboard/notifications_screen.dart` `_NotificationTile`.
+class NotificationTileSkeleton extends StatelessWidget {
+  const NotificationTileSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.4),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const ShimmerBox(width: 32, height: 32, borderRadius: 8),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Expanded(child: ShimmerBox(height: 12)),
+                    SizedBox(width: 10),
+                    ShimmerBox(
+                      width: 36,
+                      height: 9,
+                      borderRadius: 4,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const ShimmerBox(height: 10),
+                const SizedBox(height: 6),
+                ShimmerBox(
+                  width: MediaQuery.of(context).size.width * 0.55,
+                  height: 10,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Replica eines Conversation-Tiles im Messages-Screen — runder Avatar +
+/// Name + Preview-Zeile + Zeit + optional unread-Badge.
+class ConversationTileSkeleton extends StatelessWidget {
+  const ConversationTileSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      child: Row(
+        children: [
+          const ShimmerBox(width: 44, height: 44, borderRadius: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Expanded(child: ShimmerBox(height: 12, width: 140)),
+                    SizedBox(width: 8),
+                    ShimmerBox(width: 32, height: 9, borderRadius: 4),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ShimmerBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: 10,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Wiederholt eine Skeleton-Tile-Variante n-mal. Default = PostCardSkeleton.
 class ListSkeleton extends StatelessWidget {
   const ListSkeleton({
