@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,16 +24,60 @@ const _filters = <(String, String)>[
 
 /// SKILL: mensaena-features
 /// Matching-Screen — automatische Vorschlaege fuer passende Posts.
-class MatchingScreen extends ConsumerWidget {
+class MatchingScreen extends ConsumerStatefulWidget {
   const MatchingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MatchingScreen> createState() => _MatchingScreenState();
+}
+
+class _MatchingScreenState extends ConsumerState<MatchingScreen> {
+  /// Vorheriger Pending-Count, fuer Snackbar-Feedback nach Pull-to-Refresh.
+  int? _lastPendingCount;
+
+  Future<void> _handleRefresh() async {
+    final prevPending = _lastPendingCount ??
+        ref.read(matchingCountsProvider).value?.pending ??
+        0;
+    // Optional: serverseitige Neu-Berechnung anstossen. Fail-silent
+    // wenn RPC nicht existiert (alte DBs / lokale Dev-Setups).
+    try {
+      await sb.rpc<dynamic>('refresh_matches');
+    } catch (_) {
+      // ignore
+    }
+    ref.invalidate(matchingListProvider);
+    ref.invalidate(matchingCountsProvider);
+    ref.invalidate(matchPreferencesProvider);
+    await ref.read(matchingListProvider.future);
+    final newCounts = await ref.read(matchingCountsProvider.future);
+    if (!mounted) return;
+    final delta = newCounts.pending - prevPending;
+    if (delta > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        duration: const Duration(seconds: 3),
+        content: Text(
+          delta == 1
+              ? '1 neuer Match'
+              : '$delta neue Matches',
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+      ));
+    }
+    _lastPendingCount = newCounts.pending;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final filter = ref.watch(matchingFilterProvider);
     final matchesAsync = ref.watch(matchingListProvider);
     final countsAsync = ref.watch(matchingCountsProvider);
     final prefsAsync = ref.watch(matchPreferencesProvider);
     final matchingDisabled = prefsAsync.value?.matchingEnabled == false;
+
+    // Anfangs-Snapshot fuer Delta-Vergleich beim ersten Refresh.
+    _lastPendingCount ??= countsAsync.value?.pending;
 
     // Realtime-Sub: bei jedem Insert/Update der matches-Tabelle die Liste neu laden.
     ref.listen(matchingStreamProvider, (prev, next) {
@@ -53,12 +100,7 @@ class MatchingScreen extends ConsumerWidget {
         child: RefreshIndicator(
           color: AppColors.amber,
           backgroundColor: AppColors.surface,
-          onRefresh: () async {
-            ref.invalidate(matchingListProvider);
-            ref.invalidate(matchingCountsProvider);
-            ref.invalidate(matchPreferencesProvider);
-            await ref.read(matchingListProvider.future);
-          },
+          onRefresh: _handleRefresh,
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -413,7 +455,7 @@ class _MatchCard extends StatelessWidget {
     final myResponded = iAmOffer
         ? (match.offerAccepted != null)
         : (match.requestAccepted != null);
-    final scorePct = (match.matchScore * 100).clamp(0, 100).toInt();
+    final scoreClamped = match.matchScore.clamp(0.0, 1.0);
 
     final card = Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -428,20 +470,8 @@ class _MatchCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.teal.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text('$scorePct% Match',
-                    style: AppTypography.label(
-                      size: 9,
-                      color: AppColors.tealSoft,
-                    )),
-              ),
-              const SizedBox(width: 6),
+              _MatchScoreRing(score: scoreClamped, size: 52),
+              const SizedBox(width: 10),
               if (match.distanceKm != null)
                 Text('${match.distanceKm!.toStringAsFixed(1)} km',
                     style: AppTypography.label(size: 9)),
@@ -669,7 +699,7 @@ class _MatchDetailSheet extends StatelessWidget {
     final myResponded = iAmOffer
         ? (match.offerAccepted != null)
         : (match.requestAccepted != null);
-    final scorePct = (match.matchScore * 100).clamp(0, 100).toInt();
+    final scoreClamped = match.matchScore.clamp(0.0, 1.0);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -693,18 +723,8 @@ class _MatchDetailSheet extends StatelessWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.teal.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text('$scorePct% Match',
-                    style: AppTypography.label(
-                        size: 10, color: AppColors.tealSoft)),
-              ),
-              const SizedBox(width: 8),
+              _MatchScoreRing(score: scoreClamped, size: 72),
+              const SizedBox(width: 12),
               if (match.distanceKm != null)
                 Text('${match.distanceKm!.toStringAsFixed(1)} km',
                     style: AppTypography.label(size: 10)),
@@ -1068,4 +1088,133 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
             ),
     );
   }
+}
+
+/// Animierter Match-Score-Ring (CustomPainter).
+///
+/// Zeigt den Match-Score (0.0–1.0) als kreisfoermigen Fortschrittsring mit
+/// 1.2s easeOutCubic Wachstums-Animation. Farbverlauf von herzrot
+/// (<40%) ueber amber (40-70%) zu leben (>=70%). Subtiler Glow via
+/// MaskFilter.blur.
+class _MatchScoreRing extends StatefulWidget {
+  const _MatchScoreRing({required this.score, this.size = 64});
+  final double score; // 0.0 - 1.0
+  final double size;
+
+  @override
+  State<_MatchScoreRing> createState() => _MatchScoreRingState();
+}
+
+class _MatchScoreRingState extends State<_MatchScoreRing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+    _ctrl.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MatchScoreRing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.score != widget.score) {
+      _ctrl
+        ..reset()
+        ..forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final clamped = widget.score.clamp(0.0, 1.0);
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (_, __) {
+        final progress = _anim.value * clamped;
+        return CustomPaint(
+          size: Size.square(widget.size),
+          painter: _RingPainter(progress: progress),
+          child: SizedBox.square(
+            dimension: widget.size,
+            child: Center(
+              child: Text(
+                '${(clamped * 100 * _anim.value).round()}%',
+                style: AppTypography.mono(
+                  size: widget.size * 0.22,
+                  color: AppColors.ink,
+                  weight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _RingPainter extends CustomPainter {
+  _RingPainter({required this.progress});
+  final double progress; // 0.0 - 1.0
+
+  Color _colorFor(double p) {
+    if (p < 0.4) return AppColors.herzrot;
+    if (p < 0.7) return AppColors.amber;
+    return AppColors.leben;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (math.min(size.width, size.height) / 2) - 5;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    // Background-Track (voller Kreis).
+    final trackPaint = Paint()
+      ..color = AppColors.line
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(center, radius, trackPaint);
+
+    if (progress <= 0) return;
+
+    final color = _colorFor(progress);
+    const startAngle = -math.pi / 2;
+    final sweepAngle = 2 * math.pi * progress;
+
+    // Glow-Layer (zweiter Arc darunter, blurred).
+    final glowPaint = Paint()
+      ..color = color.withValues(alpha: 0.4)
+      ..strokeWidth = 7
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const ui.MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawArc(rect, startAngle, sweepAngle, false, glowPaint);
+
+    // Foreground-Arc.
+    final arcPaint = Paint()
+      ..color = color
+      ..strokeWidth = 5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawArc(rect, startAngle, sweepAngle, false, arcPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RingPainter old) =>
+      old.progress != progress;
 }

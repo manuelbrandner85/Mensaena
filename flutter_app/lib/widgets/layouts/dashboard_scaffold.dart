@@ -10,6 +10,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../effects/cinema_overlay.dart';
@@ -234,6 +235,9 @@ class _BottomNav extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Pending-Match-Count fuer Profile-Tab-Badge (klein, amber).
+    final pendingMatches =
+        ref.watch(matchingCountsProvider).value?.pending ?? 0;
     // Glass-Effekt: BackdropFilter blur(8) + surface.withOpacity(0.6).
     return ClipRect(
       child: BackdropFilter(
@@ -286,6 +290,7 @@ class _BottomNav extends ConsumerWidget {
                       label: 'nav.profile'.tr(),
                       route: '/dashboard/profile',
                       active: _matches(activeRoute, ['/dashboard/profile']),
+                      badgeCount: pendingMatches,
                     ),
                   ),
                 ],
@@ -304,12 +309,17 @@ class _BottomItem extends StatelessWidget {
     required this.label,
     required this.route,
     required this.active,
+    this.badgeCount = 0,
   });
 
   final IconData icon;
   final String label;
   final String route;
   final bool active;
+
+  /// Optionales Mini-Badge oben rechts auf dem Icon (z.B. Pending-Matches).
+  /// 0 = kein Badge. > 99 zeigt "99+".
+  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +352,43 @@ class _BottomItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: color),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, size: 20, color: color),
+                  if (badgeCount > 0)
+                    Positioned(
+                      top: -4,
+                      right: -6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 1),
+                        constraints: const BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.amber,
+                          borderRadius: BorderRadius.circular(7),
+                          border: Border.all(
+                            color: AppColors.surface,
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            badgeCount > 99 ? '99+' : '$badgeCount',
+                            style: AppTypography.mono(
+                              size: 8,
+                              color: AppColors.voidColor,
+                              weight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
               const SizedBox(height: 2),
               Text(
                 label,
