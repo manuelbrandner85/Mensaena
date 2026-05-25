@@ -636,10 +636,10 @@ extension CinemaIntensityX on CinemaIntensity {
 
   static CinemaIntensity fromKey(String? key) {
     switch (key) {
-      case 'reduced': return CinemaIntensity.reduced;
+      case 'full':    return CinemaIntensity.full;
       case 'minimal': return CinemaIntensity.minimal;
-      case 'full':
-      default:        return CinemaIntensity.full;
+      case 'reduced':
+      default:        return CinemaIntensity.reduced;
     }
   }
 }

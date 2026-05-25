@@ -107,8 +107,8 @@ class CinemaOverlay extends ConsumerWidget {
           ),
         ),
 
-        // 5. God-Rays vom Sky-Body
-        if (spec.hasGodRays)
+        // 5. God-Rays vom Sky-Body — nur bei full intensity.
+        if (spec.hasGodRays && intensity >= 0.6)
           RepaintBoundary(
             child: GodRays(
               source: spec.skyBody.alignment,
@@ -117,8 +117,8 @@ class CinemaOverlay extends ConsumerWidget {
             ),
           ),
 
-        // 6. Lens-Flare
-        if (spec.lensFlare != null)
+        // 6. Lens-Flare — nur bei full intensity.
+        if (spec.lensFlare != null && intensity >= 0.6)
           RepaintBoundary(
             child: LensFlare(
               spec: spec.lensFlare!,
@@ -134,8 +134,8 @@ class CinemaOverlay extends ConsumerWidget {
           ),
         ),
 
-        // 8. Ground-Fog (vor Light-Leaks, kurz vor Content)
-        if (spec.hasGroundFog && spec.fogColor != null)
+        // 8. Ground-Fog — nur bei full intensity (animiert, teuer).
+        if (spec.hasGroundFog && spec.fogColor != null && intensity >= 0.6)
           RepaintBoundary(
             child: GroundFog(
               color: spec.fogColor!,
@@ -143,8 +143,8 @@ class CinemaOverlay extends ConsumerWidget {
             ),
           ),
 
-        // 9. Dust-Particles (zwischen Atmosphäre und Content)
-        if (spec.hasDust && spec.dustColor != null)
+        // 9. Dust-Particles — nur bei full intensity (animiert, teuer).
+        if (spec.hasDust && spec.dustColor != null && intensity >= 0.6)
           RepaintBoundary(
             child: DustParticles(
               color: spec.dustColor!,
