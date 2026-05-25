@@ -35,6 +35,7 @@ import '../../../widgets/dashboard/health_widget.dart';
 import '../../../widgets/dashboard/mood_chart_widget.dart';
 import '../../../widgets/dashboard/nasa_apod_widget.dart';
 import '../../../widgets/dashboard/on_this_day_widget.dart';
+import '../../../widgets/dashboard/gratitude_widget.dart';
 import '../../../widgets/dashboard/streak_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
@@ -464,6 +465,10 @@ class _DashboardHomeScreenState
           break;
         case 'streak':
           out.add(const StreakWidget());
+          addSpacing();
+          break;
+        case 'gratitude':
+          out.add(const GratitudeWidget());
           addSpacing();
           break;
         case 'nearby_posts':

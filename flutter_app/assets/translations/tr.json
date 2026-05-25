@@ -1823,6 +1823,13 @@
     "days": "{count} gün üst üste",
     "best": "Rekor"
   },
+  "gratitude": {
+    "title": "Şükran",
+    "prompt": "Dokun ve kısa bir düşünce yaz.",
+    "sheetTitle": "Bugün şunun için minnettarım…",
+    "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
+    "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
+  },
   "a11y": {
     "section": "Erişilebilirlik",
     "textScale": "Metin boyutu: %{pct}",

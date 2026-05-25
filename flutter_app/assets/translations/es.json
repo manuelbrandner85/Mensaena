@@ -1824,6 +1824,13 @@
     "days": "{count} días seguidos",
     "best": "Récord"
   },
+  "gratitude": {
+    "title": "Gratitud",
+    "prompt": "Toca para anotar un pensamiento corto.",
+    "sheetTitle": "Hoy doy gracias por…",
+    "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
+    "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
+  },
   "a11y": {
     "section": "Accesibilidad",
     "textScale": "Tamaño del texto: {pct}%",

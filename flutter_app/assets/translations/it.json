@@ -1824,6 +1824,13 @@
     "days": "{count} giorni di fila",
     "best": "Record"
   },
+  "gratitude": {
+    "title": "Gratitudine",
+    "prompt": "Tocca per scrivere un breve pensiero.",
+    "sheetTitle": "Oggi sono grato/a per…",
+    "sheetHint": "Una frase basta. Solo tu vedi queste note — restano sul tuo dispositivo.",
+    "placeholder": "es. una chiamata gentile, il sole, una mano amica…"
+  },
   "a11y": {
     "section": "Accessibilità",
     "textScale": "Dimensione testo: {pct}%",

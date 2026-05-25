@@ -208,6 +208,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.streak',
       icon: LucideIcons.flame,
     ),
+    DashboardWidgetMeta(
+      id: 'gratitude',
+      title: 'widgets.titles.gratitude',
+      description: 'widgets.descriptions.gratitude',
+      icon: LucideIcons.heart,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

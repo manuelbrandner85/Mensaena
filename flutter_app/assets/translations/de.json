@@ -1915,7 +1915,8 @@
       "mood": "Stimmungs-Tracker",
       "sun": "Sonne",
       "quote": "Zitat des Tages",
-      "streak": "Login-Streak"
+      "streak": "Login-Streak",
+      "gratitude": "Dankbarkeit"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1946,7 +1947,8 @@
       "mood": "Tägliches Stimmungs-Check-in mit 7-Tage-Verlauf",
       "sun": "Sonnenauf-/-untergang + Golden Hour",
       "quote": "Tägliches Zitat zum Innehalten",
-      "streak": "Aufeinanderfolgende Tage in der App"
+      "streak": "Aufeinanderfolgende Tage in der App",
+      "gratitude": "Wofür bist du heute dankbar?"
     }
   },
   "hubs": {
@@ -2040,6 +2042,13 @@
     "title": "Dranbleiben",
     "days": "{count} Tage in Folge",
     "best": "Rekord"
+  },
+  "gratitude": {
+    "title": "Dankbarkeit",
+    "prompt": "Tippe und schreib einen kurzen Gedanken.",
+    "sheetTitle": "Heute bin ich dankbar für…",
+    "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
+    "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
   },
   "a11y": {
     "section": "Barrierefreiheit",

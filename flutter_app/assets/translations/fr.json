@@ -1824,6 +1824,13 @@
     "days": "{count} jours d'affilée",
     "best": "Record"
   },
+  "gratitude": {
+    "title": "Gratitude",
+    "prompt": "Touche pour noter une petite pensée.",
+    "sheetTitle": "Aujourd'hui je suis reconnaissant·e pour…",
+    "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
+    "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
+  },
   "a11y": {
     "section": "Accessibilité",
     "textScale": "Taille du texte : {pct} %",

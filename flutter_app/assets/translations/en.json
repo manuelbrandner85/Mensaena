@@ -1916,7 +1916,8 @@
       "mood": "Mood tracker",
       "sun": "Sun",
       "quote": "Quote of the day",
-      "streak": "Login streak"
+      "streak": "Login streak",
+      "gratitude": "Gratitude"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1947,7 +1948,8 @@
       "mood": "Daily mood check-in + 7-day trend",
       "sun": "Sunrise/sunset + Golden Hour",
       "quote": "Daily quote for reflection",
-      "streak": "Consecutive days in the app"
+      "streak": "Consecutive days in the app",
+      "gratitude": "What are you thankful for today?"
     }
   },
   "hubs": {
@@ -2041,6 +2043,13 @@
     "title": "Keep it going",
     "days": "{count} days in a row",
     "best": "Best"
+  },
+  "gratitude": {
+    "title": "Gratitude",
+    "prompt": "Tap to jot down a short thought.",
+    "sheetTitle": "Today I'm grateful for…",
+    "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
+    "placeholder": "e.g. a kind call, sunshine, a helping hand…"
   },
   "a11y": {
     "section": "Accessibility",
