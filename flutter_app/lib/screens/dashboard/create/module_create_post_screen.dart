@@ -235,7 +235,8 @@ class _ModuleCreatePostScreenState
             'module_key': widget.config.moduleKey,
           })
           .select()
-          .single();
+          .maybeSingle();
+      if (inserted == null) throw StateError('insert_blocked');
 
       await PostDraftService.clear();
       if (!mounted) return;

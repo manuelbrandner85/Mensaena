@@ -54,8 +54,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
               'status': 'pending',
             })
             .select('invite_code')
-            .single();
-        code = inserted['invite_code'] as String?;
+            .maybeSingle();
+        code = inserted?['invite_code'] as String?;
       }
       final acceptedRes = await sb
           .from('referrals')

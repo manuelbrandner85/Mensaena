@@ -83,7 +83,8 @@ class MarketplaceRepository {
             'status': 'active',
           })
           .select()
-          .single();
+          .maybeSingle();
+      if (row == null) return null;
       return row['id'] as String?;
     } catch (_) {
       return null;

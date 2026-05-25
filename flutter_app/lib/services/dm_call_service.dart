@@ -63,7 +63,11 @@ class DmCallService {
             'room_name': roomName,
           })
           .select('id, room_name')
-          .single();
+          .maybeSingle();
+      if (row == null) {
+        return const DmCallStartResult(
+            success: false, errorReason: 'Insert blockiert (RLS)');
+      }
       final id = row['id'] as String?;
       if (id == null) {
         return const DmCallStartResult(

@@ -235,7 +235,8 @@ class EventsRepository {
         'is_online': isOnline,
         if (onlineUrl != null && onlineUrl.isNotEmpty) 'online_url': onlineUrl,
         'status': 'active',
-      }).select('id').single();
+      }).select('id').maybeSingle();
+      if (row == null) return null;
       return row['id'] as String?;
     } catch (_) {
       return null;

@@ -176,7 +176,8 @@ class GroupsRepository {
             'post_count': 0,
           })
           .select()
-          .single();
+          .maybeSingle();
+      if (row == null) return null;
       final id = row['id'] as String?;
       if (id != null) {
         await sb.from('group_members').insert({

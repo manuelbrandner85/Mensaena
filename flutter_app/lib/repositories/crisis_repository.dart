@@ -134,7 +134,8 @@ class CrisisRepository {
             'is_anonymous': isAnonymous,
           })
           .select()
-          .single();
+          .maybeSingle();
+      if (row == null) return null;
       return row['id'] as String?;
     } catch (_) {
       return null;

@@ -66,7 +66,10 @@ class BoardRepository {
             'comment_count': 0,
           })
           .select()
-          .single();
+          .maybeSingle();
+      // maybeSingle liefert null wenn RLS den Insert verhindert ODER
+      // wenn das Select keinen Row zurueckliefert. Beides = fail.
+      if (row == null) return null;
       return row['id'] as String?;
     } catch (_) {
       return null;

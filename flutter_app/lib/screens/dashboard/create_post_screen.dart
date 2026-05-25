@@ -286,9 +286,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             'status': 'active',
           })
           .select()
-          .single();
+          .maybeSingle();
 
       if (!mounted) return;
+      if (inserted == null) {
+        // RLS-Block oder leerer Result → werfen damit catch greift
+        // und User klare Fehler-Snackbar sieht.
+        throw StateError('insert_blocked');
+      }
       final id = inserted['id'] as String;
       await PostDraftService.clear();
       if (!mounted) return;

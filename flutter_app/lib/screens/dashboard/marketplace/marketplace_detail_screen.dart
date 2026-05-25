@@ -346,7 +346,8 @@ class MarketplaceDetailScreen extends ConsumerWidget {
               }),
             })
             .select()
-            .single();
+            .maybeSingle();
+        if (inserted == null) throw StateError('insert_blocked');
         convId = inserted['id'] as String;
         await sb.from('conversation_members').insert([
           {'conversation_id': convId, 'user_id': uid},
