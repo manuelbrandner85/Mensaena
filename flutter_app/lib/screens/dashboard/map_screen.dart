@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -66,6 +68,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   // V3 — FMTC-Ready Flag fuer Tile-Cache
   bool _fmtcReady = false;
 
+  // V16 — Accessibility-Layer (Overpass-API). Toggle in Toolbar,
+  // laedt wheelchair-Tags fuer den aktuellen Center+Radius. Cache pro
+  // (center,radius)-Schluessel, TTL 10min, max 20 Eintraege.
+  bool _accessibilityOn = false;
+  bool _a11yLoading = false;
+  List<_AccessiblePlace> _accessiblePlaces = const [];
+  final Map<String, ({DateTime at, List<_AccessiblePlace> places})>
+      _a11yCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -79,6 +90,71 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     _searchCtrl.dispose();
     _moveDebounce?.cancel();
     super.dispose();
+  }
+
+  /// V16: Overpass-Query fuer wheelchair-Tagged Nodes in Radius.
+  /// Verwendet "overpass-api.de", fallback bei Fehlern silent. Cache
+  /// TTL 10min — innerhalb dieser Frist wird die Query nicht erneut
+  /// gefeuert sondern aus dem Memory bedient.
+  Future<void> _loadAccessiblePlaces() async {
+    final lat = _center.latitude;
+    final lng = _center.longitude;
+    final radiusM = _radiusKm * 1000;
+    final cacheKey =
+        '${lat.toStringAsFixed(2)},${lng.toStringAsFixed(2)}:$radiusM';
+    final hit = _a11yCache[cacheKey];
+    if (hit != null &&
+        DateTime.now().difference(hit.at) < const Duration(minutes: 10)) {
+      setState(() => _accessiblePlaces = hit.places);
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _a11yLoading = true);
+    try {
+      final q =
+          '[out:json][timeout:10];node["wheelchair"](around:$radiusM,$lat,$lng);out body 80;';
+      final uri = Uri.parse('https://overpass-api.de/api/interpreter');
+      final resp = await http.post(uri, body: {'data': q}).timeout(
+          const Duration(seconds: 12));
+      if (resp.statusCode != 200) {
+        if (mounted) setState(() => _a11yLoading = false);
+        return;
+      }
+      final json = jsonDecode(resp.body) as Map<String, dynamic>;
+      final elements =
+          (json['elements'] as List?) ?? const <dynamic>[];
+      final places = <_AccessiblePlace>[];
+      for (final el in elements) {
+        if (el is! Map) continue;
+        final tags = el['tags'];
+        final wheel = (tags is Map ? tags['wheelchair'] : null) as String?;
+        final name = (tags is Map ? tags['name'] : null) as String?;
+        final plat = (el['lat'] as num?)?.toDouble();
+        final plng = (el['lon'] as num?)?.toDouble();
+        if (plat == null || plng == null || wheel == null) continue;
+        places.add(_AccessiblePlace(
+          lat: plat,
+          lng: plng,
+          name: name ?? 'map.a11y.unnamed'.tr(),
+          status: wheel,
+        ));
+      }
+      // Cache trimmen damit kein Memory-Leak entsteht.
+      if (_a11yCache.length > 20) {
+        final oldest = _a11yCache.entries
+            .toList()
+          ..sort((a, b) => a.value.at.compareTo(b.value.at));
+        _a11yCache.remove(oldest.first.key);
+      }
+      _a11yCache[cacheKey] = (at: DateTime.now(), places: places);
+      if (!mounted) return;
+      setState(() {
+        _accessiblePlaces = places;
+        _a11yLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _a11yLoading = false);
+    }
   }
 
   Future<void> _initFmtc() async {
@@ -365,7 +441,33 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     size: const Size(40, 40),
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(50),
-                    markers: markers,
+                    markers: [
+                      ...markers,
+                      if (_accessibilityOn)
+                        for (final p in _accessiblePlaces)
+                          Marker(
+                            point: LatLng(p.lat, p.lng),
+                            width: 28,
+                            height: 28,
+                            child: GestureDetector(
+                              onTap: () => _openA11ySheet(p),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: _a11yColor(p.status),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: AppColors.voidColor, width: 2),
+                                ),
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  LucideIcons.accessibility,
+                                  size: 14,
+                                  color: AppColors.voidColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ],
                     builder: (context, mks) {
                       return Container(
                         decoration: BoxDecoration(
@@ -437,6 +539,48 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   }
                 });
               },
+            ),
+          ),
+          // ── V16 Accessibility-Toggle ─────────────────────────────
+          Positioned(
+            top: 152,
+            right: 60,
+            child: GestureDetector(
+              onTap: () async {
+                setState(() => _accessibilityOn = !_accessibilityOn);
+                if (_accessibilityOn) {
+                  await _loadAccessiblePlaces();
+                }
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: _accessibilityOn
+                      ? AppColors.leben.withValues(alpha: 0.85)
+                      : AppColors.deep.withValues(alpha: 0.92),
+                  border: Border.all(
+                    color: _accessibilityOn
+                        ? AppColors.lebenSoft
+                        : AppColors.lineActive,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: _a11yLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.voidColor))
+                    : Icon(
+                        LucideIcons.accessibility,
+                        size: 18,
+                        color: _accessibilityOn
+                            ? AppColors.voidColor
+                            : AppColors.leben,
+                      ),
+              ),
             ),
           ),
           // ── V11 Heatmap-Toggle (top-right) ─────────────────────────
@@ -1168,6 +1312,105 @@ class _PostBottomSheet extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── V16 Accessibility (Overpass-Layer) ────────────────────────────
+class _AccessiblePlace {
+  const _AccessiblePlace({
+    required this.lat,
+    required this.lng,
+    required this.name,
+    required this.status,
+  });
+
+  final double lat;
+  final double lng;
+  final String name;
+  final String status; // 'yes' | 'limited' | 'no' | sonstige
+
+  Color get color {
+    switch (status) {
+      case 'yes':
+        return AppColors.leben;
+      case 'limited':
+        return AppColors.amber;
+      case 'no':
+        return AppColors.herzrot;
+      default:
+        return AppColors.mute;
+    }
+  }
+}
+
+Color _a11yColor(String s) {
+  switch (s) {
+    case 'yes':
+      return AppColors.leben;
+    case 'limited':
+      return AppColors.amber;
+    case 'no':
+      return AppColors.herzrot;
+    default:
+      return AppColors.mute;
+  }
+}
+
+extension _A11ySheet on _MapScreenState {
+  void _openA11ySheet(_AccessiblePlace p) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: p.color,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(LucideIcons.accessibility,
+                        size: 18, color: AppColors.voidColor),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      p.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.display(
+                          size: 16, color: AppColors.ink),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'map.a11y.status.${p.status}'.tr(),
+                style: AppTypography.body(size: 13, color: p.color),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'map.a11y.source'.tr(),
+                style: AppTypography.caption(),
+              ),
+            ],
+          ),
         ),
       ),
     );

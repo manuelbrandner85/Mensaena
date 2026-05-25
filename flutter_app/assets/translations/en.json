@@ -1492,7 +1492,16 @@
     "monthsAgo": "{n} months ago",
     "gpsOffTitle": "Location unavailable",
     "gpsOffBody": "Enable GPS to see nearby posts",
-    "gpsActivate": "Activate"
+    "gpsActivate": "Activate",
+    "a11y": {
+      "unnamed": "Unnamed place",
+      "source": "Source: OpenStreetMap (wheelchair tag)",
+      "status": {
+        "yes": "Fully accessible",
+        "limited": "Limited accessibility",
+        "no": "Not accessible"
+      }
+    }
   },
   "calendar": {
     "noEvents": "No events in calendar.",

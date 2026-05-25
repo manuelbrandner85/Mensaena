@@ -51,6 +51,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   String? _activeCallId;
   String? _activeStreamRoom;
   Map<String, dynamic>? _replyTo;
+  // Optimistic Outbox: lokal eingefuegte Messages, die noch nicht via
+  // Realtime-Stream zurueckgekommen sind. Werden gemerged + dedupliziert
+  // (durch content + sender_id) im List-Builder. Bubble rendert mit
+  // 60% Opacity solange noch pending.
+  final List<Map<String, dynamic>> _pendingOutgoing =
+      <Map<String, dynamic>>[];
   // @-Mention state (1:1 to Web ChatView.tsx mention-autocomplete)
   List<Map<String, dynamic>> _mentionSuggestions = const [];
   String? _mentionQuery;
@@ -429,24 +435,49 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final text = _ctrl.text.trim();
     if (text.isEmpty) return;
     Haptics.tap();
-    setState(() => _sending = true);
     final reply = _replyTo;
+    final replyId = reply?['id'] as String?;
+    final myUid = SupabaseService.currentUser?.id;
+    final tempId = 'temp_${DateTime.now().microsecondsSinceEpoch}';
+
+    // Optimistic: TextField sofort leeren, fake-Message in der Liste
+    // anzeigen. So fuehlt sich das Senden instant an, auch wenn der
+    // RPC + Realtime-Roundtrip 150-400ms braucht.
+    setState(() {
+      _sending = true;
+      _pendingOutgoing.add({
+        'id': tempId,
+        'sender_id': myUid,
+        'content': text,
+        'reply_to_id': replyId,
+        'created_at': DateTime.now().toUtc().toIso8601String(),
+        '_pending': true,
+      });
+      _ctrl.clear();
+      _replyTo = null;
+    });
+
     final ok = await MessagesRepository.send(
       conversationId: widget.conversationId,
       content: text,
-      replyToId: reply?['id'] as String?,
+      replyToId: replyId,
     );
     if (!mounted) return;
     setState(() => _sending = false);
-    if (ok) {
-      _ctrl.clear();
-      setState(() => _replyTo = null);
-    } else {
+    if (!ok) {
+      // Rollback: pending-Bubble entfernen, Text restaurieren.
+      setState(() {
+        _pendingOutgoing.removeWhere((m) => m['id'] == tempId);
+        _ctrl.text = text;
+      });
       unawaited(Haptics.error());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('chat.messageNotSent'.tr())),
       );
     }
+    // Erfolg: pending bleibt drin, wird vom naechsten Stream-Tick
+    // entfernt sobald die echte Message via Realtime ankommt
+    // (Dedupe-Logik im data-Builder).
   }
 
   Future<void> _editMessage(String id, String currentContent) async {
@@ -575,11 +606,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
                 ),
                 data: (msgsRaw) {
+                  // Optimistic-Dedupe: filtere _pendingOutgoing-Eintraege
+                  // raus, die jetzt schon im Stream-Result enthalten sind
+                  // (gleicher Sender + gleicher Content). Cleanup im
+                  // State erfolgt post-frame damit setState() nicht im
+                  // Build-Cycle laeuft.
+                  final pending = _pendingOutgoing
+                      .where((p) => !msgsRaw.any((m) =>
+                          m['sender_id'] == p['sender_id'] &&
+                          m['content'] == p['content']))
+                      .toList();
+                  if (pending.length != _pendingOutgoing.length) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
+                      _pendingOutgoing.removeWhere((p) => msgsRaw.any((m) =>
+                          m['sender_id'] == p['sender_id'] &&
+                          m['content'] == p['content']));
+                    });
+                  }
+                  final combined = pending.isEmpty
+                      ? msgsRaw
+                      : <Map<String, dynamic>>[...msgsRaw, ...pending];
                   // In-Chat-Search: lokaler Filter ueber content
                   final q = _searchQuery.trim().toLowerCase();
                   final msgs = q.isEmpty
-                      ? msgsRaw
-                      : msgsRaw.where((m) {
+                      ? combined
+                      : combined.where((m) {
                           final c = (m['content'] as String? ?? '')
                               .toLowerCase();
                           return c.contains(q);
@@ -669,12 +721,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           }
                         }
                       }
+                      final isPending = m['_pending'] == true;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (showDayHeader) _DaySeparator(date: mAt),
                           if (showUnreadDivider) const _UnreadDivider(),
-                          ChatMessageBubble(
+                          Opacity(
+                            opacity: isPending ? 0.55 : 1.0,
+                            child: ChatMessageBubble(
                         json: m,
                         mine: mine,
                         clustered: clustered,
@@ -719,7 +774,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 );
                               }
                             : null,
-                      ),
+                            ),
+                          ),
                         ],
                       );
                     },

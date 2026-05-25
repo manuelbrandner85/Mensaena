@@ -36,16 +36,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
   Future<Profile?>? _future;
+  // Lazy-Loading: nur Tabs die der User mindestens 1x geoeffnet hat
+  // werden tatsaechlich gebaut. Spart Renderzeit + Provider-Watch fuer
+  // 7 ungenutzte Tabs beim ersten Settings-Open.
+  final Set<int> _builtTabs = <int>{0};
 
   @override
   void initState() {
     super.initState();
     _tab = TabController(length: 8, vsync: this);
+    _tab.addListener(_onTabChanged);
     _future = ProfilesRepository.getMine();
+  }
+
+  void _onTabChanged() {
+    if (_tab.indexIsChanging) return;
+    if (!_builtTabs.contains(_tab.index)) {
+      setState(() => _builtTabs.add(_tab.index));
+    }
   }
 
   @override
   void dispose() {
+    _tab.removeListener(_onTabChanged);
     _tab.dispose();
     super.dispose();
   }
@@ -101,18 +114,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         style: AppTypography.caption()),
                   );
                 }
+                // Lazy-Tabs: jeder Tab ist erst ein SizedBox.shrink()
+                // bis der User ihn das erste Mal aufschlaegt. Spart bei
+                // First-Open ~7 Tab-Builds + ~5 Provider-Watches.
+                final tabs = <Widget>[
+                  _AccountTab(profile: p),
+                  _PrivacyTab(profile: p, onPatch: _patch),
+                  const _SecurityTab(),
+                  const _LanguageTab(),
+                  _NotifTab(profile: p, onPatch: _patch),
+                  _RegionTab(profile: p, onPatch: _patch),
+                  const _AppearanceTab(),
+                  _DangerTab(),
+                ];
                 return TabBarView(
                   controller: _tab,
-                  children: [
-                    _AccountTab(profile: p),
-                    _PrivacyTab(profile: p, onPatch: _patch),
-                    const _SecurityTab(),
-                    const _LanguageTab(),
-                    _NotifTab(profile: p, onPatch: _patch),
-                    _RegionTab(profile: p, onPatch: _patch),
-                    const _AppearanceTab(),
-                    _DangerTab(),
-                  ],
+                  children: List.generate(
+                    tabs.length,
+                    (i) => _builtTabs.contains(i)
+                        ? tabs[i]
+                        : const SizedBox.shrink(),
+                  ),
                 );
               },
             ),

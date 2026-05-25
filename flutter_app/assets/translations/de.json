@@ -1491,7 +1491,16 @@
     "monthsAgo": "vor {n} Monaten",
     "gpsOffTitle": "Standort nicht verfügbar",
     "gpsOffBody": "Aktiviere GPS für Posts in deiner Nähe",
-    "gpsActivate": "Aktivieren"
+    "gpsActivate": "Aktivieren",
+    "a11y": {
+      "unnamed": "Ort ohne Namen",
+      "source": "Quelle: OpenStreetMap (wheelchair-Tag)",
+      "status": {
+        "yes": "Vollständig barrierefrei",
+        "limited": "Eingeschränkt barrierefrei",
+        "no": "Nicht barrierefrei"
+      }
+    }
   },
   "calendar": {
     "noEvents": "Keine Events im Kalender.",
