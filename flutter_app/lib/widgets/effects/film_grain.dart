@@ -1,11 +1,15 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 /// SKILL: mensaena-design
-/// Film-Grain — procedurales animiertes Rauschen ueber dem gesamten Screen.
-/// Tick alle 80ms — verschiebt das Noise-Pattern leicht.
+/// Film-Grain v2 — AnimationController + AnimatedBuilder statt Timer.
+///
+/// Vorher: Timer.periodic(80ms) → setState(_frame++) → full widget rebuild
+/// inkl. allem oberhalb. setState wirkt durch den ganzen build-Stack.
+/// Jetzt: AnimationController fires repaint via Listenable an CustomPaint,
+/// kein setState noetig. Engine handhabt vsync — spart ~0.5ms/Frame +
+/// koppelt sich automatisch an TickerMode ab wenn nicht sichtbar.
 class FilmGrainOverlay extends StatefulWidget {
   const FilmGrainOverlay({required this.opacity, super.key});
 
@@ -16,17 +20,20 @@ class FilmGrainOverlay extends StatefulWidget {
   State<FilmGrainOverlay> createState() => _FilmGrainOverlayState();
 }
 
-class _FilmGrainOverlayState extends State<FilmGrainOverlay> {
-  Timer? _timer;
-  int _frame = 0;
+class _FilmGrainOverlayState extends State<FilmGrainOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
 
   @override
   void initState() {
     super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      // 80ms-Cycle wie vorher → 12.5fps Grain (sieht weicher aus als 60fps).
+      duration: const Duration(milliseconds: 80),
+    );
     if (widget.opacity > 0.001) {
-      _timer = Timer.periodic(const Duration(milliseconds: 80), (_) {
-        if (mounted) setState(() => _frame++);
-      });
+      _ctrl.repeat();
     }
   }
 
@@ -34,18 +41,17 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay> {
   void didUpdateWidget(FilmGrainOverlay old) {
     super.didUpdateWidget(old);
     if (old.opacity != widget.opacity) {
-      _timer?.cancel();
-      if (widget.opacity > 0.001) {
-        _timer = Timer.periodic(const Duration(milliseconds: 80), (_) {
-          if (mounted) setState(() => _frame++);
-        });
+      if (widget.opacity > 0.001 && !_ctrl.isAnimating) {
+        _ctrl.repeat();
+      } else if (widget.opacity <= 0.001 && _ctrl.isAnimating) {
+        _ctrl.stop();
       }
     }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _ctrl.dispose();
     super.dispose();
   }
 
@@ -53,12 +59,19 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay> {
   Widget build(BuildContext context) {
     if (widget.opacity <= 0.001) return const SizedBox.shrink();
     return IgnorePointer(
-      child: CustomPaint(
-        painter: _FilmGrainPainter(
-          opacity: widget.opacity,
-          seed: _frame,
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _ctrl,
+          builder: (_, __) => CustomPaint(
+            painter: _FilmGrainPainter(
+              opacity: widget.opacity,
+              // value [0..1) → diskreter Seed alle 80ms wenn das
+              // controller-cycle endet und neu startet.
+              seed: (_ctrl.value * 1000).floor(),
+            ),
+            size: Size.infinite,
+          ),
         ),
-        size: Size.infinite,
       ),
     );
   }

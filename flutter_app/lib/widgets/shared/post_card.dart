@@ -364,25 +364,9 @@ class _PostCardState extends ConsumerState<PostCard> {
                   color: AppColors.herzrotWarm,
                 ),
                 const SizedBox(width: 14),
-                _PostCardAction(
-                  icon: LucideIcons.arrowUp,
-                  label: ref.watch(postVoteScoreProvider(post.id)).when(
-                        loading: () => '…',
-                        data: (v) => '$v',
-                        error: (_, __) => '?',
-                      ),
-                  color: AppColors.amber,
-                ),
+                _VoteBadge(postId: post.id),
                 const SizedBox(width: 14),
-                _PostCardAction(
-                  icon: LucideIcons.messageCircle,
-                  label: ref.watch(postCommentCountProvider(post.id)).when(
-                        loading: () => '…',
-                        data: (v) => '$v',
-                        error: (_, __) => '?',
-                      ),
-                  color: AppColors.tealSoft,
-                ),
+                _CommentBadge(postId: post.id),
                 const SizedBox(width: 14),
                 InkWell(
                   onTap: _savedKnown ? _toggleSave : null,
@@ -538,5 +522,49 @@ class _PostCardAction extends StatelessWidget {
       return (label: 'Mental', emoji: '💚', color: AppColors.leben);
     default:
       return (label: 'Post', emoji: '📝', color: AppColors.bronze);
+  }
+}
+
+// Isolierte Badge-Widgets: rebuilden nur wenn ihr Provider feuert,
+// nicht die ganze PostCard. RepaintBoundary kapselt Paint-Cache.
+class _VoteBadge extends ConsumerWidget {
+  const _VoteBadge({required this.postId});
+  final String postId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final score = ref.watch(postVoteScoreProvider(postId));
+    return RepaintBoundary(
+      child: _PostCardAction(
+        icon: LucideIcons.arrowUp,
+        label: score.when(
+          loading: () => '…',
+          data: (v) => '$v',
+          error: (_, __) => '?',
+        ),
+        color: AppColors.amber,
+      ),
+    );
+  }
+}
+
+class _CommentBadge extends ConsumerWidget {
+  const _CommentBadge({required this.postId});
+  final String postId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(postCommentCountProvider(postId));
+    return RepaintBoundary(
+      child: _PostCardAction(
+        icon: LucideIcons.messageCircle,
+        label: count.when(
+          loading: () => '…',
+          data: (v) => '$v',
+          error: (_, __) => '?',
+        ),
+        color: AppColors.tealSoft,
+      ),
+    );
   }
 }
