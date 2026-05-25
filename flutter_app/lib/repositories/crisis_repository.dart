@@ -183,6 +183,23 @@ class EmergencyNumbersRepository {
       return const [];
     }
   }
+
+  /// Lädt ALLE Notrufnummern (alle Länder) für Country-Tabs in Resources-Screen.
+  static Future<List<EmergencyNumber>> listAll() async {
+    try {
+      final rows = await sb
+          .from('emergency_numbers')
+          .select()
+          .order('country')
+          .order('sort_order');
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(EmergencyNumber.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
 }
 
 // ── Providers ────────────────────────────────────────────────────────────
@@ -208,4 +225,8 @@ final crisisUpdatesStreamProvider =
 final emergencyNumbersProvider =
     FutureProvider.family<List<EmergencyNumber>, String>((ref, country) async {
   return EmergencyNumbersRepository.listForCountry(country);
+});
+
+final allEmergencyNumbersProvider = FutureProvider<List<EmergencyNumber>>((ref) async {
+  return EmergencyNumbersRepository.listAll();
 });
