@@ -342,6 +342,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const ProfileScreen(),
         ),
         routes: [
+          // WICHTIG: literale Subroutes (edit/saved) MUESSEN vor der
+          // :userId-Wildcard stehen. Sonst matched GoRouter
+          // "/dashboard/profile/edit" als ProfileScreen(userId:"edit").
+          // Resultat war ein Fremd-Profil mit "Nachbar:in" + Melden/Blockieren.
+          GoRoute(
+            path: 'edit',
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: const ProfileEditScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'saved',
+            pageBuilder: (_, s) => mensaenaTransition<void>(
+              key: s.pageKey,
+              child: const ProfileSavedScreen(),
+            ),
+          ),
           GoRoute(
             path: ':userId',
             pageBuilder: (_, s) => mensaenaTransition<void>(
@@ -1130,21 +1148,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const AdminSystemScreen(),
         ),
       ),
-      // Profile-Edit + Saved-Posts
-      GoRoute(
-        path: '/dashboard/profile/edit',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
-          key: state.pageKey,
-          child: const ProfileEditScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/dashboard/profile/saved',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
-          key: state.pageKey,
-          child: const ProfileSavedScreen(),
-        ),
-      ),
+      // Profile-Edit + Saved-Posts werden jetzt als Subroutes unter
+      // /dashboard/profile definiert (siehe oben), damit sie vor der
+      // :userId-Wildcard matchen. Die alten Top-Level-Definitionen
+      // hier wurden entfernt um Routing-Duplikate zu vermeiden.
       // LiveKit Call + Live-Room Screens (DM-Call / Channel-Stream)
       GoRoute(
         path: '/dashboard/call-history',

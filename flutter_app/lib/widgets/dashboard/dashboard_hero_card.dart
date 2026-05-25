@@ -313,7 +313,7 @@ class DashboardHeroCard extends StatelessWidget {
                     icon: LucideIcons.edit3,
                     label: 'Bearbeiten',
                     onTap: () =>
-                        context.go('/dashboard/settings'),
+                        context.go('/dashboard/profile/edit'),
                   ),
                   const SizedBox(width: 8),
                   _ActionChip(

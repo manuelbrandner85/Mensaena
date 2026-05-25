@@ -125,7 +125,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                  child: _Header(profile: p),
+                  child: _Header(profile: p, isMe: isMe),
                 ),
                 TabBar(
                   controller: _tab,
@@ -664,12 +664,16 @@ class _BadgesTab extends ConsumerWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.profile});
+  const _Header({required this.profile, required this.isMe});
   final Profile profile;
+  // isMe wird vom Parent (ProfileScreen) explizit reingereicht — basiert
+  // auf widget.userId == null/empty. Robuster als
+  // SupabaseService.currentUser?.id == profile.id zu vergleichen, weil
+  // das bei einem kurzen Auth-Refresh false werden koennte.
+  final bool isMe;
 
   @override
   Widget build(BuildContext context) {
-    final isMe = SupabaseService.currentUser?.id == profile.id;
     return Column(
       children: [
         Row(
