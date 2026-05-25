@@ -617,8 +617,12 @@ class _NearbyFeed extends StatelessWidget {
         ),
       );
     }
-    return Column(
-      children: posts.map((p) => PostCard(post: p)).toList(),
+    // ListView.builder: nur sichtbare PostCards werden gebaut.
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: posts.length,
+      itemBuilder: (context, i) => PostCard(post: posts[i]),
     );
   }
 }

@@ -94,6 +94,11 @@ class _TiltCardState extends ConsumerState<TiltCard> {
   double _tiltX = 0;
   double _tiltY = 0;
 
+  // Frame-Throttle: max 15fps statt 60fps für Tilt-Updates.
+  // 4 TiltCards × 60 setState/s = 240 Rebuilds/s → jetzt 60 Rebuilds/s.
+  DateTime _lastUpdate = DateTime(0);
+  static const _minInterval = Duration(milliseconds: 66);
+
   @override
   void initState() {
     super.initState();
@@ -114,11 +119,14 @@ class _TiltCardState extends ConsumerState<TiltCard> {
 
   void _onSample(AccelerometerEvent e) {
     if (!mounted) return;
+    final now = DateTime.now();
+    if (now.difference(_lastUpdate) < _minInterval) return;
+    _lastUpdate = now;
     final targetX = (-e.y * _sensitivity).clamp(-_maxTiltRad, _maxTiltRad).toDouble();
     final targetY = (e.x * _sensitivity).clamp(-_maxTiltRad, _maxTiltRad).toDouble();
     final nx = _tiltX + (targetX - _tiltX) * _smoothing;
     final ny = _tiltY + (targetY - _tiltY) * _smoothing;
-    if ((nx - _tiltX).abs() < 0.0005 && (ny - _tiltY).abs() < 0.0005) return;
+    if ((nx - _tiltX).abs() < 0.001 && (ny - _tiltY).abs() < 0.001) return;
     setState(() {
       _tiltX = nx;
       _tiltY = ny;

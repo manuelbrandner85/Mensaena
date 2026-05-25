@@ -101,7 +101,7 @@ class NinaWarning {
   }
 }
 
-final ninaWarningsProvider = FutureProvider.family<
+final ninaWarningsProvider = FutureProvider.autoDispose.family<
     List<NinaWarning>,
     ({double? lat, double? lng})>((ref, geo) async {
   try {
@@ -113,7 +113,7 @@ final ninaWarningsProvider = FutureProvider.family<
       },
     );
     final res =
-        await http.get(uri).timeout(const Duration(seconds: 8));
+        await http.get(uri).timeout(const Duration(seconds: 4));
     if (res.statusCode != 200) return const [];
     final data = jsonDecode(res.body) as Map<String, dynamic>;
     final list = (data['warnings'] as List?) ?? const [];
@@ -319,11 +319,11 @@ class FoodWarning {
 }
 
 final foodWarningsProvider =
-    FutureProvider<List<FoodWarning>>((ref) async {
+    FutureProvider.autoDispose<List<FoodWarning>>((ref) async {
   try {
     final uri = Uri.parse('https://www.mensaena.de/api/food-warnings');
     final res =
-        await http.get(uri).timeout(const Duration(seconds: 8));
+        await http.get(uri).timeout(const Duration(seconds: 4));
     if (res.statusCode != 200) return const [];
     final data = jsonDecode(res.body);
     final list = data is List ? data : ((data['warnings'] as List?) ?? []);
