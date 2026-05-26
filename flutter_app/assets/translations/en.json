@@ -2283,6 +2283,15 @@
       "completed": "Action completed! +{karma} Karma"
     }
   },
+  "livestream": {
+    "chat": "Stream chat",
+    "send_message": "Send message …",
+    "viewers": "Viewers",
+    "applause": "Applause",
+    "star": "Star",
+    "diamond": "Diamond",
+    "not_enough_karma": "Not enough karma for this gift."
+  },
   "community": {
     "polls": "Community Polls",
     "create_poll": "Create poll",

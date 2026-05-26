@@ -2282,6 +2282,15 @@
       "completed": "Aktion abgeschlossen! +{karma} Karma"
     }
   },
+  "livestream": {
+    "chat": "Stream-Chat",
+    "send_message": "Nachricht senden …",
+    "viewers": "Zuschauer",
+    "applause": "Applaus",
+    "star": "Stern",
+    "diamond": "Diamant",
+    "not_enough_karma": "Nicht genug Karma für dieses Geschenk."
+  },
   "community": {
     "polls": "Community-Umfragen",
     "create_poll": "Umfrage erstellen",
