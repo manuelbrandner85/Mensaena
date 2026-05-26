@@ -102,9 +102,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   // ── Dynamic pages from Supabase ──────────────────────────────────
+  //
+  // Build-Resilience: jeder Fetch hat ein hartes 20s-Budget via
+  // AbortController. Wenn Supabase langsam ist (Edge-Region-Timeout
+  // wie zuletzt 504 in den CI-Logs), gibt's leeren Pages-Block statt
+  // einen Build-Crash. Sitemap-Revalidate (1h) holt naechste Stunde
+  // erneut, sobald die Latenz wieder normal ist.
 
   let postPages: MetadataRoute.Sitemap = []
   let profilePages: MetadataRoute.Sitemap = []
+
+  const FETCH_BUDGET_MS = 20_000
+  const LIMIT = 1000 // war 5000 — 1000 reicht fuer SEO-Discovery, 5x schneller
+
+  const fetchWithTimeout = async <T>(
+    label: string,
+    fn: (signal: AbortSignal) => Promise<T>,
+  ): Promise<T | null> => {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), FETCH_BUDGET_MS)
+    try {
+      return await fn(ctrl.signal)
+    } catch (err) {
+      console.warn(`[sitemap] ${label} skipped:`, err)
+      return null
+    } finally {
+      clearTimeout(timer)
+    }
+  }
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -113,15 +138,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey)
 
-      // Active posts
-      const { data: posts } = await supabase
-        .from('posts')
-        .select('id, updated_at')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(5000)
+      // Beide Queries parallel — spart Wartezeit. AbortSignal greift
+      // wenn Supabase langsamer als FETCH_BUDGET_MS antwortet.
+      const [postsRes, profilesRes] = await Promise.all([
+        fetchWithTimeout('posts', (signal) =>
+          supabase
+            .from('posts')
+            .select('id, updated_at')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(LIMIT)
+            .abortSignal(signal),
+        ),
+        fetchWithTimeout('profiles', (signal) =>
+          supabase
+            .from('profiles')
+            .select('id, updated_at')
+            .order('created_at', { ascending: false })
+            .limit(LIMIT)
+            .abortSignal(signal),
+        ),
+      ])
 
-      if (posts) {
+      const posts = postsRes?.data
+      if (Array.isArray(posts)) {
         postPages = posts.map((p) => ({
           url: `${SITE_URL}/dashboard/posts/${p.id}`,
           lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
@@ -130,14 +170,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
       }
 
-      // Public profiles
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, updated_at')
-        .order('created_at', { ascending: false })
-        .limit(5000)
-
-      if (profiles) {
+      const profiles = profilesRes?.data
+      if (Array.isArray(profiles)) {
         profilePages = profiles.map((p) => ({
           url: `${SITE_URL}/dashboard/profile/${p.id}`,
           lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
@@ -147,7 +181,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
   } catch (err) {
-    // Silently continue – sitemap works without dynamic pages
+    // Sitemap funktioniert auch ohne dynamische Seiten — niemals den Build crashen.
     console.warn('[sitemap] Failed to fetch dynamic pages:', err)
   }
 
