@@ -956,6 +956,7 @@
   "posts": {
     "title": "Publicaciones",
     "allPosts": "Todas las publicaciones",
+    "linkCopied": "Enlace copiado al portapapeles",
     "loadingNearby": "Cargando publicaciones cerca de ti…",
     "activeNearby": "{count}{more} activas cerca de ti",
     "searchHint": "Buscar publicaciones…",

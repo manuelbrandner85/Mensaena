@@ -955,6 +955,7 @@
   "posts": {
     "title": "Gönderiler",
     "allPosts": "Tüm gönderiler",
+    "linkCopied": "Bağlantı panoya kopyalandı",
     "loadingNearby": "Yakındaki gönderiler yükleniyor…",
     "activeNearby": "{count}{more} yakında aktif",
     "searchHint": "Gönderilerde ara…",

@@ -3,6 +3,7 @@ import 'dart:async';
 import '../../widgets/shared/sized_avatar_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -100,6 +101,22 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       subject: p.title,
       text: '${p.title}\n\n${ShareService.buildShareUrl(postId: p.id)}',
     );
+  }
+
+  /// F82: kopiert nur den Post-Link in die Zwischenablage + zeigt Snackbar.
+  Future<void> _copyLink() async {
+    final p = _post;
+    if (p == null) return;
+    final url = ShareService.buildShareUrl(postId: p.id);
+    await Clipboard.setData(ClipboardData(text: url));
+    if (!mounted) return;
+    Haptics.tap();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: const Duration(seconds: 2),
+      backgroundColor: AppColors.surface,
+      content: Text('posts.linkCopied'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
   }
 
   Future<void> _report() async {
@@ -377,6 +394,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                               onVoteDown: () => _vote(-1),
                               onSave: _toggleSave,
                               onShare: _share,
+                              onCopyLink: _copyLink,
                               onReport: _report,
                               onHelp: _post!.userId !=
                                       SupabaseService.currentUser?.id
@@ -630,6 +648,7 @@ class _ActionsBar extends StatelessWidget {
     required this.onVoteDown,
     required this.onSave,
     required this.onShare,
+    required this.onCopyLink,
     required this.onReport,
     required this.onHelp,
   });
@@ -641,6 +660,7 @@ class _ActionsBar extends StatelessWidget {
   final VoidCallback onVoteDown;
   final VoidCallback onSave;
   final VoidCallback onShare;
+  final VoidCallback onCopyLink;
   final VoidCallback onReport;
   final VoidCallback? onHelp;
 
@@ -692,6 +712,12 @@ class _ActionsBar extends StatelessWidget {
                 label: '',
                 active: false,
                 onTap: onShare,
+              ),
+              _ActionIcon(
+                icon: LucideIcons.link,
+                label: '',
+                active: false,
+                onTap: onCopyLink,
               ),
               _ActionIcon(
                 icon: LucideIcons.flag,

@@ -955,6 +955,7 @@
   "posts": {
     "title": "Объявления",
     "allPosts": "Все объявления",
+    "linkCopied": "Ссылка скопирована",
     "loadingNearby": "Загружаю объявления рядом…",
     "activeNearby": "{count}{more} активных рядом",
     "searchHint": "Поиск по объявлениям…",

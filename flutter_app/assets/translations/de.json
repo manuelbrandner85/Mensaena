@@ -959,6 +959,7 @@
   "posts": {
     "title": "Beiträge",
     "allPosts": "Alle Beiträge",
+    "linkCopied": "Link in Zwischenablage kopiert",
     "loadingNearby": "Lade Beiträge in deiner Nähe…",
     "activeNearby": "{count}{more} aktiv in deiner Nähe",
     "searchHint": "Beiträge durchsuchen…",

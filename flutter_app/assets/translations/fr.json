@@ -956,6 +956,7 @@
   "posts": {
     "title": "Publications",
     "allPosts": "Toutes les publications",
+    "linkCopied": "Lien copié dans le presse-papiers",
     "loadingNearby": "Chargement des publications près de toi…",
     "activeNearby": "{count}{more} actives près de toi",
     "searchHint": "Rechercher des publications…",
