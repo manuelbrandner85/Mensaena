@@ -12,8 +12,8 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/active_call_provider.dart';
+import '../../providers/pending_actions_provider.dart';
 import '../../providers/unread_counts_provider.dart';
-import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/recent_pages_service.dart';
@@ -328,8 +328,11 @@ class _BottomNav extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pendingMatches =
-        ref.watch(matchingCountsProvider).value?.pending ?? 0;
+    // H2: aggregierter Pending-Counter — eingehende Hilfe-Anfragen +
+    // Matches + Freundschaftsanfragen. Ersetzt den isolierten
+    // pendingMatches-Badge.
+    final pendingActions =
+        ref.watch(pendingActionsCountProvider).value ?? 0;
     final unreadDm = ref.watch(unreadDmCountProvider).value ?? 0;
     return RepaintBoundary(
       child: ClipRect(
@@ -387,7 +390,7 @@ class _BottomNav extends ConsumerWidget {
                         route: '/dashboard/profile',
                         active:
                             _matches(activeRoute, ['/dashboard/profile']),
-                        badgeCount: pendingMatches,
+                        badgeCount: pendingActions,
                       ),
                     ),
                   ],
