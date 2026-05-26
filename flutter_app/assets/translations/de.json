@@ -348,6 +348,8 @@
     "share_duration": "{min} Minuten",
     "share_stop": "Teilen beenden",
     "share_no_permission": "Standort-Berechtigung fehlt.",
+    "mute": "Stumm schalten",
+    "unmute": "Wieder benachrichtigen",
     "noConversations": "Noch keine Nachrichten.",
     "noConversationsHint": "Schreibe einem:r Nachbar:in über deren Profil oder Beitrag.",
     "newDm": "Neue Nachricht",
@@ -2248,6 +2250,12 @@
   "polls": {
     "total_votes": "{n} Stimmen",
     "closed": "Abstimmung beendet · {n} Stimmen"
+  },
+  "notif": {
+    "send_test": "Test-Benachrichtigung senden",
+    "test_title": "Mensaena-Test",
+    "test_body": "Wenn du das hier siehst, funktionieren Benachrichtigungen.",
+    "test_sent": "Test-Benachrichtigung wurde gesendet."
   },
   "status": {
     "title": "Status setzen",

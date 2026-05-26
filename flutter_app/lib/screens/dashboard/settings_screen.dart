@@ -527,6 +527,17 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                     _update(prefs.copyWith(dailyDigestHour: h)),
               ),
             const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: _sendTestNotification,
+              icon: const Icon(LucideIcons.bellRing, size: 16),
+              label: Text('notif.send_test'.tr()),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.bronze,
+                side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+                minimumSize: const Size.fromHeight(44),
+              ),
+            ),
+            const SizedBox(height: 16),
             Text(
               'Profil-Settings (E-Mail-Notifications, Push-Token-Lifecycle) '
               'bleiben separat im Konto-Bereich.',
@@ -542,6 +553,27 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
     setState(() => _local = next);
     await NotificationPrefsRepository.save(next);
     ref.invalidate(myNotifPrefsProvider);
+  }
+
+  Future<void> _sendTestNotification() async {
+    final uid = sb.auth.currentUser?.id;
+    if (uid == null) return;
+    try {
+      await sb.from('notifications').insert({
+        'user_id': uid,
+        'type': 'system',
+        'title': 'notif.test_title'.tr(),
+        'message': 'notif.test_body'.tr(),
+        'data': {'kind': 'test'},
+        'is_read': false,
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('notif.test_sent'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    } catch (_) {}
   }
 }
 

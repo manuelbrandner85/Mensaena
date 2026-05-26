@@ -348,6 +348,8 @@
     "share_duration": "{min} minutes",
     "share_stop": "Stop sharing",
     "share_no_permission": "Location permission missing.",
+    "mute": "Mute",
+    "unmute": "Unmute",
     "noConversations": "No messages yet.",
     "noConversationsHint": "Message a neighbour from their profile or post.",
     "newDm": "New message",
@@ -2249,6 +2251,12 @@
   "polls": {
     "total_votes": "{n} votes",
     "closed": "Poll closed · {n} votes"
+  },
+  "notif": {
+    "send_test": "Send test notification",
+    "test_title": "Mensaena test",
+    "test_body": "If you see this, notifications are working.",
+    "test_sent": "Test notification sent."
   },
   "status": {
     "title": "Set status",

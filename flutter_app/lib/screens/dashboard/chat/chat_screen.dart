@@ -15,6 +15,7 @@ import '../../../config/theme/cinema_accents.dart';
 import '../../../providers/cinema_provider.dart';
 import '../../../repositories/conversations_repository.dart';
 import '../../../services/chat_context_service.dart';
+import '../../../services/conversation_mute_service.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/presence_service.dart';
@@ -558,6 +559,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             // Eleganter Chat-Top-Bar: Avatar/Emoji + Name + Action-Icons.
             // Ersetzt den grossen FAB unten rechts.
             _ChatTopBar(
+              conversationId: widget.conversationId,
               context: _context,
               activeCallId: _activeCallId,
               activeStreamRoom: _activeStreamRoom,
@@ -965,6 +967,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 // ─────────────────────────────────────────────────────────────
 class _ChatTopBar extends ConsumerStatefulWidget {
   const _ChatTopBar({
+    required this.conversationId,
     required this.context,
     required this.activeCallId,
     required this.activeStreamRoom,
@@ -980,6 +983,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
     required this.onClearDmHistory,
   });
 
+  final String conversationId;
   final ChatContext? context;
   final String? activeCallId;
   final String? activeStreamRoom;
@@ -1131,6 +1135,7 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                   color: widget.searchOpen ? accent : AppColors.mute,
                   onTap: () async => widget.onToggleSearch(),
                 ),
+                _MuteToggleIcon(conversationId: widget.conversationId),
               ],
             ),
           ),
@@ -1268,6 +1273,47 @@ class _LeadingBadge extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _MuteToggleIcon extends StatefulWidget {
+  const _MuteToggleIcon({required this.conversationId});
+  final String conversationId;
+  @override
+  State<_MuteToggleIcon> createState() => _MuteToggleIconState();
+}
+
+class _MuteToggleIconState extends State<_MuteToggleIcon> {
+  bool? _muted;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final m = await ConversationMuteService.instance
+        .isMuted(widget.conversationId);
+    if (mounted) setState(() => _muted = m);
+  }
+
+  Future<void> _toggle() async {
+    final next = !(_muted ?? false);
+    if (mounted) setState(() => _muted = next);
+    await ConversationMuteService.instance
+        .setMuted(widget.conversationId, muted: next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final muted = _muted ?? false;
+    return _ActionIcon(
+      icon: muted ? LucideIcons.bellOff : LucideIcons.bell,
+      label: muted ? 'chat.unmute'.tr() : 'chat.mute'.tr(),
+      color: muted ? AppColors.bronze : AppColors.mute,
+      onTap: () async => _toggle(),
     );
   }
 }
