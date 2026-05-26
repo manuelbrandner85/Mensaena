@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
+import '../../../widgets/badges/badge_detail_sheet.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/badge.dart';
 import '../../../models/user_badge.dart';
@@ -115,14 +116,8 @@ class _BadgeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _rarityColor;
     return GestureDetector(
-      onTap: () => showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: AppColors.surface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (_) => _BadgeSheet(badge: badge, earned: earned),
-      ),
+      // G2: Neuer BadgeDetailSheet mit "Wie bekomme ich das?"-Erklärung.
+      onTap: () => BadgeDetailSheet.show(context, badge, earned: earned),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -178,80 +173,3 @@ class _BadgeTile extends StatelessWidget {
   }
 }
 
-class _BadgeSheet extends StatelessWidget {
-  const _BadgeSheet({required this.badge, required this.earned});
-  final BadgeModel badge;
-  final bool earned;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.line,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Icon(
-            earned ? LucideIcons.award : LucideIcons.lock,
-            size: 48,
-            color: earned ? AppColors.amber : AppColors.mute,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            badge.name,
-            textAlign: TextAlign.center,
-            style: AppTypography.display(
-              size: 22,
-              color: AppColors.ink,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${badge.category} · ${badge.rarity.toUpperCase()} · ${badge.points} P',
-            style: AppTypography.label(size: 10),
-          ),
-          if (badge.description != null) ...[
-            const SizedBox(height: 14),
-            Text(
-              badge.description!,
-              textAlign: TextAlign.center,
-              style: AppTypography.body(
-                size: 14,
-                color: AppColors.inkSoft,
-                height: 1.55,
-              ),
-            ),
-          ],
-          const SizedBox(height: 14),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.elevated,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              earned
-                  ? 'Erhalten ✓'
-                  : 'Anforderung: ${badge.requirementType} ≥ ${badge.requirementValue}',
-              style: AppTypography.label(
-                size: 10,
-                color: earned ? AppColors.lebenSoft : AppColors.inkSoft,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
