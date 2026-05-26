@@ -93,10 +93,37 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                 subtitle: 'modules.farms.subtitle'.tr(),
               ),
             ),
+            // Info-Karte: erklärt was "Versorgung" meint.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.amber.withValues(alpha: 0.10),
+                  border: Border.all(
+                      color: AppColors.amber.withValues(alpha: 0.35)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(children: [
+                  const Icon(LucideIcons.info,
+                      size: 16, color: AppColors.amber),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Hier findest du Solidarische Landwirtschaft (Solawi), '
+                      'Tafeln, Hofläden und Foodsharing-Stellen in deiner '
+                      'Nähe — plus eigene Tausch- und Mitnehm-Angebote.',
+                      style: AppTypography.body(
+                          size: 12, color: AppColors.inkSoft, height: 1.4),
+                    ),
+                  ),
+                ]),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
               child: InkWell(
-                onTap: () => context.go('/dashboard/supply/foodbanks'),
+                onTap: () => context.push('/dashboard/supply/foodbanks'),
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
