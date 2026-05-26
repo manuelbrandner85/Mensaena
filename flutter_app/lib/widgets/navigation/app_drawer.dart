@@ -148,6 +148,8 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/badges'),
         _NavLink(icon: LucideIcons.calendar, label: 'nav.calendar',
             route: '/dashboard/calendar'),
+        _NavLink(icon: LucideIcons.hash, label: 'nav.followedTags',
+            route: '/dashboard/followed-tags'),
         _NavLink(icon: LucideIcons.settings, label: 'nav.settings',
             route: '/dashboard/settings'),
       ],

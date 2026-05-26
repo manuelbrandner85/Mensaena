@@ -99,6 +99,73 @@ class PostTagsRepository {
   }
 }
 
+/// followed_tags — D2: User folgt einzelnen Tags, um den Feed zu kuratieren.
+class FollowedTagsRepository {
+  const FollowedTagsRepository._();
+
+  static Future<List<String>> myTags() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final rows = await sb
+          .from('followed_tags')
+          .select('tag')
+          .eq('user_id', uid)
+          .order('created_at', ascending: false);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map((r) => (r['tag'] as String?) ?? '')
+          .where((t) => t.isNotEmpty)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static Future<bool> isFollowed(String tag) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    final t = tag.toLowerCase().trim();
+    try {
+      final rows = await sb
+          .from('followed_tags')
+          .select('id')
+          .eq('user_id', uid)
+          .eq('tag', t)
+          .limit(1);
+      return (rows as List).isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Returns the new state (true = jetzt gefolgt).
+  static Future<bool> toggleFollow(String tag) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    final t = tag.toLowerCase().trim();
+    if (t.isEmpty) return false;
+    final currently = await isFollowed(t);
+    try {
+      if (currently) {
+        await sb
+            .from('followed_tags')
+            .delete()
+            .eq('user_id', uid)
+            .eq('tag', t);
+        return false;
+      }
+      await sb.from('followed_tags').insert({
+        'user_id': uid,
+        'tag': t,
+      });
+      return true;
+    } catch (_) {
+      return currently;
+    }
+  }
+}
+
 /// post_drafts — Speichere unfertige Posts für später (1 Draft/User).
 class PostDraftsRepository {
   const PostDraftsRepository._();

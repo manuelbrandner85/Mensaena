@@ -80,6 +80,7 @@
     "skills": "Skills",
     "badges": "Badges",
     "calendar": "Calendar",
+    "followedTags": "Follow topics",
     "invite": "Invite neighbours",
     "interactions": "Interactions",
     "organizations": "Organisations",
@@ -2376,6 +2377,17 @@
     "channelDescription": "Reminder before saved events.",
     "title": "Event reminder",
     "body": "{title} starts in {minutes} minutes."
+  },
+  "followed_tags": {
+    "title": "Follow topics",
+    "intro": "Follow individual hashtags to curate your feed.",
+    "addHint": "Type a tag (e.g. harvest)",
+    "mine": "You follow",
+    "empty": "You don't follow any topics yet.",
+    "suggested": "Popular topics",
+    "noSuggestions": "No suggestions yet.",
+    "added": "#{tag} added.",
+    "removed": "#{tag} removed."
   },
   "a11y": {
     "section": "Accessibility",

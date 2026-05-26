@@ -80,6 +80,7 @@
     "skills": "Skills",
     "badges": "Badges",
     "calendar": "Kalender",
+    "followedTags": "Themen folgen",
     "invite": "Nachbarn einladen",
     "interactions": "Interaktionen",
     "organizations": "Organisationen",
@@ -2375,6 +2376,17 @@
     "channelDescription": "Erinnerung vor gespeicherten Events.",
     "title": "Event-Erinnerung",
     "body": "{title} startet in {minutes} Minuten."
+  },
+  "followed_tags": {
+    "title": "Themen folgen",
+    "intro": "Folge einzelnen Hashtags, um deinen Feed zu kuratieren.",
+    "addHint": "Tag eingeben (z. B. ernten)",
+    "mine": "Du folgst",
+    "empty": "Du folgst noch keinen Themen.",
+    "suggested": "Beliebte Themen",
+    "noSuggestions": "Noch keine Vorschläge.",
+    "added": "#{tag} hinzugefügt.",
+    "removed": "#{tag} entfernt."
   },
   "a11y": {
     "section": "Barrierefreiheit",

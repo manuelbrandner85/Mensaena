@@ -78,6 +78,7 @@
     "skills": "Competenze",
     "badges": "Distintivi",
     "calendar": "Calendario",
+    "followedTags": "Segui argomenti",
     "invite": "Invita vicini",
     "interactions": "Interazioni",
     "organizations": "Organizzazioni",
@@ -1995,5 +1996,16 @@
     "channelDescription": "Promemoria prima degli eventi salvati.",
     "title": "Promemoria evento",
     "body": "{title} inizia tra {minutes} minuti."
+  },
+  "followed_tags": {
+    "title": "Segui argomenti",
+    "intro": "Segui singoli hashtag per personalizzare il tuo feed.",
+    "addHint": "Scrivi un tag (es. raccolto)",
+    "mine": "Stai seguendo",
+    "empty": "Non segui ancora nessun argomento.",
+    "suggested": "Argomenti popolari",
+    "noSuggestions": "Nessun suggerimento.",
+    "added": "#{tag} aggiunto.",
+    "removed": "#{tag} rimosso."
   }
 }

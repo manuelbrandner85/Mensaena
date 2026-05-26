@@ -78,6 +78,7 @@
     "skills": "Beceriler",
     "badges": "Rozetler",
     "calendar": "Takvim",
+    "followedTags": "Konuları takip et",
     "invite": "Komşuları davet et",
     "interactions": "Etkileşimler",
     "organizations": "Kuruluşlar",
@@ -1994,5 +1995,16 @@
     "channelDescription": "Kayıtlı etkinliklerden önce hatırlatma.",
     "title": "Etkinlik hatırlatıcısı",
     "body": "{title} {minutes} dakika içinde başlıyor."
+  },
+  "followed_tags": {
+    "title": "Konuları takip et",
+    "intro": "Akışını özelleştirmek için hashtag'leri takip et.",
+    "addHint": "Etiket yaz (örn. hasat)",
+    "mine": "Takip ediyorsun",
+    "empty": "Henüz hiçbir konuyu takip etmiyorsun.",
+    "suggested": "Popüler konular",
+    "noSuggestions": "Henüz öneri yok.",
+    "added": "#{tag} eklendi.",
+    "removed": "#{tag} kaldırıldı."
   }
 }

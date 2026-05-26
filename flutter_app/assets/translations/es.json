@@ -78,6 +78,7 @@
     "skills": "Habilidades",
     "badges": "Insignias",
     "calendar": "Calendario",
+    "followedTags": "Seguir temas",
     "invite": "Invitar vecinos",
     "interactions": "Interacciones",
     "organizations": "Organizaciones",
@@ -1995,5 +1996,16 @@
     "channelDescription": "Recordatorio antes de eventos guardados.",
     "title": "Recordatorio de evento",
     "body": "{title} empieza en {minutes} minutos."
+  },
+  "followed_tags": {
+    "title": "Seguir temas",
+    "intro": "Sigue hashtags concretos para personalizar tu feed.",
+    "addHint": "Escribe un tag (p. ej. cosecha)",
+    "mine": "Sigues",
+    "empty": "Aún no sigues ningún tema.",
+    "suggested": "Temas populares",
+    "noSuggestions": "Sin sugerencias todavía.",
+    "added": "#{tag} añadido.",
+    "removed": "#{tag} eliminado."
   }
 }

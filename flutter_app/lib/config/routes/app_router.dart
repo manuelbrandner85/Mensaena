@@ -23,6 +23,7 @@ import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/call/call_history_screen.dart';
 import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
+import '../../screens/dashboard/followed_tags_screen.dart';
 import '../../screens/dashboard/global_search_screen.dart';
 import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
@@ -267,6 +268,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: GlobalSearchScreen(
           initialQuery: s.uri.queryParameters['q'],
         ),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/followed-tags',
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: const FollowedTagsScreen(),
         ),
       ),
       GoRoute(
