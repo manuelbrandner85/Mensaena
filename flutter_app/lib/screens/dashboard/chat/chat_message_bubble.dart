@@ -707,16 +707,35 @@ bool _isEmojiOnly(String s) {
 }
 
 /// Rendert Text mit @mentions als bronze-highlighted spans.
-/// Tap auf einen Mention öffnet das Profil des erwähnten Users (DB-Lookup
-/// via display_name) — fire-and-forget; bei Fehler kein Crash.
-class _MentionAwareText extends StatelessWidget {
+/// Stateful damit TapGestureRecognizer pro Mention nur 1x erzeugt +
+/// in dispose() abgeräumt wird (LEAK-Fix: pro Bubble-Rebuild wurde
+/// vorher ein neuer Recognizer leak't → App hängte nach längerem Chat).
+class _MentionAwareText extends StatefulWidget {
   const _MentionAwareText({required this.text, required this.baseStyle});
   final String text;
   final TextStyle baseStyle;
 
   static final _re = RegExp(r'@([\p{L}0-9._-]+)', unicode: true);
 
-  Future<void> _openMention(BuildContext context, String name) async {
+  @override
+  State<_MentionAwareText> createState() => _MentionAwareTextState();
+}
+
+class _MentionAwareTextState extends State<_MentionAwareText> {
+  final List<TapGestureRecognizer> _recognizers = [];
+  List<InlineSpan>? _spans;
+  String? _builtFor;
+
+  @override
+  void dispose() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
+    super.dispose();
+  }
+
+  Future<void> _openMention(String name) async {
     try {
       final row = await sb
           .from('profiles')
@@ -724,39 +743,56 @@ class _MentionAwareText extends StatelessWidget {
           .eq('display_name', name)
           .limit(1)
           .maybeSingle();
-      if (row == null) return;
-      if (!context.mounted) return;
+      if (row == null || !mounted) return;
       GoRouter.of(context).go('/dashboard/profile/${row['id']}');
     } catch (_) {/* silently no-op */}
   }
 
-  @override
-  Widget build(BuildContext context) {
+  void _buildSpans() {
+    for (final r in _recognizers) {
+      r.dispose();
+    }
+    _recognizers.clear();
     final spans = <InlineSpan>[];
     int last = 0;
-    for (final m in _re.allMatches(text)) {
+    final text = widget.text;
+    for (final m in _MentionAwareText._re.allMatches(text)) {
       if (m.start > last) {
         spans.add(TextSpan(
           text: text.substring(last, m.start),
-          style: baseStyle,
+          style: widget.baseStyle,
         ));
       }
       final name = m.group(1) ?? '';
+      final rec = TapGestureRecognizer()..onTap = () => _openMention(name);
+      _recognizers.add(rec);
       spans.add(TextSpan(
         text: m.group(0),
-        style: baseStyle.copyWith(
+        style: widget.baseStyle.copyWith(
           color: AppColors.bronze,
           fontWeight: FontWeight.w700,
         ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () => _openMention(context, name),
+        recognizer: rec,
       ));
       last = m.end;
     }
     if (last < text.length) {
-      spans.add(TextSpan(text: text.substring(last), style: baseStyle));
+      spans.add(TextSpan(text: text.substring(last), style: widget.baseStyle));
     }
-    if (spans.isEmpty) return Text(text, style: baseStyle);
-    return RichText(text: TextSpan(children: spans));
+    _spans = spans;
+    _builtFor = text;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Spans nur neu bauen wenn Text sich geändert hat — Recognizers
+    // bleiben sonst stabil über Parent-Rebuilds.
+    if (_builtFor != widget.text) {
+      _buildSpans();
+    }
+    if (_spans == null || _spans!.isEmpty) {
+      return Text(widget.text, style: widget.baseStyle);
+    }
+    return RichText(text: TextSpan(children: _spans));
   }
 }
