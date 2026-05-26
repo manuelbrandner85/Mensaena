@@ -1831,6 +1831,18 @@
     "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
     "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
   },
+  "affirmation": {
+    "title": "Pensamiento del día",
+    "pool": {
+      "1": "Un pequeño gesto puede salvar el día de otra persona.",
+      "2": "Eres parte de este barrio — tu sola presencia cuenta.",
+      "3": "Pedir no es debilidad. Pedir deja que otros ayuden.",
+      "4": "La ayuda puede ser ligera. No tienes que cargarlo todo.",
+      "5": "Hoy importa más que ayer. Lo que haces ahora mueve algo.",
+      "6": "La confianza crece despacio. Tú la estás sembrando ahora mismo.",
+      "7": "Algunos momentos se quedan — no los ruidosos, sino los sinceros."
+    }
+  },
   "personalBest": {
     "title": "Tu mejor marca",
     "subtitle": "Récords de toda la vida — siéntete orgulloso/a.",

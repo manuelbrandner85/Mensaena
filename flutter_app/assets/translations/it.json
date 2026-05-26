@@ -1831,6 +1831,18 @@
     "sheetHint": "Una frase basta. Solo tu vedi queste note — restano sul tuo dispositivo.",
     "placeholder": "es. una chiamata gentile, il sole, una mano amica…"
   },
+  "affirmation": {
+    "title": "Pensiero del giorno",
+    "pool": {
+      "1": "Un piccolo gesto può salvare la giornata di un'altra persona.",
+      "2": "Fai parte di questo quartiere — la tua sola presenza conta.",
+      "3": "Chiedere non è debolezza. Chiedere permette agli altri di aiutare.",
+      "4": "L'aiuto può essere leggero. Non devi portare tutto da solo/a.",
+      "5": "Oggi conta più di ieri. Ciò che fai ora muove qualcosa.",
+      "6": "La fiducia cresce piano. La stai seminando proprio adesso.",
+      "7": "Alcuni momenti restano — non i rumorosi, ma quelli sinceri."
+    }
+  },
   "personalBest": {
     "title": "Il tuo record",
     "subtitle": "Record di sempre — siine fiero/a.",

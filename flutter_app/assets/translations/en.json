@@ -1924,7 +1924,8 @@
       "quickNote": "Quick note",
       "helpStreak": "Help streak",
       "moon": "Moon phase",
-      "personalBest": "Personal best"
+      "personalBest": "Personal best",
+      "affirmation": "Daily affirmation"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1963,7 +1964,8 @@
       "quickNote": "Personal sticky note, lives only on your device",
       "helpStreak": "Consecutive days where you've helped",
       "moon": "Today's moon phase and illumination",
-      "personalBest": "Your lifetime highs to keep you going"
+      "personalBest": "Your lifetime highs to keep you going",
+      "affirmation": "A calm reminder once a day"
     }
   },
   "hubs": {
@@ -2064,6 +2066,18 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "affirmation": {
+    "title": "Thought for today",
+    "pool": {
+      "1": "A small gesture can save someone else's day.",
+      "2": "You're part of this neighbourhood — just being here counts.",
+      "3": "Asking is not weakness. Asking lets others help.",
+      "4": "Help is allowed to be light. You don't have to carry it all.",
+      "5": "Today matters more than yesterday. What you do now moves things.",
+      "6": "Trust grows slowly. You're sowing it right now.",
+      "7": "Some moments stay — not the loud ones, but the honest ones."
+    }
   },
   "personalBest": {
     "title": "Personal best",

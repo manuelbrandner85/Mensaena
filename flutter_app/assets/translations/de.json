@@ -1923,7 +1923,8 @@
       "quickNote": "Notizzettel",
       "helpStreak": "Hilfe-Streak",
       "moon": "Mondphase",
-      "personalBest": "Persönliche Bestleistung"
+      "personalBest": "Persönliche Bestleistung",
+      "affirmation": "Tages-Affirmation"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1962,7 +1963,8 @@
       "quickNote": "Privater Notizzettel, nur auf deinem Gerät",
       "helpStreak": "Aufeinanderfolgende Tage, an denen du geholfen hast",
       "moon": "Heutige Mondphase und Beleuchtungsgrad",
-      "personalBest": "Deine Lifetime-Spitzenwerte als Motivator"
+      "personalBest": "Deine Lifetime-Spitzenwerte als Motivator",
+      "affirmation": "Eine ruhige Erinnerung pro Tag"
     }
   },
   "hubs": {
@@ -2063,6 +2065,18 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "affirmation": {
+    "title": "Gedanke des Tages",
+    "pool": {
+      "1": "Eine kleine Geste kann den Tag von jemand anderem retten.",
+      "2": "Du bist Teil dieser Nachbarschaft — schon deine Anwesenheit zählt.",
+      "3": "Bitten ist keine Schwäche. Wer fragt, gibt anderen die Chance zu helfen.",
+      "4": "Hilfe darf leicht sein. Du musst nicht alles selbst tragen.",
+      "5": "Heute zählt mehr als gestern. Was du jetzt tust, bewegt etwas.",
+      "6": "Vertrauen wächst langsam. Du bist gerade dabei, es zu säen.",
+      "7": "Manche Momente bleiben — nicht das laute, sondern das ehrliche."
+    }
   },
   "personalBest": {
     "title": "Deine Bestleistung",

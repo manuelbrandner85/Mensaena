@@ -1830,6 +1830,18 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "affirmation": {
+    "title": "Günün düşüncesi",
+    "pool": {
+      "1": "Küçük bir jest, başkasının gününü kurtarabilir.",
+      "2": "Bu mahallenin parçasısın — sadece burada olman bile sayılır.",
+      "3": "Sormak zayıflık değildir. Sormak, başkasına yardım etme şansı verir.",
+      "4": "Yardım hafif olabilir. Her şeyi tek başına taşımana gerek yok.",
+      "5": "Bugün dünden daha önemli. Şu an yaptığın bir şey, bir şeyleri kıpırdatır.",
+      "6": "Güven yavaş büyür. Sen şu anda onu ekiyorsun.",
+      "7": "Bazı anlar kalıcıdır — gürültülüler değil, samimi olanlar."
+    }
+  },
   "personalBest": {
     "title": "Kişisel rekorun",
     "subtitle": "Tüm zamanların en iyileri — bunlarla gurur duy.",

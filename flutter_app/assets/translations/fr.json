@@ -1831,6 +1831,18 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "affirmation": {
+    "title": "Pensée du jour",
+    "pool": {
+      "1": "Un petit geste peut sauver la journée de quelqu'un d'autre.",
+      "2": "Tu fais partie de ce quartier — ta seule présence compte.",
+      "3": "Demander n'est pas une faiblesse. Demander, c'est laisser les autres aider.",
+      "4": "L'aide a le droit d'être légère. Tu n'as pas à tout porter.",
+      "5": "Aujourd'hui compte plus qu'hier. Ce que tu fais maintenant bouge les choses.",
+      "6": "La confiance pousse lentement. Tu es en train de la semer.",
+      "7": "Certains moments restent — pas les bruyants, mais les sincères."
+    }
+  },
   "personalBest": {
     "title": "Ton meilleur score",
     "subtitle": "Records à vie — sois-en fier·e.",

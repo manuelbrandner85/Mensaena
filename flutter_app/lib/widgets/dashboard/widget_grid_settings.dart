@@ -256,6 +256,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.personalBest',
       icon: LucideIcons.trophy,
     ),
+    DashboardWidgetMeta(
+      id: 'affirmation',
+      title: 'widgets.titles.affirmation',
+      description: 'widgets.descriptions.affirmation',
+      icon: LucideIcons.sparkles,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

@@ -39,6 +39,7 @@ import '../../../widgets/dashboard/gratitude_widget.dart';
 import '../../../widgets/dashboard/karma_widget.dart';
 import '../../../widgets/dashboard/streak_widget.dart';
 import '../../../widgets/dashboard/activity_heatmap_widget.dart';
+import '../../../widgets/dashboard/affirmation_widget.dart';
 import '../../../widgets/dashboard/help_streak_widget.dart';
 import '../../../widgets/dashboard/moon_widget.dart';
 import '../../../widgets/dashboard/personal_best_widget.dart';
@@ -504,6 +505,10 @@ class _DashboardHomeScreenState
           break;
         case 'personalBest':
           out.add(const PersonalBestWidget());
+          addSpacing();
+          break;
+        case 'affirmation':
+          out.add(const AffirmationWidget());
           addSpacing();
           break;
         case 'nearby_posts':
