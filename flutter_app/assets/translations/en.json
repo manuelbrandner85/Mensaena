@@ -2257,6 +2257,15 @@
     "create_title": "Schedule call",
     "empty": "No scheduled calls."
   },
+  "collections": {
+    "pick_title": "Pick a collection",
+    "create_title": "New collection",
+    "name": "Name",
+    "emoji": "Emoji (optional)",
+    "new": "New",
+    "default": "General",
+    "empty": "No collections yet — tap + to create one."
+  },
   "vanish": {
     "title": "Vanish mode",
     "description": "Messages in this conversation will be auto-deleted after the chosen duration.",

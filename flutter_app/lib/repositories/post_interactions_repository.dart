@@ -187,7 +187,7 @@ class SavedPostsRepository {
     }
   }
 
-  static Future<void> toggle(String postId) async {
+  static Future<void> toggle(String postId, {String? collectionId}) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
     try {
@@ -201,6 +201,7 @@ class SavedPostsRepository {
         await sb.from('saved_posts').insert({
           'post_id': postId,
           'user_id': uid,
+          if (collectionId != null) 'collection_id': collectionId,
         });
       }
     } catch (_) {}

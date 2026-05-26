@@ -2256,6 +2256,15 @@
     "create_title": "Anruf planen",
     "empty": "Keine geplanten Anrufe."
   },
+  "collections": {
+    "pick_title": "Sammlung wählen",
+    "create_title": "Neue Sammlung",
+    "name": "Name",
+    "emoji": "Emoji (optional)",
+    "new": "Neu",
+    "default": "Allgemein",
+    "empty": "Noch keine Sammlungen — tippe auf + um eine anzulegen."
+  },
   "vanish": {
     "title": "Vanish-Modus",
     "description": "Nachrichten in dieser Konversation werden nach der gewählten Zeit automatisch gelöscht.",
