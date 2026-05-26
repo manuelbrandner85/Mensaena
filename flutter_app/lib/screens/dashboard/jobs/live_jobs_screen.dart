@@ -81,6 +81,9 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
     return DashboardScaffold(
       title: 'jobs.liveSearchTitle'.tr(),
       currentRoute: '/dashboard/jobs/search',
+      onRefresh: () async {
+        if (!_loading) await _search();
+      },
       body: SafeArea(
         child: Column(
           children: [

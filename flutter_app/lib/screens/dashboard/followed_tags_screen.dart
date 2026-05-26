@@ -89,6 +89,11 @@ class _FollowedTagsScreenState extends ConsumerState<FollowedTagsScreen> {
     return DashboardScaffold(
       title: 'followed_tags.title'.tr(),
       currentRoute: '/dashboard/followed-tags',
+      onRefresh: () async {
+        ref.invalidate(_myFollowedTagsProvider);
+        ref.invalidate(_suggestedTagsProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+      },
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
