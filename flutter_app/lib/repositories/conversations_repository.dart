@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/supabase_service.dart';
@@ -175,12 +176,16 @@ class ConversationsRepository {
   /// F2: Startet eine 1:1-Konversation oder gibt existierende zurueck.
   /// Setzt hidden_at vom Caller zurueck wenn vorher versteckt.
   /// Returns die conversation_id oder null bei Fehler.
+  /// Bug-Sleuth: Fehler werden NICHT mehr silent verschluckt — sonst tappen
+  /// wir wieder im Dunkeln (s. CHECK-Constraint-Bug Mai 2026 wo der
+  /// notifications_type_check trigger das DM-Insert kippte).
   static Future<String?> getOrCreateDm(String otherUserId) async {
     try {
       final r = await sb.rpc<dynamic>('get_or_create_dm',
           params: {'p_other_user_id': otherUserId});
       return r as String?;
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('[getOrCreateDm] failed: $e\n$st');
       return null;
     }
   }
