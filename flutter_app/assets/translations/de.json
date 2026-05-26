@@ -725,6 +725,22 @@
     "deleteEntryConfirm": "Soll dieser Eintrag aus \"{table}\" unwiderruflich gelöscht werden?"
   },
   "create": {
+    "picker_title": "Was möchtest du erstellen?",
+    "picker_subtitle": "Wähle eine Art aus.",
+    "picker": {
+      "post": "Beitrag",
+      "post_desc": "Hilfe-Anfrage, Angebot oder Info",
+      "event": "Veranstaltung",
+      "event_desc": "Treffen, Workshop, Spaziergang",
+      "marketplace": "Marktplatz",
+      "marketplace_desc": "Verschenken, Tauschen, Verkaufen",
+      "group": "Gruppe",
+      "group_desc": "Themen-Community gründen",
+      "knowledge": "Wiki-Artikel",
+      "knowledge_desc": "Wissen + Anleitung teilen",
+      "crisis": "Krise melden",
+      "crisis_desc": "Notlage in der Nähe melden"
+    },
     "locationUnavailable": "Standort nicht verfügbar.",
     "maxImages": "Maximal 5 Bilder.",
     "kind": "Art",

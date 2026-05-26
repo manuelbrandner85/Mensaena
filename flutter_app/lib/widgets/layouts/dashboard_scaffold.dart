@@ -17,6 +17,7 @@ import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/recent_pages_service.dart';
+import '../shared/create_picker_sheet.dart';
 import '../shared/my_avatar_top_button.dart';
 import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
@@ -299,7 +300,10 @@ class _PlusFab extends StatelessWidget {
         shape: const CircleBorder(),
         onPressed: () {
           Haptics.confirm();
-          context.go('/dashboard/create');
+          // C1: Universeller Create-Picker statt direkter Route. User
+          // sieht 6 Tiles (Post/Event/Marktplatz/Gruppe/Wissen/Krise)
+          // im Cinema-GlassCard-Style.
+          CreatePickerSheet.show(context);
         },
         tooltip: 'nav.create'.tr(),
         child: const Icon(LucideIcons.plus, size: 26),

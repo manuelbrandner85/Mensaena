@@ -726,6 +726,22 @@
     "deleteEntryConfirm": "Permanently delete this entry from \"{table}\"?"
   },
   "create": {
+    "picker_title": "What do you want to create?",
+    "picker_subtitle": "Pick a type.",
+    "picker": {
+      "post": "Post",
+      "post_desc": "Help request, offer or info",
+      "event": "Event",
+      "event_desc": "Meetup, workshop, walk",
+      "marketplace": "Marketplace",
+      "marketplace_desc": "Give, swap, sell",
+      "group": "Group",
+      "group_desc": "Start a topic community",
+      "knowledge": "Wiki article",
+      "knowledge_desc": "Share knowledge + how-to",
+      "crisis": "Report crisis",
+      "crisis_desc": "Report emergency nearby"
+    },
     "locationUnavailable": "Location unavailable.",
     "maxImages": "Maximum 5 images.",
     "kind": "Kind",
