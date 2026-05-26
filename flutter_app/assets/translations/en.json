@@ -2311,7 +2311,9 @@
     "leaderboard": "Leaderboard",
     "this_week": "THIS WEEK",
     "no_leaderboard": "No data yet.",
-    "daily_challenges": "Daily challenges"
+    "daily_challenges": "Daily challenges",
+    "price_below_avg": "Below average (∅ €{avg})",
+    "price_above_avg": "Above average (∅ €{avg})"
   },
   "smartReply": {
     "sheetTitle": "Message about this post",

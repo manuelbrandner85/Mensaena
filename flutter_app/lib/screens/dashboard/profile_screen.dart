@@ -21,6 +21,7 @@ import '../../services/supabase_service.dart';
 import '../../repositories/mega_repositories.dart';
 import '../../widgets/dashboard/activity_heatmap_widget.dart';
 import '../../widgets/profile/follow_button.dart';
+import '../../widgets/profile/qr_share_sheet.dart';
 import '../../widgets/profile/verified_badge.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/post_card.dart';
@@ -788,6 +789,18 @@ class _Header extends StatelessWidget {
                 );
               },
               icon: const Icon(LucideIcons.share2,
+                  size: 18, color: AppColors.mute),
+            ),
+            // F34: QR-Code-Profil-Teilen
+            IconButton(
+              tooltip: 'profile.qr_code'.tr(),
+              onPressed: () => QrShareSheet.show(
+                context,
+                userId: profile.id,
+                displayName:
+                    profile.displayName ?? profile.name ?? 'Mensaena',
+              ),
+              icon: const Icon(LucideIcons.qrCode,
                   size: 18, color: AppColors.mute),
             ),
           ],

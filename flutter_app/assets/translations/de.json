@@ -2310,7 +2310,9 @@
     "leaderboard": "Bestenliste",
     "this_week": "DIESE WOCHE",
     "no_leaderboard": "Noch keine Daten.",
-    "daily_challenges": "Tages-Aufgaben"
+    "daily_challenges": "Tages-Aufgaben",
+    "price_below_avg": "Unter Durchschnitt (∅ {avg} €)",
+    "price_above_avg": "Über Durchschnitt (∅ {avg} €)"
   },
   "smartReply": {
     "sheetTitle": "Nachricht zum Beitrag",
