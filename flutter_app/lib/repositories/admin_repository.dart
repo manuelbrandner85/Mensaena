@@ -149,7 +149,12 @@ class AdminRepository {
 
     int activeGroups = 0;
     try {
-      final rows = await sb.from('groups').select('id').eq('is_active', true);
+      // BUGFIX: DB hat kein is_active — Schema nutzt is_archived. Eine
+      // 'aktive' Gruppe ist eine die NICHT archiviert ist.
+      final rows = await sb
+          .from('groups')
+          .select('id')
+          .eq('is_archived', false);
       activeGroups = (rows as List).length;
     } catch (_) {}
 

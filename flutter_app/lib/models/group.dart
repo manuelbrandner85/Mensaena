@@ -30,20 +30,23 @@ class Group {
   final String? creatorId;
 
   factory Group.fromJson(Map<String, dynamic> j) {
+    // BUGFIX: DB-Spalten slug + category sind nullable — vorher als
+    // 'as String' required gelesen → eine einzige Row ohne slug/category
+    // killte die ganze Liste. Defensive Fallback auf '' bzw. 'sonstiges'.
     return Group(
       id: j['id'] as String,
-      name: j['name'] as String,
-      slug: j['slug'] as String,
-      category: j['category'] as String,
+      name: j['name'] as String? ?? '',
+      slug: j['slug'] as String? ?? '',
+      category: j['category'] as String? ?? 'sonstiges',
       memberCount: (j['member_count'] as num?)?.toInt() ?? 0,
       createdAt:
           DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
       description: j['description'] as String?,
-      avatarUrl: j['avatar_url'] as String?,
-      bannerUrl: j['banner_url'] as String?,
+      avatarUrl: (j['avatar_url'] ?? j['image_url']) as String?,
+      bannerUrl: (j['banner_url'] ?? j['cover_image_url']) as String?,
       isPrivate: (j['is_private'] as bool?) ?? false,
       postCount: (j['post_count'] as num?)?.toInt() ?? 0,
-      creatorId: j['creator_id'] as String?,
+      creatorId: (j['creator_id'] ?? j['created_by']) as String?,
     );
   }
 
