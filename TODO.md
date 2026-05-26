@@ -262,3 +262,22 @@ LAST_TASK=feat(modul-audit Sprint 5): WikipediaBox-Widget (Post-Detail bei Anima
 
 ## Zeit
 B1-B8: ~85h | Audit-Fixes: ~20-30h | Session G (2026-04-24): ~3h | Session H (2026-04-30): ~3h
+
+## Mensaena-Flutter Welle 1-5 (2026-05-26)
+- [x] feat(P1): Intent-Kontaktsystem (10 Intents, anonymisiert) – live
+- [x] feat(P4): Livestream-Chat realtime + Reactions + Karma-Gifts
+- [x] feat(P6): Follow/Profile-Views/Verifizierung/Polls/Leaderboard/Daily-Challenges/QR-Share
+- [x] feat(P7): Marketplace-Preis-Indikator, Drafts-Screen, Scheduled/Expires-Posts
+- [x] feat(P8): Live-Location-Share im Chat (15/30/60min)
+- [x] feat(P9): Event QR-Check-in (Organisator zeigt / Attendee scannt)
+- [x] feat(P10): Karma-History-Screen, Mentorship-Übersicht, Status-Text auf Profil
+- [x] feat(P11): Stories (24h), OLED-Mode, Senior-Mode, Sleep-Reminder (zonedSchedule)
+- [x] feat(P12): Account-Deletion (14-Tage-Frist + Cancel), JSON-Daten-Export (GDPR), Offline-Queue mit Connectivity-Auto-Flush, Cron-Jobs für scheduled/delete
+- [x] feat(P5): Daily-Digest opt-in (pg_cron stündlich aggregiert)
+- [x] DB: posts.scheduled_at/expires_at, profiles.status_text/emoji/until, event_checkins, user_streaks, karma_log, stream_clips, account_deletion_requests, crash_logs (alle mit RLS)
+- [x] DB-Cron: publish_scheduled_posts_5m, execute_account_deletions_hourly, daily_digest_hourly
+- [x] CI-Resilience: flutter.yml + shorebird_patch.yml 5x retry bei 5xx/Network
+- [x] Bugfix-Welle: Map-GPS-Drift, Module-Filter-Default-On, 8+ Schema-Mismatches, Mundraub/E-Auto nwr-Query
+- [x] Crash-Fix: Biometric Endlos-Loop entschärft (kein auto-prompt mehr)
+
+
