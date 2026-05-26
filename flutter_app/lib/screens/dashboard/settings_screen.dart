@@ -1153,6 +1153,17 @@ class _AppearanceTab extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/scheduled-calls'),
+          icon: const Icon(LucideIcons.phoneCall, size: 16),
+          label: Text('scheduled_calls.title'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
           onPressed: () => context.go('/dashboard/my-drafts'),
           icon: const Icon(LucideIcons.fileText, size: 16),
           label: Text('posts.drafts'.tr()),

@@ -52,7 +52,9 @@ import '../../screens/dashboard/account_screen.dart';
 import '../../screens/dashboard/drafts_screen.dart';
 import '../../screens/dashboard/karma_history_screen.dart';
 import '../../screens/dashboard/admin/admin_crash_logs_screen.dart';
+import '../../screens/dashboard/call/scheduled_calls_screen.dart';
 import '../../screens/dashboard/call/voicemail_screen.dart';
+import '../../screens/dashboard/mentorship_match_screen.dart';
 import '../../screens/dashboard/live/scheduled_streams_screen.dart';
 import '../../screens/dashboard/mentorship_screen.dart';
 import '../../screens/dashboard/leaderboard_screen.dart';
@@ -1293,6 +1295,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, st) => mensaenaTransition<void>(
           key: st.pageKey,
           child: const AdminCrashLogsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/scheduled-calls',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const ScheduledCallsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/mentorship/find',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const MentorshipMatchScreen(),
         ),
       ),
       GoRoute(

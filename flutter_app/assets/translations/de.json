@@ -1797,6 +1797,8 @@
     "clip_saved": "Clip wurde gespeichert."
   },
   "call": {
+    "audio": "Audio",
+    "video": "Video",
     "incoming": "Eingehender Anruf",
     "calling": "Klingelt …",
     "ringing": "Eingehender Anruf",
@@ -2241,7 +2243,18 @@
     "title": "Mentoring",
     "empty": "Du hast aktuell keine Mentorings.",
     "you_are_mentor": "Du bist Mentor:in",
-    "you_are_mentee": "Du bist Mentee"
+    "you_are_mentee": "Du bist Mentee",
+    "find_title": "Mentor:innen finden",
+    "no_mentors": "Aktuell sind keine Mentor:innen verfügbar.",
+    "match_overlap": "{n} Thema-Match",
+    "request": "Anfragen",
+    "request_sent": "Anfrage gesendet.",
+    "request_failed": "Anfrage fehlgeschlagen."
+  },
+  "scheduled_calls": {
+    "title": "Geplante Anrufe",
+    "create_title": "Anruf planen",
+    "empty": "Keine geplanten Anrufe."
   },
   "voicemail": {
     "title": "Voicemail",

@@ -89,6 +89,16 @@ class MentorshipScreen extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text('mentorship.empty'.tr(),
                       style: AppTypography.caption()),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: () =>
+                        context.go('/dashboard/mentorship/find'),
+                    icon: const Icon(LucideIcons.search, size: 14),
+                    label: Text('mentorship.find_title'.tr()),
+                    style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.bronze,
+                        foregroundColor: AppColors.voidColor),
+                  ),
                 ]),
               ),
             );

@@ -1798,6 +1798,8 @@
     "clip_saved": "Clip saved."
   },
   "call": {
+    "audio": "Audio",
+    "video": "Video",
     "incoming": "Incoming call",
     "calling": "Ringing …",
     "ringing": "Incoming call",
@@ -2242,7 +2244,18 @@
     "title": "Mentoring",
     "empty": "You don't have any mentorships yet.",
     "you_are_mentor": "You are a mentor",
-    "you_are_mentee": "You are a mentee"
+    "you_are_mentee": "You are a mentee",
+    "find_title": "Find mentors",
+    "no_mentors": "No mentors available right now.",
+    "match_overlap": "{n} topic match",
+    "request": "Request",
+    "request_sent": "Request sent.",
+    "request_failed": "Request failed."
+  },
+  "scheduled_calls": {
+    "title": "Scheduled calls",
+    "create_title": "Schedule call",
+    "empty": "No scheduled calls."
   },
   "voicemail": {
     "title": "Voicemail",

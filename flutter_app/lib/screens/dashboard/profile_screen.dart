@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../widgets/profile/status_editor_sheet.dart';
+import 'call/scheduled_calls_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../widgets/effects/tilt_card.dart';
@@ -760,7 +761,21 @@ class _Header extends StatelessWidget {
                   ),
                   if (!isMe) ...[
                     const SizedBox(height: 4),
-                    FollowButton(userId: profile.id),
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      FollowButton(userId: profile.id),
+                      const SizedBox(width: 6),
+                      IconButton(
+                        tooltip: 'scheduled_calls.create_title'.tr(),
+                        onPressed: () => ScheduleCallSheet.show(
+                          context,
+                          calleeId: profile.id,
+                          calleeName:
+                              profile.displayName ?? profile.name ?? 'mensaena',
+                        ),
+                        icon: const Icon(LucideIcons.calendarPlus,
+                            size: 18, color: AppColors.bronze),
+                      ),
+                    ]),
                   ],
                   if (profile.location != null)
                     Text(
