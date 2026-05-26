@@ -54,16 +54,19 @@ class ChargeStationsService {
       return hit.data;
     }
     final radiusM = radiusKm * 1000;
-    final q = '[out:json][timeout:15];'
-        'node["amenity"="charging_station"](around:$radiusM,$lat,$lng);'
-        'out body $limit;';
+    // BUGFIX: nwr statt node + 'out center' damit auch Ladestationen die als
+    // way (z. B. ganze Parkplatz-Polygone) getagged sind erfasst werden.
+    // Timeout 15s → 25s weil Overpass-Server oft langsam ist.
+    final q = '[out:json][timeout:25];'
+        'nwr["amenity"="charging_station"](around:$radiusM,$lat,$lng);'
+        'out center $limit;';
     try {
       final r = await http
           .post(
             Uri.parse('https://overpass-api.de/api/interpreter'),
             body: {'data': q},
           )
-          .timeout(const Duration(seconds: 18));
+          .timeout(const Duration(seconds: 30));
       if (r.statusCode != 200) {
         debugPrint('[ChargeStations] HTTP ${r.statusCode}');
         return const [];
@@ -72,8 +75,13 @@ class ChargeStationsService {
       final elements = (j['elements'] as List?) ?? const [];
       final out = <ChargeStation>[];
       for (final el in elements.whereType<Map<String, dynamic>>()) {
-        final plat = (el['lat'] as num?)?.toDouble();
-        final plng = (el['lon'] as num?)?.toDouble();
+        double? plat = (el['lat'] as num?)?.toDouble();
+        double? plng = (el['lon'] as num?)?.toDouble();
+        if (plat == null || plng == null) {
+          final center = el['center'] as Map<String, dynamic>?;
+          plat = (center?['lat'] as num?)?.toDouble();
+          plng = (center?['lon'] as num?)?.toDouble();
+        }
         final tags = (el['tags'] as Map?)?.cast<String, dynamic>();
         if (plat == null || plng == null) continue;
         final feeStr = tags?['fee'] as String?;

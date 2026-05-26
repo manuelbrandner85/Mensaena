@@ -68,18 +68,25 @@ class MundraubService {
       return hit.data;
     }
     final radiusM = radiusKm * 1000;
-    final q = '[out:json][timeout:15];'
-        '(node["produce"](around:$radiusM,$lat,$lng);'
-        'node["amenity"="give_box"](around:$radiusM,$lat,$lng);'
-        'node["amenity"="public_bookcase"](around:$radiusM,$lat,$lng);'
-        ');out body $limit;';
+    // BUGFIX: Statt nur 'node' nutzen wir 'nwr' (node+way+relation) — viele
+    // give_box und Obstbäume sind als WAY oder RELATION getagged (Polygone
+    // mit z. B. amenity=give_box auf einem Container-Schrank). 'out center'
+    // liefert dann fuer ways/relations einen Center-Punkt statt body.
+    // Auch ergaenzt: landuse=orchard (Obstplantagen) zaehlen als fruit-Quelle.
+    final q = '[out:json][timeout:25];'
+        '('
+        'nwr["produce"](around:$radiusM,$lat,$lng);'
+        'nwr["landuse"="orchard"](around:$radiusM,$lat,$lng);'
+        'nwr["amenity"="give_box"](around:$radiusM,$lat,$lng);'
+        'nwr["amenity"="public_bookcase"](around:$radiusM,$lat,$lng);'
+        ');out center $limit;';
     try {
       final r = await http
           .post(
             Uri.parse('https://overpass-api.de/api/interpreter'),
             body: {'data': q},
           )
-          .timeout(const Duration(seconds: 18));
+          .timeout(const Duration(seconds: 30));
       if (r.statusCode != 200) {
         debugPrint('[Mundraub] Overpass HTTP ${r.statusCode}');
         return const [];
@@ -89,8 +96,14 @@ class MundraubService {
       final out = <FreePickSpot>[];
       for (final el in elements.whereType<Map<String, dynamic>>()) {
         final id = '${el['type']}/${el['id']}';
-        final plat = (el['lat'] as num?)?.toDouble();
-        final plng = (el['lon'] as num?)?.toDouble();
+        // node hat lat/lon direkt, way/relation hat sie unter 'center'.
+        double? plat = (el['lat'] as num?)?.toDouble();
+        double? plng = (el['lon'] as num?)?.toDouble();
+        if (plat == null || plng == null) {
+          final center = el['center'] as Map<String, dynamic>?;
+          plat = (center?['lat'] as num?)?.toDouble();
+          plng = (center?['lon'] as num?)?.toDouble();
+        }
         final tags = (el['tags'] as Map?)?.cast<String, dynamic>();
         if (plat == null || plng == null || tags == null) continue;
         FreePickKind kind;
@@ -98,7 +111,8 @@ class MundraubService {
           kind = FreePickKind.giveBox;
         } else if (tags['amenity'] == 'public_bookcase') {
           kind = FreePickKind.bookcase;
-        } else if (tags['produce'] != null) {
+        } else if (tags['produce'] != null ||
+            tags['landuse'] == 'orchard') {
           kind = FreePickKind.fruit;
         } else {
           continue;

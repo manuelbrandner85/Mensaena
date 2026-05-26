@@ -41,11 +41,20 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
 
   Future<void> _preFillPlz() async {
     final p = await ProfilesRepository.getMine();
-    final plz = p?.homePostalCode;
-    if (plz != null && plz.isNotEmpty && mounted) {
-      setState(() => _plzCtrl.text = plz);
-      _search();
+    // BUGFIX: Auch zip_code-Spalte beachten (manche User haben nur eines
+    // der beiden gesetzt), Fallback auf locationText-Heuristik (erste 5
+    // Ziffern), letzter Fallback Berlin-Mitte.
+    String plz = p?.homePostalCode ?? '';
+    if (plz.isEmpty) {
+      // Suche 5-stellige Zahl im location_text (z. B. "10115 Berlin")
+      final loc = p?.location ?? '';
+      final m = RegExp(r'\b\d{5}\b').firstMatch(loc);
+      if (m != null) plz = m.group(0)!;
     }
+    if (plz.isEmpty) plz = '10115';
+    if (!mounted) return;
+    setState(() => _plzCtrl.text = plz);
+    _search();
   }
 
   @override

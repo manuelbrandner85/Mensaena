@@ -2278,5 +2278,52 @@
       "request_declined": "Your request was declined",
       "completed": "Action completed! +{karma} Karma"
     }
+  },
+  "smartReply": {
+    "sheetTitle": "Message about this post",
+    "sheetHint": "Tap a suggestion or write your own.",
+    "placeholder": "Write your message …",
+    "openOnly": "Open chat only",
+    "send": "Send",
+    "helpNeeded": {
+      "1": "Hi! I saw your post „{title}\" — when do you need help?",
+      "2": "Hey, I can help with „{title}\". Where shall we meet?",
+      "3": "Hi! Happy to help. Let me know when it works for you."
+    },
+    "helpOffered": {
+      "1": "Hi! Your offer „{title}\" sounds great — I'd love to take it.",
+      "2": "Hey, I need exactly what you're offering. When does it work?",
+      "3": "Hi! I'd like to accept your offer. What's the next step?"
+    },
+    "itemOffered": {
+      "1": "Hi! Is „{title}\" still available?",
+      "2": "Hello! I'm interested in „{title}\" — when can I come by?",
+      "3": "Hey, still around? I'd like to pick it up."
+    },
+    "itemWanted": {
+      "1": "Hi! I have what you're looking for — „{title}\". Let's arrange.",
+      "2": "Hello! I can provide what you're looking for.",
+      "3": "Hey, responding to your request — I have it."
+    },
+    "eventInvite": {
+      "1": "Hi! I'd love to come to „{title}\" — any spots left?",
+      "2": "Hello! „{title}\" sounds great, I'm in.",
+      "3": "Hi, I'm joining. Should I bring anything?"
+    },
+    "lostFound": {
+      "1": "Hello! I think I saw „{title}\" — can we chat briefly?",
+      "2": "Hi! I'll help search. Any other clues?",
+      "3": "Hello, I'll reach out if I find something."
+    },
+    "social": {
+      "1": "Hi! Saw your profile — would love to meet.",
+      "2": "Hey, let's hang out sometime!",
+      "3": "Hi! How are you? Up for a coffee?"
+    },
+    "general": {
+      "1": "Hi! I saw your post „{title}\".",
+      "2": "Hey, quick question about your post.",
+      "3": "Hi! Can we chat briefly?"
+    }
   }
 }

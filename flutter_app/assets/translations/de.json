@@ -2277,5 +2277,52 @@
       "request_declined": "Deine Anfrage wurde leider abgelehnt",
       "completed": "Aktion abgeschlossen! +{karma} Karma"
     }
+  },
+  "smartReply": {
+    "sheetTitle": "Nachricht zum Beitrag",
+    "sheetHint": "Tippe auf einen Vorschlag oder schreibe selbst.",
+    "placeholder": "Schreib deine Nachricht …",
+    "openOnly": "Nur Chat öffnen",
+    "send": "Senden",
+    "helpNeeded": {
+      "1": "Hallo! Ich habe deinen Beitrag „{title}\" gesehen — wann kannst du gut Hilfe brauchen?",
+      "2": "Hi, ich kann dir bei „{title}\" helfen. Wo treffen wir uns am besten?",
+      "3": "Hallo! Ich helfe dir gerne. Sag mir Bescheid wann es dir passt."
+    },
+    "helpOffered": {
+      "1": "Hallo! Dein Angebot „{title}\" klingt super — würde es gerne annehmen.",
+      "2": "Hi, ich brauche genau das was du anbietest. Wann passt es dir?",
+      "3": "Hallo! Ich nehme dein Angebot gerne an. Wie machen wir weiter?"
+    },
+    "itemOffered": {
+      "1": "Hi! Ist „{title}\" noch verfügbar?",
+      "2": "Hallo! Mich interessiert „{title}\" — wann kann ich vorbeikommen?",
+      "3": "Hi, ist das noch da? Würde es gern abholen."
+    },
+    "itemWanted": {
+      "1": "Hi! Ich habe das, was du suchst — „{title}\". Wie können wir tauschen?",
+      "2": "Hallo! Ich kann dir das was du suchst zur Verfügung stellen.",
+      "3": "Hi, melde mich auf dein Gesuch — habs zuhause."
+    },
+    "eventInvite": {
+      "1": "Hi! Ich komme gerne zu „{title}\" — gibt es noch Plätze?",
+      "2": "Hallo! „{title}\" klingt super, ich nehme teil.",
+      "3": "Hi, bin dabei. Brauche ich etwas mitbringen?"
+    },
+    "lostFound": {
+      "1": "Hallo! Ich glaube ich hab „{title}\" gesehen — können wir kurz reden?",
+      "2": "Hi! Ich helfe bei der Suche. Hast du noch andere Hinweise?",
+      "3": "Hallo, ich melde mich falls ich was finde."
+    },
+    "social": {
+      "1": "Hi! Habe dein Profil gesehen — würde dich gerne kennenlernen.",
+      "2": "Hallo, lass uns mal was unternehmen!",
+      "3": "Hi! Wie geht's? Auf einen Kaffee?"
+    },
+    "general": {
+      "1": "Hallo! Ich habe deinen Beitrag „{title}\" gesehen.",
+      "2": "Hi, kurze Frage zu deinem Beitrag.",
+      "3": "Hallo! Können wir kurz schreiben?"
+    }
   }
 }

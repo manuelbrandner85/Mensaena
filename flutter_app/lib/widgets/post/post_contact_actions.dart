@@ -8,7 +8,6 @@ library;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,8 +18,8 @@ import '../../models/post.dart';
 import '../../models/post_contact_preference.dart';
 import '../../models/post_intent.dart';
 import '../../providers/post_contact_provider.dart';
-import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
+import 'smart_reply_sheet.dart';
 import '../../services/supabase_service.dart';
 import '../effects/celebrate_burst.dart';
 import 'contact_requests_manager.dart';
@@ -172,7 +171,7 @@ class PostContactActions extends ConsumerWidget {
                   pref: pref,
                   revealed: revealedAsync.valueOrNull,
                   intent: intent,
-                  postOwnerId: post.userId,
+                  post: post,
                 ),
                 if (pref != null && pref.hasAvailability) ...[
                   const SizedBox(height: 8),
@@ -394,12 +393,13 @@ class _SecondaryMethodsRow extends ConsumerWidget {
     required this.pref,
     required this.revealed,
     required this.intent,
-    required this.postOwnerId,
+    required this.post,
   });
   final PostContactPreference? pref;
   final PostContactPreference? revealed;
   final PostIntent intent;
-  final String postOwnerId;
+  final Post post;
+  String get postOwnerId => post.userId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -420,11 +420,13 @@ class _SecondaryMethodsRow extends ConsumerWidget {
           _MethodChip(
             method: 'in_app_chat',
             revealed: revealed,
-            onTap: () async {
-              final convId =
-                  await ConversationsRepository.getOrCreateDm(postOwnerId);
-              if (!context.mounted || convId == null) return;
-              context.go('/dashboard/messages/$convId');
+            onTap: () {
+              // Smart-Reply-Sheet mit 3 Vorschlaegen + editierbarem Text.
+              SmartReplySheet.show(
+                context,
+                post: post,
+                postOwnerId: postOwnerId,
+              );
             },
           ),
       ],
