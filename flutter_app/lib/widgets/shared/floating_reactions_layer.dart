@@ -111,41 +111,55 @@ class _FloatingReactionItemState extends State<_FloatingReactionItem>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return AnimatedBuilder(
-          animation: _progress,
-          builder: (_, __) {
-            final h = constraints.maxHeight;
-            final w = constraints.maxWidth;
-            final t = _progress.value;
-            // Vertikale Bewegung: bottom (h-50) → top (0.15*h)
-            final y = h - 60 - (h - 100) * t;
-            // Horizontale Drift (Sinus, sanft) + zufaelliger Start
-            final x = w * widget.reaction.startX +
-                math.sin(t * math.pi * 2) * 30 +
-                widget.reaction.drift * w * t;
-            // Fade: ersten 70% voll sichtbar, letzten 30% raus
-            final opacity = t < 0.7 ? 1.0 : (1.0 - (t - 0.7) / 0.3);
-            // Scale: poppt am Anfang
-            final scale = 0.5 + 0.6 * math.min(t * 4, 1.0);
-            return Positioned(
-              left: x.clamp(0.0, w - 40),
-              top: y.clamp(0.0, h - 40),
-              child: Opacity(
-                opacity: opacity.clamp(0.0, 1.0),
-                child: Transform.scale(
-                  scale: scale,
-                  child: Text(
-                    widget.reaction.emoji,
-                    style: const TextStyle(fontSize: 36),
+    // Crash-Fix (BoxParentData → StackParentData, 1288 Live-Crashes):
+    // Vorher gab dieses build() ein `Positioned` zurück, das innerhalb
+    // von `LayoutBuilder` + `AnimatedBuilder` saß. Der `LayoutBuilder`
+    // erzeugt ein eigenes RenderObject mit BoxParentData, sodass das
+    // Positioned beim Mount versuchte, StackParentData auf einen
+    // BoxParentData-Parent zu setzen → TypeCast-Crash.
+    //
+    // Lösung: Positioned.fill ALS ÄUSSERSTES Widget (sitzt direkt
+    // unter Stack), darin Transform.translate für die animierte
+    // Position. Ergebnis: visuell identisch, kein ParentData-Mismatch.
+    return Positioned.fill(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return AnimatedBuilder(
+            animation: _progress,
+            builder: (_, __) {
+              final h = constraints.maxHeight;
+              final w = constraints.maxWidth;
+              final t = _progress.value;
+              final y = h - 60 - (h - 100) * t;
+              final x = w * widget.reaction.startX +
+                  math.sin(t * math.pi * 2) * 30 +
+                  widget.reaction.drift * w * t;
+              final opacity = t < 0.7 ? 1.0 : (1.0 - (t - 0.7) / 0.3);
+              final scale = 0.5 + 0.6 * math.min(t * 4, 1.0);
+              return Stack(
+                children: [
+                  Positioned(
+                    left: x.clamp(0.0, w - 40),
+                    top: y.clamp(0.0, h - 40),
+                    child: IgnorePointer(
+                      child: Opacity(
+                        opacity: opacity.clamp(0.0, 1.0),
+                        child: Transform.scale(
+                          scale: scale,
+                          child: Text(
+                            widget.reaction.emoji,
+                            style: const TextStyle(fontSize: 36),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
