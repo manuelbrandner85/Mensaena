@@ -956,6 +956,7 @@
     "title": "Объявления",
     "allPosts": "Все объявления",
     "linkCopied": "Ссылка скопирована",
+    "readTime": "Чтение ~{min} мин",
     "loadingNearby": "Загружаю объявления рядом…",
     "activeNearby": "{count}{more} активных рядом",
     "searchHint": "Поиск по объявлениям…",

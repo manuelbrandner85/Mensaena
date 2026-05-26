@@ -956,6 +956,7 @@
     "title": "Gönderiler",
     "allPosts": "Tüm gönderiler",
     "linkCopied": "Bağlantı panoya kopyalandı",
+    "readTime": "{min} dk okuma",
     "loadingNearby": "Yakındaki gönderiler yükleniyor…",
     "activeNearby": "{count}{more} yakında aktif",
     "searchHint": "Gönderilerde ara…",

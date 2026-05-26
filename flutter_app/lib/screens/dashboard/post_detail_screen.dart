@@ -511,6 +511,32 @@ class _Hero extends StatelessWidget {
               height: 1.6,
             ),
           ),
+          // F83: Read-Time-Chip nur ab > 60 Worten (~30s)
+          if (() {
+            final words = post.description!.split(RegExp(r'\s+')).length;
+            return words >= 60;
+          }()) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(LucideIcons.clock,
+                    size: 12, color: AppColors.mute),
+                const SizedBox(width: 4),
+                Text(
+                  'posts.readTime'.tr(namedArgs: {
+                    'min': (() {
+                      final words =
+                          post.description!.split(RegExp(r'\s+')).length;
+                      // ~200 Worte/Min Lesegeschwindigkeit
+                      final mins = (words / 200).ceil().clamp(1, 60);
+                      return '$mins';
+                    }())
+                  }),
+                  style: AppTypography.caption(),
+                ),
+              ],
+            ),
+          ],
         ],
         const SizedBox(height: 14),
         Row(

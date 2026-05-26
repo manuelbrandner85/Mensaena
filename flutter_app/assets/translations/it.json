@@ -957,6 +957,7 @@
     "title": "Post",
     "allPosts": "Tutti i post",
     "linkCopied": "Link copiato negli appunti",
+    "readTime": "{min} min di lettura",
     "loadingNearby": "Carico i post vicino a te…",
     "activeNearby": "{count}{more} attivi vicino a te",
     "searchHint": "Cerca tra i post…",
