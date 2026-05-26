@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -114,10 +115,26 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
         _toast('Foto zu groß (max 8 MB).');
         return;
       }
-      final ext = res.path.split('.').last;
+      final raw = res.path.split('.').last.toLowerCase();
+      final ext = (raw.length <= 4 && raw.isNotEmpty) ? raw : 'jpg';
+      final contentType = switch (ext) {
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'heic' || 'heif' => 'image/heic',
+        _ => 'image/jpeg',
+      };
       final rand = DateTime.now().millisecondsSinceEpoch.toRadixString(36);
-      final path = 'farm/$uid/${DateTime.now().millisecondsSinceEpoch}_$rand.$ext';
-      await sb.storage.from('post-images').upload(path, file);
+      // BUG-FIX: 'farm/$uid' begann mit "farm/" → storage.foldername(name)[1]
+      // = uid kommt erst NACH "farm/" → RLS-Policy verglich falsche Position
+      // → Upload schlug fehl. Pfad muss mit uid/ starten damit RLS matched.
+      final path = '$uid/farm-${DateTime.now().millisecondsSinceEpoch}_$rand.$ext';
+      await sb.storage.from('post-images').upload(
+            path,
+            file,
+            fileOptions:
+                FileOptions(upsert: false, contentType: contentType),
+          );
       final url = sb.storage.from('post-images').getPublicUrl(path);
       setState(() => _mediaUrls.add(url));
     } catch (_) {

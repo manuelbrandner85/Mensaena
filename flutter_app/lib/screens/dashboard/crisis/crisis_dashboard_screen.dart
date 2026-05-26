@@ -113,6 +113,16 @@ class _CrisisDashboardScreenState
         child: Column(
           children: [
             const _SosTopBanner(),
+            // FIX (User-Wunsch: "in krisenmodus soll auch krise melden
+            // können"): prominenter Report-Button DIREKT unter dem
+            // SOS-Banner, damit der User sofort sieht wo er eine Krise
+            // melden kann.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+              child: _ReportCrisisButton(
+                onTap: () => context.push('/dashboard/crisis/create'),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(
@@ -260,7 +270,7 @@ class _CrisisDashboardScreenState
                             const Spacer(),
                             TextButton.icon(
                               onPressed: () =>
-                                  context.go('/dashboard/crisis/create'),
+                                  context.push('/dashboard/crisis/create'),
                               icon: const Icon(LucideIcons.plus,
                                   size: 12, color: AppColors.amber),
                               label: Text('crisis.report'.tr(),
@@ -287,7 +297,7 @@ class _CrisisDashboardScreenState
                             onAction: _hasFilters
                                 ? _reset
                                 : () =>
-                                    context.go('/dashboard/crisis/create'),
+                                    context.push('/dashboard/crisis/create'),
                           )
                         else
                           ...list.map((c) => _CrisisTile(crisis: c)),
@@ -317,7 +327,7 @@ class _CrisisDashboardScreenState
       builder: (sheetCtx) => _SosSheet(
         onReport: () {
           Navigator.pop(sheetCtx);
-          context.go('/dashboard/crisis/create');
+          context.push('/dashboard/crisis/create');
         },
       ),
     );
@@ -1080,7 +1090,7 @@ class _ResourcesCta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.go('/dashboard/crisis/resources'),
+      onTap: () => context.push('/dashboard/crisis/resources'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(14),
@@ -1392,7 +1402,7 @@ class _SosTopBanner extends StatelessWidget {
                 const SizedBox(height: 6),
                 // Quick-Link zu allen Notruf-Nummern (Polizei/Gift/Frauen/etc.)
                 InkWell(
-                  onTap: () => context.go('/dashboard/crisis/resources'),
+                  onTap: () => context.push('/dashboard/crisis/resources'),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     padding: const EdgeInsets.symmetric(

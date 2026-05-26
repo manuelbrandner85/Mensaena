@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -89,10 +90,24 @@ class _AddStoryBtn extends StatelessWidget {
     ));
     try {
       final file = File(pick.path);
-      final ext = pick.path.split('.').last;
+      final raw = pick.path.split('.').last.toLowerCase();
+      final ext = (raw.length <= 4 && raw.isNotEmpty) ? raw : 'jpg';
+      final contentType = switch (ext) {
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'heic' || 'heif' => 'image/heic',
+        _ => 'image/jpeg',
+      };
+      // BUG-FIX: 'story/$uid' brach RLS — Pfad muss mit uid/ starten.
       final path =
-          'story/$uid/${DateTime.now().millisecondsSinceEpoch}.$ext';
-      await sb.storage.from('post-images').upload(path, file);
+          '$uid/story-${DateTime.now().millisecondsSinceEpoch}.$ext';
+      await sb.storage.from('post-images').upload(
+            path,
+            file,
+            fileOptions:
+                FileOptions(upsert: false, contentType: contentType),
+          );
       final url = sb.storage.from('post-images').getPublicUrl(path);
       final ok = await StoriesRepository.create(mediaUrl: url);
       if (ok) onUploaded();

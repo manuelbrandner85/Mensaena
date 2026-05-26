@@ -14,6 +14,8 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/location_service.dart';
 import '../../../services/post_draft_service.dart';
 import '../../../services/rate_limit_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
+
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
@@ -154,13 +156,32 @@ class _ModuleCreatePostScreenState
     if (uid == null) return urls;
     for (var i = 0; i < _images.length; i++) {
       final file = _images[i];
-      final ext = file.path.split('.').last;
+      final raw = file.path.split('.').last.toLowerCase();
+      final ext = (raw.length <= 4 && raw.isNotEmpty) ? raw : 'jpg';
+      final contentType = switch (ext) {
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'heic' || 'heif' => 'image/heic',
+        _ => 'image/jpeg',
+      };
       final path =
           '$uid/${DateTime.now().millisecondsSinceEpoch}-$i.$ext';
       try {
-        await sb.storage.from('post-images').upload(path, file);
+        await sb.storage.from('post-images').upload(
+              path,
+              file,
+              fileOptions:
+                  FileOptions(upsert: false, contentType: contentType),
+            );
         urls.add(sb.storage.from('post-images').getPublicUrl(path));
-      } catch (_) {}
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Upload-Fehler Bild ${i + 1}: $e'),
+          ));
+        }
+      }
     }
     return urls;
   }

@@ -57,6 +57,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final _phoneCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _whatsappCtrl = TextEditingController();
+  final _meetingCtrl = TextEditingController();
+  final _timeHoursCtrl = TextEditingController();
   final _tagsCtrl = TextEditingController();
   bool _privacyPhone = false;
   bool _privacyEmail = false;
@@ -170,6 +172,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     _phoneCtrl.dispose();
     _emailCtrl.dispose();
     _whatsappCtrl.dispose();
+    _meetingCtrl.dispose();
+    _timeHoursCtrl.dispose();
     _tagsCtrl.dispose();
     super.dispose();
   }
@@ -315,6 +319,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             'contact_whatsapp': _whatsappCtrl.text.trim().isEmpty
                 ? null
                 : _whatsappCtrl.text.trim(),
+            'meeting_point': _meetingCtrl.text.trim().isEmpty
+                ? null
+                : _meetingCtrl.text.trim(),
+            'time_hours': double.tryParse(
+                _timeHoursCtrl.text.replaceAll(',', '.').trim()),
             // DB-Spalte ist TEXT mit Enum 'low'|'medium'|'high'|'critical'.
             // 5er-UI-Slider (Niedrig/Normal/Mittel/Hoch/Sehr hoch) wird auf
             // die 4 DB-Werte gemappt — 'normal' und 'low' beide → 'low',
@@ -518,6 +527,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           phoneCtrl: _phoneCtrl,
           emailCtrl: _emailCtrl,
           whatsappCtrl: _whatsappCtrl,
+          meetingCtrl: _meetingCtrl,
+          timeHoursCtrl: _timeHoursCtrl,
+          showTimeBank: _intent == PostIntent.helpNeeded ||
+              _intent == PostIntent.helpOffered,
           privacyPhone: _privacyPhone,
           privacyEmail: _privacyEmail,
           onTogglePhone: (v) => setState(() => _privacyPhone = v),
@@ -932,6 +945,9 @@ class _StepKontakt extends StatelessWidget {
     required this.phoneCtrl,
     required this.emailCtrl,
     required this.whatsappCtrl,
+    required this.meetingCtrl,
+    required this.timeHoursCtrl,
+    required this.showTimeBank,
     required this.privacyPhone,
     required this.privacyEmail,
     required this.onTogglePhone,
@@ -946,6 +962,9 @@ class _StepKontakt extends StatelessWidget {
   final TextEditingController phoneCtrl;
   final TextEditingController emailCtrl;
   final TextEditingController whatsappCtrl;
+  final TextEditingController meetingCtrl;
+  final TextEditingController timeHoursCtrl;
+  final bool showTimeBank;
   final bool privacyPhone;
   final bool privacyEmail;
   final ValueChanged<bool> onTogglePhone;
@@ -1034,6 +1053,28 @@ class _StepKontakt extends StatelessWidget {
           style: AppTypography.body(size: 14, color: AppColors.ink),
           decoration: InputDecoration(labelText: 'create.whatsappOptional'.tr()),
         ),
+        const SizedBox(height: 6),
+        // Treffpunkt (Sinnvoll bei Verabredung/Hilfe).
+        TextField(
+          controller: meetingCtrl,
+          style: AppTypography.body(size: 14, color: AppColors.ink),
+          decoration: const InputDecoration(
+            labelText: 'Treffpunkt (z. B. Bahnhof, Café …) — optional',
+          ),
+        ),
+        if (showTimeBank) ...[
+          const SizedBox(height: 6),
+          TextField(
+            controller: timeHoursCtrl,
+            keyboardType:
+                const TextInputType.numberWithOptions(decimal: true),
+            style: AppTypography.body(size: 14, color: AppColors.ink),
+            decoration: const InputDecoration(
+              labelText: 'Zeitbank-Stunden (optional)',
+              hintText: 'z. B. 2.5',
+            ),
+          ),
+        ],
         const SizedBox(height: 18),
         Text('create.urgency'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 8),
