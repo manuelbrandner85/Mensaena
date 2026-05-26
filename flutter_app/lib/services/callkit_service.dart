@@ -87,7 +87,12 @@ class CallkitService {
           'call_type': callType,
         },
         android: const AndroidParams(
-          isCustomNotification: true,
+          // FIX: isCustomNotification=false → Android's native Full-Screen-
+          // Intent-Notification (wie Telefon-App). Vorher (true) musste der
+          // User die Heads-Up-Notification erst tappen + dann nochmal auf
+          // Annehmen — jetzt direkt Vollbild-Call-UI mit Accept/Decline-
+          // Wischen wie bei einem normalen Anruf.
+          isCustomNotification: false,
           isShowLogo: true,
           ringtonePath: 'system_ringtone_default',
           backgroundColor: '#0A0F1C',
@@ -96,6 +101,7 @@ class CallkitService {
           incomingCallNotificationChannelName: 'Eingehende Anrufe',
           missedCallNotificationChannelName: 'Verpasste Anrufe',
           isShowFullLockedScreen: true,
+          isShowCallID: false,
         ),
         ios: const IOSParams(
           iconName: 'CallKitLogo',

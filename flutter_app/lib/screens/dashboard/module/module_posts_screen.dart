@@ -76,13 +76,18 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
 
   Future<List<Post>> _load() async {
     try {
-      // Wenn moduleKey gesetzt: OR-Filter (type=X ODER module_key=Y) — so
-      // erscheinen auch Posts die aus dem Modul-Wizard mit anderen Type-Werten
-      // (z.B. harvest → type=sharing) erstellt wurden, sobald sie module_key
-      // gesetzt haben.
+      // BUG-FIX (User-Report: "in rettung sind falsche Postings"):
+      // Vorher: OR-Filter (type=X ODER module_key=Y) → matched ALLE
+      // type=sharing-Posts global, also auch nicht für harvest gemeinte
+      // → harvest-Modul zeigte fremde Posts.
+      //
+      // Jetzt: moduleKey gesetzt → STRIKT module_key=Y (Module-Wizard
+      // setzt das immer). Backwards-compat für alte Posts ohne module_key:
+      // type=X UND module_key IS NULL erlaubt.
       var q = sb.from('posts').select().eq('status', 'active');
       if (widget.moduleKey != null) {
-        q = q.or('type.eq.${widget.postType},module_key.eq.${widget.moduleKey}');
+        q = q.or(
+            'module_key.eq.${widget.moduleKey},and(type.eq.${widget.postType},module_key.is.null)');
       } else {
         q = q.eq('type', widget.postType);
       }

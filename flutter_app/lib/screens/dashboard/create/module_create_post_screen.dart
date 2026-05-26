@@ -49,6 +49,8 @@ class _ModuleCreatePostScreenState
   final _phoneCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _whatsappCtrl = TextEditingController();
+  final _meetingCtrl = TextEditingController();
+  final _timeHoursCtrl = TextEditingController();
   final _tagsCtrl = TextEditingController();
   bool _privacyPhone = false;
   bool _privacyEmail = false;
@@ -102,6 +104,8 @@ class _ModuleCreatePostScreenState
     _phoneCtrl.dispose();
     _emailCtrl.dispose();
     _whatsappCtrl.dispose();
+    _meetingCtrl.dispose();
+    _timeHoursCtrl.dispose();
     _tagsCtrl.dispose();
     super.dispose();
   }
@@ -225,6 +229,11 @@ class _ModuleCreatePostScreenState
             'contact_whatsapp': _whatsappCtrl.text.trim().isEmpty
                 ? null
                 : _whatsappCtrl.text.trim(),
+            'meeting_point': _meetingCtrl.text.trim().isEmpty
+                ? null
+                : _meetingCtrl.text.trim(),
+            'time_hours':
+                double.tryParse(_timeHoursCtrl.text.replaceAll(',', '.').trim()),
             // DB-Spalte ist TEXT (Enum 'low'|'medium'|'high'|'critical').
             'urgency': _urgency <= 1
                 ? 'low'
@@ -511,7 +520,45 @@ class _ModuleCreatePostScreenState
               title: Text('create.emailOnlyInterested'.tr(),
                   style: AppTypography.caption()),
             ),
-
+            const SizedBox(height: 6),
+            // FIX (User-Request): WhatsApp + Treffpunkt fehlten in der UI
+            // obwohl _whatsappCtrl im State existierte.
+            TextField(
+              controller: _whatsappCtrl,
+              keyboardType: TextInputType.phone,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: const InputDecoration(
+                labelText: 'WhatsApp',
+                hintText: '+49 …',
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _meetingCtrl,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: const InputDecoration(
+                labelText: 'Treffpunkt (z. B. Bahnhof, Café …)',
+                isDense: true,
+              ),
+            ),
+            // Zeitbank-Bezug: nur sinnvoll bei Hilfe-Posts.
+            if (_type == 'sharing' ||
+                _type == 'rescue' ||
+                _type == 'community') ...[
+              const SizedBox(height: 6),
+              TextField(
+                controller: _timeHoursCtrl,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: const InputDecoration(
+                  labelText: 'Zeitbank-Stunden (optional)',
+                  hintText: 'z. B. 2.5',
+                  isDense: true,
+                ),
+              ),
+            ],
             const SizedBox(height: 6),
             // Anonym
             SwitchListTile(
