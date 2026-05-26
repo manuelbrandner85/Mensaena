@@ -11,6 +11,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../services/location_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -32,6 +33,9 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   String? _category;
   String? _condition;
   bool _showClaimed = false;
+  double? _maxPrice;
+  double? _maxDistanceKm;
+  ({double lat, double lng})? _myPos;
 
   static const List<FilterOption<String>> _types = [
     FilterOption(value: 'verschenken', label: '🎁 Verschenken'),
@@ -66,17 +70,60 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       _search.isNotEmpty ||
       _category != null ||
       _condition != null ||
-      _type != 'all';
+      _type != 'all' ||
+      _maxPrice != null ||
+      _maxDistanceKm != null;
 
   List<MarketplaceListing> _apply(List<MarketplaceListing> all) {
     final q = _search.trim().toLowerCase();
     return all.where((m) {
       if (_category != null && m.category != _category) return false;
       if (_condition != null && m.condition != _condition) return false;
+      if (_maxPrice != null && m.price != null && m.price! > _maxPrice!) {
+        return false;
+      }
+      if (_maxDistanceKm != null &&
+          _myPos != null &&
+          m.latitude != null &&
+          m.longitude != null) {
+        final d = LocationService.haversineKm(
+            _myPos!.lat, _myPos!.lng, m.latitude!, m.longitude!);
+        if (d > _maxDistanceKm!) return false;
+      }
       if (q.isEmpty) return true;
       return m.title.toLowerCase().contains(q) ||
           m.description.toLowerCase().contains(q);
     }).toList();
+  }
+
+  Future<void> _ensureMyPos() async {
+    if (_myPos != null) return;
+    try {
+      final pos = await LocationService.getCurrentPosition()
+          .timeout(const Duration(seconds: 6));
+      if (!mounted) return;
+      setState(() => _myPos = (lat: pos.latitude, lng: pos.longitude));
+    } catch (_) {/* keep null — distance filter then ignored */}
+  }
+
+  Future<void> _openAdvancedFilters() async {
+    final result = await showModalBottomSheet<(double?, double?)>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => _AdvancedFilterSheet(
+        initialMaxPrice: _maxPrice,
+        initialMaxDistanceKm: _maxDistanceKm,
+      ),
+    );
+    if (result == null) return;
+    setState(() {
+      _maxPrice = result.$1;
+      _maxDistanceKm = result.$2;
+    });
+    if (_maxDistanceKm != null) await _ensureMyPos();
   }
 
   @override
@@ -148,9 +195,35 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-              child: ModuleSearchBar(
-                hintText: 'marketplace.searchPlaceholder'.tr(),
-                onChanged: (v) => setState(() => _search = v),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ModuleSearchBar(
+                      hintText: 'marketplace.searchPlaceholder'.tr(),
+                      onChanged: (v) => setState(() => _search = v),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: (_maxPrice != null || _maxDistanceKm != null)
+                          ? AppColors.amber.withValues(alpha: 0.18)
+                          : AppColors.elevated,
+                      border: Border.all(
+                        color: (_maxPrice != null || _maxDistanceKm != null)
+                            ? AppColors.amber.withValues(alpha: 0.6)
+                            : AppColors.line,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      tooltip: 'marketplace.advancedFilters'.tr(),
+                      icon: const Icon(LucideIcons.slidersHorizontal,
+                          size: 18, color: AppColors.amber),
+                      onPressed: _openAdvancedFilters,
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -214,12 +287,25 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         label: '🔍 $_search',
                         onRemove: () => setState(() => _search = ''),
                       ),
+                    if (_maxPrice != null)
+                      ActiveFilterChip(
+                        label: '≤ ${_maxPrice!.toStringAsFixed(0)} €',
+                        onRemove: () => setState(() => _maxPrice = null),
+                      ),
+                    if (_maxDistanceKm != null)
+                      ActiveFilterChip(
+                        label: '≤ ${_maxDistanceKm!.toStringAsFixed(0)} km',
+                        onRemove: () =>
+                            setState(() => _maxDistanceKm = null),
+                      ),
                   ],
                   onClearAll: () => setState(() {
                     _type = 'all';
                     _category = null;
                     _condition = null;
                     _search = '';
+                    _maxPrice = null;
+                    _maxDistanceKm = null;
                   }),
                 ),
               ),
@@ -263,6 +349,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                                       _category = null;
                                       _condition = null;
                                       _search = '';
+                                      _maxPrice = null;
+                                      _maxDistanceKm = null;
                                     })
                                 : null,
                           ),
@@ -651,6 +739,147 @@ class _Tile extends ConsumerWidget {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// E3: BottomSheet mit Preis- und Distanz-Slider. Liefert beim Schließen
+/// ein Tuple zurück (maxPrice, maxDistanceKm), beide nullable.
+class _AdvancedFilterSheet extends StatefulWidget {
+  const _AdvancedFilterSheet({
+    required this.initialMaxPrice,
+    required this.initialMaxDistanceKm,
+  });
+  final double? initialMaxPrice;
+  final double? initialMaxDistanceKm;
+
+  @override
+  State<_AdvancedFilterSheet> createState() => _AdvancedFilterSheetState();
+}
+
+class _AdvancedFilterSheetState extends State<_AdvancedFilterSheet> {
+  late double? _price = widget.initialMaxPrice;
+  late double? _km = widget.initialMaxDistanceKm;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text('marketplace.advancedFilters'.tr(),
+                style: AppTypography.body(
+                    size: 16,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700)),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                const Icon(LucideIcons.banknote,
+                    size: 16, color: AppColors.amber),
+                const SizedBox(width: 8),
+                Text('marketplace.maxPrice'.tr(),
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.inkSoft)),
+                const Spacer(),
+                Text(
+                  _price == null
+                      ? 'marketplace.anyPrice'.tr()
+                      : '≤ ${_price!.toStringAsFixed(0)} €',
+                  style: AppTypography.body(
+                      size: 13,
+                      color: AppColors.amber,
+                      weight: FontWeight.w700),
+                ),
+              ],
+            ),
+            Slider(
+              value: _price ?? 500,
+              min: 0,
+              max: 500,
+              divisions: 50,
+              activeColor: AppColors.amber,
+              onChanged: (v) => setState(() => _price = v >= 500 ? null : v),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(LucideIcons.mapPin,
+                    size: 16, color: AppColors.bronze),
+                const SizedBox(width: 8),
+                Text('marketplace.maxDistance'.tr(),
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.inkSoft)),
+                const Spacer(),
+                Text(
+                  _km == null
+                      ? 'marketplace.anyDistance'.tr()
+                      : '≤ ${_km!.toStringAsFixed(0)} km',
+                  style: AppTypography.body(
+                      size: 13,
+                      color: AppColors.bronze,
+                      weight: FontWeight.w700),
+                ),
+              ],
+            ),
+            Slider(
+              value: _km ?? 100,
+              min: 1,
+              max: 100,
+              divisions: 99,
+              activeColor: AppColors.bronze,
+              onChanged: (v) => setState(() => _km = v >= 100 ? null : v),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _price = null;
+                        _km = null;
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.inkSoft,
+                      side: const BorderSide(color: AppColors.line),
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                    child: Text('common.reset'.tr()),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () => Navigator.pop(context, (_price, _km)),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.amber,
+                      foregroundColor: AppColors.voidColor,
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                    child: Text('common.confirm'.tr()),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
