@@ -244,20 +244,28 @@ class _ChannelListView extends StatelessWidget {
           grouped.putIfAbsent(key, () => []).add(ch);
         }
         final keys = grouped.keys.toList()..sort();
-        return ListView(
+        // Flach gemachte Item-Liste damit ListView.builder lazy rendert.
+        final flat = <Object>[];
+        for (final cat in keys) {
+          flat.add(cat); // Header-Marker
+          flat.addAll(grouped[cat]!);
+        }
+        return ListView.builder(
           padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
-          children: [
-            for (final cat in keys) ...[
-              Padding(
+          itemCount: flat.length,
+          itemBuilder: (_, i) {
+            final item = flat[i];
+            if (item is String) {
+              return Padding(
                 padding: const EdgeInsets.fromLTRB(4, 14, 4, 6),
                 child: Text(
-                  cat.toUpperCase(),
+                  item.toUpperCase(),
                   style: AppTypography.label(size: 9, color: AppColors.mute),
                 ),
-              ),
-              for (final ch in grouped[cat]!) _ChannelTile(channel: ch),
-            ],
-          ],
+              );
+            }
+            return _ChannelTile(channel: item as Map<String, dynamic>);
+          },
         );
       },
     );

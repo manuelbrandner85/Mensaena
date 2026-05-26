@@ -954,7 +954,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               conversationId: widget.conversationId,
               onSend: _send,
               onVoiceUploaded: _sendVoice,
-              onTextChanged: () => setState(() {}),
+              // Perf: keine setState bei jedem Keystroke mehr — der
+              // Send-Button beobachtet jetzt controller direkt via
+              // AnimatedBuilder in ChatInputBar.
+              onTextChanged: () {},
             ),
           ],
         ),

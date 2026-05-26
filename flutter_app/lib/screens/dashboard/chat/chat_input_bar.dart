@@ -104,9 +104,14 @@ class ChatInputBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 // Send-Button: aktiv = Bronze-Glow, inaktiv = opacity 0.3
-                ChatSendButton(
-                  enabled: controller.text.trim().isNotEmpty,
-                  onPressed: onSend,
+                // Perf: AnimatedBuilder lauscht direkt auf controller →
+                // kein setState im Parent (ChatScreen) bei jedem Keystroke.
+                AnimatedBuilder(
+                  animation: controller,
+                  builder: (_, __) => ChatSendButton(
+                    enabled: controller.text.trim().isNotEmpty,
+                    onPressed: onSend,
+                  ),
                 ),
               ],
             ),
