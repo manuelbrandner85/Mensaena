@@ -9,6 +9,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../widgets/shared/editorial_module_header.dart';
 import '../../models/notification_model.dart';
+import '../../services/notification_router.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
@@ -359,9 +360,9 @@ class _NotificationTile extends StatelessWidget {
       onTap: () async {
         await NotificationsRepository.markRead(notif.id);
         if (!context.mounted) return;
-        if (notif.link != null && notif.link!.isNotEmpty) {
-          context.go(notif.link!);
-        }
+        // F23: Smart-Routing — nutzt zentrale Router-Logik. Fallback auf
+        // link-Feld nur wenn Router-Map keinen Treffer hat.
+        NotificationRouter.navigate(GoRouter.of(context), notif);
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

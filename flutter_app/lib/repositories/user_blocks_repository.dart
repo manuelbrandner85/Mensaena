@@ -37,6 +37,23 @@ class UserBlocksRepository {
     }
   }
 
+  /// True wenn ich den User blockiert habe ODER er mich blockiert hat.
+  /// R17: Beidseitiger Check vor Kontakt/DM/Call.
+  static Future<bool> isBlockedEitherWay(String otherUserId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final rows = await sb
+          .from('user_blocks')
+          .select('id')
+          .or('and(blocker_id.eq.$uid,blocked_id.eq.$otherUserId),and(blocker_id.eq.$otherUserId,blocked_id.eq.$uid)')
+          .limit(1);
+      return (rows as List).isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Liste der von mir blockierten User-IDs.
   static Future<Set<String>> myBlockedIds() async {
     final uid = SupabaseService.currentUser?.id;

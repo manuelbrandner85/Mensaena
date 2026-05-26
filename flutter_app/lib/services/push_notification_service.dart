@@ -6,8 +6,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:go_router/go_router.dart';
 
 import 'callkit_service.dart';
+import 'notification_router.dart';
 import 'supabase_service.dart';
 
 /// SKILL: mensaena-architektur
@@ -210,9 +212,17 @@ class PushNotificationService {
   /// uebernimmt der FcmForegroundListener das im Foreground; im
   /// Background-Tap landet der User per FlutterEngine-Restart auf der
   /// Initial-Route, GlobalRouter-Redirect macht den Rest.
+  /// Globaler GoRouter — gesetzt aus app.dart sobald router initialisiert ist.
+  static GoRouter? rootRouter;
+
   static void _handleNotificationTap(RemoteMessage m) {
-    // Aktuell stille — App-Restart navigiert via initialMessage zur URL
-    // ueber Deep-Link-Plugin (Phase 4).
+    // F23: Smart-Routing — wenn rootRouter gesetzt, navigiere direkt zum
+    // passenden Screen. data-Map enthält type + IDs.
+    final r = rootRouter;
+    if (r == null) return;
+    final data = m.data;
+    if (data.isEmpty) return;
+    NotificationRouter.navigateFromPush(r, Map<String, dynamic>.from(data));
   }
 
   /// Native Local-Notification anzeigen (Android: System-Tray + Sound).

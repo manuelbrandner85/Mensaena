@@ -11,6 +11,7 @@ import 'providers/accessibility_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
 import 'widgets/shared/incoming_call_listener.dart';
@@ -40,6 +41,8 @@ class MensaenaApp extends ConsumerWidget {
     );
 
     final router = ref.watch(goRouterProvider);
+    // F23: globalen Router-Ref für Push-Tap-Routing setzen.
+    PushNotificationService.rootRouter = router;
     // localeProvider mountet den Notifier — der ruft persistierten
     // Mode + ggf. GPS-Detect ab und triggert context.setLocale().
     ref.watch(localeProvider);
