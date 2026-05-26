@@ -18,6 +18,7 @@ import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/post/post_contact_actions.dart';
+import '../../widgets/posts/post_poll_widget.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 
@@ -572,6 +573,8 @@ class _Hero extends StatelessWidget {
             ],
           ],
         ),
+        // Phase 7: Inline-Poll (rendert nichts wenn keine poll für post)
+        PostPollWidget(postId: post.id),
         // Wikipedia-Box: Such-Term aus erstem Tag oder Titel-Keyword.
         if (post.tags.isNotEmpty || post.type == 'animal') ...[
           const SizedBox(height: 14),

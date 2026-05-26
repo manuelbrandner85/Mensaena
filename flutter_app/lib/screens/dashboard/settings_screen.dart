@@ -1129,6 +1129,28 @@ class _AppearanceTab extends ConsumerWidget {
             minimumSize: const Size.fromHeight(44),
           ),
         ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/voicemail'),
+          icon: const Icon(LucideIcons.voicemail, size: 16),
+          label: Text('voicemail.title'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/live/scheduled'),
+          icon: const Icon(LucideIcons.calendarClock, size: 16),
+          label: Text('live.scheduled_title'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(14),

@@ -2243,6 +2243,10 @@
     "title": "Voicemail",
     "empty": "No voice messages."
   },
+  "polls": {
+    "total_votes": "{n} votes",
+    "closed": "Poll closed · {n} votes"
+  },
   "status": {
     "title": "Set status",
     "set": "Set status",

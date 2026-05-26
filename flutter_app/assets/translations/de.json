@@ -2242,6 +2242,10 @@
     "title": "Voicemail",
     "empty": "Keine Sprachnachrichten."
   },
+  "polls": {
+    "total_votes": "{n} Stimmen",
+    "closed": "Abstimmung beendet · {n} Stimmen"
+  },
   "status": {
     "title": "Status setzen",
     "set": "Status setzen",
