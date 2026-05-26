@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -704,16 +705,32 @@ bool _isEmojiOnly(String s) {
 }
 
 /// Rendert Text mit @mentions als bronze-highlighted spans.
+/// Tap auf einen Mention öffnet das Profil des erwähnten Users (DB-Lookup
+/// via display_name) — fire-and-forget; bei Fehler kein Crash.
 class _MentionAwareText extends StatelessWidget {
   const _MentionAwareText({required this.text, required this.baseStyle});
   final String text;
   final TextStyle baseStyle;
 
-  static final _re = RegExp(r'(@[\p{L}0-9._-]+)', unicode: true);
+  static final _re = RegExp(r'@([\p{L}0-9._-]+)', unicode: true);
+
+  Future<void> _openMention(BuildContext context, String name) async {
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('id')
+          .eq('display_name', name)
+          .limit(1)
+          .maybeSingle();
+      if (row == null) return;
+      if (!context.mounted) return;
+      GoRouter.of(context).go('/dashboard/profile/${row['id']}');
+    } catch (_) {/* silently no-op */}
+  }
 
   @override
   Widget build(BuildContext context) {
-    final spans = <TextSpan>[];
+    final spans = <InlineSpan>[];
     int last = 0;
     for (final m in _re.allMatches(text)) {
       if (m.start > last) {
@@ -722,12 +739,15 @@ class _MentionAwareText extends StatelessWidget {
           style: baseStyle,
         ));
       }
+      final name = m.group(1) ?? '';
       spans.add(TextSpan(
         text: m.group(0),
         style: baseStyle.copyWith(
           color: AppColors.bronze,
           fontWeight: FontWeight.w700,
         ),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => _openMention(context, name),
       ));
       last = m.end;
     }

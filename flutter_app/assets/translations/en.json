@@ -1048,6 +1048,12 @@
   },
   "marketplace": {
     "listing": "Listing",
+    "reserve_request": "Reserve",
+    "reserve_hint": "Send the seller a reservation request.",
+    "reserve_message": "Message (optional)",
+    "reserve_send": "Send request",
+    "reserve_sent": "Reservation request sent.",
+    "reserve_failed": "Request failed.",
     "listingNotFound": "Listing not found.",
     "condition": "Condition: {state}",
     "contact": "Contact",

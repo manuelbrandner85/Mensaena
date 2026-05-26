@@ -148,6 +148,13 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                         label: Text('marketplace.contact'.tr()),
                       ),
                     ),
+                    if (!isOwner && l.status == 'active') ...[
+                      const SizedBox(width: 8),
+                      _CircleIconButton(
+                        icon: LucideIcons.bookmark,
+                        onTap: () => _reserveAsBuyer(context, ref, l),
+                      ),
+                    ],
                     const SizedBox(width: 8),
                     _CircleIconButton(
                       icon: LucideIcons.share2,
@@ -376,6 +383,90 @@ class MarketplaceDetailScreen extends ConsumerWidget {
       subject: 'marketplace.shareSubject'
           .tr(namedArgs: {'title': l.title}),
     );
+  }
+
+  /// Käufer-Aktion: Reservierungs-Anfrage mit optionaler Nachricht.
+  Future<void> _reserveAsBuyer(
+      BuildContext context, WidgetRef ref, MarketplaceListing l) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    final msgCtrl = TextEditingController();
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 20 + MediaQuery.of(sheetCtx).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                const Icon(LucideIcons.bookmark,
+                    size: 18, color: AppColors.bronze),
+                const SizedBox(width: 8),
+                Text('marketplace.reserve_request'.tr(),
+                    style: AppTypography.display(
+                        size: 18, color: AppColors.ink)),
+              ]),
+              const SizedBox(height: 6),
+              Text('marketplace.reserve_hint'.tr(),
+                  style: AppTypography.body(
+                      size: 12, color: AppColors.inkSoft, height: 1.4)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: msgCtrl,
+                maxLines: 4,
+                maxLength: 500,
+                decoration: InputDecoration(
+                    labelText: 'marketplace.reserve_message'.tr(),
+                    border: const OutlineInputBorder()),
+              ),
+              const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => Navigator.pop(sheetCtx, true),
+                icon: const Icon(LucideIcons.send, size: 14),
+                label: Text('marketplace.reserve_send'.tr()),
+                style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.bronze,
+                    foregroundColor: AppColors.voidColor,
+                    minimumSize: const Size.fromHeight(44)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    try {
+      await sb.from('marketplace_reservations').insert({
+        'listing_id': l.id,
+        'user_id': uid,
+        'message': msgCtrl.text.trim().isEmpty ? null : msgCtrl.text.trim(),
+      });
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('marketplace.reserve_sent'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('marketplace.reserve_failed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
   }
 
   /// Owner-Aktion: Direkt-Reservierung (vereinfachter Flow).
