@@ -48,7 +48,9 @@ import '../../screens/dashboard/supply/supply_screen.dart';
 import '../../screens/dashboard/chat/chat_screen.dart';
 import '../../screens/dashboard/community_polls_screen.dart';
 import '../../screens/dashboard/contact_requests_screen.dart';
+import '../../screens/dashboard/account_screen.dart';
 import '../../screens/dashboard/drafts_screen.dart';
+import '../../screens/dashboard/karma_history_screen.dart';
 import '../../screens/dashboard/leaderboard_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
@@ -1245,6 +1247,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, st) => mensaenaTransition<void>(
           key: st.pageKey,
           child: const DraftsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/account',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const AccountScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/karma-history',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const KarmaHistoryScreen(),
         ),
       ),
       GoRoute(

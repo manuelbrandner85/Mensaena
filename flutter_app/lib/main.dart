@@ -14,9 +14,11 @@ import 'repositories/extra_repositories.dart';
 import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
+import 'services/offline_queue_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/shorebird_patch_service.dart';
 import 'services/supabase_service.dart';
+import 'repositories/wave_final_repositories.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// SKILL: mensaena-architektur
@@ -159,6 +161,16 @@ Future<void> _initBackgroundServices() async {
   // feuert der Service ein onPatchReady-Event, die UpdateGate zeigt
   // dann den gruenen Restart-Banner.
   unawaited(ShorebirdPatchService.instance.checkAndDownloadPatch());
+
+  // P12: Offline-Queue lauscht auf Connectivity & flusht.
+  try {
+    await OfflineQueueService.instance.install();
+  } catch (_) {}
+
+  // P10: Streak-Tick beim App-Launch (DB-Sync, neben lokalem Service).
+  try {
+    await UserStreaksRepository().tickActivity();
+  } catch (_) {}
 }
 
 /// Spielt assets/sounds/startup.mp3 maximal 1x pro Kalendertag.

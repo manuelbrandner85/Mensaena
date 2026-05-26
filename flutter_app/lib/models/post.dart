@@ -36,6 +36,8 @@ class Post {
     this.likeCount,
     this.commentCount,
     this.saveCount,
+    this.scheduledAt,
+    this.expiresAt,
   });
 
   final String id;
@@ -79,6 +81,13 @@ class Post {
   final int? likeCount;
   final int? commentCount;
   final int? saveCount;
+  final DateTime? scheduledAt;
+  final DateTime? expiresAt;
+
+  bool get isScheduled =>
+      scheduledAt != null && scheduledAt!.isAfter(DateTime.now());
+  bool get isExpired =>
+      expiresAt != null && expiresAt!.isBefore(DateTime.now());
 
   factory Post.fromJson(Map<String, dynamic> j) {
     return Post(
@@ -127,6 +136,12 @@ class Post {
           : const [],
       privacyPhone: (j['privacy_phone'] as bool?) ?? false,
       privacyEmail: (j['privacy_email'] as bool?) ?? false,
+      scheduledAt: j['scheduled_at'] != null
+          ? DateTime.tryParse(j['scheduled_at'] as String)
+          : null,
+      expiresAt: j['expires_at'] != null
+          ? DateTime.tryParse(j['expires_at'] as String)
+          : null,
     );
   }
 
@@ -160,6 +175,8 @@ class Post {
         'tags': tags,
         'privacy_phone': privacyPhone,
         'privacy_email': privacyEmail,
+        'scheduled_at': scheduledAt?.toIso8601String(),
+        'expires_at': expiresAt?.toIso8601String(),
       };
 }
 
