@@ -40,7 +40,11 @@ class _BiometricLockGateState extends State<BiometricLockGate>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkLockStatus(promptImmediately: true);
+    // BUGFIX: KEIN promptImmediately mehr — der native Biometric-Prompt
+    // setzt die App auf paused, der Resume triggert wieder den Prompt → ∞.
+    // User sieht Lock-Screen und tappt selbst auf 'Entsperren' wenn er
+    // bereit ist. Das ist auch UX-konform (iOS macht es genau so).
+    _checkLockStatus(promptImmediately: false);
   }
 
   @override

@@ -63,12 +63,18 @@ class BiometricService {
   /// Triggert den nativen Biometric-Prompt. Liefert true bei Erfolg.
   static Future<bool> authenticate({required String reason}) async {
     try {
+      // stickyAuth: false — der Prompt bleibt NICHT aktiv nach App-Pause.
+      // Mit stickyAuth=true persistierte der Prompt ueber Lifecycle-Wechsel,
+      // was im Zusammenspiel mit BiometricLockGate.didChangeAppLifecycleState
+      // den Endlos-Auth-Loop ausgeloest hatte. UseErrorDialogs=false: bei
+      // 'too many attempts' kein blockierender System-Dialog der die App
+      // zusaetzlich freezed.
       final ok = await _auth.authenticate(
         localizedReason: reason,
         options: const AuthenticationOptions(
           biometricOnly: false,
-          stickyAuth: true,
-          useErrorDialogs: true,
+          stickyAuth: false,
+          useErrorDialogs: false,
         ),
       );
       if (ok) await _markUnlockedNow();
