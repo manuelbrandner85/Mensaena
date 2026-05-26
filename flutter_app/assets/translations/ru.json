@@ -1504,7 +1504,10 @@
     "tileStyleTooltip": "Сменить стиль карты",
     "tileStyleAuto": "Стиль: Авто (свет/тёмный)",
     "tileStyleVoyager": "Стиль: Voyager",
-    "tileStyleTopo": "Стиль: Топо-рельеф"
+    "tileStyleTopo": "Стиль: Топо-рельеф",
+    "savePinTitle": "Сохранить точку",
+    "savePinHint": "напр. любимое кафе, место встречи…",
+    "removePin": "Удалить точку"
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",

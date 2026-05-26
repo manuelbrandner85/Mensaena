@@ -1570,6 +1570,9 @@
     "tileStyleAuto": "Map style: Auto (light/dark)",
     "tileStyleVoyager": "Map style: Voyager",
     "tileStyleTopo": "Map style: Topo relief",
+    "savePinTitle": "Save pin",
+    "savePinHint": "e.g. favourite café, meeting spot…",
+    "removePin": "Remove pin",
     "a11y": {
       "unnamed": "Unnamed place",
       "source": "Source: OpenStreetMap (wheelchair tag)",

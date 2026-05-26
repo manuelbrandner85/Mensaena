@@ -20,6 +20,7 @@ import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
 import '../../services/air_quality_service.dart';
 import '../../services/location_service.dart';
+import '../../services/saved_pins_service.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -69,6 +70,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   // F62 — Tile-Style: 0=auto (light/dark via theme), 1=Voyager, 2=Topo
   int _tileStyle = 0;
 
+  // F64 — gespeicherte User-Pins (on-device).
+  List<SavedPin> _savedPins = const [];
+
   // V3 — FMTC-Ready Flag fuer Tile-Cache
   bool _fmtcReady = false;
 
@@ -86,6 +90,125 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     super.initState();
     _initFmtc();
     _initLocationAndLoad();
+    _loadSavedPins();
+  }
+
+  Future<void> _loadSavedPins() async {
+    final pins = await SavedPinsService.all();
+    if (!mounted) return;
+    setState(() => _savedPins = pins);
+  }
+
+  /// F64: Long-Press auf Map → Dialog "Pin speichern?" mit Label-Eingabe.
+  Future<void> _promptSavePin(double lat, double lng) async {
+    final ctrl = TextEditingController();
+    final label = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('map.savePinTitle'.tr(),
+            style: AppTypography.body(
+                size: 15,
+                color: AppColors.ink,
+                weight: FontWeight.w700)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLength: 60,
+          style: AppTypography.body(size: 14, color: AppColors.ink),
+          decoration: InputDecoration(
+            hintText: 'map.savePinHint'.tr(),
+            filled: true,
+            fillColor: AppColors.elevated,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('common.cancel'.tr())),
+          FilledButton(
+            onPressed: () =>
+                Navigator.pop(ctx, ctrl.text.trim()),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.bronze,
+              foregroundColor: AppColors.voidColor,
+            ),
+            child: Text('common.save'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (label == null || label.isEmpty) return;
+    final pin = SavedPin(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      label: label,
+      lat: lat,
+      lng: lng,
+      createdAt: DateTime.now(),
+    );
+    await SavedPinsService.add(pin);
+    await _loadSavedPins();
+  }
+
+  /// F64: Pin-Tap → Detail-Sheet mit Lösch-Option.
+  void _openSavedPinSheet(SavedPin pin) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(LucideIcons.bookmark,
+                    size: 18, color: AppColors.bronze),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(pin.label,
+                      style: AppTypography.display(
+                          size: 18, color: AppColors.ink)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${pin.lat.toStringAsFixed(5)}, ${pin.lng.toStringAsFixed(5)}',
+              style: AppTypography.caption(),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await SavedPinsService.remove(pin.id);
+                  await _loadSavedPins();
+                  if (!ctx.mounted) return;
+                  Navigator.pop(ctx);
+                },
+                icon: const Icon(LucideIcons.trash2, size: 14),
+                label: Text('map.removePin'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.herzrotWarm,
+                  side: BorderSide(
+                      color: AppColors.herzrotWarm.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -429,6 +552,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               initialZoom: _zoom,
               minZoom: 3,
               maxZoom: 18,
+              // F64: Long-Press → eigenen Pin setzen
+              onLongPress: (tapPos, latLng) =>
+                  _promptSavePin(latLng.latitude, latLng.longitude),
               // V5 — debounced Move-Reload
               onMapEvent: (event) {
                 if (event is MapEventMoveEnd) {
@@ -459,6 +585,44 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       )
                     : NetworkTileProvider(),
               ),
+              // F64 — gespeicherte User-Pins (Bronze-Bookmark)
+              if (_savedPins.isNotEmpty)
+                MarkerLayer(
+                  markers: _savedPins
+                      .map((p) => Marker(
+                            point: LatLng(p.lat, p.lng),
+                            width: 36,
+                            height: 36,
+                            child: GestureDetector(
+                              onTap: () => _openSavedPinSheet(p),
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: AppColors.bronze
+                                      .withValues(alpha: 0.85),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: AppColors.voidColor,
+                                      width: 2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.bronze
+                                          .withValues(alpha: 0.4),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  LucideIcons.bookmark,
+                                  size: 16,
+                                  color: AppColors.voidColor,
+                                ),
+                              ),
+                            ),
+                          ))
+                      .toList(),
+                ),
               // V4 — eigener Standort als blauer Google-Style-Punkt
               if (_hasGps)
                 MarkerLayer(

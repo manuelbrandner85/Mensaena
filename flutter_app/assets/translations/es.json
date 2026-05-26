@@ -1505,7 +1505,10 @@
     "tileStyleTooltip": "Cambiar estilo del mapa",
     "tileStyleAuto": "Estilo: Automático (claro/oscuro)",
     "tileStyleVoyager": "Estilo: Voyager",
-    "tileStyleTopo": "Estilo: Relieve topográfico"
+    "tileStyleTopo": "Estilo: Relieve topográfico",
+    "savePinTitle": "Guardar pin",
+    "savePinHint": "p. ej. cafetería favorita, punto de encuentro…",
+    "removePin": "Borrar pin"
   },
   "calendar": {
     "noEvents": "No hay eventos en el calendario.",

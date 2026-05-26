@@ -1504,7 +1504,10 @@
     "tileStyleTooltip": "Harita stilini değiştir",
     "tileStyleAuto": "Stil: Otomatik (açık/koyu)",
     "tileStyleVoyager": "Stil: Voyager",
-    "tileStyleTopo": "Stil: Topo rölyefi"
+    "tileStyleTopo": "Stil: Topo rölyefi",
+    "savePinTitle": "İğne kaydet",
+    "savePinHint": "ör. favori kafe, buluşma noktası…",
+    "removePin": "İğneyi sil"
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",

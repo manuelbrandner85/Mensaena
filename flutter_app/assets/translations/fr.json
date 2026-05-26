@@ -1505,7 +1505,10 @@
     "tileStyleTooltip": "Changer le style de carte",
     "tileStyleAuto": "Style : Auto (clair/sombre)",
     "tileStyleVoyager": "Style : Voyager",
-    "tileStyleTopo": "Style : Relief topographique"
+    "tileStyleTopo": "Style : Relief topographique",
+    "savePinTitle": "Enregistrer un repère",
+    "savePinHint": "p. ex. café préféré, point de RDV…",
+    "removePin": "Supprimer le repère"
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",

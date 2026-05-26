@@ -1569,6 +1569,9 @@
     "tileStyleAuto": "Karten-Stil: Automatisch (Hell/Dunkel)",
     "tileStyleVoyager": "Karten-Stil: Voyager",
     "tileStyleTopo": "Karten-Stil: Topo-Relief",
+    "savePinTitle": "Pin speichern",
+    "savePinHint": "z. B. Lieblings-Café, Treffpunkt …",
+    "removePin": "Pin löschen",
     "a11y": {
       "unnamed": "Ort ohne Namen",
       "source": "Quelle: OpenStreetMap (wheelchair-Tag)",
