@@ -2282,6 +2282,12 @@
       "completed": "Aktion abgeschlossen! +{karma} Karma"
     }
   },
+  "stories": {
+    "add": "Deine",
+    "uploading": "Story wird hochgeladen …",
+    "upload_failed": "Upload fehlgeschlagen.",
+    "expired": "Abgelaufen"
+  },
   "livestream": {
     "chat": "Stream-Chat",
     "send_message": "Nachricht senden …",

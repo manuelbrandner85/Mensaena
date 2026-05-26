@@ -50,6 +50,7 @@ import '../../../widgets/dashboard/daily_challenges_widget.dart';
 import '../../../widgets/dashboard/today_events_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
+import '../../../widgets/stories/stories_ring.dart';
 import '../../../widgets/dashboard/holiday_badge.dart';
 import '../../../widgets/dashboard/location_onboarding_modal.dart';
 import '../../../widgets/dashboard/mini_map_widget.dart';
@@ -225,6 +226,8 @@ class _DashboardHomeScreenState
                 ? 0
                 : DateTime.now().difference(profile.createdAt).inDays,
           ));
+          // F59 Stories-Ring direkt unter dem Hero.
+          out.add(const StoriesRing());
           addSpacing(14);
           break;
         case 'safety':

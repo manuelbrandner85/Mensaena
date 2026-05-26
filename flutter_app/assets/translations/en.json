@@ -2283,6 +2283,12 @@
       "completed": "Action completed! +{karma} Karma"
     }
   },
+  "stories": {
+    "add": "Your",
+    "uploading": "Uploading story …",
+    "upload_failed": "Upload failed.",
+    "expired": "Expired"
+  },
   "livestream": {
     "chat": "Stream chat",
     "send_message": "Send message …",
