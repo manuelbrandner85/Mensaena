@@ -1845,6 +1845,10 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "todayEvents": {
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain"
+  },
   "releaseNotes": {
     "title": "Quoi de neuf ?",
     "subtitle": "Dernières mises à jour de l'app",

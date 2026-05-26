@@ -1941,7 +1941,8 @@
       "helpStreak": "Hilfe-Streak",
       "moon": "Mondphase",
       "personalBest": "Persönliche Bestleistung",
-      "affirmation": "Tages-Affirmation"
+      "affirmation": "Tages-Affirmation",
+      "todayEvents": "Heute / Morgen Events"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1981,7 +1982,8 @@
       "helpStreak": "Aufeinanderfolgende Tage, an denen du geholfen hast",
       "moon": "Heutige Mondphase und Beleuchtungsgrad",
       "personalBest": "Deine Lifetime-Spitzenwerte als Motivator",
-      "affirmation": "Eine ruhige Erinnerung pro Tag"
+      "affirmation": "Eine ruhige Erinnerung pro Tag",
+      "todayEvents": "Nächstes Event in den nächsten 24 Stunden"
     }
   },
   "hubs": {
@@ -2082,6 +2084,10 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "todayEvents": {
+    "today": "Heute",
+    "tomorrow": "Morgen"
   },
   "releaseNotes": {
     "title": "Was ist neu?",

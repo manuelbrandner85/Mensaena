@@ -46,6 +46,7 @@ import '../../../widgets/dashboard/personal_best_widget.dart';
 import '../../../widgets/dashboard/quick_note_widget.dart';
 import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
+import '../../../widgets/dashboard/today_events_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
 import '../../../widgets/dashboard/holiday_badge.dart';
@@ -509,6 +510,10 @@ class _DashboardHomeScreenState
           break;
         case 'affirmation':
           out.add(const AffirmationWidget());
+          addSpacing();
+          break;
+        case 'todayEvents':
+          out.add(const TodayEventsWidget());
           addSpacing();
           break;
         case 'nearby_posts':

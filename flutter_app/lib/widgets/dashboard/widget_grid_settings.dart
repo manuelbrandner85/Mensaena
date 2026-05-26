@@ -262,6 +262,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.affirmation',
       icon: LucideIcons.sparkles,
     ),
+    DashboardWidgetMeta(
+      id: 'todayEvents',
+      title: 'widgets.titles.todayEvents',
+      description: 'widgets.descriptions.todayEvents',
+      icon: LucideIcons.calendar,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

@@ -1942,7 +1942,8 @@
       "helpStreak": "Help streak",
       "moon": "Moon phase",
       "personalBest": "Personal best",
-      "affirmation": "Daily affirmation"
+      "affirmation": "Daily affirmation",
+      "todayEvents": "Today / tomorrow events"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1982,7 +1983,8 @@
       "helpStreak": "Consecutive days where you've helped",
       "moon": "Today's moon phase and illumination",
       "personalBest": "Your lifetime highs to keep you going",
-      "affirmation": "A calm reminder once a day"
+      "affirmation": "A calm reminder once a day",
+      "todayEvents": "Next event in the coming 24 hours"
     }
   },
   "hubs": {
@@ -2083,6 +2085,10 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "todayEvents": {
+    "today": "Today",
+    "tomorrow": "Tomorrow"
   },
   "releaseNotes": {
     "title": "What's new?",

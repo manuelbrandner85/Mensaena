@@ -1844,6 +1844,10 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "todayEvents": {
+    "today": "Bugün",
+    "tomorrow": "Yarın"
+  },
   "releaseNotes": {
     "title": "Yenilikler",
     "subtitle": "Uygulamanın son güncellemeleri",
