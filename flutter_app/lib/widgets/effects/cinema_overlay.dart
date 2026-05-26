@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/cinema_theme.dart';
+import '../../providers/accessibility_provider.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import 'atmospheric_layers.dart';
@@ -46,6 +47,11 @@ class CinemaOverlay extends ConsumerWidget {
     final phase = ref.watch(effectiveCinemaPhaseProvider);
     final baseIntensity = ref.watch(cinemaIntensityProvider).multiplier;
     final isLight = ref.watch(isLightModeProvider);
+    // P21: reduceMotion (oder seniorMode) → Cinema-Effects komplett aus.
+    // Statisches Theme reicht für Lesbarkeit, animierte Layer würden
+    // bei A11y-Bedarf eher stören.
+    final reduceMotion =
+        ref.watch(a11yProvider.select((p) => p.effectiveReduceMotion));
 
     // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
     // ergeben strukturell SEHR unterschiedliche Widget-Trees (SizedBox vs
@@ -53,7 +59,7 @@ class CinemaOverlay extends ConsumerWidget {
     // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
     // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
     // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
-    if (phase == null || baseIntensity <= 0.01) {
+    if (phase == null || baseIntensity <= 0.01 || reduceMotion) {
       return KeyedSubtree(
         key: const ValueKey('cinema_overlay_off'),
         child: child,
