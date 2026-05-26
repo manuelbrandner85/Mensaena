@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -556,6 +558,16 @@ class _ArticleTile extends StatelessWidget {
           ),
           builder: (_) => _ArticleSheet(article: article),
         );
+        // P11: Reading-Tracker — fire-and-forget upsert, ignoriert Fehler.
+        final uid = SupabaseService.currentUser?.id;
+        if (uid != null) {
+          unawaited(sb.from('knowledge_article_reads').upsert({
+            'article_id': article.id,
+            'user_id': uid,
+            'scroll_pct': 0,
+            'last_read_at': DateTime.now().toIso8601String(),
+          }, onConflict: 'article_id,user_id').then((_) {}).catchError((_) {}));
+        }
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

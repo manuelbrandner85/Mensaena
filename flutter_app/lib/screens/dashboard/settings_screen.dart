@@ -23,6 +23,7 @@ import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../providers/role_provider.dart';
 import '../../services/biometric_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
@@ -1182,6 +1183,31 @@ class _AppearanceTab extends ConsumerWidget {
             side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
             minimumSize: const Size.fromHeight(44),
           ),
+        ),
+        Consumer(
+          builder: (_, ref, __) {
+            final role = ref.watch(userRoleProvider) ?? 'user';
+            if (role != 'admin' &&
+                role != 'super_admin' &&
+                role != 'moderator') {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: OutlinedButton.icon(
+                onPressed: () =>
+                    context.go('/dashboard/admin/crash-logs'),
+                icon: const Icon(LucideIcons.bug, size: 16),
+                label: Text('admin.crash_logs'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.herzrotWarm,
+                  side: BorderSide(
+                      color: AppColors.herzrotWarm.withValues(alpha: 0.5)),
+                  minimumSize: const Size.fromHeight(44),
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 24),
         Container(
