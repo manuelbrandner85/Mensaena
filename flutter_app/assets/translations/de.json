@@ -2514,6 +2514,21 @@
       "3": "Hallo! Können wir kurz schreiben?"
     }
   },
+  "friend": {
+    "request": "Freundschaft anfragen",
+    "request_again": "Erneut anfragen",
+    "requested": "Anfrage gesendet",
+    "accept": "Anfrage annehmen",
+    "friends": "Befreundet",
+    "request_sent": "Freundschaftsanfrage gesendet.",
+    "request_canceled": "Anfrage zurückgezogen.",
+    "request_failed": "Aktion fehlgeschlagen.",
+    "accepted": "Freundschaft bestätigt.",
+    "removed": "Freundschaft beendet.",
+    "unfriend_title": "Freundschaft beenden?",
+    "unfriend_body": "Ihr seid nicht mehr als Freunde verbunden — Folgen bleibt unverändert.",
+    "unfriend_confirm": "Beenden"
+  },
   "gas": {
     "title": "Spritpreise in der Nähe",
     "empty": "Keine Tankstellen gefunden — GPS aktiv?",

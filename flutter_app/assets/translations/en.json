@@ -2515,6 +2515,21 @@
       "3": "Hi! Can we chat briefly?"
     }
   },
+  "friend": {
+    "request": "Send friend request",
+    "request_again": "Request again",
+    "requested": "Request sent",
+    "accept": "Accept request",
+    "friends": "Friends",
+    "request_sent": "Friend request sent.",
+    "request_canceled": "Request withdrawn.",
+    "request_failed": "Action failed.",
+    "accepted": "Friendship confirmed.",
+    "removed": "Friendship ended.",
+    "unfriend_title": "End friendship?",
+    "unfriend_body": "You'll no longer be friends — follow status stays unchanged.",
+    "unfriend_confirm": "End"
+  },
   "gas": {
     "title": "Fuel prices nearby",
     "empty": "No gas stations found — GPS active?",

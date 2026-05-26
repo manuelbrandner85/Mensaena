@@ -17,6 +17,7 @@ import '../../repositories/matching_repository.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/recent_pages_service.dart';
+import '../shared/my_avatar_top_button.dart';
 import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
 import '../navigation/language_picker.dart';
@@ -215,6 +216,8 @@ class DashboardScaffold extends ConsumerWidget {
           const SOSButton(),
           const LanguagePicker(),
           NotificationBell(unreadCount: unread),
+          // P1: Avatar = 1-Tap zum eigenen Profil. Cinema-Bronze-Ring.
+          const MyAvatarTopButton(),
           const SizedBox(width: 4),
         ],
       ),
