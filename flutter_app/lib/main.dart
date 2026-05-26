@@ -163,20 +163,20 @@ Future<void> _initBackgroundServices() async {
   // dann den gruenen Restart-Banner.
   unawaited(ShorebirdPatchService.instance.checkAndDownloadPatch());
 
-  // P12: Offline-Queue lauscht auf Connectivity & flusht.
-  try {
-    await OfflineQueueService.instance.install();
-  } catch (_) {}
-
-  // P10: Streak-Tick beim App-Launch (DB-Sync, neben lokalem Service).
-  try {
-    await UserStreaksRepository().tickActivity();
-  } catch (_) {}
-
-  // P11: Sleep-Reminder re-schedule (Re-Boot, OTA-Patch).
-  try {
-    await SleepReminderService.instance.ensureScheduled();
-  } catch (_) {}
+  // P12/P10/P11: drei Background-Tasks NIE sequenziell awaiten — sonst
+  // blockt ein hängender Connectivity-Check oder tz-Init alle nachfolgenden
+  // und kann beim Navigieren zu Stalls fuehren. Jede Task fire-and-forget
+  // mit eigenem catchError damit eine Exception nicht den runZonedGuarded-
+  // Wrapper aufwaermt.
+  unawaited(
+    OfflineQueueService.instance.install().catchError((_) {}),
+  );
+  unawaited(
+    UserStreaksRepository().tickActivity().catchError((_) {}),
+  );
+  unawaited(
+    SleepReminderService.instance.ensureScheduled().catchError((_) {}),
+  );
 }
 
 /// Spielt assets/sounds/startup.mp3 maximal 1x pro Kalendertag.

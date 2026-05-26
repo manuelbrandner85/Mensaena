@@ -14,9 +14,13 @@ class PostsRepository {
   /// Wird vor jeder Feed-Liste neu geladen (lazy, single roundtrip).
   static Future<List<Post>> _filterBlocked(List<Post> posts) async {
     if (posts.isEmpty) return posts;
+    // Expired-Posts hier client-seitig ausfiltern statt via PostgREST-OR,
+    // damit eine fehlende/falsche or()-Syntax die ganze Query nicht
+    // catch't und 0 Ergebnisse liefert.
+    final visible = posts.where((p) => !p.isExpired).toList();
     final blocked = await UserBlocksRepository.myBlockedIds();
-    if (blocked.isEmpty) return posts;
-    return posts.where((p) => !blocked.contains(p.userId)).toList();
+    if (blocked.isEmpty) return visible;
+    return visible.where((p) => !blocked.contains(p.userId)).toList();
   }
 
   /// Posts in einem Umkreis um (lat, lng). Nutzt get_nearby_posts RPC.
@@ -123,8 +127,7 @@ class PostsRepository {
         final esc = query.trim().replaceAll('%', r'\%');
         q = q.or('title.ilike.%$esc%,description.ilike.%$esc%');
       }
-      final nowIso = DateTime.now().toIso8601String();
-      q = q.or('expires_at.is.null,expires_at.gt.$nowIso');
+      // expires_at-Filter passiert in _filterBlocked client-seitig.
       final rows = await q
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
@@ -141,12 +144,11 @@ class PostsRepository {
 
   static Future<List<Post>> _latestActive({int limit = 10}) async {
     try {
-      final nowIso = DateTime.now().toIso8601String();
+      // expires_at-Filter passiert in _filterBlocked client-seitig.
       final rows = await sb
           .from('posts')
           .select()
           .eq('status', 'active')
-          .or('expires_at.is.null,expires_at.gt.$nowIso')
           .order('created_at', ascending: false)
           .limit(limit);
       final posts = (rows as List)

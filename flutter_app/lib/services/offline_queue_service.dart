@@ -21,15 +21,22 @@ class OfflineQueueService {
   StreamSubscription<List<ConnectivityResult>>? _sub;
 
   Future<void> install() async {
-    _sub = Connectivity().onConnectivityChanged.listen((res) {
-      if (res.any((r) => r != ConnectivityResult.none)) {
-        unawaited(flush());
-      }
-    });
-    final initial = await Connectivity().checkConnectivity();
-    if (initial.any((r) => r != ConnectivityResult.none)) {
-      unawaited(flush());
-    }
+    try {
+      _sub = Connectivity().onConnectivityChanged.listen((res) {
+        if (res.any((r) => r != ConnectivityResult.none)) {
+          unawaited(flush().catchError((_) {}));
+        }
+      });
+    } catch (_) {/* Connectivity-Listener konnte nicht registriert werden */}
+    // Initial-Check NICHT awaiten — falls connectivity_plus auf dem Device
+    // haengt (selten, aber moeglich), darf das nicht die App-Init blockieren.
+    unawaited(
+      Connectivity().checkConnectivity().then((res) {
+        if (res.any((r) => r != ConnectivityResult.none)) {
+          unawaited(flush().catchError((_) {}));
+        }
+      }).catchError((_) {}),
+    );
   }
 
   Future<List<Map<String, dynamic>>> _read() async {
