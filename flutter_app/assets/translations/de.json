@@ -551,6 +551,9 @@
     "screenTitle": "Matching"
   },
   "admin": {
+    "crash_logs": "Crash-Logs",
+    "no_crashes": "Keine Crashes in den letzten 7 Tagen.",
+    "no_access": "Du hast keine Berechtigung für diesen Bereich.",
     "statusSetTo": "Status auf \"{s}\" gesetzt.",
     "statusUpdateFailed": "Status-Update fehlgeschlagen.",
     "actionFailed": "Aktion fehlgeschlagen.",

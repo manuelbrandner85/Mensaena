@@ -552,6 +552,9 @@
     "screenTitle": "Matching"
   },
   "admin": {
+    "crash_logs": "Crash logs",
+    "no_crashes": "No crashes in the last 7 days.",
+    "no_access": "You don't have permission to view this area.",
     "statusSetTo": "Status set to \"{s}\".",
     "statusUpdateFailed": "Status update failed.",
     "actionFailed": "Action failed.",
