@@ -20,6 +20,7 @@ import '../../services/post_draft_service.dart';
 import '../../services/rate_limit_service.dart';
 import '../../services/supabase_service.dart';
 import '../../models/post_intent.dart';
+import '../../widgets/effects/glass_card.dart';
 import '../../models/post_contact_preference.dart';
 import '../../repositories/post_contact_repository.dart';
 import '../../widgets/effects/celebrate_burst.dart';
@@ -65,6 +66,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   double? _lng;
   bool _submitting = false;
   String? _error;
+  DateTime? _scheduledAt;
+  DateTime? _expiresAt;
 
   static List<_PostType> get _types => [
         _PostType('help_request', 'create.typeHelpRequest'.tr(), '🆘',
@@ -302,8 +305,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             'is_anonymous': _isAnonymous,
             'media_urls': urls,
             'tags': tags,
-            'status': 'active',
+            'status':
+                _scheduledAt != null && _scheduledAt!.isAfter(DateTime.now())
+                    ? 'scheduled'
+                    : 'active',
             'post_intent': _intent.value,
+            'scheduled_at': _scheduledAt?.toIso8601String(),
+            'expires_at': _expiresAt?.toIso8601String(),
           })
           .select()
           .maybeSingle();
@@ -498,6 +506,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             });
           },
         ),
+            const SizedBox(height: 18),
+            _SchedulingSection(
+              scheduledAt: _scheduledAt,
+              expiresAt: _expiresAt,
+              onPickScheduled: (dt) => setState(() => _scheduledAt = dt),
+              onPickExpires: (dt) => setState(() => _expiresAt = dt),
+            ),
           ],
         );
     }
@@ -1240,6 +1255,106 @@ class _AiAssistantCardState extends State<_AiAssistantCard> {
               ),
             ],
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SchedulingSection extends StatelessWidget {
+  const _SchedulingSection({
+    required this.scheduledAt,
+    required this.expiresAt,
+    required this.onPickScheduled,
+    required this.onPickExpires,
+  });
+
+  final DateTime? scheduledAt;
+  final DateTime? expiresAt;
+  final ValueChanged<DateTime?> onPickScheduled;
+  final ValueChanged<DateTime?> onPickExpires;
+
+  Future<DateTime?> _pick(BuildContext context, DateTime? initial) async {
+    final base = initial ?? DateTime.now().add(const Duration(hours: 1));
+    final d = await showDatePicker(
+      context: context,
+      initialDate: base,
+      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (d == null) return null;
+    if (!context.mounted) return null;
+    final t = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(base),
+    );
+    if (t == null) return null;
+    return DateTime(d.year, d.month, d.day, t.hour, t.minute);
+  }
+
+  String _fmt(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}, '
+      '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            const Icon(LucideIcons.calendarClock,
+                size: 18, color: AppColors.bronze),
+            const SizedBox(width: 8),
+            Text('create.scheduling'.tr(),
+                style: AppTypography.display(size: 16, color: AppColors.ink)),
+          ]),
+          const SizedBox(height: 8),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(LucideIcons.clock,
+                size: 18, color: AppColors.inkSoft),
+            title: Text('create.scheduled_at'.tr(),
+                style: AppTypography.body(size: 14, color: AppColors.ink)),
+            subtitle: Text(
+              scheduledAt == null
+                  ? 'create.publish_now'.tr()
+                  : _fmt(scheduledAt!),
+              style: AppTypography.caption(),
+            ),
+            trailing: scheduledAt != null
+                ? IconButton(
+                    icon: const Icon(LucideIcons.x, size: 16),
+                    onPressed: () => onPickScheduled(null),
+                  )
+                : const Icon(LucideIcons.chevronRight, size: 16),
+            onTap: () async {
+              final picked = await _pick(context, scheduledAt);
+              if (picked != null) onPickScheduled(picked);
+            },
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(LucideIcons.hourglass,
+                size: 18, color: AppColors.inkSoft),
+            title: Text('create.expires_at'.tr(),
+                style: AppTypography.body(size: 14, color: AppColors.ink)),
+            subtitle: Text(
+              expiresAt == null ? 'create.never'.tr() : _fmt(expiresAt!),
+              style: AppTypography.caption(),
+            ),
+            trailing: expiresAt != null
+                ? IconButton(
+                    icon: const Icon(LucideIcons.x, size: 16),
+                    onPressed: () => onPickExpires(null),
+                  )
+                : const Icon(LucideIcons.chevronRight, size: 16),
+            onTap: () async {
+              final picked = await _pick(context, expiresAt);
+              if (picked != null) onPickExpires(picked);
+            },
+          ),
         ],
       ),
     );

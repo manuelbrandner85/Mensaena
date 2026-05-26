@@ -17,6 +17,7 @@ import 'services/callkit_service.dart';
 import 'services/offline_queue_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/shorebird_patch_service.dart';
+import 'services/sleep_reminder_service.dart';
 import 'services/supabase_service.dart';
 import 'repositories/wave_final_repositories.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -170,6 +171,11 @@ Future<void> _initBackgroundServices() async {
   // P10: Streak-Tick beim App-Launch (DB-Sync, neben lokalem Service).
   try {
     await UserStreaksRepository().tickActivity();
+  } catch (_) {}
+
+  // P11: Sleep-Reminder re-schedule (Re-Boot, OTA-Patch).
+  try {
+    await SleepReminderService.instance.ensureScheduled();
   } catch (_) {}
 }
 

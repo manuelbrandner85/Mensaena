@@ -30,6 +30,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/event_attendees_section.dart';
+import '../../../widgets/events/event_qr_checkin_sheet.dart';
 import '../../../widgets/event_countdown.dart';
 import '../../../widgets/event_reminder_widget.dart';
 import '../../../widgets/event_share_sheet.dart';
@@ -353,6 +354,20 @@ class _EventDetailBody extends ConsumerWidget {
                   icon: const Icon(LucideIcons.share2, size: 18),
                   color: AppColors.bronze,
                 ),
+                if (!isAuthor) ...[
+                  const SizedBox(width: 8),
+                  IconButton(
+                    tooltip: 'events.checkin_title'.tr(),
+                    onPressed: () => EventQrCheckinSheet.show(
+                      context,
+                      eventId: event.id,
+                      eventTitle: event.title,
+                      isOrganizer: false,
+                    ),
+                    icon: const Icon(LucideIcons.qrCode, size: 18),
+                    color: AppColors.bronze,
+                  ),
+                ],
               ],
             ),
           ),
@@ -373,6 +388,20 @@ class _EventDetailBody extends ConsumerWidget {
                     style: AppTypography.label(size: 10),
                   ),
                   const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () => EventQrCheckinSheet.show(
+                      context,
+                      eventId: event.id,
+                      eventTitle: event.title,
+                      isOrganizer: true,
+                    ),
+                    icon: const Icon(LucideIcons.qrCode, size: 14),
+                    label: Text('events.checkin_title'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.bronze,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   OutlinedButton.icon(
                     onPressed: () {
                       // Placeholder: Edit-Screen

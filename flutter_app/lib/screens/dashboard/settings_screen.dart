@@ -26,6 +26,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../services/biometric_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
+import '../../services/sleep_reminder_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -1062,6 +1063,55 @@ class _AppearanceTab extends ConsumerWidget {
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 4),
         const _DetoxSection(),
+        const SizedBox(height: 16),
+        Text('sleep_reminder.section'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        const _SleepReminderSection(),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/account'),
+          icon: const Icon(LucideIcons.userCog, size: 16),
+          label: Text('account.title'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/karma-history'),
+          icon: const Icon(LucideIcons.history, size: 16),
+          label: Text('karma.history_title'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/mentorship'),
+          icon: const Icon(LucideIcons.users, size: 16),
+          label: Text('mentorship.title'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: () => context.go('/dashboard/my-drafts'),
+          icon: const Icon(LucideIcons.fileText, size: 16),
+          label: Text('posts.drafts'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(14),
@@ -2011,6 +2061,105 @@ class _BiometricSectionState extends State<_BiometricSection> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// P11 Sleep-Reminder: täglich um gewählte Uhrzeit lokal benachrichtigen.
+// ─────────────────────────────────────────────────────────────
+class _SleepReminderSection extends StatefulWidget {
+  const _SleepReminderSection();
+  @override
+  State<_SleepReminderSection> createState() => _SleepReminderSectionState();
+}
+
+class _SleepReminderSectionState extends State<_SleepReminderSection> {
+  bool _enabled = false;
+  int _hour = 22;
+  int _minute = 0;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final on = await SleepReminderService.instance.isEnabled();
+    final t = await SleepReminderService.instance.currentTime();
+    if (!mounted) return;
+    setState(() {
+      _enabled = on;
+      _hour = t.hour;
+      _minute = t.minute;
+      _loaded = true;
+    });
+  }
+
+  Future<void> _toggle(bool v) async {
+    setState(() => _enabled = v);
+    if (v) {
+      await SleepReminderService.instance
+          .enable(hour: _hour, minute: _minute);
+    } else {
+      await SleepReminderService.instance.disable();
+    }
+  }
+
+  Future<void> _pickTime() async {
+    final t = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: _hour, minute: _minute),
+    );
+    if (t == null) return;
+    setState(() {
+      _hour = t.hour;
+      _minute = t.minute;
+    });
+    if (_enabled) {
+      await SleepReminderService.instance
+          .enable(hour: _hour, minute: _minute);
+    }
+  }
+
+  String get _timeLabel =>
+      '${_hour.toString().padLeft(2, '0')}:${_minute.toString().padLeft(2, '0')}';
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Center(
+            child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2))),
+      );
+    }
+    return Column(
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          value: _enabled,
+          onChanged: _toggle,
+          activeColor: AppColors.bronze,
+          title: Text('sleep_reminder.enable'.tr(),
+              style: AppTypography.body(size: 14, color: AppColors.ink)),
+          subtitle: Text(
+            'sleep_reminder.time_label'
+                .tr(namedArgs: {'time': _timeLabel}),
+            style: AppTypography.caption(),
+          ),
+        ),
+        TextButton.icon(
+          onPressed: _pickTime,
+          icon: const Icon(LucideIcons.clock, size: 14),
+          label: Text('sleep_reminder.pick_time'.tr()),
+        ),
+      ],
     );
   }
 }
