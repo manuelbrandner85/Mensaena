@@ -1,8 +1,10 @@
 /// SKILL: mensaena-features
-/// Accessibility-Suite (F20): zentrale Prefs fuer
+/// Accessibility-Suite (F20 + F53 + F83): zentrale Prefs fuer
 /// - textScale (0.85 / 1.0 / 1.15 / 1.3)
 /// - reduceMotion (Bool — schaltet Bloom-Pulse / Konfetti / Animationen aus)
 /// - highContrast (Bool — staerkere Borders / kontrastreichere Texte)
+/// - oledMode (F83 — pure black Hintergrund für OLED-Akku-Sparen)
+/// - seniorMode (F53 — TextScale 1.3, größere Buttons, weniger Animationen)
 ///
 /// Persistiert on-device in flutter_secure_storage.
 library;
@@ -15,27 +17,44 @@ class A11yPrefs {
     required this.textScale,
     required this.reduceMotion,
     required this.highContrast,
+    this.oledMode = false,
+    this.seniorMode = false,
   });
 
   final double textScale;
   final bool reduceMotion;
   final bool highContrast;
+  final bool oledMode;
+  final bool seniorMode;
 
   static const initial = A11yPrefs(
     textScale: 1.0,
     reduceMotion: false,
     highContrast: false,
+    oledMode: false,
+    seniorMode: false,
   );
+
+  /// Effektive TextScale — Senior-Mode bumpt 1.3.
+  double get effectiveTextScale =>
+      seniorMode ? (textScale < 1.3 ? 1.3 : textScale) : textScale;
+
+  /// Effective reduceMotion — Senior-Mode forces true.
+  bool get effectiveReduceMotion => seniorMode || reduceMotion;
 
   A11yPrefs copyWith({
     double? textScale,
     bool? reduceMotion,
     bool? highContrast,
+    bool? oledMode,
+    bool? seniorMode,
   }) {
     return A11yPrefs(
       textScale: textScale ?? this.textScale,
       reduceMotion: reduceMotion ?? this.reduceMotion,
       highContrast: highContrast ?? this.highContrast,
+      oledMode: oledMode ?? this.oledMode,
+      seniorMode: seniorMode ?? this.seniorMode,
     );
   }
 }
@@ -45,10 +64,11 @@ class A11yNotifier extends Notifier<A11yPrefs> {
   static const _scaleKey = 'mensaena_a11y_text_scale_v1';
   static const _motionKey = 'mensaena_a11y_reduce_motion_v1';
   static const _contrastKey = 'mensaena_a11y_high_contrast_v1';
+  static const _oledKey = 'mensaena_a11y_oled_v1';
+  static const _seniorKey = 'mensaena_a11y_senior_v1';
 
   @override
   A11yPrefs build() {
-    // Initial = default. Async load updated den State danach.
     _load();
     return A11yPrefs.initial;
   }
@@ -60,10 +80,14 @@ class A11yNotifier extends Notifier<A11yPrefs> {
           1.0;
       final motion = (await _storage.read(key: _motionKey)) == 'true';
       final contrast = (await _storage.read(key: _contrastKey)) == 'true';
+      final oled = (await _storage.read(key: _oledKey)) == 'true';
+      final senior = (await _storage.read(key: _seniorKey)) == 'true';
       state = A11yPrefs(
         textScale: scale.clamp(0.85, 1.3),
         reduceMotion: motion,
         highContrast: contrast,
+        oledMode: oled,
+        seniorMode: senior,
       );
     } catch (_) {}
   }
@@ -89,10 +113,23 @@ class A11yNotifier extends Notifier<A11yPrefs> {
       await _storage.write(key: _contrastKey, value: v ? 'true' : 'false');
     } catch (_) {}
   }
+
+  Future<void> setOledMode(bool v) async {
+    state = state.copyWith(oledMode: v);
+    try {
+      await _storage.write(key: _oledKey, value: v ? 'true' : 'false');
+    } catch (_) {}
+  }
+
+  Future<void> setSeniorMode(bool v) async {
+    state = state.copyWith(seniorMode: v);
+    try {
+      await _storage.write(key: _seniorKey, value: v ? 'true' : 'false');
+    } catch (_) {}
+  }
 }
 
 final a11yProvider = NotifierProvider<A11yNotifier, A11yPrefs>(A11yNotifier.new);
 
-/// Quick-Accessor fuer Widgets ohne Ref. Liefert default wenn kein Provider.
 bool reduceMotionFromRef(WidgetRef ref) =>
-    ref.read(a11yProvider).reduceMotion;
+    ref.read(a11yProvider).effectiveReduceMotion;
