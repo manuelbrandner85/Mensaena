@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
+import '../../models/post_intent.dart';
 import '../../repositories/post_interactions_repository.dart'
     hide ContentReportsRepository;
 import '../../repositories/posts_repository.dart';
@@ -352,8 +353,14 @@ class _PostCardState extends ConsumerState<PostCard> {
                 ],
               ),
             ],
-            // Action-Bar
+            // H1: Intent-aware CTA-Bar — User sieht sofort was zu tun ist.
+            // helpNeeded → "Ich helfe" (Leben-Grün)
+            // helpOffered + itemOffered → "Ich frage an" (Bronze)
+            // sonst → "Antworten" (Bronze, neutral)
             const SizedBox(height: 12),
+            _IntentCta(post: post),
+            // Action-Bar (Like, Vote, Comment, Save, Share)
+            const SizedBox(height: 10),
             Divider(
               height: 1,
               color: Colors.white.withValues(alpha: 0.04),
@@ -567,6 +574,52 @@ class _CommentBadge extends ConsumerWidget {
           error: (_, __) => '?',
         ),
         color: AppColors.tealSoft,
+      ),
+    );
+  }
+}
+
+/// H1: Intent-aware Call-To-Action auf jeder PostCard.
+/// Direkt sichtbar was der User tun kann — vorher musste man erst in
+/// den Post-Detail navigieren um die Aktion zu sehen.
+class _IntentCta extends StatelessWidget {
+  const _IntentCta({required this.post});
+  final Post post;
+
+  @override
+  Widget build(BuildContext context) {
+    final intent = post.postIntent;
+    // Skip CTA für reine Info-Posts (info_share, social, general) wo
+    // keine direkte Aktion erwartet wird — würde nur verwirren.
+    if (intent == PostIntent.infoShare ||
+        intent == PostIntent.social ||
+        intent == PostIntent.general) {
+      return const SizedBox.shrink();
+    }
+    final (label, color) = switch (intent) {
+      PostIntent.helpNeeded => ('Ich helfe', AppColors.leben),
+      PostIntent.helpOffered => ('Ich nehme an', AppColors.bronze),
+      PostIntent.itemOffered => ('Ich nehme', AppColors.bronze),
+      PostIntent.itemWanted => ('Ich biete an', AppColors.bronze),
+      PostIntent.eventInvite => ('Dabei sein', AppColors.amber),
+      PostIntent.warning => ('Mehr erfahren', AppColors.herzrotWarm),
+      PostIntent.lostFound => ('Ich helfe suchen', AppColors.leben),
+      _ => ('Antworten', AppColors.bronze),
+    };
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: () => context.push('/dashboard/posts/${post.id}'),
+        icon: const Icon(LucideIcons.messageCircle, size: 14),
+        label: Text(label),
+        style: FilledButton.styleFrom(
+          backgroundColor: color.withValues(alpha: 0.18),
+          foregroundColor: color,
+          side: BorderSide(color: color.withValues(alpha: 0.45)),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)),
+        ),
       ),
     );
   }
