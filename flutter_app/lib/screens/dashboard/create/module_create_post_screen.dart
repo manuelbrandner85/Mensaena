@@ -405,7 +405,11 @@ class _ModuleCreatePostScreenState
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.file(_images[i],
-                            width: 80, height: 80, fit: BoxFit.cover),
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            cacheWidth: 160,
+                            cacheHeight: 160),
                       ),
                       Positioned(
                         top: 2,

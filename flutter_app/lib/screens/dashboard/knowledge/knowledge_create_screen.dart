@@ -664,6 +664,8 @@ class _CoverPickerBox extends StatelessWidget {
             height: 180,
             width: double.infinity,
             fit: BoxFit.cover,
+            cacheWidth: 800,
+            cacheHeight: 400,
           ),
         ),
         Positioned(

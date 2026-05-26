@@ -341,6 +341,8 @@ class _MarketplaceCreateScreenState
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
+                          cacheWidth: 160,
+                          cacheHeight: 160,
                         ),
                       ),
                       Positioned(

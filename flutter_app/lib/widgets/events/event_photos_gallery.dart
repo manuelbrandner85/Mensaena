@@ -46,7 +46,7 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
     try {
       final x = await ImagePicker().pickImage(
           source: ImageSource.gallery, imageQuality: 80, maxWidth: 1600);
-      if (x == null) return;
+      if (x == null || !mounted) return;
       setState(() => _uploading = true);
       final bytes = await x.readAsBytes();
       final ext = x.path.split('.').last;

@@ -71,7 +71,11 @@ class _IdentifySpeciesScreenState
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.file(_photo!,
-                    height: 240, width: double.infinity, fit: BoxFit.cover),
+                    height: 240,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    cacheWidth: 800,
+                    cacheHeight: 600),
               )
             else
               Container(

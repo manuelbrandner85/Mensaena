@@ -1035,7 +1035,10 @@ class _Hero extends StatelessWidget {
                   children: [
                     Container(color: AppColors.elevated),
                     if (coverFile != null)
-                      Image.file(coverFile!, fit: BoxFit.cover)
+                      Image.file(coverFile!,
+                          fit: BoxFit.cover,
+                          cacheWidth: 800,
+                          cacheHeight: 400)
                     else if (coverUrl != null)
                       CachedNetworkImage(
                         imageUrl: coverUrl!,

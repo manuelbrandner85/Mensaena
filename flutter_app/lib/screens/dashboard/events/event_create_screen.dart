@@ -381,7 +381,10 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
             fit: StackFit.expand,
             children: [
               if (_coverImage != null)
-                Image.file(_coverImage!, fit: BoxFit.cover)
+                Image.file(_coverImage!,
+                    fit: BoxFit.cover,
+                    cacheWidth: 800,
+                    cacheHeight: 600)
               else if (_uploadedImageUrl != null)
                 CachedNetworkImage(
                   imageUrl: _uploadedImageUrl!,
