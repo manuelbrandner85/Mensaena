@@ -40,6 +40,13 @@
 # Geolocator / Permission-Handler
 -keep class com.baseflow.** { *; }
 
+# Google Play Core (Deferred-Components, Split-Install) — R8 erwartet
+# diese Klassen weil Flutter sie referenziert für App-Bundles, aber wir
+# nutzen sie nicht aktiv. Müssen aber als dontwarn drin sein.
+-keep class com.google.android.play.core.** { *; }
+-dontwarn com.google.android.play.core.**
+-dontwarn com.google.android.play.**
+
 # Don't warn on missing optional classes
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**

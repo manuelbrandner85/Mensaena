@@ -85,14 +85,18 @@ android {
                 // CI setzt IMMER key.properties aus den Secrets.
                 signingConfigs.getByName("debug")
             }
-            // P22: R8-Code-Shrinking + Resource-Shrinking für kleinere APK
-            // + bessere Cold-Start-Zeit. ProGuard-Rules in proguard-rules.pro.
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // R8/ProGuard ist aktuell DEAKTIVIERT — ein Aktivierungsversuch
+            // brach den Build mit "Missing class com.google.android.play.core.*"
+            // (Deferred-Components erwartet Flutter, wir nutzen es nicht).
+            // proguard-rules.pro hat die korrekten keep+dontwarn-Rules drin,
+            // sobald wir es wieder aktivieren wollen → einfach diese 6 Zeilen
+            // einkommentieren:
+            //   isMinifyEnabled = true
+            //   isShrinkResources = true
+            //   proguardFiles(
+            //     getDefaultProguardFile("proguard-android-optimize.txt"),
+            //     "proguard-rules.pro"
+            //   )
         }
     }
 }
