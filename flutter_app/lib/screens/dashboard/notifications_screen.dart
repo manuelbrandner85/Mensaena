@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -33,6 +34,30 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   ];
 
   String _tab = 'all';
+  static const _tabPrefKey = 'mensaena_notif_tab_v1';
+  static const _storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTabPref();
+  }
+
+  Future<void> _loadTabPref() async {
+    try {
+      final raw = await _storage.read(key: _tabPrefKey);
+      if (raw != null && _tabs.any((t) => t.key == raw) && mounted) {
+        setState(() => _tab = raw);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _setTab(String t) async {
+    setState(() => _tab = t);
+    try {
+      await _storage.write(key: _tabPrefKey, value: t);
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +190,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   final t = _tabs[i];
                   final active = t.key == _tab;
                   return GestureDetector(
-                    onTap: () => setState(() => _tab = t.key),
+                    onTap: () => _setTab(t.key),
                     child: Container(
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(
