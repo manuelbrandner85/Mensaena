@@ -22,6 +22,7 @@ import '../shared/my_avatar_top_button.dart';
 import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
 import '../navigation/language_picker.dart';
+import '../shared/critical_crisis_alert_listener.dart';
 import '../shared/fcm_foreground_listener.dart';
 import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
@@ -241,6 +242,7 @@ class DashboardScaffold extends ConsumerWidget {
           // Layer 2: Actual Content
           FcmForegroundListener(
             child: IncomingCallListener(
+              child: CriticalCrisisAlertListener(
               child: Stack(
                 children: [
                   Column(
@@ -260,6 +262,7 @@ class DashboardScaffold extends ConsumerWidget {
                       !activeRoute.startsWith('/dashboard/call/'))
                     ActiveCallMiniPlayer(info: activeCall),
                 ],
+              ),
               ),
             ),
           ),
