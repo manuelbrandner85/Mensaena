@@ -741,6 +741,7 @@ class _CountryChip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Container(
           alignment: Alignment.center,
@@ -1412,12 +1413,12 @@ class _OrgCardSkeleton extends StatelessWidget {
                 const SizedBox(height: 8),
                 ShimmerBox(
                   height: 10,
-                  width: MediaQuery.of(context).size.width * 0.5,
+                  width: MediaQuery.sizeOf(context).width * 0.5,
                 ),
                 const SizedBox(height: 8),
                 ShimmerBox(
                   height: 10,
-                  width: MediaQuery.of(context).size.width * 0.4,
+                  width: MediaQuery.sizeOf(context).width * 0.4,
                 ),
               ],
             ),

@@ -38,7 +38,7 @@ class WatcherPanel extends StatelessWidget {
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.75,
+        width: MediaQuery.sizeOf(context).width * 0.75,
         height: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.deep.withValues(alpha: 0.95),

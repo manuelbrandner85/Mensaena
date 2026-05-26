@@ -174,7 +174,7 @@ class _ChatScreenSkeleton extends StatelessWidget {
                     ),
                   ),
                 ShimmerBox(
-                  width: MediaQuery.of(context).size.width *
+                  width: MediaQuery.sizeOf(context).width *
                       (mine ? 0.45 : 0.6),
                   height: 44,
                   borderRadius: 14,

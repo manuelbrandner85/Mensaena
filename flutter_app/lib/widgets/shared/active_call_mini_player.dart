@@ -62,7 +62,7 @@ class _ActiveCallMiniPlayerState
   Widget build(BuildContext context) {
     final info = widget.info;
     final elapsed = DateTime.now().difference(info.startedAt);
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     return Positioned(
       right: _offset.dx,
       top: _offset.dy,

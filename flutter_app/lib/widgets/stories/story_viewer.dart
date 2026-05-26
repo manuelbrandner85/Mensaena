@@ -92,7 +92,7 @@ class _StoryViewerState extends State<StoryViewer>
         child: GestureDetector(
           onTapDown: (d) {
             final dx = d.globalPosition.dx;
-            final width = MediaQuery.of(context).size.width;
+            final width = MediaQuery.sizeOf(context).width;
             if (dx < width / 3) {
               _previous();
             } else {

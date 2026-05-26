@@ -143,7 +143,7 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
             const Divider(color: AppColors.line),
             ConstrainedBox(
               constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.4),
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.4),
               child: async.when(
                 loading: () => const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),

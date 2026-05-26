@@ -609,7 +609,7 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mine = message.role == 'user';
-    final maxWidth = MediaQuery.of(context).size.width * 0.75;
+    final maxWidth = MediaQuery.sizeOf(context).width * 0.75;
 
     // Bot-Bubble = GlassCard.subtle für cinematic Feel
     if (!mine) {

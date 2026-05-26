@@ -178,7 +178,9 @@ class ChatMessageBubble extends ConsumerWidget {
               ? const EdgeInsets.all(4)
               : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.75,
+            // Perf: sizeOf statt of(context) — granulare Subscription auf
+            // Size only, kein Rebuild bei Padding/Locale-Changes.
+            maxWidth: MediaQuery.sizeOf(context).width * 0.75,
           ),
           decoration: BoxDecoration(
             color: deleted

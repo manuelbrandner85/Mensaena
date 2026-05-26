@@ -350,7 +350,7 @@ class _AuthScreenState extends State<AuthScreen>
             sizeRatio: 0.65,
           ),
           // Firefly-Particles
-          ..._buildFireflies(MediaQuery.of(context).size),
+          ..._buildFireflies(MediaQuery.sizeOf(context)),
 
           // Content
           SafeArea(
@@ -655,7 +655,7 @@ class _HeroOrb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final dim = size.width * sizeRatio;
     return Positioned(
       top: top != null ? size.height * top! : null,

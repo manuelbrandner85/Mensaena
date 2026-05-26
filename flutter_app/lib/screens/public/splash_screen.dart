@@ -129,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final palette = _paletteForHour(DateTime.now().hour);
 
     return Scaffold(

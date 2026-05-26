@@ -127,7 +127,7 @@ class _VideoPreviewModalState extends State<VideoPreviewModal> {
 
   @override
   Widget build(BuildContext context) {
-    final h = MediaQuery.of(context).size.height * 0.7;
+    final h = MediaQuery.sizeOf(context).height * 0.7;
     return SafeArea(
       child: SizedBox(
         height: h,

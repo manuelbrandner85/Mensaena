@@ -137,7 +137,7 @@ class PostCardSkeleton extends StatelessWidget {
                     const ShimmerBox(width: 120, height: 11),
                     const SizedBox(height: 6),
                     ShimmerBox(
-                      width: MediaQuery.of(context).size.width * 0.25,
+                      width: MediaQuery.sizeOf(context).width * 0.25,
                       height: 9,
                     ),
                   ],
@@ -151,7 +151,7 @@ class PostCardSkeleton extends StatelessWidget {
           const SizedBox(height: 8),
           ShimmerBox(
             height: 14,
-            width: MediaQuery.of(context).size.width * 0.7,
+            width: MediaQuery.sizeOf(context).width * 0.7,
           ),
           const SizedBox(height: 12),
           // Optional Image-Block
@@ -214,7 +214,7 @@ class NotificationTileSkeleton extends StatelessWidget {
                 const ShimmerBox(height: 10),
                 const SizedBox(height: 6),
                 ShimmerBox(
-                  width: MediaQuery.of(context).size.width * 0.55,
+                  width: MediaQuery.sizeOf(context).width * 0.55,
                   height: 10,
                 ),
               ],
@@ -252,7 +252,7 @@ class ConversationTileSkeleton extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 ShimmerBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
+                  width: MediaQuery.sizeOf(context).width * 0.6,
                   height: 10,
                 ),
               ],
