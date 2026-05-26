@@ -182,7 +182,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Kein kommerzieller Handel — verschenken, tauschen, leihen.',
+                        'marketplace.nonCommercialHint'.tr(),
                         style: AppTypography.body(
                           size: 11,
                           color: AppColors.inkSoft,
@@ -240,7 +240,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
               child: FilterChipBar<String>(
                 options: _categories,
                 selected: _category == null ? const <String>{} : {_category!},
-                allLabel: 'Alle Kategorien',
+                allLabel: 'marketplace.allCategories'.tr(),
                 onChanged: (s) =>
                     setState(() => _category = s.isEmpty ? null : s.first),
               ),
@@ -251,7 +251,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                 options: _conditions,
                 selected:
                     _condition == null ? const <String>{} : {_condition!},
-                allLabel: 'Alle Zustände',
+                allLabel: 'marketplace.allConditions'.tr(),
                 onChanged: (s) =>
                     setState(() => _condition = s.isEmpty ? null : s.first),
               ),
@@ -336,13 +336,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                           EmptyStateCard(
                             icon: LucideIcons.store,
                             title: _hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Keine Inserate vorhanden.',
+                                ? 'marketplace.noMatches'.tr()
+                                : 'marketplace.noListings'.tr(),
                             description: _hasFilters
-                                ? 'Filter zurücksetzen oder andere wählen.'
-                                : 'Sei der/die Erste:r — Plus-Button.',
-                            actionLabel:
-                                _hasFilters ? 'Filter zurücksetzen' : null,
+                                ? 'marketplace.noMatchesHint'.tr()
+                                : 'marketplace.beFirstHint'.tr(),
+                            actionLabel: _hasFilters
+                                ? 'marketplace.resetFilters'.tr()
+                                : null,
                             onAction: _hasFilters
                                 ? () => setState(() {
                                       _type = 'all';
