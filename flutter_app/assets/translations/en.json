@@ -2067,6 +2067,16 @@
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
   },
+  "releaseNotes": {
+    "title": "What's new?",
+    "subtitle": "Latest updates to this app",
+    "openButton": "What's new?",
+    "mandatory": "Mandatory update",
+    "patch": "Patch",
+    "noEntries": "No notes for this release.",
+    "empty": "No releases available yet.",
+    "error": "Couldn't load release notes."
+  },
   "affirmation": {
     "title": "Thought for today",
     "pool": {

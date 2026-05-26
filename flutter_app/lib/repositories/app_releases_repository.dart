@@ -29,6 +29,28 @@ class AppReleasesRepository {
       return null;
     }
   }
+
+  /// Letzte N Releases (APK + Patches) sortiert nach build_number desc.
+  /// Fuer den In-App "Was ist neu?"-Sheet (F48).
+  static Future<List<AppRelease>> recent({
+    int limit = 8,
+    String platform = 'android',
+  }) async {
+    try {
+      final rows = await sb
+          .from('app_releases')
+          .select()
+          .eq('platform', platform)
+          .order('build_number', ascending: false)
+          .limit(limit);
+      return (rows as List)
+          .cast<Map<String, dynamic>>()
+          .map(AppRelease.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
 }
 
 /// Resultat-Tuple: Latest-Release, current-buildNumber.

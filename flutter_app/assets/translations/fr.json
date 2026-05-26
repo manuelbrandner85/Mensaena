@@ -1831,6 +1831,16 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "releaseNotes": {
+    "title": "Quoi de neuf ?",
+    "subtitle": "Dernières mises à jour de l'app",
+    "openButton": "Quoi de neuf ?",
+    "mandatory": "Obligatoire",
+    "patch": "Patch",
+    "noEntries": "Pas de notes pour cette version.",
+    "empty": "Aucune version disponible pour le moment.",
+    "error": "Impossible de charger les notes."
+  },
   "affirmation": {
     "title": "Pensée du jour",
     "pool": {

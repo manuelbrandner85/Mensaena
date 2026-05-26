@@ -1830,6 +1830,16 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "releaseNotes": {
+    "title": "Yenilikler",
+    "subtitle": "Uygulamanın son güncellemeleri",
+    "openButton": "Yenilikler",
+    "mandatory": "Zorunlu",
+    "patch": "Yama",
+    "noEntries": "Bu sürüm için not yok.",
+    "empty": "Henüz sürüm yok.",
+    "error": "Sürüm notları yüklenemedi."
+  },
   "affirmation": {
     "title": "Günün düşüncesi",
     "pool": {

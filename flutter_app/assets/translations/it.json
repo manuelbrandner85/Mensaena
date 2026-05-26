@@ -1831,6 +1831,16 @@
     "sheetHint": "Una frase basta. Solo tu vedi queste note — restano sul tuo dispositivo.",
     "placeholder": "es. una chiamata gentile, il sole, una mano amica…"
   },
+  "releaseNotes": {
+    "title": "Cosa c'è di nuovo?",
+    "subtitle": "Ultimi aggiornamenti di questa app",
+    "openButton": "Cosa c'è di nuovo?",
+    "mandatory": "Obbligatorio",
+    "patch": "Patch",
+    "noEntries": "Nessuna nota per questa versione.",
+    "empty": "Nessuna versione disponibile.",
+    "error": "Impossibile caricare le note."
+  },
   "affirmation": {
     "title": "Pensiero del giorno",
     "pool": {

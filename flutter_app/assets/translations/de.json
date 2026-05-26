@@ -2066,6 +2066,16 @@
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
   },
+  "releaseNotes": {
+    "title": "Was ist neu?",
+    "subtitle": "Die letzten Updates dieser App",
+    "openButton": "Was ist neu?",
+    "mandatory": "Pflicht-Update",
+    "patch": "Patch",
+    "noEntries": "Keine Notizen für dieses Release.",
+    "empty": "Noch keine Releases verfügbar.",
+    "error": "Konnte Release-Notizen nicht laden."
+  },
   "affirmation": {
     "title": "Gedanke des Tages",
     "pool": {

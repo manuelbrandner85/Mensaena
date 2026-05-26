@@ -28,6 +28,7 @@ import '../../services/shorebird_patch_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/release_notes_sheet.dart';
 
 /// SKILL: mensaena-features
 /// Settings-Screen mit 5 Tabs (Account/Privacy/Notifications/Region/Danger).
@@ -182,6 +183,17 @@ class _AccountTab extends StatelessWidget {
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 8),
         const _AppVersionInfo(),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: () => ReleaseNotesSheet.show(context),
+          icon: const Icon(LucideIcons.sparkles, size: 14),
+          label: Text('releaseNotes.openButton'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.amber,
+            side: BorderSide(color: AppColors.amber.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
       ],
     );
   }
