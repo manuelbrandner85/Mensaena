@@ -30,6 +30,12 @@ class _BiometricLockGateState extends State<BiometricLockGate>
   bool _busy = false;
   bool _checked = false;
 
+  /// CRITICAL: verhindert Endlos-Loop wenn der Biometric-Prompt die App
+  /// pausiert. Ohne dieses Flag triggert jeder Lifecycle 'resumed' einen
+  /// neuen Prompt — der User cancelt → resumed → Prompt → cancelt → ∞ →
+  /// Crash. Wir prompten nur einmal pro App-Session beim ersten Mount.
+  bool _autoPromptDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +52,17 @@ class _BiometricLockGateState extends State<BiometricLockGate>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _checkLockStatus(promptImmediately: true);
+      // BUGFIX (Crash-Loop): Bei Resume nur shouldLock prüfen, KEINEN
+      // Auto-Prompt mehr triggern. Wenn die App nach Background-Timeout
+      // wieder gesperrt ist, sieht der User den Lock-Screen und tappt
+      // selbst auf "Entsperren" — sonst loopen wir mit dem nativen
+      // Biometric-Prompt (jeder Prompt-Open setzt die App auf paused,
+      // jeder Prompt-Close auf resumed → unendliche Re-Auth).
+      _checkLockStatus(promptImmediately: false);
+    } else if (state == AppLifecycleState.paused) {
+      // Wenn die App pausiert wird (User schickt sie in Background ODER
+      // System öffnet einen anderen Activity wie das Biometric-Sheet),
+      // reset _autoPromptDone NICHT — das wäre wieder der Loop.
     }
   }
 
@@ -57,8 +73,9 @@ class _BiometricLockGateState extends State<BiometricLockGate>
       _locked = shouldLock;
       _checked = true;
     });
-    if (shouldLock && promptImmediately) {
-      // Nicht sofort — UI muss erst gemounted sein.
+    // Auto-Prompt nur EINMAL pro Mount + nur wenn explizit gewollt.
+    if (shouldLock && promptImmediately && !_autoPromptDone) {
+      _autoPromptDone = true;
       WidgetsBinding.instance.addPostFrameCallback((_) => _tryUnlock());
     }
   }
