@@ -8,10 +8,12 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/posts/save_collection_picker.dart';
 import '../../widgets/shared/post_card.dart';
 
 /// SKILL: mensaena-features
 /// Gespeicherte Posts — Bookmark-Liste aus saved_posts.
+/// Mit Collection-Filter-Chips (P7).
 class ProfileSavedScreen extends ConsumerStatefulWidget {
   const ProfileSavedScreen({super.key});
 
@@ -22,6 +24,7 @@ class ProfileSavedScreen extends ConsumerStatefulWidget {
 
 class _ProfileSavedScreenState extends ConsumerState<ProfileSavedScreen> {
   Future<List<Post>>? _future;
+  String? _collectionId; // null = alle
 
   @override
   void initState() {
@@ -30,65 +33,112 @@ class _ProfileSavedScreenState extends ConsumerState<ProfileSavedScreen> {
   }
 
   Future<void> _refresh() async {
-    final f = PostsRepository.listSaved();
+    final f = PostsRepository.listSaved(collectionId: _collectionId);
     setState(() => _future = f);
     await f;
   }
 
+  void _setCollection(String? id) {
+    setState(() {
+      _collectionId = id;
+      _future = PostsRepository.listSaved(collectionId: id);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final collections = ref.watch(saveCollectionsProvider);
     return DashboardScaffold(
       title: 'profile.savedTitle'.tr(),
       currentRoute: '/dashboard/profile/saved',
       body: SafeArea(
-        child: RefreshIndicator(
-          color: AppColors.bronze,
-          backgroundColor: AppColors.surface,
-          onRefresh: _refresh,
-          child: FutureBuilder<List<Post>>(
-            future: _future,
-            builder: (context, snap) {
-              if (snap.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.bronze),
-                );
-              }
-              final list = snap.data ?? const <Post>[];
-              if (list.isEmpty) {
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 44,
+              child: collections.maybeWhen(
+                data: (list) => ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   children: [
-                    const SizedBox(height: 120),
-                    Center(
-                      child: Column(
-                        children: [
-                          const Icon(LucideIcons.bookmark,
-                              size: 36, color: AppColors.mute),
-                          const SizedBox(height: 10),
-                          Text('profile.nothingSaved'.tr(),
-                              style: AppTypography.body(
-                                  size: 14,
-                                  color: AppColors.ink,
-                                  weight: FontWeight.w600)),
-                          const SizedBox(height: 4),
-                          Text(
-                              'profile.savedHint'.tr(),
-                              textAlign: TextAlign.center,
-                              style: AppTypography.body(
-                                  size: 12, color: AppColors.mute)),
-                        ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 6),
+                      child: ChoiceChip(
+                        selected: _collectionId == null,
+                        label: Text('collections.default'.tr()),
+                        onSelected: (_) => _setCollection(null),
                       ),
                     ),
+                    for (final c in list)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 6),
+                        child: ChoiceChip(
+                          selected: _collectionId == c['id'],
+                          label: Text(
+                              '${c['emoji'] ?? '📁'} ${c['name']}'),
+                          onSelected: (_) =>
+                              _setCollection(c['id'] as String),
+                        ),
+                      ),
                   ],
-                );
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(12),
-                itemCount: list.length,
-                itemBuilder: (context, i) => PostCard(post: list[i]),
-              );
-            },
-          ),
+                ),
+                orElse: () => const SizedBox.shrink(),
+              ),
+            ),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.bronze,
+                backgroundColor: AppColors.surface,
+                onRefresh: _refresh,
+                child: FutureBuilder<List<Post>>(
+                  future: _future,
+                  builder: (context, snap) {
+                    if (snap.connectionState != ConnectionState.done) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                            color: AppColors.bronze),
+                      );
+                    }
+                    final list = snap.data ?? const <Post>[];
+                    if (list.isEmpty) {
+                      return ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          const SizedBox(height: 120),
+                          Center(
+                            child: Column(
+                              children: [
+                                const Icon(LucideIcons.bookmark,
+                                    size: 36, color: AppColors.mute),
+                                const SizedBox(height: 10),
+                                Text('profile.nothingSaved'.tr(),
+                                    style: AppTypography.body(
+                                        size: 14,
+                                        color: AppColors.ink,
+                                        weight: FontWeight.w600)),
+                                const SizedBox(height: 4),
+                                Text('profile.savedHint'.tr(),
+                                    textAlign: TextAlign.center,
+                                    style: AppTypography.body(
+                                        size: 12, color: AppColors.mute)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: list.length,
+                      itemBuilder: (context, i) => PostCard(post: list[i]),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

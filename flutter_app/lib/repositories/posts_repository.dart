@@ -222,14 +222,18 @@ class PostsRepository {
   }
 
   /// Alle gespeicherten Posts des aktuellen Users.
-  static Future<List<Post>> listSaved() async {
+  static Future<List<Post>> listSaved({String? collectionId}) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return const [];
     try {
-      final rows = await sb
+      var q = sb
           .from('saved_posts')
-          .select('post_id, posts(*)')
-          .eq('user_id', uid)
+          .select('post_id, collection_id, posts(*)')
+          .eq('user_id', uid);
+      if (collectionId != null) {
+        q = q.eq('collection_id', collectionId);
+      }
+      final rows = await q
           .order('created_at', ascending: false)
           .limit(100);
       final out = <Post>[];
