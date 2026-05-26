@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../widgets/profile/send_voicemail_sheet.dart';
 import '../../widgets/profile/status_editor_sheet.dart';
 import 'call/scheduled_calls_screen.dart';
 import 'package:share_plus/share_plus.dart';
@@ -773,6 +774,17 @@ class _Header extends StatelessWidget {
                               profile.displayName ?? profile.name ?? 'mensaena',
                         ),
                         icon: const Icon(LucideIcons.calendarPlus,
+                            size: 18, color: AppColors.bronze),
+                      ),
+                      IconButton(
+                        tooltip: 'voicemail.send_to'.tr(),
+                        onPressed: () => SendVoicemailSheet.show(
+                          context,
+                          calleeId: profile.id,
+                          calleeName:
+                              profile.displayName ?? profile.name ?? 'mensaena',
+                        ),
+                        icon: const Icon(LucideIcons.voicemail,
                             size: 18, color: AppColors.bronze),
                       ),
                     ]),

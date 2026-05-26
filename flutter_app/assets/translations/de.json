@@ -2258,7 +2258,15 @@
   },
   "voicemail": {
     "title": "Voicemail",
-    "empty": "Keine Sprachnachrichten."
+    "empty": "Keine Sprachnachrichten.",
+    "send_to": "Voicemail senden",
+    "tap_to_record": "Tippen zum Aufnehmen",
+    "recording": "Aufnahme läuft — tippen zum Stoppen.",
+    "sending": "Wird gesendet …",
+    "sent": "Voicemail wurde gesendet.",
+    "error_record": "Aufnahme fehlgeschlagen.",
+    "error_upload": "Hochladen fehlgeschlagen.",
+    "error_permission": "Mikrofon-Berechtigung fehlt."
   },
   "polls": {
     "total_votes": "{n} Stimmen",

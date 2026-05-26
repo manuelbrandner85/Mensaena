@@ -2259,7 +2259,15 @@
   },
   "voicemail": {
     "title": "Voicemail",
-    "empty": "No voice messages."
+    "empty": "No voice messages.",
+    "send_to": "Send voicemail",
+    "tap_to_record": "Tap to record",
+    "recording": "Recording — tap to stop.",
+    "sending": "Sending …",
+    "sent": "Voicemail sent.",
+    "error_record": "Recording failed.",
+    "error_upload": "Upload failed.",
+    "error_permission": "Microphone permission missing."
   },
   "polls": {
     "total_votes": "{n} votes",
