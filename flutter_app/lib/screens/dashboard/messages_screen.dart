@@ -8,6 +8,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../config/theme/cinema_accents.dart';
 import '../../providers/cinema_provider.dart';
+import '../../providers/conversation_mute_ids_provider.dart';
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
@@ -612,6 +613,15 @@ class _DmTile extends ConsumerWidget {
                               weight: FontWeight.w600),
                         ),
                       ),
+                      if (ref
+                          .watch(mutedConversationIdsProvider)
+                          .maybeWhen(
+                              data: (s) => s.contains(id), orElse: () => false))
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, right: 4),
+                          child: Icon(LucideIcons.bellOff,
+                              size: 12, color: AppColors.mute),
+                        ),
                       Text(
                         DateFormat('dd.MM. HH:mm').format(updatedAt),
                         style: AppTypography.caption(),

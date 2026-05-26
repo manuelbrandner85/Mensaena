@@ -22,6 +22,8 @@ import '../../../services/presence_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
 import '../../../widgets/chat/mentions_autocomplete.dart';
+import '../../../widgets/chat/vanish_mode_banner.dart';
+import '../../../widgets/chat/vanish_mode_sheet.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/video_preview_modal.dart';
@@ -599,6 +601,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             // Pinned-Messages-Panel — nur in Channels
             if (_context?.kind == ChatKind.channel)
               ChatPinnedMessagesPanel(conversationId: widget.conversationId),
+            VanishModeBanner(conversationId: widget.conversationId),
             Expanded(
               child: stream.when(
                 loading: () => const _ChatBubbleSkeleton(count: 6),
@@ -1136,6 +1139,16 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                   onTap: () async => widget.onToggleSearch(),
                 ),
                 _MuteToggleIcon(conversationId: widget.conversationId),
+                if (isDm)
+                  _ActionIcon(
+                    icon: LucideIcons.eyeOff,
+                    label: 'vanish.title'.tr(),
+                    color: AppColors.mute,
+                    onTap: () async => VanishModeSheet.show(
+                      context,
+                      conversationId: widget.conversationId,
+                    ),
+                  ),
               ],
             ),
           ),

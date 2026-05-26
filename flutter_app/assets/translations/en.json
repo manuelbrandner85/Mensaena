@@ -2257,6 +2257,13 @@
     "create_title": "Schedule call",
     "empty": "No scheduled calls."
   },
+  "vanish": {
+    "title": "Vanish mode",
+    "description": "Messages in this conversation will be auto-deleted after the chosen duration.",
+    "enable": "Enable",
+    "lifetime": "Lifetime",
+    "banner": "Vanish active · messages disappear after {duration}"
+  },
   "voicemail": {
     "title": "Voicemail",
     "empty": "No voice messages.",

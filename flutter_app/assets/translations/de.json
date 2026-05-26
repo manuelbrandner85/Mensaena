@@ -2256,6 +2256,13 @@
     "create_title": "Anruf planen",
     "empty": "Keine geplanten Anrufe."
   },
+  "vanish": {
+    "title": "Vanish-Modus",
+    "description": "Nachrichten in dieser Konversation werden nach der gewählten Zeit automatisch gelöscht.",
+    "enable": "Aktivieren",
+    "lifetime": "Lebensdauer",
+    "banner": "Vanish aktiv · Nachrichten verschwinden nach {duration}"
+  },
   "voicemail": {
     "title": "Voicemail",
     "empty": "Keine Sprachnachrichten.",
