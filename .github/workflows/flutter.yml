@@ -466,8 +466,28 @@ jobs:
 
       # Pro Version eigenes GitHub Release (versionierte APK bleibt
       # für ältere Installs erreichbar).
-      - name: Publish versioned GitHub Release
+      # WICHTIG: softprops/action-gh-release@v2 versucht bei existierendem
+      # Tag ein UPDATE — das schlägt manchmal mit "Resource not accessible
+      # by integration" fehl wenn pubspec-Version nicht bumped war. Mit
+      # `if_no_release` setzen wir das nicht; stattdessen prüfen wir
+      # vorher ob es das Release schon gibt und überspringen den
+      # Veröffentlichungs-Step idempotent.
+      - name: Check if versioned release exists
+        id: rel_check
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          TAG="${{ steps.apk.outputs.tag }}"
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "exists=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 1) Wenn Release noch nicht da → create.
+      - name: Publish versioned GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.rel_check.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.apk.outputs.tag }}
@@ -483,30 +503,45 @@ jobs:
           files: |
             mensaena-v${{ steps.apk.outputs.version }}.apk
           prerelease: false
-          make_latest: false
+          make_latest: 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2) Wenn Release schon existiert → nur Asset clobbern (ersetzt
+      # gleichnamige Datei, ändert kein Release-Metadata-Update das
+      # 403 werfen könnte).
+      - name: Update versioned APK asset
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.rel_check.outputs.exists == 'true'
+        run: |
+          gh release upload "${{ steps.apk.outputs.tag }}" \
+            "mensaena-v${{ steps.apk.outputs.version }}.apk" \
+            --repo "${{ github.repository }}" --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Plus stabiles `latest`-Release für den Self-Update-Flow:
       # mensaena-release.apk-Filename bleibt konstant.
+      # `latest`-Release: existiert quasi immer, also direkt mit gh CLI
+      # asset-clobbern (idempotent, kein 403 durch make_latest-update).
+      - name: Ensure latest release exists
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if ! gh release view latest --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release create latest \
+              --repo "${{ github.repository }}" \
+              --title "Mensaena (latest build)" \
+              --notes "Mensaena Android APK – automatisch gebaut aus \`main\`."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish latest GitHub Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: Mensaena (latest build)
-          body: |
-            Mensaena Android APK – automatisch gebaut aus `main`.
-
-            **Direct download:** [`mensaena-release.apk`](https://github.com/${{ github.repository }}/releases/latest/download/mensaena-release.apk)
-
-            * Aktuelle Version: ${{ steps.apk.outputs.version }}
-            * Versionierte Releases: https://github.com/${{ github.repository }}/releases
-          files: mensaena-release.apk
-          make_latest: true
-          prerelease: false
+        run: |
+          gh release upload latest "mensaena-release.apk" \
+            --repo "${{ github.repository }}" --clobber
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ── app_releases-Eintrag (APK Release, evtl. mandatory) ─────────────
       # Pendant zu shorebird_patch.yml's Insert. flutter.yml ist verantwortlich
