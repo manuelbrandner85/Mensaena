@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -575,6 +576,8 @@ class _Hero extends StatelessWidget {
           ],
         ),
         // Phase 7: Inline-Poll (rendert nichts wenn keine poll für post)
+        if (post.description != null && post.description!.length > 40)
+          _TranslateButton(text: post.description!),
         PostPollWidget(postId: post.id),
         if (post.userId == SupabaseService.currentUser?.id)
           _AddPollButton(postId: post.id),
@@ -612,6 +615,32 @@ class _Hero extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _TranslateButton extends StatelessWidget {
+  const _TranslateButton({required this.text});
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: () async {
+          final locale = context.locale.languageCode;
+          final url = Uri.https('translate.google.com', '/', {
+            'sl': 'auto',
+            'tl': locale,
+            'text': text,
+            'op': 'translate',
+          });
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        },
+        icon: const Icon(LucideIcons.languages, size: 14),
+        label: Text('posts.translate'.tr()),
+        style: TextButton.styleFrom(foregroundColor: AppColors.bronze),
+      ),
     );
   }
 }

@@ -980,6 +980,7 @@
     "title": "Posts",
     "drafts": "Drafts",
     "no_drafts": "No drafts yet.",
+    "translate": "Translate",
     "allPosts": "All posts",
     "linkCopied": "Link copied to clipboard",
     "readTime": "{min} min read",

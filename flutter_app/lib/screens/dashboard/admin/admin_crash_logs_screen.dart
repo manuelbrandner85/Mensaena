@@ -19,13 +19,39 @@ final _crashLogsProvider =
   try {
     final since =
         DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
-    final rows = await sb
-        .from('crash_logs')
-        .select()
-        .gte('created_at', since)
-        .order('created_at', ascending: false)
-        .limit(500);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
+    // Liest aus error_logs (Live-Source aus main.dart) UND crash_logs.
+    final results = await Future.wait([
+      sb
+          .from('error_logs')
+          .select()
+          .gte('created_at', since)
+          .order('created_at', ascending: false)
+          .limit(300)
+          .then((r) => (r as List).whereType<Map<String, dynamic>>().toList()),
+      sb
+          .from('crash_logs')
+          .select()
+          .gte('created_at', since)
+          .order('created_at', ascending: false)
+          .limit(200)
+          .then((r) => (r as List).whereType<Map<String, dynamic>>().toList()),
+    ]);
+    final merged = <Map<String, dynamic>>[
+      ...results[0].map((r) => {
+            ...r,
+            'error_message': r['message'] ?? r['error_message'],
+            'stack_trace': r['stack'] ?? r['stack_trace'],
+            'build_number': r['build_number'] ?? 0,
+          }),
+      ...results[1],
+    ];
+    merged.sort((a, b) {
+      final aT = DateTime.tryParse(a['created_at'] as String? ?? '');
+      final bT = DateTime.tryParse(b['created_at'] as String? ?? '');
+      if (aT == null || bT == null) return 0;
+      return bT.compareTo(aT);
+    });
+    return merged.take(500).toList();
   } catch (_) {
     return const [];
   }
