@@ -961,6 +961,8 @@
   },
   "posts": {
     "title": "Beiträge",
+    "drafts": "Entwürfe",
+    "no_drafts": "Keine Entwürfe vorhanden.",
     "allPosts": "Alle Beiträge",
     "linkCopied": "Link in Zwischenablage kopiert",
     "readTime": "{min} Min. Lesezeit",
@@ -2186,7 +2188,11 @@
     "reduceMotion": "Bewegung reduzieren",
     "reduceMotionHint": "Schaltet Konfetti, Pulse-Glows und große Animationen aus.",
     "highContrast": "Hoher Kontrast",
-    "highContrastHint": "Stärkere Ränder und kräftigere Textfarben."
+    "highContrastHint": "Stärkere Ränder und kräftigere Textfarben.",
+    "oledMode": "OLED-Schwarz",
+    "oledModeHint": "Tiefschwarzer Hintergrund für AMOLED-Displays — spart Akku.",
+    "seniorMode": "Senior-Modus",
+    "seniorModeHint": "Größere Schrift, weniger Animationen, mehr Kontrast."
   },
   "biometric": {
     "section": "App-Sperre per Fingerabdruck / Gesicht",

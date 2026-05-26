@@ -2097,6 +2097,38 @@ class _A11ySection extends ConsumerWidget {
             subtitle: Text('a11y.highContrastHint'.tr(),
                 style: AppTypography.caption()),
           ),
+          const SizedBox(height: 4),
+          // F83 OLED Dark Mode
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: a11y.oledMode,
+            onChanged: notifier.setOledMode,
+            activeColor: AppColors.bronze,
+            title: Text('a11y.oledMode'.tr(),
+                style: AppTypography.body(
+                  size: 13,
+                  color: AppColors.ink,
+                  weight: FontWeight.w600,
+                )),
+            subtitle: Text('a11y.oledModeHint'.tr(),
+                style: AppTypography.caption()),
+          ),
+          const SizedBox(height: 4),
+          // F53 Senior-Mode
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            value: a11y.seniorMode,
+            onChanged: notifier.setSeniorMode,
+            activeColor: AppColors.bronze,
+            title: Text('a11y.seniorMode'.tr(),
+                style: AppTypography.body(
+                  size: 13,
+                  color: AppColors.ink,
+                  weight: FontWeight.w600,
+                )),
+            subtitle: Text('a11y.seniorModeHint'.tr(),
+                style: AppTypography.caption()),
+          ),
         ],
       ),
     );

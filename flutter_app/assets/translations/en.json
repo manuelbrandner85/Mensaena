@@ -962,6 +962,8 @@
   },
   "posts": {
     "title": "Posts",
+    "drafts": "Drafts",
+    "no_drafts": "No drafts yet.",
     "allPosts": "All posts",
     "linkCopied": "Link copied to clipboard",
     "readTime": "{min} min read",
@@ -2187,7 +2189,11 @@
     "reduceMotion": "Reduce motion",
     "reduceMotionHint": "Disables confetti, pulse glows and large animations.",
     "highContrast": "High contrast",
-    "highContrastHint": "Stronger borders and bolder text colours."
+    "highContrastHint": "Stronger borders and bolder text colours.",
+    "oledMode": "OLED black",
+    "oledModeHint": "Pure black background for AMOLED displays — saves battery.",
+    "seniorMode": "Senior mode",
+    "seniorModeHint": "Larger text, fewer animations, more contrast."
   },
   "biometric": {
     "section": "App lock with fingerprint / face",
