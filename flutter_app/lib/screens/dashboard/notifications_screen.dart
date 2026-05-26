@@ -30,6 +30,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     (key: 'all', label: 'Alle'),
     (key: 'unread', label: 'Ungelesen'),
     (key: 'message', label: 'Nachrichten'),
+    (key: 'mention', label: 'Erwähnungen'),
     (key: 'interaction', label: 'Interaktionen'),
     (key: 'system', label: 'System'),
   ];

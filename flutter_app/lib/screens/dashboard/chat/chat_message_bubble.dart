@@ -275,20 +275,23 @@ class ChatMessageBubble extends ConsumerWidget {
                   // #6 Emoji-Only Large: wenn die ganze Nachricht nur aus
                   // Emojis besteht (max 3), groesser darstellen ohne
                   // Bubble-Begrenzung. Wirkt wie iMessage/Telegram.
-                  child: Text(
-                    textWithoutImages,
-                    style: _isEmojiOnly(textWithoutImages)
-                        ? AppTypography.body(
+                  child: _isEmojiOnly(textWithoutImages)
+                      ? Text(
+                          textWithoutImages,
+                          style: AppTypography.body(
                             size: 32,
                             color: AppColors.ink,
                             height: 1.2,
-                          )
-                        : AppTypography.body(
+                          ),
+                        )
+                      : _MentionAwareText(
+                          text: textWithoutImages,
+                          baseStyle: AppTypography.body(
                             size: 14,
                             color: AppColors.ink,
                             height: 1.4,
                           ),
-                  ),
+                        ),
                 ),
               const SizedBox(height: 2),
               // Reactions-Pills
@@ -698,4 +701,40 @@ bool _isEmojiOnly(String s) {
     return false;
   }
   return true;
+}
+
+/// Rendert Text mit @mentions als bronze-highlighted spans.
+class _MentionAwareText extends StatelessWidget {
+  const _MentionAwareText({required this.text, required this.baseStyle});
+  final String text;
+  final TextStyle baseStyle;
+
+  static final _re = RegExp(r'(@[\p{L}0-9._-]+)', unicode: true);
+
+  @override
+  Widget build(BuildContext context) {
+    final spans = <TextSpan>[];
+    int last = 0;
+    for (final m in _re.allMatches(text)) {
+      if (m.start > last) {
+        spans.add(TextSpan(
+          text: text.substring(last, m.start),
+          style: baseStyle,
+        ));
+      }
+      spans.add(TextSpan(
+        text: m.group(0),
+        style: baseStyle.copyWith(
+          color: AppColors.bronze,
+          fontWeight: FontWeight.w700,
+        ),
+      ));
+      last = m.end;
+    }
+    if (last < text.length) {
+      spans.add(TextSpan(text: text.substring(last), style: baseStyle));
+    }
+    if (spans.isEmpty) return Text(text, style: baseStyle);
+    return RichText(text: TextSpan(children: spans));
+  }
 }
