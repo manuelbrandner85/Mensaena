@@ -19,8 +19,13 @@ import '../../services/location_service.dart';
 import '../../services/post_draft_service.dart';
 import '../../services/rate_limit_service.dart';
 import '../../services/supabase_service.dart';
+import '../../models/post_intent.dart';
+import '../../models/post_contact_preference.dart';
+import '../../repositories/post_contact_repository.dart';
 import '../../widgets/effects/celebrate_burst.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/post/contact_preference_selector.dart';
+import '../../widgets/post/post_intent_selector.dart';
 import '../../widgets/shared/address_autocomplete_field.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
@@ -41,6 +46,9 @@ class CreatePostScreen extends ConsumerStatefulWidget {
 class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   int _step = 0;
   String? _type;
+  // Mega-Contact-System: Intent + Contact-Preferences
+  PostIntent _intent = PostIntent.general;
+  PostContactPreference? _contactPref;
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
@@ -295,6 +303,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             'media_urls': urls,
             'tags': tags,
             'status': 'active',
+            'post_intent': _intent.value,
           })
           .select()
           .maybeSingle();
@@ -306,6 +315,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         throw StateError('insert_blocked');
       }
       final id = inserted['id'] as String;
+      // Mega-Contact-System: Kontaktpraeferenzen upsert (wenn Intent Kontakt verlangt)
+      if (_intent.requiresContact && _contactPref != null) {
+        final fixed = _contactPref!.copyWith().toJson()
+          ..['post_id'] = id;
+        // Re-build mit korrekter post_id (Selector hat 'pending' placeholder)
+        await const PostContactRepository().upsertPreferences(
+          PostContactPreference.fromJson({
+            ...fixed,
+            'user_id': uid,
+          }),
+        );
+      }
       await PostDraftService.clear();
       if (!mounted) return;
       // F4 Micro-Interaction: kurzer Konfetti-Burst zum Feiern.
@@ -407,29 +428,58 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           onSelect: (t) {
             setState(() {
               _type = t;
+              _intent = PostIntent.fromPostType(t);
               _error = null;
             });
           },
         );
       case 1:
-        return _StepInhalt(
-          titleCtrl: _titleCtrl,
-          descCtrl: _descCtrl,
-          tagsCtrl: _tagsCtrl,
-          images: _images,
-          onPickImage: _pickImage,
-          onRemoveImage: (i) => setState(() => _images.removeAt(i)),
-          intentHint: _intentHint(),
-          onApplyIntent: (t) {
-            setState(() => _type = t);
-          },
-          isAnonymous: _isAnonymous,
-          onToggleAnonymous: (v) => setState(() => _isAnonymous = v),
-          postType: _type,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Mega-Contact-System: PostIntentSelector am Anfang von Step 2
+            PostIntentSelector(
+              onIntentSelected: (i) => setState(() => _intent = i),
+              initialPostType: _type,
+              selectedIntent: _intent,
+            ),
+            const SizedBox(height: 18),
+            _StepInhalt(
+              titleCtrl: _titleCtrl,
+              descCtrl: _descCtrl,
+              tagsCtrl: _tagsCtrl,
+              images: _images,
+              onPickImage: _pickImage,
+              onRemoveImage: (i) => setState(() => _images.removeAt(i)),
+              intentHint: _intentHint(),
+              onApplyIntent: (t) {
+                setState(() {
+                    _type = t;
+                    _intent = PostIntent.fromPostType(t);
+                  });
+              },
+              isAnonymous: _isAnonymous,
+              onToggleAnonymous: (v) => setState(() => _isAnonymous = v),
+              postType: _type,
+            ),
+          ],
         );
       case 2:
       default:
-        return _StepKontakt(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Mega-Contact-System: ContactPreferenceSelector (nur wenn Intent es verlangt)
+            if (_intent.requiresContact) ...[
+              ContactPreferenceSelector(
+                userId: SupabaseService.currentUser?.id ?? '',
+                postId: 'pending', // wird beim Insert auf echte ID gemapped
+                initial: _contactPref,
+                onChanged: (p) => setState(() => _contactPref = p),
+              ),
+              const SizedBox(height: 18),
+            ],
+            _StepKontakt(
           locationCtrl: _locationCtrl,
           phoneCtrl: _phoneCtrl,
           emailCtrl: _emailCtrl,
@@ -447,6 +497,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               _lng = s.lng;
             });
           },
+        ),
+          ],
         );
     }
   }

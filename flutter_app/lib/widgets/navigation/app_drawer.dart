@@ -10,6 +10,7 @@ import '../../config/theme/app_typography.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../repositories/crisis_repository.dart';
+import '../../providers/post_contact_provider.dart';
 import '../../repositories/interactions_repository.dart';
 import '../shared/sized_avatar_image.dart';
 import '../../repositories/matching_repository.dart';
@@ -74,6 +75,8 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/organizations'),
         _NavLink(icon: LucideIcons.helpingHand, label: 'nav.interactions',
             route: '/dashboard/interactions', badgeKey: 'interactionRequests'),
+        _NavLink(icon: LucideIcons.inbox, label: 'contact.requests.title',
+            route: '/contact-requests', badgeKey: 'incomingContactRequests'),
         _NavLink(icon: LucideIcons.dog, label: 'nav.animals',
             route: '/dashboard/animals'),
       ],
@@ -473,6 +476,13 @@ class _LinkTile extends ConsumerWidget {
             0;
       case 'interactionRequests':
         return ref.watch(activeInteractionsCountProvider).asData?.value ?? 0;
+      case 'incomingContactRequests':
+        return ref
+                .watch(myIncomingContactRequestsProvider)
+                .asData
+                ?.value
+                .length ??
+            0;
       default:
         return 0;
     }

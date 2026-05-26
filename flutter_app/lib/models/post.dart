@@ -1,11 +1,14 @@
-/// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `posts` (huaqldjkgyosefzfhjnf).
+// SKILL: mensaena-architektur + flutter-implement-json-serialization
+// Spiegel der Supabase-Tabelle `posts` (huaqldjkgyosefzfhjnf).
+import 'post_intent.dart';
+
 class Post {
   const Post({
     required this.id,
     required this.type,
     required this.title,
     required this.userId,
+    this.postIntent = PostIntent.general,
     required this.createdAt,
     required this.status,
     this.category,
@@ -37,6 +40,7 @@ class Post {
 
   final String id;
   final String type;
+  final PostIntent postIntent;
   final String title;
   final String userId;
   final DateTime createdAt;
@@ -80,6 +84,7 @@ class Post {
     return Post(
       id: j['id'] as String,
       type: j['type'] as String,
+      postIntent: PostIntent.fromString(j['post_intent'] as String?),
       title: j['title'] as String,
       userId: j['user_id'] as String,
       createdAt:
@@ -128,6 +133,7 @@ class Post {
   Map<String, dynamic> toJson() => {
         'id': id,
         'type': type,
+        'post_intent': postIntent.value,
         'title': title,
         'user_id': userId,
         'created_at': createdAt.toIso8601String(),

@@ -17,6 +17,7 @@ import '../../services/haptics.dart';
 import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/post/post_contact_actions.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 
@@ -385,6 +386,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                           padding: const EdgeInsets.all(16),
                           children: [
                             _Hero(post: _post!),
+                            const SizedBox(height: 16),
+                            // Mega-Contact-System (Intent-basierte CTAs)
+                            PostContactActions(post: _post!),
                             const SizedBox(height: 16),
                             _ActionsBar(
                               myVote: _myVote,

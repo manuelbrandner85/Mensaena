@@ -46,6 +46,7 @@ import '../../screens/dashboard/supply/farm_detail_screen.dart';
 import '../../screens/dashboard/supply/foodbanks_screen.dart';
 import '../../screens/dashboard/supply/supply_screen.dart';
 import '../../screens/dashboard/chat/chat_screen.dart';
+import '../../screens/dashboard/contact_requests_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
 import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
@@ -1214,6 +1215,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // :userId-Wildcard matchen. Die alten Top-Level-Definitionen
       // hier wurden entfernt um Routing-Duplikate zu vermeiden.
       // LiveKit Call + Live-Room Screens (DM-Call / Channel-Stream)
+      GoRoute(
+        path: '/contact-requests',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const ContactRequestsScreen(),
+        ),
+      ),
       GoRoute(
         path: '/dashboard/call-history',
         pageBuilder: (_, st) => mensaenaTransition<void>(
