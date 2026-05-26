@@ -135,6 +135,8 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
                     child: CachedNetworkImage(
                       imageUrl: url,
                       fit: BoxFit.cover,
+                      memCacheWidth: 300,
+                      memCacheHeight: 300,
                       errorWidget: (_, __, ___) => Container(
                         color: AppColors.elevated,
                         alignment: Alignment.center,

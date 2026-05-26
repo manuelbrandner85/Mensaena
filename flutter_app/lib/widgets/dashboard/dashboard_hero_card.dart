@@ -178,6 +178,8 @@ class DashboardHeroCard extends StatelessWidget {
                                   fit: BoxFit.cover,
                                   width: 64,
                                   height: 64,
+                                  memCacheWidth: 128,
+                                  memCacheHeight: 128,
                                   placeholder: (_, __) => Container(
                                     width: 64,
                                     height: 64,

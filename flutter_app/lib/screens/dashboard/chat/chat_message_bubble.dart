@@ -231,6 +231,7 @@ class ChatMessageBubble extends ConsumerWidget {
                         child: CachedNetworkImage(
                           imageUrl: m.group(1)!,
                           fit: BoxFit.cover,
+                          memCacheWidth: 600,
                           placeholder: (_, __) => Container(
                             height: 120,
                             color: AppColors.elevated,

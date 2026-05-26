@@ -140,6 +140,8 @@ class MentorshipMatchScreen extends ConsumerWidget {
                                   imageUrl: avatar,
                                   width: 44,
                                   height: 44,
+                                  memCacheWidth: 88,
+                                  memCacheHeight: 88,
                                   fit: BoxFit.cover,
                                 )
                               : Container(

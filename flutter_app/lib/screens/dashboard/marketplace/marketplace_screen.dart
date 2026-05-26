@@ -496,6 +496,8 @@ class _Tile extends ConsumerWidget {
                                   tag: 'marketplace-image-${item.id}',
                                   child: CachedNetworkImage(
                                     imageUrl: urls.first,
+                                    memCacheWidth: 400,
+                                    memCacheHeight: 400,
                                     fadeInDuration:
                                         const Duration(milliseconds: 200),
                                     fit: BoxFit.cover,

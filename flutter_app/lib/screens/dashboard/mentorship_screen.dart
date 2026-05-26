@@ -125,6 +125,8 @@ class MentorshipScreen extends ConsumerWidget {
                               imageUrl: avatar,
                               width: 44,
                               height: 44,
+                              memCacheWidth: 88,
+                              memCacheHeight: 88,
                               fit: BoxFit.cover,
                               errorWidget: (_, __, ___) =>
                                   _avatarFallback(name),

@@ -54,6 +54,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
             height: widget.height,
             width: double.infinity,
             fit: BoxFit.cover,
+            // RAM-Limit: decoded auf max 2x logical pixels.
+            memCacheHeight: (widget.height * 2).toInt(),
             placeholder: (_, __) => _placeholder(),
             errorWidget: (_, __, ___) => _errorBox(),
           ),
@@ -80,6 +82,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                   imageUrl: widget.urls[i],
                   fit: BoxFit.cover,
                   width: double.infinity,
+                  memCacheHeight: (widget.height * 2).toInt(),
                   placeholder: (_, __) => _placeholder(),
                   errorWidget: (_, __, ___) => _errorBox(),
                 ),

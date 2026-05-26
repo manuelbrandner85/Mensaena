@@ -101,6 +101,8 @@ class ScheduledCallsScreen extends ConsumerWidget {
                               imageUrl: avatar,
                               width: 40,
                               height: 40,
+                              memCacheWidth: 80,
+                              memCacheHeight: 80,
                               fit: BoxFit.cover,
                             )
                           : Container(

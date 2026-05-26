@@ -126,6 +126,8 @@ class _VoicemailScreenState extends ConsumerState<VoicemailScreen> {
                               imageUrl: avatar,
                               width: 40,
                               height: 40,
+                              memCacheWidth: 80,
+                              memCacheHeight: 80,
                               fit: BoxFit.cover,
                             )
                           : Container(

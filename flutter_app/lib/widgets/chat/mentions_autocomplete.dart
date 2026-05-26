@@ -115,6 +115,8 @@ class MentionsAutocomplete extends ConsumerWidget {
                                                   m['avatar_url'] as String,
                                               width: 24,
                                               height: 24,
+                                              memCacheWidth: 48,
+                                              memCacheHeight: 48,
                                               fit: BoxFit.cover,
                                               errorWidget: (_, __, ___) =>
                                                   _fallback(m),

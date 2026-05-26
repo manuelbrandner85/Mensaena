@@ -879,6 +879,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             if (avatarUrl != null)
                               CachedNetworkImage(
                                 imageUrl: avatarUrl,
+                                memCacheWidth: 80,
+                                memCacheHeight: 80,
                                 fadeInDuration:
                                     const Duration(milliseconds: 200),
                                 imageBuilder: (_, img) => CircleAvatar(
@@ -1259,6 +1261,8 @@ class _LeadingBadge extends StatelessWidget {
                     fadeInDuration: const Duration(milliseconds: 200),
                     width: 38,
                     height: 38,
+                    memCacheWidth: 76,
+                    memCacheHeight: 76,
                     fit: BoxFit.cover,
                     placeholder: (_, __) => Container(
                       color: AppColors.elevated,
