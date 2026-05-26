@@ -134,7 +134,17 @@ class INaturalistService {
       if (streamed.statusCode != 200) {
         debugPrint(
             '[Identify] HTTP ${streamed.statusCode}: ${body.substring(0, body.length.clamp(0, 200))}');
-        return const [];
+        if (streamed.statusCode == 429) {
+          throw const IdentificationException(
+              'Tageslimit der kostenlosen Bestimmungs-API erreicht. '
+              'Bitte morgen erneut versuchen.');
+        }
+        if (streamed.statusCode == 404) {
+          throw const IdentificationException(
+              'Kein Treffer — Bild zu unklar oder Spezies nicht in der DB.');
+        }
+        throw IdentificationException(
+            'Bestimmungs-Service nicht erreichbar (Code ${streamed.statusCode}).');
       }
       final j = json.decode(body) as Map<String, dynamic>;
       final results = j['results'] as List? ?? const [];
@@ -156,11 +166,20 @@ class INaturalistService {
         if (out.length >= 5) break;
       }
       return out;
+    } on IdentificationException {
+      rethrow;
     } catch (e) {
       debugPrint('[Identify] failed: $e');
       return const [];
     }
   }
+}
+
+class IdentificationException implements Exception {
+  const IdentificationException(this.message);
+  final String message;
+  @override
+  String toString() => message;
 }
 
 class INaturalistIdentificationGuess {

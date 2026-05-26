@@ -211,7 +211,7 @@ class _Note extends StatelessWidget {
   Widget build(BuildContext context) {
     final base = _bgColors[post.color] ?? const Color(0xFFFEF08A);
     return InkWell(
-      onTap: () => context.go('/dashboard/board/${post.id}'),
+      onTap: () => context.push('/dashboard/board/${post.id}'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(14),

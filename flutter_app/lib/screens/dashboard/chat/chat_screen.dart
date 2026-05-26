@@ -107,42 +107,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _showCallError('Gesprächspartner nicht gefunden');
       return;
     }
-    // Confirm-Dialog (Audio) bzw. Video-Preview-Sheet (Video) BEVOR der
-    // Call in DB angelegt wird — sonst sieht der Callee ein kurzes
-    // Klingel-FlackerEvent obwohl der Anrufer abbricht.
+    // Video: kurzes Camera-Preview-Sheet (Permission + Mic-Check).
+    // Audio: sofort starten — der Vollscreen-Call-Screen hat eigene
+    // Cancel/Hang-up-Buttons, ein extra Confirm-Dialog wäre 1× Tap zu viel.
     if (callType == 'video') {
       final ok = await VideoPreviewModal.show(context, peerName: ctx.title);
       if (!ok || !mounted) return;
-    } else {
-      final ok = await showDialog<bool>(
-        context: context,
-        builder: (dCtx) => AlertDialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16)),
-          title: Text(
-            'call.confirmTitle'.tr(),
-            style: AppTypography.body(
-                size: 16, color: AppColors.ink, weight: FontWeight.w700),
-          ),
-          content: Text(
-            'call.confirmBody'.tr(namedArgs: {'name': ctx.title}),
-            style: AppTypography.body(size: 14, color: AppColors.inkSoft),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dCtx, false),
-              child: Text('common.cancel'.tr()),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(dCtx, true),
-              style: TextButton.styleFrom(foregroundColor: AppColors.leben),
-              child: Text('call.confirmStart'.tr()),
-            ),
-          ],
-        ),
-      );
-      if (ok != true || !mounted) return;
     }
     final result = await DmCallService.start(
       conversationId: widget.conversationId,

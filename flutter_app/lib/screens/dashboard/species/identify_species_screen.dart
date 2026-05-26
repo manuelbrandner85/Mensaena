@@ -43,12 +43,23 @@ class _IdentifySpeciesScreenState
       _loading = true;
       _guesses = const [];
     });
-    final results = await INaturalistService.identifyFromPhoto(file);
-    if (!mounted) return;
-    setState(() {
-      _loading = false;
-      _guesses = results;
-    });
+    try {
+      final results = await INaturalistService.identifyFromPhoto(file);
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _guesses = results;
+      });
+    } on IdentificationException catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(e.message,
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+        duration: const Duration(seconds: 5),
+      ));
+    }
   }
 
   @override

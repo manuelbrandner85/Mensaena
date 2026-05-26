@@ -564,6 +564,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               route: '/dashboard/charge-stations',
               color: Color(0xFF66C7C8),
             ),
+            ModuleQuickAction(
+              icon: LucideIcons.fuel,
+              label: 'gas.title',
+              route: '/dashboard/mobility/gas',
+              color: Color(0xFFE8A24A),
+            ),
           ],
           subFilters: const [
             FilterOption(value: 'rideshare', label: '🚗 Mitfahrt'),
