@@ -44,6 +44,11 @@ class AppDrawer extends ConsumerWidget {
     label: 'nav.dashboard',
     route: '/dashboard',
   );
+  static const _NavLink _modulesHub = _NavLink(
+    icon: LucideIcons.layoutGrid,
+    label: 'modulesHub.title',
+    route: '/dashboard/modules',
+  );
   static const _NavLink _notifications = _NavLink(
     icon: LucideIcons.bell,
     label: 'nav.notifications',
@@ -200,6 +205,8 @@ class AppDrawer extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     children: [
                       _LinkTile(link: _home, currentLoc: currentLoc),
+                      _LinkTile(
+                          link: _modulesHub, currentLoc: currentLoc),
                       _LinkTile(
                           link: _notifications, currentLoc: currentLoc),
                       const _PinnedSection(),

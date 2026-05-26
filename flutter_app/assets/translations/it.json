@@ -2009,6 +2009,10 @@
     "title": "Promemoria evento",
     "body": "{title} inizia tra {minutes} minuti."
   },
+  "modulesHub": {
+    "title": "Tutti i moduli",
+    "intro": "Esplora i 22 moduli della piattaforma Mensaena."
+  },
   "followed_tags": {
     "title": "Segui argomenti",
     "intro": "Segui singoli hashtag per personalizzare il tuo feed.",

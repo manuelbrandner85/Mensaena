@@ -25,6 +25,7 @@ import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
 import '../../screens/dashboard/followed_tags_screen.dart';
 import '../../screens/dashboard/global_search_screen.dart';
+import '../../screens/dashboard/modules_hub_screen.dart';
 import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
@@ -275,6 +276,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, s) => mensaenaTransition<void>(
           key: s.pageKey,
           child: const FollowedTagsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/modules',
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: const ModulesHubScreen(),
         ),
       ),
       GoRoute(

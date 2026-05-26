@@ -2390,6 +2390,10 @@
     "title": "Event reminder",
     "body": "{title} starts in {minutes} minutes."
   },
+  "modulesHub": {
+    "title": "All modules",
+    "intro": "Browse all 22 Mensaena modules."
+  },
   "followed_tags": {
     "title": "Follow topics",
     "intro": "Follow individual hashtags to curate your feed.",

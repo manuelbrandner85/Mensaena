@@ -2009,6 +2009,10 @@
     "title": "Rappel d'événement",
     "body": "{title} commence dans {minutes} minutes."
   },
+  "modulesHub": {
+    "title": "Tous les modules",
+    "intro": "Parcours les 22 modules de la plateforme Mensaena."
+  },
   "followed_tags": {
     "title": "Suivre des sujets",
     "intro": "Suis des hashtags pour personnaliser ton fil.",

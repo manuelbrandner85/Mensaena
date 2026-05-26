@@ -2008,6 +2008,10 @@
     "title": "Etkinlik hatırlatıcısı",
     "body": "{title} {minutes} dakika içinde başlıyor."
   },
+  "modulesHub": {
+    "title": "Tüm modüller",
+    "intro": "Mensaena'nın 22 modülünü keşfet."
+  },
   "followed_tags": {
     "title": "Konuları takip et",
     "intro": "Akışını özelleştirmek için hashtag'leri takip et.",

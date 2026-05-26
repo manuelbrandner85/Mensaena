@@ -2389,6 +2389,10 @@
     "title": "Event-Erinnerung",
     "body": "{title} startet in {minutes} Minuten."
   },
+  "modulesHub": {
+    "title": "Alle Module",
+    "intro": "Stöbere durch die 22 Module der Mensaena-Plattform."
+  },
   "followed_tags": {
     "title": "Themen folgen",
     "intro": "Folge einzelnen Hashtags, um deinen Feed zu kuratieren.",

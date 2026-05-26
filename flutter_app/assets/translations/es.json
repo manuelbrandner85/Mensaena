@@ -2009,6 +2009,10 @@
     "title": "Recordatorio de evento",
     "body": "{title} empieza en {minutes} minutos."
   },
+  "modulesHub": {
+    "title": "Todos los módulos",
+    "intro": "Explora los 22 módulos de Mensaena."
+  },
   "followed_tags": {
     "title": "Seguir temas",
     "intro": "Sigue hashtags concretos para personalizar tu feed.",
