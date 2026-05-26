@@ -14,6 +14,7 @@ library;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -70,6 +71,10 @@ import '../../../widgets/dashboard/water_level_widget.dart';
 import '../../../widgets/dashboard/weather_widget.dart';
 import '../../../widgets/dashboard/weekly_challenge_highlight.dart';
 import '../../../widgets/dashboard/weekly_digest.dart';
+import '../../../widgets/dashboard/dashboard_edit_banner.dart';
+import '../../../widgets/dashboard/dashboard_onboarding_tooltip.dart';
+import '../../../widgets/dashboard/dashboard_widget_wrapper.dart';
+import '../../../widgets/dashboard/disabled_widgets_bar.dart';
 import '../../../widgets/dashboard/widget_grid_settings.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -179,22 +184,63 @@ class _DashboardHomeScreenState
           builder: (context, snap) {
             final loading = snap.connectionState != ConnectionState.done;
             final data = snap.data;
-            // UX: bei Cold-Start (data noch null + loading) zeigen wir
-            // ein Skeleton statt weisser Flaeche. Sobald data da ist,
-            // rendert die echte Liste.
             if (loading && data == null) {
               return const ListSkeleton(count: 5);
             }
-            final children = _buildChildren(cfg, data, loading);
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: children,
+            final isEditMode = ref.watch(isDashboardEditModeProvider);
+            return PopScope(
+              canPop: !isEditMode,
+              onPopInvokedWithResult: (didPop, _) {
+                if (!didPop && isEditMode) {
+                  ref.read(isDashboardEditModeProvider.notifier).state = false;
+                }
+              },
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onLongPress: isEditMode
+                    ? null
+                    : () {
+                        HapticFeedback.heavyImpact();
+                        ref
+                            .read(isDashboardEditModeProvider.notifier)
+                            .state = true;
+                      },
+                child: _DashboardScrollBody(
+                  cfg: cfg,
+                  data: data,
+                  loading: loading,
+                  isEditMode: isEditMode,
+                  buildWidgetById: _buildWidgetById,
+                  buildChildren: _buildChildren,
+                ),
+              ),
             );
           },
         ),
       ),
     );
+  }
+
+  /// Rendert ein EINZELNES Widget per ID (für ReorderableListView im
+  /// Edit-Mode). Die volle _buildChildren-Logik mit V14-Grouping wird im
+  /// Normal-Modus genutzt; im Edit-Mode rendern wir flat 1-Widget-pro-ID.
+  Widget _buildWidgetById(
+    String id,
+    DashboardWidgetConfig cfg,
+    _DashboardData? data,
+    bool loading,
+  ) {
+    // _buildChildren ist gross + V14-grouped — wir geben einen
+    // Single-Item-Config und filtern dessen Output.
+    final singleCfg = DashboardWidgetConfig(
+      order: [id],
+      visible: {id},
+      version: cfg.version,
+    );
+    final widgets = _buildChildren(singleCfg, data, loading);
+    if (widgets.isEmpty) return const SizedBox.shrink();
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: widgets);
   }
 
   /// Iteriert die User-konfigurierte Reihenfolge und rendert nur sichtbare
@@ -799,3 +845,85 @@ class _MapEmptyTile extends StatelessWidget {
     );
   }
 }
+
+
+// ═══════════════════════════════════════════════════════════════════
+// Edit-Mode Scroll-Body: ReorderableListView wenn editMode, sonst
+// normale Column für volle V14-Grouping-Performance.
+// ═══════════════════════════════════════════════════════════════════
+class _DashboardScrollBody extends ConsumerWidget {
+  const _DashboardScrollBody({
+    required this.cfg,
+    required this.data,
+    required this.loading,
+    required this.isEditMode,
+    required this.buildWidgetById,
+    required this.buildChildren,
+  });
+
+  final DashboardWidgetConfig cfg;
+  final _DashboardData? data;
+  final bool loading;
+  final bool isEditMode;
+  final Widget Function(String, DashboardWidgetConfig, _DashboardData?, bool)
+      buildWidgetById;
+  final List<Widget> Function(DashboardWidgetConfig, _DashboardData?, bool)
+      buildChildren;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!isEditMode) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const DashboardOnboardingTooltip(),
+          ...buildChildren(cfg, data, loading),
+        ],
+      );
+    }
+    final ids = cfg.activeWidgetIds;
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        const SliverToBoxAdapter(child: DashboardEditBanner()),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+          sliver: SliverReorderableList(
+            itemCount: ids.length,
+            proxyDecorator: (child, index, animation) => Material(
+              elevation: 8,
+              color: Colors.transparent,
+              child: Transform.scale(
+                scale: 1.05,
+                child: Opacity(opacity: 0.92, child: child),
+              ),
+            ),
+            onReorder: (oldIndex, newIndex) {
+              ref
+                  .read(dashboardWidgetConfigProvider.notifier)
+                  .reorder(oldIndex, newIndex);
+              HapticFeedback.selectionClick();
+            },
+            itemBuilder: (_, i) {
+              final id = ids[i];
+              return Padding(
+                key: ValueKey('edit-$id'),
+                padding: const EdgeInsets.only(bottom: 14, top: 6),
+                child: DashboardWidgetWrapper(
+                  widgetId: id,
+                  isEditMode: true,
+                  dragIndex: i,
+                  child: buildWidgetById(id, cfg, data, loading),
+                ),
+              );
+            },
+          ),
+        ),
+        const SliverToBoxAdapter(child: DisabledWidgetsBar()),
+        const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
+      ],
+    );
+  }
+}
+

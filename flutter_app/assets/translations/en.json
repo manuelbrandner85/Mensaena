@@ -4,6 +4,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
+    "undo": "Undo",
     "edit": "Edit",
     "close": "Close",
     "back": "Back",
@@ -2512,6 +2513,23 @@
       "1": "Hi! I saw your post „{title}\".",
       "2": "Hey, quick question about your post.",
       "3": "Hi! Can we chat briefly?"
+    }
+  },
+  "dashboard": {
+    "edit": {
+      "title": "Edit Dashboard",
+      "hint": "Drag widgets to rearrange them",
+      "done": "Done",
+      "reset": "Restore Default",
+      "reset_confirm": "Reset dashboard to default? Your layout will be lost.",
+      "reset_yes": "Reset",
+      "reset_no": "Cancel",
+      "add_widget": "Add Widget",
+      "all_active": "All widgets are active",
+      "onboarding": "Long-press the dashboard to rearrange and customize widgets",
+      "onboarding_ok": "Got it",
+      "widget_disabled": "Widget disabled",
+      "widget_enabled": "Widget enabled"
     }
   }
 }

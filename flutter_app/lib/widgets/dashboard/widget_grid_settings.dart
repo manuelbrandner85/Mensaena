@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -8,21 +9,25 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../services/supabase_service.dart';
 import '../effects/glass_card.dart';
 import '../effects/tilt_card.dart';
 
 /// SKILL: mensaena-features
 /// Pendant zu Web `dashboardWidgetStore`. Erlaubt Sichtbarkeit + Reihenfolge
-/// der Dashboard-Widgets pro User zu konfigurieren. Persistiert in
-/// flutter_secure_storage.
+/// der Dashboard-Widgets pro User zu konfigurieren. Persistiert
+/// DUAL: flutter_secure_storage (sofort, offline) + profiles.dashboard_config
+/// (Hintergrund-Sync zu Supabase).
 class DashboardWidgetConfig {
   const DashboardWidgetConfig({
     required this.order,
     required this.visible,
+    this.version = 2,
   });
 
   final List<String> order;
   final Set<String> visible;
+  final int version;
 
   static const _key = 'mensaena_widget_grid_v1';
   static const _storage = FlutterSecureStorage();
@@ -294,40 +299,159 @@ class DashboardWidgetConfig {
       );
 
   static Future<DashboardWidgetConfig> load() async {
+    // 1. Local-First (schnell, offline-fähig)
+    DashboardWidgetConfig local = defaultConfig;
     try {
       final raw = await _storage.read(key: _key);
-      if (raw == null || raw.isEmpty) return defaultConfig;
-      final j = jsonDecode(raw) as Map<String, dynamic>;
-      final order = (j['order'] as List?)?.cast<String>() ??
-          defaultConfig.order;
-      final visible =
-          ((j['visible'] as List?)?.cast<String>() ?? defaultConfig.visible)
-              .toSet();
-      return DashboardWidgetConfig(order: order, visible: visible);
+      if (raw != null && raw.isNotEmpty) {
+        local = _fromJsonString(raw);
+      }
+    } catch (_) {}
+    // 2. Background-Sync: wenn remote.version > local.version → übernehmen
+    unawaited(_syncFromRemote(local).catchError((_) => local));
+    return local;
+  }
+
+  static Future<DashboardWidgetConfig> _syncFromRemote(
+      DashboardWidgetConfig local) async {
+    try {
+      final uid = SupabaseService.currentUser?.id;
+      if (uid == null) return local;
+      final row = await sb
+          .from('profiles')
+          .select('dashboard_config')
+          .eq('id', uid)
+          .maybeSingle();
+      final raw = row?['dashboard_config'];
+      if (raw is! Map || raw.isEmpty) return local;
+      final remote = DashboardWidgetConfig.fromJson(
+          Map<String, dynamic>.from(raw));
+      // Conflict-Resolution: höhere version gewinnt.
+      if (remote.version > local.version) {
+        await remote._writeLocal();
+        return remote;
+      }
+      return local;
+    } catch (_) {
+      return local;
+    }
+  }
+
+  Future<void> _writeLocal() async {
+    try {
+      await _storage.write(key: _key, value: jsonEncode(toJson()));
+    } catch (_) {}
+  }
+
+  Future<void> save() async {
+    await _writeLocal();
+    // Background-Sync zu Supabase — fire-and-forget, ignoriert Fehler.
+    unawaited(_pushRemote().catchError((_) {}));
+  }
+
+  Future<void> _pushRemote() async {
+    try {
+      final uid = SupabaseService.currentUser?.id;
+      if (uid == null) return;
+      await sb
+          .from('profiles')
+          .update({'dashboard_config': toJson()}).eq('id', uid);
+    } catch (_) {}
+  }
+
+  Map<String, dynamic> toJson() => {
+        'order': order,
+        'visible': visible.toList(),
+        'version': version,
+      };
+
+  factory DashboardWidgetConfig.fromJson(Map<String, dynamic> j) {
+    final order = (j['order'] as List?)?.cast<String>() ?? defaultConfig.order;
+    final visible =
+        ((j['visible'] as List?)?.cast<String>() ?? defaultConfig.visible.toList())
+            .toSet();
+    final version = (j['version'] as num?)?.toInt() ?? 1;
+    return DashboardWidgetConfig(
+        order: order, visible: visible, version: version);
+  }
+
+  static DashboardWidgetConfig _fromJsonString(String raw) {
+    try {
+      return DashboardWidgetConfig.fromJson(
+          jsonDecode(raw) as Map<String, dynamic>);
     } catch (_) {
       return defaultConfig;
     }
   }
 
-  Future<void> save() async {
-    try {
-      await _storage.write(
-        key: _key,
-        value: jsonEncode({
-          'order': order,
-          'visible': visible.toList(),
-        }),
-      );
-    } catch (_) {}
+  /// Schnell-Test: ist Widget aktiv UND in order?
+  bool isEnabled(String id) => visible.contains(id);
+
+  /// Reorder gibt eine NEUE Instanz mit bumped version zurück damit
+  /// Sync remote als "neuer" erkennt.
+  DashboardWidgetConfig reorder(int oldIndex, int newIndex) {
+    final list = List<String>.from(order);
+    var ni = newIndex;
+    if (oldIndex < ni) ni -= 1;
+    final id = list.removeAt(oldIndex);
+    list.insert(ni, id);
+    return DashboardWidgetConfig(
+        order: list, visible: visible, version: version + 1);
   }
+
+  DashboardWidgetConfig toggleVisible(String id) {
+    final next = Set<String>.from(visible);
+    if (next.contains(id)) {
+      next.remove(id);
+    } else {
+      next.add(id);
+      // wenn neu hinzugefügt und nicht in order → ans Ende
+      if (!order.contains(id)) {
+        final ord = List<String>.from(order)..add(id);
+        return DashboardWidgetConfig(
+            order: ord, visible: next, version: version + 1);
+      }
+    }
+    return DashboardWidgetConfig(
+        order: order, visible: next, version: version + 1);
+  }
+
+  DashboardWidgetConfig enableWidget(String id) {
+    if (visible.contains(id)) return this;
+    final next = Set<String>.from(visible)..add(id);
+    final ord = order.contains(id)
+        ? List<String>.from(order)
+        : (List<String>.from(order)..add(id));
+    return DashboardWidgetConfig(
+        order: ord, visible: next, version: version + 1);
+  }
+
+  DashboardWidgetConfig disableWidget(String id) {
+    if (!visible.contains(id)) return this;
+    final next = Set<String>.from(visible)..remove(id);
+    return DashboardWidgetConfig(
+        order: order, visible: next, version: version + 1);
+  }
+
+  /// Liste der IDs in Render-Reihenfolge, nur sichtbare.
+  List<String> get activeWidgetIds =>
+      order.where((id) => visible.contains(id)).toList();
+
+  /// Disabled IDs (in Master-Order).
+  List<String> get disabledWidgetIds => all
+      .map((w) => w.id)
+      .where((id) => !visible.contains(id))
+      .toList();
 
   DashboardWidgetConfig copyWith({
     List<String>? order,
     Set<String>? visible,
+    int? version,
   }) {
     return DashboardWidgetConfig(
       order: order ?? this.order,
       visible: visible ?? this.visible,
+      version: version ?? this.version,
     );
   }
 }
@@ -361,34 +485,43 @@ class DashboardWidgetConfigNotifier
 
   Future<void> toggleVisible(String id) async {
     final current = state.value ?? DashboardWidgetConfig.defaultConfig;
-    final newVisible = Set<String>.from(current.visible);
-    if (newVisible.contains(id)) {
-      newVisible.remove(id);
-    } else {
-      newVisible.add(id);
-    }
-    final next = current.copyWith(visible: newVisible);
-    await next.save();
+    final next = current.toggleVisible(id);
     state = AsyncValue.data(next);
+    await next.save();
+  }
+
+  Future<void> enableWidget(String id) async {
+    final current = state.value ?? DashboardWidgetConfig.defaultConfig;
+    final next = current.enableWidget(id);
+    state = AsyncValue.data(next);
+    await next.save();
+  }
+
+  Future<void> disableWidget(String id) async {
+    final current = state.value ?? DashboardWidgetConfig.defaultConfig;
+    final next = current.disableWidget(id);
+    state = AsyncValue.data(next);
+    await next.save();
   }
 
   Future<void> reorder(int oldIndex, int newIndex) async {
     final current = state.value ?? DashboardWidgetConfig.defaultConfig;
-    final list = List<String>.from(current.order);
-    if (oldIndex < newIndex) newIndex -= 1;
-    final id = list.removeAt(oldIndex);
-    list.insert(newIndex, id);
-    final next = current.copyWith(order: list);
-    await next.save();
+    final next = current.reorder(oldIndex, newIndex);
     state = AsyncValue.data(next);
+    await next.save();
   }
 
   Future<void> reset() async {
-    final next = DashboardWidgetConfig.defaultConfig;
-    await next.save();
+    final next = DashboardWidgetConfig.defaultConfig
+        .copyWith(version: (state.value?.version ?? 1) + 1);
     state = AsyncValue.data(next);
+    await next.save();
   }
 }
+
+/// Globaler Edit-Mode-Provider. Dashboard-Home wechselt zwischen normaler
+/// Column und ReorderableListView basierend darauf.
+final isDashboardEditModeProvider = StateProvider<bool>((ref) => false);
 
 // ─────────────────────────────────────────────────────────────
 // Settings-Sheet (Modal)
