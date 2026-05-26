@@ -239,7 +239,7 @@ class _MarketplaceCreateScreenState
     }
 
     if (!mounted) return;
-    context.go('/dashboard/marketplace/$id');
+    context.push('/dashboard/marketplace/$id');
   }
 
   @override

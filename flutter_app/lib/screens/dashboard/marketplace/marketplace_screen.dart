@@ -91,7 +91,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
-        onPressed: () => context.go('/dashboard/marketplace/create'),
+        onPressed: () => context.push('/dashboard/marketplace/create'),
         icon: const Icon(LucideIcons.plus),
         label: Text('marketplace.advertise'.tr()),
       ),
@@ -453,7 +453,7 @@ class _Tile extends ConsumerWidget {
     final isClaimed = item.status == 'claimed' || item.status == 'sold';
     final isReserved = item.status == 'reserved';
     return InkWell(
-      onTap: () => context.go('/dashboard/marketplace/${item.id}'),
+      onTap: () => context.push('/dashboard/marketplace/${item.id}'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(

@@ -113,7 +113,7 @@ class DraftsScreen extends ConsumerWidget {
                       IconButton(
                         tooltip: 'common.edit'.tr(),
                         onPressed: () =>
-                            context.go('/dashboard/posts/${d.id}'),
+                            context.push('/dashboard/posts/${d.id}'),
                         icon: const Icon(LucideIcons.edit2, size: 16),
                       ),
                       IconButton(

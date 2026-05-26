@@ -43,7 +43,7 @@ class TodayEventsWidget extends ConsumerWidget {
         return GlassCard(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
           child: InkWell(
-            onTap: () => context.go('/dashboard/events/${e.id}'),
+            onTap: () => context.push('/dashboard/events/${e.id}'),
             borderRadius: BorderRadius.circular(8),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),

@@ -80,7 +80,7 @@ class BecomeMentorCta extends ConsumerWidget {
                   ),
                   IconButton(
                     onPressed: () =>
-                        context.go('/dashboard/profile/edit'),
+                        context.push('/dashboard/profile/edit'),
                     icon: const Icon(LucideIcons.arrowRight,
                         size: 18, color: AppColors.bronze),
                   ),

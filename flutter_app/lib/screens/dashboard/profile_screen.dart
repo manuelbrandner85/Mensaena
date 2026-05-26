@@ -878,7 +878,7 @@ class _Header extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => context.go('/dashboard/profile/edit'),
+                  onPressed: () => context.push('/dashboard/profile/edit'),
                   icon: const Icon(LucideIcons.edit2, size: 14),
                   label: Text('profile.editProfile'.tr()),
                   style: OutlinedButton.styleFrom(
@@ -891,7 +891,7 @@ class _Header extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => context.go('/dashboard/profile/saved'),
+                  onPressed: () => context.push('/dashboard/profile/saved'),
                   icon: const Icon(LucideIcons.bookmark, size: 14),
                   label: Text('profile.saved'.tr()),
                   style: OutlinedButton.styleFrom(

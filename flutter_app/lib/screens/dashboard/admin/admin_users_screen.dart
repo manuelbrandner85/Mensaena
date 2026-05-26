@@ -822,7 +822,7 @@ class _UserRow extends StatelessWidget {
                 onTap: () {
                   final uid = user['id'] as String?;
                   if (uid != null) {
-                    context.go('/dashboard/profile/$uid');
+                    context.push('/dashboard/profile/$uid');
                   }
                 },
               ),

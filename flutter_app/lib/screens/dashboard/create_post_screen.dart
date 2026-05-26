@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -215,16 +216,41 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final urls = <String>[];
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return urls;
+    final errors = <String>[];
     for (var i = 0; i < _images.length; i++) {
       final file = _images[i];
-      final ext = file.path.split('.').last;
+      // Bug-Fix: ext robust + contentType — sonst lehnt Supabase Upload
+      // teilweise stillschweigend ab.
+      final raw = file.path.split('.').last.toLowerCase();
+      final ext = (raw.length <= 4 && raw.isNotEmpty) ? raw : 'jpg';
+      final contentType = switch (ext) {
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'heic' || 'heif' => 'image/heic',
+        _ => 'image/jpeg',
+      };
       final path = '$uid/${DateTime.now().millisecondsSinceEpoch}-$i.$ext';
       try {
-        await sb.storage.from('post-images').upload(path, file);
+        await sb.storage.from('post-images').upload(
+              path,
+              file,
+              fileOptions:
+                  FileOptions(upsert: false, contentType: contentType),
+            );
         urls.add(sb.storage.from('post-images').getPublicUrl(path));
-      } catch (_) {
-        // Skip einzelnes Bild bei Upload-Fehler.
+      } catch (e) {
+        errors.add('$i: $e');
       }
+    }
+    if (errors.isNotEmpty && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          'Upload-Fehler (${errors.length}/${_images.length}): ${errors.first}',
+          style: AppTypography.body(size: 12, color: AppColors.ink),
+        ),
+      ));
     }
     return urls;
   }
@@ -339,7 +365,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       if (!mounted) return;
       // F4 Micro-Interaction: kurzer Konfetti-Burst zum Feiern.
       CelebrateBurst.fire(context);
-      context.go('/dashboard/posts/$id');
+      context.push('/dashboard/posts/$id');
     } catch (e) {
       if (!mounted) return;
       setState(() {

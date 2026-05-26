@@ -331,16 +331,37 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
     try {
-      final ext = file.path.split('.').last;
+      // Bug-Fix: ext robust extrahieren — Kamera-Files haben oft keine
+      // Extension, dann fällt jpg als Default ein.
+      final raw = file.path.split('.').last.toLowerCase();
+      final ext = (raw.length <= 4 && raw.isNotEmpty) ? raw : 'jpg';
+      final contentType = switch (ext) {
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'heic' || 'heif' => 'image/heic',
+        _ => 'image/jpeg',
+      };
       final path =
           '$uid/$prefix-${DateTime.now().millisecondsSinceEpoch}.$ext';
       await sb.storage.from(bucket).upload(
             path,
             file,
-            fileOptions: const FileOptions(upsert: true),
+            // contentType ist PFLICHT für Supabase-Storage (sonst wird
+            // gelegentlich "octet-stream" als MIME genommen → Web zeigt
+            // den Avatar nicht an).
+            fileOptions: FileOptions(upsert: true, contentType: contentType),
           );
       return sb.storage.from(bucket).getPublicUrl(path);
-    } catch (_) {
+    } catch (e) {
+      // Fehler NICHT mehr silent — User sieht Snackbar mit Fail-Reason.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('Upload fehlgeschlagen: $e',
+              style: AppTypography.body(size: 12, color: AppColors.ink)),
+        ));
+      }
       return null;
     }
   }

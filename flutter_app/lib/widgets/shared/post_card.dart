@@ -230,7 +230,7 @@ class _PostCardState extends ConsumerState<PostCard> {
     final post = widget.post;
     final cfg = _typeConfig(post.type);
     return InkWell(
-      onTap: () => context.go('/dashboard/posts/${post.id}'),
+      onTap: () => context.push('/dashboard/posts/${post.id}'),
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(16),

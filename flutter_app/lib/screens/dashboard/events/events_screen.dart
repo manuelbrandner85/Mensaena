@@ -70,7 +70,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
-        onPressed: () => context.go('/dashboard/events/create'),
+        onPressed: () => context.push('/dashboard/events/create'),
         icon: const Icon(LucideIcons.plus),
         label: Text('events.create'.tr()),
       ),
@@ -189,7 +189,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                             ),
                         ],
                         onMarkerTap: (m) =>
-                            context.go('/dashboard/events/${m.id}'),
+                            context.push('/dashboard/events/${m.id}'),
                       );
                     }
                     if (list.isEmpty) {
@@ -415,7 +415,7 @@ class _EventTile extends StatelessWidget {
     final df = DateFormat('EEE, dd.MM.', 'de');
     final tf = DateFormat('HH:mm');
     return InkWell(
-      onTap: () => context.go('/dashboard/events/${event.id}'),
+      onTap: () => context.push('/dashboard/events/${event.id}'),
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),

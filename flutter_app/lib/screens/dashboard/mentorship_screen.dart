@@ -92,7 +92,7 @@ class MentorshipScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   FilledButton.icon(
                     onPressed: () =>
-                        context.go('/dashboard/mentorship/find'),
+                        context.push('/dashboard/mentorship/find'),
                     icon: const Icon(LucideIcons.search, size: 14),
                     label: Text('mentorship.find_title'.tr()),
                     style: FilledButton.styleFrom(
@@ -155,7 +155,7 @@ class MentorshipScreen extends ConsumerWidget {
                     IconButton(
                       tooltip: 'common.openProfile'.tr(),
                       onPressed: () =>
-                          context.go('/dashboard/profile/$partnerId'),
+                          context.push('/dashboard/profile/$partnerId'),
                       icon: const Icon(LucideIcons.arrowRight, size: 18),
                     ),
                   ]),

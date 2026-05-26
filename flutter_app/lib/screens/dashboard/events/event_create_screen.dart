@@ -309,7 +309,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       setState(() => _error = 'events.createFailed'.tr());
       return;
     }
-    context.go('/dashboard/events/$eventId');
+    context.push('/dashboard/events/$eventId');
   }
 
   // ── Build ─────────────────────────────────────────────────

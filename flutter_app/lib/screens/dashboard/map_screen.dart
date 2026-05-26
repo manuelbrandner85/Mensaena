@@ -1576,7 +1576,7 @@ class _PostBottomSheet extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.go('/dashboard/posts/${post.id}');
+                      context.push('/dashboard/posts/${post.id}');
                     },
                     icon: const Icon(LucideIcons.arrowRight, size: 16),
                     label: Text('common.open'.tr()),

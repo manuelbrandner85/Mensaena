@@ -72,7 +72,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
       });
       return;
     }
-    context.go('/dashboard/groups/$id');
+    context.push('/dashboard/groups/$id');
   }
 
   @override

@@ -82,7 +82,7 @@ class _SmartReplySheetState extends State<SmartReplySheet> {
     }
     if (!mounted) return;
     Navigator.of(context).pop();
-    context.go('/dashboard/messages/$convId');
+    context.push('/dashboard/messages/$convId');
   }
 
   @override

@@ -1120,7 +1120,7 @@ class _AppearanceTab extends ConsumerWidget {
         const _SleepReminderSection(),
         const SizedBox(height: 16),
         OutlinedButton.icon(
-          onPressed: () => context.go('/dashboard/account'),
+          onPressed: () => context.push('/dashboard/account'),
           icon: const Icon(LucideIcons.userCog, size: 16),
           label: Text('account.title'.tr()),
           style: OutlinedButton.styleFrom(
@@ -1131,7 +1131,7 @@ class _AppearanceTab extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
-          onPressed: () => context.go('/dashboard/karma-history'),
+          onPressed: () => context.push('/dashboard/karma-history'),
           icon: const Icon(LucideIcons.history, size: 16),
           label: Text('karma.history_title'.tr()),
           style: OutlinedButton.styleFrom(
@@ -1153,7 +1153,7 @@ class _AppearanceTab extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
-          onPressed: () => context.go('/dashboard/scheduled-calls'),
+          onPressed: () => context.push('/dashboard/scheduled-calls'),
           icon: const Icon(LucideIcons.phoneCall, size: 16),
           label: Text('scheduled_calls.title'.tr()),
           style: OutlinedButton.styleFrom(
@@ -1164,7 +1164,7 @@ class _AppearanceTab extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
-          onPressed: () => context.go('/dashboard/my-drafts'),
+          onPressed: () => context.push('/dashboard/my-drafts'),
           icon: const Icon(LucideIcons.fileText, size: 16),
           label: Text('posts.drafts'.tr()),
           style: OutlinedButton.styleFrom(
@@ -1175,7 +1175,7 @@ class _AppearanceTab extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
-          onPressed: () => context.go('/dashboard/voicemail'),
+          onPressed: () => context.push('/dashboard/voicemail'),
           icon: const Icon(LucideIcons.voicemail, size: 16),
           label: Text('voicemail.title'.tr()),
           style: OutlinedButton.styleFrom(
@@ -1186,7 +1186,7 @@ class _AppearanceTab extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
-          onPressed: () => context.go('/dashboard/live/scheduled'),
+          onPressed: () => context.push('/dashboard/live/scheduled'),
           icon: const Icon(LucideIcons.calendarClock, size: 16),
           label: Text('live.scheduled_title'.tr()),
           style: OutlinedButton.styleFrom(
@@ -1207,7 +1207,7 @@ class _AppearanceTab extends ConsumerWidget {
               padding: const EdgeInsets.only(top: 8),
               child: OutlinedButton.icon(
                 onPressed: () =>
-                    context.go('/dashboard/admin/crash-logs'),
+                    context.push('/dashboard/admin/crash-logs'),
                 icon: const Icon(LucideIcons.bug, size: 16),
                 label: Text('admin.crash_logs'.tr()),
                 style: OutlinedButton.styleFrom(

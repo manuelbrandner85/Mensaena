@@ -128,7 +128,7 @@ class _EventRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.go('/dashboard/events/${event.id}'),
+      onTap: () => context.push('/dashboard/events/${event.id}'),
       borderRadius: BorderRadius.circular(10),
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),

@@ -60,7 +60,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
-        onPressed: () => context.go('/dashboard/groups/create'),
+        onPressed: () => context.push('/dashboard/groups/create'),
         icon: const Icon(LucideIcons.plus),
         label: Text('groups.create'.tr()),
       ),
@@ -153,7 +153,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                                       _search = '';
                                     })
                                 : () =>
-                                    context.go('/dashboard/groups/create'),
+                                    context.push('/dashboard/groups/create'),
                           ),
                         ],
                       );
@@ -183,7 +183,7 @@ class _Tile extends StatelessWidget {
   Widget build(BuildContext context) {
     final avatarUrl = group.avatarUrl ?? group.bannerUrl;
     return InkWell(
-      onTap: () => context.go('/dashboard/groups/${group.id}'),
+      onTap: () => context.push('/dashboard/groups/${group.id}'),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),

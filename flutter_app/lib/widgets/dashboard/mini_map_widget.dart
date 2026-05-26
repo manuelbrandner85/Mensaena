@@ -132,7 +132,7 @@ class MiniMapWidget extends StatelessWidget {
                 ],
                 initialZoom: 9,
                 onMarkerTap: (m) =>
-                    context.go('/dashboard/posts/${m.id}'),
+                    context.push('/dashboard/posts/${m.id}'),
               ),
             ),
           ),

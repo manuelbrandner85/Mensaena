@@ -288,7 +288,7 @@ class _ChannelTile extends ConsumerWidget {
     return InkWell(
       onTap: convId == null
           ? null
-          : () => context.go('/dashboard/messages/$convId'),
+          : () => context.push('/dashboard/messages/$convId'),
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -526,7 +526,7 @@ class _DmTile extends ConsumerWidget {
     final accent = CinemaAccents.hue(phase);
 
     return InkWell(
-      onTap: () => context.go('/dashboard/messages/$id'),
+      onTap: () => context.push('/dashboard/messages/$id'),
       // F1c: Long-Press → Action-Sheet mit Verstecken + Endgueltig loeschen
       onLongPress: isDm
           ? () => _showDmActions(context, ref, id, title,
