@@ -1779,7 +1779,18 @@
   "live": {
     "connectionFailed": "Connection failed",
     "waitingParticipants": "Waiting for participants …",
-    "tooltipLeave": "Leave"
+    "tooltipLeave": "Leave",
+    "scheduled_title": "Scheduled livestreams",
+    "schedule_title": "Schedule stream",
+    "schedule_title_field": "Title",
+    "schedule_description": "Description (optional)",
+    "schedule_button": "Schedule stream",
+    "no_scheduled": "No scheduled streams.",
+    "pick_time": "Pick date & time",
+    "reminder_on": "Remind me",
+    "reminder_off": "Remove reminder",
+    "clip_save": "Save clip",
+    "clip_saved": "Clip saved."
   },
   "call": {
     "incoming": "Incoming call",

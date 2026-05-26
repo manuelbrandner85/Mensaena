@@ -1778,7 +1778,18 @@
   "live": {
     "connectionFailed": "Verbindung fehlgeschlagen",
     "waitingParticipants": "Warte auf Teilnehmer:innen …",
-    "tooltipLeave": "Verlassen"
+    "tooltipLeave": "Verlassen",
+    "scheduled_title": "Geplante Livestreams",
+    "schedule_title": "Stream planen",
+    "schedule_title_field": "Titel",
+    "schedule_description": "Beschreibung (optional)",
+    "schedule_button": "Stream planen",
+    "no_scheduled": "Keine geplanten Streams.",
+    "pick_time": "Datum & Uhrzeit wählen",
+    "reminder_on": "Erinnern",
+    "reminder_off": "Erinnerung entfernen",
+    "clip_save": "Clip speichern",
+    "clip_saved": "Clip wurde gespeichert."
   },
   "call": {
     "incoming": "Eingehender Anruf",
