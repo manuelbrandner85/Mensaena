@@ -49,6 +49,7 @@ import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/become_mentor_cta.dart';
 import '../../../widgets/dashboard/daily_challenges_widget.dart';
+import '../../../widgets/dashboard/nearby_neighbors_widget.dart';
 import '../../../widgets/dashboard/today_events_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
@@ -571,6 +572,10 @@ class _DashboardHomeScreenState
           out.add(const DailyChallengesWidget());
           addSpacing();
           out.add(const BecomeMentorCta());
+          addSpacing();
+          // D1: Neu in deiner Nachbarschaft — Avatar-Reihe der letzten
+          // 5-10 Neu-Anmeldungen im 50km-Umkreis (letzte 14 Tage).
+          out.add(const NearbyNeighborsWidget());
           addSpacing();
           break;
         case 'nearby_posts':

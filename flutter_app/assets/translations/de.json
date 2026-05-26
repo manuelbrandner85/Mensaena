@@ -2530,6 +2530,9 @@
       "3": "Hallo! Können wir kurz schreiben?"
     }
   },
+  "neighbors": {
+    "title": "Neu in deiner Nachbarschaft"
+  },
   "friend": {
     "request": "Freundschaft anfragen",
     "request_again": "Erneut anfragen",
