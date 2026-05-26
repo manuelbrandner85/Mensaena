@@ -1811,7 +1811,9 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset",
     "dayLength": "Daylight",
-    "goldenHour": "✨ Golden Hour"
+    "goldenHour": "✨ Golden Hour",
+    "pathTitle": "Sun position today",
+    "solarNoon": "Solar noon"
   },
   "quote": {
     "title": "Quote of the day",

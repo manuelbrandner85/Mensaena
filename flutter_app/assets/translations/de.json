@@ -1810,7 +1810,9 @@
     "sunrise": "Aufgang",
     "sunset": "Untergang",
     "dayLength": "Taglicht",
-    "goldenHour": "✨ Golden Hour"
+    "goldenHour": "✨ Golden Hour",
+    "pathTitle": "Sonnenstand heute",
+    "solarNoon": "Höchststand"
   },
   "quote": {
     "title": "Zitat des Tages",
