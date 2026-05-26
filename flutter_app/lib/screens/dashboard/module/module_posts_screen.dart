@@ -40,12 +40,17 @@ class ModulePostsScreen extends ConsumerStatefulWidget {
     this.subtitle,
     this.subFilters = const [],
     this.quickActions = const [],
+    this.moduleKey,
     super.key,
   });
 
   final String title;
   final String emoji;
   final String postType;
+  /// Optional: zusaetzlich nach posts.module_key filtern (Versorgung/Harvest
+  /// erstellt Posts mit type=sharing|community|rescue + module_key=harvest).
+  /// Wenn gesetzt, wird OR-Filter type=X OR module_key=Y verwendet.
+  final String? moduleKey;
   final String route;
   final String? subtitle;
   final List<FilterOption<String>> subFilters;
@@ -71,11 +76,17 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
 
   Future<List<Post>> _load() async {
     try {
-      final rows = await sb
-          .from('posts')
-          .select()
-          .eq('type', widget.postType)
-          .eq('status', 'active')
+      // Wenn moduleKey gesetzt: OR-Filter (type=X ODER module_key=Y) — so
+      // erscheinen auch Posts die aus dem Modul-Wizard mit anderen Type-Werten
+      // (z.B. harvest → type=sharing) erstellt wurden, sobald sie module_key
+      // gesetzt haben.
+      var q = sb.from('posts').select().eq('status', 'active');
+      if (widget.moduleKey != null) {
+        q = q.or('type.eq.${widget.postType},module_key.eq.${widget.moduleKey}');
+      } else {
+        q = q.eq('type', widget.postType);
+      }
+      final rows = await q
           .order('created_at', ascending: false)
           .limit(100);
       return (rows as List)

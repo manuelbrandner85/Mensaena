@@ -162,9 +162,12 @@ class _ChallengeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = progress?.currentCount ?? 0;
-    final ratio = challenge.targetCount > 0
-        ? (current / challenge.targetCount).clamp(0.0, 1.0)
-        : 0.0;
+    // BUGFIX: DB hat keine target_count-Spalte. Statt dessen nutzen wir
+    // max_participants als implizites Ziel (oder fall-back 1 = "geschafft
+    // sobald 1 mal getan"). UI rechnet current/maxParticipants.
+    final target = challenge.maxParticipants ?? 1;
+    final ratio =
+        target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
     final completed = progress?.completed ?? false;
     final isJoined = progress != null;
 
@@ -188,12 +191,12 @@ class _ChallengeTile extends StatelessWidget {
                   color: AppColors.amber.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(challenge.type,
+                child: Text(challenge.category ?? challenge.difficulty ?? '—',
                     style: AppTypography.label(size: 9)),
               ),
               const Spacer(),
-              if (challenge.pointsReward != null)
-                Text('+${challenge.pointsReward} P',
+              if (challenge.points != null)
+                Text('+${challenge.points} P',
                     style: AppTypography.mono(
                       size: 13,
                       color: AppColors.amber,
@@ -239,7 +242,7 @@ class _ChallengeTile extends StatelessWidget {
           Row(
             children: [
               Text(
-                '$current / ${challenge.targetCount}',
+                '$current / $target',
                 style: AppTypography.mono(
                   size: 11,
                   color: AppColors.inkSoft,

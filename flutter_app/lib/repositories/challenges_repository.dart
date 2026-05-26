@@ -13,10 +13,13 @@ class ChallengesRepository {
 
   static Future<List<Challenge>> listActive() async {
     try {
+      // BUGFIX: DB-Schema nutzt status='active' (TEXT), KEINE is_active-
+      // Bool-Spalte. Vorher: .eq('is_active', true) lieferte immer leer →
+      // Admin-aktive Challenges erschienen nicht im Modul.
       final rows = await sb
           .from('challenges')
           .select()
-          .eq('is_active', true)
+          .eq('status', 'active')
           .order('created_at', ascending: false)
           .limit(50);
       return (rows as List)

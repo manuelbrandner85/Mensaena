@@ -561,6 +561,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           title: 'nav.harvest'.tr(),
           emoji: '🌾',
           postType: 'supply',
+          moduleKey: 'harvest',
           route: '/dashboard/harvest',
           quickActions: const [
             ModuleQuickAction(

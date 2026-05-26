@@ -462,7 +462,7 @@ class _PostsTabState extends State<_PostsTab> {
       final rows = await sb
           .from('posts')
           .select()
-          .eq('author_id', widget.userId)
+          .eq('user_id', widget.userId)
           .eq('status', 'active')
           .order('created_at', ascending: false)
           .limit(50);

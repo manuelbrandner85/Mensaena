@@ -48,6 +48,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   final MapController _mapController = MapController();
   LatLng _center = _defaultCenter;
+  // Separate GPS-Position (User-Standort) — wird NUR bei expliziter GPS-
+  // Abfrage gesetzt, NICHT beim Pan. Sonst "wandert" der User-Pin.
+  LatLng? _gpsLocation;
   double _zoom = 6;
   int _radiusKm = 10;
   List<Post> _posts = const [];
@@ -55,8 +58,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   String? _error;
   bool _hasGps = false;
 
-  // V1 — Kategorie-Filter
-  final Set<String> _activeTypes = <String>{};
+  // V1 — Kategorie-Filter: standardmaessig alle 9 Typen aktiv (User-Wunsch).
+  // Wird beim ersten Tap auf einen Chip auf Single-Select-Style umgeschaltet.
+  static const Set<String> _allTypes = {
+    'crisis',
+    'help_request',
+    'help_offered',
+    'rescue',
+    'animal',
+    'housing',
+    'mobility',
+    'sharing',
+    'mental',
+  };
+  final Set<String> _activeTypes = {..._allTypes};
 
   // V2 — Suchfeld
   bool _searchOpen = false;
@@ -325,6 +340,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       if (!mounted) return;
       setState(() {
         _center = LatLng(pos.latitude, pos.longitude);
+        _gpsLocation = LatLng(pos.latitude, pos.longitude);
         _zoom = _radiusZoom[_radiusKm] ?? 12;
         _hasGps = true;
       });
@@ -459,6 +475,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final loc = LatLng(pos.latitude, pos.longitude);
       setState(() {
         _center = loc;
+        _gpsLocation = loc;
         _hasGps = true;
       });
       _mapController.move(loc, _radiusZoom[_radiusKm] ?? 13);
@@ -584,9 +601,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Timer(const Duration(milliseconds: 600), () {
                     final newCenter = _mapController.camera.center;
                     if (!mounted) return;
+                    // BUGFIX: nur _center updaten, NICHT _hasGps oder
+                    // _gpsLocation — der User-Pin bleibt fix am echten
+                    // GPS-Standort, _center bewegt sich mit der Karte.
                     setState(() {
                       _center = newCenter;
-                      _hasGps = true;
                     });
                     _loadPosts();
                   });
@@ -645,11 +664,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       .toList(),
                 ),
               // V4 — eigener Standort als blauer Google-Style-Punkt
-              if (_hasGps)
+              // BUGFIX: rendert _gpsLocation (statisch nach GPS-Lookup),
+              // NICHT _center (wandert beim Pan).
+              if (_gpsLocation != null)
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: _center,
+                      point: _gpsLocation!,
                       width: 24,
                       height: 24,
                       child: Container(
