@@ -52,18 +52,46 @@ class ChatInputBar extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: controller,
-                    maxLines: null,
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => onSend(),
-                    onChanged: (_) => onTextChanged(),
-                    style: AppTypography.body(
-                        size: 14, color: AppColors.ink),
-                    decoration: InputDecoration(
-                      hintText: 'chat.messageHint'.tr(),
-                      isDense: true,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        maxLines: null,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (_) => onSend(),
+                        onChanged: (_) => onTextChanged(),
+                        style: AppTypography.body(
+                            size: 14, color: AppColors.ink),
+                        decoration: InputDecoration(
+                          hintText: 'chat.messageHint'.tr(),
+                          isDense: true,
+                        ),
+                      ),
+                      // F87: Char-Counter sichtbar ab 800 Zeichen
+                      AnimatedBuilder(
+                        animation: controller,
+                        builder: (_, __) {
+                          final len = controller.text.length;
+                          if (len < 800) return const SizedBox.shrink();
+                          final overLimit = len >= 2000;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              '$len',
+                              style: AppTypography.body(
+                                size: 10,
+                                color: overLimit
+                                    ? AppColors.herzrotWarm
+                                    : AppColors.mute,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 // Voice-Diktat → Text-Composer.
