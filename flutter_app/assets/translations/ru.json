@@ -1497,7 +1497,10 @@
     "monthsAgo": "{n} мес назад",
     "gpsOffTitle": "Геолокация недоступна",
     "gpsOffBody": "Включи GPS, чтобы видеть ближайшие посты",
-    "gpsActivate": "Включить"
+    "gpsActivate": "Включить",
+    "airQualityTooltip": "Качество воздуха здесь",
+    "airQualityTitle": "Качество воздуха",
+    "airQualityEmpty": "Нет данных о качестве воздуха."
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",

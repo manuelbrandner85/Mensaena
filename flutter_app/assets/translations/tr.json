@@ -1497,7 +1497,10 @@
     "monthsAgo": "{n} ay önce",
     "gpsOffTitle": "Konum yok",
     "gpsOffBody": "Yakındaki gönderiler için GPS'i aç",
-    "gpsActivate": "Aç"
+    "gpsActivate": "Aç",
+    "airQualityTooltip": "Buradaki hava kalitesi",
+    "airQualityTitle": "Hava kalitesi",
+    "airQualityEmpty": "Hava kalitesi verisi yok."
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",

@@ -18,6 +18,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
+import '../../services/air_quality_service.dart';
 import '../../services/location_service.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -289,6 +290,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ? _posts
       : _posts.where((p) => _activeTypes.contains(p.type)).toList();
 
+  /// F61: zeigt Luftqualitaet (Open-Meteo) am aktuellen Map-Center.
+  Future<void> _showAirQualitySheet() async {
+    final center = _mapController.camera.center;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => _AirQualitySheet(lat: center.latitude, lng: center.longitude),
+    );
+  }
+
   Future<void> _recenterOnGps() async {
     try {
       final pos = await LocationService.getCurrentPosition(
@@ -347,11 +361,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return DashboardScaffold(
       title: 'map.screenTitle'.tr(),
       currentRoute: '/dashboard/map',
-      fab: FloatingActionButton(
-        backgroundColor: AppColors.amber,
-        foregroundColor: AppColors.voidColor,
-        onPressed: _recenterOnGps,
-        child: const Icon(LucideIcons.locate),
+      fab: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // F61: Air-Quality am aktuellen Map-Center
+          FloatingActionButton.small(
+            heroTag: 'aq_fab',
+            backgroundColor: AppColors.tealSoft,
+            foregroundColor: AppColors.voidColor,
+            onPressed: _showAirQualitySheet,
+            tooltip: 'map.airQualityTooltip'.tr(),
+            child: const Icon(LucideIcons.wind),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            heroTag: 'gps_fab',
+            backgroundColor: AppColors.amber,
+            foregroundColor: AppColors.voidColor,
+            onPressed: _recenterOnGps,
+            child: const Icon(LucideIcons.locate),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -1412,6 +1442,157 @@ extension _A11ySheet on _MapScreenState {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// F61: Air-Quality-Bottom-Sheet — listet aktuelle Schadstoffwerte am Punkt.
+class _AirQualitySheet extends StatefulWidget {
+  const _AirQualitySheet({required this.lat, required this.lng});
+  final double lat;
+  final double lng;
+
+  @override
+  State<_AirQualitySheet> createState() => _AirQualitySheetState();
+}
+
+class _AirQualitySheetState extends State<_AirQualitySheet> {
+  late Future<List<AirQualitySample>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future =
+        AirQualityService.nearby(lat: widget.lat, lng: widget.lng);
+  }
+
+  String _labelFor(String code) {
+    switch (code) {
+      case 'pm25':
+        return 'PM2.5';
+      case 'pm10':
+        return 'PM10';
+      case 'o3':
+        return 'Ozon';
+      case 'no2':
+        return 'NO₂';
+      case 'so2':
+        return 'SO₂';
+      case 'co':
+        return 'CO';
+      default:
+        return code.toUpperCase();
+    }
+  }
+
+  Color _colorFor(String code, double v) {
+    // grobe WHO/EEA-Grenzen — gruen = gut, gelb = mittel, rot = schlecht.
+    double good = 50, mid = 100;
+    if (code == 'pm25') {
+      good = 10;
+      mid = 25;
+    } else if (code == 'pm10') {
+      good = 20;
+      mid = 50;
+    } else if (code == 'o3') {
+      good = 60;
+      mid = 120;
+    } else if (code == 'no2') {
+      good = 25;
+      mid = 50;
+    }
+    if (v <= good) return AppColors.leben;
+    if (v <= mid) return AppColors.amber;
+    return AppColors.herzrotWarm;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.wind,
+                  size: 20, color: AppColors.tealSoft),
+              const SizedBox(width: 8),
+              Text('map.airQualityTitle'.tr(),
+                  style: AppTypography.display(
+                      size: 18, color: AppColors.ink)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${widget.lat.toStringAsFixed(3)}, ${widget.lng.toStringAsFixed(3)} · Open-Meteo',
+            style: AppTypography.caption(),
+          ),
+          const SizedBox(height: 14),
+          FutureBuilder<List<AirQualitySample>>(
+            future: _future,
+            builder: (context, snap) {
+              if (snap.connectionState != ConnectionState.done) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 30),
+                  child: Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.tealSoft),
+                    ),
+                  ),
+                );
+              }
+              final list = snap.data ?? const <AirQualitySample>[];
+              if (list.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text('map.airQualityEmpty'.tr(),
+                      style: AppTypography.caption()),
+                );
+              }
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: list.map((s) {
+                  final color = _colorFor(s.parameter, s.value);
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border:
+                          Border.all(color: color.withValues(alpha: 0.45)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(_labelFor(s.parameter),
+                            style: AppTypography.body(
+                                size: 11,
+                                color: color,
+                                weight: FontWeight.w700)),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${s.value.toStringAsFixed(1)} ${s.unit}',
+                          style: AppTypography.body(
+                              size: 14,
+                              color: AppColors.ink,
+                              weight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

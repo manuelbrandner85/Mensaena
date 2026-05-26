@@ -1563,6 +1563,9 @@
     "gpsOffTitle": "Location unavailable",
     "gpsOffBody": "Enable GPS to see nearby posts",
     "gpsActivate": "Activate",
+    "airQualityTooltip": "Air quality here",
+    "airQualityTitle": "Air quality",
+    "airQualityEmpty": "No air-quality data available.",
     "a11y": {
       "unnamed": "Unnamed place",
       "source": "Source: OpenStreetMap (wheelchair tag)",

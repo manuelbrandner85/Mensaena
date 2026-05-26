@@ -1498,7 +1498,10 @@
     "monthsAgo": "il y a {n} mois",
     "gpsOffTitle": "Position indisponible",
     "gpsOffBody": "Active le GPS pour voir les posts proches",
-    "gpsActivate": "Activer"
+    "gpsActivate": "Activer",
+    "airQualityTooltip": "Qualité de l'air ici",
+    "airQualityTitle": "Qualité de l'air",
+    "airQualityEmpty": "Pas de données de qualité de l'air."
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",

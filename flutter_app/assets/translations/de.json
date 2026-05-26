@@ -1562,6 +1562,9 @@
     "gpsOffTitle": "Standort nicht verfügbar",
     "gpsOffBody": "Aktiviere GPS für Posts in deiner Nähe",
     "gpsActivate": "Aktivieren",
+    "airQualityTooltip": "Luftqualität hier",
+    "airQualityTitle": "Luftqualität",
+    "airQualityEmpty": "Keine Luftqualitäts-Daten verfügbar.",
     "a11y": {
       "unnamed": "Ort ohne Namen",
       "source": "Quelle: OpenStreetMap (wheelchair-Tag)",
