@@ -304,6 +304,7 @@
     "profileNotFound": "Profil bulunamadı.",
     "nameLabel": "İsim",
     "appVersionLabel": "UYGULAMA SÜRÜMÜ",
+    "bugReport": "Hata bildir",
     "errorPrefix": "Hata: {error}",
     "profileVisibility": "Profil görünürlüğü",
     "locationLabel": "Konum",
@@ -957,6 +958,7 @@
     "allPosts": "Tüm gönderiler",
     "linkCopied": "Bağlantı panoya kopyalandı",
     "readTime": "{min} dk okuma",
+    "createFirst": "İlk gönderiyi oluştur",
     "loadingNearby": "Yakındaki gönderiler yükleniyor…",
     "activeNearby": "{count}{more} yakında aktif",
     "searchHint": "Gönderilerde ara…",
@@ -1511,7 +1513,8 @@
     "tileStyleTopo": "Stil: Topo rölyefi",
     "savePinTitle": "İğne kaydet",
     "savePinHint": "ör. favori kafe, buluşma noktası…",
-    "removePin": "İğneyi sil"
+    "removePin": "İğneyi sil",
+    "longPressHint": "İpucu: kendi iğneni kaydetmek için haritaya uzun bas."
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",

@@ -8,6 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -97,6 +98,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final pins = await SavedPinsService.all();
     if (!mounted) return;
     setState(() => _savedPins = pins);
+    // F90: einmal pro Install zeigen wir den Long-Press-Hinweis als Snackbar.
+    if (pins.isEmpty) _maybeShowPinHint();
+  }
+
+  static const _pinHintKey = 'mensaena_map_pin_hint_v1';
+  Future<void> _maybeShowPinHint() async {
+    try {
+      const storage = FlutterSecureStorage();
+      final shown = await storage.read(key: _pinHintKey);
+      if (shown == 'true') return;
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 5),
+        backgroundColor: AppColors.surface,
+        content: Text('map.longPressHint'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+      await storage.write(key: _pinHintKey, value: 'true');
+    } catch (_) {}
   }
 
   /// F64: Long-Press auf Map → Dialog "Pin speichern?" mit Label-Eingabe.

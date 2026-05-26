@@ -304,6 +304,7 @@
     "profileNotFound": "Perfil no encontrado.",
     "nameLabel": "Nombre",
     "appVersionLabel": "VERSIÓN DE LA APP",
+    "bugReport": "Reportar un error",
     "errorPrefix": "Error: {error}",
     "profileVisibility": "Visibilidad del perfil",
     "locationLabel": "Ubicación",
@@ -958,6 +959,7 @@
     "allPosts": "Todas las publicaciones",
     "linkCopied": "Enlace copiado al portapapeles",
     "readTime": "{min} min de lectura",
+    "createFirst": "Crear primera publicación",
     "loadingNearby": "Cargando publicaciones cerca de ti…",
     "activeNearby": "{count}{more} activas cerca de ti",
     "searchHint": "Buscar publicaciones…",
@@ -1512,7 +1514,8 @@
     "tileStyleTopo": "Estilo: Relieve topográfico",
     "savePinTitle": "Guardar pin",
     "savePinHint": "p. ej. cafetería favorita, punto de encuentro…",
-    "removePin": "Borrar pin"
+    "removePin": "Borrar pin",
+    "longPressHint": "Tip: mantén pulsado el mapa para guardar tu propio pin."
   },
   "calendar": {
     "noEvents": "No hay eventos en el calendario.",

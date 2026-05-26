@@ -386,8 +386,12 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
             description: _hasActiveFilters
                 ? 'posts.resetOrChange'.tr()
                 : 'posts.beFirst'.tr(),
-            actionLabel: _hasActiveFilters ? 'posts.resetFilter'.tr() : null,
-            onAction: _hasActiveFilters ? _resetAll : null,
+            actionLabel: _hasActiveFilters
+                ? 'posts.resetFilter'.tr()
+                : 'posts.createFirst'.tr(),
+            onAction: _hasActiveFilters
+                ? _resetAll
+                : () => context.go('/dashboard/create'),
           ),
         ],
       );

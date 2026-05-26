@@ -304,6 +304,7 @@
     "profileNotFound": "Profil nicht gefunden.",
     "nameLabel": "Name",
     "appVersionLabel": "APP-VERSION",
+    "bugReport": "Bug melden",
     "checkForUpdate": "Nach Update suchen",
     "checkingForUpdate": "Suche nach Updates …",
     "patchReady": "Patch #{n} bereit — bitte App neustarten",
@@ -961,6 +962,7 @@
     "allPosts": "Alle Beiträge",
     "linkCopied": "Link in Zwischenablage kopiert",
     "readTime": "{min} Min. Lesezeit",
+    "createFirst": "Ersten Beitrag erstellen",
     "loadingNearby": "Lade Beiträge in deiner Nähe…",
     "activeNearby": "{count}{more} aktiv in deiner Nähe",
     "searchHint": "Beiträge durchsuchen…",
@@ -1576,6 +1578,7 @@
     "savePinTitle": "Pin speichern",
     "savePinHint": "z. B. Lieblings-Café, Treffpunkt …",
     "removePin": "Pin löschen",
+    "longPressHint": "Tipp: Lange auf die Karte tippen → eigenen Pin speichern.",
     "a11y": {
       "unnamed": "Ort ohne Namen",
       "source": "Quelle: OpenStreetMap (wheelchair-Tag)",

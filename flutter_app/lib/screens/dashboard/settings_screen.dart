@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show SignOutScope, UserAttributes;
 
 import '../../config/theme/app_colors.dart';
@@ -191,6 +192,29 @@ class _AccountTab extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.amber,
             side: BorderSide(color: AppColors.amber.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // F88: Bug-Report via mailto
+        OutlinedButton.icon(
+          onPressed: () async {
+            final info = await PackageInfo.fromPlatform();
+            final body =
+                '\n\n---\nApp: ${info.version} (${info.buildNumber})\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
+            final uri = Uri(
+              scheme: 'mailto',
+              path: 'kontakt@mensaena.de',
+              query: 'subject=Bug-Report Mensaena App&body=${Uri.encodeComponent(body)}',
+            );
+            await launchUrl(uri);
+          },
+          icon: const Icon(LucideIcons.bug, size: 14),
+          label: Text('settings.bugReport'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.herzrotWarm,
+            side: BorderSide(
+                color: AppColors.herzrotWarm.withValues(alpha: 0.5)),
             minimumSize: const Size.fromHeight(44),
           ),
         ),

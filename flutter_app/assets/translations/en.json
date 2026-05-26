@@ -304,6 +304,7 @@
     "profileNotFound": "Profile not found.",
     "nameLabel": "Name",
     "appVersionLabel": "APP VERSION",
+    "bugReport": "Report a bug",
     "checkForUpdate": "Check for update",
     "checkingForUpdate": "Checking for updates …",
     "patchReady": "Patch #{n} ready — please restart the app",
@@ -962,6 +963,7 @@
     "allPosts": "All posts",
     "linkCopied": "Link copied to clipboard",
     "readTime": "{min} min read",
+    "createFirst": "Create first post",
     "loadingNearby": "Loading posts near you…",
     "activeNearby": "{count}{more} active near you",
     "searchHint": "Search posts…",
@@ -1577,6 +1579,7 @@
     "savePinTitle": "Save pin",
     "savePinHint": "e.g. favourite café, meeting spot…",
     "removePin": "Remove pin",
+    "longPressHint": "Tip: long-press the map to save your own pin.",
     "a11y": {
       "unnamed": "Unnamed place",
       "source": "Source: OpenStreetMap (wheelchair tag)",

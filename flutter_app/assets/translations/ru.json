@@ -304,6 +304,7 @@
     "profileNotFound": "Профиль не найден.",
     "nameLabel": "Имя",
     "appVersionLabel": "ВЕРСИЯ ПРИЛОЖЕНИЯ",
+    "bugReport": "Сообщить об ошибке",
     "errorPrefix": "Ошибка: {error}",
     "profileVisibility": "Видимость профиля",
     "locationLabel": "Местоположение",
@@ -957,6 +958,7 @@
     "allPosts": "Все объявления",
     "linkCopied": "Ссылка скопирована",
     "readTime": "Чтение ~{min} мин",
+    "createFirst": "Создать первое объявление",
     "loadingNearby": "Загружаю объявления рядом…",
     "activeNearby": "{count}{more} активных рядом",
     "searchHint": "Поиск по объявлениям…",
@@ -1511,7 +1513,8 @@
     "tileStyleTopo": "Стиль: Топо-рельеф",
     "savePinTitle": "Сохранить точку",
     "savePinHint": "напр. любимое кафе, место встречи…",
-    "removePin": "Удалить точку"
+    "removePin": "Удалить точку",
+    "longPressHint": "Подсказка: долгое нажатие на карту сохраняет вашу точку."
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",
