@@ -1,5 +1,5 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-05-22 (Flutter Phase 3.1 – Dashboard Home + Scaffold)
+> Aktualisiert: 2026-05-26 (Phase 4 Mega-Roadmap KOMPLETT — 28 Features)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
@@ -53,6 +53,12 @@ LAST_TASK=feat(modul-audit Sprint 5): WikipediaBox-Widget (Post-Detail bei Anima
 - [x] Phase 5.5 – Account-Deletion + Data-Export (2026-05-24): _DangerTab umgebaut zu StatefulWidget; _exportData parallel-fetch von profile/posts/comments/messages/interactions/trust_ratings/notifications/saved_posts/badges → JSON via Share.shareXFiles (DSGVO Art. 20); _deleteAccount 3-Stage-Flow (Warning → typed "LOESCHEN" → RPC delete_my_account mit Fallback auf is_banned/anonymize)
 - [x] Phase 5.6 – Multi-Image-Carousel in PostCard + Post-Detail (2026-05-24): ImageCarousel-Widget (PageView + Index-Counter top-right + animated Indicator-Dots bottom + Tap-zur-Lightbox); Post-Model um imageUrls erweitert (image_urls[] Spalte) + allImageUrls Getter (image_urls + media_urls merged); PostCard zeigt Carousel zwischen Description und Action-Bar; Post-Detail Hero nutzt jetzt shared ImageCarousel statt eigenes PageView
 - [x] Phase 5.7 – Comments-Reply-Nested (2026-05-24): _buildCommentTree depth-1 (Roots + indented Replies via parent_id-Map); _CommentTile.onReply setzt _replyToParentId+_replyToAuthor; Reply-Banner ueber _CommentInput mit Author-Name + X zum Abbrechen; PostCommentsRepository.add nimmt parentId
+- [x] Phase 4 Mega-Roadmap KOMPLETT (2026-05-26): 28 Features ueber 4 Sub-Phasen — Quick-Wins, Core Community, Karten/APIs, Module. Alle on-device wo moeglich (Streak/Detox/Karma/Gratitude/Heatmap/QuickNote/Affirmation/MoonPhase/SavedPins) — keine DB-Migrationen noetig. i18n in allen 7 Sprachen (de/en/es/fr/it/ru/tr). flutter analyze = 0 issues durchgehend.
+  - **Phase 1 Quick-Wins (6):** F4 Micro-Interactions/Konfetti · F7 Skeletonizer-Migration · F15 Biometric App-Lock · F20 Accessibility-Suite (TextScale + ReduceMotion + HighContrast) · F38 Login-Streak · F41 Digital Detox
+  - **Phase 2 Core Community (8):** F30 Gratitude Journal · F31 Karma Points System (5 Levels: Nachbar/Helfer/Stuetze/Anker/Leuchtturm) · F33 Activity-Heatmap (12-Wochen Contribution-Grid) · F40 Wochenrueckblick (7d vs 7d-davor) · F45 Quick-Note (Sticky-Note) · F46 Personal-Best Lifetime-Spitzenwerte · F47 Tages-Affirmation (7er-Pool) · F48 Release-Notes-Sheet
+  - **Phase 3 Karten/APIs (6):** F50 Help-Streak (Tage in Folge mit Hilfe) · F60 Mondphase-Widget (Astro-Math) · F61 Air-Quality-Layer (Open-Meteo PM2.5/PM10/O3/NO2/SO2/CO) · F62 Map-Tile-Style-Toggle (Auto/Voyager/Topo) · F63 Sun-Path-Sheet (Halbkreis-Diagramm) · F64 Saved-Pins (Long-Press → User-Marker)
+  - **Phase 4 Module (12):** F70 Activity-Heatmap im Profile-Screen · F80 Mood-Streak Badge · F81 Profile-Share-Button · F82 Post-Copy-Link · F83 Read-Time-Chip (≥60 Worte) · F84 Notification-Tab persistent · F85 Posts-Filter persistent · F86 Today-Events-Widget · F87 Chat-Char-Counter · F88 Settings Bug-Report mailto · F89 Posts-Empty-State CTA · F90 Map-Pin-Hint
+  - **Infra-Fixes (2):** flutter.yml + shorebird_patch.yml Retry-Backoff 5x bei 5xx/Network-Errors fuer app_releases-Insert; src/app/sitemap.ts Per-Query AbortController 20s + Limit 5000→1000 — verhindert dass langsame Supabase-Edge den Build crasht
 - [x] Phase 6 – LiveKit-Secrets Setup (2026-05-24): User hat KEY+SECRET aus /opt/livekit/docker-compose.yaml via `docker compose config | awk '/keys:/{f=1;next}/redis:/{f=0}f'` extrahiert (Key APImsn6f2c8fd70b21c369, Secret 40-char). Verifikation gegen wss://livekit.mensaena.de: HMAC-Signature wird akzeptiert (Permission-denied bei CreateRoom ist erwartet, da Token nur roomJoin hat — fuer echte Calls reicht das). INSERT in private.push_config; Edge-Function-Diagnose zeigt has_key:true, has_secret:true.
 
 ## Sofort-Massnahmen Top 5
