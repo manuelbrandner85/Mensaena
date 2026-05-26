@@ -1565,6 +1565,10 @@
     "airQualityTooltip": "Luftqualität hier",
     "airQualityTitle": "Luftqualität",
     "airQualityEmpty": "Keine Luftqualitäts-Daten verfügbar.",
+    "tileStyleTooltip": "Karten-Stil wechseln",
+    "tileStyleAuto": "Karten-Stil: Automatisch (Hell/Dunkel)",
+    "tileStyleVoyager": "Karten-Stil: Voyager",
+    "tileStyleTopo": "Karten-Stil: Topo-Relief",
     "a11y": {
       "unnamed": "Ort ohne Namen",
       "source": "Quelle: OpenStreetMap (wheelchair-Tag)",

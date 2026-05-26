@@ -1501,7 +1501,11 @@
     "gpsActivate": "Activar",
     "airQualityTooltip": "Calidad del aire aquí",
     "airQualityTitle": "Calidad del aire",
-    "airQualityEmpty": "Sin datos de calidad del aire."
+    "airQualityEmpty": "Sin datos de calidad del aire.",
+    "tileStyleTooltip": "Cambiar estilo del mapa",
+    "tileStyleAuto": "Estilo: Automático (claro/oscuro)",
+    "tileStyleVoyager": "Estilo: Voyager",
+    "tileStyleTopo": "Estilo: Relieve topográfico"
   },
   "calendar": {
     "noEvents": "No hay eventos en el calendario.",

@@ -1566,6 +1566,10 @@
     "airQualityTooltip": "Air quality here",
     "airQualityTitle": "Air quality",
     "airQualityEmpty": "No air-quality data available.",
+    "tileStyleTooltip": "Switch map style",
+    "tileStyleAuto": "Map style: Auto (light/dark)",
+    "tileStyleVoyager": "Map style: Voyager",
+    "tileStyleTopo": "Map style: Topo relief",
     "a11y": {
       "unnamed": "Unnamed place",
       "source": "Source: OpenStreetMap (wheelchair tag)",

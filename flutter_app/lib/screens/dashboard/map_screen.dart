@@ -66,6 +66,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   // V11 — Heatmap-Toggle
   bool _showHeatmap = false;
 
+  // F62 — Tile-Style: 0=auto (light/dark via theme), 1=Voyager, 2=Topo
+  int _tileStyle = 0;
+
   // V3 — FMTC-Ready Flag fuer Tile-Cache
   bool _fmtcReady = false;
 
@@ -350,9 +353,33 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   String _tileUrl(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark
-        ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    switch (_tileStyle) {
+      case 1:
+        return 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      case 2:
+        return 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png';
+      case 0:
+      default:
+        return isDark
+            ? 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    }
+  }
+
+  /// F62: cycle through 3 tile styles.
+  void _cycleTileStyle() {
+    setState(() {
+      _tileStyle = (_tileStyle + 1) % 3;
+    });
+    final names = [
+      'map.tileStyleAuto',
+      'map.tileStyleVoyager',
+      'map.tileStyleTopo',
+    ];
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: const Duration(seconds: 1),
+      content: Text(names[_tileStyle].tr()),
+    ));
   }
 
   @override
@@ -364,6 +391,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       fab: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // F62: Tile-Style cyclen (Auto → Voyager → Topo)
+          FloatingActionButton.small(
+            heroTag: 'tile_fab',
+            backgroundColor: AppColors.bronze,
+            foregroundColor: AppColors.voidColor,
+            onPressed: _cycleTileStyle,
+            tooltip: 'map.tileStyleTooltip'.tr(),
+            child: const Icon(LucideIcons.layers),
+          ),
+          const SizedBox(height: 10),
           // F61: Air-Quality am aktuellen Map-Center
           FloatingActionButton.small(
             heroTag: 'aq_fab',

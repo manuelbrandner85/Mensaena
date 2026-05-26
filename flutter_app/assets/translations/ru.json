@@ -1500,7 +1500,11 @@
     "gpsActivate": "Включить",
     "airQualityTooltip": "Качество воздуха здесь",
     "airQualityTitle": "Качество воздуха",
-    "airQualityEmpty": "Нет данных о качестве воздуха."
+    "airQualityEmpty": "Нет данных о качестве воздуха.",
+    "tileStyleTooltip": "Сменить стиль карты",
+    "tileStyleAuto": "Стиль: Авто (свет/тёмный)",
+    "tileStyleVoyager": "Стиль: Voyager",
+    "tileStyleTopo": "Стиль: Топо-рельеф"
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",
