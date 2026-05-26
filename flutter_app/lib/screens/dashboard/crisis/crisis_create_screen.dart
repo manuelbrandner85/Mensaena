@@ -96,11 +96,56 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
     }
   }
 
+  Future<bool> _confirmLocation() async {
+    // K1: GPS-Bestätigung VOR dem Insert — User soll explizit bestätigen
+    // dass die gemeldete Krise an der angegebenen Position passiert.
+    // Verhindert Falschmeldungen mit alter/falscher Location.
+    final hasGps = _lat != null && _lng != null;
+    final hint = hasGps
+        ? 'GPS-Position: ${_lat!.toStringAsFixed(5)}, ${_lng!.toStringAsFixed(5)}'
+        : _location.text.trim().isEmpty
+            ? 'Keine Position angegeben — die Krise wird ohne Standort gemeldet.'
+            : 'Adresse: ${_location.text.trim()}';
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dCtx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        icon: const Icon(LucideIcons.mapPin,
+            size: 32, color: AppColors.herzrotWarm),
+        title: Text('Bist du HIER?',
+            textAlign: TextAlign.center,
+            style: AppTypography.display(size: 18, color: AppColors.ink)),
+        content: Text(hint,
+            textAlign: TextAlign.center,
+            style: AppTypography.body(
+                size: 13, color: AppColors.inkSoft, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dCtx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dCtx, true),
+            icon: const Icon(LucideIcons.check, size: 14),
+            label: const Text('Ja, hier melden'),
+            style: FilledButton.styleFrom(
+                backgroundColor: AppColors.herzrotWarm,
+                foregroundColor: Colors.white),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
   Future<void> _submit() async {
     if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
       setState(() => _error = 'crisis.fieldTitleRequired'.tr());
       return;
     }
+    // K1: GPS-Bestätigung
+    final confirmed = await _confirmLocation();
+    if (!confirmed) return;
     setState(() {
       _submitting = true;
       _error = null;
