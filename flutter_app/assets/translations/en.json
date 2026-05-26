@@ -1805,6 +1805,7 @@
     "logNow": "Log",
     "loadError": "Couldn't load history.",
     "empty": "No entries yet. Tap Log to start.",
+    "streakBadge": "🔥 {count} days",
     "helpTitle": "You are not alone 💚",
     "helpHint": "You've reported a heavy mood the last few days. If you'd like to talk: Telefonseelsorge is free and anonymous, 24/7.",
     "callTelefonseelsorge": "Call 0800 111 0 111"

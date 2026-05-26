@@ -97,6 +97,37 @@ class MoodRepository {
     return result;
   }
 
+  /// F80: zaehlt aufeinanderfolgende Tage mit Mood-Eintrag.
+  /// Heute zaehlt nur wenn schon geloggt — sonst startet ab gestern.
+  static Future<int> moodStreak() async {
+    final entries = await history(limit: 60);
+    if (entries.isEmpty) return 0;
+    final days = <String>{};
+    for (final e in entries) {
+      final d = e.createdAt.toLocal();
+      days.add(
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}');
+    }
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    String dayKey(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    DateTime cursor;
+    if (days.contains(dayKey(today))) {
+      cursor = today;
+    } else if (days.contains(dayKey(today.subtract(const Duration(days: 1))))) {
+      cursor = today.subtract(const Duration(days: 1));
+    } else {
+      return 0;
+    }
+    int streak = 0;
+    while (days.contains(dayKey(cursor))) {
+      streak += 1;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
+
   /// True wenn der User die letzten 3 Tage jeweils mood ≤ 2 hatte.
   /// Auslöser für Telefonseelsorge-Hinweis.
   static Future<bool> hasNegativeStreak() async {

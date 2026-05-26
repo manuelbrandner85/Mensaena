@@ -1803,7 +1803,8 @@
     "chartTitle": "Stimmungs-Verlauf (7T)",
     "logNow": "Eintragen",
     "loadError": "Konnte Verlauf nicht laden.",
-    "empty": "Noch keine Einträge. Tippe „Eintragen“ oben rechts.",
+    "empty": "Noch keine Einträge. Tippe „Eintragen\" oben rechts.",
+    "streakBadge": "🔥 {count} Tage",
     "helpTitle": "Du bist nicht allein 💚",
     "helpHint": "Du hast die letzten Tage schwere Stimmung eingetragen. Wenn du reden möchtest: Die Telefonseelsorge ist kostenlos und anonym 24/7 erreichbar.",
     "callTelefonseelsorge": "0800 111 0 111 anrufen"

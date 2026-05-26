@@ -17,6 +17,10 @@ final _mood7dProvider = FutureProvider<List<double?>>((ref) async {
   return MoodRepository.last7Days();
 });
 
+final _moodStreakProvider = FutureProvider<int>((ref) async {
+  return MoodRepository.moodStreak();
+});
+
 class MoodChartWidget extends ConsumerWidget {
   const MoodChartWidget({super.key});
 
@@ -38,12 +42,38 @@ class MoodChartWidget extends ConsumerWidget {
                       size: 13,
                       color: AppColors.ink,
                       weight: FontWeight.w700)),
+              const SizedBox(width: 6),
+              Consumer(builder: (_, ref, __) {
+                final streak = ref.watch(_moodStreakProvider);
+                final count = streak.maybeWhen(
+                    data: (n) => n, orElse: () => 0);
+                if (count <= 1) return const SizedBox.shrink();
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.bronze.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                  ),
+                  child: Text(
+                    'mood.streakBadge'.tr(namedArgs: {'count': '$count'}),
+                    style: AppTypography.body(
+                      size: 10,
+                      color: AppColors.bronze,
+                      weight: FontWeight.w700,
+                    ),
+                  ),
+                );
+              }),
               const Spacer(),
               TextButton.icon(
                 onPressed: () async {
                   final ok = await MoodCheckInDialog.show(context);
                   if (ok == true) {
                     ref.invalidate(_mood7dProvider);
+                    ref.invalidate(_moodStreakProvider);
                   }
                 },
                 icon: const Icon(LucideIcons.plus, size: 12),
