@@ -123,6 +123,8 @@ class PostsRepository {
         final esc = query.trim().replaceAll('%', r'\%');
         q = q.or('title.ilike.%$esc%,description.ilike.%$esc%');
       }
+      final nowIso = DateTime.now().toIso8601String();
+      q = q.or('expires_at.is.null,expires_at.gt.$nowIso');
       final rows = await q
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
@@ -139,10 +141,12 @@ class PostsRepository {
 
   static Future<List<Post>> _latestActive({int limit = 10}) async {
     try {
+      final nowIso = DateTime.now().toIso8601String();
       final rows = await sb
           .from('posts')
           .select()
           .eq('status', 'active')
+          .or('expires_at.is.null,expires_at.gt.$nowIso')
           .order('created_at', ascending: false)
           .limit(limit);
       final posts = (rows as List)
