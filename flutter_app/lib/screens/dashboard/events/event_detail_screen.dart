@@ -30,6 +30,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/event_attendees_section.dart';
+import '../../../widgets/events/event_photos_gallery.dart';
 import '../../../widgets/events/event_qr_checkin_sheet.dart';
 import '../../../widgets/event_countdown.dart';
 import '../../../widgets/event_reminder_widget.dart';
@@ -311,6 +312,13 @@ class _EventDetailBody extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: EventAttendeesSection(eventId: event.id),
+          ),
+
+          // ── 10b) Foto-Galerie (P9 F94) ──────────────────────────
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: EventPhotosGallery(eventId: event.id),
           ),
 
           // ── 11) Action-Bar ───────────────────────────────────────

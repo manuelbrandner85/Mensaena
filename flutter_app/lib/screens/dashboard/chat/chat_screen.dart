@@ -20,6 +20,7 @@ import '../../../services/haptics.dart';
 import '../../../services/presence_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
+import '../../../widgets/chat/mentions_autocomplete.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/video_preview_modal.dart';
@@ -936,6 +937,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   },
                 ),
               ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: MentionsAutocomplete(
+                controller: _ctrl,
+                conversationId: widget.conversationId,
+              ),
+            ),
             ChatInputBar(
               controller: _ctrl,
               conversationId: widget.conversationId,
