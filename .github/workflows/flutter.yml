@@ -512,6 +512,10 @@ jobs:
       # 403 werfen könnte).
       - name: Update versioned APK asset
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.rel_check.outputs.exists == 'true'
+        # WICHTIG: job-default working-directory ist flutter_app/, die
+        # APK wurde aber in $GITHUB_WORKSPACE (Repo-Root) kopiert →
+        # absoluter Pfad nötig.
+        working-directory: ${{ github.workspace }}
         run: |
           gh release upload "${{ steps.apk.outputs.tag }}" \
             "mensaena-v${{ steps.apk.outputs.version }}.apk" \
@@ -537,6 +541,7 @@ jobs:
 
       - name: Publish latest GitHub Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: ${{ github.workspace }}
         run: |
           gh release upload latest "mensaena-release.apk" \
             --repo "${{ github.repository }}" --clobber
