@@ -115,6 +115,8 @@
   "profile": {
     "myProfile": "Profilim",
     "editProfile": "Profili düzenle",
+    "share": "Profili paylaş",
+    "shareMessage": "{name} adlı kişiyi Mensaena'da gör: {url}",
     "saved": "Kaydedildi",
     "name": "İsim",
     "bio": "Hakkımda",

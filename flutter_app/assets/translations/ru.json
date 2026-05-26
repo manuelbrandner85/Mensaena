@@ -115,6 +115,8 @@
   "profile": {
     "myProfile": "Мой профиль",
     "editProfile": "Редактировать профиль",
+    "share": "Поделиться профилем",
+    "shareMessage": "Посмотрите профиль {name} на Mensaena: {url}",
     "saved": "Сохранённое",
     "name": "Имя",
     "bio": "О себе",

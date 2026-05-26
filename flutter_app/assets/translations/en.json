@@ -115,6 +115,8 @@
   "profile": {
     "myProfile": "My Profile",
     "editProfile": "Edit profile",
+    "share": "Share profile",
+    "shareMessage": "Check out {name} on Mensaena: {url}",
     "saved": "Saved",
     "name": "Name",
     "bio": "About me",

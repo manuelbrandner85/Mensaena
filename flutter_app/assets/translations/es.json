@@ -115,6 +115,8 @@
   "profile": {
     "myProfile": "Mi perfil",
     "editProfile": "Editar perfil",
+    "share": "Compartir perfil",
+    "shareMessage": "Mira a {name} en Mensaena: {url}",
     "saved": "Guardado",
     "name": "Nombre",
     "bio": "Sobre mí",

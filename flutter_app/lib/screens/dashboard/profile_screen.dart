@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../widgets/effects/tilt_card.dart';
 
@@ -747,6 +748,23 @@ class _Header extends StatelessWidget {
                       userId: profile.id),
                 ],
               ),
+            ),
+            // F81: Share-Profil-Button rechts oben in der Header-Row
+            IconButton(
+              tooltip: 'profile.share'.tr(),
+              onPressed: () {
+                final name =
+                    profile.displayName ?? profile.name ?? 'Mensaena';
+                final url =
+                    'https://www.mensaena.de/dashboard/profile/${profile.id}';
+                Share.share(
+                  'profile.shareMessage'
+                      .tr(namedArgs: {'name': name, 'url': url}),
+                  subject: name,
+                );
+              },
+              icon: const Icon(LucideIcons.share2,
+                  size: 18, color: AppColors.mute),
             ),
           ],
         ),
