@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
+
 import '../repositories/extra_repositories.dart';
 import 'supabase_service.dart';
 
@@ -120,6 +122,32 @@ class DmCallService {
         'ended_at': DateTime.now().toUtc().toIso8601String(),
       }).eq('id', callId);
     } catch (_) {}
+  }
+
+  /// Versteckt einen einzelnen Anruf im Verlauf des aktuellen Users
+  /// (per-side soft-hide, kein Hard-Delete).
+  static Future<bool> hideCallForMe(String callId) async {
+    try {
+      final r = await sb.rpc<dynamic>('hide_dm_call_for_me',
+          params: {'p_call_id': callId});
+      return r == true;
+    } catch (e) {
+      debugPrint('[hideCallForMe] failed: $e');
+      return false;
+    }
+  }
+
+  /// Räumt den kompletten Verlauf des aktuellen Users.
+  static Future<int?> hideAllCallsForMe() async {
+    try {
+      final r = await sb.rpc<dynamic>('hide_all_dm_calls_for_me');
+      if (r is int) return r;
+      if (r is num) return r.toInt();
+      return 0;
+    } catch (e) {
+      debugPrint('[hideAllCallsForMe] failed: $e');
+      return null;
+    }
   }
 }
 

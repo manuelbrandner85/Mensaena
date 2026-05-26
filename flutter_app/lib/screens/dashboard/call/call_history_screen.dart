@@ -55,9 +55,10 @@ class _CallHistoryScreenState extends ConsumerState<CallHistoryScreen> {
           .from('dm_calls')
           .select('id, caller_id, callee_id, call_type, status, '
               'created_at, answered_at, ended_at, conversation_id, room_name, '
+              'caller_hidden_at, callee_hidden_at, '
               'caller:profiles!dm_calls_caller_id_fkey(id,display_name,name,avatar_url),'
               'callee:profiles!dm_calls_callee_id_fkey(id,display_name,name,avatar_url)')
-          .or('caller_id.eq.$myId,callee_id.eq.$myId')
+          .or('and(caller_id.eq.$myId,caller_hidden_at.is.null),and(callee_id.eq.$myId,callee_hidden_at.is.null)')
           .order('created_at', ascending: false)
           .limit(30);
       return List<Map<String, dynamic>>.from(rows as List);
@@ -67,13 +68,69 @@ class _CallHistoryScreenState extends ConsumerState<CallHistoryScreen> {
         final rows = await sb
             .from('dm_calls')
             .select()
-            .or('caller_id.eq.$myId,callee_id.eq.$myId')
+            .or('and(caller_id.eq.$myId,caller_hidden_at.is.null),and(callee_id.eq.$myId,callee_hidden_at.is.null)')
             .order('created_at', ascending: false)
             .limit(30);
         return List<Map<String, dynamic>>.from(rows as List);
       } catch (_) {
         return const <Map<String, dynamic>>[];
       }
+    }
+  }
+
+  Future<void> _hideOne(String callId) async {
+    final ok = await DmCallService.hideCallForMe(callId);
+    if (!mounted) return;
+    if (ok) {
+      setState(_load);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('common.failed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
+    }
+  }
+
+  Future<void> _clearAll() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dCtx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('callHistory.clearAllTitle'.tr(),
+            style: AppTypography.body(
+                size: 15, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text('callHistory.clearAllBody'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dCtx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dCtx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: Text('common.delete'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final count = await DmCallService.hideAllCallsForMe();
+    if (!mounted) return;
+    if (count != null) {
+      setState(_load);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('callHistory.cleared'.tr(namedArgs: {'n': '$count'}),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('common.failed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
     }
   }
 
@@ -117,10 +174,47 @@ class _CallHistoryScreenState extends ConsumerState<CallHistoryScreen> {
               return ListView.separated(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-                itemCount: list.length,
+                itemCount: list.length + 1,
                 separatorBuilder: (_, __) => const SizedBox(height: 6),
-                itemBuilder: (_, i) =>
-                    _CallRow(row: list[i], myId: myId ?? ''),
+                itemBuilder: (ctx, i) {
+                  if (i == 0) {
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _clearAll,
+                        icon: const Icon(LucideIcons.trash2,
+                            size: 14, color: AppColors.herzrotWarm),
+                        label: Text(
+                          'callHistory.clearAll'.tr(),
+                          style: AppTypography.body(
+                              size: 12,
+                              color: AppColors.herzrotWarm,
+                              weight: FontWeight.w600),
+                        ),
+                      ),
+                    );
+                  }
+                  final row = list[i - 1];
+                  final id = row['id'] as String;
+                  return Dismissible(
+                    key: ValueKey('call-$id'),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: AppColors.herzrot.withValues(alpha: 0.18),
+                        border: Border.all(
+                            color: AppColors.herzrot.withValues(alpha: 0.4)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(LucideIcons.trash2,
+                          color: AppColors.herzrot, size: 20),
+                    ),
+                    onDismissed: (_) => _hideOne(id),
+                    child: _CallRow(row: row, myId: myId ?? ''),
+                  );
+                },
               );
             },
           ),

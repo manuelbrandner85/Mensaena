@@ -1954,7 +1954,11 @@
     "statusEnded": "Ended",
     "callbackNoConv": "No conversation found",
     "callbackFailed": "Callback failed",
-    "openHistory": "Open call history"
+    "openHistory": "Open call history",
+    "clearAll": "Clear history",
+    "clearAllTitle": "Clear call history?",
+    "clearAllBody": "All calls will be removed from your history. Other participants keep their own history.",
+    "cleared": "{n} calls removed."
   },
   "videoPreview": {
     "title": "Video call to {name}",

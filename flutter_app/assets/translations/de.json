@@ -1953,7 +1953,11 @@
     "statusEnded": "Beendet",
     "callbackNoConv": "Keine Konversation gefunden",
     "callbackFailed": "Rückruf fehlgeschlagen",
-    "openHistory": "Anrufverlauf öffnen"
+    "openHistory": "Anrufverlauf öffnen",
+    "clearAll": "Verlauf löschen",
+    "clearAllTitle": "Anrufverlauf löschen?",
+    "clearAllBody": "Alle Anrufe werden aus deinem Verlauf entfernt. Andere Teilnehmer behalten ihren eigenen Verlauf.",
+    "cleared": "{n} Anrufe entfernt."
   },
   "videoPreview": {
     "title": "Videoanruf an {name}",

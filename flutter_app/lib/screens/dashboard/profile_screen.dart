@@ -95,6 +95,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               );
             }
             final p = snap.data;
+            // Robust own-profile-check: zusätzlich zur Route-Heuristik
+            // (widget.userId leer) auch profile.id gegen aktuelle Session
+            // vergleichen. Sonst zeigt /dashboard/profile/<my-uid> Block-/
+            // Report-Buttons auf dem EIGENEN Profil.
+            final myUid = SupabaseService.currentUser?.id;
+            final effectiveIsMe =
+                isMe || (p != null && myUid != null && p.id == myUid);
             if (p == null) {
               // Wenn eigenes Profil + nicht gefunden: vermutlich JWT abgelaufen
               // oder profile-Row fehlt. Biete Retry-Button + Logout-Hinweis.
@@ -140,7 +147,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                  child: _Header(profile: p, isMe: isMe),
+                  child: _Header(profile: p, isMe: effectiveIsMe),
                 ),
                 TabBar(
                   controller: _tab,
@@ -160,7 +167,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                   child: TabBarView(
                     controller: _tab,
                     children: [
-                      _AboutTab(profile: p, isMe: isMe),
+                      _AboutTab(profile: p, isMe: effectiveIsMe),
                       _PostsTab(userId: p.id),
                       _RatingsTab(userId: p.id),
                       _BadgesTab(userId: p.id),
