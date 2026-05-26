@@ -2250,7 +2250,15 @@
   },
   "polls": {
     "total_votes": "{n} votes",
-    "closed": "Poll closed · {n} votes"
+    "closed": "Poll closed · {n} votes",
+    "create_title": "Create poll",
+    "question": "Question",
+    "option_n": "Option {n}",
+    "add_option": "Add option",
+    "add_to_post": "Attach poll",
+    "no_close": "Keep open",
+    "duration_hours": "{n} h",
+    "duration_days": "{n} days"
   },
   "notif": {
     "send_test": "Send test notification",

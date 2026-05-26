@@ -18,6 +18,7 @@ import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/post/post_contact_actions.dart';
+import '../../widgets/posts/poll_create_sheet.dart';
 import '../../widgets/posts/post_poll_widget.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/wikipedia_box.dart';
@@ -575,6 +576,8 @@ class _Hero extends StatelessWidget {
         ),
         // Phase 7: Inline-Poll (rendert nichts wenn keine poll für post)
         PostPollWidget(postId: post.id),
+        if (post.userId == SupabaseService.currentUser?.id)
+          _AddPollButton(postId: post.id),
         // Wikipedia-Box: Such-Term aus erstem Tag oder Titel-Keyword.
         if (post.tags.isNotEmpty || post.type == 'animal') ...[
           const SizedBox(height: 14),
@@ -609,6 +612,30 @@ class _Hero extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _AddPollButton extends ConsumerWidget {
+  const _AddPollButton({required this.postId});
+  final String postId;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton.icon(
+        onPressed: () async {
+          final ok = await PollCreateSheet.show(context, postId: postId);
+          if (ok == true) {
+            // PostPollWidget liest via _pollProvider(postId) — neu fetchen.
+            // Wir wissen den genauen Provider-Key nicht, also komplett refresh.
+            ref.invalidate(postPollProvider(postId));
+          }
+        },
+        icon: const Icon(LucideIcons.barChart3, size: 14),
+        label: Text('polls.add_to_post'.tr()),
+        style: TextButton.styleFrom(foregroundColor: AppColors.bronze),
+      ),
     );
   }
 }

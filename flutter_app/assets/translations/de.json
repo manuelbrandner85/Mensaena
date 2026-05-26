@@ -2249,7 +2249,15 @@
   },
   "polls": {
     "total_votes": "{n} Stimmen",
-    "closed": "Abstimmung beendet · {n} Stimmen"
+    "closed": "Abstimmung beendet · {n} Stimmen",
+    "create_title": "Abstimmung erstellen",
+    "question": "Frage",
+    "option_n": "Option {n}",
+    "add_option": "Option hinzufügen",
+    "add_to_post": "Abstimmung anhängen",
+    "no_close": "Offen lassen",
+    "duration_hours": "{n} h",
+    "duration_days": "{n} Tage"
   },
   "notif": {
     "send_test": "Test-Benachrichtigung senden",

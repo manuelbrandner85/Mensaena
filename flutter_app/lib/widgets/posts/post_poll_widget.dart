@@ -11,8 +11,8 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 
-class _PollData {
-  const _PollData({
+class PollData {
+  const PollData({
     required this.pollId,
     required this.question,
     required this.options,
@@ -32,8 +32,8 @@ class _PollData {
       closesAt != null && closesAt!.isBefore(DateTime.now());
 }
 
-final _pollProvider =
-    FutureProvider.autoDispose.family<_PollData?, String>((ref, postId) async {
+final postPollProvider =
+    FutureProvider.autoDispose.family<PollData?, String>((ref, postId) async {
   try {
     final pollRow = await sb
         .from('post_polls')
@@ -60,7 +60,7 @@ final _pollProvider =
         if (v['user_id'] == myId) mine = idx;
       }
     }
-    return _PollData(
+    return PollData(
       pollId: pollId,
       question: pollRow['question'] as String? ?? '',
       options: opts,
@@ -79,7 +79,7 @@ class PostPollWidget extends ConsumerWidget {
   const PostPollWidget({required this.postId, super.key});
   final String postId;
 
-  Future<void> _vote(WidgetRef ref, _PollData poll, int idx) async {
+  Future<void> _vote(WidgetRef ref, PollData poll, int idx) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null || poll.isClosed) return;
     try {
@@ -96,13 +96,13 @@ class PostPollWidget extends ConsumerWidget {
             .eq('poll_id', poll.pollId)
             .eq('user_id', uid);
       }
-      ref.invalidate(_pollProvider(postId));
+      ref.invalidate(postPollProvider(postId));
     } catch (_) {}
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(_pollProvider(postId)).maybeWhen(
+    return ref.watch(postPollProvider(postId)).maybeWhen(
           data: (poll) {
             if (poll == null) return const SizedBox.shrink();
             return Container(
