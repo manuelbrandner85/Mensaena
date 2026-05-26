@@ -1830,6 +1830,14 @@
     "sheetHint": "Bir cümle yeterli. Bu notları sadece sen görürsün — cihazında kalır.",
     "placeholder": "ör. nazik bir arama, güneş, küçük bir yardım…"
   },
+  "personalBest": {
+    "title": "Kişisel rekorun",
+    "subtitle": "Tüm zamanların en iyileri — bunlarla gurur duy.",
+    "helps": "Toplam yardım",
+    "posts": "Gönderi",
+    "streak": "En uzun seri",
+    "bestDay": "En iyi gün"
+  },
   "moon": {
     "title": "Ay",
     "illumination": "Aydınlanma",

@@ -41,6 +41,7 @@ import '../../../widgets/dashboard/streak_widget.dart';
 import '../../../widgets/dashboard/activity_heatmap_widget.dart';
 import '../../../widgets/dashboard/help_streak_widget.dart';
 import '../../../widgets/dashboard/moon_widget.dart';
+import '../../../widgets/dashboard/personal_best_widget.dart';
 import '../../../widgets/dashboard/quick_note_widget.dart';
 import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
@@ -499,6 +500,10 @@ class _DashboardHomeScreenState
           break;
         case 'moon':
           out.add(const MoonWidget());
+          addSpacing();
+          break;
+        case 'personalBest':
+          out.add(const PersonalBestWidget());
           addSpacing();
           break;
         case 'nearby_posts':

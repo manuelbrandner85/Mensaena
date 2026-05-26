@@ -1831,6 +1831,14 @@
     "sheetHint": "Una frase basta. Solo tú ves estas notas — se quedan en tu dispositivo.",
     "placeholder": "p. ej. una llamada amable, el sol, una mano amiga…"
   },
+  "personalBest": {
+    "title": "Tu mejor marca",
+    "subtitle": "Récords de toda la vida — siéntete orgulloso/a.",
+    "helps": "Ayudas totales",
+    "posts": "Publicaciones",
+    "streak": "Mejor racha",
+    "bestDay": "Mejor día"
+  },
   "moon": {
     "title": "Luna",
     "illumination": "Iluminación",

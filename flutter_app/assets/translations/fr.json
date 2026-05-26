@@ -1831,6 +1831,14 @@
     "sheetHint": "Une phrase suffit. Toi seul·e vois ces notes — elles restent sur ton appareil.",
     "placeholder": "p. ex. un appel sympa, du soleil, un coup de main…"
   },
+  "personalBest": {
+    "title": "Ton meilleur score",
+    "subtitle": "Records à vie — sois-en fier·e.",
+    "helps": "Aides au total",
+    "posts": "Publications",
+    "streak": "Plus longue série",
+    "bestDay": "Meilleur jour"
+  },
   "moon": {
     "title": "Lune",
     "illumination": "Illumination",

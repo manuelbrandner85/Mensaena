@@ -1922,7 +1922,8 @@
       "heatmap": "Aktivitäts-Heatmap",
       "quickNote": "Notizzettel",
       "helpStreak": "Hilfe-Streak",
-      "moon": "Mondphase"
+      "moon": "Mondphase",
+      "personalBest": "Persönliche Bestleistung"
     },
     "descriptions": {
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
@@ -1960,7 +1961,8 @@
       "heatmap": "12-Wochen-Übersicht deiner täglichen Aktivität",
       "quickNote": "Privater Notizzettel, nur auf deinem Gerät",
       "helpStreak": "Aufeinanderfolgende Tage, an denen du geholfen hast",
-      "moon": "Heutige Mondphase und Beleuchtungsgrad"
+      "moon": "Heutige Mondphase und Beleuchtungsgrad",
+      "personalBest": "Deine Lifetime-Spitzenwerte als Motivator"
     }
   },
   "hubs": {
@@ -2061,6 +2063,14 @@
     "sheetTitle": "Heute bin ich dankbar für…",
     "sheetHint": "Ein Satz reicht. Nur du siehst diese Einträge — sie bleiben auf deinem Gerät.",
     "placeholder": "z. B. einen freundlichen Anruf, Sonnenstrahl, Hilfe…"
+  },
+  "personalBest": {
+    "title": "Deine Bestleistung",
+    "subtitle": "Lifetime-Rekorde — sei stolz darauf.",
+    "helps": "Hilfen gesamt",
+    "posts": "Beiträge",
+    "streak": "Längste Streak",
+    "bestDay": "Bester Tag"
   },
   "moon": {
     "title": "Mond",

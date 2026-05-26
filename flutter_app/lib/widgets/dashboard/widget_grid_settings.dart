@@ -250,6 +250,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.moon',
       icon: LucideIcons.moon,
     ),
+    DashboardWidgetMeta(
+      id: 'personalBest',
+      title: 'widgets.titles.personalBest',
+      description: 'widgets.descriptions.personalBest',
+      icon: LucideIcons.trophy,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

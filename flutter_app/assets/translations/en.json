@@ -1923,7 +1923,8 @@
       "heatmap": "Activity heatmap",
       "quickNote": "Quick note",
       "helpStreak": "Help streak",
-      "moon": "Moon phase"
+      "moon": "Moon phase",
+      "personalBest": "Personal best"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1961,7 +1962,8 @@
       "heatmap": "12-week overview of your daily activity",
       "quickNote": "Personal sticky note, lives only on your device",
       "helpStreak": "Consecutive days where you've helped",
-      "moon": "Today's moon phase and illumination"
+      "moon": "Today's moon phase and illumination",
+      "personalBest": "Your lifetime highs to keep you going"
     }
   },
   "hubs": {
@@ -2062,6 +2064,14 @@
     "sheetTitle": "Today I'm grateful for…",
     "sheetHint": "One sentence is enough. Only you see these entries — they stay on your device.",
     "placeholder": "e.g. a kind call, sunshine, a helping hand…"
+  },
+  "personalBest": {
+    "title": "Personal best",
+    "subtitle": "Lifetime records — be proud of them.",
+    "helps": "Total helps",
+    "posts": "Posts",
+    "streak": "Longest streak",
+    "bestDay": "Best day"
   },
   "moon": {
     "title": "Moon",
