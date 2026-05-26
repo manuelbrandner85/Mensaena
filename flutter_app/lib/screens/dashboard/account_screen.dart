@@ -38,7 +38,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         'exported_at': DateTime.now().toIso8601String(),
         'user_id': uid,
       };
-      for (final t in [
+      const tables = [
         'profiles',
         'posts',
         'messages',
@@ -52,14 +52,18 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         'group_members',
         'community_polls',
         'community_poll_votes',
-      ]) {
+      ];
+      // Perf: parallel statt sequenziell — 13 Roundtrips in 1.
+      final results = await Future.wait(tables.map((t) async {
         try {
           final col = (t == 'profiles') ? 'id' : 'user_id';
-          final rows = await sb.from(t).select().eq(col, uid).limit(10000);
-          dump[t] = rows;
+          return await sb.from(t).select().eq(col, uid).limit(10000);
         } catch (_) {
-          dump[t] = <Map<String, dynamic>>[];
+          return <Map<String, dynamic>>[];
         }
+      }));
+      for (var i = 0; i < tables.length; i++) {
+        dump[tables[i]] = results[i];
       }
       final dir = await getTemporaryDirectory();
       final path =
