@@ -2250,7 +2250,9 @@
     "match_overlap": "{n} Thema-Match",
     "request": "Anfragen",
     "request_sent": "Anfrage gesendet.",
-    "request_failed": "Anfrage fehlgeschlagen."
+    "request_failed": "Anfrage fehlgeschlagen.",
+    "become_title": "Werde Mentor:in",
+    "become_body": "Du hast schon einige Skills hinterlegt — teile dein Wissen mit anderen."
   },
   "scheduled_calls": {
     "title": "Geplante Anrufe",

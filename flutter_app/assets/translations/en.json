@@ -2251,7 +2251,9 @@
     "match_overlap": "{n} topic match",
     "request": "Request",
     "request_sent": "Request sent.",
-    "request_failed": "Request failed."
+    "request_failed": "Request failed.",
+    "become_title": "Become a mentor",
+    "become_body": "You've already added several skills — share your knowledge with others."
   },
   "scheduled_calls": {
     "title": "Scheduled calls",

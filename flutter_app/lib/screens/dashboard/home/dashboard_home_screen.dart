@@ -46,6 +46,7 @@ import '../../../widgets/dashboard/personal_best_widget.dart';
 import '../../../widgets/dashboard/quick_note_widget.dart';
 import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
+import '../../../widgets/dashboard/become_mentor_cta.dart';
 import '../../../widgets/dashboard/daily_challenges_widget.dart';
 import '../../../widgets/dashboard/today_events_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
@@ -522,6 +523,8 @@ class _DashboardHomeScreenState
           break;
         case 'dailyChallenges':
           out.add(const DailyChallengesWidget());
+          addSpacing();
+          out.add(const BecomeMentorCta());
           addSpacing();
           break;
         case 'nearby_posts':
