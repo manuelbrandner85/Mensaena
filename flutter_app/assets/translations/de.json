@@ -2238,6 +2238,10 @@
     "you_are_mentor": "Du bist Mentor:in",
     "you_are_mentee": "Du bist Mentee"
   },
+  "voicemail": {
+    "title": "Voicemail",
+    "empty": "Keine Sprachnachrichten."
+  },
   "status": {
     "title": "Status setzen",
     "set": "Status setzen",

@@ -2239,6 +2239,10 @@
     "you_are_mentor": "You are a mentor",
     "you_are_mentee": "You are a mentee"
   },
+  "voicemail": {
+    "title": "Voicemail",
+    "empty": "No voice messages."
+  },
   "status": {
     "title": "Set status",
     "set": "Set status",

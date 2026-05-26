@@ -51,6 +51,7 @@ import '../../screens/dashboard/contact_requests_screen.dart';
 import '../../screens/dashboard/account_screen.dart';
 import '../../screens/dashboard/drafts_screen.dart';
 import '../../screens/dashboard/karma_history_screen.dart';
+import '../../screens/dashboard/call/voicemail_screen.dart';
 import '../../screens/dashboard/live/scheduled_streams_screen.dart';
 import '../../screens/dashboard/mentorship_screen.dart';
 import '../../screens/dashboard/leaderboard_screen.dart';
@@ -1277,6 +1278,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, st) => mensaenaTransition<void>(
           key: st.pageKey,
           child: const ScheduledStreamsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/voicemail',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const VoicemailScreen(),
         ),
       ),
       GoRoute(
