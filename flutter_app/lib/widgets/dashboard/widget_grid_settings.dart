@@ -268,6 +268,12 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.todayEvents',
       icon: LucideIcons.calendar,
     ),
+    DashboardWidgetMeta(
+      id: 'dailyChallenges',
+      title: 'widgets.titles.dailyChallenges',
+      description: 'widgets.descriptions.dailyChallenges',
+      icon: LucideIcons.target,
+    ),
   ];
 
   /// Widgets die im Default-Setup AUS sind. Sichtbar wird ueber das

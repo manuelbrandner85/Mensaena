@@ -46,7 +46,9 @@ import '../../screens/dashboard/supply/farm_detail_screen.dart';
 import '../../screens/dashboard/supply/foodbanks_screen.dart';
 import '../../screens/dashboard/supply/supply_screen.dart';
 import '../../screens/dashboard/chat/chat_screen.dart';
+import '../../screens/dashboard/community_polls_screen.dart';
 import '../../screens/dashboard/contact_requests_screen.dart';
+import '../../screens/dashboard/leaderboard_screen.dart';
 import '../../screens/dashboard/create_post_screen.dart';
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
 import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
@@ -1221,6 +1223,20 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, st) => mensaenaTransition<void>(
           key: st.pageKey,
           child: const ContactRequestsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/community-polls',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const CommunityPollsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/leaderboard',
+        pageBuilder: (_, st) => mensaenaTransition<void>(
+          key: st.pageKey,
+          child: const LeaderboardScreen(),
         ),
       ),
       GoRoute(

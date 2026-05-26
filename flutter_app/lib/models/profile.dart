@@ -40,6 +40,8 @@ class Profile {
     this.verifiedEmail = false,
     this.verifiedPhone = false,
     this.verifiedCommunity = false,
+    this.isVerified,
+    this.verifiedAt,
     this.emergencyContact1Name,
     this.emergencyContact1Phone,
     this.emergencyContact2Name,
@@ -133,6 +135,10 @@ class Profile {
   final bool verifiedEmail;
   final bool verifiedPhone;
   final bool verifiedCommunity;
+
+  /// F35: globales Admin-verifiziertes Konto (blauer Haken).
+  final bool? isVerified;
+  final DateTime? verifiedAt;
   final String? emergencyContact1Name;
   final String? emergencyContact1Phone;
   final String? emergencyContact2Name;
@@ -260,6 +266,10 @@ class Profile {
       verifiedEmail: (j['verified_email'] as bool?) ?? false,
       verifiedPhone: (j['verified_phone'] as bool?) ?? false,
       verifiedCommunity: (j['verified_community'] as bool?) ?? false,
+      isVerified: j['is_verified'] as bool?,
+      verifiedAt: j['verified_at'] != null
+          ? DateTime.tryParse(j['verified_at'] as String)
+          : null,
       emergencyContact1Name: j['emergency_contact_1_name'] as String?,
       emergencyContact1Phone: j['emergency_contact_1_phone'] as String?,
       emergencyContact2Name: j['emergency_contact_2_name'] as String?,

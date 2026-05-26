@@ -117,6 +117,8 @@
     "editProfile": "Edit profile",
     "share": "Share profile",
     "shareMessage": "Check out {name} on Mensaena: {url}",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
     "saved": "Saved",
     "name": "Name",
     "bio": "About me",
@@ -1946,7 +1948,8 @@
       "moon": "Moon phase",
       "personalBest": "Personal best",
       "affirmation": "Daily affirmation",
-      "todayEvents": "Today / tomorrow events"
+      "todayEvents": "Today / tomorrow events",
+      "dailyChallenges": "Daily challenges"
     },
     "descriptions": {
       "greeting": "Personalised hero with time-of-day mood",
@@ -1987,7 +1990,8 @@
       "moon": "Today's moon phase and illumination",
       "personalBest": "Your lifetime highs to keep you going",
       "affirmation": "A calm reminder once a day",
-      "todayEvents": "Next event in the coming 24 hours"
+      "todayEvents": "Next event in the coming 24 hours",
+      "dailyChallenges": "3 small daily tasks with karma bonus"
     }
   },
   "hubs": {
@@ -2278,6 +2282,21 @@
       "request_declined": "Your request was declined",
       "completed": "Action completed! +{karma} Karma"
     }
+  },
+  "community": {
+    "polls": "Community Polls",
+    "create_poll": "Create poll",
+    "publish": "Publish",
+    "question": "Question",
+    "option": "Option",
+    "add_option": "Add option",
+    "anonymous": "Vote anonymously",
+    "votes": "votes",
+    "no_polls": "No polls yet.",
+    "leaderboard": "Leaderboard",
+    "this_week": "THIS WEEK",
+    "no_leaderboard": "No data yet.",
+    "daily_challenges": "Daily challenges"
   },
   "smartReply": {
     "sheetTitle": "Message about this post",

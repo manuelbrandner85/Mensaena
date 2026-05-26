@@ -18,7 +18,10 @@ import '../../repositories/profiles_repository.dart';
 import '../../repositories/trust_ratings_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
 import '../../services/supabase_service.dart';
+import '../../repositories/mega_repositories.dart';
 import '../../widgets/dashboard/activity_heatmap_widget.dart';
+import '../../widgets/profile/follow_button.dart';
+import '../../widgets/profile/verified_badge.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/post_card.dart';
 
@@ -52,6 +55,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         ? ProfilesRepository.getMine()
         : ProfilesRepository.getById(uid);
     _tab = TabController(length: 4, vsync: this);
+    // F37: Profile-View aufzeichnen wenn fremdes Profil (1x pro Tag).
+    if (!isOwn) {
+      ProfileViewsRepository.recordView(uid);
+    }
   }
 
   bool get _isOwnProfile {
@@ -734,13 +741,24 @@ class _Header extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    profile.displayName ?? profile.name ?? 'Nachbar:in',
-                    style: AppTypography.display(
-                      size: 22,
-                      color: AppColors.ink,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          profile.displayName ?? profile.name ?? 'Nachbar:in',
+                          style: AppTypography.display(
+                            size: 22,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                      ),
+                      VerifiedBadge(isVerified: profile.isVerified ?? false),
+                    ],
                   ),
+                  if (!isMe) ...[
+                    const SizedBox(height: 4),
+                    FollowButton(userId: profile.id),
+                  ],
                   if (profile.location != null)
                     Text(
                       profile.location!,
