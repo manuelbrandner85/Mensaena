@@ -1200,6 +1200,17 @@
     },
     "showAll": "Alle {n} anzeigen",
     "showLess": "Weniger",
+    "save": "Speichern",
+    "unsave": "Entfernen",
+    "saved": "In deinen Events gespeichert.",
+    "unsaved": "Aus gespeicherten Events entfernt.",
+    "reminderTitle": "Wann erinnert werden?",
+    "reminderNone": "Keine Erinnerung",
+    "reminderMinutes": "{n} Minuten vorher",
+    "reminderHours": "{n} Stunden vorher",
+    "reminderDays": "{n} Tage vorher",
+    "reminderSet": "Erinnerung gesetzt: {label}",
+    "reminderRemoved": "Erinnerung entfernt.",
     "share": "Teilen",
     "shareLink": "Link kopieren",
     "shareText": "Text kopieren",
@@ -2358,6 +2369,12 @@
     "enable": "Schlaf-Erinnerung aktivieren",
     "time_label": "Erinnern um {time}",
     "pick_time": "Uhrzeit wählen"
+  },
+  "event_reminders": {
+    "channelName": "Event-Erinnerungen",
+    "channelDescription": "Erinnerung vor gespeicherten Events.",
+    "title": "Event-Erinnerung",
+    "body": "{title} startet in {minutes} Minuten."
   },
   "a11y": {
     "section": "Barrierefreiheit",

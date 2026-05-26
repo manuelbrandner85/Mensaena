@@ -25,6 +25,7 @@ import '../../../models/event.dart';
 import '../../../models/profile.dart';
 import '../../../repositories/events_repository.dart';
 import '../../../repositories/profiles_repository.dart';
+import '../../../services/event_reminder_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
@@ -350,6 +351,8 @@ class _EventDetailBody extends ConsumerWidget {
                         horizontal: 14, vertical: 10),
                   ),
                 ),
+                const SizedBox(width: 8),
+                _SavedToggleButton(event: event),
                 const SizedBox(width: 8),
                 IconButton(
                   tooltip: 'events.share'.tr(),
@@ -1252,3 +1255,180 @@ class _DetailSkeleton extends StatelessWidget {
     );
   }
 }
+
+// ── E2: Save (Bookmark) + lokale Reminder-Notification ───────────────
+class _SavedToggleButton extends ConsumerStatefulWidget {
+  const _SavedToggleButton({required this.event});
+  final EventItem event;
+
+  @override
+  ConsumerState<_SavedToggleButton> createState() =>
+      _SavedToggleButtonState();
+}
+
+class _SavedToggleButtonState extends ConsumerState<_SavedToggleButton> {
+  bool _saved = false;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    final v = await EventsRepository.isSaved(widget.event.id);
+    if (!mounted) return;
+    setState(() {
+      _saved = v;
+      _loading = false;
+    });
+  }
+
+  Future<void> _tap() async {
+    Haptics.tap();
+    final wasSaved = _saved;
+    final now = await EventsRepository.toggleSave(widget.event.id);
+    if (!mounted) return;
+    setState(() => _saved = now);
+    if (wasSaved && !now) {
+      await EventReminderService.cancel(widget.event.id);
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        now
+            ? 'events.saved'.tr()
+            : 'events.unsaved'.tr(),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
+  Future<void> _longPress() async {
+    Haptics.longPress();
+    final mins = await showModalBottomSheet<int?>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.line,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'events.reminderTitle'.tr(),
+                style: AppTypography.body(
+                  size: 15,
+                  color: AppColors.ink,
+                  weight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            for (final m in const [15, 60, 360, 1440])
+              ListTile(
+                leading: const Icon(LucideIcons.bell, color: AppColors.amber),
+                title: Text(
+                  _reminderLabel(m),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                ),
+                onTap: () => Navigator.pop(sheetCtx, m),
+              ),
+            ListTile(
+              leading: const Icon(LucideIcons.bellOff, color: AppColors.mute),
+              title: Text(
+                'events.reminderNone'.tr(),
+                style: AppTypography.body(size: 14, color: AppColors.inkSoft),
+              ),
+              onTap: () => Navigator.pop(sheetCtx, 0),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (mins == null || !mounted) return;
+    if (!_saved) {
+      final now = await EventsRepository.toggleSave(
+        widget.event.id,
+        reminderMinutesBefore: mins > 0 ? mins : null,
+      );
+      if (!mounted) return;
+      setState(() => _saved = now);
+    }
+    if (mins == 0) {
+      await EventReminderService.cancel(widget.event.id);
+    } else {
+      await EventReminderService.schedule(
+        eventId: widget.event.id,
+        eventStart: widget.event.startDate,
+        minutesBefore: mins,
+        title: widget.event.title,
+      );
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        mins == 0
+            ? 'events.reminderRemoved'.tr()
+            : 'events.reminderSet'
+                .tr(namedArgs: {'label': _reminderLabel(mins)}),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
+  String _reminderLabel(int minutes) {
+    if (minutes < 60) {
+      return 'events.reminderMinutes'.tr(namedArgs: {'n': '$minutes'});
+    }
+    if (minutes < 1440) {
+      return 'events.reminderHours'.tr(namedArgs: {'n': '${minutes ~/ 60}'});
+    }
+    return 'events.reminderDays'.tr(namedArgs: {'n': '${minutes ~/ 1440}'});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const SizedBox(
+          width: 48,
+          height: 48,
+          child: Center(
+              child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.bronze))));
+    }
+    return GestureDetector(
+      onLongPress: _longPress,
+      child: IconButton(
+        tooltip: _saved ? 'events.unsave'.tr() : 'events.save'.tr(),
+        onPressed: _tap,
+        icon: Icon(
+          _saved ? LucideIcons.bookMarked : LucideIcons.bookmark,
+          size: 20,
+        ),
+        color: _saved ? AppColors.amber : AppColors.bronze,
+      ),
+    );
+  }
+}
+

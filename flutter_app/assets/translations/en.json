@@ -1201,6 +1201,17 @@
     },
     "showAll": "Show all {n}",
     "showLess": "Show less",
+    "save": "Save",
+    "unsave": "Remove",
+    "saved": "Saved to your events.",
+    "unsaved": "Removed from saved events.",
+    "reminderTitle": "When should we remind you?",
+    "reminderNone": "No reminder",
+    "reminderMinutes": "{n} minutes before",
+    "reminderHours": "{n} hours before",
+    "reminderDays": "{n} days before",
+    "reminderSet": "Reminder set: {label}",
+    "reminderRemoved": "Reminder removed.",
     "share": "Share",
     "shareLink": "Copy link",
     "shareText": "Copy text",
@@ -2359,6 +2370,12 @@
     "enable": "Enable sleep reminder",
     "time_label": "Remind me at {time}",
     "pick_time": "Pick a time"
+  },
+  "event_reminders": {
+    "channelName": "Event reminders",
+    "channelDescription": "Reminder before saved events.",
+    "title": "Event reminder",
+    "body": "{title} starts in {minutes} minutes."
   },
   "a11y": {
     "section": "Accessibility",

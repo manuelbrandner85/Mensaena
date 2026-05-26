@@ -1142,6 +1142,17 @@
     },
     "showAll": "Tümünü göster ({n})",
     "showLess": "Daha az göster",
+    "save": "Kaydet",
+    "unsave": "Kaldır",
+    "saved": "Etkinliklerine kaydedildi.",
+    "unsaved": "Kayıtlı etkinliklerden çıkarıldı.",
+    "reminderTitle": "Ne zaman hatırlatalım?",
+    "reminderNone": "Hatırlatıcı yok",
+    "reminderMinutes": "{n} dakika önce",
+    "reminderHours": "{n} saat önce",
+    "reminderDays": "{n} gün önce",
+    "reminderSet": "Hatırlatıcı kuruldu: {label}",
+    "reminderRemoved": "Hatırlatıcı kaldırıldı.",
     "share": "Paylaş",
     "shareLink": "Bağlantıyı kopyala",
     "shareText": "Metni kopyala",
@@ -1977,5 +1988,11 @@
     "message": "Bugün Mensaena'da {min} dk geçirdin. Biraz güneş, kısa bir yürüyüş ya da sohbete ne dersin?",
     "continue": "Yine de devam et",
     "pause": "Uygulamayı kapat"
+  },
+  "event_reminders": {
+    "channelName": "Etkinlik hatırlatıcıları",
+    "channelDescription": "Kayıtlı etkinliklerden önce hatırlatma.",
+    "title": "Etkinlik hatırlatıcısı",
+    "body": "{title} {minutes} dakika içinde başlıyor."
   }
 }

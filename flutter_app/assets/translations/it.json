@@ -1143,6 +1143,17 @@
     },
     "showAll": "Mostra tutti i {n}",
     "showLess": "Mostra meno",
+    "save": "Salva",
+    "unsave": "Rimuovi",
+    "saved": "Salvato nei tuoi eventi.",
+    "unsaved": "Rimosso dagli eventi salvati.",
+    "reminderTitle": "Quando ricordarti?",
+    "reminderNone": "Nessun promemoria",
+    "reminderMinutes": "{n} minuti prima",
+    "reminderHours": "{n} ore prima",
+    "reminderDays": "{n} giorni prima",
+    "reminderSet": "Promemoria impostato: {label}",
+    "reminderRemoved": "Promemoria rimosso.",
     "share": "Condividi",
     "shareLink": "Copia link",
     "shareText": "Copia testo",
@@ -1978,5 +1989,11 @@
     "message": "Oggi hai passato {min} min su Mensaena. Che ne dici di un po' di sole, una passeggiata o una chiacchierata?",
     "continue": "Continua comunque",
     "pause": "Chiudi app"
+  },
+  "event_reminders": {
+    "channelName": "Promemoria eventi",
+    "channelDescription": "Promemoria prima degli eventi salvati.",
+    "title": "Promemoria evento",
+    "body": "{title} inizia tra {minutes} minuti."
   }
 }

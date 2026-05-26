@@ -1143,6 +1143,17 @@
     },
     "showAll": "Voir les {n}",
     "showLess": "Voir moins",
+    "save": "Enregistrer",
+    "unsave": "Retirer",
+    "saved": "Enregistré dans tes événements.",
+    "unsaved": "Retiré des événements enregistrés.",
+    "reminderTitle": "Quand te rappeler ?",
+    "reminderNone": "Pas de rappel",
+    "reminderMinutes": "{n} minutes avant",
+    "reminderHours": "{n} heures avant",
+    "reminderDays": "{n} jours avant",
+    "reminderSet": "Rappel défini : {label}",
+    "reminderRemoved": "Rappel supprimé.",
     "share": "Partager",
     "shareLink": "Copier le lien",
     "shareText": "Copier le texte",
@@ -1978,5 +1989,11 @@
     "message": "Tu as passé {min} min sur Mensaena aujourd'hui. Et si tu profitais d'un peu de soleil, d'une promenade ou d'une discussion ?",
     "continue": "Continuer quand même",
     "pause": "Fermer l'app"
+  },
+  "event_reminders": {
+    "channelName": "Rappels d'événements",
+    "channelDescription": "Rappel avant les événements enregistrés.",
+    "title": "Rappel d'événement",
+    "body": "{title} commence dans {minutes} minutes."
   }
 }

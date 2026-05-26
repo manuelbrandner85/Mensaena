@@ -147,6 +147,72 @@ class EventsRepository {
     }
   }
 
+  // ── E2: Saved Events (bookmark, unabhängig vom RSVP) ────────────
+
+  static Future<bool> isSaved(String eventId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final rows = await sb
+          .from('saved_events')
+          .select('event_id')
+          .eq('user_id', uid)
+          .eq('event_id', eventId)
+          .limit(1);
+      return (rows as List).isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Toggle bookmark. Returns the new saved-state (true = jetzt gespeichert).
+  /// Optional `reminderMinutesBefore` wird in der saved_events-Row hinterlegt
+  /// (das eigentliche Scheduling übernimmt `EventReminderService`).
+  static Future<bool> toggleSave(
+    String eventId, {
+    int? reminderMinutesBefore,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    final currently = await isSaved(eventId);
+    try {
+      if (currently) {
+        await sb
+            .from('saved_events')
+            .delete()
+            .eq('user_id', uid)
+            .eq('event_id', eventId);
+        return false;
+      }
+      await sb.from('saved_events').insert({
+        'user_id': uid,
+        'event_id': eventId,
+        if (reminderMinutesBefore != null)
+          'reminder_minutes_before': reminderMinutesBefore,
+      });
+      return true;
+    } catch (_) {
+      return currently;
+    }
+  }
+
+  static Future<List<String>> listSavedEventIds() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final rows = await sb
+          .from('saved_events')
+          .select('event_id')
+          .eq('user_id', uid);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map((r) => r['event_id'] as String)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Entfernt Erinnerung (setzt reminder_set=false).
   static Future<bool> removeReminder(String eventId) async {
     final uid = SupabaseService.currentUser?.id;

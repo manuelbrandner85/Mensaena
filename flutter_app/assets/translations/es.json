@@ -1143,6 +1143,17 @@
     },
     "showAll": "Ver los {n}",
     "showLess": "Ver menos",
+    "save": "Guardar",
+    "unsave": "Quitar",
+    "saved": "Guardado en tus eventos.",
+    "unsaved": "Eliminado de eventos guardados.",
+    "reminderTitle": "¿Cuándo recordarte?",
+    "reminderNone": "Sin recordatorio",
+    "reminderMinutes": "{n} minutos antes",
+    "reminderHours": "{n} horas antes",
+    "reminderDays": "{n} días antes",
+    "reminderSet": "Recordatorio fijado: {label}",
+    "reminderRemoved": "Recordatorio eliminado.",
     "share": "Compartir",
     "shareLink": "Copiar enlace",
     "shareText": "Copiar texto",
@@ -1978,5 +1989,11 @@
     "message": "Ya llevas {min} min en Mensaena hoy. ¿Qué tal un poco de sol, un paseo o una charla?",
     "continue": "Seguir igualmente",
     "pause": "Cerrar app"
+  },
+  "event_reminders": {
+    "channelName": "Recordatorios de eventos",
+    "channelDescription": "Recordatorio antes de eventos guardados.",
+    "title": "Recordatorio de evento",
+    "body": "{title} empieza en {minutes} minutos."
   }
 }
