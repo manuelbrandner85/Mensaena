@@ -207,6 +207,11 @@ class DashboardScaffold extends ConsumerWidget {
             : null, // Top-Level: automatic-hamburger
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
+          IconButton(
+            tooltip: 'common.search'.tr(),
+            onPressed: () => context.push('/dashboard/search'),
+            icon: const Icon(LucideIcons.search, size: 20),
+          ),
           const SOSButton(),
           const LanguagePicker(),
           NotificationBell(unreadCount: unread),

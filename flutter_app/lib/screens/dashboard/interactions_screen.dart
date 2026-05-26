@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -62,24 +63,43 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                 return ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    const SizedBox(height: 120),
+                    const SizedBox(height: 80),
                     Center(
-                      child: Column(
-                        children: [
-                          const Icon(
-                            LucideIcons.helpingHand,
-                            size: 32,
-                            color: AppColors.mute,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Keine aktiven Interaktionen.',
-                            style: AppTypography.body(
-                              size: 14,
-                              color: AppColors.mute,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
+                          children: [
+                            const Icon(LucideIcons.helpingHand,
+                                size: 40, color: AppColors.bronze),
+                            const SizedBox(height: 14),
+                            Text('Noch keine Hilfe-Vorgänge',
+                                textAlign: TextAlign.center,
+                                style: AppTypography.display(
+                                    size: 18, color: AppColors.ink)),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Hier siehst du alle Posts, bei denen du Hilfe '
+                              'angeboten oder erhalten hast — von der Anfrage '
+                              'bis zum Abschluss.',
+                              textAlign: TextAlign.center,
+                              style: AppTypography.body(
+                                  size: 13,
+                                  color: AppColors.inkSoft,
+                                  height: 1.5),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 18),
+                            FilledButton.icon(
+                              onPressed: () =>
+                                  context.go('/dashboard/posts'),
+                              icon: const Icon(LucideIcons.search,
+                                  size: 16),
+                              label: const Text('Hilfe-Anfragen entdecken'),
+                              style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.bronze,
+                                  foregroundColor: AppColors.voidColor),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

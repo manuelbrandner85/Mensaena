@@ -130,10 +130,11 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
         onPressed: () {
-          // 1:1 Web: Modul-spezifische Create-Route mit Whitelist
-          // statt generischem /dashboard/create?type=
+          // FIX (User-Wunsch): push statt go damit Zurück-Button vom
+          // Create-Screen ZURÜCK ins Modul führt statt komplett zum
+          // Dashboard.
           final moduleRoute = _moduleCreateRouteFor(widget.postType);
-          context.go(moduleRoute);
+          context.push(moduleRoute);
         },
         icon: const Icon(LucideIcons.plus),
         label: Text('modules.post'.tr()),

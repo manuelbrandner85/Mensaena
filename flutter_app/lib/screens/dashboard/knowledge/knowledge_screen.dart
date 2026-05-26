@@ -75,10 +75,22 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
 
   Future<List<KnowledgeArticle>> _load() async {
     try {
-      final rows = await sb
-          .from('knowledge_articles')
-          .select()
-          .eq('is_public', true)
+      // FIX (User-Wunsch): "/dashboard/wiki" und "/dashboard/knowledge"
+      // zeigten dieselben Artikel. Jetzt:
+      // - knowledge (= Bildung) → category IN ('kurs','workshop',
+      //   'tutorial','lernmaterial','webinar','anleitung')
+      // - wiki → der Rest
+      const eduCats = ['kurs', 'workshop', 'tutorial', 'lernmaterial',
+          'webinar', 'anleitung'];
+      var q = sb.from('knowledge_articles').select().eq('is_public', true);
+      final isBildung = widget.routePath == '/dashboard/knowledge';
+      if (isBildung) {
+        q = q.inFilter('category', eduCats);
+      } else {
+        q = q.not('category', 'in',
+            '(${eduCats.map((c) => '"$c"').join(',')})');
+      }
+      final rows = await q
           .order('is_featured', ascending: false)
           .order('created_at', ascending: false)
           .limit(200);
