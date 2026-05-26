@@ -263,9 +263,12 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
             .from('group_members')
             .select('id')
             .eq('user_id', widget.userId),
+        // BUGFIX: DB-Spalte heisst status (text) + completed_at (timestamp).
+        // KEINE 'completed'-Boolean-Spalte. Vorher: 'c.completed != true'
+        // ergab fuer alle Rows true (null != true == true) — falsche Counts.
         sb
             .from('challenge_progress')
-            .select('id, completed')
+            .select('id, status, completed_at')
             .eq('user_id', widget.userId),
         sb
             .from('timebank_entries')
@@ -283,9 +286,10 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
           received += h;
         }
       }
+      // 'aktiv' = nicht abgeschlossen: completed_at null UND status != 'completed'.
       final activeCh = (results[2] as List)
           .whereType<Map<String, dynamic>>()
-          .where((c) => c['completed'] != true)
+          .where((c) => c['completed_at'] == null && c['status'] != 'completed')
           .length;
       return _StatsData(
         postsCount: (results[0] as List).length,
@@ -521,10 +525,12 @@ class _RatingsTabState extends State<_RatingsTab> {
 
   Future<List<Map<String, dynamic>>> _load() async {
     try {
+      // BUGFIX: DB-Spalte heisst rated_id, nicht rated_user_id —
+      // vorher silent catch → leerer Ratings-Tab.
       final rows = await sb
           .from('trust_ratings')
           .select()
-          .eq('rated_user_id', widget.userId)
+          .eq('rated_id', widget.userId)
           .order('created_at', ascending: false)
           .limit(50);
       return (rows as List)
