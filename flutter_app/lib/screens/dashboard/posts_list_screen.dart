@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -67,10 +68,29 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   Timer? _searchDebounce;
   Timer? _locationDebounce;
 
+  static const _typePrefKey = 'mensaena_posts_type_v1';
+  static const _filterStorage = FlutterSecureStorage();
+
   @override
   void initState() {
     super.initState();
-    _load(reset: true);
+    _restoreTypeFilter();
+  }
+
+  Future<void> _restoreTypeFilter() async {
+    try {
+      final raw = await _filterStorage.read(key: _typePrefKey);
+      if (raw != null && raw.isNotEmpty && mounted) {
+        setState(() => _type = raw);
+      }
+    } catch (_) {}
+    await _load(reset: true);
+  }
+
+  Future<void> _persistTypeFilter(String type) async {
+    try {
+      await _filterStorage.write(key: _typePrefKey, value: type);
+    } catch (_) {}
   }
 
   @override
@@ -214,6 +234,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         label: opt.label,
         onRemove: () {
           setState(() => _type = 'all');
+          _persistTypeFilter('all');
           _load(reset: true);
         },
       ));
@@ -297,7 +318,9 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                 options: _typeOptions,
                 selected: _type == 'all' ? const <String>{} : {_type},
                 onChanged: (s) {
-                  setState(() => _type = s.isEmpty ? 'all' : s.first);
+                  final next = s.isEmpty ? 'all' : s.first;
+                  setState(() => _type = next);
+                  _persistTypeFilter(next);
                   _load(reset: true);
                 },
               ),
