@@ -1545,8 +1545,11 @@
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",
+    "noEventsThisDay": "Aucun événement ce jour.",
     "screenTitle": "Calendrier",
-    "daySectionSr": "{date}, {count} événements"
+    "daySectionSr": "{date}, {count} événements",
+    "tabList": "Liste",
+    "tabMonth": "Mois"
   },
   "notifications": {
     "allRead": "Tout lu ✓",

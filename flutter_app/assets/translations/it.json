@@ -1545,8 +1545,11 @@
   },
   "calendar": {
     "noEvents": "Nessun evento in calendario.",
+    "noEventsThisDay": "Nessun evento in questo giorno.",
     "screenTitle": "Calendario",
-    "daySectionSr": "{date}, {count} eventi"
+    "daySectionSr": "{date}, {count} eventi",
+    "tabList": "Elenco",
+    "tabMonth": "Mese"
   },
   "notifications": {
     "allRead": "Tutte lette ✓",

@@ -1544,8 +1544,11 @@
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",
+    "noEventsThisDay": "Bu gün için etkinlik yok.",
     "screenTitle": "Takvim",
-    "daySectionSr": "{date}, {count} etkinlik"
+    "daySectionSr": "{date}, {count} etkinlik",
+    "tabList": "Liste",
+    "tabMonth": "Ay"
   },
   "notifications": {
     "allRead": "Tümü okundu ✓",

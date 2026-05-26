@@ -1544,8 +1544,11 @@
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",
+    "noEventsThisDay": "В этот день событий нет.",
     "screenTitle": "Календарь",
-    "daySectionSr": "{date}, событий: {count}"
+    "daySectionSr": "{date}, событий: {count}",
+    "tabList": "Список",
+    "tabMonth": "Месяц"
   },
   "notifications": {
     "allRead": "Все прочитаны ✓",
