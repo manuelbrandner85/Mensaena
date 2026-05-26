@@ -48,6 +48,7 @@ dependencies:
   # (data-only Pushes muessen vom Client als sichtbare Notification angezeigt
   # werden, sonst nur stille Updates → kein User-Feedback bei geschlossener App).
   flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
 
   # Fonts (Inter, Fraunces, Instrument Serif, JetBrains Mono)
   google_fonts: ^6.2.1

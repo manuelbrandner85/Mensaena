@@ -8,6 +8,7 @@
     "close": "Schließen",
     "back": "Zurück",
     "next": "Weiter",
+    "openProfile": "Profil öffnen",
     "send": "Senden",
     "search": "Suchen",
     "loading": "Lädt …",
@@ -342,6 +343,11 @@
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",
+    "share_live_location": "Live-Standort teilen",
+    "share_live_location_hint": "Dein Standort wird live mit dem Chat geteilt.",
+    "share_duration": "{min} Minuten",
+    "share_stop": "Teilen beenden",
+    "share_no_permission": "Standort-Berechtigung fehlt.",
     "noConversations": "Noch keine Nachrichten.",
     "noConversationsHint": "Schreibe einem:r Nachbar:in über deren Profil oder Beitrag.",
     "newDm": "Neue Nachricht",
@@ -2205,6 +2211,20 @@
       "anchor": "Anker",
       "beacon": "Leuchtturm"
     }
+  },
+  "mentorship": {
+    "title": "Mentoring",
+    "empty": "Du hast aktuell keine Mentorings.",
+    "you_are_mentor": "Du bist Mentor:in",
+    "you_are_mentee": "Du bist Mentee"
+  },
+  "sleep_reminder": {
+    "title": "Zeit zum Abschalten",
+    "body": "Lege dein Handy weg — guter Schlaf macht den Tag stärker.",
+    "section": "Schlaf-Erinnerung",
+    "enable": "Schlaf-Erinnerung aktivieren",
+    "time_label": "Erinnern um {time}",
+    "pick_time": "Uhrzeit wählen"
   },
   "a11y": {
     "section": "Barrierefreiheit",

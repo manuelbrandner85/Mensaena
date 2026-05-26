@@ -8,6 +8,7 @@
     "close": "Close",
     "back": "Back",
     "next": "Next",
+    "openProfile": "Open profile",
     "send": "Send",
     "search": "Search",
     "loading": "Loading …",
@@ -342,6 +343,11 @@
   },
   "chat": {
     "writeMessage": "Write a message …",
+    "share_live_location": "Share live location",
+    "share_live_location_hint": "Your live location will be shared with the chat.",
+    "share_duration": "{min} minutes",
+    "share_stop": "Stop sharing",
+    "share_no_permission": "Location permission missing.",
     "noConversations": "No messages yet.",
     "noConversationsHint": "Message a neighbour from their profile or post.",
     "newDm": "New message",
@@ -2206,6 +2212,20 @@
       "anchor": "Anchor",
       "beacon": "Beacon"
     }
+  },
+  "mentorship": {
+    "title": "Mentoring",
+    "empty": "You don't have any mentorships yet.",
+    "you_are_mentor": "You are a mentor",
+    "you_are_mentee": "You are a mentee"
+  },
+  "sleep_reminder": {
+    "title": "Time to unwind",
+    "body": "Put down your phone — good sleep makes a stronger day.",
+    "section": "Sleep reminder",
+    "enable": "Enable sleep reminder",
+    "time_label": "Remind me at {time}",
+    "pick_time": "Pick a time"
   },
   "a11y": {
     "section": "Accessibility",
