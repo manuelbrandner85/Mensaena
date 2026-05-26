@@ -411,6 +411,12 @@
     "emptySubtitle": "Wirf den ersten Stein ins Wasser — schreib eine Nachricht und starte das Gespräch. 🌊",
     "copy": "Text kopieren",
     "copied": "Kopiert.",
+    "edited": "Bearbeitet.",
+    "editFailed": "Bearbeiten fehlgeschlagen.",
+    "deleted": "Nachricht gelöscht.",
+    "deleteFailed": "Löschen fehlgeschlagen.",
+    "pinned": "📌 Nachricht angepinnt.",
+    "unpinned": "Pin entfernt.",
     "welcomeChannelTitle": "Willkommen in #{name}",
     "welcomeChannelBody": "Hier treffen sich Nachbar:innen. Sei respektvoll, hilf wo du kannst — und denk dran: Nachrichten werden alle 6 Stunden automatisch entfernt. 🌊"
   },

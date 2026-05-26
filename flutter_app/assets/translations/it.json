@@ -397,6 +397,12 @@
     "emptySubtitle": "Lancia il primo sasso — scrivi un messaggio e inizia la conversazione. 🌊",
     "copy": "Copia testo",
     "copied": "Copiato.",
+    "edited": "Modificato.",
+    "editFailed": "Modifica non riuscita.",
+    "deleted": "Messaggio eliminato.",
+    "deleteFailed": "Eliminazione non riuscita.",
+    "pinned": "📌 Messaggio fissato.",
+    "unpinned": "Pin rimosso.",
     "welcomeChannelTitle": "Benvenuto in #{name}",
     "welcomeChannelBody": "Dove si incontrano i vicini. Sii rispettoso, aiuta dove puoi — i messaggi vengono rimossi automaticamente ogni 6 ore. 🌊"
   },

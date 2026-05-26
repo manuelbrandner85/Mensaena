@@ -250,12 +250,15 @@ class MessagesRepository {
         'edited_at': DateTime.now().toUtc().toIso8601String(),
       }).eq('id', messageId);
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MessagesRepository.edit] failed: $e');
       return false;
     }
   }
 
   /// Eigene Nachricht soft-deleten (RLS auf sender_id = auth.uid()).
+  /// Setzt content='' — funktioniert seit Mai 2026 weil messages_content_check
+  /// jetzt empty erlaubt wenn deleted_at IS NOT NULL.
   static Future<bool> deleteMessage(String messageId) async {
     try {
       await sb.from('messages').update({
@@ -263,7 +266,8 @@ class MessagesRepository {
         'content': '',
       }).eq('id', messageId);
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MessagesRepository.deleteMessage] failed: $e');
       return false;
     }
   }
@@ -323,7 +327,8 @@ class MessagesRepository {
         'pinned_by': uid,
       });
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MessagesRepository.togglePin] failed: $e');
       return false;
     }
   }

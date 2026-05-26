@@ -412,6 +412,12 @@
     "emptySubtitle": "Throw the first stone — write a message and start the conversation. 🌊",
     "copy": "Copy text",
     "copied": "Copied.",
+    "edited": "Edited.",
+    "editFailed": "Edit failed.",
+    "deleted": "Message deleted.",
+    "deleteFailed": "Delete failed.",
+    "pinned": "📌 Message pinned.",
+    "unpinned": "Pin removed.",
     "welcomeChannelTitle": "Welcome to #{name}",
     "welcomeChannelBody": "Where neighbors meet. Be respectful, help where you can — and note: messages are auto-removed every 6 hours. 🌊"
   },

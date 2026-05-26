@@ -396,6 +396,12 @@
     "emptySubtitle": "İlk taşı at — bir mesaj yaz ve sohbeti başlat. 🌊",
     "copy": "Metni kopyala",
     "copied": "Kopyalandı.",
+    "edited": "Düzenlendi.",
+    "editFailed": "Düzenleme başarısız.",
+    "deleted": "Mesaj silindi.",
+    "deleteFailed": "Silme başarısız.",
+    "pinned": "📌 Mesaj sabitlendi.",
+    "unpinned": "Sabit kaldırıldı.",
     "welcomeChannelTitle": "#{name} kanalına hoş geldin",
     "welcomeChannelBody": "Komşuların buluştuğu yer. Saygılı ol, elinden geleni yap — mesajlar her 6 saatte bir otomatik silinir. 🌊"
   },

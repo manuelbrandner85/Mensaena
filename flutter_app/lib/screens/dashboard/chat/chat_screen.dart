@@ -484,7 +484,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (newText == null || newText.isEmpty || newText == currentContent) {
       return;
     }
-    await MessagesRepository.edit(messageId: id, newContent: newText);
+    final ok =
+        await MessagesRepository.edit(messageId: id, newContent: newText);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok ? 'chat.edited'.tr() : 'chat.editFailed'.tr(),
+        style: AppTypography.body(
+            size: 13,
+            color: ok ? AppColors.ink : AppColors.herzrotWarm),
+      ),
+    ));
   }
 
   Future<void> _deleteMessage(String id) async {
@@ -511,7 +522,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
     );
     if (confirmed != true) return;
-    await MessagesRepository.deleteMessage(id);
+    final ok = await MessagesRepository.deleteMessage(id);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok ? 'chat.deleted'.tr() : 'chat.deleteFailed'.tr(),
+        style: AppTypography.body(
+            size: 13,
+            color: ok ? AppColors.ink : AppColors.herzrotWarm),
+      ),
+    ));
   }
 
   @override
@@ -727,29 +748,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         onDelete: mine
                             ? () => _deleteMessage(m['id'] as String)
                             : null,
-                        // Pin only for channels (DMs have no admin-mod model)
-                        onPin: _context?.kind == ChatKind.channel
-                            ? () async {
-                                final pinned = await MessagesRepository
-                                    .togglePin(
-                                  messageId: m['id'] as String,
-                                  conversationId: widget.conversationId,
-                                );
-                                if (!context.mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: AppColors.surface,
-                                    content: Text(
-                                      pinned
-                                          ? '📌 Nachricht angepinnt.'
-                                          : 'Pin entfernt.',
-                                      style: AppTypography.body(
-                                          size: 13, color: AppColors.ink),
-                                    ),
-                                  ),
-                                );
-                              }
-                            : null,
+                        // Pin: jeder Conversation-Member kann pinnen
+                        // (in DMs + Channels). RLS pins_insert_member
+                        // setzt is_conversation_member voraus.
+                        onPin: () async {
+                          final pinned = await MessagesRepository.togglePin(
+                            messageId: m['id'] as String,
+                            conversationId: widget.conversationId,
+                          );
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: AppColors.surface,
+                              content: Text(
+                                pinned
+                                    ? 'chat.pinned'.tr()
+                                    : 'chat.unpinned'.tr(),
+                                style: AppTypography.body(
+                                    size: 13, color: AppColors.ink),
+                              ),
+                            ),
+                          );
+                        },
                             ),
                           ),
                         ],
