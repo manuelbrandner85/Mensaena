@@ -1155,6 +1155,7 @@
     "reminderDays": "{n} días antes",
     "reminderSet": "Recordatorio fijado: {label}",
     "reminderRemoved": "Recordatorio eliminado.",
+    "savedFilter": "Guardados",
     "share": "Compartir",
     "shareLink": "Copiar enlace",
     "shareText": "Copiar texto",

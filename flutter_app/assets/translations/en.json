@@ -1213,6 +1213,7 @@
     "reminderDays": "{n} days before",
     "reminderSet": "Reminder set: {label}",
     "reminderRemoved": "Reminder removed.",
+    "savedFilter": "Saved",
     "share": "Share",
     "shareLink": "Copy link",
     "shareText": "Copy text",

@@ -1155,6 +1155,7 @@
     "reminderDays": "{n} giorni prima",
     "reminderSet": "Promemoria impostato: {label}",
     "reminderRemoved": "Promemoria rimosso.",
+    "savedFilter": "Salvati",
     "share": "Condividi",
     "shareLink": "Copia link",
     "shareText": "Copia testo",

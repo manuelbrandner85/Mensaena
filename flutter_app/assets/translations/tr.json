@@ -1154,6 +1154,7 @@
     "reminderDays": "{n} gün önce",
     "reminderSet": "Hatırlatıcı kuruldu: {label}",
     "reminderRemoved": "Hatırlatıcı kaldırıldı.",
+    "savedFilter": "Kayıtlı",
     "share": "Paylaş",
     "shareLink": "Bağlantıyı kopyala",
     "shareText": "Metni kopyala",

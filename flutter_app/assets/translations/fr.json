@@ -1155,6 +1155,7 @@
     "reminderDays": "{n} jours avant",
     "reminderSet": "Rappel défini : {label}",
     "reminderRemoved": "Rappel supprimé.",
+    "savedFilter": "Enregistrés",
     "share": "Partager",
     "shareLink": "Copier le lien",
     "shareText": "Copier le texte",

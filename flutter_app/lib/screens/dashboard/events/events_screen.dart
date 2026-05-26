@@ -46,15 +46,31 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
   _EventView _view = _EventView.list;
   String? _category;
   String _search = '';
+  bool _onlySaved = false;
+  Set<String> _savedIds = const <String>{};
   DateTime _calendarMonth =
       DateTime(DateTime.now().year, DateTime.now().month);
 
-  bool get _hasFilters => _category != null || _search.isNotEmpty;
+  bool get _hasFilters =>
+      _category != null || _search.isNotEmpty || _onlySaved;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshSavedIds();
+  }
+
+  Future<void> _refreshSavedIds() async {
+    final ids = await EventsRepository.listSavedEventIds();
+    if (!mounted) return;
+    setState(() => _savedIds = ids.toSet());
+  }
 
   List<EventItem> _apply(List<EventItem> all) {
     final q = _search.trim().toLowerCase();
     return all.where((e) {
       if (_category != null && e.category != _category) return false;
+      if (_onlySaved && !_savedIds.contains(e.id)) return false;
       if (q.isEmpty) return true;
       return e.title.toLowerCase().contains(q) ||
           (e.locationName ?? '').toLowerCase().contains(q);
@@ -121,11 +137,65 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-              child: FilterChipBar<String>(
-                options: _categories,
-                selected: _category == null ? const <String>{} : {_category!},
-                onChanged: (s) =>
-                    setState(() => _category = s.isEmpty ? null : s.first),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: FilterChipBar<String>(
+                      options: _categories,
+                      selected:
+                          _category == null ? const <String>{} : {_category!},
+                      onChanged: (s) => setState(
+                          () => _category = s.isEmpty ? null : s.first),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  InkWell(
+                    onTap: () {
+                      setState(() => _onlySaved = !_onlySaved);
+                      if (_onlySaved) _refreshSavedIds();
+                    },
+                    borderRadius: BorderRadius.circular(999),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _onlySaved
+                            ? AppColors.amber.withValues(alpha: 0.22)
+                            : AppColors.elevated,
+                        border: Border.all(
+                          color: _onlySaved
+                              ? AppColors.amber.withValues(alpha: 0.6)
+                              : AppColors.line,
+                        ),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _onlySaved
+                                ? LucideIcons.bookMarked
+                                : LucideIcons.bookmark,
+                            size: 14,
+                            color: _onlySaved
+                                ? AppColors.amber
+                                : AppColors.inkSoft,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'events.savedFilter'.tr(),
+                            style: AppTypography.body(
+                              size: 11,
+                              color: _onlySaved
+                                  ? AppColors.amber
+                                  : AppColors.inkSoft,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             if (_hasFilters)
@@ -145,10 +215,16 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                         label: '🔍 $_search',
                         onRemove: () => setState(() => _search = ''),
                       ),
+                    if (_onlySaved)
+                      ActiveFilterChip(
+                        label: 'events.savedFilter'.tr(),
+                        onRemove: () => setState(() => _onlySaved = false),
+                      ),
                   ],
                   onClearAll: () => setState(() {
                     _category = null;
                     _search = '';
+                    _onlySaved = false;
                   }),
                 ),
               ),

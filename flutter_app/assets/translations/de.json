@@ -1212,6 +1212,7 @@
     "reminderDays": "{n} Tage vorher",
     "reminderSet": "Erinnerung gesetzt: {label}",
     "reminderRemoved": "Erinnerung entfernt.",
+    "savedFilter": "Gespeicherte",
     "share": "Teilen",
     "shareLink": "Link kopieren",
     "shareText": "Text kopieren",

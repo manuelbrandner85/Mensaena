@@ -1154,6 +1154,7 @@
     "reminderDays": "За {n} дней",
     "reminderSet": "Напоминание поставлено: {label}",
     "reminderRemoved": "Напоминание удалено.",
+    "savedFilter": "Сохранённые",
     "share": "Поделиться",
     "shareLink": "Скопировать ссылку",
     "shareText": "Скопировать текст",
