@@ -48,6 +48,34 @@ class NotificationRouter {
       return '/dashboard/messages';
     }
 
+    // Mention — gleicher Pfad wie Chat (öffnet conversation, optional
+    // mit highlight für message_id, das macht der Screen selbst).
+    if (t == 'mention' || (meta['kind']?.toString() == 'mention')) {
+      final conv = meta['conversation_id']?.toString();
+      if (conv != null) return '/dashboard/messages/$conv';
+      return '/dashboard/messages';
+    }
+
+    // Stream-Reminder — öffnet Liste geplanter Streams.
+    if (meta['kind']?.toString() == 'stream_reminder') {
+      return '/dashboard/live/scheduled';
+    }
+
+    // Scheduled-Call-Reminder — öffnet Liste geplanter Anrufe.
+    if (meta['kind']?.toString() == 'scheduled_call_reminder') {
+      return '/dashboard/scheduled-calls';
+    }
+
+    // Daily-Digest — Dashboard-Home.
+    if (meta['kind']?.toString() == 'daily_digest') {
+      return '/dashboard';
+    }
+
+    // Voicemail — öffnet Voicemail-Liste.
+    if (t == 'voicemail' || meta['kind']?.toString() == 'voicemail') {
+      return '/dashboard/voicemail';
+    }
+
     // Contact-System
     if (t == 'contact_request_received') return '/contact-requests';
     if (t == 'contact_request_accepted' ||
