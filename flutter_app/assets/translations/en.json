@@ -2224,6 +2224,15 @@
     "you_are_mentor": "You are a mentor",
     "you_are_mentee": "You are a mentee"
   },
+  "status": {
+    "title": "Set status",
+    "set": "Set status",
+    "hint": "What's on your mind?",
+    "clear": "Clear",
+    "until_cleared": "Until I change it",
+    "duration_hours": "{n} hours",
+    "duration_days": "{n} days"
+  },
   "sleep_reminder": {
     "title": "Time to unwind",
     "body": "Put down your phone — good sleep makes a stronger day.",

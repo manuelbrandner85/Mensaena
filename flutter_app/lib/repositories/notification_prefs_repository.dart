@@ -20,6 +20,8 @@ class NotifPrefs {
     required this.quietStartHour,
     required this.quietEndHour,
     required this.quietAllowCritical,
+    required this.dailyDigestEnabled,
+    required this.dailyDigestHour,
   });
 
   final bool enabled;
@@ -33,6 +35,8 @@ class NotifPrefs {
   final int quietStartHour;
   final int quietEndHour;
   final bool quietAllowCritical;
+  final bool dailyDigestEnabled;
+  final int dailyDigestHour;
 
   static const NotifPrefs defaults = NotifPrefs(
     enabled: true,
@@ -46,6 +50,8 @@ class NotifPrefs {
     quietStartHour: 22,
     quietEndHour: 7,
     quietAllowCritical: true,
+    dailyDigestEnabled: false,
+    dailyDigestHour: 8,
   );
 
   factory NotifPrefs.fromMap(Map<String, dynamic> m) => NotifPrefs(
@@ -60,6 +66,8 @@ class NotifPrefs {
         quietStartHour: (m['quiet_start_hour'] as num?)?.toInt() ?? 22,
         quietEndHour: (m['quiet_end_hour'] as num?)?.toInt() ?? 7,
         quietAllowCritical: m['quiet_allow_critical'] as bool? ?? true,
+        dailyDigestEnabled: m['daily_digest_enabled'] as bool? ?? false,
+        dailyDigestHour: (m['daily_digest_hour'] as num?)?.toInt() ?? 8,
       );
 
   NotifPrefs copyWith({
@@ -74,6 +82,8 @@ class NotifPrefs {
     int? quietStartHour,
     int? quietEndHour,
     bool? quietAllowCritical,
+    bool? dailyDigestEnabled,
+    int? dailyDigestHour,
   }) =>
       NotifPrefs(
         enabled: enabled ?? this.enabled,
@@ -87,6 +97,8 @@ class NotifPrefs {
         quietStartHour: quietStartHour ?? this.quietStartHour,
         quietEndHour: quietEndHour ?? this.quietEndHour,
         quietAllowCritical: quietAllowCritical ?? this.quietAllowCritical,
+        dailyDigestEnabled: dailyDigestEnabled ?? this.dailyDigestEnabled,
+        dailyDigestHour: dailyDigestHour ?? this.dailyDigestHour,
       );
 
   Map<String, dynamic> toUpsertMap(String userId) => {
@@ -102,6 +114,8 @@ class NotifPrefs {
         'quiet_start_hour': quietStartHour,
         'quiet_end_hour': quietEndHour,
         'quiet_allow_critical': quietAllowCritical,
+        'daily_digest_enabled': dailyDigestEnabled,
+        'daily_digest_hour': dailyDigestHour,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       };
 }

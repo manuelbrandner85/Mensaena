@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+
+import '../../widgets/profile/status_editor_sheet.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../widgets/effects/tilt_card.dart';
@@ -766,6 +768,44 @@ class _Header extends StatelessWidget {
                       style: AppTypography.body(
                           size: 13, color: AppColors.mute),
                     ),
+                  if (profile.hasActiveStatus) ...[
+                    const SizedBox(height: 6),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: GestureDetector(
+                        onTap: isMe
+                            ? () => StatusEditorSheet.show(context)
+                            : null,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(profile.statusEmoji ?? '💬',
+                                style: const TextStyle(fontSize: 14)),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                profile.statusText!,
+                                style: AppTypography.body(
+                                    size: 13, color: AppColors.inkSoft),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ] else if (isMe) ...[
+                    const SizedBox(height: 6),
+                    TextButton.icon(
+                      onPressed: () => StatusEditorSheet.show(context),
+                      icon: const Icon(LucideIcons.smile, size: 14),
+                      label: Text('status.set'.tr()),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.bronze,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   _TrustBadge(
                       score: profile.trustScore,

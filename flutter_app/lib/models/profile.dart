@@ -95,6 +95,9 @@ class Profile {
     this.offerTags = const [],
     this.seekTags = const [],
     this.coverUrl,
+    this.statusText,
+    this.statusEmoji,
+    this.statusUntil,
   });
 
   final String id;
@@ -192,6 +195,15 @@ class Profile {
   final List<String> offerTags;
   final List<String> seekTags;
   final String? coverUrl;
+  final String? statusText;
+  final String? statusEmoji;
+  final DateTime? statusUntil;
+
+  bool get hasActiveStatus {
+    if (statusText == null || statusText!.isEmpty) return false;
+    if (statusUntil == null) return true;
+    return statusUntil!.isAfter(DateTime.now());
+  }
 
   factory Profile.fromJson(Map<String, dynamic> j) {
     // Postgres NUMERIC kommt via PostgREST manchmal als String (z.B.
@@ -345,6 +357,11 @@ class Profile {
           ? (j['seek_tags'] as List).whereType<String>().toList()
           : const [],
       coverUrl: j['cover_url'] as String?,
+      statusText: j['status_text'] as String?,
+      statusEmoji: j['status_emoji'] as String?,
+      statusUntil: j['status_until'] != null
+          ? DateTime.tryParse(j['status_until'] as String)
+          : null,
     );
   }
 
@@ -440,5 +457,8 @@ class Profile {
         'offer_tags': offerTags,
         'seek_tags': seekTags,
         'cover_url': coverUrl,
+        'status_text': statusText,
+        'status_emoji': statusEmoji,
+        'status_until': statusUntil?.toIso8601String(),
       };
 }

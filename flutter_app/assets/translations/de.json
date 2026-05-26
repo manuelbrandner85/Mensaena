@@ -2223,6 +2223,15 @@
     "you_are_mentor": "Du bist Mentor:in",
     "you_are_mentee": "Du bist Mentee"
   },
+  "status": {
+    "title": "Status setzen",
+    "set": "Status setzen",
+    "hint": "Wie geht es dir gerade?",
+    "clear": "Löschen",
+    "until_cleared": "Bis ich es ändere",
+    "duration_hours": "{n} Stunden",
+    "duration_days": "{n} Tage"
+  },
   "sleep_reminder": {
     "title": "Zeit zum Abschalten",
     "body": "Lege dein Handy weg — guter Schlaf macht den Tag stärker.",

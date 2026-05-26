@@ -509,6 +509,23 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                     _update(prefs.copyWith(quietAllowCritical: v)),
               ),
             ],
+            const SizedBox(height: 18),
+            Text('TÄGLICHE ZUSAMMENFASSUNG',
+                style: AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            _BoolTile(
+              label: 'Daily-Digest aktivieren',
+              value: prefs.dailyDigestEnabled,
+              onChanged: (v) =>
+                  _update(prefs.copyWith(dailyDigestEnabled: v)),
+            ),
+            if (prefs.dailyDigestEnabled)
+              _HourRow(
+                label: 'Versand-Uhrzeit',
+                value: prefs.dailyDigestHour,
+                onChanged: (h) =>
+                    _update(prefs.copyWith(dailyDigestHour: h)),
+              ),
             const SizedBox(height: 24),
             Text(
               'Profil-Settings (E-Mail-Notifications, Push-Token-Lifecycle) '
