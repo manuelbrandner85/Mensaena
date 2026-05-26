@@ -13,8 +13,9 @@ import '../../config/theme/app_typography.dart';
 import '../../services/activity_heatmap_service.dart';
 import '../effects/glass_card.dart';
 
-final _heatmapProvider = FutureProvider<ActivityHeatmap>((ref) async {
-  return ActivityHeatmapService.compute();
+final _heatmapProvider =
+    FutureProvider.family<ActivityHeatmap, String?>((ref, userId) async {
+  return ActivityHeatmapService.compute(userId: userId);
 });
 
 const int _weeks = 12;
@@ -22,11 +23,14 @@ const int _cellSize = 12;
 const double _cellGap = 3;
 
 class ActivityHeatmapWidget extends ConsumerWidget {
-  const ActivityHeatmapWidget({super.key});
+  const ActivityHeatmapWidget({this.userId, super.key});
+
+  /// Optional: fremder User; null = aktueller User.
+  final String? userId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final async = ref.watch(_heatmapProvider);
+    final async = ref.watch(_heatmapProvider(userId));
     return async.when(
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),

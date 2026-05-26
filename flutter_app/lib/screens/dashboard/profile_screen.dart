@@ -17,6 +17,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../repositories/trust_ratings_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/dashboard/activity_heatmap_widget.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/post_card.dart';
 
@@ -173,6 +174,8 @@ class _AboutTab extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       children: [
         _ProfileStatsBar(userId: p.id),
+        const SizedBox(height: 18),
+        ActivityHeatmapWidget(userId: p.id),
         const SizedBox(height: 18),
         if (p.bio != null && p.bio!.isNotEmpty) ...[
           Text('profile.about'.tr(), style: AppTypography.label(size: 10)),
