@@ -85,6 +85,14 @@ android {
                 // CI setzt IMMER key.properties aus den Secrets.
                 signingConfigs.getByName("debug")
             }
+            // P22: R8-Code-Shrinking + Resource-Shrinking für kleinere APK
+            // + bessere Cold-Start-Zeit. ProGuard-Rules in proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

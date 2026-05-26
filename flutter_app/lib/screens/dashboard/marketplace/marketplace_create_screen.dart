@@ -156,8 +156,9 @@ class _MarketplaceCreateScreenState
     try {
       final picked = await _picker.pickImage(
         source: source,
-        maxWidth: 1920,
-        imageQuality: 85,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        imageQuality: 80,
       );
       if (picked == null || !mounted) return;
       setState(() => _images.add(File(picked.path)));

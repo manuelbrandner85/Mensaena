@@ -300,11 +300,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
   Future<void> _pickAvatar() async {
     final picker = ImagePicker();
+    // R6: Avatar 400px reicht für 2x-Retina-Display, viel kleinere Upload.
     final picked = await picker.pickImage(
       source: ImageSource.gallery,
-      maxWidth: 800,
-      maxHeight: 800,
-      imageQuality: 85,
+      maxWidth: 400,
+      maxHeight: 400,
+      imageQuality: 75,
     );
     if (picked == null) return;
     setState(() => _newAvatar = File(picked.path));

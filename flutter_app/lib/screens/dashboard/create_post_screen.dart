@@ -203,8 +203,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final picker = ImagePicker();
     final result = await picker.pickImage(
       source: ImageSource.gallery,
-      maxWidth: 1920,
-      maxHeight: 1920,
+      maxWidth: 1200,
+      maxHeight: 1200,
       imageQuality: 80,
     );
     if (result == null) return;

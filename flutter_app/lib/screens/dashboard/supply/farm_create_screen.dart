@@ -99,8 +99,8 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
     final picker = ImagePicker();
     final res = await picker.pickImage(
       source: ImageSource.gallery,
-      maxWidth: 1920,
-      maxHeight: 1920,
+      maxWidth: 1200,
+      maxHeight: 1200,
       imageQuality: 80,
     );
     if (res == null) return;
