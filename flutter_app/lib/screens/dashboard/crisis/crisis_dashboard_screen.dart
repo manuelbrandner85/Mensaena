@@ -13,6 +13,7 @@ import '../../../repositories/crisis_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/locale_country_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/crisis/safe_checkin_button.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -113,6 +114,10 @@ class _CrisisDashboardScreenState
         child: Column(
           children: [
             const _SosTopBanner(),
+            // K3: 'Ich bin sicher'-Banner bei aktiver kritischer Krise.
+            // Erscheint nur wenn kritische Krise existiert; verschwindet
+            // nach erfolgreichem Check-In (12h Cooldown).
+            const SafeCheckinButton(),
             // FIX (User-Wunsch: "in krisenmodus soll auch krise melden
             // können"): prominenter Report-Button DIREKT unter dem
             // SOS-Banner, damit der User sofort sieht wo er eine Krise

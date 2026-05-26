@@ -37,7 +37,16 @@
     "phone": "Téléphone",
     "description": "Description",
     "share": "Partager",
-    "errorGeneric": "Une erreur s'est produite."
+    "errorGeneric": "Une erreur s'est produite.",
+    "failed": "Action échouée."
+  },
+  "safe": {
+    "critical_nearby_title": "Crise critique près de toi",
+    "critical_nearby_hint": "Es-tu en sécurité ? Confirme rapidement pour tes voisins.",
+    "checked_in_title": "Tu es marqué·e en sécurité",
+    "checked_in_hint": "Ton statut a été envoyé à la communauté.",
+    "button": "Je suis en sécurité",
+    "confirmed": "Merci — ton statut a été enregistré."
   },
   "nav": {
     "home": "Accueil",

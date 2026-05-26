@@ -39,7 +39,16 @@
     "phone": "Phone",
     "description": "Description",
     "share": "Share",
-    "errorGeneric": "Something went wrong."
+    "errorGeneric": "Something went wrong.",
+    "failed": "Action failed."
+  },
+  "safe": {
+    "critical_nearby_title": "Critical crisis near you",
+    "critical_nearby_hint": "Are you safe? Confirm quickly for your neighbours.",
+    "checked_in_title": "You're marked as safe",
+    "checked_in_hint": "Your status was shared with the community.",
+    "button": "I'm safe",
+    "confirmed": "Thanks — your status was saved."
   },
   "nav": {
     "home": "Home",

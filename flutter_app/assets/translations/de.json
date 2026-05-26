@@ -39,7 +39,16 @@
     "phone": "Telefon",
     "description": "Beschreibung",
     "share": "Teilen",
-    "errorGeneric": "Etwas ist schiefgelaufen."
+    "errorGeneric": "Etwas ist schiefgelaufen.",
+    "failed": "Aktion fehlgeschlagen."
+  },
+  "safe": {
+    "critical_nearby_title": "Kritische Krise in deiner Nähe",
+    "critical_nearby_hint": "Bist du in Sicherheit? Bestätige es kurz für deine Nachbarschaft.",
+    "checked_in_title": "Du bist als sicher markiert",
+    "checked_in_hint": "Dein Status wurde an die Community gesendet.",
+    "button": "Ich bin sicher",
+    "confirmed": "Danke — dein Status wurde gespeichert."
   },
   "nav": {
     "home": "Home",

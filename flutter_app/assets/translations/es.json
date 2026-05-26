@@ -37,7 +37,16 @@
     "phone": "Teléfono",
     "description": "Descripción",
     "share": "Compartir",
-    "errorGeneric": "Algo salió mal."
+    "errorGeneric": "Algo salió mal.",
+    "failed": "Acción fallida."
+  },
+  "safe": {
+    "critical_nearby_title": "Crisis crítica cerca de ti",
+    "critical_nearby_hint": "¿Estás a salvo? Confirma rápidamente para tus vecinos.",
+    "checked_in_title": "Estás marcado como a salvo",
+    "checked_in_hint": "Tu estado se envió a la comunidad.",
+    "button": "Estoy a salvo",
+    "confirmed": "Gracias — tu estado se ha guardado."
   },
   "nav": {
     "home": "Inicio",

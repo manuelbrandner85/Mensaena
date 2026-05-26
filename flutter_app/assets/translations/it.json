@@ -37,7 +37,16 @@
     "phone": "Telefono",
     "description": "Descrizione",
     "share": "Condividi",
-    "errorGeneric": "Qualcosa è andato storto."
+    "errorGeneric": "Qualcosa è andato storto.",
+    "failed": "Azione non riuscita."
+  },
+  "safe": {
+    "critical_nearby_title": "Crisi critica vicino a te",
+    "critical_nearby_hint": "Sei al sicuro? Conferma rapidamente per i tuoi vicini.",
+    "checked_in_title": "Sei segnalato al sicuro",
+    "checked_in_hint": "Il tuo stato è stato inviato alla comunità.",
+    "button": "Sono al sicuro",
+    "confirmed": "Grazie — il tuo stato è stato salvato."
   },
   "nav": {
     "home": "Home",

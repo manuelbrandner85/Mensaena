@@ -37,7 +37,16 @@
     "phone": "Telefon",
     "description": "Açıklama",
     "share": "Paylaş",
-    "errorGeneric": "Bir şeyler ters gitti."
+    "errorGeneric": "Bir şeyler ters gitti.",
+    "failed": "İşlem başarısız."
+  },
+  "safe": {
+    "critical_nearby_title": "Yakınında kritik bir kriz",
+    "critical_nearby_hint": "Güvende misin? Komşuların için kısa bir onay ver.",
+    "checked_in_title": "Güvende olarak işaretlendin",
+    "checked_in_hint": "Durumun topluluğa gönderildi.",
+    "button": "Güvendeyim",
+    "confirmed": "Teşekkürler — durumun kaydedildi."
   },
   "nav": {
     "home": "Ana Sayfa",
