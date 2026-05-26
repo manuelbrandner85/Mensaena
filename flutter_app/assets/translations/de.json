@@ -2533,6 +2533,9 @@
   "neighbors": {
     "title": "Neu in deiner Nachbarschaft"
   },
+  "recent": {
+    "title": "Zuletzt besucht"
+  },
   "friend": {
     "request": "Freundschaft anfragen",
     "request_again": "Erneut anfragen",

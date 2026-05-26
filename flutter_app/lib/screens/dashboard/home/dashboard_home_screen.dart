@@ -50,6 +50,7 @@ import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/become_mentor_cta.dart';
 import '../../../widgets/dashboard/daily_challenges_widget.dart';
 import '../../../widgets/dashboard/nearby_neighbors_widget.dart';
+import '../../../widgets/dashboard/recent_routes_widget.dart';
 import '../../../widgets/dashboard/today_events_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
 import '../../../widgets/dashboard/dashboard_hero_card.dart';
@@ -293,6 +294,9 @@ class _DashboardHomeScreenState
           break;
         case 'quick_actions':
           if (profile != null) {
+            // N3: Recent-Routes-Chips zuerst (zuletzt besucht)
+            out.add(const RecentRoutesWidget());
+            out.add(const SizedBox(height: 8));
             out.add(Text('home.quickActions'.tr(),
                 style: AppTypography.label(size: 10)));
             out.add(const SizedBox(height: 8));
