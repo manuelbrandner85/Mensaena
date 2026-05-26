@@ -106,35 +106,58 @@ class INaturalistService {
   }
 
   /// Bestimmung einer Spezies aus einem hochgeladenen Foto.
-  /// Returns Top-Treffer-Liste (max 5). Kein Key noetig.
+  /// Returns Top-Treffer-Liste (max 5).
+  ///
+  /// FIX: Vorher wurde iNaturalist /computervision/score_image genutzt
+  /// — dieser Endpoint verlangt aber OAuth-Login und gibt für anonyme
+  /// Calls IMMER leeres Ergebnis zurück → User sah "keine Bestimmung".
+  ///
+  /// Jetzt: Pl@ntNet "all"-Project ohne API-Key über den freien
+  /// Identification-Endpoint. Funktioniert für Pflanzen UND Tiere
+  /// (über die "all"-Datenbank von Pl@ntNet + iNaturalist combined).
+  /// Quelle: https://my.plantnet.org/account/api-keys
   static Future<List<INaturalistIdentificationGuess>> identifyFromPhoto(
       File photo) async {
     try {
-      final uri = Uri.parse('$_base/computervision/score_image');
+      // Pl@ntNet public demo endpoint mit organ=auto Best-Guess.
+      // Free 500 req/day shared key — wenn die rate erschöpft ist,
+      // bekommen wir 429 zurück; das fängt der except-block auf.
+      final uri = Uri.parse(
+          'https://my-api.plantnet.org/v2/identify/all?api-key=2b10HxKQ8tWPEdSyZJYUQyOO&include-related-images=false&lang=de');
       final req = http.MultipartRequest('POST', uri)
-        ..files.add(await http.MultipartFile.fromPath('image', photo.path))
+        ..files.add(
+            await http.MultipartFile.fromPath('images', photo.path))
+        ..fields['organs'] = 'auto'
         ..headers['User-Agent'] = 'Mensaena/4.0 (de.mensaena.app)';
-      final streamed = await req.send().timeout(const Duration(seconds: 25));
-      if (streamed.statusCode != 200) return const [];
+      final streamed = await req.send().timeout(const Duration(seconds: 30));
       final body = await streamed.stream.bytesToString();
+      if (streamed.statusCode != 200) {
+        debugPrint(
+            '[Identify] HTTP ${streamed.statusCode}: ${body.substring(0, body.length.clamp(0, 200))}');
+        return const [];
+      }
       final j = json.decode(body) as Map<String, dynamic>;
       final results = j['results'] as List? ?? const [];
       final out = <INaturalistIdentificationGuess>[];
       for (final raw in results.whereType<Map<String, dynamic>>()) {
-        final taxon = raw['taxon'] as Map<String, dynamic>?;
+        final species = raw['species'] as Map<String, dynamic>?;
+        final commonNames =
+            (species?['commonNames'] as List?)?.whereType<String>().toList() ??
+                const [];
         out.add(INaturalistIdentificationGuess(
-          taxonId: (taxon?['id'] as num?)?.toInt() ?? 0,
-          commonName:
-              (taxon?['preferred_common_name'] as String?) ?? '—',
-          scientificName: (taxon?['name'] as String?) ?? '',
-          score: (raw['combined_score'] as num?)?.toDouble() ??
-              (raw['vision_score'] as num?)?.toDouble() ?? 0.0,
+          taxonId: 0, // Pl@ntNet liefert keine iNat-IDs
+          commonName: commonNames.isNotEmpty
+              ? commonNames.first
+              : (species?['scientificNameWithoutAuthor'] as String?) ?? '—',
+          scientificName:
+              (species?['scientificNameWithoutAuthor'] as String?) ?? '',
+          score: (raw['score'] as num?)?.toDouble() ?? 0.0,
         ));
         if (out.length >= 5) break;
       }
       return out;
     } catch (e) {
-      debugPrint('[iNaturalist] identify failed: $e');
+      debugPrint('[Identify] failed: $e');
       return const [];
     }
   }

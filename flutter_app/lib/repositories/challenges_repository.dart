@@ -124,14 +124,22 @@ class ChallengesRepository {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
     try {
-      await sb.from('challenge_progress').insert({
+      // Schema-Fix: DB hat status+progress_pct, NICHT current_count+completed.
+      // Vorher schlug der Insert mit "column does not exist" fehl → silent
+      // catch → User sah "Konnte nicht beitreten".
+      // upsert damit doppeltes Join nicht crash't (idempotent).
+      await sb.from('challenge_progress').upsert({
         'user_id': uid,
         'challenge_id': challengeId,
-        'current_count': 0,
-        'completed': false,
-      });
+        'status': 'active',
+        'progress_pct': 0,
+      }, onConflict: 'challenge_id,user_id');
       return true;
-    } catch (_) {
+    } catch (e) {
+      // Debug-Print damit man im LogCat sehen kann wenn DB-Schema sich
+      // wieder ändert.
+      // ignore: avoid_print
+      print('ChallengesRepository.join failed: $e');
       return false;
     }
   }
