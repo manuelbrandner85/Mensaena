@@ -91,6 +91,7 @@ import '../../screens/dashboard/harvest/wild_picks_screen.dart';
 import '../../screens/dashboard/jobs/job_portals_screen.dart';
 import '../../screens/dashboard/jobs/live_jobs_screen.dart';
 import '../../screens/dashboard/mobility/charge_stations_screen.dart';
+import '../../screens/dashboard/mobility/gas_prices_screen.dart';
 import '../../screens/dashboard/species/identify_species_screen.dart';
 import '../../screens/dashboard/warnungen/air_quality_screen.dart';
 import '../../screens/dashboard/warnungen/civil_protection_screen.dart';
@@ -998,12 +999,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const WildPicksScreen(),
         ),
       ),
-      // E-Auto-Ladestationen (OSM-Overpass)
+      // E-Auto-Ladestationen (OSM-Overpass) — bleibt für Nostalgie, aber
+      // User-Wunsch: durch Spritpreise als primärer Mobilität-Inhalt ersetzt.
       GoRoute(
         path: '/dashboard/charge-stations',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const ChargeStationsScreen(),
+        ),
+      ),
+      // Spritpreise via Tankerkönig (DE) — Ersatz für Charge-Stations
+      // im Mobilität-Modul.
+      GoRoute(
+        path: '/dashboard/mobility/gas',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const GasPricesScreen(),
         ),
       ),
       GoRoute(

@@ -41,17 +41,14 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
 
   Future<void> _preFillPlz() async {
     final p = await ProfilesRepository.getMine();
-    // BUGFIX: Auch zip_code-Spalte beachten (manche User haben nur eines
-    // der beiden gesetzt), Fallback auf locationText-Heuristik (erste 5
-    // Ziffern), letzter Fallback Berlin-Mitte.
     String plz = p?.homePostalCode ?? '';
     if (plz.isEmpty) {
-      // Suche 5-stellige Zahl im location_text (z. B. "10115 Berlin")
       final loc = p?.location ?? '';
       final m = RegExp(r'\b\d{5}\b').firstMatch(loc);
       if (m != null) plz = m.group(0)!;
     }
-    if (plz.isEmpty) plz = '10115';
+    // FIX (User-Wunsch: GPS-unabhängig): KEIN Hardcode auf Berlin mehr.
+    // Wenn PLZ leer → leer lassen + bundesweite Suche.
     if (!mounted) return;
     setState(() => _plzCtrl.text = plz);
     _search();
@@ -65,12 +62,11 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
   }
 
   Future<void> _search() async {
-    final plz = _plzCtrl.text.trim();
-    if (plz.isEmpty) return;
+    // PLZ leer = bundesweit suchen (User-Wunsch GPS-unabhängig).
     setState(() {
       _loading = true;
       _future = JobsService.search(
-        plz: plz,
+        plz: _plzCtrl.text.trim(),
         umkreis: _radius,
         was: _qCtrl.text.trim().isEmpty ? null : _qCtrl.text.trim(),
         size: 40,

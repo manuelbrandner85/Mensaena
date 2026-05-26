@@ -42,22 +42,27 @@ class JobsService {
   const JobsService._();
 
   /// Sucht Jobs in einem Postleitzahl-Umkreis.
-  /// [plz]    — z. B. '10115' (Berlin Mitte)
+  /// [plz]    — PLZ ODER Stadt-Name ODER leer (= bundesweit).
+  ///            Bei empty PLZ → KEIN wo-Parameter → BA-API liefert
+  ///            bundesweite Suche (User-Wunsch: GPS-unabhängig).
   /// [umkreis] — Radius in km (5, 10, 25, 50, 100, 200)
   /// [was]    — Suchbegriff (optional)
   static Future<List<JobOffer>> search({
-    required String plz,
+    String plz = '',
     int umkreis = 25,
     String? was,
     int size = 30,
   }) async {
     try {
       final params = <String, String>{
-        'wo': plz,
-        'umkreis': umkreis.toString(),
         'size': size.toString(),
         'page': '1',
       };
+      // wo + umkreis nur senden wenn PLZ gegeben — sonst bundesweit.
+      if (plz.trim().isNotEmpty) {
+        params['wo'] = plz.trim();
+        params['umkreis'] = umkreis.toString();
+      }
       if (was != null && was.isNotEmpty) params['was'] = was;
       final uri = Uri.https(
         'rest.arbeitsagentur.de',
@@ -67,7 +72,8 @@ class JobsService {
       final r = await http.get(uri, headers: {
         // Bundesagentur erfordert diesen Demo-Header.
         'X-API-Key': 'jobboerse-jobsuche',
-      }).timeout(const Duration(seconds: 8));
+        'Accept': 'application/json',
+      }).timeout(const Duration(seconds: 12));
       if (r.statusCode != 200) return const [];
       final j = json.decode(r.body) as Map<String, dynamic>;
       final stellen = j['stellenangebote'] as List? ?? const [];

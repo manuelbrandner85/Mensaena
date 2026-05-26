@@ -2514,6 +2514,11 @@
       "3": "Hallo! Können wir kurz schreiben?"
     }
   },
+  "gas": {
+    "title": "Spritpreise in der Nähe",
+    "empty": "Keine Tankstellen gefunden — GPS aktiv?",
+    "closed": "geschlossen"
+  },
   "dashboard": {
     "edit": {
       "title": "Dashboard bearbeiten",
