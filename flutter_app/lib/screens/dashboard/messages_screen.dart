@@ -9,6 +9,7 @@ import '../../config/theme/app_typography.dart';
 import '../../config/theme/cinema_accents.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/conversation_mute_ids_provider.dart';
+import '../../providers/unread_counts_provider.dart';
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
@@ -668,8 +669,41 @@ class _DmTile extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight,
-                size: 14, color: AppColors.mute),
+            // F8: Unread-Badge pro Conv
+            Builder(builder: (ctx) {
+              final unread = ref
+                      .watch(perConversationUnreadProvider)
+                      .maybeWhen(
+                        data: (m) => m[id] ?? 0,
+                        orElse: () => 0,
+                      );
+              if (unread <= 0) {
+                return const Icon(LucideIcons.chevronRight,
+                    size: 14, color: AppColors.mute);
+              }
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.bronze,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.bronze.withValues(alpha: 0.55),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Text(
+                  unread > 99 ? '99+' : '$unread',
+                  style: AppTypography.body(
+                    size: 11,
+                    color: AppColors.voidColor,
+                    weight: FontWeight.w700,
+                  ),
+                ),
+              );
+            }),
           ],
         ),
       ),
