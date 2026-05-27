@@ -3,9 +3,9 @@
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
-## CACHE — Mega-Prompt FINAL Status (2026-05-27)
-OPEN=Phase 0 (sicher), 1 (5/6), 2 (8/8), 3 (3/5), 5 (4/7), 6 (5/8), 7 (F38+F40+F41+F70+viele exist.), 8 (3/3), 9 (existing), 10 (Foundation+DW-K reset), 11 (P19+P21), 12 (meiste existing). 20+ Commits.
-COUNT=Phase 0: 14 SQL + 6 Flutter | Phasen 1-12: 14 weitere Items live | Plus Splash + 6 reine Bug-Fixes (DM-Erstellung, Pin/Edit/Delete, Anrufverlauf, Friendship, HEIC-Upload). Total: 41+ konkrete Verbesserungen.
+## CACHE — Mega-Prompt v2.1 Status (2026-05-27)
+OPEN=Phase 0 + 1 + 2 (8/8) + 3 (4/5: F12+F13 done, iOS-PiP defer) + 5 + 6 (ZUSATZ-4 done) + 7 + 8 + 9 + 10 (Sektionen+E3/E4/E6/E9/E10) + 11 PiP + 12 (S8 done) + 14. 40+ Commits.
+COUNT=v2.1 spezifisch (seit Session-Start): L1 reports + L5/L8/L9/L11/L12 constraints + F13 Cap 10 + S8 create_post raus + Books-Widget raus + QuickActions ohne Posten + ZUSATZ-4 Friends + ZUSATZ-3 PiP (Call+Group+Livestream) + Phase-10 6-Sektionen + E3/E4/E6/E9/E10 Widget-Konsolidierung + F38 Post-Reactions + F50 Streak-Freeze.
 NEXT=Verbleibende Defer-Items größerer Brocken: F12 Screen-Share + F13 Group-Calls (Android-Permissions/Architektur), F28 Message-Requests-für-Fremde (UX-Design), F22 Notification-Grouping (Backend-Rollup), F38 Scheduled Posts (DB+UI+Cron), F76 Chat-Summarization (ML), F52 Vorlesefunktion (Package-Add). Phase 11 P22 R8/ProGuard war früher deaktiviert (Crash-Risiko).
 LAST_SESSION=2026-05-27
 LAST_TASK_PHASE0=L3+L4+L6+L7+L8+L13+L15+L16+L18+L23+L24+L25+L26+L34+L35+L44+L45+L48+L51+L55+L56 live
