@@ -79,6 +79,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       FloatingReactionsController();
   RoomEventsService? _events;
   StreamSubscription<RoomEvent>? _eventsSub;
+  // F11: Connection-Quality
+  lk.ConnectionQuality _quality = lk.ConnectionQuality.unknown;
+  bool _poorWarningShown = false;
 
   @override
   void initState() {
@@ -341,6 +344,29 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       ..on<lk.RoomReconnectedEvent>((_) {
         if (!mounted) return;
         setState(() => _state = _CallState.connected);
+      })
+      // F11: Verbindungsqualität live tracken. Bei 'poor' Snackbar-Warnung,
+      // Indicator-Badge oben rechts zeigt die aktuelle Stufe.
+      ..on<lk.ParticipantConnectionQualityUpdatedEvent>((ev) {
+        if (!mounted) return;
+        if (ev.participant.identity != room.localParticipant?.identity) {
+          return;
+        }
+        setState(() => _quality = ev.connectionQuality);
+        if (ev.connectionQuality == lk.ConnectionQuality.poor &&
+            !_poorWarningShown) {
+          _poorWarningShown = true;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: AppColors.surface,
+            duration: const Duration(seconds: 4),
+            content: Text('call.poorConnection'.tr(),
+                style: AppTypography.body(
+                    size: 13, color: AppColors.herzrotWarm)),
+          ));
+        }
+        if (ev.connectionQuality != lk.ConnectionQuality.poor) {
+          _poorWarningShown = false;
+        }
       });
 
     try {
@@ -571,6 +597,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       body: Stack(
         children: [
           SafeArea(child: _buildBody()),
+          // F11: Connection-Quality-Badge oben rechts (während Call aktiv).
+          if (_state == _CallState.connected &&
+              _quality != lk.ConnectionQuality.unknown)
+            Positioned(
+              top: 12,
+              right: 12,
+              child: SafeArea(child: _ConnectionQualityBadge(_quality)),
+            ),
           // Floating-Reactions ueber dem Video/Avatar — andere Seite sieht
           // gesendete Reaktionen automatisch via Stream.
           Positioned.fill(
@@ -1114,6 +1148,49 @@ class _LocalCamPreviewState extends State<_LocalCamPreview> {
           mirrorMode: lk.VideoViewMirrorMode.mirror,
         ),
       ),
+    );
+  }
+}
+
+
+/// F11: Connection-Quality-Badge.
+class _ConnectionQualityBadge extends StatelessWidget {
+  const _ConnectionQualityBadge(this.quality);
+  final lk.ConnectionQuality quality;
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, icon, label) = switch (quality) {
+      lk.ConnectionQuality.excellent => (
+          AppColors.leben,
+          LucideIcons.signal,
+          'call.qualityExcellent'.tr()
+        ),
+      lk.ConnectionQuality.good => (
+          AppColors.amber,
+          LucideIcons.signal,
+          'call.qualityGood'.tr()
+        ),
+      lk.ConnectionQuality.poor => (
+          AppColors.herzrotWarm,
+          LucideIcons.signalLow,
+          'call.qualityPoor'.tr()
+        ),
+      _ => (AppColors.mute, LucideIcons.signalZero, '')
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.voidColor.withValues(alpha: 0.65),
+        border: Border.all(color: color.withValues(alpha: 0.6)),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 12, color: color),
+        const SizedBox(width: 4),
+        Text(label,
+            style: AppTypography.label(size: 9, color: color)),
+      ]),
     );
   }
 }

@@ -1878,6 +1878,10 @@
   "call": {
     "audio": "Audio",
     "video": "Video",
+    "qualityExcellent": "Strong",
+    "qualityGood": "OK",
+    "qualityPoor": "Weak",
+    "poorConnection": "Connection weak — video may be disabled.",
     "incoming": "Incoming call",
     "calling": "Ringing …",
     "ringing": "Incoming call",

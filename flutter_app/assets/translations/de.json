@@ -1877,6 +1877,10 @@
   "call": {
     "audio": "Audio",
     "video": "Video",
+    "qualityExcellent": "Stark",
+    "qualityGood": "OK",
+    "qualityPoor": "Schwach",
+    "poorConnection": "Verbindung schwach — Video wird ggf. ausgeschaltet.",
     "incoming": "Eingehender Anruf",
     "calling": "Klingelt …",
     "ringing": "Eingehender Anruf",
