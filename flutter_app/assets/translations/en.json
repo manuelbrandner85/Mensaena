@@ -2247,6 +2247,10 @@
     "enter": "Reading mode",
     "exit": "Normal view"
   },
+  "badges": {
+    "shareBtn": "Share achievement",
+    "shareCaption": "I just unlocked the ‹{name}› badge on Mensaena 🏅"
+  },
   "streak": {
     "title": "Keep it going",
     "days": "{count} days in a row",

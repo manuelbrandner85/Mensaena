@@ -6,6 +6,7 @@ library;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -226,6 +227,35 @@ class _Body extends StatelessWidget {
                   ]),
             ),
             const SizedBox(height: 16),
+            // F55 Achievement-Sharing: nur sichtbar wenn earned.
+            if (earned)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final caption = 'badges.shareCaption'.tr(
+                          namedArgs: {
+                            'name': badge.name,
+                          });
+                      await Share.share(
+                        '$caption\n\nhttps://www.mensaena.de',
+                        subject: badge.name,
+                      );
+                    },
+                    icon: const Icon(LucideIcons.share2, size: 16),
+                    label: Text('badges.shareBtn'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.bronze,
+                      side: BorderSide(
+                          color: AppColors.bronze.withValues(alpha: 0.5)),
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ),
             SizedBox(
               width: double.infinity,
               child: FilledButton(

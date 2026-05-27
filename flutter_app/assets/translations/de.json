@@ -2246,6 +2246,10 @@
     "enter": "Lese-Modus",
     "exit": "Normal-Ansicht"
   },
+  "badges": {
+    "shareBtn": "Erfolg teilen",
+    "shareCaption": "Ich habe gerade das Badge ‹{name}› auf Mensaena freigeschaltet 🏅"
+  },
   "streak": {
     "title": "Dranbleiben",
     "days": "{count} Tage in Folge",
