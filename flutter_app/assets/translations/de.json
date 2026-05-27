@@ -2454,6 +2454,17 @@
     "read": "Vorlesen",
     "stop": "Stopp"
   },
+  "group_call": {
+    "title": "Gruppen-Anruf",
+    "startBtn": "Gruppen-Anruf",
+    "inviteLabel": "GRUPPEN-ANRUF",
+    "inviteTitle": "Anruf läuft",
+    "inviteCta": "Beitreten →",
+    "inviteFailed": "Einladung konnte nicht gesendet werden.",
+    "connectFailed": "Verbindung zum Anruf fehlgeschlagen.",
+    "full": "Anruf voll — maximal 4 Teilnehmer.",
+    "you": "Du"
+  },
   "thanks": {
     "sheetTitle": "Danke-Karte senden",
     "recipient": "An {name}",

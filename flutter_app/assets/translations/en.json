@@ -2455,6 +2455,17 @@
     "read": "Read aloud",
     "stop": "Stop"
   },
+  "group_call": {
+    "title": "Group call",
+    "startBtn": "Group call",
+    "inviteLabel": "GROUP CALL",
+    "inviteTitle": "Call is live",
+    "inviteCta": "Join →",
+    "inviteFailed": "Couldn't send invite.",
+    "connectFailed": "Couldn't connect to the call.",
+    "full": "Call is full — max 4 participants.",
+    "you": "You"
+  },
   "thanks": {
     "sheetTitle": "Send thank-you card",
     "recipient": "To {name}",

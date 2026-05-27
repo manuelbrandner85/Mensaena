@@ -94,6 +94,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   // Call/Stream-Buttons sind jetzt im _ChatTopBar integriert (eleganter
   // statt grosser FAB unten rechts). Die Action-Handler bleiben unten.
 
+  /// F13: Group-Call — generiert eindeutigen Room-Namen, postet
+  /// [CALL_INVITE]-Marker als Message und öffnet GroupCallScreen.
+  /// Andere Teilnehmer tappen die Bubble um beizutreten.
+  Future<void> _startGroupCall() async {
+    final me = SupabaseService.currentUser?.id;
+    if (me == null) return;
+    final roomName = 'mensaena-group-${DateTime.now().millisecondsSinceEpoch}'
+        '-${me.substring(0, 8)}';
+    try {
+      await sb.from('messages').insert({
+        'conversation_id': widget.conversationId,
+        'sender_id': me,
+        'content': '[CALL_INVITE:$roomName]',
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('group_call.inviteFailed'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm)),
+      ));
+      return;
+    }
+    if (!mounted) return;
+    context.push('/dashboard/group-call/$roomName');
+  }
+
   Future<void> _startCall({String callType = 'audio'}) async {
     final ctx = _context;
     if (ctx == null) {
@@ -569,6 +597,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               onSearchChanged: (v) => setState(() => _searchQuery = v),
               onStartCall: () => _startCall(callType: 'audio'),
               onStartVideoCall: () => _startCall(callType: 'video'),
+              onStartGroupCall: _startGroupCall,
               onCancelCall: () async {
                 if (_activeCallId == null) return;
                 await DmCallService.cancel(_activeCallId!);
@@ -982,6 +1011,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
     required this.onSearchChanged,
     required this.onStartCall,
     required this.onStartVideoCall,
+    required this.onStartGroupCall,
     required this.onCancelCall,
     required this.onStartStream,
     required this.onEndStream,
@@ -998,6 +1028,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
   final ValueChanged<String> onSearchChanged;
   final Future<void> Function() onStartCall;
   final Future<void> Function() onStartVideoCall;
+  final Future<void> Function() onStartGroupCall;
   final Future<void> Function() onCancelCall;
   final Future<void> Function() onStartStream;
   final Future<void> Function() onEndStream;
@@ -1108,6 +1139,14 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                     label: 'call.videoAction'.tr(),
                     color: AppColors.bronze,
                     onTap: () async => widget.onStartVideoCall(),
+                  ),
+                // F13: Group-Call starten — sendet [CALL_INVITE]-Bubble.
+                if (widget.activeCallId == null)
+                  _ActionIcon(
+                    icon: LucideIcons.users,
+                    label: 'group_call.startBtn'.tr(),
+                    color: AppColors.amber,
+                    onTap: () async => widget.onStartGroupCall(),
                   ),
                 if (isChannel)
                   _ActionIcon(

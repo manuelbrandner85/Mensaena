@@ -14,6 +14,7 @@ import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
+import '../../../widgets/chat/call_invite_bubble.dart';
 import '../../../widgets/chat/post_card_chat_bubble.dart';
 import '../../../widgets/shared/image_lightbox.dart';
 import '../../../widgets/shared/voice_message_bubble.dart';
@@ -281,6 +282,13 @@ class ChatMessageBubble extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: PostCardChatBubble(
                       postId: _postCardId(textWithoutImages)!),
+                )
+              else if (_callInviteRoom(textWithoutImages) != null)
+                // F13: Group-Call-Invite-Karte.
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: CallInviteBubble(
+                      roomName: _callInviteRoom(textWithoutImages)!),
                 )
               else if (textWithoutImages.startsWith('[FORWARDED]'))
                 // F7: Weitergeleitete Nachricht — Header + Original-Text.
@@ -741,6 +749,16 @@ final _postCardRegex = RegExp(
     multiLine: false);
 String? _postCardId(String s) {
   final m = _postCardRegex.firstMatch(s.trim());
+  return m?.group(1);
+}
+
+/// F13: Erkennt `[CALL_INVITE:<roomName>]`-Marker und gibt den
+/// LiveKit-Room-Namen zurück.
+final _callInviteRegex = RegExp(
+    r'^\[CALL_INVITE:([a-zA-Z0-9_-]{4,80})\]$',
+    multiLine: false);
+String? _callInviteRoom(String s) {
+  final m = _callInviteRegex.firstMatch(s.trim());
   return m?.group(1);
 }
 
