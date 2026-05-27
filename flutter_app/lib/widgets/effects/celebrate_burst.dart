@@ -35,7 +35,7 @@ class CelebrateBurst {
     final overlay = Overlay.maybeOf(context);
     if (overlay == null) return;
     unawaited(Haptics.success());
-    if (ref != null && ref.read(a11yProvider).reduceMotion) {
+    if (ref != null && ref.read(a11yProvider).effectiveReduceMotion) {
       return;
     }
 
