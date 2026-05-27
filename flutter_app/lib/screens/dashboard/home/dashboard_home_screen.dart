@@ -94,6 +94,8 @@ class _DashboardHomeScreenState
     extends ConsumerState<DashboardHomeScreen> {
   Future<_DashboardData>? _data;
   bool _locationCheckDone = false;
+  // L16: Doppel-Back-Tap-to-Exit-Schutz auf Dashboard-Home.
+  DateTime? _lastBackPress;
 
   @override
   void initState() {
@@ -167,9 +169,30 @@ class _DashboardHomeScreenState
   Widget build(BuildContext context) {
     final cfg = ref.watch(dashboardWidgetConfigProvider).asData?.value ??
         DashboardWidgetConfig.defaultConfig;
-    return DashboardScaffold(
-      title: 'home.dashboardTitle'.tr(),
-      currentRoute: '/dashboard',
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final now = DateTime.now();
+        if (_lastBackPress != null &&
+            now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
+          SystemNavigator.pop();
+          return;
+        }
+        _lastBackPress = now;
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          duration: const Duration(milliseconds: 1800),
+          content: Text(
+            'home.tapAgainToExit'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink),
+          ),
+        ));
+      },
+      child: DashboardScaffold(
+        title: 'home.dashboardTitle'.tr(),
+        currentRoute: '/dashboard',
       fab: FloatingActionButton.small(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.bronze,
@@ -219,6 +242,7 @@ class _DashboardHomeScreenState
             );
           },
         ),
+      ),
       ),
     );
   }

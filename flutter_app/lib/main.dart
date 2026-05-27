@@ -71,6 +71,60 @@ Future<void> main() async {
   // Call-Screen.
   CallEventBus.init();
 
+  // L18: Globaler Error-Boundary — verhindert Red-Screen-of-Death.
+  // Statt Flutter's Default-Widget zeigen wir eine Cinema-Style Karte mit
+  // freundlichem Text + Reload-Hinweis. In Release-Builds wird stack-trace
+  // nicht angezeigt (Datenschutz).
+  ErrorWidget.builder = (details) {
+    const isDebug = !bool.fromEnvironment('dart.vm.product');
+    return Material(
+      color: const Color(0xFF0A0F1A),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 360),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1B2434).withValues(alpha: 0.9),
+              border: Border.all(color: const Color(0xFFC79363).withValues(alpha: 0.5)),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline, size: 36, color: Color(0xFFE26B6B)),
+                const SizedBox(height: 12),
+                const Text(
+                  'Etwas ist schiefgelaufen',
+                  style: TextStyle(
+                    fontSize: 16, color: Color(0xFFE9E2D5),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Diese Karte konnte nicht geladen werden. Tippe Zurück oder lade neu.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Color(0xFFB6AC9A), height: 1.4),
+                ),
+                if (isDebug) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    details.exceptionAsString(),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 10, color: Color(0xFF8C8275)),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  };
+
   // 3. App SOFORT rendern — kein await auf Firebase/FCM/Listener!
   runApp(
     EasyLocalization(

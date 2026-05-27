@@ -513,6 +513,7 @@
     "notAuthenticated": "Not signed in."
   },
   "home": {
+    "tapAgainToExit": "Tap again to exit",
     "quickActions": "Quick Actions",
     "viewAll": "View all",
     "trust": "Trust",

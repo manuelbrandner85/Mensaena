@@ -512,6 +512,7 @@
     "notAuthenticated": "Nicht angemeldet."
   },
   "home": {
+    "tapAgainToExit": "Erneut tippen zum Beenden",
     "quickActions": "Schnell-Aktionen",
     "viewAll": "Alle ansehen",
     "trust": "Vertrauen",
