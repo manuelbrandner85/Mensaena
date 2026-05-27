@@ -71,6 +71,7 @@ import '../../../widgets/dashboard/rating_prompt_banner.dart';
 import '../../../widgets/dashboard/safety_banners.dart';
 import '../../../widgets/dashboard/smart_match_widget.dart';
 import '../../../widgets/dashboard/stats_row.dart';
+import '../../../widgets/dashboard/sticky_quick_actions_bar.dart';
 import '../../../widgets/dashboard/success_story_card.dart';
 import '../../../widgets/dashboard/thanks_received.dart';
 import '../../../widgets/dashboard/trust_score_card.dart';
@@ -207,7 +208,8 @@ class _DashboardHomeScreenState
         tooltip: 'home.configureWidgets'.tr(),
         child: const Icon(LucideIcons.settings, size: 16),
       ),
-      body: RefreshIndicator(
+      body: Stack(children: [
+        RefreshIndicator(
         color: AppColors.amber,
         backgroundColor: AppColors.surface,
         onRefresh: _refresh,
@@ -250,6 +252,18 @@ class _DashboardHomeScreenState
           },
         ),
       ),
+        // Phase 10 B3: Sticky Quick-Actions-Bar — always visible, floating
+        // pill am unteren Rand. Im Edit-Mode versteckt damit User die
+        // Widgets nicht versehentlich verdeckt.
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 8,
+          child: ref.watch(isDashboardEditModeProvider)
+              ? const SizedBox.shrink()
+              : const StickyQuickActionsBar(),
+        ),
+      ]),
       ),
     );
   }
