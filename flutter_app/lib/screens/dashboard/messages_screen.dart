@@ -10,6 +10,7 @@ import '../../config/theme/cinema_accents.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/conversation_mute_ids_provider.dart';
 import '../../providers/unread_counts_provider.dart';
+import '../../widgets/chat/chat_recap_sheet.dart';
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
@@ -751,6 +752,22 @@ void _showDmActions(
             ),
           ),
           const SizedBox(height: 16),
+          ListTile(
+            leading: const Icon(LucideIcons.fileText, color: AppColors.bronze),
+            title: Text('chat.recapMenuTitle'.tr(),
+                style: AppTypography.body(size: 14, color: AppColors.ink)),
+            subtitle: Text('chat.recapMenuHint'.tr(),
+                style: AppTypography.caption()),
+            onTap: () async {
+              Navigator.pop(sheetCtx);
+              if (!context.mounted) return;
+              await ChatRecapSheet.show(
+                context,
+                conversationId: convId,
+                conversationTitle: title,
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(LucideIcons.eyeOff, color: AppColors.mute),
             title: Text('messages.hideForMe'.tr(),
