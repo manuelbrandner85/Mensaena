@@ -4,10 +4,11 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Modul-Audit Sprints 1-5 KOMPLETT. Alle Vorschläge live.
-COUNT=200+ Web | Flutter: Phase 1-7 + Cinema v3 + i18n W3 + Push W1-W3 + Modul-Audit S1-S5 ✅
-NEXT=Frei
-LAST_SESSION=2026-05-24
+OPEN=Phase 0 Foundation-Pass DURCH (Welle 1+2). 30+ Phase-0-Items + Phasen 1-12 noch offen.
+COUNT=Phase 0: 14 SQL + 6 Flutter live (Commits 4092dd0b → 4dd4735c).
+NEXT=Phase 0 Rest oder Phase 1 (BUG1-3, F26-F28)
+LAST_SESSION=2026-05-27
+LAST_TASK_PHASE0=L3+L4+L6+L7+L8+L13+L15+L16+L18+L23+L24+L25+L26+L34+L35+L44+L45+L48+L51+L55+L56 live, 3 Commits, flutter analyze 0 issues
 LAST_TASK=feat(modul-audit Sprint 5): WikipediaBox-Widget (Post-Detail bei Animal/tags), TranslateInlineButton (LibreTranslate für Chat-Messages, Auto-Detect + Toggle), Event-Detail-1-Tap In-Kalender-Button (add_2_calendar) + .ics-Fallback, BetterFeedback (shake_to_report-Style via 3-Finger-Long-Press, Submit → error_logs mit Screenshot-Bytes). Total Modul-Audit (5 Sprints): 35+ Items live, 10+ neue Services, 5+ neue Widgets, 9 neue Packages.
 
 ## Flutter-Migration
