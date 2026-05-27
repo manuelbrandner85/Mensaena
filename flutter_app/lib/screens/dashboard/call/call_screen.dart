@@ -82,6 +82,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   // F11: Connection-Quality
   lk.ConnectionQuality _quality = lk.ConnectionQuality.unknown;
   bool _poorWarningShown = false;
+  // F12: Screen-Share
+  bool _screenShareEnabled = false;
 
   @override
   void initState() {
@@ -423,6 +425,28 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     setState(() => _micEnabled = next);
   }
 
+  /// F12: Screen-Share toggeln. Auf Android braucht das ggf. eine
+  /// Foreground-Service-Permission; bei Fehler zeigen wir Snackbar statt
+  /// zu crashen.
+  Future<void> _toggleScreenShare() async {
+    final lp = _room?.localParticipant;
+    if (lp == null) return;
+    final next = !_screenShareEnabled;
+    try {
+      await lp.setScreenShareEnabled(next);
+      if (!mounted) return;
+      setState(() => _screenShareEnabled = next);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('call.screenShareFailed'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm)),
+      ));
+    }
+  }
+
   Future<void> _toggleCam() async {
     final lp = _room?.localParticipant;
     if (lp == null) return;
@@ -712,6 +736,21 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         ? AppColors.bronze
                         : AppColors.mute,
                     onTap: _state == _CallState.connected ? _toggleCam : null,
+                  ),
+                  // F12: Screen-Share-Toggle
+                  _CircleAction(
+                    icon: _screenShareEnabled
+                        ? LucideIcons.monitorOff
+                        : LucideIcons.monitor,
+                    label: _screenShareEnabled
+                        ? 'call.screenShareOff'.tr()
+                        : 'call.screenShareOn'.tr(),
+                    color: _screenShareEnabled
+                        ? AppColors.amber
+                        : AppColors.mute,
+                    onTap: _state == _CallState.connected
+                        ? _toggleScreenShare
+                        : null,
                   ),
                 ],
               ),
