@@ -272,6 +272,23 @@
   },
   "settings": {
     "title": "Ajustes",
+    "sections": {
+      "email": "CORREO ELECTRÓNICO",
+      "pushNotifications": "NOTIFICACIONES PUSH",
+      "categories": "CATEGORÍAS",
+      "nightMode": "MODO NOCHE",
+      "dailySummary": "RESUMEN DIARIO",
+      "session": "SESIÓN",
+      "privacyGdpr": "PRIVACIDAD (RGPD)",
+      "dangerZone": "ZONA DE PELIGRO",
+      "currentMood": "ESTADO DE ÁNIMO ACTUAL",
+      "cinemaMode": "MODO CINE",
+      "effectStrength": "INTENSIDAD DEL EFECTO",
+      "sound": "SONIDO",
+      "uiSounds": "Sonidos de interfaz",
+      "automatic": "AUTOMÁTICO",
+      "chooseManually": "ELEGIR MANUALMENTE"
+    },
     "tabs": {
       "account": "Cuenta",
       "privacy": "Privacidad",
@@ -2031,5 +2048,21 @@
     "noSuggestions": "Sin sugerencias todavía.",
     "added": "#{tag} añadido.",
     "removed": "#{tag} eliminado."
+  },
+  "interactions": {
+    "noneTitle": "Aún no hay actividades de ayuda",
+    "noneBody": "Aquí verás todas las publicaciones en las que has ofrecido o recibido ayuda — desde la solicitud hasta la finalización.",
+    "discover": "Descubrir solicitudes de ayuda"
+  },
+  "uploads": {
+    "imageFailed": "Error al subir la imagen {n}: {e}",
+    "failed": "Error al subir: {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "PRIVADO"
+  },
+  "crisisCreate": {
+    "areYouHere": "¿Estás AQUÍ?",
+    "yesReportHere": "Sí, reportar aquí"
   }
 }

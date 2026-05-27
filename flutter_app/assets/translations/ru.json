@@ -272,6 +272,23 @@
   },
   "settings": {
     "title": "Настройки",
+    "sections": {
+      "email": "E-MAIL",
+      "pushNotifications": "PUSH-УВЕДОМЛЕНИЯ",
+      "categories": "КАТЕГОРИИ",
+      "nightMode": "НОЧНОЙ РЕЖИМ",
+      "dailySummary": "ЕЖЕДНЕВНАЯ СВОДКА",
+      "session": "СЕССИЯ",
+      "privacyGdpr": "КОНФИДЕНЦИАЛЬНОСТЬ (GDPR)",
+      "dangerZone": "ОПАСНАЯ ЗОНА",
+      "currentMood": "ТЕКУЩЕЕ НАСТРОЕНИЕ",
+      "cinemaMode": "РЕЖИМ КИНО",
+      "effectStrength": "СИЛА ЭФФЕКТА",
+      "sound": "ЗВУК",
+      "uiSounds": "Звуки интерфейса",
+      "automatic": "АВТОМАТИЧЕСКИ",
+      "chooseManually": "ВЫБРАТЬ ВРУЧНУЮ"
+    },
     "tabs": {
       "account": "Аккаунт",
       "privacy": "Приватность",
@@ -2030,5 +2047,21 @@
     "noSuggestions": "Пока нет предложений.",
     "added": "#{tag} добавлен.",
     "removed": "#{tag} удалён."
+  },
+  "interactions": {
+    "noneTitle": "Пока нет действий помощи",
+    "noneBody": "Здесь ты увидишь все публикации, в которых ты предложил или получил помощь — от заявки до завершения.",
+    "discover": "Найти запросы о помощи"
+  },
+  "uploads": {
+    "imageFailed": "Ошибка загрузки изображения {n}: {e}",
+    "failed": "Ошибка загрузки: {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "ЛИЧНЫЙ"
+  },
+  "crisisCreate": {
+    "areYouHere": "Ты ЗДЕСЬ?",
+    "yesReportHere": "Да, сообщить здесь"
   }
 }

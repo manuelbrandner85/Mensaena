@@ -272,6 +272,23 @@
   },
   "settings": {
     "title": "Ayarlar",
+    "sections": {
+      "email": "E-POSTA",
+      "pushNotifications": "PUSH BİLDİRİMLER",
+      "categories": "KATEGORİLER",
+      "nightMode": "GECE MODU",
+      "dailySummary": "GÜNLÜK ÖZET",
+      "session": "OTURUM",
+      "privacyGdpr": "GİZLİLİK (GDPR)",
+      "dangerZone": "TEHLİKE BÖLGESİ",
+      "currentMood": "MEVCUT RUH HALİ",
+      "cinemaMode": "SİNEMA MODU",
+      "effectStrength": "EFEKT YOĞUNLUĞU",
+      "sound": "SES",
+      "uiSounds": "Arayüz sesleri",
+      "automatic": "OTOMATİK",
+      "chooseManually": "ELLE SEÇ"
+    },
     "tabs": {
       "account": "Hesap",
       "privacy": "Gizlilik",
@@ -2030,5 +2047,21 @@
     "noSuggestions": "Henüz öneri yok.",
     "added": "#{tag} eklendi.",
     "removed": "#{tag} kaldırıldı."
+  },
+  "interactions": {
+    "noneTitle": "Henüz yardım etkinliği yok",
+    "noneBody": "Burada yardım önerdiğin veya aldığın tüm gönderileri göreceksin — talepten tamamlanmaya kadar.",
+    "discover": "Yardım taleplerini keşfet"
+  },
+  "uploads": {
+    "imageFailed": "{n}. resim yüklenemedi: {e}",
+    "failed": "Yükleme başarısız: {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "ÖZEL"
+  },
+  "crisisCreate": {
+    "areYouHere": "BURADA mısın?",
+    "yesReportHere": "Evet, burada bildir"
   }
 }

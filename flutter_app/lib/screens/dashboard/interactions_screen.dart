@@ -72,15 +72,13 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                             const Icon(LucideIcons.helpingHand,
                                 size: 40, color: AppColors.bronze),
                             const SizedBox(height: 14),
-                            Text('Noch keine Hilfe-Vorgänge',
+                            Text('interactions.noneTitle'.tr(),
                                 textAlign: TextAlign.center,
                                 style: AppTypography.display(
                                     size: 18, color: AppColors.ink)),
                             const SizedBox(height: 8),
                             Text(
-                              'Hier siehst du alle Posts, bei denen du Hilfe '
-                              'angeboten oder erhalten hast — von der Anfrage '
-                              'bis zum Abschluss.',
+                              'interactions.noneBody'.tr(),
                               textAlign: TextAlign.center,
                               style: AppTypography.body(
                                   size: 13,
@@ -93,7 +91,7 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                                   context.go('/dashboard/posts'),
                               icon: const Icon(LucideIcons.search,
                                   size: 16),
-                              label: const Text('Hilfe-Anfragen entdecken'),
+                              label: Text('interactions.discover'.tr()),
                               style: FilledButton.styleFrom(
                                   backgroundColor: AppColors.bronze,
                                   foregroundColor: AppColors.voidColor),

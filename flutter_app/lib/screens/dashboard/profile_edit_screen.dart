@@ -358,7 +358,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: AppColors.surface,
-          content: Text('Upload fehlgeschlagen: $e',
+          content: Text('uploads.failed'.tr(namedArgs: {'e': '$e'}),
               style: AppTypography.body(size: 12, color: AppColors.ink)),
         ));
       }

@@ -272,6 +272,23 @@
   },
   "settings": {
     "title": "Impostazioni",
+    "sections": {
+      "email": "E-MAIL",
+      "pushNotifications": "NOTIFICHE PUSH",
+      "categories": "CATEGORIE",
+      "nightMode": "MODALITÀ NOTTE",
+      "dailySummary": "RIEPILOGO GIORNALIERO",
+      "session": "SESSIONE",
+      "privacyGdpr": "PRIVACY (GDPR)",
+      "dangerZone": "ZONA PERICOLO",
+      "currentMood": "UMORE ATTUALE",
+      "cinemaMode": "MODALITÀ CINEMA",
+      "effectStrength": "INTENSITÀ EFFETTO",
+      "sound": "AUDIO",
+      "uiSounds": "Suoni interfaccia",
+      "automatic": "AUTOMATICO",
+      "chooseManually": "SCEGLI MANUALMENTE"
+    },
     "tabs": {
       "account": "Account",
       "privacy": "Privacy",
@@ -2031,5 +2048,21 @@
     "noSuggestions": "Nessun suggerimento.",
     "added": "#{tag} aggiunto.",
     "removed": "#{tag} rimosso."
+  },
+  "interactions": {
+    "noneTitle": "Ancora nessuna attività di aiuto",
+    "noneBody": "Qui vedrai tutti i post in cui hai offerto o ricevuto aiuto — dalla richiesta al completamento.",
+    "discover": "Scopri richieste di aiuto"
+  },
+  "uploads": {
+    "imageFailed": "Caricamento immagine {n} fallito: {e}",
+    "failed": "Caricamento fallito: {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "PRIVATO"
+  },
+  "crisisCreate": {
+    "areYouHere": "Sei QUI?",
+    "yesReportHere": "Sì, segnala qui"
   }
 }

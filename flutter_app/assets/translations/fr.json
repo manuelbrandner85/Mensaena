@@ -272,6 +272,23 @@
   },
   "settings": {
     "title": "Paramètres",
+    "sections": {
+      "email": "E-MAIL",
+      "pushNotifications": "NOTIFICATIONS PUSH",
+      "categories": "CATÉGORIES",
+      "nightMode": "MODE NUIT",
+      "dailySummary": "RÉSUMÉ QUOTIDIEN",
+      "session": "SESSION",
+      "privacyGdpr": "CONFIDENTIALITÉ (RGPD)",
+      "dangerZone": "ZONE DE DANGER",
+      "currentMood": "HUMEUR ACTUELLE",
+      "cinemaMode": "MODE CINÉMA",
+      "effectStrength": "INTENSITÉ DE L'EFFET",
+      "sound": "SON",
+      "uiSounds": "Sons d'interface",
+      "automatic": "AUTOMATIQUE",
+      "chooseManually": "CHOIX MANUEL"
+    },
     "tabs": {
       "account": "Compte",
       "privacy": "Confidentialité",
@@ -2031,5 +2048,21 @@
     "noSuggestions": "Pas encore de suggestions.",
     "added": "#{tag} ajouté.",
     "removed": "#{tag} retiré."
+  },
+  "interactions": {
+    "noneTitle": "Aucune activité d'aide pour l'instant",
+    "noneBody": "Ici, tu verras toutes les publications où tu as offert ou reçu de l'aide — de la demande à la finalisation.",
+    "discover": "Découvrir les demandes d'aide"
+  },
+  "uploads": {
+    "imageFailed": "Échec du téléchargement de l'image {n} : {e}",
+    "failed": "Échec du téléchargement : {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "PRIVÉ"
+  },
+  "crisisCreate": {
+    "areYouHere": "Es-tu ICI ?",
+    "yesReportHere": "Oui, signaler ici"
   }
 }

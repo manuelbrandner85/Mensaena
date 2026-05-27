@@ -164,7 +164,7 @@ class _AccountTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('E-Mail', style: AppTypography.label(size: 10)),
+        Text('settings.sections.email'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 4),
         Text(profile.email ?? '–',
             style: AppTypography.body(size: 14, color: AppColors.ink)),
@@ -436,7 +436,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Text('PUSH-BENACHRICHTIGUNGEN',
+            Text('settings.sections.pushNotifications'.tr(),
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
@@ -445,7 +445,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
               onChanged: (v) => _update(prefs.copyWith(enabled: v)),
             ),
             const SizedBox(height: 18),
-            Text('KATEGORIEN',
+            Text('settings.sections.categories'.tr(),
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
@@ -479,7 +479,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
               onChanged: (v) => _update(prefs.copyWith(system: v)),
             ),
             const SizedBox(height: 18),
-            Text('NACHT-MODUS',
+            Text('settings.sections.nightMode'.tr(),
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
@@ -511,7 +511,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
               ),
             ],
             const SizedBox(height: 18),
-            Text('TÄGLICHE ZUSAMMENFASSUNG',
+            Text('settings.sections.dailySummary'.tr(),
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
@@ -877,7 +877,7 @@ class _DangerTabState extends State<_DangerTab> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('SITZUNG', style: AppTypography.label(size: 10)),
+        Text('settings.sections.session'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () async {
@@ -888,7 +888,7 @@ class _DangerTabState extends State<_DangerTab> {
           label: Text('common.logout'.tr()),
         ),
         const SizedBox(height: 24),
-        Text('DATENSCHUTZ (DSGVO)', style: AppTypography.label(size: 10)),
+        Text('settings.sections.privacyGdpr'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: _exporting ? null : _exportData,
@@ -908,7 +908,7 @@ class _DangerTabState extends State<_DangerTab> {
           ),
         ),
         const SizedBox(height: 24),
-        Text('GEFAHRENZONE', style: AppTypography.label(size: 10)),
+        Text('settings.sections.dangerZone'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(14),
@@ -1029,7 +1029,7 @@ class _AppearanceTab extends ConsumerWidget {
                   const Icon(LucideIcons.palette,
                       color: AppColors.bronze, size: 16),
                   const SizedBox(width: 6),
-                  Text('AKTUELLE STIMMUNG',
+                  Text('settings.sections.currentMood'.tr(),
                       style: AppTypography.label(
                           size: 9, color: AppColors.bronzeSoft)),
                 ],
@@ -1077,7 +1077,7 @@ class _AppearanceTab extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Text('CINEMA-MODUS',
+        Text('settings.sections.cinemaMode'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 8),
         for (final m in CinemaMode.values)
@@ -1088,12 +1088,12 @@ class _AppearanceTab extends ConsumerWidget {
                 ref.read(cinemaModeProvider.notifier).set(m),
           ),
         const SizedBox(height: 16),
-        Text('EFFEKT-STÄRKE',
+        Text('settings.sections.effectStrength'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 8),
         _IntensityTiles(),
         const SizedBox(height: 16),
-        Text('SOUND',
+        Text('settings.sections.sound'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 4),
         const _SoundToggle(),
@@ -1360,7 +1360,7 @@ class _SoundToggleState extends ConsumerState<_SoundToggle> {
         if (next) SoundService.click();
       },
       activeColor: AppColors.bronze,
-      title: Text('UI-Sounds',
+      title: Text('settings.sections.uiSounds'.tr(),
           style: AppTypography.body(size: 14, color: AppColors.ink)),
       subtitle: Text(
         'Dezenter System-Klick bei Taps und Toggles.',
@@ -1814,7 +1814,7 @@ class _LanguageTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('AUTOMATIK',
+        Text('settings.sections.automatic'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 4),
         SwitchListTile.adaptive(
@@ -1895,7 +1895,7 @@ class _LanguageTab extends ConsumerWidget {
           ),
         ],
         const SizedBox(height: 24),
-        Text('MANUELL WÄHLEN',
+        Text('settings.sections.chooseManually'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 8),
         for (final l in kSupportedLocales)

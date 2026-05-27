@@ -278,6 +278,23 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "sections": {
+      "email": "E-MAIL",
+      "pushNotifications": "PUSH-BENACHRICHTIGUNGEN",
+      "categories": "KATEGORIEN",
+      "nightMode": "NACHT-MODUS",
+      "dailySummary": "TÄGLICHE ZUSAMMENFASSUNG",
+      "session": "SITZUNG",
+      "privacyGdpr": "DATENSCHUTZ (DSGVO)",
+      "dangerZone": "GEFAHRENZONE",
+      "currentMood": "AKTUELLE STIMMUNG",
+      "cinemaMode": "CINEMA-MODUS",
+      "effectStrength": "EFFEKT-STÄRKE",
+      "sound": "SOUND",
+      "uiSounds": "UI-Sounds",
+      "automatic": "AUTOMATIK",
+      "chooseManually": "MANUELL WÄHLEN"
+    },
     "tabs": {
       "account": "Account",
       "privacy": "Privatsphäre",
@@ -2775,5 +2792,21 @@
     "alerts": {
       "allClear": "Alles sicher"
     }
+  },
+  "interactions": {
+    "noneTitle": "Noch keine Hilfe-Vorgänge",
+    "noneBody": "Hier siehst du alle Posts, bei denen du Hilfe angeboten oder erhalten hast — von der Anfrage bis zum Abschluss.",
+    "discover": "Hilfe-Anfragen entdecken"
+  },
+  "uploads": {
+    "imageFailed": "Upload-Fehler Bild {n}: {e}",
+    "failed": "Upload fehlgeschlagen: {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "PRIVAT"
+  },
+  "crisisCreate": {
+    "areYouHere": "Bist du HIER?",
+    "yesReportHere": "Ja, hier melden"
   }
 }

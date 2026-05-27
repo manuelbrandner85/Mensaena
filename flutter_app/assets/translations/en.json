@@ -278,6 +278,23 @@
   },
   "settings": {
     "title": "Settings",
+    "sections": {
+      "email": "E-MAIL",
+      "pushNotifications": "PUSH NOTIFICATIONS",
+      "categories": "CATEGORIES",
+      "nightMode": "NIGHT MODE",
+      "dailySummary": "DAILY SUMMARY",
+      "session": "SESSION",
+      "privacyGdpr": "PRIVACY (GDPR)",
+      "dangerZone": "DANGER ZONE",
+      "currentMood": "CURRENT MOOD",
+      "cinemaMode": "CINEMA MODE",
+      "effectStrength": "EFFECT STRENGTH",
+      "sound": "SOUND",
+      "uiSounds": "UI sounds",
+      "automatic": "AUTOMATIC",
+      "chooseManually": "CHOOSE MANUALLY"
+    },
     "tabs": {
       "account": "Account",
       "privacy": "Privacy",
@@ -2776,5 +2793,21 @@
     "alerts": {
       "allClear": "All clear"
     }
+  },
+  "interactions": {
+    "noneTitle": "No help activities yet",
+    "noneBody": "Here you'll see all posts where you've offered or received help — from request to completion.",
+    "discover": "Discover help requests"
+  },
+  "uploads": {
+    "imageFailed": "Image {n} upload failed: {e}",
+    "failed": "Upload failed: {e}"
+  },
+  "groupsModule": {
+    "privateBadge": "PRIVATE"
+  },
+  "crisisCreate": {
+    "areYouHere": "Are you HERE?",
+    "yesReportHere": "Yes, report here"
   }
 }

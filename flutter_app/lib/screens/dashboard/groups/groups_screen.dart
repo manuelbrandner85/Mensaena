@@ -251,7 +251,7 @@ class _Tile extends StatelessWidget {
                                   size: 9,
                                   color: AppColors.bronze),
                               const SizedBox(width: 3),
-                              Text('PRIVAT',
+                              Text('groupsModule.privateBadge'.tr(),
                                   style: AppTypography.label(
                                       size: 7,
                                       color: AppColors.bronze)),

@@ -112,7 +112,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
         backgroundColor: AppColors.surface,
         icon: const Icon(LucideIcons.mapPin,
             size: 32, color: AppColors.herzrotWarm),
-        title: Text('Bist du HIER?',
+        title: Text('crisisCreate.areYouHere'.tr(),
             textAlign: TextAlign.center,
             style: AppTypography.display(size: 18, color: AppColors.ink)),
         content: Text(hint,
@@ -127,7 +127,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
           FilledButton.icon(
             onPressed: () => Navigator.pop(dCtx, true),
             icon: const Icon(LucideIcons.check, size: 14),
-            label: const Text('Ja, hier melden'),
+            label: Text('crisisCreate.yesReportHere'.tr()),
             style: FilledButton.styleFrom(
                 backgroundColor: AppColors.herzrotWarm,
                 foregroundColor: Colors.white),

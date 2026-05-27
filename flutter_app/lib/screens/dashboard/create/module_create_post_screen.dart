@@ -178,7 +178,8 @@ class _ModuleCreatePostScreenState
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Upload-Fehler Bild ${i + 1}: $e'),
+            content: Text('uploads.imageFailed'.tr(
+                namedArgs: {'n': '${i + 1}', 'e': '$e'})),
           ));
         }
       }
