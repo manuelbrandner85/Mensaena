@@ -16,6 +16,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/livekit_token_service.dart';
+import '../../../services/pip_service.dart';
 import '../../../services/supabase_service.dart';
 
 class GroupCallScreen extends ConsumerStatefulWidget {
@@ -253,6 +254,12 @@ class _GroupCallScreenState extends ConsumerState<GroupCallScreen> {
                     color: AppColors.herzrot,
                     big: true,
                     onTap: _hangUp,
+                  ),
+                  // ZUSATZ-3 PiP: System-PiP-Fenster.
+                  _CircleAction(
+                    icon: LucideIcons.pictureInPicture2,
+                    color: AppColors.bronze,
+                    onTap: () => PipService.enterPip(width: 16, height: 9),
                   ),
                 ],
               ),

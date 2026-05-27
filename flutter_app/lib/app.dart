@@ -8,9 +8,11 @@ import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
 import 'providers/accessibility_provider.dart';
+import 'providers/active_call_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'services/pip_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
@@ -20,11 +22,48 @@ import 'widgets/shared/update_gate.dart';
 
 /// SKILL: mensaena-architektur
 /// Root-Widget. MaterialApp.router mit GoRouter aus app_router.dart.
-class MensaenaApp extends ConsumerWidget {
+///
+/// ZUSATZ-3 PiP: WidgetsBindingObserver lauscht auf AppLifecycleState.paused.
+/// Wenn die App minimiert wird UND ein DM-Call oder Group-Call läuft,
+/// triggern wir automatisch PiP — Audio/Video bleiben damit aktiv im
+/// System-PiP-Fenster statt zu pausieren.
+class MensaenaApp extends ConsumerStatefulWidget {
   const MensaenaApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MensaenaApp> createState() => _MensaenaAppState();
+}
+
+class _MensaenaAppState extends ConsumerState<MensaenaApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Bei App-Minimize prüfen ob ein DM-Call aktiv ist → PiP triggern.
+    // Group-Calls + Livestream haben eigene Lifecycle-Handler (zukünftig).
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      final activeCall = ref.read(activeCallProvider);
+      if (activeCall != null) {
+        // Fire-and-forget — Android entscheidet selbst ob PiP klappt.
+        PipService.enterPip();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
     final isLight = ref.watch(isLightModeProvider);
 

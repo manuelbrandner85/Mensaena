@@ -1904,6 +1904,7 @@
     "screenShareOn": "Share screen",
     "screenShareOff": "Stop sharing",
     "screenShareFailed": "Screen sharing isn't supported on this device.",
+    "pip": "Mini window",
     "incoming": "Incoming call",
     "calling": "Ringing …",
     "ringing": "Incoming call",

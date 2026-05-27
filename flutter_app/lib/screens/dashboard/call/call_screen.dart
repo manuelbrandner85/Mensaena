@@ -20,6 +20,7 @@ import '../../../providers/active_call_provider.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
+import '../../../services/pip_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
@@ -750,6 +751,15 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         : AppColors.mute,
                     onTap: _state == _CallState.connected
                         ? _toggleScreenShare
+                        : null,
+                  ),
+                  // ZUSATZ-3 PiP: System-PiP-Fenster.
+                  _CircleAction(
+                    icon: LucideIcons.pictureInPicture2,
+                    label: 'call.pip'.tr(),
+                    color: AppColors.bronze,
+                    onTap: _state == _CallState.connected
+                        ? () => PipService.enterPip(width: 16, height: 9)
                         : null,
                   ),
                 ],
