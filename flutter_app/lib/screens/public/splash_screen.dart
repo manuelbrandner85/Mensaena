@@ -36,7 +36,8 @@ class _SplashScreenState extends State<SplashScreen>
   Timer? _navTimer;
 
   static const _wordmark = 'Mensaena';
-  static const _totalDurationMs = 2600;
+  // Etwas länger — gibt der Animation Raum + zeigt die Marke ruhiger.
+  static const _totalDurationMs = 4200;
 
   @override
   void initState() {
