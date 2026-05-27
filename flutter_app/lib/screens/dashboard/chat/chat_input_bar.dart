@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/haptics.dart';
 import '../../../services/voice_recorder_service.dart';
+import '../../../widgets/chat/live_location_button.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
 
 /// SKILL: mensaena-features
@@ -96,6 +97,9 @@ class ChatInputBar extends StatelessWidget {
                 ),
                 // Voice-Diktat → Text-Composer.
                 VoiceDictationButton(controller: controller, localeId: 'de_DE'),
+                const SizedBox(width: 2),
+                // F9: Live-Standort teilen (15/30/60 Min)
+                LiveLocationButton(conversationId: conversationId),
                 const SizedBox(width: 2),
                 // Voice-Recorder — long-press = recording, release = send.
                 ChatVoiceRecorderButton(
