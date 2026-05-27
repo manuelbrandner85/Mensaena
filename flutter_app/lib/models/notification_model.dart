@@ -86,4 +86,30 @@ class AppNotification {
         'priority': priority,
         'deleted_at': deletedAt?.toIso8601String(),
       };
+
+  AppNotification copyWith({
+    String? title,
+    String? body,
+    bool? read,
+    DateTime? readAt,
+  }) {
+    return AppNotification(
+      id: id,
+      userId: userId,
+      type: type,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      createdAt: createdAt,
+      link: link,
+      readAt: readAt ?? this.readAt,
+      scheduledFor: scheduledFor,
+      category: category,
+      content: content,
+      actorId: actorId,
+      metadata: metadata,
+      read: read ?? this.read,
+      priority: priority,
+      deletedAt: deletedAt,
+    );
+  }
 }

@@ -327,25 +327,68 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   List<AppNotification> _filter(List<AppNotification> all) {
-    switch (_tab) {
-      case 'unread':
-        return all.where((n) => !n.read && n.readAt == null).toList();
-      case 'message':
-        return all.where((n) => n.category == 'message').toList();
-      case 'interaction':
-        return all
-            .where((n) =>
-                n.category == 'interaction' || n.category == 'post_response')
-            .toList();
-      case 'system':
-        return all.where((n) {
+    final filtered = switch (_tab) {
+      'unread' => all.where((n) => !n.read && n.readAt == null).toList(),
+      'message' => all.where((n) => n.category == 'message').toList(),
+      'interaction' => all
+          .where((n) =>
+              n.category == 'interaction' || n.category == 'post_response')
+          .toList(),
+      'system' => all.where((n) {
           return n.category == 'system' ||
               n.category == 'bot' ||
               n.category == 'welcome';
-        }).toList();
-      default:
-        return all;
+        }).toList(),
+      _ => List<AppNotification>.from(all),
+    };
+    return _groupSimilar(filtered);
+  }
+
+  /// F22: Aggregiert Notifications mit gleichem `type` + gleichem
+  /// `target_id` (aus metadata) wenn sie innerhalb 1h liegen. Behält die
+  /// neueste Notification und hängt im Titel "und X weitere" an. Lese-
+  /// status, Tap-Routing usw. nehmen die neueste Notification als Basis.
+  List<AppNotification> _groupSimilar(List<AppNotification> input) {
+    final groups = <String, List<AppNotification>>{};
+    final order = <String>[];
+    for (final n in input) {
+      final target = (n.metadata['post_id']
+              ?? n.metadata['conversation_id']
+              ?? n.metadata['event_id']
+              ?? n.metadata['crisis_id']
+              ?? n.metadata['friendship_id']
+              ?? '').toString();
+      // Buckets bei leerem target keinen Group-Key — bleibt einzeln.
+      if (target.isEmpty) {
+        final k = 'solo_${n.id}';
+        groups[k] = [n];
+        order.add(k);
+        continue;
+      }
+      final bucketHour = n.createdAt
+          .toUtc()
+          .toIso8601String()
+          .substring(0, 13); // YYYY-MM-DDTHH
+      final key = '${n.type}_${target}_$bucketHour';
+      groups.putIfAbsent(key, () {
+        order.add(key);
+        return <AppNotification>[];
+      }).add(n);
     }
+    final out = <AppNotification>[];
+    for (final k in order) {
+      final g = groups[k]!;
+      if (g.length <= 1) {
+        out.add(g.first);
+        continue;
+      }
+      final newest = g.first;
+      final extra = g.length - 1;
+      out.add(newest.copyWith(
+        title: '${newest.title} · +$extra',
+      ));
+    }
+    return out;
   }
 }
 
