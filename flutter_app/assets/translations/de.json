@@ -2395,7 +2395,11 @@
     "send_test": "Test-Benachrichtigung senden",
     "test_title": "Mensaena-Test",
     "test_body": "Wenn du das hier siehst, funktionieren Benachrichtigungen.",
-    "test_sent": "Test-Benachrichtigung wurde gesendet."
+    "test_sent": "Test-Benachrichtigung wurde gesendet.",
+    "radiusSection": "Benachrichtigungs-Radius",
+    "nearbyToggle": "Push bei Hilfegesuchen in der Nähe",
+    "radiusValue": "{km} km Umkreis",
+    "radiusHint": "Nur help_needed-Beiträge innerhalb dieses Umkreises lösen Push-Benachrichtigungen aus."
   },
   "status": {
     "title": "Status setzen",

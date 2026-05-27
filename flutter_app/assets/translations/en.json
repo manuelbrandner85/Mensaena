@@ -2396,7 +2396,11 @@
     "send_test": "Send test notification",
     "test_title": "Mensaena test",
     "test_body": "If you see this, notifications are working.",
-    "test_sent": "Test notification sent."
+    "test_sent": "Test notification sent.",
+    "radiusSection": "Notification radius",
+    "nearbyToggle": "Push for nearby help requests",
+    "radiusValue": "{km} km radius",
+    "radiusHint": "Only help_needed posts within this radius trigger push notifications."
   },
   "status": {
     "title": "Set status",

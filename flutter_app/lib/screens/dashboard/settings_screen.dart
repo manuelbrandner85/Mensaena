@@ -527,6 +527,12 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 onChanged: (h) =>
                     _update(prefs.copyWith(dailyDigestHour: h)),
               ),
+            const SizedBox(height: 18),
+            // F44: Benachrichtigungs-Radius für nearby-Posts.
+            Text('notif.radiusSection'.tr().toUpperCase(),
+                style: AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            _NotifyRadiusRow(),
             const SizedBox(height: 24),
             OutlinedButton.icon(
               onPressed: _sendTestNotification,
@@ -2389,5 +2395,92 @@ class _A11ySection extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// F44: Slider + Toggle für Benachrichtigungs-Radius (km).
+class _NotifyRadiusRow extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<_NotifyRadiusRow> createState() => _NotifyRadiusRowState();
+}
+
+class _NotifyRadiusRowState extends ConsumerState<_NotifyRadiusRow> {
+  double? _radius;
+  bool? _enabled;
+  bool _saving = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final pAsync = ref.watch(myProfileProvider);
+    return pAsync.when(
+      loading: () => const SizedBox(height: 60),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (p) {
+        _radius ??= (p?.notificationRadiusKm ?? 10).toDouble();
+        _enabled ??= p?.notifyNearbyPosts ?? true;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _BoolTile(
+              label: 'notif.nearbyToggle'.tr(),
+              value: _enabled!,
+              onChanged: (v) async {
+                setState(() => _enabled = v);
+                await _save();
+              },
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(LucideIcons.target,
+                    size: 14, color: AppColors.bronze),
+                const SizedBox(width: 8),
+                Text(
+                  'notif.radiusValue'
+                      .tr(namedArgs: {'km': _radius!.toStringAsFixed(0)}),
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.ink),
+                ),
+                const Spacer(),
+                if (_saving)
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.bronze),
+                  ),
+              ],
+            ),
+            Slider(
+              value: _radius!,
+              min: 1,
+              max: 50,
+              divisions: 49,
+              activeColor: AppColors.bronze,
+              onChanged: _enabled!
+                  ? (v) => setState(() => _radius = v)
+                  : null,
+              onChangeEnd: _enabled! ? (_) => _save() : null,
+            ),
+            Text('notif.radiusHint'.tr(),
+                style: AppTypography.caption()),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _save() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null || _saving) return;
+    setState(() => _saving = true);
+    try {
+      await ProfilesRepository.update(uid, {
+        'notification_radius_km': _radius!.toInt(),
+        'notify_nearby_posts': _enabled,
+      });
+      ref.invalidate(myProfileProvider);
+    } catch (_) {}
+    if (mounted) setState(() => _saving = false);
   }
 }
