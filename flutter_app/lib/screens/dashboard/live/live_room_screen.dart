@@ -29,6 +29,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/livekit_token_service.dart';
+import '../../../services/pip_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
@@ -670,6 +671,14 @@ class _ElegantHeader extends StatelessWidget {
             icon: const Icon(LucideIcons.users,
                 color: AppColors.bronze),
             tooltip: 'watchers.show'.tr(),
+          ),
+          // ZUSATZ-3 PiP für Livestream — gleiche Funktion wie im Call.
+          IconButton(
+            iconSize: 18,
+            onPressed: () => PipService.enterPip(width: 9, height: 16),
+            icon: const Icon(LucideIcons.pictureInPicture2,
+                color: AppColors.bronze),
+            tooltip: 'call.pip'.tr(),
           ),
           IconButton(
             iconSize: 20,
