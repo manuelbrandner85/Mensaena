@@ -2009,7 +2009,11 @@
     "justNow": "gerade eben",
     "minutesShort": "vor {n} Min",
     "hoursShort": "vor {n} Std",
-    "daysShort": "vor {n} T"
+    "daysShort": "vor {n} T",
+    "minutesAgo": "vor {n} Min.",
+    "hoursAgo": "vor {n} Std.",
+    "daysAgo": "vor {n} Tagen",
+    "yesterday": "Gestern"
   },
   "voice": {
     "micDenied": "Mikrofon-Berechtigung verweigert."

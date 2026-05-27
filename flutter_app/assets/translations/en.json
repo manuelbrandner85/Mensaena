@@ -2010,7 +2010,11 @@
     "justNow": "just now",
     "minutesShort": "{n} min ago",
     "hoursShort": "{n} h ago",
-    "daysShort": "{n} d ago"
+    "daysShort": "{n} d ago",
+    "minutesAgo": "{n} min. ago",
+    "hoursAgo": "{n} h ago",
+    "daysAgo": "{n} days ago",
+    "yesterday": "Yesterday"
   },
   "voice": {
     "micDenied": "Microphone permission denied."

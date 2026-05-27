@@ -93,8 +93,31 @@ class ProfilesRepository {
   }
 
   /// Profile patchen.
+  /// L23: avatar_url + cover_url müssen aus dem Supabase-Storage stammen.
+  /// Falls jemand versucht externe URLs einzukippen — werden sie ignoriert.
   static Future<void> update(String userId, Map<String, dynamic> patch) async {
+    if (patch.containsKey('avatar_url')) {
+      final v = patch['avatar_url'];
+      if (v is String && v.isNotEmpty && !_isAllowedStorageUrl(v, 'avatars')) {
+        patch.remove('avatar_url');
+      }
+    }
+    if (patch.containsKey('cover_url')) {
+      final v = patch['cover_url'];
+      if (v is String && v.isNotEmpty && !_isAllowedStorageUrl(v, 'covers')) {
+        patch.remove('cover_url');
+      }
+    }
     await sb.from('profiles').update(patch).eq('id', userId);
+  }
+
+  static final _storageHost = RegExp(
+      r'^https://[a-z0-9-]+\.supabase\.co/storage/v1/object/public/');
+
+  static bool _isAllowedStorageUrl(String url, String bucket) {
+    final m = _storageHost.firstMatch(url);
+    if (m == null) return false;
+    return url.startsWith('${m.group(0)}$bucket/');
   }
 }
 

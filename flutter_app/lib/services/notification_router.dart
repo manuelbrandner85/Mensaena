@@ -146,7 +146,51 @@ class NotificationRouter {
       return '/dashboard/map';
     }
 
+    // Safety check-in confirmations
+    if (t == 'safety_checkin') {
+      final crisisId = meta['crisis_id']?.toString();
+      if (crisisId != null) return '/dashboard/crisis/$crisisId';
+      return '/dashboard/crisis';
+    }
+
+    // Post nearby (radius-Notification)
+    if (t == 'post_nearby' || t == 'post_response' || t == 'post_update') {
+      final postId = meta['post_id']?.toString();
+      if (postId != null) return '/dashboard/posts/$postId';
+      return '/dashboard/posts';
+    }
+
+    // Friendship-System (P2)
+    if (t == 'friend_request' || t == 'friend_accepted') {
+      final from = meta['from_id']?.toString() ?? meta['with_id']?.toString();
+      if (from != null) return '/dashboard/profile/$from';
+      return '/dashboard/profile';
+    }
+
+    // Zu Conversation hinzugefügt
+    if (t == 'conversation_added') {
+      final conv = meta['conversation_id']?.toString();
+      if (conv != null) return '/dashboard/messages/$conv';
+      return '/dashboard/messages';
+    }
+
+    // Bot — keine spezielle Action, zum Dashboard
+    if (t == 'bot' || t == 'system') return '/dashboard';
+
+    // Welcome — Profile-Setup oder Profil
+    if (t == 'welcome') return '/dashboard/profile';
+
+    // Generic Reminder — routet je metadata
+    if (t == 'reminder') {
+      if (meta['event_id'] != null) {
+        return '/dashboard/events/${meta['event_id']}';
+      }
+      if (meta['challenge_id'] != null) return '/dashboard/challenges';
+      if (meta['post_id'] != null) return '/dashboard/posts/${meta['post_id']}';
+      return '/dashboard';
+    }
+
     debugPrint('[NotificationRouter] unmapped type=$t category=$category');
-    return null;
+    return '/dashboard'; // Fallback statt null — Tap führt immer irgendwohin.
   }
 }
