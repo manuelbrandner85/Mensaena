@@ -1,3 +1,4 @@
+import '../services/block_guard.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
@@ -15,6 +16,7 @@ class UserBlocksRepository {
         'blocker_id': uid,
         'blocked_id': blockedUserId,
       });
+      BlockGuard.invalidate(blockedUserId);
       return true;
     } catch (_) {
       return false;
@@ -31,6 +33,7 @@ class UserBlocksRepository {
           .delete()
           .eq('blocker_id', uid)
           .eq('blocked_id', blockedUserId);
+      BlockGuard.invalidate(blockedUserId);
       return true;
     } catch (_) {
       return false;
