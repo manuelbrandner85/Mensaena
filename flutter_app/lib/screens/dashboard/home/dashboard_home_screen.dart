@@ -71,7 +71,6 @@ import '../../../widgets/dashboard/rating_prompt_banner.dart';
 import '../../../widgets/dashboard/safety_banners.dart';
 import '../../../widgets/dashboard/smart_match_widget.dart';
 import '../../../widgets/dashboard/stats_row.dart';
-import '../../../widgets/dashboard/sticky_quick_actions_bar.dart';
 import '../../../widgets/dashboard/success_story_card.dart';
 import '../../../widgets/dashboard/thanks_received.dart';
 import '../../../widgets/dashboard/trust_score_card.dart';
@@ -208,8 +207,7 @@ class _DashboardHomeScreenState
         tooltip: 'home.configureWidgets'.tr(),
         child: const Icon(LucideIcons.settings, size: 16),
       ),
-      body: Stack(children: [
-        RefreshIndicator(
+      body: RefreshIndicator(
         color: AppColors.amber,
         backgroundColor: AppColors.surface,
         onRefresh: _refresh,
@@ -252,18 +250,6 @@ class _DashboardHomeScreenState
           },
         ),
       ),
-        // Phase 10 B3: Sticky Quick-Actions-Bar — always visible, floating
-        // pill am unteren Rand. Im Edit-Mode versteckt damit User die
-        // Widgets nicht versehentlich verdeckt.
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 8,
-          child: ref.watch(isDashboardEditModeProvider)
-              ? const SizedBox.shrink()
-              : const StickyQuickActionsBar(),
-        ),
-      ]),
       ),
     );
   }
@@ -321,10 +307,16 @@ class _DashboardHomeScreenState
 
     // PINNED HEADERS: hero + onboarding + safety + stats müssen IMMER
     // ganz oben bleiben, unabhängig von Tageszeit/Sektion und niemals
-    // collapse-bar. User-Wunsch: Begrüßung + Profil-Zugang stets sichtbar.
+    // collapse-bar. User-Wunsch (2026-05): die Hero-Begrüßungs-Karte
+    // (Guten Tag / Avatar / Bearbeiten / Vollprofil) MUSS fest ganz oben
+    // sein — kein User-Reorder kann sie verschieben.
     const pinnedTop = {'hero', 'onboarding', 'safety', 'stats'};
-    // Order-Liste nach Tageszeit-Sektions-Reihenfolge stabil neu sortieren.
-    // Pinned-IDs behalten ihre ursprüngliche Position (kommen ganz nach oben).
+    // Feste Reihenfolge der Pinned. Hero IMMER #0.
+    const pinnedFixedOrder = ['hero', 'onboarding', 'safety', 'stats'];
+    int pinnedRank(String id) {
+      final idx = pinnedFixedOrder.indexOf(id);
+      return idx < 0 ? 999 : idx;
+    }
     final sortedOrder = [...order];
     sortedOrder.sort((a, b) {
       final pinnedA = pinnedTop.contains(a);
@@ -332,8 +324,8 @@ class _DashboardHomeScreenState
       if (pinnedA && !pinnedB) return -1;
       if (!pinnedA && pinnedB) return 1;
       if (pinnedA && pinnedB) {
-        // Original-Reihenfolge der Pinned (hero zuerst).
-        return order.indexOf(a).compareTo(order.indexOf(b));
+        // Pinned-vs-Pinned: feste Reihenfolge, NICHT user-order-abhängig.
+        return pinnedRank(a).compareTo(pinnedRank(b));
       }
       final sa = sectionForWidget(a);
       final sb = sectionForWidget(b);
@@ -345,8 +337,20 @@ class _DashboardHomeScreenState
 
     final collapsed = ref.read(collapsedSectionsProvider);
     bool pinnedSectionDone = false; // markiert ob wir die Pinned-Phase verlassen haben
+    // Defensive: stelle sicher dass 'hero' in sortedOrder existiert und
+    // ganz vorne steht — selbst wenn der User irgendwie das order-Array
+    // korrumpiert hat. Hero darf NIE verloren gehen.
+    if (!sortedOrder.contains('hero')) {
+      sortedOrder.insert(0, 'hero');
+    }
     for (final id in sortedOrder) {
-      if (!visible.contains(id) || consumed.contains(id)) continue;
+      // Hero ist nicht-verbergbar (User-Wunsch). Auch wenn visible-Set
+      // hero nicht enthält, rendern wir es trotzdem.
+      if (id != 'hero' &&
+          (!visible.contains(id) || consumed.contains(id))) {
+        continue;
+      }
+      if (consumed.contains(id)) continue;
       final isPinned = pinnedTop.contains(id);
       // Pinned-Widgets: KEIN Sektion-Banner, KEIN Collapse-Effekt.
       if (isPinned) {
