@@ -21,6 +21,7 @@ import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/post/post_contact_actions.dart';
 import '../../widgets/posts/poll_create_sheet.dart';
 import '../../widgets/posts/post_poll_widget.dart';
+import '../../widgets/posts/reading_mode_toggle.dart';
 import '../../widgets/posts/similar_posts_carousel.dart';
 import '../../widgets/shared/post_reactions_button.dart';
 import '../../widgets/shared/image_carousel.dart';
@@ -513,13 +514,19 @@ class _Hero extends StatelessWidget {
         ),
         if (post.description != null && post.description!.isNotEmpty) ...[
           const SizedBox(height: 12),
-          Text(
-            post.description!,
-            style: AppTypography.body(
-              size: 15,
-              color: AppColors.inkSoft,
-              height: 1.6,
-            ),
+          // F81 Lese-Modus: größerer Text + mehr Line-Height wenn aktiv.
+          Consumer(
+            builder: (_, r, __) {
+              final reading = r.watch(readingModeProvider);
+              return Text(
+                post.description!,
+                style: AppTypography.body(
+                  size: reading ? 17 : 15,
+                  color: AppColors.ink,
+                  height: reading ? 1.85 : 1.6,
+                ),
+              );
+            },
           ),
           // F83: Read-Time-Chip nur ab > 60 Worten (~30s)
           if (() {
@@ -803,6 +810,9 @@ class _ActionsBar extends StatelessWidget {
               const SizedBox(width: 8),
               // F38: Emoji-Reactions neben dem Vote-Up/Down.
               PostReactionsButton(postId: postId),
+              const SizedBox(width: 8),
+              // F81: Lese-Modus toggle (Book / BookOpen).
+              const ReadingModeToggle(),
               const Spacer(),
               _ActionIcon(
                 icon: saved ? LucideIcons.bookmark : LucideIcons.bookmark,

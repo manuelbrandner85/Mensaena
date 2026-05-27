@@ -2242,6 +2242,10 @@
     "bannerTitle": "Bleib auf dem Laufenden",
     "bannerBody": "Aktiviere Push, damit du Anrufe, Nachrichten und Hilferufe sofort siehst."
   },
+  "reading": {
+    "enter": "Lese-Modus",
+    "exit": "Normal-Ansicht"
+  },
   "streak": {
     "title": "Dranbleiben",
     "days": "{count} Tage in Folge",

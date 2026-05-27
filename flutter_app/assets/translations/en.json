@@ -2243,6 +2243,10 @@
     "bannerTitle": "Stay in the loop",
     "bannerBody": "Turn on push so you see calls, messages, and requests right away."
   },
+  "reading": {
+    "enter": "Reading mode",
+    "exit": "Normal view"
+  },
   "streak": {
     "title": "Keep it going",
     "days": "{count} days in a row",
