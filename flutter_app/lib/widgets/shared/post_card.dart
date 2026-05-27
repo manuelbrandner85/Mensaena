@@ -10,6 +10,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../models/post_intent.dart';
 import '../../services/haptics.dart';
+import 'post_reactions_button.dart';
 import '../../repositories/post_interactions_repository.dart'
     hide ContentReportsRepository;
 import '../../repositories/posts_repository.dart';
@@ -405,11 +406,8 @@ class _PostCardState extends ConsumerState<PostCard> {
             const SizedBox(height: 10),
             Row(
               children: [
-                _PostCardAction(
-                  icon: LucideIcons.heart,
-                  label: '${post.likeCount ?? 0}',
-                  color: AppColors.herzrotWarm,
-                ),
+                // F38: Reactions-Button mit Emoji-Picker (Long-Press).
+                PostReactionsButton(postId: post.id),
                 const SizedBox(width: 14),
                 _VoteBadge(postId: post.id),
                 const SizedBox(width: 14),

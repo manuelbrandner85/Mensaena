@@ -22,6 +22,7 @@ import '../../widgets/post/post_contact_actions.dart';
 import '../../widgets/posts/poll_create_sheet.dart';
 import '../../widgets/posts/post_poll_widget.dart';
 import '../../widgets/posts/similar_posts_carousel.dart';
+import '../../widgets/shared/post_reactions_button.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 
@@ -395,6 +396,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                             PostContactActions(post: _post!),
                             const SizedBox(height: 16),
                             _ActionsBar(
+                              postId: widget.postId,
                               myVote: _myVote,
                               score: _score,
                               saved: _saved,
@@ -737,6 +739,7 @@ class _TypeBadge extends StatelessWidget {
 // ── Actions ──────────────────────────────────────────────────────────────
 class _ActionsBar extends StatelessWidget {
   const _ActionsBar({
+    required this.postId,
     required this.myVote,
     required this.score,
     required this.saved,
@@ -749,6 +752,7 @@ class _ActionsBar extends StatelessWidget {
     required this.onHelp,
   });
 
+  final String postId;
   final int? myVote;
   final int score;
   final bool saved;
@@ -796,6 +800,9 @@ class _ActionsBar extends StatelessWidget {
                 active: myVote == -1,
                 onTap: onVoteDown,
               ),
+              const SizedBox(width: 8),
+              // F38: Emoji-Reactions neben dem Vote-Up/Down.
+              PostReactionsButton(postId: postId),
               const Spacer(),
               _ActionIcon(
                 icon: saved ? LucideIcons.bookmark : LucideIcons.bookmark,
