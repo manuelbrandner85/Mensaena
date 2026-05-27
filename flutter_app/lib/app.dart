@@ -8,11 +8,9 @@ import 'config/app_config.dart';
 import 'config/routes/app_router.dart';
 import 'config/theme/app_theme.dart';
 import 'providers/accessibility_provider.dart';
-import 'providers/active_call_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
-import 'services/pip_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
@@ -50,16 +48,12 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Bei App-Minimize prüfen ob ein DM-Call aktiv ist → PiP triggern.
-    // Group-Calls + Livestream haben eigene Lifecycle-Handler (zukünftig).
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.paused) {
-      final activeCall = ref.read(activeCallProvider);
-      if (activeCall != null) {
-        // Fire-and-forget — Android entscheidet selbst ob PiP klappt.
-        PipService.enterPip();
-      }
-    }
+    // User-Wunsch (2026-05): KEIN Auto-PiP bei App-Minimize.
+    // Der User will sich innerhalb der App frei bewegen während Call/
+    // Livestream läuft. Das übernimmt der ActiveCallMiniPlayer im
+    // DashboardScaffold — er bleibt sichtbar sobald activeCallProvider
+    // gesetzt ist + der User vom Call-Screen weg navigiert.
+    // System-PiP-Mode wird hier NICHT mehr automatisch getriggert.
   }
 
   @override

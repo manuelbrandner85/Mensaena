@@ -29,13 +29,12 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/livekit_token_service.dart';
-import '../../../services/pip_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/shared/live_poll_overlay.dart';
-import '../../../widgets/shared/live_subtitle_overlay.dart';
+import '../../../widgets/livestream/livestream_chat_resolver.dart';
 import '../../../widgets/shared/watcher_panel.dart';
 
 class LiveRoomScreen extends ConsumerStatefulWidget {
@@ -76,16 +75,10 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   LivePoll? _activePoll;
   // Watcher-Panel sichtbar?
   bool _watchersOpen = false;
-  // Subtitle-State
-  SubtitleData? _currentSubtitle;
-  Timer? _subtitleFadeTimer;
   // Watcher join/leave Toast-Queue
   String? _toastName;
   JoinLeaveKind? _toastKind;
   Timer? _toastTimer;
-  // Highlights (host-collected)
-  final List<DateTime> _highlights = [];
-
   @override
   void initState() {
     super.initState();
@@ -281,7 +274,6 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     _eventsSub?.cancel();
     _events?.dispose();
     _reactionsCtrl.dispose();
-    _subtitleFadeTimer?.cancel();
     _toastTimer?.cancel();
     _listener?.dispose();
     _listener = null;
@@ -335,19 +327,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
         _showJoinLeaveToast('🔖 Highlight!', JoinLeaveKind.join);
         break;
       case RoomEventType.subtitle:
-        final text = ev.data['text'] as String?;
-        final lang = ev.data['lang'] as String? ?? 'de';
-        if (text != null && text.isNotEmpty) {
-          setState(() => _currentSubtitle = SubtitleData(
-                text: text,
-                sourceLang: lang,
-                timestamp: DateTime.now(),
-              ));
-          _subtitleFadeTimer?.cancel();
-          _subtitleFadeTimer = Timer(const Duration(seconds: 9), () {
-            if (mounted) setState(() => _currentSubtitle = null);
-          });
-        }
+        // User-Wunsch: Untertitel im Livestream entfernt — Event ignorieren.
         break;
       default:
         break;
@@ -407,27 +387,28 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     await _events?.send(RoomEventType.pollClose, {'pollId': poll.id});
   }
 
-  Future<void> _markHighlight() async {
-    _highlights.add(DateTime.now());
-    _showJoinLeaveToast('🔖 Highlight gesetzt', JoinLeaveKind.join);
-    await _events?.send(RoomEventType.highlight, {
-      'ts': DateTime.now().toIso8601String(),
-    });
+  /// Internen Livestream-Chat als DraggableScrollableSheet öffnen.
+  /// LivestreamChatByRoomName resolved room_name → uuid intern.
+  void _openChatSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (_, __) =>
+            LivestreamChatByRoomName(roomName: widget.roomName),
+      ),
+    );
   }
 
-  Future<void> _sendSubtitle(String text) async {
-    final lang = Localizations.localeOf(context).languageCode;
-    setState(() => _currentSubtitle = SubtitleData(
-        text: text, sourceLang: lang, timestamp: DateTime.now()));
-    _subtitleFadeTimer?.cancel();
-    _subtitleFadeTimer = Timer(const Duration(seconds: 9), () {
-      if (mounted) setState(() => _currentSubtitle = null);
-    });
-    await _events?.send(RoomEventType.subtitle, {
-      'text': text,
-      'lang': lang,
-    });
-  }
+  // _markHighlight + _sendSubtitle entfernt (User-Wunsch).
 
   List<WatcherEntry> _buildWatcherList() {
     final out = <WatcherEntry>[];
@@ -455,7 +436,6 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final targetLang = Localizations.localeOf(context).languageCode;
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       body: SafeArea(
@@ -483,6 +463,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   onClose: _leave,
                   onToggleWatchers: () =>
                       setState(() => _watchersOpen = !_watchersOpen),
+                  onOpenChat: _openChatSheet,
                 ),
                 Expanded(
                   child: _state == _RoomState.connecting
@@ -508,14 +489,9 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                     myIdentity:
                         _room?.localParticipant?.identity ?? '',
                   ),
-                // Subtitle-Display unten ueber dem ActionBar.
-                SubtitleDisplay(
-                  subtitle: _currentSubtitle,
-                  targetLang: targetLang,
-                ),
-                // Host-Subtitle-Composer (nur fuer Host).
-                if (widget.isHost && _state == _RoomState.connected)
-                  SubtitleComposer(onSend: _sendSubtitle),
+                // User-Wunsch: Untertitel + Highlights raus aus Livestream.
+                // Statt SubtitleDisplay/Composer ist hier nur noch
+                // Reaction-Picker — Chat liegt im LivestreamChat-Panel.
                 // Reaction-Picker fuer alle Teilnehmer.
                 if (_state == _RoomState.connected)
                   Padding(
@@ -535,7 +511,8 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   onStartPoll: widget.isHost && _activePoll == null
                       ? _hostStartPoll
                       : null,
-                  onHighlight: widget.isHost ? _markHighlight : null,
+                  // User-Wunsch: Highlight-Button raus.
+                  onHighlight: null,
                 ),
               ],
             ),
@@ -578,6 +555,7 @@ class _ElegantHeader extends StatelessWidget {
     required this.connected,
     required this.onClose,
     required this.onToggleWatchers,
+    required this.onOpenChat,
   });
 
   final String channelTitle;
@@ -585,6 +563,7 @@ class _ElegantHeader extends StatelessWidget {
   final bool connected;
   final VoidCallback onClose;
   final VoidCallback onToggleWatchers;
+  final VoidCallback onOpenChat;
 
   @override
   Widget build(BuildContext context) {
@@ -672,13 +651,25 @@ class _ElegantHeader extends StatelessWidget {
                 color: AppColors.bronze),
             tooltip: 'watchers.show'.tr(),
           ),
-          // ZUSATZ-3 PiP für Livestream — gleiche Funktion wie im Call.
+          // Live-Stream-Chat — User-Wunsch: jeder kann reinschreiben.
           IconButton(
             iconSize: 18,
-            onPressed: () => PipService.enterPip(width: 9, height: 16),
-            icon: const Icon(LucideIcons.pictureInPicture2,
+            onPressed: onOpenChat,
+            icon: const Icon(LucideIcons.messageSquare,
                 color: AppColors.bronze),
-            tooltip: 'call.pip'.tr(),
+            tooltip: 'live.openChat'.tr(),
+          ),
+          // Mini-Modus für Livestream: schließt Screen, MiniPlayer bleibt.
+          IconButton(
+            iconSize: 18,
+            onPressed: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            },
+            icon: const Icon(LucideIcons.minimize2,
+                color: AppColors.bronze),
+            tooltip: 'call.minimize'.tr(),
           ),
           IconButton(
             iconSize: 20,

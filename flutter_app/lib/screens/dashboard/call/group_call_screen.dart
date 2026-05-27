@@ -16,7 +16,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/livekit_token_service.dart';
-import '../../../services/pip_service.dart';
 import '../../../services/supabase_service.dart';
 
 class GroupCallScreen extends ConsumerStatefulWidget {
@@ -255,11 +254,17 @@ class _GroupCallScreenState extends ConsumerState<GroupCallScreen> {
                     big: true,
                     onTap: _hangUp,
                   ),
-                  // ZUSATZ-3 PiP: System-PiP-Fenster.
+                  // Mini-Modus: zurück zum Dashboard, MiniPlayer übernimmt.
                   _CircleAction(
-                    icon: LucideIcons.pictureInPicture2,
+                    icon: LucideIcons.minimize2,
                     color: AppColors.bronze,
-                    onTap: () => PipService.enterPip(width: 16, height: 9),
+                    onTap: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/dashboard');
+                      }
+                    },
                   ),
                 ],
               ),

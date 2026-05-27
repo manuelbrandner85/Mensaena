@@ -20,7 +20,6 @@ import '../../../providers/active_call_provider.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
-import '../../../services/pip_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
@@ -453,11 +452,51 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     if (lp == null) return;
     if (!_camEnabled) {
       final cam = await Permission.camera.request();
-      if (cam.isDenied || cam.isPermanentlyDenied) return;
+      if (cam.isPermanentlyDenied) {
+        if (!mounted) return;
+        // User-Fix: zeigt klare Aufforderung statt stillem Fail.
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(
+            'call.cameraDeniedPermanent'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm),
+          ),
+          action: SnackBarAction(
+            label: 'call.openSettings'.tr(),
+            onPressed: openAppSettings,
+          ),
+          duration: const Duration(seconds: 6),
+        ));
+        return;
+      }
+      if (cam.isDenied) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('call.cameraDenied'.tr(),
+              style: AppTypography.body(
+                  size: 13, color: AppColors.herzrotWarm)),
+        ));
+        return;
+      }
     }
     final next = !_camEnabled;
-    await lp.setCameraEnabled(next);
-    setState(() => _camEnabled = next);
+    try {
+      await lp.setCameraEnabled(next);
+      if (!mounted) return;
+      setState(() => _camEnabled = next);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          'call.cameraFailed'.tr(),
+          style: AppTypography.body(
+              size: 13, color: AppColors.herzrotWarm),
+        ),
+      ));
+    }
   }
 
   Future<void> _toggleSpeaker() async {
@@ -753,13 +792,21 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         ? _toggleScreenShare
                         : null,
                   ),
-                  // ZUSATZ-3 PiP: System-PiP-Fenster.
+                  // ZUSATZ-3 Mini-Modus: Call bleibt aktiv im
+                  // ActiveCallMiniPlayer (DashboardScaffold). User
+                  // navigiert frei in der App — Audio/Video läuft weiter.
                   _CircleAction(
-                    icon: LucideIcons.pictureInPicture2,
-                    label: 'call.pip'.tr(),
+                    icon: LucideIcons.minimize2,
+                    label: 'call.minimize'.tr(),
                     color: AppColors.bronze,
                     onTap: _state == _CallState.connected
-                        ? () => PipService.enterPip(width: 16, height: 9)
+                        ? () {
+                            if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go('/dashboard');
+                            }
+                          }
                         : null,
                   ),
                 ],

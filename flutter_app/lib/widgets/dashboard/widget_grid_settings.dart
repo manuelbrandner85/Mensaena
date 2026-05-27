@@ -53,6 +53,7 @@ class DashboardWidgetConfig {
       title: 'widgets.titles.startup',
       description: 'widgets.descriptions.startup',
       icon: LucideIcons.checkCircle,
+      removable: false,
     ),
     DashboardWidgetMeta(
       id: 'quick_actions',
@@ -65,6 +66,7 @@ class DashboardWidgetConfig {
       title: 'widgets.titles.stats',
       description: 'widgets.descriptions.stats',
       icon: LucideIcons.barChart3,
+      removable: false,
     ),
     DashboardWidgetMeta(
       id: 'smart_match',

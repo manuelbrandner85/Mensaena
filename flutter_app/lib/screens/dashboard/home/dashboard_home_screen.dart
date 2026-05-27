@@ -319,38 +319,61 @@ class _DashboardHomeScreenState
         orderedSections(DateTime.now())[i].id: i,
     };
 
+    // PINNED HEADERS: hero + onboarding + safety + stats müssen IMMER
+    // ganz oben bleiben, unabhängig von Tageszeit/Sektion und niemals
+    // collapse-bar. User-Wunsch: Begrüßung + Profil-Zugang stets sichtbar.
+    const pinnedTop = {'hero', 'onboarding', 'safety', 'stats'};
     // Order-Liste nach Tageszeit-Sektions-Reihenfolge stabil neu sortieren.
+    // Pinned-IDs behalten ihre ursprüngliche Position (kommen ganz nach oben).
     final sortedOrder = [...order];
     sortedOrder.sort((a, b) {
+      final pinnedA = pinnedTop.contains(a);
+      final pinnedB = pinnedTop.contains(b);
+      if (pinnedA && !pinnedB) return -1;
+      if (!pinnedA && pinnedB) return 1;
+      if (pinnedA && pinnedB) {
+        // Original-Reihenfolge der Pinned (hero zuerst).
+        return order.indexOf(a).compareTo(order.indexOf(b));
+      }
       final sa = sectionForWidget(a);
       final sb = sectionForWidget(b);
       final pa = sa == null ? 999 : (sectionPriority[sa.id] ?? 999);
       final pb = sb == null ? 999 : (sectionPriority[sb.id] ?? 999);
       if (pa != pb) return pa.compareTo(pb);
-      // gleicher Section-Priority → ursprüngliche Reihenfolge.
       return order.indexOf(a).compareTo(order.indexOf(b));
     });
 
     final collapsed = ref.read(collapsedSectionsProvider);
-    // Phase 10 F4: Collapse-All-Toggle direkt am Anfang der Liste.
-    out.add(const Padding(
-      padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: CollapseAllToggle(),
-      ),
-    ));
+    bool pinnedSectionDone = false; // markiert ob wir die Pinned-Phase verlassen haben
     for (final id in sortedOrder) {
       if (!visible.contains(id) || consumed.contains(id)) continue;
-      // Sektion-Banner einfügen wenn sich die Sektion ändert.
-      final widgetSection = sectionForWidget(id);
-      if (widgetSection != null && widgetSection.id != currentSection) {
-        currentSection = widgetSection.id;
-        out.add(_SectionBanner(section: widgetSection));
-      }
-      // Wenn Sektion eingeklappt → Widget skippen.
-      if (widgetSection != null && collapsed.contains(widgetSection.id)) {
-        continue;
+      final isPinned = pinnedTop.contains(id);
+      // Pinned-Widgets: KEIN Sektion-Banner, KEIN Collapse-Effekt.
+      if (isPinned) {
+        // Fall-through zur Case-Switch.
+      } else {
+        // Collapse-All-Toggle einmal direkt nach den Pinned einfügen.
+        if (!pinnedSectionDone) {
+          pinnedSectionDone = true;
+          out.add(const Padding(
+            padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: CollapseAllToggle(),
+            ),
+          ));
+        }
+        // Sektion-Banner einfügen wenn sich die Sektion ändert.
+        final widgetSection = sectionForWidget(id);
+        if (widgetSection != null && widgetSection.id != currentSection) {
+          currentSection = widgetSection.id;
+          out.add(_SectionBanner(section: widgetSection));
+        }
+        // Wenn Sektion eingeklappt → Widget skippen.
+        if (widgetSection != null &&
+            collapsed.contains(widgetSection.id)) {
+          continue;
+        }
       }
 
       switch (id) {
