@@ -261,6 +261,20 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.personalBest',
       icon: LucideIcons.trophy,
     ),
+    // Phase 10 E3 — SkyWidget (Weather + Sun + Moon PageView).
+    DashboardWidgetMeta(
+      id: 'sky',
+      title: 'widgets.titles.sky',
+      description: 'widgets.descriptions.sky',
+      icon: LucideIcons.sun,
+    ),
+    // Phase 10 E4 — ProgressTrioWidget (Karma + Streak + HelpStreak Row).
+    DashboardWidgetMeta(
+      id: 'progress_trio',
+      title: 'widgets.titles.progressTrio',
+      description: 'widgets.descriptions.progressTrio',
+      icon: LucideIcons.trendingUp,
+    ),
     DashboardWidgetMeta(
       id: 'affirmation',
       title: 'widgets.titles.affirmation',
@@ -288,7 +302,18 @@ class DashboardWidgetConfig {
   /// "lieferten keine Daten" weil sie versteckt waren. Traffic bleibt aus,
   /// weil 9 Autobahn-API-Calls bei jedem Open kostspielig sind.
   /// NASA APOD + OnThisDay sind neu, default-an fuer Discovery-Effekt.
-  static const Set<String> _defaultHidden = {'traffic'};
+  /// Phase 10 E3/E4: weather/moon/sun → sky; karma/streak/helpStreak →
+  /// progress_trio. Die alten Widgets bleiben verfügbar (Settings),
+  /// werden aber bei Neu-Usern nicht direkt eingeblendet.
+  static const Set<String> _defaultHidden = {
+    'traffic',
+    'weather',
+    'moon',
+    'sun',
+    'karma',
+    'streak',
+    'helpStreak',
+  };
 
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(
         order: all.map((w) => w.id).toList(),

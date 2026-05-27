@@ -2063,6 +2063,8 @@
     "hide": "Ausblenden",
     "resetDefault": "Standard wiederherstellen",
     "titles": {
+      "sky": "Himmel",
+      "progressTrio": "Fortschritt",
       "greeting": "Begrüßung",
       "safetyAlerts": "Sicherheits-Warnungen",
       "startup": "Einstieg",
@@ -2105,6 +2107,8 @@
       "dailyChallenges": "Tages-Aufgaben"
     },
     "descriptions": {
+      "sky": "Wetter, Sonne, Mond — wechseln per Swipe",
+      "progressTrio": "Karma, Streak, Hilfe-Streak in einer Zeile",
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
       "safetyAlerts": "NINA + Lebensmittel-Rückrufe",
       "startup": "Onboarding-Checkliste für neue Nachbarn",

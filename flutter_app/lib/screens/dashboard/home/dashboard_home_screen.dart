@@ -47,7 +47,9 @@ import '../../../widgets/dashboard/affirmation_widget.dart';
 import '../../../widgets/dashboard/help_streak_widget.dart';
 import '../../../widgets/dashboard/moon_widget.dart';
 import '../../../widgets/dashboard/personal_best_widget.dart';
+import '../../../widgets/dashboard/progress_trio_widget.dart';
 import '../../../widgets/dashboard/quick_note_widget.dart';
+import '../../../widgets/dashboard/sky_widget.dart';
 import '../../../widgets/dashboard/weekly_recap_widget.dart';
 import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/become_mentor_cta.dart';
@@ -598,6 +600,23 @@ class _DashboardHomeScreenState
         case 'streak':
           out.add(const StreakWidget());
           addSpacing();
+          break;
+        // Phase 10 E4: ProgressTrio = Karma + Streak + HelpStreak in Row.
+        case 'progress_trio':
+          out.add(const ProgressTrioWidget());
+          consumed.addAll(const ['karma', 'streak', 'helpStreak']);
+          addSpacing();
+          break;
+        // Phase 10 E3: SkyWidget = Weather + Sun + Moon im PageView.
+        case 'sky':
+          if (profile?.latitude != null && profile?.longitude != null) {
+            out.add(SkyWidget(
+              lat: profile!.latitude!,
+              lng: profile.longitude!,
+            ));
+            consumed.addAll(const ['weather', 'sun', 'moon']);
+            addSpacing();
+          }
           break;
         case 'gratitude':
           out.add(const GratitudeWidget());

@@ -2064,6 +2064,8 @@
     "hide": "Hide",
     "resetDefault": "Restore defaults",
     "titles": {
+      "sky": "Sky",
+      "progressTrio": "Progress",
       "greeting": "Greeting",
       "safetyAlerts": "Safety alerts",
       "startup": "Getting started",
@@ -2106,6 +2108,8 @@
       "dailyChallenges": "Daily challenges"
     },
     "descriptions": {
+      "sky": "Weather, sun, moon — swipe between them",
+      "progressTrio": "Karma, streak, help streak in one row",
       "greeting": "Personalised hero with time-of-day mood",
       "safetyAlerts": "NINA + food recalls",
       "startup": "Onboarding checklist for new neighbours",
