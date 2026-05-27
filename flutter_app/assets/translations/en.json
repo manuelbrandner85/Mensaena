@@ -1379,6 +1379,8 @@
   },
   "groups": {
     "title": "Group",
+    "nearbyTitle": "Groups near you",
+    "memberCount": "{n} members",
     "notFound": "Group not found.",
     "leave": "Leave",
     "join": "Join",

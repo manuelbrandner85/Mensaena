@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/group.dart';
 import '../../../repositories/groups_repository.dart';
+import '../../../widgets/groups/nearby_groups_carousel.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -160,9 +161,14 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
-                      itemCount: list.length,
-                      itemBuilder: (context, i) =>
-                          _Tile(group: list[i]),
+                      // F74: itemCount +1 für Nachbarschafts-Carousel an
+                      // Position 0 (nur sichtbar wenn GPS-Standort
+                      // verfügbar UND mind. 1 Group mit lat/lng in Radius).
+                      itemCount: list.length + 1,
+                      itemBuilder: (context, i) {
+                        if (i == 0) return const NearbyGroupsCarousel();
+                        return _Tile(group: list[i - 1]);
+                      },
                     );
                   },
                 ),

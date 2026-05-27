@@ -1378,6 +1378,8 @@
   },
   "groups": {
     "title": "Gruppe",
+    "nearbyTitle": "Gruppen in deiner Nähe",
+    "memberCount": "{n} Mitglieder",
     "notFound": "Gruppe nicht gefunden.",
     "leave": "Verlassen",
     "join": "Beitreten",

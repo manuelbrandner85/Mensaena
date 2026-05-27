@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/group.dart';
@@ -9,6 +11,53 @@ import '../services/supabase_service.dart';
 /// Groups + Members + Group-Posts.
 class GroupsRepository {
   const GroupsRepository._();
+
+  /// F74: Gruppen in der Nähe (Haversine-Filter clientseitig, weil ohne
+  /// PostGIS-Funktion einfacher). Limitiert auf top 50 nach Mitglieder-
+  /// zahl, dann filtert clientseitig per Radius.
+  static Future<List<Group>> nearby({
+    required double lat,
+    required double lng,
+    double radiusKm = 5,
+    int limit = 20,
+  }) async {
+    try {
+      final rows = await sb
+          .from('groups')
+          .select()
+          .eq('is_archived', false)
+          .not('latitude', 'is', null)
+          .order('member_count', ascending: false)
+          .limit(50);
+      final groups = (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .where((r) {
+        final gl = (r['latitude'] as num?)?.toDouble();
+        final gn = (r['longitude'] as num?)?.toDouble();
+        if (gl == null || gn == null) return false;
+        return _haversineKm(lat, lng, gl, gn) <= radiusKm;
+      }).take(limit).map(Group.fromJson).toList();
+      return groups;
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static double _haversineKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    const r = 6371.0;
+    final dLat = _deg(lat2 - lat1);
+    final dLon = _deg(lon2 - lon1);
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_deg(lat1)) *
+            math.cos(_deg(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final c = 2 * math.asin(math.sqrt(a.clamp(0.0, 1.0)));
+    return r * c;
+  }
+
+  static double _deg(double d) => d * math.pi / 180.0;
 
   static Future<List<Group>> listAll({int limit = 100}) async {
     try {
