@@ -1021,6 +1021,7 @@
   },
   "posts": {
     "title": "Posts",
+    "similarTitle": "Similar posts",
     "drafts": "Drafts",
     "no_drafts": "No drafts yet.",
     "translate": "Translate",

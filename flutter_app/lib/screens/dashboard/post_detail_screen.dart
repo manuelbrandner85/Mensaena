@@ -21,6 +21,7 @@ import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/post/post_contact_actions.dart';
 import '../../widgets/posts/poll_create_sheet.dart';
 import '../../widgets/posts/post_poll_widget.dart';
+import '../../widgets/posts/similar_posts_carousel.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 
@@ -588,6 +589,12 @@ class _Hero extends StatelessWidget {
             term: post.tags.isNotEmpty ? post.tags.first : post.title,
           ),
         ],
+        // F41: Ähnliche Beiträge — gleicher Typ + Tag-Overlap.
+        SimilarPostsCarousel(
+          postId: post.id,
+          type: post.type,
+          tags: post.tags,
+        ),
         if (post.tags.isNotEmpty) ...[
           const SizedBox(height: 10),
           Wrap(
