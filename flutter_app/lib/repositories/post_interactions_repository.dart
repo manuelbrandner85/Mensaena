@@ -220,12 +220,13 @@ class ContentReportsRepository {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
     try {
-      await sb.from('content_reports').insert({
+      // L1: content_reports → reports. details → comment.
+      await sb.from('reports').insert({
         'reporter_id': uid,
         'content_type': contentType,
         'content_id': contentId,
         'reason': reason,
-        'details': details,
+        if (details != null) 'comment': details,
         'status': 'pending',
       });
       return true;

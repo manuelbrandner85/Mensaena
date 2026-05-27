@@ -40,7 +40,9 @@ class _GroupCallScreenState extends ConsumerState<GroupCallScreen> {
   final ValueNotifier<Duration> _elapsed =
       ValueNotifier<Duration>(Duration.zero);
 
-  static const _maxParticipants = 4;
+  // F13: Cap auf 10 — größer als 4 packt der Mobile-Mic-Mix qualitativ
+  // schon spürbar an, aber 10 ist mit Mute-Disziplin praktikabel.
+  static const _maxParticipants = 10;
 
   @override
   void initState() {
@@ -275,14 +277,15 @@ class _GroupCallScreenState extends ConsumerState<GroupCallScreen> {
         ),
       for (var i = 0; i < remaining; i++) const _EmptySlot(),
     ];
-    final cols = allCount <= 1 ? 1 : 2;
+    // Spalten skalieren mit Teilnehmerzahl: 1 (solo), 2 (≤4), 3 (≥5).
+    final cols = allCount <= 1 ? 1 : (allCount <= 4 ? 2 : 3);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GridView.count(
         crossAxisCount: cols,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: cols == 1 ? 0.9 : 0.85,
+        childAspectRatio: cols == 1 ? 0.9 : (cols == 2 ? 0.85 : 0.75),
         children: tiles,
       ),
     );

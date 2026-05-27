@@ -2463,7 +2463,7 @@
     "inviteCta": "Join →",
     "inviteFailed": "Couldn't send invite.",
     "connectFailed": "Couldn't connect to the call.",
-    "full": "Call is full — max 4 participants.",
+    "full": "Call is full — max 10 participants.",
     "you": "You"
   },
   "thanks": {

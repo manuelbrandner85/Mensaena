@@ -45,7 +45,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
   void _load() {
     setState(() {
       _future = AdminRepository.recent(
-        'content_reports',
+        'reports',
         statusFilter: _status,
       );
     });
@@ -53,7 +53,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
 
   Future<void> _setStatus(String id, String status) async {
     final ok = await AdminRepository.updateStatus(
-      table: 'content_reports',
+      table: 'reports',
       id: id,
       status: status,
     );
@@ -90,7 +90,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
       ),
     );
     if (confirm != true) return;
-    final ok = await AdminRepository.delete(table: 'content_reports', id: id);
+    final ok = await AdminRepository.delete(table: 'reports', id: id);
     if (!mounted) return;
     if (ok) _load();
   }

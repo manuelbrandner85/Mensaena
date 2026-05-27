@@ -88,7 +88,7 @@ class AdminRepository {
       count('crises'),
       count('organizations'),
       count('farm_listings'),
-      count('content_reports'),
+      count('reports'),
       count('messages'),
       count('conversations'),
       count('groups'),
@@ -161,7 +161,7 @@ class AdminRepository {
     int openReports = 0;
     try {
       final rows =
-          await sb.from('content_reports').select('id').eq('status', 'pending');
+          await sb.from('reports').select('id').eq('status', 'pending');
       openReports = (rows as List).length;
     } catch (_) {}
 
@@ -378,7 +378,7 @@ class AdminRepository {
   static Future<int> openReportsCount() async {
     try {
       final rows = await sb
-          .from('content_reports')
+          .from('reports')
           .select('id')
           .eq('status', 'pending');
       return (rows as List).length;

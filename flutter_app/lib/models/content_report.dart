@@ -1,5 +1,10 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `content_reports` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `reports` (huaqldjkgyosefzfhjnf).
+/// L1: Migration von content_reports → reports. Spalten-Mapping:
+///   details → comment, resolvedBy → reviewedBy, resolvedAt → reviewedAt.
+///   resolveNote entfällt (Spalte existiert in `reports` nicht).
+/// Klassenname `ContentReport` bleibt aus Backwards-Compat-Gründen
+/// erhalten — alle bestehenden Imports funktionieren unverändert.
 class ContentReport {
   const ContentReport({
     required this.id,
@@ -11,7 +16,6 @@ class ContentReport {
     this.details,
     this.resolvedBy,
     this.resolvedAt,
-    this.resolveNote,
     this.createdAt,
   });
 
@@ -24,7 +28,6 @@ class ContentReport {
   final String status;
   final String? resolvedBy;
   final DateTime? resolvedAt;
-  final String? resolveNote;
   final DateTime? createdAt;
 
   factory ContentReport.fromJson(Map<String, dynamic> j) {
@@ -34,13 +37,14 @@ class ContentReport {
       contentType: j['content_type'] as String? ?? '',
       contentId: j['content_id'] as String? ?? '',
       reason: j['reason'] as String? ?? '',
-      details: j['details'] as String?,
+      // L1: 'details' (alte Tabelle) ODER 'comment' (neue Tabelle).
+      details: (j['comment'] ?? j['details']) as String?,
       status: j['status'] as String? ?? '',
-      resolvedBy: j['resolved_by'] as String?,
-      resolvedAt: j['resolved_at'] != null
-          ? DateTime.tryParse(j['resolved_at'] as String)
+      resolvedBy: (j['reviewed_by'] ?? j['resolved_by']) as String?,
+      resolvedAt: (j['reviewed_at'] ?? j['resolved_at']) != null
+          ? DateTime.tryParse(
+              (j['reviewed_at'] ?? j['resolved_at']) as String)
           : null,
-      resolveNote: j['resolve_note'] as String?,
       createdAt: j['created_at'] != null
           ? DateTime.tryParse(j['created_at'] as String)
           : null,
@@ -53,11 +57,10 @@ class ContentReport {
         'content_type': contentType,
         'content_id': contentId,
         'reason': reason,
-        'details': details,
+        'comment': details,
         'status': status,
-        'resolved_by': resolvedBy,
-        'resolved_at': resolvedAt?.toIso8601String(),
-        'resolve_note': resolveNote,
+        'reviewed_by': resolvedBy,
+        'reviewed_at': resolvedAt?.toIso8601String(),
         'created_at': createdAt?.toIso8601String(),
       };
 }
