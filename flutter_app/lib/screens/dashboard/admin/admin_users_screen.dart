@@ -305,6 +305,10 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     if (uid == null) return false;
 
     final originalRole = (user['role'] ?? 'user').toString();
+    final originalName = (user['name'] ?? '').toString();
+    final originalNickname = (user['nickname'] ?? '').toString();
+    final newName = _editNameCtrl.text.trim();
+    final newNickname = _editNicknameCtrl.text.trim();
     bool allOk = true;
 
     try {
@@ -313,22 +317,27 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             await AdminRepository.changeUserRole(uid, _editRole);
         allOk = allOk && roleOk;
       }
-      final nameOk = await AdminRepository.updateField(
-        table: 'profiles',
-        id: uid,
-        column: 'name',
-        value: _editNameCtrl.text.trim(),
-      );
-      allOk = allOk && nameOk;
-      final nickOk = await AdminRepository.updateField(
-        table: 'profiles',
-        id: uid,
-        column: 'nickname',
-        value: _editNicknameCtrl.text.trim().isEmpty
-            ? null
-            : _editNicknameCtrl.text.trim(),
-      );
-      allOk = allOk && nickOk;
+      // User-Wunsch (2026-05): NIE den Namen überschreiben wenn er sich
+      // nicht geändert hat oder leer ist. Sonst löscht die Rollen-Vergabe
+      // versehentlich den User-Namen (originale Bug-Quelle).
+      if (newName.isNotEmpty && newName != originalName) {
+        final nameOk = await AdminRepository.updateField(
+          table: 'profiles',
+          id: uid,
+          column: 'name',
+          value: newName,
+        );
+        allOk = allOk && nameOk;
+      }
+      if (newNickname != originalNickname) {
+        final nickOk = await AdminRepository.updateField(
+          table: 'profiles',
+          id: uid,
+          column: 'nickname',
+          value: newNickname.isEmpty ? null : newNickname,
+        );
+        allOk = allOk && nickOk;
+      }
     } catch (_) {
       allOk = false;
     }
