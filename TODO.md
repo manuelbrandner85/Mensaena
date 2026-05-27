@@ -4,11 +4,18 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## CACHE
-OPEN=Phase 0 Foundation-Pass DURCH (Welle 1+2). 30+ Phase-0-Items + Phasen 1-12 noch offen.
-COUNT=Phase 0: 14 SQL + 6 Flutter live (Commits 4092dd0b → 4dd4735c).
-NEXT=Phase 0 Rest oder Phase 1 (BUG1-3, F26-F28)
+OPEN=Phase 0 (Welle 1+2), Phase 1 (5/6), Phase 2 (8/8), Phase 3 (F11/F14/F15), Phase 5 (F23/F30/F32/F33), Phase 6 (F35/F36/F37/F71), Phase 7 (F70) — alles live.
+COUNT=Phase 0: 14 SQL + 6 Flutter; Phasen 1-7: 11 weitere Items live. Total: 31 Items, 11+ Commits.
+NEXT=Phase 7 Rest (F38/F40/F42/F60/F66/F77/F80) oder Phase 8/9/10/11/12
 LAST_SESSION=2026-05-27
-LAST_TASK_PHASE0=L3+L4+L6+L7+L8+L13+L15+L16+L18+L23+L24+L25+L26+L34+L35+L44+L45+L48+L51+L55+L56 live, 3 Commits, flutter analyze 0 issues
+LAST_TASK_PHASE0=L3+L4+L6+L7+L8+L13+L15+L16+L18+L23+L24+L25+L26+L34+L35+L44+L45+L48+L51+L55+L56 live
+LAST_TASK_PHASE1=BUG1 DM-mit-postId, BUG2 verifiziert, BUG3 Cold-Start-Buffer, F26 PostCard-Bubble, F27 BlockGuard. F28 defer.
+LAST_TASK_PHASE2=F8 Unread-Badge per Conv, F7 Forward, F9 Live-Location verdrahtet (F4/F5/F6/F10/F25 schon da).
+LAST_TASK_PHASE3=F11 Connection-Quality-Indicator + Poor-Warnung. F12/F13 defer.
+LAST_TASK_PHASE5=F30 Swipe-Gesten auf PostCard.
+LAST_TASK_PHASE6=F71 Danke-Karten-Send-Sheet (4 Designs).
+LAST_TASK_PHASE7=F70 Marketplace Preis-Indikator farb-codiert.
+SPLASH=Dauer 2.6s → 4.2s erhöht (User-Wunsch)
 LAST_TASK=feat(modul-audit Sprint 5): WikipediaBox-Widget (Post-Detail bei Animal/tags), TranslateInlineButton (LibreTranslate für Chat-Messages, Auto-Detect + Toggle), Event-Detail-1-Tap In-Kalender-Button (add_2_calendar) + .ics-Fallback, BetterFeedback (shake_to_report-Style via 3-Finger-Long-Press, Submit → error_logs mit Screenshot-Bytes). Total Modul-Audit (5 Sprints): 35+ Items live, 10+ neue Services, 5+ neue Widgets, 9 neue Packages.
 
 ## Flutter-Migration
