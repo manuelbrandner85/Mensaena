@@ -24,6 +24,7 @@ import '../../screens/dashboard/call/call_history_screen.dart';
 import '../../screens/dashboard/call/call_screen.dart';
 import '../../screens/dashboard/live/live_room_screen.dart';
 import '../../screens/dashboard/followed_tags_screen.dart';
+import '../../screens/dashboard/friends_screen.dart';
 import '../../screens/dashboard/global_search_screen.dart';
 import '../../screens/dashboard/call/group_call_screen.dart';
 import '../../screens/dashboard/modules_hub_screen.dart';
@@ -277,6 +278,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, s) => mensaenaTransition<void>(
           key: s.pageKey,
           child: const FollowedTagsScreen(),
+        ),
+      ),
+      // ZUSATZ-4F: Freundesliste mit Tabs Alle / Online / Anfragen.
+      GoRoute(
+        path: '/dashboard/friends',
+        pageBuilder: (_, s) => mensaenaTransition<void>(
+          key: s.pageKey,
+          child: const FriendsScreen(),
         ),
       ),
       GoRoute(

@@ -80,6 +80,7 @@
     "skills": "Skills",
     "badges": "Badges",
     "calendar": "Kalender",
+    "friends": "Freunde",
     "followedTags": "Themen folgen",
     "savedPosts": "Gespeicherte Beiträge",
     "invite": "Nachbarn einladen",
@@ -2676,6 +2677,20 @@
   },
   "recent": {
     "title": "Zuletzt besucht"
+  },
+  "friends": {
+    "screenTitle": "Freunde",
+    "tabAll": "Alle",
+    "tabOnline": "Online",
+    "tabRequests": "Anfragen",
+    "searchHint": "Freunde suchen …",
+    "noFriends": "Noch keine Freunde — über Posts und Events andere kennenlernen.",
+    "noOnline": "Niemand gerade online.",
+    "noRequests": "Keine offenen Anfragen.",
+    "wantsToConnect": "möchte sich mit dir verbinden",
+    "chatTooltip": "Direkte Nachricht",
+    "suggestionsTitle": "Personen die du kennen könntest",
+    "fromYourArea": "Aus deiner Gegend"
   },
   "friend": {
     "request": "Freundschaft anfragen",

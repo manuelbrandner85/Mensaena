@@ -13,6 +13,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/friendships_repository.dart';
+import '../effects/celebrate_burst.dart';
 
 final friendshipStateProvider = FutureProvider.autoDispose
     .family<FriendshipState, String>((ref, otherId) async {
@@ -41,6 +42,10 @@ class FriendRequestButton extends ConsumerWidget {
       case FriendshipState.incomingPending:
         ok = await FriendshipsRepository.accept(userId);
         message = ok ? 'friend.accepted'.tr() : 'friend.request_failed'.tr();
+        // ZUSATZ-4E: Konfetti nach erfolgreicher Annahme.
+        if (ok && context.mounted) {
+          CelebrateBurst.fire(context, ref: ref);
+        }
         break;
       case FriendshipState.accepted:
         // Confirm-Dialog vor "Freundschaft beenden"

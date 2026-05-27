@@ -110,6 +110,60 @@ class FriendshipsRepository {
     }
   }
 
+  /// ZUSATZ-4D: Vorschläge "Personen die du kennen könntest".
+  /// Heuristik: gleiche neighborhood_group / region, NICHT bereits in
+  /// einer Friendship-Row mit mir (egal welcher Status), nicht self,
+  /// nicht geblockt. Max [limit] Treffer.
+  static Future<List<Map<String, dynamic>>> suggestions({int limit = 10}) async {
+    final me = SupabaseService.currentUser?.id;
+    if (me == null) return const [];
+    try {
+      // Bereits bestehende Beziehungen (egal welcher Status) ausschließen.
+      final existingRows = await sb
+          .from('friendships')
+          .select('requester_id, addressee_id')
+          .or('requester_id.eq.$me,addressee_id.eq.$me');
+      final excludeIds = <String>{me};
+      for (final r in (existingRows as List).whereType<Map<String, dynamic>>()) {
+        final req = r['requester_id'] as String?;
+        final add = r['addressee_id'] as String?;
+        if (req != null && req != me) excludeIds.add(req);
+        if (add != null && add != me) excludeIds.add(add);
+      }
+      // Optional: Auch geblockte/blockierende User ausschließen.
+      final blockRows = await sb
+          .from('user_blocks')
+          .select('blocker_id, blocked_id')
+          .or('blocker_id.eq.$me,blocked_id.eq.$me');
+      for (final r in (blockRows as List).whereType<Map<String, dynamic>>()) {
+        final b = r['blocker_id'] as String?;
+        final t = r['blocked_id'] as String?;
+        if (b != null && b != me) excludeIds.add(b);
+        if (t != null && t != me) excludeIds.add(t);
+      }
+      // Meine Region holen.
+      final my = await sb
+          .from('profiles')
+          .select('region_id, neighborhood_group_id')
+          .eq('id', me)
+          .maybeSingle();
+      var query = sb
+          .from('profiles')
+          .select('id, display_name, name, avatar_url, region_id')
+          .filter('is_banned', 'eq', false)
+          .not('id', 'in',
+              '(${excludeIds.map((id) => '"$id"').join(',')})');
+      final regionId = my?['region_id'] as String?;
+      if (regionId != null) query = query.eq('region_id', regionId);
+      final rows = await query
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Liste eingehender pending-Anfragen für mich.
   static Future<List<Map<String, dynamic>>> incoming() async {
     final me = SupabaseService.currentUser?.id;
