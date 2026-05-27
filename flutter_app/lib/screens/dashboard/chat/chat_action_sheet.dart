@@ -15,6 +15,7 @@ class ChatActionSheet {
     BuildContext context, {
     Future<bool> Function(String emoji)? onReact,
     VoidCallback? onReply,
+    VoidCallback? onForward,
     VoidCallback? onEdit,
     VoidCallback? onDelete,
     VoidCallback? onPin,
@@ -65,6 +66,15 @@ class ChatActionSheet {
                   onTap: () {
                     Navigator.pop(sheetCtx);
                     onReply();
+                  },
+                ),
+              if (onForward != null)
+                _ActionTile(
+                  icon: LucideIcons.share2,
+                  label: 'chat.forward'.tr(),
+                  onTap: () {
+                    Navigator.pop(sheetCtx);
+                    onForward();
                   },
                 ),
               if (onCopy != null)

@@ -21,6 +21,7 @@ import '../../../services/haptics.dart';
 import '../../../services/presence_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
+import '../../../widgets/chat/forward_message_sheet.dart';
 import '../../../widgets/chat/mentions_autocomplete.dart';
 import '../../../widgets/chat/vanish_mode_banner.dart';
 import '../../../widgets/chat/vanish_mode_sheet.dart';
@@ -739,6 +740,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           emoji: emoji,
                         ),
                         onReply: () => setState(() => _replyTo = m),
+                        onForward: () => ForwardMessageSheet.show(
+                          context,
+                          originalContent:
+                              (m['content'] as String?) ?? '',
+                          fromConversationId: widget.conversationId,
+                        ),
                         onEdit: mine
                             ? () => _editMessage(
                                   m['id'] as String,

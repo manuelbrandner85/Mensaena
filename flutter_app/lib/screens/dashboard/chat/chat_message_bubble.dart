@@ -32,6 +32,7 @@ class ChatMessageBubble extends ConsumerWidget {
     this.clustered = false,
     this.onReact,
     this.onReply,
+    this.onForward,
     this.onEdit,
     this.onDelete,
     this.onPin,
@@ -47,6 +48,7 @@ class ChatMessageBubble extends ConsumerWidget {
   final bool clustered;
   final Future<bool> Function(String emoji)? onReact;
   final VoidCallback? onReply;
+  final VoidCallback? onForward;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final VoidCallback? onPin;
@@ -148,6 +150,7 @@ class ChatMessageBubble extends ConsumerWidget {
           context,
           onReact: onReact,
           onReply: onReply,
+          onForward: onForward,
           onEdit: onEdit,
           onDelete: onDelete,
           onPin: onPin,
@@ -278,6 +281,38 @@ class ChatMessageBubble extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: PostCardChatBubble(
                       postId: _postCardId(textWithoutImages)!),
+                )
+              else if (textWithoutImages.startsWith('[FORWARDED]'))
+                // F7: Weitergeleitete Nachricht — Header + Original-Text.
+                Padding(
+                  padding: hasImages
+                      ? const EdgeInsets.fromLTRB(8, 4, 8, 0)
+                      : EdgeInsets.zero,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        const Icon(LucideIcons.cornerUpRight,
+                            size: 11, color: AppColors.bronze),
+                        const SizedBox(width: 4),
+                        Text(
+                          'chat.forwarded'.tr(),
+                          style: AppTypography.label(
+                              size: 9, color: AppColors.bronze),
+                        ),
+                      ]),
+                      const SizedBox(height: 4),
+                      _MentionAwareText(
+                        text: textWithoutImages
+                            .replaceFirst(RegExp(r'^\[FORWARDED\]\n?'), ''),
+                        baseStyle: AppTypography.body(
+                          size: 14,
+                          color: AppColors.ink,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               else if (textWithoutImages.isNotEmpty)
                 Padding(
