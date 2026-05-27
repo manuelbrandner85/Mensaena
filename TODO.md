@@ -3,8 +3,8 @@
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
-## CACHE — Mega-Prompt Status (2026-05-27)
-OPEN=Phase 0 (Welle 1+2), Phase 1 (5/6), Phase 2 (8/8), Phase 3 (3/5), Phase 5 (4/7), Phase 6 (5/8), Phase 7 (1/14 neu + viele exist.), Phase 8 (3/3), Phase 11 (P21), Phase 10 (Foundation da). 17+ Commits.
+## CACHE — Mega-Prompt FINAL Status (2026-05-27)
+OPEN=Phase 0 (sicher), 1 (5/6), 2 (8/8), 3 (3/5), 5 (4/7), 6 (5/8), 7 (F38+F40+F41+F70+viele exist.), 8 (3/3), 9 (existing), 10 (Foundation+DW-K reset), 11 (P19+P21), 12 (meiste existing). 20+ Commits.
 COUNT=Phase 0: 14 SQL + 6 Flutter | Phasen 1-12: 14 weitere Items live | Plus Splash + 6 reine Bug-Fixes (DM-Erstellung, Pin/Edit/Delete, Anrufverlauf, Friendship, HEIC-Upload). Total: 41+ konkrete Verbesserungen.
 NEXT=Verbleibende Defer-Items größerer Brocken: F12 Screen-Share + F13 Group-Calls (Android-Permissions/Architektur), F28 Message-Requests-für-Fremde (UX-Design), F22 Notification-Grouping (Backend-Rollup), F38 Scheduled Posts (DB+UI+Cron), F76 Chat-Summarization (ML), F52 Vorlesefunktion (Package-Add). Phase 11 P22 R8/ProGuard war früher deaktiviert (Crash-Risiko).
 LAST_SESSION=2026-05-27
