@@ -346,6 +346,8 @@
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",
+    "communityChannel": "Topluluk kanalı",
+    "groupSubtitle": "Grup",
     "noConversations": "Henüz mesaj yok.",
     "noConversationsHint": "Bir komşuya profilinden veya gönderisinden mesaj gönder.",
     "newDm": "Yeni mesaj",

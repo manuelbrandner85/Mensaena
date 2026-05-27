@@ -346,6 +346,8 @@
   },
   "chat": {
     "writeMessage": "Écrire un message …",
+    "communityChannel": "Canal communautaire",
+    "groupSubtitle": "Groupe",
     "noConversations": "Pas encore de messages.",
     "noConversationsHint": "Écrivez à un voisin depuis son profil ou sa publication.",
     "newDm": "Nouveau message",

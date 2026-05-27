@@ -346,6 +346,8 @@
   },
   "chat": {
     "writeMessage": "Написать сообщение …",
+    "communityChannel": "Канал сообщества",
+    "groupSubtitle": "Группа",
     "noConversations": "Сообщений пока нет.",
     "noConversationsHint": "Напишите соседу с его профиля или публикации.",
     "newDm": "Новое сообщение",

@@ -363,6 +363,8 @@
     "share_no_permission": "Location permission missing.",
     "mute": "Mute",
     "unmute": "Unmute",
+    "communityChannel": "Community channel",
+    "groupSubtitle": "Group",
     "noConversations": "No messages yet.",
     "noConversationsHint": "Message a neighbour from their profile or post.",
     "newDm": "New message",

@@ -1239,12 +1239,12 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
   String _subtitle(ChatContext? ctx, bool isOnline) {
     if (ctx == null) return '';
     if (ctx.kind == ChatKind.dm) {
-      return isOnline ? 'Online' : 'Offline';
+      return isOnline ? 'common.online'.tr() : 'common.offline'.tr();
     }
     if (ctx.kind == ChatKind.channel) {
-      return ctx.subtitle ?? 'Community-Kanal';
+      return ctx.subtitle ?? 'chat.communityChannel'.tr();
     }
-    if (ctx.kind == ChatKind.group) return 'Gruppe';
+    if (ctx.kind == ChatKind.group) return 'chat.groupSubtitle'.tr();
     return '';
   }
 }

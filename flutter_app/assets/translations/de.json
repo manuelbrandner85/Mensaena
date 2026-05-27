@@ -363,6 +363,8 @@
     "share_no_permission": "Standort-Berechtigung fehlt.",
     "mute": "Stumm schalten",
     "unmute": "Wieder benachrichtigen",
+    "communityChannel": "Community-Kanal",
+    "groupSubtitle": "Gruppe",
     "noConversations": "Noch keine Nachrichten.",
     "noConversationsHint": "Schreibe einem:r Nachbar:in über deren Profil oder Beitrag.",
     "newDm": "Neue Nachricht",
