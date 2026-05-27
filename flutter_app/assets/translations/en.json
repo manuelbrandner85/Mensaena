@@ -416,6 +416,8 @@
     "editFailed": "Edit failed.",
     "deleted": "Message deleted.",
     "deleteFailed": "Delete failed.",
+    "postCardLabel": "ABOUT THIS POST",
+    "postCardFallback": "Post no longer available.",
     "pinned": "📌 Message pinned.",
     "unpinned": "Pin removed.",
     "welcomeChannelTitle": "Welcome to #{name}",
@@ -2408,6 +2410,11 @@
   "modulesHub": {
     "title": "All modules",
     "intro": "Browse all 22 Mensaena modules."
+  },
+  "block": {
+    "cannotInteract": "Contact with this person isn't possible.",
+    "userBlocked": "You blocked this person.",
+    "youAreBlocked": "This person has blocked you."
   },
   "followed_tags": {
     "title": "Follow topics",

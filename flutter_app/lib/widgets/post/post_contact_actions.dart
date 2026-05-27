@@ -18,6 +18,7 @@ import '../../models/post.dart';
 import '../../models/post_contact_preference.dart';
 import '../../models/post_intent.dart';
 import '../../providers/post_contact_provider.dart';
+import '../../services/block_guard.dart';
 import '../../services/haptics.dart';
 import 'smart_reply_sheet.dart';
 import '../../services/supabase_service.dart';
@@ -201,6 +202,21 @@ class PostContactActions extends ConsumerWidget {
     PostIntent intent,
   ) async {
     Haptics.confirm();
+    // F27: BlockGuard — wenn einer der Seiten den anderen blockiert hat,
+    // Kontakt-Aktion sofort abbrechen mit klarer Snackbar.
+    if (post.userId.isNotEmpty) {
+      final canContact = await BlockGuard.canInteract(post.userId);
+      if (!context.mounted) return;
+      if (!canContact) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('block.cannotInteract'.tr(),
+              style: AppTypography.body(
+                  size: 13, color: AppColors.herzrotWarm)),
+        ));
+        return;
+      }
+    }
     final methods = pref?.enabledMethods ?? const ['in_app_chat'];
     final msgCtrl = TextEditingController();
     String selectedMethod = methods.first;

@@ -14,6 +14,7 @@ import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
+import '../../../widgets/chat/post_card_chat_bubble.dart';
 import '../../../widgets/shared/image_lightbox.dart';
 import '../../../widgets/shared/voice_message_bubble.dart';
 import 'chat_action_sheet.dart';
@@ -270,6 +271,13 @@ class ChatMessageBubble extends ConsumerWidget {
                   url: voiceMsg.url,
                   durationSeconds: voiceMsg.durationSeconds,
                   mine: mine,
+                )
+              else if (_postCardId(textWithoutImages) != null)
+                // F26: Auto-Postcard als erste Nachricht aus Post-Kontakt.
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: PostCardChatBubble(
+                      postId: _postCardId(textWithoutImages)!),
                 )
               else if (textWithoutImages.isNotEmpty)
                 Padding(
@@ -689,6 +697,16 @@ class _SystemCallCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// F26: Erkennt `[POSTCARD:<uuid>]`-Marker und gibt die postId zurück,
+/// sonst null. Auto-Kontaktkarte bei DM-aus-Post.
+final _postCardRegex = RegExp(
+    r'^\[POSTCARD:([0-9a-fA-F-]{36})\]$',
+    multiLine: false);
+String? _postCardId(String s) {
+  final m = _postCardRegex.firstMatch(s.trim());
+  return m?.group(1);
 }
 
 /// Heuristik fuer Emoji-Only-Nachrichten (#6): ohne Buchstaben/Zahlen,

@@ -173,16 +173,20 @@ class ConversationsRepository {
     }
   }
 
-  /// F2: Startet eine 1:1-Konversation oder gibt existierende zurueck.
+  /// F2 + Phase-1-BUG1: Startet eine 1:1-Konversation oder gibt existierende
+  /// zurueck. Optional `postId` setzt den Post-Bezug auf der conversation
+  /// (Chat-Header zeigt dann 'Bezug: [Post-Titel]').
   /// Setzt hidden_at vom Caller zurueck wenn vorher versteckt.
   /// Returns die conversation_id oder null bei Fehler.
-  /// Bug-Sleuth: Fehler werden NICHT mehr silent verschluckt — sonst tappen
-  /// wir wieder im Dunkeln (s. CHECK-Constraint-Bug Mai 2026 wo der
-  /// notifications_type_check trigger das DM-Insert kippte).
-  static Future<String?> getOrCreateDm(String otherUserId) async {
+  static Future<String?> getOrCreateDm(
+    String otherUserId, {
+    String? postId,
+  }) async {
     try {
-      final r = await sb.rpc<dynamic>('get_or_create_dm',
-          params: {'p_other_user_id': otherUserId});
+      final r = await sb.rpc<dynamic>('get_or_create_dm', params: {
+        'p_other_user_id': otherUserId,
+        if (postId != null) 'p_post_id': postId,
+      });
       return r as String?;
     } catch (e, st) {
       debugPrint('[getOrCreateDm] failed: $e\n$st');

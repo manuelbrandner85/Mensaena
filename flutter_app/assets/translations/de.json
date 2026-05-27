@@ -415,6 +415,8 @@
     "editFailed": "Bearbeiten fehlgeschlagen.",
     "deleted": "Nachricht gelöscht.",
     "deleteFailed": "Löschen fehlgeschlagen.",
+    "postCardLabel": "BEZUG ZUM BEITRAG",
+    "postCardFallback": "Beitrag nicht mehr verfügbar.",
     "pinned": "📌 Nachricht angepinnt.",
     "unpinned": "Pin entfernt.",
     "welcomeChannelTitle": "Willkommen in #{name}",
@@ -2407,6 +2409,11 @@
   "modulesHub": {
     "title": "Alle Module",
     "intro": "Stöbere durch die 22 Module der Mensaena-Plattform."
+  },
+  "block": {
+    "cannotInteract": "Kontakt zu dieser Person ist nicht möglich.",
+    "userBlocked": "Du hast diese Person blockiert.",
+    "youAreBlocked": "Diese Person hat dich blockiert."
   },
   "followed_tags": {
     "title": "Themen folgen",

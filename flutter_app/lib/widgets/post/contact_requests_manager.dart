@@ -15,6 +15,7 @@ import '../../models/post_contact_request.dart';
 import '../../providers/post_contact_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
+import '../../services/supabase_service.dart';
 import '../effects/celebrate_burst.dart';
 import '../effects/glass_card.dart';
 
@@ -351,13 +352,41 @@ class _PendingActions extends ConsumerWidget {
         .read(postContactRepositoryProvider)
         .respondToRequest(req.id, 'accepted');
     if (!ok) return;
-    // Bei in_app_chat → DM erstellen
+    // Bei in_app_chat → DM erstellen (BUG1: mit postId für Post-Bezug,
+    // F26: erste Nachricht ist die Auto-Kontaktkarte mit Post-Vorschau).
     if (req.contactMethod == 'in_app_chat') {
-      await ConversationsRepository.getOrCreateDm(req.requesterId);
+      final convId = await ConversationsRepository.getOrCreateDm(
+        req.requesterId,
+        postId: postId,
+      );
+      if (convId != null) {
+        await _maybeInsertPostCard(convId);
+      }
     }
     ref.invalidate(postContactRequestsProvider(postId));
     ref.invalidate(myIncomingContactRequestsProvider);
     ref.invalidate(helperCountProvider(postId));
+  }
+
+  /// F26: Erste Nachricht ist eine [POSTCARD]-Markierung. Wird vom Chat-
+  /// Bubble erkannt und als Karte mit Post-Preview gerendert. Nur einfügen
+  /// wenn die Konversation noch keine Messages hat (erste Begegnung).
+  Future<void> _maybeInsertPostCard(String convId) async {
+    try {
+      final existing = await sb
+          .from('messages')
+          .select('id')
+          .eq('conversation_id', convId)
+          .limit(1);
+      if ((existing as List).isNotEmpty) return;
+      final me = SupabaseService.currentUser?.id;
+      if (me == null) return;
+      await sb.from('messages').insert({
+        'conversation_id': convId,
+        'sender_id': me,
+        'content': '[POSTCARD:$postId]',
+      });
+    } catch (_) {/* silent — fallback ist normaler leerer Chat */}
   }
 
   Future<void> _decline(BuildContext context, WidgetRef ref) async {
