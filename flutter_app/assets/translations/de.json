@@ -2441,6 +2441,10 @@
     "userBlocked": "Du hast diese Person blockiert.",
     "youAreBlocked": "Diese Person hat dich blockiert."
   },
+  "tts": {
+    "read": "Vorlesen",
+    "stop": "Stopp"
+  },
   "thanks": {
     "sheetTitle": "Danke-Karte senden",
     "recipient": "An {name}",

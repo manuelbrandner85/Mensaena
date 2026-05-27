@@ -2442,6 +2442,10 @@
     "userBlocked": "You blocked this person.",
     "youAreBlocked": "This person has blocked you."
   },
+  "tts": {
+    "read": "Read aloud",
+    "stop": "Stop"
+  },
   "thanks": {
     "sheetTitle": "Send thank-you card",
     "recipient": "To {name}",

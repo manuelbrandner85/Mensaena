@@ -22,6 +22,7 @@ import '../../widgets/post/post_contact_actions.dart';
 import '../../widgets/posts/poll_create_sheet.dart';
 import '../../widgets/posts/post_poll_widget.dart';
 import '../../widgets/posts/similar_posts_carousel.dart';
+import '../../widgets/posts/tts_play_button.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 
@@ -577,8 +578,16 @@ class _Hero extends StatelessWidget {
           ],
         ),
         // Phase 7: Inline-Poll (rendert nichts wenn keine poll für post)
-        if (post.description != null && post.description!.length > 40)
-          _TranslateButton(text: post.description!),
+        if (post.description != null && post.description!.length > 40) ...[
+          Row(children: [
+            _TranslateButton(text: post.description!),
+            const SizedBox(width: 8),
+            // F52: Vorlesefunktion via OS-TTS
+            TtsPlayButton(
+              text: '${post.title}. ${post.description!}',
+            ),
+          ]),
+        ],
         PostPollWidget(postId: post.id),
         if (post.userId == SupabaseService.currentUser?.id)
           _AddPollButton(postId: post.id),

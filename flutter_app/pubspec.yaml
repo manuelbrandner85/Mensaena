@@ -41,6 +41,9 @@ dependencies:
   record: 5.0.5
   audioplayers: ^6.0.0
 
+  # F52: Vorlesefunktion (Post-Detail, Wiki-Artikel etc) via OS-native TTS.
+  flutter_tts: ^4.2.0
+
   # Push Notifications
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3
