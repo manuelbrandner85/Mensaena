@@ -28,7 +28,9 @@ import '../../../repositories/notifications_repository.dart';
 import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
-import '../../../widgets/dashboard/books_widget.dart';
+// v2.1: Books-Widget entfernt — Import bleibt aus damit Linter mahnt
+// wenn jemand das aus Versehen wieder einbaut.
+// import '../../../widgets/dashboard/books_widget.dart';
 import '../../../widgets/dashboard/bot_tip_card.dart';
 import '../../../widgets/dashboard/community_pulse.dart';
 import '../../../widgets/dashboard/daily_quote_widget.dart';
@@ -525,8 +527,7 @@ class _DashboardHomeScreenState
           addSpacing();
           break;
         case 'books':
-          out.add(const BooksWidget());
-          addSpacing();
+          // v2.1: Books-Widget entfernt (User-Wunsch).
           break;
         case 'health':
           out.add(const HealthWidget());
@@ -802,7 +803,7 @@ class _NearbyFeed extends StatelessWidget {
             SizedBox(
               height: 48,
               child: ElevatedButton.icon(
-                onPressed: () => context.go('/dashboard/create'),
+                onPressed: () => context.go('/dashboard/modules'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.bronze,
                   foregroundColor: AppColors.voidColor,

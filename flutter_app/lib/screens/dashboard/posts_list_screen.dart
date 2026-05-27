@@ -277,7 +277,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.amber,
         foregroundColor: AppColors.voidColor,
-        onPressed: () => context.go('/dashboard/create'),
+        onPressed: () => context.go('/dashboard/modules'),
         icon: const Icon(LucideIcons.plus),
         label: Text('posts.post'.tr()),
       ),
@@ -391,7 +391,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                 : 'posts.createFirst'.tr(),
             onAction: _hasActiveFilters
                 ? _resetAll
-                : () => context.go('/dashboard/create'),
+                : () => context.go('/dashboard/modules'),
           ),
         ],
       );

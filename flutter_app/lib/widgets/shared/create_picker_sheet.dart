@@ -51,16 +51,9 @@ class CreatePickerSheet {
                 crossAxisSpacing: 10,
                 childAspectRatio: 1.6,
                 children: [
-                  _Tile(
-                    icon: LucideIcons.fileText,
-                    label: 'create.picker.post'.tr(),
-                    desc: 'create.picker.post_desc'.tr(),
-                    color: AppColors.bronze,
-                    onTap: () {
-                      Navigator.pop(sheetCtx);
-                      context.push('/dashboard/create');
-                    },
-                  ),
+                  // v2.1: 'Neuer Beitrag' raus — Beiträge werden über
+                  // das jeweilige Modul (Plus-Button im Module-Screen)
+                  // erstellt, nicht zentral.
                   _Tile(
                     icon: LucideIcons.calendar,
                     label: 'create.picker.event'.tr(),

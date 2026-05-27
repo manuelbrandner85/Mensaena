@@ -21,11 +21,14 @@ class QuickActions extends StatelessWidget {
     Color accent,
     String route,
   })>[
+    // v2.1: 'Neuer Beitrag' raus — Beiträge laufen über Module.
+    // qaPost-Eintrag ersetzt durch 'Alle Module' damit User direkt zum
+    // Hub springt und dort ein Modul + dessen Create-Flow nimmt.
     (
-      i18n: 'home.qaPost',
-      icon: LucideIcons.plus,
+      i18n: 'home.qaModules',
+      icon: LucideIcons.layoutGrid,
       accent: AppColors.amber,
-      route: '/dashboard/create',
+      route: '/dashboard/modules',
     ),
     (
       i18n: 'home.qaMap',
