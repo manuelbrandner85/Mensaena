@@ -275,6 +275,21 @@ class DashboardWidgetConfig {
       description: 'widgets.descriptions.progressTrio',
       icon: LucideIcons.trendingUp,
     ),
+    // Phase 10 E6 — WeeklySummary (Recap + Digest Tabs).
+    DashboardWidgetMeta(
+      id: 'weekly_summary',
+      title: 'widgets.titles.weeklySummary',
+      description: 'widgets.descriptions.weeklySummary',
+      icon: LucideIcons.calendar,
+    ),
+    // Phase 10 E9 — AlertsBadge (idle pill / active SafetyBanners).
+    DashboardWidgetMeta(
+      id: 'alerts_badge',
+      title: 'widgets.titles.alertsBadge',
+      description: 'widgets.descriptions.alertsBadge',
+      icon: LucideIcons.shieldCheck,
+      removable: false,
+    ),
     DashboardWidgetMeta(
       id: 'affirmation',
       title: 'widgets.titles.affirmation',
@@ -313,6 +328,11 @@ class DashboardWidgetConfig {
     'karma',
     'streak',
     'helpStreak',
+    // Phase 10 E6/E9: durch weekly_summary / alerts_badge ersetzt.
+    'recap',
+    'digest',
+    'safety',
+    'water_level',
   };
 
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(

@@ -2066,6 +2066,8 @@
     "titles": {
       "sky": "Sky",
       "progressTrio": "Progress",
+      "weeklySummary": "Weekly summary",
+      "alertsBadge": "Alerts",
       "greeting": "Greeting",
       "safetyAlerts": "Safety alerts",
       "startup": "Getting started",
@@ -2110,6 +2112,8 @@
     "descriptions": {
       "sky": "Weather, sun, moon — swipe between them",
       "progressTrio": "Karma, streak, help streak in one row",
+      "weeklySummary": "Your activity + community digest in tabs",
+      "alertsBadge": "NINA + water level + food recalls — compact",
       "greeting": "Personalised hero with time-of-day mood",
       "safetyAlerts": "NINA + food recalls",
       "startup": "Onboarding checklist for new neighbours",
@@ -2743,6 +2747,13 @@
       "events": "Events & time-bank"
     },
     "collapseAll": "Collapse all",
-    "expandAll": "Expand all"
+    "expandAll": "Expand all",
+    "summary": {
+      "mine": "My activity",
+      "community": "Community"
+    },
+    "alerts": {
+      "allClear": "All clear"
+    }
   }
 }

@@ -28,6 +28,7 @@ import '../../../repositories/notifications_repository.dart';
 import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
+import '../../../widgets/dashboard/alerts_badge_widget.dart';
 import '../../../widgets/dashboard/dashboard_section.dart';
 // v2.1: Books-Widget entfernt — Import bleibt aus damit Linter mahnt
 // wenn jemand das aus Versehen wieder einbaut.
@@ -78,6 +79,7 @@ import '../../../widgets/dashboard/water_level_widget.dart';
 import '../../../widgets/dashboard/weather_widget.dart';
 import '../../../widgets/dashboard/weekly_challenge_highlight.dart';
 import '../../../widgets/dashboard/weekly_digest.dart';
+import '../../../widgets/dashboard/weekly_summary_widget.dart';
 import '../../../widgets/dashboard/dashboard_edit_banner.dart';
 import '../../../widgets/dashboard/dashboard_onboarding_tooltip.dart';
 import '../../../widgets/dashboard/dashboard_widget_wrapper.dart';
@@ -628,6 +630,23 @@ class _DashboardHomeScreenState
           break;
         case 'recap':
           out.add(const WeeklyRecapWidget());
+          addSpacing();
+          break;
+        // Phase 10 E6: WeeklySummary = Recap + Digest in einem TabBar.
+        case 'weekly_summary':
+          if (profile != null) {
+            out.add(WeeklySummaryWidget(profile: profile));
+            consumed.addAll(const ['recap', 'digest']);
+            addSpacing();
+          }
+          break;
+        // Phase 10 E9: AlertsBadge = idle 'Alles sicher' / aktiv SafetyBanners.
+        case 'alerts_badge':
+          out.add(AlertsBadgeWidget(
+            lat: profile?.latitude,
+            lng: profile?.longitude,
+          ));
+          consumed.addAll(const ['safety', 'traffic', 'water_level']);
           addSpacing();
           break;
         case 'heatmap':

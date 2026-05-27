@@ -13,6 +13,9 @@ import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../effects/glass_card.dart';
 
+/// Phase 10 E10: Mentor-CTA nur wenn karma≥100 UND trust_score≥4.0
+/// UND mind. 3 Skills hinterlegt sind. Verhindert dass Anfänger-User
+/// einen "Werde Mentor"-CTA sehen bevor sie eine soziale Basis haben.
 final _myMentorEligibilityProvider =
     FutureProvider.autoDispose<bool>((ref) async {
   final uid = SupabaseService.currentUser?.id;
@@ -20,12 +23,16 @@ final _myMentorEligibilityProvider =
   try {
     final row = await sb
         .from('profiles')
-        .select('is_mentor, skills, offer_tags')
+        .select('is_mentor, skills, offer_tags, karma_points, trust_score')
         .eq('id', uid)
         .maybeSingle();
     if (row == null) return false;
     final isMentor = row['is_mentor'] as bool? ?? false;
     if (isMentor) return false;
+    final karma = (row['karma_points'] as num?)?.toInt() ?? 0;
+    if (karma < 100) return false;
+    final trust = (row['trust_score'] as num?)?.toDouble() ?? 0.0;
+    if (trust < 4.0) return false;
     final skillCount =
         ((row['skills'] as List?)?.length ?? 0) +
             ((row['offer_tags'] as List?)?.length ?? 0);

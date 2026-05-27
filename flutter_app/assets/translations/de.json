@@ -2065,6 +2065,8 @@
     "titles": {
       "sky": "Himmel",
       "progressTrio": "Fortschritt",
+      "weeklySummary": "Wochen-Übersicht",
+      "alertsBadge": "Warnungen",
       "greeting": "Begrüßung",
       "safetyAlerts": "Sicherheits-Warnungen",
       "startup": "Einstieg",
@@ -2109,6 +2111,8 @@
     "descriptions": {
       "sky": "Wetter, Sonne, Mond — wechseln per Swipe",
       "progressTrio": "Karma, Streak, Hilfe-Streak in einer Zeile",
+      "weeklySummary": "Eigene Aktivität + Community-Digest in Tabs",
+      "alertsBadge": "NINA + Pegel + Lebensmittel — kompakt",
       "greeting": "Personalisierter Hero mit Tageszeit-Stimmung",
       "safetyAlerts": "NINA + Lebensmittel-Rückrufe",
       "startup": "Onboarding-Checkliste für neue Nachbarn",
@@ -2742,6 +2746,13 @@
       "events": "Events & Zeitbank"
     },
     "collapseAll": "Alle zuklappen",
-    "expandAll": "Alle aufklappen"
+    "expandAll": "Alle aufklappen",
+    "summary": {
+      "mine": "Meine Aktivität",
+      "community": "Community"
+    },
+    "alerts": {
+      "allClear": "Alles sicher"
+    }
   }
 }
