@@ -289,8 +289,139 @@ class _AdminDetailSheet extends StatefulWidget {
 
 class _AdminDetailSheetState extends State<_AdminDetailSheet> {
   bool _busy = false;
+  bool _editing = false;
+  // Pro-Feld TextEditingControllers für editierbare String/Number-Felder.
+  final Map<String, TextEditingController> _editCtrls = {};
+  // Pro-Feld aktueller Boolean-Wert für Switch-Felder.
+  final Map<String, bool> _editBools = {};
+
+  // Felder die NIE editierbar sein sollen — würden FK-Constraints brechen
+  // oder Audit-Spuren manipulieren.
+  static const _readonlyFields = {
+    'id', 'created_at', 'updated_at', 'auth_created_at',
+    'profile_created_at', 'email_confirmed_at', 'last_sign_in_at',
+    'deleted_at', 'banned_until', 'profile_missing',
+  };
+
+  bool _isReadonly(String key) {
+    if (_readonlyFields.contains(key)) return true;
+    // Alle Fremdschlüssel-IDs (user_id, helper_id, post_id, etc.)
+    if (key.endsWith('_id')) return true;
+    return false;
+  }
 
   String? get _id => widget.row['id'] as String?;
+
+  @override
+  void dispose() {
+    for (final c in _editCtrls.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _enterEditMode() {
+    setState(() {
+      _editing = true;
+      _editCtrls.clear();
+      _editBools.clear();
+      for (final entry in widget.row.entries) {
+        if (_isReadonly(entry.key)) continue;
+        final v = entry.value;
+        if (v is bool) {
+          _editBools[entry.key] = v;
+        } else if (v == null || v is String || v is num) {
+          _editCtrls[entry.key] =
+              TextEditingController(text: v?.toString() ?? '');
+        }
+        // Maps/Lists/JSONb übersprungen — Admin nutzt SQL-Editor für komplexe
+        // Strukturen.
+      }
+    });
+  }
+
+  void _cancelEdit() {
+    for (final c in _editCtrls.values) {
+      c.dispose();
+    }
+    setState(() {
+      _editing = false;
+      _editCtrls.clear();
+      _editBools.clear();
+    });
+  }
+
+  Future<void> _saveEdit() async {
+    if (_id == null) return;
+    setState(() => _busy = true);
+    var allOk = true;
+    var changed = 0;
+    try {
+      for (final entry in _editCtrls.entries) {
+        final original = widget.row[entry.key];
+        final newText = entry.value.text.trim();
+        // Empty + originaly null → no change
+        final originalStr = original?.toString() ?? '';
+        if (newText == originalStr) continue;
+        // Number-Erkennung: wenn original num war, versuche zu parsen.
+        dynamic newValue;
+        if (newText.isEmpty) {
+          newValue = null;
+        } else if (original is int) {
+          newValue = int.tryParse(newText) ?? newText;
+        } else if (original is double) {
+          newValue = double.tryParse(newText) ?? newText;
+        } else {
+          newValue = newText;
+        }
+        final ok = await AdminRepository.updateField(
+          table: widget.tableName,
+          id: _id!,
+          column: entry.key,
+          value: newValue,
+        );
+        if (!ok) allOk = false;
+        if (ok) changed++;
+      }
+      for (final entry in _editBools.entries) {
+        final original = widget.row[entry.key];
+        if (original == entry.value) continue;
+        final ok = await AdminRepository.updateField(
+          table: widget.tableName,
+          id: _id!,
+          column: entry.key,
+          value: entry.value,
+        );
+        if (!ok) allOk = false;
+        if (ok) changed++;
+      }
+    } catch (_) {
+      allOk = false;
+    }
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (allOk && changed > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.editSaved'.tr(
+          namedArgs: {'n': '$changed'},
+        ))),
+      );
+      widget.onChanged();
+      Navigator.of(context).pop();
+    } else if (changed == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.editNoChanges'.tr())),
+      );
+      _cancelEdit();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.editPartialFail'.tr(
+          namedArgs: {'n': '$changed'},
+        ))),
+      );
+      widget.onChanged();
+    }
+  }
 
   // Erlaubte Status-Werte je Tabelle (1:1 zu Web-Admin)
   List<String> get _availableStatuses {
@@ -521,24 +652,74 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
           const SizedBox(height: 14),
         ],
 
-        // ── Delete ──────────────────────────────────────────────
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: _busy || _id == null ? null : _delete,
-            icon: const Icon(LucideIcons.trash2, size: 14),
-            label: Text('admin.deleteEntry'.tr()),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.herzrot,
-              side: BorderSide(
-                  color: AppColors.herzrot.withValues(alpha: 0.5)),
-            ),
+        // ── Edit + Delete ───────────────────────────────────────
+        if (!_editing) ...[
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _busy || _id == null ? null : _enterEditMode,
+                  icon: const Icon(LucideIcons.pencil, size: 14),
+                  label: Text('admin.editEntry'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    side: BorderSide(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _busy || _id == null ? null : _delete,
+                  icon: const Icon(LucideIcons.trash2, size: 14),
+                  label: Text('admin.deleteEntry'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.herzrot,
+                    side: BorderSide(
+                        color: AppColors.herzrot.withValues(alpha: 0.5)),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 20),
+          const SizedBox(height: 20),
+        ] else ...[
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: _busy ? null : _saveEdit,
+                  icon: const Icon(LucideIcons.check, size: 14),
+                  label: Text('common.save'.tr()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.bronze,
+                    foregroundColor: AppColors.voidColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _busy ? null : _cancelEdit,
+                  icon: const Icon(LucideIcons.x, size: 14),
+                  label: Text('common.cancel'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.mute,
+                    side: const BorderSide(color: AppColors.line),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+        ],
 
-        // ── Roh-Daten ───────────────────────────────────────────
-        Text('admin.rawData'.tr(), style: AppTypography.label(size: 10)),
+        // ── Daten (Roh oder Edit-Form) ─────────────────────────
+        Text(
+          _editing ? 'admin.editFields'.tr() : 'admin.rawData'.tr(),
+          style: AppTypography.label(size: 10),
+        ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(12),
@@ -551,20 +732,80 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
             children: [
               for (final entry in widget.row.entries) ...[
                 Text(entry.key, style: AppTypography.label(size: 9)),
-                const SizedBox(height: 2),
-                Text(
-                  entry.value?.toString() ?? 'null',
-                  style: AppTypography.mono(
-                    size: 11,
-                    color: AppColors.inkSoft,
-                  ),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
+                _renderField(entry.key, entry.value),
+                const SizedBox(height: 10),
               ],
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _renderField(String key, dynamic value) {
+    if (!_editing || _isReadonly(key)) {
+      return Text(
+        value?.toString() ?? 'null',
+        style: AppTypography.mono(size: 11, color: AppColors.inkSoft),
+      );
+    }
+    if (value is bool || _editBools.containsKey(key)) {
+      return Row(
+        children: [
+          Switch(
+            value: _editBools[key] ?? (value is bool ? value : false),
+            activeColor: AppColors.bronze,
+            onChanged: _busy
+                ? null
+                : (v) => setState(() => _editBools[key] = v),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            (_editBools[key] ?? false) ? 'true' : 'false',
+            style: AppTypography.mono(size: 11, color: AppColors.inkSoft),
+          ),
+        ],
+      );
+    }
+    final ctrl = _editCtrls[key];
+    if (ctrl == null) {
+      // Komplexes Feld (Map/List) — nicht editierbar im generischen UI.
+      return Text(
+        value?.toString() ?? 'null',
+        style: AppTypography.mono(size: 11, color: AppColors.mute),
+      );
+    }
+    final isNumber = value is num;
+    final isMultiline = (value is String) && value.length > 60;
+    return TextField(
+      controller: ctrl,
+      enabled: !_busy,
+      keyboardType: isNumber
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : (isMultiline ? TextInputType.multiline : TextInputType.text),
+      maxLines: isMultiline ? null : 1,
+      minLines: isMultiline ? 2 : 1,
+      style: AppTypography.mono(size: 12, color: AppColors.ink),
+      decoration: InputDecoration(
+        isDense: true,
+        filled: true,
+        fillColor: AppColors.surface,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.line),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.line),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.bronze),
+        ),
+      ),
     );
   }
 }
