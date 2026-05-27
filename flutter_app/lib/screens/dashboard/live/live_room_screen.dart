@@ -33,7 +33,6 @@ import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
-import '../../../widgets/shared/live_poll_overlay.dart';
 import '../../../widgets/livestream/livestream_chat_resolver.dart';
 import '../../../widgets/shared/watcher_panel.dart';
 
@@ -65,14 +64,12 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   int _participantCount = 0;
   // Cache: identity → profile (name + avatar_url) für Avatar-Fallback.
   final Map<String, _ParticipantProfile> _profiles = {};
-  // Room-Events Bus (Reactions/Polls/Highlights/Subtitles via DataChannel)
+  // Room-Events Bus (Reactions via DataChannel)
   RoomEventsService? _events;
   StreamSubscription<RoomEvent>? _eventsSub;
   // Floating-Hearts
   final FloatingReactionsController _reactionsCtrl =
       FloatingReactionsController();
-  // Live-Poll-State (nur einer aktiv gleichzeitig)
-  LivePoll? _activePoll;
   // Watcher-Panel sichtbar?
   bool _watchersOpen = false;
   // Watcher join/leave Toast-Queue
@@ -293,41 +290,13 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
         if (emoji != null) _reactionsCtrl.spawn(emoji);
         break;
       case RoomEventType.pollStart:
-        final id = ev.data['id'] as String?;
-        final q = ev.data['question'] as String?;
-        final opts = (ev.data['options'] as List?)?.cast<String>();
-        if (id != null && q != null && opts != null && opts.isNotEmpty) {
-          setState(() => _activePoll = LivePoll(
-              id: id, question: q, options: opts));
-        }
-        break;
       case RoomEventType.pollVote:
-        final pollId = ev.data['pollId'] as String?;
-        final optionIndex = (ev.data['optionIndex'] as num?)?.toInt();
-        if (pollId != null &&
-            optionIndex != null &&
-            _activePoll?.id == pollId) {
-          setState(() {
-            // Vorherigen Vote des Senders entfernen (re-vote moeglich)
-            for (final s in _activePoll!.votes.values) {
-              s.remove(ev.senderIdentity);
-            }
-            _activePoll!.votes
-                .putIfAbsent(optionIndex, () => <String>{})
-                .add(ev.senderIdentity);
-          });
-        }
-        break;
       case RoomEventType.pollClose:
-        setState(() => _activePoll = null);
+        // User-Wunsch: Umfragen aus Livestream entfernt.
         break;
       case RoomEventType.highlight:
-        // Host hat einen Wichtig-Moment markiert — alle Zuschauer sehen
-        // einen kurzen Toast.
-        _showJoinLeaveToast('🔖 Highlight!', JoinLeaveKind.join);
-        break;
       case RoomEventType.subtitle:
-        // User-Wunsch: Untertitel im Livestream entfernt — Event ignorieren.
+        // User-Wunsch: Highlights + Untertitel aus Livestream entfernt.
         break;
       default:
         break;
@@ -354,38 +323,6 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     _events?.send(RoomEventType.reaction, {'emoji': emoji}, reliable: false);
   }
 
-  Future<void> _hostStartPoll() async {
-    final poll = await CreatePollSheet.show(context);
-    if (poll == null || !mounted) return;
-    setState(() => _activePoll = poll);
-    await _events?.send(RoomEventType.pollStart, {
-      'id': poll.id,
-      'question': poll.question,
-      'options': poll.options,
-    });
-  }
-
-  Future<void> _vote(int optionIndex) async {
-    final poll = _activePoll;
-    if (poll == null) return;
-    final me = _room?.localParticipant?.identity ?? '';
-    if (me.isEmpty) return;
-    setState(() {
-      for (final s in poll.votes.values) {
-        s.remove(me);
-      }
-      poll.votes.putIfAbsent(optionIndex, () => <String>{}).add(me);
-    });
-    await _events?.send(
-        RoomEventType.pollVote, {'pollId': poll.id, 'optionIndex': optionIndex});
-  }
-
-  Future<void> _hostClosePoll() async {
-    final poll = _activePoll;
-    if (poll == null) return;
-    setState(() => _activePoll = null);
-    await _events?.send(RoomEventType.pollClose, {'pollId': poll.id});
-  }
 
   /// Internen Livestream-Chat als DraggableScrollableSheet öffnen.
   /// LivestreamChatByRoomName resolved room_name → uuid intern.
@@ -479,20 +416,8 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                               myMicEnabled: _micEnabled,
                             ),
                 ),
-                // Live-Poll (falls aktiv) ueber dem ActionBar.
-                if (_activePoll != null)
-                  LivePollOverlay(
-                    poll: _activePoll!,
-                    onVote: _vote,
-                    onClose: _hostClosePoll,
-                    isHost: widget.isHost,
-                    myIdentity:
-                        _room?.localParticipant?.identity ?? '',
-                  ),
-                // User-Wunsch: Untertitel + Highlights raus aus Livestream.
-                // Statt SubtitleDisplay/Composer ist hier nur noch
-                // Reaction-Picker — Chat liegt im LivestreamChat-Panel.
-                // Reaction-Picker fuer alle Teilnehmer.
+                // User-Wunsch: Umfragen + Highlights + Untertitel raus.
+                // Es bleibt nur der Reaction-Picker + Chat-Button im Header.
                 if (_state == _RoomState.connected)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -508,11 +433,6 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   onMicTap: _toggleMic,
                   onCamTap: _toggleCam,
                   onLeaveTap: _leave,
-                  onStartPoll: widget.isHost && _activePoll == null
-                      ? _hostStartPoll
-                      : null,
-                  // User-Wunsch: Highlight-Button raus.
-                  onHighlight: null,
                 ),
               ],
             ),
@@ -1007,8 +927,6 @@ class _ActionBar extends StatelessWidget {
     required this.onCamTap,
     required this.onLeaveTap,
     this.isHost = false,
-    this.onStartPoll,
-    this.onHighlight,
   });
 
   final bool micEnabled;
@@ -1018,8 +936,6 @@ class _ActionBar extends StatelessWidget {
   final VoidCallback onMicTap;
   final VoidCallback onCamTap;
   final VoidCallback onLeaveTap;
-  final VoidCallback? onStartPoll;
-  final VoidCallback? onHighlight;
 
   @override
   Widget build(BuildContext context) {
@@ -1050,20 +966,6 @@ class _ActionBar extends StatelessWidget {
             color: camEnabled ? AppColors.bronze : AppColors.mute,
             onTap: enabled ? onCamTap : null,
           ),
-          if (isHost && onStartPoll != null)
-            _RoundAction(
-              icon: LucideIcons.barChart3,
-              label: 'Umfrage',
-              color: AppColors.bronze,
-              onTap: onStartPoll,
-            ),
-          if (isHost && onHighlight != null)
-            _RoundAction(
-              icon: LucideIcons.bookmark,
-              label: 'Highlight',
-              color: AppColors.amber,
-              onTap: onHighlight,
-            ),
           _RoundAction(
             icon: LucideIcons.phoneOff,
             label: 'Verlassen',
