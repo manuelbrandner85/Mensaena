@@ -199,12 +199,18 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
                             ),
                           );
                         }
-                        return ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-                          itemCount: list.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 6),
-                          itemBuilder: (_, i) => _JobCard(job: list[i]),
+                        return RefreshIndicator(
+                          color: AppColors.amber,
+                          backgroundColor: AppColors.surface,
+                          onRefresh: _search,
+                          child: ListView.separated(
+                            padding:
+                                const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                            itemCount: list.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 6),
+                            itemBuilder: (_, i) => _JobCard(job: list[i]),
+                          ),
                         );
                       },
                     ),
