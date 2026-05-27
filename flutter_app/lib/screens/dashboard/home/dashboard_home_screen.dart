@@ -28,6 +28,7 @@ import '../../../repositories/notifications_repository.dart';
 import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
+import '../../../widgets/dashboard/dashboard_section.dart';
 // v2.1: Books-Widget entfernt — Import bleibt aus damit Linter mahnt
 // wenn jemand das aus Versehen wieder einbaut.
 // import '../../../widgets/dashboard/books_widget.dart';
@@ -290,8 +291,49 @@ class _DashboardHomeScreenState
     void addSpacing([double h = 16]) =>
         out.add(SizedBox(height: h));
 
-    for (final id in order) {
+    // Phase 10 A/B/C: Sektion-Banner zwischen Widget-Gruppen.
+    // Tageszeit-Sortierung beeinflusst hier die Reihenfolge der Sektionen.
+    DashboardSectionId? currentSection;
+    final sectionPriority = {
+      for (var i = 0;
+          i < orderedSections(DateTime.now()).length;
+          i++)
+        orderedSections(DateTime.now())[i].id: i,
+    };
+
+    // Order-Liste nach Tageszeit-Sektions-Reihenfolge stabil neu sortieren.
+    final sortedOrder = [...order];
+    sortedOrder.sort((a, b) {
+      final sa = sectionForWidget(a);
+      final sb = sectionForWidget(b);
+      final pa = sa == null ? 999 : (sectionPriority[sa.id] ?? 999);
+      final pb = sb == null ? 999 : (sectionPriority[sb.id] ?? 999);
+      if (pa != pb) return pa.compareTo(pb);
+      // gleicher Section-Priority → ursprüngliche Reihenfolge.
+      return order.indexOf(a).compareTo(order.indexOf(b));
+    });
+
+    final collapsed = ref.read(collapsedSectionsProvider);
+    // Phase 10 F4: Collapse-All-Toggle direkt am Anfang der Liste.
+    out.add(const Padding(
+      padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: CollapseAllToggle(),
+      ),
+    ));
+    for (final id in sortedOrder) {
       if (!visible.contains(id) || consumed.contains(id)) continue;
+      // Sektion-Banner einfügen wenn sich die Sektion ändert.
+      final widgetSection = sectionForWidget(id);
+      if (widgetSection != null && widgetSection.id != currentSection) {
+        currentSection = widgetSection.id;
+        out.add(_SectionBanner(section: widgetSection));
+      }
+      // Wenn Sektion eingeklappt → Widget skippen.
+      if (widgetSection != null && collapsed.contains(widgetSection.id)) {
+        continue;
+      }
 
       switch (id) {
         case 'hero':
@@ -961,3 +1003,70 @@ class _DashboardScrollBody extends ConsumerWidget {
   }
 }
 
+
+/// Phase 10 D1/D2: kompakter Sektion-Banner zwischen Widget-Gruppen.
+/// Glassmorphism + Sektions-Farbe als Linker-Rand. Tap toggelt die
+/// gesamte Sektion (collapsed/expanded). Im Initial-State sind alle
+/// expanded, der User kann via CollapseAllToggle alle einklappen.
+class _SectionBanner extends ConsumerWidget {
+  const _SectionBanner({required this.section});
+  final DashboardSection section;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final collapsed =
+        ref.watch(collapsedSectionsProvider).contains(section.id);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 16, 12, 4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () => ref
+            .read(collapsedSectionsProvider.notifier)
+            .toggle(section.id),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                section.color.withValues(alpha: 0.18),
+                section.color.withValues(alpha: 0.04),
+              ],
+            ),
+            border: Border(
+              left: BorderSide(color: section.color, width: 3),
+              top: BorderSide(
+                  color: AppColors.bronze.withValues(alpha: 0.15)),
+              right: BorderSide(
+                  color: AppColors.bronze.withValues(alpha: 0.15)),
+              bottom: BorderSide(
+                  color: AppColors.bronze.withValues(alpha: 0.15)),
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(children: [
+            Icon(section.icon, size: 16, color: section.color),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                section.titleKey.tr(),
+                style: AppTypography.body(
+                    size: 13,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700),
+              ),
+            ),
+            AnimatedRotation(
+              turns: collapsed ? -0.25 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                LucideIcons.chevronDown,
+                color: section.color,
+                size: 16,
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}

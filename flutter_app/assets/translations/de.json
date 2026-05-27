@@ -2728,6 +2728,16 @@
       "onboarding_ok": "Verstanden",
       "widget_disabled": "Widget deaktiviert",
       "widget_enabled": "Widget aktiviert"
-    }
+    },
+    "sections": {
+      "myDay": "Mein Tag",
+      "community": "Community & Aktivität",
+      "gamification": "Fortschritt",
+      "environment": "Umgebung & Natur",
+      "knowledge": "Wissen & Reflexion",
+      "events": "Events & Zeitbank"
+    },
+    "collapseAll": "Alle zuklappen",
+    "expandAll": "Alle aufklappen"
   }
 }

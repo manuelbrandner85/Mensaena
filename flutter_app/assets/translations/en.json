@@ -2729,6 +2729,16 @@
       "onboarding_ok": "Got it",
       "widget_disabled": "Widget disabled",
       "widget_enabled": "Widget enabled"
-    }
+    },
+    "sections": {
+      "myDay": "My day",
+      "community": "Community & activity",
+      "gamification": "Progress",
+      "environment": "Environment & nature",
+      "knowledge": "Knowledge & reflection",
+      "events": "Events & time-bank"
+    },
+    "collapseAll": "Collapse all",
+    "expandAll": "Expand all"
   }
 }
