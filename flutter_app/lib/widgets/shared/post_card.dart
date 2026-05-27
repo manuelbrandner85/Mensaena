@@ -9,6 +9,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../models/post_intent.dart';
+import '../../services/haptics.dart';
 import '../../repositories/post_interactions_repository.dart'
     hide ContentReportsRepository;
 import '../../repositories/posts_repository.dart';
@@ -230,7 +231,43 @@ class _PostCardState extends ConsumerState<PostCard> {
   Widget build(BuildContext context) {
     final post = widget.post;
     final cfg = _typeConfig(post.type);
-    return InkWell(
+    // F30: Swipe-Gesten — Left → Save toggeln, Right → Meldung-Sheet öffnen.
+    return Dismissible(
+      key: ValueKey('postcard-${post.id}'),
+      direction: DismissDirection.horizontal,
+      confirmDismiss: (dir) async {
+        Haptics.tap();
+        if (dir == DismissDirection.endToStart) {
+          await _toggleSave();
+        } else if (dir == DismissDirection.startToEnd) {
+          _openMenu();
+        }
+        return false; // nie wirklich dismissen, nur Action triggern
+      },
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          color: AppColors.herzrot.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: const Icon(LucideIcons.flag,
+            color: AppColors.herzrot, size: 22),
+      ),
+      secondaryBackground: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          color: AppColors.amber.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Icon(
+          _saved ? LucideIcons.bookmarkMinus : LucideIcons.bookmark,
+          color: AppColors.amber,
+          size: 22,
+        ),
+      ),
+      child: InkWell(
       onTap: () => context.push('/dashboard/posts/${post.id}'),
       borderRadius: BorderRadius.circular(14),
       child: Container(
@@ -428,6 +465,7 @@ class _PostCardState extends ConsumerState<PostCard> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
