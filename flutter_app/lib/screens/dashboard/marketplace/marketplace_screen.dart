@@ -715,15 +715,11 @@ class _Tile extends ConsumerWidget {
                         ),
                       ),
                       const Spacer(),
-                      if (item.price != null && item.listingType == 'verkaufen')
-                        Text(
-                          '${item.price!.toStringAsFixed(0)} €',
-                          style: AppTypography.mono(
-                            size: 13,
-                            color: AppColors.amber,
-                            weight: FontWeight.w700,
-                          ),
-                        ),
+                      // F70: Preis-Indikator je Listing-Typ farb-codiert.
+                      _PriceBadge(
+                        listingType: item.listingType,
+                        price: item.price,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -883,6 +879,47 @@ class _AdvancedFilterSheetState extends State<_AdvancedFilterSheet> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// F70: Preis-Indikator für Listing-Tile.
+/// Gratis → leben-grün · Tausch → tealSoft · Verkauf → bronze · Leihen → amber.
+class _PriceBadge extends StatelessWidget {
+  const _PriceBadge({required this.listingType, required this.price});
+  final String listingType;
+  final double? price;
+
+  @override
+  Widget build(BuildContext context) {
+    final (color, label) = switch (listingType) {
+      'verschenken' => (AppColors.leben, 'marketplace.badgeFree'.tr()),
+      'tauschen' => (AppColors.tealSoft, 'marketplace.badgeSwap'.tr()),
+      'verkaufen' => (
+          AppColors.bronze,
+          price != null && price! > 0
+              ? '${price!.toStringAsFixed(0)} €'
+              : 'marketplace.badgeFree'.tr(),
+        ),
+      'leihen' => (AppColors.amber, 'marketplace.badgeLend'.tr()),
+      _ => (AppColors.amber, ''),
+    };
+    if (label.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.18),
+        border: Border.all(color: color.withValues(alpha: 0.55)),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.mono(
+          size: 11,
+          color: color,
+          weight: FontWeight.w700,
         ),
       ),
     );
