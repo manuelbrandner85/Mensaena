@@ -17,6 +17,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/marketplace/barter_matches_carousel.dart';
 import '../../../widgets/marketplace_reservation.dart';
 import '../../../widgets/shared/image_carousel.dart';
 
@@ -129,6 +130,13 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                   listingId: l.id,
                   ownerId: ownerId,
                   reservedFor: l.reservedFor,
+                ),
+                // F67: Tausch-Matches in derselben Kategorie (nur bei
+                // listing_type='tauschen').
+                BarterMatchesCarousel(
+                  listingId: l.id,
+                  category: l.category,
+                  listingType: l.listingType,
                 ),
                 const SizedBox(height: 14),
                 // Action-Bar

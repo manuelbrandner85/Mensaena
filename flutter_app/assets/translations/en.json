@@ -1138,6 +1138,7 @@
     "badgeFree": "FREE",
     "badgeSwap": "SWAP",
     "badgeLend": "LEND",
+    "barterMatchesTitle": "Swap suggestions in this category",
     "statsActive": "{n} listings",
     "statsFree": "{n} free",
     "statsClaimed": "{n} claimed",
