@@ -3,19 +3,24 @@
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
-## CACHE
-OPEN=Phase 0 (Welle 1+2), Phase 1 (5/6), Phase 2 (8/8), Phase 3 (F11/F14/F15), Phase 5 (F23/F30/F32/F33), Phase 6 (F35/F36/F37/F71), Phase 7 (F70) — alles live.
-COUNT=Phase 0: 14 SQL + 6 Flutter; Phasen 1-7: 11 weitere Items live. Total: 31 Items, 11+ Commits.
-NEXT=Phase 7 Rest (F38/F40/F42/F60/F66/F77/F80) oder Phase 8/9/10/11/12
+## CACHE — Mega-Prompt Status (2026-05-27)
+OPEN=Phase 0 (Welle 1+2), Phase 1 (5/6), Phase 2 (8/8), Phase 3 (3/5), Phase 5 (4/7), Phase 6 (5/8), Phase 7 (1/14 neu + viele exist.), Phase 8 (3/3), Phase 11 (P21), Phase 10 (Foundation da). 17+ Commits.
+COUNT=Phase 0: 14 SQL + 6 Flutter | Phasen 1-12: 14 weitere Items live | Plus Splash + 6 reine Bug-Fixes (DM-Erstellung, Pin/Edit/Delete, Anrufverlauf, Friendship, HEIC-Upload). Total: 41+ konkrete Verbesserungen.
+NEXT=Verbleibende Defer-Items größerer Brocken: F12 Screen-Share + F13 Group-Calls (Android-Permissions/Architektur), F28 Message-Requests-für-Fremde (UX-Design), F22 Notification-Grouping (Backend-Rollup), F38 Scheduled Posts (DB+UI+Cron), F76 Chat-Summarization (ML), F52 Vorlesefunktion (Package-Add). Phase 11 P22 R8/ProGuard war früher deaktiviert (Crash-Risiko).
 LAST_SESSION=2026-05-27
 LAST_TASK_PHASE0=L3+L4+L6+L7+L8+L13+L15+L16+L18+L23+L24+L25+L26+L34+L35+L44+L45+L48+L51+L55+L56 live
-LAST_TASK_PHASE1=BUG1 DM-mit-postId, BUG2 verifiziert, BUG3 Cold-Start-Buffer, F26 PostCard-Bubble, F27 BlockGuard. F28 defer.
-LAST_TASK_PHASE2=F8 Unread-Badge per Conv, F7 Forward, F9 Live-Location verdrahtet (F4/F5/F6/F10/F25 schon da).
-LAST_TASK_PHASE3=F11 Connection-Quality-Indicator + Poor-Warnung. F12/F13 defer.
-LAST_TASK_PHASE5=F30 Swipe-Gesten auf PostCard.
-LAST_TASK_PHASE6=F71 Danke-Karten-Send-Sheet (4 Designs).
-LAST_TASK_PHASE7=F70 Marketplace Preis-Indikator farb-codiert.
-SPLASH=Dauer 2.6s → 4.2s erhöht (User-Wunsch)
+LAST_TASK_PHASE1=BUG1+BUG2+BUG3+F26+F27 live. F28 defer.
+LAST_TASK_PHASE2=F4+F5+F6+F7+F8+F9+F10+F25 alle live ✅
+LAST_TASK_PHASE3=F11+F14+F15 live. F12+F13 defer.
+LAST_TASK_PHASE5=F23+F30+F32+F33 live. F22+F24+F31 defer.
+LAST_TASK_PHASE6=F34+F35+F36+F37+F71 live. F59 da, F69 da, F74 defer.
+LAST_TASK_PHASE7=F39+F42+F56+F60+F64+F66+F70+F75+F77+F80 als existing verifiziert. F38+F40+F41+F67+F76 offen.
+LAST_TASK_PHASE8=F43+F44+F45 alle live ✅
+LAST_TASK_PHASE9=F46+F47+F48 existieren (Leaderboard, daily_challenges, badges).
+LAST_TASK_PHASE10=Foundation (DashboardWidgetConfig + WidgetGridSettings + DisabledWidgetsBar + DashboardEditBanner) da. DW-A Long-Press-Jiggle nicht im dashboard_home_screen verdrahtet.
+LAST_TASK_PHASE11=P21 effectiveReduceMotion auf CelebrateBurst durchgereicht (war auf Basis-Toggle). P22 R8 historisch deaktiviert wegen Crash, nicht reaktiviert.
+LAST_TASK_PHASE12=F53 SeniorMode in A11yPrefs, F54 weekly_recap_widget, F55 community_pulse, F58 UpdateGate, F72 sleep_reminder, F83 OLED-dark — alles existing. F52 Vorlesefunktion offen (braucht flutter_tts).
+SPLASH=Dauer 2.6s → 4.2s erhöht.
 LAST_TASK=feat(modul-audit Sprint 5): WikipediaBox-Widget (Post-Detail bei Animal/tags), TranslateInlineButton (LibreTranslate für Chat-Messages, Auto-Detect + Toggle), Event-Detail-1-Tap In-Kalender-Button (add_2_calendar) + .ics-Fallback, BetterFeedback (shake_to_report-Style via 3-Finger-Long-Press, Submit → error_logs mit Screenshot-Bytes). Total Modul-Audit (5 Sprints): 35+ Items live, 10+ neue Services, 5+ neue Widgets, 9 neue Packages.
 
 ## Flutter-Migration
