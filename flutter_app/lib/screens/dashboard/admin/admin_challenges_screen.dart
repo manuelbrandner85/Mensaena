@@ -2,6 +2,7 @@
 /// Challenges-Admin — delegiert vorerst an AdminTableScreen.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,12 +13,12 @@ class AdminChallengesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const AdminTableScreen(
-      title: 'Challenges',
+    return AdminTableScreen(
+      title: 'admin.screens.challenges'.tr(),
       tableName: 'challenges',
       currentRoute: '/dashboard/admin/challenges',
       titleField: 'title',
-      subtitleFields: ['category', 'difficulty', 'status'],
+      subtitleFields: const ['category', 'difficulty', 'status'],
     );
   }
 }

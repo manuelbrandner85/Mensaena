@@ -612,6 +612,13 @@
     "screenTitle": "Matching"
   },
   "admin": {
+    "screens": {
+      "timebank": "Time-bank",
+      "challenges": "Challenges",
+      "contactInbox": "Contact inbox",
+      "botFeedback": "Bot feedback",
+      "groups": "Groups"
+    },
     "crash_logs": "Crash logs",
     "no_crashes": "No crashes in the last 7 days.",
     "no_access": "You don't have permission to view this area.",

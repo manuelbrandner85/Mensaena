@@ -3,6 +3,7 @@
 /// In Phase P1 wird hier ein dedizierter Screen mit Edit-/Create-Modals stehen.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,12 +14,12 @@ class AdminGroupsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const AdminTableScreen(
-      title: 'Gruppen',
+    return AdminTableScreen(
+      title: 'admin.screens.groups'.tr(),
       tableName: 'groups',
       currentRoute: '/dashboard/admin/groups',
       titleField: 'name',
-      subtitleFields: ['category', 'slug'],
+      subtitleFields: const ['category', 'slug'],
     );
   }
 }

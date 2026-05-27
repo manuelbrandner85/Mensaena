@@ -574,6 +574,13 @@
     "screenTitle": "Eşleştirme"
   },
   "admin": {
+    "screens": {
+      "timebank": "Zaman bankası",
+      "challenges": "Görevler",
+      "contactInbox": "İletişim kutusu",
+      "botFeedback": "Bot geri bildirimi",
+      "groups": "Gruplar"
+    },
     "statusSetTo": "Durum \"{s}\" olarak ayarlandı.",
     "statusUpdateFailed": "Durum güncellemesi başarısız.",
     "actionFailed": "İşlem başarısız.",

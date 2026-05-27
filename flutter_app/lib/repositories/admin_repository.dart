@@ -266,12 +266,16 @@ class AdminRepository {
     );
   }
 
-  /// Letzte 100 Eintraege einer Tabelle mit beliebiger Sortspalte.
+  /// Letzte N Eintraege einer Tabelle mit beliebiger Sortspalte.
+  /// Default 500 — vorher 100, was bei kleinen Sub-Tabellen wie
+  /// challenges/groups/contact_messages/bot_feedback regelmäßig nicht
+  /// alle Zeilen zeigte.
   static Future<List<Map<String, dynamic>>> recent(
     String table, {
     String orderBy = 'created_at',
     String? statusFilter,
     String? search,
+    int limit = 500,
   }) async {
     try {
       var q = sb.from(table).select();
@@ -280,7 +284,7 @@ class AdminRepository {
         final esc = search.trim().replaceAll('%', r'\%');
         q = q.or('reason.ilike.%$esc%,title.ilike.%$esc%,name.ilike.%$esc%');
       }
-      final rows = await q.order(orderBy, ascending: false).limit(100);
+      final rows = await q.order(orderBy, ascending: false).limit(limit);
       return (rows as List).whereType<Map<String, dynamic>>().toList();
     } catch (_) {
       return const [];
@@ -336,23 +340,50 @@ class AdminRepository {
     String? search,
     bool onlyUnconfirmed = false,
     bool onlyMissingProfile = false,
+    String? role,
     int limit = 100,
+    int offset = 0,
   }) async {
     try {
       final res = await sb.rpc<dynamic>('admin_list_users', params: {
         'p_search': (search ?? '').isEmpty ? null : search,
         'p_only_unconfirmed': onlyUnconfirmed,
         'p_only_missing_profile': onlyMissingProfile,
+        'p_role': (role ?? '').isEmpty ? null : role,
         'p_limit': limit,
-        'p_offset': 0,
+        'p_offset': offset,
       });
       if (res is List) {
         return res.whereType<Map<String, dynamic>>().toList();
       }
       return const [];
     } catch (_) {
-      // Fallback fuer den Fall dass Migration noch nicht angewendet wurde
+      // Fallback wenn Migration noch nicht angewendet wurde
       return recent('profiles', orderBy: 'created_at');
+    }
+  }
+
+  /// Anzahl aller User die den aktuellen Filtern entsprechen.
+  /// Wird für die Pagination-Anzeige genutzt — verhindert dass User 101+
+  /// versehentlich versteckt bleiben.
+  static Future<int> countUsersViaRpc({
+    String? search,
+    bool onlyUnconfirmed = false,
+    bool onlyMissingProfile = false,
+    String? role,
+  }) async {
+    try {
+      final res = await sb.rpc<dynamic>('admin_count_users', params: {
+        'p_search': (search ?? '').isEmpty ? null : search,
+        'p_only_unconfirmed': onlyUnconfirmed,
+        'p_only_missing_profile': onlyMissingProfile,
+        'p_role': (role ?? '').isEmpty ? null : role,
+      });
+      if (res is int) return res;
+      if (res is num) return res.toInt();
+      return 0;
+    } catch (_) {
+      return 0;
     }
   }
 

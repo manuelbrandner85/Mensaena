@@ -2,6 +2,7 @@
 /// Bot-Feedback-Admin — delegiert vorerst an AdminTableScreen.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,12 +13,12 @@ class AdminBotFeedbackScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const AdminTableScreen(
-      title: 'Bot-Feedback',
+    return AdminTableScreen(
+      title: 'admin.screens.botFeedback'.tr(),
       tableName: 'bot_feedback',
       currentRoute: '/dashboard/admin/bot-feedback',
       titleField: 'question',
-      subtitleFields: ['rating', 'route'],
+      subtitleFields: const ['rating', 'route'],
     );
   }
 }

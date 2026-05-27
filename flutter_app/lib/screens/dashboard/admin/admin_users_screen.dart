@@ -85,18 +85,27 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final all = await AdminRepository.listUsersViaRpc(search: _search);
-      var filtered = all;
-      if (_roleFilter != null && _roleFilter!.isNotEmpty) {
-        filtered = filtered.where((u) => u['role'] == _roleFilter).toList();
+      // Server-side Pagination: lade nur die aktuelle Seite via offset+limit.
+      // Search + Role-Filter laufen ebenfalls im RPC — verhindert dass User
+      // 101+ versteckt bleiben.
+      final total = await AdminRepository.countUsersViaRpc(
+        search: _search,
+        role: _roleFilter,
+      );
+      // Falls aktuelle Seite jenseits des Totals liegt → auf Seite 0 springen.
+      var page = _page;
+      if (page * _pageSize >= total && total > 0) {
+        page = 0;
       }
-      _total = filtered.length;
-      final start = _page * _pageSize;
-      if (start >= _total) {
-        _page = 0;
-      }
-      final pageStart = _page * _pageSize;
-      _users = filtered.skip(pageStart).take(_pageSize).toList();
+      final page0Users = await AdminRepository.listUsersViaRpc(
+        search: _search,
+        role: _roleFilter,
+        limit: _pageSize,
+        offset: page * _pageSize,
+      );
+      _total = total;
+      _users = page0Users;
+      _page = page;
     } catch (_) {
       _users = const [];
       _total = 0;
@@ -130,7 +139,13 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   void _openEdit(Map<String, dynamic> user) {
     setState(() {
       _editUser = user;
-      _editNameCtrl.text = (user['name'] ?? '').toString();
+      // Fallback-Kette: name → display_name → '' damit das Feld bei
+      // bestehenden Usern nicht leer ist (sonst würde der Admin den Namen
+      // versehentlich überschreiben wollen).
+      _editNameCtrl.text = (user['name'] ??
+              user['display_name'] ??
+              '')
+          .toString();
       _editNicknameCtrl.text = (user['nickname'] ?? '').toString();
       _editRole = (user['role'] ?? 'user').toString();
       _editSaving = false;

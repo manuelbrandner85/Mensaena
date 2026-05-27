@@ -574,6 +574,13 @@
     "screenTitle": "Совпадения"
   },
   "admin": {
+    "screens": {
+      "timebank": "Банк времени",
+      "challenges": "Челленджи",
+      "contactInbox": "Контакт-форма",
+      "botFeedback": "Отзывы о боте",
+      "groups": "Группы"
+    },
     "statusSetTo": "Статус установлен на «{s}».",
     "statusUpdateFailed": "Не удалось обновить статус.",
     "actionFailed": "Не удалось выполнить действие.",

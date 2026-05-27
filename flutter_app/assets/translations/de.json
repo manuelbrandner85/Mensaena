@@ -611,6 +611,13 @@
     "screenTitle": "Matching"
   },
   "admin": {
+    "screens": {
+      "timebank": "Zeitbank",
+      "challenges": "Challenges",
+      "contactInbox": "Kontakt-Postfach",
+      "botFeedback": "Bot-Feedback",
+      "groups": "Gruppen"
+    },
     "crash_logs": "Crash-Logs",
     "no_crashes": "Keine Crashes in den letzten 7 Tagen.",
     "no_access": "Du hast keine Berechtigung für diesen Bereich.",

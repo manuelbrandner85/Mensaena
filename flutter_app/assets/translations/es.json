@@ -575,6 +575,13 @@
     "screenTitle": "Matching"
   },
   "admin": {
+    "screens": {
+      "timebank": "Banco de tiempo",
+      "challenges": "Retos",
+      "contactInbox": "Buzón de contacto",
+      "botFeedback": "Comentarios del bot",
+      "groups": "Grupos"
+    },
     "statusSetTo": "Estado establecido en \"{s}\".",
     "statusUpdateFailed": "Error al actualizar el estado.",
     "actionFailed": "Acción fallida.",
