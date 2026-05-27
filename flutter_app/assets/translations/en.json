@@ -2427,6 +2427,15 @@
     "userBlocked": "You blocked this person.",
     "youAreBlocked": "This person has blocked you."
   },
+  "thanks": {
+    "sheetTitle": "Send thank-you card",
+    "recipient": "To {name}",
+    "pickDesign": "Pick design",
+    "messageHint": "Personal note (optional) …",
+    "sendBtn": "Send card",
+    "sent": "Thank-you card sent to {name} 💛",
+    "sendFailed": "Sending failed."
+  },
   "followed_tags": {
     "title": "Follow topics",
     "intro": "Follow individual hashtags to curate your feed.",

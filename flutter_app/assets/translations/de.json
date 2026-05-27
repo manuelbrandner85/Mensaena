@@ -2426,6 +2426,15 @@
     "userBlocked": "Du hast diese Person blockiert.",
     "youAreBlocked": "Diese Person hat dich blockiert."
   },
+  "thanks": {
+    "sheetTitle": "Danke-Karte senden",
+    "recipient": "An {name}",
+    "pickDesign": "Design wählen",
+    "messageHint": "Persönliche Nachricht (optional) …",
+    "sendBtn": "Karte abschicken",
+    "sent": "Danke-Karte an {name} geschickt 💛",
+    "sendFailed": "Senden fehlgeschlagen."
+  },
   "followed_tags": {
     "title": "Themen folgen",
     "intro": "Folge einzelnen Hashtags, um deinen Feed zu kuratieren.",

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../widgets/profile/send_thank_you_sheet.dart';
 import '../../widgets/profile/send_voicemail_sheet.dart';
 import '../../widgets/profile/status_editor_sheet.dart';
 import 'call/scheduled_calls_screen.dart';
@@ -796,6 +797,19 @@ class _Header extends StatelessWidget {
                         ),
                         icon: const Icon(LucideIcons.voicemail,
                             size: 18, color: AppColors.bronze),
+                      ),
+                      // F71: Danke-Karte senden
+                      IconButton(
+                        tooltip: 'thanks.sheetTitle'.tr(),
+                        onPressed: () => SendThankYouSheet.show(
+                          context,
+                          receiverId: profile.id,
+                          receiverName: profile.displayName ??
+                              profile.name ??
+                              'mensaena',
+                        ),
+                        icon: const Icon(LucideIcons.heart,
+                            size: 18, color: AppColors.amber),
                       ),
                     ]),
                   ],
