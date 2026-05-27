@@ -213,16 +213,36 @@ class PushNotificationService {
   /// Background-Tap landet der User per FlutterEngine-Restart auf der
   /// Initial-Route, GlobalRouter-Redirect macht den Rest.
   /// Globaler GoRouter — gesetzt aus app.dart sobald router initialisiert ist.
-  static GoRouter? rootRouter;
+  static GoRouter? _rootRouter;
+  // BUG3: Cold-Start-Buffer. Wenn _handleNotificationTap zu früh feuert
+  // (App noch nicht montiert, rootRouter == null), parken wir die data-Map
+  // hier. Setter unten flusht den Buffer sobald der Router gesetzt ist.
+  static Map<String, dynamic>? _pendingDeepLink;
+
+  static GoRouter? get rootRouter => _rootRouter;
+  static set rootRouter(GoRouter? r) {
+    _rootRouter = r;
+    if (r != null && _pendingDeepLink != null) {
+      final buffered = _pendingDeepLink!;
+      _pendingDeepLink = null;
+      // Mikrotask damit der Router seinen ersten Build abschließt.
+      Future.microtask(() {
+        NotificationRouter.navigateFromPush(r, buffered);
+      });
+    }
+  }
 
   static void _handleNotificationTap(RemoteMessage m) {
-    // F23: Smart-Routing — wenn rootRouter gesetzt, navigiere direkt zum
-    // passenden Screen. data-Map enthält type + IDs.
-    final r = rootRouter;
-    if (r == null) return;
     final data = m.data;
     if (data.isEmpty) return;
-    NotificationRouter.navigateFromPush(r, Map<String, dynamic>.from(data));
+    final dataMap = Map<String, dynamic>.from(data);
+    final r = _rootRouter;
+    if (r == null) {
+      // BUG3: Router noch nicht ready → parken bis er gesetzt ist.
+      _pendingDeepLink = dataMap;
+      return;
+    }
+    NotificationRouter.navigateFromPush(r, dataMap);
   }
 
   /// Native Local-Notification anzeigen (Android: System-Tray + Sound).
