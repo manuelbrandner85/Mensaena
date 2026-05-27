@@ -34,6 +34,53 @@ class StreakService {
   static const _currentKey = 'mensaena_streak_current_v1';
   static const _bestKey = 'mensaena_streak_best_v1';
   static const _lastDateKey = 'mensaena_streak_last_date_v1';
+  // F50: Streak-Freeze. Speichert die ISO-Wochen-Nummer in der der
+  // letzte Freeze eingesetzt wurde — 1 pro Kalenderwoche.
+  static const _freezeWeekKey = 'mensaena_streak_freeze_week_v1';
+
+  /// ISO-Week-Identifier wie "2026-W21". Stable über Year-Boundaries.
+  static String _isoWeekKey(DateTime d) {
+    // Donnerstag derselben Woche → ISO-Year-Anker
+    final thursday = d.add(Duration(days: 4 - (d.weekday)));
+    final yearStart = DateTime(thursday.year, 1, 1);
+    final firstThursday = yearStart.add(Duration(
+        days: (4 - yearStart.weekday + 7) % 7));
+    final weekNum =
+        ((thursday.difference(firstThursday).inDays) / 7).floor() + 1;
+    return '${thursday.year}-W${weekNum.toString().padLeft(2, '0')}';
+  }
+
+  /// `true` wenn diese Woche noch ein Freeze verfügbar ist.
+  static Future<bool> isFreezeAvailable() async {
+    try {
+      final raw = await _storage.read(key: _freezeWeekKey);
+      if (raw == null || raw.isEmpty) return true;
+      return raw != _isoWeekKey(DateTime.now());
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Setzt den Freeze ein: tut so als ob heute schon geöffnet wäre
+  /// (sodass morgen der Streak normal weiterlaufen kann ohne dass die
+  /// heutige Lücke zählt). Returns `true` wenn erfolgreich gesetzt,
+  /// `false` wenn diese Woche bereits ein Freeze verwendet wurde.
+  static Future<bool> useFreeze() async {
+    try {
+      final week = _isoWeekKey(DateTime.now());
+      final raw = await _storage.read(key: _freezeWeekKey);
+      if (raw == week) return false; // schon verbraucht
+      final today = DateTime.now();
+      final pinned = DateTime(today.year, today.month, today.day);
+      await _storage.write(
+          key: _lastDateKey, value: pinned.toIso8601String());
+      await _storage.write(key: _freezeWeekKey, value: week);
+      return true;
+    } catch (e) {
+      debugPrint('[Streak] useFreeze failed: $e');
+      return false;
+    }
+  }
 
   /// Liest den aktuellen Streak. Aktualisiert nicht.
   static Future<StreakData> read() async {

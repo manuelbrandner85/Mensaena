@@ -2245,7 +2245,11 @@
   "streak": {
     "title": "Dranbleiben",
     "days": "{count} Tage in Folge",
-    "best": "Rekord"
+    "best": "Rekord",
+    "freezeAvailable": "Pause einsetzen — 1× pro Woche",
+    "freezeUsed": "Diese Woche schon eingesetzt",
+    "freezeApplied": "Pause aktiviert ❄️ — Streak bleibt",
+    "freezeFailed": "Pause konnte nicht aktiviert werden"
   },
   "gratitude": {
     "title": "Dankbarkeit",

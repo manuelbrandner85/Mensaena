@@ -2246,7 +2246,11 @@
   "streak": {
     "title": "Keep it going",
     "days": "{count} days in a row",
-    "best": "Best"
+    "best": "Best",
+    "freezeAvailable": "Use freeze — 1× per week",
+    "freezeUsed": "Already used this week",
+    "freezeApplied": "Freeze activated ❄️ — streak intact",
+    "freezeFailed": "Couldn't activate freeze"
   },
   "gratitude": {
     "title": "Gratitude",

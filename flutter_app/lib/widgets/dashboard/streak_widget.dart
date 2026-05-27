@@ -20,6 +20,11 @@ final _streakProvider = FutureProvider<StreakData>((ref) async {
   return StreakService.read();
 });
 
+/// F50 Streak-Freeze — Verfügbarkeit pro Woche.
+final _freezeAvailableProvider = FutureProvider.autoDispose<bool>((ref) async {
+  return StreakService.isFreezeAvailable();
+});
+
 const _milestones = {7, 14, 30, 60, 100, 365};
 const _milestoneFiredKey = 'mensaena_streak_milestone_fired_v1';
 
@@ -111,10 +116,56 @@ class _StreakWidgetState extends ConsumerState<StreakWidget> {
                             size: 18, color: AppColors.bronze)),
                   ],
                 ),
+              // F50: Streak-Freeze-Icon-Button. Schneeflocke aktiv wenn
+              // diese Woche noch verfügbar, ausgegraut sonst.
+              const SizedBox(width: 6),
+              const _FreezeButton(),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _FreezeButton extends ConsumerWidget {
+  const _FreezeButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final available = ref.watch(_freezeAvailableProvider).maybeWhen(
+          data: (b) => b,
+          orElse: () => false,
+        );
+    return IconButton(
+      tooltip: available
+          ? 'streak.freezeAvailable'.tr()
+          : 'streak.freezeUsed'.tr(),
+      onPressed: available
+          ? () async {
+              final ok = await StreakService.useFreeze();
+              if (!context.mounted) return;
+              ref.invalidate(_freezeAvailableProvider);
+              ref.invalidate(_streakProvider);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                backgroundColor: AppColors.surface,
+                content: Text(
+                  ok
+                      ? 'streak.freezeApplied'.tr()
+                      : 'streak.freezeFailed'.tr(),
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.ink),
+                ),
+              ));
+            }
+          : null,
+      icon: Icon(
+        LucideIcons.snowflake,
+        size: 18,
+        color: available
+            ? AppColors.tealSoft
+            : AppColors.mute.withValues(alpha: 0.4),
+      ),
     );
   }
 }
