@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import 'glass_card.dart';
 
 class CreatePickerSheet {
   const CreatePickerSheet._();
@@ -19,12 +20,11 @@ class CreatePickerSheet {
     HapticFeedback.lightImpact();
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      // Design: Glass-Strong-Sheet statt opaker Fläche.
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetCtx) => SafeArea(
+      builder: (sheetCtx) => GlassSheet(
+        child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
           child: Column(
@@ -109,6 +109,7 @@ class CreatePickerSheet {
             ],
           ),
         ),
+      ),
       ),
     );
   }
