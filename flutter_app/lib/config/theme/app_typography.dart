@@ -77,13 +77,15 @@ class AppTypography {
       );
 
   /// Uppercase Labels (Kategorie-Pillen, Eyebrows, Section-Labels).
+  /// Design (Cinema-Hyperreal): Eyebrows/Nav/Chips sind durchgängig
+  /// Monospace mit weitem Tracking → JetBrains Mono statt Inter.
   static TextStyle label({
     double size = 12,
     Color color = AppColors.mute,
-    FontWeight weight = FontWeight.w600,
-    double letterSpacing = 0.05,
+    FontWeight weight = FontWeight.w500,
+    double letterSpacing = 0.16,
   }) =>
-      GoogleFonts.inter(
+      GoogleFonts.jetBrainsMono(
         fontSize: size,
         color: color,
         fontWeight: weight,
