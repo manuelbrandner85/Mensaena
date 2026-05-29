@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -49,10 +50,24 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
       if (x == null || !mounted) return;
       setState(() => _uploading = true);
       final bytes = await x.readAsBytes();
-      final ext = x.path.split('.').last;
+      final ext = x.path.split('.').last.toLowerCase();
+      // contentType setzen, sonst speichert Supabase als octet-stream und
+      // das Bild wird nicht als Bild ausgeliefert (Punkt 8). uid-Prefix für
+      // die "own delete"-Policy.
+      final mime = switch (ext) {
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'heic' => 'image/heic',
+        _ => 'image/jpeg',
+      };
       final path =
-          '${widget.eventId}/$uid-${DateTime.now().millisecondsSinceEpoch}.$ext';
-      await sb.storage.from('event-photos').uploadBinary(path, bytes);
+          '$uid/${widget.eventId}-${DateTime.now().millisecondsSinceEpoch}.$ext';
+      await sb.storage.from('event-photos').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: mime, upsert: false),
+          );
       final url = sb.storage.from('event-photos').getPublicUrl(path);
       await sb.from('event_photos').insert({
         'event_id': widget.eventId,
