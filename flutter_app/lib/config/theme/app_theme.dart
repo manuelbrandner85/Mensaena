@@ -193,6 +193,20 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: false,
       ),
+      // Design (Cinema-Hyperreal): alle Bottom-Sheets bekommen zentral den
+      // dunklen Glass-Strong-Ton + rounded-22-Oberkante. Sheets die ihren
+      // eigenen Container malen überschreiben das ggf. weiterhin.
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Color(0xF0121A28),
+        modalBackgroundColor: Color(0xF0121A28),
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        modalElevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          side: BorderSide(color: Color(0x33ECE5D6)),
+        ),
+      ),
       cardTheme: CardTheme(
         color: AppColors.surface,
         elevation: 0,

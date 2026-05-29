@@ -346,7 +346,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -375,7 +375,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     }
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

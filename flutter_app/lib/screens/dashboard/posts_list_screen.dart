@@ -436,7 +436,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
   void _openFilterSheet(BuildContext ctx) {
     showModalBottomSheet<void>(
       context: ctx,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

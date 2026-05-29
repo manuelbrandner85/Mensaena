@@ -112,7 +112,7 @@ class _MarketplaceCreateScreenState
     if (_images.length >= _maxImages) return;
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       shape: const RoundedRectangleBorder(
         borderRadius:
             BorderRadius.vertical(top: Radius.circular(16)),

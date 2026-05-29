@@ -470,7 +470,7 @@ class _EventDetailBody extends ConsumerWidget {
   }) async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -1310,7 +1310,7 @@ class _SavedToggleButtonState extends ConsumerState<_SavedToggleButton> {
     Haptics.longPress();
     final mins = await showModalBottomSheet<int?>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

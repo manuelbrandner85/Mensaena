@@ -238,7 +238,7 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
     }
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -459,7 +459,7 @@ class _AdminRow extends StatelessWidget {
   void _openDetail(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xF0121A28),
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
