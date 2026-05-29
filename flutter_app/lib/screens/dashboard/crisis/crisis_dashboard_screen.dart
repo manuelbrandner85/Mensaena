@@ -848,7 +848,8 @@ class _BigEmergencyButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(LucideIcons.phone, color: Colors.white, size: 32),
+            const Icon(LucideIcons.phone,
+                color: AppColors.voidColor, size: 32),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -858,12 +859,13 @@ class _BigEmergencyButton extends StatelessWidget {
                   Text(number,
                       style: AppTypography.mono(
                         size: 36,
-                        color: Colors.white,
+                        color: AppColors.voidColor,
                         weight: FontWeight.w800,
                       )),
                   Text('crisis.callNow'.tr(),
                       style: AppTypography.label(
-                          size: 10, color: Colors.white)),
+                          size: 10,
+                          color: AppColors.voidColor.withValues(alpha: 0.8))),
                 ],
               ),
             ),

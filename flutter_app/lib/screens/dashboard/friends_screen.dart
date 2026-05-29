@@ -3,6 +3,8 @@
 /// Online-Status nutzt presence_service. Suche filtert nach display_name.
 library;
 
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +41,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tab;
   String _search = '';
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -52,8 +55,16 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _tab.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String v) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _search = v.toLowerCase());
+    });
   }
 
   @override
@@ -130,7 +141,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
               child: TextField(
-                onChanged: (v) => setState(() => _search = v.toLowerCase()),
+                onChanged: _onSearchChanged,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 decoration: InputDecoration(
                   hintText: _tab.index == 3

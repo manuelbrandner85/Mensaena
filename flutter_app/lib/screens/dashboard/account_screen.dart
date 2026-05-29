@@ -234,8 +234,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                       icon: const Icon(LucideIcons.trash2, size: 16),
                       label: Text('account.delete_button'.tr()),
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.herzrotWarm,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.herzrot,
+                        foregroundColor: AppColors.ink,
                       ),
                     ),
                   ],

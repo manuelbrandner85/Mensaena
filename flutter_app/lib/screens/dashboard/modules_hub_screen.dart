@@ -253,7 +253,7 @@ class _ModuleCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: AppColors.voidColor.withValues(alpha: 0.35),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),

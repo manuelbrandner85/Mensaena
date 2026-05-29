@@ -272,7 +272,11 @@ class _OptionBar extends StatelessWidget {
     final pct = total == 0 ? 0.0 : (count / total).clamp(0.0, 1.0);
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: InkWell(
+      // Visuelles Feedback: bereits abgestimmte/gesperrte Optionen leicht
+      // ausgrauen, damit klar ist warum kein Tap reagiert.
+      child: Opacity(
+        opacity: disabled && !voted ? 0.45 : 1.0,
+        child: InkWell(
         onTap: disabled ? null : onTap,
         borderRadius: BorderRadius.circular(8),
         child: Stack(
@@ -331,6 +335,7 @@ class _OptionBar extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

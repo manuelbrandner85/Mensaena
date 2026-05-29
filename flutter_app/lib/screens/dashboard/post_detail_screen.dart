@@ -388,7 +388,11 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 : Column(
                     children: [
                       Expanded(
-                        child: ListView(
+                        child: RefreshIndicator(
+                          color: AppColors.amber,
+                          backgroundColor: AppColors.surface,
+                          onRefresh: _load,
+                          child: ListView(
                           padding: const EdgeInsets.all(16),
                           children: [
                             _Hero(post: _post!),
@@ -429,6 +433,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                             else
                               ..._buildCommentTree(),
                           ],
+                        ),
                         ),
                       ),
                       if (_replyToParentId != null)

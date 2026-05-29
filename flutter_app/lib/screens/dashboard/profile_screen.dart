@@ -30,6 +30,7 @@ import '../../widgets/profile/friend_request_button.dart';
 import '../../widgets/profile/qr_share_sheet.dart';
 import '../../widgets/profile/verified_badge.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/empty_state_card.dart';
 import '../../widgets/shared/post_card.dart';
 
 /// SKILL: mensaena-features + mensaena-design
@@ -513,8 +514,13 @@ class _PostsTabState extends State<_PostsTab> {
         final list = snap.data ?? const <Post>[];
         if (list.isEmpty) {
           return Center(
-            child: Text('profile.noPosts'.tr(),
-                style: AppTypography.caption()),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: EmptyStateCard(
+                icon: LucideIcons.fileText,
+                title: 'profile.noPosts'.tr(),
+              ),
+            ),
           );
         }
         return ListView.builder(

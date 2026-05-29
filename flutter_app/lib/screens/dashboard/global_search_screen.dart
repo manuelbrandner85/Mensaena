@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +29,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
   final _ctrl = TextEditingController();
   String _query = '';
   Future<_SearchResults>? _future;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _ctrl.dispose();
     super.dispose();
   }
@@ -110,9 +114,16 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
   }
 
   void _onChanged(String v) {
-    setState(() {
-      _query = v;
-      _future = v.trim().length >= 2 ? _runSearch(v) : null;
+    // Sofort _query setzen (UI/Clear-Button reagiert), aber die DB-Suche
+    // erst nach 300ms Ruhe auslösen (Debounce statt Query pro Tastendruck).
+    setState(() => _query = v);
+    _debounce?.cancel();
+    if (v.trim().length < 2) {
+      setState(() => _future = null);
+      return;
+    }
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _future = _runSearch(v));
     });
   }
 
