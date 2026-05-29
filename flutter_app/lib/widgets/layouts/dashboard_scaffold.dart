@@ -279,37 +279,51 @@ class _PlusFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (secondaryFab != null) return secondaryFab!;
+    // Design (Cinema-Hyperreal): zentraler FAB ist Bronze-Gradient mit
+    // abgerundetem Quadrat (radius 18) + Bronze-Glow, nicht Kreis-Amber.
     return Container(
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.amber.withValues(alpha: 0.40),
-            blurRadius: 16,
+            color: AppColors.bronze.withValues(alpha: 0.45),
+            blurRadius: 24,
             spreadRadius: -2,
-          ),
-          BoxShadow(
-            color: AppColors.amber.withValues(alpha: 0.15),
-            blurRadius: 28,
-            spreadRadius: 0,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: FloatingActionButton(
-        backgroundColor: AppColors.amber,
-        foregroundColor: AppColors.voidColor,
-        elevation: 0,
-        highlightElevation: 0,
-        shape: const CircleBorder(),
-        onPressed: () {
-          Haptics.confirm();
-          // C1: Universeller Create-Picker statt direkter Route. User
-          // sieht 6 Tiles (Post/Event/Marktplatz/Gruppe/Wissen/Krise)
-          // im Cinema-GlassCard-Style.
-          CreatePickerSheet.show(context);
-        },
-        tooltip: 'nav.create'.tr(),
-        child: const Icon(LucideIcons.plus, size: 26),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.bronze, AppColors.bronzeDeep],
+          ),
+          border: Border.all(
+            color: const Color(0x59FFFFFF), // inset top highlight
+            width: 0.5,
+          ),
+        ),
+        child: FloatingActionButton(
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppColors.voidColor,
+          elevation: 0,
+          highlightElevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          onPressed: () {
+            Haptics.confirm();
+            // C1: Universeller Create-Picker statt direkter Route. User
+            // sieht 6 Tiles (Post/Event/Marktplatz/Gruppe/Wissen/Krise)
+            // im Cinema-GlassCard-Style.
+            CreatePickerSheet.show(context);
+          },
+          tooltip: 'nav.create'.tr(),
+          child: const Icon(LucideIcons.plus, size: 26),
+        ),
       ),
     );
   }
@@ -424,7 +438,10 @@ class _BottomItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? AppColors.amber : AppColors.mute;
+    // Design (Cinema-Hyperreal): aktiv = Bronze-Glyph mit Glow + Papier-Label,
+    // inaktiv = gedämpftes Papier (paper-dim).
+    final glyphColor = active ? AppColors.bronze : AppColors.inkSoft;
+    final labelColor = active ? AppColors.ink : AppColors.mute;
     return InkWell(
       onTap: () {
         Haptics.select();
@@ -438,12 +455,12 @@ class _BottomItem extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: active
               ? BoxDecoration(
-                  color: AppColors.amber.withValues(alpha: 0.12),
+                  color: AppColors.bronze.withValues(alpha: 0.12),
                   border: Border.all(
-                    color: AppColors.amber.withValues(alpha: 0.35),
+                    color: AppColors.bronze.withValues(alpha: 0.35),
                     width: 1,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 )
               : null,
           child: Column(
@@ -453,7 +470,20 @@ class _BottomItem extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Icon(icon, size: 20, color: color),
+                  // Aktiver Glyph mit Bronze-Drop-Shadow-Glow (Design).
+                  active
+                      ? Icon(
+                          icon,
+                          size: 20,
+                          color: glyphColor,
+                          shadows: [
+                            Shadow(
+                              color: AppColors.bronze.withValues(alpha: 0.55),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        )
+                      : Icon(icon, size: 20, color: glyphColor),
                   if (badgeCount > 0)
                     Positioned(
                       top: -4,
@@ -487,13 +517,17 @@ class _BottomItem extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
+              // Design: Nav-Label als Mono-Uppercase mit weitem Tracking.
               Text(
-                label,
-                style: AppTypography.body(
-                  size: 10,
-                  color: color,
-                  weight: active ? FontWeight.w600 : FontWeight.w400,
+                label.toUpperCase(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.label(
+                  size: 8.5,
+                  color: labelColor,
+                  weight: active ? FontWeight.w600 : FontWeight.w500,
+                  letterSpacing: 0.14,
                 ),
               ),
             ],
