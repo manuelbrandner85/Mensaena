@@ -16,6 +16,7 @@ import '../../repositories/post_interactions_repository.dart'
 import '../../repositories/posts_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
 import '../../repositories/content_reports_repository.dart';
+import 'glass_card.dart';
 import 'image_carousel.dart';
 
 /// SKILL: mensaena-design + mensaena-features
@@ -74,13 +75,9 @@ class _PostCardState extends ConsumerState<PostCard> {
   }
 
   Future<void> _openMenu() async {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetCtx) => SafeArea(
+    GlassSheet.show<void>(
+      context,
+      (sheetCtx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

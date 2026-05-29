@@ -594,9 +594,17 @@ class WidgetSettingsSheet extends ConsumerWidget {
       maxChildSize: 0.95,
       expand: false,
       builder: (_, scrollCtrl) => Container(
+        // Design: Glass-Strong-Gradient (ohne Blur — hohes Scroll-Sheet,
+        // Blur wäre GPU-teuer; transluzenter Gradient zeigt die Cinema-
+        // Atmosphäre trotzdem durch).
         decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xF0141C28), Color(0xF6080C14)],
+          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          border: Border(top: BorderSide(color: Color(0x47ECE5D6))),
         ),
         child: Column(
           children: [

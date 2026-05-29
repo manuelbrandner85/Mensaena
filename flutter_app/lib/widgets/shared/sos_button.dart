@@ -89,11 +89,8 @@ class _SOSButtonState extends State<SOSButton>
 void _showSOSSheet(BuildContext context) {
   showModalBottomSheet<void>(
     context: context,
-    backgroundColor: AppColors.surface,
+    backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
     builder: (sheetCtx) => const _SOSSheet(),
   );
 }
@@ -145,7 +142,18 @@ class _SOSSheetState extends State<_SOSSheet> {
       minChildSize: 0.4,
       expand: false,
       builder: (_, scrollCtrl) {
-        return Column(
+        return Container(
+          // Design: Glass-Strong-Gradient (ohne Blur — Scroll-Sheet).
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xF0141C28), Color(0xF6080C14)],
+            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+            border: Border(top: BorderSide(color: Color(0x47ECE5D6))),
+          ),
+          child: Column(
           children: [
             const SizedBox(height: 10),
             Container(
@@ -242,6 +250,7 @@ class _SOSSheetState extends State<_SOSSheet> {
               ),
             ),
           ],
+          ),
         );
       },
     );

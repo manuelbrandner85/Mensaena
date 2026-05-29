@@ -76,6 +76,22 @@ class GlassSheet extends StatelessWidget {
   final Widget child;
   final double blur;
 
+  /// Bequemer Ersatz für showModalBottomSheet im Glass-Strong-Design:
+  /// transparenter Hintergrund + GlassSheet-Wrapper. [builder] liefert den
+  /// Sheet-Inhalt (typischerweise SafeArea + Padding + Column).
+  static Future<T?> show<T>(
+    BuildContext context,
+    Widget Function(BuildContext) builder, {
+    bool isScrollControlled = true,
+  }) {
+    return showModalBottomSheet<T>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: isScrollControlled,
+      builder: (ctx) => GlassSheet(child: builder(ctx)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
