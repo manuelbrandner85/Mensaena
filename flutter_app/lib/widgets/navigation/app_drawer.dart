@@ -10,6 +10,7 @@ import '../../config/theme/app_typography.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/conversations_repository.dart';
 import '../../repositories/crisis_repository.dart';
+import '../../repositories/friendships_repository.dart';
 import '../../providers/post_contact_provider.dart';
 import '../../repositories/interactions_repository.dart';
 import '../shared/sized_avatar_image.dart';
@@ -65,6 +66,9 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/messages', badgeKey: 'unreadMessages'),
         _NavLink(icon: LucideIcons.messageCircle, label: 'nav.communityChat',
             route: '/dashboard/chat'),
+        // Freunde gehören zu Kommunikation (zuvor irrtümlich in "Mein Bereich").
+        _NavLink(icon: LucideIcons.users, label: 'nav.friends',
+            route: '/dashboard/friends', badgeKey: 'friendRequests'),
         _NavLink(icon: LucideIcons.sparkles, label: 'nav.matching',
             route: '/dashboard/matching', badgeKey: 'suggestedMatches'),
       ],
@@ -153,8 +157,6 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/badges'),
         _NavLink(icon: LucideIcons.calendar, label: 'nav.calendar',
             route: '/dashboard/calendar'),
-        _NavLink(icon: LucideIcons.users, label: 'nav.friends',
-            route: '/dashboard/friends'),
         _NavLink(icon: LucideIcons.hash, label: 'nav.followedTags',
             route: '/dashboard/followed-tags'),
         _NavLink(icon: LucideIcons.bookmark, label: 'nav.savedPosts',
@@ -495,6 +497,12 @@ class _LinkTile extends ConsumerWidget {
                 .asData
                 ?.value
                 .length ??
+            0;
+      case 'friendRequests':
+        return ref
+                .watch(incomingFriendRequestsCountProvider)
+                .asData
+                ?.value ??
             0;
       default:
         return 0;

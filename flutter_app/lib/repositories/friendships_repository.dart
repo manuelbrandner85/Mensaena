@@ -3,7 +3,16 @@
 /// das einseitig ist).
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../services/supabase_service.dart';
+
+/// Anzahl eingehender, noch offener Freundschaftsanfragen (für Drawer-Badge).
+final incomingFriendRequestsCountProvider =
+    FutureProvider.autoDispose<int>((ref) async {
+  final list = await FriendshipsRepository.incoming();
+  return list.length;
+});
 
 enum FriendshipState {
   none, // keine Verbindung
@@ -159,6 +168,82 @@ class FriendshipsRepository {
           .order('created_at', ascending: false)
           .limit(limit);
       return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Globale User-Suche zum Freunde-Finden. Sucht über display_name, name
+  /// und nickname (case-insensitive), schließt sich selbst + geblockte aus.
+  /// Liefert pro Treffer das Profil + den aktuellen Friendship-Status, damit
+  /// die UI den richtigen Button zeigen kann (Anfragen / Angefragt /
+  /// Annehmen / Befreundet).
+  static Future<List<Map<String, dynamic>>> searchUsers(
+    String query, {
+    int limit = 30,
+  }) async {
+    final me = SupabaseService.currentUser?.id;
+    if (me == null) return const [];
+    final q = query.trim();
+    if (q.length < 2) return const [];
+    try {
+      final esc = q.replaceAll('%', r'\%').replaceAll(',', '');
+      final rows = await sb
+          .from('profiles')
+          .select('id, display_name, name, avatar_url')
+          .filter('is_banned', 'eq', false)
+          .neq('id', me)
+          .or('display_name.ilike.%$esc%,name.ilike.%$esc%,nickname.ilike.%$esc%')
+          .limit(limit);
+      final profiles =
+          (rows as List).whereType<Map<String, dynamic>>().toList();
+      if (profiles.isEmpty) return const [];
+
+      // Alle Friendship-Rows die mich + einen der Treffer betreffen, holen.
+      final ids = profiles.map((p) => p['id'] as String).toList();
+      final frRows = await sb
+          .from('friendships')
+          .select('requester_id, addressee_id, status')
+          .or('requester_id.eq.$me,addressee_id.eq.$me');
+      final stateById = <String, FriendshipState>{};
+      for (final r in (frRows as List).whereType<Map<String, dynamic>>()) {
+        final req = r['requester_id'] as String?;
+        final add = r['addressee_id'] as String?;
+        final status = r['status'] as String? ?? 'pending';
+        final other = req == me ? add : req;
+        if (other == null || !ids.contains(other)) continue;
+        FriendshipState st;
+        if (status == 'accepted') {
+          st = FriendshipState.accepted;
+        } else if (status == 'declined') {
+          st = FriendshipState.declined;
+        } else {
+          st = req == me
+              ? FriendshipState.outgoingPending
+              : FriendshipState.incomingPending;
+        }
+        stateById[other] = st;
+      }
+      // Geblockte ausschließen.
+      final blockRows = await sb
+          .from('user_blocks')
+          .select('blocker_id, blocked_id')
+          .or('blocker_id.eq.$me,blocked_id.eq.$me');
+      final blocked = <String>{};
+      for (final r in (blockRows as List).whereType<Map<String, dynamic>>()) {
+        final b = r['blocker_id'] as String?;
+        final t = r['blocked_id'] as String?;
+        if (b != null && b != me) blocked.add(b);
+        if (t != null && t != me) blocked.add(t);
+      }
+      return profiles
+          .where((p) => !blocked.contains(p['id']))
+          .map((p) => {
+                ...p,
+                'friendship_state':
+                    (stateById[p['id']] ?? FriendshipState.none).name,
+              })
+          .toList();
     } catch (_) {
       return const [];
     }

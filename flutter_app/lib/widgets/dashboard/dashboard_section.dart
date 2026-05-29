@@ -138,47 +138,19 @@ const _sections = <DashboardSection>[
   ),
 ];
 
-/// C1: Tageszeit-Reihenfolge.
+/// User-Wunsch (2026-05): KEINE Tageszeit-Umsortierung mehr — die Widgets
+/// "wanderten" je nach Uhrzeit und verwirrten. Die Reihenfolge ist jetzt
+/// FEST: Mein Tag → Community → Fortschritt → Umgebung → Wissen → Events.
+/// (Parameter `now` bleibt für Signatur-Kompatibilität, wird ignoriert.)
 List<DashboardSection> orderedSections(DateTime now) {
-  final h = now.hour;
-  List<DashboardSectionId> order;
-  if (h >= 6 && h < 12) {
-    order = const [
-      DashboardSectionId.myDay,
-      DashboardSectionId.events,
-      DashboardSectionId.community,
-      DashboardSectionId.environment,
-      DashboardSectionId.gamification,
-      DashboardSectionId.knowledge,
-    ];
-  } else if (h >= 12 && h < 18) {
-    order = const [
-      DashboardSectionId.community,
-      DashboardSectionId.events,
-      DashboardSectionId.myDay,
-      DashboardSectionId.gamification,
-      DashboardSectionId.environment,
-      DashboardSectionId.knowledge,
-    ];
-  } else if (h >= 18 && h < 22) {
-    order = const [
-      DashboardSectionId.myDay,
-      DashboardSectionId.knowledge,
-      DashboardSectionId.gamification,
-      DashboardSectionId.community,
-      DashboardSectionId.events,
-      DashboardSectionId.environment,
-    ];
-  } else {
-    order = const [
-      DashboardSectionId.knowledge,
-      DashboardSectionId.myDay,
-      DashboardSectionId.gamification,
-      DashboardSectionId.community,
-      DashboardSectionId.environment,
-      DashboardSectionId.events,
-    ];
-  }
+  const order = [
+    DashboardSectionId.myDay,
+    DashboardSectionId.community,
+    DashboardSectionId.gamification,
+    DashboardSectionId.environment,
+    DashboardSectionId.knowledge,
+    DashboardSectionId.events,
+  ];
   return [for (final id in order) _sections.firstWhere((s) => s.id == id)];
 }
 

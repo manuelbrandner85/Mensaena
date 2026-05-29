@@ -42,7 +42,11 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(length: 4, vsync: this);
+    _tab.addListener(() {
+      // Such-Hint je nach Tab aktualisieren (Rebuild).
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -91,10 +95,13 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                 labelStyle: AppTypography.body(
                     size: 12, weight: FontWeight.w700),
                 unselectedLabelStyle: AppTypography.body(size: 12),
+                isScrollable: true,
+                tabAlignment: TabAlignment.center,
                 tabs: [
                   Tab(text: 'friends.tabAll'.tr()),
                   Tab(text: 'friends.tabOnline'.tr()),
                   Tab(text: 'friends.tabRequests'.tr()),
+                  Tab(text: 'friends.tabFind'.tr()),
                 ],
               ),
             ),
@@ -104,7 +111,9 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                 onChanged: (v) => setState(() => _search = v.toLowerCase()),
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 decoration: InputDecoration(
-                  hintText: 'friends.searchHint'.tr(),
+                  hintText: _tab.index == 3
+                      ? 'friends.findHint'.tr()
+                      : 'friends.searchHint'.tr(),
                   hintStyle: AppTypography.caption(),
                   prefixIcon: const Icon(LucideIcons.search,
                       size: 16, color: AppColors.mute),
@@ -134,6 +143,13 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
                     onlineOnly: true,
                   ),
                   _IncomingList(async: incomingAsync, search: _search),
+                  _SearchAddList(
+                    query: _search,
+                    onChanged: () {
+                      ref.invalidate(_friendsProvider);
+                      ref.invalidate(_incomingProvider);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -393,6 +409,187 @@ class _IncomingTile extends ConsumerWidget {
             ref.invalidate(_incomingProvider);
           },
         ),
+      ]),
+    );
+  }
+}
+
+/// Tab "Finden": globale User-Suche + zustandsabhängiger Aktions-Button
+/// (Anfragen / Angefragt / Annehmen / Befreundet).
+class _SearchAddList extends StatefulWidget {
+  const _SearchAddList({required this.query, required this.onChanged});
+  final String query;
+  final VoidCallback onChanged;
+
+  @override
+  State<_SearchAddList> createState() => _SearchAddListState();
+}
+
+class _SearchAddListState extends State<_SearchAddList> {
+  Future<List<Map<String, dynamic>>>? _future;
+  String _lastQuery = '';
+
+  @override
+  void didUpdateWidget(_SearchAddList old) {
+    super.didUpdateWidget(old);
+    if (widget.query != _lastQuery) {
+      _lastQuery = widget.query;
+      _future = widget.query.trim().length < 2
+          ? Future.value(const [])
+          : FriendshipsRepository.searchUsers(widget.query);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.query.trim().length < 2) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(LucideIcons.userPlus, size: 40, color: AppColors.mute),
+              const SizedBox(height: 10),
+              Text('friends.findPrompt'.tr(),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.body(size: 13, color: AppColors.mute)),
+            ],
+          ),
+        ),
+      );
+    }
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _future,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(
+              child: CircularProgressIndicator(color: AppColors.bronze));
+        }
+        final rows = snap.data ?? const [];
+        if (rows.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text('friends.findNoResults'.tr(),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.body(size: 13, color: AppColors.mute)),
+            ),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+          itemCount: rows.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 6),
+          itemBuilder: (_, i) => _SearchResultTile(
+            row: rows[i],
+            onChanged: () {
+              widget.onChanged();
+              // Such-Ergebnis neu laden damit der Button-Status stimmt.
+              setState(() {
+                _future = FriendshipsRepository.searchUsers(widget.query);
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SearchResultTile extends StatefulWidget {
+  const _SearchResultTile({required this.row, required this.onChanged});
+  final Map<String, dynamic> row;
+  final VoidCallback onChanged;
+
+  @override
+  State<_SearchResultTile> createState() => _SearchResultTileState();
+}
+
+class _SearchResultTileState extends State<_SearchResultTile> {
+  bool _busy = false;
+  late String _state = widget.row['friendship_state'] as String? ?? 'none';
+
+  Future<void> _act() async {
+    final id = widget.row['id'] as String;
+    setState(() => _busy = true);
+    bool ok = false;
+    switch (_state) {
+      case 'none':
+      case 'declined':
+        ok = await FriendshipsRepository.request(id);
+        if (ok) _state = 'outgoingPending';
+        break;
+      case 'incomingPending':
+        ok = await FriendshipsRepository.accept(id);
+        if (ok) _state = 'accepted';
+        break;
+      case 'outgoingPending':
+        ok = await FriendshipsRepository.remove(id);
+        if (ok) _state = 'none';
+        break;
+    }
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (ok) widget.onChanged();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final id = widget.row['id'] as String;
+    final name = (widget.row['display_name'] as String?) ??
+        (widget.row['name'] as String?) ??
+        'common.neighbour'.tr();
+    final avatar = widget.row['avatar_url'] as String?;
+
+    final (String label, IconData icon, Color color) = switch (_state) {
+      'accepted' => ('friends.stateFriends'.tr(), LucideIcons.check,
+          AppColors.leben),
+      'outgoingPending' => ('friends.stateRequested'.tr(),
+          LucideIcons.clock, AppColors.mute),
+      'incomingPending' => ('friends.stateAccept'.tr(),
+          LucideIcons.userCheck, AppColors.bronze),
+      _ => ('friends.stateAdd'.tr(), LucideIcons.userPlus, AppColors.bronze),
+    };
+    final isInteractive = _state != 'accepted';
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(children: [
+        InkWell(
+          onTap: () => context.push('/dashboard/profile/$id'),
+          child: SizedAvatarImage(url: avatar, size: 44, fallbackInitial: name),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: InkWell(
+            onTap: () => context.push('/dashboard/profile/$id'),
+            child: Text(name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.body(
+                    size: 14, color: AppColors.ink, weight: FontWeight.w600)),
+          ),
+        ),
+        if (_busy)
+          const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+                strokeWidth: 2, color: AppColors.bronze),
+          )
+        else
+          TextButton.icon(
+            onPressed: isInteractive ? _act : null,
+            icon: Icon(icon, size: 16, color: color),
+            label: Text(label,
+                style: AppTypography.body(size: 12, color: color)),
+          ),
       ]),
     );
   }

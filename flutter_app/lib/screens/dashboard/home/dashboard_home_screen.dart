@@ -335,8 +335,6 @@ class _DashboardHomeScreenState
       return order.indexOf(a).compareTo(order.indexOf(b));
     });
 
-    final collapsed = ref.read(collapsedSectionsProvider);
-    bool pinnedSectionDone = false; // markiert ob wir die Pinned-Phase verlassen haben
     // Defensive: stelle sicher dass 'hero' in sortedOrder existiert und
     // ganz vorne steht — selbst wenn der User irgendwie das order-Array
     // korrumpiert hat. Hero darf NIE verloren gehen.
@@ -352,31 +350,17 @@ class _DashboardHomeScreenState
       }
       if (consumed.contains(id)) continue;
       final isPinned = pinnedTop.contains(id);
-      // Pinned-Widgets: KEIN Sektion-Banner, KEIN Collapse-Effekt.
+      // Pinned-Widgets: KEIN Sektion-Banner.
       if (isPinned) {
         // Fall-through zur Case-Switch.
       } else {
-        // Collapse-All-Toggle einmal direkt nach den Pinned einfügen.
-        if (!pinnedSectionDone) {
-          pinnedSectionDone = true;
-          out.add(const Padding(
-            padding: EdgeInsets.fromLTRB(12, 8, 12, 0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: CollapseAllToggle(),
-            ),
-          ));
-        }
+        // User-Wunsch (2026-05): Sektionen bleiben als optische Trenner,
+        // sind aber IMMER offen — kein Collapse-Toggle, kein Skip-Effekt.
         // Sektion-Banner einfügen wenn sich die Sektion ändert.
         final widgetSection = sectionForWidget(id);
         if (widgetSection != null && widgetSection.id != currentSection) {
           currentSection = widgetSection.id;
           out.add(_SectionBanner(section: widgetSection));
-        }
-        // Wenn Sektion eingeklappt → Widget skippen.
-        if (widgetSection != null &&
-            collapsed.contains(widgetSection.id)) {
-          continue;
         }
       }
 
@@ -1084,67 +1068,47 @@ class _DashboardScrollBody extends ConsumerWidget {
 
 
 /// Phase 10 D1/D2: kompakter Sektion-Banner zwischen Widget-Gruppen.
-/// Glassmorphism + Sektions-Farbe als Linker-Rand. Tap toggelt die
-/// gesamte Sektion (collapsed/expanded). Im Initial-State sind alle
-/// expanded, der User kann via CollapseAllToggle alle einklappen.
-class _SectionBanner extends ConsumerWidget {
+/// Glassmorphism + Sektions-Farbe als Linker-Rand. User-Wunsch (2026-05):
+/// reiner optischer Trenner — KEIN Toggle, KEIN Collapse. Sektionen sind
+/// immer offen.
+class _SectionBanner extends StatelessWidget {
   const _SectionBanner({required this.section});
   final DashboardSection section;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final collapsed =
-        ref.watch(collapsedSectionsProvider).contains(section.id);
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 16, 12, 4),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: () => ref
-            .read(collapsedSectionsProvider.notifier)
-            .toggle(section.id),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                section.color.withValues(alpha: 0.18),
-                section.color.withValues(alpha: 0.04),
-              ],
-            ),
-            border: Border(
-              left: BorderSide(color: section.color, width: 3),
-              top: BorderSide(
-                  color: AppColors.bronze.withValues(alpha: 0.15)),
-              right: BorderSide(
-                  color: AppColors.bronze.withValues(alpha: 0.15)),
-              bottom: BorderSide(
-                  color: AppColors.bronze.withValues(alpha: 0.15)),
-            ),
-            borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              section.color.withValues(alpha: 0.18),
+              section.color.withValues(alpha: 0.04),
+            ],
           ),
-          child: Row(children: [
-            Icon(section.icon, size: 16, color: section.color),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                section.titleKey.tr(),
-                style: AppTypography.body(
-                    size: 13,
-                    color: AppColors.ink,
-                    weight: FontWeight.w700),
-              ),
-            ),
-            AnimatedRotation(
-              turns: collapsed ? -0.25 : 0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                LucideIcons.chevronDown,
-                color: section.color,
-                size: 16,
-              ),
-            ),
-          ]),
+          border: Border(
+            left: BorderSide(color: section.color, width: 3),
+            top: BorderSide(color: AppColors.bronze.withValues(alpha: 0.15)),
+            right:
+                BorderSide(color: AppColors.bronze.withValues(alpha: 0.15)),
+            bottom:
+                BorderSide(color: AppColors.bronze.withValues(alpha: 0.15)),
+          ),
+          borderRadius: BorderRadius.circular(10),
         ),
+        child: Row(children: [
+          Icon(section.icon, size: 16, color: section.color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              section.titleKey.tr(),
+              style: AppTypography.body(
+                  size: 13, color: AppColors.ink, weight: FontWeight.w700),
+            ),
+          ),
+        ]),
       ),
     );
   }
