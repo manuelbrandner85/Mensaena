@@ -19,6 +19,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/air_quality_service.dart';
 import '../../services/location_service.dart';
 import '../../services/saved_pins_service.dart';
@@ -333,10 +334,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _initLocationAndLoad() async {
-    try {
-      final pos = await LocationService.getCurrentPosition(
-        accuracy: LocationAccuracy.medium,
-      );
+    // 1) Robuster GPS-Fix (frischer Fix → Last-Known als Fallback).
+    final pos = await LocationService.getBestPosition(
+      accuracy: LocationAccuracy.medium,
+    );
+    if (pos != null) {
       if (!mounted) return;
       setState(() {
         _center = LatLng(pos.latitude, pos.longitude);
@@ -345,8 +347,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         _hasGps = true;
       });
       _mapController.move(_center, _zoom);
-    } catch (_) {
-      // GPS verweigert / nicht verfuegbar — Default-Center bleibt.
+    } else {
+      // 2) Fallback: in den Einstellungen gespeicherter Heimat-/Profil-
+      //    Standort — adressiert "Standort aktiviert, aber Karte zeigt nichts".
+      final profile = ref.read(myProfileProvider).asData?.value;
+      final double? lat = profile?.latitude ?? profile?.homeLat;
+      final double? lng = profile?.longitude ?? profile?.homeLng;
+      if (lat != null && lng != null) {
+        if (!mounted) return;
+        final home = LatLng(lat, lng);
+        setState(() {
+          _center = home;
+          _gpsLocation = home;
+          _zoom = _radiusZoom[_radiusKm] ?? 12;
+          _hasGps = true;
+        });
+        _mapController.move(_center, _zoom);
+      } else if (mounted) {
+        // 3) Wirklich nichts da → sichtbarer Hinweis statt stiller Leere.
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('map.locationUnavailable'.tr(),
+              style: AppTypography.body(size: 13, color: AppColors.ink)),
+        ));
+      }
     }
     await _loadPosts();
   }
@@ -467,25 +491,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _recenterOnGps() async {
-    try {
-      final pos = await LocationService.getCurrentPosition(
-        accuracy: LocationAccuracy.high,
-      );
-      if (!mounted) return;
-      final loc = LatLng(pos.latitude, pos.longitude);
-      setState(() {
-        _center = loc;
-        _gpsLocation = loc;
-        _hasGps = true;
-      });
-      _mapController.move(loc, _radiusZoom[_radiusKm] ?? 13);
-      await _loadPosts();
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('map.locationUnavailable'.tr())),
-      );
+    final pos = await LocationService.getBestPosition(
+      accuracy: LocationAccuracy.high,
+    );
+    if (!mounted) return;
+    if (pos == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('map.locationUnavailable'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+      return;
     }
+    final loc = LatLng(pos.latitude, pos.longitude);
+    setState(() {
+      _center = loc;
+      _gpsLocation = loc;
+      _hasGps = true;
+    });
+    _mapController.move(loc, _radiusZoom[_radiusKm] ?? 13);
+    await _loadPosts();
   }
 
   void _openPostSheet(Post post) {

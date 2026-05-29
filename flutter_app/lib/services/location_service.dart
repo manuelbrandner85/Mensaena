@@ -34,6 +34,45 @@ class LocationService {
     );
   }
 
+  /// Robuste Positionsermittlung für die Karte: versucht einen frischen
+  /// Fix (großzügiger Timeout), fällt bei Timeout/Fehler auf die letzte
+  /// bekannte Position zurück, statt komplett zu scheitern. Liefert null
+  /// nur wenn wirklich gar nichts verfügbar ist (kein Wurf → kein stilles
+  /// Verschlucken mehr beim Aufrufer).
+  static Future<Position?> getBestPosition({
+    LocationAccuracy accuracy = LocationAccuracy.medium,
+  }) async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return Geolocator.getLastKnownPosition();
+      }
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return Geolocator.getLastKnownPosition();
+      }
+      try {
+        return await Geolocator.getCurrentPosition(
+          desiredAccuracy: accuracy,
+          timeLimit: const Duration(seconds: 18),
+        );
+      } catch (_) {
+        // Timeout / kein Fix → letzte bekannte Position als Fallback.
+        return await Geolocator.getLastKnownPosition();
+      }
+    } catch (_) {
+      try {
+        return await Geolocator.getLastKnownPosition();
+      } catch (_) {
+        return null;
+      }
+    }
+  }
+
   /// Haversine-Distanz zwischen zwei Koordinaten in Kilometern.
   static double haversineKm(
     double lat1,
