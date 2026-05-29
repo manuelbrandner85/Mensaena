@@ -779,6 +779,19 @@
       "auditTitle": "Audit log",
       "auditError": "Audit log could not be loaded.",
       "auditEmpty": "No audit entries yet.",
+      "filter": {
+        "allActions": "All actions",
+        "create": "Created",
+        "update": "Updated",
+        "delete": "Deleted",
+        "ban": "Ban/Unban",
+        "day1": "Today",
+        "day7": "7 days",
+        "day30": "30 days",
+        "allTime": "All time",
+        "actorSearchHint": "Search by admin name or ID …",
+        "resultCount": "{n} results"
+      },
       "act": {
         "banUser": "User banned",
         "unbanUser": "User unbanned",

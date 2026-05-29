@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,7 +74,6 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
   @override
   Widget build(BuildContext context) {
     final statsAsync = ref.watch(adminStatsProvider);
-    final auditAsync = ref.watch(adminAuditLogsProvider);
     return DashboardScaffold(
       title: 'admin.systemTitle'.tr(),
       currentRoute: '/dashboard/admin/system',
@@ -133,7 +134,7 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
               ),
             ]),
             const SizedBox(height: 14),
-            _auditSection(auditAsync),
+            const _AuditSectionWithFilters(),
             const SizedBox(height: 14),
             _quickLinksSection(),
           ],
@@ -263,75 +264,7 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Audit-log section
-  // ---------------------------------------------------------------------------
-
-  Widget _auditSection(AsyncValue<List<Map<String, dynamic>>> auditAsync) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.5),
-        border: Border.all(color: AppColors.line),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(LucideIcons.scrollText, size: 18, color: AppColors.tealSoft),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'admin.system.auditTitle'.tr(),
-                  style: AppTypography.display(size: 16),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(LucideIcons.refreshCw, size: 16, color: AppColors.mute),
-                onPressed: () => ref.invalidate(adminAuditLogsProvider),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 320,
-            child: auditAsync.when(
-              loading: () => ListView.separated(
-                itemCount: 5,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (_, __) =>
-                    const ShimmerBox(height: 44, borderRadius: 8),
-              ),
-              error: (_, __) => Center(
-                child: Text(
-                  'admin.system.auditError'.tr(),
-                  style: AppTypography.caption(),
-                ),
-              ),
-              data: (rows) {
-                if (rows.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'admin.system.auditEmpty'.tr(),
-                      style: AppTypography.caption(),
-                    ),
-                  );
-                }
-                return ListView.separated(
-                  itemCount: rows.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(height: 1, color: AppColors.line),
-                  itemBuilder: (_, i) => _AuditRow(row: rows[i]),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Audit-Log Section ist jetzt ein separates Widget mit Filter-State.
 
   // ---------------------------------------------------------------------------
   // Quick-links section
@@ -481,6 +414,293 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// Audit-Section mit Filter-State
+// =============================================================================
+
+class _AuditSectionWithFilters extends ConsumerStatefulWidget {
+  const _AuditSectionWithFilters();
+
+  @override
+  ConsumerState<_AuditSectionWithFilters> createState() =>
+      _AuditSectionWithFiltersState();
+}
+
+class _AuditSectionWithFiltersState
+    extends ConsumerState<_AuditSectionWithFilters> {
+  String? _actionFilter; // null = alle
+  int? _daysBack = 7; // Default: letzte 7 Tage
+  String _actorSearch = '';
+  Timer? _searchDebounce;
+  Future<List<Map<String, dynamic>>>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
+
+  void _refresh() {
+    setState(() {
+      _future = AdminRepository.loadAuditLogs(
+        actionFilter: _actionFilter,
+        daysBack: _daysBack,
+        actorSearch: _actorSearch.isEmpty ? null : _actorSearch,
+        limit: 200,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.scrollText,
+                  size: 18, color: AppColors.tealSoft),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'admin.system.auditTitle'.tr(),
+                  style: AppTypography.display(size: 16),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(LucideIcons.refreshCw,
+                    size: 16, color: AppColors.mute),
+                onPressed: _refresh,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Filter-Zeile 1: Action-Type-Chips
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              _FilterChip(
+                label: 'admin.system.filter.allActions'.tr(),
+                selected: _actionFilter == null,
+                onTap: () {
+                  _actionFilter = null;
+                  _refresh();
+                },
+              ),
+              _FilterChip(
+                label: 'admin.system.filter.create'.tr(),
+                selected: _actionFilter == 'create',
+                onTap: () {
+                  _actionFilter = 'create';
+                  _refresh();
+                },
+              ),
+              _FilterChip(
+                label: 'admin.system.filter.update'.tr(),
+                selected: _actionFilter == 'update',
+                onTap: () {
+                  _actionFilter = 'update';
+                  _refresh();
+                },
+              ),
+              _FilterChip(
+                label: 'admin.system.filter.delete'.tr(),
+                selected: _actionFilter == 'delete',
+                onTap: () {
+                  _actionFilter = 'delete';
+                  _refresh();
+                },
+              ),
+              _FilterChip(
+                label: 'admin.system.filter.ban'.tr(),
+                selected: _actionFilter == 'ban',
+                onTap: () {
+                  _actionFilter = 'ban';
+                  _refresh();
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Filter-Zeile 2: Zeitraum-Chips + Actor-Search
+          Row(
+            children: [
+              _FilterChip(
+                label: 'admin.system.filter.day1'.tr(),
+                selected: _daysBack == 1,
+                onTap: () {
+                  _daysBack = 1;
+                  _refresh();
+                },
+              ),
+              const SizedBox(width: 4),
+              _FilterChip(
+                label: 'admin.system.filter.day7'.tr(),
+                selected: _daysBack == 7,
+                onTap: () {
+                  _daysBack = 7;
+                  _refresh();
+                },
+              ),
+              const SizedBox(width: 4),
+              _FilterChip(
+                label: 'admin.system.filter.day30'.tr(),
+                selected: _daysBack == 30,
+                onTap: () {
+                  _daysBack = 30;
+                  _refresh();
+                },
+              ),
+              const SizedBox(width: 4),
+              _FilterChip(
+                label: 'admin.system.filter.allTime'.tr(),
+                selected: _daysBack == null,
+                onTap: () {
+                  _daysBack = null;
+                  _refresh();
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            onChanged: (v) {
+              _searchDebounce?.cancel();
+              _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+                if (!mounted) return;
+                _actorSearch = v;
+                _refresh();
+              });
+            },
+            style: AppTypography.body(size: 13, color: AppColors.ink),
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: AppColors.elevated,
+              prefixIcon: const Icon(LucideIcons.search,
+                  size: 14, color: AppColors.mute),
+              hintText: 'admin.system.filter.actorSearchHint'.tr(),
+              hintStyle: AppTypography.caption(),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 380,
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _future,
+              builder: (context, snap) {
+                if (snap.connectionState != ConnectionState.done) {
+                  return ListView.separated(
+                    itemCount: 5,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (_, __) =>
+                        const ShimmerBox(height: 44, borderRadius: 8),
+                  );
+                }
+                if (snap.hasError) {
+                  return Center(
+                    child: Text('admin.system.auditError'.tr(),
+                        style: AppTypography.caption()),
+                  );
+                }
+                final rows = snap.data ?? const [];
+                if (rows.isEmpty) {
+                  return Center(
+                    child: Text('admin.system.auditEmpty'.tr(),
+                        style: AppTypography.caption()),
+                  );
+                }
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        'admin.system.filter.resultCount'
+                            .tr(namedArgs: {'n': '${rows.length}'}),
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.mute),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: rows.length,
+                        separatorBuilder: (_, __) => const Divider(
+                            height: 1, color: AppColors.line),
+                        itemBuilder: (_, i) => _AuditRow(row: rows[i]),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.bronze.withValues(alpha: 0.25)
+              : AppColors.elevated,
+          border: Border.all(
+            color: selected
+                ? AppColors.bronze.withValues(alpha: 0.6)
+                : AppColors.line,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.body(
+            size: 11,
+            color: selected ? AppColors.bronze : AppColors.inkSoft,
+            weight: selected ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

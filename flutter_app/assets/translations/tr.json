@@ -738,6 +738,19 @@
       "auditTitle": "Denetim günlüğü",
       "auditError": "Denetim günlüğü yüklenemedi.",
       "auditEmpty": "Henüz denetim kaydı yok.",
+      "filter": {
+        "allActions": "Tüm eylemler",
+        "create": "Oluşturuldu",
+        "update": "Güncellendi",
+        "delete": "Silindi",
+        "ban": "Ban/Unban",
+        "day1": "Bugün",
+        "day7": "7 gün",
+        "day30": "30 gün",
+        "allTime": "Tüm zamanlar",
+        "actorSearchHint": "Admin adı veya ID ile ara …",
+        "resultCount": "{n} sonuç"
+      },
       "act": {
         "banUser": "Kullanıcı yasaklandı",
         "unbanUser": "Kullanıcının yasağı kaldırıldı",

@@ -739,6 +739,19 @@
       "auditTitle": "Registro de auditoría",
       "auditError": "No se pudo cargar el registro de auditoría.",
       "auditEmpty": "Aún no hay entradas de auditoría.",
+      "filter": {
+        "allActions": "Todas las acciones",
+        "create": "Creado",
+        "update": "Actualizado",
+        "delete": "Eliminado",
+        "ban": "Ban/Unban",
+        "day1": "Hoy",
+        "day7": "7 días",
+        "day30": "30 días",
+        "allTime": "Todo el tiempo",
+        "actorSearchHint": "Buscar por nombre o ID de admin …",
+        "resultCount": "{n} resultados"
+      },
       "act": {
         "banUser": "Usuario bloqueado",
         "unbanUser": "Usuario desbloqueado",

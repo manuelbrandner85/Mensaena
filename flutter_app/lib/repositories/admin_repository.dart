@@ -463,14 +463,61 @@ class AdminRepository {
   // ---------------------------------------------------------------------------
 
   /// Most recent audit-log entries with actor profile (best-effort).
-  static Future<List<Map<String, dynamic>>> loadAuditLogs({int limit = 50}) async {
+  static Future<List<Map<String, dynamic>>> loadAuditLogs({
+    int limit = 100,
+    String? actionFilter,
+    int? daysBack,
+    String? actorSearch,
+  }) async {
     try {
-      final rows = await sb
+      var q = sb
           .from('audit_logs')
-          .select('*, profiles!audit_logs_actor_id_fkey(name)')
-          .order('created_at', ascending: false)
-          .limit(limit);
-      return (rows as List).whereType<Map<String, dynamic>>().toList();
+          .select('*, profiles!audit_logs_actor_id_fkey(name)');
+      if (actionFilter != null && actionFilter.isNotEmpty) {
+        // Group-Filter: 'create' matched admin_create, 'update' matched
+        // admin_update_*, 'delete' matched admin_delete_row + delete_user
+        // + delete_post, 'ban' matched ban_user + unban_user.
+        switch (actionFilter) {
+          case 'create':
+            q = q.eq('action', 'admin_create');
+            break;
+          case 'update':
+            q = q.or('action.eq.admin_update_field,action.eq.admin_update_status,action.eq.change_role');
+            break;
+          case 'delete':
+            q = q.or('action.eq.admin_delete_row,action.eq.delete_user,action.eq.delete_post');
+            break;
+          case 'ban':
+            q = q.or('action.eq.ban_user,action.eq.unban_user');
+            break;
+          default:
+            q = q.eq('action', actionFilter);
+        }
+      }
+      if (daysBack != null && daysBack > 0) {
+        final since = DateTime.now()
+            .subtract(Duration(days: daysBack))
+            .toIso8601String();
+        q = q.gte('created_at', since);
+      }
+      final rows = await q.order('created_at', ascending: false).limit(limit);
+      var list =
+          (rows as List).whereType<Map<String, dynamic>>().toList();
+      // Actor-Search nur client-side weil Supabase keine sinnvolle
+      // .or() auf joined columns unterstützt.
+      if (actorSearch != null && actorSearch.trim().isNotEmpty) {
+        final needle = actorSearch.trim().toLowerCase();
+        list = list.where((r) {
+          final p = r['profiles'];
+          if (p is Map) {
+            final n = (p['name'] as String?)?.toLowerCase() ?? '';
+            if (n.contains(needle)) return true;
+          }
+          final aid = (r['actor_id'] as String?)?.toLowerCase() ?? '';
+          return aid.contains(needle);
+        }).toList();
+      }
+      return list;
     } catch (_) {
       return const [];
     }

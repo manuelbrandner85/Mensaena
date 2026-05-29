@@ -739,6 +739,19 @@
       "auditTitle": "Journal d'audit",
       "auditError": "Impossible de charger le journal d'audit.",
       "auditEmpty": "Aucune entrée d'audit pour le moment.",
+      "filter": {
+        "allActions": "Toutes les actions",
+        "create": "Créé",
+        "update": "Modifié",
+        "delete": "Supprimé",
+        "ban": "Ban/Unban",
+        "day1": "Aujourd'hui",
+        "day7": "7 jours",
+        "day30": "30 jours",
+        "allTime": "Tout",
+        "actorSearchHint": "Rechercher par nom d'admin ou ID …",
+        "resultCount": "{n} résultats"
+      },
       "act": {
         "banUser": "Utilisateur banni",
         "unbanUser": "Utilisateur débanni",

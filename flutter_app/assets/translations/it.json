@@ -739,6 +739,19 @@
       "auditTitle": "Registro audit",
       "auditError": "Impossibile caricare il registro audit.",
       "auditEmpty": "Nessuna voce di audit presente.",
+      "filter": {
+        "allActions": "Tutte le azioni",
+        "create": "Creato",
+        "update": "Aggiornato",
+        "delete": "Eliminato",
+        "ban": "Ban/Unban",
+        "day1": "Oggi",
+        "day7": "7 giorni",
+        "day30": "30 giorni",
+        "allTime": "Sempre",
+        "actorSearchHint": "Cerca per nome admin o ID …",
+        "resultCount": "{n} risultati"
+      },
       "act": {
         "banUser": "Utente bannato",
         "unbanUser": "Utente sbloccato",
