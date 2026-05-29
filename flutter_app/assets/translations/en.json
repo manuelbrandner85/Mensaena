@@ -786,7 +786,11 @@
         "changeRole": "Role changed",
         "deletePost": "Post deleted",
         "resolveReport": "Report resolved",
-        "cleanup": "System cleanup"
+        "cleanup": "System cleanup",
+        "create": "Entry created",
+        "updateField": "Field updated",
+        "updateStatus": "Status updated",
+        "deleteRow": "Entry deleted"
       },
       "quickLinks": "External tools",
       "linkSupabase": "Supabase Dashboard",

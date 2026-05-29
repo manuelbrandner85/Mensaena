@@ -785,7 +785,11 @@
         "changeRole": "Rolle geändert",
         "deletePost": "Beitrag gelöscht",
         "resolveReport": "Meldung bearbeitet",
-        "cleanup": "System-Cleanup"
+        "cleanup": "System-Cleanup",
+        "create": "Eintrag angelegt",
+        "updateField": "Feld geändert",
+        "updateStatus": "Status geändert",
+        "deleteRow": "Eintrag gelöscht"
       },
       "quickLinks": "Externe Tools",
       "linkSupabase": "Supabase Dashboard",

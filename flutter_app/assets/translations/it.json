@@ -746,7 +746,11 @@
         "changeRole": "Ruolo modificato",
         "deletePost": "Contenuto eliminato",
         "resolveReport": "Segnalazione risolta",
-        "cleanup": "Pulizia del sistema"
+        "cleanup": "Pulizia del sistema",
+        "create": "Voce creata",
+        "updateField": "Campo aggiornato",
+        "updateStatus": "Stato aggiornato",
+        "deleteRow": "Voce eliminata"
       },
       "quickLinks": "Strumenti esterni",
       "linkSupabase": "Dashboard Supabase",

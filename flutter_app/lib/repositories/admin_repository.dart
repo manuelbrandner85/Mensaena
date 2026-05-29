@@ -299,19 +299,31 @@ class AdminRepository {
   }) async {
     try {
       await sb.from(table).update({'status': status}).eq('id', id);
+      unawaited(_logAdminAction(
+        'admin_update_status',
+        targetId: id,
+        tableName: table,
+        details: {'table': table, 'status': status},
+      ));
       return true;
     } catch (_) {
       return false;
     }
   }
 
-  /// Generisches Hard-Delete einer Row.
+  /// Generisches Hard-Delete einer Row. Schreibt audit_logs.
   static Future<bool> delete({
     required String table,
     required String id,
   }) async {
     try {
       await sb.from(table).delete().eq('id', id);
+      unawaited(_logAdminAction(
+        'admin_delete_row',
+        targetId: id,
+        tableName: table,
+        details: {'table': table},
+      ));
       return true;
     } catch (_) {
       return false;
@@ -336,13 +348,27 @@ class AdminRepository {
 
   /// Generisches INSERT für Admin-Create-Formulare. Liefert die
   /// erstellte Row zurück (mit auto-generierter id/created_at) oder null
-  /// bei Fehler.
+  /// bei Fehler. Schreibt audit_logs (action='admin_create').
   static Future<Map<String, dynamic>?> insertRow({
     required String table,
     required Map<String, dynamic> values,
   }) async {
     try {
       final res = await sb.from(table).insert(values).select().single();
+      final newId = res['id'] as String?;
+      unawaited(_logAdminAction(
+        'admin_create',
+        targetId: newId,
+        tableName: table,
+        details: {
+          'table': table,
+          // Werte loggen aber Längen-Cap auf 200 Chars um audit_logs schlank zu halten.
+          'values': values.map((k, v) {
+            final s = v?.toString() ?? 'null';
+            return MapEntry(k, s.length > 200 ? '${s.substring(0, 200)}…' : s);
+          }),
+        },
+      ));
       return res;
     } catch (_) {
       return null;
@@ -350,6 +376,7 @@ class AdminRepository {
   }
 
   /// Generisches Feld-Update (z.B. is_banned/is_admin auf profiles).
+  /// Schreibt audit_logs (action='admin_update_field').
   static Future<bool> updateField({
     required String table,
     required String id,
@@ -358,6 +385,19 @@ class AdminRepository {
   }) async {
     try {
       await sb.from(table).update({column: value}).eq('id', id);
+      unawaited(_logAdminAction(
+        'admin_update_field',
+        targetId: id,
+        tableName: table,
+        details: {
+          'table': table,
+          'column': column,
+          'value': () {
+            final s = value?.toString() ?? 'null';
+            return s.length > 200 ? '${s.substring(0, 200)}…' : s;
+          }(),
+        },
+      ));
       return true;
     } catch (_) {
       return false;

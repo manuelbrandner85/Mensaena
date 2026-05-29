@@ -746,7 +746,11 @@
         "changeRole": "Rôle modifié",
         "deletePost": "Publication supprimée",
         "resolveReport": "Signalement traité",
-        "cleanup": "Nettoyage du système"
+        "cleanup": "Nettoyage du système",
+        "create": "Entrée créée",
+        "updateField": "Champ modifié",
+        "updateStatus": "Statut modifié",
+        "deleteRow": "Entrée supprimée"
       },
       "quickLinks": "Outils externes",
       "linkSupabase": "Tableau de bord Supabase",

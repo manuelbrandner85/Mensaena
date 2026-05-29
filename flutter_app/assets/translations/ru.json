@@ -745,7 +745,11 @@
         "changeRole": "Роль изменена",
         "deletePost": "Публикация удалена",
         "resolveReport": "Жалоба обработана",
-        "cleanup": "Очистка системы"
+        "cleanup": "Очистка системы",
+        "create": "Запись создана",
+        "updateField": "Поле изменено",
+        "updateStatus": "Статус изменён",
+        "deleteRow": "Запись удалена"
       },
       "quickLinks": "Внешние инструменты",
       "linkSupabase": "Панель Supabase",

@@ -745,7 +745,11 @@
         "changeRole": "Rol değiştirildi",
         "deletePost": "Gönderi silindi",
         "resolveReport": "Şikayet işlendi",
-        "cleanup": "Sistem temizliği"
+        "cleanup": "Sistem temizliği",
+        "create": "Kayıt oluşturuldu",
+        "updateField": "Alan güncellendi",
+        "updateStatus": "Durum güncellendi",
+        "deleteRow": "Kayıt silindi"
       },
       "quickLinks": "Harici araçlar",
       "linkSupabase": "Supabase Paneli",

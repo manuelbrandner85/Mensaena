@@ -510,6 +510,14 @@ class _AuditRow extends StatelessWidget {
         return 'admin.system.act.resolveReport'.tr();
       case 'system_cleanup':
         return 'admin.system.act.cleanup'.tr();
+      case 'admin_create':
+        return 'admin.system.act.create'.tr();
+      case 'admin_update_field':
+        return 'admin.system.act.updateField'.tr();
+      case 'admin_update_status':
+        return 'admin.system.act.updateStatus'.tr();
+      case 'admin_delete_row':
+        return 'admin.system.act.deleteRow'.tr();
       default:
         return action ?? '—';
     }
@@ -522,6 +530,7 @@ class _AuditRow extends StatelessWidget {
         return LucideIcons.ban;
       case 'delete_user':
       case 'delete_post':
+      case 'admin_delete_row':
         return LucideIcons.trash2;
       case 'change_role':
         return LucideIcons.shieldCheck;
@@ -529,6 +538,11 @@ class _AuditRow extends StatelessWidget {
         return LucideIcons.flag;
       case 'system_cleanup':
         return LucideIcons.sparkles;
+      case 'admin_create':
+        return LucideIcons.plus;
+      case 'admin_update_field':
+      case 'admin_update_status':
+        return LucideIcons.pencil;
       default:
         return LucideIcons.activity;
     }
