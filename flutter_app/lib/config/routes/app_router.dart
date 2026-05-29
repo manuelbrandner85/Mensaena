@@ -26,7 +26,6 @@ import '../../screens/dashboard/live/live_room_screen.dart';
 import '../../screens/dashboard/followed_tags_screen.dart';
 import '../../screens/dashboard/friends_screen.dart';
 import '../../screens/dashboard/global_search_screen.dart';
-import '../../screens/dashboard/call/group_call_screen.dart';
 import '../../screens/dashboard/modules_hub_screen.dart';
 import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
@@ -293,16 +292,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, s) => mensaenaTransition<void>(
           key: s.pageKey,
           child: const ModulesHubScreen(),
-        ),
-      ),
-      // F13: Group-Call — bis 4 Teilnehmer, Beitritt via [CALL_INVITE]-Bubble.
-      GoRoute(
-        path: '/dashboard/group-call/:roomName',
-        pageBuilder: (_, s) => mensaenaTransition<void>(
-          key: s.pageKey,
-          child: GroupCallScreen(
-            roomName: s.pathParameters['roomName']!,
-          ),
         ),
       ),
       GoRoute(

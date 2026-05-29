@@ -2552,6 +2552,7 @@
     "stop": "Stopp"
   },
   "group_call": {
+    "removedNotice": "Gruppen-Anruf nicht mehr verfügbar.",
     "title": "Gruppen-Anruf",
     "startBtn": "Gruppen-Anruf",
     "inviteLabel": "GRUPPEN-ANRUF",

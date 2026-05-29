@@ -14,7 +14,6 @@ import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
-import '../../../widgets/chat/call_invite_bubble.dart';
 import '../../../widgets/chat/post_card_chat_bubble.dart';
 import '../../../widgets/shared/image_lightbox.dart';
 import '../../../widgets/shared/voice_message_bubble.dart';
@@ -284,11 +283,14 @@ class ChatMessageBubble extends ConsumerWidget {
                       postId: _postCardId(textWithoutImages)!),
                 )
               else if (_callInviteRoom(textWithoutImages) != null)
-                // F13: Group-Call-Invite-Karte.
+                // Gruppen-Anruf wurde entfernt — alte [CALL_INVITE]-Marker
+                // werden als inerter Hinweis dargestellt (keine Navigation).
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: CallInviteBubble(
-                      roomName: _callInviteRoom(textWithoutImages)!),
+                  child: Text(
+                    'group_call.removedNotice'.tr(),
+                    style: AppTypography.caption(),
+                  ),
                 )
               else if (textWithoutImages.startsWith('[FORWARDED]'))
                 // F7: Weitergeleitete Nachricht — Header + Original-Text.

@@ -2553,6 +2553,7 @@
     "stop": "Stop"
   },
   "group_call": {
+    "removedNotice": "Group call no longer available.",
     "title": "Group call",
     "startBtn": "Group call",
     "inviteLabel": "GROUP CALL",
