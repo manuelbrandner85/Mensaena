@@ -608,6 +608,13 @@
       "empty": "Нет данных для экспорта.",
       "failed": "Экспорт не удался."
     },
+    "bulk": {
+      "selected": "Выбрано: {n}",
+      "deleteAction": "Удалить выбранное",
+      "deleteTitle": "Удалить {n} записей?",
+      "deleteWarn": "Это действие необратимо.",
+      "deleteResult": "Удалено: {ok}, ошибок: {fail}."
+    },
     "rawData": "Сырые данные",
     "deleteReportTitle": "Удалить жалобу?",
     "deleteReportConfirm": "Это действие нельзя отменить.",

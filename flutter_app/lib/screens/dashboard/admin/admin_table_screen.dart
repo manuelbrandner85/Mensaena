@@ -43,6 +43,86 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
   Future<List<Map<String, dynamic>>>? _future;
   String _query = '';
 
+  // Bulk-Select-State
+  bool _selectionMode = false;
+  final Set<String> _selectedIds = {};
+
+  void _toggleSelection(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+      if (_selectedIds.isEmpty) _selectionMode = false;
+    });
+  }
+
+  void _enterSelectionMode(String firstId) {
+    setState(() {
+      _selectionMode = true;
+      _selectedIds.add(firstId);
+    });
+  }
+
+  void _exitSelectionMode() {
+    setState(() {
+      _selectionMode = false;
+      _selectedIds.clear();
+    });
+  }
+
+  Future<void> _bulkDelete() async {
+    if (_selectedIds.isEmpty) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text(
+          'admin.bulk.deleteTitle'.tr(
+              namedArgs: {'n': '${_selectedIds.length}'}),
+          style: AppTypography.body(
+              size: 16, color: AppColors.ink, weight: FontWeight.w700),
+        ),
+        content: Text(
+          'admin.bulk.deleteWarn'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.inkSoft),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.herzrot),
+            child: Text('common.delete'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    var okCount = 0;
+    var failCount = 0;
+    for (final id in _selectedIds.toList()) {
+      final ok = await AdminRepository.delete(
+          table: widget.tableName, id: id);
+      if (ok) {
+        okCount++;
+      } else {
+        failCount++;
+      }
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('admin.bulk.deleteResult'.tr(
+        namedArgs: {'ok': '$okCount', 'fail': '$failCount'},
+      ))),
+    );
+    _exitSelectionMode();
+    await _refresh();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -219,29 +299,67 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
                 ),
               ),
             ),
-            // CSV-Export-Button: exportiert die aktuell gefilterten Rows
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        final rows = (await _future) ?? const [];
-                        await _exportCsv(rows.where(_matches).toList());
-                      },
-                      icon: const Icon(LucideIcons.download, size: 14),
-                      label: Text('admin.export.button'.tr()),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.tealSoft,
-                        side: BorderSide(
-                            color: AppColors.tealSoft.withValues(alpha: 0.5)),
+            // Bulk-Selection-Bar (nur in Selection-Mode)
+            if (_selectionMode)
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+                color: AppColors.herzrot.withValues(alpha: 0.12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(LucideIcons.x,
+                          size: 18, color: AppColors.mute),
+                      onPressed: _exitSelectionMode,
+                      tooltip: 'common.cancel'.tr(),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'admin.bulk.selected'.tr(
+                            namedArgs: {'n': '${_selectedIds.length}'}),
+                        style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.ink,
+                            weight: FontWeight.w600),
                       ),
                     ),
-                  ),
-                ],
+                    TextButton.icon(
+                      onPressed: _bulkDelete,
+                      icon: const Icon(LucideIcons.trash2,
+                          size: 14, color: AppColors.herzrot),
+                      label: Text(
+                        'admin.bulk.deleteAction'.tr(),
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.herzrot),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            // CSV-Export-Button: exportiert die aktuell gefilterten Rows
+            if (!_selectionMode)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final rows = (await _future) ?? const [];
+                          await _exportCsv(rows.where(_matches).toList());
+                        },
+                        icon: const Icon(LucideIcons.download, size: 14),
+                        label: Text('admin.export.button'.tr()),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.tealSoft,
+                          side: BorderSide(
+                              color: AppColors.tealSoft
+                                  .withValues(alpha: 0.5)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.amber,
@@ -284,12 +402,23 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
                           const SizedBox(height: 6),
                       itemBuilder: (context, i) {
                         final row = rows[i];
+                        final id = row['id'] as String?;
+                        final selected = id != null &&
+                            _selectedIds.contains(id);
                         return _AdminRow(
                           title: _titleOf(row),
                           subtitle: _subtitleOf(row),
                           row: row,
                           tableName: widget.tableName,
                           onChanged: _refresh,
+                          selectionMode: _selectionMode,
+                          selected: selected,
+                          onLongPress: id == null
+                              ? null
+                              : () => _enterSelectionMode(id),
+                          onToggleSelect: id == null
+                              ? null
+                              : () => _toggleSelection(id),
                         );
                       },
                     );
@@ -311,6 +440,10 @@ class _AdminRow extends StatelessWidget {
     required this.row,
     required this.tableName,
     required this.onChanged,
+    this.selectionMode = false,
+    this.selected = false,
+    this.onLongPress,
+    this.onToggleSelect,
   });
 
   final String title;
@@ -318,40 +451,71 @@ class _AdminRow extends StatelessWidget {
   final Map<String, dynamic> row;
   final String tableName;
   final VoidCallback onChanged;
+  final bool selectionMode;
+  final bool selected;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onToggleSelect;
+
+  void _openDetail(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (_, scroll) => _AdminDetailSheet(
+          scroll: scroll,
+          title: title,
+          row: row,
+          tableName: tableName,
+          onChanged: onChanged,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: AppColors.surface,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (_) => DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (_, scroll) => _AdminDetailSheet(
-            scroll: scroll,
-            title: title,
-            row: row,
-            tableName: tableName,
-            onChanged: onChanged,
-          ),
-        ),
-      ),
+      onTap: () {
+        if (selectionMode) {
+          onToggleSelect?.call();
+        } else {
+          _openDetail(context);
+        }
+      },
+      onLongPress: selectionMode ? null : onLongPress,
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.5),
-          border: Border.all(color: AppColors.line),
+          color: selected
+              ? AppColors.bronze.withValues(alpha: 0.15)
+              : AppColors.surface.withValues(alpha: 0.5),
+          border: Border.all(
+            color: selected
+                ? AppColors.bronze.withValues(alpha: 0.7)
+                : AppColors.line,
+          ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
           children: [
+            if (selectionMode) ...[
+              Icon(
+                selected
+                    ? LucideIcons.checkCircle2
+                    : LucideIcons.circle,
+                size: 18,
+                color: selected ? AppColors.bronze : AppColors.mute,
+              ),
+              const SizedBox(width: 10),
+            ],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,8 +542,9 @@ class _AdminRow extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight,
-                color: AppColors.mute, size: 16),
+            if (!selectionMode)
+              const Icon(LucideIcons.chevronRight,
+                  color: AppColors.mute, size: 16),
           ],
         ),
       ),

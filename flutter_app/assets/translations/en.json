@@ -649,6 +649,13 @@
       "empty": "No data to export.",
       "failed": "Export failed."
     },
+    "bulk": {
+      "selected": "{n} selected",
+      "deleteAction": "Delete selection",
+      "deleteTitle": "Delete {n} entries?",
+      "deleteWarn": "This cannot be undone.",
+      "deleteResult": "{ok} deleted, {fail} failed."
+    },
     "rawData": "Raw data",
     "deleteReportTitle": "Delete report?",
     "deleteReportConfirm": "This action cannot be undone.",

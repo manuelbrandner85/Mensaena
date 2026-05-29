@@ -608,6 +608,13 @@
       "empty": "Dışa aktarılacak veri yok.",
       "failed": "Dışa aktarma başarısız."
     },
+    "bulk": {
+      "selected": "{n} seçili",
+      "deleteAction": "Seçimi sil",
+      "deleteTitle": "{n} kayıt silinsin mi?",
+      "deleteWarn": "Bu işlem geri alınamaz.",
+      "deleteResult": "{ok} silindi, {fail} başarısız."
+    },
     "rawData": "Ham veri",
     "deleteReportTitle": "Bildirimi sil?",
     "deleteReportConfirm": "Bu işlem geri alınamaz.",

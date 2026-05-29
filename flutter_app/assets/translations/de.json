@@ -648,6 +648,13 @@
       "empty": "Keine Daten zum Exportieren.",
       "failed": "Export fehlgeschlagen."
     },
+    "bulk": {
+      "selected": "{n} ausgewählt",
+      "deleteAction": "Auswahl löschen",
+      "deleteTitle": "{n} Einträge löschen?",
+      "deleteWarn": "Diese Aktion ist nicht rückgängig zu machen.",
+      "deleteResult": "{ok} gelöscht, {fail} fehlgeschlagen."
+    },
     "rawData": "Rohdaten",
     "deleteReportTitle": "Meldung löschen?",
     "deleteReportConfirm": "Diese Aktion ist nicht rückgängig.",

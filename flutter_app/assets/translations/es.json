@@ -609,6 +609,13 @@
       "empty": "Sin datos para exportar.",
       "failed": "Exportación fallida."
     },
+    "bulk": {
+      "selected": "{n} seleccionados",
+      "deleteAction": "Eliminar selección",
+      "deleteTitle": "¿Eliminar {n} entradas?",
+      "deleteWarn": "Esta acción no se puede deshacer.",
+      "deleteResult": "{ok} eliminadas, {fail} fallidas."
+    },
     "rawData": "Datos sin procesar",
     "deleteReportTitle": "¿Eliminar el reporte?",
     "deleteReportConfirm": "Esta acción no se puede deshacer.",

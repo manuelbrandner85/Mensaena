@@ -609,6 +609,13 @@
       "empty": "Nessun dato da esportare.",
       "failed": "Export fallito."
     },
+    "bulk": {
+      "selected": "{n} selezionati",
+      "deleteAction": "Elimina selezione",
+      "deleteTitle": "Eliminare {n} voci?",
+      "deleteWarn": "Questa azione è irreversibile.",
+      "deleteResult": "{ok} eliminate, {fail} non riuscite."
+    },
     "rawData": "Dati grezzi",
     "deleteReportTitle": "Eliminare la segnalazione?",
     "deleteReportConfirm": "Questa azione non può essere annullata.",

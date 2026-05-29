@@ -609,6 +609,13 @@
       "empty": "Aucune donnée à exporter.",
       "failed": "Échec de l'export."
     },
+    "bulk": {
+      "selected": "{n} sélectionnés",
+      "deleteAction": "Supprimer la sélection",
+      "deleteTitle": "Supprimer {n} entrées ?",
+      "deleteWarn": "Cette action est irréversible.",
+      "deleteResult": "{ok} supprimées, {fail} échouées."
+    },
     "rawData": "Données brutes",
     "deleteReportTitle": "Supprimer le signalement ?",
     "deleteReportConfirm": "Cette action est irréversible.",
