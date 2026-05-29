@@ -351,22 +351,35 @@ class _BottomNav extends ConsumerWidget {
     final pendingActions =
         ref.watch(pendingActionsCountProvider).value ?? 0;
     final unreadDm = ref.watch(unreadDmCountProvider).value ?? 0;
-    return RepaintBoundary(
-      child: ClipRect(
-        child: BackdropFilter(
-          // V20: sigma 2 statt 3 — visuell kaum Unterschied, spart GPU.
-          filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-          child: Container(
-            decoration: BoxDecoration(
-              // V20: Erhoehe Surface-Opazitaet von 0.60 auf 0.72 um
-              // den reduzierten Blur zu kompensieren. Sieht identisch aus.
-              color: AppColors.surface.withValues(alpha: 0.72),
-              border: const Border(top: BorderSide(color: AppColors.line)),
-            ),
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
+    // Design (Cinema-Hyperreal): schwebende Glass-Pill mit 14px-Rand,
+    // rounded 26, Glass-Gradient, line-strong-Border + tiefem Schatten.
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        child: RepaintBoundary(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(26),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
                 height: 64,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xC70E141E), Color(0xEB080C14)],
+                  ),
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(color: const Color(0x47ECE5D6)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x80000000),
+                      blurRadius: 30,
+                      offset: Offset(0, 10),
+                    ),
+                  ],
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
