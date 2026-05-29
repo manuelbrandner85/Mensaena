@@ -23,6 +23,7 @@ import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/room_events_service.dart';
+import '../../../services/sound_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
@@ -183,19 +184,26 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   Future<void> _startRingback() async {
     // Versuche zuerst die Asset-MP3. Wenn nicht vorhanden — Vibrations-Pulse
     // als Fallback (haptic alle 2s).
+    // Punkt 7: Lautstärke + Vibration aus User-Einstellungen.
+    final vol = await SoundService.ringVolume();
+    final vibrate = await SoundService.callVibration();
     try {
-      final player = AudioPlayer();
-      await player.setReleaseMode(ReleaseMode.loop);
-      await player.setVolume(0.6);
-      await player.play(AssetSource('sounds/ringback.mp3'));
-      _ringback = player;
+      if (vol > 0) {
+        final player = AudioPlayer();
+        await player.setReleaseMode(ReleaseMode.loop);
+        await player.setVolume(vol);
+        await player.play(AssetSource('sounds/ringback.mp3'));
+        _ringback = player;
+      }
     } catch (_) {
       _ringback = null;
     }
     // Haptic-Pulse parallel: dezenter Tap alle 2 Sekunden bis Verbindung.
-    _ringbackHaptic = Timer.periodic(const Duration(seconds: 2), (_) {
-      HapticFeedback.lightImpact();
-    });
+    if (vibrate) {
+      _ringbackHaptic = Timer.periodic(const Duration(seconds: 2), (_) {
+        HapticFeedback.lightImpact();
+      });
+    }
   }
 
   Future<void> _stopRingback() async {

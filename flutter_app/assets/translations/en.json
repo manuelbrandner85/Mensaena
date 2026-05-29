@@ -291,9 +291,14 @@
       "cinemaMode": "CINEMA MODE",
       "effectStrength": "EFFECT STRENGTH",
       "sound": "SOUND",
+      "callSound": "CALL SOUND & VOLUME",
       "uiSounds": "UI sounds",
       "automatic": "AUTOMATIC",
       "chooseManually": "CHOOSE MANUALLY"
+    },
+    "callSound": {
+      "ringVolume": "Ringtone volume",
+      "vibration": "Vibrate on calls"
     },
     "tabs": {
       "account": "Account",

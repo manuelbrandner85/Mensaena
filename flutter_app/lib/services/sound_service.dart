@@ -11,6 +11,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'haptics.dart';
 
 const _soundEnabledKey = 'sound_enabled_v1';
+const _ringVolumeKey = 'ring_volume_v1';
+const _callVibrationKey = 'call_vibration_v1';
 const _storage = FlutterSecureStorage();
 
 class SoundService {
@@ -66,8 +68,64 @@ class SoundService {
     Haptics.confirm();
     await click();
   }
+
+  // ── Punkt 7: Anruf-Ton-Lautstärke (Klingelton/Ringback) ──────────
+  static double _ringVolume = 0.6;
+  static bool _ringLoaded = false;
+
+  static Future<double> ringVolume() async {
+    if (!_ringLoaded) {
+      try {
+        final raw = await _storage.read(key: _ringVolumeKey);
+        final v = double.tryParse(raw ?? '');
+        if (v != null) _ringVolume = v.clamp(0.0, 1.0);
+      } catch (_) {}
+      _ringLoaded = true;
+    }
+    return _ringVolume;
+  }
+
+  static Future<void> setRingVolume(double v) async {
+    _ringVolume = v.clamp(0.0, 1.0);
+    _ringLoaded = true;
+    try {
+      await _storage.write(key: _ringVolumeKey, value: '$_ringVolume');
+    } catch (_) {}
+  }
+
+  // ── Punkt 7: Vibration bei Anrufen ───────────────────────────────
+  static bool _callVibration = true;
+  static bool _vibLoaded = false;
+
+  static Future<bool> callVibration() async {
+    if (!_vibLoaded) {
+      try {
+        final raw = await _storage.read(key: _callVibrationKey);
+        _callVibration = raw != 'false';
+      } catch (_) {}
+      _vibLoaded = true;
+    }
+    return _callVibration;
+  }
+
+  static Future<void> setCallVibration(bool v) async {
+    _callVibration = v;
+    _vibLoaded = true;
+    try {
+      await _storage.write(
+          key: _callVibrationKey, value: v ? 'true' : 'false');
+    } catch (_) {}
+  }
 }
 
 final soundEnabledProvider = FutureProvider<bool>((ref) async {
   return SoundService.isEnabled();
+});
+
+final ringVolumeProvider = FutureProvider<double>((ref) async {
+  return SoundService.ringVolume();
+});
+
+final callVibrationProvider = FutureProvider<bool>((ref) async {
+  return SoundService.callVibration();
 });

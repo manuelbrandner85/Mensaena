@@ -1098,6 +1098,12 @@ class _AppearanceTab extends ConsumerWidget {
         const SizedBox(height: 4),
         const _SoundToggle(),
         const SizedBox(height: 12),
+        // Punkt 7: Anruf-Ton & Lautstärke.
+        Text('settings.sections.callSound'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        const _CallSoundSection(),
+        const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () => context.go('/onboarding'),
           icon: const Icon(LucideIcons.play, size: 14),
@@ -1366,6 +1372,92 @@ class _SoundToggleState extends ConsumerState<_SoundToggle> {
         'Dezenter System-Klick bei Taps und Toggles.',
         style: AppTypography.body(size: 12, color: AppColors.mute),
       ),
+    );
+  }
+}
+
+/// Punkt 7: Klingelton-Lautstärke (Slider) + Anruf-Vibration (Toggle).
+class _CallSoundSection extends StatefulWidget {
+  const _CallSoundSection();
+
+  @override
+  State<_CallSoundSection> createState() => _CallSoundSectionState();
+}
+
+class _CallSoundSectionState extends State<_CallSoundSection> {
+  double _ringVolume = 0.6;
+  bool _vibration = true;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.wait([
+      SoundService.ringVolume(),
+      SoundService.callVibration(),
+    ]).then((vals) {
+      if (!mounted) return;
+      setState(() {
+        _ringVolume = vals[0] as double;
+        _vibration = vals[1] as bool;
+        _loaded = true;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) {
+      return const SizedBox(
+        height: 40,
+        child: Center(
+          child: SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+                strokeWidth: 2, color: AppColors.bronze),
+          ),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              _ringVolume == 0
+                  ? LucideIcons.volumeX
+                  : LucideIcons.volume2,
+              size: 16,
+              color: AppColors.bronze,
+            ),
+            const SizedBox(width: 8),
+            Text('settings.callSound.ringVolume'.tr(),
+                style: AppTypography.body(size: 13, color: AppColors.ink)),
+            const Spacer(),
+            Text('${(_ringVolume * 100).round()}%',
+                style: AppTypography.mono(size: 11, color: AppColors.mute)),
+          ],
+        ),
+        Slider.adaptive(
+          value: _ringVolume,
+          activeColor: AppColors.bronze,
+          onChanged: (v) => setState(() => _ringVolume = v),
+          onChangeEnd: (v) => SoundService.setRingVolume(v),
+        ),
+        SwitchListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          value: _vibration,
+          activeColor: AppColors.bronze,
+          onChanged: (next) async {
+            await SoundService.setCallVibration(next);
+            if (mounted) setState(() => _vibration = next);
+          },
+          title: Text('settings.callSound.vibration'.tr(),
+              style: AppTypography.body(size: 14, color: AppColors.ink)),
+        ),
+      ],
     );
   }
 }

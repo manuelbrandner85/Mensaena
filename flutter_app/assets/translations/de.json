@@ -291,9 +291,14 @@
       "cinemaMode": "CINEMA-MODUS",
       "effectStrength": "EFFEKT-STÄRKE",
       "sound": "SOUND",
+      "callSound": "ANRUF-TON & LAUTSTÄRKE",
       "uiSounds": "UI-Sounds",
       "automatic": "AUTOMATIK",
       "chooseManually": "MANUELL WÄHLEN"
+    },
+    "callSound": {
+      "ringVolume": "Klingelton-Lautstärke",
+      "vibration": "Vibration bei Anrufen"
     },
     "tabs": {
       "account": "Account",
