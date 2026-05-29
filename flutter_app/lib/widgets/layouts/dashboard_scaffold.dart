@@ -248,7 +248,23 @@ class DashboardScaffold extends ConsumerWidget {
                   Column(
                     children: [
                       const ZeitbankConfirmationBanner(),
-                      Expanded(child: refreshed),
+                      // Sanfter Cross-Fade beim Tab-/Screen-Wechsel
+                      // (Cinema-Feel statt hartem Sprung).
+                      Expanded(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 240),
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
+                          transitionBuilder: (child, anim) => FadeTransition(
+                            opacity: anim,
+                            child: child,
+                          ),
+                          child: KeyedSubtree(
+                            key: ValueKey(activeRoute),
+                            child: refreshed,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const Positioned(

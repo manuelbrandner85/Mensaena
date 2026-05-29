@@ -18,6 +18,7 @@ import '../../repositories/user_blocks_repository.dart';
 import '../../repositories/content_reports_repository.dart';
 import 'glass_card.dart';
 import 'image_carousel.dart';
+import 'pressable.dart';
 
 /// SKILL: mensaena-design + mensaena-features
 /// PostCard fuer Listen-Ansichten. Zeigt Typ-Badge, Titel,
@@ -265,7 +266,7 @@ class _PostCardState extends ConsumerState<PostCard> {
           size: 22,
         ),
       ),
-      child: InkWell(
+      child: Pressable(
       onTap: () => context.push('/dashboard/posts/${post.id}'),
       borderRadius: BorderRadius.circular(14),
       child: Container(
