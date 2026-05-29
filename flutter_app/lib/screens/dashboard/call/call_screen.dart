@@ -21,6 +21,7 @@ import '../../../services/call_busy_state.dart';
 import '../../../services/call_room_holder.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
+import '../../../services/live_audio_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/sound_service.dart';
@@ -220,6 +221,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   Future<void> _onPeerUnreachable({String status = 'missed'}) async {
     _hungUp = true;
+    LiveAudioService.stop(); // Punkt 11
     _ringingTimeout?.cancel();
     _ringingTicker?.cancel();
     await _stopRingback();
@@ -352,6 +354,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _room = room;
     // Punkt 4: User ist jetzt im Call → eingehende Anrufe als besetzt ablehnen.
     CallBusyState.inCall = true;
+    LiveAudioService.start(); // Punkt 11: Hintergrund-/Screen-off-Audio.
     _attachRoomListeners(room);
 
     try {
@@ -405,6 +408,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     }
     _room = room;
     CallBusyState.inCall = true;
+    LiveAudioService.start(); // Punkt 11: Hintergrund-/Screen-off-Audio.
     _attachRoomListeners(room);
     _attachEventsBus(room);
     if (!mounted) return;
@@ -436,6 +440,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         // Server-seitiges Ende → Holder aufräumen + Busy-Status freigeben.
         _hungUp = true;
         CallBusyState.inCall = false;
+        LiveAudioService.stop();
         CallRoomHolder.room = null;
         CallRoomHolder.callId = null;
       })
@@ -586,6 +591,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   Future<void> _hangUp() async {
     // Punkt 6: echtes Auflegen → Holder leeren (trennt + disposed Room).
     _hungUp = true;
+    LiveAudioService.stop(); // Punkt 11
     _room = null; // dispose() soll den Room nicht doppelt anfassen
     await CallRoomHolder.clear();
     await DmCallService.end(widget.callId);

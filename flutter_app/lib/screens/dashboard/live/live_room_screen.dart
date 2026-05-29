@@ -30,6 +30,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/friendships_repository.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
+import '../../../services/live_audio_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
@@ -139,6 +140,8 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     _room = room;
     // Punkt 4: User ist im Livestream → eingehende Anrufe als besetzt ablehnen.
     CallBusyState.inStream = true;
+    // Punkt 11: Foreground-Service → Audio läuft im Hintergrund/Screen-off.
+    LiveAudioService.start();
     _listener = room.createListener()
       ..on<lk.RoomDisconnectedEvent>((_) async {
         if (!mounted) return;
@@ -277,6 +280,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   @override
   void dispose() {
     CallBusyState.inStream = false;
+    LiveAudioService.stop();
     if (widget.isHost) {
       LiveStreamService.endChannelStream(widget.roomName);
     }

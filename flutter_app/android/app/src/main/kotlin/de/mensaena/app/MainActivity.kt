@@ -16,6 +16,7 @@ import io.flutter.plugin.common.MethodChannel
 /// damit das UI sich anpasst (z.B. Controls verstecken im PiP-Modus).
 class MainActivity : FlutterFragmentActivity() {
     private val pipChannel = "de.mensaena.app/pip"
+    private val audioChannel = "de.mensaena.app/audio"
     private var methodChannel: MethodChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -30,6 +31,44 @@ class MainActivity : FlutterFragmentActivity() {
                 "isPipSupported" -> result.success(isPipSupported())
                 else -> result.notImplemented()
             }
+        }
+        // Punkt 11: Foreground-Audio-Service für Hintergrund-/Screen-off-Audio.
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger, audioChannel
+        ).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "start" -> {
+                    startAudioService()
+                    result.success(true)
+                }
+                "stop" -> {
+                    stopAudioService()
+                    result.success(true)
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun startAudioService() {
+        try {
+            val intent = android.content.Intent(this, LiveAudioService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            } else {
+                startService(intent)
+            }
+        } catch (e: Exception) {
+            // Service-Start darf das App-UI nie crashen.
+        }
+    }
+
+    private fun stopAudioService() {
+        try {
+            stopService(
+                android.content.Intent(this, LiveAudioService::class.java)
+            )
+        } catch (e: Exception) {
         }
     }
 

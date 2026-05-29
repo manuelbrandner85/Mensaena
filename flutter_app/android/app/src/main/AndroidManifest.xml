@@ -81,6 +81,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Punkt 11: Foreground-Service für Live-/Call-Audio im Hintergrund. -->
+        <service
+            android:name=".LiveAudioService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
     </application>
 
     <queries>
