@@ -95,6 +95,44 @@ class DmCallService {
     }
   }
 
+  /// Punkt 13: Lädt eine weitere Person in einen LAUFENDEN Call ein.
+  /// Erzeugt eine neue dm_calls-Row mit DEM SELBEN room_name → die Person
+  /// klingelt (WhatsApp-Stil, via IncomingCallListener) und landet bei
+  /// Annahme im selben LiveKit-Raum (Multi-Party). Liefert die neue callId.
+  static Future<String?> invite({
+    required String roomName,
+    required String conversationId,
+    required String calleeId,
+    String callType = 'video',
+  }) async {
+    final caller = SupabaseService.currentUser?.id;
+    if (caller == null || caller == calleeId) return null;
+    await SupabaseService.ensureFreshSession();
+    try {
+      final row = await sb
+          .from('dm_calls')
+          .insert({
+            'caller_id': caller,
+            'callee_id': calleeId,
+            'conversation_id': conversationId,
+            'call_type': callType,
+            'status': 'ringing',
+            'room_name': roomName,
+          })
+          .select('id')
+          .maybeSingle();
+      return row?['id'] as String?;
+    } catch (e, st) {
+      // ignore: discarded_futures
+      ErrorLogsRepository.log(
+        errorType: 'dm_call_invite_failed',
+        message: e.toString(),
+        stack: st.toString(),
+      );
+      return null;
+    }
+  }
+
   /// Legacy: nur callId.
   static Future<String?> startCallId({
     required String conversationId,
