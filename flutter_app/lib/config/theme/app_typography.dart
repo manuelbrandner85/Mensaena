@@ -92,16 +92,14 @@ class AppTypography {
         letterSpacing: letterSpacing * size,
       );
 
-  /// AppBar-Titel (wide-tracked Inter mit subtilem Amber-Glow).
+  /// AppBar-Titel — Design (Cinema-Hyperreal): editorialer Instrument-Serif
+  /// statt weit-getrackerter Inter (.appbar .title font-family Instrument Serif).
   static TextStyle appBarTitle({Color color = AppColors.ink}) =>
-      GoogleFonts.inter(
-        fontSize: 17,
+      GoogleFonts.instrumentSerif(
+        fontSize: 23,
         color: color,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 5.0,
-        shadows: const [
-          Shadow(color: AppColors.amberGlow, blurRadius: 20),
-        ],
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.2,
       );
 
   /// Helper fuer Subtitles/Captions.
