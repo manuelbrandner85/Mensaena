@@ -84,20 +84,41 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   }
 
   Future<void> _vote(int v) async {
-    await PostVotesRepository.vote(postId: widget.postId, value: v);
+    // Optimistic UI: sofort lokal anwenden, bei Fehler zurückrollen.
+    final prevVote = _myVote;
+    final prevScore = _score;
     final newVote = _myVote == v ? null : v;
+    // Score-Delta lokal schätzen (alte Stimme raus, neue rein).
+    final delta = (newVote ?? 0) - (prevVote ?? 0);
+    Haptics.select();
     setState(() {
       _myVote = newVote;
+      _score = prevScore + delta;
     });
-    // Re-fetch total score for accuracy.
-    final score = await PostVotesRepository.totalScore(widget.postId);
-    if (mounted) setState(() => _score = score);
+    try {
+      await PostVotesRepository.vote(postId: widget.postId, value: v);
+      // Server-Score nachziehen für exakte Genauigkeit.
+      final score = await PostVotesRepository.totalScore(widget.postId);
+      if (mounted) setState(() => _score = score);
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _myVote = prevVote;
+          _score = prevScore;
+        });
+      }
+    }
   }
 
   Future<void> _toggleSave() async {
     Haptics.tap();
-    await SavedPostsRepository.toggle(widget.postId);
-    setState(() => _saved = !_saved);
+    final prev = _saved;
+    setState(() => _saved = !prev); // optimistic
+    try {
+      await SavedPostsRepository.toggle(widget.postId);
+    } catch (_) {
+      if (mounted) setState(() => _saved = prev); // rollback
+    }
   }
 
   Future<void> _share() async {

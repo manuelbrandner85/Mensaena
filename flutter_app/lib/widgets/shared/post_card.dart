@@ -54,9 +54,14 @@ class _PostCardState extends ConsumerState<PostCard> {
   }
 
   Future<void> _toggleSave() async {
+    // Optimistic: Icon sofort umschalten, Server im Hintergrund.
+    final prev = _saved;
+    Haptics.tap();
+    setState(() => _saved = !prev);
     final next = await PostsRepository.toggleSave(widget.post.id);
     if (!mounted) return;
-    setState(() => _saved = next);
+    // Server-Wahrheit übernehmen (falls abweichend).
+    if (next != !prev) setState(() => _saved = next);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       duration: const Duration(seconds: 2),
