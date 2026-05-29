@@ -25,8 +25,10 @@ import '../../../services/livekit_token_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/sound_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../repositories/friendships_repository.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
+import '../../../widgets/shared/sized_avatar_image.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-DM-Anruf (Audio + optional Video) via LiveKit.
@@ -896,11 +898,124 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                           }
                         : null,
                   ),
+                  // Punkt 13: Teilnehmer hinzufügen (Multi-Party).
+                  _CircleAction(
+                    icon: LucideIcons.userPlus,
+                    label: 'call.addParticipant'.tr(),
+                    color: AppColors.leben,
+                    onTap: _state == _CallState.connected
+                        ? _addParticipant
+                        : null,
+                  ),
                 ],
               ),
             ),
           ],
         );
+  }
+
+  /// Punkt 13: Öffnet ein Sheet mit Freunden und lädt die gewählte Person
+  /// in den laufenden Call ein (klingelt bei ihr, gleicher LiveKit-Raum).
+  Future<void> _addParticipant() async {
+    // conversation_id + call_type aus der aktuellen Call-Row holen.
+    String? convId;
+    String callType = 'video';
+    try {
+      final row = await sb
+          .from('dm_calls')
+          .select('conversation_id, call_type')
+          .eq('id', widget.callId)
+          .maybeSingle();
+      convId = row?['conversation_id'] as String?;
+      callType = (row?['call_type'] as String?) ?? 'video';
+    } catch (_) {}
+    if (convId == null || !mounted) return;
+    final friends = await FriendshipsRepository.friends();
+    if (!mounted) return;
+    if (friends.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('call.addNoFriends'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+      return;
+    }
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scroll) => ListView(
+          controller: scroll,
+          padding: const EdgeInsets.all(20),
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text('call.addParticipant'.tr(),
+                style: AppTypography.display(size: 18, color: AppColors.ink)),
+            const SizedBox(height: 14),
+            for (final f in friends)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: SizedAvatarImage(
+                  url: f['avatar_url'] as String?,
+                  size: 40,
+                  fallbackInitial:
+                      (f['display_name'] as String?) ?? (f['name'] as String?),
+                ),
+                title: Text(
+                  (f['display_name'] as String?) ??
+                      (f['name'] as String?) ??
+                      'common.neighbour'.tr(),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                ),
+                trailing: const Icon(LucideIcons.phoneCall,
+                    size: 18, color: AppColors.leben),
+                onTap: () async {
+                  Navigator.of(sheetCtx).pop();
+                  final id = await DmCallService.invite(
+                    roomName: widget.roomName,
+                    conversationId: convId!,
+                    calleeId: f['id'] as String,
+                    callType: callType,
+                  );
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: AppColors.surface,
+                    content: Text(
+                      id != null
+                          ? 'call.addRinging'.tr(namedArgs: {
+                              'name': (f['display_name'] as String?) ??
+                                  (f['name'] as String?) ??
+                                  'common.neighbour'.tr(),
+                            })
+                          : 'call.addFailed'.tr(),
+                      style:
+                          AppTypography.body(size: 13, color: AppColors.ink),
+                    ),
+                  ));
+                },
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   String _subtitle() {

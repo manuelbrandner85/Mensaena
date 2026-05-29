@@ -27,6 +27,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../repositories/friendships_repository.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/livekit_token_service.dart';
@@ -35,6 +36,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/livestream/livestream_chat_resolver.dart';
+import '../../../widgets/shared/sized_avatar_image.dart';
 import '../../../widgets/shared/watcher_panel.dart';
 
 class LiveRoomScreen extends ConsumerStatefulWidget {
@@ -355,7 +357,93 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     );
   }
 
-  // _markHighlight + _sendSubtitle entfernt (User-Wunsch).
+  /// Punkt 13: Freunde-Sheet → Einladung in diesen Livestream (Notification).
+  Future<void> _inviteToStream() async {
+    final friends = await FriendshipsRepository.friends();
+    if (!mounted) return;
+    if (friends.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('call.addNoFriends'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scroll) => ListView(
+          controller: scroll,
+          padding: const EdgeInsets.all(20),
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text('call.addParticipant'.tr(),
+                style: AppTypography.display(size: 18, color: AppColors.ink)),
+            const SizedBox(height: 14),
+            for (final f in friends)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: SizedAvatarImage(
+                  url: f['avatar_url'] as String?,
+                  size: 40,
+                  fallbackInitial:
+                      (f['display_name'] as String?) ?? (f['name'] as String?),
+                ),
+                title: Text(
+                  (f['display_name'] as String?) ??
+                      (f['name'] as String?) ??
+                      'common.neighbour'.tr(),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                ),
+                trailing: const Icon(LucideIcons.send,
+                    size: 18, color: AppColors.bronze),
+                onTap: () async {
+                  Navigator.of(sheetCtx).pop();
+                  final ok = await LiveStreamService.inviteToStream(
+                    roomName: widget.roomName,
+                    inviteeId: f['id'] as String,
+                    streamTitle: widget.channelTitle,
+                  );
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: AppColors.surface,
+                    content: Text(
+                      ok
+                          ? 'live.inviteSent'.tr(namedArgs: {
+                              'name': (f['display_name'] as String?) ??
+                                  (f['name'] as String?) ??
+                                  'common.neighbour'.tr(),
+                            })
+                          : 'call.addFailed'.tr(),
+                      style:
+                          AppTypography.body(size: 13, color: AppColors.ink),
+                    ),
+                  ));
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   List<WatcherEntry> _buildWatcherList() {
     final out = <WatcherEntry>[];
@@ -411,6 +499,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   onToggleWatchers: () =>
                       setState(() => _watchersOpen = !_watchersOpen),
                   onOpenChat: _openChatSheet,
+                  onInvite: _inviteToStream,
                 ),
                 Expanded(
                   child: _state == _RoomState.connecting
@@ -486,6 +575,7 @@ class _ElegantHeader extends StatelessWidget {
     required this.onClose,
     required this.onToggleWatchers,
     required this.onOpenChat,
+    required this.onInvite,
   });
 
   final String channelTitle;
@@ -494,6 +584,7 @@ class _ElegantHeader extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onToggleWatchers;
   final VoidCallback onOpenChat;
+  final VoidCallback onInvite;
 
   @override
   Widget build(BuildContext context) {
@@ -588,6 +679,13 @@ class _ElegantHeader extends StatelessWidget {
             icon: const Icon(LucideIcons.messageSquare,
                 color: AppColors.bronze),
             tooltip: 'live.openChat'.tr(),
+          ),
+          // Punkt 13: Teilnehmer in den Livestream einladen.
+          IconButton(
+            iconSize: 18,
+            onPressed: onInvite,
+            icon: const Icon(LucideIcons.userPlus, color: AppColors.bronze),
+            tooltip: 'call.addParticipant'.tr(),
           ),
           // Mini-Modus für Livestream: schließt Screen, MiniPlayer bleibt.
           IconButton(

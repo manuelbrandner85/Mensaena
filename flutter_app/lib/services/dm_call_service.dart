@@ -301,4 +301,52 @@ class LiveStreamService {
               : Map<String, dynamic>.from(active.first);
         });
   }
+
+  /// Punkt 13: Lädt eine Person in einen laufenden Livestream ein. Sie
+  /// bekommt eine Benachrichtigung (Tippen → landet direkt im Stream-Raum).
+  /// Liefert true bei Erfolg.
+  static Future<bool> inviteToStream({
+    required String roomName,
+    required String inviteeId,
+    String? streamTitle,
+  }) async {
+    final host = SupabaseService.currentUser?.id;
+    if (host == null || host == inviteeId) return false;
+    await SupabaseService.ensureFreshSession();
+    String hostName = 'Jemand';
+    try {
+      final p = await sb
+          .from('profiles')
+          .select('display_name, name')
+          .eq('id', host)
+          .maybeSingle();
+      hostName = (p?['display_name'] as String?) ??
+          (p?['name'] as String?) ??
+          hostName;
+    } catch (_) {}
+    try {
+      await sb.from('notifications').insert({
+        'user_id': inviteeId,
+        'actor_id': host,
+        'type': 'livestream_invite',
+        'category': 'system',
+        'title': 'Livestream-Einladung',
+        'body': '$hostName lädt dich in einen Livestream ein.',
+        'link': '/dashboard/live/${Uri.encodeComponent(roomName)}?host=0',
+        'metadata': {
+          'room_name': roomName,
+          if (streamTitle != null) 'title': streamTitle,
+        },
+      });
+      return true;
+    } catch (e, st) {
+      // ignore: discarded_futures
+      ErrorLogsRepository.log(
+        errorType: 'livestream_invite_failed',
+        message: e.toString(),
+        stack: st.toString(),
+      );
+      return false;
+    }
+  }
 }

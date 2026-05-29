@@ -114,7 +114,11 @@ class NotificationRouter {
     }
 
     // Livestream — korrekte Route ist /dashboard/live/:roomName.
-    if (t == 'livestream_started' || t == 'livestream_scheduled') {
+    // DB-Typen: live_room_started + livestream_invite (Punkt 13).
+    if (t == 'livestream_started' ||
+        t == 'livestream_scheduled' ||
+        t == 'live_room_started' ||
+        t == 'livestream_invite') {
       final roomName = meta['room_name']?.toString();
       if (roomName != null && roomName.isNotEmpty) {
         return '/dashboard/live/${Uri.encodeComponent(roomName)}?host=0';
