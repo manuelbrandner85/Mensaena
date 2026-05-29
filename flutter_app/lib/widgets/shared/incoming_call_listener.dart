@@ -20,8 +20,10 @@ import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../services/call_busy_state.dart';
 import '../../services/call_event_bus.dart';
 import '../../services/callkit_service.dart';
+import '../../services/dm_call_service.dart';
 import '../../services/supabase_service.dart';
 
 class IncomingCallListener extends ConsumerStatefulWidget {
@@ -239,6 +241,14 @@ class _IncomingCallListenerState
     String? conversationId,
     String callType = 'audio',
   }) async {
+    // Punkt 4: Wenn der User bereits in einem Call/Stream ist, den
+    // eingehenden Anruf als "besetzt" ablehnen statt ihn aus dem laufenden
+    // Call/Stream zu werfen. Kein CallKit-Fullscreen, keine Navigation.
+    if (CallBusyState.busy) {
+      unawaited(DmCallService.declineBusy(callId));
+      return;
+    }
+
     String resolvedName = callerName ?? 'Nachbar:in';
     String? avatarUrl = callerAvatar;
     if (callerId != null && (callerName == null || avatarUrl == null)) {

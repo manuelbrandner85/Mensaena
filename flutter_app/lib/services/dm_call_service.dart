@@ -104,6 +104,18 @@ class DmCallService {
     return r.success ? r.callId : null;
   }
 
+  /// Lehnt einen eingehenden Anruf ab weil der Callee bereits in einem
+  /// anderen Call/Stream ist ("besetzt"). Der Anrufer sieht 'declined'.
+  static Future<void> declineBusy(String callId) async {
+    try {
+      await sb.from('dm_calls').update({
+        'status': 'declined',
+        'ended_reason': 'declined',
+        'ended_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', callId);
+    } catch (_) {}
+  }
+
   /// Bricht eigenen Anruf ab.
   static Future<void> cancel(String callId) async {
     try {

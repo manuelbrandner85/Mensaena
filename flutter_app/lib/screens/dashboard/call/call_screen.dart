@@ -17,6 +17,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../providers/active_call_provider.dart';
+import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
@@ -326,6 +327,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
     final room = lk.Room();
     _room = room;
+    // Punkt 4: User ist jetzt im Call → eingehende Anrufe als besetzt ablehnen.
+    CallBusyState.inCall = true;
     _listener = room.createListener()
       ..on<lk.RoomDisconnectedEvent>((_) async {
         if (!mounted) return;
@@ -528,6 +531,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   @override
   void dispose() {
+    CallBusyState.inCall = false;
     _ringingTimeout?.cancel();
     _ringingTicker?.cancel();
     _ringbackHaptic?.cancel();

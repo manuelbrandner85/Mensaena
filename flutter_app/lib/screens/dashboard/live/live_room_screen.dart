@@ -27,6 +27,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/room_events_service.dart';
@@ -137,6 +138,8 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
     final room = lk.Room();
     _room = room;
+    // Punkt 4: User ist im Livestream → eingehende Anrufe als besetzt ablehnen.
+    CallBusyState.inStream = true;
     _listener = room.createListener()
       ..on<lk.RoomDisconnectedEvent>((_) async {
         if (!mounted) return;
@@ -265,6 +268,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   @override
   void dispose() {
+    CallBusyState.inStream = false;
     if (widget.isHost) {
       LiveStreamService.endChannelStream(widget.roomName);
     }
