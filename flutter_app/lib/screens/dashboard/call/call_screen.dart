@@ -18,6 +18,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../providers/active_call_provider.dart';
 import '../../../services/call_busy_state.dart';
+import '../../../services/call_room_holder.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/end_tone_service.dart';
 import '../../../services/livekit_token_service.dart';
@@ -85,6 +86,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   bool _poorWarningShown = false;
   // F12: Screen-Share
   bool _screenShareEnabled = false;
+  // Punkt 6: true nur bei echtem Auflegen — steuert ob dispose() den
+  // Room trennt oder im CallRoomHolder weiterlaufen lässt.
+  bool _hungUp = false;
 
   @override
   void initState() {
@@ -96,6 +100,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   /// Entscheidet ob wir Caller (Outgoing-Ringing-UI + Ringback) oder
   /// Callee (sofort LiveKit-Connect — Annahme erfolgt schon vor Nav) sind.
   Future<void> _bootstrap() async {
+    // Punkt 6: Reattach an einen noch laufenden Call (Mini-Player getappt).
+    if (CallRoomHolder.hasRoomFor(widget.callId)) {
+      await _reattach();
+      return;
+    }
     try {
       final me = SupabaseService.currentUser?.id;
       final call = await sb
@@ -200,10 +209,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   }
 
   Future<void> _onPeerUnreachable({String status = 'missed'}) async {
+    _hungUp = true;
     _ringingTimeout?.cancel();
     _ringingTicker?.cancel();
     await _stopRingback();
     await EndToneService.play();
+    // Punkt 6: Call endgültig → Holder leeren.
+    _room = null;
+    await CallRoomHolder.clear();
     // Active-Call-Banner clearen falls noch gesetzt.
     if (ref.read(activeCallProvider)?.callId == widget.callId) {
       ref.read(activeCallProvider.notifier).state = null;
@@ -329,6 +342,75 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _room = room;
     // Punkt 4: User ist jetzt im Call → eingehende Anrufe als besetzt ablehnen.
     CallBusyState.inCall = true;
+    _attachRoomListeners(room);
+
+    try {
+      await room.connect(tok.url, tok.token);
+      await room.localParticipant?.setMicrophoneEnabled(true);
+      if (!mounted) return;
+      setState(() => _state = _CallState.connected);
+      // Call-Duration-Timer starten.
+      _stopwatch
+        ..reset()
+        ..start();
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) setState(() {});
+      });
+      final startedAt = DateTime.now();
+      // Active-Call-Banner: ab jetzt weiss die App-Shell vom laufenden
+      // Call, so kann der User wegnavigieren ohne den Call zu verlieren.
+      ref.read(activeCallProvider.notifier).state = ActiveCallInfo(
+        callId: widget.callId,
+        roomName: widget.roomName,
+        peerName: widget.peerName,
+        startedAt: startedAt,
+      );
+      // Punkt 6: Room im Holder ablegen damit er Screen-Disposal überlebt.
+      CallRoomHolder.store(
+        r: room,
+        callId: widget.callId,
+        roomName: widget.roomName,
+        peerName: widget.peerName,
+        startedAt: startedAt,
+      );
+      // Room-Events-Bus: Floating-Reactions + Cheer-Pings.
+      _attachEventsBus(room);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _state = _CallState.failed;
+        _error = 'Verbindungs-Fehler: $e';
+      });
+    }
+  }
+
+  /// Punkt 6: Reattach an einen im CallRoomHolder laufenden Room (nach
+  /// Minimieren). Kein neuer LiveKit-Join — Audio lief durchgehend weiter.
+  Future<void> _reattach() async {
+    final room = CallRoomHolder.room;
+    if (room == null) {
+      // Holder doch leer → normaler Connect.
+      await _connect();
+      return;
+    }
+    _room = room;
+    CallBusyState.inCall = true;
+    _attachRoomListeners(room);
+    _attachEventsBus(room);
+    if (!mounted) return;
+    setState(() => _state = _CallState.connected);
+    // Duration ab dem ursprünglichen Start fortführen.
+    _stopwatch
+      ..reset()
+      ..start();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  /// Hängt alle Room-Event-Listener an [room]. Wird von _connect UND
+  /// _reattach genutzt (bei Reattach mit neuem State neu erstellt).
+  void _attachRoomListeners(lk.Room room) {
     _listener = room.createListener()
       ..on<lk.RoomDisconnectedEvent>((_) async {
         if (!mounted) return;
@@ -341,6 +423,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         if (ref.read(activeCallProvider)?.callId == widget.callId) {
           ref.read(activeCallProvider.notifier).state = null;
         }
+        // Server-seitiges Ende → Holder aufräumen + Busy-Status freigeben.
+        _hungUp = true;
+        CallBusyState.inCall = false;
+        CallRoomHolder.room = null;
+        CallRoomHolder.callId = null;
       })
       ..on<lk.RoomReconnectingEvent>((_) {
         if (!mounted) return;
@@ -373,51 +460,27 @@ class _CallScreenState extends ConsumerState<CallScreen> {
           _poorWarningShown = false;
         }
       });
+  }
 
-    try {
-      await room.connect(tok.url, tok.token);
-      await room.localParticipant?.setMicrophoneEnabled(true);
-      if (!mounted) return;
-      setState(() => _state = _CallState.connected);
-      // Call-Duration-Timer starten.
-      _stopwatch
-        ..reset()
-        ..start();
-      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (mounted) setState(() {});
-      });
-      // Active-Call-Banner: ab jetzt weiss die App-Shell vom laufenden
-      // Call, so kann der User wegnavigieren ohne den Call zu verlieren.
-      ref.read(activeCallProvider.notifier).state = ActiveCallInfo(
-        callId: widget.callId,
-        roomName: widget.roomName,
-        peerName: widget.peerName,
-        startedAt: DateTime.now(),
-      );
-      // Room-Events-Bus: Floating-Reactions + Cheer-Pings.
-      _events = RoomEventsService(room: room);
-      _eventsSub = _events!.stream.listen((ev) {
-        if (ev.type == RoomEventType.reaction) {
-          final emoji = ev.data['emoji'] as String?;
-          if (emoji != null && emoji.isNotEmpty) {
-            _reactionsCtrl.spawn(emoji);
-            HapticFeedback.selectionClick();
-          }
+  /// Events-Bus (Floating-Reactions) an [room] hängen + CallKit-connected
+  /// melden. Wird von _connect UND _reattach genutzt.
+  void _attachEventsBus(lk.Room room) {
+    _events = RoomEventsService(room: room);
+    _eventsSub = _events!.stream.listen((ev) {
+      if (ev.type == RoomEventType.reaction) {
+        final emoji = ev.data['emoji'] as String?;
+        if (emoji != null && emoji.isNotEmpty) {
+          _reactionsCtrl.spawn(emoji);
+          HapticFeedback.selectionClick();
         }
-      });
-      // Critical: tell CallKit/Telecom the call connected. Without this,
-      // iOS auto-ends after 30s "no answer" and Android's ConnectionService
-      // stays in a half-ringing state.
-      try {
-        await FlutterCallkitIncoming.setCallConnected(widget.callId);
-      } catch (_) {}
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _state = _CallState.failed;
-        _error = e.toString();
-      });
-    }
+      }
+    });
+    // Critical: tell CallKit/Telecom the call connected. Without this,
+    // iOS auto-ends after 30s "no answer" and Android's ConnectionService
+    // stays in a half-ringing state.
+    try {
+      FlutterCallkitIncoming.setCallConnected(widget.callId);
+    } catch (_) {}
   }
 
   Future<void> _toggleMic() async {
@@ -511,9 +574,10 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   }
 
   Future<void> _hangUp() async {
-    try {
-      await _room?.disconnect();
-    } catch (_) {}
+    // Punkt 6: echtes Auflegen → Holder leeren (trennt + disposed Room).
+    _hungUp = true;
+    _room = null; // dispose() soll den Room nicht doppelt anfassen
+    await CallRoomHolder.clear();
     await DmCallService.end(widget.callId);
     await EndToneService.play();
     if (ref.read(activeCallProvider)?.callId == widget.callId) {
@@ -531,7 +595,13 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   @override
   void dispose() {
-    CallBusyState.inCall = false;
+    // Punkt 6: Bei reinem Minimieren (nicht aufgelegt) bleibt der Room im
+    // CallRoomHolder aktiv → Audio läuft im Hintergrund weiter, Mini-Player
+    // sichtbar. Nur bei echtem Auflegen ist alles schon via
+    // CallRoomHolder.clear() getrennt → dann auch Busy-Status zurücksetzen.
+    if (_hungUp) {
+      CallBusyState.inCall = false;
+    }
     _ringingTimeout?.cancel();
     _ringingTicker?.cancel();
     _ringbackHaptic?.cancel();
@@ -542,11 +612,16 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       _ringback?.stop();
       _ringback?.dispose();
     } catch (_) {}
+    // Listener + Events-Bus gehören zu DIESEM State → immer lösen
+    // (bei Reattach baut der neue State sie neu auf). Der Room selbst wird
+    // NUR bei echtem Auflegen disposed (sonst lebt er im Holder weiter).
     _eventsSub?.cancel();
     _events?.dispose();
     _reactionsCtrl.dispose();
     _listener?.dispose();
-    _room?.dispose();
+    if (_hungUp) {
+      _room?.dispose();
+    }
     super.dispose();
   }
 
