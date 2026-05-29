@@ -196,7 +196,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     label: Text('marketplace.claimedBadge'.tr()),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.herzrot,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.ink,
                       minimumSize: const Size.fromHeight(44),
                     ),
                   ),

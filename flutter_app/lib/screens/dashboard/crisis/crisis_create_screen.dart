@@ -129,8 +129,8 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
             icon: const Icon(LucideIcons.check, size: 14),
             label: Text('crisisCreate.yesReportHere'.tr()),
             style: FilledButton.styleFrom(
-                backgroundColor: AppColors.herzrotWarm,
-                foregroundColor: Colors.white),
+                backgroundColor: AppColors.herzrot,
+                foregroundColor: AppColors.ink),
           ),
         ],
       ),

@@ -378,7 +378,7 @@ class _LockPanel extends StatelessWidget {
               style: FilledButton.styleFrom(
                 backgroundColor:
                     isLocked ? AppColors.leben : AppColors.herzrot,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.voidColor,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),

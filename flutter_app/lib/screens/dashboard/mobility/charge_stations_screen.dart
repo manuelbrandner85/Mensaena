@@ -191,7 +191,7 @@ class _ChargeStationsScreenState
                             ),
                             alignment: Alignment.center,
                             child: const Icon(LucideIcons.zap,
-                                size: 14, color: Colors.white),
+                                size: 14, color: AppColors.voidColor),
                           ),
                         ),
                       ),
@@ -300,7 +300,7 @@ class _ChargeStationsScreenState
                     decoration: const BoxDecoration(
                         color: AppColors.tealSoft, shape: BoxShape.circle),
                     child: const Icon(LucideIcons.zap,
-                        size: 18, color: Colors.white),
+                        size: 18, color: AppColors.voidColor),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
