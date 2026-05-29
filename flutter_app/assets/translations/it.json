@@ -603,6 +603,12 @@
     "createFailed": "Creazione fallita (vincolo DB?).",
     "createMissingFields": "Campi obbligatori mancanti: {fields}",
     "createUnavailable": "Metadati colonna non disponibili (tabella non in whitelist admin?).",
+    "export": {
+      "button": "Esporta come CSV",
+      "subject": "Export admin Mensaena · {table}",
+      "empty": "Nessun dato da esportare.",
+      "failed": "Export fallito."
+    },
     "rawData": "Dati grezzi",
     "deleteReportTitle": "Eliminare la segnalazione?",
     "deleteReportConfirm": "Questa azione non può essere annullata.",

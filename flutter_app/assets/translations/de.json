@@ -642,6 +642,12 @@
     "createFailed": "Anlegen fehlgeschlagen (DB-Constraint?).",
     "createMissingFields": "Pflichtfelder fehlen: {fields}",
     "createUnavailable": "Spalten-Metadaten nicht verfügbar (Tabelle nicht in Admin-Whitelist?).",
+    "export": {
+      "button": "Als CSV exportieren",
+      "subject": "Mensaena Admin-Export · {table}",
+      "empty": "Keine Daten zum Exportieren.",
+      "failed": "Export fehlgeschlagen."
+    },
     "rawData": "Rohdaten",
     "deleteReportTitle": "Meldung löschen?",
     "deleteReportConfirm": "Diese Aktion ist nicht rückgängig.",

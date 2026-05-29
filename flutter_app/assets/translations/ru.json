@@ -602,6 +602,12 @@
     "createFailed": "Создание не удалось (ограничение БД?).",
     "createMissingFields": "Не заполнены обязательные поля: {fields}",
     "createUnavailable": "Метаданные столбцов недоступны (таблица вне белого списка администратора?).",
+    "export": {
+      "button": "Экспорт в CSV",
+      "subject": "Экспорт админа Mensaena · {table}",
+      "empty": "Нет данных для экспорта.",
+      "failed": "Экспорт не удался."
+    },
     "rawData": "Сырые данные",
     "deleteReportTitle": "Удалить жалобу?",
     "deleteReportConfirm": "Это действие нельзя отменить.",

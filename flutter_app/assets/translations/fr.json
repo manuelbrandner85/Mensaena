@@ -603,6 +603,12 @@
     "createFailed": "Création échouée (contrainte BD ?).",
     "createMissingFields": "Champs obligatoires manquants : {fields}",
     "createUnavailable": "Métadonnées de colonne indisponibles (table absente de la liste blanche admin ?).",
+    "export": {
+      "button": "Exporter en CSV",
+      "subject": "Export admin Mensaena · {table}",
+      "empty": "Aucune donnée à exporter.",
+      "failed": "Échec de l'export."
+    },
     "rawData": "Données brutes",
     "deleteReportTitle": "Supprimer le signalement ?",
     "deleteReportConfirm": "Cette action est irréversible.",

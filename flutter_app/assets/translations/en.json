@@ -643,6 +643,12 @@
     "createFailed": "Create failed (DB constraint?).",
     "createMissingFields": "Required fields missing: {fields}",
     "createUnavailable": "Column metadata unavailable (table not in admin whitelist?).",
+    "export": {
+      "button": "Export as CSV",
+      "subject": "Mensaena admin export · {table}",
+      "empty": "No data to export.",
+      "failed": "Export failed."
+    },
     "rawData": "Raw data",
     "deleteReportTitle": "Delete report?",
     "deleteReportConfirm": "This action cannot be undone.",

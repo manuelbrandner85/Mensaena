@@ -603,6 +603,12 @@
     "createFailed": "Error al crear (¿restricción de BD?).",
     "createMissingFields": "Faltan campos obligatorios: {fields}",
     "createUnavailable": "Metadatos de columna no disponibles (¿tabla fuera de la lista blanca de admin?).",
+    "export": {
+      "button": "Exportar como CSV",
+      "subject": "Exportación admin de Mensaena · {table}",
+      "empty": "Sin datos para exportar.",
+      "failed": "Exportación fallida."
+    },
     "rawData": "Datos sin procesar",
     "deleteReportTitle": "¿Eliminar el reporte?",
     "deleteReportConfirm": "Esta acción no se puede deshacer.",

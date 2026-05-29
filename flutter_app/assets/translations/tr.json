@@ -602,6 +602,12 @@
     "createFailed": "Oluşturma başarısız (DB kısıtlaması?).",
     "createMissingFields": "Zorunlu alanlar eksik: {fields}",
     "createUnavailable": "Sütun meta verisi yok (tablo admin beyaz listesinde değil mi?).",
+    "export": {
+      "button": "CSV olarak dışa aktar",
+      "subject": "Mensaena admin dışa aktarımı · {table}",
+      "empty": "Dışa aktarılacak veri yok.",
+      "failed": "Dışa aktarma başarısız."
+    },
     "rawData": "Ham veri",
     "deleteReportTitle": "Bildirimi sil?",
     "deleteReportConfirm": "Bu işlem geri alınamaz.",

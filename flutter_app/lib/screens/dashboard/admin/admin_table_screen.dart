@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -87,6 +92,61 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
         .any((v) => v.toLowerCase().contains(q));
   }
 
+  /// CSV-Escape: " → "", Felder mit ; / " / Newline werden gequoted.
+  String _csvEscape(dynamic v) {
+    if (v == null) return '';
+    var s = v.toString();
+    final needsQuote = s.contains(';') || s.contains('"') ||
+        s.contains('\n') || s.contains('\r');
+    s = s.replaceAll('"', '""');
+    return needsQuote ? '"$s"' : s;
+  }
+
+  /// Exportiert die aktuell gefilterten Rows als CSV-Datei und öffnet
+  /// das System-Share-Sheet. Spalten-Reihenfolge: alle in der ersten
+  /// Row vorhandenen Keys + alle in nachfolgenden Rows neu auftauchenden.
+  Future<void> _exportCsv(List<Map<String, dynamic>> rows) async {
+    if (rows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.export.empty'.tr())),
+      );
+      return;
+    }
+    // Spalten-Set sammeln
+    final cols = <String>[];
+    final seen = <String>{};
+    for (final r in rows) {
+      for (final k in r.keys) {
+        if (seen.add(k)) cols.add(k);
+      }
+    }
+    final buf = StringBuffer();
+    buf.writeln(cols.map(_csvEscape).join(';'));
+    for (final r in rows) {
+      buf.writeln(cols.map((c) => _csvEscape(r[c])).join(';'));
+    }
+    try {
+      final dir = await getTemporaryDirectory();
+      final ts = DateTime.now()
+          .toIso8601String()
+          .replaceAll(':', '-')
+          .substring(0, 19);
+      final file = File('${dir.path}/${widget.tableName}_$ts.csv');
+      // BOM für Excel-Kompatibilität (UTF-8 wird sonst als Latin1 gelesen).
+      await file.writeAsString('﻿${buf.toString()}', encoding: utf8);
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'text/csv')],
+        subject:
+            'admin.export.subject'.tr(namedArgs: {'table': widget.tableName}),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.export.failed'.tr())),
+      );
+    }
+  }
+
   Future<void> _openCreateSheet() async {
     final cols = await AdminRepository.getTableColumns(widget.tableName);
     if (!mounted) return;
@@ -157,6 +217,29 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 0),
                 ),
+              ),
+            ),
+            // CSV-Export-Button: exportiert die aktuell gefilterten Rows
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final rows = (await _future) ?? const [];
+                        await _exportCsv(rows.where(_matches).toList());
+                      },
+                      icon: const Icon(LucideIcons.download, size: 14),
+                      label: Text('admin.export.button'.tr()),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.tealSoft,
+                        side: BorderSide(
+                            color: AppColors.tealSoft.withValues(alpha: 0.5)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
