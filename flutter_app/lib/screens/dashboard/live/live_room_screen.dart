@@ -84,15 +84,12 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   }
 
   Future<void> _connect() async {
-    // Mikro ist Default an → alle brauchen Mic-Permission beim Beitritt.
+    // Punkt 5: Mikro-Berechtigung anfragen, aber bei Ablehnung NICHT den
+    // Beitritt blockieren — der User tritt dann als stummer Zuschauer bei
+    // und kann das Mikro später per Toggle aktivieren (fragt erneut an).
     final mic = await Permission.microphone.request();
     if (mic.isDenied || mic.isPermanentlyDenied) {
-      if (!mounted) return;
-      setState(() {
-        _state = _RoomState.failed;
-        _error = 'Mikrofon-Berechtigung verweigert.';
-      });
-      return;
+      _micEnabled = false;
     }
 
     final myId = SupabaseService.currentUser?.id ?? 'guest';
@@ -215,6 +212,15 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     final lp = _room?.localParticipant;
     if (lp == null) return;
     final next = !_micEnabled;
+    // Beim Aktivieren ggf. Mic-Berechtigung anfragen (Zuschauer der ohne
+    // Mic beigetreten ist kann hier zum Sprecher werden).
+    if (next) {
+      final mic = await Permission.microphone.request();
+      if (mic.isDenied || mic.isPermanentlyDenied) {
+        _toast('Mikrofon-Berechtigung verweigert.');
+        return;
+      }
+    }
     try {
       await lp.setMicrophoneEnabled(next);
       if (mounted) setState(() => _micEnabled = next);

@@ -113,16 +113,18 @@ class NotificationRouter {
       return '/dashboard/events';
     }
 
-    // Livestream
+    // Livestream — korrekte Route ist /dashboard/live/:roomName.
     if (t == 'livestream_started' || t == 'livestream_scheduled') {
-      final roomId = meta['room_id']?.toString();
-      if (roomId != null) return '/dashboard/livestream/$roomId';
-      return '/dashboard/livestreams';
+      final roomName = meta['room_name']?.toString();
+      if (roomName != null && roomName.isNotEmpty) {
+        return '/dashboard/live/${Uri.encodeComponent(roomName)}?host=0';
+      }
+      return '/dashboard/live/scheduled';
     }
 
-    // Calls
+    // Calls — korrekte Route ist /dashboard/call-history.
     if (t == 'call_missed' || t == 'incoming_call') {
-      return '/dashboard/calls';
+      return '/dashboard/call-history';
     }
 
     // Follow / Social
