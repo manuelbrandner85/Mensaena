@@ -2795,6 +2795,8 @@
     "findPrompt": "Gib mindestens 2 Zeichen ein, um Nutzer zu finden und Freundschaftsanfragen zu senden.",
     "findNoResults": "Keine Nutzer gefunden.",
     "stateAdd": "Anfragen",
+    "requestSent": "Freundschaftsanfrage an {name} gesendet.",
+    "requestFailed": "Anfrage konnte nicht gesendet werden.",
     "stateRequested": "Angefragt",
     "stateAccept": "Annehmen",
     "stateFriends": "Befreundet",

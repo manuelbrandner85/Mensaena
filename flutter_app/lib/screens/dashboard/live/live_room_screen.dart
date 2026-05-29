@@ -27,7 +27,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
-import '../../../repositories/friendships_repository.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/live_audio_service.dart';
@@ -37,7 +36,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/livestream/livestream_chat_resolver.dart';
-import '../../../widgets/shared/sized_avatar_image.dart';
+import '../../../widgets/shared/user_picker_sheet.dart';
 import '../../../widgets/shared/watcher_panel.dart';
 
 class LiveRoomScreen extends ConsumerStatefulWidget {
@@ -361,90 +360,18 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     );
   }
 
-  /// Punkt 13: Freunde-Sheet → Einladung in diesen Livestream (Notification).
+  /// Punkt 13 (überarbeitet): Globales User-Picker-Sheet → JEDEN User
+  /// einladen, nicht nur Freunde. Suche über display_name/name/nickname.
   Future<void> _inviteToStream() async {
-    final friends = await FriendshipsRepository.friends();
-    if (!mounted) return;
-    if (friends.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('call.addNoFriends'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
-      return;
-    }
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xF0121A28),
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetCtx) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (_, scroll) => ListView(
-          controller: scroll,
-          padding: const EdgeInsets.all(20),
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.line,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text('call.addParticipant'.tr(),
-                style: AppTypography.display(size: 18, color: AppColors.ink)),
-            const SizedBox(height: 14),
-            for (final f in friends)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: SizedAvatarImage(
-                  url: f['avatar_url'] as String?,
-                  size: 40,
-                  fallbackInitial:
-                      (f['display_name'] as String?) ?? (f['name'] as String?),
-                ),
-                title: Text(
-                  (f['display_name'] as String?) ??
-                      (f['name'] as String?) ??
-                      'common.neighbour'.tr(),
-                  style: AppTypography.body(size: 14, color: AppColors.ink),
-                ),
-                trailing: const Icon(LucideIcons.send,
-                    size: 18, color: AppColors.bronze),
-                onTap: () async {
-                  Navigator.of(sheetCtx).pop();
-                  final ok = await LiveStreamService.inviteToStream(
-                    roomName: widget.roomName,
-                    inviteeId: f['id'] as String,
-                    streamTitle: widget.channelTitle,
-                  );
-                  if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    backgroundColor: AppColors.surface,
-                    content: Text(
-                      ok
-                          ? 'live.inviteSent'.tr(namedArgs: {
-                              'name': (f['display_name'] as String?) ??
-                                  (f['name'] as String?) ??
-                                  'common.neighbour'.tr(),
-                            })
-                          : 'call.addFailed'.tr(),
-                      style:
-                          AppTypography.body(size: 13, color: AppColors.ink),
-                    ),
-                  ));
-                },
-              ),
-          ],
-        ),
+    await UserPickerSheet.show(
+      context,
+      title: 'call.addParticipant'.tr(),
+      pickedLabelKey: 'live.inviteSent',
+      failedLabelKey: 'call.addFailed',
+      onPick: (id, name) => LiveStreamService.inviteToStream(
+        roomName: widget.roomName,
+        inviteeId: id,
+        streamTitle: widget.channelTitle,
       ),
     );
   }

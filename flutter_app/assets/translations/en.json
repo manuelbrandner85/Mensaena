@@ -2796,6 +2796,8 @@
     "findPrompt": "Type at least 2 characters to find users and send friend requests.",
     "findNoResults": "No users found.",
     "stateAdd": "Add",
+    "requestSent": "Friend request sent to {name}.",
+    "requestFailed": "Request could not be sent.",
     "stateRequested": "Requested",
     "stateAccept": "Accept",
     "stateFriends": "Friends",

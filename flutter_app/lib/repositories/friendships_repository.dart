@@ -185,7 +185,7 @@ class FriendshipsRepository {
     final me = SupabaseService.currentUser?.id;
     if (me == null) return const [];
     final q = query.trim();
-    if (q.length < 2) return const [];
+    if (q.isEmpty) return const [];
     try {
       final esc = q.replaceAll('%', r'\%').replaceAll(',', '');
       final rows = await sb

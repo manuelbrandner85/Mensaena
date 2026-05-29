@@ -16,6 +16,7 @@ import '../../repositories/friendships_repository.dart';
 import '../../services/presence_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
+import '../../widgets/shared/user_picker_sheet.dart';
 
 final _friendsProvider = FutureProvider.autoDispose<
     List<Map<String, dynamic>>>((ref) async {
@@ -64,6 +65,27 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
     return DashboardScaffold(
       title: 'friends.screenTitle'.tr(),
       currentRoute: '/dashboard/friends',
+      // Sichtbarer 1-Tap-Einstieg zur User-Suche → Freundschaftsanfrage.
+      fab: FloatingActionButton.extended(
+        backgroundColor: AppColors.bronze,
+        foregroundColor: AppColors.voidColor,
+        icon: const Icon(LucideIcons.userPlus, size: 18),
+        label: Text(
+          'friends.stateAdd'.tr(),
+          style: AppTypography.label(
+            size: 11,
+            color: AppColors.voidColor,
+            weight: FontWeight.w700,
+          ),
+        ),
+        onPressed: () => UserPickerSheet.show(
+          context,
+          title: 'friends.tabFind'.tr(),
+          pickedLabelKey: 'friends.requestSent',
+          failedLabelKey: 'friends.requestFailed',
+          onPick: (id, _) => FriendshipsRepository.request(id),
+        ),
+      ),
       onRefresh: () async {
         ref.invalidate(_friendsProvider);
         ref.invalidate(_incomingProvider);
@@ -434,15 +456,19 @@ class _SearchAddListState extends State<_SearchAddList> {
     super.didUpdateWidget(old);
     if (widget.query != _lastQuery) {
       _lastQuery = widget.query;
-      _future = widget.query.trim().length < 2
-          ? Future.value(const [])
-          : FriendshipsRepository.searchUsers(widget.query);
+      // setState damit der FutureBuilder den neuen Future garantiert
+      // aufnimmt — vorheriges nur-Zuweisen hat den Rebuild verpasst.
+      setState(() {
+        _future = widget.query.trim().isEmpty
+            ? Future.value(const [])
+            : FriendshipsRepository.searchUsers(widget.query);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.query.trim().length < 2) {
+    if (widget.query.trim().isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
