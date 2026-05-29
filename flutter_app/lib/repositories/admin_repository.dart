@@ -318,6 +318,37 @@ class AdminRepository {
     }
   }
 
+  /// Spalten-Metadaten für eine Tabelle (für generische Create-Formulare).
+  /// Whitelist im RPC verhindert Zugriff auf sensitive Tabellen.
+  static Future<List<Map<String, dynamic>>> getTableColumns(
+      String table) async {
+    try {
+      final res = await sb
+          .rpc<dynamic>('admin_get_table_columns', params: {'p_table': table});
+      if (res is List) {
+        return res.whereType<Map<String, dynamic>>().toList();
+      }
+      return const [];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Generisches INSERT für Admin-Create-Formulare. Liefert die
+  /// erstellte Row zurück (mit auto-generierter id/created_at) oder null
+  /// bei Fehler.
+  static Future<Map<String, dynamic>?> insertRow({
+    required String table,
+    required Map<String, dynamic> values,
+  }) async {
+    try {
+      final res = await sb.from(table).insert(values).select().single();
+      return res;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Generisches Feld-Update (z.B. is_banned/is_admin auf profiles).
   static Future<bool> updateField({
     required String table,

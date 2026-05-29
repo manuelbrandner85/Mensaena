@@ -87,11 +87,48 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
         .any((v) => v.toLowerCase().contains(q));
   }
 
+  Future<void> _openCreateSheet() async {
+    final cols = await AdminRepository.getTableColumns(widget.tableName);
+    if (!mounted) return;
+    if (cols.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.createUnavailable'.tr())),
+      );
+      return;
+    }
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (_, scroll) => _AdminCreateSheet(
+          scroll: scroll,
+          tableName: widget.tableName,
+          columns: cols,
+          onCreated: _refresh,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
       title: 'admin.tableTitlePrefix'.tr(namedArgs: {'title': widget.title}),
       currentRoute: widget.currentRoute,
+      fab: FloatingActionButton(
+        backgroundColor: AppColors.bronze,
+        foregroundColor: AppColors.voidColor,
+        onPressed: _openCreateSheet,
+        tooltip: 'admin.createEntry'.tr(),
+        child: const Icon(LucideIcons.plus),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -805,6 +842,271 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.bronze),
         ),
+      ),
+    );
+  }
+}
+
+// ── Create-Sheet: neue Row anlegen mit dynamischer Felder-Liste ─────
+class _AdminCreateSheet extends StatefulWidget {
+  const _AdminCreateSheet({
+    required this.scroll,
+    required this.tableName,
+    required this.columns,
+    required this.onCreated,
+  });
+
+  final ScrollController scroll;
+  final String tableName;
+  final List<Map<String, dynamic>> columns;
+  final VoidCallback onCreated;
+
+  @override
+  State<_AdminCreateSheet> createState() => _AdminCreateSheetState();
+}
+
+class _AdminCreateSheetState extends State<_AdminCreateSheet> {
+  bool _busy = false;
+  final Map<String, TextEditingController> _ctrls = {};
+  final Map<String, bool> _bools = {};
+
+  // Felder die beim Insert NICHT geschickt werden — DB füllt automatisch.
+  static const _autoFields = {
+    'id', 'created_at', 'updated_at', 'auth_created_at',
+    'profile_created_at', 'email_confirmed_at', 'last_sign_in_at',
+    'deleted_at',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    for (final col in widget.columns) {
+      final name = col['column_name'] as String?;
+      if (name == null || _autoFields.contains(name)) continue;
+      final type = (col['data_type'] as String? ?? '').toLowerCase();
+      if (type == 'boolean') {
+        _bools[name] = false;
+      } else {
+        _ctrls[name] = TextEditingController();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final c in _ctrls.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  bool _isNumberType(String type) {
+    return type.contains('int') ||
+        type.contains('numeric') ||
+        type.contains('real') ||
+        type.contains('double') ||
+        type.contains('float');
+  }
+
+  Future<void> _save() async {
+    final missing = <String>[];
+    for (final col in widget.columns) {
+      final name = col['column_name'] as String?;
+      if (name == null || _autoFields.contains(name)) continue;
+      if (col['is_required'] == true) {
+        final type = (col['data_type'] as String? ?? '').toLowerCase();
+        if (type == 'boolean') continue;
+        final txt = _ctrls[name]?.text.trim() ?? '';
+        if (txt.isEmpty) missing.add(name);
+      }
+    }
+    if (missing.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.createMissingFields'.tr(
+          namedArgs: {'fields': missing.join(', ')},
+        ))),
+      );
+      return;
+    }
+    setState(() => _busy = true);
+    final values = <String, dynamic>{};
+    for (final col in widget.columns) {
+      final name = col['column_name'] as String?;
+      if (name == null || _autoFields.contains(name)) continue;
+      final type = (col['data_type'] as String? ?? '').toLowerCase();
+      if (type == 'boolean') {
+        values[name] = _bools[name] ?? false;
+      } else {
+        final txt = _ctrls[name]?.text.trim() ?? '';
+        if (txt.isEmpty) continue;
+        if (_isNumberType(type)) {
+          final n = num.tryParse(txt);
+          values[name] = n ?? txt;
+        } else {
+          values[name] = txt;
+        }
+      }
+    }
+    final created = await AdminRepository.insertRow(
+      table: widget.tableName,
+      values: values,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (created != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.createSuccess'.tr())),
+      );
+      widget.onCreated();
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.createFailed'.tr())),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      controller: widget.scroll,
+      padding: const EdgeInsets.all(20),
+      children: [
+        Center(
+          child: Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.line,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'admin.createInTable'.tr(namedArgs: {'name': widget.tableName}),
+          style: AppTypography.display(size: 18, color: AppColors.ink),
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: _busy ? null : _save,
+                icon: const Icon(LucideIcons.check, size: 14),
+                label: Text('admin.createEntry'.tr()),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.bronze,
+                  foregroundColor: AppColors.voidColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: _busy ? null : () => Navigator.pop(context),
+                icon: const Icon(LucideIcons.x, size: 14),
+                label: Text('common.cancel'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.mute,
+                  side: const BorderSide(color: AppColors.line),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.elevated,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final col in widget.columns) ...[
+                if (_autoFields.contains(col['column_name'] as String?))
+                  const SizedBox.shrink()
+                else
+                  _buildColumnField(col),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildColumnField(Map<String, dynamic> col) {
+    final name = col['column_name'] as String;
+    final type = (col['data_type'] as String? ?? '').toLowerCase();
+    final required = col['is_required'] == true;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(name, style: AppTypography.label(size: 9)),
+              const SizedBox(width: 4),
+              if (required)
+                Text('*',
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.herzrot)),
+              const SizedBox(width: 6),
+              Text('($type)',
+                  style: AppTypography.label(size: 8, color: AppColors.mute)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          if (type == 'boolean')
+            Row(
+              children: [
+                Switch(
+                  value: _bools[name] ?? false,
+                  activeColor: AppColors.bronze,
+                  onChanged:
+                      _busy ? null : (v) => setState(() => _bools[name] = v),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  (_bools[name] ?? false) ? 'true' : 'false',
+                  style:
+                      AppTypography.mono(size: 11, color: AppColors.inkSoft),
+                ),
+              ],
+            )
+          else
+            TextField(
+              controller: _ctrls[name],
+              enabled: !_busy,
+              keyboardType: _isNumberType(type)
+                  ? const TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.text,
+              style: AppTypography.mono(size: 12, color: AppColors.ink),
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: AppColors.surface,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 8),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.line),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.line),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.bronze),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
