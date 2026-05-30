@@ -1377,7 +1377,11 @@
     "title": "Челленджи",
     "badges": "Бейджи",
     "join": "Участвовать",
-    "screenTitle": "Задачи"
+    "screenTitle": "Задачи",
+    "maxParticipants": "Максимум участников",
+    "unlimited": "Без ограничений",
+    "weeklyChallenge": "Челлендж недели",
+    "weeklyHint": "Отмечается как еженедельный челлендж"
   },
   "invite": {
     "title": "Пригласить",

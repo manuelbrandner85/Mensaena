@@ -1378,7 +1378,11 @@
     "title": "Retos",
     "badges": "Insignias",
     "join": "Participar",
-    "screenTitle": "Retos"
+    "screenTitle": "Retos",
+    "maxParticipants": "Participantes máximos",
+    "unlimited": "Ilimitado",
+    "weeklyChallenge": "Reto semanal",
+    "weeklyHint": "Destacado como reto semanal"
   },
   "invite": {
     "title": "Invitar",

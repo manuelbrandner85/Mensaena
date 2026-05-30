@@ -1377,7 +1377,11 @@
     "title": "Görevler",
     "badges": "Rozetler",
     "join": "Katıl",
-    "screenTitle": "Görevler"
+    "screenTitle": "Görevler",
+    "maxParticipants": "En fazla katılımcı",
+    "unlimited": "Sınırsız",
+    "weeklyChallenge": "Haftalık meydan okuma",
+    "weeklyHint": "Haftalık meydan okuma olarak öne çıkarılır"
   },
   "invite": {
     "title": "Davet et",

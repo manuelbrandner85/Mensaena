@@ -1378,7 +1378,11 @@
     "title": "Défis",
     "badges": "Badges",
     "join": "Participer",
-    "screenTitle": "Défis"
+    "screenTitle": "Défis",
+    "maxParticipants": "Participants maximum",
+    "unlimited": "Illimité",
+    "weeklyChallenge": "Défi hebdomadaire",
+    "weeklyHint": "Mis en avant comme défi hebdomadaire"
   },
   "invite": {
     "title": "Inviter",

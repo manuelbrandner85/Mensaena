@@ -31,6 +31,8 @@ class _ChallengeCreateScreenState
   String _difficulty = 'mittel';
   int _points = 50;
   int _days = 7;
+  int _maxParticipants = 0;
+  bool _isWeekly = false;
   bool _busy = false;
 
   Map<String, String> get _categories => {
@@ -66,6 +68,8 @@ class _ChallengeCreateScreenState
       difficulty: _difficulty,
       points: _points,
       durationDays: _days,
+      maxParticipants: _maxParticipants > 0 ? _maxParticipants : null,
+      isWeekly: _isWeekly,
     );
     if (!mounted) return;
     setState(() => _busy = false);
@@ -183,6 +187,45 @@ class _ChallengeCreateScreenState
                 divisions: 89,
                 suffix: 'challenges.daysSuffix'.tr(),
                 onChanged: (v) => setState(() => _days = v.round()),
+              ),
+              const SizedBox(height: 12),
+              // Maximale Teilnehmer (0 = unbegrenzt).
+              Row(
+                children: [
+                  Expanded(
+                    child: Text('challenges.maxParticipants'.tr(),
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.mute)),
+                  ),
+                  Text(
+                    _maxParticipants == 0
+                        ? 'challenges.unlimited'.tr()
+                        : '$_maxParticipants',
+                    style:
+                        AppTypography.mono(size: 13, color: AppColors.bronze),
+                  ),
+                ],
+              ),
+              Slider(
+                value: _maxParticipants.toDouble(),
+                min: 0,
+                max: 500,
+                divisions: 50,
+                activeColor: AppColors.bronze,
+                inactiveColor: AppColors.line,
+                onChanged: (v) =>
+                    setState(() => _maxParticipants = v.round()),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                activeColor: AppColors.amber,
+                value: _isWeekly,
+                onChanged: (v) => setState(() => _isWeekly = v),
+                title: Text('challenges.weeklyChallenge'.tr(),
+                    style:
+                        AppTypography.body(size: 14, color: AppColors.ink)),
+                subtitle: Text('challenges.weeklyHint'.tr(),
+                    style: AppTypography.caption()),
               ),
               const SizedBox(height: 28),
               FilledButton.icon(

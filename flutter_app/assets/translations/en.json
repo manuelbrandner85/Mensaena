@@ -1475,7 +1475,11 @@
     "title": "Challenges",
     "badges": "Badges",
     "join": "Join",
-    "screenTitle": "Challenges"
+    "screenTitle": "Challenges",
+    "maxParticipants": "Maximum participants",
+    "unlimited": "Unlimited",
+    "weeklyChallenge": "Weekly challenge",
+    "weeklyHint": "Featured as a weekly challenge"
   },
   "invite": {
     "title": "Invite",

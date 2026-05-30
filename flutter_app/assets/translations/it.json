@@ -1378,7 +1378,11 @@
     "title": "Sfide",
     "badges": "Distintivi",
     "join": "Partecipa",
-    "screenTitle": "Sfide"
+    "screenTitle": "Sfide",
+    "maxParticipants": "Partecipanti massimi",
+    "unlimited": "Illimitati",
+    "weeklyChallenge": "Sfida settimanale",
+    "weeklyHint": "In evidenza come sfida settimanale"
   },
   "invite": {
     "title": "Invita",
