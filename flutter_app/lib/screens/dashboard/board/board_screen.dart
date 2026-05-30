@@ -10,6 +10,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/board_post.dart';
 import '../../../repositories/board_repository.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/skeleton_card.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -182,7 +183,10 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                         childAspectRatio: 0.95,
                       ),
                       itemCount: list.length,
-                      itemBuilder: (context, i) => _Note(post: list[i]),
+                      itemBuilder: (context, i) => AnimatedEntrance(
+                        index: i,
+                        child: _Note(post: list[i]),
+                      ),
                     );
                   },
                 ),

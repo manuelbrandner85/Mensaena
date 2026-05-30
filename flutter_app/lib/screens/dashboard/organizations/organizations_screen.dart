@@ -19,6 +19,7 @@ import '../../../services/location_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/effects/parallax_hero.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/effects/tilt_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -479,7 +480,10 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
             padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
             sliver: SliverList.builder(
               itemCount: list.length,
-              itemBuilder: (context, i) => _OrgCard(org: list[i]),
+              itemBuilder: (context, i) => AnimatedEntrance(
+                index: i,
+                child: _OrgCard(org: list[i]),
+              ),
             ),
           );
         },
