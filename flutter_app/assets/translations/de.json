@@ -1472,6 +1472,8 @@
     "notFound": "Gruppe nicht gefunden.",
     "leave": "Verlassen",
     "join": "Beitreten",
+    "joinedSnack": "Gruppe beigetreten.",
+    "leftSnack": "Gruppe verlassen.",
     "posts": "Beiträge",
     "noPostsYet": "Noch keine Beiträge in der Gruppe.",
     "writePost": "Beitrag schreiben…",

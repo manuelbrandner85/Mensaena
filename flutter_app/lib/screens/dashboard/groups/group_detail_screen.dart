@@ -169,10 +169,17 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                             ),
                             OutlinedButton.icon(
                               onPressed: () async {
+                                final m = ScaffoldMessenger.of(context);
                                 await GroupsRepository.leave(g.id);
                                 ref.invalidate(
                                     groupMembershipProvider(g.id));
                                 ref.invalidate(groupDetailProvider(g.id));
+                                m.showSnackBar(SnackBar(
+                                  backgroundColor: AppColors.surface,
+                                  content: Text('groups.leftSnack'.tr(),
+                                      style: AppTypography.body(
+                                          size: 13, color: AppColors.ink)),
+                                ));
                               },
                               icon: const Icon(LucideIcons.logOut, size: 14),
                               label: Text('groups.leave'.tr()),
@@ -181,10 +188,17 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                           else
                             ElevatedButton.icon(
                               onPressed: () async {
+                                final m = ScaffoldMessenger.of(context);
                                 await GroupsRepository.join(g.id);
                                 ref.invalidate(
                                     groupMembershipProvider(g.id));
                                 ref.invalidate(groupDetailProvider(g.id));
+                                m.showSnackBar(SnackBar(
+                                  backgroundColor: AppColors.surface,
+                                  content: Text('groups.joinedSnack'.tr(),
+                                      style: AppTypography.body(
+                                          size: 13, color: AppColors.ink)),
+                                ));
                               },
                               icon: const Icon(LucideIcons.plus, size: 14),
                               label: Text('groups.join'.tr()),

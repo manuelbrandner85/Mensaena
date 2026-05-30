@@ -1473,6 +1473,8 @@
     "notFound": "Group not found.",
     "leave": "Leave",
     "join": "Join",
+    "joinedSnack": "Joined group.",
+    "leftSnack": "Left group.",
     "posts": "Posts",
     "noPostsYet": "No posts in this group yet.",
     "writePost": "Write a post…",
