@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../services/location_service.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -29,9 +30,14 @@ class _MarketplaceCreateScreenState
   final _desc = TextEditingController();
   final _location = TextEditingController();
   final _price = TextEditingController();
+  final _tags = TextEditingController();
   String _listingType = 'verschenken';
   String _category = 'haushalt';
   String _condition = 'gut';
+  bool _negotiable = false;
+  double? _lat;
+  double? _lng;
+  bool _locating = false;
   bool _submitting = false;
   bool _titleError = false;
   bool _descError = false;
@@ -41,33 +47,71 @@ class _MarketplaceCreateScreenState
   static const int _maxImages = 5;
   final ImagePicker _picker = ImagePicker();
 
-  static const List<({String value, String label, String emoji})> _types = [
-    (value: 'verschenken', label: 'Verschenken', emoji: '🎁'),
-    (value: 'tauschen', label: 'Tauschen', emoji: '🔄'),
-    (value: 'verkaufen', label: 'Günstig abgeben', emoji: '💶'),
-    (value: 'leihen', label: 'Leihen', emoji: '📅'),
+  static const List<({String value, String i18n, String emoji})> _types = [
+    (value: 'verschenken', i18n: 'marketplace.typeVerschenken', emoji: '🎁'),
+    (value: 'tauschen', i18n: 'marketplace.typeTauschen', emoji: '🔄'),
+    (value: 'verkaufen', i18n: 'marketplace.typeVerkaufen', emoji: '💶'),
+    (value: 'leihen', i18n: 'marketplace.typeLeihen', emoji: '📅'),
   ];
 
-  static const List<String> _categories = [
-    'haushalt',
-    'kleidung',
-    'kinder',
-    'moebel',
-    'elektronik',
-    'sport',
-    'buecher',
-    'garten',
-    'werkzeug',
-    'sonstiges',
-  ];
+  // value = stabil (DB/Web-Parität), i18n = übersetztes Label.
+  static const Map<String, String> _categories = {
+    'haushalt': 'marketplace.catHaushalt',
+    'kleidung': 'marketplace.catKleidung',
+    'kinder': 'marketplace.catKinder',
+    'moebel': 'marketplace.catMoebel',
+    'elektronik': 'marketplace.catElektronik',
+    'sport': 'marketplace.catSport',
+    'buecher': 'marketplace.catBuecher',
+    'garten': 'marketplace.catGarten',
+    'werkzeug': 'marketplace.catWerkzeug',
+    'sonstiges': 'marketplace.catSonstiges',
+  };
 
-  static const List<String> _conditions = [
-    'neu',
-    'sehr_gut',
-    'gut',
-    'gebraucht',
-    'defekt',
-  ];
+  static const Map<String, String> _conditions = {
+    'neu': 'marketplace.condNeu',
+    'sehr_gut': 'marketplace.condSehrGut',
+    'gut': 'marketplace.condGut',
+    'gebraucht': 'marketplace.condGebraucht',
+    'defekt': 'marketplace.condDefekt',
+  };
+
+  @override
+  void dispose() {
+    _title.dispose();
+    _desc.dispose();
+    _location.dispose();
+    _price.dispose();
+    _tags.dispose();
+    super.dispose();
+  }
+
+  Future<void> _useGps() async {
+    setState(() => _locating = true);
+    try {
+      final pos = await LocationService.getCurrentPosition();
+      if (!mounted) return;
+      setState(() {
+        _lat = pos.latitude;
+        _lng = pos.longitude;
+        if (_location.text.trim().isEmpty) {
+          _location.text =
+              '${pos.latitude.toStringAsFixed(3)}, ${pos.longitude.toStringAsFixed(3)}';
+        }
+      });
+    } catch (_) {
+      // Standort bleibt optional.
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
+
+  List<String> _parseTags() => _tags.text
+      .split(',')
+      .map((t) => t.trim())
+      .where((t) => t.isNotEmpty)
+      .take(8)
+      .toList();
 
   /// Öffnet Barcode-Scanner → Open Food Facts Lookup → füllt Titel +
   /// Beschreibung. Snackbar bei Erfolg/Fehler.
@@ -222,16 +266,20 @@ class _MarketplaceCreateScreenState
       price: _listingType == 'verkaufen'
           ? double.tryParse(_price.text.trim().replaceAll(',', '.'))
           : null,
+      priceType: _negotiable ? 'negotiable' : 'fixed',
       locationText: _location.text.trim().isEmpty
           ? null
           : _location.text.trim(),
+      latitude: _lat,
+      longitude: _lng,
+      tags: _parseTags(),
     );
 
     if (!mounted) return;
     if (id == null) {
       setState(() {
         _submitting = false;
-        _error = 'Konnte Inserat nicht speichern.';
+        _error = 'common.errorGeneric'.tr();
       });
       return;
     }
@@ -285,7 +333,7 @@ class _MarketplaceCreateScreenState
                         Text(t.emoji, style: const TextStyle(fontSize: 13)),
                         const SizedBox(width: 4),
                         Text(
-                          t.label,
+                          t.i18n.tr(),
                           style: AppTypography.label(
                             size: 10,
                             color: active
@@ -427,8 +475,9 @@ class _MarketplaceCreateScreenState
               decoration: InputDecoration(labelText: 'create.categoryLabel'.tr()),
               dropdownColor: AppColors.surface,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              items: _categories
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+              items: _categories.entries
+                  .map((e) => DropdownMenuItem(
+                      value: e.key, child: Text(e.value.tr())))
                   .toList(),
               onChanged: (v) => setState(() => _category = v ?? _category),
             ),
@@ -438,8 +487,9 @@ class _MarketplaceCreateScreenState
               decoration: InputDecoration(labelText: 'create.condition'.tr()),
               dropdownColor: AppColors.surface,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              items: _conditions
-                  .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+              items: _conditions.entries
+                  .map((e) => DropdownMenuItem(
+                      value: e.key, child: Text(e.value.tr())))
                   .toList(),
               onChanged: (v) => setState(() => _condition = v ?? _condition),
             ),
@@ -453,12 +503,54 @@ class _MarketplaceCreateScreenState
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 decoration: InputDecoration(labelText: 'create.priceEuro'.tr()),
               ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                activeColor: AppColors.amber,
+                value: _negotiable,
+                onChanged: (v) => setState(() => _negotiable = v),
+                title: Text('marketplace.priceNegotiable'.tr(),
+                    style:
+                        AppTypography.body(size: 14, color: AppColors.ink)),
+              ),
             ],
+            const SizedBox(height: 10),
+            // Schlagwörter — bessere Auffindbarkeit über die Suche.
+            TextField(
+              controller: _tags,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: InputDecoration(
+                labelText: 'marketplace.tags'.tr(),
+                hintText: 'marketplace.tagsHint'.tr(),
+                prefixIcon: const Icon(LucideIcons.tag, size: 18),
+              ),
+            ),
             const SizedBox(height: 10),
             TextField(
               controller: _location,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(labelText: 'create.location'.tr()),
+              decoration: InputDecoration(
+                labelText: 'create.location'.tr(),
+                suffixIcon: IconButton(
+                  onPressed: _locating ? null : _useGps,
+                  tooltip: 'marketplace.useGps'.tr(),
+                  icon: _locating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.bronze),
+                        )
+                      : Icon(
+                          _lat != null
+                              ? LucideIcons.mapPin
+                              : LucideIcons.locate,
+                          size: 18,
+                          color: _lat != null
+                              ? AppColors.bronze
+                              : AppColors.inkSoft,
+                        ),
+                ),
+              ),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
@@ -493,7 +585,9 @@ class _MarketplaceCreateScreenState
             ElevatedButton.icon(
               onPressed: _submitting ? null : _submit,
               icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text(_submitting ? 'Speichere…' : 'Inserieren'),
+              label: Text(_submitting
+                  ? 'marketplace.saving'.tr()
+                  : 'marketplace.createButton'.tr()),
             ),
           ],
         ),

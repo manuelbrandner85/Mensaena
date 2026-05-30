@@ -61,6 +61,7 @@ class MarketplaceRepository {
     String? locationText,
     double? latitude,
     double? longitude,
+    List<String> tags = const [],
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -80,6 +81,7 @@ class MarketplaceRepository {
             'location_text': locationText,
             'latitude': latitude,
             'longitude': longitude,
+            if (tags.isNotEmpty) 'tags': tags,
             'status': 'active',
           })
           .select()
