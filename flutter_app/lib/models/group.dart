@@ -14,6 +14,10 @@ class Group {
     this.isPrivate = false,
     this.postCount = 0,
     this.creatorId,
+    this.maxMembers,
+    this.latitude,
+    this.longitude,
+    this.radiusKm,
   });
 
   final String id;
@@ -28,6 +32,10 @@ class Group {
   final bool isPrivate;
   final int postCount;
   final String? creatorId;
+  final int? maxMembers;
+  final double? latitude;
+  final double? longitude;
+  final int? radiusKm;
 
   factory Group.fromJson(Map<String, dynamic> j) {
     // BUGFIX: DB-Spalten slug + category sind nullable — vorher als
@@ -47,6 +55,10 @@ class Group {
       isPrivate: (j['is_private'] as bool?) ?? false,
       postCount: (j['post_count'] as num?)?.toInt() ?? 0,
       creatorId: (j['creator_id'] ?? j['created_by']) as String?,
+      maxMembers: (j['max_members'] as num?)?.toInt(),
+      latitude: (j['latitude'] as num?)?.toDouble(),
+      longitude: (j['longitude'] as num?)?.toDouble(),
+      radiusKm: (j['radius_km'] as num?)?.toInt(),
     );
   }
 
@@ -63,5 +75,9 @@ class Group {
         'is_private': isPrivate,
         'post_count': postCount,
         'creator_id': creatorId,
+        'max_members': maxMembers,
+        'latitude': latitude,
+        'longitude': longitude,
+        'radius_km': radiusKm,
       };
 }

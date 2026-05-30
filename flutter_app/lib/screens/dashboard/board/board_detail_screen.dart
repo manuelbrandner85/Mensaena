@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -148,6 +149,18 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 8),
+                      if (p.imageUrl != null && p.imageUrl!.isNotEmpty) ...[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(
+                            imageUrl: p.imageUrl!,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       Text(
                         p.content,
                         style: AppTypography.body(
@@ -188,6 +201,23 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                         DateFormat('dd.MM.yyyy HH:mm').format(p.createdAt),
                         style: AppTypography.caption(),
                       ),
+                      if (p.expiresAt != null) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(LucideIcons.calendarClock,
+                                size: 12, color: AppColors.mute),
+                            const SizedBox(width: 6),
+                            Text(
+                              'board.expiresOn'.tr(namedArgs: {
+                                'date': DateFormat('dd.MM.yyyy')
+                                    .format(p.expiresAt!)
+                              }),
+                              style: AppTypography.caption(),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 20),
                       Text('board.comments'.tr(), style: AppTypography.label(size: 10)),
                       const SizedBox(height: 8),

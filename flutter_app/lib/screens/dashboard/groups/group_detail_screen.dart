@@ -145,10 +145,23 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                         size: 12, color: AppColors.mute),
                                     const SizedBox(width: 4),
                                     Text(
-                                        'groups.memberCount'.tr(namedArgs: {
-                                          'count': '${g.memberCount}'
-                                        }),
+                                        g.maxMembers != null &&
+                                                g.maxMembers! > 0
+                                            ? '${g.memberCount}/${g.maxMembers}'
+                                            : 'groups.memberCount'.tr(
+                                                namedArgs: {
+                                                    'count': '${g.memberCount}'
+                                                  }),
                                         style: AppTypography.caption()),
+                                    if (g.latitude != null &&
+                                        (g.radiusKm ?? 0) > 0) ...[
+                                      const SizedBox(width: 8),
+                                      const Icon(LucideIcons.mapPin,
+                                          size: 12, color: AppColors.mute),
+                                      const SizedBox(width: 4),
+                                      Text('${g.radiusKm} km',
+                                          style: AppTypography.caption()),
+                                    ],
                                   ],
                                 ),
                               ],

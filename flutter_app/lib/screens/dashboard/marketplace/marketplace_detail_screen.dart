@@ -21,6 +21,25 @@ import '../../../widgets/marketplace/barter_matches_carousel.dart';
 import '../../../widgets/marketplace_reservation.dart';
 import '../../../widgets/shared/image_carousel.dart';
 
+// Stabile DB-Werte → Anzeige-i18n-Keys (Spiegel des Create-Screens).
+const Map<String, String> _kTypeLabels = {
+  'verschenken': 'marketplace.typeVerschenken',
+  'tauschen': 'marketplace.typeTauschen',
+  'verkaufen': 'marketplace.typeVerkaufen',
+  'leihen': 'marketplace.typeLeihen',
+};
+const Map<String, String> _kCondLabels = {
+  'neu': 'marketplace.condNeu',
+  'sehr_gut': 'marketplace.condSehrGut',
+  'gut': 'marketplace.condGut',
+  'gebraucht': 'marketplace.condGebraucht',
+  'defekt': 'marketplace.condDefekt',
+};
+
+String _typeLabel(String v) =>
+    _kTypeLabels[v] != null ? _kTypeLabels[v]!.tr() : v.toUpperCase();
+String _condLabel(String v) => _kCondLabels[v] != null ? _kCondLabels[v]!.tr() : v;
+
 class MarketplaceDetailScreen extends ConsumerWidget {
   const MarketplaceDetailScreen({required this.listingId, super.key});
   final String listingId;
@@ -65,20 +84,33 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                         color: AppColors.amber.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Text(l.listingType.toUpperCase(),
+                      child: Text(_typeLabel(l.listingType).toUpperCase(),
                           style: AppTypography.label(size: 9)),
                     ),
                     const SizedBox(width: 6),
                     Text(l.category, style: AppTypography.label(size: 9)),
                     const Spacer(),
                     if (l.price != null)
-                      Text(
-                        '${l.price!.toStringAsFixed(0)} €',
-                        style: AppTypography.mono(
-                          size: 18,
-                          color: AppColors.amber,
-                          weight: FontWeight.w700,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            '${l.price!.toStringAsFixed(0)} €',
+                            style: AppTypography.mono(
+                              size: 18,
+                              color: AppColors.amber,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                          if (l.priceType == 'negotiable') ...[
+                            const SizedBox(width: 4),
+                            Text('marketplace.priceNegotiable'.tr(),
+                                style: AppTypography.label(
+                                    size: 9, color: AppColors.mute)),
+                          ],
+                        ],
                       ),
                   ],
                 ),
@@ -95,7 +127,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 6),
                   Text(
                       'marketplace.condition'.tr(
-                          namedArgs: {'state': l.conditionState!}),
+                          namedArgs: {'state': _condLabel(l.conditionState!)}),
                       style: AppTypography.caption()),
                 ],
                 const SizedBox(height: 12),
@@ -122,6 +154,28 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                             )),
                       ),
                     ],
+                  ),
+                ],
+                if (l.tags.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: l.tags
+                        .map((t) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.surface.withValues(alpha: 0.6),
+                                border: Border.all(color: AppColors.line),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text('#$t',
+                                  style: AppTypography.label(
+                                      size: 10, color: AppColors.inkSoft)),
+                            ))
+                        .toList(),
                   ),
                 ],
                 const SizedBox(height: 16),
