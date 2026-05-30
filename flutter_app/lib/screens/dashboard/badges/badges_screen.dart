@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
-import '../../../widgets/badges/badge_detail_sheet.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../widgets/badges/badge_detail_sheet.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../models/badge.dart';
 import '../../../models/user_badge.dart';
 import '../../../repositories/challenges_repository.dart';
@@ -57,9 +58,12 @@ class BadgesScreen extends ConsumerWidget {
                 itemCount: badges.length,
                 itemBuilder: (context, i) {
                   final b = badges[i];
-                  return _BadgeTile(
-                    badge: b,
-                    earned: earnedIds.contains(b.id),
+                  return AnimatedEntrance(
+                    index: i,
+                    child: _BadgeTile(
+                      badge: b,
+                      earned: earnedIds.contains(b.id),
+                    ),
                   );
                 },
               );
