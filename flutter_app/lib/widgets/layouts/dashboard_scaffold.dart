@@ -12,6 +12,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/active_call_provider.dart';
+import '../../providers/active_stream_provider.dart';
 import '../../providers/pending_actions_provider.dart';
 import '../../providers/unread_counts_provider.dart';
 import '../../repositories/notifications_repository.dart';
@@ -28,6 +29,7 @@ import '../dashboard/zeitbank_confirmation_banner.dart';
 import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
 import '../shared/active_call_mini_player.dart';
+import '../shared/active_stream_mini_player.dart';
 import '../shared/mensaena_bot_button.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
@@ -95,6 +97,7 @@ class DashboardScaffold extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(unreadNotificationCountProvider);
     final activeCall = ref.watch(activeCallProvider);
+    final activeStream = ref.watch(activeStreamProvider);
 
     String activeRoute;
     try {
@@ -280,6 +283,11 @@ class DashboardScaffold extends ConsumerWidget {
                   if (activeCall != null &&
                       !activeRoute.startsWith('/dashboard/call/'))
                     ActiveCallMiniPlayer(info: activeCall),
+                  // Telegram-Modell: Mini-Player für laufenden Livestream,
+                  // wenn der User nicht im Stream-Screen ist.
+                  if (activeStream != null &&
+                      !activeRoute.startsWith('/dashboard/live/'))
+                    ActiveStreamMiniPlayer(info: activeStream),
                 ],
               ),
               ),

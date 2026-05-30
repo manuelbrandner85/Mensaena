@@ -27,10 +27,12 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../providers/active_stream_provider.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/live_audio_service.dart';
 import '../../../services/livekit_token_service.dart';
+import '../../../services/stream_room_holder.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/bloom.dart';
@@ -63,6 +65,9 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   _RoomState _state = _RoomState.connecting;
   bool _micEnabled = true;
   bool _camEnabled = false;
+  // true nur wenn der User den Stream WIRKLICH verlässt — steuert ob
+  // dispose() den Room trennt oder im StreamRoomHolder weiterlaufen lässt.
+  bool _left = false;
   String? _error;
   int _participantCount = 0;
   // Cache: identity → profile (name + avatar_url) für Avatar-Fallback.
@@ -86,6 +91,12 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   }
 
   Future<void> _connect() async {
+    // Telegram-Modell: an einen noch laufenden Stream-Room reattachen
+    // (User kam über den Mini-Player zurück). Kein Neu-Join.
+    if (StreamRoomHolder.hasRoomFor(widget.roomName)) {
+      await _reattach();
+      return;
+    }
     // Punkt 5: Mikro-Berechtigung anfragen, aber bei Ablehnung NICHT den
     // Beitritt blockieren — der User tritt dann als stummer Zuschauer bei
     // und kann das Mikro später per Toggle aktivieren (fragt erneut an).
@@ -141,10 +152,90 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     CallBusyState.inStream = true;
     // Punkt 11: Foreground-Service → Audio läuft im Hintergrund/Screen-off.
     LiveAudioService.start();
+    _attachListeners(room);
+
+    try {
+      await room.connect(tok.url, tok.token);
+      // Mikro an, Kamera aus (User entscheidet via Toggle).
+      await room.localParticipant?.setMicrophoneEnabled(_micEnabled);
+      if (!mounted) return;
+      // Prefetch profile data für alle Remote-Participants
+      for (final p in room.remoteParticipants.values) {
+        _fetchProfileFor(p.identity);
+      }
+      final startedAt = DateTime.now();
+      setState(() {
+        _state = _RoomState.connected;
+        _participantCount = room.remoteParticipants.length + 1;
+      });
+      // Telegram-Modell: Room im Holder ablegen + Shell informieren, damit
+      // er Screen-Disposal überlebt und der Mini-Player erscheint.
+      StreamRoomHolder.store(
+        r: room,
+        roomName: widget.roomName,
+        channelTitle: widget.channelTitle,
+        isHost: widget.isHost,
+        startedAt: startedAt,
+      );
+      ref.read(activeStreamProvider.notifier).state = ActiveStreamInfo(
+        roomName: widget.roomName,
+        channelTitle: widget.channelTitle,
+        isHost: widget.isHost,
+        startedAt: startedAt,
+      );
+      _attachEventsBus(room);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _state = _RoomState.failed;
+        _error = e.toString();
+      });
+    }
+  }
+
+  /// Telegram-Modell: Reattach an den im Holder laufenden Room (Rückkehr
+  /// über Mini-Player) — kein erneuter LiveKit-Join, Audio lief durch.
+  Future<void> _reattach() async {
+    final room = StreamRoomHolder.room;
+    if (room == null) {
+      // Holder doch leer → normaler Connect-Pfad erneut.
+      StreamRoomHolder.roomName = null;
+      await _connect();
+      return;
+    }
+    _room = room;
+    CallBusyState.inStream = true;
+    _attachListeners(room);
+    _attachEventsBus(room);
+    final myId = SupabaseService.currentUser?.id ?? 'guest';
+    _micEnabled = room.localParticipant?.isMicrophoneEnabled() ?? _micEnabled;
+    for (final p in room.remoteParticipants.values) {
+      _fetchProfileFor(p.identity);
+    }
+    _fetchProfileFor(myId);
+    if (!mounted) return;
+    setState(() {
+      _state = _RoomState.connected;
+      _participantCount = room.remoteParticipants.length + 1;
+    });
+  }
+
+  /// Hängt Room-Event-Listener an [room]. Von _connect UND _reattach genutzt
+  /// (pro State neu gebaut, da die Closures auf diesen State zeigen).
+  void _attachListeners(lk.Room room) {
     _listener = room.createListener()
       ..on<lk.RoomDisconnectedEvent>((_) async {
-        if (!mounted) return;
-        setState(() => _state = _RoomState.ended);
+        // Server-seitiges Ende → Stream wirklich vorbei: Holder + Shell
+        // aufräumen, damit dispose() den Room final wegräumt.
+        _left = true;
+        StreamRoomHolder.room = null;
+        StreamRoomHolder.roomName = null;
+        CallBusyState.inStream = false;
+        LiveAudioService.stop();
+        if (mounted) {
+          ref.read(activeStreamProvider.notifier).state = null;
+          setState(() => _state = _RoomState.ended);
+        }
       })
       ..on<lk.ParticipantConnectedEvent>((e) async {
         _fetchProfileFor(e.participant.identity);
@@ -167,30 +258,11 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                 : 'Nachbar:in',
             JoinLeaveKind.leave);
       });
+  }
 
-    try {
-      await room.connect(tok.url, tok.token);
-      // Mikro an, Kamera aus (User entscheidet via Toggle).
-      await room.localParticipant?.setMicrophoneEnabled(_micEnabled);
-      if (!mounted) return;
-      // Prefetch profile data für alle Remote-Participants
-      for (final p in room.remoteParticipants.values) {
-        _fetchProfileFor(p.identity);
-      }
-      setState(() {
-        _state = _RoomState.connected;
-        _participantCount = room.remoteParticipants.length + 1;
-      });
-      // Events-Bus initialisieren (Reactions/Polls/Highlights/Subtitles).
-      _events = RoomEventsService(room: room);
-      _eventsSub = _events!.stream.listen(_onRoomEvent);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _state = _RoomState.failed;
-        _error = e.toString();
-      });
-    }
+  void _attachEventsBus(lk.Room room) {
+    _events = RoomEventsService(room: room);
+    _eventsSub = _events!.stream.listen(_onRoomEvent);
   }
 
   Future<void> _fetchProfileFor(String identity) async {
@@ -262,12 +334,16 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   }
 
   Future<void> _leave() async {
-    try {
-      await _room?.disconnect();
-    } catch (_) {}
+    // Echtes Verlassen → Room trennen + Holder/Shell aufräumen.
+    _left = true;
+    CallBusyState.inStream = false;
+    LiveAudioService.stop();
+    _room = null; // dispose() soll den Room nicht doppelt anfassen
     if (widget.isHost) {
       await LiveStreamService.endChannelStream(widget.roomName);
     }
+    await StreamRoomHolder.clear();
+    ref.read(activeStreamProvider.notifier).state = null;
     if (!mounted) return;
     if (context.canPop()) {
       context.pop();
@@ -278,10 +354,14 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   @override
   void dispose() {
-    CallBusyState.inStream = false;
-    LiveAudioService.stop();
-    if (widget.isHost) {
-      LiveStreamService.endChannelStream(widget.roomName);
+    // Telegram-Modell: Bei reinem Minimieren/Wegnavigieren (nicht verlassen)
+    // bleibt der Room im StreamRoomHolder aktiv → Audio läuft weiter, der
+    // Mini-Player bringt zurück. Listener/Events gehören zu DIESEM State und
+    // werden immer gelöst (Reattach baut sie neu). Der Room wird NUR bei
+    // echtem Verlassen disposed.
+    if (_left) {
+      CallBusyState.inStream = false;
+      LiveAudioService.stop();
     }
     _eventsSub?.cancel();
     _events?.dispose();
@@ -289,10 +369,12 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     _toastTimer?.cancel();
     _listener?.dispose();
     _listener = null;
-    try {
-      _room?.disconnect();
-    } catch (_) {}
-    _room?.dispose();
+    if (_left) {
+      try {
+        _room?.disconnect();
+      } catch (_) {}
+      _room?.dispose();
+    }
     _room = null;
     super.dispose();
   }
