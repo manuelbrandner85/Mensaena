@@ -389,6 +389,9 @@ class FarmsRepository {
     List<String> mediaUrls = const [],
     bool isBio = false,
     bool isSeasonal = false,
+    String? region,
+    double? latitude,
+    double? longitude,
   }) async {
     final trimmedName = name.trim();
     final trimmedCity = city.trim();
@@ -399,6 +402,10 @@ class FarmsRepository {
         'name': trimmedName,
         'slug': slug,
         'category': category,
+        if (region != null && region.trim().isNotEmpty)
+          'region': region.trim(),
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
         if (description != null && description.trim().isNotEmpty)
           'description': description.trim(),
         if (address != null && address.trim().isNotEmpty)

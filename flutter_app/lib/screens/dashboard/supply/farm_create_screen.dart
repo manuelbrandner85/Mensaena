@@ -18,6 +18,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/organizations_repository.dart';
+import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -50,20 +51,24 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
   bool _isSeasonal = false;
   bool _busy = false;
   bool _uploading = false;
+  bool _locating = false;
+  double? _lat;
+  double? _lng;
   final List<String> _mediaUrls = [];
 
-  static const _categories = <String>[
-    'Bauernhof',
-    'Imkerei',
-    'Mosterei',
-    'Metzgerei',
-    'Käserei',
-    'Mühle',
-    'Bäckerei',
-    'Brauerei',
-    'Hofladen',
-    'Sonstiges',
-  ];
+  // Wert = stabiler DB-/Web-Parität-Schlüssel (Deutsch), i18n = Anzeige-Label.
+  static const Map<String, String> _categories = {
+    'Bauernhof': 'supply.farmCreate.catBauernhof',
+    'Imkerei': 'supply.farmCreate.catImkerei',
+    'Mosterei': 'supply.farmCreate.catMosterei',
+    'Metzgerei': 'supply.farmCreate.catMetzgerei',
+    'Käserei': 'supply.farmCreate.catKaeserei',
+    'Mühle': 'supply.farmCreate.catMuehle',
+    'Bäckerei': 'supply.farmCreate.catBaeckerei',
+    'Brauerei': 'supply.farmCreate.catBrauerei',
+    'Hofladen': 'supply.farmCreate.catHofladen',
+    'Sonstiges': 'supply.farmCreate.catSonstiges',
+  };
 
   static const _countries = <String, String>{
     'AT': '🇦🇹 Österreich',
@@ -92,9 +97,26 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
     super.dispose();
   }
 
+  Future<void> _useGps() async {
+    setState(() => _locating = true);
+    try {
+      final pos = await LocationService.getCurrentPosition();
+      if (!mounted) return;
+      setState(() {
+        _lat = pos.latitude;
+        _lng = pos.longitude;
+      });
+      _toast('supply.farmCreate.gpsSet'.tr());
+    } catch (_) {
+      // Standort bleibt optional.
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
+
   Future<void> _pickPhoto() async {
     if (_mediaUrls.length >= 5) {
-      _toast('Maximal 5 Fotos.');
+      _toast('supply.farmCreate.maxPhotos'.tr());
       return;
     }
     final picker = ImagePicker();
@@ -112,7 +134,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       final file = File(res.path);
       final size = await file.length();
       if (size > 8 * 1024 * 1024) {
-        _toast('Foto zu groß (max 8 MB).');
+        _toast('supply.farmCreate.photoTooLarge'.tr());
         return;
       }
       final raw = res.path.split('.').last.toLowerCase();
@@ -138,7 +160,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       final url = sb.storage.from('post-images').getPublicUrl(path);
       setState(() => _mediaUrls.add(url));
     } catch (_) {
-      _toast('Foto-Upload fehlgeschlagen.');
+      _toast('supply.farmCreate.uploadFailed'.tr());
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
@@ -175,14 +197,17 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       isBio: _isBio,
       isSeasonal: _isSeasonal,
       mediaUrls: _mediaUrls,
+      region: _state.text,
+      latitude: _lat,
+      longitude: _lng,
     );
     if (!mounted) return;
     setState(() => _busy = false);
     if (slug == null) {
-      _toast('Eintrag konnte nicht erstellt werden.');
+      _toast('supply.farmCreate.createFailed'.tr());
       return;
     }
-    _toast('Bauernhof eingetragen! Danke.');
+    _toast('supply.farmCreate.createSuccess'.tr());
     context.go('/dashboard/supply');
   }
 
@@ -210,47 +235,52 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
                       size: 22, color: AppColors.ink)),
               const SizedBox(height: 4),
               Text(
-                'Trage einen Bauernhof, Hofladen oder Direktvermarkter aus deiner Region ein.',
+                'supply.farmCreate.intro'.tr(),
                 style: AppTypography.body(
                     size: 13, color: AppColors.mute),
               ),
               const SizedBox(height: 20),
-              _section('Grunddaten'),
+              _section('supply.farmCreate.secBasics'.tr()),
               _field(
                 _name,
-                'Name *',
-                'Hof zur Sonne',
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Pflichtfeld' : null,
+                'supply.farmCreate.fName'.tr(),
+                'supply.farmCreate.fNameHint'.tr(),
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'supply.farmCreate.required'.tr()
+                    : null,
               ),
               const SizedBox(height: 10),
               _dropdown(
-                label: 'Kategorie',
+                label: 'supply.farmCreate.fCategory'.tr(),
                 value: _category,
-                items: _categories,
+                items: _categories.keys.toList(),
+                itemLabel: (k) => (_categories[k] ?? k).tr(),
                 onChanged: (v) => setState(() => _category = v!),
               ),
               const SizedBox(height: 10),
-              _field(_description, 'Beschreibung', 'Was macht euren Hof aus?',
+              _field(_description, 'supply.farmCreate.fDescription'.tr(),
+                  'supply.farmCreate.fDescHint'.tr(),
                   maxLines: 3),
               const SizedBox(height: 18),
-              _section('Standort'),
-              _field(_address, 'Adresse', 'Straße + Nr.'),
+              _section('supply.farmCreate.secLocation'.tr()),
+              _field(_address, 'supply.farmCreate.fAddress'.tr(),
+                  'supply.farmCreate.fAddressHint'.tr()),
               const SizedBox(height: 10),
               Row(
                 children: [
                   SizedBox(
                     width: 120,
-                    child: _field(_postalCode, 'PLZ', '12345'),
+                    child: _field(_postalCode, 'supply.farmCreate.fPostal'.tr(),
+                        '12345'),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _field(
                       _city,
-                      'Stadt *',
-                      'Berlin',
+                      'supply.farmCreate.fCity'.tr(),
+                      'supply.farmCreate.fCityHint'.tr(),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Pflichtfeld'
+                          ? 'supply.farmCreate.required'.tr()
                           : null,
                     ),
                   ),
@@ -259,11 +289,13 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(child: _field(_state, 'Bundesland', '')),
+                  Expanded(
+                      child: _field(
+                          _state, 'supply.farmCreate.fState'.tr(), '')),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _dropdown(
-                      label: 'Land',
+                      label: 'supply.farmCreate.fCountry'.tr(),
                       value: _country,
                       items: _countries.keys.toList(),
                       itemLabel: (k) => _countries[k] ?? k,
@@ -272,23 +304,56 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              // Standort per GPS (optional) — für korrekte Karten-Platzierung.
+              OutlinedButton.icon(
+                onPressed: _locating ? null : _useGps,
+                icon: _locating
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.bronze),
+                      )
+                    : Icon(
+                        _lat != null
+                            ? LucideIcons.mapPin
+                            : LucideIcons.locate,
+                        size: 16,
+                        color: _lat != null
+                            ? AppColors.bronze
+                            : AppColors.inkSoft,
+                      ),
+                label: Text(_lat != null
+                    ? '${_lat!.toStringAsFixed(3)}, ${_lng!.toStringAsFixed(3)}'
+                    : 'supply.farmCreate.useGps'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor:
+                      _lat != null ? AppColors.bronze : AppColors.inkSoft,
+                  side: BorderSide(
+                      color: _lat != null
+                          ? AppColors.bronze.withValues(alpha: 0.5)
+                          : AppColors.line),
+                  minimumSize: const Size.fromHeight(46),
+                ),
+              ),
               const SizedBox(height: 18),
-              _section('Kontakt'),
-              _field(_phone, 'Telefon', '+43 …'),
+              _section('supply.farmCreate.secContact'.tr()),
+              _field(_phone, 'supply.farmCreate.fPhone'.tr(), '+43 …'),
               const SizedBox(height: 10),
-              _field(_email, 'E-Mail', 'hof@…'),
+              _field(_email, 'supply.farmCreate.fEmail'.tr(), 'hof@…'),
               const SizedBox(height: 10),
-              _field(_website, 'Website', 'https://…'),
+              _field(_website, 'supply.farmCreate.fWebsite'.tr(), 'https://…'),
               const SizedBox(height: 18),
-              _section('Angebot'),
-              _field(_productsRaw, 'Produkte (kommagetrennt)',
-                  'Eier, Honig, Kartoffeln'),
+              _section('supply.farmCreate.secOffer'.tr()),
+              _field(_productsRaw, 'supply.farmCreate.fProducts'.tr(),
+                  'supply.farmCreate.fProductsHint'.tr()),
               const SizedBox(height: 10),
-              _field(_servicesRaw, 'Services (kommagetrennt)',
-                  'Hofführung, Workshops'),
+              _field(_servicesRaw, 'supply.farmCreate.fServices'.tr(),
+                  'supply.farmCreate.fServicesHint'.tr()),
               const SizedBox(height: 10),
-              _field(_deliveryRaw, 'Lieferoptionen (kommagetrennt)',
-                  'Selbstabholung, Lieferung'),
+              _field(_deliveryRaw, 'supply.farmCreate.fDelivery'.tr(),
+                  'supply.farmCreate.fDeliveryHint'.tr()),
               const SizedBox(height: 10),
               SwitchListTile.adaptive(
                 value: _isBio,
@@ -309,7 +374,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 18),
-              _section('Fotos (max 5)'),
+              _section('supply.farmCreate.secPhotos'.tr()),
               _photoGrid(),
               const SizedBox(height: 28),
               FilledButton.icon(
@@ -331,7 +396,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Dein Eintrag wird vor Veröffentlichung von der Moderation geprüft.',
+                'supply.farmCreate.moderationNote'.tr(),
                 textAlign: TextAlign.center,
                 style: AppTypography.label(size: 10, color: AppColors.mute),
               ),
