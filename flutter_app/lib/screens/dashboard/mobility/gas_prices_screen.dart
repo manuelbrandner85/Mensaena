@@ -12,6 +12,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/location_service.dart';
 import '../../../services/tankerkoenig_service.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -68,7 +69,9 @@ class GasPricesScreen extends ConsumerWidget {
             itemCount: stations.length,
             itemBuilder: (_, i) {
               final s = stations[i];
-              return Padding(
+              return AnimatedEntrance(
+                index: i,
+                child: Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: GlassCard(
                   padding: const EdgeInsets.all(14),
@@ -120,6 +123,7 @@ class GasPricesScreen extends ConsumerWidget {
                         ]),
                       ]),
                 ),
+              ),
               );
             },
           );
