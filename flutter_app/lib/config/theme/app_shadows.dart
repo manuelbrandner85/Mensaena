@@ -26,6 +26,26 @@ class AppShadows {
     ),
   ];
 
+  /// Stärkere Tiefe für Sheets/Overlays/Floating-Elemente.
+  static const List<BoxShadow> elevated = [
+    BoxShadow(
+      color: Color(0x80000000),
+      blurRadius: 30,
+      spreadRadius: -2,
+      offset: Offset(0, 10),
+    ),
+  ];
+
+  /// Bronze-Glow (Leit-Akzent: FAB, Primär-Buttons im Cinema-Design).
+  static List<BoxShadow> bronzeGlow({double intensity = 0.45}) => [
+        BoxShadow(
+          color: AppColors.bronze.withValues(alpha: intensity),
+          blurRadius: 24,
+          spreadRadius: -2,
+          offset: const Offset(0, 8),
+        ),
+      ];
+
   /// Amber-Glow (Primary-Buttons, Stats).
   static const List<BoxShadow> amberGlow = [
     BoxShadow(

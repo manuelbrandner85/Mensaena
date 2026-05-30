@@ -18,6 +18,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/effects/celebrate_burst.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -285,6 +286,8 @@ class _ModuleCreatePostScreenState
       await PostDraftService.clear();
       if (!mounted) return;
       final id = inserted['id'] as String;
+      // Premium: kleiner Feier-Moment beim erfolgreichen Erstellen.
+      CelebrateBurst.fire(context, ref: ref);
       // 1:1 Web: navigiere zur Modul-Detail-Page, nicht zum Post-Detail
       // (Web macht beides — wir nehmen Modul-Route für bessere UX-Continuity).
       context.go('${widget.config.returnRoute}/$id');
