@@ -1277,7 +1277,8 @@
     "priceNegotiable": "Price negotiable",
     "useGps": "Use current location",
     "saving": "Saving…",
-    "createButton": "Post listing"
+    "createButton": "Post listing",
+    "inserted": "{name} added"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -3031,5 +3032,9 @@
     "resPower": "Power",
     "resTools": "Tools",
     "resVehicle": "Vehicle"
+  },
+  "safety": {
+    "foodRecall": "FOOD RECALL",
+    "moreWarnings": "+{n} more"
   }
 }

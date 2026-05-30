@@ -148,7 +148,8 @@ class _MarketplaceCreateScreenState
     });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text('✓ ${p.name} eingefügt',
+      content: Text(
+          '✓ ${'marketplace.inserted'.tr(namedArgs: {'name': p.name})}',
           style: AppTypography.body(size: 13, color: AppColors.leben)),
     ));
   }

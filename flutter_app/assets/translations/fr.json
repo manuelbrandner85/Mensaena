@@ -1190,7 +1190,8 @@
     "priceNegotiable": "Prix négociable",
     "useGps": "Utiliser la position actuelle",
     "saving": "Enregistrement…",
-    "createButton": "Publier l'annonce"
+    "createButton": "Publier l'annonce",
+    "inserted": "{name} ajouté"
   },
   "trust": {
     "rate": "Évaluer {name}",
@@ -2255,5 +2256,9 @@
     "resPower": "Électricité",
     "resTools": "Outils",
     "resVehicle": "Véhicule"
+  },
+  "safety": {
+    "foodRecall": "RAPPEL ALIMENTAIRE",
+    "moreWarnings": "+{n} autres"
   }
 }

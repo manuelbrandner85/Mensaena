@@ -1189,7 +1189,8 @@
     "priceNegotiable": "Pazarlık payı var",
     "useGps": "Mevcut konumu kullan",
     "saving": "Kaydediliyor…",
-    "createButton": "İlan ver"
+    "createButton": "İlan ver",
+    "inserted": "{name} eklendi"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -2254,5 +2255,9 @@
     "resPower": "Elektrik",
     "resTools": "Aletler",
     "resVehicle": "Araç"
+  },
+  "safety": {
+    "foodRecall": "GIDA GERİ ÇAĞIRMA",
+    "moreWarnings": "+{n} daha"
   }
 }

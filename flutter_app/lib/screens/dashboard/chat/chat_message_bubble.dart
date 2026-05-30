@@ -430,7 +430,7 @@ class _ReplyQuote extends StatelessWidget {
               color: AppColors.elevated.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Text('lädt…',
+            child: Text('common.loading'.tr(),
                 style: AppTypography.body(
                     size: 11, color: AppColors.mute)),
           );

@@ -1276,7 +1276,8 @@
     "priceNegotiable": "Preis verhandelbar (VB)",
     "useGps": "Aktuellen Standort verwenden",
     "saving": "Speichere…",
-    "createButton": "Inserieren"
+    "createButton": "Inserieren",
+    "inserted": "{name} hinzugefügt"
   },
   "trust": {
     "rate": "Bewerte {name}",
@@ -3030,5 +3031,9 @@
     "resPower": "Strom",
     "resTools": "Werkzeug",
     "resVehicle": "Fahrzeug"
+  },
+  "safety": {
+    "foodRecall": "LEBENSMITTEL-RÜCKRUF",
+    "moreWarnings": "+{n} weitere"
   }
 }

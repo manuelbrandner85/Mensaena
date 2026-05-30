@@ -1189,7 +1189,8 @@
     "priceNegotiable": "Цена договорная",
     "useGps": "Использовать текущее местоположение",
     "saving": "Сохранение…",
-    "createButton": "Разместить"
+    "createButton": "Разместить",
+    "inserted": "{name} добавлено"
   },
   "trust": {
     "rate": "Оценить {name}",
@@ -2254,5 +2255,9 @@
     "resPower": "Электричество",
     "resTools": "Инструменты",
     "resVehicle": "Транспорт"
+  },
+  "safety": {
+    "foodRecall": "ОТЗЫВ ПРОДУКТА",
+    "moreWarnings": "+{n} ещё"
   }
 }

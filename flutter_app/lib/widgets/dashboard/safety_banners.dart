@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -218,7 +219,9 @@ class _NinaCardState extends State<_NinaCard> {
                             ),
                             const SizedBox(width: 6),
                             if (more > 0)
-                              Text('+$more weitere',
+                              Text(
+                                  'safety.moreWarnings'
+                                      .tr(namedArgs: {'n': '$more'}),
                                   style: AppTypography.label(
                                       size: 9, color: AppColors.mute)),
                           ],
@@ -382,13 +385,16 @@ class _FoodCard extends StatelessWidget {
                         color: AppColors.amber.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Text('LEBENSMITTEL-RÜCKRUF',
+                      child: Text('safety.foodRecall'.tr(),
                           style: AppTypography.label(
                               size: 8, color: AppColors.amber)),
                     ),
                     const SizedBox(width: 6),
                     if (warnings.length > 1)
-                      Text('+${warnings.length - 1} weitere',
+                      Text(
+                          'safety.moreWarnings'.tr(namedArgs: {
+                            'n': '${warnings.length - 1}'
+                          }),
                           style: AppTypography.label(
                               size: 9, color: AppColors.mute)),
                   ],

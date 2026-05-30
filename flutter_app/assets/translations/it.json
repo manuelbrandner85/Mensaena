@@ -1190,7 +1190,8 @@
     "priceNegotiable": "Prezzo trattabile",
     "useGps": "Usa posizione attuale",
     "saving": "Salvataggio…",
-    "createButton": "Pubblica annuncio"
+    "createButton": "Pubblica annuncio",
+    "inserted": "{name} aggiunto"
   },
   "trust": {
     "rate": "Valuta {name}",
@@ -2255,5 +2256,9 @@
     "resPower": "Elettricità",
     "resTools": "Attrezzi",
     "resVehicle": "Veicolo"
+  },
+  "safety": {
+    "foodRecall": "RICHIAMO ALIMENTARE",
+    "moreWarnings": "+{n} altri"
   }
 }
