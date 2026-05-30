@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -317,84 +316,63 @@ class _BottomNav extends ConsumerWidget {
     final pendingActions =
         ref.watch(pendingActionsCountProvider).value ?? 0;
     final unreadDm = ref.watch(unreadDmCountProvider).value ?? 0;
-    // Design (Cinema-Hyperreal): schwebende Glass-Pill mit 14px-Rand,
-    // rounded 26, Glass-Gradient, line-strong-Border + tiefem Schatten.
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-        child: RepaintBoundary(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(26),
-            child: BackdropFilter(
-              // sigma niedrig halten (3 statt 10) — BackdropFilter rendert
-              // jeden Frame; mit dauerlaufendem CinemaOverlay war 10 ein
-              // GPU-/Main-Thread-Treiber Richtung ANR.
-              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-              child: Container(
-                height: 64,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xC70E141E), Color(0xEB080C14)],
-                  ),
-                  borderRadius: BorderRadius.circular(26),
-                  border: Border.all(color: const Color(0x47ECE5D6)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x80000000),
-                      blurRadius: 30,
-                      offset: Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: _BottomItem(
-                        icon: LucideIcons.home,
-                        label: 'nav.home'.tr(),
-                        route: '/dashboard',
-                        active: activeRoute == '/dashboard',
-                      ),
-                    ),
-                    Expanded(
-                      child: _BottomItem(
-                        icon: LucideIcons.map,
-                        label: 'nav.map'.tr(),
-                        route: '/dashboard/map',
-                        active: _matches(activeRoute, ['/dashboard/map']),
-                      ),
-                    ),
-                    Expanded(
-                      child: _BottomItem(
-                        icon: LucideIcons.messageSquare,
-                        label: 'nav.chat'.tr(),
-                        route: '/dashboard/messages',
-                        active: _matches(activeRoute, [
-                          '/dashboard/messages',
-                          '/dashboard/chat',
-                        ]),
-                        badgeCount: unreadDm,
-                      ),
-                    ),
-                    Expanded(
-                      child: _BottomItem(
-                        icon: LucideIcons.user,
-                        label: 'nav.profile'.tr(),
-                        route: '/dashboard/profile',
-                        active:
-                            _matches(activeRoute, ['/dashboard/profile']),
-                        badgeCount: pendingActions,
-                      ),
-                    ),
-                  ],
+    // Crash-Fix (User-Report 2026-05): klassische angedockte Bottom-Nav
+    // statt schwebender Glass-Pill. Die Floating-Pill mit BackdropFilter +
+    // ClipRRect + Container im bottomNavigationBar-Slot war als Crash-
+    // Verdächtiger bei Nav-Tap markiert. Stabile Material-Standard-
+    // Struktur, Cinema-Look bleibt via Tokens.
+    return Material(
+      color: AppColors.surface,
+      elevation: 0,
+      child: SafeArea(
+        top: false,
+        child: Container(
+          height: 64,
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: AppColors.line)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.home,
+                  label: 'nav.home'.tr(),
+                  route: '/dashboard',
+                  active: activeRoute == '/dashboard',
                 ),
               ),
-            ),
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.map,
+                  label: 'nav.map'.tr(),
+                  route: '/dashboard/map',
+                  active: _matches(activeRoute, ['/dashboard/map']),
+                ),
+              ),
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.messageSquare,
+                  label: 'nav.chat'.tr(),
+                  route: '/dashboard/messages',
+                  active: _matches(activeRoute, [
+                    '/dashboard/messages',
+                    '/dashboard/chat',
+                  ]),
+                  badgeCount: unreadDm,
+                ),
+              ),
+              Expanded(
+                child: _BottomItem(
+                  icon: LucideIcons.user,
+                  label: 'nav.profile'.tr(),
+                  route: '/dashboard/profile',
+                  active: _matches(activeRoute, ['/dashboard/profile']),
+                  badgeCount: pendingActions,
+                ),
+              ),
+            ],
           ),
         ),
       ),
