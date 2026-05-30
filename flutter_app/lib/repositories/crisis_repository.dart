@@ -130,6 +130,14 @@ class CrisisRepository {
     double? longitude,
     double? radiusKm,
     bool isAnonymous = false,
+    // Erweiterte, krisen-spezifische Felder (nutzen bestehende Spalten).
+    int? affectedCount,
+    int? neededHelpers,
+    List<String> neededSkills = const [],
+    List<String> neededResources = const [],
+    String? contactName,
+    String? contactPhone,
+    List<String> imageUrls = const [],
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -148,6 +156,16 @@ class CrisisRepository {
             'longitude': longitude,
             'radius_km': radiusKm,
             'is_anonymous': isAnonymous,
+            if (affectedCount != null) 'affected_count': affectedCount,
+            if (neededHelpers != null) 'needed_helpers': neededHelpers,
+            if (neededSkills.isNotEmpty) 'needed_skills': neededSkills,
+            if (neededResources.isNotEmpty)
+              'needed_resources': neededResources,
+            if (contactName != null && contactName.isNotEmpty)
+              'contact_name': contactName,
+            if (contactPhone != null && contactPhone.isNotEmpty)
+              'contact_phone': contactPhone,
+            if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
           })
           .select()
           .maybeSingle();

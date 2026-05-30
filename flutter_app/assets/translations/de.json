@@ -1469,7 +1469,7 @@
   "groups": {
     "title": "Gruppe",
     "nearbyTitle": "Gruppen in deiner Nähe",
-    "memberCount": "{n} Mitglieder",
+    "memberCount": "{count} Mitglieder",
     "notFound": "Gruppe nicht gefunden.",
     "leave": "Verlassen",
     "join": "Beitreten",
@@ -1484,7 +1484,6 @@
     "inviteSend": "Einladen",
     "inviteSentTo": "Einladung gesendet an {email}",
     "inviteFailed": "Einladung fehlgeschlagen.",
-    "memberCount": "{count} Mitglieder",
     "create": "Gruppe erstellen",
     "categoryLabel": "Kategorie",
     "searchPlaceholder": "Gruppen suchen…",
@@ -2334,9 +2333,14 @@
     }
   },
   "notif": {
-    "enable": "Benachrichtigungen aktivieren",
-    "bannerTitle": "Bleib auf dem Laufenden",
-    "bannerBody": "Aktiviere Push, damit du Anrufe, Nachrichten und Hilferufe sofort siehst."
+    "send_test": "Test-Benachrichtigung senden",
+    "test_title": "Mensaena-Test",
+    "test_body": "Wenn du das hier siehst, funktionieren Benachrichtigungen.",
+    "test_sent": "Test-Benachrichtigung wurde gesendet.",
+    "radiusSection": "Benachrichtigungs-Radius",
+    "nearbyToggle": "Push bei Hilfegesuchen in der Nähe",
+    "radiusValue": "{km} km Umkreis",
+    "radiusHint": "Nur help_needed-Beiträge innerhalb dieses Umkreises lösen Push-Benachrichtigungen aus."
   },
   "reading": {
     "enter": "Lese-Modus",
@@ -2526,16 +2530,6 @@
     "no_close": "Offen lassen",
     "duration_hours": "{n} h",
     "duration_days": "{n} Tage"
-  },
-  "notif": {
-    "send_test": "Test-Benachrichtigung senden",
-    "test_title": "Mensaena-Test",
-    "test_body": "Wenn du das hier siehst, funktionieren Benachrichtigungen.",
-    "test_sent": "Test-Benachrichtigung wurde gesendet.",
-    "radiusSection": "Benachrichtigungs-Radius",
-    "nearbyToggle": "Push bei Hilfegesuchen in der Nähe",
-    "radiusValue": "{km} km Umkreis",
-    "radiusHint": "Nur help_needed-Beiträge innerhalb dieses Umkreises lösen Push-Benachrichtigungen aus."
   },
   "status": {
     "title": "Status setzen",
@@ -2892,6 +2886,33 @@
   },
   "crisisCreate": {
     "areYouHere": "Bist du HIER?",
-    "yesReportHere": "Ja, hier melden"
+    "yesReportHere": "Ja, hier melden",
+    "moreDetails": "Weitere Details (optional)",
+    "affectedCount": "Betroffene Personen",
+    "neededHelpers": "Benötigte Helfer:innen",
+    "neededSkills": "Benötigte Fähigkeiten",
+    "neededResources": "Benötigte Ressourcen",
+    "contactName": "Ansprechpartner:in",
+    "contactPhone": "Kontakt-Telefon",
+    "anonymous": "Anonym melden",
+    "anonymousHint": "Dein Name wird Helfenden nicht angezeigt",
+    "photos": "Fotos",
+    "addPhoto": "Foto",
+    "skillMedical": "Medizinisch",
+    "skillTransport": "Transport",
+    "skillShelter": "Unterkunft",
+    "skillManpower": "Tatkraft",
+    "skillTechnical": "Technik",
+    "skillTranslation": "Übersetzung",
+    "skillChildcare": "Kinderbetreuung",
+    "skillAnimalcare": "Tierversorgung",
+    "resWater": "Wasser",
+    "resFood": "Essen",
+    "resBlankets": "Decken",
+    "resClothing": "Kleidung",
+    "resMedicine": "Medikamente",
+    "resPower": "Strom",
+    "resTools": "Werkzeug",
+    "resVehicle": "Fahrzeug"
   }
 }

@@ -1,13 +1,18 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/crisis_repository.dart';
+import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
@@ -29,15 +34,46 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
   final _title = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
+  final _contactName = TextEditingController();
+  final _contactPhone = TextEditingController();
   String _category = 'medical';
   String _urgency = 'high';
   double? _lat;
   double? _lng;
+  int _affected = 0;
+  int _neededHelpers = 0;
+  final Set<String> _skills = <String>{};
+  final Set<String> _resources = <String>{};
+  final List<File> _images = <File>[];
+  bool _anonymous = false;
   bool _submitting = false;
   bool _titleError = false;
   bool _descError = false;
   String? _error;
   late final AnimationController _pulse;
+
+  // Krisen-spezifische Hilfe-Bedarfe (Wert wird gespeichert, Label übersetzt).
+  static const List<({String value, String i18n})> _skillOptions = [
+    (value: 'medical', i18n: 'crisisCreate.skillMedical'),
+    (value: 'transport', i18n: 'crisisCreate.skillTransport'),
+    (value: 'shelter', i18n: 'crisisCreate.skillShelter'),
+    (value: 'manpower', i18n: 'crisisCreate.skillManpower'),
+    (value: 'technical', i18n: 'crisisCreate.skillTechnical'),
+    (value: 'translation', i18n: 'crisisCreate.skillTranslation'),
+    (value: 'childcare', i18n: 'crisisCreate.skillChildcare'),
+    (value: 'animalcare', i18n: 'crisisCreate.skillAnimalcare'),
+  ];
+
+  static const List<({String value, String i18n})> _resourceOptions = [
+    (value: 'water', i18n: 'crisisCreate.resWater'),
+    (value: 'food', i18n: 'crisisCreate.resFood'),
+    (value: 'blankets', i18n: 'crisisCreate.resBlankets'),
+    (value: 'clothing', i18n: 'crisisCreate.resClothing'),
+    (value: 'medicine', i18n: 'crisisCreate.resMedicine'),
+    (value: 'power', i18n: 'crisisCreate.resPower'),
+    (value: 'tools', i18n: 'crisisCreate.resTools'),
+    (value: 'vehicle', i18n: 'crisisCreate.resVehicle'),
+  ];
 
   static const List<({String value, String i18n})> _categories = [
     (value: 'medical', i18n: 'crisis.catMedical'),
@@ -75,7 +111,22 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
     _title.dispose();
     _desc.dispose();
     _location.dispose();
+    _contactName.dispose();
+    _contactPhone.dispose();
     super.dispose();
+  }
+
+  Future<void> _addPhoto() async {
+    if (_images.length >= 3) return;
+    final picker = ImagePicker();
+    final result = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1400,
+      maxHeight: 1400,
+      imageQuality: 80,
+    );
+    if (result == null) return;
+    setState(() => _images.add(File(result.path)));
   }
 
   Future<void> _useGps() async {
@@ -158,6 +209,9 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       _submitting = true;
       _error = null;
     });
+    final imageUrls = _images.isEmpty
+        ? const <String>[]
+        : await ImageUploadService.upload(_images);
     final id = await CrisisRepository.create(
       title: _title.text.trim(),
       description: _desc.text.trim(),
@@ -168,6 +222,15 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
           : _location.text.trim(),
       latitude: _lat,
       longitude: _lng,
+      affectedCount: _affected > 0 ? _affected : null,
+      neededHelpers: _neededHelpers > 0 ? _neededHelpers : null,
+      neededSkills: _skills.toList(),
+      neededResources: _resources.toList(),
+      contactName:
+          _anonymous ? null : _contactName.text.trim(),
+      contactPhone: _contactPhone.text.trim(),
+      imageUrls: imageUrls,
+      isAnonymous: _anonymous,
     );
     if (!mounted) return;
     if (id == null) {
@@ -381,6 +444,151 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+            // ─── Weitere, krisen-spezifische Details (alle optional) ─────
+            Row(
+              children: [
+                Icon(LucideIcons.listPlus,
+                    size: 14, color: AppColors.bronze.withValues(alpha: 0.8)),
+                const SizedBox(width: 6),
+                Text('crisisCreate.moreDetails'.tr(),
+                    style: AppTypography.label(size: 10)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Betroffene Personen + benötigte Helfer:innen als kompakte Stepper.
+            Row(
+              children: [
+                Expanded(
+                  child: _CounterField(
+                    label: 'crisisCreate.affectedCount'.tr(),
+                    icon: LucideIcons.users,
+                    value: _affected,
+                    onChanged: (v) => setState(() => _affected = v),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _CounterField(
+                    label: 'crisisCreate.neededHelpers'.tr(),
+                    icon: LucideIcons.helpingHand,
+                    value: _neededHelpers,
+                    onChanged: (v) => setState(() => _neededHelpers = v),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            // Benötigte Fähigkeiten (Mehrfachauswahl).
+            Text('crisisCreate.neededSkills'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 10),
+            _ChipMultiSelect(
+              options: _skillOptions,
+              selected: _skills,
+              onToggle: (v) => setState(() =>
+                  _skills.contains(v) ? _skills.remove(v) : _skills.add(v)),
+            ),
+            const SizedBox(height: 18),
+            // Benötigte Ressourcen (Mehrfachauswahl).
+            Text('crisisCreate.neededResources'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 10),
+            _ChipMultiSelect(
+              options: _resourceOptions,
+              selected: _resources,
+              onToggle: (v) => setState(() => _resources.contains(v)
+                  ? _resources.remove(v)
+                  : _resources.add(v)),
+            ),
+            const SizedBox(height: 18),
+            // Fotos (max 3) — helfen Helfenden bei der Lageeinschätzung.
+            Text('crisisCreate.photos'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (var i = 0; i < _images.length; i++)
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(_images[i],
+                            width: 76, height: 76, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        right: 2,
+                        top: 2,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _images.removeAt(i)),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Color(0xCC000000),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(LucideIcons.x,
+                                size: 14, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (_images.length < 3)
+                  GestureDetector(
+                    onTap: _addPhoto,
+                    child: Container(
+                      width: 76,
+                      height: 76,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface.withValues(alpha: 0.5),
+                        border: Border.all(color: AppColors.line),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(LucideIcons.camera,
+                          color: AppColors.bronze, size: 22),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            // Kontakt (entfällt bei anonymer Meldung).
+            if (!_anonymous) ...[
+              TextField(
+                controller: _contactName,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'crisisCreate.contactName'.tr(),
+                  prefixIcon: const Icon(LucideIcons.user, size: 18),
+                ),
+              ),
+              const SizedBox(height: 14),
+            ],
+            TextField(
+              controller: _contactPhone,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s/()-]')),
+              ],
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: InputDecoration(
+                labelText: 'crisisCreate.contactPhone'.tr(),
+                prefixIcon: const Icon(LucideIcons.phone, size: 18),
+              ),
+            ),
+            const SizedBox(height: 6),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _anonymous,
+              activeColor: AppColors.herzrot,
+              onChanged: (v) => setState(() => _anonymous = v),
+              title: Text('crisisCreate.anonymous'.tr(),
+                  style: AppTypography.body(size: 14, color: AppColors.ink)),
+              subtitle: Text('crisisCreate.anonymousHint'.tr(),
+                  style: AppTypography.caption()),
+            ),
             if (_error != null) ...[
               const SizedBox(height: 14),
               Container(
@@ -445,6 +653,154 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Kompakter +/−-Zähler für kleine Mengenangaben (Betroffene/Helfer:innen).
+class _CounterField extends StatelessWidget {
+  const _CounterField({
+    required this.label,
+    required this.icon,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final IconData icon;
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 13, color: AppColors.inkSoft),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.caption()),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _StepBtn(
+                icon: LucideIcons.minus,
+                onTap: value > 0 ? () => onChanged(value - 1) : null,
+              ),
+              Text(value == 0 ? '–' : '$value',
+                  style: AppTypography.body(
+                      size: 17,
+                      color: AppColors.ink,
+                      weight: FontWeight.w700)),
+              _StepBtn(
+                icon: LucideIcons.plus,
+                onTap: () => onChanged(value + 1),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepBtn extends StatelessWidget {
+  const _StepBtn({required this.icon, this.onTap});
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 34,
+        height: 34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: enabled
+              ? AppColors.bronze.withValues(alpha: 0.16)
+              : AppColors.surface.withValues(alpha: 0.3),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon,
+            size: 16,
+            color: enabled ? AppColors.bronze : AppColors.mute),
+      ),
+    );
+  }
+}
+
+/// Mehrfach-Auswahl als Chips. Speichert stabile `value`, zeigt `i18n.tr()`.
+class _ChipMultiSelect extends StatelessWidget {
+  const _ChipMultiSelect({
+    required this.options,
+    required this.selected,
+    required this.onToggle,
+  });
+
+  final List<({String value, String i18n})> options;
+  final Set<String> selected;
+  final ValueChanged<String> onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: options.map((o) {
+        final active = selected.contains(o.value);
+        return GestureDetector(
+          onTap: () => onToggle(o.value),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+            decoration: BoxDecoration(
+              color: active
+                  ? AppColors.bronze.withValues(alpha: 0.20)
+                  : AppColors.surface.withValues(alpha: 0.5),
+              border: Border.all(
+                color: active ? AppColors.bronze : AppColors.line,
+                width: active ? 1.5 : 1,
+              ),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (active) ...[
+                  const Icon(LucideIcons.check,
+                      size: 12, color: AppColors.bronze),
+                  const SizedBox(width: 5),
+                ],
+                Text(o.i18n.tr(),
+                    style: AppTypography.label(
+                      size: 11,
+                      color: active ? AppColors.bronze : AppColors.inkSoft,
+                    )),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

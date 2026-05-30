@@ -1470,7 +1470,7 @@
   "groups": {
     "title": "Group",
     "nearbyTitle": "Groups near you",
-    "memberCount": "{n} members",
+    "memberCount": "{count} members",
     "notFound": "Group not found.",
     "leave": "Leave",
     "join": "Join",
@@ -1485,7 +1485,6 @@
     "inviteSend": "Invite",
     "inviteSentTo": "Invitation sent to {email}",
     "inviteFailed": "Invitation failed.",
-    "memberCount": "{count} members",
     "create": "Create group",
     "categoryLabel": "Category",
     "searchPlaceholder": "Search groups…",
@@ -2335,9 +2334,14 @@
     }
   },
   "notif": {
-    "enable": "Enable notifications",
-    "bannerTitle": "Stay in the loop",
-    "bannerBody": "Turn on push so you see calls, messages, and requests right away."
+    "send_test": "Send test notification",
+    "test_title": "Mensaena test",
+    "test_body": "If you see this, notifications are working.",
+    "test_sent": "Test notification sent.",
+    "radiusSection": "Notification radius",
+    "nearbyToggle": "Push for nearby help requests",
+    "radiusValue": "{km} km radius",
+    "radiusHint": "Only help_needed posts within this radius trigger push notifications."
   },
   "reading": {
     "enter": "Reading mode",
@@ -2527,16 +2531,6 @@
     "no_close": "Keep open",
     "duration_hours": "{n} h",
     "duration_days": "{n} days"
-  },
-  "notif": {
-    "send_test": "Send test notification",
-    "test_title": "Mensaena test",
-    "test_body": "If you see this, notifications are working.",
-    "test_sent": "Test notification sent.",
-    "radiusSection": "Notification radius",
-    "nearbyToggle": "Push for nearby help requests",
-    "radiusValue": "{km} km radius",
-    "radiusHint": "Only help_needed posts within this radius trigger push notifications."
   },
   "status": {
     "title": "Set status",
@@ -2893,6 +2887,33 @@
   },
   "crisisCreate": {
     "areYouHere": "Are you HERE?",
-    "yesReportHere": "Yes, report here"
+    "yesReportHere": "Yes, report here",
+    "moreDetails": "More details (optional)",
+    "affectedCount": "People affected",
+    "neededHelpers": "Helpers needed",
+    "neededSkills": "Skills needed",
+    "neededResources": "Resources needed",
+    "contactName": "Contact person",
+    "contactPhone": "Contact phone",
+    "anonymous": "Report anonymously",
+    "anonymousHint": "Your name won't be shown to helpers",
+    "photos": "Photos",
+    "addPhoto": "Photo",
+    "skillMedical": "Medical",
+    "skillTransport": "Transport",
+    "skillShelter": "Shelter",
+    "skillManpower": "Manpower",
+    "skillTechnical": "Technical",
+    "skillTranslation": "Translation",
+    "skillChildcare": "Childcare",
+    "skillAnimalcare": "Animal care",
+    "resWater": "Water",
+    "resFood": "Food",
+    "resBlankets": "Blankets",
+    "resClothing": "Clothing",
+    "resMedicine": "Medicine",
+    "resPower": "Power",
+    "resTools": "Tools",
+    "resVehicle": "Vehicle"
   }
 }
