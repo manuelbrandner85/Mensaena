@@ -17,7 +17,6 @@ import '../../providers/unread_counts_provider.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/recent_pages_service.dart';
-import '../shared/create_picker_sheet.dart';
 import '../shared/my_avatar_top_button.dart';
 import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
@@ -225,8 +224,12 @@ class DashboardScaffold extends ConsumerWidget {
       ),
       drawer: const AppDrawer(),
       bottomNavigationBar: _BottomNav(activeRoute: activeRoute),
-      floatingActionButton: _PlusFab(secondaryFab: fab),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // Zentraler '+'-FAB entfernt (User-Wunsch 2026-05): jedes Modul hat
+      // einen eigenen, zielgerichteten Create-Pfad — ein globaler Picker
+      // ist redundant. fab-Parameter wird durchgereicht für Module die
+      // ihren eigenen FAB setzen.
+      floatingActionButton: fab,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       // V20: CinemaOverlay als SEPARATER Background-Layer, nicht als Wrapper.
       // Das SizedBox.expand() ist der "child" — Cinema rendert seine
       // Atmosphäre dahinter. Content liegt als zweites Stack-Kind DRÜBER.
@@ -288,62 +291,8 @@ class DashboardScaffold extends ConsumerWidget {
   }
 }
 
-class _PlusFab extends StatelessWidget {
-  const _PlusFab({this.secondaryFab});
-  final Widget? secondaryFab;
-
-  @override
-  Widget build(BuildContext context) {
-    if (secondaryFab != null) return secondaryFab!;
-    // Design (Cinema-Hyperreal): zentraler FAB ist Bronze-Gradient mit
-    // abgerundetem Quadrat (radius 18) + Bronze-Glow, nicht Kreis-Amber.
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.bronze.withValues(alpha: 0.45),
-            blurRadius: 24,
-            spreadRadius: -2,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.bronze, AppColors.bronzeDeep],
-          ),
-          border: Border.all(
-            color: const Color(0x59FFFFFF), // inset top highlight
-            width: 0.5,
-          ),
-        ),
-        child: FloatingActionButton(
-          backgroundColor: Colors.transparent,
-          foregroundColor: AppColors.voidColor,
-          elevation: 0,
-          highlightElevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          onPressed: () {
-            Haptics.confirm();
-            // C1: Universeller Create-Picker statt direkter Route. User
-            // sieht 6 Tiles (Post/Event/Marktplatz/Gruppe/Wissen/Krise)
-            // im Cinema-GlassCard-Style.
-            CreatePickerSheet.show(context);
-          },
-          tooltip: 'nav.create'.tr(),
-          child: const Icon(LucideIcons.plus, size: 26),
-        ),
-      ),
-    );
-  }
-}
+// _PlusFab entfernt (User-Wunsch 2026-05): zentraler '+'-Create-Picker
+// raus — jedes Modul hat seinen eigenen zielgerichteten Create-Pfad.
 
 /// V20: BottomNav — BackdropFilter BLEIBT aber sigma von 3 auf 2 reduziert.
 /// Visuell kaum Unterschied (3→2), spart ~25% GPU-Last pro Frame.
@@ -416,7 +365,6 @@ class _BottomNav extends ConsumerWidget {
                         active: _matches(activeRoute, ['/dashboard/map']),
                       ),
                     ),
-                    const SizedBox(width: 56),
                     Expanded(
                       child: _BottomItem(
                         icon: LucideIcons.messageSquare,
