@@ -16,6 +16,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/jobs_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 
@@ -209,7 +210,10 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
                             itemCount: list.length,
                             separatorBuilder: (_, __) =>
                                 const SizedBox(height: 6),
-                            itemBuilder: (_, i) => _JobCard(job: list[i]),
+                            itemBuilder: (_, i) => AnimatedEntrance(
+                              index: i,
+                              child: _JobCard(job: list[i]),
+                            ),
                           ),
                         );
                       },

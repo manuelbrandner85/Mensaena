@@ -9,6 +9,7 @@ import '../../models/post.dart';
 import '../../repositories/posts_repository.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/posts/save_collection_picker.dart';
+import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/shared/post_card.dart';
 
 /// SKILL: mensaena-features
@@ -132,7 +133,10 @@ class _ProfileSavedScreenState extends ConsumerState<ProfileSavedScreen> {
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
                       itemCount: list.length,
-                      itemBuilder: (context, i) => PostCard(post: list[i]),
+                      itemBuilder: (context, i) => AnimatedEntrance(
+                        index: i,
+                        child: PostCard(post: list[i]),
+                      ),
                     );
                   },
                 ),

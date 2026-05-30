@@ -11,6 +11,7 @@ import '../../repositories/interactions_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/shared/trust_rating_modal.dart';
 
 /// SKILL: mensaena-features
@@ -108,7 +109,9 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                 itemCount: all.length,
                 itemBuilder: (context, i) {
                   final it = all[i];
-                  return Container(
+                  return AnimatedEntrance(
+                    index: i,
+                    child: Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -163,6 +166,7 @@ class _InteractionsScreenState extends ConsumerState<InteractionsScreen> {
                         ),
                       ],
                     ),
+                  ),
                   );
                 },
               );

@@ -13,6 +13,7 @@ import '../../../repositories/profiles_repository.dart';
 import '../../../services/locale_country_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
@@ -306,7 +307,10 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
                       itemCount: list.length,
-                      itemBuilder: (context, i) => _FarmTile(farm: list[i]),
+                      itemBuilder: (context, i) => AnimatedEntrance(
+                        index: i,
+                        child: _FarmTile(farm: list[i]),
+                      ),
                     );
                   },
                 ),
