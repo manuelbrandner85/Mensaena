@@ -38,12 +38,18 @@ class CallScreen extends ConsumerStatefulWidget {
     required this.callId,
     required this.roomName,
     required this.peerName,
+    this.preAccepted = false,
     super.key,
   });
 
   final String callId;
   final String roomName;
   final String peerName;
+
+  /// True wenn der Callee den Anruf bereits via CallKit angenommen hat →
+  /// CallScreen verbindet sofort, ohne den dm_calls-Status erst abzufragen
+  /// (schnellerer Raum-Eintritt, kein "App lädt erst komplett"-Gefühl).
+  final bool preAccepted;
 
   @override
   ConsumerState<CallScreen> createState() => _CallScreenState();
@@ -108,6 +114,13 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       await _reattach();
       return;
     }
+    // Callee hat via CallKit angenommen → direkt verbinden, kein
+    // redundanter dm_calls-Status-Query. Status-Update läuft fire-and-forget.
+    if (widget.preAccepted) {
+      unawaited(_markActive());
+      await _connect();
+      return;
+    }
     try {
       final me = SupabaseService.currentUser?.id;
       final call = await sb
@@ -158,6 +171,17 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     } catch (_) {
       await _connect();
     }
+  }
+
+  /// Setzt den Call auf 'active' (fire-and-forget) — beim direkten Beitritt
+  /// nach CallKit-Accept, damit der Caller-Status sofort umspringt.
+  Future<void> _markActive() async {
+    try {
+      await sb.from('dm_calls').update({'status': 'active'}).eq(
+            'id',
+            widget.callId,
+          );
+    } catch (_) {}
   }
 
   void _watchCallStatus() {

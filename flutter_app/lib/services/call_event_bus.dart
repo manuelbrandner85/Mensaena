@@ -211,8 +211,9 @@ class CallEventBus {
 
     final encName = Uri.encodeComponent(ctx.callerName);
     final encRoom = Uri.encodeComponent(ctx.roomName);
+    // accepted=1 → CallScreen verbindet direkt ohne Status-Query-Umweg.
     final route =
-        '/dashboard/call/${ctx.callId}?room=$encRoom&peer=$encName';
+        '/dashboard/call/${ctx.callId}?room=$encRoom&peer=$encName&accepted=1';
 
     final navState = rootNavigatorKey.currentState;
     if (navState != null) {

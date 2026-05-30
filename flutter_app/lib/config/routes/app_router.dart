@@ -1367,6 +1367,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           callId: st.pathParameters['callId']!,
           roomName: st.uri.queryParameters['room'] ?? '',
           peerName: st.uri.queryParameters['peer'] ?? 'Anruf',
+          // accepted=1 → Callee hat angenommen: direkt verbinden ohne
+          // redundanten dm_calls-Status-Query (schnellerer Raum-Eintritt).
+          preAccepted: st.uri.queryParameters['accepted'] == '1',
         ),
         ),
       ),
