@@ -21,9 +21,6 @@ import '../shared/my_avatar_top_button.dart';
 import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
 import '../navigation/language_picker.dart';
-import '../shared/critical_crisis_alert_listener.dart';
-import '../shared/fcm_foreground_listener.dart';
-import '../shared/incoming_call_listener.dart';
 import '../dashboard/zeitbank_confirmation_banner.dart';
 import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
@@ -248,42 +245,31 @@ class DashboardScaffold extends ConsumerWidget {
             child: CinemaOverlay(child: SizedBox.expand()),
           ),
           // Layer 2: Actual Content
-          FcmForegroundListener(
-            child: IncomingCallListener(
-              child: CriticalCrisisAlertListener(
-              child: Stack(
+          // Listener (Fcm/IncomingCall/CriticalCrisis) sind als SINGLETONS
+          // in app.dart MaterialApp.router.builder gemountet — NICHT hier.
+          // Jeder Screen instanziiert seinen eigenen DashboardScaffold, d.h.
+          // ein Wrap hier würde bei jeder Navigation Realtime-/FCM-Subs
+          // disposen + neu öffnen → Socket-Churn → Crash nach 2. Tap.
+          Stack(
+            children: [
+              Column(
                 children: [
-                  Column(
-                    children: [
-                      const ZeitbankConfirmationBanner(),
-                      // Body direkt — KEIN AnimatedSwitcher mehr. Der
-                      // hielt bei jeder Navigation alten+neuen Screen-
-                      // Subtree parallel + erzwang Voll-Rebuild via
-                      // KeyedSubtree → mit dem dauerlaufenden CinemaOverlay
-                      // + Nav-BackdropFilter Main-Thread-Überlast → ANR
-                      // (App hängt bei jedem Tap, dann Crash).
-                      Expanded(child: refreshed),
-                    ],
-                  ),
-                  const Positioned(
-                    left: 16,
-                    bottom: 16,
-                    child: SafeArea(child: MensaenaBotButton()),
-                  ),
-                  // Picture-in-Picture-Mini-Player fuer laufenden Call.
-                  // Draggable, ersetzt den frueheren 36dp-Top-Banner.
-                  if (activeCall != null &&
-                      !activeRoute.startsWith('/dashboard/call/'))
-                    ActiveCallMiniPlayer(info: activeCall),
-                  // Telegram-Modell: Mini-Player für laufenden Livestream,
-                  // wenn der User nicht im Stream-Screen ist.
-                  if (activeStream != null &&
-                      !activeRoute.startsWith('/dashboard/live/'))
-                    ActiveStreamMiniPlayer(info: activeStream),
+                  const ZeitbankConfirmationBanner(),
+                  Expanded(child: refreshed),
                 ],
               ),
+              const Positioned(
+                left: 16,
+                bottom: 16,
+                child: SafeArea(child: MensaenaBotButton()),
               ),
-            ),
+              if (activeCall != null &&
+                  !activeRoute.startsWith('/dashboard/call/'))
+                ActiveCallMiniPlayer(info: activeCall),
+              if (activeStream != null &&
+                  !activeRoute.startsWith('/dashboard/live/'))
+                ActiveStreamMiniPlayer(info: activeStream),
+            ],
           ),
         ],
       ),

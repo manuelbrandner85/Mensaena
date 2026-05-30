@@ -14,6 +14,8 @@ import 'repositories/extra_repositories.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
+import 'widgets/shared/critical_crisis_alert_listener.dart';
+import 'widgets/shared/fcm_foreground_listener.dart';
 import 'widgets/shared/incoming_call_listener.dart';
 import 'widgets/shared/notification_permission_banner.dart';
 import 'widgets/shared/update_gate.dart';
@@ -107,6 +109,8 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
         child: UpdateGate(
           child: BiometricLockGate(
             child: IncomingCallListener(
+              child: FcmForegroundListener(
+              child: CriticalCrisisAlertListener(
               child: _ShakeFeedbackListener(
                 child: Stack(
                   children: [
@@ -121,6 +125,8 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
                     ),
                   ],
                 ),
+              ),
+              ),
               ),
             ),
           ),

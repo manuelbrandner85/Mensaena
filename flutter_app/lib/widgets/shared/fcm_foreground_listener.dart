@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/push_notification_service.dart';
@@ -51,14 +52,21 @@ class _FcmForegroundListenerState extends State<FcmForegroundListener> {
     final type = m.data['type'] as String? ?? 'system';
     if (title == null && body == null) return;
 
+    // Root-Context aus dem globalen Navigator-Key holen, weil dieser
+    // Listener jetzt als Singleton oberhalb des Routers gemountet ist —
+    // der lokale `context` hat dort weder GoRouter noch ScaffoldMessenger
+    // direkt zur Hand.
+    final navCtx = rootNavigatorKey.currentContext;
+    if (navCtx == null) return;
+
     HapticFeedback.mediumImpact();
     SystemSound.play(SystemSoundType.click);
 
     // Incoming-Call: direkt zur Chat-Screen oder Call-Screen
     if (type == 'incoming_call') {
       final callId = m.data['call_id'] as String?;
-      if (callId != null && mounted) {
-        context.go('/dashboard/chat?conv=$callId');
+      if (callId != null) {
+        navCtx.go('/dashboard/chat?conv=$callId');
         return;
       }
     }
@@ -66,7 +74,7 @@ class _FcmForegroundListenerState extends State<FcmForegroundListener> {
     final color = _colorFor(type);
     final icon = _iconFor(type);
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(navCtx).showSnackBar(SnackBar(
       backgroundColor: AppColors.raised,
       duration: const Duration(seconds: 5),
       content: Row(
@@ -132,7 +140,8 @@ class _FcmForegroundListenerState extends State<FcmForegroundListener> {
           ? SnackBarAction(
               label: 'Öffnen',
               textColor: color,
-              onPressed: () => context.go(url),
+              onPressed: () =>
+                  rootNavigatorKey.currentContext?.go(url),
             )
           : null,
     ));
