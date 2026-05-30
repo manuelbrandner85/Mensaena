@@ -68,6 +68,8 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   // true nur wenn der User den Stream WIRKLICH verlässt — steuert ob
   // dispose() den Room trennt oder im StreamRoomHolder weiterlaufen lässt.
   bool _left = false;
+  // Schutz gegen parallele Reconnect-Versuche nach transientem Abbruch.
+  bool _reconnecting = false;
   String? _error;
   int _participantCount = 0;
   // Cache: identity → profile (name + avatar_url) für Avatar-Fallback.
@@ -193,6 +195,36 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     }
   }
 
+  /// Nach transientem Abbruch (Netzwerk-Blip beim Minimieren/Backgrounding):
+  /// den toten Room sauber verwerfen und FRISCH neu beitreten — statt den
+  /// User wie bisher hart aus dem Stream zu werfen. Holder + Foreground-
+  /// Service bleiben durchgehend aktiv, der Mini-Player überlebt.
+  Future<void> _attemptReconnect() async {
+    if (_reconnecting || _left) return;
+    _reconnecting = true;
+    final dead = _room;
+    _room = null;
+    // Holder-Slot freigeben, damit der nachfolgende _connect() NICHT in den
+    // Reattach-Pfad auf den toten Room läuft.
+    StreamRoomHolder.room = null;
+    StreamRoomHolder.roomName = null;
+    try {
+      await dead?.disconnect();
+    } catch (_) {}
+    try {
+      await dead?.dispose();
+    } catch (_) {}
+    _eventsSub?.cancel();
+    _eventsSub = null;
+    _events?.dispose();
+    _events = null;
+    _listener?.dispose();
+    _listener = null;
+    if (mounted) setState(() => _state = _RoomState.connecting);
+    await _connect();
+    _reconnecting = false;
+  }
+
   /// Telegram-Modell: Reattach an den im Holder laufenden Room (Rückkehr
   /// über Mini-Player) — kein erneuter LiveKit-Join, Audio lief durch.
   Future<void> _reattach() async {
@@ -224,7 +256,31 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   /// (pro State neu gebaut, da die Closures auf diesen State zeigen).
   void _attachListeners(lk.Room room) {
     _listener = room.createListener()
-      ..on<lk.RoomDisconnectedEvent>((_) async {
+      ..on<lk.RoomDisconnectedEvent>((e) async {
+        // Bug-Fix (User-Report): Zuschauer "flogen raus" beim Minimieren.
+        // Ursache: JEDER Disconnect-Grund wurde als finales Stream-Ende
+        // behandelt → Holder geleert + Foreground-Service gestoppt. Der Host
+        // publisht durchgehend Audio und hält die Verbindung warm; ein reiner
+        // Zuhörer trifft beim Backgrounding/Minimieren viel eher einen
+        // TRANSIENTEN Abbruch — und wurde dadurch sofort komplett getrennt.
+        //
+        // Jetzt: nur bei TERMINALEN Gründen wirklich beenden. Transiente
+        // Netzwerk-Abbrüche (disconnected, signalingConnectionFailure,
+        // reconnectAttemptsExceeded, stateMismatch, unknown) → Reconnect-
+        // Versuch, Holder + Audio-Service bleiben am Leben.
+        const terminal = {
+          lk.DisconnectReason.clientInitiated,
+          lk.DisconnectReason.roomDeleted,
+          lk.DisconnectReason.serverShutdown,
+          lk.DisconnectReason.participantRemoved,
+          lk.DisconnectReason.duplicateIdentity,
+        };
+        final reason = e.reason;
+        final isTerminal = reason != null && terminal.contains(reason);
+        if (!isTerminal && !_left) {
+          await _attemptReconnect();
+          return;
+        }
         // Server-seitiges Ende → Stream wirklich vorbei: Holder + Shell
         // aufräumen, damit dispose() den Room final wegräumt.
         _left = true;
