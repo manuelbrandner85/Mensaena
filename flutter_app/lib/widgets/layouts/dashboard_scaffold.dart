@@ -158,8 +158,11 @@ class DashboardScaffold extends ConsumerWidget {
         ? body
         : RefreshIndicator(
             onRefresh: onRefresh!,
-            color: AppColors.amber,
+            // Cinema-Branding: Bronze statt Material-Amber, dezenter.
+            color: AppColors.bronze,
             backgroundColor: AppColors.surface,
+            strokeWidth: 2.6,
+            displacement: 44,
             child: body,
           );
 
