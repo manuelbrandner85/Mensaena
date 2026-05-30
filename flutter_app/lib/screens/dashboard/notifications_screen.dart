@@ -12,6 +12,7 @@ import '../../models/notification_model.dart';
 import '../../services/notification_router.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/notification_service.dart';
+import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -280,7 +281,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     itemCount: filtered.length,
                     itemBuilder: (context, i) {
                       final n = filtered[i];
-                      return Dismissible(
+                      return AnimatedEntrance(
+                        index: i,
+                        child: Dismissible(
                         key: ValueKey('notif_${n.id}'),
                         direction: DismissDirection.endToStart,
                         background: Container(
@@ -313,6 +316,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           );
                         },
                         child: _NotificationTile(notif: n),
+                      ),
                       );
                     },
                     ),
