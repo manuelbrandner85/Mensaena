@@ -888,6 +888,7 @@
     "description": "Description",
     "tagsCommaSeparated": "Tags (comma-separated)",
     "tagsHint": "shopping, seniors, saturday",
+    "tagSuggestions": "Suggestions — tap to add",
     "imagesOptional": "Images (optional, max. 5)",
     "anonymousSubtitle": "Your name and avatar will not be shown.",
     "maybeMean": "Did you mean \"{type}\"?",

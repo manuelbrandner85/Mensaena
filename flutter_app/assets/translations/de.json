@@ -887,6 +887,7 @@
     "description": "Beschreibung",
     "tagsCommaSeparated": "Tags (Komma-getrennt)",
     "tagsHint": "einkaufen, senioren, samstag",
+    "tagSuggestions": "Vorschläge — antippen zum Hinzufügen",
     "imagesOptional": "Bilder (optional, max. 5)",
     "anonymousSubtitle": "Dein Name + Avatar werden nicht angezeigt.",
     "maybeMean": "Vielleicht meinst du \"{type}\"?",

@@ -19,6 +19,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
+import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import 'module_create_config.dart';
 
@@ -492,14 +493,20 @@ class _ModuleCreatePostScreenState
             ),
             const SizedBox(height: 14),
 
-            // Tags
-            TextField(
+            // Tags mit antippbaren Vorschlägen
+            TagSuggestionField(
               controller: _tagsCtrl,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.tagsCommaSeparated'.tr(),
-                hintText: 'z.B. dringend, lokal, vegan',
-              ),
+              label: 'create.tagsCommaSeparated'.tr(),
+              suggestions: const [
+                'dringend',
+                'lokal',
+                'kostenlos',
+                'hilfe',
+                'nachbarschaft',
+                'vegan',
+                'familie',
+                'tiere',
+              ],
             ),
             const SizedBox(height: 14),
 
