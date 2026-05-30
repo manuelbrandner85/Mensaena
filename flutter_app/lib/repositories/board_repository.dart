@@ -47,6 +47,9 @@ class BoardRepository {
     required String color,
     String? contactInfo,
     DateTime? expiresAt,
+    String? imageUrl,
+    double? latitude,
+    double? longitude,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -60,6 +63,9 @@ class BoardRepository {
             'color': color,
             'contact_info': contactInfo,
             'expires_at': expiresAt?.toUtc().toIso8601String(),
+            if (imageUrl != null) 'image_url': imageUrl,
+            if (latitude != null) 'latitude': latitude,
+            if (longitude != null) 'longitude': longitude,
             'status': 'active',
             'pinned': false,
             'pin_count': 0,
