@@ -4,6 +4,8 @@
 /// Gefühl statt hartem Erscheinen. Einmalig pro Item (läuft nicht erneut).
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class AnimatedEntrance extends StatefulWidget {
@@ -32,27 +34,37 @@ class AnimatedEntrance extends StatefulWidget {
 class _AnimatedEntranceState extends State<AnimatedEntrance>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c;
-  late final Animation<double> _fade;
+  late final CurvedAnimation _curve;
   late final Animation<Offset> _slide;
+  Timer? _delayTimer;
 
   @override
   void initState() {
     super.initState();
     _c = AnimationController(vsync: this, duration: widget.duration);
-    _fade = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+    _curve = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
     _slide = Tween<Offset>(
       begin: Offset(0, widget.offsetY / 100),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
+    ).animate(_curve);
     final stagger = widget.index.clamp(0, widget.maxStagger);
-    final delay = Duration(milliseconds: 45 * stagger);
-    Future<void>.delayed(delay, () {
-      if (mounted) _c.forward();
-    });
+    if (stagger == 0) {
+      _c.forward();
+    } else {
+      // Timer als Feld halten + in dispose canceln. Sonst feuert ein
+      // Future.delayed nach dem Dispose (schnelles Scrollen baut/disposed
+      // Items laufend) und ruft forward() auf einem disposed Controller →
+      // Crash. mounted-Check allein reicht nicht zuverlässig.
+      _delayTimer = Timer(Duration(milliseconds: 45 * stagger), () {
+        if (mounted) _c.forward();
+      });
+    }
   }
 
   @override
   void dispose() {
+    _delayTimer?.cancel();
+    _curve.dispose();
     _c.dispose();
     super.dispose();
   }
@@ -60,7 +72,7 @@ class _AnimatedEntranceState extends State<AnimatedEntrance>
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: _fade,
+      opacity: _curve,
       child: SlideTransition(position: _slide, child: widget.child),
     );
   }
