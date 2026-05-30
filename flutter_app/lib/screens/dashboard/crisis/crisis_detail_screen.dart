@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,6 +60,10 @@ class CrisisDetailScreen extends ConsumerWidget {
                   onOffer: () => _offerHelp(context, ref, c),
                   onShare: () => _shareCrisis(c),
                 ),
+                if (_NeedsBlock.hasContent(c)) ...[
+                  const SizedBox(height: 16),
+                  _NeedsBlock(crisis: c),
+                ],
                 const SizedBox(height: 18),
                 Row(
                   children: [
@@ -452,6 +457,148 @@ class _ContactBlock extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Zeigt die krisen-spezifischen Bedarfe an, die im Create-Screen erfasst
+/// werden: Fotos, Betroffenenzahl, benötigte Fähigkeiten & Ressourcen.
+class _NeedsBlock extends StatelessWidget {
+  const _NeedsBlock({required this.crisis});
+
+  final Crisis crisis;
+
+  // Stabile DB-Werte → Anzeige-i18n-Keys (Spiegel des Create-Screens).
+  static const Map<String, String> _skillLabels = {
+    'medical': 'crisisCreate.skillMedical',
+    'transport': 'crisisCreate.skillTransport',
+    'shelter': 'crisisCreate.skillShelter',
+    'manpower': 'crisisCreate.skillManpower',
+    'technical': 'crisisCreate.skillTechnical',
+    'translation': 'crisisCreate.skillTranslation',
+    'childcare': 'crisisCreate.skillChildcare',
+    'animalcare': 'crisisCreate.skillAnimalcare',
+  };
+  static const Map<String, String> _resourceLabels = {
+    'water': 'crisisCreate.resWater',
+    'food': 'crisisCreate.resFood',
+    'blankets': 'crisisCreate.resBlankets',
+    'clothing': 'crisisCreate.resClothing',
+    'medicine': 'crisisCreate.resMedicine',
+    'power': 'crisisCreate.resPower',
+    'tools': 'crisisCreate.resTools',
+    'vehicle': 'crisisCreate.resVehicle',
+  };
+
+  static bool hasContent(Crisis c) =>
+      c.imageUrls.isNotEmpty ||
+      (c.affectedCount ?? 0) > 0 ||
+      c.neededSkills.isNotEmpty ||
+      c.neededResources.isNotEmpty;
+
+  String _label(Map<String, String> map, String value) {
+    final key = map[value];
+    return key != null ? key.tr() : value;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (crisis.imageUrls.isNotEmpty) ...[
+            SizedBox(
+              height: 120,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: crisis.imageUrls.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) => ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CachedNetworkImage(
+                    imageUrl: crisis.imageUrls[i],
+                    width: 160,
+                    height: 120,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, __, ___) => Container(
+                      width: 160,
+                      height: 120,
+                      color: AppColors.elevated,
+                      alignment: Alignment.center,
+                      child: const Icon(LucideIcons.imageOff,
+                          size: 18, color: AppColors.mute),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+          ],
+          if ((crisis.affectedCount ?? 0) > 0) ...[
+            Row(
+              children: [
+                const Icon(LucideIcons.users,
+                    size: 16, color: AppColors.inkSoft),
+                const SizedBox(width: 8),
+                Text(
+                  'crisisCreate.affectedCount'.tr(),
+                  style: AppTypography.caption(),
+                ),
+                const Spacer(),
+                Text('${crisis.affectedCount}',
+                    style: AppTypography.body(
+                        size: 15,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700)),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (crisis.neededSkills.isNotEmpty) ...[
+            Text('crisisCreate.neededSkills'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: crisis.neededSkills
+                  .map((s) => _chip(_label(_skillLabels, s)))
+                  .toList(),
+            ),
+            const SizedBox(height: 12),
+          ],
+          if (crisis.neededResources.isNotEmpty) ...[
+            Text('crisisCreate.neededResources'.tr(),
+                style: AppTypography.label(size: 10)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: crisis.neededResources
+                  .map((r) => _chip(_label(_resourceLabels, r)))
+                  .toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _chip(String label) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: AppColors.bronze.withValues(alpha: 0.14),
+          border: Border.all(color: AppColors.bronze.withValues(alpha: 0.4)),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(label,
+            style: AppTypography.label(size: 11, color: AppColors.bronze)),
+      );
 }
 
 class _HelperBlock extends StatelessWidget {
