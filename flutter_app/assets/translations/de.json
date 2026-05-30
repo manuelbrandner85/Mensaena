@@ -1813,6 +1813,8 @@
   },
   "timebank": {
     "history": "Historie",
+    "confirmedSnack": "Eintrag bestätigt.",
+    "rejectedSnack": "Eintrag abgelehnt.",
     "zeitbankConfirmation": "ZEITBANK-BESTÄTIGUNG",
     "reject": "Ablehnen",
     "confirm": "Bestätigen",

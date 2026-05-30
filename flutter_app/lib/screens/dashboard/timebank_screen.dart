@@ -286,9 +286,16 @@ class _EntryTile extends ConsumerWidget {
                       foregroundColor: AppColors.voidColor,
                     ),
                     onPressed: () async {
+                      final m = ScaffoldMessenger.of(context);
                       await TimebankRepository.confirm(entry.id);
                       ref.invalidate(timebankBalanceProvider);
                       ref.invalidate(timebankEntriesProvider);
+                      m.showSnackBar(SnackBar(
+                        backgroundColor: AppColors.surface,
+                        content: Text('timebank.confirmedSnack'.tr(),
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.ink)),
+                      ));
                     },
                     child: Text('common.confirm'.tr()),
                   ),
@@ -297,9 +304,16 @@ class _EntryTile extends ConsumerWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () async {
+                      final m = ScaffoldMessenger.of(context);
                       await TimebankRepository.reject(entry.id);
                       ref.invalidate(timebankBalanceProvider);
                       ref.invalidate(timebankEntriesProvider);
+                      m.showSnackBar(SnackBar(
+                        backgroundColor: AppColors.surface,
+                        content: Text('timebank.rejectedSnack'.tr(),
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.ink)),
+                      ));
                     },
                     child: Text('common.reject'.tr()),
                   ),

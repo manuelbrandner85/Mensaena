@@ -1814,6 +1814,8 @@
   },
   "timebank": {
     "history": "History",
+    "confirmedSnack": "Entry confirmed.",
+    "rejectedSnack": "Entry rejected.",
     "zeitbankConfirmation": "TIMEBANK CONFIRMATION",
     "reject": "Decline",
     "confirm": "Confirm",
