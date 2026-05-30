@@ -75,6 +75,7 @@ class CommunityPollsScreen extends ConsumerWidget {
       TextEditingController(),
     ];
     bool anon = false;
+    bool submitting = false; // Doppel-Submit-Schutz
 
     await showModalBottomSheet<void>(
       context: context,
@@ -149,7 +150,9 @@ class CommunityPollsScreen extends ConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () async {
+                      onPressed: submitting
+                          ? null
+                          : () async {
                         final options = opts
                             .map((c) => c.text.trim())
                             .where((s) => s.isNotEmpty)
@@ -158,6 +161,8 @@ class CommunityPollsScreen extends ConsumerWidget {
                             options.length < 2) {
                           return;
                         }
+                        setState(() => submitting = true);
+                        final messenger = ScaffoldMessenger.of(context);
                         final ok = await CommunityPollsRepository.create(
                           question: qCtrl.text.trim(),
                           options: options,
@@ -168,13 +173,31 @@ class CommunityPollsScreen extends ConsumerWidget {
                         }
                         if (!ctx.mounted) return;
                         Navigator.pop(ctx);
+                        messenger.showSnackBar(SnackBar(
+                          backgroundColor: AppColors.surface,
+                          content: Text(
+                            ok
+                                ? 'community.pollCreated'.tr()
+                                : 'community.pollFailed'.tr(),
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.ink),
+                          ),
+                        ));
                       },
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.bronze,
                         foregroundColor: AppColors.voidColor,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text('community.publish'.tr()),
+                      child: submitting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.voidColor),
+                            )
+                          : Text('community.publish'.tr()),
                     ),
                   ),
                 ],

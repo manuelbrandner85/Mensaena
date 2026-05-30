@@ -2726,6 +2726,8 @@
     "polls": "Community-Umfragen",
     "create_poll": "Umfrage erstellen",
     "publish": "Veröffentlichen",
+    "pollCreated": "Umfrage erstellt.",
+    "pollFailed": "Umfrage konnte nicht erstellt werden.",
     "question": "Frage",
     "option": "Option",
     "add_option": "Option hinzufügen",

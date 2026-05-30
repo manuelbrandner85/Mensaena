@@ -2727,6 +2727,8 @@
     "polls": "Community Polls",
     "create_poll": "Create poll",
     "publish": "Publish",
+    "pollCreated": "Poll created.",
+    "pollFailed": "Could not create poll.",
     "question": "Question",
     "option": "Option",
     "add_option": "Add option",
