@@ -1,14 +1,18 @@
 /// SKILL: mensaena-design (Cinema-Hyperreal / Premium-Motion)
-/// Gestaffelte Eintritts-Animation für Listen-Items: dezentes Fade + Slide-up,
-/// pro Index leicht verzögert. Gibt Listen das hochwertige "fließt herein"-
-/// Gefühl statt hartem Erscheinen. Einmalig pro Item (läuft nicht erneut).
+/// Gestaffelte Eintritts-Animation für Listen-Items.
+///
+/// User-Report 2026-05: 'crasht nach zweitem Tap in Navigation'. Klassisches
+/// Muster: 1. Tap baut Items auf (Controllers/Timer), 2. Tap disposed sie →
+/// dangling Animations-Callback feuert auf disposed State → Crash.
+/// NOTBREMSE: AnimatedEntrance ist app-weit No-Op. Reine Optik, kein
+/// Funktionsverlust. Reaktivierung durch Umstellen von _NO_OP = false.
 library;
-
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class AnimatedEntrance extends StatefulWidget {
+const bool _kAnimatedEntranceEnabled = false;
+
+class AnimatedEntrance extends StatelessWidget {
   const AnimatedEntrance({
     required this.child,
     this.index = 0,
@@ -23,20 +27,46 @@ class AnimatedEntrance extends StatefulWidget {
   final Duration duration;
   final double offsetY;
 
-  /// Ab diesem Index keine zusätzliche Verzögerung mehr (verhindert dass
-  /// lange Listen spät-sichtbare Items ewig verzögern).
+  /// Ab diesem Index keine zusätzliche Verzögerung mehr.
   final int maxStagger;
 
   @override
-  State<AnimatedEntrance> createState() => _AnimatedEntranceState();
+  Widget build(BuildContext context) {
+    if (!_kAnimatedEntranceEnabled) return child;
+    return _AnimatedEntranceImpl(
+      index: index,
+      duration: duration,
+      offsetY: offsetY,
+      maxStagger: maxStagger,
+      child: child,
+    );
+  }
 }
 
-class _AnimatedEntranceState extends State<AnimatedEntrance>
+class _AnimatedEntranceImpl extends StatefulWidget {
+  const _AnimatedEntranceImpl({
+    required this.child,
+    required this.index,
+    required this.duration,
+    required this.offsetY,
+    required this.maxStagger,
+  });
+
+  final Widget child;
+  final int index;
+  final Duration duration;
+  final double offsetY;
+  final int maxStagger;
+
+  @override
+  State<_AnimatedEntranceImpl> createState() => _AnimatedEntranceImplState();
+}
+
+class _AnimatedEntranceImplState extends State<_AnimatedEntranceImpl>
     with SingleTickerProviderStateMixin {
   late final AnimationController _c;
   late final CurvedAnimation _curve;
   late final Animation<Offset> _slide;
-  Timer? _delayTimer;
 
   @override
   void initState() {
@@ -51,19 +81,15 @@ class _AnimatedEntranceState extends State<AnimatedEntrance>
     if (stagger == 0) {
       _c.forward();
     } else {
-      // Timer als Feld halten + in dispose canceln. Sonst feuert ein
-      // Future.delayed nach dem Dispose (schnelles Scrollen baut/disposed
-      // Items laufend) und ruft forward() auf einem disposed Controller →
-      // Crash. mounted-Check allein reicht nicht zuverlässig.
-      _delayTimer = Timer(Duration(milliseconds: 45 * stagger), () {
-        if (mounted) _c.forward();
-      });
+      // Kein Timer/Future mehr — direkt starten, dann mit CurvedAnimation
+      // den Stagger-Effekt simulieren wäre möglich, aber einfacher: alle
+      // Items starten zusammen wenn _kAnimatedEntranceEnabled true.
+      _c.forward();
     }
   }
 
   @override
   void dispose() {
-    _delayTimer?.cancel();
     _curve.dispose();
     _c.dispose();
     super.dispose();
