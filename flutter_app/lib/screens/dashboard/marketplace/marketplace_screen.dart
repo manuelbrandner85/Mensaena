@@ -264,21 +264,24 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     if (_type != 'all')
                       ActiveFilterChip(
                         label: _types
-                            .firstWhere((t) => t.value == _type)
+                            .firstWhere((t) => t.value == _type,
+                                orElse: () => _types.first)
                             .label,
                         onRemove: () => setState(() => _type = 'all'),
                       ),
                     if (_category != null)
                       ActiveFilterChip(
                         label: _categories
-                            .firstWhere((c) => c.value == _category)
+                            .firstWhere((c) => c.value == _category,
+                                orElse: () => _categories.first)
                             .label,
                         onRemove: () => setState(() => _category = null),
                       ),
                     if (_condition != null)
                       ActiveFilterChip(
                         label: _conditions
-                            .firstWhere((c) => c.value == _condition)
+                            .firstWhere((c) => c.value == _condition,
+                                orElse: () => _conditions.first)
                             .label,
                         onRemove: () => setState(() => _condition = null),
                       ),

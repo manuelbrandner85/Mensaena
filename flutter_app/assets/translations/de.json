@@ -2796,6 +2796,8 @@
     "findNoResults": "Keine Nutzer gefunden.",
     "stateAdd": "Anfragen",
     "requestSent": "Freundschaftsanfrage an {name} gesendet.",
+    "requestAccepted": "Freundschaftsanfrage angenommen.",
+    "requestDeclined": "Anfrage abgelehnt.",
     "requestFailed": "Anfrage konnte nicht gesendet werden.",
     "stateRequested": "Angefragt",
     "stateAccept": "Annehmen",

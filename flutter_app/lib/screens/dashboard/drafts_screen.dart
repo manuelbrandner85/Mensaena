@@ -12,6 +12,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/confirm_dialog.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -119,6 +120,13 @@ class DraftsScreen extends ConsumerWidget {
                       IconButton(
                         tooltip: 'common.delete'.tr(),
                         onPressed: () async {
+                          final ok = await ConfirmDialog.show(
+                            context,
+                            title: 'posts.deleteTitle'.tr(),
+                            message: 'posts.deleteConfirm'.tr(),
+                            danger: true,
+                          );
+                          if (!ok) return;
                           await sb
                               .from('posts')
                               .delete()

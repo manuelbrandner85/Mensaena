@@ -2797,6 +2797,8 @@
     "findNoResults": "No users found.",
     "stateAdd": "Add",
     "requestSent": "Friend request sent to {name}.",
+    "requestAccepted": "Friend request accepted.",
+    "requestDeclined": "Request declined.",
     "requestFailed": "Request could not be sent.",
     "stateRequested": "Requested",
     "stateAccept": "Accept",

@@ -906,9 +906,17 @@ class _NewDmPickerSheetState extends State<_NewDmPickerSheet> {
   Future<void> _startChat(String otherId, String name) async {
     if (_creating) return;
     setState(() => _creating = true);
-    final convId = await ConversationsRepository.getOrCreateDm(otherId);
+    String? convId;
+    try {
+      convId = await ConversationsRepository.getOrCreateDm(otherId);
+    } catch (_) {
+      convId = null;
+    } finally {
+      // Guard immer zurücksetzen wenn der Screen noch lebt — sonst bleibt
+      // der Button bei Fehler dauerhaft disabled (Spur-1-Bug).
+      if (mounted) setState(() => _creating = false);
+    }
     if (!mounted) return;
-    setState(() => _creating = false);
     if (convId == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,

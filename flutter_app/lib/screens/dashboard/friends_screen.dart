@@ -428,9 +428,15 @@ class _IncomingTile extends ConsumerWidget {
           icon: const Icon(LucideIcons.check,
               size: 20, color: AppColors.leben),
           onPressed: () async {
+            final messenger = ScaffoldMessenger.of(context);
             await FriendshipsRepository.accept(requesterId);
             ref.invalidate(_incomingProvider);
             ref.invalidate(_friendsProvider);
+            messenger.showSnackBar(SnackBar(
+              backgroundColor: AppColors.surface,
+              content: Text('friends.requestAccepted'.tr(),
+                  style: AppTypography.body(size: 13, color: AppColors.ink)),
+            ));
           },
         ),
         IconButton(
@@ -438,8 +444,14 @@ class _IncomingTile extends ConsumerWidget {
           icon: const Icon(LucideIcons.x,
               size: 20, color: AppColors.herzrotWarm),
           onPressed: () async {
+            final messenger = ScaffoldMessenger.of(context);
             await FriendshipsRepository.decline(requesterId);
             ref.invalidate(_incomingProvider);
+            messenger.showSnackBar(SnackBar(
+              backgroundColor: AppColors.surface,
+              content: Text('friends.requestDeclined'.tr(),
+                  style: AppTypography.body(size: 13, color: AppColors.ink)),
+            ));
           },
         ),
       ]),

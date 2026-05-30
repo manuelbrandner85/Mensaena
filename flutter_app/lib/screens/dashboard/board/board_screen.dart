@@ -117,7 +117,8 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                     if (_category != 'all')
                       ActiveFilterChip(
                         label: _categories
-                            .firstWhere((c) => c.value == _category)
+                            .firstWhere((c) => c.value == _category,
+                                orElse: () => _categories.first)
                             .label,
                         onRemove: () => setState(() => _category = 'all'),
                       ),
