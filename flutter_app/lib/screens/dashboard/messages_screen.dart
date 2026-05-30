@@ -16,6 +16,7 @@ import '../../repositories/conversations_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
@@ -266,7 +267,10 @@ class _ChannelListView extends StatelessWidget {
                 ),
               );
             }
-            return _ChannelTile(channel: item as Map<String, dynamic>);
+            return AnimatedEntrance(
+              index: i,
+              child: _ChannelTile(channel: item as Map<String, dynamic>),
+            );
           },
         );
       },
