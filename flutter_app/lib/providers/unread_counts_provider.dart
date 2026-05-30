@@ -60,13 +60,20 @@ final unreadDmCountProvider = StreamProvider<int>((ref) async* {
   }
   Future<int> fetch() async {
     try {
+      // BUGFIX: messages.receiver_id / read_at sind im DM-Modell IMMER null
+      // (Lesestatus läuft über conversation_members.last_read_at). Die alte
+      // Query lieferte daher KONSTANT 0 → das BottomNav-DM-Badge erschien
+      // nie. Jetzt aus v_unread_counts summieren — dieselbe Quelle, die der
+      // perConversationUnreadProvider bereits korrekt nutzt.
       final rows = await sb
-          .from('messages')
-          .select('id')
-          .eq('receiver_id', myId)
-          .isFilter('read_at', null)
-          .limit(100);
-      return (rows as List).length;
+          .from('v_unread_counts')
+          .select('unread_count')
+          .eq('user_id', myId);
+      var total = 0;
+      for (final r in (rows as List).whereType<Map<String, dynamic>>()) {
+        total += (r['unread_count'] as num?)?.toInt() ?? 0;
+      }
+      return total;
     } catch (_) {
       return 0;
     }

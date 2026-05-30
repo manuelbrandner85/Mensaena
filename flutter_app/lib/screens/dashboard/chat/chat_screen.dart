@@ -78,8 +78,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _captureLastReadAtOpen();
-    MessagesRepository.markRead(widget.conversationId);
+    // BUGFIX: capture MUSS vor markRead laufen (markRead überschreibt
+    // last_read_at mit now()). Vorher waren beide fire-and-forget → Race:
+    // gewann markRead, stand der Unread-Divider falsch (am Ende statt an
+    // der ersten ungelesenen Nachricht). Jetzt sequenziell verkettet.
+    _captureLastReadAtOpen().whenComplete(() {
+      MessagesRepository.markRead(widget.conversationId);
+    });
     _setupPresence();
     _ctrl.addListener(_onTextChanged);
     _loadContext();
@@ -605,22 +610,38 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ),
                 ),
                 data: (msgsRaw) {
-                  // Optimistic-Dedupe: filtere _pendingOutgoing-Eintraege
-                  // raus, die jetzt schon im Stream-Result enthalten sind
-                  // (gleicher Sender + gleicher Content). Cleanup im
-                  // State erfolgt post-frame damit setState() nicht im
-                  // Build-Cycle laeuft.
-                  final pending = _pendingOutgoing
-                      .where((p) => !msgsRaw.any((m) =>
-                          m['sender_id'] == p['sender_id'] &&
-                          m['content'] == p['content']))
-                      .toList();
-                  if (pending.length != _pendingOutgoing.length) {
+                  // Optimistic-Dedupe (count-basiert): pro (Sender|Content)
+                  // wird nur so viel pending entfernt, wie es bereits echte
+                  // Stream-Nachrichten dazu gibt. BUGFIX: vorher wurde rein
+                  // per any(sender+content) gematcht → zwei identische
+                  // Nachrichten ("ok","ok") wurden zu EINER kollabiert,
+                  // solange erst ein Echo angekommen war. Cleanup post-frame.
+                  String keyOf(Map<String, dynamic> m) =>
+                      '${m['sender_id']} ${m['content']}';
+                  final realCounts = <String, int>{};
+                  for (final m in msgsRaw) {
+                    realCounts.update(keyOf(m), (v) => v + 1,
+                        ifAbsent: () => 1);
+                  }
+                  final consumed = <String, int>{};
+                  final pending = <Map<String, dynamic>>[];
+                  final echoedIds = <String>{};
+                  for (final p in _pendingOutgoing) {
+                    final k = keyOf(p);
+                    final used = consumed[k] ?? 0;
+                    if (used < (realCounts[k] ?? 0)) {
+                      consumed[k] = used + 1; // Echo schon im Stream → droppen
+                      final id = p['id'] as String?;
+                      if (id != null) echoedIds.add(id);
+                    } else {
+                      pending.add(p); // noch kein Echo → optimistisch zeigen
+                    }
+                  }
+                  if (echoedIds.isNotEmpty) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (!mounted) return;
-                      _pendingOutgoing.removeWhere((p) => msgsRaw.any((m) =>
-                          m['sender_id'] == p['sender_id'] &&
-                          m['content'] == p['content']));
+                      _pendingOutgoing.removeWhere(
+                          (p) => echoedIds.contains(p['id']));
                     });
                   }
                   final combined = pending.isEmpty
