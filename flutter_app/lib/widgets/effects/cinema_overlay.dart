@@ -59,6 +59,17 @@ class CinemaOverlay extends ConsumerWidget {
     // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
     // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
     // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
+    // ANR-NOTBREMSE (User-Report 2026-05: 'egal wo man drückt hängt App
+    // dann crash'): Cinema-Overlay app-weit aus. Bis zu 12 animierte
+    // Effect-Layer mit AnimationController.repeat + AnimatedSwitcher die
+    // alte+neue Phase 8s parallel halten → ANR-Treiber. Statisches Cinema-
+    // Dark via AppColors ist lesbar genug. Re-aktivieren: diese Zeile
+    // entfernen sobald wir Geräte-Performance verifiziert haben.
+    return KeyedSubtree(
+      key: const ValueKey('cinema_overlay_off'),
+      child: child,
+    );
+    // ignore: dead_code
     if (phase == null || baseIntensity <= 0.01 || reduceMotion) {
       return KeyedSubtree(
         key: const ValueKey('cinema_overlay_off'),
