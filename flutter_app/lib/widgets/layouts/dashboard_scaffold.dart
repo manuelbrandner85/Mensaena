@@ -257,23 +257,13 @@ class DashboardScaffold extends ConsumerWidget {
                   Column(
                     children: [
                       const ZeitbankConfirmationBanner(),
-                      // Sanfter Cross-Fade beim Tab-/Screen-Wechsel
-                      // (Cinema-Feel statt hartem Sprung).
-                      Expanded(
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 240),
-                          switchInCurve: Curves.easeOut,
-                          switchOutCurve: Curves.easeIn,
-                          transitionBuilder: (child, anim) => FadeTransition(
-                            opacity: anim,
-                            child: child,
-                          ),
-                          child: KeyedSubtree(
-                            key: ValueKey(activeRoute),
-                            child: refreshed,
-                          ),
-                        ),
-                      ),
+                      // Body direkt — KEIN AnimatedSwitcher mehr. Der
+                      // hielt bei jeder Navigation alten+neuen Screen-
+                      // Subtree parallel + erzwang Voll-Rebuild via
+                      // KeyedSubtree → mit dem dauerlaufenden CinemaOverlay
+                      // + Nav-BackdropFilter Main-Thread-Überlast → ANR
+                      // (App hängt bei jedem Tap, dann Crash).
+                      Expanded(child: refreshed),
                     ],
                   ),
                   const Positioned(
@@ -337,7 +327,10 @@ class _BottomNav extends ConsumerWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(26),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              // sigma niedrig halten (3 statt 10) — BackdropFilter rendert
+              // jeden Frame; mit dauerlaufendem CinemaOverlay war 10 ein
+              // GPU-/Main-Thread-Treiber Richtung ANR.
+              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
               child: Container(
                 height: 64,
                 decoration: BoxDecoration(
