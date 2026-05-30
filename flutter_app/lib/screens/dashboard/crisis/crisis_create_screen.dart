@@ -34,6 +34,8 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
   double? _lat;
   double? _lng;
   bool _submitting = false;
+  bool _titleError = false;
+  bool _descError = false;
   String? _error;
   late final AnimationController _pulse;
 
@@ -139,8 +141,14 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
   }
 
   Future<void> _submit() async {
-    if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
-      setState(() => _error = 'crisis.fieldTitleRequired'.tr());
+    final titleEmpty = _title.text.trim().isEmpty;
+    final descEmpty = _desc.text.trim().isEmpty;
+    if (titleEmpty || descEmpty) {
+      setState(() {
+        _titleError = titleEmpty;
+        _descError = descEmpty;
+        _error = 'crisis.fieldTitleRequired'.tr();
+      });
       return;
     }
     // K1: GPS-Bestätigung
@@ -304,8 +312,12 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
               controller: _title,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
+              onChanged: _titleError
+                  ? (_) => setState(() => _titleError = false)
+                  : null,
               decoration: InputDecoration(
                 labelText: 'crisis.fieldTitle'.tr(),
+                errorText: _titleError ? 'create.titleRequired'.tr() : null,
               ),
             ),
             const SizedBox(height: 14),
@@ -317,11 +329,16 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
                   maxLines: 5,
                   maxLength: 1500,
                   style: AppTypography.body(size: 14, color: AppColors.ink),
+                  onChanged: _descError
+                      ? (_) => setState(() => _descError = false)
+                      : null,
                   decoration: InputDecoration(
                     labelText: 'crisis.fieldDescription'.tr(),
                     alignLabelWithHint: true,
                     helperText: 'crisis.voiceHint'.tr(),
                     helperStyle: AppTypography.caption(),
+                    errorText:
+                        _descError ? 'create.descRequired'.tr() : null,
                   ),
                 ),
                 Positioned(

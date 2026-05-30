@@ -22,6 +22,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   String _category = 'general';
   String _color = 'yellow';
   bool _submitting = false;
+  bool _contentError = false;
   String? _error;
 
   static const List<({String value, String label, String emoji})> _categories = [
@@ -46,7 +47,10 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
 
   Future<void> _submit() async {
     if (_content.text.trim().isEmpty) {
-      setState(() => _error = 'Inhalt ist Pflicht.');
+      setState(() {
+        _contentError = true;
+        _error = 'create.contentRequired'.tr();
+      });
       return;
     }
     setState(() {
@@ -154,9 +158,14 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
               maxLines: 6,
               maxLength: 1000,
               style: AppTypography.body(size: 14, color: AppColors.ink),
+              onChanged: _contentError
+                  ? (_) => setState(() => _contentError = false)
+                  : null,
               decoration: InputDecoration(
                 labelText: 'create.pinNote'.tr(),
                 alignLabelWithHint: true,
+                errorText:
+                    _contentError ? 'create.contentRequired'.tr() : null,
               ),
             ),
             const SizedBox(height: 12),

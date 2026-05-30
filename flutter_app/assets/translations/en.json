@@ -839,6 +839,7 @@
     "titleRequired": "Title is required.",
     "nameRequired": "Name is required.",
     "descRequired": "Description is required.",
+    "contentRequired": "Content is required.",
     "fillTypeAndTitle": "Please fill in type and title.",
     "fillTitleAndDesc": "Please fill in title and description.",
     "picker_title": "What do you want to create?",
@@ -1783,6 +1784,7 @@
     "savePinTitle": "Save pin",
     "savePinHint": "e.g. favourite café, meeting spot…",
     "removePin": "Remove pin",
+    "removePinConfirm": "Really delete this saved place?",
     "longPressHint": "Tip: long-press the map to save your own pin.",
     "a11y": {
       "unnamed": "Unnamed place",

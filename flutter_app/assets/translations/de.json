@@ -838,6 +838,7 @@
     "titleRequired": "Titel ist erforderlich.",
     "nameRequired": "Name ist erforderlich.",
     "descRequired": "Beschreibung ist erforderlich.",
+    "contentRequired": "Inhalt ist erforderlich.",
     "fillTypeAndTitle": "Bitte Typ und Titel ausfüllen.",
     "fillTitleAndDesc": "Bitte Titel und Beschreibung ausfüllen.",
     "picker_title": "Was möchtest du erstellen?",
@@ -1782,6 +1783,7 @@
     "savePinTitle": "Pin speichern",
     "savePinHint": "z. B. Lieblings-Café, Treffpunkt …",
     "removePin": "Pin löschen",
+    "removePinConfirm": "Diesen gespeicherten Ort wirklich löschen?",
     "longPressHint": "Tipp: Lange auf die Karte tippen → eigenen Pin speichern.",
     "a11y": {
       "unnamed": "Ort ohne Namen",

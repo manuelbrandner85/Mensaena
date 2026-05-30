@@ -23,6 +23,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../services/air_quality_service.dart';
 import '../../services/location_service.dart';
 import '../../services/saved_pins_service.dart';
+import '../../widgets/confirm_dialog.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -227,6 +228,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () async {
+                  final confirmed = await ConfirmDialog.show(
+                    ctx,
+                    title: 'map.removePin'.tr(),
+                    message: 'map.removePinConfirm'.tr(),
+                    danger: true,
+                  );
+                  if (!confirmed) return;
                   await SavedPinsService.remove(pin.id);
                   await _loadSavedPins();
                   if (!ctx.mounted) return;
