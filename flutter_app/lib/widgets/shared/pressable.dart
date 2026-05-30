@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../config/theme/app_colors.dart';
 import '../../services/haptics.dart';
 
 class Pressable extends StatefulWidget {
@@ -16,6 +17,7 @@ class Pressable extends StatefulWidget {
     this.scale = 0.97,
     this.haptic = true,
     this.borderRadius,
+    this.glow,
     super.key,
   });
 
@@ -25,6 +27,9 @@ class Pressable extends StatefulWidget {
   final double scale;
   final bool haptic;
   final BorderRadius? borderRadius;
+
+  /// Optional: Glow-Farbe beim Drücken (für Primär-Aktionen). Null = kein Glow.
+  final Color? glow;
 
   @override
   State<Pressable> createState() => _PressableState();
@@ -54,7 +59,26 @@ class _PressableState extends State<Pressable> {
         scale: _down ? widget.scale : 1.0,
         duration: const Duration(milliseconds: 110),
         curve: Curves.easeOut,
-        child: widget.child,
+        child: widget.glow == null
+            ? widget.child
+            : AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                decoration: BoxDecoration(
+                  borderRadius:
+                      widget.borderRadius ?? BorderRadius.circular(14),
+                  boxShadow: _down
+                      ? [
+                          BoxShadow(
+                            color: (widget.glow ?? AppColors.bronze)
+                                .withValues(alpha: 0.45),
+                            blurRadius: 22,
+                            spreadRadius: -2,
+                          ),
+                        ]
+                      : const [],
+                ),
+                child: widget.child,
+              ),
       ),
     );
   }

@@ -17,6 +17,7 @@ import '../../widgets/shared/editorial_module_header.dart';
 import '../../widgets/shared/empty_state_card.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
 import '../../widgets/shared/module_search_bar.dart';
+import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/shared/post_card.dart';
 import '../../widgets/shared/skeleton_card.dart';
 
@@ -426,7 +427,10 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
               ),
             );
           }
-          return PostCard(post: _items[i]);
+          return AnimatedEntrance(
+            index: i,
+            child: PostCard(post: _items[i]),
+          );
         },
       ),
     );
