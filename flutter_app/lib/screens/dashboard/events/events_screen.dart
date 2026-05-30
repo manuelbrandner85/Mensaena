@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -299,8 +300,10 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
                       itemCount: list.length,
-                      itemBuilder: (context, i) =>
-                          _EventTile(event: list[i]),
+                      itemBuilder: (context, i) => AnimatedEntrance(
+                        index: i,
+                        child: _EventTile(event: list[i]),
+                      ),
                     );
                   },
                 ),

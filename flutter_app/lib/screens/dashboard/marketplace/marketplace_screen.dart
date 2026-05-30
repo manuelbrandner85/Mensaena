@@ -12,6 +12,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/location_service.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -372,8 +373,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         childAspectRatio: 0.72,
                       ),
                       itemCount: list.length,
-                      itemBuilder: (context, i) =>
-                          _Tile(item: list[i]),
+                      itemBuilder: (context, i) => AnimatedEntrance(
+                        index: i,
+                        child: _Tile(item: list[i]),
+                      ),
                     );
                   },
                 ),

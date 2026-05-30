@@ -1,3 +1,4 @@
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/shared/sized_avatar_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -167,7 +168,10 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                       itemCount: list.length + 1,
                       itemBuilder: (context, i) {
                         if (i == 0) return const NearbyGroupsCarousel();
-                        return _Tile(group: list[i - 1]);
+                        return AnimatedEntrance(
+                          index: i,
+                          child: _Tile(group: list[i - 1]),
+                        );
                       },
                     );
                   },
