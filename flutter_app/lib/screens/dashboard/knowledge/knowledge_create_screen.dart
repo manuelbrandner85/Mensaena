@@ -14,6 +14,7 @@ import '../../../repositories/knowledge_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
+import '../../../widgets/shared/tag_suggestion_field.dart';
 
 /// SKILL: mensaena-features
 /// Knowledge-Create-Screen — Markdown-Editor mit Live-Vorschau,
@@ -446,12 +447,18 @@ class _KnowledgeCreateScreenState
             // 5) Tags
             _sectionLabel('knowledge.tags'.tr()),
             const SizedBox(height: 6),
-            TextField(
+            TagSuggestionField(
               controller: _tagsCtrl,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                hintText: 'einkaufen, wien, vegan',
-              ),
+              suggestions: const [
+                'anleitung',
+                'tipp',
+                'wissen',
+                'gesundheit',
+                'garten',
+                'reparatur',
+                'recht',
+                'finanzen',
+              ],
             ),
             const SizedBox(height: 14),
 

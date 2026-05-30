@@ -836,6 +836,8 @@
     "deleteEntryConfirm": "Permanently delete this entry from \"{table}\"?"
   },
   "create": {
+    "titleRequired": "Title is required.",
+    "fillTypeAndTitle": "Please fill in type and title.",
     "picker_title": "What do you want to create?",
     "picker_subtitle": "Pick a type.",
     "picker": {

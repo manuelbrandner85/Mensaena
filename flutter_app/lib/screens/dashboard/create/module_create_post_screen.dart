@@ -63,6 +63,7 @@ class _ModuleCreatePostScreenState
   double? _lat;
   double? _lng;
   bool _submitting = false;
+  bool _titleError = false;
   String? _error;
   Timer? _draftTimer;
 
@@ -189,8 +190,12 @@ class _ModuleCreatePostScreenState
   }
 
   Future<void> _submit() async {
-    if (_type == null || _titleCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'Bitte Typ und Titel ausfüllen.');
+    final titleEmpty = _titleCtrl.text.trim().isEmpty;
+    if (_type == null || titleEmpty) {
+      setState(() {
+        _titleError = titleEmpty;
+        _error = 'create.fillTypeAndTitle'.tr();
+      });
       return;
     }
     setState(() {
@@ -386,14 +391,18 @@ class _ModuleCreatePostScreenState
               const SizedBox(height: 14),
             ],
 
-            // Titel
+            // Titel (Pflichtfeld — inline-Fehler bei Submit-Versuch)
             TextField(
               controller: _titleCtrl,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
+              onChanged: _titleError
+                  ? (_) => setState(() => _titleError = false)
+                  : null,
               decoration: InputDecoration(
                 labelText: 'create.title'.tr(),
                 counterText: '',
+                errorText: _titleError ? 'create.titleRequired'.tr() : null,
               ),
             ),
             const SizedBox(height: 12),
