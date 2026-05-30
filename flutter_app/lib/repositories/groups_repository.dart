@@ -211,6 +211,11 @@ class GroupsRepository {
     required String category,
     String? description,
     bool isPrivate = false,
+    String? coverImageUrl,
+    int? maxMembers,
+    double? latitude,
+    double? longitude,
+    int? radiusKm,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -226,6 +231,11 @@ class GroupsRepository {
             'creator_id': uid,
             'member_count': 1,
             'post_count': 0,
+            if (coverImageUrl != null) 'cover_image_url': coverImageUrl,
+            if (maxMembers != null) 'max_members': maxMembers,
+            if (latitude != null) 'latitude': latitude,
+            if (longitude != null) 'longitude': longitude,
+            if (radiusKm != null) 'radius_km': radiusKm,
           })
           .select()
           .maybeSingle();
