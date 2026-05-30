@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/skill_offer.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 
@@ -117,7 +118,10 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
               return ListView.builder(
                 padding: const EdgeInsets.all(12),
                 itemCount: list.length,
-                itemBuilder: (context, i) => _SkillTile(skill: list[i]),
+                itemBuilder: (context, i) => AnimatedEntrance(
+                  index: i,
+                  child: _SkillTile(skill: list[i]),
+                ),
               );
             },
           ),
