@@ -33,6 +33,8 @@ class _MarketplaceCreateScreenState
   String _category = 'haushalt';
   String _condition = 'gut';
   bool _submitting = false;
+  bool _titleError = false;
+  bool _descError = false;
   bool _uploading = false;
   String? _error;
   final List<File> _images = [];
@@ -173,8 +175,14 @@ class _MarketplaceCreateScreenState
   }
 
   Future<void> _submit() async {
-    if (_title.text.trim().isEmpty || _desc.text.trim().isEmpty) {
-      setState(() => _error = 'Titel und Beschreibung sind Pflicht.');
+    final titleEmpty = _title.text.trim().isEmpty;
+    final descEmpty = _desc.text.trim().isEmpty;
+    if (titleEmpty || descEmpty) {
+      setState(() {
+        _titleError = titleEmpty;
+        _descError = descEmpty;
+        _error = 'create.fillTitleAndDesc'.tr();
+      });
       return;
     }
     setState(() {
@@ -308,16 +316,26 @@ class _MarketplaceCreateScreenState
               controller: _title,
               maxLength: 120,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: InputDecoration(labelText: 'create.title'.tr()),
+              onChanged: _titleError
+                  ? (_) => setState(() => _titleError = false)
+                  : null,
+              decoration: InputDecoration(
+                labelText: 'create.title'.tr(),
+                errorText: _titleError ? 'create.titleRequired'.tr() : null,
+              ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _desc,
               maxLines: 4,
               style: AppTypography.body(size: 14, color: AppColors.ink),
+              onChanged: _descError
+                  ? (_) => setState(() => _descError = false)
+                  : null,
               decoration: InputDecoration(
                 labelText: 'create.description'.tr(),
                 alignLabelWithHint: true,
+                errorText: _descError ? 'create.descRequired'.tr() : null,
               ),
             ),
             const SizedBox(height: 12),

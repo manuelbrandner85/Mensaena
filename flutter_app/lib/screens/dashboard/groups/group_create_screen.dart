@@ -22,6 +22,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
   String _category = 'nachbarschaft';
   bool _isPrivate = false;
   bool _submitting = false;
+  bool _nameError = false;
   String? _error;
 
   static const List<({String value, String label, String emoji})> _categories = [
@@ -50,7 +51,10 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
 
   Future<void> _submit() async {
     if (_name.text.trim().isEmpty) {
-      setState(() => _error = 'Name ist Pflicht.');
+      setState(() {
+        _nameError = true;
+        _error = 'create.nameRequired'.tr();
+      });
       return;
     }
     setState(() {
@@ -88,7 +92,13 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
               controller: _name,
               maxLength: 60,
               style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: InputDecoration(labelText: 'create.groupName'.tr()),
+              onChanged: _nameError
+                  ? (_) => setState(() => _nameError = false)
+                  : null,
+              decoration: InputDecoration(
+                labelText: 'create.groupName'.tr(),
+                errorText: _nameError ? 'create.nameRequired'.tr() : null,
+              ),
             ),
             const SizedBox(height: 8),
             TextField(

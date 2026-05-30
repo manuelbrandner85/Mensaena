@@ -50,6 +50,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   File? _coverImage;
   String? _uploadedImageUrl;
   bool _submitting = false;
+  bool _titleError = false;
   bool _uploading = false;
   String? _error;
 
@@ -228,7 +229,10 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
 
   Future<void> _submit() async {
     if (_titleCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'events.validationTitle'.tr());
+      setState(() {
+        _titleError = true;
+        _error = 'events.validationTitle'.tr();
+      });
       return;
     }
     if (_startDate == null) {
@@ -446,8 +450,11 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
             style: AppTypography.body(size: 15, color: AppColors.ink),
             decoration: InputDecoration(
               labelText: 'create.title'.tr(),
+              errorText: _titleError ? 'create.titleRequired'.tr() : null,
             ),
-            onChanged: (_) => setState(() {/* triggert Submit-Button-State */}),
+            onChanged: (_) => setState(() {
+              if (_titleError) _titleError = false;
+            }),
           ),
           const SizedBox(height: 6),
           TextField(
