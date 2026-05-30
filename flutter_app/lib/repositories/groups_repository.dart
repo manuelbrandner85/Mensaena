@@ -64,6 +64,9 @@ class GroupsRepository {
       final rows = await sb
           .from('groups')
           .select()
+          // Audit-Fix: archivierte/gelöschte Gruppen ausblenden (nearby()
+          // hatte den Filter, listAll() nicht → zeigte tote Gruppen).
+          .eq('is_archived', false)
           .order('member_count', ascending: false)
           .limit(limit);
       return (rows as List)
