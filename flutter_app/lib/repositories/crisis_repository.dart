@@ -4,15 +4,24 @@ import '../models/crisis.dart';
 import '../models/crisis_helper.dart';
 import '../models/crisis_update.dart';
 import '../models/emergency_number.dart';
+import '../services/location_service.dart';
 import '../services/supabase_service.dart';
+import 'profiles_repository.dart';
 
 /// SKILL: supabase + mensaena-features
 /// Crisis-Repository: aktive Krisen, Helpers (Realtime), Updates (Realtime).
 class CrisisRepository {
   const CrisisRepository._();
 
-  /// Alle aktiven Krisen (status != 'resolved' && resolved_at IS NULL).
-  static Future<List<Crisis>> listActive() async {
+  /// Aktive Krisen (status != 'resolved' && resolved_at IS NULL).
+  /// User-Wunsch: nach eingestelltem Standort filtern. [lat]/[lng] = Profil-
+  /// Standort; ohne Angabe → global. SICHERHEIT: Krisen OHNE Koordinaten
+  /// werden IMMER gezeigt (nie eine Notlage verstecken).
+  static Future<List<Crisis>> listActive({
+    double? lat,
+    double? lng,
+    double radiusKm = 150,
+  }) async {
     try {
       final rows = await sb
           .from('crises')
@@ -20,10 +29,17 @@ class CrisisRepository {
           .filter('resolved_at', 'is', null)
           .neq('status', 'resolved')
           .order('created_at', ascending: false);
-      return (rows as List)
+      final all = (rows as List)
           .whereType<Map<String, dynamic>>()
           .map(Crisis.fromJson)
           .toList();
+      if (lat == null || lng == null) return all;
+      return all.where((c) {
+        if (c.latitude == null || c.longitude == null) return true; // safety
+        final d = LocationService.haversineKm(
+            lat, lng, c.latitude!, c.longitude!);
+        return d <= radiusKm;
+      }).toList();
     } catch (_) {
       return const [];
     }
@@ -205,7 +221,11 @@ class EmergencyNumbersRepository {
 
 // ── Providers ────────────────────────────────────────────────────────────
 final activeCrisesProvider = FutureProvider<List<Crisis>>((ref) async {
-  return CrisisRepository.listActive();
+  // User-Wunsch: Krisen nach eingestelltem (Profil-)Standort filtern.
+  final profile = ref.watch(myProfileProvider).asData?.value;
+  final lat = profile?.latitude ?? profile?.homeLat;
+  final lng = profile?.longitude ?? profile?.homeLng;
+  return CrisisRepository.listActive(lat: lat, lng: lng);
 });
 
 final crisisDetailProvider =
