@@ -1,23 +1,55 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
+import 'package:go_router/go_router.dart';
+
 /// SKILL: mensaena-architektur
-/// Deep-Link Handling — initial Link + Stream fuer eingehende Links.
-/// Verarbeitet Mensaena-spezifische Schemas:
-///   https://www.mensaena.de/dashboard/posts/<id> → /dashboard/posts/<id>
-///   https://www.mensaena.de/auth?ref=<code>     → /auth?ref=<code>
+/// Deep-Link Handling — fängt eingehende `https://www.mensaena.de/...`-Links
+/// nativ ab (Android-App-Links + iOS-Universal-Links) und reicht sie als
+/// interne GoRouter-Routen weiter.
 ///
-/// Phase 1 Skeleton: nur Pfad-Mapping, keine Platform-Channel-Implementierung.
-/// Reale Anbindung an app_links/uni_links Package erfolgt in Phase 3
-/// (zusammen mit dem Login-Flow der den ref-Param interpretieren muss).
+/// Mapping:
+///   https://www.mensaena.de/dashboard/posts/<id> → /dashboard/posts/<id>
+///   https://www.mensaena.de/auth?ref=<code>      → /auth?ref=<code>
+///   mensaena://...                                → /...
 class DeepLinkService {
   DeepLinkService._();
   static final DeepLinkService instance = DeepLinkService._();
 
+  final AppLinks _appLinks = AppLinks();
   final StreamController<String> _controller =
       StreamController<String>.broadcast();
+  StreamSubscription<Uri>? _sub;
+  bool _initialized = false;
 
   /// Stream eingehender Deep-Links als App-interne Routen.
   Stream<String> get linkStream => _controller.stream;
+
+  /// Einmalige Initialisierung beim App-Start. Hört auf eingehende
+  /// Links und holt den Initial-Link (falls die App über einen Link
+  /// gekaltstartet wurde). Mehrfach-Aufrufe sind no-op.
+  Future<void> initialize({GoRouter? router}) async {
+    if (_initialized) return;
+    _initialized = true;
+    try {
+      // Cold-Start-Link.
+      final initial = await _appLinks.getInitialLink();
+      if (initial != null) _handle(initial, router);
+    } catch (_) {/* fail-silent */}
+    _sub = _appLinks.uriLinkStream.listen(
+      (uri) => _handle(uri, router),
+      onError: (_) {/* fail-silent */},
+      cancelOnError: false,
+    );
+  }
+
+  void _handle(Uri uri, GoRouter? router) {
+    final route = toInternalRoute(uri);
+    if (route == null) return;
+    _controller.add(route);
+    // Sofort navigieren wenn der Router schon bereit ist.
+    router?.go(route);
+  }
 
   /// Konvertiert eine eingehende URL in eine GoRouter-Route.
   /// Returns null wenn URL nicht zu uns gehoert.
@@ -32,8 +64,12 @@ class DeepLinkService {
     return '$path$query';
   }
 
-  /// Test-/Phase-3-Hook: simuliert einen eingehenden Link.
+  /// Test-Hook: simuliert einen eingehenden Link.
   void simulateLink(String internalRoute) => _controller.add(internalRoute);
 
-  void dispose() => _controller.close();
+  void dispose() {
+    _sub?.cancel();
+    _sub = null;
+    _controller.close();
+  }
 }

@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/board_post.dart';
 import '../../../repositories/board_repository.dart';
+import '../../../services/share_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -132,6 +133,16 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                               },
                             ),
                           ],
+                          IconButton(
+                            tooltip: 'common.share'.tr(),
+                            icon: const Icon(LucideIcons.share2,
+                                size: 16, color: AppColors.bronze),
+                            onPressed: () => ShareService.share(
+                              type: ShareableType.board,
+                              id: p.id,
+                              titleOrText: p.content,
+                            ),
+                          ),
                           IconButton(
                             icon: Icon(
                               LucideIcons.pin,

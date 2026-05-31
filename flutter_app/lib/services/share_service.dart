@@ -3,15 +3,71 @@ import 'package:share_plus/share_plus.dart';
 import '../config/app_config.dart';
 import 'supabase_service.dart';
 
+/// Geteilte Inhalte — App-weit unterstützte Typen für Deep-Links.
+/// Spiegelt 1:1 die GoRouter-Detail-Pfade.
+enum ShareableType {
+  post,
+  event,
+  group,
+  marketplace,
+  board,
+  knowledge,
+  crisis,
+  profile,
+  organization,
+}
+
+extension _SharePath on ShareableType {
+  String get path {
+    switch (this) {
+      case ShareableType.post:         return 'posts';
+      case ShareableType.event:        return 'events';
+      case ShareableType.group:        return 'groups';
+      case ShareableType.marketplace:  return 'marketplace';
+      case ShareableType.board:        return 'board';
+      case ShareableType.knowledge:    return 'knowledge';
+      case ShareableType.crisis:       return 'crisis';
+      case ShareableType.profile:      return 'profile';
+      case ShareableType.organization: return 'organizations';
+    }
+  }
+}
+
 /// SKILL: mensaena-features
-/// Sharing intern (DM) + extern (System-Share-Sheet). QR-Code-Trigger
-/// liefert nur die zu codierende URL — Rendering uebernimmt qr_flutter
-/// im UI-Layer (damit Tests ohne Plugin laufen).
+/// Sharing intern (DM) + extern (System-Share-Sheet). Generisch für alle
+/// App-Inhalte. Die URLs spiegeln 1:1 die Web-/Deep-Link-Routen
+/// `https://www.mensaena.de/dashboard/<typ>/<id>` → öffnen die App via
+/// Intent-Filter oder fallen auf die Web-Version zurück.
 class ShareService {
   const ShareService._();
 
-  /// Externe Share via System-Share-Sheet (WhatsApp, Signal, Mail...).
-  /// Trackt den Share in post_shares (platform='external').
+  /// Generischer Share — wird für ALLE Inhaltstypen genutzt.
+  /// [titleOrText] erscheint im Share-Sheet als Vorschau. Wenn null,
+  /// wird "Schau dir das auf Mensaena an" als Default benutzt.
+  static Future<void> share({
+    required ShareableType type,
+    required String id,
+    String? titleOrText,
+    String? subject,
+  }) async {
+    final url = buildUrl(type: type, id: id);
+    final text = titleOrText == null || titleOrText.trim().isEmpty
+        ? 'Schau dir das auf Mensaena an: $url'
+        : '$titleOrText\n\n$url';
+    await Share.share(text, subject: subject ?? titleOrText);
+    if (type == ShareableType.post) {
+      await _trackShare(postId: id, platform: 'external');
+    }
+  }
+
+  /// Erzeugt die externe URL für einen Inhalt (Web + Deep-Link).
+  static String buildUrl({required ShareableType type, required String id}) {
+    return 'https://www.mensaena.de/dashboard/${type.path}/$id';
+  }
+
+  /// Externe Share via System-Share-Sheet (WhatsApp, Signal, Mail …).
+  /// Trackt den Share in post_shares (platform='external'). Beibehalten
+  /// für Aufrufer die den alten Post-spezifischen API noch nutzen.
   static Future<void> shareExternal({
     required String postId,
     required String text,
@@ -21,12 +77,9 @@ class ShareService {
     await _trackShare(postId: postId, platform: 'external');
   }
 
-  /// Erzeugt die URL die in einem QR-Code codiert werden soll.
-  static String buildShareUrl({
-    required String postId,
-  }) {
-    return 'https://www.mensaena.de/dashboard/posts/$postId';
-  }
+  /// Erzeugt die URL die in einem QR-Code codiert werden soll (Posts).
+  static String buildShareUrl({required String postId}) =>
+      buildUrl(type: ShareableType.post, id: postId);
 
   /// Interne Share an einen User (Conversation).
   /// Trackt den Share in post_shares (platform='internal').

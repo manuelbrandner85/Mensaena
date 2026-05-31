@@ -62,6 +62,21 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Deep-Links: https://www.mensaena.de/* öffnet die App.
+                 autoVerify="true" aktiviert App-Links wenn die Site eine
+                 .well-known/assetlinks.json mit dem Package-Fingerprint
+                 ausliefert. Ohne assetlinks zeigt Android eine Auswahl
+                 ("App oder Browser?") — beides ist OK, App-Link ist
+                 später per Server-File aktivierbar. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"/>
+                <data android:host="www.mensaena.de"/>
+                <data android:host="mensaena.de"/>
+                <data android:pathPrefix="/dashboard/"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

@@ -11,6 +11,7 @@ import 'providers/accessibility_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'services/deep_link_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
@@ -78,6 +79,9 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
     final router = ref.watch(goRouterProvider);
     // F23: globalen Router-Ref für Push-Tap-Routing setzen.
     PushNotificationService.rootRouter = router;
+    // Deep-Links: einmalig App-Links-Stream koppeln (https://mensaena.de/...
+    // → GoRouter). initialize() ist idempotent.
+    DeepLinkService.instance.initialize(router: router);
     // localeProvider mountet den Notifier — der ruft persistierten
     // Mode + ggf. GPS-Detect ab und triggert context.setLocale().
     ref.watch(localeProvider);

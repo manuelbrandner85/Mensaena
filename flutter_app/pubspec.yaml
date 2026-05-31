@@ -74,6 +74,9 @@ dependencies:
   intl: '>=0.19.0 <1.0.0'
   url_launcher: ^6.3.0
   share_plus: ^10.0.0
+  # Deep-Links: fängt eingehende mensaena.de-Links nativ ab und reicht
+  # sie an den DeepLinkService → GoRouter weiter.
+  app_links: ^6.3.0
   flutter_secure_storage: ^9.2.2
   package_info_plus: ^8.0.0
   qr_flutter: ^4.1.0
