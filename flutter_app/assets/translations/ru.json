@@ -787,7 +787,20 @@
       "cleanupConfirmAction": "Запустить"
     },
     "cannotActOnSelf": "Вы не можете выполнить это действие над собой.",
-    "deleteEntryConfirm": "Удалить эту запись из \"{table}\" безвозвратно?"
+    "deleteEntryConfirm": "Удалить эту запись из \"{table}\" безвозвратно?",
+    "usersOverviewTitle": "Обзор пользователей",
+    "totalUsers": "Всего пользователей",
+    "totalUsersHint": "Всего зарегистрированных профилей",
+    "active24h": "Активны (24ч)",
+    "active7d": "Активны (7 дней)",
+    "active30d": "Активны (30 дней)",
+    "newUsers24h": "Новые (24ч)",
+    "newUsers7d": "Новые (7 дней)",
+    "newUsers30d": "Новые (30 дней)",
+    "roleAdmins": "Админы",
+    "roleModerators": "Модераторы",
+    "banned": "Заблокированы",
+    "openDetails": "Открыть подробности"
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",

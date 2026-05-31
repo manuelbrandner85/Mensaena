@@ -787,7 +787,20 @@
       "cleanupConfirmAction": "Başlat"
     },
     "cannotActOnSelf": "Bu işlemi kendinize uygulayamazsınız.",
-    "deleteEntryConfirm": "\"{table}\" tablosundaki bu giriş kalıcı olarak silinsin mi?"
+    "deleteEntryConfirm": "\"{table}\" tablosundaki bu giriş kalıcı olarak silinsin mi?",
+    "usersOverviewTitle": "Kullanıcı özeti",
+    "totalUsers": "Toplam kullanıcı",
+    "totalUsersHint": "Kayıtlı profillerin toplamı",
+    "active24h": "Aktif (24s)",
+    "active7d": "Aktif (7 gün)",
+    "active30d": "Aktif (30 gün)",
+    "newUsers24h": "Yeni (24s)",
+    "newUsers7d": "Yeni (7 gün)",
+    "newUsers30d": "Yeni (30 gün)",
+    "roleAdmins": "Yöneticiler",
+    "roleModerators": "Moderatörler",
+    "banned": "Yasaklı",
+    "openDetails": "Ayrıntıları aç"
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",

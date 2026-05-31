@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show CountOption, PostgrestResponse;
 
 import '../services/supabase_service.dart';
 
@@ -20,6 +22,69 @@ class AdminRepository {
   }
 
   static Future<AdminStats> stats() async {
+    // Live-Erweiterung (client-seitig, ohne RPC-Änderung): Granulare
+    // User-Metriken (24h/7d aktiv, neu 24h/30d, Rollen-Verteilung, gebannt).
+    // Parallel zur Haupt-RPC, damit der Dashboard-Refresh nicht langsamer
+    // wird. Bei Fehler werden 0-Werte zurückgegeben.
+    Future<int> safeCount(Future<PostgrestResponse<dynamic>> Function() run) async {
+      try {
+        return (await run()).count;
+      } catch (_) {
+        return 0;
+      }
+    }
+
+    Future<_UsersOverview> usersOverview() async {
+      final results = await Future.wait<int>([
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .gte('updated_at', _ago(const Duration(hours: 24)))
+            .count(CountOption.exact)),
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .gte('updated_at', _ago(const Duration(days: 7)))
+            .count(CountOption.exact)),
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .gte('created_at', _ago(const Duration(hours: 24)))
+            .count(CountOption.exact)),
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .gte('created_at', _ago(const Duration(days: 30)))
+            .count(CountOption.exact)),
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .eq('role', 'admin')
+            .count(CountOption.exact)),
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .eq('role', 'moderator')
+            .count(CountOption.exact)),
+        safeCount(() => sb
+            .from('profiles')
+            .select('id')
+            .eq('is_banned', true)
+            .count(CountOption.exact)),
+      ]);
+      return _UsersOverview(
+        active24h: results[0],
+        active7d: results[1],
+        newUsers24h: results[2],
+        newUsers30d: results[3],
+        admins: results[4],
+        moderators: results[5],
+        bannedUsers: results[6],
+      );
+    }
+
+    final overviewFuture = usersOverview();
+
     // Phase 1: try aggregated RPC for performance.
     try {
       final res = await sb.rpc<dynamic>('get_admin_dashboard_stats');
@@ -41,15 +106,26 @@ class AdminRepository {
           return 0.0;
         }
 
+        // BUGFIX: Die RPC liefert Schlüssel im Format `total_*`/`active_*`,
+        // der Dart-Code las aber zuvor die kurzen Aliase (`users`, `posts`,
+        // …) — Resultat: ALLE Headline-Zahlen im Dashboard waren 0, obwohl
+        // die DB 49 Nutzer:innen kennt. Erst-Schlüssel = RPC-Realität,
+        // Zweit-Schlüssel = alter Alias als Sicherheitsnetz.
+        int pick(String primary, String fallback) {
+          final p = i(primary);
+          return p != 0 ? p : i(fallback);
+        }
+
+        final overview = await overviewFuture;
         return AdminStats(
-          users: i('users'),
-          posts: i('posts'),
-          events: i('events'),
-          boardPosts: i('board_posts'),
-          crises: i('crises'),
-          organizations: i('organizations'),
-          farms: i('farms'),
-          reports: i('reports'),
+          users: pick('total_users', 'users'),
+          posts: pick('total_posts', 'posts'),
+          events: pick('total_events', 'events'),
+          boardPosts: pick('total_board_posts', 'board_posts'),
+          crises: pick('total_crises', 'crises'),
+          organizations: pick('total_organizations', 'organizations'),
+          farms: pick('total_farm_listings', 'farms'),
+          reports: i('open_reports'),
           activeUsers30d: i('active_users_30d'),
           newUsers7d: i('new_users_7d'),
           newPosts7d: i('new_posts_7d'),
@@ -73,6 +149,13 @@ class AdminRepository {
           unreadNotifications: i('unread_notifications'),
           totalSavedPosts: i('total_saved_posts'),
           openReports: i('open_reports'),
+          activeUsers24h: overview.active24h,
+          activeUsers7d: overview.active7d,
+          newUsers24h: overview.newUsers24h,
+          newUsers30d: overview.newUsers30d,
+          admins: overview.admins,
+          moderators: overview.moderators,
+          bannedUsers: overview.bannedUsers,
         );
       }
     } catch (_) {
@@ -231,6 +314,7 @@ class AdminRepository {
       }
     } catch (_) {}
 
+    final overview = await overviewFuture;
     return AdminStats(
       users: base[0],
       posts: base[1],
@@ -263,8 +347,18 @@ class AdminRepository {
       totalTimebankHours: totalTimebankHours,
       unreadNotifications: unreadNotifications,
       openReports: openReports,
+      activeUsers24h: overview.active24h,
+      activeUsers7d: overview.active7d,
+      newUsers24h: overview.newUsers24h,
+      newUsers30d: overview.newUsers30d,
+      admins: overview.admins,
+      moderators: overview.moderators,
+      bannedUsers: overview.bannedUsers,
     );
   }
+
+  static String _ago(Duration d) =>
+      DateTime.now().subtract(d).toUtc().toIso8601String();
 
   /// Letzte N Eintraege einer Tabelle mit beliebiger Sortspalte.
   /// Default 500 — vorher 100, was bei kleinen Sub-Tabellen wie
@@ -783,6 +877,13 @@ class AdminStats {
     this.unreadNotifications = 0,
     this.totalSavedPosts = 0,
     this.openReports = 0,
+    this.activeUsers24h = 0,
+    this.activeUsers7d = 0,
+    this.newUsers24h = 0,
+    this.newUsers30d = 0,
+    this.admins = 0,
+    this.moderators = 0,
+    this.bannedUsers = 0,
   });
 
   final int users;
@@ -816,6 +917,34 @@ class AdminStats {
   final int unreadNotifications;
   final int totalSavedPosts;
   final int openReports;
+  // Erweiterte Nutzer-Metriken (client-seitig befüllt, keine RPC-Migration).
+  final int activeUsers24h;
+  final int activeUsers7d;
+  final int newUsers24h;
+  final int newUsers30d;
+  final int admins;
+  final int moderators;
+  final int bannedUsers;
+}
+
+class _UsersOverview {
+  const _UsersOverview({
+    this.active24h = 0,
+    this.active7d = 0,
+    this.newUsers24h = 0,
+    this.newUsers30d = 0,
+    this.admins = 0,
+    this.moderators = 0,
+    this.bannedUsers = 0,
+  });
+
+  final int active24h;
+  final int active7d;
+  final int newUsers24h;
+  final int newUsers30d;
+  final int admins;
+  final int moderators;
+  final int bannedUsers;
 }
 
 final adminStatsProvider = FutureProvider<AdminStats>((ref) async {

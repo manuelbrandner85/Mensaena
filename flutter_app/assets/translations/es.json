@@ -788,7 +788,20 @@
       "cleanupConfirmAction": "Iniciar"
     },
     "cannotActOnSelf": "No puedes realizar esta acción sobre ti mismo.",
-    "deleteEntryConfirm": "¿Eliminar permanentemente esta entrada de \"{table}\"?"
+    "deleteEntryConfirm": "¿Eliminar permanentemente esta entrada de \"{table}\"?",
+    "usersOverviewTitle": "Vista de usuarios",
+    "totalUsers": "Usuarios totales",
+    "totalUsersHint": "Perfiles registrados en total",
+    "active24h": "Activos (24h)",
+    "active7d": "Activos (7 días)",
+    "active30d": "Activos (30 días)",
+    "newUsers24h": "Nuevos (24h)",
+    "newUsers7d": "Nuevos (7 días)",
+    "newUsers30d": "Nuevos (30 días)",
+    "roleAdmins": "Administradores",
+    "roleModerators": "Moderadores",
+    "banned": "Vetados",
+    "openDetails": "Abrir detalles"
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",

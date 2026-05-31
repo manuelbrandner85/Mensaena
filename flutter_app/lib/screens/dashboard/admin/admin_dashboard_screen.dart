@@ -35,6 +35,8 @@ class AdminDashboardScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _OpenReportsAlert(),
+              _UsersOverviewCard(),
+              SizedBox(height: 16),
               _StatsStrip(),
               SizedBox(height: 16),
               _ActivityAndActions(),
@@ -100,6 +102,275 @@ class _OpenReportsAlert extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Hero-Karte: Gesamt-Nutzer:innen prominent + Aufschlüsselung (Aktiv 24h/7d/
+// 30d, Neu 24h/7d/30d, Admins, Moderator:innen, Gebannte). Antwort auf den
+// User-Wunsch "Gesamt Nutzer in Zahlen anzeigen" — vorher waren alle Headline-
+// Zahlen wegen RPC-Key-Mismatch (`total_users` vs. `users`) konstant 0.
+// ---------------------------------------------------------------------------
+
+class _UsersOverviewCard extends ConsumerWidget {
+  const _UsersOverviewCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(adminStatsProvider);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.bronze.withValues(alpha: 0.18),
+            AppColors.amber.withValues(alpha: 0.08),
+          ],
+        ),
+        border: Border.all(color: AppColors.bronze.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.users,
+                  color: AppColors.bronze, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'admin.usersOverviewTitle'.tr(),
+                  style: AppTypography.display(
+                      size: 18, color: AppColors.ink),
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.go('/dashboard/admin/users'),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.bronze,
+                  minimumSize: const Size(0, 32),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('admin.openDetails'.tr(),
+                        style: AppTypography.body(
+                            size: 12,
+                            color: AppColors.bronze,
+                            weight: FontWeight.w600)),
+                    const SizedBox(width: 4),
+                    const Icon(LucideIcons.chevronRight,
+                        size: 16, color: AppColors.bronze),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          statsAsync.when(
+            loading: () => const _UsersOverviewSkeleton(),
+            error: (_, __) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text('admin.statsLoadShort'.tr(),
+                  style: AppTypography.caption()),
+            ),
+            data: (s) => _UsersOverviewContent(stats: s),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UsersOverviewSkeleton extends StatelessWidget {
+  const _UsersOverviewSkeleton();
+  @override
+  Widget build(BuildContext context) => const Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ShimmerBox(height: 56, borderRadius: 12),
+          SizedBox(height: 12),
+          ShimmerBox(height: 90, borderRadius: 12),
+        ],
+      );
+}
+
+class _UsersOverviewContent extends StatelessWidget {
+  const _UsersOverviewContent({required this.stats});
+  final AdminStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Hero: Gesamtzahl. Prominent, mit Subtitle.
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              _formatNumber(stats.users),
+              style: AppTypography.mono(
+                size: 44,
+                color: AppColors.ink,
+                weight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('admin.totalUsers'.tr(),
+                      style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700)),
+                  Text('admin.totalUsersHint'.tr(),
+                      style: AppTypography.caption()),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        // Aufschlüsselung als responsives Mini-Grid.
+        LayoutBuilder(
+          builder: (ctx, c) {
+            final cols = c.maxWidth >= 520 ? 4 : 2;
+            final tiles = <_MiniTile>[
+              _MiniTile(
+                  icon: LucideIcons.activity,
+                  label: 'admin.active24h'.tr(),
+                  value: stats.activeUsers24h,
+                  color: AppColors.leben),
+              _MiniTile(
+                  icon: LucideIcons.activity,
+                  label: 'admin.active7d'.tr(),
+                  value: stats.activeUsers7d,
+                  color: AppColors.teal),
+              _MiniTile(
+                  icon: LucideIcons.activity,
+                  label: 'admin.active30d'.tr(),
+                  value: stats.activeUsers30d,
+                  color: AppColors.amber),
+              _MiniTile(
+                  icon: LucideIcons.userPlus,
+                  label: 'admin.newUsers24h'.tr(),
+                  value: stats.newUsers24h,
+                  color: AppColors.leben),
+              _MiniTile(
+                  icon: LucideIcons.userPlus,
+                  label: 'admin.newUsers7d'.tr(),
+                  value: stats.newUsers7d,
+                  color: AppColors.teal),
+              _MiniTile(
+                  icon: LucideIcons.userPlus,
+                  label: 'admin.newUsers30d'.tr(),
+                  value: stats.newUsers30d,
+                  color: AppColors.amber),
+              _MiniTile(
+                  icon: LucideIcons.shieldCheck,
+                  label: 'admin.roleAdmins'.tr(),
+                  value: stats.admins,
+                  color: AppColors.bronze),
+              _MiniTile(
+                  icon: LucideIcons.shield,
+                  label: 'admin.roleModerators'.tr(),
+                  value: stats.moderators,
+                  color: AppColors.bronze),
+              if (stats.bannedUsers > 0)
+                _MiniTile(
+                    icon: LucideIcons.ban,
+                    label: 'admin.banned'.tr(),
+                    value: stats.bannedUsers,
+                    color: AppColors.herzrot),
+            ];
+            return GridView.count(
+              crossAxisCount: cols,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 2.2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [for (final t in tiles) _MiniTileView(data: t)],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // Tausender-Trenner gemäß System-Locale; bei kleinen Zahlen sieht es
+  // identisch aus, bei 10.000+ wird es sofort lesbar.
+  static String _formatNumber(int n) {
+    final s = n.toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i != 0 && (s.length - i) % 3 == 0) buf.write('.');
+      buf.write(s[i]);
+    }
+    return buf.toString();
+  }
+}
+
+class _MiniTile {
+  const _MiniTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+  final IconData icon;
+  final String label;
+  final int value;
+  final Color color;
+}
+
+class _MiniTileView extends StatelessWidget {
+  const _MiniTileView({required this.data});
+  final _MiniTile data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: data.color.withValues(alpha: 0.10),
+        border: Border.all(color: data.color.withValues(alpha: 0.30)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(data.icon, size: 14, color: data.color),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${data.value}',
+                    style: AppTypography.mono(
+                        size: 16,
+                        color: AppColors.ink,
+                        weight: FontWeight.w800)),
+                Text(data.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.mute)),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

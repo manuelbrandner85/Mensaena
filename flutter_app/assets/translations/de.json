@@ -832,7 +832,20 @@
       "cleanupConfirmAction": "Starten"
     },
     "cannotActOnSelf": "Du kannst diese Aktion nicht auf dich selbst anwenden.",
-    "deleteEntryConfirm": "Soll dieser Eintrag aus \"{table}\" unwiderruflich gelöscht werden?"
+    "deleteEntryConfirm": "Soll dieser Eintrag aus \"{table}\" unwiderruflich gelöscht werden?",
+    "usersOverviewTitle": "Nutzer-Übersicht",
+    "totalUsers": "Nutzer:innen gesamt",
+    "totalUsersHint": "Gesamtzahl der registrierten Profile",
+    "active24h": "Aktiv (24h)",
+    "active7d": "Aktiv (7 Tage)",
+    "active30d": "Aktiv (30 Tage)",
+    "newUsers24h": "Neu (24h)",
+    "newUsers7d": "Neu (7 Tage)",
+    "newUsers30d": "Neu (30 Tage)",
+    "roleAdmins": "Admins",
+    "roleModerators": "Moderator:innen",
+    "banned": "Gebannt",
+    "openDetails": "Details öffnen"
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",

@@ -833,7 +833,20 @@
       "cleanupConfirmAction": "Start"
     },
     "cannotActOnSelf": "You cannot perform this action on yourself.",
-    "deleteEntryConfirm": "Permanently delete this entry from \"{table}\"?"
+    "deleteEntryConfirm": "Permanently delete this entry from \"{table}\"?",
+    "usersOverviewTitle": "User overview",
+    "totalUsers": "Total users",
+    "totalUsersHint": "Total registered profiles",
+    "active24h": "Active (24h)",
+    "active7d": "Active (7 days)",
+    "active30d": "Active (30 days)",
+    "newUsers24h": "New (24h)",
+    "newUsers7d": "New (7 days)",
+    "newUsers30d": "New (30 days)",
+    "roleAdmins": "Admins",
+    "roleModerators": "Moderators",
+    "banned": "Banned",
+    "openDetails": "Open details"
   },
   "create": {
     "titleRequired": "Title is required.",
