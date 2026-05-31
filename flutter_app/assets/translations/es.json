@@ -817,7 +817,15 @@
     "broadcastConfirm": "¿Enviar de verdad este anuncio a todos los usuarios?",
     "broadcastSuccess": "Anuncio enviado a {count} usuarios.",
     "broadcastFailed": "Error al enviar.",
-    "broadcastEmpty": "El título y el mensaje son obligatorios."
+    "broadcastEmpty": "El título y el mensaje son obligatorios.",
+    "growthTitle": "Crecimiento de usuarios",
+    "growthSubtitle": "Registros diarios + evolución acumulada",
+    "range14d": "14 días",
+    "range30d": "30 días",
+    "growthLegendNew": "Nuevos por día",
+    "growthLegendTotal": "Total",
+    "growthEmpty": "Sin datos disponibles.",
+    "growthTooltip": "{day}: +{new} • total {total}"
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",

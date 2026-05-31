@@ -871,6 +871,33 @@ class AdminRepository {
       return null;
     }
   }
+
+  /// Tägliche Nutzer-Zuwachs-Reihe (für Dashboard-Chart).
+  /// Liefert pro Tag: day (ISO-Datum), newUsers, cumulative.
+  static Future<List<UserGrowthPoint>> userGrowthSeries({int days = 14}) async {
+    try {
+      final res = await sb.rpc<dynamic>(
+        'admin_user_growth_series',
+        params: {'p_days': days},
+      );
+      if (res is! List) return const [];
+      final out = <UserGrowthPoint>[];
+      for (final r in res.whereType<Map<String, dynamic>>()) {
+        final dayRaw = r['day']?.toString();
+        if (dayRaw == null) continue;
+        final day = DateTime.tryParse(dayRaw);
+        if (day == null) continue;
+        out.add(UserGrowthPoint(
+          day: day,
+          newUsers: (r['new_users'] as num?)?.toInt() ?? 0,
+          cumulative: (r['cumulative'] as num?)?.toInt() ?? 0,
+        ));
+      }
+      return out;
+    } catch (_) {
+      return const [];
+    }
+  }
 }
 
 class AdminStats {
@@ -956,6 +983,17 @@ class AdminStats {
   final int bannedUsers;
 }
 
+class UserGrowthPoint {
+  const UserGrowthPoint({
+    required this.day,
+    required this.newUsers,
+    required this.cumulative,
+  });
+  final DateTime day;
+  final int newUsers;
+  final int cumulative;
+}
+
 class _UsersOverview {
   const _UsersOverview({
     this.active24h = 0,
@@ -986,4 +1024,10 @@ final adminAuditLogsProvider = FutureProvider<List<Map<String, dynamic>>>(
 
 final adminOpenReportsProvider = FutureProvider<int>(
   (ref) => AdminRepository.openReportsCount(),
+);
+
+/// Family-Provider: tägliche Nutzer-Zuwachs-Reihe für N Tage (14/30).
+final adminUserGrowthProvider =
+    FutureProvider.family<List<UserGrowthPoint>, int>(
+  (ref, days) => AdminRepository.userGrowthSeries(days: days),
 );

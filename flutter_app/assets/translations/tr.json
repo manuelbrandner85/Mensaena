@@ -816,7 +816,15 @@
     "broadcastConfirm": "Bu duyuru gerçekten tüm kullanıcılara gönderilsin mi?",
     "broadcastSuccess": "Duyuru {count} kullanıcıya gönderildi.",
     "broadcastFailed": "Gönderme başarısız.",
-    "broadcastEmpty": "Başlık ve mesaj zorunludur."
+    "broadcastEmpty": "Başlık ve mesaj zorunludur.",
+    "growthTitle": "Kullanıcı artışı",
+    "growthSubtitle": "Günlük kayıtlar + kümülatif eğri",
+    "range14d": "14 gün",
+    "range30d": "30 gün",
+    "growthLegendNew": "Günlük yeni",
+    "growthLegendTotal": "Toplam",
+    "growthEmpty": "Veri yok.",
+    "growthTooltip": "{day}: +{new} • toplam {total}"
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",

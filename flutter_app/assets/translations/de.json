@@ -861,7 +861,15 @@
     "broadcastConfirm": "Diese Ankündigung wirklich an alle Nutzer:innen senden?",
     "broadcastSuccess": "Ankündigung an {count} Nutzer:innen gesendet.",
     "broadcastFailed": "Senden fehlgeschlagen.",
-    "broadcastEmpty": "Titel und Nachricht sind erforderlich."
+    "broadcastEmpty": "Titel und Nachricht sind erforderlich.",
+    "growthTitle": "Nutzer-Zuwachs",
+    "growthSubtitle": "Tägliche Neuanmeldungen + Gesamtverlauf",
+    "range14d": "14 Tage",
+    "range30d": "30 Tage",
+    "growthLegendNew": "Neu pro Tag",
+    "growthLegendTotal": "Gesamt",
+    "growthEmpty": "Keine Daten verfügbar.",
+    "growthTooltip": "{day}: +{new} • gesamt {total}"
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",

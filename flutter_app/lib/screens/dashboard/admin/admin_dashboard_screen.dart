@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +27,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         ref.invalidate(adminStatsProvider);
         ref.invalidate(adminAuditLogsProvider);
         ref.invalidate(adminOpenReportsProvider);
+        ref.invalidate(adminUserGrowthProvider);
         await ref.read(adminStatsProvider.future);
       },
       body: const SafeArea(
@@ -36,6 +39,8 @@ class AdminDashboardScreen extends ConsumerWidget {
             children: [
               _OpenReportsAlert(),
               _UsersOverviewCard(),
+              SizedBox(height: 16),
+              _UserGrowthCard(),
               SizedBox(height: 16),
               _StatsStrip(),
               SizedBox(height: 16),
@@ -1087,6 +1092,335 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
       ),
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Nutzer-Zuwachs-Chart (Tagesreihe + kumulative Linie). Pure CustomPaint,
+// keine externe Chart-Dependency. Range-Toggle 14 / 30 Tage.
+// ---------------------------------------------------------------------------
+
+class _UserGrowthCard extends ConsumerStatefulWidget {
+  const _UserGrowthCard();
+
+  @override
+  ConsumerState<_UserGrowthCard> createState() => _UserGrowthCardState();
+}
+
+class _UserGrowthCardState extends ConsumerState<_UserGrowthCard> {
+  int _days = 14;
+
+  @override
+  Widget build(BuildContext context) {
+    final async = ref.watch(adminUserGrowthProvider(_days));
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.6),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.trendingUp,
+                  color: AppColors.amber, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('admin.growthTitle'.tr(),
+                        style: AppTypography.display(
+                            size: 16, color: AppColors.ink)),
+                    Text('admin.growthSubtitle'.tr(),
+                        style: AppTypography.caption()),
+                  ],
+                ),
+              ),
+              _RangeToggle(
+                value: _days,
+                onChanged: (v) => setState(() => _days = v),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 180,
+            child: async.when(
+              loading: () => const Center(
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.amber),
+                ),
+              ),
+              error: (_, __) => Center(
+                child: Text('admin.statsLoadShort'.tr(),
+                    style: AppTypography.caption()),
+              ),
+              data: (points) {
+                if (points.isEmpty) {
+                  return Center(
+                    child: Text('admin.growthEmpty'.tr(),
+                        style: AppTypography.caption()),
+                  );
+                }
+                return _GrowthChart(points: points);
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Legende.
+          Row(
+            children: [
+              _LegendDot(
+                  color: AppColors.amber,
+                  label: 'admin.growthLegendNew'.tr()),
+              const SizedBox(width: 14),
+              _LegendDot(
+                  color: AppColors.bronze,
+                  label: 'admin.growthLegendTotal'.tr(),
+                  isLine: true),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RangeToggle extends StatelessWidget {
+  const _RangeToggle({required this.value, required this.onChanged});
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget seg(int days, String key) {
+      final active = value == days;
+      return GestureDetector(
+        onTap: () => onChanged(days),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: active
+                ? AppColors.bronze.withValues(alpha: 0.22)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(key.tr(),
+              style: AppTypography.label(
+                size: 10,
+                color: active ? AppColors.bronze : AppColors.inkSoft,
+                weight: active ? FontWeight.w700 : FontWeight.w500,
+              )),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: AppColors.elevated.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          seg(14, 'admin.range14d'),
+          seg(30, 'admin.range30d'),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegendDot extends StatelessWidget {
+  const _LegendDot({
+    required this.color,
+    required this.label,
+    this.isLine = false,
+  });
+  final Color color;
+  final String label;
+  final bool isLine;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: isLine ? 16 : 10,
+          height: isLine ? 2 : 10,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(isLine ? 1 : 5),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: AppTypography.caption()),
+      ],
+    );
+  }
+}
+
+class _GrowthChart extends StatelessWidget {
+  const _GrowthChart({required this.points});
+  final List<UserGrowthPoint> points;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (ctx, c) => CustomPaint(
+        size: Size(c.maxWidth, c.maxHeight),
+        painter: _GrowthChartPainter(points: points),
+      ),
+    );
+  }
+}
+
+class _GrowthChartPainter extends CustomPainter {
+  _GrowthChartPainter({required this.points});
+  final List<UserGrowthPoint> points;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.isEmpty) return;
+
+    const padLeft = 28.0;
+    const padRight = 28.0;
+    const padTop = 6.0;
+    const padBottom = 22.0;
+    final chartW = size.width - padLeft - padRight;
+    final chartH = size.height - padTop - padBottom;
+
+    // Achsen-Range.
+    final maxNew =
+        points.map((p) => p.newUsers).fold<int>(0, (a, b) => a > b ? a : b);
+    final maxCum = points
+        .map((p) => p.cumulative)
+        .fold<int>(0, (a, b) => a > b ? a : b);
+    final scaleNew = maxNew == 0 ? 1.0 : maxNew.toDouble();
+    final scaleCum = maxCum == 0 ? 1.0 : maxCum.toDouble();
+
+    // Hilfslinien (3 horizontale).
+    final gridPaint = Paint()
+      ..color = AppColors.line.withValues(alpha: 0.4)
+      ..strokeWidth = 1;
+    for (var i = 0; i <= 3; i++) {
+      final y = padTop + chartH * i / 3;
+      canvas.drawLine(
+        Offset(padLeft, y),
+        Offset(padLeft + chartW, y),
+        gridPaint,
+      );
+    }
+
+    // Y-Labels: rechtsbündig links (Neu pro Tag, 0 + max) und rechts
+    // (kumulative Linie, max).
+    void drawText(String s, Offset at,
+        {TextAlign align = TextAlign.left, Color? color, double width = 40}) {
+      final pb = ui.ParagraphBuilder(ui.ParagraphStyle(
+        textAlign: align,
+        textDirection: ui.TextDirection.ltr,
+      ))
+        ..pushStyle(ui.TextStyle(
+          color: color ?? AppColors.mute,
+          fontSize: 9,
+          height: 1.0,
+        ))
+        ..addText(s);
+      final p = pb.build()..layout(ui.ParagraphConstraints(width: width));
+      canvas.drawParagraph(p, at);
+    }
+
+    // Links: 0 + max(neu).
+    drawText('$maxNew', const Offset(0, padTop - 2),
+        align: TextAlign.right, color: AppColors.amber, width: padLeft - 4);
+    drawText('0', Offset(0, padTop + chartH - 8),
+        align: TextAlign.right, width: padLeft - 4);
+    // Rechts: max(cumulative).
+    drawText('$maxCum', Offset(size.width - padRight + 2, padTop - 2),
+        align: TextAlign.left, color: AppColors.bronze, width: padRight - 2);
+
+    // Balken: Neu pro Tag.
+    final barPaint = Paint()..color = AppColors.amber.withValues(alpha: 0.75);
+    final n = points.length;
+    final slot = chartW / n;
+    final barW = slot * 0.6;
+    for (var i = 0; i < n; i++) {
+      final p = points[i];
+      final h = p.newUsers / scaleNew * chartH;
+      final x = padLeft + slot * i + (slot - barW) / 2;
+      final y = padTop + chartH - h;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x, y, barW, h),
+          const Radius.circular(2),
+        ),
+        barPaint,
+      );
+    }
+
+    // X-Labels: nur erstes, mittleres und letztes Datum (gegen Overlap).
+    String fmt(DateTime d) =>
+        '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}';
+    final indices = <int>{0, n ~/ 2, n - 1};
+    for (final i in indices) {
+      if (i < 0 || i >= n) continue;
+      final x = padLeft + slot * i + slot / 2 - 14;
+      drawText(
+        fmt(points[i].day),
+        Offset(x, padTop + chartH + 4),
+        align: TextAlign.center,
+      );
+    }
+
+    // Kumulative Linie.
+    final linePaint = Paint()
+      ..color = AppColors.bronze
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final path = Path();
+    for (var i = 0; i < n; i++) {
+      final p = points[i];
+      final x = padLeft + slot * i + slot / 2;
+      final y = padTop + chartH - (p.cumulative / scaleCum * chartH);
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    canvas.drawPath(path, linePaint);
+
+    // Punkte auf der Linie.
+    final dotPaint = Paint()..color = AppColors.bronze;
+    final dotEdge = Paint()
+      ..color = AppColors.surface
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    for (var i = 0; i < n; i++) {
+      final p = points[i];
+      final x = padLeft + slot * i + slot / 2;
+      final y = padTop + chartH - (p.cumulative / scaleCum * chartH);
+      canvas.drawCircle(Offset(x, y), 2.5, dotPaint);
+      canvas.drawCircle(Offset(x, y), 2.5, dotEdge);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GrowthChartPainter old) =>
+      old.points != points;
 }
 
 // ---------------------------------------------------------------------------

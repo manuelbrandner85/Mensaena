@@ -816,7 +816,15 @@
     "broadcastConfirm": "Действительно отправить это объявление всем пользователям?",
     "broadcastSuccess": "Объявление отправлено {count} пользователям.",
     "broadcastFailed": "Не удалось отправить.",
-    "broadcastEmpty": "Заголовок и сообщение обязательны."
+    "broadcastEmpty": "Заголовок и сообщение обязательны.",
+    "growthTitle": "Рост пользователей",
+    "growthSubtitle": "Регистрации по дням + суммарно",
+    "range14d": "14 дней",
+    "range30d": "30 дней",
+    "growthLegendNew": "Новые в день",
+    "growthLegendTotal": "Всего",
+    "growthEmpty": "Нет данных.",
+    "growthTooltip": "{day}: +{new} • всего {total}"
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",
