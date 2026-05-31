@@ -2307,5 +2307,14 @@
   "safety": {
     "foodRecall": "RETIRADA DE ALIMENTOS",
     "moreWarnings": "+{n} más"
+  },
+  "verified": {
+    "badgeTooltip": "Identidad verificada",
+    "badgeShort": "Verificado",
+    "panelTitle": "Verificación",
+    "email": "Correo electrónico",
+    "phone": "Número de teléfono",
+    "community": "Confianza de la comunidad",
+    "admin": "Verificado por admin"
   }
 }

@@ -3083,5 +3083,14 @@
   "safety": {
     "foodRecall": "FOOD RECALL",
     "moreWarnings": "+{n} more"
+  },
+  "verified": {
+    "badgeTooltip": "Identity verified",
+    "badgeShort": "Verified",
+    "panelTitle": "Verification",
+    "email": "Email address",
+    "phone": "Phone number",
+    "community": "Community trust",
+    "admin": "Admin-verified"
   }
 }

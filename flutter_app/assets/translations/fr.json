@@ -2307,5 +2307,14 @@
   "safety": {
     "foodRecall": "RAPPEL ALIMENTAIRE",
     "moreWarnings": "+{n} autres"
+  },
+  "verified": {
+    "badgeTooltip": "Identité vérifiée",
+    "badgeShort": "Vérifié",
+    "panelTitle": "Vérification",
+    "email": "Adresse e-mail",
+    "phone": "Numéro de téléphone",
+    "community": "Confiance de la communauté",
+    "admin": "Vérifié par admin"
   }
 }

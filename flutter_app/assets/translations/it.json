@@ -2307,5 +2307,14 @@
   "safety": {
     "foodRecall": "RICHIAMO ALIMENTARE",
     "moreWarnings": "+{n} altri"
+  },
+  "verified": {
+    "badgeTooltip": "Identità verificata",
+    "badgeShort": "Verificato",
+    "panelTitle": "Verifica",
+    "email": "Indirizzo email",
+    "phone": "Numero di telefono",
+    "community": "Fiducia della community",
+    "admin": "Verificato dall'admin"
   }
 }

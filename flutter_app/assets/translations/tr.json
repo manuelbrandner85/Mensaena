@@ -2306,5 +2306,14 @@
   "safety": {
     "foodRecall": "GIDA GERİ ÇAĞIRMA",
     "moreWarnings": "+{n} daha"
+  },
+  "verified": {
+    "badgeTooltip": "Kimlik doğrulandı",
+    "badgeShort": "Doğrulandı",
+    "panelTitle": "Doğrulama",
+    "email": "E-posta adresi",
+    "phone": "Telefon numarası",
+    "community": "Topluluk güveni",
+    "admin": "Yönetici onaylı"
   }
 }
