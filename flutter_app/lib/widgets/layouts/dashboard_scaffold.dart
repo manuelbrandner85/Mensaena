@@ -73,6 +73,11 @@ final _newestUnreadProvider = Provider<_NewestUnread>((ref) {
   return (id: newest.id, title: newest.title, link: newest.link);
 });
 
+// Letzte aufgezeichnete Route. File-static, weil DashboardScaffold ein
+// ConsumerWidget ist (kein Instance-State). Reicht: in der App ist immer
+// nur EIN Scaffold gleichzeitig sichtbar.
+String? _lastRecordedRoute;
+
 class DashboardScaffold extends ConsumerWidget {
   const DashboardScaffold({
     required this.body,
@@ -187,10 +192,24 @@ class DashboardScaffold extends ConsumerWidget {
 
     // Recent-Pages-Tracking: jede Dashboard-Navigation wird in
     // SecureStorage protokolliert, damit der Drawer "Zuletzt"-Section
-    // aufpoppen kann. Post-frame damit es nicht im Build-Cycle laeuft.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      RecentPagesService.addRecent(activeRoute);
-    });
+    // aufpoppen kann.
+    //
+    // PERF-FIX (App-langsam-Report): Vorher lief addPostFrameCallback
+    // bei JEDEM build() — jedes ref.watch-Rebuild (Notification-Stream,
+    // unread-Counter, Snackbar-Trigger) hat eine SecureStorage-Read+
+    // Write-Plattform-Channel-IO ausgelöst (50–200ms pro Build). Bei
+    // schnellen Stream-Echos hat das den Main-Thread blockiert → die
+    // App fühlte sich langsam an und konnte unter Last hängen.
+    // Jetzt: nur wenn sich die ROUTE seit dem letzten Build geändert
+    // hat, wird gespeichert. addPostFrameCallback hält die IO weiter
+    // außerhalb des Build-Cycles.
+    if (_lastRecordedRoute != activeRoute) {
+      _lastRecordedRoute = activeRoute;
+      final route = activeRoute;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        RecentPagesService.addRecent(route);
+      });
+    }
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(

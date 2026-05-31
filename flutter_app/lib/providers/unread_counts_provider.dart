@@ -45,12 +45,29 @@ final perConversationUnreadProvider =
     }
   }
 
-  yield await fetch();
+  // PERF-FIX: Dedupe — nur yield wenn sich die Map wirklich geändert hat.
+  // Vorher hat jeder 30s-Tick ein neues Map-Objekt emittiert, das ref.watch-
+  // Reaktionen in Listen/BottomNav rebuildete, auch wenn sich kein einziger
+  // Counter geändert hat.
+  var last = await fetch();
+  yield last;
   await for (final _
-      in Stream<void>.periodic(const Duration(seconds: 30))) {
-    yield await fetch();
+      in Stream<void>.periodic(const Duration(seconds: 45))) {
+    final next = await fetch();
+    if (!_mapsEqual(last, next)) {
+      last = next;
+      yield next;
+    }
   }
 });
+
+bool _mapsEqual(Map<String, int> a, Map<String, int> b) {
+  if (a.length != b.length) return false;
+  for (final e in a.entries) {
+    if (b[e.key] != e.value) return false;
+  }
+  return true;
+}
 
 final unreadDmCountProvider = StreamProvider<int>((ref) async* {
   final myId = SupabaseService.currentUser?.id;
@@ -79,9 +96,16 @@ final unreadDmCountProvider = StreamProvider<int>((ref) async* {
     }
   }
 
-  yield await fetch();
+  // PERF-FIX: 30s → 45s, plus Dedupe wie oben. Halbiert ungefähr die
+  // BottomNav-Rebuild-Frequenz bei unverändertem Zustand.
+  var last = await fetch();
+  yield last;
   await for (final _
-      in Stream<void>.periodic(const Duration(seconds: 30))) {
-    yield await fetch();
+      in Stream<void>.periodic(const Duration(seconds: 45))) {
+    final next = await fetch();
+    if (next != last) {
+      last = next;
+      yield next;
+    }
   }
 });
