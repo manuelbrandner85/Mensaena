@@ -1777,7 +1777,9 @@
     "savePinTitle": "Enregistrer un repère",
     "savePinHint": "p. ex. café préféré, point de RDV…",
     "removePin": "Supprimer le repère",
-    "longPressHint": "Astuce : appuie longuement sur la carte pour enregistrer ton repère."
+    "longPressHint": "Astuce : appuie longuement sur la carte pour enregistrer ton repère.",
+    "toggleCrises": "Afficher/masquer crises",
+    "toggleEvents": "Afficher/masquer événements"
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",

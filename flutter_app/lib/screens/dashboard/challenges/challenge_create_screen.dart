@@ -12,6 +12,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/challenges_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
@@ -74,6 +75,7 @@ class _ChallengeCreateScreenState
     if (!mounted) return;
     setState(() => _busy = false);
     if (id == null) {
+      Haptics.error();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text('challenges.createFailed'.tr(),
@@ -81,6 +83,7 @@ class _ChallengeCreateScreenState
       ));
       return;
     }
+    Haptics.success();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text('challenges.createSuccess'.tr(),

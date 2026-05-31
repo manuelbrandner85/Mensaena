@@ -1947,7 +1947,9 @@
         "limited": "Limited accessibility",
         "no": "Not accessible"
       }
-    }
+    },
+    "toggleCrises": "Toggle crises",
+    "toggleEvents": "Toggle events"
   },
   "calendar": {
     "noEvents": "No events in calendar.",

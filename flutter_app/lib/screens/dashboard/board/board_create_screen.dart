@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/board_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -132,12 +133,14 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
     );
     if (!mounted) return;
     if (id == null) {
+      Haptics.error();
       setState(() {
         _submitting = false;
         _error = 'common.errorGeneric'.tr();
       });
       return;
     }
+    Haptics.success();
     context.go('/dashboard/board/$id');
   }
 

@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/groups_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
@@ -112,12 +113,14 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
     );
     if (!mounted) return;
     if (id == null) {
+      Haptics.error();
       setState(() {
         _submitting = false;
         _error = 'common.errorGeneric'.tr();
       });
       return;
     }
+    Haptics.success();
     context.push('/dashboard/groups/$id');
   }
 

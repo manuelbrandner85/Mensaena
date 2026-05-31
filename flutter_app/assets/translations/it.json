@@ -1777,7 +1777,9 @@
     "savePinTitle": "Salva pin",
     "savePinHint": "es. caffè preferito, punto d'incontro…",
     "removePin": "Rimuovi pin",
-    "longPressHint": "Suggerimento: tieni premuto sulla mappa per salvare il tuo pin."
+    "longPressHint": "Suggerimento: tieni premuto sulla mappa per salvare il tuo pin.",
+    "toggleCrises": "Mostra/nascondi crisi",
+    "toggleEvents": "Mostra/nascondi eventi"
   },
   "calendar": {
     "noEvents": "Nessun evento in calendario.",

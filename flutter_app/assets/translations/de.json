@@ -1946,7 +1946,9 @@
         "limited": "Eingeschränkt barrierefrei",
         "no": "Nicht barrierefrei"
       }
-    }
+    },
+    "toggleCrises": "Krisen ein/aus",
+    "toggleEvents": "Events ein/aus"
   },
   "calendar": {
     "noEvents": "Keine Events im Kalender.",

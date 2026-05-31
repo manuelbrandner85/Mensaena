@@ -17,7 +17,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../models/crisis.dart';
+import '../../models/event.dart';
 import '../../models/post.dart';
+import '../../repositories/crisis_repository.dart';
+import '../../repositories/events_repository.dart';
 import '../../repositories/posts_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/air_quality_service.dart';
@@ -100,6 +104,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _accessibilityOn = false;
   bool _a11yLoading = false;
   List<_AccessiblePlace> _accessiblePlaces = const [];
+  // Content-Layer-Toggles: Karte = Herzstück → mehrere Inhaltstypen
+  // gleichzeitig sichtbar (User-Wunsch "1M€ App"). Defaults: Krisen IMMER
+  // an (Notlagen sollen sichtbar sein), Events optional.
+  bool _showCrises = true;
+  bool _showEvents = true;
   final Map<String, ({DateTime at, List<_AccessiblePlace> places})>
       _a11yCache = {};
 
@@ -579,12 +588,108 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final markers = _filteredPosts.map(_buildMarker).toList();
+    // Krisen + Events als zusätzliche Marker-Layers. Beide Provider sind
+    // FutureProvider — bei Lade/Fehler einfach leer (.asData?.value ?? []),
+    // dann erscheint kein Marker. Geo-Filter passiert serverseitig durch
+    // activeCrisesProvider (kann lat/lng nehmen) bzw. listUpcoming
+    // (alle, hier client-seitig auf hasGeo gefiltert).
+    final crises = _showCrises
+        ? (ref.watch(activeCrisesProvider).asData?.value ?? const <Crisis>[])
+        : const <Crisis>[];
+    final events = _showEvents
+        ? (ref.watch(upcomingEventsProvider).asData?.value ??
+            const <EventItem>[])
+        : const <EventItem>[];
+    final crisisMarkers = [
+      for (final c in crises)
+        if (c.latitude != null && c.longitude != null)
+          Marker(
+            point: LatLng(c.latitude!, c.longitude!),
+            width: 40,
+            height: 40,
+            child: GestureDetector(
+              onTap: () => context.push('/dashboard/crisis/${c.id}'),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.herzrot.withValues(alpha: 0.92),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.herzrot.withValues(alpha: 0.55),
+                      blurRadius: 14,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const Icon(LucideIcons.alertTriangle,
+                    size: 18, color: Colors.white),
+              ),
+            ),
+          ),
+    ];
+    final eventMarkers = [
+      for (final e in events)
+        if (e.latitude != null && e.longitude != null)
+          Marker(
+            point: LatLng(e.latitude!, e.longitude!),
+            width: 34,
+            height: 34,
+            child: GestureDetector(
+              onTap: () => context.push('/dashboard/events/${e.id}'),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.tealSoft.withValues(alpha: 0.92),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.tealSoft.withValues(alpha: 0.4),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: const Icon(LucideIcons.calendar,
+                    size: 16, color: Colors.white),
+              ),
+            ),
+          ),
+    ];
     return DashboardScaffold(
       title: 'map.screenTitle'.tr(),
       currentRoute: '/dashboard/map',
       fab: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          // Content-Layer-Toggle: Krisen (Herzrot) sichtbar/aus.
+          FloatingActionButton.small(
+            heroTag: 'crises_fab',
+            backgroundColor: _showCrises
+                ? AppColors.herzrot
+                : AppColors.surface,
+            foregroundColor:
+                _showCrises ? Colors.white : AppColors.herzrot,
+            onPressed: () => setState(() => _showCrises = !_showCrises),
+            tooltip: 'map.toggleCrises'.tr(),
+            child: const Icon(LucideIcons.alertTriangle),
+          ),
+          const SizedBox(height: 10),
+          // Content-Layer-Toggle: Events (Teal) sichtbar/aus.
+          FloatingActionButton.small(
+            heroTag: 'events_fab',
+            backgroundColor: _showEvents
+                ? AppColors.tealSoft
+                : AppColors.surface,
+            foregroundColor:
+                _showEvents ? Colors.white : AppColors.tealSoft,
+            onPressed: () => setState(() => _showEvents = !_showEvents),
+            tooltip: 'map.toggleEvents'.tr(),
+            child: const Icon(LucideIcons.calendar),
+          ),
+          const SizedBox(height: 10),
           // F62: Tile-Style cyclen (Auto → Voyager → Topo)
           FloatingActionButton.small(
             heroTag: 'tile_fab',
@@ -748,7 +853,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(50),
                     markers: [
+                      // Reihenfolge = Z-Order: Krisen ZULETZT, damit sie
+                      // bei Überlappung dominieren (Notfall-Sichtbarkeit).
                       ...markers,
+                      ...eventMarkers,
+                      ...crisisMarkers,
                       if (_accessibilityOn)
                         for (final p in _accessiblePlaces)
                           Marker(

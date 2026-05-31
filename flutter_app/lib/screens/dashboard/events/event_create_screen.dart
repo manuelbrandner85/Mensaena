@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -310,9 +311,11 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     if (!mounted) return;
     setState(() => _submitting = false);
     if (eventId == null) {
+      Haptics.error();
       setState(() => _error = 'events.createFailed'.tr());
       return;
     }
+    Haptics.success();
     context.push('/dashboard/events/$eventId');
   }
 

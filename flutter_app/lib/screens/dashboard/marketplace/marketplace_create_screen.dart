@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
@@ -278,6 +279,7 @@ class _MarketplaceCreateScreenState
 
     if (!mounted) return;
     if (id == null) {
+      Haptics.error();
       setState(() {
         _submitting = false;
         _error = 'common.errorGeneric'.tr();
@@ -296,6 +298,7 @@ class _MarketplaceCreateScreenState
     }
 
     if (!mounted) return;
+    Haptics.success();
     context.push('/dashboard/marketplace/$id');
   }
 

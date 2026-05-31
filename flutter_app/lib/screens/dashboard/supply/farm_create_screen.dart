@@ -18,6 +18,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/organizations_repository.dart';
+import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
@@ -204,9 +205,11 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (slug == null) {
+      Haptics.error();
       _toast('supply.farmCreate.createFailed'.tr());
       return;
     }
+    Haptics.success();
     _toast('supply.farmCreate.createSuccess'.tr());
     context.go('/dashboard/supply');
   }
