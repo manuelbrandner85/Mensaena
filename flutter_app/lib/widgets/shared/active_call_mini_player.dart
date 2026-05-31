@@ -4,8 +4,6 @@
 /// nicht auf dem Call-Screen ist. Draggable, tap = zurueck zum Call.
 library;
 
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,22 +24,29 @@ class ActiveCallMiniPlayer extends ConsumerStatefulWidget {
 }
 
 class _ActiveCallMiniPlayerState
-    extends ConsumerState<ActiveCallMiniPlayer> {
+    extends ConsumerState<ActiveCallMiniPlayer>
+    with SingleTickerProviderStateMixin {
   // Position: relative oben/rechts. User kann den Player verschieben.
   Offset _offset = const Offset(16, 80);
-  Timer? _ticker;
+  // PERF-FIX: AnimationController statt Timer.periodic. Vorteile:
+  //   - pausiert automatisch wenn das Widget per TickerMode/Hintergrund
+  //     inaktiv ist (Timer.periodic lief stumpf weiter und feuerte
+  //     setState selbst wenn die App im Hintergrund war).
+  //   - vsync-gekoppelt, kein "freier" Timer im Event-Loop.
+  late final AnimationController _ticker;
 
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
+    _ticker = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat();
   }
 
   @override
   void dispose() {
-    _ticker?.cancel();
+    _ticker.dispose();
     super.dispose();
   }
 
@@ -61,7 +66,6 @@ class _ActiveCallMiniPlayerState
   @override
   Widget build(BuildContext context) {
     final info = widget.info;
-    final elapsed = DateTime.now().difference(info.startedAt);
     final size = MediaQuery.sizeOf(context);
     return Positioned(
       right: _offset.dx,
@@ -144,12 +148,18 @@ class _ActiveCallMiniPlayerState
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(
-                      _fmt(elapsed),
-                      style: AppTypography.mono(
-                        size: 11,
-                        color: Colors.white,
-                        weight: FontWeight.w700,
+                    // Nur dieser kleine Text-Knoten rebuildet 1× pro
+                    // Sekunde via AnimatedBuilder — der teure Container
+                    // mit Gradient/BoxShadow bleibt stabil.
+                    AnimatedBuilder(
+                      animation: _ticker,
+                      builder: (_, __) => Text(
+                        _fmt(DateTime.now().difference(info.startedAt)),
+                        style: AppTypography.mono(
+                          size: 11,
+                          color: Colors.white,
+                          weight: FontWeight.w700,
+                        ),
                       ),
                     ),
                     const Spacer(),

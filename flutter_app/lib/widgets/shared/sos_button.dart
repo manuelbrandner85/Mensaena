@@ -27,12 +27,13 @@ class SOSButton extends StatefulWidget {
 }
 
 class _SOSButtonState extends State<SOSButton>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _anim;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _anim = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1100),
@@ -41,46 +42,61 @@ class _SOSButtonState extends State<SOSButton>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _anim.dispose();
     super.dispose();
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // PERF-FIX (App-langsam-Report): SOSButton-Pulse läuft sonst dauerhaft
+    // auf JEDEM Dashboard-Screen (er sitzt in der AppBar.actions). Im
+    // Hintergrund / nicht-aktiv den Ticker stoppen → Frame-Budget frei.
+    if (state == AppLifecycleState.resumed) {
+      if (!_anim.isAnimating) _anim.repeat(reverse: true);
+    } else {
+      if (_anim.isAnimating) _anim.stop();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: 'sos.tooltip'.tr(),
-      button: true,
-      child: AnimatedBuilder(
-        animation: _anim,
-        builder: (_, __) {
-          final v = _anim.value;
-          return InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () {
-              Haptics.heavy();
-              _showSOSSheet(context);
-            },
-            child: Container(
-              width: 36,
-              height: 36,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.herzrot.withValues(alpha: 0.12 + 0.12 * v),
-                border: Border.all(
-                  color: AppColors.herzrot.withValues(alpha: 0.4 + 0.3 * v),
-                  width: 1.5,
+    return RepaintBoundary(
+      child: Semantics(
+        label: 'sos.tooltip'.tr(),
+        button: true,
+        child: AnimatedBuilder(
+          animation: _anim,
+          builder: (_, __) {
+            final v = _anim.value;
+            return InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                Haptics.heavy();
+                _showSOSSheet(context);
+              },
+              child: Container(
+                width: 36,
+                height: 36,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.herzrot.withValues(alpha: 0.12 + 0.12 * v),
+                  border: Border.all(
+                    color: AppColors.herzrot.withValues(alpha: 0.4 + 0.3 * v),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  LucideIcons.alertTriangle,
+                  size: 16,
+                  color: AppColors.herzrot,
                 ),
               ),
-              child: const Icon(
-                LucideIcons.alertTriangle,
-                size: 16,
-                color: AppColors.herzrot,
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

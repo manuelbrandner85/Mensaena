@@ -33,6 +33,16 @@ import 'repositories/wave_final_repositories.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // CRASH-FIX (App-langsam-/crasht-Report): Image-Cache eng deckeln.
+  // Default-Flutter: 1000 Bilder / 100 MB. Auf Low-RAM-Android-Geräten
+  // reicht ein einziges vom Server unsanft groß ausgeliefertes Avatar/
+  // Cover-Bild aus, um den Decoder zu sprengen → Native-OOM-Crash. 58
+  // CachedNetworkImage-Stellen sind ohne memCacheWidth/Height. Kappung
+  // auf 200 Bilder / 64 MB ist konservativ und vermeidet OOM bei
+  // moderaten Bildmengen (Feed-Scrolling, Marktplatz-Grids).
+  PaintingBinding.instance.imageCache.maximumSize = 200;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 64 * 1024 * 1024;
+
   // Globaler Crash-Reporter → error_logs Tabelle in Supabase.
   // Per fail-silent: ErrorLogsRepository fängt eigene Exceptions ab.
   FlutterError.onError = (details) {

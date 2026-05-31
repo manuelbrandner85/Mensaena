@@ -5,8 +5,6 @@
 /// läuft durchgehend (Room im StreamRoomHolder).
 library;
 
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,21 +27,25 @@ class ActiveStreamMiniPlayer extends ConsumerStatefulWidget {
 }
 
 class _ActiveStreamMiniPlayerState
-    extends ConsumerState<ActiveStreamMiniPlayer> {
+    extends ConsumerState<ActiveStreamMiniPlayer>
+    with SingleTickerProviderStateMixin {
   Offset _offset = const Offset(16, 150);
-  Timer? _ticker;
+  // PERF-FIX: AnimationController statt Timer.periodic (vsync-gekoppelt,
+  // pausiert mit TickerMode/Hintergrund).
+  late final AnimationController _ticker;
 
   @override
   void initState() {
     super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
+    _ticker = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat();
   }
 
   @override
   void dispose() {
-    _ticker?.cancel();
+    _ticker.dispose();
     super.dispose();
   }
 
@@ -69,7 +71,6 @@ class _ActiveStreamMiniPlayerState
   @override
   Widget build(BuildContext context) {
     final info = widget.info;
-    final elapsed = DateTime.now().difference(info.startedAt);
     final size = MediaQuery.sizeOf(context);
     return Positioned(
       right: _offset.dx,
@@ -149,9 +150,16 @@ class _ActiveStreamMiniPlayerState
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Text(_fmt(elapsed),
+                    // Nur dieser Text rebuildet 1×/s; der teure Container
+                    // außenrum bleibt stabil.
+                    AnimatedBuilder(
+                      animation: _ticker,
+                      builder: (_, __) => Text(
+                        _fmt(DateTime.now().difference(info.startedAt)),
                         style: AppTypography.mono(
-                            size: 11, color: AppColors.bronze)),
+                            size: 11, color: AppColors.bronze),
+                      ),
+                    ),
                     const Spacer(),
                     const Icon(LucideIcons.expand,
                         size: 12, color: AppColors.mute),
