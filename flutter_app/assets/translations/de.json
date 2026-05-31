@@ -1989,7 +1989,15 @@
     "posts": "BEITRÄGE",
     "profiles": "PROFILE",
     "events": "VERANSTALTUNGEN",
-    "organizations": "ORGANISATIONEN"
+    "organizations": "ORGANISATIONEN",
+    "groups": "Gruppen",
+    "marketplace": "Marktplatz",
+    "board": "Brett",
+    "knowledge": "Wissen",
+    "crises": "Krisen",
+    "recentTitle": "Zuletzt gesucht",
+    "recentClear": "Verlauf löschen",
+    "hintAllSources": "Beiträge, Nachbar:innen, Events, Gruppen, Marktplatz …"
   },
   "skills": {
     "offerSkill": "Skill anbieten",

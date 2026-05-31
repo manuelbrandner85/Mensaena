@@ -1818,7 +1818,15 @@
     "posts": "PUBLICACIONES",
     "profiles": "PERSONAS",
     "events": "EVENTOS",
-    "organizations": "ORGANIZACIONES"
+    "organizations": "ORGANIZACIONES",
+    "groups": "Grupos",
+    "marketplace": "Mercado",
+    "board": "Tablón",
+    "knowledge": "Saber",
+    "crises": "Crisis",
+    "recentTitle": "Búsquedas recientes",
+    "recentClear": "Borrar historial",
+    "hintAllSources": "Publicaciones, vecinos, eventos, grupos, mercado …"
   },
   "skills": {
     "offerSkill": "Ofrecer habilidad",

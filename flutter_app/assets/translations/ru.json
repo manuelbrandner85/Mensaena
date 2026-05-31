@@ -1817,7 +1817,15 @@
     "posts": "ПУБЛИКАЦИИ",
     "profiles": "ЛЮДИ",
     "events": "СОБЫТИЯ",
-    "organizations": "ОРГАНИЗАЦИИ"
+    "organizations": "ОРГАНИЗАЦИИ",
+    "groups": "Группы",
+    "marketplace": "Маркет",
+    "board": "Доска",
+    "knowledge": "Знания",
+    "crises": "Кризисы",
+    "recentTitle": "Недавние запросы",
+    "recentClear": "Очистить историю",
+    "hintAllSources": "Записи, соседи, события, группы, маркет …"
   },
   "skills": {
     "offerSkill": "Предложить навык",

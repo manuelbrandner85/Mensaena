@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -30,6 +32,11 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
   String _query = '';
   Future<_SearchResults>? _future;
   Timer? _debounce;
+  List<String> _recent = const [];
+
+  static const _storage = FlutterSecureStorage();
+  static const _recentKey = 'mensaena_recent_searches_v1';
+  static const _maxRecent = 6;
 
   @override
   void initState() {
@@ -38,6 +45,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
     _ctrl.text = q;
     _query = q;
     if (q.length >= 2) _future = _runSearch(q);
+    _loadRecent();
   }
 
   @override
@@ -50,42 +58,118 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
   Future<_SearchResults> _runSearch(String q) async {
     final query = q.trim();
     if (query.length < 2) return const _SearchResults.empty();
+    final pattern = '%$query%';
+    Future<List<Map<String, dynamic>>> safe(
+        Future<dynamic> Function() run) async {
+      try {
+        final res = await run();
+        if (res is List) {
+          return res.whereType<Map<String, dynamic>>().toList();
+        }
+      } catch (_) {}
+      return const [];
+    }
+
     try {
-      // Parallel fetch via 4 endpoints — 1:1 zu Web CommandPalette
-      final results = await Future.wait<List<dynamic>>([
-        // Posts via search_posts RPC (fallback to ilike if RPC missing)
+      // 8 Parallel-Quellen für die globale Suche (1M€-App-Niveau):
+      // Posts/Profile/Events/Orgs (bestehend) + Gruppen/Marktplatz/Brett/
+      // Wissen (neu). Jede Quelle in safe() gewrappt, damit eine fehlende
+      // Tabelle/RLS nicht die anderen 7 Ergebnisse killt.
+      final results = await Future.wait<List<Map<String, dynamic>>>([
         _searchPosts(query),
-        // Profiles direct query
-        sb
+        safe(() => sb
             .from('profiles')
             .select('id, name, display_name, nickname, avatar_url, location')
-            .or('name.ilike.%$query%,nickname.ilike.%$query%,display_name.ilike.%$query%')
-            .limit(10),
-        // Events
-        sb
+            .or('name.ilike.$pattern,nickname.ilike.$pattern,display_name.ilike.$pattern')
+            .limit(10)),
+        safe(() => sb
             .from('events')
             .select('id, title, description, start_date, location_name')
-            .ilike('title', '%$query%')
+            .ilike('title', pattern)
             .eq('status', 'active')
             .order('start_date')
-            .limit(10),
-        // Organizations
-        sb
+            .limit(10)),
+        safe(() => sb
             .from('organizations')
             .select('id, name, category, city, is_verified')
-            .or('name.ilike.%$query%,description.ilike.%$query%')
-            .limit(10),
+            .or('name.ilike.$pattern,description.ilike.$pattern')
+            .limit(10)),
+        safe(() => sb
+            .from('groups')
+            .select('id, name, slug, category, description, member_count')
+            .or('name.ilike.$pattern,description.ilike.$pattern')
+            .neq('is_archived', true)
+            .order('member_count', ascending: false)
+            .limit(10)),
+        safe(() => sb
+            .from('marketplace_listings')
+            .select('id, title, listing_type, category, price, location_text')
+            .or('title.ilike.$pattern,description.ilike.$pattern')
+            .eq('status', 'active')
+            .order('created_at', ascending: false)
+            .limit(10)),
+        safe(() => sb
+            .from('board_posts')
+            .select('id, content, category, color, created_at')
+            .ilike('content', pattern)
+            .eq('status', 'active')
+            .order('created_at', ascending: false)
+            .limit(10)),
+        safe(() => sb
+            .from('knowledge_articles')
+            .select('id, slug, title, summary, category')
+            .or('title.ilike.$pattern,summary.ilike.$pattern,content.ilike.$pattern')
+            .eq('is_public', true)
+            .limit(10)),
       ]);
       return _SearchResults(
-        posts: results[0].whereType<Map<String, dynamic>>().toList(),
-        profiles: results[1].whereType<Map<String, dynamic>>().toList(),
-        events: results[2].whereType<Map<String, dynamic>>().toList(),
-        organizations:
-            results[3].whereType<Map<String, dynamic>>().toList(),
+        posts: results[0],
+        profiles: results[1],
+        events: results[2],
+        organizations: results[3],
+        groups: results[4],
+        marketplace: results[5],
+        board: results[6],
+        knowledge: results[7],
       );
     } catch (_) {
       return const _SearchResults.empty();
     }
+  }
+
+  // ── Recent-Searches: persistiert via SecureStorage, max 6 Einträge ──
+  Future<void> _loadRecent() async {
+    try {
+      final raw = await _storage.read(key: _recentKey);
+      if (raw == null || raw.isEmpty) return;
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return;
+      if (!mounted) return;
+      setState(() => _recent =
+          decoded.whereType<String>().toList(growable: false));
+    } catch (_) {/* default leer */}
+  }
+
+  Future<void> _pushRecent(String q) async {
+    final trimmed = q.trim();
+    if (trimmed.length < 2) return;
+    final list = List<String>.from(_recent);
+    list.removeWhere((s) => s.toLowerCase() == trimmed.toLowerCase());
+    list.insert(0, trimmed);
+    while (list.length > _maxRecent) {
+      list.removeLast();
+    }
+    setState(() => _recent = list);
+    try {
+      await _storage.write(key: _recentKey, value: jsonEncode(list));
+    } catch (_) {}
+  }
+
+  Future<void> _clearRecent() async {
+    setState(() => _recent = const []);
+    try {
+      await _storage.delete(key: _recentKey);
+    } catch (_) {}
   }
 
   Future<List<Map<String, dynamic>>> _searchPosts(String q) async {
@@ -123,7 +207,9 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
       return;
     }
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      if (mounted) setState(() => _future = _runSearch(v));
+      if (!mounted) return;
+      setState(() => _future = _runSearch(v));
+      _pushRecent(v);
     });
   }
 
@@ -157,7 +243,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                           },
                         )
                       : null,
-                  hintText: 'search.hintPostsProfilesEvents'.tr(),
+                  hintText: 'search.hintAllSources'.tr(),
                   hintStyle: AppTypography.body(
                       size: 14, color: AppColors.mute),
                   border: OutlineInputBorder(
@@ -169,7 +255,14 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
             ),
             Expanded(
               child: _query.trim().length < 2
-                  ? _EmptyHint()
+                  ? _RecentPanel(
+                      recent: _recent,
+                      onPick: (q) {
+                        _ctrl.text = q;
+                        _onChanged(q);
+                      },
+                      onClear: _clearRecent,
+                    )
                   : FutureBuilder<_SearchResults>(
                       future: _future,
                       builder: (context, snap) {
@@ -184,7 +277,8 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                           children: [
                             if (r.posts.isNotEmpty) ...[
                               _SectionHeader(
-                                  label: 'Beiträge', count: r.posts.length),
+                                  label: 'search.posts'.tr(),
+                                  count: r.posts.length),
                               for (final p in r.posts)
                                 _ResultTile(
                                   icon: LucideIcons.fileText,
@@ -197,7 +291,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                             ],
                             if (r.profiles.isNotEmpty) ...[
                               _SectionHeader(
-                                  label: 'Nachbar:innen',
+                                  label: 'search.profiles'.tr(),
                                   count: r.profiles.length),
                               for (final p in r.profiles)
                                 _ResultTile(
@@ -216,7 +310,8 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                             ],
                             if (r.events.isNotEmpty) ...[
                               _SectionHeader(
-                                  label: 'Events', count: r.events.length),
+                                  label: 'search.events'.tr(),
+                                  count: r.events.length),
                               for (final e in r.events)
                                 _ResultTile(
                                   icon: LucideIcons.calendar,
@@ -228,9 +323,84 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                                       .go('/dashboard/events/${e['id']}'),
                                 ),
                             ],
+                            if (r.groups.isNotEmpty) ...[
+                              _SectionHeader(
+                                  label: 'search.groups'.tr(),
+                                  count: r.groups.length),
+                              for (final g in r.groups)
+                                _ResultTile(
+                                  icon: LucideIcons.users2,
+                                  color: AppColors.teal,
+                                  title: (g['name'] as String?) ?? '',
+                                  subtitle: [
+                                    g['category'],
+                                    if ((g['member_count'] as num? ?? 0) > 0)
+                                      '${g['member_count']} 👥',
+                                  ]
+                                      .whereType<String>()
+                                      .where((s) => s.isNotEmpty)
+                                      .join(' · '),
+                                  onTap: () => context
+                                      .go('/dashboard/groups/${g['id']}'),
+                                ),
+                            ],
+                            if (r.marketplace.isNotEmpty) ...[
+                              _SectionHeader(
+                                  label: 'search.marketplace'.tr(),
+                                  count: r.marketplace.length),
+                              for (final m in r.marketplace)
+                                _ResultTile(
+                                  icon: LucideIcons.shoppingBag,
+                                  color: AppColors.amber,
+                                  title: (m['title'] as String?) ?? '',
+                                  subtitle: [
+                                    m['listing_type'],
+                                    if (m['price'] != null)
+                                      '${m['price']} €',
+                                    m['location_text'],
+                                  ]
+                                      .whereType<Object>()
+                                      .map((o) => '$o')
+                                      .where((s) => s.isNotEmpty)
+                                      .join(' · '),
+                                  onTap: () => context.go(
+                                      '/dashboard/marketplace/${m['id']}'),
+                                ),
+                            ],
+                            if (r.board.isNotEmpty) ...[
+                              _SectionHeader(
+                                  label: 'search.board'.tr(),
+                                  count: r.board.length),
+                              for (final b in r.board)
+                                _ResultTile(
+                                  icon: LucideIcons.stickyNote,
+                                  color: AppColors.bronze,
+                                  title: (b['content'] as String?) ?? '',
+                                  subtitle:
+                                      (b['category'] as String?) ?? '',
+                                  onTap: () => context
+                                      .go('/dashboard/board/${b['id']}'),
+                                ),
+                            ],
+                            if (r.knowledge.isNotEmpty) ...[
+                              _SectionHeader(
+                                  label: 'search.knowledge'.tr(),
+                                  count: r.knowledge.length),
+                              for (final k in r.knowledge)
+                                _ResultTile(
+                                  icon: LucideIcons.bookOpen,
+                                  color: AppColors.lebenSoft,
+                                  title: (k['title'] as String?) ?? '',
+                                  subtitle: (k['summary'] as String?) ??
+                                      (k['category'] as String?) ??
+                                      '',
+                                  onTap: () => context.go(
+                                      '/dashboard/knowledge/${k['slug'] ?? k['id']}'),
+                                ),
+                            ],
                             if (r.organizations.isNotEmpty) ...[
                               _SectionHeader(
-                                  label: 'Organisationen',
+                                  label: 'search.organizations'.tr(),
                                   count: r.organizations.length),
                               for (final o in r.organizations)
                                 _ResultTile(
@@ -268,23 +438,39 @@ class _SearchResults {
     required this.profiles,
     required this.events,
     required this.organizations,
+    required this.groups,
+    required this.marketplace,
+    required this.board,
+    required this.knowledge,
   });
   const _SearchResults.empty()
       : posts = const [],
         profiles = const [],
         events = const [],
-        organizations = const [];
+        organizations = const [],
+        groups = const [],
+        marketplace = const [],
+        board = const [],
+        knowledge = const [];
 
   final List<Map<String, dynamic>> posts;
   final List<Map<String, dynamic>> profiles;
   final List<Map<String, dynamic>> events;
   final List<Map<String, dynamic>> organizations;
+  final List<Map<String, dynamic>> groups;
+  final List<Map<String, dynamic>> marketplace;
+  final List<Map<String, dynamic>> board;
+  final List<Map<String, dynamic>> knowledge;
 
   bool get isEmpty =>
       posts.isEmpty &&
       profiles.isEmpty &&
       events.isEmpty &&
-      organizations.isEmpty;
+      organizations.isEmpty &&
+      groups.isEmpty &&
+      marketplace.isEmpty &&
+      board.isEmpty &&
+      knowledge.isEmpty;
 }
 
 class _EmptyHint extends StatelessWidget {
@@ -301,6 +487,82 @@ class _EmptyHint extends StatelessWidget {
                   AppTypography.body(size: 13, color: AppColors.mute)),
         ],
       ),
+    );
+  }
+}
+
+/// Recent-Searches-Panel: zeigt zuletzt gesuchte Begriffe als Chips, wenn
+/// die Eingabe leer ist. Tap auf einen Chip → erneute Suche. Persistent in
+/// SecureStorage.
+class _RecentPanel extends StatelessWidget {
+  const _RecentPanel({
+    required this.recent,
+    required this.onPick,
+    required this.onClear,
+  });
+
+  final List<String> recent;
+  final ValueChanged<String> onPick;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    if (recent.isEmpty) return _EmptyHint();
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'search.recentTitle'.tr().toUpperCase(),
+                style: AppTypography.label(size: 10, color: AppColors.mute),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: onClear,
+              icon: const Icon(LucideIcons.trash2, size: 12),
+              label: Text('search.recentClear'.tr()),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.mute,
+                textStyle: AppTypography.label(size: 10),
+                minimumSize: const Size(0, 28),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final q in recent)
+              GestureDetector(
+                onTap: () => onPick(q),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.elevated.withValues(alpha: 0.6),
+                    border: Border.all(color: AppColors.line),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(LucideIcons.clock,
+                          size: 12, color: AppColors.mute),
+                      const SizedBox(width: 6),
+                      Text(q,
+                          style: AppTypography.body(
+                              size: 13, color: AppColors.ink)),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

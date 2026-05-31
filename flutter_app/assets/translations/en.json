@@ -1990,7 +1990,15 @@
     "posts": "POSTS",
     "profiles": "PEOPLE",
     "events": "EVENTS",
-    "organizations": "ORGANIZATIONS"
+    "organizations": "ORGANIZATIONS",
+    "groups": "Groups",
+    "marketplace": "Marketplace",
+    "board": "Board",
+    "knowledge": "Knowledge",
+    "crises": "Crises",
+    "recentTitle": "Recent searches",
+    "recentClear": "Clear history",
+    "hintAllSources": "Posts, neighbours, events, groups, marketplace …"
   },
   "skills": {
     "offerSkill": "Offer skill",

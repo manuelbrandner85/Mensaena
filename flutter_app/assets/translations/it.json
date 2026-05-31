@@ -1818,7 +1818,15 @@
     "posts": "POST",
     "profiles": "PERSONE",
     "events": "EVENTI",
-    "organizations": "ORGANIZZAZIONI"
+    "organizations": "ORGANIZZAZIONI",
+    "groups": "Gruppi",
+    "marketplace": "Mercato",
+    "board": "Bacheca",
+    "knowledge": "Sapere",
+    "crises": "Crisi",
+    "recentTitle": "Ricerche recenti",
+    "recentClear": "Svuota cronologia",
+    "hintAllSources": "Post, vicini, eventi, gruppi, mercato …"
   },
   "skills": {
     "offerSkill": "Offri un'abilità",

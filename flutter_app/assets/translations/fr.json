@@ -1818,7 +1818,15 @@
     "posts": "PUBLICATIONS",
     "profiles": "PROFILS",
     "events": "ÉVÉNEMENTS",
-    "organizations": "ORGANISATIONS"
+    "organizations": "ORGANISATIONS",
+    "groups": "Groupes",
+    "marketplace": "Marché",
+    "board": "Panneau",
+    "knowledge": "Savoir",
+    "crises": "Crises",
+    "recentTitle": "Recherches récentes",
+    "recentClear": "Effacer l'historique",
+    "hintAllSources": "Posts, voisins, événements, groupes, marché …"
   },
   "skills": {
     "offerSkill": "Proposer une compétence",
