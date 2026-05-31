@@ -842,6 +842,35 @@ class AdminRepository {
       return false;
     }
   }
+
+  /// Admin-Broadcast: sendet eine Ankündigung als Notification an ALLE
+  /// Nutzer:innen (server-seitig via SECURITY-DEFINER-RPC, admin-only).
+  /// Gibt die Anzahl erreichter Profile zurück oder null bei Fehler.
+  static Future<int?> broadcastNotification({
+    required String title,
+    required String body,
+    String? link,
+    String priority = 'normal',
+  }) async {
+    try {
+      final res = await sb.rpc<dynamic>(
+        'admin_broadcast_notification',
+        params: {
+          'p_title': title,
+          'p_body': body,
+          'p_link': (link != null && link.trim().isNotEmpty)
+              ? link.trim()
+              : null,
+          'p_priority': priority,
+        },
+      );
+      if (res is int) return res;
+      if (res is num) return res.toInt();
+      return int.tryParse('$res');
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 class AdminStats {

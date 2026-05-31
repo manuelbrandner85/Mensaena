@@ -746,6 +746,8 @@ class _QuickActions extends StatelessWidget {
             style: AppTypography.display(size: 16, color: AppColors.ink),
           ),
           const SizedBox(height: 12),
+          const _BroadcastButton(),
+          const SizedBox(height: 8),
           _ActionButton(
             icon: LucideIcons.users,
             label: 'admin.manageUsers'.tr(),
@@ -811,6 +813,275 @@ class _ActionButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Broadcast: Ankündigung an alle Nutzer:innen (Composer-Sheet + RPC).
+// ---------------------------------------------------------------------------
+
+class _BroadcastButton extends StatelessWidget {
+  const _BroadcastButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: () => showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const _BroadcastSheet(),
+        ),
+        icon: const Icon(LucideIcons.megaphone, size: 18),
+        label: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'admin.broadcast'.tr(),
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.body(
+                size: 13,
+                color: AppColors.voidColor,
+                weight: FontWeight.w700),
+          ),
+        ),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.bronze,
+          foregroundColor: AppColors.voidColor,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BroadcastSheet extends ConsumerStatefulWidget {
+  const _BroadcastSheet();
+
+  @override
+  ConsumerState<_BroadcastSheet> createState() => _BroadcastSheetState();
+}
+
+class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
+  final _title = TextEditingController();
+  final _body = TextEditingController();
+  final _link = TextEditingController();
+  String _priority = 'normal';
+  bool _sending = false;
+
+  @override
+  void dispose() {
+    _title.dispose();
+    _body.dispose();
+    _link.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final title = _title.text.trim();
+    final body = _body.text.trim();
+    if (title.isEmpty || body.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.broadcastEmpty'.tr())),
+      );
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dCtx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        icon: const Icon(LucideIcons.megaphone,
+            size: 28, color: AppColors.bronze),
+        content: Text('admin.broadcastConfirm'.tr(),
+            textAlign: TextAlign.center,
+            style: AppTypography.body(
+                size: 14, color: AppColors.ink, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dCtx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dCtx, true),
+            style: FilledButton.styleFrom(
+                backgroundColor: AppColors.bronze,
+                foregroundColor: AppColors.voidColor),
+            child: Text('admin.broadcastSend'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _sending = true);
+    final count = await AdminRepository.broadcastNotification(
+      title: title,
+      body: body,
+      link: _link.text,
+      priority: _priority,
+    );
+    if (!mounted) return;
+    setState(() => _sending = false);
+    if (count == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.broadcastFailed'.tr())),
+      );
+      return;
+    }
+    // Notification-Count im Dashboard auffrischen.
+    ref.invalidate(adminStatsProvider);
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('admin.broadcastSuccess'
+            .tr(namedArgs: {'count': '$count'})),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final insets = MediaQuery.viewInsetsOf(context);
+    return Padding(
+      padding: EdgeInsets.only(bottom: insets.bottom),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.line,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  const Icon(LucideIcons.megaphone,
+                      size: 20, color: AppColors.bronze),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('admin.broadcastTitle'.tr(),
+                        style: AppTypography.display(
+                            size: 18, color: AppColors.ink)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text('admin.broadcastDesc'.tr(),
+                  style: AppTypography.caption()),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _title,
+                maxLength: 120,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'admin.broadcastFieldTitle'.tr(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _body,
+                maxLines: 4,
+                maxLength: 500,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'admin.broadcastFieldBody'.tr(),
+                  alignLabelWithHint: true,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _link,
+                keyboardType: TextInputType.url,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'admin.broadcastFieldLink'.tr(),
+                  prefixIcon: const Icon(LucideIcons.link, size: 16),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text('admin.broadcastPriority'.tr(),
+                  style: AppTypography.label(size: 10)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  for (final p in const [
+                    ('low', 'admin.prioLow'),
+                    ('normal', 'admin.prioNormal'),
+                    ('high', 'admin.prioHigh'),
+                  ])
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(p.$2.tr()),
+                        selected: _priority == p.$1,
+                        onSelected: (_) =>
+                            setState(() => _priority = p.$1),
+                        selectedColor:
+                            AppColors.bronze.withValues(alpha: 0.25),
+                        labelStyle: AppTypography.label(
+                          size: 11,
+                          color: _priority == p.$1
+                              ? AppColors.bronze
+                              : AppColors.inkSoft,
+                        ),
+                        backgroundColor:
+                            AppColors.elevated.withValues(alpha: 0.5),
+                        side: BorderSide(
+                          color: _priority == p.$1
+                              ? AppColors.bronze
+                              : AppColors.line,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                height: 52,
+                child: FilledButton.icon(
+                  onPressed: _sending ? null : _send,
+                  icon: _sending
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.voidColor),
+                        )
+                      : const Icon(LucideIcons.send, size: 18),
+                  label: Text(_sending
+                      ? 'admin.broadcastSending'.tr()
+                      : 'admin.broadcastSend'.tr()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.bronze,
+                    foregroundColor: AppColors.voidColor,
+                    textStyle: AppTypography.body(
+                        size: 15, weight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
