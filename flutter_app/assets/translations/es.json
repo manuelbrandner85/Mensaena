@@ -2324,5 +2324,13 @@
     "phone": "Número de teléfono",
     "community": "Confianza de la comunidad",
     "admin": "Verificado por admin"
+  },
+  "account": {
+    "verifyTitle": "Verificación de correo",
+    "verifyDone": "Tu correo {email} está verificado. ✓",
+    "verifyPending": "Tu correo {email} aún no está verificado. Confírmalo para obtener la insignia de verificado.",
+    "verifyResend": "Reenviar verificación",
+    "verifySent": "Correo de verificación enviado. Revisa tu bandeja.",
+    "verifyFailed": "No se pudo enviar la verificación."
   }
 }

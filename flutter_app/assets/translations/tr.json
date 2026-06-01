@@ -2323,5 +2323,13 @@
     "phone": "Telefon numarası",
     "community": "Topluluk güveni",
     "admin": "Yönetici onaylı"
+  },
+  "account": {
+    "verifyTitle": "E-posta doğrulama",
+    "verifyDone": "E-postan {email} doğrulandı. ✓",
+    "verifyPending": "E-postan {email} henüz doğrulanmadı. Doğrulanmış rozeti için onayla.",
+    "verifyResend": "Doğrulamayı tekrar gönder",
+    "verifySent": "Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.",
+    "verifyFailed": "Doğrulama gönderilemedi."
   }
 }

@@ -2617,7 +2617,13 @@
     "delete_confirm": "Ja, löschen",
     "delete_pending": "Löschung angefordert",
     "delete_scheduled_for": "Dein Konto wird am {date} gelöscht.",
-    "delete_cancel": "Löschung abbrechen"
+    "delete_cancel": "Löschung abbrechen",
+    "verifyTitle": "E-Mail-Bestätigung",
+    "verifyDone": "Deine E-Mail {email} ist bestätigt. ✓",
+    "verifyPending": "Deine E-Mail {email} ist noch nicht bestätigt. Bestätige sie, um das Verifiziert-Abzeichen zu erhalten.",
+    "verifyResend": "Bestätigung erneut senden",
+    "verifySent": "Bestätigungs-Mail gesendet. Schau in dein Postfach.",
+    "verifyFailed": "Konnte Bestätigung nicht senden."
   },
   "karma": {
     "title": "Karma",

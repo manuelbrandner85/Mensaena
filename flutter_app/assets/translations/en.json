@@ -2618,7 +2618,13 @@
     "delete_confirm": "Yes, delete",
     "delete_pending": "Deletion requested",
     "delete_scheduled_for": "Your account will be deleted on {date}.",
-    "delete_cancel": "Cancel deletion"
+    "delete_cancel": "Cancel deletion",
+    "verifyTitle": "Email verification",
+    "verifyDone": "Your email {email} is verified. ✓",
+    "verifyPending": "Your email {email} is not verified yet. Confirm it to earn the verified badge.",
+    "verifyResend": "Resend verification",
+    "verifySent": "Verification email sent. Check your inbox.",
+    "verifyFailed": "Could not send verification."
   },
   "karma": {
     "title": "Karma",
