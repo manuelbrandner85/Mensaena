@@ -327,6 +327,8 @@ class _CrisisDashboardScreenState
                           ...list.map((c) => _CrisisTile(crisis: c)),
                         const SizedBox(height: 16),
                         _ResourcesCta(),
+                        const SizedBox(height: 10),
+                        _CircleCta(),
                       ],
                     );
                   },
@@ -1143,6 +1145,51 @@ class _ResourcesCta extends StatelessWidget {
                   ),
                   Text(
                     'crisis.emergencyNumbersList'.tr(),
+                    style: AppTypography.caption(),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight, color: AppColors.amber),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// R3: Einstieg in den Familien-Kreis (Notfall-Kontakte + SOS).
+class _CircleCta extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => context.push('/dashboard/crisis/circle'),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.surface.withValues(alpha: 0.5),
+          border: Border.all(color: AppColors.line),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.heartHandshake, color: AppColors.bronze),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'circle.title'.tr(),
+                    style: AppTypography.body(
+                      size: 14,
+                      color: AppColors.ink,
+                      weight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    'circle.ctaSub'.tr(),
                     style: AppTypography.caption(),
                   ),
                 ],

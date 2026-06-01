@@ -176,6 +176,93 @@ class CrisisRepository {
     }
   }
 
+  // ── R2: Krisen-Team — Aufgaben-Koordination ────────────────────────
+  /// Realtime-Stream aller Aufgaben einer Krise (offen zuerst).
+  static Stream<List<Map<String, dynamic>>> watchTasks(String crisisId) {
+    return sb
+        .from('crisis_tasks')
+        .stream(primaryKey: ['id'])
+        .eq('crisis_id', crisisId)
+        .order('created_at')
+        .map((rows) => rows.whereType<Map<String, dynamic>>().toList());
+  }
+
+  /// Neue Aufgabe anlegen.
+  static Future<bool> createTask({
+    required String crisisId,
+    required String title,
+    String? description,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('crisis_tasks').insert({
+        'crisis_id': crisisId,
+        'created_by': uid,
+        'title': title.trim(),
+        'description': (description != null && description.trim().isNotEmpty)
+            ? description.trim()
+            : null,
+        'status': 'open',
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Aufgabe übernehmen (assigned_to = ich, status = claimed).
+  static Future<bool> claimTask(String taskId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('crisis_tasks').update({
+        'assigned_to': uid,
+        'status': 'claimed',
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', taskId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Aufgabe als erledigt markieren.
+  static Future<bool> completeTask(String taskId) async {
+    try {
+      await sb.from('crisis_tasks').update({
+        'status': 'done',
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', taskId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Aufgabe wieder freigeben (zurück auf offen, niemandem zugewiesen).
+  static Future<bool> releaseTask(String taskId) async {
+    try {
+      await sb.from('crisis_tasks').update({
+        'assigned_to': null,
+        'status': 'open',
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', taskId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> deleteTask(String taskId) async {
+    try {
+      await sb.from('crisis_tasks').delete().eq('id', taskId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Status-Update an Krise anhaengen.
   static Future<bool> addUpdate({
     required String crisisId,
@@ -259,6 +346,12 @@ final crisisHelpersStreamProvider =
 final crisisUpdatesStreamProvider =
     StreamProvider.family<List<CrisisUpdate>, String>((ref, crisisId) {
   return CrisisRepository.watchUpdates(crisisId);
+});
+
+/// R2: Aufgaben-Stream für das Krisen-Team.
+final crisisTasksStreamProvider =
+    StreamProvider.family<List<Map<String, dynamic>>, String>((ref, crisisId) {
+  return CrisisRepository.watchTasks(crisisId);
 });
 
 final emergencyNumbersProvider =

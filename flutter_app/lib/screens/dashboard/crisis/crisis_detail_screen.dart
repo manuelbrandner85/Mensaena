@@ -64,6 +64,8 @@ class CrisisDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   _NeedsBlock(crisis: c),
                 ],
+                const SizedBox(height: 16),
+                _TeamTasksBlock(crisis: c),
                 const SizedBox(height: 18),
                 Row(
                   children: [
@@ -679,6 +681,248 @@ class _HelperBlock extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// R2: Krisen-Team — koordinierte Aufgaben. Jede:r angemeldete Helfer:in
+/// kann Aufgaben anlegen, freie Aufgaben übernehmen und erledigte abhaken.
+/// Ersteller:in der Aufgabe bzw. der Krise darf löschen.
+class _TeamTasksBlock extends ConsumerWidget {
+  const _TeamTasksBlock({required this.crisis});
+  final Crisis crisis;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uid = SupabaseService.currentUser?.id;
+    final isCrisisOwner = uid != null && uid == crisis.creatorId;
+    final async = ref.watch(crisisTasksStreamProvider(crisis.id));
+    final tasks = async.asData?.value ?? const [];
+    final open = tasks.where((t) => t['status'] != 'done').toList();
+    final done = tasks.where((t) => t['status'] == 'done').length;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.4),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.users, size: 15, color: AppColors.bronze),
+              const SizedBox(width: 6),
+              Text('crisis.teamTitle'.tr(),
+                  style: AppTypography.label(size: 10, color: AppColors.bronze)),
+              const Spacer(),
+              if (uid != null)
+                TextButton.icon(
+                  onPressed: () => _createTask(context, ref),
+                  icon: const Icon(LucideIcons.plus,
+                      size: 12, color: AppColors.bronze),
+                  label: Text('crisis.addTask'.tr(),
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.bronze)),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 30),
+                  ),
+                ),
+            ],
+          ),
+          if (done > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                'crisis.tasksDoneCount'.tr(namedArgs: {'n': '$done'}),
+                style: AppTypography.caption(),
+              ),
+            ),
+          const SizedBox(height: 8),
+          if (open.isEmpty)
+            Text('crisis.noTasksYet'.tr(), style: AppTypography.caption())
+          else
+            for (final t in open)
+              _taskRow(context, ref, t, uid, isCrisisOwner),
+        ],
+      ),
+    );
+  }
+
+  Widget _taskRow(BuildContext context, WidgetRef ref,
+      Map<String, dynamic> t, String? uid, bool isCrisisOwner) {
+    final id = t['id'] as String;
+    final title = (t['title'] ?? '').toString();
+    final desc = (t['description'] ?? '').toString();
+    final status = (t['status'] ?? 'open').toString();
+    final assignedTo = t['assigned_to'] as String?;
+    final mineAssigned = assignedTo != null && assignedTo == uid;
+    final canDelete = isCrisisOwner || t['created_by'] == uid;
+    final claimed = status == 'claimed';
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(
+              claimed ? LucideIcons.userCheck : LucideIcons.circleDashed,
+              size: 15,
+              color: claimed ? AppColors.amber : AppColors.mute,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.ink,
+                        weight: FontWeight.w600)),
+                if (desc.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1),
+                    child: Text(desc,
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.inkSoft),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                const SizedBox(height: 4),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 2,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (uid != null && status == 'open')
+                      _action(LucideIcons.hand, 'crisis.taskClaim'.tr(),
+                          AppColors.bronze, () async {
+                        await CrisisRepository.claimTask(id);
+                      }),
+                    if (claimed && (mineAssigned || isCrisisOwner))
+                      _action(LucideIcons.check, 'crisis.taskDone'.tr(),
+                          AppColors.leben, () async {
+                        await CrisisRepository.completeTask(id);
+                      }),
+                    if (claimed && mineAssigned)
+                      _action(LucideIcons.undo2, 'crisis.taskRelease'.tr(),
+                          AppColors.mute, () async {
+                        await CrisisRepository.releaseTask(id);
+                      }),
+                    if (canDelete)
+                      _action(LucideIcons.trash2, 'common.delete'.tr(),
+                          AppColors.mute, () async {
+                        await CrisisRepository.deleteTask(id);
+                      }),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _action(
+      IconData icon, String label, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: color),
+            const SizedBox(width: 3),
+            Text(label, style: AppTypography.label(size: 9, color: color)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createTask(BuildContext context, WidgetRef ref) async {
+    final titleCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    bool sending = false;
+    await showDialog<void>(
+      context: context,
+      builder: (dlg) => StatefulBuilder(
+        builder: (dlg, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('crisis.addTask'.tr(),
+              style: AppTypography.display(size: 18, color: AppColors.ink)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleCtrl,
+                autofocus: true,
+                maxLength: 120,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  hintText: 'crisis.taskTitleHint'.tr(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descCtrl,
+                maxLines: 3,
+                maxLength: 300,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  hintText: 'crisis.taskDescHint'.tr(),
+                  isDense: true,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: sending ? null : () => Navigator.pop(dlg),
+              child: Text('common.cancel'.tr()),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.bronze,
+                foregroundColor: AppColors.voidColor,
+              ),
+              onPressed: sending
+                  ? null
+                  : () async {
+                      final title = titleCtrl.text.trim();
+                      if (title.isEmpty) return;
+                      setLocal(() => sending = true);
+                      await CrisisRepository.createTask(
+                        crisisId: crisis.id,
+                        title: title,
+                        description: descCtrl.text,
+                      );
+                      if (!dlg.mounted) return;
+                      Navigator.pop(dlg);
+                    },
+              child: sending
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.voidColor),
+                    )
+                  : Text('crisis.taskSave'.tr()),
+            ),
+          ],
+        ),
       ),
     );
   }
