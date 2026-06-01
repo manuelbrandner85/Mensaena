@@ -885,7 +885,12 @@
     "lastLogin": "zuletzt",
     "exportCsv": "CSV-Export",
     "exportCsvSubject": "Mensaena Nutzer-Export",
-    "exportCsvFailed": "CSV-Export fehlgeschlagen."
+    "exportCsvFailed": "CSV-Export fehlgeschlagen.",
+    "bulkSelect": "Mehrfachauswahl",
+    "bulkSelected": "{n} ausgewählt",
+    "bulkRole": "Rolle",
+    "bulkBanReason": "Sammel-Sperre durch Admin",
+    "bulkDone": "{ok} von {total} Nutzer:innen aktualisiert."
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",

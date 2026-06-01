@@ -841,7 +841,12 @@
     "lastLogin": "dernier",
     "exportCsv": "Exporter CSV",
     "exportCsvSubject": "Export des utilisateurs Mensaena",
-    "exportCsvFailed": "Échec de l'export CSV."
+    "exportCsvFailed": "Échec de l'export CSV.",
+    "bulkSelect": "Sélection multiple",
+    "bulkSelected": "{n} sélectionnés",
+    "bulkRole": "Rôle",
+    "bulkBanReason": "Bannissement groupé par l'admin",
+    "bulkDone": "{ok} sur {total} utilisateurs mis à jour."
   },
   "create": {
     "locationUnavailable": "Position non disponible.",

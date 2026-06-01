@@ -840,7 +840,12 @@
     "lastLogin": "вход",
     "exportCsv": "Экспорт CSV",
     "exportCsvSubject": "Экспорт пользователей Mensaena",
-    "exportCsvFailed": "Не удалось экспортировать CSV."
+    "exportCsvFailed": "Не удалось экспортировать CSV.",
+    "bulkSelect": "Множественный выбор",
+    "bulkSelected": "Выбрано: {n}",
+    "bulkRole": "Роль",
+    "bulkBanReason": "Массовая блокировка админом",
+    "bulkDone": "Обновлено {ok} из {total} пользователей."
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",

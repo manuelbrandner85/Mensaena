@@ -886,7 +886,12 @@
     "lastLogin": "last",
     "exportCsv": "Export CSV",
     "exportCsvSubject": "Mensaena user export",
-    "exportCsvFailed": "CSV export failed."
+    "exportCsvFailed": "CSV export failed.",
+    "bulkSelect": "Multi-select",
+    "bulkSelected": "{n} selected",
+    "bulkRole": "Role",
+    "bulkBanReason": "Bulk ban by admin",
+    "bulkDone": "{ok} of {total} users updated."
   },
   "create": {
     "titleRequired": "Title is required.",

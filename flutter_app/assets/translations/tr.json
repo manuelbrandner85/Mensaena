@@ -840,7 +840,12 @@
     "lastLogin": "son",
     "exportCsv": "CSV dışa aktar",
     "exportCsvSubject": "Mensaena kullanıcı dışa aktarımı",
-    "exportCsvFailed": "CSV dışa aktarma başarısız."
+    "exportCsvFailed": "CSV dışa aktarma başarısız.",
+    "bulkSelect": "Çoklu seçim",
+    "bulkSelected": "{n} seçildi",
+    "bulkRole": "Rol",
+    "bulkBanReason": "Yönetici toplu yasak",
+    "bulkDone": "{total} kullanıcıdan {ok} güncellendi."
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",

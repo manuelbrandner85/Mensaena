@@ -52,6 +52,76 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   String? _myRole;
   bool _exporting = false;
 
+  // A3 Bulk-Aktionen
+  bool _selectionMode = false;
+  final Set<String> _selectedIds = <String>{};
+
+  void _toggleSelectionMode() {
+    setState(() {
+      _selectionMode = !_selectionMode;
+      if (!_selectionMode) _selectedIds.clear();
+    });
+  }
+
+  void _toggleSelected(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  /// Wendet eine Bulk-Aktion auf alle ausgewählten Nutzer an (außer dem
+  /// eigenen Konto). Sammelt Erfolge, zeigt Snackbar, lädt neu.
+  Future<void> _applyBulk(
+      Future<bool> Function(String id) action, String labelKey) async {
+    final myId = SupabaseService.currentUser?.id;
+    final ids = _selectedIds.where((id) => id != myId).toList();
+    if (ids.isEmpty) return;
+    var ok = 0;
+    for (final id in ids) {
+      if (await action(id)) ok++;
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('admin.bulkDone'.tr(
+            namedArgs: {'ok': '$ok', 'total': '${ids.length}'})),
+      ),
+    );
+    setState(() {
+      _selectionMode = false;
+      _selectedIds.clear();
+    });
+    _load();
+  }
+
+  Future<void> _bulkRole() async {
+    final role = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final r in const ['user', 'moderator', 'admin'])
+              ListTile(
+                leading: const Icon(LucideIcons.shieldCheck,
+                    color: AppColors.bronze),
+                title: Text(r),
+                onTap: () => Navigator.pop(ctx, r),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (role == null) return;
+    await _applyBulk(
+        (id) => AdminRepository.changeUserRole(id, role), 'role');
+  }
+
   /// A4: exportiert ALLE Nutzer (über die aktuelle Filter-Suche hinweg)
   /// als CSV und teilt sie via System-Share-Sheet. Holt bis zu 5000 Rows
   /// direkt aus admin_list_users — unabhängig von der Seiten-Pagination.
@@ -613,6 +683,22 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                     value: _roleFilter,
                     onChanged: _setRoleFilter,
                   ),
+                  if (_isAdmin) ...[
+                    const SizedBox(width: 4),
+                    IconButton(
+                      tooltip: 'admin.bulkSelect'.tr(),
+                      onPressed: _toggleSelectionMode,
+                      icon: Icon(
+                        _selectionMode
+                            ? LucideIcons.x
+                            : LucideIcons.listChecks,
+                        size: 20,
+                        color: _selectionMode
+                            ? AppColors.bronze
+                            : AppColors.mute,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -647,6 +733,13 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                             canBan: _isAdmin,
                             canDelete: _isAdmin,
                             isModerator: _isModerator,
+                            selectionMode: _selectionMode,
+                            selected: _selectedIds
+                                .contains(_users[i]['id']?.toString()),
+                            onToggleSelect: () {
+                              final id = _users[i]['id']?.toString();
+                              if (id != null) _toggleSelected(id);
+                            },
                             onEdit: () => _openEdit(_users[i]),
                             onBan: () => _openBan(_users[i]),
                             onUnban: () => _unban(_users[i]),
@@ -654,6 +747,17 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                           ),
                         ),
             ),
+            if (_selectionMode && _selectedIds.isNotEmpty)
+              _BulkBar(
+                count: _selectedIds.length,
+                onBan: () => _applyBulk(
+                    (id) => AdminRepository.banUser(
+                        id, 'admin.bulkBanReason'.tr()),
+                    'ban'),
+                onUnban: () => _applyBulk(
+                    (id) => AdminRepository.unbanUser(id), 'unban'),
+                onRole: _bulkRole,
+              ),
             if (_total > _pageSize)
               _PaginationBar(
                 page: _page,
@@ -741,6 +845,9 @@ class _UserRow extends StatelessWidget {
     required this.onBan,
     required this.onUnban,
     required this.onDelete,
+    this.selectionMode = false,
+    this.selected = false,
+    this.onToggleSelect,
   });
 
   final Map<String, dynamic> user;
@@ -752,6 +859,9 @@ class _UserRow extends StatelessWidget {
   final VoidCallback onBan;
   final VoidCallback onUnban;
   final VoidCallback onDelete;
+  final bool selectionMode;
+  final bool selected;
+  final VoidCallback? onToggleSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -779,17 +889,21 @@ class _UserRow extends StatelessWidget {
 
     final initial = (name.isNotEmpty ? name : '?').substring(0, 1).toUpperCase();
 
-    return Container(
+    final container = Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isBanned
-            ? AppColors.herzrot.withValues(alpha: 0.08)
-            : AppColors.surface,
+        color: selected
+            ? AppColors.bronze.withValues(alpha: 0.10)
+            : isBanned
+                ? AppColors.herzrot.withValues(alpha: 0.08)
+                : AppColors.surface,
         border: Border.all(
-          color: isBanned
-              ? AppColors.herzrot.withValues(alpha: 0.4)
-              : AppColors.line,
+          color: selected
+              ? AppColors.bronze
+              : isBanned
+                  ? AppColors.herzrot.withValues(alpha: 0.4)
+                  : AppColors.line,
         ),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -799,6 +913,16 @@ class _UserRow extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (selectionMode) ...[
+                Icon(
+                  selected
+                      ? LucideIcons.checkCircle2
+                      : LucideIcons.circle,
+                  size: 22,
+                  color: selected ? AppColors.bronze : AppColors.mute,
+                ),
+                const SizedBox(width: 10),
+              ],
               if (avatar != null && avatar.isNotEmpty)
                 CachedNetworkImage(
                   imageUrl: avatar,
@@ -917,6 +1041,8 @@ class _UserRow extends StatelessWidget {
                 ),
             ],
           ),
+          // In Selection-Mode keine Einzel-Aktionen — der Row-Tap wählt aus.
+          if (!selectionMode) ...[
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
@@ -964,9 +1090,20 @@ class _UserRow extends StatelessWidget {
                 ),
             ],
           ),
+          ],
         ],
       ),
     );
+    // Im Selection-Mode fängt ein GestureDetector den Tap ab und toggelt
+    // die Auswahl statt eine Einzel-Aktion auszulösen.
+    if (selectionMode) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onToggleSelect,
+        child: container,
+      );
+    }
+    return container;
   }
 
   String _roleLabel(String role) {
@@ -1112,6 +1249,90 @@ class _PaginationBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A3 Bulk-Aktions-Leiste — erscheint am unteren Rand wenn im Selection-
+/// Mode mindestens ein Nutzer ausgewählt ist.
+class _BulkBar extends StatelessWidget {
+  const _BulkBar({
+    required this.count,
+    required this.onBan,
+    required this.onUnban,
+    required this.onRole,
+  });
+
+  final int count;
+  final VoidCallback onBan;
+  final VoidCallback onUnban;
+  final VoidCallback onRole;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.line)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Text(
+              'admin.bulkSelected'.tr(namedArgs: {'n': '$count'}),
+              style: AppTypography.label(size: 10, color: AppColors.bronze),
+            ),
+            const Spacer(),
+            _BulkBtn(
+                icon: LucideIcons.shieldCheck,
+                label: 'admin.bulkRole'.tr(),
+                color: AppColors.bronze,
+                onTap: onRole),
+            const SizedBox(width: 6),
+            _BulkBtn(
+                icon: LucideIcons.unlock,
+                label: 'admin.users.unban'.tr(),
+                color: AppColors.leben,
+                onTap: onUnban),
+            const SizedBox(width: 6),
+            _BulkBtn(
+                icon: LucideIcons.ban,
+                label: 'admin.users.ban'.tr(),
+                color: AppColors.herzrot,
+                onTap: onBan),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BulkBtn extends StatelessWidget {
+  const _BulkBtn({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 14, color: color),
+      label: Text(label,
+          style: AppTypography.label(size: 9, color: color)),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: color.withValues(alpha: 0.5)),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        minimumSize: Size.zero,
       ),
     );
   }
