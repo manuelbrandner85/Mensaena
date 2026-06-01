@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/groups_repository.dart';
+import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/premium_image.dart';
 
@@ -48,11 +49,41 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     ref.invalidate(groupPostsProvider(widget.groupId));
   }
 
+  Future<void> _deletePost(String postId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        content: Text('groups.deletePostConfirm'.tr(),
+            style: AppTypography.body(size: 14, color: AppColors.ink)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.herzrot),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('common.delete'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    final ok = await GroupsRepository.deletePost(postId);
+    if (!mounted) return;
+    if (ok) ref.invalidate(groupPostsProvider(widget.groupId));
+  }
+
   @override
   Widget build(BuildContext context) {
     final group = ref.watch(groupDetailProvider(widget.groupId));
     final isMember = ref.watch(groupMembershipProvider(widget.groupId));
     final posts = ref.watch(groupPostsProvider(widget.groupId));
+    // G2: Owner/Admin der Gruppe dürfen fremde Posts moderieren.
+    final myRole = ref.watch(groupMyRoleProvider(widget.groupId)).value;
+    final canModerate = myRole == 'owner' || myRole == 'admin';
+    final myUid = SupabaseService.currentUser?.id;
 
     return DashboardScaffold(
       title: 'groups.title'.tr(),
@@ -252,19 +283,43 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.start,
                                   children: [
-                                    if (p.isPinned)
-                                      const Padding(
-                                        padding: EdgeInsets.only(bottom: 4),
-                                        child: Icon(LucideIcons.pin,
-                                            size: 12, color: AppColors.amber),
-                                      ),
-                                    Text(
-                                      p.content,
-                                      style: AppTypography.body(
-                                        size: 13,
-                                        color: AppColors.ink,
-                                        height: 1.45,
-                                      ),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (p.isPinned)
+                                          const Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 6),
+                                            child: Icon(LucideIcons.pin,
+                                                size: 12,
+                                                color: AppColors.amber),
+                                          ),
+                                        Expanded(
+                                          child: Text(
+                                            p.content,
+                                            style: AppTypography.body(
+                                              size: 13,
+                                              color: AppColors.ink,
+                                              height: 1.45,
+                                            ),
+                                          ),
+                                        ),
+                                        if (canModerate || p.userId == myUid)
+                                          GestureDetector(
+                                            onTap: () =>
+                                                _deletePost(p.id),
+                                            child: const Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 6),
+                                              child: Icon(
+                                                LucideIcons.trash2,
+                                                size: 14,
+                                                color: AppColors.mute,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
                                     ),
                                     const SizedBox(height: 4),
                                     if (p.createdAt != null)

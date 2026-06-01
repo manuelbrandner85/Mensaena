@@ -1505,7 +1505,8 @@
     "catBildung": "Образование",
     "catTiere": "Животные",
     "catHandwerk": "Ремёсла",
-    "catSonstiges": "Другое"
+    "catSonstiges": "Другое",
+    "deletePostConfirm": "Удалить эту запись?"
   },
   "board": {
     "title": "Заметка",

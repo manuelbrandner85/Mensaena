@@ -1506,7 +1506,8 @@
     "catBildung": "Educación",
     "catTiere": "Animales",
     "catHandwerk": "Artesanía",
-    "catSonstiges": "Otros"
+    "catSonstiges": "Otros",
+    "deletePostConfirm": "¿Eliminar esta publicación?"
   },
   "board": {
     "title": "Nota",

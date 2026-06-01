@@ -1506,7 +1506,8 @@
     "catBildung": "Éducation",
     "catTiere": "Animaux",
     "catHandwerk": "Artisanat",
-    "catSonstiges": "Autre"
+    "catSonstiges": "Autre",
+    "deletePostConfirm": "Supprimer cette publication ?"
   },
   "board": {
     "title": "Note",

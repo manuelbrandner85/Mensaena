@@ -1505,7 +1505,8 @@
     "catBildung": "Eğitim",
     "catTiere": "Hayvanlar",
     "catHandwerk": "El sanatları",
-    "catSonstiges": "Diğer"
+    "catSonstiges": "Diğer",
+    "deletePostConfirm": "Bu gönderi silinsin mi?"
   },
   "board": {
     "title": "Not",

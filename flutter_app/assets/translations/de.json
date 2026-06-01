@@ -1605,7 +1605,8 @@
     "catBildung": "Bildung",
     "catTiere": "Tiere",
     "catHandwerk": "Handwerk",
-    "catSonstiges": "Sonstiges"
+    "catSonstiges": "Sonstiges",
+    "deletePostConfirm": "Diesen Beitrag löschen?"
   },
   "board": {
     "title": "Notiz",

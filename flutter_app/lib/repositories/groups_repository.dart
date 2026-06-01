@@ -205,6 +205,34 @@ class GroupsRepository {
     }
   }
 
+  /// G2: meine Rolle in der Gruppe ('owner' | 'admin' | 'member' | null).
+  static Future<String?> myRoleInGroup(String groupId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final row = await sb
+          .from('group_members')
+          .select('role')
+          .eq('group_id', groupId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      return row?['role'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// G2: löscht einen Gruppen-Post. RLS erlaubt nur dem Autor ODER einem
+  /// Owner/Admin der Gruppe das Löschen.
+  static Future<bool> deletePost(String postId) async {
+    try {
+      await sb.from('group_posts').delete().eq('id', postId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<String?> create({
     required String name,
     required String slug,
@@ -261,5 +289,7 @@ final groupDetailProvider =
     FutureProvider.family<Group?, String>((ref, id) => GroupsRepository.getById(id));
 final groupMembershipProvider =
     FutureProvider.family<bool, String>((ref, id) => GroupsRepository.amMember(id));
+final groupMyRoleProvider = FutureProvider.family<String?, String>(
+    (ref, id) => GroupsRepository.myRoleInGroup(id));
 final groupPostsProvider = FutureProvider.family<List<GroupPost>, String>(
     (ref, id) => GroupsRepository.postsFor(id));

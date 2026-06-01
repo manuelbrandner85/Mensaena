@@ -1606,7 +1606,8 @@
     "catBildung": "Education",
     "catTiere": "Animals",
     "catHandwerk": "Crafts",
-    "catSonstiges": "Other"
+    "catSonstiges": "Other",
+    "deletePostConfirm": "Delete this post?"
   },
   "board": {
     "title": "Note",
