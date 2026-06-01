@@ -81,7 +81,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   int _ringingElapsed = 0;
   StreamSubscription<List<Map<String, dynamic>>>? _callStatusSub;
   // Call-Duration-Timer — startet bei connected.
+  // PERF (Audit): ValueNotifier statt setState(){} damit der 1s-Tick NUR
+  // den kleinen Subtitle-Text rebuildet (ValueListenableBuilder, s.u.) —
+  // nicht den ganzen Call-Screen mit LiveKit-Video-Tracks + Gradient +
+  // Controls (das war ein 1Hz-Vollrebuild und zog Frames).
   final Stopwatch _stopwatch = Stopwatch();
+  final ValueNotifier<int> _elapsedSec = ValueNotifier<int>(0);
   Timer? _ticker;
   // Mini-Cam-Preview-Position (draggable).
   Offset _camPreviewPos = const Offset(16, 100);
@@ -389,8 +394,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       _stopwatch
         ..reset()
         ..start();
+      _elapsedSec.value = 0;
       _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (mounted) setState(() {});
+        if (mounted) _elapsedSec.value = _stopwatch.elapsed.inSeconds;
       });
       final startedAt = DateTime.now();
       // Active-Call-Banner: ab jetzt weiss die App-Shell vom laufenden
@@ -440,8 +446,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _stopwatch
       ..reset()
       ..start();
+    _elapsedSec.value = 0;
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
+      if (mounted) _elapsedSec.value = _stopwatch.elapsed.inSeconds;
     });
   }
 
@@ -647,6 +654,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _callStatusSub?.cancel();
     _ticker?.cancel();
     _stopwatch.stop();
+    _elapsedSec.dispose();
     try {
       _ringback?.stop();
       _ringback?.dispose();
@@ -830,9 +838,16 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                   size: 26, color: AppColors.ink, height: 1.2),
             ),
             const SizedBox(height: 6),
-            Text(_subtitle(),
-                style: AppTypography.body(
-                    size: 13, color: AppColors.inkSoft)),
+            // PERF (Audit): nur das Duration-Update rebuildet via
+            // ValueListenableBuilder. Im connected-State liest der
+            // Builder _stopwatch.elapsed beim Tick (1Hz) — der Rest
+            // des Call-Screens bleibt stabil.
+            ValueListenableBuilder<int>(
+              valueListenable: _elapsedSec,
+              builder: (_, __, ___) => Text(_subtitle(),
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.inkSoft)),
+            ),
             const Spacer(),
             // Wenn Remote-Video vorhanden: zeige Video. Sonst: großer Avatar.
             _PeerVideoOrAvatar(

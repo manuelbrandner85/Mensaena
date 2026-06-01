@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/notifications_repository.dart';
 
 /// SKILL: mensaena-design
 /// Bell-Icon mit Unread-Badge im AppBar. Tippen oeffnet /notifications.
-class NotificationBell extends StatelessWidget {
-  const NotificationBell({required this.unreadCount, super.key});
-
-  final int unreadCount;
+///
+/// PERF (Audit): Vorher watchte das umschließende DashboardScaffold den
+/// unreadNotificationCountProvider direkt → bei jedem Notification-Stream-
+/// Event wurde das KOMPLETTE Scaffold (inkl. Body) neu gebaut. Jetzt
+/// watcht NotificationBell selbst → rebuild beschränkt sich auf den Bell-
+/// Subtree, der Scaffold-Body bleibt stabil.
+class NotificationBell extends ConsumerWidget {
+  const NotificationBell({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
     return InkWell(
       onTap: () => context.go('/dashboard/notifications'),
       borderRadius: BorderRadius.circular(20),

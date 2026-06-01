@@ -96,7 +96,6 @@ class DashboardScaffold extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final unread = ref.watch(unreadNotificationCountProvider);
     final activeCall = ref.watch(activeCallProvider);
     final activeStream = ref.watch(activeStreamProvider);
 
@@ -237,7 +236,7 @@ class DashboardScaffold extends ConsumerWidget {
           ),
           const SOSButton(),
           const LanguagePicker(),
-          NotificationBell(unreadCount: unread),
+          const NotificationBell(),
           // P1: Avatar = 1-Tap zum eigenen Profil. Cinema-Bronze-Ring.
           const MyAvatarTopButton(),
           const SizedBox(width: 4),
