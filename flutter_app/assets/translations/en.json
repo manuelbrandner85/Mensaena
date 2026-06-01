@@ -1623,7 +1623,15 @@
     "requestPending": "Request pending",
     "requestsCount": "Join requests ({n})",
     "requestApprove": "Approve",
-    "requestReject": "Reject"
+    "requestReject": "Reject",
+    "eventsTitle": "Events",
+    "createEvent": "Event",
+    "createEventLong": "Create event",
+    "noEvents": "No events planned yet.",
+    "eventTitle": "Event title",
+    "eventWhere": "Location (optional)",
+    "eventDescription": "Description (optional)",
+    "eventSave": "Create event"
   },
   "board": {
     "title": "Note",

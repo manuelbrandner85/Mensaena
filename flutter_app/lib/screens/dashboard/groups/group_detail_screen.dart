@@ -116,6 +116,148 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     if (ok) ref.invalidate(groupPostsProvider(widget.groupId));
   }
 
+  /// G1: Event-Erstellen-Dialog (Titel, Ort, Datum/Uhrzeit, Beschreibung).
+  Future<void> _createEvent(String groupId) async {
+    final titleCtrl = TextEditingController();
+    final locCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    DateTime when = DateTime.now().add(const Duration(days: 1, hours: 1));
+    bool sending = false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dlg) => StatefulBuilder(
+        builder: (dlg, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('groups.createEventLong'.tr(),
+              style: AppTypography.display(size: 18, color: AppColors.ink)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: titleCtrl,
+                  autofocus: true,
+                  maxLength: 120,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    hintText: 'groups.eventTitle'.tr(),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: locCtrl,
+                  maxLength: 160,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    hintText: 'groups.eventWhere'.tr(),
+                    prefixIcon: const Icon(LucideIcons.mapPin,
+                        size: 16, color: AppColors.mute),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: dlg,
+                      initialDate: when,
+                      firstDate: DateTime.now(),
+                      lastDate:
+                          DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (d == null) return;
+                    if (!dlg.mounted) return;
+                    final t = await showTimePicker(
+                      context: dlg,
+                      initialTime: TimeOfDay.fromDateTime(when),
+                    );
+                    if (t == null) return;
+                    setLocal(() => when = DateTime(
+                        d.year, d.month, d.day, t.hour, t.minute));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.line),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(LucideIcons.calendar,
+                            size: 16, color: AppColors.amber),
+                        const SizedBox(width: 8),
+                        Text(
+                          DateFormat('EEE, dd.MM.yyyy · HH:mm')
+                              .format(when),
+                          style: AppTypography.body(
+                              size: 14, color: AppColors.ink),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: descCtrl,
+                  maxLines: 3,
+                  maxLength: 500,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    hintText: 'groups.eventDescription'.tr(),
+                    isDense: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: sending ? null : () => Navigator.pop(dlg),
+              child: Text('common.cancel'.tr()),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.amber,
+                foregroundColor: AppColors.voidColor,
+              ),
+              onPressed: sending
+                  ? null
+                  : () async {
+                      final title = titleCtrl.text.trim();
+                      if (title.isEmpty) return;
+                      setLocal(() => sending = true);
+                      final ok = await GroupsRepository.createGroupEvent(
+                        groupId: groupId,
+                        title: title,
+                        description: descCtrl.text,
+                        location: locCtrl.text,
+                        startAt: when,
+                      );
+                      if (!dlg.mounted) return;
+                      Navigator.pop(dlg);
+                      if (ok) {
+                        ref.invalidate(groupEventsProvider(groupId));
+                      }
+                    },
+              child: sending
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.voidColor),
+                    )
+                  : Text('groups.eventSave'.tr()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final group = ref.watch(groupDetailProvider(widget.groupId));
@@ -314,6 +456,16 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                             color: AppColors.inkSoft,
                             height: 1.55,
                           ),
+                        ),
+                      ],
+                      // G1: Gruppen-Events — nur für Mitglieder sichtbar.
+                      if (isMember.asData?.value == true) ...[
+                        const SizedBox(height: 20),
+                        _GroupEventsSection(
+                          groupId: widget.groupId,
+                          canModerate: canModerate,
+                          myUid: myUid,
+                          onCreate: () => _createEvent(widget.groupId),
                         ),
                       ],
                       const SizedBox(height: 20),
@@ -537,6 +689,177 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// G1: Sektion mit kommenden Gruppen-Events (nur für Mitglieder). Mitglieder
+/// können neue Events anlegen; Ersteller bzw. Owner/Admin dürfen löschen.
+class _GroupEventsSection extends ConsumerWidget {
+  const _GroupEventsSection({
+    required this.groupId,
+    required this.canModerate,
+    required this.myUid,
+    required this.onCreate,
+  });
+  final String groupId;
+  final bool canModerate;
+  final String? myUid;
+  final VoidCallback onCreate;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(groupEventsProvider(groupId));
+    final events = async.asData?.value ?? const [];
+
+    Future<void> delete(String id) async {
+      final ok = await GroupsRepository.deleteGroupEvent(id);
+      if (ok) ref.invalidate(groupEventsProvider(groupId));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('groups.eventsTitle'.tr(),
+                style: AppTypography.label(size: 10)),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: onCreate,
+              icon: const Icon(LucideIcons.calendarPlus,
+                  size: 14, color: AppColors.amber),
+              label: Text('groups.createEvent'.tr(),
+                  style: AppTypography.label(size: 10, color: AppColors.amber)),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(0, 32),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (events.isEmpty)
+          Text('groups.noEvents'.tr(), style: AppTypography.caption())
+        else
+          for (final e in events)
+            Builder(builder: (_) {
+              final id = e['id'] as String;
+              final title = (e['title'] ?? '').toString();
+              final loc = (e['location'] ?? '').toString();
+              final desc = (e['description'] ?? '').toString();
+              final startStr = e['start_at']?.toString();
+              final start = startStr != null
+                  ? DateTime.tryParse(startStr)?.toLocal()
+                  : null;
+              final canDelete =
+                  canModerate || e['created_by'] == myUid;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.amber.withValues(alpha: 0.06),
+                  border: Border.all(
+                      color: AppColors.amber.withValues(alpha: 0.25)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 44,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.amber.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            start != null
+                                ? DateFormat('dd').format(start)
+                                : '–',
+                            style: AppTypography.display(
+                                size: 18, color: AppColors.amber),
+                          ),
+                          Text(
+                            start != null
+                                ? DateFormat('MMM').format(start)
+                                : '',
+                            style: AppTypography.label(
+                                size: 9, color: AppColors.amber),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title,
+                              style: AppTypography.body(
+                                  size: 14,
+                                  color: AppColors.ink,
+                                  weight: FontWeight.w700)),
+                          if (start != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Row(
+                                children: [
+                                  const Icon(LucideIcons.clock,
+                                      size: 11, color: AppColors.mute),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    DateFormat('EEE, HH:mm').format(start),
+                                    style: AppTypography.caption(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (loc.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Row(
+                                children: [
+                                  const Icon(LucideIcons.mapPin,
+                                      size: 11, color: AppColors.mute),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(loc,
+                                        style: AppTypography.caption(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (desc.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(desc,
+                                  style: AppTypography.body(
+                                      size: 12, color: AppColors.inkSoft),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (canDelete)
+                      GestureDetector(
+                        onTap: () => delete(id),
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 6),
+                          child: Icon(LucideIcons.trash2,
+                              size: 14, color: AppColors.mute),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            }),
+      ],
     );
   }
 }

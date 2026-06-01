@@ -310,6 +310,69 @@ class GroupsRepository {
     }
   }
 
+  // ── G1: Gruppen-Events (nur für Mitglieder sichtbar) ────────────────
+  /// Kommende Events einer Gruppe inkl. Ersteller-Profil. RLS stellt
+  /// sicher, dass nur Mitglieder lesen können.
+  static Future<List<Map<String, dynamic>>> listGroupEvents(
+      String groupId) async {
+    try {
+      final rows = await sb
+          .from('group_events')
+          .select('id, group_id, created_by, title, description, location, '
+              'start_at, created_at, '
+              'profiles(id, name, display_name, avatar_url)')
+          .eq('group_id', groupId)
+          .gte('start_at', DateTime.now()
+              .subtract(const Duration(hours: 3))
+              .toUtc()
+              .toIso8601String())
+          .order('start_at', ascending: true)
+          .limit(50);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Legt ein Event an (nur Mitglieder; RLS prüft Mitgliedschaft).
+  static Future<bool> createGroupEvent({
+    required String groupId,
+    required String title,
+    String? description,
+    String? location,
+    required DateTime startAt,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('group_events').insert({
+        'group_id': groupId,
+        'created_by': uid,
+        'title': title.trim(),
+        'description': (description != null && description.trim().isNotEmpty)
+            ? description.trim()
+            : null,
+        'location': (location != null && location.trim().isNotEmpty)
+            ? location.trim()
+            : null,
+        'start_at': startAt.toUtc().toIso8601String(),
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Löscht ein Event. RLS erlaubt nur dem Ersteller ODER Owner/Admin.
+  static Future<bool> deleteGroupEvent(String eventId) async {
+    try {
+      await sb.from('group_events').delete().eq('id', eventId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<String?> create({
     required String name,
     required String slug,
@@ -375,3 +438,6 @@ final groupPendingRequestsProvider =
         (ref, id) => GroupsRepository.pendingRequests(id));
 final groupPostsProvider = FutureProvider.family<List<GroupPost>, String>(
     (ref, id) => GroupsRepository.postsFor(id));
+final groupEventsProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, String>(
+        (ref, id) => GroupsRepository.listGroupEvents(id));

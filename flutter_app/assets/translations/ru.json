@@ -1522,7 +1522,15 @@
     "requestPending": "Заявка на рассмотрении",
     "requestsCount": "Заявки на вступление ({n})",
     "requestApprove": "Принять",
-    "requestReject": "Отклонить"
+    "requestReject": "Отклонить",
+    "eventsTitle": "События",
+    "createEvent": "Событие",
+    "createEventLong": "Создать событие",
+    "noEvents": "Пока нет запланированных событий.",
+    "eventTitle": "Название события",
+    "eventWhere": "Место (необязательно)",
+    "eventDescription": "Описание (необязательно)",
+    "eventSave": "Создать событие"
   },
   "board": {
     "title": "Заметка",

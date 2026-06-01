@@ -1523,7 +1523,15 @@
     "requestPending": "Demande en attente",
     "requestsCount": "Demandes d'adhésion ({n})",
     "requestApprove": "Accepter",
-    "requestReject": "Refuser"
+    "requestReject": "Refuser",
+    "eventsTitle": "Événements",
+    "createEvent": "Événement",
+    "createEventLong": "Créer un événement",
+    "noEvents": "Aucun événement prévu pour l’instant.",
+    "eventTitle": "Titre de l’événement",
+    "eventWhere": "Lieu (facultatif)",
+    "eventDescription": "Description (facultatif)",
+    "eventSave": "Créer l’événement"
   },
   "board": {
     "title": "Note",

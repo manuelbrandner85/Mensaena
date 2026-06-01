@@ -1622,7 +1622,15 @@
     "requestPending": "Anfrage läuft",
     "requestsCount": "Beitritts-Anfragen ({n})",
     "requestApprove": "Annehmen",
-    "requestReject": "Ablehnen"
+    "requestReject": "Ablehnen",
+    "eventsTitle": "Termine",
+    "createEvent": "Termin",
+    "createEventLong": "Termin erstellen",
+    "noEvents": "Noch keine Termine geplant.",
+    "eventTitle": "Titel des Termins",
+    "eventWhere": "Ort (optional)",
+    "eventDescription": "Beschreibung (optional)",
+    "eventSave": "Termin anlegen"
   },
   "board": {
     "title": "Notiz",

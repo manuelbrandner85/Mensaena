@@ -1522,7 +1522,15 @@
     "requestPending": "İstek beklemede",
     "requestsCount": "Katılma istekleri ({n})",
     "requestApprove": "Kabul et",
-    "requestReject": "Reddet"
+    "requestReject": "Reddet",
+    "eventsTitle": "Etkinlikler",
+    "createEvent": "Etkinlik",
+    "createEventLong": "Etkinlik oluştur",
+    "noEvents": "Henüz planlanmış etkinlik yok.",
+    "eventTitle": "Etkinlik başlığı",
+    "eventWhere": "Konum (isteğe bağlı)",
+    "eventDescription": "Açıklama (isteğe bağlı)",
+    "eventSave": "Etkinlik oluştur"
   },
   "board": {
     "title": "Not",

@@ -1523,7 +1523,15 @@
     "requestPending": "Solicitud pendiente",
     "requestsCount": "Solicitudes de ingreso ({n})",
     "requestApprove": "Aceptar",
-    "requestReject": "Rechazar"
+    "requestReject": "Rechazar",
+    "eventsTitle": "Eventos",
+    "createEvent": "Evento",
+    "createEventLong": "Crear evento",
+    "noEvents": "Aún no hay eventos planificados.",
+    "eventTitle": "Título del evento",
+    "eventWhere": "Lugar (opcional)",
+    "eventDescription": "Descripción (opcional)",
+    "eventSave": "Crear evento"
   },
   "board": {
     "title": "Nota",
