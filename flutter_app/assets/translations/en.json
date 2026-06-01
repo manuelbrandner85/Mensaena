@@ -3136,5 +3136,30 @@
     "phone": "Phone number",
     "community": "Community trust",
     "admin": "Admin-verified"
+  },
+  "firstAid": {
+    "title": "First aid (offline)",
+    "offlineHint": "This guide works without an internet connection.",
+    "emergencyCall": "Call emergency",
+    "emergencyHint": "When in doubt, always call emergency services first.",
+    "disclaimer": "These notes do not replace medical training. In a real emergency follow the dispatcher's instructions.",
+    "recoveryTitle": "Recovery position",
+    "recovery1": "Turn an unconscious but breathing person onto their side.",
+    "recovery2": "Bend the upper leg, place their hand under the cheek.",
+    "recovery3": "Tilt the head back, open the mouth slightly — keeps the airway clear.",
+    "recovery4": "Keep checking breathing until the ambulance arrives.",
+    "cprTitle": "CPR (chest compressions)",
+    "cpr1": "No normal breathing? Call emergency and start CPR immediately.",
+    "cpr2": "Heel of one hand on the centre of the chest, second hand on top.",
+    "cpr3": "Push hard 30 times about 5–6 cm deep, rate ~100–120/min.",
+    "cpr4": "Keep going until help arrives or the person moves.",
+    "bleedingTitle": "Severe bleeding",
+    "bleeding1": "Press directly on the wound — with a cloth or bare hand.",
+    "bleeding2": "Apply a pressure bandage, raise the affected limb.",
+    "bleeding3": "For life-threatening bleeding call emergency immediately.",
+    "burnTitle": "Burns",
+    "burn1": "Cool immediately for 10–20 minutes with hand-warm water.",
+    "burn2": "No home remedies (oil, flour, toothpaste) on the wound.",
+    "burn3": "Don't open blisters, cover loosely and sterile."
   }
 }

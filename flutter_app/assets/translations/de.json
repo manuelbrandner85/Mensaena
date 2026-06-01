@@ -3135,5 +3135,30 @@
     "phone": "Telefonnummer",
     "community": "Community-Vertrauen",
     "admin": "Admin-verifiziert"
+  },
+  "firstAid": {
+    "title": "Erste Hilfe (offline)",
+    "offlineHint": "Diese Anleitung funktioniert auch ohne Internet.",
+    "emergencyCall": "Notruf wählen",
+    "emergencyHint": "Im Zweifel immer zuerst den Notruf rufen.",
+    "disclaimer": "Diese Hinweise ersetzen keine medizinische Ausbildung. Im Ernstfall den Anweisungen der Leitstelle folgen.",
+    "recoveryTitle": "Stabile Seitenlage",
+    "recovery1": "Bewusstlose Person, die atmet, auf die Seite drehen.",
+    "recovery2": "Oben liegendes Bein anwinkeln, Hand unter die Wange legen.",
+    "recovery3": "Kopf nach hinten neigen, Mund leicht öffnen — die Atemwege bleiben frei.",
+    "recovery4": "Atmung laufend kontrollieren bis der Rettungsdienst kommt.",
+    "cprTitle": "Wiederbelebung (Herzdruckmassage)",
+    "cpr1": "Keine normale Atmung? Sofort Notruf und mit der Wiederbelebung beginnen.",
+    "cpr2": "Handballen auf die Mitte des Brustkorbs, zweite Hand darüber.",
+    "cpr3": "30-mal kräftig ca. 5–6 cm tief drücken, Tempo ~100–120/Minute.",
+    "cpr4": "Weiterdrücken bis Hilfe da ist oder die Person sich bewegt.",
+    "bleedingTitle": "Starke Blutung",
+    "bleeding1": "Direkt auf die Wunde drücken — mit Tuch oder bloßer Hand.",
+    "bleeding2": "Druckverband anlegen, betroffenes Körperteil hochhalten.",
+    "bleeding3": "Bei lebensbedrohlicher Blutung sofort Notruf rufen.",
+    "burnTitle": "Verbrennung",
+    "burn1": "Sofort 10–20 Minuten mit handwarmem Wasser kühlen.",
+    "burn2": "Keine Hausmittel (Öl, Mehl, Zahnpasta) auf die Wunde.",
+    "burn3": "Brandblasen nicht öffnen, locker steril bedecken."
   }
 }

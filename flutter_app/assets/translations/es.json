@@ -2362,5 +2362,30 @@
     "verifyResend": "Reenviar verificación",
     "verifySent": "Correo de verificación enviado. Revisa tu bandeja.",
     "verifyFailed": "No se pudo enviar la verificación."
+  },
+  "firstAid": {
+    "title": "Primeros auxilios (sin conexión)",
+    "offlineHint": "Esta guía funciona también sin internet.",
+    "emergencyCall": "Llamar a emergencias",
+    "emergencyHint": "En caso de duda, llama siempre primero a emergencias.",
+    "disclaimer": "Estas notas no sustituyen la formación médica. En una emergencia sigue las instrucciones de la central.",
+    "recoveryTitle": "Posición lateral de seguridad",
+    "recovery1": "Gira de lado a una persona inconsciente que respira.",
+    "recovery2": "Dobla la pierna de arriba, pon su mano bajo la mejilla.",
+    "recovery3": "Inclina la cabeza hacia atrás, abre un poco la boca — la vía aérea queda libre.",
+    "recovery4": "Controla la respiración hasta que llegue la ambulancia.",
+    "cprTitle": "Reanimación (compresiones)",
+    "cpr1": "¿No respira con normalidad? Llama a emergencias y empieza la reanimación.",
+    "cpr2": "Talón de una mano en el centro del pecho, la otra encima.",
+    "cpr3": "Comprime fuerte 30 veces unos 5–6 cm, ritmo ~100–120/min.",
+    "cpr4": "Sigue hasta que llegue ayuda o la persona se mueva.",
+    "bleedingTitle": "Hemorragia grave",
+    "bleeding1": "Presiona directamente la herida — con un paño o la mano.",
+    "bleeding2": "Aplica un vendaje compresivo, eleva la extremidad.",
+    "bleeding3": "Si la hemorragia es mortal, llama a emergencias de inmediato.",
+    "burnTitle": "Quemadura",
+    "burn1": "Enfría enseguida 10–20 minutos con agua templada.",
+    "burn2": "Nada de remedios caseros (aceite, harina, pasta de dientes).",
+    "burn3": "No revientes las ampollas, cubre suelto y estéril."
   }
 }

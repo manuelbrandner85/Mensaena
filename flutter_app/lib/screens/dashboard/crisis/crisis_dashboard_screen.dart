@@ -128,6 +128,25 @@ class _CrisisDashboardScreenState
                 onTap: () => context.push('/dashboard/crisis/create'),
               ),
             ),
+            // R4: Offline-Erste-Hilfe — immer verfügbar, auch ohne Netz.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      context.push('/dashboard/crisis/first-aid'),
+                  icon: const Icon(LucideIcons.plusCircle, size: 16),
+                  label: Text('firstAid.title'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    side: BorderSide(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: EditorialModuleHeader(

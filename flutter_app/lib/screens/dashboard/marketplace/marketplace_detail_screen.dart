@@ -3,10 +3,13 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -155,6 +158,11 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+                ],
+                // M4: Inline-Karten-Vorschau wenn Koordinaten vorhanden.
+                if (l.latitude != null && l.longitude != null) ...[
+                  const SizedBox(height: 10),
+                  _MapPreview(lat: l.latitude!, lng: l.longitude!),
                 ],
                 if (l.tags.isNotEmpty) ...[
                   const SizedBox(height: 12),
@@ -637,6 +645,99 @@ class _SaveButton extends ConsumerWidget {
             size: 16,
             color: isSaved ? AppColors.bronze : AppColors.inkSoft,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// M4: kleine nicht-interaktive Karten-Vorschau mit Pin + "Route"-Button.
+/// Tiles direkt von OSM (kein FMTC-Cache nötig für ein einzelnes statisches
+/// Preview). interactionOptions = none → kein versehentliches Verschieben
+/// im Scroll-Body.
+class _MapPreview extends StatelessWidget {
+  const _MapPreview({required this.lat, required this.lng});
+  final double lat;
+  final double lng;
+
+  Future<void> _route(BuildContext context) async {
+    final geo = Uri.parse('geo:0,0?q=$lat,$lng');
+    final web = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    try {
+      if (await canLaunchUrl(geo)) {
+        await launchUrl(geo, mode: LaunchMode.externalApplication);
+        return;
+      }
+      await launchUrl(web, mode: LaunchMode.externalApplication);
+    } catch (_) {/* still */}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final center = LatLng(lat, lng);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: SizedBox(
+        height: 140,
+        child: Stack(
+          children: [
+            FlutterMap(
+              options: MapOptions(
+                initialCenter: center,
+                initialZoom: 14,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.none,
+                ),
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'de.mensaena.app',
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: center,
+                      width: 34,
+                      height: 34,
+                      child: const Icon(LucideIcons.mapPin,
+                          size: 30, color: AppColors.herzrot),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // Route-Button unten rechts.
+            Positioned(
+              right: 8,
+              bottom: 8,
+              child: Material(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(999),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => _route(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 7),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(LucideIcons.navigation,
+                            size: 13, color: AppColors.bronze),
+                        const SizedBox(width: 5),
+                        Text('map.routeTo'.tr(),
+                            style: AppTypography.label(
+                                size: 10, color: AppColors.bronze)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

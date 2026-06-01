@@ -2362,5 +2362,30 @@
     "verifyResend": "Renvoyer la vérification",
     "verifySent": "E-mail de vérification envoyé. Vérifiez votre boîte.",
     "verifyFailed": "Impossible d'envoyer la vérification."
+  },
+  "firstAid": {
+    "title": "Premiers secours (hors ligne)",
+    "offlineHint": "Ce guide fonctionne même sans connexion.",
+    "emergencyCall": "Appeler les secours",
+    "emergencyHint": "En cas de doute, appelez toujours d'abord les secours.",
+    "disclaimer": "Ces conseils ne remplacent pas une formation médicale. En urgence, suivez les instructions du centre d'appel.",
+    "recoveryTitle": "Position latérale de sécurité",
+    "recovery1": "Tournez sur le côté une personne inconsciente qui respire.",
+    "recovery2": "Pliez la jambe du dessus, placez sa main sous la joue.",
+    "recovery3": "Basculez la tête en arrière, ouvrez légèrement la bouche — les voies restent libres.",
+    "recovery4": "Surveillez la respiration jusqu'à l'arrivée des secours.",
+    "cprTitle": "Réanimation (massage cardiaque)",
+    "cpr1": "Pas de respiration normale ? Appelez les secours et commencez la réanimation.",
+    "cpr2": "Talon d'une main au centre du thorax, l'autre dessus.",
+    "cpr3": "Appuyez fort 30 fois d'environ 5–6 cm, rythme ~100–120/min.",
+    "cpr4": "Continuez jusqu'à l'arrivée des secours ou jusqu'à ce que la personne bouge.",
+    "bleedingTitle": "Hémorragie grave",
+    "bleeding1": "Appuyez directement sur la plaie — avec un linge ou la main.",
+    "bleeding2": "Posez un pansement compressif, surélevez le membre.",
+    "bleeding3": "Pour une hémorragie vitale, appelez immédiatement les secours.",
+    "burnTitle": "Brûlure",
+    "burn1": "Refroidissez aussitôt 10–20 minutes à l'eau tiède.",
+    "burn2": "Pas de remèdes maison (huile, farine, dentifrice) sur la plaie.",
+    "burn3": "N'ouvrez pas les cloques, couvrez sans serrer et stérile."
   }
 }

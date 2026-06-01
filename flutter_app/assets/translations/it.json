@@ -2362,5 +2362,30 @@
     "verifyResend": "Invia di nuovo la verifica",
     "verifySent": "Email di verifica inviata. Controlla la posta.",
     "verifyFailed": "Impossibile inviare la verifica."
+  },
+  "firstAid": {
+    "title": "Primo soccorso (offline)",
+    "offlineHint": "Questa guida funziona anche senza internet.",
+    "emergencyCall": "Chiama i soccorsi",
+    "emergencyHint": "Nel dubbio, chiama sempre prima i soccorsi.",
+    "disclaimer": "Queste note non sostituiscono una formazione medica. In emergenza segui le istruzioni della centrale.",
+    "recoveryTitle": "Posizione laterale di sicurezza",
+    "recovery1": "Gira su un fianco una persona incosciente che respira.",
+    "recovery2": "Piega la gamba superiore, metti la mano sotto la guancia.",
+    "recovery3": "Inclina la testa all'indietro, apri leggermente la bocca — le vie aeree restano libere.",
+    "recovery4": "Controlla il respiro fino all'arrivo dei soccorsi.",
+    "cprTitle": "Rianimazione (massaggio cardiaco)",
+    "cpr1": "Respiro assente? Chiama i soccorsi e inizia subito la rianimazione.",
+    "cpr2": "Palmo di una mano al centro del torace, l'altra sopra.",
+    "cpr3": "Premi forte 30 volte di circa 5–6 cm, ritmo ~100–120/min.",
+    "cpr4": "Continua finché non arrivano i soccorsi o la persona si muove.",
+    "bleedingTitle": "Emorragia grave",
+    "bleeding1": "Premi direttamente sulla ferita — con un panno o a mani nude.",
+    "bleeding2": "Applica una fasciatura compressiva, solleva l'arto.",
+    "bleeding3": "Per emorragie potenzialmente letali chiama subito i soccorsi.",
+    "burnTitle": "Ustione",
+    "burn1": "Raffredda subito 10–20 minuti con acqua tiepida.",
+    "burn2": "Niente rimedi casalinghi (olio, farina, dentifricio) sulla ferita.",
+    "burn3": "Non rompere le vesciche, copri in modo lasco e sterile."
   }
 }

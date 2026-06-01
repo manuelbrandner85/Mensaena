@@ -2361,5 +2361,30 @@
     "verifyResend": "Doğrulamayı tekrar gönder",
     "verifySent": "Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.",
     "verifyFailed": "Doğrulama gönderilemedi."
+  },
+  "firstAid": {
+    "title": "İlk yardım (çevrimdışı)",
+    "offlineHint": "Bu kılavuz internet olmadan da çalışır.",
+    "emergencyCall": "Acil çağrı",
+    "emergencyHint": "Şüphedeyseniz önce her zaman acili arayın.",
+    "disclaimer": "Bu notlar tıbbi eğitimin yerini tutmaz. Acil durumda merkezin talimatlarını izleyin.",
+    "recoveryTitle": "Koma pozisyonu",
+    "recovery1": "Nefes alan baygın kişiyi yan çevirin.",
+    "recovery2": "Üstteki bacağı bükün, elini yanağının altına koyun.",
+    "recovery3": "Başı geriye yatırın, ağzı hafif açın — hava yolu açık kalır.",
+    "recovery4": "Yardım gelene kadar nefesi kontrol edin.",
+    "cprTitle": "Kalp masajı (CPR)",
+    "cpr1": "Normal nefes yok mu? Acili arayın ve hemen CPR'a başlayın.",
+    "cpr2": "Bir elin topuğu göğsün ortasına, diğer el üstüne.",
+    "cpr3": "30 kez yaklaşık 5–6 cm derin, ~100–120/dk hızla bastırın.",
+    "cpr4": "Yardım gelene veya kişi hareket edene kadar devam edin.",
+    "bleedingTitle": "Şiddetli kanama",
+    "bleeding1": "Doğrudan yaraya bastırın — bez ya da çıplak elle.",
+    "bleeding2": "Baskılı bandaj uygulayın, uzvu yukarı kaldırın.",
+    "bleeding3": "Hayati kanamada hemen acili arayın.",
+    "burnTitle": "Yanık",
+    "burn1": "Hemen 10–20 dakika ılık suyla soğutun.",
+    "burn2": "Yaraya ev ilacı (yağ, un, diş macunu) sürmeyin.",
+    "burn3": "Su toplamasını patlatmayın, gevşek ve steril örtün."
   }
 }

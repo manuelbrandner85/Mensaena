@@ -63,6 +63,7 @@ import '../../screens/dashboard/mentorship_screen.dart';
 import '../../screens/dashboard/leaderboard_screen.dart';
 // import '../../screens/dashboard/create_post_screen.dart'; // S8: entfernt — Modul-spezifische Creates
 import '../../screens/dashboard/crisis/crisis_create_screen.dart';
+import '../../screens/dashboard/crisis/crisis_first_aid_screen.dart';
 import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
 import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
 import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
@@ -859,6 +860,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const CrisisDashboardScreen(),
         ),
         routes: [
+          GoRoute(
+            path: 'first-aid',
+            pageBuilder: (_, state) => mensaenaTransition<void>(
+              key: state.pageKey,
+              child: const CrisisFirstAidScreen(),
+            ),
+          ),
           GoRoute(
             path: 'create',
             pageBuilder: (_, state) => mensaenaTransition<void>(
