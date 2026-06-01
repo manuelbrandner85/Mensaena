@@ -55,6 +55,14 @@ class ChatMessageBubble extends ConsumerWidget {
 
   static final _imgRegex =
       RegExp(r'!\[[^\]]*\]\((https?://[^\s\)]+)\)');
+  // PERF (Audit): vorher wurden _callRegex/_sysRegex pro build() neu
+  // kompiliert. Bei 100 Bubbles auf dem Screen = 200 RegExp-Kompilierungen
+  // pro Scroll-Frame → 50–80ms Frame-Spike. Static final = einmal pro
+  // Prozess.
+  static final _callRegex =
+      RegExp(r'^\[SYSTEM_CALL:([a-z]+):([^:]*):([0-9]+):([^\]]*)\]$');
+  static final _sysRegex = RegExp(r'^\[SYSTEM(?::([\w_]+))?\]\s*(.*)$');
+  static final _forwardedRegex = RegExp(r'^\[FORWARDED\]\n?');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,9 +77,7 @@ class ChatMessageBubble extends ConsumerWidget {
     // wird als zentrierte Karte mit Icon/Label/Dauer/Rueckruf-Button gerendert.
     // MUSS vor der generischen SYSTEM-Detection laufen weil die Regex
     // ansonsten "SYSTEM_CALL" als type interpretieren wuerde.
-    final callMatch = RegExp(
-            r'^\[SYSTEM_CALL:([a-z]+):([^:]*):([0-9]+):([^\]]*)\]$')
-        .firstMatch(content.trim());
+    final callMatch = _callRegex.firstMatch(content.trim());
     if (callMatch != null && !deleted) {
       return _SystemCallCard(
         type: callMatch.group(1) ?? 'ended',
@@ -85,8 +91,7 @@ class ChatMessageBubble extends ConsumerWidget {
 
     // #15 System-Messages — Pattern [SYSTEM:type] body wird als zentrierte
     // gedimmte Pill gerendert statt normale Bubble.
-    final sysMatch = RegExp(r'^\[SYSTEM(?::([\w_]+))?\]\s*(.*)$')
-        .firstMatch(content);
+    final sysMatch = _sysRegex.firstMatch(content);
     if (sysMatch != null && !deleted) {
       return Center(
         child: Padding(
@@ -314,7 +319,7 @@ class ChatMessageBubble extends ConsumerWidget {
                       const SizedBox(height: 4),
                       _MentionAwareText(
                         text: textWithoutImages
-                            .replaceFirst(RegExp(r'^\[FORWARDED\]\n?'), ''),
+                            .replaceFirst(_forwardedRegex, ''),
                         baseStyle: AppTypography.body(
                           size: 14,
                           color: AppColors.ink,

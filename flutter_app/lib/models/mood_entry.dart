@@ -40,6 +40,7 @@ class MoodEntry {
         userId: j['user_id'] as String,
         moodLevel: (j['mood_level'] as num).toInt(),
         note: j['note'] as String?,
-        createdAt: DateTime.parse(j['created_at'] as String),
+        createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+            DateTime.now(),
       );
 }

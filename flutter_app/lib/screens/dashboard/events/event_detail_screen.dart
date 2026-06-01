@@ -1039,7 +1039,7 @@ class _AuthorRow extends ConsumerWidget {
               backgroundColor: AppColors.elevated,
               backgroundImage:
                   (avatar != null && avatar.isNotEmpty)
-                      ? CachedNetworkImageProvider(avatar)
+                      ? CachedNetworkImageProvider(avatar, maxWidth: 128)
                       : null,
               child: (avatar == null || avatar.isEmpty)
                   ? const Icon(LucideIcons.user,

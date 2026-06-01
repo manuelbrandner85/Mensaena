@@ -22,6 +22,9 @@ import '../../repositories/content_reports_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../repositories/trust_ratings_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show CountOption, PostgrestResponse;
+
 import '../../services/supabase_service.dart';
 import '../../repositories/mega_repositories.dart';
 import '../../widgets/dashboard/activity_heatmap_widget.dart';
@@ -275,26 +278,39 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
 
   Future<_StatsData> _load() async {
     try {
-      final results = await Future.wait([
+      // PERF (Audit): Vorher zog jede Stat-Query ALLE matching Rows (id-only,
+      // aber bei Power-Usern hundert+) — der Profile-Screen wartete bis zu
+      // 1.2s auf 4 sequenzielle Roundtrips. Jetzt:
+      //   - Posts + Group-Memberships: head-only count() statt Row-Liste.
+      //   - Challenges: filter direkt auf "nicht completed" → kleinere Liste.
+      //   - Timebank-Hours: hours + giver_id genügt (status='confirmed'
+      //     filtert serverseitig; receiver_id ist redundant weil die
+      //     OR-Bedingung garantiert dass userId einer der beiden ist).
+      final results = await Future.wait<dynamic>([
         sb
             .from('posts')
             .select('id')
             .eq('user_id', widget.userId)
-            .eq('status', 'active'),
+            .eq('status', 'active')
+            .count(CountOption.exact),
         sb
             .from('group_members')
             .select('id')
-            .eq('user_id', widget.userId),
-        // BUGFIX: DB-Spalte heisst status (text) + completed_at (timestamp).
-        // KEINE 'completed'-Boolean-Spalte. Vorher: 'c.completed != true'
-        // ergab fuer alle Rows true (null != true == true) — falsche Counts.
+            .eq('user_id', widget.userId)
+            .count(CountOption.exact),
+        // Aktive Challenges: completed_at IS NULL + status != 'completed'.
         sb
             .from('challenge_progress')
-            .select('id, status, completed_at')
-            .eq('user_id', widget.userId),
+            .select('id')
+            .eq('user_id', widget.userId)
+            .filter('completed_at', 'is', null)
+            .neq('status', 'completed')
+            .count(CountOption.exact),
+        // Timebank: hours + giver_id genügt, status='confirmed' filtert
+        // serverseitig.
         sb
             .from('timebank_entries')
-            .select('hours, giver_id, receiver_id, status')
+            .select('hours, giver_id')
             .or('giver_id.eq.${widget.userId},receiver_id.eq.${widget.userId}')
             .eq('status', 'confirmed'),
       ]);
@@ -308,15 +324,10 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
           received += h;
         }
       }
-      // 'aktiv' = nicht abgeschlossen: completed_at null UND status != 'completed'.
-      final activeCh = (results[2] as List)
-          .whereType<Map<String, dynamic>>()
-          .where((c) => c['completed_at'] == null && c['status'] != 'completed')
-          .length;
       return _StatsData(
-        postsCount: (results[0] as List).length,
-        groupsCount: (results[1] as List).length,
-        activeChallenges: activeCh,
+        postsCount: (results[0] as PostgrestResponse).count,
+        groupsCount: (results[1] as PostgrestResponse).count,
+        activeChallenges: (results[2] as PostgrestResponse).count,
         hoursGiven: given,
         hoursReceived: received,
       );

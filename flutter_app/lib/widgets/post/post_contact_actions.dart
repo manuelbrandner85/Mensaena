@@ -152,8 +152,7 @@ class PostContactActions extends ConsumerWidget {
                   onPressed: () => _openContactSheet(
                       context, ref, pref, intent),
                 ),
-                if (helperCountAsync.valueOrNull != null &&
-                    helperCountAsync.value! > 0) ...[
+                if ((helperCountAsync.valueOrNull ?? 0) > 0) ...[
                   const SizedBox(height: 6),
                   Center(
                     child: Text(

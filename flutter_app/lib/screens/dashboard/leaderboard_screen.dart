@@ -136,7 +136,7 @@ class _PodiumStep extends StatelessWidget {
             radius: rank == 1 ? 32 : 26,
             backgroundColor: AppColors.surface,
             backgroundImage: avatar != null && avatar.isNotEmpty
-                ? CachedNetworkImageProvider(avatar)
+                ? CachedNetworkImageProvider(avatar, maxWidth: 128)
                 : null,
             child: (avatar == null || avatar.isEmpty)
                 ? Text((name ?? '?').substring(0, 1).toUpperCase(),
@@ -207,7 +207,7 @@ class _RankRow extends StatelessWidget {
             radius: 16,
             backgroundColor: AppColors.surface,
             backgroundImage: avatar != null && avatar.isNotEmpty
-                ? CachedNetworkImageProvider(avatar)
+                ? CachedNetworkImageProvider(avatar, maxWidth: 128)
                 : null,
             child: (avatar == null || avatar.isEmpty)
                 ? Text(name.substring(0, 1).toUpperCase(),
