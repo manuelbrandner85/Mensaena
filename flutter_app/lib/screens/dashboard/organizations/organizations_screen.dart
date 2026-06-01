@@ -468,8 +468,16 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
                             icon: getCategoryConfig(o.category).icon,
                           ),
                       ],
-                      onMarkerTap: (m) => context.go(
-                          '/dashboard/organizations/${list.firstWhere((o) => o.id == m.id).slug ?? m.id}'),
+                      onMarkerTap: (m) {
+                        // CRASH-FIX (Audit): firstWhere ohne orElse warf
+                        // StateError, wenn ein Marker noch vom alten State
+                        // sichtbar war, die Org aber bereits entfernt
+                        // wurde. Jetzt: Tap fällt sauber auf m.id zurück.
+                        final match = list.where((o) => o.id == m.id);
+                        final slugOrId =
+                            match.isNotEmpty ? (match.first.slug ?? m.id) : m.id;
+                        context.go('/dashboard/organizations/$slugOrId');
+                      },
                     ),
                   ),
                 ),

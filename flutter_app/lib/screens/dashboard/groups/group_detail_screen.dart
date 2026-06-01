@@ -21,6 +21,10 @@ class GroupDetailScreen extends ConsumerStatefulWidget {
 
 class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   final _postCtrl = TextEditingController();
+  // PERF/BUG (Audit): vorher konnte der Send-Button durch schnelle Doppel-
+  // Taps zwei identische Posts in die Gruppe schicken (Submit war nicht
+  // gegen In-Flight-Aufrufe geschützt). Flag verhindert das.
+  bool _sending = false;
 
   @override
   void dispose() {
@@ -29,13 +33,17 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   }
 
   Future<void> _submit() async {
+    if (_sending) return;
     final text = _postCtrl.text.trim();
     if (text.isEmpty) return;
+    setState(() => _sending = true);
     final ok = await GroupsRepository.addPost(
       groupId: widget.groupId,
       content: text,
     );
-    if (!ok || !mounted) return;
+    if (!mounted) return;
+    setState(() => _sending = false);
+    if (!ok) return;
     _postCtrl.clear();
     ref.invalidate(groupPostsProvider(widget.groupId));
   }
@@ -297,9 +305,17 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                           ),
                         ),
                         IconButton(
-                          onPressed: _submit,
-                          icon: const Icon(LucideIcons.send,
-                              color: AppColors.amber),
+                          onPressed: _sending ? null : _submit,
+                          icon: _sending
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.amber),
+                                )
+                              : const Icon(LucideIcons.send,
+                                  color: AppColors.amber),
                         ),
                       ],
                     ),
