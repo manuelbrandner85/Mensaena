@@ -32,6 +32,7 @@ import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/event_attendees_section.dart';
 import '../../../widgets/events/event_photos_gallery.dart';
+import '../../../widgets/shared/premium_image.dart';
 import '../../../widgets/events/event_qr_checkin_sheet.dart';
 import '../../../widgets/event_countdown.dart';
 import '../../../widgets/event_reminder_widget.dart';
@@ -788,21 +789,13 @@ class _HeroBlock extends StatelessWidget {
           SizedBox(
             height: 240,
             width: double.infinity,
-            child: CachedNetworkImage(
-              imageUrl: event.imageUrl!,
-              fit: BoxFit.cover,
-              fadeInDuration: const Duration(milliseconds: 200),
-              placeholder: (_, __) => const ShimmerBox(
-                height: 240,
-                width: double.infinity,
-                borderRadius: 0,
-              ),
-              errorWidget: (_, __, ___) => Container(
-                color: AppColors.elevated,
-                alignment: Alignment.center,
-                child: const Icon(LucideIcons.imageOff,
-                    size: 28, color: AppColors.mute),
-              ),
+            child: PremiumImage(
+              url: event.imageUrl,
+              height: 240,
+              width: double.infinity,
+              borderRadius: BorderRadius.zero,
+              bottomGradient: true,
+              heroTag: 'event_cover_${event.id}',
             ),
           ),
           Positioned.fill(

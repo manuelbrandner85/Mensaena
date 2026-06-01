@@ -8,8 +8,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/groups_repository.dart';
-import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/premium_image.dart';
 
 class GroupDetailScreen extends ConsumerStatefulWidget {
   const GroupDetailScreen({required this.groupId, super.key});
@@ -70,28 +70,13 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                     padding: const EdgeInsets.all(16),
                     children: [
                       if (g.bannerUrl != null)
-                        ClipRRect(
+                        PremiumImage(
+                          url: g.bannerUrl,
+                          height: 140,
+                          width: double.infinity,
                           borderRadius: BorderRadius.circular(14),
-                          child: CachedNetworkImage(
-                            imageUrl: g.bannerUrl!,
-                            fadeInDuration:
-                                const Duration(milliseconds: 200),
-                            height: 140,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => const ShimmerBox(
-                              width: double.infinity,
-                              height: 140,
-                              borderRadius: 14,
-                            ),
-                            errorWidget: (_, __, ___) => Container(
-                              color: AppColors.elevated,
-                              height: 140,
-                              alignment: Alignment.center,
-                              child: const Icon(LucideIcons.imageOff,
-                                  size: 20, color: AppColors.mute),
-                            ),
-                          ),
+                          bottomGradient: true,
+                          heroTag: 'group_banner_${g.id}',
                         ),
                       const SizedBox(height: 12),
                       Row(

@@ -1,13 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import 'image_lightbox.dart';
+import 'premium_image.dart';
 
 /// SKILL: mensaena-design + mensaena-features
 /// Image-Carousel — PageView mit Indicator-Dots + Tap-zur-Lightbox.
-/// 1:1 zu Web PostCard.tsx + Marketplace-Detail.
+/// Premium-Pass (#A5): jedes Item nutzt PremiumImage → konsistenter
+/// Foto-Look (Skeleton-Loading statt Spinner, Lite-Mode-bewusstes Decode,
+/// dezenter Innen-Highlight) app-weit ohne pro Aufrufstelle Code.
 class ImageCarousel extends StatefulWidget {
   const ImageCarousel({
     required this.urls,
@@ -45,20 +46,13 @@ class _ImageCarouselState extends State<ImageCarousel> {
     if (widget.urls.isEmpty) return const SizedBox.shrink();
     if (widget.urls.length == 1) {
       // Single image — no carousel needed
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(widget.borderRadius),
-        child: GestureDetector(
-          onTap: () => ImageLightbox.open(context, urls: widget.urls),
-          child: CachedNetworkImage(
-            imageUrl: widget.urls.first,
-            height: widget.height,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            // RAM-Limit: decoded auf max 2x logical pixels.
-            memCacheHeight: (widget.height * 2).toInt(),
-            placeholder: (_, __) => _placeholder(),
-            errorWidget: (_, __, ___) => _errorBox(),
-          ),
+      return GestureDetector(
+        onTap: () => ImageLightbox.open(context, urls: widget.urls),
+        child: PremiumImage(
+          url: widget.urls.first,
+          height: widget.height,
+          width: double.infinity,
+          borderRadius: BorderRadius.circular(widget.borderRadius),
         ),
       );
     }
@@ -78,13 +72,13 @@ class _ImageCarouselState extends State<ImageCarousel> {
                   urls: widget.urls,
                   initialIndex: i,
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: widget.urls[i],
-                  fit: BoxFit.cover,
+                child: PremiumImage(
+                  url: widget.urls[i],
+                  height: widget.height,
                   width: double.infinity,
-                  memCacheHeight: (widget.height * 2).toInt(),
-                  placeholder: (_, __) => _placeholder(),
-                  errorWidget: (_, __, ___) => _errorBox(),
+                  // Outer-ClipRRect kümmert sich um Rounded-Corners.
+                  borderRadius: BorderRadius.zero,
+                  innerHighlight: false,
                 ),
               ),
             ),
@@ -138,21 +132,4 @@ class _ImageCarouselState extends State<ImageCarousel> {
       ),
     );
   }
-
-  Widget _placeholder() => Container(
-        color: AppColors.elevated,
-        alignment: Alignment.center,
-        child: const SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(
-              strokeWidth: 2, color: AppColors.amber),
-        ),
-      );
-
-  Widget _errorBox() => Container(
-        color: AppColors.elevated,
-        alignment: Alignment.center,
-        child: const Icon(LucideIcons.imageOff, color: AppColors.mute),
-      );
 }
