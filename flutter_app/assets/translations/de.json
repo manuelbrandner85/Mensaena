@@ -891,7 +891,16 @@
     "bulkSelected": "{n} ausgewählt",
     "bulkRole": "Rolle",
     "bulkBanReason": "Sammel-Sperre durch Admin",
-    "bulkDone": "{ok} von {total} Nutzer:innen aktualisiert."
+    "bulkDone": "{ok} von {total} Nutzer:innen aktualisiert.",
+    "broadcastScheduleConfirm": "Diese Ankündigung wird am {when} automatisch an alle gesendet. Planen?",
+    "broadcastScheduleAction": "Planen",
+    "broadcastScheduled": "Broadcast geplant.",
+    "broadcastSendNow": "Sofort senden",
+    "broadcastScheduledFor": "Geplant für {when}",
+    "broadcastScheduleLater": "Später planen",
+    "broadcastChangeTime": "Zeit ändern",
+    "broadcastScheduledTitle": "Geplante Broadcasts",
+    "broadcastSentInfo": "Gesendet an {count}"
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",

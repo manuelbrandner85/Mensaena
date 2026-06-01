@@ -872,6 +872,62 @@ class AdminRepository {
     }
   }
 
+  // ── A5: Geplante Broadcasts ─────────────────────────────────────────
+  /// Plant einen Broadcast für einen späteren Zeitpunkt. pg_cron versendet
+  /// ihn server-seitig zur fälligen Minute. Gibt die ID zurück oder null.
+  static Future<String?> scheduleBroadcast({
+    required String title,
+    required String body,
+    required DateTime scheduledAt,
+    String? link,
+    String priority = 'normal',
+  }) async {
+    try {
+      final res = await sb.rpc<dynamic>(
+        'admin_schedule_broadcast',
+        params: {
+          'p_title': title,
+          'p_body': body,
+          'p_scheduled_at': scheduledAt.toUtc().toIso8601String(),
+          'p_link': (link != null && link.trim().isNotEmpty)
+              ? link.trim()
+              : null,
+          'p_priority': priority,
+        },
+      );
+      return res?.toString();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Liste geplanter/gesendeter Broadcasts (Admin-only via RLS).
+  static Future<List<Map<String, dynamic>>> listScheduledBroadcasts() async {
+    try {
+      final rows = await sb
+          .from('scheduled_broadcasts')
+          .select()
+          .order('scheduled_at', ascending: false)
+          .limit(50);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Bricht einen noch nicht versendeten Broadcast ab.
+  static Future<bool> cancelScheduledBroadcast(String id) async {
+    try {
+      final res = await sb.rpc<dynamic>(
+        'admin_cancel_scheduled_broadcast',
+        params: {'p_id': id},
+      );
+      return res == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Tägliche Nutzer-Zuwachs-Reihe (für Dashboard-Chart).
   /// Liefert pro Tag: day (ISO-Datum), newUsers, cumulative.
   static Future<List<UserGrowthPoint>> userGrowthSeries({int days = 14}) async {
@@ -1030,4 +1086,10 @@ final adminOpenReportsProvider = FutureProvider<int>(
 final adminUserGrowthProvider =
     FutureProvider.family<List<UserGrowthPoint>, int>(
   (ref, days) => AdminRepository.userGrowthSeries(days: days),
+);
+
+/// A5: geplante/gesendete Broadcasts (Admin-only).
+final adminScheduledBroadcastsProvider =
+    FutureProvider<List<Map<String, dynamic>>>(
+  (ref) => AdminRepository.listScheduledBroadcasts(),
 );

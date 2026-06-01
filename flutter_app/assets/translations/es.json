@@ -847,7 +847,16 @@
     "bulkSelected": "{n} seleccionados",
     "bulkRole": "Rol",
     "bulkBanReason": "Bloqueo masivo por admin",
-    "bulkDone": "{ok} de {total} usuarios actualizados."
+    "bulkDone": "{ok} de {total} usuarios actualizados.",
+    "broadcastScheduleConfirm": "Este anuncio se enviará automáticamente a todos el {when}. ¿Programar?",
+    "broadcastScheduleAction": "Programar",
+    "broadcastScheduled": "Difusión programada.",
+    "broadcastSendNow": "Enviar ahora",
+    "broadcastScheduledFor": "Programado para el {when}",
+    "broadcastScheduleLater": "Programar para después",
+    "broadcastChangeTime": "Cambiar hora",
+    "broadcastScheduledTitle": "Difusiones programadas",
+    "broadcastSentInfo": "Enviado a {count}"
   },
   "create": {
     "locationUnavailable": "Ubicación no disponible.",

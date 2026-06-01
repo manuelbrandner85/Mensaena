@@ -734,6 +734,7 @@ class _QuickActions extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           const _BroadcastButton(),
+          const _ScheduledBroadcastsList(),
           const SizedBox(height: 8),
           _ActionButton(
             icon: LucideIcons.users,
@@ -851,6 +852,109 @@ class _BroadcastButton extends StatelessWidget {
   }
 }
 
+/// A5: kompakte Liste geplanter (und kürzlich gesendeter) Broadcasts mit
+/// Abbrechen-Aktion für noch ausstehende Einträge.
+class _ScheduledBroadcastsList extends ConsumerWidget {
+  const _ScheduledBroadcastsList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(adminScheduledBroadcastsProvider);
+    final all = async.asData?.value ?? const [];
+    // Nur relevante zeigen: ausstehende + die letzten gesendeten.
+    final pending = all.where((b) => b['status'] == 'pending').toList();
+    final recentSent = all.where((b) => b['status'] == 'sent').take(3);
+    final visible = [...pending, ...recentSent];
+    if (visible.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('admin.broadcastScheduledTitle'.tr(),
+              style: AppTypography.label(size: 10)),
+          const SizedBox(height: 6),
+          for (final b in visible)
+            _scheduledRow(context, ref, b),
+        ],
+      ),
+    );
+  }
+
+  Widget _scheduledRow(
+      BuildContext context, WidgetRef ref, Map<String, dynamic> b) {
+    final status = (b['status'] ?? 'pending').toString();
+    final isPending = status == 'pending';
+    final when =
+        DateTime.tryParse(b['scheduled_at']?.toString() ?? '')?.toLocal();
+    final recipients = b['recipients_count'];
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.4),
+        border: Border.all(
+          color: isPending
+              ? AppColors.bronze.withValues(alpha: 0.3)
+              : AppColors.line,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(isPending ? LucideIcons.clock : LucideIcons.checkCheck,
+              size: 14,
+              color: isPending ? AppColors.bronze : AppColors.mute),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text((b['title'] ?? '').toString(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.ink,
+                        weight: FontWeight.w600)),
+                Text(
+                  isPending
+                      ? (when != null
+                          ? 'admin.broadcastScheduledFor'.tr(namedArgs: {
+                              'when': DateFormat('dd.MM.yyyy HH:mm')
+                                  .format(when)
+                            })
+                          : '')
+                      : 'admin.broadcastSentInfo'.tr(namedArgs: {
+                          'count': '${recipients ?? 0}'
+                        }),
+                  style: AppTypography.caption(),
+                ),
+              ],
+            ),
+          ),
+          if (isPending)
+            GestureDetector(
+              onTap: () async {
+                final ok =
+                    await AdminRepository.cancelScheduledBroadcast(
+                        b['id'] as String);
+                if (ok) ref.invalidate(adminScheduledBroadcastsProvider);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Text('common.cancel'.tr(),
+                    style: AppTypography.label(
+                        size: 10, color: AppColors.herzrot)),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BroadcastSheet extends ConsumerStatefulWidget {
   const _BroadcastSheet();
 
@@ -864,6 +968,8 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
   final _link = TextEditingController();
   String _priority = 'normal';
   bool _sending = false;
+  // A5: null = sofort senden; gesetzt = für diesen Zeitpunkt planen.
+  DateTime? _scheduledAt;
 
   @override
   void dispose() {
@@ -882,13 +988,20 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
       );
       return;
     }
+    final scheduled = _scheduledAt;
+    final isScheduled = scheduled != null;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dCtx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        icon: const Icon(LucideIcons.megaphone,
+        icon: Icon(isScheduled ? LucideIcons.clock : LucideIcons.megaphone,
             size: 28, color: AppColors.bronze),
-        content: Text('admin.broadcastConfirm'.tr(),
+        content: Text(
+            isScheduled
+                ? 'admin.broadcastScheduleConfirm'.tr(namedArgs: {
+                    'when': DateFormat('dd.MM.yyyy HH:mm').format(scheduled)
+                  })
+                : 'admin.broadcastConfirm'.tr(),
             textAlign: TextAlign.center,
             style: AppTypography.body(
                 size: 14, color: AppColors.ink, height: 1.4)),
@@ -902,13 +1015,40 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
             style: FilledButton.styleFrom(
                 backgroundColor: AppColors.bronze,
                 foregroundColor: AppColors.voidColor),
-            child: Text('admin.broadcastSend'.tr()),
+            child: Text(isScheduled
+                ? 'admin.broadcastScheduleAction'.tr()
+                : 'admin.broadcastSend'.tr()),
           ),
         ],
       ),
     );
     if (confirmed != true) return;
     setState(() => _sending = true);
+
+    if (isScheduled) {
+      final id = await AdminRepository.scheduleBroadcast(
+        title: title,
+        body: body,
+        scheduledAt: scheduled,
+        link: _link.text,
+        priority: _priority,
+      );
+      if (!mounted) return;
+      setState(() => _sending = false);
+      if (id == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('admin.broadcastFailed'.tr())),
+        );
+        return;
+      }
+      ref.invalidate(adminScheduledBroadcastsProvider);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('admin.broadcastScheduled'.tr())),
+      );
+      return;
+    }
+
     final count = await AdminRepository.broadcastNotification(
       title: title,
       body: body,
@@ -932,6 +1072,27 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
             .tr(namedArgs: {'count': '$count'})),
       ),
     );
+  }
+
+  /// A5: Zeitpunkt für geplanten Versand wählen (oder auf "sofort" zurück).
+  Future<void> _pickSchedule() async {
+    final now = DateTime.now();
+    final base = _scheduledAt ?? now.add(const Duration(hours: 1));
+    final d = await showDatePicker(
+      context: context,
+      initialDate: base,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (d == null || !mounted) return;
+    final t = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(base),
+    );
+    if (t == null || !mounted) return;
+    setState(() {
+      _scheduledAt = DateTime(d.year, d.month, d.day, t.hour, t.minute);
+    });
   }
 
   @override
@@ -1043,6 +1204,64 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
                     ),
                 ],
               ),
+              const SizedBox(height: 16),
+              // A5: Versand-Zeitpunkt — sofort oder geplant.
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.elevated.withValues(alpha: 0.4),
+                  border: Border.all(color: AppColors.line),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                        _scheduledAt == null
+                            ? LucideIcons.send
+                            : LucideIcons.clock,
+                        size: 16,
+                        color: AppColors.bronze),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _scheduledAt == null
+                            ? 'admin.broadcastSendNow'.tr()
+                            : 'admin.broadcastScheduledFor'.tr(namedArgs: {
+                                'when': DateFormat('dd.MM.yyyy HH:mm')
+                                    .format(_scheduledAt!)
+                              }),
+                        style: AppTypography.body(
+                            size: 13, color: AppColors.ink),
+                      ),
+                    ),
+                    if (_scheduledAt != null)
+                      GestureDetector(
+                        onTap: () => setState(() => _scheduledAt = null),
+                        child: const Padding(
+                          padding: EdgeInsets.only(right: 6),
+                          child: Icon(LucideIcons.x,
+                              size: 16, color: AppColors.mute),
+                        ),
+                      ),
+                    TextButton(
+                      onPressed: _pickSchedule,
+                      style: TextButton.styleFrom(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                        minimumSize: const Size(0, 32),
+                      ),
+                      child: Text(
+                        _scheduledAt == null
+                            ? 'admin.broadcastScheduleLater'.tr()
+                            : 'admin.broadcastChangeTime'.tr(),
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.bronze),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 18),
               SizedBox(
                 height: 52,
@@ -1056,10 +1275,16 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
                               strokeWidth: 2,
                               color: AppColors.voidColor),
                         )
-                      : const Icon(LucideIcons.send, size: 18),
+                      : Icon(
+                          _scheduledAt == null
+                              ? LucideIcons.send
+                              : LucideIcons.clock,
+                          size: 18),
                   label: Text(_sending
                       ? 'admin.broadcastSending'.tr()
-                      : 'admin.broadcastSend'.tr()),
+                      : _scheduledAt == null
+                          ? 'admin.broadcastSend'.tr()
+                          : 'admin.broadcastScheduleAction'.tr()),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.bronze,
                     foregroundColor: AppColors.voidColor,

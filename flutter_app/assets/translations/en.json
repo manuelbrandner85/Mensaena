@@ -892,7 +892,16 @@
     "bulkSelected": "{n} selected",
     "bulkRole": "Role",
     "bulkBanReason": "Bulk ban by admin",
-    "bulkDone": "{ok} of {total} users updated."
+    "bulkDone": "{ok} of {total} users updated.",
+    "broadcastScheduleConfirm": "This announcement will be sent to everyone automatically on {when}. Schedule it?",
+    "broadcastScheduleAction": "Schedule",
+    "broadcastScheduled": "Broadcast scheduled.",
+    "broadcastSendNow": "Send now",
+    "broadcastScheduledFor": "Scheduled for {when}",
+    "broadcastScheduleLater": "Schedule later",
+    "broadcastChangeTime": "Change time",
+    "broadcastScheduledTitle": "Scheduled broadcasts",
+    "broadcastSentInfo": "Sent to {count}"
   },
   "create": {
     "titleRequired": "Title is required.",

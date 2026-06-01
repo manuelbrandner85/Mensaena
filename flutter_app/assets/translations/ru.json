@@ -846,7 +846,16 @@
     "bulkSelected": "Выбрано: {n}",
     "bulkRole": "Роль",
     "bulkBanReason": "Массовая блокировка админом",
-    "bulkDone": "Обновлено {ok} из {total} пользователей."
+    "bulkDone": "Обновлено {ok} из {total} пользователей.",
+    "broadcastScheduleConfirm": "Это объявление будет автоматически отправлено всем {when}. Запланировать?",
+    "broadcastScheduleAction": "Запланировать",
+    "broadcastScheduled": "Рассылка запланирована.",
+    "broadcastSendNow": "Отправить сейчас",
+    "broadcastScheduledFor": "Запланировано на {when}",
+    "broadcastScheduleLater": "Запланировать позже",
+    "broadcastChangeTime": "Изменить время",
+    "broadcastScheduledTitle": "Запланированные рассылки",
+    "broadcastSentInfo": "Отправлено {count}"
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",

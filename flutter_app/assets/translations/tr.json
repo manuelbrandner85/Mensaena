@@ -846,7 +846,16 @@
     "bulkSelected": "{n} seçildi",
     "bulkRole": "Rol",
     "bulkBanReason": "Yönetici toplu yasak",
-    "bulkDone": "{total} kullanıcıdan {ok} güncellendi."
+    "bulkDone": "{total} kullanıcıdan {ok} güncellendi.",
+    "broadcastScheduleConfirm": "Bu duyuru {when} tarihinde herkese otomatik gönderilecek. Planlansın mı?",
+    "broadcastScheduleAction": "Planla",
+    "broadcastScheduled": "Yayın planlandı.",
+    "broadcastSendNow": "Şimdi gönder",
+    "broadcastScheduledFor": "{when} için planlandı",
+    "broadcastScheduleLater": "Sonraya planla",
+    "broadcastChangeTime": "Saati değiştir",
+    "broadcastScheduledTitle": "Planlanmış yayınlar",
+    "broadcastSentInfo": "{count} kişiye gönderildi"
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",

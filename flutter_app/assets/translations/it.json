@@ -847,7 +847,16 @@
     "bulkSelected": "{n} selezionati",
     "bulkRole": "Ruolo",
     "bulkBanReason": "Blocco in blocco dall'admin",
-    "bulkDone": "{ok} di {total} utenti aggiornati."
+    "bulkDone": "{ok} di {total} utenti aggiornati.",
+    "broadcastScheduleConfirm": "Questo annuncio verrà inviato automaticamente a tutti il {when}. Pianificare?",
+    "broadcastScheduleAction": "Pianifica",
+    "broadcastScheduled": "Broadcast pianificato.",
+    "broadcastSendNow": "Invia ora",
+    "broadcastScheduledFor": "Pianificato per il {when}",
+    "broadcastScheduleLater": "Pianifica più tardi",
+    "broadcastChangeTime": "Cambia orario",
+    "broadcastScheduledTitle": "Broadcast pianificati",
+    "broadcastSentInfo": "Inviato a {count}"
   },
   "create": {
     "locationUnavailable": "Posizione non disponibile.",
