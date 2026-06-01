@@ -432,7 +432,10 @@
     "unpinned": "Épingle retirée.",
     "welcomeChannelTitle": "Bienvenue dans #{name}",
     "welcomeChannelBody": "Où se rencontrent les voisin·es. Sois respectueux, aide quand tu peux — les messages sont supprimés automatiquement toutes les 6 h. 🌊",
-    "editedTag": "modifié"
+    "editedTag": "modifié",
+    "sharedMedia": "Médias partagés",
+    "noSharedMedia": "Aucune image partagée pour l'instant.",
+    "mediaAction": "Médias"
   },
   "languages": {
     "de": "Allemand",

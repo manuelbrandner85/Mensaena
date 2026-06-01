@@ -471,7 +471,10 @@
     "unpinned": "Pin entfernt.",
     "welcomeChannelTitle": "Willkommen in #{name}",
     "welcomeChannelBody": "Hier treffen sich Nachbar:innen. Sei respektvoll, hilf wo du kannst — und denk dran: Nachrichten werden alle 6 Stunden automatisch entfernt. 🌊",
-    "editedTag": "bearbeitet"
+    "editedTag": "bearbeitet",
+    "sharedMedia": "Geteilte Medien",
+    "noSharedMedia": "Noch keine Bilder geteilt.",
+    "mediaAction": "Medien"
   },
   "languages": {
     "de": "Deutsch",

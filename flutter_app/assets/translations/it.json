@@ -432,7 +432,10 @@
     "unpinned": "Pin rimosso.",
     "welcomeChannelTitle": "Benvenuto in #{name}",
     "welcomeChannelBody": "Dove si incontrano i vicini. Sii rispettoso, aiuta dove puoi — i messaggi vengono rimossi automaticamente ogni 6 ore. 🌊",
-    "editedTag": "modificato"
+    "editedTag": "modificato",
+    "sharedMedia": "Media condivisi",
+    "noSharedMedia": "Nessuna immagine condivisa.",
+    "mediaAction": "Media"
   },
   "languages": {
     "de": "Tedesco",

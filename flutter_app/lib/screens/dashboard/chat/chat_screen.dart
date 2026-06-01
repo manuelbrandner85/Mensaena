@@ -30,6 +30,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/video_preview_modal.dart';
 import 'chat_input_bar.dart';
 import 'chat_live_banner.dart';
+import 'chat_media_sheet.dart';
 import 'chat_message_bubble.dart';
 import 'chat_typing_indicator.dart';
 
@@ -587,6 +588,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 if (mounted) setState(() => _activeStreamRoom = null);
               },
               onClearDmHistory: _clearDmHistory,
+              onOpenMedia: () => ChatMediaSheet.show(
+                context,
+                conversationId: widget.conversationId,
+              ),
             ),
             // Live-Banner — wenn jemand im Channel live ist, koennen
             // alle anderen beitreten.
@@ -1013,6 +1018,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
     required this.onStartStream,
     required this.onEndStream,
     required this.onClearDmHistory,
+    required this.onOpenMedia,
   });
 
   final String conversationId;
@@ -1029,6 +1035,7 @@ class _ChatTopBar extends ConsumerStatefulWidget {
   final Future<void> Function() onStartStream;
   final Future<void> Function() onEndStream;
   final Future<void> Function() onClearDmHistory;
+  final VoidCallback onOpenMedia;
 
   @override
   ConsumerState<_ChatTopBar> createState() => _ChatTopBarState();
@@ -1151,6 +1158,13 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                         ? () async => widget.onEndStream()
                         : () async => widget.onStartStream(),
                     pulse: widget.activeStreamRoom != null,
+                  ),
+                if (isDm)
+                  _ActionIcon(
+                    icon: LucideIcons.image,
+                    label: 'chat.mediaAction'.tr(),
+                    color: AppColors.mute,
+                    onTap: () async => widget.onOpenMedia(),
                   ),
                 if (isDm)
                   _ActionIcon(

@@ -432,7 +432,10 @@
     "unpinned": "Fijado eliminado.",
     "welcomeChannelTitle": "Bienvenido a #{name}",
     "welcomeChannelBody": "Donde se encuentran los vecinos. Sé respetuoso, ayuda en lo que puedas — los mensajes se eliminan automáticamente cada 6 horas. 🌊",
-    "editedTag": "editado"
+    "editedTag": "editado",
+    "sharedMedia": "Medios compartidos",
+    "noSharedMedia": "Aún no se han compartido imágenes.",
+    "mediaAction": "Medios"
   },
   "languages": {
     "de": "Alemán",
