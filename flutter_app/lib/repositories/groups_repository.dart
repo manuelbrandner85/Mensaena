@@ -120,6 +120,83 @@ class GroupsRepository {
     }
   }
 
+  // ── G3: Beitritts-Anträge ───────────────────────────────────────────
+  /// Stellt einen Beitritts-Antrag mit optionaler Nachricht. Bei privaten
+  /// Gruppen statt direktem Beitritt.
+  static Future<bool> requestJoin(String groupId, String? message) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('group_join_requests').insert({
+        'group_id': groupId,
+        'user_id': uid,
+        'message': (message != null && message.trim().isNotEmpty)
+            ? message.trim()
+            : null,
+        'status': 'pending',
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Status meines Antrags ('pending'|'approved'|'rejected'|null).
+  static Future<String?> myJoinRequestStatus(String groupId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final row = await sb
+          .from('group_join_requests')
+          .select('status')
+          .eq('group_id', groupId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      return row?['status'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Offene Anträge einer Gruppe (für Owner/Admin) inkl. Antragsteller-Profil.
+  static Future<List<Map<String, dynamic>>> pendingRequests(
+      String groupId) async {
+    try {
+      final rows = await sb
+          .from('group_join_requests')
+          .select('id, user_id, message, created_at, '
+              'profiles(id, name, display_name, avatar_url)')
+          .eq('group_id', groupId)
+          .eq('status', 'pending')
+          .order('created_at', ascending: true);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static Future<bool> approveRequest(String requestId) async {
+    try {
+      final res = await sb.rpc<dynamic>('approve_group_join',
+          params: {'p_request_id': requestId});
+      return res == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> rejectRequest(String requestId) async {
+    try {
+      await sb.from('group_join_requests').update({
+        'status': 'rejected',
+        'decided_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', requestId);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Mitglied per E-Mail einladen — laeuft ueber RPC `invite_user_to_group`
   /// (lookupt User per email, dann insert in group_members mit invited-Flag).
   /// Fallback: einfacher Insert wenn RPC nicht existiert.
@@ -291,5 +368,10 @@ final groupMembershipProvider =
     FutureProvider.family<bool, String>((ref, id) => GroupsRepository.amMember(id));
 final groupMyRoleProvider = FutureProvider.family<String?, String>(
     (ref, id) => GroupsRepository.myRoleInGroup(id));
+final groupMyJoinStatusProvider = FutureProvider.family<String?, String>(
+    (ref, id) => GroupsRepository.myJoinRequestStatus(id));
+final groupPendingRequestsProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, String>(
+        (ref, id) => GroupsRepository.pendingRequests(id));
 final groupPostsProvider = FutureProvider.family<List<GroupPost>, String>(
     (ref, id) => GroupsRepository.postsFor(id));

@@ -49,6 +49,47 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     ref.invalidate(groupPostsProvider(widget.groupId));
   }
 
+  /// G3: Beitritts-Antrag mit optionaler Nachricht (Eisbrecher-Frage).
+  Future<void> _requestJoin(String groupId) async {
+    final ctrl = TextEditingController();
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('groups.requestJoinTitle'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: TextField(
+          controller: ctrl,
+          maxLines: 3,
+          maxLength: 280,
+          style: AppTypography.body(size: 14, color: AppColors.ink),
+          decoration: InputDecoration(
+            hintText: 'groups.requestJoinHint'.tr(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('groups.requestSend'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (send != true) return;
+    final ok = await GroupsRepository.requestJoin(groupId, ctrl.text);
+    if (!mounted) return;
+    if (ok) {
+      ref.invalidate(groupMyJoinStatusProvider(groupId));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('groups.requestSent'.tr())),
+      );
+    }
+  }
+
   Future<void> _deletePost(String postId) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -84,6 +125,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     final myRole = ref.watch(groupMyRoleProvider(widget.groupId)).value;
     final canModerate = myRole == 'owner' || myRole == 'admin';
     final myUid = SupabaseService.currentUser?.id;
+    // G3: Beitritts-Antrag-Status (für private Gruppen).
+    final joinStatus =
+        ref.watch(groupMyJoinStatusProvider(widget.groupId)).value;
 
     return DashboardScaffold(
       title: 'groups.title'.tr(),
@@ -222,6 +266,22 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                               label: Text('groups.leave'.tr()),
                             ),
                           ]
+                          // G3: private Gruppe → Antrag stellen statt
+                          // direktem Beitritt.
+                          else if (g.isPrivate && joinStatus == 'pending')
+                            Chip(
+                              backgroundColor:
+                                  AppColors.amber.withValues(alpha: 0.16),
+                              label: Text('groups.requestPending'.tr(),
+                                  style: AppTypography.label(
+                                      size: 10, color: AppColors.amber)),
+                            )
+                          else if (g.isPrivate)
+                            ElevatedButton.icon(
+                              onPressed: () => _requestJoin(g.id),
+                              icon: const Icon(LucideIcons.lock, size: 14),
+                              label: Text('groups.requestJoin'.tr()),
+                            )
                           else
                             ElevatedButton.icon(
                               onPressed: () async {
@@ -242,6 +302,9 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                             ),
                         ],
                       ),
+                      // G3: Owner/Admin-Anträge-Panel.
+                      if (canModerate)
+                        _PendingRequestsPanel(groupId: widget.groupId),
                       if (g.description != null) ...[
                         const SizedBox(height: 12),
                         Text(
@@ -473,6 +536,112 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// G3: Panel mit offenen Beitritts-Anträgen für Owner/Admin. Jeder Antrag
+/// zeigt Antragsteller + Nachricht + Annehmen/Ablehnen.
+class _PendingRequestsPanel extends ConsumerWidget {
+  const _PendingRequestsPanel({required this.groupId});
+  final String groupId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(groupPendingRequestsProvider(groupId));
+    final reqs = async.asData?.value ?? const [];
+    if (reqs.isEmpty) return const SizedBox.shrink();
+
+    Future<void> decide(String id, bool approve) async {
+      final ok = approve
+          ? await GroupsRepository.approveRequest(id)
+          : await GroupsRepository.rejectRequest(id);
+      if (ok) {
+        ref.invalidate(groupPendingRequestsProvider(groupId));
+        ref.invalidate(groupDetailProvider(groupId));
+      }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'groups.requestsCount'.tr(namedArgs: {'n': '${reqs.length}'}),
+            style: AppTypography.label(size: 10, color: AppColors.bronze),
+          ),
+          const SizedBox(height: 8),
+          for (final r in reqs) ...[
+            Builder(builder: (_) {
+              final p = r['profiles'] as Map<String, dynamic>?;
+              final name = (p?['display_name'] ??
+                      p?['name'] ??
+                      'common.neighbour'.tr())
+                  .toString();
+              final msg = (r['message'] ?? '').toString();
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name,
+                        style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.ink,
+                            weight: FontWeight.w700)),
+                    if (msg.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text('„$msg"',
+                            style: AppTypography.body(
+                                size: 12, color: AppColors.inkSoft)),
+                      ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              decide(r['id'] as String, true),
+                          icon: const Icon(LucideIcons.check, size: 13),
+                          label: Text('groups.requestApprove'.tr()),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.leben,
+                            side: BorderSide(
+                                color: AppColors.leben
+                                    .withValues(alpha: 0.5)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              decide(r['id'] as String, false),
+                          icon: const Icon(LucideIcons.x, size: 13),
+                          label: Text('groups.requestReject'.tr()),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.mute,
+                            side: const BorderSide(color: AppColors.line),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ],
       ),
     );
   }

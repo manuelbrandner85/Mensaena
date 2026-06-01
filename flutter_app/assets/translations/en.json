@@ -1614,7 +1614,16 @@
     "catTiere": "Animals",
     "catHandwerk": "Crafts",
     "catSonstiges": "Other",
-    "deletePostConfirm": "Delete this post?"
+    "deletePostConfirm": "Delete this post?",
+    "requestJoin": "Request to join",
+    "requestJoinTitle": "Request to join",
+    "requestJoinHint": "Why do you want to join? (optional)",
+    "requestSend": "Send request",
+    "requestSent": "Request sent.",
+    "requestPending": "Request pending",
+    "requestsCount": "Join requests ({n})",
+    "requestApprove": "Approve",
+    "requestReject": "Reject"
   },
   "board": {
     "title": "Note",

@@ -1513,7 +1513,16 @@
     "catTiere": "Животные",
     "catHandwerk": "Ремёсла",
     "catSonstiges": "Другое",
-    "deletePostConfirm": "Удалить эту запись?"
+    "deletePostConfirm": "Удалить эту запись?",
+    "requestJoin": "Подать заявку",
+    "requestJoinTitle": "Подать заявку",
+    "requestJoinHint": "Почему вы хотите вступить? (необязательно)",
+    "requestSend": "Отправить заявку",
+    "requestSent": "Заявка отправлена.",
+    "requestPending": "Заявка на рассмотрении",
+    "requestsCount": "Заявки на вступление ({n})",
+    "requestApprove": "Принять",
+    "requestReject": "Отклонить"
   },
   "board": {
     "title": "Заметка",

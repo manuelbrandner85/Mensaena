@@ -1513,7 +1513,16 @@
     "catTiere": "Hayvanlar",
     "catHandwerk": "El sanatları",
     "catSonstiges": "Diğer",
-    "deletePostConfirm": "Bu gönderi silinsin mi?"
+    "deletePostConfirm": "Bu gönderi silinsin mi?",
+    "requestJoin": "Katılma isteği",
+    "requestJoinTitle": "Katılma isteği",
+    "requestJoinHint": "Neden katılmak istiyorsun? (isteğe bağlı)",
+    "requestSend": "İstek gönder",
+    "requestSent": "İstek gönderildi.",
+    "requestPending": "İstek beklemede",
+    "requestsCount": "Katılma istekleri ({n})",
+    "requestApprove": "Kabul et",
+    "requestReject": "Reddet"
   },
   "board": {
     "title": "Not",

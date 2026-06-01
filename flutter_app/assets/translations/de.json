@@ -1613,7 +1613,16 @@
     "catTiere": "Tiere",
     "catHandwerk": "Handwerk",
     "catSonstiges": "Sonstiges",
-    "deletePostConfirm": "Diesen Beitrag löschen?"
+    "deletePostConfirm": "Diesen Beitrag löschen?",
+    "requestJoin": "Beitritt anfragen",
+    "requestJoinTitle": "Beitritt anfragen",
+    "requestJoinHint": "Warum möchtest du beitreten? (optional)",
+    "requestSend": "Anfrage senden",
+    "requestSent": "Anfrage gesendet.",
+    "requestPending": "Anfrage läuft",
+    "requestsCount": "Beitritts-Anfragen ({n})",
+    "requestApprove": "Annehmen",
+    "requestReject": "Ablehnen"
   },
   "board": {
     "title": "Notiz",

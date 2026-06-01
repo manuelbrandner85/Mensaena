@@ -1514,7 +1514,16 @@
     "catTiere": "Animaux",
     "catHandwerk": "Artisanat",
     "catSonstiges": "Autre",
-    "deletePostConfirm": "Supprimer cette publication ?"
+    "deletePostConfirm": "Supprimer cette publication ?",
+    "requestJoin": "Demander à rejoindre",
+    "requestJoinTitle": "Demander à rejoindre",
+    "requestJoinHint": "Pourquoi voulez-vous rejoindre ? (facultatif)",
+    "requestSend": "Envoyer la demande",
+    "requestSent": "Demande envoyée.",
+    "requestPending": "Demande en attente",
+    "requestsCount": "Demandes d'adhésion ({n})",
+    "requestApprove": "Accepter",
+    "requestReject": "Refuser"
   },
   "board": {
     "title": "Note",
