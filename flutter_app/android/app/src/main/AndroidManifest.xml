@@ -114,6 +114,12 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="https"/>
         </intent>
+        <!-- K2 Routenplanung: geo:-Schema, damit canLaunchUrl die Karten-
+             App auf Android 11+ findet (Package-Visibility). -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="geo"/>
+        </intent>
         <!-- Required to query activities that can process text -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>

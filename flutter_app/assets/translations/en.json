@@ -1968,7 +1968,9 @@
       }
     },
     "toggleCrises": "Toggle crises",
-    "toggleEvents": "Toggle events"
+    "toggleEvents": "Toggle events",
+    "routeTo": "Directions",
+    "routeFailed": "Could not open maps app."
   },
   "calendar": {
     "noEvents": "No events in calendar.",

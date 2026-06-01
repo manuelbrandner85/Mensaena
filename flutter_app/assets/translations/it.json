@@ -1798,7 +1798,9 @@
     "removePin": "Rimuovi pin",
     "longPressHint": "Suggerimento: tieni premuto sulla mappa per salvare il tuo pin.",
     "toggleCrises": "Mostra/nascondi crisi",
-    "toggleEvents": "Mostra/nascondi eventi"
+    "toggleEvents": "Mostra/nascondi eventi",
+    "routeTo": "Indicazioni",
+    "routeFailed": "Impossibile aprire l'app mappe."
   },
   "calendar": {
     "noEvents": "Nessun evento in calendario.",

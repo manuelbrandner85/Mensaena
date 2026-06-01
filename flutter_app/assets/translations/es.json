@@ -1798,7 +1798,9 @@
     "removePin": "Borrar pin",
     "longPressHint": "Tip: mantén pulsado el mapa para guardar tu propio pin.",
     "toggleCrises": "Mostrar/ocultar crisis",
-    "toggleEvents": "Mostrar/ocultar eventos"
+    "toggleEvents": "Mostrar/ocultar eventos",
+    "routeTo": "Cómo llegar",
+    "routeFailed": "No se pudo abrir la app de mapas."
   },
   "calendar": {
     "noEvents": "No hay eventos en el calendario.",

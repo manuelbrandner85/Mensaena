@@ -1797,7 +1797,9 @@
     "removePin": "İğneyi sil",
     "longPressHint": "İpucu: kendi iğneni kaydetmek için haritaya uzun bas.",
     "toggleCrises": "Krizleri aç/kapat",
-    "toggleEvents": "Etkinlikleri aç/kapat"
+    "toggleEvents": "Etkinlikleri aç/kapat",
+    "routeTo": "Yol tarifi",
+    "routeFailed": "Harita uygulaması açılamadı."
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",

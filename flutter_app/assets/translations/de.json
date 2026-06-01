@@ -1967,7 +1967,9 @@
       }
     },
     "toggleCrises": "Krisen ein/aus",
-    "toggleEvents": "Events ein/aus"
+    "toggleEvents": "Events ein/aus",
+    "routeTo": "Route hierher",
+    "routeFailed": "Karten-App konnte nicht geöffnet werden."
   },
   "calendar": {
     "noEvents": "Keine Events im Kalender.",

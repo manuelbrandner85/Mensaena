@@ -14,6 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -1487,6 +1488,30 @@ class _GpsBanner extends StatelessWidget {
 }
 
 // ── V6 erweiterter Post-Bottom-Sheet ─────────────────────────────────────
+/// K2: öffnet die Karten-App des Geräts mit einer Route zum Ziel.
+/// Versucht zuerst geo:?q= (Android-Standard, lässt den User die App
+/// wählen), fällt auf die Google-Maps-Web-URL zurück (öffnet App falls
+/// installiert, sonst Browser — funktioniert auch auf iOS).
+Future<void> _openDirections(
+    BuildContext context, double lat, double lng) async {
+  final geo = Uri.parse('geo:0,0?q=$lat,$lng');
+  final web = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+  try {
+    if (await canLaunchUrl(geo)) {
+      await launchUrl(geo, mode: LaunchMode.externalApplication);
+      return;
+    }
+    await launchUrl(web, mode: LaunchMode.externalApplication);
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('map.routeFailed'.tr())),
+      );
+    }
+  }
+}
+
 class _PostBottomSheet extends StatelessWidget {
   const _PostBottomSheet({
     required this.post,
@@ -1705,6 +1730,26 @@ class _PostBottomSheet extends StatelessWidget {
               ),
             ],
             const SizedBox(height: 18),
+            // K2 Routenplanung — öffnet die Karten-App des Geräts mit einer
+            // Route zum Post-Standort. Nur wenn Koordinaten vorhanden.
+            if (post.latitude != null && post.longitude != null) ...[
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _openDirections(
+                      context, post.latitude!, post.longitude!),
+                  icon: const Icon(LucideIcons.navigation, size: 16),
+                  label: Text('map.routeTo'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    side: BorderSide(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
             Row(
               children: [
                 Expanded(

@@ -1798,7 +1798,9 @@
     "removePin": "Supprimer le repère",
     "longPressHint": "Astuce : appuie longuement sur la carte pour enregistrer ton repère.",
     "toggleCrises": "Afficher/masquer crises",
-    "toggleEvents": "Afficher/masquer événements"
+    "toggleEvents": "Afficher/masquer événements",
+    "routeTo": "Itinéraire",
+    "routeFailed": "Impossible d'ouvrir l'app de cartes."
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",
