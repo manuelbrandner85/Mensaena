@@ -9,8 +9,20 @@ import 'app_colors.dart';
 /// - Fraunces: Display-Backup, Wordmarks
 /// - Inter: Body, UI, Buttons
 /// - JetBrains Mono: Zahlen, Stats, Code, Timestamps
+///
+/// Premium-Pass (A6): Mono + Label nutzen jetzt `tabularFigures` —
+/// gleichbreite Ziffern, sodass Stats-Tabellen, Counter, Preise und
+/// Timestamps exakt untereinander stehen (Bloomberg-Look). Display-Serif
+/// nutzt `liningFigures` für editorialer Großziffern-Optik.
 class AppTypography {
   const AppTypography._();
+
+  // Re-usable Feature-Listen. const damit kein Realloc pro Aufruf.
+  static const List<FontFeature> _tabular = [FontFeature.tabularFigures()];
+  static const List<FontFeature> _lining = [
+    FontFeature.tabularFigures(),
+    FontFeature.liningFigures(),
+  ];
 
   /// Cinema-Editorial Headlines (Web-Klasse: h1/h2/h3).
   static TextStyle display({
@@ -28,6 +40,7 @@ class AppTypography {
         letterSpacing: letterSpacing * size,
         height: height,
         shadows: shadows,
+        fontFeatures: _lining,
       );
 
   /// Display-Backup / Wordmark (Cinema-Display-Variable Font).
@@ -44,6 +57,7 @@ class AppTypography {
         fontWeight: weight,
         letterSpacing: letterSpacing * size,
         height: height,
+        fontFeatures: _lining,
       );
 
   /// Standard-Text (UI, Buttons, Paragraphs).
@@ -62,7 +76,8 @@ class AppTypography {
         letterSpacing: letterSpacing,
       );
 
-  /// Zahlen, Stats, Code, Timestamps.
+  /// Zahlen, Stats, Code, Timestamps. Tabular-Figures sorgen für exakt
+  /// gleichbreite Ziffern → Tabellen/Counter richten sich aus.
   static TextStyle mono({
     double size = 14,
     Color color = AppColors.amber,
@@ -74,6 +89,25 @@ class AppTypography {
         color: color,
         fontWeight: weight,
         letterSpacing: letterSpacing,
+        fontFeatures: _tabular,
+      );
+
+  /// Bloomberg-Style Hero-Zahl. Riesig, fett, mono, tabular — für die
+  /// Headline-Stats im Admin-Dashboard, Trust-Score, Karma, etc. Eigene
+  /// semantische API damit der "1-Mio-€-Look" überall konsistent ist.
+  static TextStyle stat({
+    double size = 44,
+    Color color = AppColors.ink,
+    FontWeight weight = FontWeight.w800,
+    double letterSpacing = -1.5,
+  }) =>
+      GoogleFonts.jetBrainsMono(
+        fontSize: size,
+        color: color,
+        fontWeight: weight,
+        letterSpacing: letterSpacing,
+        height: 1.0,
+        fontFeatures: _tabular,
       );
 
   /// Uppercase Labels (Kategorie-Pillen, Eyebrows, Section-Labels).
@@ -90,6 +124,7 @@ class AppTypography {
         color: color,
         fontWeight: weight,
         letterSpacing: letterSpacing * size,
+        fontFeatures: _tabular,
       );
 
   /// AppBar-Titel — Design (Cinema-Hyperreal): editorialer Instrument-Serif
@@ -100,6 +135,7 @@ class AppTypography {
         color: color,
         fontWeight: FontWeight.w400,
         letterSpacing: -0.2,
+        fontFeatures: _lining,
       );
 
   /// Helper fuer Subtitles/Captions.

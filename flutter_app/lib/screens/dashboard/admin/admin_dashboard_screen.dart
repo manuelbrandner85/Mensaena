@@ -221,11 +221,7 @@ class _UsersOverviewContent extends StatelessWidget {
           children: [
             Text(
               _formatNumber(stats.users),
-              style: AppTypography.mono(
-                size: 44,
-                color: AppColors.ink,
-                weight: FontWeight.w800,
-              ),
+              style: AppTypography.stat(),
             ),
             const SizedBox(width: 10),
             Expanded(
