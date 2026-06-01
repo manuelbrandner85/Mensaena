@@ -2775,7 +2775,14 @@
     "oledMode": "OLED black",
     "oledModeHint": "Pure black background for AMOLED displays — saves battery.",
     "seniorMode": "Senior mode",
-    "seniorModeHint": "Larger text, fewer animations, more contrast."
+    "seniorModeHint": "Larger text, fewer animations, more contrast.",
+    "performanceMode": "Performance mode",
+    "liteAuto": "Automatic (recommended)",
+    "liteOn": "Lite mode: on",
+    "liteOff": "Lite mode: off",
+    "liteHint": "Animated effects off, smaller image caches — easier on older devices.",
+    "liteAutoDetected": "Lite is active on your device (auto-detected).",
+    "liteOverrideHint": "Manual setting overrides the automatic detection."
   },
   "biometric": {
     "section": "App lock with fingerprint / face",

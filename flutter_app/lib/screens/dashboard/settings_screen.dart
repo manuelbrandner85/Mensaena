@@ -25,6 +25,7 @@ import '../../repositories/notification_prefs_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../providers/role_provider.dart';
 import '../../services/biometric_service.dart';
+import '../../services/device_tier_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
 import '../../services/sleep_reminder_service.dart';
@@ -2437,6 +2438,9 @@ class _A11ySection extends ConsumerWidget {
                 style: AppTypography.caption()),
           ),
           const SizedBox(height: 4),
+          // Performance-Modus (Lite/Standard/Auto) — siehe DeviceTierService.
+          const _PerformanceModeRow(),
+          const SizedBox(height: 4),
           // High Contrast
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
@@ -2574,5 +2578,70 @@ class _NotifyRadiusRowState extends ConsumerState<_NotifyRadiusRow> {
       ref.invalidate(myProfileProvider);
     } catch (_) {}
     if (mounted) setState(() => _saving = false);
+  }
+}
+
+/// Lite-Mode-Toggle: Auto / An / Aus. Auto-Detection erkennt ARM32 +
+/// Android < 9 als „lite". Override persistiert in SecureStorage und
+/// gewinnt über die Auto-Detection.
+class _PerformanceModeRow extends ConsumerWidget {
+  const _PerformanceModeRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final infoAsync = ref.watch(deviceTierProvider);
+    return infoAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (info) {
+        final isLite = info.tier == DeviceTier.lite;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8, bottom: 4),
+              child: Text('a11y.performanceMode'.tr(),
+                  style: AppTypography.body(
+                    size: 13,
+                    color: AppColors.ink,
+                    weight: FontWeight.w600,
+                  )),
+            ),
+            Text('a11y.liteHint'.tr(),
+                style: AppTypography.caption()),
+            const SizedBox(height: 8),
+            SegmentedButton<DeviceTier?>(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                  value: null,
+                  label: Text('a11y.liteAuto'.tr()),
+                ),
+                ButtonSegment(
+                  value: DeviceTier.lite,
+                  label: Text('a11y.liteOn'.tr()),
+                ),
+                ButtonSegment(
+                  value: DeviceTier.standard,
+                  label: Text('a11y.liteOff'.tr()),
+                ),
+              ],
+              selected: <DeviceTier?>{info.overridden ? info.tier : null},
+              onSelectionChanged: (set) async {
+                await DeviceTierService.setOverride(set.first);
+                ref.invalidate(deviceTierProvider);
+              },
+            ),
+            const SizedBox(height: 6),
+            if (isLite && !info.overridden)
+              Text('a11y.liteAutoDetected'.tr(),
+                  style: AppTypography.caption()),
+            if (info.overridden)
+              Text('a11y.liteOverrideHint'.tr(),
+                  style: AppTypography.caption()),
+          ],
+        );
+      },
+    );
   }
 }

@@ -2218,7 +2218,14 @@
     "reduceMotion": "Riduci animazioni",
     "reduceMotionHint": "Disattiva coriandoli, bagliori pulsanti e grandi animazioni.",
     "highContrast": "Contrasto elevato",
-    "highContrastHint": "Bordi più marcati e colori del testo più intensi."
+    "highContrastHint": "Bordi più marcati e colori del testo più intensi.",
+    "performanceMode": "Modalità prestazioni",
+    "liteAuto": "Automatica (consigliata)",
+    "liteOn": "Modalità lite: attiva",
+    "liteOff": "Modalità lite: spenta",
+    "liteHint": "Effetti animati disattivati, cache immagini ridotta — più leggero sui dispositivi più datati.",
+    "liteAutoDetected": "Lite è attiva sul tuo dispositivo (rilevamento automatico).",
+    "liteOverrideHint": "L'impostazione manuale ha la precedenza sul rilevamento."
   },
   "biometric": {
     "section": "Blocco app con impronta / volto",

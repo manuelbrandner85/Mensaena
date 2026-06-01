@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +16,7 @@ import 'repositories/extra_repositories.dart';
 import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
+import 'services/device_tier_service.dart';
 import 'services/offline_queue_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/shorebird_patch_service.dart';
@@ -36,12 +39,22 @@ Future<void> main() async {
   // CRASH-FIX (App-langsam-/crasht-Report): Image-Cache eng deckeln.
   // Default-Flutter: 1000 Bilder / 100 MB. Auf Low-RAM-Android-Geräten
   // reicht ein einziges vom Server unsanft groß ausgeliefertes Avatar/
-  // Cover-Bild aus, um den Decoder zu sprengen → Native-OOM-Crash. 58
-  // CachedNetworkImage-Stellen sind ohne memCacheWidth/Height. Kappung
-  // auf 200 Bilder / 64 MB ist konservativ und vermeidet OOM bei
-  // moderaten Bildmengen (Feed-Scrolling, Marktplatz-Grids).
+  // Cover-Bild aus, um den Decoder zu sprengen → Native-OOM-Crash.
+  //
+  // PERF-FIX 2: Tier-abhängige Caps (ARM32 / Android <9 = Lite-Mode):
+  //   Lite     →  32 MB / 100 Bilder
+  //   Standard →  64 MB / 200 Bilder
+  // Detection läuft fire-and-forget; bis sie fertig ist, gilt der
+  // großzügigere Standard-Cap.
   PaintingBinding.instance.imageCache.maximumSize = 200;
   PaintingBinding.instance.imageCache.maximumSizeBytes = 64 * 1024 * 1024;
+  unawaited(DeviceTierService.detect().then((info) {
+    if (info.tier == DeviceTier.lite) {
+      PaintingBinding.instance.imageCache.maximumSize = 100;
+      PaintingBinding.instance.imageCache.maximumSizeBytes =
+          32 * 1024 * 1024;
+    }
+  }));
 
   // Globaler Crash-Reporter → error_logs Tabelle in Supabase.
   // Per fail-silent: ErrorLogsRepository fängt eigene Exceptions ab.

@@ -77,6 +77,9 @@ dependencies:
   # Deep-Links: fängt eingehende mensaena.de-Links nativ ab und reicht
   # sie an den DeepLinkService → GoRouter weiter.
   app_links: ^6.3.0
+  # Device-Tier-Detection: ARM-ABI, SDK-Version, ggf. Hersteller — Grundlage
+  # für den Lite-Mode auf alten Geräten (Cinema-Effekte/Animationen aus).
+  device_info_plus: ^11.3.0
   flutter_secure_storage: ^9.2.2
   package_info_plus: ^8.0.0
   qr_flutter: ^4.1.0

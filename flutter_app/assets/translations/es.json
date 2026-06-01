@@ -2218,7 +2218,14 @@
     "reduceMotion": "Reducir movimiento",
     "reduceMotionHint": "Desactiva confeti, brillos pulsantes y animaciones grandes.",
     "highContrast": "Alto contraste",
-    "highContrastHint": "Bordes más marcados y colores de texto más intensos."
+    "highContrastHint": "Bordes más marcados y colores de texto más intensos.",
+    "performanceMode": "Modo de rendimiento",
+    "liteAuto": "Automático (recomendado)",
+    "liteOn": "Modo ligero: activado",
+    "liteOff": "Modo ligero: desactivado",
+    "liteHint": "Efectos animados desactivados, cachés de imagen reducidas — más liviano en dispositivos antiguos.",
+    "liteAutoDetected": "El modo ligero está activo en tu dispositivo (detección automática).",
+    "liteOverrideHint": "El ajuste manual sobrescribe la detección."
   },
   "biometric": {
     "section": "Bloqueo de la app con huella / cara",

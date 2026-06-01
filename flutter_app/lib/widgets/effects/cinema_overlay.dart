@@ -29,6 +29,7 @@ import '../../config/theme/cinema_theme.dart';
 import '../../providers/accessibility_provider.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/theme_mode_provider.dart';
+import '../../services/device_tier_service.dart';
 import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
 import 'film_grain.dart';
@@ -52,6 +53,10 @@ class CinemaOverlay extends ConsumerWidget {
     // bei A11y-Bedarf eher stören.
     final reduceMotion =
         ref.watch(a11yProvider.select((p) => p.effectiveReduceMotion));
+    // PERF: Lite-Mode (ARM32 / Android < 9) → Effekte komplett aus, sonst
+    // crasht die App auf alten Geräten unter dem Gewicht der 9+
+    // AnimationControllers.
+    final liteMode = ref.watch(liteModeActiveProvider);
 
     // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
     // ergeben strukturell SEHR unterschiedliche Widget-Trees (SizedBox vs
@@ -59,7 +64,10 @@ class CinemaOverlay extends ConsumerWidget {
     // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
     // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
     // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
-    if (phase == null || baseIntensity <= 0.01 || reduceMotion) {
+    if (phase == null ||
+        baseIntensity <= 0.01 ||
+        reduceMotion ||
+        liteMode) {
       return KeyedSubtree(
         key: const ValueKey('cinema_overlay_off'),
         child: child,

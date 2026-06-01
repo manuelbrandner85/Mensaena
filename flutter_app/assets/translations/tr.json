@@ -2217,7 +2217,14 @@
     "reduceMotion": "Hareketi azalt",
     "reduceMotionHint": "Konfeti, nabız parıltıları ve büyük animasyonları kapatır.",
     "highContrast": "Yüksek kontrast",
-    "highContrastHint": "Daha belirgin kenarlıklar ve canlı metin renkleri."
+    "highContrastHint": "Daha belirgin kenarlıklar ve canlı metin renkleri.",
+    "performanceMode": "Performans modu",
+    "liteAuto": "Otomatik (önerilen)",
+    "liteOn": "Lite mod: açık",
+    "liteOff": "Lite mod: kapalı",
+    "liteHint": "Animasyonlu efektler kapalı, daha küçük görsel önbellekleri — eski cihazlarda daha rahat.",
+    "liteAutoDetected": "Cihazında Lite mod etkin (otomatik algılandı).",
+    "liteOverrideHint": "Manuel ayar otomatik algılamayı geçersiz kılar."
   },
   "biometric": {
     "section": "Parmak izi / yüz ile uygulama kilidi",

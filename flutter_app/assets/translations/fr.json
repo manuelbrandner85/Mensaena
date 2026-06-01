@@ -2218,7 +2218,14 @@
     "reduceMotion": "Réduire les animations",
     "reduceMotionHint": "Désactive confettis, pulsations et grandes animations.",
     "highContrast": "Contraste élevé",
-    "highContrastHint": "Bordures plus marquées et couleurs de texte plus fortes."
+    "highContrastHint": "Bordures plus marquées et couleurs de texte plus fortes.",
+    "performanceMode": "Mode performance",
+    "liteAuto": "Automatique (recommandé)",
+    "liteOn": "Mode léger : activé",
+    "liteOff": "Mode léger : désactivé",
+    "liteHint": "Effets animés désactivés, caches d'images réduits — plus léger sur les anciens appareils.",
+    "liteAutoDetected": "Le mode léger est actif sur votre appareil (détection automatique).",
+    "liteOverrideHint": "Le réglage manuel remplace la détection automatique."
   },
   "biometric": {
     "section": "Verrouillage par empreinte / visage",

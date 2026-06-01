@@ -2774,7 +2774,14 @@
     "oledMode": "OLED-Schwarz",
     "oledModeHint": "Tiefschwarzer Hintergrund für AMOLED-Displays — spart Akku.",
     "seniorMode": "Senior-Modus",
-    "seniorModeHint": "Größere Schrift, weniger Animationen, mehr Kontrast."
+    "seniorModeHint": "Größere Schrift, weniger Animationen, mehr Kontrast.",
+    "performanceMode": "Performance-Modus",
+    "liteAuto": "Automatisch (empfohlen)",
+    "liteOn": "Lite-Modus: an",
+    "liteOff": "Lite-Modus: aus",
+    "liteHint": "Animierte Effekte aus, kleinere Bild-Caches — schont alte Geräte.",
+    "liteAutoDetected": "Lite ist auf deinem Gerät aktiv (automatisch erkannt).",
+    "liteOverrideHint": "Manuelle Einstellung überschreibt die automatische Erkennung."
   },
   "biometric": {
     "section": "App-Sperre per Fingerabdruck / Gesicht",
