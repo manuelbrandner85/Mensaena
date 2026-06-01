@@ -484,7 +484,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
-              label: 'Quiet Hours aktivieren',
+              label: 'settings.notif.quietEnable'.tr(),
               value: prefs.quietHoursEnabled,
               onChanged: (v) =>
                   _update(prefs.copyWith(quietHoursEnabled: v)),
@@ -492,20 +492,20 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
             if (prefs.quietHoursEnabled) ...[
               const SizedBox(height: 4),
               _HourRow(
-                label: 'Von',
+                label: 'settings.notif.quietFrom'.tr(),
                 value: prefs.quietStartHour,
                 onChanged: (h) =>
                     _update(prefs.copyWith(quietStartHour: h)),
               ),
               _HourRow(
-                label: 'Bis',
+                label: 'settings.notif.quietTo'.tr(),
                 value: prefs.quietEndHour,
                 onChanged: (h) =>
                     _update(prefs.copyWith(quietEndHour: h)),
               ),
               const SizedBox(height: 4),
               _BoolTile(
-                label: 'Krisen dürfen Quiet-Hours durchbrechen',
+                label: 'settings.notif.quietAllowCritical'.tr(),
                 value: prefs.quietAllowCritical,
                 onChanged: (v) =>
                     _update(prefs.copyWith(quietAllowCritical: v)),
@@ -516,14 +516,14 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
-              label: 'Daily-Digest aktivieren',
+              label: 'settings.notif.digestEnable'.tr(),
               value: prefs.dailyDigestEnabled,
               onChanged: (v) =>
                   _update(prefs.copyWith(dailyDigestEnabled: v)),
             ),
             if (prefs.dailyDigestEnabled)
               _HourRow(
-                label: 'Versand-Uhrzeit',
+                label: 'settings.notif.digestHour'.tr(),
                 value: prefs.dailyDigestHour,
                 onChanged: (h) =>
                     _update(prefs.copyWith(dailyDigestHour: h)),

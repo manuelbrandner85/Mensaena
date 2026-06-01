@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/notification_prefs_repository.dart';
 import '../../services/push_notification_service.dart';
 import '../../services/safe_url.dart';
 
@@ -51,6 +52,16 @@ class _FcmForegroundListenerState extends State<FcmForegroundListener> {
     final url = safeInternalRoute(rawUrl);
     final type = m.data['type'] as String? ?? 'system';
     if (title == null && body == null) return;
+
+    // N1 Quiet-Hours: während des Ruhefensters keinen In-App-Toast +
+    // keine Haptik/Sound feuern. Ausnahme: kritische Krisen-Pushes, wenn
+    // der User "Krisen dürfen durchbrechen" aktiviert hat.
+    final prefs = NotificationPrefsRepository.cached;
+    final isCritical = type == 'crisis_alert' || type == 'incoming_call';
+    if (prefs.isQuietNow() &&
+        !(isCritical && prefs.quietAllowCritical)) {
+      return;
+    }
 
     // Root-Context aus dem globalen Navigator-Key holen, weil dieser
     // Listener jetzt als Singleton oberhalb des Routers gemountet ist —

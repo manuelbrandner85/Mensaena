@@ -359,6 +359,14 @@
       "system": "Sistem",
       "light": "Açık",
       "dark": "Koyu"
+    },
+    "notif": {
+      "quietEnable": "Sessiz saatleri etkinleştir",
+      "quietFrom": "Başlangıç",
+      "quietTo": "Bitiş",
+      "quietAllowCritical": "Krizler sessiz saatleri aşabilir",
+      "digestEnable": "Günlük özeti etkinleştir",
+      "digestHour": "Gönderim saati"
     }
   },
   "chat": {

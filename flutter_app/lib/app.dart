@@ -11,6 +11,7 @@ import 'providers/accessibility_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
+import 'repositories/notification_prefs_repository.dart';
 import 'services/deep_link_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
@@ -82,6 +83,9 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
     // Deep-Links: einmalig App-Links-Stream koppeln (https://mensaena.de/...
     // → GoRouter). initialize() ist idempotent.
     DeepLinkService.instance.initialize(router: router);
+    // N1 Quiet-Hours: Prefs einmal warm laden, damit der FCM-Foreground-
+    // Listener den Cache synchron prüfen kann (kein async im Hot-Path).
+    ref.watch(myNotifPrefsProvider);
     // localeProvider mountet den Notifier — der ruft persistierten
     // Mode + ggf. GPS-Detect ab und triggert context.setLocale().
     ref.watch(localeProvider);

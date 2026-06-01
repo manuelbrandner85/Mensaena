@@ -374,6 +374,14 @@
       "system": "System",
       "light": "Hell",
       "dark": "Dunkel"
+    },
+    "notif": {
+      "quietEnable": "Quiet Hours aktivieren",
+      "quietFrom": "Von",
+      "quietTo": "Bis",
+      "quietAllowCritical": "Krisen dürfen Quiet-Hours durchbrechen",
+      "digestEnable": "Tageszusammenfassung aktivieren",
+      "digestHour": "Versand-Uhrzeit"
     }
   },
   "chat": {

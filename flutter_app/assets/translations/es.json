@@ -359,6 +359,14 @@
       "system": "Sistema",
       "light": "Claro",
       "dark": "Oscuro"
+    },
+    "notif": {
+      "quietEnable": "Activar horas de silencio",
+      "quietFrom": "Desde",
+      "quietTo": "Hasta",
+      "quietAllowCritical": "Las crisis pueden romper las horas de silencio",
+      "digestEnable": "Activar resumen diario",
+      "digestHour": "Hora de envío"
     }
   },
   "chat": {

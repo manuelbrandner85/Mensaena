@@ -374,6 +374,14 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
+    },
+    "notif": {
+      "quietEnable": "Enable quiet hours",
+      "quietFrom": "From",
+      "quietTo": "To",
+      "quietAllowCritical": "Let crises break through quiet hours",
+      "digestEnable": "Enable daily summary",
+      "digestHour": "Delivery time"
     }
   },
   "chat": {

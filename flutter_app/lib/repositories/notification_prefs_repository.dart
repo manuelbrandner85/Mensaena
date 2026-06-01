@@ -101,6 +101,20 @@ class NotifPrefs {
         dailyDigestHour: dailyDigestHour ?? this.dailyDigestHour,
       );
 
+  /// True wenn JETZT (lokale Uhrzeit) innerhalb des Quiet-Hours-Fensters.
+  /// Behandelt über-Mitternacht-Fenster korrekt (z.B. 22→7).
+  bool isQuietNow([DateTime? now]) {
+    if (!quietHoursEnabled) return false;
+    final h = (now ?? DateTime.now()).hour;
+    if (quietStartHour == quietEndHour) return false;
+    if (quietStartHour < quietEndHour) {
+      // Gleicher Tag, z.B. 1→6.
+      return h >= quietStartHour && h < quietEndHour;
+    }
+    // Über Mitternacht, z.B. 22→7: gilt 22,23,0,1,…,6.
+    return h >= quietStartHour || h < quietEndHour;
+  }
+
   Map<String, dynamic> toUpsertMap(String userId) => {
         'user_id': userId,
         'enabled': enabled,
@@ -123,6 +137,11 @@ class NotifPrefs {
 class NotificationPrefsRepository {
   const NotificationPrefsRepository._();
 
+  /// Synchroner Cache der zuletzt geladenen Prefs — damit der FCM-
+  /// Foreground-Listener Quiet-Hours OHNE async-Roundtrip prüfen kann.
+  /// Wird bei jedem getMine()/save() aktualisiert.
+  static NotifPrefs cached = NotifPrefs.defaults;
+
   static Future<NotifPrefs> getMine() async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return NotifPrefs.defaults;
@@ -133,7 +152,9 @@ class NotificationPrefsRepository {
           .eq('user_id', uid)
           .maybeSingle();
       if (row == null) return NotifPrefs.defaults;
-      return NotifPrefs.fromMap(Map<String, dynamic>.from(row));
+      final prefs = NotifPrefs.fromMap(Map<String, dynamic>.from(row));
+      cached = prefs;
+      return prefs;
     } catch (_) {
       return NotifPrefs.defaults;
     }
@@ -144,6 +165,7 @@ class NotificationPrefsRepository {
     if (uid == null) return false;
     try {
       await sb.from('user_notification_prefs').upsert(prefs.toUpsertMap(uid));
+      cached = prefs;
       return true;
     } catch (_) {
       return false;

@@ -359,6 +359,14 @@
       "system": "Система",
       "light": "Светлое",
       "dark": "Тёмное"
+    },
+    "notif": {
+      "quietEnable": "Включить тихие часы",
+      "quietFrom": "С",
+      "quietTo": "До",
+      "quietAllowCritical": "Кризисы могут прерывать тихие часы",
+      "digestEnable": "Включить ежедневную сводку",
+      "digestHour": "Время отправки"
     }
   },
   "chat": {
