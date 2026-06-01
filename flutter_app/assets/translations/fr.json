@@ -1168,7 +1168,10 @@
     "markInProgress": "Marquer comme en cours",
     "markResolved": "Marquer comme résolu",
     "markActive": "Rouvrir",
-    "statusChanged": "Statut mis à jour."
+    "statusChanged": "Statut mis à jour.",
+    "boost": "Amplifier",
+    "boosted": "Amplifié",
+    "boostedCount": "Amplifié {n}×"
   },
   "marketplace": {
     "listing": "Annonce",

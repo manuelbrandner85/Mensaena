@@ -1244,7 +1244,10 @@
     "markInProgress": "Als „in Bearbeitung“ markieren",
     "markResolved": "Als erledigt markieren",
     "markActive": "Wieder öffnen",
-    "statusChanged": "Status aktualisiert."
+    "statusChanged": "Status aktualisiert.",
+    "boost": "Verstärken",
+    "boosted": "Verstärkt",
+    "boostedCount": "{n}× verstärkt"
   },
   "marketplace": {
     "listing": "Inserat",

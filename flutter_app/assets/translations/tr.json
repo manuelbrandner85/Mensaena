@@ -1167,7 +1167,10 @@
     "markInProgress": "Devam ediyor olarak işaretle",
     "markResolved": "Çözüldü olarak işaretle",
     "markActive": "Yeniden aç",
-    "statusChanged": "Durum güncellendi."
+    "statusChanged": "Durum güncellendi.",
+    "boost": "Öne çıkar",
+    "boosted": "Öne çıkarıldı",
+    "boostedCount": "{n}× öne çıkarıldı"
   },
   "marketplace": {
     "listing": "İlan",

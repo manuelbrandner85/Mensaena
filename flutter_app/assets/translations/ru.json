@@ -1167,7 +1167,10 @@
     "markInProgress": "Отметить «в процессе»",
     "markResolved": "Отметить решённым",
     "markActive": "Открыть снова",
-    "statusChanged": "Статус обновлён."
+    "statusChanged": "Статус обновлён.",
+    "boost": "Усилить",
+    "boosted": "Усилено",
+    "boostedCount": "Усилено {n}×"
   },
   "marketplace": {
     "listing": "Объявление",

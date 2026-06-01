@@ -465,6 +465,12 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                   ? _offerHelp
                                   : null,
                             ),
+                            // P5: Verstärken — nicht beim eigenen Post.
+                            if (_post!.userId !=
+                                SupabaseService.currentUser?.id) ...[
+                              const SizedBox(height: 10),
+                              _RepostButton(postId: widget.postId),
+                            ],
                             const SizedBox(height: 24),
                             Text(
                               'posts.commentsCount'.tr(namedArgs: {'count': '${_comments.length}'}),
@@ -1301,6 +1307,92 @@ class _StatusBtn extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         side: BorderSide(color: accent.withValues(alpha: 0.5)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+    );
+  }
+}
+
+/// P5: Verstärken-Button. Self-contained — lädt eigenen Zustand + Count,
+/// toggelt optimistisch. Verstärkte Posts erscheinen im Feed der eigenen
+/// Follower (get_reposted_feed-RPC).
+class _RepostButton extends StatefulWidget {
+  const _RepostButton({required this.postId});
+  final String postId;
+
+  @override
+  State<_RepostButton> createState() => _RepostButtonState();
+}
+
+class _RepostButtonState extends State<_RepostButton> {
+  bool? _did;
+  int _count = 0;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final results = await Future.wait([
+      PostsRepository.didRepost(widget.postId),
+      PostsRepository.repostCount(widget.postId),
+    ]);
+    if (!mounted) return;
+    setState(() {
+      _did = results[0] as bool;
+      _count = results[1] as int;
+    });
+  }
+
+  Future<void> _toggle() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    // Optimistisch.
+    final prevDid = _did ?? false;
+    final prevCount = _count;
+    setState(() {
+      _did = !prevDid;
+      _count = prevCount + (prevDid ? -1 : 1);
+    });
+    Haptics.tap();
+    final newState = await PostsRepository.toggleRepost(widget.postId);
+    if (!mounted) return;
+    setState(() {
+      _did = newState;
+      _busy = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final active = _did ?? false;
+    final color = active ? AppColors.leben : AppColors.bronze;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _did == null ? null : _toggle,
+        icon: Icon(
+            active ? LucideIcons.checkCircle2 : LucideIcons.megaphone,
+            size: 16,
+            color: color),
+        label: Text(
+          _count > 0
+              ? 'posts.boostedCount'
+                  .tr(namedArgs: {'n': '$_count'})
+              : (active
+                  ? 'posts.boosted'.tr()
+                  : 'posts.boost'.tr()),
+          style: AppTypography.label(size: 11, color: color),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: color.withValues(alpha: 0.5)),
+          backgroundColor: active
+              ? AppColors.leben.withValues(alpha: 0.08)
+              : null,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+        ),
       ),
     );
   }

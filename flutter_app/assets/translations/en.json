@@ -1245,7 +1245,10 @@
     "markInProgress": "Mark as in progress",
     "markResolved": "Mark as resolved",
     "markActive": "Reopen",
-    "statusChanged": "Status updated."
+    "statusChanged": "Status updated.",
+    "boost": "Boost",
+    "boosted": "Boosted",
+    "boostedCount": "Boosted {n}×"
   },
   "marketplace": {
     "listing": "Listing",

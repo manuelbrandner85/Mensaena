@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:supabase_flutter/supabase_flutter.dart' show CountOption;
 
 import '../models/post.dart';
 import '../services/supabase_service.dart';
@@ -268,6 +269,67 @@ class PostsRepository {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  // ── P5: Repost / Verstärken ────────────────────────────────────────
+  /// Zählt die Reposts eines Posts.
+  static Future<int> repostCount(String postId) async {
+    try {
+      final res = await sb
+          .from('post_reposts')
+          .select('id')
+          .eq('post_id', postId)
+          .count(CountOption.exact);
+      return res.count;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  /// Habe ICH diesen Post verstärkt?
+  static Future<bool> didRepost(String postId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final row = await sb
+          .from('post_reposts')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      return row != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Toggle Repost. Gibt den NEUEN Zustand zurück (true = jetzt verstärkt).
+  static Future<bool> toggleRepost(String postId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final existing = await sb
+          .from('post_reposts')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      if (existing != null) {
+        await sb
+            .from('post_reposts')
+            .delete()
+            .eq('post_id', postId)
+            .eq('user_id', uid);
+        return false;
+      }
+      await sb.from('post_reposts').insert({
+        'post_id': postId,
+        'user_id': uid,
+      });
+      return true;
+    } catch (_) {
+      return await didRepost(postId);
     }
   }
 
