@@ -268,7 +268,8 @@
     },
     "savedTitle": "Guardados",
     "otherProfile": "Perfil",
-    "notLoggedIn": "Has cerrado sesión. Inicia sesión de nuevo para ver tu perfil."
+    "notLoggedIn": "Has cerrado sesión. Inicia sesión de nuevo para ver tu perfil.",
+    "trustTrend": "Tendencia de confianza"
   },
   "settings": {
     "title": "Ajustes",

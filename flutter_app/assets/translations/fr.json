@@ -268,7 +268,8 @@
     },
     "savedTitle": "Enregistrés",
     "otherProfile": "Profil",
-    "notLoggedIn": "Vous êtes déconnecté. Reconnectez-vous pour voir votre profil."
+    "notLoggedIn": "Vous êtes déconnecté. Reconnectez-vous pour voir votre profil.",
+    "trustTrend": "Tendance de confiance"
   },
   "settings": {
     "title": "Paramètres",

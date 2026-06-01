@@ -274,7 +274,8 @@
     },
     "savedTitle": "Gespeichert",
     "otherProfile": "Profil",
-    "notLoggedIn": "Du bist abgemeldet. Bitte melde dich neu an, um dein Profil zu sehen."
+    "notLoggedIn": "Du bist abgemeldet. Bitte melde dich neu an, um dein Profil zu sehen.",
+    "trustTrend": "Trust-Verlauf"
   },
   "settings": {
     "title": "Einstellungen",

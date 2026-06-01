@@ -123,6 +123,40 @@ class TrustRatingsRepository {
     }
   }
 
+  /// V4: Trust-Score-Verlauf. Holt alle Bewertungen für [userId] sortiert
+  /// nach Zeit und berechnet den LAUFENDEN Durchschnitt nach jeder
+  /// Bewertung → eine Punktreihe für die Verlaufs-Sparkline. Liefert max
+  /// 200 Punkte; bei < 2 Bewertungen leere Liste (kein sinnvoller Trend).
+  static Future<List<double>> scoreHistory(String userId) async {
+    try {
+      final rows = await sb
+          .from('trust_ratings')
+          .select('score, rating, created_at')
+          .eq('rated_id', userId)
+          .order('created_at', ascending: true)
+          .limit(500);
+      final list = (rows as List).whereType<Map<String, dynamic>>().toList();
+      final out = <double>[];
+      var sum = 0.0;
+      var n = 0;
+      for (final r in list) {
+        final raw = r['score'] ?? r['rating'];
+        final v = raw is num ? raw.toDouble() : null;
+        if (v == null) continue;
+        sum += v;
+        n++;
+        out.add(sum / n);
+      }
+      if (out.length < 2) return const [];
+      // Auf max 200 Punkte ausdünnen (gleichmäßig).
+      if (out.length <= 200) return out;
+      final step = out.length / 200;
+      return [for (var i = 0; i < 200; i++) out[(i * step).floor()]];
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Trust-Score-Breakdown for a user (calls get_trust_breakdown RPC).
   static Future<Map<String, dynamic>?> getBreakdown(String userId) async {
     try {

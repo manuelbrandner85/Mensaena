@@ -11,6 +11,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
+import '../../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
 /// Skills-Liste aus skill_offers (eigenes Schema, kein post.type).
@@ -86,9 +87,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
             future: _future,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.amber),
-                );
+                return const SkeletonList(count: 6, itemHeight: 84);
               }
               final list = snap.data ?? const <SkillOffer>[];
               if (list.isEmpty) {

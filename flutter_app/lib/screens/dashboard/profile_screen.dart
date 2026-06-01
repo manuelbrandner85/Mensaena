@@ -35,6 +35,13 @@ import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/empty_state_card.dart';
 import '../../widgets/shared/verified_badge.dart';
 import '../../widgets/shared/post_card.dart';
+import '../../widgets/shared/sparkline.dart';
+
+/// V4: Trust-Score-Verlauf (laufender Durchschnitt aus trust_ratings).
+final _trustHistoryProvider =
+    FutureProvider.family.autoDispose<List<double>, String>(
+  (ref, userId) => TrustRatingsRepository.scoreHistory(userId),
+);
 
 /// SKILL: mensaena-features + mensaena-design
 /// Profil-Screen: eigenes oder fremdes (per userId). Trust-Score + Level
@@ -880,6 +887,7 @@ class _Header extends StatelessWidget {
                       score: profile.trustScore,
                       count: profile.trustScoreCount,
                       userId: profile.id),
+                  _TrustHistory(userId: profile.id),
                   const SizedBox(height: 12),
                   VerifiedDetailsPanel(profile: profile),
                 ],
@@ -1097,6 +1105,32 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// V4: Trust-Score-Verlauf als Sparkline. Erscheint nur wenn genug
+/// Bewertungen für einen sinnvollen Trend da sind (>= 2).
+class _TrustHistory extends ConsumerWidget {
+  const _TrustHistory({required this.userId});
+  final String userId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(_trustHistoryProvider(userId));
+    final data = async.asData?.value ?? const <double>[];
+    if (data.length < 2) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('profile.trustTrend'.tr(),
+              style: AppTypography.label(size: 9, color: AppColors.mute)),
+          const SizedBox(height: 4),
+          Sparkline(values: data, color: AppColors.trust, height: 40),
+        ],
+      ),
     );
   }
 }

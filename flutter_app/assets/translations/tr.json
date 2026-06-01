@@ -268,7 +268,8 @@
     },
     "savedTitle": "Kaydedildi",
     "otherProfile": "Profil",
-    "notLoggedIn": "Oturumun kapalı. Profilini görmek için tekrar giriş yap."
+    "notLoggedIn": "Oturumun kapalı. Profilini görmek için tekrar giriş yap.",
+    "trustTrend": "Güven eğilimi"
   },
   "settings": {
     "title": "Ayarlar",

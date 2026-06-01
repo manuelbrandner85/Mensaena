@@ -16,6 +16,7 @@ import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
+import '../../../widgets/shared/skeleton_card.dart';
 
 class GroupsScreen extends ConsumerStatefulWidget {
   const GroupsScreen({super.key});
@@ -124,10 +125,8 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                 backgroundColor: AppColors.surface,
                 onRefresh: () async => ref.invalidate(groupsListProvider),
                 child: async.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(
-                        color: AppColors.amber),
-                  ),
+                  loading: () =>
+                      const SkeletonList(count: 6, itemHeight: 84),
                   error: (e, _) => Center(
                       child: Text('$e', style: AppTypography.caption())),
                   data: (all) {

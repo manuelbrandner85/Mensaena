@@ -268,7 +268,8 @@
     },
     "savedTitle": "Salvati",
     "otherProfile": "Profilo",
-    "notLoggedIn": "Sei disconnesso. Accedi di nuovo per vedere il tuo profilo."
+    "notLoggedIn": "Sei disconnesso. Accedi di nuovo per vedere il tuo profilo.",
+    "trustTrend": "Andamento fiducia"
   },
   "settings": {
     "title": "Impostazioni",

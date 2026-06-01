@@ -274,7 +274,8 @@
     },
     "savedTitle": "Saved",
     "otherProfile": "Profile",
-    "notLoggedIn": "You're signed out. Sign in again to see your profile."
+    "notLoggedIn": "You're signed out. Sign in again to see your profile.",
+    "trustTrend": "Trust trend"
   },
   "settings": {
     "title": "Settings",
