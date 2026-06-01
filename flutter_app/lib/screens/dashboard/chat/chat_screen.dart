@@ -742,7 +742,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         }
                       }
                       final isPending = m['_pending'] == true;
-                      return Column(
+                      // PERF: jede Bubble in eigener RepaintBoundary —
+                      // eine spielende Voice-Bubble oder Read-Status-Update
+                      // repaintet so NUR sich selbst, nicht die ganze Liste.
+                      return RepaintBoundary(
+                        child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (showDayHeader) _DaySeparator(date: mAt),
@@ -802,6 +806,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             ),
                           ),
                         ],
+                        ),
                       );
                     },
                   );

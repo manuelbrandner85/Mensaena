@@ -422,7 +422,8 @@
     "pinned": "📌 Mesaj sabitlendi.",
     "unpinned": "Sabit kaldırıldı.",
     "welcomeChannelTitle": "#{name} kanalına hoş geldin",
-    "welcomeChannelBody": "Komşuların buluştuğu yer. Saygılı ol, elinden geleni yap — mesajlar her 6 saatte bir otomatik silinir. 🌊"
+    "welcomeChannelBody": "Komşuların buluştuğu yer. Saygılı ol, elinden geleni yap — mesajlar her 6 saatte bir otomatik silinir. 🌊",
+    "editedTag": "düzenlendi"
   },
   "languages": {
     "de": "Almanca",

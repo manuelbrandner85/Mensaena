@@ -463,7 +463,8 @@
     "pinned": "📌 Message pinned.",
     "unpinned": "Pin removed.",
     "welcomeChannelTitle": "Welcome to #{name}",
-    "welcomeChannelBody": "Where neighbors meet. Be respectful, help where you can — and note: messages are auto-removed every 6 hours. 🌊"
+    "welcomeChannelBody": "Where neighbors meet. Be respectful, help where you can — and note: messages are auto-removed every 6 hours. 🌊",
+    "editedTag": "edited"
   },
   "languages": {
     "de": "German",

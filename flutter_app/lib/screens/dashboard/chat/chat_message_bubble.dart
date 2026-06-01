@@ -374,7 +374,7 @@ class ChatMessageBubble extends ConsumerWidget {
                     ),
                     if (editedAt != null && !deleted) ...[
                       const SizedBox(width: 4),
-                      Text('bearbeitet',
+                      Text('chat.editedTag'.tr(),
                           style: AppTypography.label(
                               size: 8, color: AppColors.mute)),
                     ],
