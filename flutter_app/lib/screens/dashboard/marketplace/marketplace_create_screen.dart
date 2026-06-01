@@ -12,6 +12,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
+import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -299,6 +300,7 @@ class _MarketplaceCreateScreenState
 
     if (!mounted) return;
     Haptics.success();
+    MiniConfetti.show(context);
     context.push('/dashboard/marketplace/$id');
   }
 

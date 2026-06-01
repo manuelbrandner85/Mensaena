@@ -13,6 +13,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/challenges_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
@@ -84,6 +85,7 @@ class _ChallengeCreateScreenState
       return;
     }
     Haptics.success();
+    MiniConfetti.show(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text('challenges.createSuccess'.tr(),

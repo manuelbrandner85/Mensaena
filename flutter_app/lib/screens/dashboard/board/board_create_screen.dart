@@ -13,6 +13,7 @@ import '../../../repositories/board_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
+import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class BoardCreateScreen extends ConsumerStatefulWidget {
@@ -141,6 +142,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       return;
     }
     Haptics.success();
+    MiniConfetti.show(context);
     context.go('/dashboard/board/$id');
   }
 

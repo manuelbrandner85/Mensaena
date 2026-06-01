@@ -12,6 +12,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/groups_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
+import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 
@@ -121,6 +122,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
       return;
     }
     Haptics.success();
+    MiniConfetti.show(context);
     context.push('/dashboard/groups/$id');
   }
 

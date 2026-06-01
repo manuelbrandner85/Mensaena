@@ -20,6 +20,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/organizations_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
+import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -210,6 +211,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       return;
     }
     Haptics.success();
+    MiniConfetti.show(context);
     _toast('supply.farmCreate.createSuccess'.tr());
     context.go('/dashboard/supply');
   }

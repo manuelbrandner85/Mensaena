@@ -12,6 +12,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/events_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -316,6 +317,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       return;
     }
     Haptics.success();
+    MiniConfetti.show(context);
     context.push('/dashboard/events/$eventId');
   }
 

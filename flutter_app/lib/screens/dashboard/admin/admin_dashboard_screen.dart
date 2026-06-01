@@ -11,6 +11,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/animated_stat_number.dart';
 
 /// SKILL: mensaena-features (Admin Phase 6)
 /// Web-parity admin dashboard: open-reports alert, stat-cards strip,
@@ -219,10 +220,7 @@ class _UsersOverviewContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            Text(
-              _formatNumber(stats.users),
-              style: AppTypography.stat(),
-            ),
+            AnimatedStatNumber(value: stats.users),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -307,18 +305,6 @@ class _UsersOverviewContent extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  // Tausender-Trenner gemäß System-Locale; bei kleinen Zahlen sieht es
-  // identisch aus, bei 10.000+ wird es sofort lesbar.
-  static String _formatNumber(int n) {
-    final s = n.toString();
-    final buf = StringBuffer();
-    for (var i = 0; i < s.length; i++) {
-      if (i != 0 && (s.length - i) % 3 == 0) buf.write('.');
-      buf.write(s[i]);
-    }
-    return buf.toString();
   }
 }
 
