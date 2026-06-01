@@ -882,7 +882,11 @@
     "growthLegendNew": "New per day",
     "growthLegendTotal": "Total",
     "growthEmpty": "No data available.",
-    "growthTooltip": "{day}: +{new} • total {total}"
+    "growthTooltip": "{day}: +{new} • total {total}",
+    "lastLogin": "last",
+    "exportCsv": "Export CSV",
+    "exportCsvSubject": "Mensaena user export",
+    "exportCsvFailed": "CSV export failed."
   },
   "create": {
     "titleRequired": "Title is required.",

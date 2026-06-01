@@ -836,7 +836,11 @@
     "growthLegendNew": "Günlük yeni",
     "growthLegendTotal": "Toplam",
     "growthEmpty": "Veri yok.",
-    "growthTooltip": "{day}: +{new} • toplam {total}"
+    "growthTooltip": "{day}: +{new} • toplam {total}",
+    "lastLogin": "son",
+    "exportCsv": "CSV dışa aktar",
+    "exportCsvSubject": "Mensaena kullanıcı dışa aktarımı",
+    "exportCsvFailed": "CSV dışa aktarma başarısız."
   },
   "create": {
     "locationUnavailable": "Konum mevcut değil.",

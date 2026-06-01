@@ -837,7 +837,11 @@
     "growthLegendNew": "Nouveaux par jour",
     "growthLegendTotal": "Total",
     "growthEmpty": "Aucune donnée disponible.",
-    "growthTooltip": "{day} : +{new} • total {total}"
+    "growthTooltip": "{day} : +{new} • total {total}",
+    "lastLogin": "dernier",
+    "exportCsv": "Exporter CSV",
+    "exportCsvSubject": "Export des utilisateurs Mensaena",
+    "exportCsvFailed": "Échec de l'export CSV."
   },
   "create": {
     "locationUnavailable": "Position non disponible.",

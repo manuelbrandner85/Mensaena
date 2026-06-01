@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -47,6 +50,62 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
 
   // Self-Role for permission guard
   String? _myRole;
+  bool _exporting = false;
+
+  /// A4: exportiert ALLE Nutzer (über die aktuelle Filter-Suche hinweg)
+  /// als CSV und teilt sie via System-Share-Sheet. Holt bis zu 5000 Rows
+  /// direkt aus admin_list_users — unabhängig von der Seiten-Pagination.
+  Future<void> _exportCsv() async {
+    if (_exporting) return;
+    setState(() => _exporting = true);
+    try {
+      final rows = await AdminRepository.listUsersViaRpc(
+        search: _search.isEmpty ? null : _search,
+        role: _roleFilter,
+        limit: 5000,
+        offset: 0,
+      );
+      String esc(Object? v) {
+        final s = (v ?? '').toString().replaceAll('"', '""');
+        return '"$s"';
+      }
+
+      final buf = StringBuffer()
+        ..writeln('id,email,name,nickname,role,verified_email,banned,'
+            'trust_score,home_city,created_at,last_sign_in_at');
+      for (final u in rows) {
+        final verified = u['email_confirmed_at'] != null ||
+            u['verified_email'] == true;
+        buf.writeln([
+          esc(u['id']),
+          esc(u['email']),
+          esc(u['display_name'] ?? u['name']),
+          esc(u['nickname']),
+          esc(u['role']),
+          esc(verified),
+          esc(u['is_banned'] == true),
+          esc(u['trust_score']),
+          esc(u['home_city']),
+          esc(u['profile_created_at'] ?? u['created_at']),
+          esc(u['last_sign_in_at']),
+        ].join(','));
+      }
+      final dir = await getTemporaryDirectory();
+      final ts = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final path = '${dir.path}/mensaena_users_$ts.csv';
+      await File(path).writeAsString(buf.toString());
+      await Share.shareXFiles([XFile(path)],
+          text: 'admin.exportCsvSubject'.tr());
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('admin.exportCsvFailed'.tr())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
 
   @override
   void initState() {
@@ -522,6 +581,20 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     return DashboardScaffold(
       title: 'admin.usersTitle'.tr(),
       currentRoute: '/dashboard/admin/users',
+      fab: FloatingActionButton.extended(
+        backgroundColor: AppColors.bronze,
+        foregroundColor: AppColors.voidColor,
+        onPressed: _exporting ? null : _exportCsv,
+        icon: _exporting
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: AppColors.voidColor),
+              )
+            : const Icon(LucideIcons.fileSpreadsheet, size: 18),
+        label: Text('admin.exportCsv'.tr()),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -693,11 +766,16 @@ class _UserRow extends StatelessWidget {
     final avatar = user['avatar_url'] as String?;
     final homeCity = (user['home_city'] ?? '').toString();
     final trustScore = user['trust_score'];
-    final createdAt = user['created_at']?.toString();
+    final createdAt =
+        (user['created_at'] ?? user['profile_created_at'])?.toString();
     DateTime? created;
     if (createdAt != null) {
       created = DateTime.tryParse(createdAt);
     }
+    // A1: letzter Login. admin_users_view liefert last_sign_in_at.
+    final lastLoginRaw = user['last_sign_in_at']?.toString();
+    final lastLogin =
+        lastLoginRaw != null ? DateTime.tryParse(lastLoginRaw) : null;
 
     final initial = (name.isNotEmpty ? name : '?').substring(0, 1).toUpperCase();
 
@@ -830,6 +908,11 @@ class _UserRow extends StatelessWidget {
               if (created != null)
                 Text(
                   '· ${DateFormat('dd.MM.yyyy').format(created)}',
+                  style: AppTypography.caption(),
+                ),
+              if (lastLogin != null)
+                Text(
+                  '· ${'admin.lastLogin'.tr()} ${DateFormat('dd.MM.yyyy').format(lastLogin)}',
                   style: AppTypography.caption(),
                 ),
             ],

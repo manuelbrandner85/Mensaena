@@ -836,7 +836,11 @@
     "growthLegendNew": "Новые в день",
     "growthLegendTotal": "Всего",
     "growthEmpty": "Нет данных.",
-    "growthTooltip": "{day}: +{new} • всего {total}"
+    "growthTooltip": "{day}: +{new} • всего {total}",
+    "lastLogin": "вход",
+    "exportCsv": "Экспорт CSV",
+    "exportCsvSubject": "Экспорт пользователей Mensaena",
+    "exportCsvFailed": "Не удалось экспортировать CSV."
   },
   "create": {
     "locationUnavailable": "Местоположение недоступно.",
