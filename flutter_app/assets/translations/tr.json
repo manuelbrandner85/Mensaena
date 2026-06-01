@@ -1147,7 +1147,14 @@
     "blockUserConfirm": "Bu kullanıcının gönderilerini ve mesajlarını artık görmeyeceksin.",
     "blockButton": "Engelle",
     "chooseReason": "Bir sebep seç:",
-    "openMenu": "Menüyü aç"
+    "openMenu": "Menüyü aç",
+    "statusActive": "Açık",
+    "statusInProgress": "Devam ediyor",
+    "statusResolved": "Çözüldü",
+    "markInProgress": "Devam ediyor olarak işaretle",
+    "markResolved": "Çözüldü olarak işaretle",
+    "markActive": "Yeniden aç",
+    "statusChanged": "Durum güncellendi."
   },
   "marketplace": {
     "listing": "İlan",

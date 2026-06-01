@@ -1147,7 +1147,14 @@
     "blockUserConfirm": "Вы больше не будете видеть посты и сообщения этого пользователя.",
     "blockButton": "Заблокировать",
     "chooseReason": "Выберите причину:",
-    "openMenu": "Открыть меню"
+    "openMenu": "Открыть меню",
+    "statusActive": "Открыто",
+    "statusInProgress": "В процессе",
+    "statusResolved": "Решено",
+    "markInProgress": "Отметить «в процессе»",
+    "markResolved": "Отметить решённым",
+    "markActive": "Открыть снова",
+    "statusChanged": "Статус обновлён."
   },
   "marketplace": {
     "listing": "Объявление",

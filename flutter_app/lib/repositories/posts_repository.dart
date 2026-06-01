@@ -119,7 +119,12 @@ class PostsRepository {
     int offset = 0,
   }) async {
     try {
-      var q = sb.from('posts').select().eq('status', 'active');
+      // P6 Status-Lifecycle: active + in_progress bleiben im Feed sichtbar
+      // (in_progress mit Badge "in Bearbeitung"), nur resolved verschwindet.
+      var q = sb
+          .from('posts')
+          .select()
+          .inFilter('status', const ['active', 'in_progress']);
       if (type != null && type != 'all') {
         q = q.eq('type', type);
       }
@@ -148,7 +153,7 @@ class PostsRepository {
       final rows = await sb
           .from('posts')
           .select()
-          .eq('status', 'active')
+          .inFilter('status', const ['active', 'in_progress'])
           .order('created_at', ascending: false)
           .limit(limit);
       final posts = (rows as List)
@@ -246,6 +251,23 @@ class PostsRepository {
       return out;
     } catch (_) {
       return const [];
+    }
+  }
+
+  /// P6 Status-Lifecycle: setzt den Status eines eigenen Posts.
+  /// Erlaubt: 'active' | 'in_progress' | 'resolved'. RLS stellt sicher,
+  /// dass nur der Autor ändern kann.
+  static Future<bool> setStatus(String postId, String status) async {
+    const allowed = {'active', 'in_progress', 'resolved'};
+    if (!allowed.contains(status)) return false;
+    try {
+      await sb.from('posts').update({
+        'status': status,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', postId);
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 

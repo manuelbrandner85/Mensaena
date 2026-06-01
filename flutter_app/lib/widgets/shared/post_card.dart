@@ -18,6 +18,7 @@ import '../../repositories/user_blocks_repository.dart';
 import '../../repositories/content_reports_repository.dart';
 import 'glass_card.dart';
 import 'image_carousel.dart';
+import 'post_status_badge.dart';
 
 /// SKILL: mensaena-design + mensaena-features
 /// PostCard fuer Listen-Ansichten. Zeigt Typ-Badge, Titel,
@@ -336,6 +337,11 @@ class _PostCardState extends ConsumerState<PostCard> {
               ],
             ),
             const SizedBox(height: 10),
+            // P6 Status-Badge — nur sichtbar wenn nicht "active".
+            if (post.status != 'active') ...[
+              PostStatusBadge(status: post.status, compact: true),
+              const SizedBox(height: 8),
+            ],
             Text(
               post.title,
               style: AppTypography.body(

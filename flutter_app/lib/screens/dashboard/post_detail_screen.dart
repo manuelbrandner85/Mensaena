@@ -25,6 +25,7 @@ import '../../widgets/posts/reading_mode_toggle.dart';
 import '../../widgets/posts/similar_posts_carousel.dart';
 import '../../widgets/shared/post_reactions_button.dart';
 import '../../widgets/shared/image_carousel.dart';
+import '../../widgets/shared/post_status_badge.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
@@ -41,6 +42,7 @@ class PostDetailScreen extends ConsumerStatefulWidget {
 
 class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   Post? _post;
+  String? _statusOverride;
   bool _loading = true;
   bool _saved = false;
   int? _myVote;
@@ -339,6 +341,20 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     if (mounted) setState(() => _comments = fresh);
   }
 
+  Future<void> _changeStatus(String status) async {
+    if (_post == null) return;
+    final ok = await PostsRepository.setStatus(widget.postId, status);
+    if (!mounted) return;
+    if (ok) {
+      // Post hat kein copyWith → lokalen Override halten, damit das Badge
+      // sofort den neuen Status zeigt ohne Voll-Reload.
+      setState(() => _statusOverride = status);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('posts.statusChanged'.tr())),
+      );
+    }
+  }
+
   Future<void> _deletePost() async {
     if (_post == null) return;
     final confirm = await showDialog<bool>(
@@ -417,6 +433,18 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                           padding: const EdgeInsets.all(16),
                           children: [
                             _Hero(post: _post!),
+                            // P6 Status-Lifecycle: Badge für alle + Steuerung
+                            // für den Autor.
+                            if ((_statusOverride ?? _post!.status) !=
+                                    'active' ||
+                                isMyPost) ...[
+                              const SizedBox(height: 12),
+                              _StatusControl(
+                                status: _statusOverride ?? _post!.status,
+                                canEdit: isMyPost,
+                                onChange: _changeStatus,
+                              ),
+                            ],
                             const SizedBox(height: 16),
                             // Mega-Contact-System (Intent-basierte CTAs)
                             PostContactActions(post: _post!),
@@ -1176,6 +1204,103 @@ class _NotFound extends StatelessWidget {
             child: Text('common.back'.tr()),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// P6 Status-Lifecycle-Steuerung. Für alle sichtbar als Badge; der Autor
+/// bekommt zusätzlich Buttons zum Umschalten (Offen ⇄ In Bearbeitung ⇄
+/// Erledigt).
+class _StatusControl extends StatelessWidget {
+  const _StatusControl({
+    required this.status,
+    required this.canEdit,
+    required this.onChange,
+  });
+
+  final String status;
+  final bool canEdit;
+  final ValueChanged<String> onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (status != 'active')
+                PostStatusBadge(status: status)
+              else
+                Text('posts.statusActive'.tr(),
+                    style: AppTypography.label(size: 10)),
+            ],
+          ),
+          if (canEdit) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (status != 'active')
+                  _StatusBtn(
+                    icon: LucideIcons.rotateCcw,
+                    label: 'posts.markActive'.tr(),
+                    onTap: () => onChange('active'),
+                  ),
+                if (status != 'in_progress')
+                  _StatusBtn(
+                    icon: LucideIcons.loader,
+                    label: 'posts.markInProgress'.tr(),
+                    onTap: () => onChange('in_progress'),
+                  ),
+                if (status != 'resolved')
+                  _StatusBtn(
+                    icon: LucideIcons.checkCircle2,
+                    label: 'posts.markResolved'.tr(),
+                    onTap: () => onChange('resolved'),
+                    accent: AppColors.leben,
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusBtn extends StatelessWidget {
+  const _StatusBtn({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.accent = AppColors.bronze,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 14, color: accent),
+      label: Text(label,
+          style: AppTypography.label(size: 10, color: accent)),
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: accent.withValues(alpha: 0.5)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
     );
   }

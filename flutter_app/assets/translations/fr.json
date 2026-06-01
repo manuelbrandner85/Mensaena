@@ -1148,7 +1148,14 @@
     "blockUserConfirm": "Vous ne verrez plus les publications et messages de cet utilisateur.",
     "blockButton": "Bloquer",
     "chooseReason": "Choisis un motif :",
-    "openMenu": "Ouvrir le menu"
+    "openMenu": "Ouvrir le menu",
+    "statusActive": "Ouvert",
+    "statusInProgress": "En cours",
+    "statusResolved": "Résolu",
+    "markInProgress": "Marquer comme en cours",
+    "markResolved": "Marquer comme résolu",
+    "markActive": "Rouvrir",
+    "statusChanged": "Statut mis à jour."
   },
   "marketplace": {
     "listing": "Annonce",

@@ -1224,7 +1224,14 @@
     "blockUserConfirm": "Du wirst Beiträge und Nachrichten dieses Nutzers nicht mehr sehen.",
     "blockButton": "Blockieren",
     "chooseReason": "Wähle einen Grund:",
-    "openMenu": "Menü öffnen"
+    "openMenu": "Menü öffnen",
+    "statusActive": "Offen",
+    "statusInProgress": "In Bearbeitung",
+    "statusResolved": "Erledigt",
+    "markInProgress": "Als „in Bearbeitung“ markieren",
+    "markResolved": "Als erledigt markieren",
+    "markActive": "Wieder öffnen",
+    "statusChanged": "Status aktualisiert."
   },
   "marketplace": {
     "listing": "Inserat",
