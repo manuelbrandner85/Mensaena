@@ -955,6 +955,8 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
+          // V3: Vertrauens-Pfad — Quest mit Schritten die Trust aufbauen.
+          _TrustPathQuest(profile: profile),
         ] else ...[
           const SizedBox(height: 12),
           _OtherUserActions(targetUserId: profile.id),
@@ -1105,6 +1107,134 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// V3: Vertrauens-Pfad — eine kleine Quest die dem User zeigt, wie er
+/// Schritt für Schritt Vertrauen aufbaut. Alle Schritte sind aus dem
+/// Profil ableitbar (keine Extra-Queries). Erscheint nur solange noch
+/// nicht alle Schritte erledigt sind → verschwindet als sanftes Ziel.
+class _TrustPathQuest extends StatelessWidget {
+  const _TrustPathQuest({required this.profile});
+  final Profile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasLocation = (profile.homeCity != null &&
+            profile.homeCity!.isNotEmpty) ||
+        profile.latitude != null;
+    final steps = <({String label, bool done, String route})>[
+      (
+        label: 'trustPath.avatar'.tr(),
+        done: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty,
+        route: '/dashboard/profile/edit',
+      ),
+      (
+        label: 'trustPath.bio'.tr(),
+        done: profile.bio != null && profile.bio!.trim().isNotEmpty,
+        route: '/dashboard/profile/edit',
+      ),
+      (
+        label: 'trustPath.location'.tr(),
+        done: hasLocation,
+        route: '/dashboard/profile/edit',
+      ),
+      (
+        label: 'trustPath.verifyEmail'.tr(),
+        done: profile.verifiedEmail || profile.isVerified == true,
+        route: '/dashboard/account',
+      ),
+      (
+        label: 'trustPath.firstRating'.tr(),
+        done: profile.trustScoreCount > 0,
+        route: '/dashboard/posts',
+      ),
+    ];
+    final doneCount = steps.where((s) => s.done).length;
+    // Alle erledigt → Quest ausblenden (Ziel erreicht).
+    if (doneCount == steps.length) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.bronze.withValues(alpha: 0.12),
+            AppColors.amber.withValues(alpha: 0.05),
+          ],
+        ),
+        border: Border.all(color: AppColors.bronze.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.shieldCheck,
+                  size: 16, color: AppColors.bronze),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('trustPath.title'.tr(),
+                    style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.ink,
+                        weight: FontWeight.w700)),
+              ),
+              Text('$doneCount/${steps.length}',
+                  style: AppTypography.mono(
+                      size: 12, color: AppColors.bronze)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: doneCount / steps.length,
+              minHeight: 5,
+              backgroundColor: AppColors.line,
+              valueColor:
+                  const AlwaysStoppedAnimation(AppColors.bronze),
+            ),
+          ),
+          const SizedBox(height: 10),
+          for (final s in steps)
+            InkWell(
+              onTap: s.done ? null : () => context.push(s.route),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  children: [
+                    Icon(
+                      s.done
+                          ? LucideIcons.checkCircle2
+                          : LucideIcons.circle,
+                      size: 16,
+                      color:
+                          s.done ? AppColors.leben : AppColors.mute,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(s.label,
+                          style: AppTypography.body(
+                            size: 13,
+                            color: s.done
+                                ? AppColors.mute
+                                : AppColors.ink,
+                          )),
+                    ),
+                    if (!s.done)
+                      const Icon(LucideIcons.chevronRight,
+                          size: 14, color: AppColors.mute),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

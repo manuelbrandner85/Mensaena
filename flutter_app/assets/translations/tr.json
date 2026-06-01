@@ -2387,5 +2387,13 @@
     "burn1": "Hemen 10–20 dakika ılık suyla soğutun.",
     "burn2": "Yaraya ev ilacı (yağ, un, diş macunu) sürmeyin.",
     "burn3": "Su toplamasını patlatmayın, gevşek ve steril örtün."
+  },
+  "trustPath": {
+    "title": "Güven yolu",
+    "avatar": "Profil fotoğrafı yükle",
+    "bio": "Kısa bir bio yaz",
+    "location": "Konumunu ekle",
+    "verifyEmail": "E-postanı doğrula",
+    "firstRating": "İlk değerlendirmeni al"
   }
 }

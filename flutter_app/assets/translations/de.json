@@ -3161,5 +3161,13 @@
     "burn1": "Sofort 10–20 Minuten mit handwarmem Wasser kühlen.",
     "burn2": "Keine Hausmittel (Öl, Mehl, Zahnpasta) auf die Wunde.",
     "burn3": "Brandblasen nicht öffnen, locker steril bedecken."
+  },
+  "trustPath": {
+    "title": "Vertrauens-Pfad",
+    "avatar": "Profilbild hochladen",
+    "bio": "Kurze Bio schreiben",
+    "location": "Standort angeben",
+    "verifyEmail": "E-Mail bestätigen",
+    "firstRating": "Erste Bewertung erhalten"
   }
 }

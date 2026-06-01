@@ -2388,5 +2388,13 @@
     "burn1": "Enfría enseguida 10–20 minutos con agua templada.",
     "burn2": "Nada de remedios caseros (aceite, harina, pasta de dientes).",
     "burn3": "No revientes las ampollas, cubre suelto y estéril."
+  },
+  "trustPath": {
+    "title": "Camino de confianza",
+    "avatar": "Sube una foto de perfil",
+    "bio": "Escribe una bio breve",
+    "location": "Añade tu ubicación",
+    "verifyEmail": "Verifica tu correo",
+    "firstRating": "Recibe tu primera valoración"
   }
 }

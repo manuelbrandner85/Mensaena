@@ -2388,5 +2388,13 @@
     "burn1": "Refroidissez aussitôt 10–20 minutes à l'eau tiède.",
     "burn2": "Pas de remèdes maison (huile, farine, dentifrice) sur la plaie.",
     "burn3": "N'ouvrez pas les cloques, couvrez sans serrer et stérile."
+  },
+  "trustPath": {
+    "title": "Parcours de confiance",
+    "avatar": "Ajoutez une photo de profil",
+    "bio": "Écrivez une courte bio",
+    "location": "Indiquez votre lieu",
+    "verifyEmail": "Vérifiez votre e-mail",
+    "firstRating": "Recevez votre première évaluation"
   }
 }

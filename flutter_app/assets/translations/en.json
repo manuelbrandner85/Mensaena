@@ -3162,5 +3162,13 @@
     "burn1": "Cool immediately for 10–20 minutes with hand-warm water.",
     "burn2": "No home remedies (oil, flour, toothpaste) on the wound.",
     "burn3": "Don't open blisters, cover loosely and sterile."
+  },
+  "trustPath": {
+    "title": "Trust path",
+    "avatar": "Upload a profile picture",
+    "bio": "Write a short bio",
+    "location": "Add your location",
+    "verifyEmail": "Verify your email",
+    "firstRating": "Receive your first rating"
   }
 }

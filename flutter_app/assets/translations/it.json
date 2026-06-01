@@ -2388,5 +2388,13 @@
     "burn1": "Raffredda subito 10–20 minuti con acqua tiepida.",
     "burn2": "Niente rimedi casalinghi (olio, farina, dentifricio) sulla ferita.",
     "burn3": "Non rompere le vesciche, copri in modo lasco e sterile."
+  },
+  "trustPath": {
+    "title": "Percorso di fiducia",
+    "avatar": "Carica una foto profilo",
+    "bio": "Scrivi una breve bio",
+    "location": "Indica la posizione",
+    "verifyEmail": "Verifica l'email",
+    "firstRating": "Ricevi la prima valutazione"
   }
 }
