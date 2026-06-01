@@ -1343,7 +1343,10 @@
     "useGps": "Aktuellen Standort verwenden",
     "saving": "Speichere…",
     "createButton": "Inserieren",
-    "inserted": "{name} hinzugefügt"
+    "inserted": "{name} hinzugefügt",
+    "commentsCount": "Kommentare ({n})",
+    "noComments": "Noch keine Kommentare. Stell die erste Frage!",
+    "commentHint": "Frage stellen oder kommentieren …"
   },
   "trust": {
     "rate": "Bewerte {name}",

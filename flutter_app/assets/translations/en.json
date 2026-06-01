@@ -1344,7 +1344,10 @@
     "useGps": "Use current location",
     "saving": "Saving…",
     "createButton": "Post listing",
-    "inserted": "{name} added"
+    "inserted": "{name} added",
+    "commentsCount": "Comments ({n})",
+    "noComments": "No comments yet. Ask the first question!",
+    "commentHint": "Ask a question or comment …"
   },
   "trust": {
     "rate": "Rate {name}",

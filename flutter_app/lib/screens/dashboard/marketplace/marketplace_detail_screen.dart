@@ -288,6 +288,9 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 ],
+                const SizedBox(height: 20),
+                // M1: Kommentare / Anfragen.
+                _CommentsSection(listingId: l.id, ownerId: ownerId),
                 const SizedBox(height: 18),
                 Text(
                   'marketplace.postedOn'.tr(namedArgs: {
@@ -739,6 +742,185 @@ class _MapPreview extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// M1: Kommentar-/Anfrage-Bereich unter einem Inserat. Liste + Composer.
+class _CommentsSection extends ConsumerStatefulWidget {
+  const _CommentsSection({required this.listingId, required this.ownerId});
+  final String listingId;
+  final String ownerId;
+
+  @override
+  ConsumerState<_CommentsSection> createState() => _CommentsSectionState();
+}
+
+class _CommentsSectionState extends ConsumerState<_CommentsSection> {
+  final _ctrl = TextEditingController();
+  bool _sending = false;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    if (_sending) return;
+    final text = _ctrl.text.trim();
+    if (text.isEmpty) return;
+    setState(() => _sending = true);
+    final ok = await MarketplaceRepository.addComment(widget.listingId, text);
+    if (!mounted) return;
+    setState(() => _sending = false);
+    if (ok) {
+      _ctrl.clear();
+      ref.invalidate(marketplaceCommentsProvider(widget.listingId));
+    }
+  }
+
+  Future<void> _delete(String id) async {
+    final ok = await MarketplaceRepository.deleteComment(id);
+    if (!mounted) return;
+    if (ok) ref.invalidate(marketplaceCommentsProvider(widget.listingId));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final async = ref.watch(marketplaceCommentsProvider(widget.listingId));
+    final me = SupabaseService.currentUser?.id;
+    final isOwner = me != null && me == widget.ownerId;
+    final comments = async.asData?.value ?? const [];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'marketplace.commentsCount'
+              .tr(namedArgs: {'n': '${comments.length}'}),
+          style: AppTypography.label(size: 10),
+        ),
+        const SizedBox(height: 8),
+        if (async.isLoading)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: AppColors.amber),
+              ),
+            ),
+          )
+        else if (comments.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('marketplace.noComments'.tr(),
+                style: AppTypography.caption()),
+          )
+        else
+          for (final c in comments)
+            _CommentTile(
+              comment: c,
+              canDelete: isOwner || c['user_id'] == me,
+              onDelete: () => _delete(c['id'] as String),
+            ),
+        const SizedBox(height: 8),
+        // Composer
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _ctrl,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                minLines: 1,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: 'marketplace.commentHint'.tr(),
+                  isDense: true,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            IconButton(
+              onPressed: _sending ? null : _send,
+              icon: _sending
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.bronze),
+                    )
+                  : const Icon(LucideIcons.send,
+                      size: 18, color: AppColors.bronze),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _CommentTile extends StatelessWidget {
+  const _CommentTile({
+    required this.comment,
+    required this.canDelete,
+    required this.onDelete,
+  });
+  final Map<String, dynamic> comment;
+  final bool canDelete;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = comment['profiles'] as Map<String, dynamic>?;
+    final name = (profile?['display_name'] ??
+            profile?['name'] ??
+            'common.neighbour'.tr())
+        .toString();
+    final content = (comment['content'] ?? '').toString();
+    final createdRaw = comment['created_at']?.toString();
+    final created = createdRaw != null ? DateTime.tryParse(createdRaw) : null;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.5),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(name,
+                  style: AppTypography.body(
+                      size: 12,
+                      color: AppColors.ink,
+                      weight: FontWeight.w700)),
+              const Spacer(),
+              if (created != null)
+                Text(DateFormat('dd.MM. HH:mm').format(created),
+                    style: AppTypography.caption()),
+              if (canDelete)
+                GestureDetector(
+                  onTap: onDelete,
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Icon(LucideIcons.trash2,
+                        size: 13, color: AppColors.mute),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(content,
+              style: AppTypography.body(
+                  size: 13, color: AppColors.ink, height: 1.4)),
+        ],
       ),
     );
   }

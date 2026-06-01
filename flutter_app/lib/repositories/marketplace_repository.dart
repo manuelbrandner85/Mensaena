@@ -182,7 +182,70 @@ class MarketplaceRepository {
     }
     return null;
   }
+
+  // ── M1: Inserat-Kommentare ──────────────────────────────────────────
+  /// Lädt Kommentare zu einem Inserat (älteste zuerst) inkl. Autor-Profil.
+  static Future<List<Map<String, dynamic>>> listComments(
+      String listingId) async {
+    try {
+      final rows = await sb
+          .from('marketplace_comments')
+          .select(
+              'id, listing_id, user_id, content, created_at, '
+              'profiles(id, name, display_name, avatar_url)')
+          .eq('listing_id', listingId)
+          .filter('deleted_at', 'is', null)
+          .order('created_at', ascending: true)
+          .limit(200);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static Future<bool> addComment(String listingId, String content) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    final text = content.trim();
+    if (text.isEmpty) return false;
+    try {
+      await sb.from('marketplace_comments').insert({
+        'listing_id': listingId,
+        'user_id': uid,
+        'content': text,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Soft-Delete (eigener Kommentar) bzw. Hard-Delete (Inserats-Besitzer
+  /// via RLS). Wir versuchen Soft-Delete; RLS lässt es zu solange erlaubt.
+  static Future<bool> deleteComment(String commentId) async {
+    try {
+      await sb
+          .from('marketplace_comments')
+          .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('id', commentId);
+      return true;
+    } catch (_) {
+      // Fallback: harter Delete (z.B. wenn Besitzer moderiert).
+      try {
+        await sb.from('marketplace_comments').delete().eq('id', commentId);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
 }
+
+/// Family-Provider für die Kommentar-Liste eines Inserats.
+final marketplaceCommentsProvider =
+    FutureProvider.family.autoDispose<List<Map<String, dynamic>>, String>(
+  (ref, listingId) => MarketplaceRepository.listComments(listingId),
+);
 
 final marketplaceListingsProvider =
     FutureProvider.family<List<MarketplaceListing>, String>(

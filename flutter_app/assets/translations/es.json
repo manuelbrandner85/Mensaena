@@ -1257,7 +1257,10 @@
     "useGps": "Usar ubicación actual",
     "saving": "Guardando…",
     "createButton": "Publicar anuncio",
-    "inserted": "{name} añadido"
+    "inserted": "{name} añadido",
+    "commentsCount": "Comentarios ({n})",
+    "noComments": "Aún no hay comentarios. ¡Haz la primera pregunta!",
+    "commentHint": "Haz una pregunta o comenta …"
   },
   "trust": {
     "rate": "Valora a {name}",
