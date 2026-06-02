@@ -392,7 +392,14 @@ class AdminRepository {
     required String status,
   }) async {
     try {
-      await sb.from(table).update({'status': status}).eq('id', id);
+      final patch = <String, dynamic>{'status': status};
+      // Audit-Trail für Meldungen: wer hat wann bearbeitet (vorher fehlte das
+      // → Moderations-Historie unvollständig).
+      if (table == 'reports' && status != 'pending') {
+        patch['reviewed_by'] = SupabaseService.currentUser?.id;
+        patch['reviewed_at'] = DateTime.now().toUtc().toIso8601String();
+      }
+      await sb.from(table).update(patch).eq('id', id);
       unawaited(_logAdminAction(
         'admin_update_status',
         targetId: id,
