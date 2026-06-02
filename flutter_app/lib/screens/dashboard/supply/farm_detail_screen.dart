@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/farm_listing.dart';
 import '../../../repositories/organizations_repository.dart';
+import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/image_carousel.dart';
 
@@ -139,23 +140,25 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
                   _Row(
                     icon: LucideIcons.phone,
                     label: f.phone!,
-                    onTap: () => _safeLaunch(context, 'tel:${f.phone}'),
+                    onTap: () =>
+                        safeLaunch('tel:${f.phone}', context: context),
                   ),
                 if (f.email != null)
                   _Row(
                     icon: LucideIcons.mail,
                     label: f.email!,
-                    onTap: () => _safeLaunch(context, 'mailto:${f.email}'),
+                    onTap: () =>
+                        safeLaunch('mailto:${f.email}', context: context),
                   ),
                 if (f.website != null)
                   _Row(
                     icon: LucideIcons.globe,
                     label: f.website!,
-                    onTap: () => _safeLaunch(
-                      context,
+                    onTap: () => safeLaunch(
                       f.website!,
                       mode: LaunchMode.externalApplication,
                       autoHttps: true,
+                      context: context,
                     ),
                   ),
               ],
@@ -201,36 +204,5 @@ class _Row extends StatelessWidget {
             child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4), child: row),
           );
-  }
-}
-
-/// Robuster Launch für Telefon/E-Mail/Web-Links auf der Farm-Detailseite.
-/// Vorher wurden tel:/mailto:/https: direkt mit launchUrl(Uri.parse(...))
-/// gerufen — fehlerhafte Werte oder fehlender Handler (kein Telefon-App,
-/// kein Mail-Client) ließen den Tap still scheitern.
-Future<void> _safeLaunch(
-  BuildContext context,
-  String raw, {
-  LaunchMode mode = LaunchMode.platformDefault,
-  bool autoHttps = false,
-}) async {
-  final messenger = ScaffoldMessenger.of(context);
-  var url = raw.trim();
-  if (autoHttps && !url.startsWith('http://') && !url.startsWith('https://')) {
-    url = 'https://$url';
-  }
-  final uri = Uri.tryParse(url);
-  var ok = false;
-  if (uri != null) {
-    try {
-      ok = await launchUrl(uri, mode: mode);
-    } catch (_) {
-      ok = false;
-    }
-  }
-  if (!ok) {
-    messenger.showSnackBar(SnackBar(
-      content: Text('common.errorGeneric'.tr()),
-    ));
   }
 }
