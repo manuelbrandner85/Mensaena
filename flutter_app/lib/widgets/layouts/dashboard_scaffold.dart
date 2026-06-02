@@ -332,8 +332,23 @@ class _BottomNav extends ConsumerWidget {
         top: false,
         child: Container(
           height: 64,
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppColors.line)),
+          decoration: BoxDecoration(
+            // Dezenter Vertikal-Verlauf hebt die Bar optisch von der Fläche
+            // ab — bleibt GPU-leicht (kein BackdropFilter, Crash-Historie!).
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [AppColors.elevated, AppColors.surface],
+            ),
+            border: const Border(top: BorderSide(color: AppColors.line)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.28),
+                blurRadius: 16,
+                spreadRadius: -2,
+                offset: const Offset(0, -4),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -413,19 +428,37 @@ class _BottomItem extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         alignment: Alignment.center,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
           padding:
               const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: active
               ? BoxDecoration(
-                  color: AppColors.bronze.withValues(alpha: 0.12),
+                  // Verlaufs-Pille statt Flachton + weicher Bronze-Glow:
+                  // hebt die aktive Sektion filmischer hervor.
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.bronze.withValues(alpha: 0.22),
+                      AppColors.bronze.withValues(alpha: 0.08),
+                    ],
+                  ),
                   border: Border.all(
-                    color: AppColors.bronze.withValues(alpha: 0.35),
+                    color: AppColors.bronze.withValues(alpha: 0.40),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.bronze.withValues(alpha: 0.22),
+                      blurRadius: 12,
+                      spreadRadius: -3,
+                    ),
+                  ],
                 )
-              : null,
+              : const BoxDecoration(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
