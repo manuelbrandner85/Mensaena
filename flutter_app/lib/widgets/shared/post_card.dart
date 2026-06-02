@@ -253,7 +253,7 @@ class _PostCardState extends ConsumerState<PostCard> {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
           color: AppColors.herzrot.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(LucideIcons.flag,
             color: AppColors.herzrot, size: 22),
@@ -263,7 +263,7 @@ class _PostCardState extends ConsumerState<PostCard> {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
           color: AppColors.amber.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Icon(
           _saved ? LucideIcons.bookmarkMinus : LucideIcons.bookmark,
@@ -273,14 +273,37 @@ class _PostCardState extends ConsumerState<PostCard> {
       ),
       child: InkWell(
       onTap: () => context.push('/dashboard/posts/${post.id}'),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withValues(alpha: 0.5),
-          border: Border.all(color: AppColors.line),
-          borderRadius: BorderRadius.circular(14),
+          // Premium-Tiefe: dezenter Verlauf mit feiner Typ-Farb-Tönung oben
+          // statt Flachton + weicher, breiter Schatten. Konsistent mit den
+          // Dashboard-/Modul-Karten.
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              cfg.color.withValues(alpha: 0.06),
+              AppColors.surface.withValues(alpha: 0.55),
+            ],
+          ),
+          border: Border.all(color: cfg.color.withValues(alpha: 0.18)),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.20),
+              blurRadius: 18,
+              spreadRadius: -6,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: cfg.color.withValues(alpha: 0.07),
+              blurRadius: 20,
+              spreadRadius: -12,
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
