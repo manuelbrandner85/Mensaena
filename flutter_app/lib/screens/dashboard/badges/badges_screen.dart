@@ -15,11 +15,38 @@ import '../../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
 /// Badges-Gallery — alle Badges der Plattform, eigene markiert.
-class BadgesScreen extends ConsumerWidget {
+class BadgesScreen extends ConsumerStatefulWidget {
   const BadgesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BadgesScreen> createState() => _BadgesScreenState();
+}
+
+class _BadgesScreenState extends ConsumerState<BadgesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Beim Öffnen alle erreichten Badges nachverleihen (z.B. retroaktiv für
+    // bestehende Aktivität) und die Liste auffrischen, damit neu vergebene
+    // Badges sofort erscheinen.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _awardCheck());
+  }
+
+  Future<void> _awardCheck() async {
+    final newCount = await ChallengesRepository.checkAndAwardBadges();
+    if (!mounted) return;
+    if (newCount > 0) {
+      ref.invalidate(myBadgesProvider);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('badges.newlyEarned'.tr(namedArgs: {'n': '$newCount'}),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final allAsync = ref.watch(allBadgesProvider);
     final mineAsync = ref.watch(myBadgesProvider);
 
@@ -31,6 +58,7 @@ class BadgesScreen extends ConsumerWidget {
           color: AppColors.amber,
           backgroundColor: AppColors.surface,
           onRefresh: () async {
+            await ChallengesRepository.checkAndAwardBadges();
             ref.invalidate(allBadgesProvider);
             ref.invalidate(myBadgesProvider);
             await ref.read(allBadgesProvider.future);

@@ -12,6 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
 import 'providers/locale_provider.dart';
 import 'providers/role_provider.dart';
+import 'repositories/challenges_repository.dart';
 import 'repositories/extra_repositories.dart';
 import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
@@ -204,6 +205,9 @@ Future<void> _initBackgroundServices() async {
   if (SupabaseService.isLoggedIn) {
     unawaited(PushNotificationService.registerToken());
     unawaited(UserRoleCache.reload());
+    // Badge-Engine: verleiht beim Start retroaktiv alle erreichten Badges
+    // (bisher gab es keine allgemeine Vergabe-Logik → Badges blieben leer).
+    unawaited(ChallengesRepository.checkAndAwardBadges());
   }
 
   // Auth-State-Listener: bei Login/Logout Token + Rolle lifecycle managen

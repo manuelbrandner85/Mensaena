@@ -2611,7 +2611,8 @@
   },
   "badges": {
     "shareBtn": "Share achievement",
-    "shareCaption": "I just unlocked the ‹{name}› badge on Mensaena 🏅"
+    "shareCaption": "I just unlocked the ‹{name}› badge on Mensaena 🏅",
+    "newlyEarned": "{n} new badge earned!"
   },
   "streak": {
     "title": "Keep it going",

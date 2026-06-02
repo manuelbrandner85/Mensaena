@@ -2528,5 +2528,8 @@
     "reasonDanger": "Pericoloso / vietato",
     "reasonOther": "Altro",
     "thanks": "Segnalazione inviata. Grazie!"
+  },
+  "badges": {
+    "newlyEarned": "{n} nuovo badge ottenuto!"
   }
 }

@@ -182,6 +182,23 @@ class ChallengesRepository {
       return const [];
     }
   }
+
+  /// Prüft alle berechenbaren Badge-Kriterien server-seitig und verleiht
+  /// erreichte Badges (idempotent) inkl. Karma. Gibt die Anzahl NEU
+  /// vergebener Badges zurück. Vorher waren fast alle Katalog-Badges
+  /// unerreichbar (es gab keine Vergabe-Logik).
+  static Future<int> checkAndAwardBadges() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return 0;
+    try {
+      final res = await sb.rpc<dynamic>('check_and_award_badges');
+      if (res is int) return res;
+      if (res is num) return res.toInt();
+      return int.tryParse('$res') ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
 }
 
 final activeChallengesProvider =

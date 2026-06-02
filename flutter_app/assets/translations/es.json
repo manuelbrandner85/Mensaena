@@ -2528,5 +2528,8 @@
     "reasonDanger": "Peligroso / prohibido",
     "reasonOther": "Otro",
     "thanks": "Denuncia enviada. ¡Gracias!"
+  },
+  "badges": {
+    "newlyEarned": "¡{n} nueva insignia obtenida!"
   }
 }

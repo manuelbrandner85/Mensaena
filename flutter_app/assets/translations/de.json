@@ -2610,7 +2610,8 @@
   },
   "badges": {
     "shareBtn": "Erfolg teilen",
-    "shareCaption": "Ich habe gerade das Badge ‹{name}› auf Mensaena freigeschaltet 🏅"
+    "shareCaption": "Ich habe gerade das Badge ‹{name}› auf Mensaena freigeschaltet 🏅",
+    "newlyEarned": "{n} neues Badge erhalten!"
   },
   "streak": {
     "title": "Dranbleiben",
