@@ -2477,5 +2477,12 @@
     "requestPending": "{name} bekleniyor",
     "sosFrom": "{name} kişisinden SOS",
     "safeFrom": "{name} güvende"
+  },
+  "friends": {
+    "incomingTitle": "Sana gelen istekler",
+    "outgoingTitle": "Gönderdiklerin",
+    "stateRequestedTo": "{name} kişisine istek",
+    "cancelRequest": "Geri çek",
+    "tabAll": "Arkadaşların"
   }
 }

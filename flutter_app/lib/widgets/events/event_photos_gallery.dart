@@ -75,7 +75,8 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
         'image_url': url,
       });
       ref.invalidate(eventPhotosProvider(widget.eventId));
-    } catch (_) {
+    } catch (e) {
+      debugPrint('event photo upload failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('events.photo_upload_failed'.tr())));

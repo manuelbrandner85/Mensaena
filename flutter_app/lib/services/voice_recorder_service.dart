@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -113,7 +114,8 @@ class VoiceRecorderService {
       return sb.storage
           .from('chat-voice-messages')
           .getPublicUrl(remotePath);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('VoiceRecorderService.upload failed: $e');
       return null;
     }
   }

@@ -2477,5 +2477,12 @@
     "requestPending": "Ожидание {name}",
     "sosFrom": "SOS от {name}",
     "safeFrom": "{name} в безопасности"
+  },
+  "friends": {
+    "incomingTitle": "Запросы к тебе",
+    "outgoingTitle": "Отправленные тобой",
+    "stateRequestedTo": "Запрос к {name}",
+    "cancelRequest": "Отозвать",
+    "tabAll": "Твои друзья"
   }
 }

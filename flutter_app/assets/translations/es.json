@@ -2478,5 +2478,12 @@
     "requestPending": "Esperando a {name}",
     "sosFrom": "SOS de {name}",
     "safeFrom": "{name} está a salvo"
+  },
+  "friends": {
+    "incomingTitle": "Solicitudes para ti",
+    "outgoingTitle": "Enviadas por ti",
+    "stateRequestedTo": "Solicitud a {name}",
+    "cancelRequest": "Retirar",
+    "tabAll": "Tus amigos"
   }
 }

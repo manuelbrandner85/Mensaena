@@ -3046,7 +3046,7 @@
   },
   "friends": {
     "screenTitle": "Friends",
-    "tabAll": "All",
+    "tabAll": "Your friends",
     "tabOnline": "Online",
     "tabRequests": "Requests",
     "tabFind": "Find",
@@ -3068,7 +3068,11 @@
     "wantsToConnect": "wants to connect with you",
     "chatTooltip": "Direct message",
     "suggestionsTitle": "People you may know",
-    "fromYourArea": "From your area"
+    "fromYourArea": "From your area",
+    "incomingTitle": "Requests for you",
+    "outgoingTitle": "Sent by you",
+    "stateRequestedTo": "Request to {name}",
+    "cancelRequest": "Withdraw"
   },
   "friend": {
     "request": "Send friend request",

@@ -3045,7 +3045,7 @@
   },
   "friends": {
     "screenTitle": "Freunde",
-    "tabAll": "Alle",
+    "tabAll": "Deine Freunde",
     "tabOnline": "Online",
     "tabRequests": "Anfragen",
     "tabFind": "Finden",
@@ -3067,7 +3067,11 @@
     "wantsToConnect": "möchte sich mit dir verbinden",
     "chatTooltip": "Direkte Nachricht",
     "suggestionsTitle": "Personen die du kennen könntest",
-    "fromYourArea": "Aus deiner Gegend"
+    "fromYourArea": "Aus deiner Gegend",
+    "incomingTitle": "Anfragen an dich",
+    "outgoingTitle": "Von dir gesendet",
+    "stateRequestedTo": "Anfrage an {name}",
+    "cancelRequest": "Zurückziehen"
   },
   "friend": {
     "request": "Freundschaft anfragen",

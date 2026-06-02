@@ -292,6 +292,24 @@ class FriendshipsRepository {
     }
   }
 
+  /// Von mir gesendete, noch offene Anfragen (für "Gesendet"-Liste).
+  static Future<List<Map<String, dynamic>>> outgoing() async {
+    final me = SupabaseService.currentUser?.id;
+    if (me == null) return const [];
+    try {
+      final rows = await sb
+          .from('friendships')
+          .select('addressee_id, created_at, profiles!friendships_addressee_id_fkey(id, display_name, avatar_url)')
+          .eq('requester_id', me)
+          .eq('status', 'pending')
+          .order('created_at', ascending: false)
+          .limit(100);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Bestätigte Freunde.
   static Future<List<Map<String, dynamic>>> friends() async {
     final me = SupabaseService.currentUser?.id;

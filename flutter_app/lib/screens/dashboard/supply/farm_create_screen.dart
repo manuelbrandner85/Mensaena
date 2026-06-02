@@ -161,7 +161,8 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
           );
       final url = sb.storage.from('post-images').getPublicUrl(path);
       setState(() => _mediaUrls.add(url));
-    } catch (_) {
+    } catch (e) {
+      debugPrint('farm photo upload failed: $e');
       _toast('supply.farmCreate.uploadFailed'.tr());
     } finally {
       if (mounted) setState(() => _uploading = false);
