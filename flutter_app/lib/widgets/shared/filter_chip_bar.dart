@@ -84,6 +84,18 @@ class FilterOption<T> {
   final IconData? icon;
 }
 
+/// Sicheres Label-Lookup für aktive Filter. Vorher nutzten mehrere Screens
+/// `options.firstWhere((o) => o.value == v).label` OHNE orElse → StateError
+/// (Crash), sobald der gespeicherte Filterwert nicht (mehr) in der Liste war.
+extension FilterOptionLookup<T> on List<FilterOption<T>> {
+  String labelFor(T value, {String? fallback}) {
+    for (final o in this) {
+      if (o.value == value) return o.label;
+    }
+    return fallback ?? '$value';
+  }
+}
+
 class _Pill extends StatelessWidget {
   const _Pill({
     required this.label,

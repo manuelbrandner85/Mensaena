@@ -102,9 +102,7 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                   chips: [
                     if (_filter != 'all')
                       ActiveFilterChip(
-                        label: _categories
-                            .firstWhere((c) => c.value == _filter)
-                            .label,
+                        label: _categories.labelFor(_filter),
                         onRemove: () => setState(() => _filter = 'all'),
                       ),
                     if (_search.isNotEmpty)

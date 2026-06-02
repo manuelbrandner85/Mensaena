@@ -212,9 +212,7 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
                   chips: [
                     if (_subFilter != null)
                       ActiveFilterChip(
-                        label: widget.subFilters
-                            .firstWhere((o) => o.value == _subFilter)
-                            .label,
+                        label: widget.subFilters.labelFor(_subFilter!),
                         onRemove: () => setState(() => _subFilter = null),
                       ),
                     if (_search.isNotEmpty)

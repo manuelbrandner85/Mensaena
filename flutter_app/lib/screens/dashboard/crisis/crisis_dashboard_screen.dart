@@ -212,16 +212,12 @@ class _CrisisDashboardScreenState
                   chips: [
                     if (_category != null)
                       ActiveFilterChip(
-                        label: _categories
-                            .firstWhere((c) => c.value == _category)
-                            .label,
+                        label: _categories.labelFor(_category!),
                         onRemove: () => setState(() => _category = null),
                       ),
                     if (_urgency != null)
                       ActiveFilterChip(
-                        label: _urgencies
-                            .firstWhere((u) => u.value == _urgency)
-                            .label,
+                        label: _urgencies.labelFor(_urgency!),
                         onRemove: () => setState(() => _urgency = null),
                       ),
                     if (_search.isNotEmpty)

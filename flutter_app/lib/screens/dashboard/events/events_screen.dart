@@ -206,9 +206,7 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   chips: [
                     if (_category != null)
                       ActiveFilterChip(
-                        label: _categories
-                            .firstWhere((c) => c.value == _category)
-                            .label,
+                        label: _categories.labelFor(_category!),
                         onRemove: () => setState(() => _category = null),
                       ),
                     if (_search.isNotEmpty)
