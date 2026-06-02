@@ -383,7 +383,8 @@
       "quietAllowCritical": "Krisen dürfen Quiet-Hours durchbrechen",
       "digestEnable": "Tageszusammenfassung aktivieren",
       "digestHour": "Versand-Uhrzeit"
-    }
+    },
+    "saveFailed": "Konnte nicht gespeichert werden."
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",

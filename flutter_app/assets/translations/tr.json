@@ -368,7 +368,8 @@
       "quietAllowCritical": "Krizler sessiz saatleri aşabilir",
       "digestEnable": "Günlük özeti etkinleştir",
       "digestHour": "Gönderim saati"
-    }
+    },
+    "saveFailed": "Kaydedilemedi."
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",

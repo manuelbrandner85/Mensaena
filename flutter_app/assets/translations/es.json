@@ -368,7 +368,8 @@
       "quietAllowCritical": "Las crisis pueden romper las horas de silencio",
       "digestEnable": "Activar resumen diario",
       "digestHour": "Hora de envío"
-    }
+    },
+    "saveFailed": "No se pudo guardar."
   },
   "chat": {
     "writeMessage": "Escribe un mensaje …",

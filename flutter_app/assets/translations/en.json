@@ -383,7 +383,8 @@
       "quietAllowCritical": "Let crises break through quiet hours",
       "digestEnable": "Enable daily summary",
       "digestHour": "Delivery time"
-    }
+    },
+    "saveFailed": "Could not be saved."
   },
   "chat": {
     "writeMessage": "Write a message …",

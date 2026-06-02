@@ -77,8 +77,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
   Future<void> _patch(Map<String, dynamic> patch) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
-    await ProfilesRepository.update(uid, patch);
-    setState(() => _future = ProfilesRepository.getMine());
+    try {
+      await ProfilesRepository.update(uid, patch);
+    } catch (_) {
+      // Vorher still: schlug das Speichern fehl, blieb der Toggle scheinbar
+      // gesetzt, war aber nicht persistiert. Jetzt Hinweis + Re-Fetch (zeigt
+      // den echten DB-Wert).
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('settings.saveFailed'.tr(),
+              style: AppTypography.body(
+                  size: 13, color: AppColors.herzrotWarm)),
+        ));
+      }
+    }
+    if (mounted) setState(() => _future = ProfilesRepository.getMine());
   }
 
   @override
@@ -691,32 +705,63 @@ class _DangerTabState extends State<_DangerTab> {
     if (uid == null) return;
     setState(() => _exporting = true);
     try {
-      // Parallel fetch core tables
-      final results = await Future.wait<List<dynamic>>([
-        sb.from('profiles').select().eq('id', uid).limit(1),
-        sb.from('posts').select().eq('user_id', uid),
-        sb.from('post_comments').select().eq('user_id', uid),
-        sb.from('messages').select().eq('sender_id', uid),
-        sb.from('interactions').select().or('helper_id.eq.$uid,helped_id.eq.$uid'),
-        sb.from('trust_ratings').select().or('rater_id.eq.$uid,rated_id.eq.$uid'),
-        sb.from('notifications').select().eq('user_id', uid),
-        sb.from('saved_posts').select().eq('user_id', uid),
-        sb.from('badges').select().eq('user_id', uid).limit(0),
+      // Vollständiger, fehler-toleranter Export (GDPR Art. 20). Vorher:
+      // nur 9 Tabellen, badges mit limit(0) (immer leer), und ein einziger
+      // Future.wait → schlug eine Query fehl, brach der ganze Export ab.
+      // Jetzt: pro Tabelle eigener try/catch, fehlende Tabelle = leer.
+      const single = <String, String>{
+        'profiles': 'id',
+        'posts': 'user_id',
+        'post_comments': 'user_id',
+        'board_posts': 'author_id',
+        'messages': 'sender_id',
+        'notifications': 'user_id',
+        'saved_posts': 'user_id',
+        'badges': 'user_id',
+        'karma_log': 'user_id',
+        'event_attendees': 'user_id',
+        'group_members': 'user_id',
+        'marketplace_listings': 'user_id',
+        'community_poll_votes': 'user_id',
+      };
+      // Tabellen mit zwei beteiligten Spalten (beide Richtungen exportieren).
+      const dual = <String, String>{
+        'interactions': 'helper_id,helped_id',
+        'trust_ratings': 'rater_id,rated_id',
+      };
+      final collected = <String, dynamic>{};
+      await Future.wait([
+        for (final e in single.entries)
+          () async {
+            try {
+              collected[e.key] =
+                  await sb.from(e.key).select().eq(e.value, uid).limit(10000);
+            } catch (_) {
+              collected[e.key] = const <dynamic>[];
+            }
+          }(),
+        for (final e in dual.entries)
+          () async {
+            try {
+              final cols = e.value.split(',');
+              collected[e.key] = await sb
+                  .from(e.key)
+                  .select()
+                  .or('${cols[0]}.eq.$uid,${cols[1]}.eq.$uid')
+                  .limit(10000);
+            } catch (_) {
+              collected[e.key] = const <dynamic>[];
+            }
+          }(),
       ]);
+      final profileRows = collected['profiles'] as List? ?? const [];
       final exportData = <String, dynamic>{
         'exported_at': DateTime.now().toUtc().toIso8601String(),
         'user_id': uid,
         'note':
             'Mensaena GDPR Article 20 Export — Right to Data Portability',
-        'profile': results[0].isNotEmpty ? results[0].first : null,
-        'posts': results[1],
-        'comments': results[2],
-        'messages': results[3],
-        'interactions': results[4],
-        'trust_ratings': results[5],
-        'notifications': results[6],
-        'saved_posts': results[7],
-        'badges': results[8],
+        ...collected,
+        'profile': profileRows.isNotEmpty ? profileRows.first : null,
       };
       final json = const JsonEncoder.withIndent('  ').convert(exportData);
       // Write to temp + share
@@ -790,27 +835,14 @@ class _DangerTabState extends State<_DangerTab> {
     setState(() => _deleting = true);
     try {
       // Account-Delete ist irreversibel — JWT muss frisch sein, sonst
-      // schlaegt RPC silent fehl bei abgelaufenem Token.
+      // schlaegt RPC fehl bei abgelaufenem Token.
       await SupabaseService.ensureFreshSession();
-      // Try RPC first (admin_delete_user with self-permission).
-      // Fallback: just sign out + flag profile is_banned (soft-delete).
-      try {
-        await sb.rpc<dynamic>('delete_my_account');
-      } catch (_) {
-        // Fallback if RPC missing: anonymize profile.
-        final uid = SupabaseService.currentUser?.id;
-        if (uid != null) {
-          await sb.from('profiles').update({
-            'name': 'Gelöschter Nutzer',
-            'nickname': null,
-            'bio': null,
-            'avatar_url': null,
-            'phone': null,
-            'is_banned': true,
-            'ban_reason': 'self_deleted_${DateTime.now().toUtc().toIso8601String()}',
-          }).eq('id', uid);
-        }
-      }
+      // ECHTE Löschung via delete_my_account-RPC: löscht auth.users →
+      // CASCADE entfernt Profil + alle Inhalte. KEIN stiller Soft-Delete-
+      // Fallback mehr — der täuschte dem Nutzer eine Löschung vor, während
+      // Posts/Nachrichten erhalten blieben (GDPR-Verstoß). Schlägt die RPC
+      // fehl, wird der Fehler angezeigt und der Account NICHT abgemeldet.
+      await sb.rpc<dynamic>('delete_my_account');
       await sb.auth.signOut();
       if (!mounted) return;
       context.go('/');
