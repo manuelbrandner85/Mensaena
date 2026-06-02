@@ -632,35 +632,43 @@ class _HourRow extends StatelessWidget {
   }
 }
 
-class _RegionTab extends StatelessWidget {
+class _RegionTab extends StatefulWidget {
   const _RegionTab({required this.profile, required this.onPatch});
   final Profile profile;
   final Future<void> Function(Map<String, dynamic>) onPatch;
 
   @override
+  State<_RegionTab> createState() => _RegionTabState();
+}
+
+class _RegionTabState extends State<_RegionTab> {
+  late double _radius = (widget.profile.radiusKm ?? 10).toDouble();
+
+  @override
   Widget build(BuildContext context) {
-    final radius = (profile.radiusKm ?? 10).toDouble();
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         Text('settings.locationLabel'.tr(), style: AppTypography.label(size: 10)),
         const SizedBox(height: 4),
         Text(
-          profile.location ?? 'Nicht gesetzt',
+          widget.profile.location ?? 'Nicht gesetzt',
           style: AppTypography.body(size: 14, color: AppColors.ink),
         ),
         const SizedBox(height: 18),
-        Text('settings.radiusKm'.tr(namedArgs: {'km': radius.toInt().toString()}),
+        Text('settings.radiusKm'.tr(namedArgs: {'km': _radius.toInt().toString()}),
             style: AppTypography.label(size: 10)),
         Slider(
           activeColor: AppColors.amber,
           inactiveColor: AppColors.elevated,
-          value: radius,
+          value: _radius,
           min: 1,
           max: 150,
           divisions: 149,
-          onChanged: (v) {},
-          onChangeEnd: (v) => onPatch({'radius_km': v.toInt()}),
+          // Live-Feedback während des Ziehens (vorher: leeres onChanged →
+          // Regler bewegte sich erst beim Loslassen). Persistiert in onChangeEnd.
+          onChanged: (v) => setState(() => _radius = v),
+          onChangeEnd: (v) => widget.onPatch({'radius_km': v.toInt()}),
         ),
       ],
     );
