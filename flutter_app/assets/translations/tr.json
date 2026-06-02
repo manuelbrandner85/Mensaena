@@ -38,7 +38,8 @@
     "description": "Açıklama",
     "share": "Paylaş",
     "errorGeneric": "Bir şeyler ters gitti.",
-    "failed": "İşlem başarısız."
+    "failed": "İşlem başarısız.",
+    "linkOpenFailed": "Açılamadı."
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",

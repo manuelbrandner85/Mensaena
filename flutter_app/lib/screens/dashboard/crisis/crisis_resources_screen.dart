@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/emergency_numbers_config.dart';
 import '../../../config/theme/app_colors.dart';
@@ -10,6 +9,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/emergency_number.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../services/locale_country_service.dart';
+import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -414,7 +414,7 @@ class _Tile extends StatelessWidget {
   final EmergencyNumber n;
 
   Future<void> _call() async {
-    await launchUrl(Uri.parse('tel:${n.number}'));
+    await safeLaunch('tel:${n.number}');
   }
 
   @override
@@ -528,7 +528,7 @@ class _FallbackTile extends StatelessWidget {
 
   Future<void> _call() async {
     final sanitized = n.number.replaceAll(RegExp(r'[\s\-()]'), '');
-    await launchUrl(Uri.parse('tel:$sanitized'));
+    await safeLaunch('tel:$sanitized');
   }
 
   @override

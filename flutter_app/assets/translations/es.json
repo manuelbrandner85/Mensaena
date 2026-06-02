@@ -38,7 +38,8 @@
     "description": "Descripción",
     "share": "Compartir",
     "errorGeneric": "Algo salió mal.",
-    "failed": "Acción fallida."
+    "failed": "Acción fallida.",
+    "linkOpenFailed": "No se pudo abrir."
   },
   "safe": {
     "critical_nearby_title": "Crisis crítica cerca de ti",

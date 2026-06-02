@@ -185,13 +185,13 @@ class CrisisDetailScreen extends ConsumerWidget {
                     ? null
                     : () async {
                         final text = ctrl.text.trim();
-                        if (text.isEmpty) return;
+                        final uid = SupabaseService.currentUser?.id;
+                        if (text.isEmpty || uid == null) return;
                         setLocal(() => sending = true);
                         try {
                           await sb.from('crisis_updates').insert({
                             'crisis_id': c.id,
-                            'user_id': SupabaseService
-                                .currentUser!.id,
+                            'user_id': uid,
                             'content': text,
                             'severity': severity,
                           });

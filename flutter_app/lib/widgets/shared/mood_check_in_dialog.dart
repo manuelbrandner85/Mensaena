@@ -6,12 +6,12 @@ library;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/mood_repository.dart';
 import '../../services/haptics.dart';
+import '../../utils/safe_launch.dart';
 
 class MoodCheckInDialog extends StatefulWidget {
   const MoodCheckInDialog({super.key});
@@ -200,7 +200,7 @@ class _MoodCheckInDialogState extends State<MoodCheckInDialog> {
           ),
           FilledButton.icon(
             onPressed: () async {
-              await launchUrl(Uri.parse('tel:08001110111'));
+              await safeLaunch('tel:08001110111');
               if (ctx.mounted) Navigator.pop(ctx);
             },
             icon: const Icon(LucideIcons.phone, size: 14),

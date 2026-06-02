@@ -40,7 +40,8 @@
     "description": "Beschreibung",
     "share": "Teilen",
     "errorGeneric": "Etwas ist schiefgelaufen.",
-    "failed": "Aktion fehlgeschlagen."
+    "failed": "Aktion fehlgeschlagen.",
+    "linkOpenFailed": "Konnte nicht geöffnet werden."
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",

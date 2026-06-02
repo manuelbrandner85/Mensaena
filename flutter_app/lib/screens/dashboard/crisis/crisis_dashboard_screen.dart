@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/emergency_numbers_config.dart';
 import '../../../config/theme/app_colors.dart';
@@ -13,6 +12,7 @@ import '../../../repositories/crisis_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/locale_country_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../utils/safe_launch.dart';
 import '../../../widgets/crisis/safe_checkin_button.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -535,7 +535,7 @@ class _SosSheetState extends State<_SosSheet> {
   Future<void> _dial(String number) async {
     Haptics.heavyImpact();
     final sanitized = number.replaceAll(RegExp(r'[\s\-()]'), '');
-    await launchUrl(Uri.parse('tel:$sanitized'));
+    await safeLaunch('tel:$sanitized');
   }
 
   void _openCountryPicker() {
@@ -1520,7 +1520,7 @@ class _SosTopBanner extends StatelessWidget {
           const SizedBox(width: 8),
           // Country-spezifischer Emergency-Call
           InkWell(
-            onTap: () => launchUrl(Uri.parse('tel:$emergency')),
+            onTap: () => safeLaunch('tel:$emergency'),
             borderRadius: BorderRadius.circular(999),
             child: Container(
               width: 52,

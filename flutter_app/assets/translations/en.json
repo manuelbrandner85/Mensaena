@@ -40,7 +40,8 @@
     "description": "Description",
     "share": "Share",
     "errorGeneric": "Something went wrong.",
-    "failed": "Action failed."
+    "failed": "Action failed.",
+    "linkOpenFailed": "Could not be opened."
   },
   "safe": {
     "critical_nearby_title": "Critical crisis near you",
