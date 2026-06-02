@@ -25,10 +25,14 @@ jobs:
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
+        env:
+          # GITHUB_TOKEN hebt den GitHub-API-Lookup von 60/h (anonym) auf
+          # 5000/h → kein 'rate limit exceeded' mehr beim 'latest'-Resolve.
+          # Wir nutzen 'latest' damit die config.toml-Keys (oauth_server,
+          # web3, network_restrictions, s3_protocol …) erkannt werden.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Feste Version pinnen — 'latest' macht einen GitHub-API-Lookup
-          # ohne Token und scheitert sporadisch mit 'rate limit exceeded'.
-          version: 2.20.5
+          version: latest
 
       # ── Resolve + sanitize project ref ──────────────────────────────────
       # User kann die SUPABASE_PROJECT_REF als Variable ODER als Secret
