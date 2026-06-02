@@ -403,10 +403,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> _sendVoice(String url, int durationSeconds) async {
     final encoded = VoiceRecorderService.encodeMessage(
         url: url, durationSeconds: durationSeconds);
-    await MessagesRepository.send(
+    final ok = await MessagesRepository.send(
       conversationId: widget.conversationId,
       content: encoded,
     );
+    if (!mounted) return;
+    if (!ok) {
+      // Vorher ignoriert: bei Fehler verschwand die bereits hochgeladene
+      // Sprachnachricht lautlos. Jetzt Hinweis statt stillem Verlust.
+      unawaited(Haptics.error());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('chat.messageNotSent'.tr())),
+      );
+    }
   }
 
   bool _sending = false;
