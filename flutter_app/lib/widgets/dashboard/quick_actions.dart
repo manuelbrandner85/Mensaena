@@ -52,87 +52,109 @@ class QuickActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 92,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
-        itemBuilder: (context, i) {
-          final it = _items[i];
-          final isSos = it.route == '/dashboard/crisis';
-          final tile = InkWell(
-            onTap: () => context.go(it.route),
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              width: 108,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    it.accent.withValues(alpha: 0.20),
-                    it.accent.withValues(alpha: 0.08),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(
-                  color: it.accent.withValues(alpha: isSos ? 0.7 : 0.45),
-                  width: isSos ? 1.6 : 1,
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: isSos
-                    ? [
-                        BoxShadow(
-                          color: it.accent.withValues(alpha: 0.22),
-                          blurRadius: 10,
-                          spreadRadius: -2,
-                        ),
-                      ]
-                    : null,
+    // Premium-2×2-Grid statt horizontalem Scroll: wirkt intentionaler,
+    // alle 4 Aktionen sofort sichtbar (keine versteckte Scroll-Discovery).
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 2.5,
+      children: [for (final it in _items) _tile(context, it)],
+    );
+  }
+
+  Widget _tile(BuildContext context, ({
+    String i18n,
+    IconData icon,
+    Color accent,
+    String route,
+  }) it) {
+    final isSos = it.route == '/dashboard/crisis';
+    final tile = InkWell(
+      onTap: () => context.go(it.route),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              it.accent.withValues(alpha: 0.18),
+              it.accent.withValues(alpha: 0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+            color: it.accent.withValues(alpha: isSos ? 0.7 : 0.40),
+            width: isSos ? 1.6 : 1,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          // Tiefe für alle Tiles + extra Glow für SOS.
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.16),
+              blurRadius: 14,
+              spreadRadius: -6,
+              offset: const Offset(0, 6),
+            ),
+            if (isSos)
+              BoxShadow(
+                color: it.accent.withValues(alpha: 0.25),
+                blurRadius: 14,
+                spreadRadius: -2,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: it.accent.withValues(alpha: 0.22),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(it.icon, size: 18, color: it.accent),
-                  ),
-                  Text(
-                    it.i18n.tr(),
-                    style: AppTypography.body(
-                      size: 13,
-                      color: AppColors.ink,
-                      weight: FontWeight.w700,
-                    ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: it.accent.withValues(alpha: 0.20),
+                borderRadius: BorderRadius.circular(11),
+                boxShadow: [
+                  BoxShadow(
+                    color: it.accent.withValues(alpha: 0.30),
+                    blurRadius: 12,
+                    spreadRadius: -4,
                   ),
                 ],
               ),
+              child: Icon(it.icon, size: 19, color: it.accent),
             ),
-          );
-          final wrapped = TiltCard(
-            intensity: 0.5,
-            borderRadius: 16,
-            child: tile,
-          );
-          if (isSos) {
-            return Bloom(
-              color: AppColors.herzrot,
-              intensity: 0.55,
-              radius: 22,
-              child: wrapped,
-            );
-          }
-          return wrapped;
-        },
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                it.i18n.tr(),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.body(
+                  size: 13,
+                  color: AppColors.ink,
+                  weight: FontWeight.w700,
+                  height: 1.1,
+                ),
+              ),
+            ),
+            Icon(LucideIcons.chevronRight,
+                size: 14, color: it.accent.withValues(alpha: 0.7)),
+          ],
+        ),
       ),
     );
+    final wrapped = TiltCard(intensity: 0.5, borderRadius: 16, child: tile);
+    if (isSos) {
+      return Bloom(
+        color: AppColors.herzrot,
+        intensity: 0.55,
+        radius: 22,
+        child: wrapped,
+      );
+    }
+    return wrapped;
   }
 }
