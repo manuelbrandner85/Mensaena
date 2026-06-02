@@ -15,6 +15,11 @@ class BoardRepository {
           .from('board_posts')
           .select()
           .eq('status', 'active')
+          // Abgelaufene Posts ausblenden: Pinnwand-Einträge haben oft ein
+          // expires_at (z.B. Veranstaltung in 2 Wochen). Vorher kein Filter →
+          // alte Aushänge blieben sichtbar, bis sie manuell gelöscht wurden.
+          // Posts OHNE expires_at bleiben sichtbar (kein Ablauf gewählt).
+          .or('expires_at.is.null,expires_at.gt.${DateTime.now().toUtc().toIso8601String()}')
           .order('pinned', ascending: false)
           .order('created_at', ascending: false)
           .limit(limit);

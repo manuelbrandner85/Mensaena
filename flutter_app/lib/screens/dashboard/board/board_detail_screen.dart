@@ -9,8 +9,10 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/board_post.dart';
 import '../../../repositories/board_repository.dart';
+import '../../../repositories/content_reports_repository.dart';
 import '../../../services/share_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class BoardDetailScreen extends ConsumerStatefulWidget {
@@ -143,6 +145,15 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                               titleOrText: p.content,
                             ),
                           ),
+                          // Melden — nur bei fremden Pinnwand-Einträgen
+                          // (Betrugs-/Spam-Schutz; bisher fehlte die Aktion).
+                          if (p.authorId != SupabaseService.currentUser?.id)
+                            IconButton(
+                              tooltip: 'marketplace.report'.tr(),
+                              icon: const Icon(LucideIcons.flag,
+                                  size: 16, color: AppColors.mute),
+                              onPressed: () => _reportPost(p.id),
+                            ),
                           IconButton(
                             icon: Icon(
                               LucideIcons.pin,
@@ -180,33 +191,8 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                           height: 1.55,
                         ),
                       ),
-                      if (p.contactInfo != null && p.contactInfo!.isNotEmpty) ...[
-                        const SizedBox(height: 14),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface.withValues(alpha: 0.5),
-                            border: Border.all(color: AppColors.line),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(LucideIcons.phone,
-                                  size: 14, color: AppColors.amber),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  p.contactInfo!,
-                                  style: AppTypography.mono(
-                                    size: 13,
-                                    color: AppColors.amber,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      if (p.contactInfo != null && p.contactInfo!.isNotEmpty)
+                        _ContactRow(info: p.contactInfo!),
                       const SizedBox(height: 14),
                       Text(
                         DateFormat('dd.MM.yyyy HH:mm').format(p.createdAt),
@@ -475,5 +461,118 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
       default:
         return const Color(0xFFFEF08A);
     }
+  }
+
+  /// Meldet einen Pinnwand-Eintrag zur Moderation. Grund-Auswahl per Sheet,
+  /// dann INSERT in reports (content_type='board'). Parität zum Marktplatz.
+  Future<void> _reportPost(String postId) async {
+    const reasons = <String, String>{
+      'fraud': 'report.reasonFraud',
+      'spam': 'report.reasonSpam',
+      'false_info': 'report.reasonFalseInfo',
+      'danger': 'report.reasonDanger',
+      'other': 'report.reasonOther',
+    };
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Text('marketplace.reportTitle'.tr(),
+                  style: AppTypography.display(size: 17, color: AppColors.ink)),
+            ),
+            for (final e in reasons.entries)
+              ListTile(
+                leading: const Icon(LucideIcons.flag,
+                    size: 16, color: AppColors.mute),
+                title: Text(e.value.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink)),
+                onTap: () => Navigator.pop(ctx, e.key),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (reason == null || !mounted) return;
+    final ok = await ContentReportsRepository.report(
+      contentType: 'board',
+      contentId: postId,
+      reason: reason,
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok ? 'report.thanks'.tr() : 'common.errorGeneric'.tr(),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+}
+
+/// Klickbare Kontakt-Zeile: erkennt E-Mail/Telefon im Freitext und öffnet
+/// das passende System-Intent (mailto:/tel:). Vorher reiner Text → User
+/// musste die Nummer/E-Mail abtippen.
+class _ContactRow extends StatelessWidget {
+  const _ContactRow({required this.info});
+  final String info;
+
+  static final _emailRe = RegExp(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}');
+  static final _phoneRe = RegExp(r'(\+?\d[\d\s\-/()]{6,}\d)');
+
+  ({IconData icon, String? launchUrl}) _detect() {
+    final email = _emailRe.firstMatch(info)?.group(0);
+    if (email != null) return (icon: LucideIcons.mail, launchUrl: 'mailto:$email');
+    final phone = _phoneRe.firstMatch(info)?.group(0)?.replaceAll(RegExp(r'[\s\-/()]'), '');
+    if (phone != null && phone.length >= 6) {
+      return (icon: LucideIcons.phone, launchUrl: 'tel:$phone');
+    }
+    return (icon: LucideIcons.phone, launchUrl: null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final d = _detect();
+    final tap = d.launchUrl == null
+        ? null
+        : () => safeLaunch(d.launchUrl!, context: context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: InkWell(
+        onTap: tap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.surface.withValues(alpha: 0.5),
+            border: Border.all(color: AppColors.line),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              Icon(d.icon, size: 14, color: AppColors.amber),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(info,
+                    style: AppTypography.mono(
+                        size: 13, color: AppColors.amber)),
+              ),
+              if (tap != null)
+                const Icon(LucideIcons.externalLink,
+                    size: 12, color: AppColors.mute),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
