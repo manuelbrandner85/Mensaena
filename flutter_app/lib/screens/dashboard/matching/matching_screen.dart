@@ -59,8 +59,8 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
         duration: const Duration(seconds: 3),
         content: Text(
           delta == 1
-              ? '1 neuer Match'
-              : '$delta neue Matches',
+              ? 'matching.newMatchOne'.tr()
+              : 'matching.newMatchMany'.tr(namedArgs: {'n': '$delta'}),
           style: AppTypography.body(size: 13, color: AppColors.ink),
         ),
       ));
@@ -133,12 +133,12 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
                         CircularProgressIndicator(color: AppColors.amber),
                   ),
                 ),
-                error: (_, __) => _empty('Fehler beim Laden.'),
+                error: (_, __) => _empty('matching.loadError'.tr()),
                 data: (matches) {
                   if (matches.isEmpty) {
                     return _empty(filter == 'all'
-                        ? 'Noch keine Matches.'
-                        : 'Keine Matches in dieser Kategorie.');
+                        ? 'matching.noMatchesYet'.tr()
+                        : 'matching.noMatchesInCategory'.tr());
                   }
                   return Column(
                     children: matches
@@ -189,7 +189,7 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
                       weight: FontWeight.w700,
                     )),
                 Text(
-                  'Aktiviere Matching in den Einstellungen, um Vorschläge zu erhalten.',
+                  'matching.enableHint'.tr(),
                   style: AppTypography.caption(),
                 ),
               ],
@@ -282,7 +282,7 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
                     color: AppColors.ink,
                   )),
               Text(
-                'Vorschläge für passende Angebote & Gesuche.',
+                'matching.subtitle'.tr(),
                 style: AppTypography.caption(),
               ),
             ],
@@ -293,9 +293,9 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
               size: 16, color: AppColors.mute),
           onPressed: onRefresh,
         ),
-        _stat('Offen', c.pending, AppColors.amber),
+        _stat('matching.countOpen'.tr(), c.pending, AppColors.amber),
         const SizedBox(width: 6),
-        _stat('Aktiv', c.accepted, AppColors.lebenSoft),
+        _stat('matching.countActive'.tr(), c.accepted, AppColors.lebenSoft),
       ],
     );
   }
@@ -366,10 +366,12 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
         result.success
             ? (accept
                 ? (result.conversationId != null
-                    ? 'Match akzeptiert — Chat eröffnet.'
-                    : 'Du hast zugestimmt. Warte auf Gegenseite.')
-                : 'Match abgelehnt.')
-            : 'Fehler: ${result.error ?? 'unbekannt'}',
+                    ? 'matching.accepted'.tr()
+                    : 'matching.acceptedWaiting'.tr())
+                : 'matching.rejected'.tr())
+            : 'matching.errorPrefix'.tr(namedArgs: {
+                'error': result.error ?? 'matching.errorUnknown'.tr()
+              }),
         style: AppTypography.body(size: 13, color: AppColors.ink),
       ),
     ));
@@ -507,7 +509,7 @@ class _MatchCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           _PostRow(
-            label: theirUser.name ?? 'Anonym',
+            label: theirUser.name ?? 'matching.anonymous'.tr(),
             title: theirPost.title,
             type: theirPost.type,
             color: AppColors.tealSoft,
@@ -731,11 +733,11 @@ class _MatchDetailSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _detailSection('Dein Beitrag', myPost.title, myPost.type,
+          _detailSection('matching.yourPost'.tr(), myPost.title, myPost.type,
               myPost.description, myPost.location, AppColors.amber),
           const SizedBox(height: 12),
           _detailSection(
-            theirUser.name ?? 'Anonym',
+            theirUser.name ?? 'matching.anonymous'.tr(),
             theirPost.title,
             theirPost.type,
             theirPost.description,
@@ -787,7 +789,7 @@ class _MatchDetailSheet extends StatelessWidget {
             )
           else
             Text(
-              'Du hast geantwortet. Warte auf die andere Seite.',
+              'matching.alreadyResponded'.tr(),
               style: AppTypography.caption(),
             ),
         ],
@@ -856,12 +858,16 @@ class _MatchDetailSheet extends StatelessWidget {
   Widget _scoreBreakdown(MatchSummary m) {
     final b = m.scoreBreakdown;
     final rows = <(String, double)>[
-      ('Kategorie', (b['category_match'] as num?)?.toDouble() ?? 0.0),
-      ('Distanz', (b['distance_score'] as num?)?.toDouble() ?? 0.0),
-      ('Vertrauen', (b['trust_score'] as num?)?.toDouble() ?? 0.0),
-      ('Verfügbarkeit',
+      ('matching.scoreCategory'.tr(),
+          (b['category_match'] as num?)?.toDouble() ?? 0.0),
+      ('matching.scoreDistance'.tr(),
+          (b['distance_score'] as num?)?.toDouble() ?? 0.0),
+      ('matching.scoreTrust'.tr(),
+          (b['trust_score'] as num?)?.toDouble() ?? 0.0),
+      ('matching.scoreAvailability'.tr(),
           (b['availability_score'] as num?)?.toDouble() ?? 0.0),
-      ('Aktivität', (b['activity_score'] as num?)?.toDouble() ?? 0.0),
+      ('matching.scoreActivity'.tr(),
+          (b['activity_score'] as num?)?.toDouble() ?? 0.0),
     ];
     return Container(
       padding: const EdgeInsets.all(12),
@@ -998,7 +1004,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                         weight: FontWeight.w600,
                       )),
                   subtitle: Text(
-                    'Wir suchen automatisch nach passenden Beiträgen.',
+                    'matching.autoSearchHint'.tr(),
                     style: AppTypography.caption(),
                   ),
                 ),
@@ -1016,7 +1022,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
                         weight: FontWeight.w600,
                       )),
                   subtitle: Text(
-                    'Push wenn ein neuer Match gefunden wird.',
+                    'matching.pushOnNewMatchHint'.tr(),
                     style: AppTypography.caption(),
                   ),
                 ),
