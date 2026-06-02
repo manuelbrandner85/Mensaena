@@ -26,7 +26,9 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Feste Version pinnen — 'latest' macht einen GitHub-API-Lookup
+          # ohne Token und scheitert sporadisch mit 'rate limit exceeded'.
+          version: 2.20.5
 
       # ── Resolve + sanitize project ref ──────────────────────────────────
       # User kann die SUPABASE_PROJECT_REF als Variable ODER als Secret
