@@ -7,9 +7,10 @@
 //     body: { userId },
 //   })
 
-// Pin auf exakte Version — esm.sh @2-Resolver liefert manchmal HTTP 522
-// während CI-Build (kein Caching, kein Retry). Exakte Version = stabil.
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+// npm:-Spezifizierer statt esm.sh — Deno/Supabase-Edge-Runtime löst das
+// nativ auf. esm.sh lieferte im CI-Build sporadisch HTTP 522 ("failed to
+// create the graph") und blockierte den ganzen Deploy.
+import { createClient } from 'npm:@supabase/supabase-js@2.45.4'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
