@@ -12,6 +12,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/haptics.dart';
+import '../../widgets/effects/tilt_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
 class _ModuleTile {
@@ -195,11 +196,32 @@ class ModulesHubScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             for (final sectionKey in bySection.keys) ...[
+              // Editorial-Header (konsistent mit dem Dashboard): Versal-Label
+              // + auslaufende Bronze-Haarlinie statt schlichtem Grau-Text.
               Padding(
-                padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
-                child: Text(
-                  sectionKey.tr().toUpperCase(),
-                  style: AppTypography.label(size: 10, color: AppColors.mute),
+                padding: const EdgeInsets.fromLTRB(4, 22, 4, 10),
+                child: Row(
+                  children: [
+                    Text(
+                      sectionKey.tr().toUpperCase(),
+                      style: AppTypography.label(
+                          size: 10,
+                          color: AppColors.inkSoft,
+                          letterSpacing: 0.6),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        height: 1,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                            AppColors.bronze.withValues(alpha: 0.28),
+                            Colors.transparent,
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               GridView.builder(
@@ -232,64 +254,83 @@ class _ModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: () {
-        Haptics.tap();
-        context.push(tile.route);
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              tile.tint.withValues(alpha: 0.15),
-              AppColors.surface.withValues(alpha: 0.4),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          border: Border.all(color: tile.tint.withValues(alpha: 0.35)),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.voidColor.withValues(alpha: 0.35),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
+    return TiltCard(
+      intensity: 0.5,
+      borderRadius: 16,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Haptics.tap();
+          context.push(tile.route);
+        },
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                tile.tint.withValues(alpha: 0.16),
+                AppColors.surface.withValues(alpha: 0.45),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: RadialGradient(colors: [
-                  tile.tint.withValues(alpha: 0.4),
-                  tile.tint.withValues(alpha: 0.1),
-                ]),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: tile.tint.withValues(alpha: 0.55)),
+            border: Border.all(color: tile.tint.withValues(alpha: 0.32)),
+            borderRadius: BorderRadius.circular(16),
+            // Premium-Tiefe: weicher, breiter Schatten + dezenter Farb-Glow
+            // statt der harten 2px-Kante zuvor.
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.22),
+                blurRadius: 16,
+                spreadRadius: -6,
+                offset: const Offset(0, 8),
               ),
-              child: Icon(tile.icon, color: tile.tint, size: 22),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              tile.label.tr(),
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.body(
-                  size: 12,
-                  color: AppColors.ink,
-                  weight: FontWeight.w700,
-                  height: 1.2),
-            ),
-          ],
+              BoxShadow(
+                color: tile.tint.withValues(alpha: 0.10),
+                blurRadius: 18,
+                spreadRadius: -10,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(colors: [
+                    tile.tint.withValues(alpha: 0.42),
+                    tile.tint.withValues(alpha: 0.10),
+                  ]),
+                  borderRadius: BorderRadius.circular(13),
+                  border: Border.all(
+                      color: tile.tint.withValues(alpha: 0.55)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: tile.tint.withValues(alpha: 0.28),
+                      blurRadius: 14,
+                      spreadRadius: -4,
+                    ),
+                  ],
+                ),
+                child: Icon(tile.icon, color: tile.tint, size: 22),
+              ),
+              const SizedBox(height: 9),
+              Text(
+                tile.label.tr(),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.body(
+                    size: 12,
+                    color: AppColors.ink,
+                    weight: FontWeight.w700,
+                    height: 1.2),
+              ),
+            ],
+          ),
         ),
       ),
     );
