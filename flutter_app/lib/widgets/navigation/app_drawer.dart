@@ -272,48 +272,94 @@ class _ProfileHeader extends StatelessWidget {
     final location = profile?.location as String?;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 18),
       decoration: const BoxDecoration(
+        // Spotlight von oben-links: bringt filmische Tiefe in den Header,
+        // statt der flachen Fläche. Bleibt GPU-leicht (nur Gradient).
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0x33C79363), // bronze-Tönung oben
+            Color(0x00000000),
+          ],
+        ),
         border: Border(bottom: BorderSide(color: AppColors.line)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (avatarUrl != null)
-            SizedAvatarImage(
-              url: avatarUrl,
-              size: 56,
-              fallbackInitial: displayName,
-            )
-          else
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: AppColors.surface,
-              child: Text(
-                (displayName ?? '?').substring(0, 1).toUpperCase(),
-                style: AppTypography.display(
-                  size: 22,
-                  color: AppColors.amber,
+          // Bronze-Ring um den Avatar — Leit-Akzent als Rahmen.
+          Container(
+            padding: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const SweepGradient(colors: [
+                AppColors.bronze,
+                AppColors.bronzeSoft,
+                AppColors.bronzeDeep,
+                AppColors.bronze,
+              ]),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.bronze.withValues(alpha: 0.30),
+                  blurRadius: 16,
+                  spreadRadius: -2,
                 ),
-              ),
+              ],
             ),
-          const SizedBox(height: 12),
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.deep,
+              ),
+              child: avatarUrl != null
+                  ? SizedAvatarImage(
+                      url: avatarUrl,
+                      size: 56,
+                      fallbackInitial: displayName,
+                    )
+                  : CircleAvatar(
+                      radius: 28,
+                      backgroundColor: AppColors.surface,
+                      child: Text(
+                        (displayName ?? '?').substring(0, 1).toUpperCase(),
+                        style: AppTypography.display(
+                          size: 22,
+                          color: AppColors.amber,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 14),
           Text(
             displayName ?? 'common.neighbour'.tr(),
             style: AppTypography.display(
-              size: 18,
+              size: 19,
               color: AppColors.ink,
             ),
           ),
           if (location != null && location.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                location,
-                style: AppTypography.body(
-                  size: 12,
-                  color: AppColors.mute,
-                ),
+              padding: const EdgeInsets.only(top: 5),
+              child: Row(
+                children: [
+                  Icon(LucideIcons.mapPin,
+                      size: 12, color: AppColors.bronze.withValues(alpha: 0.8)),
+                  const SizedBox(width: 5),
+                  Flexible(
+                    child: Text(
+                      location,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body(
+                        size: 12,
+                        color: AppColors.inkSoft,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
         ],
@@ -529,19 +575,37 @@ class _LinkTile extends ConsumerWidget {
         ? AppColors.herzrot
         : AppColors.bronze;
     final isActive = _active;
+    // Aktiver Akzent folgt der Variante (Crisis = Rot, sonst Bronze-Leitfarbe).
+    final activeAccent =
+        link.variant == _NavVariant.crisis ? AppColors.herzrot : AppColors.bronze;
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
       decoration: isActive
-          ? const BoxDecoration(
+          ? BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              // Sanfte Pille mit Akzent-Tönung + linker Glow-Kante statt
+              // der schlichten 3px-Linie zuvor.
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  activeAccent.withValues(alpha: 0.20),
+                  activeAccent.withValues(alpha: 0.04),
+                ],
+              ),
               border: Border(
-                left: BorderSide(color: AppColors.lineActive, width: 3),
+                left: BorderSide(color: activeAccent, width: 3),
               ),
             )
           : null,
       child: ListTile(
         dense: true,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         leading: Padding(
           padding: const EdgeInsets.only(left: 8),
-          child: Icon(link.icon, size: 18, color: color),
+          child: Icon(link.icon,
+              size: 18, color: isActive ? activeAccent : color),
         ),
         title: Text(
           link.label.tr(),
