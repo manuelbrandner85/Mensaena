@@ -410,28 +410,27 @@ class LivestreamMessagesRepository {
 class LivestreamGiftsRepository {
   const LivestreamGiftsRepository._();
 
-  static Future<bool> send({
+  /// Sendet ein Gift server-seitig: prüft Guthaben, zieht Karma ab und legt
+  /// das Gift atomar an (RPC). Vorher direkter Insert OHNE Karma-Abzug →
+  /// Gifts waren faktisch gratis. Rückgabe: verbleibendes Karma, oder -1 bei
+  /// zu wenig Guthaben (Client zeigt dann 'nicht genug Karma').
+  static Future<int> send({
     required String roomId,
     required String giftType, // applause|star|diamond
   }) async {
     final uid = SupabaseService.currentUser?.id;
-    if (uid == null) return false;
-    final cost = giftType == 'diamond'
-        ? 20
-        : giftType == 'star'
-            ? 5
-            : 1;
+    if (uid == null) return -1;
     try {
-      await sb.from('livestream_gifts').insert({
-        'room_id': roomId,
-        'sender_id': uid,
-        'gift_type': giftType,
-        'karma_cost': cost,
+      final res = await sb.rpc<dynamic>('send_livestream_gift', params: {
+        'p_room_id': roomId,
+        'p_gift_type': giftType,
       });
-      return true;
+      if (res is int) return res;
+      if (res is num) return res.toInt();
+      return int.tryParse('$res') ?? -1;
     } catch (e) {
       debugPrint('[Gifts] $e');
-      return false;
+      return -1;
     }
   }
 

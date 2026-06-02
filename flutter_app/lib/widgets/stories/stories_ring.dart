@@ -47,6 +47,8 @@ class StoriesRing extends ConsumerWidget {
             itemBuilder: (_, i) {
               if (i == 0) return _AddStoryBtn(onUploaded: () => ref.invalidate(activeStoriesProvider));
               final entry = entries[i - 1];
+              // Defensiv: leere Gruppe überspringen statt .first werfen.
+              if (entry.value.isEmpty) return const SizedBox.shrink();
               final firstStory = entry.value.first;
               return _StoryAvatar(
                 story: firstStory,

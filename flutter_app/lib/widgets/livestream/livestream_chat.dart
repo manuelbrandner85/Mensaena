@@ -57,12 +57,20 @@ class _LivestreamChatState extends ConsumerState<LivestreamChat> {
         roomId: widget.roomId, content: emoji, type: 'reaction');
   }
 
+  bool _sendingGift = false;
+
   Future<void> _sendGift(String giftType) async {
+    // Guard gegen schnelle Mehrfach-Taps (vorher konnte man 5 Gifts in
+    // Sekunden senden, jedes mit Karma-Abzug).
+    if (_sendingGift) return;
+    _sendingGift = true;
     Haptics.confirm();
-    final ok =
-        await LivestreamGiftsRepository.send(roomId: widget.roomId, giftType: giftType);
+    // Rückgabe: verbleibendes Karma, oder -1 bei zu wenig Guthaben.
+    final remaining = await LivestreamGiftsRepository.send(
+        roomId: widget.roomId, giftType: giftType);
+    _sendingGift = false;
     if (!mounted) return;
-    if (!ok) {
+    if (remaining < 0) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('livestream.not_enough_karma'.tr())));
     }
