@@ -583,7 +583,16 @@
     "editedTag": "изменено",
     "sharedMedia": "Общие медиа",
     "noSharedMedia": "Изображениями ещё не делились.",
-    "mediaAction": "Медиа"
+    "mediaAction": "Медиа",
+    "loading": "Чат загружается…",
+    "callOnlyDm": "Звонки доступны только в личных чатах",
+    "partnerNotFound": "Собеседник не найден",
+    "callStartFailed": "Не удалось начать звонок",
+    "fallbackTitle": "Чат",
+    "callBtn": "Позвонить",
+    "hangupBtn": "Сбросить",
+    "searchOpen": "Поиск",
+    "searchClose": "Закрыть поиск"
   },
   "languages": {
     "de": "Немецкий",

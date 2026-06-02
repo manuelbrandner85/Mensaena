@@ -584,7 +584,16 @@
     "editedTag": "modifié",
     "sharedMedia": "Médias partagés",
     "noSharedMedia": "Aucune image partagée pour l'instant.",
-    "mediaAction": "Médias"
+    "mediaAction": "Médias",
+    "loading": "Le chat se charge…",
+    "callOnlyDm": "Les appels ne sont possibles que dans les chats privés",
+    "partnerNotFound": "Interlocuteur introuvable",
+    "callStartFailed": "Impossible de démarrer l'appel",
+    "fallbackTitle": "Chat",
+    "callBtn": "Appeler",
+    "hangupBtn": "Raccrocher",
+    "searchOpen": "Rechercher",
+    "searchClose": "Fermer la recherche"
   },
   "languages": {
     "de": "Allemand",

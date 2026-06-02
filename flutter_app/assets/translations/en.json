@@ -624,7 +624,16 @@
     "editedTag": "edited",
     "sharedMedia": "Shared media",
     "noSharedMedia": "No images shared yet.",
-    "mediaAction": "Media"
+    "mediaAction": "Media",
+    "loading": "Chat is loading…",
+    "callOnlyDm": "Calls are only available in private chats",
+    "partnerNotFound": "Conversation partner not found",
+    "callStartFailed": "Call could not be started",
+    "fallbackTitle": "Chat",
+    "callBtn": "Call",
+    "hangupBtn": "Hang up",
+    "searchOpen": "Search",
+    "searchClose": "Close search"
   },
   "languages": {
     "de": "German",

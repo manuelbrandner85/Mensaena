@@ -623,7 +623,16 @@
     "editedTag": "bearbeitet",
     "sharedMedia": "Geteilte Medien",
     "noSharedMedia": "Noch keine Bilder geteilt.",
-    "mediaAction": "Medien"
+    "mediaAction": "Medien",
+    "loading": "Chat lädt noch …",
+    "callOnlyDm": "Anrufe nur in privaten Chats möglich",
+    "partnerNotFound": "Gesprächspartner nicht gefunden",
+    "callStartFailed": "Anruf konnte nicht gestartet werden",
+    "fallbackTitle": "Chat",
+    "callBtn": "Anrufen",
+    "hangupBtn": "Auflegen",
+    "searchOpen": "Suchen",
+    "searchClose": "Suche schließen"
   },
   "languages": {
     "de": "Deutsch",

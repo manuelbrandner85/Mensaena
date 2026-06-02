@@ -583,7 +583,16 @@
     "editedTag": "düzenlendi",
     "sharedMedia": "Paylaşılan medya",
     "noSharedMedia": "Henüz görsel paylaşılmadı.",
-    "mediaAction": "Medya"
+    "mediaAction": "Medya",
+    "loading": "Sohbet yükleniyor…",
+    "callOnlyDm": "Aramalar yalnızca özel sohbetlerde mümkün",
+    "partnerNotFound": "Konuştuğun kişi bulunamadı",
+    "callStartFailed": "Arama başlatılamadı",
+    "fallbackTitle": "Sohbet",
+    "callBtn": "Ara",
+    "hangupBtn": "Kapat",
+    "searchOpen": "Ara",
+    "searchClose": "Aramayı kapat"
   },
   "languages": {
     "de": "Almanca",

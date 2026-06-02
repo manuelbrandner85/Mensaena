@@ -104,15 +104,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Future<void> _startCall({String callType = 'audio'}) async {
     final ctx = _context;
     if (ctx == null) {
-      _showCallError('Chat lädt noch …');
+      _showCallError('chat.loading'.tr());
       return;
     }
     if (ctx.kind != ChatKind.dm) {
-      _showCallError('Anrufe nur in privaten Chats möglich');
+      _showCallError('chat.callOnlyDm'.tr());
       return;
     }
     if (ctx.partnerId == null) {
-      _showCallError('Gesprächspartner nicht gefunden');
+      _showCallError('chat.partnerNotFound'.tr());
       return;
     }
     // Video: kurzes Camera-Preview-Sheet (Permission + Mic-Check).
@@ -129,7 +129,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
     if (!mounted) return;
     if (!result.success || result.callId == null || result.roomName == null) {
-      _showCallError(result.errorReason ?? 'Anruf konnte nicht gestartet werden');
+      _showCallError(result.errorReason ?? 'chat.callStartFailed'.tr());
       return;
     }
     setState(() => _activeCallId = result.callId);
@@ -558,7 +558,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final peerReadAsync =
         ref.watch(peerLastReadProvider(widget.conversationId));
     final titleText = _context == null
-        ? 'Chat'
+        ? 'chat.fallbackTitle'.tr()
         : '${_context!.emoji} ${_context!.title}';
     return DashboardScaffold(
       title: titleText,
@@ -1094,7 +1094,7 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        ctx?.title ?? 'Chat',
+                        ctx?.title ?? 'chat.fallbackTitle'.tr(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.body(
@@ -1135,8 +1135,8 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                         ? LucideIcons.phoneOff
                         : LucideIcons.phone,
                     label: widget.activeCallId != null
-                        ? 'Auflegen'
-                        : 'Anrufen',
+                        ? 'chat.hangupBtn'.tr()
+                        : 'chat.callBtn'.tr(),
                     color: widget.activeCallId != null
                         ? AppColors.herzrot
                         : AppColors.leben,
@@ -1186,7 +1186,9 @@ class _ChatTopBarState extends ConsumerState<_ChatTopBar> {
                   icon: widget.searchOpen
                       ? LucideIcons.x
                       : LucideIcons.search,
-                  label: widget.searchOpen ? 'Suche schließen' : 'Suchen',
+                  label: widget.searchOpen
+                      ? 'chat.searchClose'.tr()
+                      : 'chat.searchOpen'.tr(),
                   color: widget.searchOpen ? accent : AppColors.mute,
                   onTap: () async => widget.onToggleSearch(),
                 ),
