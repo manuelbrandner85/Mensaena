@@ -120,7 +120,17 @@
     "pwStrengthWeak": "débil",
     "pwStrengthMedium": "media",
     "pwStrengthGood": "buena",
-    "pwStrengthStrong": "fuerte"
+    "pwStrengthStrong": "fuerte",
+    "errAlreadyRegistered": "Este correo ya está registrado.",
+    "errEmailNotConfirmed": "Confirma primero tu correo. Revisa tu bandeja.",
+    "errRateLimit": "Demasiados intentos. Espera un momento.",
+    "errWeakPassword": "Contraseña demasiado débil — mínimo 6 caracteres.",
+    "errGeneric": "Algo salió mal. Inténtalo de nuevo.",
+    "infoAccountCreated": "Cuenta creada. Revisa tu correo para confirmar.",
+    "infoResetSent": "Si existe una cuenta con este correo, te enviamos un enlace de restablecimiento. Revisa tu bandeja.",
+    "errResetWeak": "Contraseña demasiado débil — mínimo 8 caracteres, mayúsculas/minúsculas, un número.",
+    "errPwMismatch": "Las contraseñas no coinciden.",
+    "infoPwSaved": "Contraseña guardada. Inicia sesión de nuevo."
   },
   "profile": {
     "myProfile": "Mi perfil",

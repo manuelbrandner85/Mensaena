@@ -120,7 +120,17 @@
     "pwStrengthWeak": "zayıf",
     "pwStrengthMedium": "orta",
     "pwStrengthGood": "iyi",
-    "pwStrengthStrong": "güçlü"
+    "pwStrengthStrong": "güçlü",
+    "errAlreadyRegistered": "Bu e-posta zaten kayıtlı.",
+    "errEmailNotConfirmed": "Önce e-postanı onayla. Gelen kutunu kontrol et.",
+    "errRateLimit": "Çok fazla deneme. Lütfen biraz bekle.",
+    "errWeakPassword": "Parola çok zayıf — en az 6 karakter.",
+    "errGeneric": "Bir şeyler ters gitti. Tekrar dene.",
+    "infoAccountCreated": "Hesap oluşturuldu. Onaylamak için e-postanı kontrol et.",
+    "infoResetSent": "Bu e-postayla bir hesap varsa sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+    "errResetWeak": "Parola çok zayıf — en az 8 karakter, büyük/küçük harf, bir rakam.",
+    "errPwMismatch": "Parolalar eşleşmiyor.",
+    "infoPwSaved": "Parola kaydedildi. Lütfen tekrar giriş yap."
   },
   "profile": {
     "myProfile": "Profilim",

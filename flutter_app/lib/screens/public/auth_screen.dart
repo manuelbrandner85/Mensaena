@@ -260,7 +260,7 @@ class _AuthScreenState extends State<AuthScreen>
             return;
           }
           setState(() => _info =
-              'Konto erstellt. Prüfe deine E-Mails zur Bestätigung.');
+              'auth.infoAccountCreated'.tr());
           break;
         case _AuthMode.forgot:
           // Email-Enumeration-Schutz: gleicher Text egal ob Konto existiert.
@@ -269,17 +269,17 @@ class _AuthScreenState extends State<AuthScreen>
             redirectTo: 'https://www.mensaena.de/auth?mode=reset',
           );
           setState(() => _info =
-              'Falls ein Konto mit dieser E-Mail existiert, haben wir dir einen Reset-Link geschickt. Prüfe dein Postfach.');
+              'auth.infoResetSent'.tr());
           break;
         case _AuthMode.reset:
           // Passwort-Stärke Pflicht.
           if (_pwScore < 3) {
             setState(() => _error =
-                'Passwort zu schwach — mind. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl.');
+                'auth.errResetWeak'.tr());
             return;
           }
           if (_passwordCtrl.text != _passwordConfirmCtrl.text) {
-            setState(() => _error = 'Passwörter stimmen nicht überein.');
+            setState(() => _error = 'auth.errPwMismatch'.tr());
             return;
           }
           await sb.auth.updateUser(
@@ -288,7 +288,7 @@ class _AuthScreenState extends State<AuthScreen>
           await sb.auth.signOut();
           if (!mounted) return;
           setState(() {
-            _info = 'Passwort gespeichert. Bitte neu anmelden.';
+            _info = 'auth.infoPwSaved'.tr();
             _mode = _AuthMode.login;
             _passwordCtrl.clear();
             _passwordConfirmCtrl.clear();
@@ -296,16 +296,35 @@ class _AuthScreenState extends State<AuthScreen>
           break;
       }
     } catch (e) {
-      var msg = e.toString().replaceFirst('AuthApiException: ', '');
-      if (msg.contains('already registered') ||
-          msg.contains('User already')) {
-        msg = 'Diese E-Mail ist bereits registriert.';
-      } else if (msg.contains('Invalid login')) {
-        msg = 'Falsche E-Mail oder Passwort.';
+      final raw = e.toString().replaceFirst('AuthApiException: ', '');
+      final low = raw.toLowerCase();
+      // Lokalisierte, nutzerfreundliche Meldungen statt roher Supabase-Texte
+      // (App ist 7-sprachig). Vorher fehlte u.a. der häufige Fall
+      // 'Email not confirmed' → Nutzer sah englischen Roh-Text.
+      String msg;
+      if (low.contains('already registered') ||
+          low.contains('user already')) {
+        msg = 'auth.errAlreadyRegistered'.tr();
+      } else if (low.contains('email not confirmed') ||
+          low.contains('not confirmed')) {
+        msg = 'auth.errEmailNotConfirmed'.tr();
+      } else if (low.contains('invalid login') ||
+          low.contains('invalid credentials')) {
+        msg = 'auth.wrongCredentials'.tr();
         _failCount += 1;
         if (_failCount >= 5) {
           _lockUntil = DateTime.now().add(const Duration(seconds: 60));
         }
+      } else if (low.contains('rate limit') ||
+          low.contains('too many') ||
+          low.contains('429')) {
+        msg = 'auth.errRateLimit'.tr();
+      } else if (low.contains('password should be') ||
+          low.contains('weak password') ||
+          low.contains('at least 6')) {
+        msg = 'auth.errWeakPassword'.tr();
+      } else {
+        msg = 'auth.errGeneric'.tr();
       }
       setState(() => _error = msg);
     } finally {
@@ -513,7 +532,7 @@ class _AuthScreenState extends State<AuthScreen>
                                     obscure: _obscure,
                                     validator: (v) {
                                       if (v != _passwordCtrl.text) {
-                                        return 'Passwörter stimmen nicht überein.';
+                                        return 'auth.errPwMismatch'.tr();
                                       }
                                       return null;
                                     },

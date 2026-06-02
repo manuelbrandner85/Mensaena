@@ -124,7 +124,17 @@
     "pwStrengthWeak": "schwach",
     "pwStrengthMedium": "mittel",
     "pwStrengthGood": "gut",
-    "pwStrengthStrong": "stark"
+    "pwStrengthStrong": "stark",
+    "errAlreadyRegistered": "Diese E-Mail ist bereits registriert.",
+    "errEmailNotConfirmed": "Bitte bestätige zuerst deine E-Mail. Schau in dein Postfach.",
+    "errRateLimit": "Zu viele Versuche. Bitte warte einen Moment.",
+    "errWeakPassword": "Passwort zu schwach — mindestens 6 Zeichen.",
+    "errGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "infoAccountCreated": "Konto erstellt. Prüfe deine E-Mails zur Bestätigung.",
+    "infoResetSent": "Falls ein Konto mit dieser E-Mail existiert, haben wir dir einen Reset-Link geschickt. Prüfe dein Postfach.",
+    "errResetWeak": "Passwort zu schwach — mind. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl.",
+    "errPwMismatch": "Passwörter stimmen nicht überein.",
+    "infoPwSaved": "Passwort gespeichert. Bitte neu anmelden."
   },
   "profile": {
     "myProfile": "Mein Profil",

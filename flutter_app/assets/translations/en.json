@@ -124,7 +124,17 @@
     "pwStrengthWeak": "weak",
     "pwStrengthMedium": "medium",
     "pwStrengthGood": "good",
-    "pwStrengthStrong": "strong"
+    "pwStrengthStrong": "strong",
+    "errAlreadyRegistered": "This email is already registered.",
+    "errEmailNotConfirmed": "Please confirm your email first. Check your inbox.",
+    "errRateLimit": "Too many attempts. Please wait a moment.",
+    "errWeakPassword": "Password too weak — at least 6 characters.",
+    "errGeneric": "Something went wrong. Please try again.",
+    "infoAccountCreated": "Account created. Check your email to confirm.",
+    "infoResetSent": "If an account with this email exists, we’ve sent you a reset link. Check your inbox.",
+    "errResetWeak": "Password too weak — at least 8 characters, upper/lowercase, a number.",
+    "errPwMismatch": "Passwords don’t match.",
+    "infoPwSaved": "Password saved. Please sign in again."
   },
   "profile": {
     "myProfile": "My Profile",

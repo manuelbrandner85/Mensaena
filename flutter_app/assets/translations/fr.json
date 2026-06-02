@@ -120,7 +120,17 @@
     "pwStrengthWeak": "faible",
     "pwStrengthMedium": "moyen",
     "pwStrengthGood": "bon",
-    "pwStrengthStrong": "fort"
+    "pwStrengthStrong": "fort",
+    "errAlreadyRegistered": "Cet e-mail est déjà enregistré.",
+    "errEmailNotConfirmed": "Confirme d’abord ton e-mail. Vérifie ta boîte.",
+    "errRateLimit": "Trop de tentatives. Patiente un instant.",
+    "errWeakPassword": "Mot de passe trop faible — au moins 6 caractères.",
+    "errGeneric": "Une erreur est survenue. Réessaie.",
+    "infoAccountCreated": "Compte créé. Vérifie tes e-mails pour confirmer.",
+    "infoResetSent": "Si un compte avec cet e-mail existe, nous t’avons envoyé un lien de réinitialisation. Vérifie ta boîte.",
+    "errResetWeak": "Mot de passe trop faible — au moins 8 caractères, majuscules/minuscules, un chiffre.",
+    "errPwMismatch": "Les mots de passe ne correspondent pas.",
+    "infoPwSaved": "Mot de passe enregistré. Reconnecte-toi."
   },
   "profile": {
     "myProfile": "Mon profil",
