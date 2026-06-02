@@ -131,7 +131,57 @@
     "infoResetSent": "Se esiste un account con questa email, ti abbiamo inviato un link di reset. Controlla la posta.",
     "errResetWeak": "Password troppo debole — almeno 8 caratteri, maiuscole/minuscole, un numero.",
     "errPwMismatch": "Le password non coincidono.",
-    "infoPwSaved": "Password salvata. Accedi di nuovo."
+    "infoPwSaved": "Password salvata. Accedi di nuovo.",
+    "heading": {
+      "login": "Bentornato ",
+      "register": "Unisciti al ",
+      "forgot": "Password ",
+      "reset": "Nuova "
+    },
+    "headingAccent": {
+      "login": "!",
+      "register": "vicinato.",
+      "forgot": "dimenticata?",
+      "reset": "password."
+    },
+    "subtitle": {
+      "login": "Bello rivederti. Accedi per vedere il tuo vicinato.",
+      "register": "Iscriviti — niente pubblicità, solo vicini veri.",
+      "forgot": "Ti invieremo un link di reimpostazione via email. Cliccalo per impostare una nuova password.",
+      "reset": "Scegli una password forte. Dopo verrai disconnesso e dovrai accedere di nuovo."
+    },
+    "submit": {
+      "login": "Accedi",
+      "register": "Crea account",
+      "forgot": "Invia link di reimpostazione",
+      "reset": "Salva password"
+    },
+    "fieldName": "NOME",
+    "fieldEmail": "EMAIL",
+    "fieldPassword": "PASSWORD",
+    "fieldConfirmPassword": "CONFERMA PASSWORD",
+    "nameHint": "Come ti chiamano i vicini?",
+    "emailHint": "vicino@esempio.it",
+    "passwordHintRegister": "Almeno 8 caratteri",
+    "confirmPasswordHint": "Ripeti la nuova password",
+    "forgotShort": "Dimenticata?",
+    "lockedSeconds": "BLOCCATO — {n}s",
+    "backToHome": "Alla home",
+    "terms": {
+      "prefix": "Accetto i ",
+      "tos": "termini di servizio",
+      "and": " e l'",
+      "privacy": "informativa sulla privacy",
+      "suffix": "."
+    },
+    "toggle": {
+      "noAccountQ": "Non hai un account? ",
+      "registerNow": "Registrati ora",
+      "alreadyRegisteredQ": "Già registrato? ",
+      "signIn": "Accedi",
+      "pwRememberedQ": "Ricordi la password? ",
+      "backToLogin": "Torna al login"
+    }
   },
   "profile": {
     "myProfile": "Il mio profilo",

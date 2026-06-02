@@ -131,7 +131,57 @@
     "infoResetSent": "Si existe una cuenta con este correo, te enviamos un enlace de restablecimiento. Revisa tu bandeja.",
     "errResetWeak": "Contraseña demasiado débil — mínimo 8 caracteres, mayúsculas/minúsculas, un número.",
     "errPwMismatch": "Las contraseñas no coinciden.",
-    "infoPwSaved": "Contraseña guardada. Inicia sesión de nuevo."
+    "infoPwSaved": "Contraseña guardada. Inicia sesión de nuevo.",
+    "heading": {
+      "login": "Bienvenido de ",
+      "register": "Únete al ",
+      "forgot": "Contraseña ",
+      "reset": "Nueva "
+    },
+    "headingAccent": {
+      "login": "vuelta.",
+      "register": "vecindario.",
+      "forgot": "olvidada?",
+      "reset": "contraseña."
+    },
+    "subtitle": {
+      "login": "Qué bien que vuelvas. Inicia sesión para ver tu vecindario.",
+      "register": "Apúntate — te ayudamos con vecinos reales, no con anuncios.",
+      "forgot": "Te enviaremos un enlace de restablecimiento por email. Haz clic para establecer una nueva contraseña.",
+      "reset": "Elige una contraseña fuerte. Después cerraremos tu sesión y deberás iniciar sesión de nuevo."
+    },
+    "submit": {
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "forgot": "Enviar enlace de restablecimiento",
+      "reset": "Guardar contraseña"
+    },
+    "fieldName": "NOMBRE",
+    "fieldEmail": "EMAIL",
+    "fieldPassword": "CONTRASEÑA",
+    "fieldConfirmPassword": "CONFIRMAR CONTRASEÑA",
+    "nameHint": "¿Cómo deben llamarte los vecinos?",
+    "emailHint": "vecino@ejemplo.es",
+    "passwordHintRegister": "Al menos 8 caracteres",
+    "confirmPasswordHint": "Repite la nueva contraseña",
+    "forgotShort": "¿Olvidada?",
+    "lockedSeconds": "BLOQUEADO — {n}s",
+    "backToHome": "A la página de inicio",
+    "terms": {
+      "prefix": "Acepto los ",
+      "tos": "términos de servicio",
+      "and": " y la ",
+      "privacy": "política de privacidad",
+      "suffix": "."
+    },
+    "toggle": {
+      "noAccountQ": "¿Aún no tienes cuenta? ",
+      "registerNow": "Regístrate",
+      "alreadyRegisteredQ": "¿Ya estás registrado? ",
+      "signIn": "Iniciar sesión",
+      "pwRememberedQ": "¿Recordaste la contraseña? ",
+      "backToLogin": "Volver al login"
+    }
   },
   "profile": {
     "myProfile": "Mi perfil",

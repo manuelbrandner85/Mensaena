@@ -131,7 +131,57 @@
     "infoResetSent": "Bu e-postayla bir hesap varsa sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
     "errResetWeak": "Parola çok zayıf — en az 8 karakter, büyük/küçük harf, bir rakam.",
     "errPwMismatch": "Parolalar eşleşmiyor.",
-    "infoPwSaved": "Parola kaydedildi. Lütfen tekrar giriş yap."
+    "infoPwSaved": "Parola kaydedildi. Lütfen tekrar giriş yap.",
+    "heading": {
+      "login": "Tekrar ",
+      "register": "Mahalleye ",
+      "forgot": "Parolanı ",
+      "reset": "Yeni "
+    },
+    "headingAccent": {
+      "login": "hoş geldin.",
+      "register": "katıl.",
+      "forgot": "mı unuttun?",
+      "reset": "parola."
+    },
+    "subtitle": {
+      "login": "Dönmene sevindik. Mahalleni görmek için giriş yap.",
+      "register": "Kaydol — sana reklamla değil, gerçek komşularla yardım ediyoruz.",
+      "forgot": "Sana e-posta ile bir sıfırlama bağlantısı göndereceğiz. Yeni parola belirlemek için bağlantıya tıkla.",
+      "reset": "Güçlü bir yeni parola seç. Sonra çıkış yapılacak ve yeniden giriş yapman gerekecek."
+    },
+    "submit": {
+      "login": "Giriş yap",
+      "register": "Hesap oluştur",
+      "forgot": "Sıfırlama bağlantısı gönder",
+      "reset": "Parolayı kaydet"
+    },
+    "fieldName": "AD",
+    "fieldEmail": "E-POSTA",
+    "fieldPassword": "PAROLA",
+    "fieldConfirmPassword": "PAROLAYI ONAYLA",
+    "nameHint": "Komşular sana nasıl seslensin?",
+    "emailHint": "komsu@ornek.com",
+    "passwordHintRegister": "En az 8 karakter",
+    "confirmPasswordHint": "Yeni parolayı tekrar yaz",
+    "forgotShort": "Unuttun mu?",
+    "lockedSeconds": "KİLİTLİ — {n}s",
+    "backToHome": "Ana sayfaya",
+    "terms": {
+      "prefix": "",
+      "tos": "Kullanım Koşulları",
+      "and": " ve ",
+      "privacy": "Gizlilik Politikası",
+      "suffix": "'nı kabul ediyorum."
+    },
+    "toggle": {
+      "noAccountQ": "Hesabın yok mu? ",
+      "registerNow": "Şimdi kaydol",
+      "alreadyRegisteredQ": "Zaten kayıtlı mısın? ",
+      "signIn": "Giriş yap",
+      "pwRememberedQ": "Parolan aklına geldi mi? ",
+      "backToLogin": "Girişe dön"
+    }
   },
   "profile": {
     "myProfile": "Profilim",

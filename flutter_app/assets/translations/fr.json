@@ -131,7 +131,57 @@
     "infoResetSent": "Si un compte avec cet e-mail existe, nous t’avons envoyé un lien de réinitialisation. Vérifie ta boîte.",
     "errResetWeak": "Mot de passe trop faible — au moins 8 caractères, majuscules/minuscules, un chiffre.",
     "errPwMismatch": "Les mots de passe ne correspondent pas.",
-    "infoPwSaved": "Mot de passe enregistré. Reconnecte-toi."
+    "infoPwSaved": "Mot de passe enregistré. Reconnecte-toi.",
+    "heading": {
+      "login": "Bon ",
+      "register": "Rejoins le ",
+      "forgot": "Mot de passe ",
+      "reset": "Nouveau "
+    },
+    "headingAccent": {
+      "login": "retour.",
+      "register": "voisinage.",
+      "forgot": "oublié ?",
+      "reset": "mot de passe."
+    },
+    "subtitle": {
+      "login": "Content de te revoir. Connecte-toi pour voir ton voisinage.",
+      "register": "Inscris-toi — on t'aide avec de vrais voisins, pas avec de la pub.",
+      "forgot": "Nous t'envoyons un lien de réinitialisation par e-mail. Clique dessus pour définir un nouveau mot de passe.",
+      "reset": "Choisis un nouveau mot de passe solide. Tu seras ensuite déconnecté et devras te reconnecter."
+    },
+    "submit": {
+      "login": "Se connecter",
+      "register": "Créer un compte",
+      "forgot": "Envoyer le lien de réinitialisation",
+      "reset": "Enregistrer le mot de passe"
+    },
+    "fieldName": "NOM",
+    "fieldEmail": "E-MAIL",
+    "fieldPassword": "MOT DE PASSE",
+    "fieldConfirmPassword": "CONFIRMER LE MOT DE PASSE",
+    "nameHint": "Comment les voisins doivent-ils t'appeler ?",
+    "emailHint": "voisin@exemple.fr",
+    "passwordHintRegister": "Au moins 8 caractères",
+    "confirmPasswordHint": "Répète le nouveau mot de passe",
+    "forgotShort": "Oublié ?",
+    "lockedSeconds": "VERROUILLÉ — {n}s",
+    "backToHome": "À l'accueil",
+    "terms": {
+      "prefix": "J'accepte les ",
+      "tos": "conditions d'utilisation",
+      "and": " et la ",
+      "privacy": "politique de confidentialité",
+      "suffix": "."
+    },
+    "toggle": {
+      "noAccountQ": "Pas encore de compte ? ",
+      "registerNow": "S'inscrire maintenant",
+      "alreadyRegisteredQ": "Déjà inscrit ? ",
+      "signIn": "Se connecter",
+      "pwRememberedQ": "Tu te souviens du mot de passe ? ",
+      "backToLogin": "Retour à la connexion"
+    }
   },
   "profile": {
     "myProfile": "Mon profil",

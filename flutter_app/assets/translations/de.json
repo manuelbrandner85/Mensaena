@@ -135,7 +135,57 @@
     "infoResetSent": "Falls ein Konto mit dieser E-Mail existiert, haben wir dir einen Reset-Link geschickt. Prüfe dein Postfach.",
     "errResetWeak": "Passwort zu schwach — mind. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl.",
     "errPwMismatch": "Passwörter stimmen nicht überein.",
-    "infoPwSaved": "Passwort gespeichert. Bitte neu anmelden."
+    "infoPwSaved": "Passwort gespeichert. Bitte neu anmelden.",
+    "heading": {
+      "login": "Willkommen ",
+      "register": "Werde Teil der ",
+      "forgot": "Passwort ",
+      "reset": "Neues "
+    },
+    "headingAccent": {
+      "login": "zurück.",
+      "register": "Nachbarschaft.",
+      "forgot": "vergessen?",
+      "reset": "Passwort."
+    },
+    "subtitle": {
+      "login": "Schön, dass du wieder da bist. Melde dich an, um deine Nachbarschaft zu sehen.",
+      "register": "Trag dich ein — wir helfen dir nicht mit Werbung, sondern mit echten Nachbarn.",
+      "forgot": "Wir senden dir einen Reset-Link per E-Mail. Klicke ihn, um ein neues Passwort zu setzen.",
+      "reset": "Wähle ein starkes neues Passwort. Du wirst danach automatisch abgemeldet und musst dich neu anmelden."
+    },
+    "submit": {
+      "login": "Anmelden",
+      "register": "Konto erstellen",
+      "forgot": "Reset-Link senden",
+      "reset": "Passwort speichern"
+    },
+    "fieldName": "NAME",
+    "fieldEmail": "E-MAIL",
+    "fieldPassword": "PASSWORT",
+    "fieldConfirmPassword": "PASSWORT BESTÄTIGEN",
+    "nameHint": "Wie sollen dich Nachbarn nennen?",
+    "emailHint": "nachbarin@beispiel.at",
+    "passwordHintRegister": "Mindestens 8 Zeichen",
+    "confirmPasswordHint": "Neues Passwort wiederholen",
+    "forgotShort": "Vergessen?",
+    "lockedSeconds": "GESPERRT — {n}s",
+    "backToHome": "Zur Startseite",
+    "terms": {
+      "prefix": "Ich stimme den ",
+      "tos": "Nutzungsbedingungen",
+      "and": " und der ",
+      "privacy": "Datenschutzerklärung",
+      "suffix": " zu."
+    },
+    "toggle": {
+      "noAccountQ": "Noch kein Konto? ",
+      "registerNow": "Jetzt registrieren",
+      "alreadyRegisteredQ": "Bereits registriert? ",
+      "signIn": "Anmelden",
+      "pwRememberedQ": "Passwort wieder eingefallen? ",
+      "backToLogin": "Zurück zum Login"
+    }
   },
   "profile": {
     "myProfile": "Mein Profil",

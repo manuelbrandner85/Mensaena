@@ -135,7 +135,57 @@
     "infoResetSent": "If an account with this email exists, we’ve sent you a reset link. Check your inbox.",
     "errResetWeak": "Password too weak — at least 8 characters, upper/lowercase, a number.",
     "errPwMismatch": "Passwords don’t match.",
-    "infoPwSaved": "Password saved. Please sign in again."
+    "infoPwSaved": "Password saved. Please sign in again.",
+    "heading": {
+      "login": "Welcome ",
+      "register": "Join the ",
+      "forgot": "Password ",
+      "reset": "New "
+    },
+    "headingAccent": {
+      "login": "back.",
+      "register": "neighbourhood.",
+      "forgot": "forgotten?",
+      "reset": "password."
+    },
+    "subtitle": {
+      "login": "Glad you're back. Sign in to see your neighbourhood.",
+      "register": "Sign up — we help you with real neighbours, not ads.",
+      "forgot": "We'll email you a reset link. Click it to set a new password.",
+      "reset": "Choose a strong new password. You'll be signed out afterwards and need to sign in again."
+    },
+    "submit": {
+      "login": "Sign in",
+      "register": "Create account",
+      "forgot": "Send reset link",
+      "reset": "Save password"
+    },
+    "fieldName": "NAME",
+    "fieldEmail": "EMAIL",
+    "fieldPassword": "PASSWORD",
+    "fieldConfirmPassword": "CONFIRM PASSWORD",
+    "nameHint": "What should neighbours call you?",
+    "emailHint": "neighbour@example.com",
+    "passwordHintRegister": "At least 8 characters",
+    "confirmPasswordHint": "Repeat new password",
+    "forgotShort": "Forgot?",
+    "lockedSeconds": "LOCKED — {n}s",
+    "backToHome": "Back to home",
+    "terms": {
+      "prefix": "I agree to the ",
+      "tos": "terms of service",
+      "and": " and the ",
+      "privacy": "privacy policy",
+      "suffix": "."
+    },
+    "toggle": {
+      "noAccountQ": "No account yet? ",
+      "registerNow": "Sign up now",
+      "alreadyRegisteredQ": "Already registered? ",
+      "signIn": "Sign in",
+      "pwRememberedQ": "Remembered your password? ",
+      "backToLogin": "Back to login"
+    }
   },
   "profile": {
     "myProfile": "My Profile",

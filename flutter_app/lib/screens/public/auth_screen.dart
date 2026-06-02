@@ -173,35 +173,31 @@ class _AuthScreenState extends State<AuthScreen>
       };
 
   String _heading() => switch (_mode) {
-        _AuthMode.login => 'Willkommen ',
-        _AuthMode.register => 'Werde Teil der ',
-        _AuthMode.forgot => 'Passwort ',
-        _AuthMode.reset => 'Neues ',
+        _AuthMode.login => 'auth.heading.login'.tr(),
+        _AuthMode.register => 'auth.heading.register'.tr(),
+        _AuthMode.forgot => 'auth.heading.forgot'.tr(),
+        _AuthMode.reset => 'auth.heading.reset'.tr(),
       };
 
   String _headingAccent() => switch (_mode) {
-        _AuthMode.login => 'zurück.',
-        _AuthMode.register => 'Nachbarschaft.',
-        _AuthMode.forgot => 'vergessen?',
-        _AuthMode.reset => 'Passwort.',
+        _AuthMode.login => 'auth.headingAccent.login'.tr(),
+        _AuthMode.register => 'auth.headingAccent.register'.tr(),
+        _AuthMode.forgot => 'auth.headingAccent.forgot'.tr(),
+        _AuthMode.reset => 'auth.headingAccent.reset'.tr(),
       };
 
   String _subtitle() => switch (_mode) {
-        _AuthMode.login =>
-          'Schön, dass du wieder da bist. Melde dich an, um deine Nachbarschaft zu sehen.',
-        _AuthMode.register =>
-          'Trag dich ein — wir helfen dir nicht mit Werbung, sondern mit echten Nachbarn.',
-        _AuthMode.forgot =>
-          'Wir senden dir einen Reset-Link per E-Mail. Klicke ihn, um ein neues Passwort zu setzen.',
-        _AuthMode.reset =>
-          'Wähle ein starkes neues Passwort. Du wirst danach automatisch abgemeldet und musst dich neu anmelden.',
+        _AuthMode.login => 'auth.subtitle.login'.tr(),
+        _AuthMode.register => 'auth.subtitle.register'.tr(),
+        _AuthMode.forgot => 'auth.subtitle.forgot'.tr(),
+        _AuthMode.reset => 'auth.subtitle.reset'.tr(),
       };
 
   String _submitLabel() => switch (_mode) {
-        _AuthMode.login => 'Anmelden',
-        _AuthMode.register => 'Konto erstellen',
-        _AuthMode.forgot => 'Reset-Link senden',
-        _AuthMode.reset => 'Passwort speichern',
+        _AuthMode.login => 'auth.submit.login'.tr(),
+        _AuthMode.register => 'auth.submit.register'.tr(),
+        _AuthMode.forgot => 'auth.submit.forgot'.tr(),
+        _AuthMode.reset => 'auth.submit.reset'.tr(),
       };
 
   // ── Actions ────────────────────────────────────────────────
@@ -444,10 +440,10 @@ class _AuthScreenState extends State<AuthScreen>
 
                               // Name (register only)
                               if (isRegister) ...[
-                                const _FieldLabel('NAME'),
+                                _FieldLabel('auth.fieldName'.tr()),
                                 _CinemaTextField(
                                   controller: _nameCtrl,
-                                  hint: 'Wie sollen dich Nachbarn nennen?',
+                                  hint: 'auth.nameHint'.tr(),
                                   icon: LucideIcons.user,
                                   validator: _validateName,
                                 ),
@@ -456,10 +452,10 @@ class _AuthScreenState extends State<AuthScreen>
 
                               // E-Mail (hidden in reset-mode, session already set)
                               if (!isReset) ...[
-                              const _FieldLabel('E-MAIL'),
+                              _FieldLabel('auth.fieldEmail'.tr()),
                               _CinemaTextField(
                                 controller: _emailCtrl,
-                                hint: 'nachbarin@beispiel.at',
+                                hint: 'auth.emailHint'.tr(),
                                 icon: LucideIcons.mail,
                                 keyboardType:
                                     TextInputType.emailAddress,
@@ -474,7 +470,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const _FieldLabel('PASSWORT'),
+                                    _FieldLabel('auth.fieldPassword'.tr()),
                                     if (_mode == _AuthMode.login)
                                       GestureDetector(
                                         onTap: () => setState(() {
@@ -483,7 +479,7 @@ class _AuthScreenState extends State<AuthScreen>
                                           _info = null;
                                         }),
                                         child: Text(
-                                          'Vergessen?',
+                                          'auth.forgotShort'.tr(),
                                           style: AppTypography.body(
                                             size: 11,
                                             color: AppColors.bronze,
@@ -496,7 +492,7 @@ class _AuthScreenState extends State<AuthScreen>
                                 _CinemaTextField(
                                   controller: _passwordCtrl,
                                   hint: isRegister
-                                      ? 'Mindestens 8 Zeichen'
+                                      ? 'auth.passwordHintRegister'.tr()
                                       : '••••••••',
                                   icon: LucideIcons.lock,
                                   obscure: _obscure,
@@ -524,10 +520,10 @@ class _AuthScreenState extends State<AuthScreen>
                                 // Confirm-Field nur fuer Reset-Mode
                                 if (isReset) ...[
                                   const SizedBox(height: 16),
-                                  const _FieldLabel('PASSWORT BESTÄTIGEN'),
+                                  _FieldLabel('auth.fieldConfirmPassword'.tr()),
                                   _CinemaTextField(
                                     controller: _passwordConfirmCtrl,
-                                    hint: 'Neues Passwort wiederholen',
+                                    hint: 'auth.confirmPasswordHint'.tr(),
                                     icon: LucideIcons.lock,
                                     obscure: _obscure,
                                     validator: (v) {
@@ -555,7 +551,8 @@ class _AuthScreenState extends State<AuthScreen>
                                 const SizedBox(height: 12),
                                 Center(
                                   child: Text(
-                                    'GESPERRT — ${lockSeconds}s',
+                                    'auth.lockedSeconds'.tr(
+                                        namedArgs: {'n': '$lockSeconds'}),
                                     style: AppTypography.mono(
                                       size: 10,
                                       color: AppColors.herzrotWarm,
@@ -595,7 +592,7 @@ class _AuthScreenState extends State<AuthScreen>
                         child: TextButton(
                           onPressed: () => context.go('/'),
                           child: Text(
-                            'Zur Startseite',
+                            'auth.backToHome'.tr(),
                             style: AppTypography.label(
                               size: 10,
                               color: AppColors.mute,
@@ -1032,22 +1029,22 @@ class _AgreementCheckbox extends StatelessWidget {
                     color: AppColors.mute,
                     height: 1.5,
                   ),
-                  children: const [
-                    TextSpan(text: 'Ich stimme den '),
+                  children: [
+                    TextSpan(text: 'auth.terms.prefix'.tr()),
                     TextSpan(
-                      text: 'Nutzungsbedingungen',
-                      style: TextStyle(
+                      text: 'auth.terms.tos'.tr(),
+                      style: const TextStyle(
                           color: AppColors.bronze,
                           fontWeight: FontWeight.w600),
                     ),
-                    TextSpan(text: ' und der '),
+                    TextSpan(text: 'auth.terms.and'.tr()),
                     TextSpan(
-                      text: 'Datenschutzerklärung',
-                      style: TextStyle(
+                      text: 'auth.terms.privacy'.tr(),
+                      style: const TextStyle(
                           color: AppColors.bronze,
                           fontWeight: FontWeight.w600),
                     ),
-                    TextSpan(text: ' zu.'),
+                    TextSpan(text: 'auth.terms.suffix'.tr()),
                   ],
                 ),
               ),
@@ -1204,14 +1201,17 @@ class _ModeToggle extends StatelessWidget {
         ),
         children: [
           if (mode == _AuthMode.login) ...[
-            const TextSpan(text: 'Noch kein Konto? '),
-            _link('Jetzt registrieren', () => onChange(_AuthMode.register)),
+            TextSpan(text: 'auth.toggle.noAccountQ'.tr()),
+            _link('auth.toggle.registerNow'.tr(),
+                () => onChange(_AuthMode.register)),
           ] else if (mode == _AuthMode.register) ...[
-            const TextSpan(text: 'Bereits registriert? '),
-            _link('Anmelden', () => onChange(_AuthMode.login)),
+            TextSpan(text: 'auth.toggle.alreadyRegisteredQ'.tr()),
+            _link(
+                'auth.toggle.signIn'.tr(), () => onChange(_AuthMode.login)),
           ] else if (mode == _AuthMode.forgot) ...[
-            const TextSpan(text: 'Passwort wieder eingefallen? '),
-            _link('Zurück zum Login', () => onChange(_AuthMode.login)),
+            TextSpan(text: 'auth.toggle.pwRememberedQ'.tr()),
+            _link('auth.toggle.backToLogin'.tr(),
+                () => onChange(_AuthMode.login)),
           ],
         ],
       ),
