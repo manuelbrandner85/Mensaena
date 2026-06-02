@@ -1373,7 +1373,9 @@
     "inserted": "{name} added",
     "commentsCount": "Comments ({n})",
     "noComments": "No comments yet. Ask the first question!",
-    "commentHint": "Ask a question or comment …"
+    "commentHint": "Ask a question or comment …",
+    "report": "Report",
+    "reportTitle": "Report listing"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -3270,5 +3272,13 @@
     "body": "So calls and important messages reach you instantly even when the app is closed, exempt Mensaena from battery optimization. Otherwise Android may stop the app in the background.",
     "allow": "Allow",
     "later": "Later"
+  },
+  "report": {
+    "reasonFraud": "Fraud / scam",
+    "reasonSpam": "Spam",
+    "reasonFalseInfo": "False information",
+    "reasonDanger": "Dangerous / prohibited",
+    "reasonOther": "Other",
+    "thanks": "Report submitted. Thank you!"
   }
 }

@@ -1372,7 +1372,9 @@
     "inserted": "{name} hinzugefügt",
     "commentsCount": "Kommentare ({n})",
     "noComments": "Noch keine Kommentare. Stell die erste Frage!",
-    "commentHint": "Frage stellen oder kommentieren …"
+    "commentHint": "Frage stellen oder kommentieren …",
+    "report": "Melden",
+    "reportTitle": "Inserat melden"
   },
   "trust": {
     "rate": "Bewerte {name}",
@@ -3269,5 +3271,13 @@
     "body": "Damit dich Anrufe und wichtige Nachrichten auch bei geschlossener App sofort erreichen, nimm Mensaena von der Akku-Optimierung aus. Sonst kann Android die App im Hintergrund stoppen.",
     "allow": "Erlauben",
     "later": "Später"
+  },
+  "report": {
+    "reasonFraud": "Betrug / Abzocke",
+    "reasonSpam": "Spam",
+    "reasonFalseInfo": "Falsche Angaben",
+    "reasonDanger": "Gefährlich / verboten",
+    "reasonOther": "Sonstiges",
+    "thanks": "Meldung eingereicht. Danke!"
   }
 }

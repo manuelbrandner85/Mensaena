@@ -1286,7 +1286,9 @@
     "inserted": "{name} aggiunto",
     "commentsCount": "Commenti ({n})",
     "noComments": "Ancora nessun commento. Fai la prima domanda!",
-    "commentHint": "Fai una domanda o commenta …"
+    "commentHint": "Fai una domanda o commenta …",
+    "report": "Segnala",
+    "reportTitle": "Segnala annuncio"
   },
   "trust": {
     "rate": "Valuta {name}",
@@ -2501,5 +2503,13 @@
     "navigate": "Calcola percorso",
     "demoTitle": "Prezzi in tempo reale non disponibili",
     "demoBody": "È in uso la chiave demo di Tankerkönig — tutte le stazioni mostrano gli stessi prezzi. Admin: imposta una chiave reale in private.push_config."
+  },
+  "report": {
+    "reasonFraud": "Truffa",
+    "reasonSpam": "Spam",
+    "reasonFalseInfo": "Informazioni false",
+    "reasonDanger": "Pericoloso / vietato",
+    "reasonOther": "Altro",
+    "thanks": "Segnalazione inviata. Grazie!"
   }
 }

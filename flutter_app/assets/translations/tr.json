@@ -1285,7 +1285,9 @@
     "inserted": "{name} eklendi",
     "commentsCount": "Yorumlar ({n})",
     "noComments": "Henüz yorum yok. İlk soruyu sor!",
-    "commentHint": "Soru sor veya yorum yap …"
+    "commentHint": "Soru sor veya yorum yap …",
+    "report": "Bildir",
+    "reportTitle": "İlanı bildir"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -2500,5 +2502,13 @@
     "navigate": "Rota oluştur",
     "demoTitle": "Canlı fiyatlar şu anda kullanılamıyor",
     "demoBody": "Tankerkönig demo anahtarı kullanılıyor — tüm istasyonlar aynı fiyatı gösteriyor. Yönetici: private.push_config içinde gerçek bir anahtar ayarlayın."
+  },
+  "report": {
+    "reasonFraud": "Dolandırıcılık",
+    "reasonSpam": "Spam",
+    "reasonFalseInfo": "Yanlış bilgi",
+    "reasonDanger": "Tehlikeli / yasak",
+    "reasonOther": "Diğer",
+    "thanks": "Bildirim gönderildi. Teşekkürler!"
   }
 }

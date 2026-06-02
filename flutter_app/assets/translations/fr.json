@@ -1286,7 +1286,9 @@
     "inserted": "{name} ajouté",
     "commentsCount": "Commentaires ({n})",
     "noComments": "Pas encore de commentaires. Posez la première question !",
-    "commentHint": "Posez une question ou commentez …"
+    "commentHint": "Posez une question ou commentez …",
+    "report": "Signaler",
+    "reportTitle": "Signaler l’annonce"
   },
   "trust": {
     "rate": "Évaluer {name}",
@@ -2501,5 +2503,13 @@
     "navigate": "Itinéraire",
     "demoTitle": "Prix en direct indisponibles",
     "demoBody": "La clé démo Tankerkönig est utilisée — toutes les stations affichent les mêmes prix. Admin : définir une vraie clé dans private.push_config."
+  },
+  "report": {
+    "reasonFraud": "Fraude / arnaque",
+    "reasonSpam": "Spam",
+    "reasonFalseInfo": "Fausses informations",
+    "reasonDanger": "Dangereux / interdit",
+    "reasonOther": "Autre",
+    "thanks": "Signalement envoyé. Merci !"
   }
 }

@@ -20,7 +20,10 @@ final _barterMatchesProvider = FutureProvider.autoDispose
   try {
     final rows = await sb
         .from('marketplace_listings')
-        .select('id, title, category, media_urls, image_url, user_id')
+        // BUGFIX: media_urls/image_url existieren NICHT in der Tabelle →
+        // PostgREST-Fehler → Carousel zeigte nie Bilder. Echte Spalten sind
+        // images + image_urls (beide Arrays).
+        .select('id, title, category, images, image_urls, user_id')
         .neq('id', key.listingId)
         .eq('listing_type', 'tauschen')
         .eq('category', key.category)
@@ -109,11 +112,15 @@ class _BarterTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final id = item['id'] as String;
     final title = (item['title'] as String?) ?? '—';
-    final media = (item['media_urls'] as List?)?.cast<String>() ??
+    // images bevorzugt, image_urls als Fallback (beide Array-Spalten).
+    final imgs = (item['images'] as List?)?.whereType<String>().toList() ??
         const <String>[];
-    final imageUrl = media.isNotEmpty
-        ? media.first
-        : (item['image_url'] as String?);
+    final altImgs =
+        (item['image_urls'] as List?)?.whereType<String>().toList() ??
+            const <String>[];
+    final imageUrl = imgs.isNotEmpty
+        ? imgs.first
+        : (altImgs.isNotEmpty ? altImgs.first : null);
     return InkWell(
       onTap: () => context.push('/dashboard/marketplace/$id'),
       borderRadius: BorderRadius.circular(12),

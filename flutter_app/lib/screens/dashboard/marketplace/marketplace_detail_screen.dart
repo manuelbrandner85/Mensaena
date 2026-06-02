@@ -16,6 +16,8 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../repositories/content_reports_repository.dart';
+import '../../../repositories/conversations_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
@@ -234,6 +236,25 @@ class MarketplaceDetailScreen extends ConsumerWidget {
                     _SaveButton(listingId: l.id),
                   ],
                 ),
+                // Melden (nur fremde Inserate). Betrugs-/Spam-Schutz.
+                if (!isOwner) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () => _reportListing(context, l),
+                      icon: const Icon(LucideIcons.flag,
+                          size: 13, color: AppColors.mute),
+                      label: Text('marketplace.report'.tr(),
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.mute)),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        minimumSize: const Size(0, 30),
+                      ),
+                    ),
+                  ),
+                ],
                 // Owner-Aktionen (nur sichtbar, wenn aktiv & nicht reserved).
                 if (isOwner &&
                     l.status == 'active' &&
@@ -389,52 +410,30 @@ class MarketplaceDetailScreen extends ConsumerWidget {
     );
   }
 
+  // In-Flight-Guard gegen Doppel-Tap (Screen ist stateless → static Set).
+  static final Set<String> _contactInFlight = {};
+
   Future<void> _contactSeller(
       BuildContext context, WidgetRef ref, MarketplaceListing l) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null || uid == l.userId) return;
+    if (!_contactInFlight.add(l.id)) return; // schon in Arbeit
     try {
-      // Suche/create Conversation
-      final convs = await sb
-          .from('conversation_members')
-          .select('conversation_id')
-          .eq('user_id', uid);
-      final existing = (convs as List)
-          .whereType<Map<String, dynamic>>()
-          .map((r) => r['conversation_id'] as String)
-          .toSet();
-      final peerConvs = await sb
-          .from('conversation_members')
-          .select('conversation_id')
-          .eq('user_id', l.userId);
-      final peer = (peerConvs as List)
-          .whereType<Map<String, dynamic>>()
-          .map((r) => r['conversation_id'] as String)
-          .toSet();
-      final shared = existing.intersection(peer);
-      String convId;
-      if (shared.isNotEmpty) {
-        convId = shared.first;
-      } else {
-        final inserted = await sb
-            .from('conversations')
-            .insert({
-              'title': 'marketplace.chatTitle'.tr(namedArgs: {
-                'title': l.title.length > 40
-                    ? '${l.title.substring(0, 40)}...'
-                    : l.title,
-              }),
-            })
-            .select()
-            .maybeSingle();
-        if (inserted == null) throw StateError('insert_blocked');
-        convId = inserted['id'] as String;
-        await sb.from('conversation_members').insert([
-          {'conversation_id': convId, 'user_id': uid},
-          {'conversation_id': convId, 'user_id': l.userId},
-        ]);
-      }
+      // BUGFIX: vorher wurde die DM manuell über die Schnittmenge aller
+      // gemeinsamen conversation_members ermittelt — das konnte eine GRUPPE/
+      // Community (nicht-DM) treffen, sodass 'Verkäufer kontaktieren' den
+      // falschen Chat öffnete. Jetzt der atomare, race-sichere RPC, der
+      // garantiert eine echte 2er-DM liefert (Advisory-Lock auf Paar).
+      final convId = await ConversationsRepository.getOrCreateDm(l.userId);
       if (!context.mounted) return;
+      if (convId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('marketplace.contactFailed'.tr(),
+              style: AppTypography.body(size: 13, color: AppColors.ink)),
+        ));
+        return;
+      }
       context.go('/dashboard/chat?conv=$convId');
     } catch (_) {
       if (!context.mounted) return;
@@ -444,7 +443,65 @@ class MarketplaceDetailScreen extends ConsumerWidget {
             style: AppTypography.body(
                 size: 13, color: AppColors.ink)),
       ));
+    } finally {
+      _contactInFlight.remove(l.id);
     }
+  }
+
+  /// Meldet ein Inserat zur Moderation. Grund-Auswahl per Bottom-Sheet,
+  /// dann INSERT in reports (content_type='marketplace').
+  Future<void> _reportListing(
+      BuildContext context, MarketplaceListing l) async {
+    const reasons = <String, String>{
+      'fraud': 'report.reasonFraud',
+      'spam': 'report.reasonSpam',
+      'false_info': 'report.reasonFalseInfo',
+      'danger': 'report.reasonDanger',
+      'other': 'report.reasonOther',
+    };
+    final reason = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Text('marketplace.reportTitle'.tr(),
+                  style: AppTypography.display(size: 17, color: AppColors.ink)),
+            ),
+            for (final e in reasons.entries)
+              ListTile(
+                leading: const Icon(LucideIcons.flag,
+                    size: 16, color: AppColors.mute),
+                title: Text(e.value.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink)),
+                onTap: () => Navigator.pop(ctx, e.key),
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (reason == null) return;
+    final ok = await ContentReportsRepository.report(
+      contentType: 'marketplace',
+      contentId: l.id,
+      reason: reason,
+    );
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok ? 'report.thanks'.tr() : 'marketplace.contactFailed'.tr(),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
   }
 
   Future<void> _share(MarketplaceListing l) async {
