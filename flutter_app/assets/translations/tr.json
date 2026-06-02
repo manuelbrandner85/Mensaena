@@ -1441,7 +1441,8 @@
       "kids": "Çocuklar",
       "other": "Diğer"
     },
-    "attendeesCount": "{count} katılıyor"
+    "attendeesCount": "{count} katılıyor",
+    "linkOpenFailed": "Bağlantı açılamadı."
   },
   "challenges": {
     "create": "Meydan okuma oluştur",

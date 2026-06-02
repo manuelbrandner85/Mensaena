@@ -1441,7 +1441,8 @@
       "kids": "Дети",
       "other": "Прочее"
     },
-    "attendeesCount": "{count} участников"
+    "attendeesCount": "{count} участников",
+    "linkOpenFailed": "Не удалось открыть ссылку."
   },
   "challenges": {
     "create": "Создать челлендж",

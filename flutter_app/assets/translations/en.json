@@ -1539,7 +1539,8 @@
       "kids": "Kids",
       "other": "Other"
     },
-    "attendeesCount": "{count} attending"
+    "attendeesCount": "{count} attending",
+    "linkOpenFailed": "Could not open the link."
   },
   "challenges": {
     "create": "Create challenge",

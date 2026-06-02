@@ -10,15 +10,23 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../config/theme/app_colors.dart';
 import '../config/theme/app_typography.dart';
 import '../repositories/events_repository.dart';
+import '../services/event_reminder_service.dart';
 
 class EventReminderWidget extends ConsumerStatefulWidget {
   const EventReminderWidget({
     required this.eventId,
     required this.initialReminderMinutes,
+    required this.eventStart,
+    required this.eventTitle,
     super.key,
   });
 
   final String eventId;
+
+  /// Startzeitpunkt + Titel werden gebraucht, um die LOKALE Benachrichtigung
+  /// tatsächlich einzuplanen (vorher nur DB-Persistenz → keine Erinnerung).
+  final DateTime eventStart;
+  final String eventTitle;
 
   /// Null if the user has not configured a reminder yet.
   final int? initialReminderMinutes;
@@ -142,6 +150,16 @@ class _EventReminderWidgetState extends ConsumerState<EventReminderWidget> {
       eventId: widget.eventId,
       minutes: minutes,
     );
+    if (ok) {
+      // BUGFIX: vorher wurde nur reminder_minutes in der DB gespeichert, die
+      // lokale Benachrichtigung aber NIE eingeplant → keine Erinnerung kam an.
+      await EventReminderService.schedule(
+        eventId: widget.eventId,
+        eventStart: widget.eventStart,
+        minutesBefore: minutes,
+        title: widget.eventTitle,
+      );
+    }
     if (!mounted) return;
     setState(() {
       if (ok) _minutes = minutes;
@@ -152,6 +170,7 @@ class _EventReminderWidgetState extends ConsumerState<EventReminderWidget> {
   Future<void> _removeReminder() async {
     setState(() => _busy = true);
     final ok = await EventsRepository.removeReminder(widget.eventId);
+    if (ok) await EventReminderService.cancel(widget.eventId);
     if (!mounted) return;
     setState(() {
       if (ok) _minutes = null;

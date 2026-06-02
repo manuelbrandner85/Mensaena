@@ -304,6 +304,8 @@ class _EventDetailBody extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: EventReminderWidget(
                 eventId: event.id,
+                eventStart: event.startDate,
+                eventTitle: event.title,
                 initialReminderMinutes: null,
               ),
             ),
@@ -995,16 +997,39 @@ class _DateTimeBlock extends StatelessWidget {
             event.onlineUrl!.isNotEmpty) ...[
           const SizedBox(height: 10),
           OutlinedButton.icon(
-            onPressed: () => launchUrl(
-              Uri.parse(event.onlineUrl!),
-              mode: LaunchMode.externalApplication,
-            ),
+            onPressed: () => _openOnlineLink(context, event.onlineUrl!),
             icon: const Icon(LucideIcons.video, size: 16),
             label: Text('events.openOnlineLink'.tr()),
           ),
         ],
       ],
     );
+  }
+
+  /// Öffnet den Online-Link robust: normalisiert die URL (ergänzt https://
+  /// falls Schema fehlt) und fängt Fehler ab statt still zu scheitern.
+  Future<void> _openOnlineLink(BuildContext context, String raw) async {
+    final messenger = ScaffoldMessenger.of(context);
+    var url = raw.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://$url';
+    }
+    final uri = Uri.tryParse(url);
+    var ok = false;
+    if (uri != null) {
+      try {
+        ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        ok = false;
+      }
+    }
+    if (!ok) {
+      messenger.showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('events.linkOpenFailed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    }
   }
 }
 

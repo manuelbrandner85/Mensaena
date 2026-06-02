@@ -1442,7 +1442,8 @@
       "kids": "Bambini",
       "other": "Altro"
     },
-    "attendeesCount": "{count} partecipanti"
+    "attendeesCount": "{count} partecipanti",
+    "linkOpenFailed": "Impossibile aprire il link."
   },
   "challenges": {
     "create": "Crea sfida",

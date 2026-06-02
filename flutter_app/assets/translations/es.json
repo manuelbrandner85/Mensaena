@@ -1442,7 +1442,8 @@
       "kids": "Niños",
       "other": "Otros"
     },
-    "attendeesCount": "{count} asistentes"
+    "attendeesCount": "{count} asistentes",
+    "linkOpenFailed": "No se pudo abrir el enlace."
   },
   "challenges": {
     "create": "Crear reto",

@@ -160,9 +160,11 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     final initial = isStart
         ? (_startDate ?? now.add(const Duration(hours: 24)))
         : (_endDate ?? _startDate ?? now.add(const Duration(hours: 24)));
-    final firstAllowed = isStart
-        ? now.subtract(const Duration(days: 1))
-        : (_startDate ?? now);
+    // BUGFIX: Start durfte 1 Tag in der Vergangenheit liegen → Event wurde
+    // angelegt, erschien aber nie in listUpcoming() (gte start_date now).
+    // Heute (Tagesbeginn) ist die früheste erlaubte Auswahl.
+    final today = DateTime(now.year, now.month, now.day);
+    final firstAllowed = isStart ? today : (_startDate ?? today);
     final date = await showDatePicker(
       context: context,
       initialDate: initial.isBefore(firstAllowed) ? firstAllowed : initial,
@@ -299,7 +301,11 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       latitude: _isOnline ? null : _lat,
       longitude: _isOnline ? null : _lng,
       imageUrl: imageUrl,
-      maxAttendees: int.tryParse(_maxAttendeesCtrl.text.trim()),
+      // 0/negativ würde das Event sofort als 'voll' anzeigen → nur > 0 zählt.
+      maxAttendees: () {
+        final n = int.tryParse(_maxAttendeesCtrl.text.trim());
+        return (n != null && n > 0) ? n : null;
+      }(),
       cost: _isFree ? 'kostenlos' : _costCtrl.text.trim(),
       whatToBring: _whatToBringCtrl.text.trim(),
       contactInfo: _contactCtrl.text.trim(),

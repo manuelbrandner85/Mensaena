@@ -1538,7 +1538,8 @@
       "kids": "Kinder",
       "other": "Sonstiges"
     },
-    "attendeesCount": "{count} Zusagen"
+    "attendeesCount": "{count} Zusagen",
+    "linkOpenFailed": "Link konnte nicht geöffnet werden."
   },
   "challenges": {
     "create": "Challenge erstellen",
