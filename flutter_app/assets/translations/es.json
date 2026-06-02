@@ -972,7 +972,9 @@
       "skills": "Comparte tus habilidades, busca mentores u ofrece talleres.",
       "jobs": "Ofrece un mini-empleo, busca trabajo u organiza voluntariado.",
       "rescuer": "Rescata alimentos, ropa u objetos antes de tirarlos."
-    }
+    },
+    "imageUploadFailed": "No se pudo subir la imagen. Inténtalo de nuevo.",
+    "imagePartialFailed": "Algunas imágenes no se pudieron subir."
   },
   "crisis": {
     "error": "Error: {error}",

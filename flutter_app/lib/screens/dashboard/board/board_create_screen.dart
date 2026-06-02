@@ -117,8 +117,23 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
     });
     String? imageUrl;
     if (_image != null) {
-      final urls = await ImageUploadService.upload([_image!]);
-      imageUrl = urls.isNotEmpty ? urls.first : null;
+      String? uploadErr;
+      final urls = await ImageUploadService.upload(
+        [_image!],
+        onError: (_, e) => uploadErr = e,
+      );
+      if (urls.isEmpty) {
+        // Bild war gewählt, Upload schlug fehl → NICHT stillschweigend ohne
+        // Bild posten, sondern Fehler zeigen.
+        Haptics.error();
+        setState(() {
+          _submitting = false;
+          _error = 'create.imageUploadFailed'.tr();
+        });
+        debugPrint('board image upload failed: $uploadErr');
+        return;
+      }
+      imageUrl = urls.first;
     }
     final id = await BoardRepository.create(
       content: _content.text.trim(),

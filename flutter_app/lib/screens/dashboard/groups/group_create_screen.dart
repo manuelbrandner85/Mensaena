@@ -97,8 +97,21 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
     });
     String? coverUrl;
     if (_cover != null) {
-      final urls = await ImageUploadService.upload([_cover!]);
-      coverUrl = urls.isNotEmpty ? urls.first : null;
+      String? uploadErr;
+      final urls = await ImageUploadService.upload(
+        [_cover!],
+        onError: (_, e) => uploadErr = e,
+      );
+      if (urls.isEmpty) {
+        Haptics.error();
+        setState(() {
+          _submitting = false;
+          _error = 'create.imageUploadFailed'.tr();
+        });
+        debugPrint('group cover upload failed: $uploadErr');
+        return;
+      }
+      coverUrl = urls.first;
     }
     final id = await GroupsRepository.create(
       name: _name.text.trim(),

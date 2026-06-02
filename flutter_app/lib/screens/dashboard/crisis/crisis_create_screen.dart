@@ -209,9 +209,16 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       _submitting = true;
       _error = null;
     });
+    // Bilder sind bei einer Krise NEBENSÄCHLICH — ein Upload-Fehler darf die
+    // Notfall-Meldung niemals blockieren. Wir laden best-effort, merken uns
+    // aber, ob etwas fehlschlug, um nach dem Anlegen kurz zu warnen.
+    var imageFailures = 0;
     final imageUrls = _images.isEmpty
         ? const <String>[]
-        : await ImageUploadService.upload(_images);
+        : await ImageUploadService.upload(
+            _images,
+            onError: (_, __) => imageFailures++,
+          );
     final id = await CrisisRepository.create(
       title: _title.text.trim(),
       description: _desc.text.trim(),
@@ -239,6 +246,13 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
         _error = 'crisis.saveFailed'.tr();
       });
       return;
+    }
+    if (imageFailures > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('create.imagePartialFailed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
     }
     context.go('/dashboard/crisis/$id');
   }

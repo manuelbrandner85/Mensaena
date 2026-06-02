@@ -972,7 +972,9 @@
       "skills": "Condividi le tue competenze, trova mentor o offri workshop.",
       "jobs": "Offri un mini-job, cerca lavoro o organizza volontariato.",
       "rescuer": "Salva cibo, vestiti o oggetti dallo spreco."
-    }
+    },
+    "imageUploadFailed": "Impossibile caricare l’immagine. Riprova.",
+    "imagePartialFailed": "Alcune immagini non sono state caricate."
   },
   "crisis": {
     "error": "Errore: {error}",

@@ -972,7 +972,9 @@
       "skills": "Partage tes compétences, trouve des mentors ou propose des ateliers.",
       "jobs": "Propose un mini-boulot, cherche un travail ou organise du bénévolat.",
       "rescuer": "Sauve aliments, vêtements ou objets de la poubelle."
-    }
+    },
+    "imageUploadFailed": "Impossible d’envoyer l’image. Réessaie.",
+    "imagePartialFailed": "Certaines images n’ont pas pu être envoyées."
   },
   "crisis": {
     "error": "Erreur : {error}",

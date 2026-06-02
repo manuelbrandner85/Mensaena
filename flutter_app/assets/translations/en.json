@@ -1045,7 +1045,9 @@
       "skills": "Share your skills, find mentors or offer workshops.",
       "jobs": "Offer a mini-job, look for work or organise volunteer activity.",
       "rescuer": "Rescue food, clothing or items from being thrown away."
-    }
+    },
+    "imageUploadFailed": "Image could not be uploaded. Please try again.",
+    "imagePartialFailed": "Some images could not be uploaded."
   },
   "crisis": {
     "error": "Error: {error}",

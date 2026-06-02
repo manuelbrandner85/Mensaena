@@ -971,7 +971,9 @@
       "skills": "Becerilerini paylaş, mentor bul veya atölye sun.",
       "jobs": "Yarı zamanlı iş sun, iş ara veya gönüllülük organize et.",
       "rescuer": "Çöpe gitmeden gıda, kıyafet ya da eşyaları kurtar."
-    }
+    },
+    "imageUploadFailed": "Görsel yüklenemedi. Lütfen tekrar deneyin.",
+    "imagePartialFailed": "Bazı görseller yüklenemedi."
   },
   "crisis": {
     "error": "Hata: {error}",

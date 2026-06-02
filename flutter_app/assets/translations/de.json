@@ -1044,7 +1044,9 @@
       "skills": "Teile deine Fähigkeiten, suche Mentoren oder biete Workshops an.",
       "jobs": "Biete einen Mini-Job, suche Tätigkeit oder organisiere ehrenamtliche Arbeit.",
       "rescuer": "Rette Lebensmittel, Kleidung oder Gegenstände vor dem Wegwerfen."
-    }
+    },
+    "imageUploadFailed": "Bild konnte nicht hochgeladen werden. Bitte erneut versuchen.",
+    "imagePartialFailed": "Einige Bilder konnten nicht hochgeladen werden."
   },
   "crisis": {
     "error": "Fehler: {error}",
