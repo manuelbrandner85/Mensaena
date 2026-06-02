@@ -2560,5 +2560,42 @@
     "requested": "Запрошено",
     "requestSent": "Запрос на менторство отправлен.",
     "requestFailed": "Запрос не удался."
+  },
+  "postCard": {
+    "savedToast": "✓ Публикация сохранена.",
+    "unsavedToast": "✗ Удалено из закладок.",
+    "removeBookmark": "Убрать из закладок",
+    "blockUser": "Заблокировать пользователя",
+    "reportPost": "Пожаловаться",
+    "reasonHate": "Ненависть / дискриминация",
+    "reasonViolence": "Насилие",
+    "userBlocked": "Пользователь заблокирован.",
+    "blockFailed": "Не удалось заблокировать.",
+    "urgent": "СРОЧНО",
+    "timeNow": "только что",
+    "timeMinutes": "{n} мин назад",
+    "timeHours": "{n} ч назад",
+    "timeDays": "{n} дн назад",
+    "type": {
+      "help_request": "Нужна помощь",
+      "help_offered": "Предлагаю помощь",
+      "sharing": "Поделиться",
+      "event": "Событие",
+      "item": "Вещь",
+      "animal": "Животное",
+      "housing": "Жильё",
+      "mobility": "Транспорт",
+      "harvest": "Урожай",
+      "skill": "Навык",
+      "crisis": "Кризис",
+      "mental": "Поддержка",
+      "default": "Пост"
+    },
+    "ctaTakeOffer": "Принять",
+    "ctaTake": "Беру",
+    "ctaOffer": "Предлагаю",
+    "ctaJoin": "Участвовать",
+    "ctaLearnMore": "Подробнее",
+    "ctaHelpSearch": "Помогу искать"
   }
 }

@@ -3325,5 +3325,42 @@
   },
   "mentalSupport": {
     "launchFailed": "Der Anruf konnte nicht gestartet werden."
+  },
+  "postCard": {
+    "savedToast": "✓ Beitrag gespeichert.",
+    "unsavedToast": "✗ Aus Lesezeichen entfernt.",
+    "removeBookmark": "Aus Lesezeichen entfernen",
+    "blockUser": "Nutzer:in blockieren",
+    "reportPost": "Beitrag melden",
+    "reasonHate": "Hass / Diskriminierung",
+    "reasonViolence": "Gewalt",
+    "userBlocked": "Nutzer:in blockiert.",
+    "blockFailed": "Fehler beim Blockieren.",
+    "urgent": "DRINGEND",
+    "timeNow": "gerade eben",
+    "timeMinutes": "vor {n} Min.",
+    "timeHours": "vor {n} Std.",
+    "timeDays": "vor {n} Tagen",
+    "type": {
+      "help_request": "Hilfe gesucht",
+      "help_offered": "Hilfe da",
+      "sharing": "Teilen",
+      "event": "Event",
+      "item": "Ding",
+      "animal": "Tier",
+      "housing": "Wohnen",
+      "mobility": "Mobilität",
+      "harvest": "Ernte",
+      "skill": "Skill",
+      "crisis": "Krise",
+      "mental": "Mental",
+      "default": "Post"
+    },
+    "ctaTakeOffer": "Ich nehme an",
+    "ctaTake": "Ich nehme",
+    "ctaOffer": "Ich biete an",
+    "ctaJoin": "Dabei sein",
+    "ctaLearnMore": "Mehr erfahren",
+    "ctaHelpSearch": "Ich helfe suchen"
   }
 }

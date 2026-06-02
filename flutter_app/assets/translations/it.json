@@ -2561,5 +2561,42 @@
     "requested": "Richiesto",
     "requestSent": "Richiesta di mentoring inviata.",
     "requestFailed": "Richiesta non riuscita."
+  },
+  "postCard": {
+    "savedToast": "✓ Post salvato.",
+    "unsavedToast": "✗ Rimosso dai segnalibri.",
+    "removeBookmark": "Rimuovi dai segnalibri",
+    "blockUser": "Blocca utente",
+    "reportPost": "Segnala post",
+    "reasonHate": "Odio / discriminazione",
+    "reasonViolence": "Violenza",
+    "userBlocked": "Utente bloccato.",
+    "blockFailed": "Blocco non riuscito.",
+    "urgent": "URGENTE",
+    "timeNow": "proprio ora",
+    "timeMinutes": "{n} min fa",
+    "timeHours": "{n} h fa",
+    "timeDays": "{n} giorni fa",
+    "type": {
+      "help_request": "Aiuto cercato",
+      "help_offered": "Aiuto offerto",
+      "sharing": "Condividere",
+      "event": "Evento",
+      "item": "Oggetto",
+      "animal": "Animale",
+      "housing": "Alloggio",
+      "mobility": "Mobilità",
+      "harvest": "Raccolto",
+      "skill": "Competenza",
+      "crisis": "Emergenza",
+      "mental": "Mentale",
+      "default": "Post"
+    },
+    "ctaTakeOffer": "Accetto",
+    "ctaTake": "Lo prendo",
+    "ctaOffer": "Offro io",
+    "ctaJoin": "Partecipa",
+    "ctaLearnMore": "Scopri di più",
+    "ctaHelpSearch": "Aiuto a cercare"
   }
 }

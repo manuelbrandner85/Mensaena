@@ -2561,5 +2561,42 @@
     "requested": "Solicitado",
     "requestSent": "Solicitud de mentoría enviada.",
     "requestFailed": "Solicitud fallida."
+  },
+  "postCard": {
+    "savedToast": "✓ Publicación guardada.",
+    "unsavedToast": "✗ Eliminado de marcadores.",
+    "removeBookmark": "Quitar de marcadores",
+    "blockUser": "Bloquear usuario",
+    "reportPost": "Reportar publicación",
+    "reasonHate": "Odio / discriminación",
+    "reasonViolence": "Violencia",
+    "userBlocked": "Usuario bloqueado.",
+    "blockFailed": "Error al bloquear.",
+    "urgent": "URGENTE",
+    "timeNow": "ahora mismo",
+    "timeMinutes": "hace {n} min",
+    "timeHours": "hace {n} h",
+    "timeDays": "hace {n} días",
+    "type": {
+      "help_request": "Ayuda buscada",
+      "help_offered": "Ayuda ofrecida",
+      "sharing": "Compartir",
+      "event": "Evento",
+      "item": "Objeto",
+      "animal": "Animal",
+      "housing": "Vivienda",
+      "mobility": "Movilidad",
+      "harvest": "Cosecha",
+      "skill": "Habilidad",
+      "crisis": "Emergencia",
+      "mental": "Mental",
+      "default": "Publicación"
+    },
+    "ctaTakeOffer": "Aceptar",
+    "ctaTake": "Lo cojo",
+    "ctaOffer": "Lo ofrezco",
+    "ctaJoin": "Apuntarse",
+    "ctaLearnMore": "Saber más",
+    "ctaHelpSearch": "Ayudo a buscar"
   }
 }

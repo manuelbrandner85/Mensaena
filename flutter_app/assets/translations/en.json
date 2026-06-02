@@ -3326,5 +3326,42 @@
   },
   "mentalSupport": {
     "launchFailed": "Could not start the call."
+  },
+  "postCard": {
+    "savedToast": "✓ Post saved.",
+    "unsavedToast": "✗ Removed from bookmarks.",
+    "removeBookmark": "Remove from bookmarks",
+    "blockUser": "Block user",
+    "reportPost": "Report post",
+    "reasonHate": "Hate / discrimination",
+    "reasonViolence": "Violence",
+    "userBlocked": "User blocked.",
+    "blockFailed": "Failed to block.",
+    "urgent": "URGENT",
+    "timeNow": "just now",
+    "timeMinutes": "{n} min ago",
+    "timeHours": "{n} h ago",
+    "timeDays": "{n} days ago",
+    "type": {
+      "help_request": "Help wanted",
+      "help_offered": "Help offered",
+      "sharing": "Sharing",
+      "event": "Event",
+      "item": "Item",
+      "animal": "Animal",
+      "housing": "Housing",
+      "mobility": "Mobility",
+      "harvest": "Harvest",
+      "skill": "Skill",
+      "crisis": "Crisis",
+      "mental": "Mental",
+      "default": "Post"
+    },
+    "ctaTakeOffer": "Accept",
+    "ctaTake": "I'll take it",
+    "ctaOffer": "I'll offer",
+    "ctaJoin": "Join",
+    "ctaLearnMore": "Learn more",
+    "ctaHelpSearch": "Help search"
   }
 }

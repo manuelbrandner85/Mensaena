@@ -66,7 +66,7 @@ class _PostCardState extends ConsumerState<PostCard> {
       backgroundColor: AppColors.surface,
       duration: const Duration(seconds: 2),
       content: Text(
-        next ? '✓ Beitrag gespeichert.' : '✗ Aus Lesezeichen entfernt.',
+        next ? 'postCard.savedToast'.tr() : 'postCard.unsavedToast'.tr(),
         style: AppTypography.body(size: 13, color: AppColors.ink),
       ),
     ));
@@ -99,7 +99,9 @@ class _PostCardState extends ConsumerState<PostCard> {
             const SizedBox(height: 12),
             _MenuTile(
               icon: _saved ? LucideIcons.bookmarkMinus : LucideIcons.bookmark,
-              label: _saved ? 'Aus Lesezeichen entfernen' : 'Speichern',
+              label: _saved
+                  ? 'postCard.removeBookmark'.tr()
+                  : 'common.save'.tr(),
               onTap: () {
                 Navigator.pop(sheetCtx);
                 _toggleSave();
@@ -107,7 +109,7 @@ class _PostCardState extends ConsumerState<PostCard> {
             ),
             _MenuTile(
               icon: LucideIcons.share2,
-              label: 'Teilen',
+              label: 'common.share'.tr(),
               onTap: () {
                 Navigator.pop(sheetCtx);
                 _share();
@@ -116,7 +118,7 @@ class _PostCardState extends ConsumerState<PostCard> {
             const Divider(color: AppColors.line, height: 1),
             _MenuTile(
               icon: LucideIcons.userX,
-              label: 'Nutzer:in blockieren',
+              label: 'postCard.blockUser'.tr(),
               color: AppColors.herzrotWarm,
               onTap: () async {
                 Navigator.pop(sheetCtx);
@@ -125,7 +127,7 @@ class _PostCardState extends ConsumerState<PostCard> {
             ),
             _MenuTile(
               icon: LucideIcons.flag,
-              label: 'Beitrag melden',
+              label: 'postCard.reportPost'.tr(),
               color: AppColors.herzrotWarm,
               onTap: () async {
                 Navigator.pop(sheetCtx);
@@ -168,20 +170,24 @@ class _PostCardState extends ConsumerState<PostCard> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text(ok ? 'Nutzer:in blockiert.' : 'Fehler beim Blockieren.',
+      content: Text(
+          ok ? 'postCard.userBlocked'.tr() : 'postCard.blockFailed'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
   }
 
   Future<void> _showReportDialog() async {
-    const reasons = <String>[
-      'Spam',
-      'Belästigung',
-      'Hass / Diskriminierung',
-      'Gewalt',
-      'Falsche Informationen',
-      'Anstößige Inhalte',
-      'Anderer Grund',
+    // value = stabile kanonische (DE) Kennung, die in der DB gespeichert wird
+    // (damit Admin-Meldungen über alle Sprachen hinweg vergleichbar bleiben);
+    // labelKey = übersetzte Anzeige für die nutzende Person.
+    const reasons = <({String value, String labelKey})>[
+      (value: 'Spam', labelKey: 'posts.reasonSpam'),
+      (value: 'Belästigung', labelKey: 'posts.reasonHarassment'),
+      (value: 'Hass / Diskriminierung', labelKey: 'postCard.reasonHate'),
+      (value: 'Gewalt', labelKey: 'postCard.reasonViolence'),
+      (value: 'Falsche Informationen', labelKey: 'posts.reasonFalse'),
+      (value: 'Anstößige Inhalte', labelKey: 'posts.reasonOffensive'),
+      (value: 'Anderer Grund', labelKey: 'posts.reasonOther'),
     ];
     final selected = await showDialog<String>(
       context: context,
@@ -200,10 +206,10 @@ class _PostCardState extends ConsumerState<PostCard> {
             for (final r in reasons)
               ListTile(
                 dense: true,
-                title: Text(r,
+                title: Text(r.labelKey.tr(),
                     style: AppTypography.body(
                         size: 13, color: AppColors.ink)),
-                onTap: () => Navigator.pop(ctx, r),
+                onTap: () => Navigator.pop(ctx, r.value),
               ),
           ],
         ),
@@ -225,7 +231,7 @@ class _PostCardState extends ConsumerState<PostCard> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text(
-        ok ? 'Meldung übermittelt. Danke.' : 'Meldung fehlgeschlagen.',
+        ok ? 'posts.reportSubmitted'.tr() : 'posts.reportFailed'.tr(),
         style: AppTypography.body(size: 13, color: AppColors.ink),
       ),
     ));
@@ -484,7 +490,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                         const Icon(LucideIcons.alertTriangle,
                             size: 9, color: AppColors.herzrotWarm),
                         const SizedBox(width: 4),
-                        Text('DRINGEND',
+                        Text('postCard.urgent'.tr(),
                             style: AppTypography.label(
                                 size: 7, color: AppColors.herzrotWarm)),
                       ],
@@ -501,11 +507,17 @@ class _PostCardState extends ConsumerState<PostCard> {
 
   static String _relativeTime(DateTime t) {
     final diff = DateTime.now().difference(t);
-    if (diff.inSeconds < 60) return 'gerade eben';
-    if (diff.inMinutes < 60) return 'vor ${diff.inMinutes} Min.';
-    if (diff.inHours < 24) return 'vor ${diff.inHours} Std.';
-    if (diff.inDays == 1) return 'gestern';
-    if (diff.inDays < 7) return 'vor ${diff.inDays} Tagen';
+    if (diff.inSeconds < 60) return 'postCard.timeNow'.tr();
+    if (diff.inMinutes < 60) {
+      return 'postCard.timeMinutes'.tr(namedArgs: {'n': '${diff.inMinutes}'});
+    }
+    if (diff.inHours < 24) {
+      return 'postCard.timeHours'.tr(namedArgs: {'n': '${diff.inHours}'});
+    }
+    if (diff.inDays == 1) return 'common.yesterday'.tr();
+    if (diff.inDays < 7) {
+      return 'postCard.timeDays'.tr(namedArgs: {'n': '${diff.inDays}'});
+    }
     return DateFormat('dd.MM.yyyy').format(t);
   }
 }
@@ -574,31 +586,83 @@ class _PostCardAction extends StatelessWidget {
 ({String label, String emoji, Color color}) _typeConfig(String type) {
   switch (type) {
     case 'help_request':
-      return (label: 'Hilfe gesucht', emoji: '🙋', color: AppColors.herzrotWarm);
+      return (
+        label: 'postCard.type.help_request'.tr(),
+        emoji: '🙋',
+        color: AppColors.herzrotWarm
+      );
     case 'help_offered':
-      return (label: 'Hilfe da', emoji: '🤝', color: AppColors.lebenSoft);
+      return (
+        label: 'postCard.type.help_offered'.tr(),
+        emoji: '🤝',
+        color: AppColors.lebenSoft
+      );
     case 'sharing':
-      return (label: 'Teilen', emoji: '🌱', color: AppColors.leben);
+      return (
+        label: 'postCard.type.sharing'.tr(),
+        emoji: '🌱',
+        color: AppColors.leben
+      );
     case 'event':
-      return (label: 'Event', emoji: '📅', color: AppColors.bronze);
+      return (
+        label: 'postCard.type.event'.tr(),
+        emoji: '📅',
+        color: AppColors.bronze
+      );
     case 'item':
-      return (label: 'Ding', emoji: '📦', color: AppColors.amber);
+      return (
+        label: 'postCard.type.item'.tr(),
+        emoji: '📦',
+        color: AppColors.amber
+      );
     case 'animal':
-      return (label: 'Tier', emoji: '🐾', color: AppColors.bronzeSoft);
+      return (
+        label: 'postCard.type.animal'.tr(),
+        emoji: '🐾',
+        color: AppColors.bronzeSoft
+      );
     case 'housing':
-      return (label: 'Wohnen', emoji: '🏠', color: AppColors.tealSoft);
+      return (
+        label: 'postCard.type.housing'.tr(),
+        emoji: '🏠',
+        color: AppColors.tealSoft
+      );
     case 'mobility':
-      return (label: 'Mobilität', emoji: '🚗', color: AppColors.amber);
+      return (
+        label: 'postCard.type.mobility'.tr(),
+        emoji: '🚗',
+        color: AppColors.amber
+      );
     case 'harvest':
-      return (label: 'Ernte', emoji: '🌾', color: AppColors.leben);
+      return (
+        label: 'postCard.type.harvest'.tr(),
+        emoji: '🌾',
+        color: AppColors.leben
+      );
     case 'skill':
-      return (label: 'Skill', emoji: '🧠', color: AppColors.bronze);
+      return (
+        label: 'postCard.type.skill'.tr(),
+        emoji: '🧠',
+        color: AppColors.bronze
+      );
     case 'crisis':
-      return (label: 'Krise', emoji: '🚨', color: AppColors.herzrot);
+      return (
+        label: 'postCard.type.crisis'.tr(),
+        emoji: '🚨',
+        color: AppColors.herzrot
+      );
     case 'mental':
-      return (label: 'Mental', emoji: '💚', color: AppColors.leben);
+      return (
+        label: 'postCard.type.mental'.tr(),
+        emoji: '💚',
+        color: AppColors.leben
+      );
     default:
-      return (label: 'Post', emoji: '📝', color: AppColors.bronze);
+      return (
+        label: 'postCard.type.default'.tr(),
+        emoji: '📝',
+        color: AppColors.bronze
+      );
   }
 }
 
@@ -664,14 +728,14 @@ class _IntentCta extends StatelessWidget {
       return const SizedBox.shrink();
     }
     final (label, color) = switch (intent) {
-      PostIntent.helpNeeded => ('Ich helfe', AppColors.leben),
-      PostIntent.helpOffered => ('Ich nehme an', AppColors.bronze),
-      PostIntent.itemOffered => ('Ich nehme', AppColors.bronze),
-      PostIntent.itemWanted => ('Ich biete an', AppColors.bronze),
-      PostIntent.eventInvite => ('Dabei sein', AppColors.amber),
-      PostIntent.warning => ('Mehr erfahren', AppColors.herzrotWarm),
-      PostIntent.lostFound => ('Ich helfe suchen', AppColors.leben),
-      _ => ('Antworten', AppColors.bronze),
+      PostIntent.helpNeeded => ('posts.ihelp'.tr(), AppColors.leben),
+      PostIntent.helpOffered => ('postCard.ctaTakeOffer'.tr(), AppColors.bronze),
+      PostIntent.itemOffered => ('postCard.ctaTake'.tr(), AppColors.bronze),
+      PostIntent.itemWanted => ('postCard.ctaOffer'.tr(), AppColors.bronze),
+      PostIntent.eventInvite => ('postCard.ctaJoin'.tr(), AppColors.amber),
+      PostIntent.warning => ('postCard.ctaLearnMore'.tr(), AppColors.herzrotWarm),
+      PostIntent.lostFound => ('postCard.ctaHelpSearch'.tr(), AppColors.leben),
+      _ => ('posts.reply'.tr(), AppColors.bronze),
     };
     return SizedBox(
       width: double.infinity,
