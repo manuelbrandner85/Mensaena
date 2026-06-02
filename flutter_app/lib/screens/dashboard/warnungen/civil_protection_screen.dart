@@ -16,6 +16,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/civil_protection_service.dart';
 import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../utils/safe_launch.dart';
 
 class CivilProtectionScreen extends ConsumerStatefulWidget {
   const CivilProtectionScreen({super.key});
@@ -180,7 +181,7 @@ class _CivilProtectionScreenState
 
   Future<void> _open(String url) async {
     if (url.isEmpty) return;
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    await safeLaunch(url, mode: LaunchMode.externalApplication);
   }
 }
 

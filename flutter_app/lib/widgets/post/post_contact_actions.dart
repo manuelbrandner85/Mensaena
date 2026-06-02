@@ -24,6 +24,7 @@ import 'smart_reply_sheet.dart';
 import '../../services/supabase_service.dart';
 import '../effects/celebrate_burst.dart';
 import 'contact_requests_manager.dart';
+import '../../utils/safe_launch.dart';
 
 class PostContactActions extends ConsumerWidget {
   const PostContactActions({required this.post, super.key});
@@ -466,19 +467,19 @@ class _SecondaryMethodsRow extends ConsumerWidget {
       case 'phone':
         final p = revealed!.phoneNumber;
         if (p == null || p.isEmpty) return;
-        await launchUrl(Uri.parse('tel:$p'));
+        await safeLaunch('tel:$p');
         break;
       case 'email':
         final e = revealed!.emailAddress;
         if (e == null || e.isEmpty) return;
-        await launchUrl(Uri.parse('mailto:$e'));
+        await safeLaunch('mailto:$e');
         break;
       case 'whatsapp':
         final w = revealed!.whatsappNumber;
         if (w == null || w.isEmpty) return;
         final clean = w.replaceAll(RegExp(r'[^0-9+]'), '');
-        await launchUrl(
-            Uri.parse('https://wa.me/${clean.replaceAll('+', '')}'));
+        await safeLaunch('https://wa.me/${clean.replaceAll('+', '')}',
+            mode: LaunchMode.externalApplication);
         break;
       case 'location_meetup':
         final note = revealed?.meetupNote ?? pref?.meetupNote;

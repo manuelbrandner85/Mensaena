@@ -17,6 +17,7 @@ import '../../../services/jobs_service.dart';
 import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
+import '../../../utils/safe_launch.dart';
 
 class JobPortalsScreen extends ConsumerStatefulWidget {
   const JobPortalsScreen({super.key});
@@ -183,7 +184,7 @@ class _PortalCard extends StatelessWidget {
 
   Future<void> _launch(String url) async {
     if (url.isEmpty) return;
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    await safeLaunch(url, mode: LaunchMode.externalApplication);
   }
 
   String _localizedDescription(BuildContext context) {

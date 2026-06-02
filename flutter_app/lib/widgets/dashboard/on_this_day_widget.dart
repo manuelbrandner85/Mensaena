@@ -13,6 +13,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/on_this_day_service.dart';
 import '../effects/glass_card.dart';
+import '../../utils/safe_launch.dart';
 
 final _onThisDayProvider =
     FutureProvider<List<OnThisDayEvent>>((ref) async {
@@ -95,7 +96,7 @@ class _EventCard extends StatelessWidget {
     final url = event.articleUrl;
     if (url == null || url.isEmpty) return;
     try {
-      await launchUrl(Uri.parse(url),
+      await safeLaunch(url,
           mode: LaunchMode.externalApplication);
     } catch (_) {}
   }

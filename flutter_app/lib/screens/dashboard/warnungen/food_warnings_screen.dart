@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -139,8 +140,7 @@ class _Tile extends StatelessWidget {
 
     return InkWell(
       onTap: link.isNotEmpty
-          ? () => launchUrl(Uri.parse(link),
-              mode: LaunchMode.externalApplication)
+          ? () => safeLaunch(link, mode: LaunchMode.externalApplication)
           : null,
       borderRadius: BorderRadius.circular(12),
       child: Container(

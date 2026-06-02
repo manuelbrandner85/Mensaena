@@ -13,6 +13,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/nasa_apod_service.dart';
 import '../effects/glass_card.dart';
+import '../../utils/safe_launch.dart';
 
 final _apodProvider = FutureProvider<NasaApod?>((ref) async {
   return NasaApodService.today();
@@ -93,7 +94,7 @@ class _ApodContentState extends State<_ApodContent> {
               onTap: () async {
                 final url = apod.hdUrl ?? apod.url;
                 if (url.isNotEmpty) {
-                  await launchUrl(Uri.parse(url),
+                  await safeLaunch(url,
                       mode: LaunchMode.externalApplication);
                 }
               },

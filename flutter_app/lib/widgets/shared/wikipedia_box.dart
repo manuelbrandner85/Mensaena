@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/wikipedia_service.dart';
+import '../../utils/safe_launch.dart';
 
 class WikipediaBox extends StatefulWidget {
   const WikipediaBox({
@@ -67,7 +68,7 @@ class _WikipediaBoxState extends State<WikipediaBox> {
     final d = _data;
     if (d == null) return const SizedBox.shrink();
     return InkWell(
-      onTap: () => launchUrl(Uri.parse(d.url),
+      onTap: () => safeLaunch(d.url,
           mode: LaunchMode.externalApplication),
       borderRadius: BorderRadius.circular(14),
       child: Container(
