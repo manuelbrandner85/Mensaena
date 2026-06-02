@@ -2074,7 +2074,19 @@
     "confirm": "Confirm",
     "screenTitle": "Timebank",
     "confirmHelpQuestion": "Did you receive this help?",
-    "confirmHelpHint": "A neighbour is asking you to confirm the hours they provided."
+    "confirmHelpHint": "A neighbour is asking you to confirm the hours they provided.",
+    "newEntry": "New entry",
+    "newEntryTitle": "Log hours",
+    "newEntryHint": "Log the hours you provided. The recipient must confirm afterwards.",
+    "pickReceiver": "Choose recipient",
+    "hours": "Hours",
+    "description": "What did you do?",
+    "createBtn": "Create entry",
+    "createdPendingSnack": "Entry created — awaiting confirmation.",
+    "errReceiverMissing": "Please choose a recipient.",
+    "errHoursInvalid": "Please enter valid hours (0–24).",
+    "errDescTooShort": "Please enter at least 3 characters.",
+    "receiverChosen": "Recipient chosen: {name}"
   },
   "search": {
     "minChars": "Type at least 2 characters",

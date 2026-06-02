@@ -1902,7 +1902,19 @@
     "confirm": "Confirmer",
     "screenTitle": "Banque de temps",
     "confirmHelpQuestion": "As-tu reçu cette aide ?",
-    "confirmHelpHint": "Un·e voisin·e te demande de confirmer les heures effectuées."
+    "confirmHelpHint": "Un·e voisin·e te demande de confirmer les heures effectuées.",
+    "newEntry": "Nouvelle entrée",
+    "newEntryTitle": "Saisir des heures",
+    "newEntryHint": "Saisis les heures que tu as données. La personne destinataire doit ensuite confirmer.",
+    "pickReceiver": "Choisir le destinataire",
+    "hours": "Heures",
+    "description": "Qu’as-tu fait ?",
+    "createBtn": "Créer l’entrée",
+    "createdPendingSnack": "Entrée créée — en attente de confirmation.",
+    "errReceiverMissing": "Choisis un destinataire.",
+    "errHoursInvalid": "Saisis des heures valides (0–24).",
+    "errDescTooShort": "3 caractères minimum.",
+    "receiverChosen": "Destinataire choisi : {name}"
   },
   "search": {
     "minChars": "Saisissez au moins 2 caractères",

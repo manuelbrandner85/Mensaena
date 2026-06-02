@@ -1902,7 +1902,19 @@
     "confirm": "Conferma",
     "screenTitle": "Banca del tempo",
     "confirmHelpQuestion": "Hai ricevuto questo aiuto?",
-    "confirmHelpHint": "Un vicino ti chiede di confermare le ore prestate."
+    "confirmHelpHint": "Un vicino ti chiede di confermare le ore prestate.",
+    "newEntry": "Nuova voce",
+    "newEntryTitle": "Registra ore",
+    "newEntryHint": "Registra le ore che hai dato. La persona destinataria deve poi confermare.",
+    "pickReceiver": "Scegli destinatario",
+    "hours": "Ore",
+    "description": "Cosa hai fatto?",
+    "createBtn": "Crea voce",
+    "createdPendingSnack": "Voce creata — in attesa di conferma.",
+    "errReceiverMissing": "Scegli un destinatario.",
+    "errHoursInvalid": "Inserisci ore valide (0–24).",
+    "errDescTooShort": "Almeno 3 caratteri.",
+    "receiverChosen": "Destinatario scelto: {name}"
   },
   "search": {
     "minChars": "Inserisci almeno 2 caratteri",

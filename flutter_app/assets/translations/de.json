@@ -2073,7 +2073,19 @@
     "confirm": "Bestätigen",
     "screenTitle": "Zeitbank",
     "confirmHelpQuestion": "Hast du diese Hilfe erhalten?",
-    "confirmHelpHint": "Ein:e Nachbar:in bittet um Bestätigung für die geleisteten Stunden."
+    "confirmHelpHint": "Ein:e Nachbar:in bittet um Bestätigung für die geleisteten Stunden.",
+    "newEntry": "Neuer Eintrag",
+    "newEntryTitle": "Stunden eintragen",
+    "newEntryHint": "Trage deine geleisteten Stunden ein. Die Empfänger:in muss anschließend bestätigen.",
+    "pickReceiver": "Empfänger:in wählen",
+    "hours": "Stunden",
+    "description": "Was hast du gemacht?",
+    "createBtn": "Eintrag erstellen",
+    "createdPendingSnack": "Eintrag erstellt — wartet auf Bestätigung.",
+    "errReceiverMissing": "Bitte Empfänger:in wählen.",
+    "errHoursInvalid": "Bitte gültige Stundenzahl angeben (0–24).",
+    "errDescTooShort": "Bitte mindestens 3 Zeichen Beschreibung.",
+    "receiverChosen": "Empfänger:in gewählt: {name}"
   },
   "search": {
     "minChars": "Mindestens 2 Zeichen eingeben",

@@ -1902,7 +1902,19 @@
     "confirm": "Confirmar",
     "screenTitle": "Banco de tiempo",
     "confirmHelpQuestion": "¿Recibiste esta ayuda?",
-    "confirmHelpHint": "Una persona vecina te pide confirmar las horas dedicadas."
+    "confirmHelpHint": "Una persona vecina te pide confirmar las horas dedicadas.",
+    "newEntry": "Nueva entrada",
+    "newEntryTitle": "Registrar horas",
+    "newEntryHint": "Registra las horas que aportaste. La persona destinataria debe confirmar después.",
+    "pickReceiver": "Elegir destinatario",
+    "hours": "Horas",
+    "description": "¿Qué hiciste?",
+    "createBtn": "Crear entrada",
+    "createdPendingSnack": "Entrada creada — pendiente de confirmación.",
+    "errReceiverMissing": "Elige un destinatario.",
+    "errHoursInvalid": "Ingresa horas válidas (0–24).",
+    "errDescTooShort": "Al menos 3 caracteres.",
+    "receiverChosen": "Destinatario elegido: {name}"
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",

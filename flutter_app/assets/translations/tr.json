@@ -1901,7 +1901,19 @@
     "confirm": "Onayla",
     "screenTitle": "Zaman bankası",
     "confirmHelpQuestion": "Bu yardımı aldın mı?",
-    "confirmHelpHint": "Bir komşun, harcanan saatleri onaylamanı istiyor."
+    "confirmHelpHint": "Bir komşun, harcanan saatleri onaylamanı istiyor.",
+    "newEntry": "Yeni kayıt",
+    "newEntryTitle": "Saat kaydet",
+    "newEntryHint": "Verdiğin saatleri kaydet. Alıcı sonra onaylamalı.",
+    "pickReceiver": "Alıcıyı seç",
+    "hours": "Saat",
+    "description": "Ne yaptın?",
+    "createBtn": "Kayıt oluştur",
+    "createdPendingSnack": "Kayıt oluşturuldu — onay bekleniyor.",
+    "errReceiverMissing": "Bir alıcı seç.",
+    "errHoursInvalid": "Geçerli saat gir (0–24).",
+    "errDescTooShort": "En az 3 karakter.",
+    "receiverChosen": "Alıcı seçildi: {name}"
   },
   "search": {
     "minChars": "En az 2 karakter girin",

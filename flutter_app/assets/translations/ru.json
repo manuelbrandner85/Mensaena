@@ -1901,7 +1901,19 @@
     "confirm": "Подтвердить",
     "screenTitle": "Банк времени",
     "confirmHelpQuestion": "Вы получили эту помощь?",
-    "confirmHelpHint": "Сосед просит подтвердить отработанные часы."
+    "confirmHelpHint": "Сосед просит подтвердить отработанные часы.",
+    "newEntry": "Новая запись",
+    "newEntryTitle": "Записать часы",
+    "newEntryHint": "Запиши часы, которые ты потратил(а). Получатель должен подтвердить.",
+    "pickReceiver": "Выбрать получателя",
+    "hours": "Часы",
+    "description": "Что ты сделал(а)?",
+    "createBtn": "Создать запись",
+    "createdPendingSnack": "Запись создана — ожидает подтверждения.",
+    "errReceiverMissing": "Выбери получателя.",
+    "errHoursInvalid": "Введи корректные часы (0–24).",
+    "errDescTooShort": "Минимум 3 символа.",
+    "receiverChosen": "Получатель выбран: {name}"
   },
   "search": {
     "minChars": "Введите минимум 2 символа",
