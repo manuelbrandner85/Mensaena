@@ -2530,5 +2530,8 @@
   },
   "badges": {
     "newlyEarned": "Получен {n} новый значок!"
+  },
+  "mentalSupport": {
+    "launchFailed": "Не удалось начать вызов."
   }
 }

@@ -2531,5 +2531,8 @@
   },
   "badges": {
     "newlyEarned": "¡{n} nueva insignia obtenida!"
+  },
+  "mentalSupport": {
+    "launchFailed": "No se pudo iniciar la llamada."
   }
 }

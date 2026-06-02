@@ -150,13 +150,11 @@ class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
   };
 
   Future<void> _tap(_Hotline h) async {
-    final uri = h.url != null
-        ? Uri.parse(h.url!)
-        : Uri.parse('tel:${h.number.replaceAll(RegExp(r'[^0-9+]'), '')}');
+    final raw = h.url ?? 'tel:${h.number.replaceAll(RegExp(r'[^0-9+]'), '')}';
     final mode = h.url != null
         ? LaunchMode.externalApplication
         : LaunchMode.platformDefault;
-    await launchUrl(uri, mode: mode);
+    await safeLaunchHotline(context, raw, mode);
   }
 
   @override
@@ -391,6 +389,28 @@ class _HotlineTile extends StatelessWidget {
   }
 }
 
+/// Robuster Hotline-Launch: vorher konnten Notruf-/Hotline-Taps still
+/// crashen (Uri.parse-Exception oder fehlender Handler). Jetzt Uri.tryParse
+/// + try/catch + Snackbar-Hinweis bei Misserfolg.
+Future<void> safeLaunchHotline(
+    BuildContext context, String raw, LaunchMode mode) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final uri = Uri.tryParse(raw);
+  var ok = false;
+  if (uri != null) {
+    try {
+      ok = await launchUrl(uri, mode: mode);
+    } catch (_) {
+      ok = false;
+    }
+  }
+  if (!ok) {
+    messenger.showSnackBar(SnackBar(
+      content: Text('mentalSupport.launchFailed'.tr()),
+    ));
+  }
+}
+
 class _EmergencyFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -427,7 +447,8 @@ class _EmergencyFooter extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => launchUrl(Uri.parse('tel:112')),
+            onTap: () =>
+                safeLaunchHotline(context, 'tel:112', LaunchMode.platformDefault),
             child: Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 8),

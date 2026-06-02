@@ -2530,5 +2530,8 @@
   },
   "badges": {
     "newlyEarned": "{n} yeni rozet kazanıldı!"
+  },
+  "mentalSupport": {
+    "launchFailed": "Arama başlatılamadı."
   }
 }

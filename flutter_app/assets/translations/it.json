@@ -2531,5 +2531,8 @@
   },
   "badges": {
     "newlyEarned": "{n} nuovo badge ottenuto!"
+  },
+  "mentalSupport": {
+    "launchFailed": "Impossibile avviare la chiamata."
   }
 }

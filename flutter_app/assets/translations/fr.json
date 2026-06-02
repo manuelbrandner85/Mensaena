@@ -2531,5 +2531,8 @@
   },
   "badges": {
     "newlyEarned": "{n} nouveau badge obtenu !"
+  },
+  "mentalSupport": {
+    "launchFailed": "Impossible de lancer l’appel."
   }
 }

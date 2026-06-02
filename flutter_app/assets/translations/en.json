@@ -3298,5 +3298,8 @@
     "reasonDanger": "Dangerous / prohibited",
     "reasonOther": "Other",
     "thanks": "Report submitted. Thank you!"
+  },
+  "mentalSupport": {
+    "launchFailed": "Could not start the call."
   }
 }

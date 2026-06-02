@@ -3297,5 +3297,8 @@
     "reasonDanger": "Gefährlich / verboten",
     "reasonOther": "Sonstiges",
     "thanks": "Meldung eingereicht. Danke!"
+  },
+  "mentalSupport": {
+    "launchFailed": "Der Anruf konnte nicht gestartet werden."
   }
 }
