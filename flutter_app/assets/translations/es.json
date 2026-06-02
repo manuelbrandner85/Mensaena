@@ -1192,7 +1192,9 @@
     "statusChanged": "Estado actualizado.",
     "boost": "Impulsar",
     "boosted": "Impulsado",
-    "boostedCount": "Impulsado {n}×"
+    "boostedCount": "Impulsado {n}×",
+    "loadingAll": "Cargando todas las publicaciones…",
+    "activeAll": "{count}{more} publicaciones activas"
   },
   "marketplace": {
     "listing": "Anuncio",
@@ -1855,7 +1857,8 @@
     "toggleCrises": "Mostrar/ocultar crisis",
     "toggleEvents": "Mostrar/ocultar eventos",
     "routeTo": "Cómo llegar",
-    "routeFailed": "No se pudo abrir la app de mapas."
+    "routeFailed": "No se pudo abrir la app de mapas.",
+    "radiusAll": "Todos"
   },
   "calendar": {
     "noEvents": "No hay eventos en el calendario.",

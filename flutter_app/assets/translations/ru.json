@@ -1191,7 +1191,9 @@
     "statusChanged": "Статус обновлён.",
     "boost": "Усилить",
     "boosted": "Усилено",
-    "boostedCount": "Усилено {n}×"
+    "boostedCount": "Усилено {n}×",
+    "loadingAll": "Загрузка всех публикаций…",
+    "activeAll": "{count}{more} активных публикаций"
   },
   "marketplace": {
     "listing": "Объявление",
@@ -1854,7 +1856,8 @@
     "toggleCrises": "Кризисы вкл/выкл",
     "toggleEvents": "События вкл/выкл",
     "routeTo": "Маршрут сюда",
-    "routeFailed": "Не удалось открыть приложение карт."
+    "routeFailed": "Не удалось открыть приложение карт.",
+    "radiusAll": "Все"
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",

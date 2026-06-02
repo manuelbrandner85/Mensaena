@@ -1191,7 +1191,9 @@
     "statusChanged": "Durum güncellendi.",
     "boost": "Öne çıkar",
     "boosted": "Öne çıkarıldı",
-    "boostedCount": "{n}× öne çıkarıldı"
+    "boostedCount": "{n}× öne çıkarıldı",
+    "loadingAll": "Tüm gönderiler yükleniyor…",
+    "activeAll": "{count}{more} aktif gönderi"
   },
   "marketplace": {
     "listing": "İlan",
@@ -1854,7 +1856,8 @@
     "toggleCrises": "Krizleri aç/kapat",
     "toggleEvents": "Etkinlikleri aç/kapat",
     "routeTo": "Yol tarifi",
-    "routeFailed": "Harita uygulaması açılamadı."
+    "routeFailed": "Harita uygulaması açılamadı.",
+    "radiusAll": "Tümü"
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",

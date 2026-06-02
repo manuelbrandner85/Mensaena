@@ -1268,7 +1268,9 @@
     "statusChanged": "Status aktualisiert.",
     "boost": "Verstärken",
     "boosted": "Verstärkt",
-    "boostedCount": "{n}× verstärkt"
+    "boostedCount": "{n}× verstärkt",
+    "loadingAll": "Lade alle Beiträge…",
+    "activeAll": "{count}{more} aktive Beiträge"
   },
   "marketplace": {
     "listing": "Inserat",
@@ -2024,7 +2026,8 @@
     "toggleCrises": "Krisen ein/aus",
     "toggleEvents": "Events ein/aus",
     "routeTo": "Route hierher",
-    "routeFailed": "Karten-App konnte nicht geöffnet werden."
+    "routeFailed": "Karten-App konnte nicht geöffnet werden.",
+    "radiusAll": "Alle"
   },
   "calendar": {
     "noEvents": "Keine Events im Kalender.",

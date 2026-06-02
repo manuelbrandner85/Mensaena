@@ -1192,7 +1192,9 @@
     "statusChanged": "Stato aggiornato.",
     "boost": "Amplifica",
     "boosted": "Amplificato",
-    "boostedCount": "Amplificato {n}×"
+    "boostedCount": "Amplificato {n}×",
+    "loadingAll": "Caricamento di tutti i post…",
+    "activeAll": "{count}{more} post attivi"
   },
   "marketplace": {
     "listing": "Annuncio",
@@ -1855,7 +1857,8 @@
     "toggleCrises": "Mostra/nascondi crisi",
     "toggleEvents": "Mostra/nascondi eventi",
     "routeTo": "Indicazioni",
-    "routeFailed": "Impossibile aprire l'app mappe."
+    "routeFailed": "Impossibile aprire l'app mappe.",
+    "radiusAll": "Tutti"
   },
   "calendar": {
     "noEvents": "Nessun evento in calendario.",

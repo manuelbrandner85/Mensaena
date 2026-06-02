@@ -1192,7 +1192,9 @@
     "statusChanged": "Statut mis à jour.",
     "boost": "Amplifier",
     "boosted": "Amplifié",
-    "boostedCount": "Amplifié {n}×"
+    "boostedCount": "Amplifié {n}×",
+    "loadingAll": "Chargement de toutes les publications…",
+    "activeAll": "{count}{more} publications actives"
   },
   "marketplace": {
     "listing": "Annonce",
@@ -1855,7 +1857,8 @@
     "toggleCrises": "Afficher/masquer crises",
     "toggleEvents": "Afficher/masquer événements",
     "routeTo": "Itinéraire",
-    "routeFailed": "Impossible d'ouvrir l'app de cartes."
+    "routeFailed": "Impossible d'ouvrir l'app de cartes.",
+    "radiusAll": "Tous"
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",

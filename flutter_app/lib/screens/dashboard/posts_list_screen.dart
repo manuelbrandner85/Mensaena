@@ -292,9 +292,17 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                 metaIndex: '§ 05',
                 metaCategory: 'posts.title'.tr(),
                 title: 'posts.allPosts'.tr(),
+                // Text spiegelt die Realität: ohne aktiven Radius-Filter
+                // werden ALLE Beiträge gezeigt ("aktiv"), nur mit gesetztem
+                // Radius "in deiner Nähe".
                 subtitle: _loading
-                    ? 'posts.loadingNearby'.tr()
-                    : 'posts.activeNearby'.tr(namedArgs: {
+                    ? (_radiusKm != null
+                        ? 'posts.loadingNearby'.tr()
+                        : 'posts.loadingAll'.tr())
+                    : (_radiusKm != null
+                            ? 'posts.activeNearby'
+                            : 'posts.activeAll')
+                        .tr(namedArgs: {
                         'count': '${_items.length}',
                         'more': _hasMore ? '+' : '',
                       }),

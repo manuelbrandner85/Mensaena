@@ -1269,7 +1269,9 @@
     "statusChanged": "Status updated.",
     "boost": "Boost",
     "boosted": "Boosted",
-    "boostedCount": "Boosted {n}×"
+    "boostedCount": "Boosted {n}×",
+    "loadingAll": "Loading all posts…",
+    "activeAll": "{count}{more} active posts"
   },
   "marketplace": {
     "listing": "Listing",
@@ -2025,7 +2027,8 @@
     "toggleCrises": "Toggle crises",
     "toggleEvents": "Toggle events",
     "routeTo": "Directions",
-    "routeFailed": "Could not open maps app."
+    "routeFailed": "Could not open maps app.",
+    "radiusAll": "All"
   },
   "calendar": {
     "noEvents": "No events in calendar.",

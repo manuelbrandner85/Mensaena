@@ -47,9 +47,12 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen> {
   static const LatLng _defaultCenter = LatLng(51.1657, 10.4515); // Mitte DE
-  static const List<int> _radiusOptions = [5, 10, 25, 50, 100];
+  // 0 = "Alle" (kein Standort-Filter — zeigt alle Beiträge weltweit).
+  // Default ist jetzt "Alle"; der Radius-Filter ist optional und greift
+  // erst wenn der User aktiv einen km-Wert wählt.
+  static const List<int> _radiusOptions = [0, 5, 10, 25, 50, 100];
   static const Map<int, double> _radiusZoom = {
-    5: 13.0, 10: 12.0, 25: 10.0, 50: 9.0, 100: 7.0,
+    0: 5.0, 5: 13.0, 10: 12.0, 25: 10.0, 50: 9.0, 100: 7.0,
   };
   static const String _storeName = 'mensaena_tiles';
 
@@ -59,7 +62,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   // Abfrage gesetzt, NICHT beim Pan. Sonst "wandert" der User-Pin.
   LatLng? _gpsLocation;
   double _zoom = 6;
-  int _radiusKm = 10;
+  // Default 0 = Alle Beiträge (kein Standort-Filter). User kann optional
+  // einen Radius wählen um nur die Umgebung zu sehen.
+  int _radiusKm = 0;
   List<Post> _posts = const [];
   bool _loading = true;
   String? _error;
@@ -281,7 +286,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Future<void> _loadAccessiblePlaces() async {
     final lat = _center.latitude;
     final lng = _center.longitude;
-    final radiusM = _radiusKm * 1000;
+    // Bei "Alle" (0) für die Barrierefrei-Orte einen sinnvollen Umkreis
+    // nehmen (weltweite Overpass-Query wäre nicht machbar).
+    final radiusM = (_radiusKm == 0 ? 25 : _radiusKm) * 1000;
     final cacheKey =
         '${lat.toStringAsFixed(2)},${lng.toStringAsFixed(2)}:$radiusM';
     final hit = _a11yCache[cacheKey];
@@ -400,11 +407,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       _error = null;
     });
     try {
-      if (_radiusKm >= 50) {
-        // Erst schnell 20 Posts zeigen, dann im Hintergrund 100 nachladen.
+      // _radiusKm == 0 → "Alle": kein Standort-Filter, lat/lng = null →
+      // Repository liefert die neuesten aktiven Beiträge global.
+      final showAll = _radiusKm == 0;
+      if (showAll || _radiusKm >= 50) {
+        // Erst schnell 20 Posts zeigen, dann im Hintergrund mehr nachladen.
         final fast = await PostsRepository.getNearby(
-          lat: _hasGps ? _center.latitude : null,
-          lng: _hasGps ? _center.longitude : null,
+          lat: (showAll || !_hasGps) ? null : _center.latitude,
+          lng: (showAll || !_hasGps) ? null : _center.longitude,
           radiusKm: _radiusKm,
           limit: 20,
         );
@@ -417,8 +427,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         unawaited(_backgroundFullFetch());
       } else {
         final posts = await PostsRepository.getNearby(
-          lat: _hasGps ? _center.latitude : null,
-          lng: _hasGps ? _center.longitude : null,
+          lat: !_hasGps ? null : _center.latitude,
+          lng: !_hasGps ? null : _center.longitude,
           radiusKm: _radiusKm,
           limit: 100,
         );
@@ -439,11 +449,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   Future<void> _backgroundFullFetch() async {
     try {
+      final showAll = _radiusKm == 0;
       final full = await PostsRepository.getNearby(
-        lat: _hasGps ? _center.latitude : null,
-        lng: _hasGps ? _center.longitude : null,
-        radiusKm: _radiusKm,
-        limit: 100,
+        lat: (showAll || !_hasGps) ? null : _center.latitude,
+        lng: (showAll || !_hasGps) ? null : _center.longitude,
+        radiusKm: _radiusKm == 0 ? 100 : _radiusKm,
+        limit: 200,
       );
       if (!mounted) return;
       // Merge nach id-Set damit keine Duplikate.
@@ -467,11 +478,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       _error = null;
     });
     try {
+      final showAll = _radiusKm == 0;
       final posts = await PostsRepository.search(
         query: q,
-        lat: _hasGps ? _center.latitude : null,
-        lng: _hasGps ? _center.longitude : null,
-        radiusKm: _radiusKm,
+        lat: (showAll || !_hasGps) ? null : _center.latitude,
+        lng: (showAll || !_hasGps) ? null : _center.longitude,
+        radiusKm: showAll ? 50 : _radiusKm,
         limit: 50,
       );
       if (!mounted) return;
@@ -1311,7 +1323,7 @@ class _RadiusBar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        '$km km',
+                        km == 0 ? 'map.radiusAll'.tr() : '$km km',
                         style: AppTypography.mono(
                           size: 11,
                           color: km == selected
