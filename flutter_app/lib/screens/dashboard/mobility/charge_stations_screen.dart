@@ -4,6 +4,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -120,7 +122,10 @@ class _ChargeStationsScreenState
   Widget build(BuildContext context) {
     return DashboardScaffold(
       title: 'charge.title'.tr(),
-      currentRoute: '/dashboard/mobility/charge',
+      // Drawer-Highlight: tatsächliche Route ist /dashboard/charge-stations,
+      // nicht /dashboard/mobility/charge → der Mobility-Eintrag im Drawer
+      // wird sonst nicht aktiv markiert.
+      currentRoute: '/dashboard/charge-stations',
       fab: FloatingActionButton(
         backgroundColor: AppColors.tealSoft,
         foregroundColor: AppColors.voidColor,
@@ -277,6 +282,31 @@ class _ChargeStationsScreenState
     );
   }
 
+  /// Öffnet die System-Karte mit Routen-Navigation zur Station.
+  /// Gleicher Mechanismus wie auf dem Spritpreise-Screen.
+  Future<void> _navigateTo(ChargeStation s) async {
+    final label = s.name ?? s.operator ?? 'charge.title'.tr();
+    final candidates = <Uri>[
+      if (Platform.isAndroid)
+        Uri.parse('google.navigation:q=${s.lat},${s.lng}&mode=d'),
+      if (Platform.isIOS)
+        Uri.parse(
+            'http://maps.apple.com/?daddr=${s.lat},${s.lng}&dirflg=d'),
+      Uri.parse(
+          'geo:${s.lat},${s.lng}?q=${s.lat},${s.lng}(${Uri.encodeComponent(label)})'),
+      Uri.parse(
+          'https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving'),
+    ];
+    for (final uri in candidates) {
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return;
+        }
+      } catch (_) {/* nächster Kandidat */}
+    }
+  }
+
   void _openSheet(ChargeStation s) {
     showModalBottomSheet<void>(
       context: context,
@@ -332,6 +362,23 @@ class _ChargeStationsScreenState
               const SizedBox(height: 8),
               Text('${s.lat.toStringAsFixed(4)}, ${s.lng.toStringAsFixed(4)}',
                   style: AppTypography.caption()),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).maybePop();
+                    _navigateTo(s);
+                  },
+                  icon: const Icon(LucideIcons.navigation, size: 16),
+                  label: Text('gas.navigate'.tr()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.tealSoft,
+                    foregroundColor: AppColors.voidColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
