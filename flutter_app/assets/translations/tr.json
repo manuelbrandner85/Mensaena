@@ -2492,5 +2492,10 @@
     "body": "Uygulama kapalıyken bile aramaların ve önemli mesajların sana anında ulaşması için Mensaena’yı pil optimizasyonundan muaf tut. Aksi halde Android uygulamayı arka planda durdurabilir.",
     "allow": "İzin ver",
     "later": "Sonra"
+  },
+  "gas": {
+    "navigate": "Rota oluştur",
+    "demoTitle": "Canlı fiyatlar şu anda kullanılamıyor",
+    "demoBody": "Tankerkönig demo anahtarı kullanılıyor — tüm istasyonlar aynı fiyatı gösteriyor. Yönetici: private.push_config içinde gerçek bir anahtar ayarlayın."
   }
 }

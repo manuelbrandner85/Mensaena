@@ -3094,7 +3094,10 @@
   "gas": {
     "title": "Fuel prices nearby",
     "empty": "No gas stations found — GPS active?",
-    "closed": "closed"
+    "closed": "closed",
+    "navigate": "Get directions",
+    "demoTitle": "Live prices currently unavailable",
+    "demoBody": "The Tankerkönig demo key is in use — all stations show identical prices. Admin: set a real key in private.push_config."
   },
   "dashboard": {
     "edit": {

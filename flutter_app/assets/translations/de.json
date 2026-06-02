@@ -3093,7 +3093,10 @@
   "gas": {
     "title": "Spritpreise in der Nähe",
     "empty": "Keine Tankstellen gefunden — GPS aktiv?",
-    "closed": "geschlossen"
+    "closed": "geschlossen",
+    "navigate": "Route berechnen",
+    "demoTitle": "Live-Preise zurzeit nicht verfügbar",
+    "demoBody": "Es wird der Tankerkönig-Demo-Schlüssel verwendet — alle Stationen zeigen identische Preise. Admin: echten Schlüssel in private.push_config setzen."
   },
   "dashboard": {
     "edit": {

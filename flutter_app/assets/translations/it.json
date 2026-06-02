@@ -2493,5 +2493,10 @@
     "body": "Affinché chiamate e messaggi importanti ti raggiungano subito anche ad app chiusa, escludi Mensaena dall’ottimizzazione della batteria. Altrimenti Android può fermare l’app in background.",
     "allow": "Consenti",
     "later": "Più tardi"
+  },
+  "gas": {
+    "navigate": "Calcola percorso",
+    "demoTitle": "Prezzi in tempo reale non disponibili",
+    "demoBody": "È in uso la chiave demo di Tankerkönig — tutte le stazioni mostrano gli stessi prezzi. Admin: imposta una chiave reale in private.push_config."
   }
 }

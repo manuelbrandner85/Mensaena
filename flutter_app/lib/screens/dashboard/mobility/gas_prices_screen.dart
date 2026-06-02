@@ -1,12 +1,16 @@
 /// SKILL: mensaena-features
-/// Spritpreise via Tankerkönig — Liste nahegelegener Tankstellen
-/// mit E5/E10/Diesel-Preis. Ersatz für die alte E-Lade-Stations-View.
+/// Spritpreise — Live-Liste umliegender Tankstellen mit E5/E10/Diesel.
+/// AT via E-Control, DE via Tankerkönig (server-seitig via Edge-Function
+/// 'fuel-prices'). Pull-to-Refresh + "Route"-Button öffnet die System-Karte.
 library;
+
+import 'dart:io' show Platform;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -17,24 +21,50 @@ import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 final _gasStationsProvider =
-    FutureProvider.autoDispose<List<GasStation>>((ref) async {
+    FutureProvider.autoDispose<FuelPricesResult>((ref) async {
   try {
     final pos = await LocationService.getCurrentPosition()
         .timeout(const Duration(seconds: 6));
     return TankerkoenigService.nearby(
       lat: pos.latitude,
       lng: pos.longitude,
-      radiusKm: 8,
+      radiusKm: 10,
     );
   } catch (_) {
-    return const [];
+    return FuelPricesResult.empty;
   }
 });
 
 class GasPricesScreen extends ConsumerWidget {
   const GasPricesScreen({super.key});
 
-  String _fmt(double? p) => p == null ? '—' : '${p.toStringAsFixed(3)} €';
+  String _fmt(double? p) =>
+      p == null ? '—' : '${p.toStringAsFixed(3)} €';
+
+  /// Öffnet die System-Karte mit Routen-Navigation zur Tankstelle.
+  /// Reihenfolge: google.navigation: (Google Maps Android) → Apple Maps →
+  /// geo:?q= → maps.google.com Webfallback.
+  Future<void> _navigateTo(GasStation s) async {
+    final candidates = <Uri>[
+      if (Platform.isAndroid)
+        Uri.parse('google.navigation:q=${s.lat},${s.lng}&mode=d'),
+      if (Platform.isIOS)
+        Uri.parse(
+            'http://maps.apple.com/?daddr=${s.lat},${s.lng}&dirflg=d'),
+      Uri.parse(
+          'geo:${s.lat},${s.lng}?q=${s.lat},${s.lng}(${Uri.encodeComponent("${s.brand} ${s.name}")})'),
+      Uri.parse(
+          'https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving'),
+    ];
+    for (final uri in candidates) {
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return;
+        }
+      } catch (_) {/* nächster Kandidat */}
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,7 +80,8 @@ class GasPricesScreen extends ConsumerWidget {
         loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.bronze)),
         error: (_, __) => const SizedBox.shrink(),
-        data: (stations) {
+        data: (result) {
+          final stations = result.stations;
           if (stations.isEmpty) {
             return Center(
               child: Padding(
@@ -66,29 +97,33 @@ class GasPricesScreen extends ConsumerWidget {
           }
           return ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            itemCount: stations.length,
+            itemCount: stations.length + (result.demo ? 1 : 0),
             itemBuilder: (_, i) {
-              final s = stations[i];
+              if (result.demo && i == 0) return const _DemoBanner();
+              final s = stations[i - (result.demo ? 1 : 0)];
               return AnimatedEntrance(
                 index: i,
                 child: Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: GlassCard(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: GlassCard(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
                           Icon(
-                            s.isOpen ? LucideIcons.fuel : LucideIcons.fuel,
+                            LucideIcons.fuel,
                             size: 18,
-                            color:
-                                s.isOpen ? AppColors.leben : AppColors.mute,
+                            color: s.isOpen
+                                ? AppColors.leben
+                                : AppColors.mute,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              '${s.brand} · ${s.name}',
+                              s.brand.isNotEmpty
+                                  ? '${s.brand} · ${s.name}'
+                                  : s.name,
                               style: AppTypography.body(
                                   size: 14,
                                   color: AppColors.ink,
@@ -108,26 +143,89 @@ class GasPricesScreen extends ConsumerWidget {
                         Row(children: [
                           _PricePill(label: 'E5', value: _fmt(s.e5)),
                           const SizedBox(width: 8),
+                          // E10 ist in AT nicht gebräuchlich → Pille
+                          // dezent grau wenn null.
                           _PricePill(label: 'E10', value: _fmt(s.e10)),
                           const SizedBox(width: 8),
                           _PricePill(
                               label: 'Diesel', value: _fmt(s.diesel)),
-                          if (!s.isOpen) ...[
-                            const Spacer(),
-                            Text('gas.closed'.tr(),
-                                style: AppTypography.body(
-                                    size: 11,
-                                    color: AppColors.herzrotWarm,
-                                    weight: FontWeight.w700)),
-                          ],
+                          const Spacer(),
+                          if (!s.isOpen)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Text('gas.closed'.tr(),
+                                  style: AppTypography.body(
+                                      size: 11,
+                                      color: AppColors.herzrotWarm,
+                                      weight: FontWeight.w700)),
+                            ),
                         ]),
-                      ]),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _navigateTo(s),
+                            icon: const Icon(LucideIcons.navigation,
+                                size: 14),
+                            label: Text('gas.navigate'.tr()),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.bronze,
+                              side: BorderSide(
+                                  color: AppColors.bronze
+                                      .withValues(alpha: 0.5)),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
               );
             },
           );
         },
+      ),
+    );
+  }
+}
+
+/// Hinweis-Banner wenn der Server gerade den Tankerkönig-Demo-Key benutzt
+/// (alle Preise wären dann fake/identisch). Admin muss einen echten Key
+/// in private.push_config (key='tankerkoenig_api_key') hinterlegen.
+class _DemoBanner extends StatelessWidget {
+  const _DemoBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(LucideIcons.alertTriangle,
+                size: 16, color: AppColors.amber),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('gas.demoTitle'.tr(),
+                      style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  Text('gas.demoBody'.tr(),
+                      style: AppTypography.caption()),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -139,6 +237,7 @@ class _PricePill extends StatelessWidget {
   final String value;
   @override
   Widget build(BuildContext context) {
+    final isPlaceholder = value == '—';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -151,7 +250,7 @@ class _PricePill extends StatelessWidget {
         Text(value,
             style: AppTypography.body(
                 size: 12,
-                color: AppColors.ink,
+                color: isPlaceholder ? AppColors.mute : AppColors.ink,
                 weight: FontWeight.w700)),
       ]),
     );

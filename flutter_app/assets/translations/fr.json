@@ -2493,5 +2493,10 @@
     "body": "Pour que les appels et messages importants te parviennent immédiatement même app fermée, exclus Mensaena de l’optimisation de la batterie. Sinon Android peut arrêter l’app en arrière-plan.",
     "allow": "Autoriser",
     "later": "Plus tard"
+  },
+  "gas": {
+    "navigate": "Itinéraire",
+    "demoTitle": "Prix en direct indisponibles",
+    "demoBody": "La clé démo Tankerkönig est utilisée — toutes les stations affichent les mêmes prix. Admin : définir une vraie clé dans private.push_config."
   }
 }

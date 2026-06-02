@@ -1,19 +1,18 @@
 /// SKILL: mensaena-features
-/// Tankerkönig API — DE-Spritpreise von Aral, Shell, ESSO, Total etc.
-/// Kostenlos via https://creativecommons.tankerkoenig.de/ (CC-BY).
-/// Benötigt einen API-Key; Demo-Key ist im freien Tier (1000/h shared).
+/// Spritpreise-Service — server-seitig vereinheitlicht via Edge-Function
+/// 'fuel-prices' (siehe supabase/functions/fuel-prices/index.ts).
 ///
-/// Endpoint: https://creativecommons.tankerkoenig.de/json/list.php
-///   ?lat={lat}&lng={lng}&rad={radiusKm}&type=all&apikey={key}
-///
-/// Doku: https://creativecommons.tankerkoenig.de/
+/// Quellen:
+///   - AT: api.e-control.at (offizielle Behörden-API, kein Key)
+///   - DE: creativecommons.tankerkoenig.de (Key liegt in private.push_config
+///     unter 'tankerkoenig_api_key' — bis ein echter Key gesetzt wird,
+///     liefert die Demo den gleichen Fake-Preis für alle Stationen
+///     → Server gibt demo=true zurück, Client zeigt einen Hinweis).
 library;
 
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart' show debugPrint;
-import 'package:http/http.dart' as http;
+
+import 'supabase_service.dart';
 
 class GasStation {
   const GasStation({
@@ -44,53 +43,72 @@ class GasStation {
   final double? e10;
 }
 
+/// Antwort des Spritpreise-Services. [source] = 'e-control'|'tankerkoenig'|
+/// 'none'. [demo] = true wenn der Server gerade den Tankerkönig-Demo-Key
+/// nutzt (Preise sind dann nicht real und müssen gekennzeichnet werden).
+class FuelPricesResult {
+  const FuelPricesResult({
+    required this.stations,
+    required this.source,
+    required this.demo,
+  });
+  final List<GasStation> stations;
+  final String source;
+  final bool demo;
+
+  static const empty =
+      FuelPricesResult(stations: [], source: 'none', demo: false);
+}
+
 class TankerkoenigService {
   TankerkoenigService._();
 
-  // Demo-Key (öffentlich). Eigenen Key kostenlos via Form anfragen wenn
-  // 1000 req/h shared limit reached:
-  // https://creativecommons.tankerkoenig.de/#register
-  static const _apiKey = '00000000-0000-0000-0000-000000000002';
-
-  /// Tankstellen rund um (lat,lng) im Radius (max 25 km).
-  static Future<List<GasStation>> nearby({
+  /// Tankstellen rund um (lat,lng) im Radius (max 25 km). Land wird
+  /// optional explizit übergeben ('AT'|'DE'|...); ansonsten leitet der
+  /// Server es aus den Koordinaten ab.
+  static Future<FuelPricesResult> nearby({
     required double lat,
     required double lng,
     double radiusKm = 10,
+    String? country,
   }) async {
     try {
-      final uri = Uri.parse(
-        'https://creativecommons.tankerkoenig.de/json/list.php'
-        '?lat=$lat&lng=$lng&rad=${radiusKm.clamp(1, 25)}&type=all&sort=dist&apikey=$_apiKey',
+      final res = await sb.functions.invoke(
+        'fuel-prices',
+        body: {
+          'lat': lat,
+          'lng': lng,
+          'rad_km': radiusKm,
+          if (country != null) 'country': country,
+        },
       );
-      final resp = await http.get(uri).timeout(const Duration(seconds: 12));
-      if (resp.statusCode != 200) {
-        debugPrint('[Tankerkoenig] HTTP ${resp.statusCode}');
-        return const [];
-      }
-      final j = jsonDecode(resp.body) as Map<String, dynamic>;
-      if (j['ok'] != true) return const [];
-      final stations = j['stations'] as List? ?? const [];
-      return stations
+      final data = res.data;
+      if (data is! Map) return FuelPricesResult.empty;
+      final stations = (data['stations'] as List? ?? const [])
           .whereType<Map<String, dynamic>>()
           .map((s) => GasStation(
-                id: s['id'] as String,
+                id: (s['id'] as String?) ?? '',
                 brand: (s['brand'] as String?) ?? '',
                 name: (s['name'] as String?) ?? '',
-                street: '${s['street'] ?? ''} ${s['houseNumber'] ?? ''}'.trim(),
+                street: (s['street'] as String?) ?? '',
                 place: (s['place'] as String?) ?? '',
-                lat: (s['lat'] as num).toDouble(),
-                lng: (s['lng'] as num).toDouble(),
-                distanceKm: (s['dist'] as num?)?.toDouble() ?? 0,
-                isOpen: s['isOpen'] == true,
+                lat: (s['lat'] as num?)?.toDouble() ?? 0,
+                lng: (s['lng'] as num?)?.toDouble() ?? 0,
+                distanceKm: (s['distance_km'] as num?)?.toDouble() ?? 0,
+                isOpen: s['is_open'] == true,
                 diesel: (s['diesel'] as num?)?.toDouble(),
                 e5: (s['e5'] as num?)?.toDouble(),
                 e10: (s['e10'] as num?)?.toDouble(),
               ))
           .toList();
+      return FuelPricesResult(
+        stations: stations,
+        source: (data['source'] as String?) ?? 'none',
+        demo: data['demo'] == true,
+      );
     } catch (e) {
-      debugPrint('[Tankerkoenig] failed: $e');
-      return const [];
+      debugPrint('[FuelPrices] failed: $e');
+      return FuelPricesResult.empty;
     }
   }
 }
