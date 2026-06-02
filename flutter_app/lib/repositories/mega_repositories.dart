@@ -191,6 +191,10 @@ class CommunityPollsRepository {
           .select(
               'id, creator_id, question, options, is_anonymous, closes_at, status, created_at, creator:profiles!community_polls_creator_id_fkey(display_name)')
           .eq('status', 'active')
+          // Geschlossene Polls (closes_at <= now) ausblenden. Vorher wurden
+          // sie nur clientseitig als disabled markiert → Feed füllte sich
+          // mit nicht-abstimmbaren Karten. Polls OHNE closes_at bleiben offen.
+          .or('closes_at.is.null,closes_at.gt.${DateTime.now().toUtc().toIso8601String()}')
           .order('created_at', ascending: false)
           .limit(50);
       return (rows as List)
@@ -206,6 +210,16 @@ class CommunityPollsRepository {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
     try {
+      // Schon abgestimmt? Vorher schluckte der catch eine Unique-Verletzung
+      // still → User tippt mehrfach, glaubt es klappt nicht. Jetzt explizite
+      // Prüfung; bereits-abgestimmt wird als Erfolg (idempotent) gewertet.
+      final existing = await sb
+          .from('community_poll_votes')
+          .select('id')
+          .eq('poll_id', pollId)
+          .eq('user_id', uid)
+          .limit(1);
+      if ((existing as List).isNotEmpty) return true;
       await sb.from('community_poll_votes').insert({
         'poll_id': pollId,
         'user_id': uid,
