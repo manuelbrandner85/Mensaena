@@ -330,7 +330,32 @@
     "savedTitle": "Kaydedildi",
     "otherProfile": "Profil",
     "notLoggedIn": "Oturumun kapalı. Profilini görmek için tekrar giriş yap.",
-    "trustTrend": "Güven eğilimi"
+    "trustTrend": "Güven eğilimi",
+    "tabs": {
+      "about": "Hakkımda",
+      "posts": "Gönderiler",
+      "ratings": "Değerlendirmeler",
+      "badges": "Rozetler"
+    },
+    "stats": {
+      "timebank": "Zaman bankası",
+      "groups": "Gruplar",
+      "challenges": "Görevler",
+      "posts": "Gönderiler",
+      "active": "aktif",
+      "membership": "üyelik",
+      "memberships": "üyelik",
+      "impact": "Etki",
+      "points": "Puan",
+      "donations": "Bağışlar"
+    },
+    "userBlocked": "Kullanıcı engellendi.",
+    "blockFailed": "Engelleme başarısız.",
+    "trustBadge": "Güven {score} · {count} değerlendirme",
+    "noRatingsForUser": "Bu kullanıcı için henüz değerlendirme yok.",
+    "ratingsOutOf": "{total} değerlendirmeden",
+    "trustScoreExplain": "Güven puanı, tamamlanmış tüm etkileşimlerden otomatik olarak hesaplanır.",
+    "qr_code": "QR kodu"
   },
   "settings": {
     "title": "Ayarlar",

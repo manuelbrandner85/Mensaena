@@ -330,7 +330,32 @@
     "savedTitle": "Salvati",
     "otherProfile": "Profilo",
     "notLoggedIn": "Sei disconnesso. Accedi di nuovo per vedere il tuo profilo.",
-    "trustTrend": "Andamento fiducia"
+    "trustTrend": "Andamento fiducia",
+    "tabs": {
+      "about": "Su di me",
+      "posts": "Post",
+      "ratings": "Valutazioni",
+      "badges": "Badge"
+    },
+    "stats": {
+      "timebank": "Banca del tempo",
+      "groups": "Gruppi",
+      "challenges": "Sfide",
+      "posts": "Post",
+      "active": "attivi",
+      "membership": "iscrizione",
+      "memberships": "iscrizioni",
+      "impact": "Impatto",
+      "points": "Punti",
+      "donations": "Donazioni"
+    },
+    "userBlocked": "Utente bloccato.",
+    "blockFailed": "Blocco non riuscito.",
+    "trustBadge": "Fiducia {score} · {count} valutazioni",
+    "noRatingsForUser": "Ancora nessuna valutazione per questo utente.",
+    "ratingsOutOf": "su {total} valutazioni",
+    "trustScoreExplain": "Il punteggio di fiducia è calcolato automaticamente da tutte le interazioni completate.",
+    "qr_code": "Codice QR"
   },
   "settings": {
     "title": "Impostazioni",

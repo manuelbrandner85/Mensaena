@@ -167,11 +167,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                   unselectedLabelColor: AppColors.inkSoft,
                   labelStyle: AppTypography.label(size: 11),
                   unselectedLabelStyle: AppTypography.label(size: 11),
-                  tabs: const [
-                    Tab(text: 'Über mich'),
-                    Tab(text: 'Posts'),
-                    Tab(text: 'Bewertungen'),
-                    Tab(text: 'Badges'),
+                  tabs: [
+                    Tab(text: 'profile.tabs.about'.tr()),
+                    Tab(text: 'profile.tabs.posts'.tr()),
+                    Tab(text: 'profile.tabs.ratings'.tr()),
+                    Tab(text: 'profile.tabs.badges'.tr()),
                   ],
                 ),
                 Expanded(
@@ -369,7 +369,7 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
                 icon: LucideIcons.clock,
                 color: AppColors.bronze,
                 value: '${netto.toStringAsFixed(1)}h',
-                label: 'Zeitbank',
+                label: 'profile.stats.timebank'.tr(),
                 sub: '${s.hoursGiven.toStringAsFixed(0)}h ↑ ${s.hoursReceived.toStringAsFixed(0)}h ↓',
               ),
             ),
@@ -379,10 +379,10 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
                 icon: LucideIcons.users2,
                 color: AppColors.tealSoft,
                 value: '${s.groupsCount}',
-                label: 'Gruppen',
+                label: 'profile.stats.groups'.tr(),
                 sub: s.groupsCount == 1
-                    ? 'Mitgliedschaft'
-                    : 'Mitgliedschaften',
+                    ? 'profile.stats.membership'.tr()
+                    : 'profile.stats.memberships'.tr(),
               ),
             ),
             const SizedBox(width: 6),
@@ -391,8 +391,8 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
                 icon: LucideIcons.trophy,
                 color: AppColors.amber,
                 value: '${s.activeChallenges}',
-                label: 'Challenges',
-                sub: 'aktiv',
+                label: 'profile.stats.challenges'.tr(),
+                sub: 'profile.stats.active'.tr(),
               ),
             ),
             const SizedBox(width: 6),
@@ -401,8 +401,8 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
                 icon: LucideIcons.fileText,
                 color: AppColors.lebenSoft,
                 value: '${s.postsCount}',
-                label: 'Beiträge',
-                sub: 'aktiv',
+                label: 'profile.stats.posts'.tr(),
+                sub: 'profile.stats.active'.tr(),
               ),
             ),
           ],
@@ -782,7 +782,9 @@ class _Header extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          profile.displayName ?? profile.name ?? 'Nachbar:in',
+                          profile.displayName ??
+                              profile.name ??
+                              'common.neighbour'.tr(),
                           style: AppTypography.display(
                             size: 22,
                             color: AppColors.ink,
@@ -1009,20 +1011,22 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
     setState(() => _busy = false);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text(ok ? 'Nutzer:in blockiert.' : 'Fehler beim Blockieren.',
+      content: Text(
+          ok ? 'profile.userBlocked'.tr() : 'profile.blockFailed'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
   }
 
   Future<void> _showReportDialog() async {
-    const reasons = <String>[
-      'Spam',
-      'Belästigung',
-      'Hass / Diskriminierung',
-      'Gewalt',
-      'Falsche Informationen',
-      'Anstößige Inhalte',
-      'Anderer Grund',
+    // value = kanonische (DE) Kennung in DB; labelKey = übersetzte Anzeige.
+    const reasons = <({String value, String labelKey})>[
+      (value: 'Spam', labelKey: 'posts.reasonSpam'),
+      (value: 'Belästigung', labelKey: 'posts.reasonHarassment'),
+      (value: 'Hass / Diskriminierung', labelKey: 'postCard.reasonHate'),
+      (value: 'Gewalt', labelKey: 'postCard.reasonViolence'),
+      (value: 'Falsche Informationen', labelKey: 'posts.reasonFalse'),
+      (value: 'Anstößige Inhalte', labelKey: 'posts.reasonOffensive'),
+      (value: 'Anderer Grund', labelKey: 'posts.reasonOther'),
     ];
     final selected = await showDialog<String>(
       context: context,
@@ -1041,10 +1045,10 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
             for (final r in reasons)
               ListTile(
                 dense: true,
-                title: Text(r,
+                title: Text(r.labelKey.tr(),
                     style: AppTypography.body(
                         size: 13, color: AppColors.ink)),
-                onTap: () => Navigator.pop(ctx, r),
+                onTap: () => Navigator.pop(ctx, r.value),
               ),
           ],
         ),
@@ -1068,7 +1072,7 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text(
-        ok ? 'Meldung übermittelt. Danke.' : 'Meldung fehlgeschlagen.',
+        ok ? 'posts.reportSubmitted'.tr() : 'posts.reportFailed'.tr(),
         style: AppTypography.body(size: 13, color: AppColors.ink),
       ),
     ));
@@ -1295,7 +1299,10 @@ class _TrustBadge extends StatelessWidget {
             Icon(LucideIcons.star, size: 12, color: color),
             const SizedBox(width: 4),
             Text(
-              'Trust $score · $count Bewertungen',
+              'profile.trustBadge'.tr(namedArgs: {
+                'score': '$score',
+                'count': '$count',
+              }),
               style: AppTypography.label(size: 10, color: color),
             ),
             const SizedBox(width: 4),
@@ -1385,7 +1392,7 @@ class _TrustBreakdownSheetState extends State<_TrustBreakdownSheet> {
                 )
               else if (total == 0)
                 Text(
-                  'Noch keine Bewertungen für diesen Nutzer.',
+                  'profile.noRatingsForUser'.tr(),
                   style: AppTypography.body(
                       size: 13, color: AppColors.mute),
                 )
@@ -1402,7 +1409,9 @@ class _TrustBreakdownSheetState extends State<_TrustBreakdownSheet> {
                         style: AppTypography.body(
                             size: 14, color: AppColors.mute)),
                     const SizedBox(width: 12),
-                    Text('aus $total Bewertungen',
+                    Text(
+                        'profile.ratingsOutOf'
+                            .tr(namedArgs: {'total': '$total'}),
                         style: AppTypography.body(
                             size: 12, color: AppColors.inkSoft)),
                   ],
@@ -1463,7 +1472,7 @@ class _TrustBreakdownSheetState extends State<_TrustBreakdownSheet> {
                   ),
                 const SizedBox(height: 16),
                 Text(
-                  'Trust-Score wird automatisch berechnet aus allen abgeschlossenen Interaktionen.',
+                  'profile.trustScoreExplain'.tr(),
                   style: AppTypography.body(
                       size: 11, color: AppColors.mute, height: 1.4),
                 ),
@@ -1487,7 +1496,7 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _Stat(
             icon: LucideIcons.zap,
-            label: 'Impact',
+            label: 'profile.stats.impact'.tr(),
             value: '${profile.impactScore}',
           ),
         ),
@@ -1495,7 +1504,7 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _Stat(
             icon: LucideIcons.trophy,
-            label: 'Punkte',
+            label: 'profile.stats.points'.tr(),
             value: '${profile.points}',
           ),
         ),
@@ -1503,7 +1512,7 @@ class _StatsGrid extends StatelessWidget {
         Expanded(
           child: _Stat(
             icon: LucideIcons.heart,
-            label: 'Spenden',
+            label: 'profile.stats.donations'.tr(),
             value: '${profile.donationCount}',
           ),
         ),

@@ -330,7 +330,32 @@
     "savedTitle": "Сохранено",
     "otherProfile": "Профиль",
     "notLoggedIn": "Вы вышли из аккаунта. Войдите снова, чтобы увидеть свой профиль.",
-    "trustTrend": "Динамика доверия"
+    "trustTrend": "Динамика доверия",
+    "tabs": {
+      "about": "О себе",
+      "posts": "Публикации",
+      "ratings": "Оценки",
+      "badges": "Значки"
+    },
+    "stats": {
+      "timebank": "Банк времени",
+      "groups": "Группы",
+      "challenges": "Вызовы",
+      "posts": "Публикации",
+      "active": "активно",
+      "membership": "участие",
+      "memberships": "участий",
+      "impact": "Влияние",
+      "points": "Очки",
+      "donations": "Пожертвования"
+    },
+    "userBlocked": "Пользователь заблокирован.",
+    "blockFailed": "Не удалось заблокировать.",
+    "trustBadge": "Доверие {score} · {count} оценок",
+    "noRatingsForUser": "Для этого пользователя пока нет оценок.",
+    "ratingsOutOf": "из {total} оценок",
+    "trustScoreExplain": "Рейтинг доверия рассчитывается автоматически по всем завершённым взаимодействиям.",
+    "qr_code": "QR-код"
   },
   "settings": {
     "title": "Настройки",

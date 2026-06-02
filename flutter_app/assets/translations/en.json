@@ -336,7 +336,32 @@
     "savedTitle": "Saved",
     "otherProfile": "Profile",
     "notLoggedIn": "You're signed out. Sign in again to see your profile.",
-    "trustTrend": "Trust trend"
+    "trustTrend": "Trust trend",
+    "tabs": {
+      "about": "About",
+      "posts": "Posts",
+      "ratings": "Ratings",
+      "badges": "Badges"
+    },
+    "stats": {
+      "timebank": "Timebank",
+      "groups": "Groups",
+      "challenges": "Challenges",
+      "posts": "Posts",
+      "active": "active",
+      "membership": "membership",
+      "memberships": "memberships",
+      "impact": "Impact",
+      "points": "Points",
+      "donations": "Donations"
+    },
+    "userBlocked": "User blocked.",
+    "blockFailed": "Failed to block.",
+    "trustBadge": "Trust {score} · {count} ratings",
+    "noRatingsForUser": "No ratings for this user yet.",
+    "ratingsOutOf": "out of {total} ratings",
+    "trustScoreExplain": "Trust score is computed automatically from all completed interactions.",
+    "qr_code": "QR code"
   },
   "settings": {
     "title": "Settings",

@@ -330,7 +330,32 @@
     "savedTitle": "Guardados",
     "otherProfile": "Perfil",
     "notLoggedIn": "Has cerrado sesión. Inicia sesión de nuevo para ver tu perfil.",
-    "trustTrend": "Tendencia de confianza"
+    "trustTrend": "Tendencia de confianza",
+    "tabs": {
+      "about": "Sobre mí",
+      "posts": "Publicaciones",
+      "ratings": "Valoraciones",
+      "badges": "Insignias"
+    },
+    "stats": {
+      "timebank": "Banco de tiempo",
+      "groups": "Grupos",
+      "challenges": "Retos",
+      "posts": "Publicaciones",
+      "active": "activos",
+      "membership": "membresía",
+      "memberships": "membresías",
+      "impact": "Impacto",
+      "points": "Puntos",
+      "donations": "Donaciones"
+    },
+    "userBlocked": "Usuario bloqueado.",
+    "blockFailed": "Error al bloquear.",
+    "trustBadge": "Confianza {score} · {count} valoraciones",
+    "noRatingsForUser": "Aún no hay valoraciones para este usuario.",
+    "ratingsOutOf": "de {total} valoraciones",
+    "trustScoreExplain": "La puntuación de confianza se calcula automáticamente a partir de todas las interacciones completadas.",
+    "qr_code": "Código QR"
   },
   "settings": {
     "title": "Ajustes",

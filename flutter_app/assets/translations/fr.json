@@ -330,7 +330,32 @@
     "savedTitle": "Enregistrés",
     "otherProfile": "Profil",
     "notLoggedIn": "Vous êtes déconnecté. Reconnectez-vous pour voir votre profil.",
-    "trustTrend": "Tendance de confiance"
+    "trustTrend": "Tendance de confiance",
+    "tabs": {
+      "about": "À propos",
+      "posts": "Posts",
+      "ratings": "Évaluations",
+      "badges": "Badges"
+    },
+    "stats": {
+      "timebank": "Banque de temps",
+      "groups": "Groupes",
+      "challenges": "Défis",
+      "posts": "Posts",
+      "active": "actifs",
+      "membership": "adhésion",
+      "memberships": "adhésions",
+      "impact": "Impact",
+      "points": "Points",
+      "donations": "Dons"
+    },
+    "userBlocked": "Utilisateur bloqué.",
+    "blockFailed": "Échec du blocage.",
+    "trustBadge": "Confiance {score} · {count} évaluations",
+    "noRatingsForUser": "Aucune évaluation pour cet utilisateur pour le moment.",
+    "ratingsOutOf": "sur {total} évaluations",
+    "trustScoreExplain": "Le score de confiance est calculé automatiquement à partir de toutes les interactions terminées.",
+    "qr_code": "Code QR"
   },
   "settings": {
     "title": "Paramètres",

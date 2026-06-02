@@ -336,7 +336,32 @@
     "savedTitle": "Gespeichert",
     "otherProfile": "Profil",
     "notLoggedIn": "Du bist abgemeldet. Bitte melde dich neu an, um dein Profil zu sehen.",
-    "trustTrend": "Trust-Verlauf"
+    "trustTrend": "Trust-Verlauf",
+    "tabs": {
+      "about": "Über mich",
+      "posts": "Posts",
+      "ratings": "Bewertungen",
+      "badges": "Badges"
+    },
+    "stats": {
+      "timebank": "Zeitbank",
+      "groups": "Gruppen",
+      "challenges": "Challenges",
+      "posts": "Beiträge",
+      "active": "aktiv",
+      "membership": "Mitgliedschaft",
+      "memberships": "Mitgliedschaften",
+      "impact": "Impact",
+      "points": "Punkte",
+      "donations": "Spenden"
+    },
+    "userBlocked": "Nutzer:in blockiert.",
+    "blockFailed": "Fehler beim Blockieren.",
+    "trustBadge": "Trust {score} · {count} Bewertungen",
+    "noRatingsForUser": "Noch keine Bewertungen für diesen Nutzer.",
+    "ratingsOutOf": "aus {total} Bewertungen",
+    "trustScoreExplain": "Trust-Score wird automatisch berechnet aus allen abgeschlossenen Interaktionen.",
+    "qr_code": "QR-Code"
   },
   "settings": {
     "title": "Einstellungen",
