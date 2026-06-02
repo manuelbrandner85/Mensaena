@@ -26,7 +26,11 @@ class WarnungenScreen extends ConsumerStatefulWidget {
 class _WarnungenScreenState extends ConsumerState<WarnungenScreen> {
   /// Länder in denen NINA tatsächlich Sinn ergibt (BBK-Quelle = Deutschland).
   /// AT/CH user koennen NINA ebenfalls hilfreich finden (Grenzregionen).
-  static const _ninaCountries = {'DE', 'AT', 'CH'};
+  // NINA ist das DEUTSCHE Bundeswarnsystem — AT/CH-Gemeinden sind dort nicht
+  // erfasst. Vorher standen AT/CH hier → österreichische/Schweizer Nutzer
+  // sahen ein leeres NINA-Dashboard. Jetzt nur DE; AT/CH bekommen die
+  // MeteoAlarm-Karte (deren Service jetzt korrekt funktioniert).
+  static const _ninaCountries = {'DE'};
 
   Future<List<Map<String, dynamic>>>? _future;
   String get _ags => AppConfig.defaultAgs;

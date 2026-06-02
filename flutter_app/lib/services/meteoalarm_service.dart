@@ -47,10 +47,41 @@ class MeteoAlarmService {
   static final Map<String, _CacheEntry> _cache = {};
   static const Duration _ttl = Duration(minutes: 15);
 
+  /// BUGFIX: Die MeteoAlarm-Legacy-Feeds heißen NICHT nach ISO-Code, sondern
+  /// nach vollem englischen Ländernamen (kleingeschrieben). Vorher wurde
+  /// 'meteoalarm-legacy-atom-AT' gebaut → 404 für JEDES Land → die
+  /// Wetterwarnungen waren immer leer. Diese Map übersetzt ISO → Feed-Slug.
+  static const Map<String, String> _feedSlug = {
+    'DE': 'germany',
+    'AT': 'austria',
+    'CH': 'switzerland',
+    'IT': 'italy',
+    'ES': 'spain',
+    'FR': 'france',
+    'GB': 'united-kingdom',
+    'PL': 'poland',
+    'HU': 'hungary',
+    'GR': 'greece',
+    'PT': 'portugal',
+    'NL': 'netherlands',
+    'BE': 'belgium',
+    'CZ': 'czechia',
+    'SK': 'slovakia',
+    'SI': 'slovenia',
+    'HR': 'croatia',
+    'IE': 'ireland',
+  };
+
+  /// True wenn für dieses Land ein MeteoAlarm-Feed existiert.
+  static bool isSupported(String code) =>
+      _feedSlug.containsKey(code.toUpperCase());
+
   /// Holt Warnungen fuer einen ISO-Country-Code (DE, AT, CH, IT, ES, ...).
-  /// Liefert leere Liste bei Netz-Error.
+  /// Liefert leere Liste bei Netz-Error oder nicht abgedecktem Land.
   static Future<List<MeteoAlarmWarning>> forCountry(String code) async {
     final country = code.toUpperCase();
+    final slug = _feedSlug[country];
+    if (slug == null) return const [];
     final cached = _cache[country];
     if (cached != null &&
         DateTime.now().difference(cached.timestamp) < _ttl) {
@@ -58,7 +89,7 @@ class MeteoAlarmService {
     }
 
     final url = 'https://feeds.meteoalarm.org/feeds/'
-        'meteoalarm-legacy-atom-$country';
+        'meteoalarm-legacy-atom-$slug';
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 8);
     try {
       final uri = Uri.parse(url);
@@ -116,6 +147,7 @@ class MeteoAlarmService {
       String? urgency;
       String? certainty;
       String? areaName;
+      String? eventName;
       DateTime? effective;
       DateTime? expires;
       String description = summary;
@@ -140,6 +172,11 @@ class MeteoAlarmService {
           case 'area_desc':
             areaName ??= value;
             break;
+          case 'event':
+            // cap:event z.B. 'Thunderstormwarning' — die eigentliche
+            // Warn-Art (Atom-Feeds haben kein <title>).
+            eventName ??= value;
+            break;
           case 'effective':
           case 'onset':
             effective ??= DateTime.tryParse(value);
@@ -153,8 +190,12 @@ class MeteoAlarmService {
         }
       }
 
-      // Title kann oft den Severity-Hinweis als Praefix enthalten.
-      final headline = title.isNotEmpty ? title : 'Wetterwarnung';
+      // Headline-Priorität: Atom-Title → cap:event → Fallback.
+      final headline = title.isNotEmpty
+          ? title
+          : (eventName != null && eventName.isNotEmpty
+              ? eventName
+              : 'Wetterwarnung');
       final severityInt = _severityToInt(severityRaw ?? _guessFromTitle(title));
 
       result.add(MeteoAlarmWarning(
