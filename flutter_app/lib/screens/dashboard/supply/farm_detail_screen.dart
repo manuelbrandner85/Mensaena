@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,8 +8,8 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/farm_listing.dart';
 import '../../../repositories/organizations_repository.dart';
-import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/image_carousel.dart';
 
 class FarmDetailScreen extends ConsumerStatefulWidget {
   const FarmDetailScreen({required this.slug, super.key});
@@ -53,28 +52,18 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                if (f.imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: CachedNetworkImage(
-                      imageUrl: f.imageUrl!,
-                      fadeInDuration: const Duration(milliseconds: 200),
-                      height: 220,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => const ShimmerBox(
-                        width: double.infinity,
-                        height: 220,
-                        borderRadius: 14,
-                      ),
-                      errorWidget: (_, __, ___) => Container(
-                        color: AppColors.elevated,
-                        height: 220,
-                        alignment: Alignment.center,
-                        child: const Icon(LucideIcons.imageOff,
-                            size: 20, color: AppColors.mute),
-                      ),
-                    ),
+                // Vorher wurde nur f.imageUrl (1 Bild) gezeigt, obwohl der
+                // Create-Screen bis zu 5 Fotos hochladen lässt → 4 Fotos
+                // waren faktisch unsichtbar. Jetzt: vollständige Galerie mit
+                // Lightbox (Tap → Vollbild). Fallback auf imageUrl falls
+                // media_urls leer ist (alte Datensätze).
+                if (f.mediaUrls.isNotEmpty || f.imageUrl != null)
+                  ImageCarousel(
+                    urls: f.mediaUrls.isNotEmpty
+                        ? f.mediaUrls
+                        : <String>[f.imageUrl!],
+                    height: 220,
+                    borderRadius: 14,
                   ),
                 const SizedBox(height: 14),
                 Row(
@@ -150,21 +139,23 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
                   _Row(
                     icon: LucideIcons.phone,
                     label: f.phone!,
-                    onTap: () => launchUrl(Uri.parse('tel:${f.phone}')),
+                    onTap: () => _safeLaunch(context, 'tel:${f.phone}'),
                   ),
                 if (f.email != null)
                   _Row(
                     icon: LucideIcons.mail,
                     label: f.email!,
-                    onTap: () => launchUrl(Uri.parse('mailto:${f.email}')),
+                    onTap: () => _safeLaunch(context, 'mailto:${f.email}'),
                   ),
                 if (f.website != null)
                   _Row(
                     icon: LucideIcons.globe,
                     label: f.website!,
-                    onTap: () => launchUrl(
-                      Uri.parse(f.website!),
+                    onTap: () => _safeLaunch(
+                      context,
+                      f.website!,
                       mode: LaunchMode.externalApplication,
+                      autoHttps: true,
                     ),
                   ),
               ],
@@ -210,5 +201,36 @@ class _Row extends StatelessWidget {
             child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4), child: row),
           );
+  }
+}
+
+/// Robuster Launch für Telefon/E-Mail/Web-Links auf der Farm-Detailseite.
+/// Vorher wurden tel:/mailto:/https: direkt mit launchUrl(Uri.parse(...))
+/// gerufen — fehlerhafte Werte oder fehlender Handler (kein Telefon-App,
+/// kein Mail-Client) ließen den Tap still scheitern.
+Future<void> _safeLaunch(
+  BuildContext context,
+  String raw, {
+  LaunchMode mode = LaunchMode.platformDefault,
+  bool autoHttps = false,
+}) async {
+  final messenger = ScaffoldMessenger.of(context);
+  var url = raw.trim();
+  if (autoHttps && !url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://$url';
+  }
+  final uri = Uri.tryParse(url);
+  var ok = false;
+  if (uri != null) {
+    try {
+      ok = await launchUrl(uri, mode: mode);
+    } catch (_) {
+      ok = false;
+    }
+  }
+  if (!ok) {
+    messenger.showSnackBar(SnackBar(
+      content: Text('common.errorGeneric'.tr()),
+    ));
   }
 }
