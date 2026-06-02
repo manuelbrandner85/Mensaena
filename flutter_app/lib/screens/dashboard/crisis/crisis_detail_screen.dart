@@ -414,8 +414,15 @@ class _ContactBlock extends StatelessWidget {
   final Crisis crisis;
 
   Future<void> _call() async {
-    if (crisis.contactPhone == null) return;
-    await launchUrl(Uri.parse('tel:${crisis.contactPhone}'));
+    final phone = crisis.contactPhone;
+    if (phone == null) return;
+    // Vorher ungeschützt: tel:-Launch ohne Handler (z.B. Web) wirft eine
+    // unbehandelte Exception. Jetzt tryParse + try/catch (best effort).
+    final uri = Uri.tryParse('tel:$phone');
+    if (uri == null) return;
+    try {
+      await launchUrl(uri);
+    } catch (_) {/* kein tel:-Handler — still ignorieren */}
   }
 
   @override
