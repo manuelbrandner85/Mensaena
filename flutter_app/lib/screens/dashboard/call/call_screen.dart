@@ -58,6 +58,10 @@ class CallScreen extends ConsumerStatefulWidget {
 enum _CallState {
   outgoingRinging,
   connecting,
+  // Joining: room.connect() Future ist zurück, aber wir warten auf das
+  // echte LiveKit-RoomConnectedEvent UND einen Remote-Participant, bevor
+  // wir die Action-Buttons aktivieren — sonst tippt der Nutzer ins Leere.
+  joining,
   connected,
   reconnecting,
   ended,
@@ -120,9 +124,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       return;
     }
     // Callee hat via CallKit angenommen → direkt verbinden, kein
-    // redundanter dm_calls-Status-Query. Status-Update läuft fire-and-forget.
+    // redundanter dm_calls-Status-Query. _markActive() wird NICHT mehr
+    // hier gefeuert (vorher: DB stand auf 'active' bevor überhaupt eine
+    // Peer-Connection bestand → Caller sah "verbunden", Callee saß noch
+    // im "Verbinde…" → "Buttons gehen nicht" beim Anderen). Stattdessen
+    // markieren wir erst beim echten RoomConnectedEvent als active.
     if (widget.preAccepted) {
-      unawaited(_markActive());
       await _connect();
       return;
     }
@@ -389,7 +396,17 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       await room.connect(tok.url, tok.token);
       await room.localParticipant?.setMicrophoneEnabled(true);
       if (!mounted) return;
-      setState(() => _state = _CallState.connected);
+      // ACHTUNG: room.connect() ist NUR der SFU-Handshake. Die echte Peer-
+      // Connection (RoomConnectedEvent + RemoteParticipant) kann noch
+      // Sekunden brauchen — solange dürfen die Action-Buttons NICHT
+      // klickbar sein, sonst tippt der Nutzer ins Leere und denkt "geht
+      // nicht". Buttons werden in den Listenern auf 'connected' gesetzt,
+      // sobald RoomConnectedEvent feuert (oder ein Remote bereits da ist).
+      if (room.remoteParticipants.isNotEmpty) {
+        setState(() => _state = _CallState.connected);
+      } else {
+        setState(() => _state = _CallState.joining);
+      }
       // Call-Duration-Timer starten.
       _stopwatch
         ..reset()
@@ -456,6 +473,31 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   /// _reattach genutzt (bei Reattach mit neuem State neu erstellt).
   void _attachRoomListeners(lk.Room room) {
     _listener = room.createListener()
+      // WhatsApp/Telegram-Pattern: erst wenn das echte RoomConnectedEvent
+      // feuert ODER ein Remote-Participant beitritt, gilt der Call als live
+      // — vorher Buttons disabled (siehe enum _CallState.joining).
+      ..on<lk.RoomConnectedEvent>((_) {
+        if (!mounted) return;
+        // Erst beim echten Connect markieren wir den Call in der DB als
+        // 'active' — der Gegenseiten-Stream-Listener sieht das und springt
+        // ebenfalls auf 'connecting'/'connected'. Idempotent.
+        unawaited(_markActive());
+        if (_state == _CallState.joining ||
+            _state == _CallState.connecting) {
+          setState(() => _state = _CallState.connected);
+        }
+      })
+      ..on<lk.ParticipantConnectedEvent>((_) {
+        if (!mounted) return;
+        // Remote ist tatsächlich da → spätestens jetzt sind Action-Buttons
+        // sinnvoll bedienbar (Mute mutet einen echten Track, Hangup beendet
+        // eine echte Connection).
+        unawaited(_markActive());
+        if (_state == _CallState.joining ||
+            _state == _CallState.connecting) {
+          setState(() => _state = _CallState.connected);
+        }
+      })
       ..on<lk.RoomDisconnectedEvent>((_) async {
         if (!mounted) return;
         // Wenn waehrend Reconnecting der Server endgueltig aufgibt,
@@ -525,7 +567,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     // stays in a half-ringing state.
     try {
       FlutterCallkitIncoming.setCallConnected(widget.callId);
-    } catch (_) {}
+    } catch (e) {
+      // Vorher silently — Folge: CallKit/Telecom blieben im Ringing-State,
+      // native Action-Buttons (Mute/Hangup auf Lockscreen) blieben tot.
+      debugPrint('[CallScreen] setCallConnected failed: $e');
+    }
   }
 
   Future<void> _toggleMic() async {
@@ -1007,6 +1053,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       case _CallState.outgoingRinging:
         return 'call.calling'.tr();
       case _CallState.connecting:
+      case _CallState.joining:
         return 'Verbinde…';
       case _CallState.connected:
         return _formatDuration(_stopwatch.elapsed);
