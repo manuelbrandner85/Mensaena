@@ -2486,5 +2486,11 @@
     "stateRequestedTo": "{name} kişisine istek",
     "cancelRequest": "Geri çek",
     "tabAll": "Arkadaşların"
+  },
+  "battery": {
+    "title": "Aramaları güvenilir şekilde al",
+    "body": "Uygulama kapalıyken bile aramaların ve önemli mesajların sana anında ulaşması için Mensaena’yı pil optimizasyonundan muaf tut. Aksi halde Android uygulamayı arka planda durdurabilir.",
+    "allow": "İzin ver",
+    "later": "Sonra"
   }
 }

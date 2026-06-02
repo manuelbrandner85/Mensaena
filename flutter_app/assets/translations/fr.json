@@ -2487,5 +2487,11 @@
     "stateRequestedTo": "Demande à {name}",
     "cancelRequest": "Retirer",
     "tabAll": "Tes amis"
+  },
+  "battery": {
+    "title": "Recevoir les appels de façon fiable",
+    "body": "Pour que les appels et messages importants te parviennent immédiatement même app fermée, exclus Mensaena de l’optimisation de la batterie. Sinon Android peut arrêter l’app en arrière-plan.",
+    "allow": "Autoriser",
+    "later": "Plus tard"
   }
 }

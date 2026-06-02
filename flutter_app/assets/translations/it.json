@@ -2487,5 +2487,11 @@
     "stateRequestedTo": "Richiesta a {name}",
     "cancelRequest": "Ritira",
     "tabAll": "I tuoi amici"
+  },
+  "battery": {
+    "title": "Ricevi le chiamate in modo affidabile",
+    "body": "Affinché chiamate e messaggi importanti ti raggiungano subito anche ad app chiusa, escludi Mensaena dall’ottimizzazione della batteria. Altrimenti Android può fermare l’app in background.",
+    "allow": "Consenti",
+    "later": "Più tardi"
   }
 }

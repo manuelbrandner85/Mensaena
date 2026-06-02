@@ -2487,5 +2487,11 @@
     "stateRequestedTo": "Solicitud a {name}",
     "cancelRequest": "Retirar",
     "tabAll": "Tus amigos"
+  },
+  "battery": {
+    "title": "Recibe llamadas de forma fiable",
+    "body": "Para que las llamadas y los mensajes importantes te lleguen al instante incluso con la app cerrada, excluye Mensaena de la optimización de batería. De lo contrario, Android puede detener la app en segundo plano.",
+    "allow": "Permitir",
+    "later": "Más tarde"
   }
 }

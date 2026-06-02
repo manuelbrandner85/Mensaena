@@ -3257,5 +3257,11 @@
     "requestPending": "Warte auf {name}",
     "sosFrom": "SOS von {name}",
     "safeFrom": "{name} ist in Sicherheit"
+  },
+  "battery": {
+    "title": "Anrufe zuverlässig empfangen",
+    "body": "Damit dich Anrufe und wichtige Nachrichten auch bei geschlossener App sofort erreichen, nimm Mensaena von der Akku-Optimierung aus. Sonst kann Android die App im Hintergrund stoppen.",
+    "allow": "Erlauben",
+    "later": "Später"
   }
 }

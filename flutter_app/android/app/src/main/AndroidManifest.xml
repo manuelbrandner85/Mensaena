@@ -18,6 +18,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
     <!-- Wake-Lock damit Audio-Call nicht beim Screen-Off abbricht -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- Akku-Optimierung ausnehmen: ohne das drosseln aggressive OEMs
+         (Xiaomi/Huawei/Samsung) FCM im Killed-State → verpasste Anrufe -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <!-- Notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Fullscreen-Intent fuer eingehende Calls (Lock-Screen ueberblendung) -->

@@ -19,6 +19,7 @@ import 'widgets/shared/biometric_lock_gate.dart';
 import 'widgets/shared/critical_crisis_alert_listener.dart';
 import 'widgets/shared/fcm_foreground_listener.dart';
 import 'widgets/shared/incoming_call_listener.dart';
+import 'widgets/shared/battery_optimization_prompt.dart';
 import 'widgets/shared/notification_permission_banner.dart';
 import 'widgets/shared/update_gate.dart';
 
@@ -131,6 +132,10 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
                       right: 0,
                       child: NotificationPermissionBanner(),
                     ),
+                    // Einmaliger Akku-Optimierungs-Hinweis (Android/OEM-Doze
+                    // → sonst verpasste Anrufe). Rendert nichts, zeigt nur
+                    // nach 12s einmalig einen Dialog falls nötig.
+                    const BatteryOptimizationPrompt(),
                   ],
                 ),
               ),

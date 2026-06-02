@@ -3258,5 +3258,11 @@
     "requestPending": "Waiting for {name}",
     "sosFrom": "SOS from {name}",
     "safeFrom": "{name} is safe"
+  },
+  "battery": {
+    "title": "Receive calls reliably",
+    "body": "So calls and important messages reach you instantly even when the app is closed, exempt Mensaena from battery optimization. Otherwise Android may stop the app in the background.",
+    "allow": "Allow",
+    "later": "Later"
   }
 }
