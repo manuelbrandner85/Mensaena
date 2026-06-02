@@ -2767,7 +2767,19 @@
     "request_sent": "Request sent.",
     "request_failed": "Request failed.",
     "become_title": "Become a mentor",
-    "become_body": "You've already added several skills — share your knowledge with others."
+    "become_body": "You've already added several skills — share your knowledge with others.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "message": "Message",
+    "accepted": "Mentorship accepted.",
+    "declined": "Request declined.",
+    "statusPending": "Pending",
+    "statusActive": "Active",
+    "statusDeclined": "Declined",
+    "statusEnded": "Ended",
+    "requested": "Requested",
+    "requestSent": "Mentorship request sent.",
+    "requestFailed": "Request failed."
   },
   "scheduled_calls": {
     "title": "Scheduled calls",

@@ -2546,5 +2546,19 @@
   },
   "mentalSupport": {
     "launchFailed": "Не удалось начать вызов."
+  },
+  "mentorship": {
+    "accept": "Принять",
+    "decline": "Отклонить",
+    "message": "Сообщение",
+    "accepted": "Менторство принято.",
+    "declined": "Запрос отклонён.",
+    "statusPending": "Ожидает",
+    "statusActive": "Активно",
+    "statusDeclined": "Отклонено",
+    "statusEnded": "Завершено",
+    "requested": "Запрошено",
+    "requestSent": "Запрос на менторство отправлен.",
+    "requestFailed": "Запрос не удался."
   }
 }

@@ -74,19 +74,27 @@ final _mentorMatchesProvider =
 class MentorshipMatchScreen extends ConsumerWidget {
   const MentorshipMatchScreen({super.key});
 
+  // In-Flight-Guard gegen Doppel-Tap (Screen ist stateless → static Set).
+  static final Set<String> _requesting = {};
+
   Future<void> _request(WidgetRef ref, String mentorId,
       BuildContext context) async {
-    final ok = await MentorshipsRepository.request(mentorId);
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        ok
-            ? 'mentorship.request_sent'.tr()
-            : 'mentorship.request_failed'.tr(),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    if (!_requesting.add(mentorId)) return; // schon in Arbeit
+    try {
+      final ok = await MentorshipsRepository.request(mentorId);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          ok
+              ? 'mentorship.request_sent'.tr()
+              : 'mentorship.request_failed'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+        ),
+      ));
+    } finally {
+      _requesting.remove(mentorId);
+    }
   }
 
   @override

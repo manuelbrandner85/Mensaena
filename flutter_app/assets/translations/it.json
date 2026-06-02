@@ -2547,5 +2547,19 @@
   },
   "mentalSupport": {
     "launchFailed": "Impossibile avviare la chiamata."
+  },
+  "mentorship": {
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "message": "Messaggio",
+    "accepted": "Mentoring accettato.",
+    "declined": "Richiesta rifiutata.",
+    "statusPending": "In attesa",
+    "statusActive": "Attivo",
+    "statusDeclined": "Rifiutato",
+    "statusEnded": "Terminato",
+    "requested": "Richiesto",
+    "requestSent": "Richiesta di mentoring inviata.",
+    "requestFailed": "Richiesta non riuscita."
   }
 }

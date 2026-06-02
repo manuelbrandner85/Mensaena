@@ -353,13 +353,74 @@ class MentorshipsRepository {
     }
   }
 
-  static Future<bool> request(String mentorId) async {
+  /// Eingehende, offene Mentoring-Anfragen an MICH (als Mentor:in).
+  static Future<List<Mentorship>> incomingRequests() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final rows = await sb
+          .from('mentorships')
+          .select()
+          .eq('mentor_id', uid)
+          .eq('status', 'pending')
+          .order('started_at', ascending: false);
+      return (rows as List)
+          .cast<Map<String, dynamic>>()
+          .map(Mentorship.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Mentoring anfragen (als Mentee). Setzt status='pending'. Verhindert
+  /// Eigen-Anfrage und Doppel-Anfragen (Unique-Constraint, idempotent).
+  static Future<bool> request(String mentorId, {String? message}) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null || uid == mentorId) return false;
     try {
-      await sb
+      // Schon eine Beziehung (egal welcher Status)? → nicht doppeln.
+      final existing = await sb
           .from('mentorships')
-          .insert({'mentor_id': mentorId, 'mentee_id': uid});
+          .select('id')
+          .eq('mentor_id', mentorId)
+          .eq('mentee_id', uid)
+          .limit(1);
+      if ((existing as List).isNotEmpty) return false;
+      await sb.from('mentorships').insert({
+        'mentor_id': mentorId,
+        'mentee_id': uid,
+        'status': 'pending',
+        if (message != null && message.trim().isNotEmpty) 'message': message.trim(),
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Mentor:in nimmt eine Anfrage an → status='active'.
+  static Future<bool> accept(String mentorshipId) async {
+    return _setStatus(mentorshipId, 'active');
+  }
+
+  /// Mentor:in lehnt eine Anfrage ab → status='declined'.
+  static Future<bool> decline(String mentorshipId) async {
+    return _setStatus(mentorshipId, 'declined');
+  }
+
+  /// Beendet ein laufendes Mentoring (beide Seiten) → status='ended'.
+  static Future<bool> end(String mentorshipId) async {
+    return _setStatus(mentorshipId, 'ended', setEndedAt: true);
+  }
+
+  static Future<bool> _setStatus(String id, String status,
+      {bool setEndedAt = false}) async {
+    try {
+      await sb.from('mentorships').update({
+        'status': status,
+        if (setEndedAt) 'ended_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', id);
       return true;
     } catch (_) {
       return false;

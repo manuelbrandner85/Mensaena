@@ -13,6 +13,8 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/mega_models.dart';
 import '../../providers/mega_providers.dart';
+import '../../repositories/conversations_repository.dart';
+import '../../repositories/mega_repositories.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -143,21 +145,48 @@ class MentorshipScreen extends ConsumerWidget {
                                   size: 14,
                                   color: AppColors.ink,
                                   weight: FontWeight.w700)),
-                          Text(
-                            amMentor
-                                ? 'mentorship.you_are_mentor'.tr()
-                                : 'mentorship.you_are_mentee'.tr(),
-                            style: AppTypography.caption(),
-                          ),
+                          Row(children: [
+                            Text(
+                              amMentor
+                                  ? 'mentorship.you_are_mentor'.tr()
+                                  : 'mentorship.you_are_mentee'.tr(),
+                              style: AppTypography.caption(),
+                            ),
+                            const SizedBox(width: 6),
+                            _StatusBadge(status: m.status),
+                          ]),
                         ],
                       ),
                     ),
-                    IconButton(
-                      tooltip: 'common.openProfile'.tr(),
-                      onPressed: () =>
-                          context.push('/dashboard/profile/$partnerId'),
-                      icon: const Icon(LucideIcons.arrowRight, size: 18),
-                    ),
+                    // Eingehende Anfrage (ich = Mentor:in, pending):
+                    // Annehmen/Ablehnen. Aktiv: Nachricht (DM). Sonst: Profil.
+                    if (amMentor && m.status == 'pending') ...[
+                      IconButton(
+                        tooltip: 'mentorship.accept'.tr(),
+                        onPressed: () => _decide(ref, context, m.id, true),
+                        icon: const Icon(LucideIcons.check,
+                            size: 18, color: AppColors.leben),
+                      ),
+                      IconButton(
+                        tooltip: 'mentorship.decline'.tr(),
+                        onPressed: () => _decide(ref, context, m.id, false),
+                        icon: const Icon(LucideIcons.x,
+                            size: 18, color: AppColors.mute),
+                      ),
+                    ] else if (m.status == 'active')
+                      IconButton(
+                        tooltip: 'mentorship.message'.tr(),
+                        onPressed: () => _message(context, partnerId),
+                        icon: const Icon(LucideIcons.messageSquare,
+                            size: 18, color: AppColors.bronze),
+                      )
+                    else
+                      IconButton(
+                        tooltip: 'common.openProfile'.tr(),
+                        onPressed: () =>
+                            context.push('/dashboard/profile/$partnerId'),
+                        icon: const Icon(LucideIcons.arrowRight, size: 18),
+                      ),
                   ]),
                 ),
               );
@@ -178,4 +207,62 @@ class MentorshipScreen extends ConsumerWidget {
           style: AppTypography.display(size: 16, color: AppColors.ink),
         ),
       );
+
+  Future<void> _decide(
+      WidgetRef ref, BuildContext context, String id, bool accept) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = accept
+        ? await MentorshipsRepository.accept(id)
+        : await MentorshipsRepository.decline(id);
+    if (ok) {
+      ref.invalidate(myMentorshipsProvider);
+      ref.invalidate(_mentorshipWithPartnersProvider);
+      ref.invalidate(incomingMentorshipsProvider);
+    }
+    messenger.showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(
+        ok
+            ? (accept
+                ? 'mentorship.accepted'.tr()
+                : 'mentorship.declined'.tr())
+            : 'common.errorGeneric'.tr(),
+        style: AppTypography.body(size: 13, color: AppColors.ink),
+      ),
+    ));
+  }
+
+  Future<void> _message(BuildContext context, String partnerId) async {
+    final convId = await ConversationsRepository.getOrCreateDm(partnerId);
+    if (!context.mounted) return;
+    if (convId != null) {
+      context.push('/dashboard/messages/$convId');
+    }
+  }
+}
+
+/// Status-Chip für ein Mentoring (pending/active/declined/ended).
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final (label, color) = switch (status) {
+      'pending' => ('mentorship.statusPending'.tr(), AppColors.amber),
+      'active' => ('mentorship.statusActive'.tr(), AppColors.leben),
+      'declined' => ('mentorship.statusDeclined'.tr(), AppColors.mute),
+      'ended' => ('mentorship.statusEnded'.tr(), AppColors.mute),
+      _ => (status, AppColors.mute),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(label,
+          style: AppTypography.label(size: 9, color: color)),
+    );
+  }
 }

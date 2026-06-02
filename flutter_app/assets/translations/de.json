@@ -2766,7 +2766,19 @@
     "request_sent": "Anfrage gesendet.",
     "request_failed": "Anfrage fehlgeschlagen.",
     "become_title": "Werde Mentor:in",
-    "become_body": "Du hast schon einige Skills hinterlegt — teile dein Wissen mit anderen."
+    "become_body": "Du hast schon einige Skills hinterlegt — teile dein Wissen mit anderen.",
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "message": "Nachricht",
+    "accepted": "Mentoring angenommen.",
+    "declined": "Anfrage abgelehnt.",
+    "statusPending": "Anfrage offen",
+    "statusActive": "Aktiv",
+    "statusDeclined": "Abgelehnt",
+    "statusEnded": "Beendet",
+    "requested": "Angefragt",
+    "requestSent": "Mentoring-Anfrage gesendet.",
+    "requestFailed": "Anfrage fehlgeschlagen."
   },
   "scheduled_calls": {
     "title": "Geplante Anrufe",

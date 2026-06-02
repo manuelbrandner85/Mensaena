@@ -50,6 +50,12 @@ final myMentorshipsProvider =
   return MentorshipsRepository.mine();
 });
 
+/// Eingehende, offene Mentoring-Anfragen an mich (als Mentor:in).
+final incomingMentorshipsProvider =
+    FutureProvider.autoDispose<List<Mentorship>>((ref) async {
+  return MentorshipsRepository.incomingRequests();
+});
+
 // F16 Livestream-Messages
 final livestreamMessagesProvider =
     StreamProvider.family.autoDispose<List<LivestreamMessage>, String>(
