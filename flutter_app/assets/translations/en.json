@@ -1592,7 +1592,8 @@
     "maxParticipants": "Maximum participants",
     "unlimited": "Unlimited",
     "weeklyChallenge": "Weekly challenge",
-    "weeklyHint": "Featured as a weekly challenge"
+    "weeklyHint": "Featured as a weekly challenge",
+    "karmaAwarded": "+{n} karma earned!"
   },
   "invite": {
     "title": "Invite",

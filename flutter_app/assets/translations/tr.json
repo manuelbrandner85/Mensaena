@@ -1494,7 +1494,8 @@
     "maxParticipants": "En fazla katılımcı",
     "unlimited": "Sınırsız",
     "weeklyChallenge": "Haftalık meydan okuma",
-    "weeklyHint": "Haftalık meydan okuma olarak öne çıkarılır"
+    "weeklyHint": "Haftalık meydan okuma olarak öne çıkarılır",
+    "karmaAwarded": "+{n} karma kazanıldı!"
   },
   "invite": {
     "title": "Davet et",

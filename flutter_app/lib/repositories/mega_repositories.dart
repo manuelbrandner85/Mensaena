@@ -116,15 +116,18 @@ class DailyChallengesRepository {
     }
   }
 
-  static Future<bool> markCompleted(String challengeId) async {
+  /// Schließt die Tages-Challenge ab UND schreibt das Karma gut. Vorher
+  /// wurde nur is_completed gesetzt → das angezeigte '+X Karma' war fiktiv.
+  /// Gibt das tatsächlich vergebene Karma zurück (0 wenn bereits erledigt).
+  static Future<int> markCompleted(String challengeId) async {
     try {
-      await sb.from('daily_challenges').update({
-        'is_completed': true,
-        'completed_at': DateTime.now().toUtc().toIso8601String(),
-      }).eq('id', challengeId);
-      return true;
+      final res = await sb.rpc<dynamic>('complete_daily_challenge',
+          params: {'p_id': challengeId});
+      if (res is int) return res;
+      if (res is num) return res.toInt();
+      return int.tryParse('$res') ?? 0;
     } catch (_) {
-      return false;
+      return 0;
     }
   }
 }

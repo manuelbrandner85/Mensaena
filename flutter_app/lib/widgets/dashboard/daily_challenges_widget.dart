@@ -80,18 +80,30 @@ class DailyChallengesWidget extends ConsumerWidget {
                   onTap: () async {
                     if (c.isCompleted) return;
                     Haptics.confirm();
-                    final ok =
+                    // markCompleted vergibt jetzt SERVER-seitig echtes Karma
+                    // und gibt den vergebenen Betrag zurück (0 = war schon
+                    // erledigt). Vorher nur lokales Flag, Karma war fiktiv.
+                    final awarded =
                         await DailyChallengesRepository.markCompleted(c.id);
-                    if (ok) {
-                      ref.invalidate(todayChallengesProvider);
-                      // Check if this completes all 3
-                      final next = await ref.read(
-                          todayChallengesProvider.future);
-                      if (next.where((x) => x.isCompleted).length ==
-                              next.length &&
-                          context.mounted) {
-                        CelebrateBurst.fire(context, ref: ref);
-                      }
+                    if (!context.mounted) return;
+                    ref.invalidate(todayChallengesProvider);
+                    if (awarded > 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        backgroundColor: AppColors.surface,
+                        content: Text(
+                          'challenges.karmaAwarded'
+                              .tr(namedArgs: {'n': '$awarded'}),
+                          style: AppTypography.body(
+                              size: 13, color: AppColors.ink),
+                        ),
+                      ));
+                    }
+                    final next =
+                        await ref.read(todayChallengesProvider.future);
+                    if (next.where((x) => x.isCompleted).length ==
+                            next.length &&
+                        context.mounted) {
+                      CelebrateBurst.fire(context, ref: ref);
                     }
                   },
                 ),

@@ -161,13 +161,12 @@ class _ChallengeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final current = progress?.currentCount ?? 0;
-    // BUGFIX: DB hat keine target_count-Spalte. Statt dessen nutzen wir
-    // max_participants als implizites Ziel (oder fall-back 1 = "geschafft
-    // sobald 1 mal getan"). UI rechnet current/maxParticipants.
-    final target = challenge.maxParticipants ?? 1;
-    final ratio =
-        target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
+    // BUGFIX: progress_pct ist BEREITS ein Prozentwert (0..100) — vorher
+    // wurde er durch max_participants (Teilnehmer-Limit, ohne Bezug zum
+    // Fortschritt) geteilt → Balken fast immer voll oder völlig falsch
+    // (bei max_participants=null sogar immer 100%). Jetzt direkt pct/100.
+    final pct = (progress?.progressPct ?? 0).clamp(0, 100);
+    final ratio = pct / 100.0;
     final completed = progress?.completed ?? false;
     final isJoined = progress != null;
 
@@ -242,7 +241,7 @@ class _ChallengeTile extends StatelessWidget {
           Row(
             children: [
               Text(
-                '$current / $target',
+                '$pct%',
                 style: AppTypography.mono(
                   size: 11,
                   color: AppColors.inkSoft,

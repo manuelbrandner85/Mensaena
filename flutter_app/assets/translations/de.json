@@ -1591,7 +1591,8 @@
     "maxParticipants": "Maximale Teilnehmer",
     "unlimited": "Unbegrenzt",
     "weeklyChallenge": "Wochen-Challenge",
-    "weeklyHint": "Wird als wöchentliche Challenge hervorgehoben"
+    "weeklyHint": "Wird als wöchentliche Challenge hervorgehoben",
+    "karmaAwarded": "+{n} Karma erhalten!"
   },
   "invite": {
     "title": "Einladen",
