@@ -726,7 +726,10 @@
       "allRoles": "Tüm roller",
       "pageInfo": "{total} sayfadan {page}. sayfa",
       "prev": "Geri",
-      "next": "İleri"
+      "next": "İleri",
+      "unbanConfirmTitle": "Yasak kaldırılsın mı?",
+      "unbanConfirmBody": "Kişi uygulamayı yeniden kısıtlamasız kullanabilecek.",
+      "unbanConfirmBtn": "Yasağı kaldır"
     },
     "chatMod": {
       "title": "Sohbet moderasyonu",

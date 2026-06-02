@@ -727,7 +727,10 @@
       "allRoles": "Tous les rôles",
       "pageInfo": "Page {page} sur {total}",
       "prev": "Retour",
-      "next": "Suivant"
+      "next": "Suivant",
+      "unbanConfirmTitle": "Lever le bannissement ?",
+      "unbanConfirmBody": "La personne pourra de nouveau utiliser l’app sans restriction.",
+      "unbanConfirmBtn": "Débannir"
     },
     "chatMod": {
       "title": "Modération du chat",

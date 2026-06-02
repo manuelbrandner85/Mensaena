@@ -726,7 +726,10 @@
       "allRoles": "Все роли",
       "pageInfo": "Страница {page} из {total}",
       "prev": "Назад",
-      "next": "Далее"
+      "next": "Далее",
+      "unbanConfirmTitle": "Снять блокировку?",
+      "unbanConfirmBody": "Пользователь снова сможет пользоваться приложением без ограничений.",
+      "unbanConfirmBtn": "Разблокировать"
     },
     "chatMod": {
       "title": "Модерация чата",

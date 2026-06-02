@@ -75,14 +75,24 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
 
   /// Wendet eine Bulk-Aktion auf alle ausgewählten Nutzer an (außer dem
   /// eigenen Konto). Sammelt Erfolge, zeigt Snackbar, lädt neu.
+  bool _bulkBusy = false;
+
   Future<void> _applyBulk(
       Future<bool> Function(String id) action, String labelKey) async {
+    // Guard: verhindert paralleles Auslösen während ein Batch (ggf. über 100
+    // Nutzer) noch läuft → keine Doppel-Operationen.
+    if (_bulkBusy) return;
     final myId = SupabaseService.currentUser?.id;
     final ids = _selectedIds.where((id) => id != myId).toList();
     if (ids.isEmpty) return;
+    setState(() => _bulkBusy = true);
     var ok = 0;
-    for (final id in ids) {
-      if (await action(id)) ok++;
+    try {
+      for (final id in ids) {
+        if (await action(id)) ok++;
+      }
+    } finally {
+      if (mounted) setState(() => _bulkBusy = false);
     }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -590,6 +600,31 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   Future<void> _unban(Map<String, dynamic> user) async {
     final uid = user['id'] as String?;
     if (uid == null) return;
+    // Bestätigung — Parität zum Ban (vorher konnte man versehentlich
+    // entsperren, ein Tap genügte).
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('admin.users.unbanConfirmTitle'.tr(),
+            style: AppTypography.body(
+                size: 16, color: AppColors.ink, weight: FontWeight.w700)),
+        content: Text('admin.users.unbanConfirmBody'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: AppColors.leben),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('admin.users.unbanConfirmBtn'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
     final ok = await AdminRepository.unbanUser(uid);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

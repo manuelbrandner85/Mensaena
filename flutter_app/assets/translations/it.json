@@ -727,7 +727,10 @@
       "allRoles": "Tutti i ruoli",
       "pageInfo": "Pagina {page} di {total}",
       "prev": "Indietro",
-      "next": "Avanti"
+      "next": "Avanti",
+      "unbanConfirmTitle": "Revocare il blocco?",
+      "unbanConfirmBody": "La persona potrà di nuovo usare l’app senza restrizioni.",
+      "unbanConfirmBtn": "Sblocca"
     },
     "chatMod": {
       "title": "Moderazione chat",

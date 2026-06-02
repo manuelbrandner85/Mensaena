@@ -772,7 +772,10 @@
       "allRoles": "All roles",
       "pageInfo": "Page {page} of {total}",
       "prev": "Back",
-      "next": "Next"
+      "next": "Next",
+      "unbanConfirmTitle": "Lift ban?",
+      "unbanConfirmBody": "The person will be able to use the app without restrictions again.",
+      "unbanConfirmBtn": "Unban"
     },
     "chatMod": {
       "title": "Chat Moderation",

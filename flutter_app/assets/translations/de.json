@@ -719,7 +719,10 @@
       "allRoles": "Alle Rollen",
       "pageInfo": "Seite {page} von {total}",
       "prev": "Zurück",
-      "next": "Weiter"
+      "next": "Weiter",
+      "unbanConfirmTitle": "Sperre aufheben?",
+      "unbanConfirmBody": "Die Person kann die App danach wieder uneingeschränkt nutzen.",
+      "unbanConfirmBtn": "Entsperren"
     },
     "tiles": {
       "users": "Users",
