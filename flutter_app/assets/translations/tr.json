@@ -1718,7 +1718,8 @@
     "coverImage": "Kapak resmi",
     "validationTitle": "Başlık en az 5 karakter olmalı.",
     "validationContent": "İçerik en az 50 karakter olmalı.",
-    "publishFailed": "Yayınlama başarısız oldu."
+    "publishFailed": "Yayınlama başarısız oldu.",
+    "publishedNoCover": "Makale yayınlandı — ancak kapak görseli yüklenemedi."
   },
   "air": {
     "title": "Hava kalitesi",

@@ -489,8 +489,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/knowledge/create',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: const KnowledgeCreateScreen(
-            routePath: '/dashboard/knowledge'),
+          // BUGFIX: Die Create-Kategorien (Alltag/Handwerk/Wissen/…) sind
+          // KEINE Bildungs-Kategorien (kurs/workshop/…). Erstellte Artikel
+          // landen daher in /dashboard/wiki, nicht im Bildungs-Tab. Vorher
+          // wurde der Nutzer nach dem Erstellen zurück zur Bildung geschickt
+          // und sah seinen Artikel nie. routePath jetzt = wiki (wo er liegt).
+          child: const KnowledgeCreateScreen(routePath: '/dashboard/wiki'),
         ),
       ),
       GoRoute(

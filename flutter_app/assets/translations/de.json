@@ -1818,7 +1818,8 @@
     "coverImage": "Cover-Bild",
     "validationTitle": "Titel min. 5 Zeichen.",
     "validationContent": "Inhalt min. 50 Zeichen.",
-    "publishFailed": "Veröffentlichung fehlgeschlagen."
+    "publishFailed": "Veröffentlichung fehlgeschlagen.",
+    "publishedNoCover": "Artikel veröffentlicht — das Titelbild konnte aber nicht hochgeladen werden."
   },
   "air": {
     "title": "Luftqualität",

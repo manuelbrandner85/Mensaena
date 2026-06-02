@@ -1719,7 +1719,8 @@
     "coverImage": "Image de couverture",
     "validationTitle": "Le titre doit contenir au moins 5 caractères.",
     "validationContent": "Le contenu doit contenir au moins 50 caractères.",
-    "publishFailed": "Échec de la publication."
+    "publishFailed": "Échec de la publication.",
+    "publishedNoCover": "Article publié — mais l’image de couverture n’a pas pu être envoyée."
   },
   "air": {
     "title": "Qualité de l'air",

@@ -1819,7 +1819,8 @@
     "coverImage": "Cover image",
     "validationTitle": "Title must be at least 5 characters.",
     "validationContent": "Content must be at least 50 characters.",
-    "publishFailed": "Publishing failed."
+    "publishFailed": "Publishing failed.",
+    "publishedNoCover": "Article published — but the cover image could not be uploaded."
   },
   "air": {
     "title": "Air quality",

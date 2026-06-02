@@ -266,6 +266,7 @@ class _KnowledgeCreateScreenState
     });
     try {
       String? imageUrl = _uploadedImageUrl;
+      var coverFailed = false;
       if (_coverImage != null && imageUrl == null) {
         final bytes = await _coverImage!.readAsBytes();
         final ext = _coverImage!.path.split('.').last.toLowerCase();
@@ -275,6 +276,10 @@ class _KnowledgeCreateScreenState
           fileExt: ext.isEmpty ? 'jpg' : ext,
         );
         _uploadedImageUrl = imageUrl;
+        // Cover war gewählt, Upload schlug fehl → vorher still ignoriert
+        // (Artikel ohne Bild, kein Hinweis). Titelbild ist optional, daher
+        // veröffentlichen wir trotzdem, warnen aber danach.
+        coverFailed = imageUrl == null;
       }
 
       final tags = _tagsCtrl.text
@@ -303,7 +308,9 @@ class _KnowledgeCreateScreenState
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
-          'knowledge.publishArticle'.tr(),
+          coverFailed
+              ? 'knowledge.publishedNoCover'.tr()
+              : 'knowledge.publishArticle'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink),
         ),
       ));
