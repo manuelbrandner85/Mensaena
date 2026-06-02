@@ -329,7 +329,7 @@ class _Step {
   final Color color;
 }
 
-class _ActionPill extends StatelessWidget {
+class _ActionPill extends StatefulWidget {
   const _ActionPill({
     required this.label,
     required this.icon,
@@ -340,27 +340,51 @@ class _ActionPill extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
-  final VoidCallback onTap;
+  final Future<void> Function() onTap;
+
+  @override
+  State<_ActionPill> createState() => _ActionPillState();
+}
+
+class _ActionPillState extends State<_ActionPill> {
+  bool _busy = false;
+
+  Future<void> _handle() async {
+    // Doppel-Tap-Guard: ohne den konnte 'Annehmen' mehrfach gefeuert werden
+    // (redundante Status-Updates / Notifications). Der Karma-Doppel-Credit
+    // ist zusätzlich server-seitig per Trigger-Übergangsprüfung entschärft.
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await widget.onTap();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final color = widget.color;
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.14),
-          border: Border.all(color: color.withValues(alpha: 0.4)),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 12, color: color),
-            const SizedBox(width: 5),
-            Text(label,
-                style: AppTypography.label(size: 10, color: color)),
-          ],
+      onTap: _busy ? null : _handle,
+      child: Opacity(
+        opacity: _busy ? 0.5 : 1,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.14),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(widget.icon, size: 12, color: color),
+              const SizedBox(width: 5),
+              Text(widget.label,
+                  style: AppTypography.label(size: 10, color: color)),
+            ],
+          ),
         ),
       ),
     );

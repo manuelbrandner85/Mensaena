@@ -239,7 +239,10 @@ class ContentReportsRepository {
 class InteractionsCreateRepository {
   const InteractionsCreateRepository._();
 
-  /// Helfen-Button: legt eine Interaction an.
+  /// Helfen-Button: legt eine Interaction an. Verhindert Doppel-Angebote
+  /// (gleiche:r Helfer:in auf demselben Post mit offenem Status) und setzt
+  /// helped_id = Post-Eigentümer:in, damit die bidirektionale Verknüpfung
+  /// (Bewertungs-Partner, Benachrichtigung) stimmt — vorher blieb sie null.
   static Future<bool> offerHelp({
     required String postId,
     String? message,
@@ -247,9 +250,29 @@ class InteractionsCreateRepository {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
     try {
+      // Schon ein offenes Angebot von mir auf diesem Post? → nicht doppeln.
+      final existing = await sb
+          .from('interactions')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('helper_id', uid)
+          .inFilter('status', ['pending', 'accepted', 'on_way', 'arrived'])
+          .limit(1);
+      if ((existing as List).isNotEmpty) return false;
+
+      // Post-Eigentümer:in für helped_id ermitteln (eigenen Post nicht helfen).
+      final post = await sb
+          .from('posts')
+          .select('user_id')
+          .eq('id', postId)
+          .maybeSingle();
+      final ownerId = post?['user_id'] as String?;
+      if (ownerId != null && ownerId == uid) return false;
+
       await sb.from('interactions').insert({
         'post_id': postId,
         'helper_id': uid,
+        if (ownerId != null) 'helped_id': ownerId,
         'status': 'pending',
         'message': message,
       });
