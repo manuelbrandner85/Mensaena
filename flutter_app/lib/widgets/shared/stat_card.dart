@@ -27,9 +27,25 @@ class StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.5),
-        border: Border.all(color: AppColors.line),
-        borderRadius: BorderRadius.circular(14),
+        // Dezenter Verlauf + Akzent-Tönung oben → mehr Tiefe als flach.
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            accent.withValues(alpha: 0.07),
+            AppColors.surface.withValues(alpha: 0.55),
+          ],
+        ),
+        border: Border.all(color: accent.withValues(alpha: 0.16)),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 18,
+            spreadRadius: -6,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,12 +53,19 @@ class StatCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 34,
+                height: 34,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
+                  color: accent.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.30),
+                      blurRadius: 14,
+                      spreadRadius: -4,
+                    ),
+                  ],
                 ),
                 child: Icon(icon, size: 16, color: accent),
               ),
@@ -57,7 +80,7 @@ class StatCard extends StatelessWidget {
           if (loading)
             Container(
               width: 40,
-              height: 22,
+              height: 24,
               decoration: BoxDecoration(
                 color: AppColors.elevated,
                 borderRadius: BorderRadius.circular(4),
@@ -67,9 +90,9 @@ class StatCard extends StatelessWidget {
             Text(
               value,
               style: AppTypography.mono(
-                size: 22,
-                weight: FontWeight.w600,
-              ),
+                size: 24,
+                weight: FontWeight.w700,
+              ).copyWith(color: AppColors.ink),
             ),
         ],
       ),

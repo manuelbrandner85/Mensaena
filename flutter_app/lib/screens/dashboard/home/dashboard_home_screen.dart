@@ -292,7 +292,8 @@ class _DashboardHomeScreenState
     // Set damit wir mehrfach-gerenderte IDs uebersrpringen (V14 grouping).
     final consumed = <String>{};
 
-    void addSpacing([double h = 16]) =>
+    // Ruhigeres Layout: etwas mehr Weißraum zwischen den Widgets (16 → 18).
+    void addSpacing([double h = 18]) =>
         out.add(SizedBox(height: h));
 
     // Phase 10 A/B/C: Sektion-Banner zwischen Widget-Gruppen.
@@ -1077,38 +1078,53 @@ class _SectionBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Editorial-Header statt buntem Banner: Akzent-Punkt + Icon +
+    // Versal-Label + Haarlinie, die über die Restbreite ausläuft. Ruhiger,
+    // hochwertiger, konsistent mit den Modul-Screens (§-Editorial-Stil).
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 16, 12, 4),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              section.color.withValues(alpha: 0.18),
-              section.color.withValues(alpha: 0.04),
-            ],
-          ),
-          border: Border(
-            left: BorderSide(color: section.color, width: 3),
-            top: BorderSide(color: AppColors.bronze.withValues(alpha: 0.15)),
-            right:
-                BorderSide(color: AppColors.bronze.withValues(alpha: 0.15)),
-            bottom:
-                BorderSide(color: AppColors.bronze.withValues(alpha: 0.15)),
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(children: [
-          Icon(section.icon, size: 16, color: section.color),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              section.titleKey.tr(),
-              style: AppTypography.body(
-                  size: 13, color: AppColors.ink, weight: FontWeight.w700),
+      padding: const EdgeInsets.fromLTRB(14, 24, 14, 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: section.color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                    color: section.color.withValues(alpha: 0.5),
+                    blurRadius: 6),
+              ],
             ),
           ),
-        ]),
+          const SizedBox(width: 8),
+          Icon(section.icon, size: 13, color: AppColors.inkSoft),
+          const SizedBox(width: 6),
+          Text(
+            section.titleKey.tr().toUpperCase(),
+            style: AppTypography.label(
+              size: 10,
+              color: AppColors.inkSoft,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.bronze.withValues(alpha: 0.28),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

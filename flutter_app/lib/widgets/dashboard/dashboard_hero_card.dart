@@ -86,20 +86,58 @@ class DashboardHeroCard extends StatelessWidget {
     final whisper = _dailyWhisper();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: _gradientFor(g.tod),
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border:
-            Border.all(color: AppColors.bronze.withValues(alpha: 0.15)),
+            Border.all(color: AppColors.bronze.withValues(alpha: 0.18)),
+        // Premium-Tiefe: weicher, breiter Schatten hebt die Karte ab —
+        // wirkt edler als die flache Variante zuvor.
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.30),
+            blurRadius: 28,
+            spreadRadius: -6,
+            offset: const Offset(0, 14),
+          ),
+          BoxShadow(
+            color: AppColors.bronze.withValues(alpha: 0.10),
+            blurRadius: 40,
+            spreadRadius: -18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
+          // Feiner innerer Glanz oben (Glasmorphismus-Kante).
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 44,
+              decoration: BoxDecoration(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(22)),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.06),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
           // Radial-Spotlight top-left
           Positioned(
             top: -40,
@@ -150,23 +188,37 @@ class DashboardHeroCard extends StatelessWidget {
                   // Avatar with online dot
                   Stack(
                     children: [
+                      // Feiner Bronze-Verlaufsring um den Avatar (Premium).
                       Container(
+                        width: 68,
+                        height: 68,
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppColors.bronze.withValues(alpha: 0.9),
+                              AppColors.bronze.withValues(alpha: 0.25),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.bronze
+                                  .withValues(alpha: 0.30),
+                              blurRadius: 26,
+                              spreadRadius: -4,
+                            ),
+                          ],
+                        ),
+                        child: Container(
                         width: 64,
                         height: 64,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color:
-                              AppColors.bronze.withValues(alpha: 0.05),
+                          color: AppColors.deep,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: AppColors.elevated, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.bronze
-                                  .withValues(alpha: 0.25),
-                              blurRadius: 24,
-                            ),
-                          ],
                         ),
                         child: p?.avatarUrl != null
                             ? ClipRRect(
@@ -212,10 +264,11 @@ class DashboardHeroCard extends StatelessWidget {
                                 ),
                               ),
                       ),
+                      ),
                       // Online dot
                       Positioned(
-                        right: -2,
-                        bottom: -2,
+                        right: 0,
+                        bottom: 0,
                         child: Container(
                           width: 14,
                           height: 14,
@@ -245,9 +298,9 @@ class DashboardHeroCard extends StatelessWidget {
                         RichText(
                           text: TextSpan(
                             style: AppTypography.display(
-                              size: 24,
+                              size: 27,
                               color: AppColors.ink,
-                              height: 1.15,
+                              height: 1.12,
                             ),
                             children: [
                               TextSpan(text: '${g.greeting} '),
@@ -258,7 +311,13 @@ class DashboardHeroCard extends StatelessWidget {
                                   fontStyle: FontStyle.italic,
                                 ),
                               ),
-                              TextSpan(text: ', $name.'),
+                              TextSpan(
+                                text: ',\n$name.',
+                                style: TextStyle(
+                                  color: AppColors.ink
+                                      .withValues(alpha: 0.95),
+                                ),
+                              ),
                             ],
                           ),
                         ),
