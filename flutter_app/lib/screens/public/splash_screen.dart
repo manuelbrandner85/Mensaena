@@ -10,11 +10,13 @@ import '../../services/supabase_service.dart';
 import 'onboarding_tour_screen.dart';
 
 /// SKILL: mensaena-design
-/// Cinematic Splash-Screen — Konzept "Aurora":
-/// Tageszeit-abhaengiger Hintergrund-Gradient, Logo schwebt ein,
-/// Fireflies bewegen sich auf Lissajous-Kurven, Wortmarke erscheint
-/// Buchstabe fuer Buchstabe, Lens-Flare + Bronze-Halo, Letterbox-Bars
-/// animieren rein und raus. Gesamtdauer: ~2.6s.
+/// Cinematic Splash-Screen — Konzept "Aurora" + "Tudum":
+/// Tageszeit-abhaengiger Hintergrund-Gradient mit Ken-Burns-Zoom,
+/// Logo schwebt ein, Fireflies bewegen sich auf Lissajous-Kurven,
+/// Wortmarke erscheint Buchstabe fuer Buchstabe mit goldener Shimmer-
+/// Sweep, anamorphotischer Lens-Streak (J.J.-Abrams-Style), Logo-Punch
+/// im Höhepunkt ("Tudum"), Letterbox-Bars + Cinematic-Exit-Flash.
+/// Gesamtdauer: ~4.4s.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -24,20 +26,20 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  // 5 Phasen:
-  //   0.00-0.25: Letterbox-Bars schliessen + Hintergrund einblenden
-  //   0.25-0.55: Logo erscheint (scale + opacity)
-  //   0.55-0.85: Wortmarke "Mensaena." Buchstabe fuer Buchstabe
-  //   0.85-0.95: Hold (Atmen)
-  //   0.95-1.00: Slow zoom-out + fade to dashboard
+  // Phasen (alles 0..1, Master-Controller):
+  //   0.00-0.18: Letterbox-Bars schliessen + BG einblenden + Ken-Burns Start
+  //   0.18-0.50: Logo erscheint (scale + opacity + Halo-Atmen)
+  //   0.50-0.78: Wortmarke "Mensaena." Buchstabe fuer Buchstabe
+  //   0.78-0.88: HÖHEPUNKT — Logo-Punch + Shimmer-Sweep + Lens-Streak peak
+  //   0.88-0.96: Hold (volle Marke sichtbar, leichtes Atmen)
+  //   0.96-1.00: Cinematic Cross-Fade (kurzer Weiß-Flash → Schwarz)
   late final AnimationController _ctrl;
   late final AnimationController _fireflyCtrl;
   late final AnimationController _haloCtrl;
   Timer? _navTimer;
 
   static const _wordmark = 'Mensaena';
-  // Etwas länger — gibt der Animation Raum + zeigt die Marke ruhiger.
-  static const _totalDurationMs = 4200;
+  static const _totalDurationMs = 4400;
 
   @override
   void initState() {
@@ -140,31 +142,46 @@ class _SplashScreenState extends State<SplashScreen>
         builder: (_, __) {
           final t = _ctrl.value;
           // Phase Easing
-          final bgT = _ease(t / 0.25);
-          final logoT = _ease((t - 0.20) / 0.35);
-          final wordT = ((t - 0.55) / 0.30).clamp(0.0, 1.0);
-          final exitT = ((t - 0.92) / 0.08).clamp(0.0, 1.0);
+          final bgT = _ease(t / 0.18);
+          final logoT = _ease((t - 0.18) / 0.32);
+          final wordT = ((t - 0.50) / 0.28).clamp(0.0, 1.0);
+          // "Tudum"-Höhepunkt: kurzer Spike-Curve 0..1..0 zwischen 0.78–0.88.
+          final climaxT = _bump((t - 0.78) / 0.10);
+          // Shimmer-Sweep über die Wortmarke: einmaliger L→R-Lauf 0.78–0.92.
+          final shimmerT = ((t - 0.78) / 0.14).clamp(0.0, 1.0);
+          // Cinematic-Exit: kurzer Weiß-Flash (cross-cut) 0.96–0.99,
+          // dann finaler Schwarz-Fade 0.97–1.00 zum Dashboard.
+          final flashT = _bump((t - 0.96) / 0.03);
+          final exitT = ((t - 0.97) / 0.03).clamp(0.0, 1.0);
 
-          final logoScale = 0.80 + logoT * 0.20 - exitT * 0.04;
+          // Logo-Scale: Grund-Reveal + Tudum-Punch (kurzer Spike +0.08)
+          // − exit-Schrumpfen.
+          final logoScale =
+              0.80 + logoT * 0.20 + climaxT * 0.08 - exitT * 0.04;
           final logoOpacity =
               logoT.clamp(0.0, 1.0) * (1.0 - exitT * 0.30);
+          // Ken-Burns: BG zoomt 1.00 → 1.06 über den gesamten Verlauf.
+          final bgScale = 1.0 + t * 0.06;
 
           return Stack(
             children: [
-              // ── Aurora-Hintergrund-Gradient ─────────────────────
-              Container(
-                width: size.width,
-                height: size.height,
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: const Alignment(0.0, -0.3),
-                    radius: 1.2,
-                    colors: [
-                      Color.lerp(
-                          AppColors.voidColor, palette.bg2, bgT * 0.85)!,
-                      Color.lerp(
-                          AppColors.voidColor, palette.bg1, bgT)!,
-                    ],
+              // ── Aurora-Hintergrund-Gradient + Ken-Burns-Zoom ────
+              Transform.scale(
+                scale: bgScale,
+                child: Container(
+                  width: size.width,
+                  height: size.height,
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0.0, -0.3),
+                      radius: 1.2,
+                      colors: [
+                        Color.lerp(
+                            AppColors.voidColor, palette.bg2, bgT * 0.85)!,
+                        Color.lerp(
+                            AppColors.voidColor, palette.bg1, bgT)!,
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -302,14 +319,17 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                         const SizedBox(height: 32),
-                        // Wortmarke — Letter-by-Letter Reveal
+                        // Wortmarke — Letter-by-Letter Reveal +
+                        // goldener Shimmer-Sweep (L→R) im Höhepunkt.
                         Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8),
-                          child: _WordmarkReveal(
+                          child: _WordmarkWithShimmer(
                             progress: wordT,
                             word: _wordmark,
                             dotColor: palette.halo,
+                            shimmer: shimmerT,
+                            shimmerColor: palette.halo,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -331,24 +351,42 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
 
-              // ── Lens-Flare (subtler horizontaler Strahl) ────────
-              if (logoT > 0.5)
+              // ── Anamorphotischer Lens-Streak (J.J.-Abrams-Style) ──
+              // Heller, breiterer Strahl quer durch die Mitte. Pulsiert
+              // beim Reveal und peakt beim 'Tudum'-Höhepunkt (climaxT).
+              if (logoT > 0.4)
                 Positioned(
-                  top: size.height * 0.42,
+                  top: size.height * 0.46,
                   left: 0,
                   right: 0,
                   child: IgnorePointer(
                     child: Container(
-                      height: 1,
+                      height: 4 + 14 * climaxT,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            palette.halo.withValues(
-                                alpha: 0.5 * (logoT - 0.5) * 2),
+                            palette.accent.withValues(
+                                alpha: 0.10 +
+                                    0.35 * (logoT - 0.4).clamp(0.0, 1.0) +
+                                    0.45 * climaxT),
+                            Colors.white.withValues(
+                                alpha: 0.20 + 0.55 * climaxT),
+                            palette.accent.withValues(
+                                alpha: 0.10 +
+                                    0.35 * (logoT - 0.4).clamp(0.0, 1.0) +
+                                    0.45 * climaxT),
                             Colors.transparent,
                           ],
+                          stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: palette.accent
+                                .withValues(alpha: 0.4 * climaxT),
+                            blurRadius: 30 + 30 * climaxT,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -382,7 +420,18 @@ class _SplashScreenState extends State<SplashScreen>
                   alignment: Alignment.bottomCenter,
                   t: bgT),
 
-              // ── Exit-Fade (zum dashboard) ───────────────────────
+              // ── Cinematic-Cut: kurzer Weiß-Flash → Schwarz-Fade ──
+              // Klassischer Film-Cut-Look: 80ms harter Weiß-Blitz, dann
+              // sanft auf Schwarz. Wirkt wie ein Kamera-Schnitt.
+              if (flashT > 0)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      color:
+                          Colors.white.withValues(alpha: flashT * 0.85),
+                    ),
+                  ),
+                ),
               if (exitT > 0)
                 Positioned.fill(
                   child: Container(
@@ -459,6 +508,13 @@ class _SplashScreenState extends State<SplashScreen>
     final c = t.clamp(0.0, 1.0);
     return 1.0 - math.pow(1.0 - c, 3).toDouble();
   }
+
+  // 0..1..0 Hump-Curve (sin) — für one-shot Spike-Animationen wie der
+  // 'Tudum'-Logo-Punch und der Cinematic-Exit-Flash.
+  double _bump(double t) {
+    final c = t.clamp(0.0, 1.0);
+    return math.sin(c * math.pi);
+  }
 }
 
 class _Palette {
@@ -473,6 +529,70 @@ class _Palette {
   final Color bg2;
   final Color accent;
   final Color halo;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Wortmarke + goldener Shimmer-Sweep (Netflix-Style Highlight-Pass)
+// ─────────────────────────────────────────────────────────────────────
+class _WordmarkWithShimmer extends StatelessWidget {
+  const _WordmarkWithShimmer({
+    required this.progress,
+    required this.word,
+    required this.dotColor,
+    required this.shimmer,
+    required this.shimmerColor,
+  });
+
+  final double progress; // 0..1 — Letter-Reveal
+  final String word;
+  final Color dotColor;
+  final double shimmer; // 0..1 — L→R Sweep
+  final Color shimmerColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          _WordmarkReveal(
+            progress: progress,
+            word: word,
+            dotColor: dotColor,
+          ),
+          if (shimmer > 0 && shimmer < 1)
+            // Schmaler heller Streifen wandert über die Wortmarke. Width
+            // wird per FractionallySizedBox auf 22 % beschränkt, Position
+            // über Alignment-x (-1.4 → +1.4) interpoliert.
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Align(
+                  alignment: Alignment(-1.4 + shimmer * 2.8, 0),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.22,
+                    heightFactor: 1.0,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            shimmerColor.withValues(alpha: 0.55),
+                            Colors.white.withValues(alpha: 0.75),
+                            shimmerColor.withValues(alpha: 0.55),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────
