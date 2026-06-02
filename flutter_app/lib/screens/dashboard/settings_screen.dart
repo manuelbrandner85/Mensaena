@@ -190,8 +190,7 @@ class _AccountTab extends StatelessWidget {
             style: AppTypography.body(size: 14, color: AppColors.ink)),
         const SizedBox(height: 24),
         Text(
-          'Email- und Profil-Daten kannst du im vollen Web-Dashboard '
-          '(www.mensaena.de) bearbeiten — In-App folgt in einer spaeteren Phase.',
+          'settings.editOnWeb'.tr(),
           style: AppTypography.caption(),
         ),
         const SizedBox(height: 24),
@@ -347,27 +346,27 @@ class _PrivacyTab extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       children: [
         _BoolTile(
-          label: 'Online-Status zeigen',
+          label: 'settings.privacy.showOnline'.tr(),
           value: profile.showOnlineStatus,
           onChanged: (v) => onPatch({'show_online_status': v}),
         ),
         _BoolTile(
-          label: 'Standort zeigen',
+          label: 'settings.privacy.showLocation'.tr(),
           value: profile.showLocation,
           onChanged: (v) => onPatch({'show_location': v}),
         ),
         _BoolTile(
-          label: 'Trust-Score zeigen',
+          label: 'settings.privacy.showTrust'.tr(),
           value: profile.showTrustScore,
           onChanged: (v) => onPatch({'show_trust_score': v}),
         ),
         _BoolTile(
-          label: 'Aktivität zeigen',
+          label: 'settings.privacy.showActivity'.tr(),
           value: profile.showActivity,
           onChanged: (v) => onPatch({'show_activity': v}),
         ),
         _BoolTile(
-          label: 'Telefon zeigen',
+          label: 'settings.privacy.showPhone'.tr(),
           value: profile.showPhone,
           onChanged: (v) => onPatch({'show_phone': v}),
         ),
@@ -412,11 +411,11 @@ class _PrivacyTab extends StatelessWidget {
   static String _label(String v) {
     switch (v) {
       case 'public':
-        return 'Öffentlich';
+        return 'settings.visibility.public'.tr();
       case 'neighbors':
-        return 'Nur Nachbarn';
+        return 'settings.visibility.neighbors'.tr();
       case 'private':
-        return 'Privat';
+        return 'settings.visibility.private'.tr();
       default:
         return v;
     }
@@ -455,7 +454,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
-              label: 'Push aktiviert',
+              label: 'settings.pushEnabled'.tr(),
               value: prefs.enabled,
               onChanged: (v) => _update(prefs.copyWith(enabled: v)),
             ),
@@ -464,32 +463,32 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _BoolTile(
-              label: '💬 Nachrichten (Chat + DM)',
+              label: 'settings.notifCat.messages'.tr(),
               value: prefs.chat,
               onChanged: (v) => _update(prefs.copyWith(chat: v)),
             ),
             _BoolTile(
-              label: '👥 Community (Reaktionen, Kommentare, Matches)',
+              label: 'settings.notifCat.community'.tr(),
               value: prefs.social,
               onChanged: (v) => _update(prefs.copyWith(social: v)),
             ),
             _BoolTile(
-              label: '🎉 Events',
+              label: 'settings.notifCat.events'.tr(),
               value: prefs.events,
               onChanged: (v) => _update(prefs.copyWith(events: v)),
             ),
             _BoolTile(
-              label: '🛒 Marktplatz',
+              label: 'settings.notifCat.marketplace'.tr(),
               value: prefs.marketplace,
               onChanged: (v) => _update(prefs.copyWith(marketplace: v)),
             ),
             _BoolTile(
-              label: '⚠️ Krisen & Notfälle',
+              label: 'settings.notifCat.crisis'.tr(),
               value: prefs.crisis,
               onChanged: (v) => _update(prefs.copyWith(crisis: v)),
             ),
             _BoolTile(
-              label: '🏆 System (Badges, Updates)',
+              label: 'settings.notifCat.system'.tr(),
               value: prefs.system,
               onChanged: (v) => _update(prefs.copyWith(system: v)),
             ),
@@ -561,8 +560,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Profil-Settings (E-Mail-Notifications, Push-Token-Lifecycle) '
-              'bleiben separat im Konto-Bereich.',
+              'settings.profileSettingsHint'.tr(),
               style: AppTypography.caption(),
             ),
           ],
@@ -806,11 +804,7 @@ class _DangerTabState extends State<_DangerTab> {
             style: AppTypography.body(
                 size: 16, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
-          'Dein Profil, alle Beiträge, Nachrichten, Bewertungen und '
-          'gespeicherten Inhalte werden permanent gelöscht. Diese Aktion '
-          'kann NICHT rückgängig gemacht werden.\n\n'
-          'Hinweis: System-Logs (z.B. anonymisierte Audit-Einträge) '
-          'können aus rechtlichen Gründen erhalten bleiben.',
+          'settings.deleteWarning'.tr(),
           style: AppTypography.body(
               size: 13, color: AppColors.inkSoft, height: 1.5),
         ),
@@ -864,7 +858,8 @@ class _DangerTabState extends State<_DangerTab> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocalState) {
-          final canDelete = ctrl.text.trim() == 'LÖSCHEN';
+          final word = 'settings.deleteConfirmWord'.tr();
+          final canDelete = ctrl.text.trim() == word;
           return AlertDialog(
             backgroundColor: AppColors.surface,
             title: Text('settings.finalConfirmTitle'.tr(),
@@ -877,7 +872,7 @@ class _DangerTabState extends State<_DangerTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tippe „LÖSCHEN" zur Bestätigung:',
+                  'settings.deleteTypePrompt'.tr(namedArgs: {'word': word}),
                   style: AppTypography.body(
                       size: 13, color: AppColors.inkSoft),
                 ),
@@ -888,8 +883,8 @@ class _DangerTabState extends State<_DangerTab> {
                   onChanged: (_) => setLocalState(() {}),
                   style: AppTypography.body(
                       size: 14, color: AppColors.ink),
-                  decoration: const InputDecoration(
-                    hintText: 'LÖSCHEN',
+                  decoration: InputDecoration(
+                    hintText: word,
                     filled: true,
                     fillColor: AppColors.elevated,
                   ),
@@ -941,8 +936,8 @@ class _DangerTabState extends State<_DangerTab> {
                       strokeWidth: 2, color: AppColors.amber))
               : const Icon(LucideIcons.download, size: 16),
           label: Text(_exporting
-              ? 'Exportiere…'
-              : 'Meine Daten herunterladen (Art. 20)'),
+              ? 'settings.exporting'.tr()
+              : 'settings.exportData'.tr()),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.amber,
             side: BorderSide(color: AppColors.amber.withValues(alpha: 0.5)),
@@ -962,7 +957,7 @@ class _DangerTabState extends State<_DangerTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Konto löschen',
+                'settings.deleteAccountHeading'.tr(),
                 style: AppTypography.body(
                   size: 14,
                   color: AppColors.herzrotWarm,
@@ -971,8 +966,7 @@ class _DangerTabState extends State<_DangerTab> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Permanente Löschung deines Accounts und aller Inhalte. '
-                'DSGVO Artikel 17 — Recht auf Vergessenwerden.',
+                'settings.deleteAccountDesc'.tr(),
                 style: AppTypography.body(
                   size: 12,
                   color: AppColors.inkSoft,
@@ -992,8 +986,8 @@ class _DangerTabState extends State<_DangerTab> {
                               strokeWidth: 2, color: AppColors.voidColor))
                       : const Icon(LucideIcons.trash2, size: 16),
                   label: Text(_deleting
-                      ? 'Lösche…'
-                      : 'Konto unwiderruflich löschen'),
+                      ? 'settings.deleting'.tr()
+                      : 'settings.deleteAccountBtn'.tr()),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.herzrot,
                     foregroundColor: AppColors.voidColor,
@@ -1296,7 +1290,7 @@ class _AppearanceTab extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Die App ändert ihre Atmosphäre subtil je nach Tageszeit — Nacht ist tiefes Indigo, Sunset wird warm bronze-orange, Tag ist klar. 6 Cinema-Effekte (Gradient, Tint, Vignette, Film-Grain, Light-Leaks, Smooth-Transitions) sorgen für ein hyperrealistisches Film-Gefühl. Brand-Farben (Bronze, Amber) bleiben gleich.',
+                'settings.cinemaExplain'.tr(),
                 style: AppTypography.body(
                     size: 12, color: AppColors.inkSoft, height: 1.5),
               ),
@@ -1410,7 +1404,7 @@ class _SoundToggleState extends ConsumerState<_SoundToggle> {
       title: Text('settings.sections.uiSounds'.tr(),
           style: AppTypography.body(size: 14, color: AppColors.ink)),
       subtitle: Text(
-        'Dezenter System-Klick bei Taps und Toggles.',
+        'settings.uiSoundsDesc'.tr(),
         style: AppTypography.body(size: 12, color: AppColors.mute),
       ),
     );
@@ -1575,15 +1569,15 @@ class _ModeTile extends StatelessWidget {
   String get _description {
     switch (mode) {
       case CinemaMode.auto:
-        return 'Wechselt automatisch — 6 Phasen über den Tag verteilt.';
+        return 'settings.cinemaDesc.auto'.tr();
       case CinemaMode.off:
-        return 'Keine Cinema-Effekte, pures Dark-Theme.';
+        return 'settings.cinemaDesc.off'.tr();
       case CinemaMode.forceNight:
-        return 'Tiefes Indigo, ruhig, kontrastreich.';
+        return 'settings.cinemaDesc.night'.tr();
       case CinemaMode.forceDay:
-        return 'Heller, klarer Tag-Modus.';
+        return 'settings.cinemaDesc.day'.tr();
       case CinemaMode.forceDusk:
-        return 'Hyperreal Sunset — warmes Amber, Light-Leaks.';
+        return 'settings.cinemaDesc.dusk'.tr();
     }
   }
 
@@ -1673,11 +1667,11 @@ class _SecurityTabState extends State<_SecurityTab> {
     final pw = _newPw.text;
     final c = _confirmPw.text;
     if (pw.length < 8) {
-      _toast('Passwort muss mindestens 8 Zeichen lang sein.');
+      _toast('settings.pwTooShort'.tr());
       return;
     }
     if (pw != c) {
-      _toast('Passwörter stimmen nicht überein.');
+      _toast('settings.pwMismatch'.tr());
       return;
     }
     setState(() => _busy = true);
@@ -1686,9 +1680,9 @@ class _SecurityTabState extends State<_SecurityTab> {
       if (!mounted) return;
       _newPw.clear();
       _confirmPw.clear();
-      _toast('Passwort geändert.');
+      _toast('settings.pwChanged'.tr());
     } catch (e) {
-      _toast('Fehler: $e');
+      _toast('settings.errorPrefix'.tr(namedArgs: {'error': '$e'}));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -1700,9 +1694,9 @@ class _SecurityTabState extends State<_SecurityTab> {
     setState(() => _busy = true);
     try {
       await sb.auth.resetPasswordForEmail(email);
-      _toast('Reset-Link an $email gesendet.');
+      _toast('settings.resetLinkSent'.tr(namedArgs: {'email': email}));
     } catch (_) {
-      _toast('Reset-Mail konnte nicht versendet werden.');
+      _toast('settings.resetMailFailed'.tr());
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -1719,7 +1713,7 @@ class _SecurityTabState extends State<_SecurityTab> {
                 color: AppColors.ink,
                 weight: FontWeight.w700)),
         content: Text(
-            'Du bleibst auf diesem Gerät eingeloggt, alle anderen Geräte werden abgemeldet.',
+            'settings.signOutOthersDesc'.tr(),
             style:
                 AppTypography.body(size: 13, color: AppColors.inkSoft)),
         actions: [
@@ -1739,9 +1733,9 @@ class _SecurityTabState extends State<_SecurityTab> {
     setState(() => _busy = true);
     try {
       await sb.auth.signOut(scope: SignOutScope.others);
-      _toast('Andere Sessions abgemeldet.');
+      _toast('settings.otherSessionsSignedOut'.tr());
     } catch (_) {
-      _toast('Abmelden fehlgeschlagen.');
+      _toast('settings.signOutFailed'.tr());
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -1762,7 +1756,7 @@ class _SecurityTabState extends State<_SecurityTab> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       children: [
-        _label('Angemeldet als'),
+        _label('settings.loggedInAs'.tr()),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -1783,19 +1777,19 @@ class _SecurityTabState extends State<_SecurityTab> {
           ),
         ),
         const SizedBox(height: 24),
-        _label('Passwort ändern'),
+        _label('settings.changePassword'.tr()),
         TextField(
           controller: _newPw,
           obscureText: !_show,
           style: AppTypography.body(size: 14, color: AppColors.ink),
-          decoration: _input('Neues Passwort'),
+          decoration: _input('settings.newPassword'.tr()),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: _confirmPw,
           obscureText: !_show,
           style: AppTypography.body(size: 14, color: AppColors.ink),
-          decoration: _input('Neues Passwort bestätigen'),
+          decoration: _input('settings.confirmNewPassword'.tr()),
         ),
         const SizedBox(height: 6),
         Row(
@@ -1822,9 +1816,9 @@ class _SecurityTabState extends State<_SecurityTab> {
           ),
         ),
         const SizedBox(height: 28),
-        _label('Passwort vergessen'),
+        _label('settings.forgotPassword'.tr()),
         Text(
-          'Wenn du dein aktuelles Passwort nicht kennst, senden wir dir einen Reset-Link an deine E-Mail-Adresse.',
+          'settings.forgotPasswordDesc'.tr(),
           style: AppTypography.body(
               size: 12, color: AppColors.inkSoft, height: 1.5),
         ),
@@ -1841,9 +1835,9 @@ class _SecurityTabState extends State<_SecurityTab> {
           ),
         ),
         const SizedBox(height: 28),
-        _label('Aktive Sessions'),
+        _label('settings.activeSessions'.tr()),
         Text(
-          'Falls du dich auf einem fremden Gerät eingeloggt hast, kannst du alle anderen Sessions hier beenden.',
+          'settings.activeSessionsDesc'.tr(),
           style: AppTypography.body(
               size: 12, color: AppColors.inkSoft, height: 1.5),
         ),
@@ -1862,7 +1856,7 @@ class _SecurityTabState extends State<_SecurityTab> {
         const SizedBox(height: 28),
         const _BiometricSection(),
         const SizedBox(height: 28),
-        _label('Zwei-Faktor-Authentisierung'),
+        _label('settings.twoFactor'.tr()),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -1877,7 +1871,7 @@ class _SecurityTabState extends State<_SecurityTab> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'TOTP-/Authenticator-App-Unterstützung kommt in einem späteren Release.',
+                  'settings.twoFactorComing'.tr(),
                   style: AppTypography.body(
                       size: 12, color: AppColors.inkSoft, height: 1.4),
                 ),
@@ -1959,7 +1953,7 @@ class _LanguageTab extends ConsumerWidget {
               style: AppTypography.body(
                   size: 14, color: AppColors.ink)),
           subtitle: Text(
-            'Die App passt sich an die Sprache des Landes an, in dem du dich befindest.',
+            'settings.languageByLocationDesc'.tr(),
             style: AppTypography.body(
                 size: 12, color: AppColors.mute, height: 1.4),
           ),
@@ -1979,7 +1973,9 @@ class _LanguageTab extends ConsumerWidget {
                     style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 8),
                 Text(
-                  'Aktuell erkannt: ${_names[detectedLang] ?? detectedLang}',
+                  'settings.detectedNow'.tr(namedArgs: {
+                    'lang': _names[detectedLang] ?? detectedLang
+                  }),
                   style: AppTypography.body(
                       size: 12, color: AppColors.inkSoft),
                 ),
@@ -2012,7 +2008,7 @@ class _LanguageTab extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Kein Standort verfügbar — Deutsch wird verwendet.',
+                    'settings.noLocationFallback'.tr(),
                     style: AppTypography.body(
                         size: 12, color: AppColors.inkSoft, height: 1.4),
                   ),
