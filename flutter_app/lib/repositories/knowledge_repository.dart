@@ -6,6 +6,7 @@ library;
 
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../services/supabase_service.dart';
@@ -13,9 +14,9 @@ import '../services/supabase_service.dart';
 class KnowledgeRepository {
   const KnowledgeRepository._();
 
-  /// Upload eines Cover-Bildes zu Supabase Storage.
-  /// Bucket-Order: 'knowledge-images' → fallback 'chat-images'.
-  /// Returns Public-URL oder null bei Fehler.
+  /// Upload eines Cover-Bildes zu Supabase Storage. Vorher: silently auf
+  /// 'chat-images' gefallen, jetzt: nur 'knowledge-images' (Bucket wurde
+  /// in Migration 20260602120000 angelegt).
   static Future<String?> uploadImage({
     required Uint8List bytes,
     required String userId,
@@ -23,18 +24,16 @@ class KnowledgeRepository {
   }) async {
     final filename = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
     final path = '$userId/$filename';
-    for (final bucket in const ['knowledge-images', 'chat-images']) {
-      try {
-        await sb.storage.from(bucket).uploadBinary(
-              path,
-              bytes,
-              fileOptions: FileOptions(contentType: 'image/$fileExt'),
-            );
-        return sb.storage.from(bucket).getPublicUrl(path);
-      } catch (_) {
-        continue;
-      }
+    try {
+      await sb.storage.from('knowledge-images').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: 'image/$fileExt'),
+          );
+      return sb.storage.from('knowledge-images').getPublicUrl(path);
+    } catch (e) {
+      debugPrint('uploadKnowledgeImage failed: $e');
+      return null;
     }
-    return null;
   }
 }

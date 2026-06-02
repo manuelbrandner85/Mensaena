@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../providers/role_provider.dart';
+import '../../services/call_event_bus.dart';
 import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
@@ -146,6 +147,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         return '/auth?mode=login';
       }
       if (loggedIn && (isAuthRoute || loc == '/')) {
+        // Cold-Start-Accept: Wenn der Nutzer einen eingehenden Call
+        // angenommen hat, bevor die App fertig gebootet war, holen wir
+        // die gespeicherte Call-Route hier ab und springen direkt rein.
+        final pendingCall = CallEventBus.consumePendingAcceptRoute();
+        if (pendingCall != null) return pendingCall;
         return '/dashboard';
       }
       // Admin-Route-Guard: nur fuer admin/moderator. Defense-in-depth

@@ -868,38 +868,16 @@ class _CallScreenState extends ConsumerState<CallScreen> {
               ),
             ],
             const Spacer(),
-            // Action Bar — 4 Buttons: Mic, Speaker, Hangup, Cam.
+            // Sekundär-Aktionen (wrapped, damit auf schmalen Geräten und in
+            // jeder Sprache nichts überläuft). Vorher: 7 Buttons in einer
+            // einzigen Row → Overflow auf kleinen Devices.
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 14,
+                runSpacing: 10,
                 children: [
-                  _CircleAction(
-                    icon: _micEnabled
-                        ? LucideIcons.mic
-                        : LucideIcons.micOff,
-                    label: _micEnabled ? 'Mute' : 'Unmute',
-                    color: _micEnabled
-                        ? AppColors.bronze
-                        : AppColors.herzrotWarm,
-                    onTap: _state == _CallState.connected ? _toggleMic : null,
-                  ),
-                  _CircleAction(
-                    icon: _speakerOn
-                        ? LucideIcons.volume2
-                        : LucideIcons.volumeX,
-                    label: _speakerOn ? 'Lautspr.' : 'Hörer',
-                    color: _speakerOn ? AppColors.bronze : AppColors.mute,
-                    onTap:
-                        _state == _CallState.connected ? _toggleSpeaker : null,
-                  ),
-                  _CircleAction(
-                    icon: LucideIcons.phoneOff,
-                    label: 'Auflegen',
-                    color: AppColors.herzrot,
-                    big: true,
-                    onTap: _hangUp,
-                  ),
                   _CircleAction(
                     icon: _camEnabled
                         ? LucideIcons.video
@@ -910,7 +888,6 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         : AppColors.mute,
                     onTap: _state == _CallState.connected ? _toggleCam : null,
                   ),
-                  // F12: Screen-Share-Toggle
                   _CircleAction(
                     icon: _screenShareEnabled
                         ? LucideIcons.monitorOff
@@ -925,9 +902,6 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                         ? _toggleScreenShare
                         : null,
                   ),
-                  // ZUSATZ-3 Mini-Modus: Call bleibt aktiv im
-                  // ActiveCallMiniPlayer (DashboardScaffold). User
-                  // navigiert frei in der App — Audio/Video läuft weiter.
                   _CircleAction(
                     icon: LucideIcons.minimize2,
                     label: 'call.minimize'.tr(),
@@ -942,7 +916,6 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                           }
                         : null,
                   ),
-                  // Punkt 13: Teilnehmer hinzufügen (Multi-Party).
                   _CircleAction(
                     icon: LucideIcons.userPlus,
                     label: 'call.addParticipant'.tr(),
@@ -950,6 +923,42 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                     onTap: _state == _CallState.connected
                         ? _addParticipant
                         : null,
+                  ),
+                ],
+              ),
+            ),
+            // Primär-Bar: Mic — Auflegen (groß, mittig) — Lautsprecher.
+            // Drei feste Slots, garantiert kein Overflow.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 36),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _CircleAction(
+                    icon: _micEnabled
+                        ? LucideIcons.mic
+                        : LucideIcons.micOff,
+                    label: _micEnabled ? 'Mute' : 'Unmute',
+                    color: _micEnabled
+                        ? AppColors.bronze
+                        : AppColors.herzrotWarm,
+                    onTap: _state == _CallState.connected ? _toggleMic : null,
+                  ),
+                  _CircleAction(
+                    icon: LucideIcons.phoneOff,
+                    label: 'Auflegen',
+                    color: AppColors.herzrot,
+                    big: true,
+                    onTap: _hangUp,
+                  ),
+                  _CircleAction(
+                    icon: _speakerOn
+                        ? LucideIcons.volume2
+                        : LucideIcons.volumeX,
+                    label: _speakerOn ? 'Lautspr.' : 'Hörer',
+                    color: _speakerOn ? AppColors.bronze : AppColors.mute,
+                    onTap:
+                        _state == _CallState.connected ? _toggleSpeaker : null,
                   ),
                 ],
               ),

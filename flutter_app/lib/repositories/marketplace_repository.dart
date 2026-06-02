@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
@@ -159,8 +160,8 @@ class MarketplaceRepository {
     }
   }
 
-  /// Upload image bytes to Supabase Storage. Returns public URL or null.
-  /// Bucket order: 'marketplace-images' → fallback 'chat-images'.
+  /// Upload image bytes to Supabase Storage. Vorher: silently auf
+  /// 'chat-images' gefallen, jetzt: nur 'marketplace-images'.
   static Future<String?> uploadListingImage({
     required Uint8List bytes,
     required String userId,
@@ -168,19 +169,17 @@ class MarketplaceRepository {
   }) async {
     final filename = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
     final path = '$userId/$filename';
-    for (final bucket in const ['marketplace-images', 'chat-images']) {
-      try {
-        await sb.storage.from(bucket).uploadBinary(
-              path,
-              bytes,
-              fileOptions: FileOptions(contentType: 'image/$fileExt'),
-            );
-        return sb.storage.from(bucket).getPublicUrl(path);
-      } catch (_) {
-        continue;
-      }
+    try {
+      await sb.storage.from('marketplace-images').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: 'image/$fileExt'),
+          );
+      return sb.storage.from('marketplace-images').getPublicUrl(path);
+    } catch (e) {
+      debugPrint('uploadListingImage failed: $e');
+      return null;
     }
-    return null;
   }
 
   // ── M1: Inserat-Kommentare ──────────────────────────────────────────

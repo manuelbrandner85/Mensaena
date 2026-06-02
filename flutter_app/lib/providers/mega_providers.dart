@@ -7,16 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/mega_models.dart';
 import '../repositories/mega_repositories.dart';
 
-// F36 Follows
-final isFollowingProvider =
-    FutureProvider.family.autoDispose<bool, String>((ref, otherUserId) async {
-  return FollowsRepository.isFollowing(otherUserId);
-});
-final followCountsProvider = FutureProvider.family
-    .autoDispose<({int followers, int following}), String>((ref, userId) async {
-  return FollowsRepository.counts(userId);
-});
-
 // F37 Profile-Views
 final myWeeklyViewsProvider = FutureProvider.autoDispose<int>((ref) async {
   return ProfileViewsRepository.myWeeklyViews();

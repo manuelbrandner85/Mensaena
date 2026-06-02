@@ -8,7 +8,7 @@
 ///   }
 ///
 /// Cacht das Ergebnis 60 Sekunden pro Target um wiederholte DB-Calls bei
-/// schnellen UI-Aktionen (z.B. Liste durchscrollen mit FollowButton) zu
+/// schnellen UI-Aktionen (z.B. Liste durchscrollen mit Friend-Button) zu
 /// vermeiden. Cache wird via invalidate() nach Block/Unblock-Aktionen
 /// geleert.
 library;

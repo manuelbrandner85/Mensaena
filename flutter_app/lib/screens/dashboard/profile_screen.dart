@@ -28,7 +28,6 @@ import 'package:supabase_flutter/supabase_flutter.dart'
 import '../../services/supabase_service.dart';
 import '../../repositories/mega_repositories.dart';
 import '../../widgets/dashboard/activity_heatmap_widget.dart';
-import '../../widgets/profile/follow_button.dart';
 import '../../widgets/profile/friend_request_button.dart';
 import '../../widgets/profile/qr_share_sheet.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -797,8 +796,6 @@ class _Header extends StatelessWidget {
                   if (!isMe) ...[
                     const SizedBox(height: 4),
                     Row(mainAxisSize: MainAxisSize.min, children: [
-                      FollowButton(userId: profile.id),
-                      const SizedBox(width: 6),
                       FriendRequestButton(userId: profile.id),
                       const SizedBox(width: 6),
                       IconButton(

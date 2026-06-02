@@ -223,23 +223,38 @@ class CallEventBus {
         return;
       } catch (_) {}
     }
-    // Cold-Start-Retry: GoRouter braucht ein paar Frames bis ready.
-    // Aggressiveres Polling (50ms statt 100ms) damit User schneller im
-    // Call landet — total max 5s bis Aufgeben.
+    // Cold-Start-Retry: GoRouter braucht teils mehrere Sekunden bis ready
+    // (Flutter-Engine-Boot + Firebase-Init + Auth-Restore + Provider-Setup).
+    // Vorher: 5s Deadline → User landete häufig NICHT im Call-Screen,
+    // weil CallKit beim Annehmen aus dem Kill-State 6-8s braucht.
+    // Jetzt: 30s Deadline + Pending-Route, die auch nach Boot ausgelöst wird.
+    _pendingAcceptRoute = route;
     var tries = 0;
-    Timer.periodic(const Duration(milliseconds: 50), (t) {
+    Timer.periodic(const Duration(milliseconds: 80), (t) {
       tries++;
       final n = rootNavigatorKey.currentState;
       if (n != null) {
         try {
           n.context.push(route);
+          _pendingAcceptRoute = null;
           t.cancel();
           return;
         } catch (_) {}
       }
-      if (tries > 100) t.cancel(); // 5s max
+      if (tries > 375) t.cancel(); // 30s max
     });
   }
+
+  /// Wird vom Router beim ersten Build aufgerufen, damit ein während des
+  /// Cold-Starts angenommener Call sofort den Call-Screen aufmacht (auch
+  /// wenn der Timer-Retry noch nicht gegriffen hat).
+  static String? consumePendingAcceptRoute() {
+    final r = _pendingAcceptRoute;
+    _pendingAcceptRoute = null;
+    return r;
+  }
+
+  static String? _pendingAcceptRoute;
 
   static Future<void> _onDecline(CallContext ctx) async {
     await _updateStatus(ctx.callId, 'cancelled');

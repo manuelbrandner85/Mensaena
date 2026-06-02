@@ -50,11 +50,26 @@ class FriendshipsRepository {
     }
   }
 
-  /// Anfrage senden.
+  /// Anfrage senden. Falls die GEGENSEITE bereits eine pending-Anfrage an
+  /// MICH hat → direkt akzeptieren (häufige UX-Falle: A schickt an B, B
+  /// öffnet B's Profil und tappt "Anfragen" — vorher gab das eine
+  /// Unique-Constraint-Verletzung, jetzt entsteht eine Freundschaft).
   static Future<bool> request(String addresseeId) async {
     final me = SupabaseService.currentUser?.id;
     if (me == null || me == addresseeId) return false;
     try {
+      // 1) Existiert bereits eine pending-Anfrage von der Gegenseite → accept.
+      final existing = await sb
+          .from('friendships')
+          .select('requester_id, status')
+          .eq('requester_id', addresseeId)
+          .eq('addressee_id', me)
+          .maybeSingle();
+      if (existing != null && existing['status'] == 'pending') {
+        return accept(addresseeId);
+      }
+      // 2) Sonst neue pending-Row anlegen (Unique-Constraint verhindert
+      //    Mehrfach-Anfragen in die gleiche Richtung).
       await sb.from('friendships').insert({
         'requester_id': me,
         'addressee_id': addresseeId,
@@ -66,22 +81,32 @@ class FriendshipsRepository {
     }
   }
 
-  /// Eingehende Anfrage akzeptieren.
+  /// Eingehende Anfrage akzeptieren. Nutzt server-seitigen RPC mit
+  /// SECURITY DEFINER → idempotent, kein Race-Condition mit RLS.
   static Future<bool> accept(String requesterId) async {
     final me = SupabaseService.currentUser?.id;
     if (me == null) return false;
     try {
-      await sb
-          .from('friendships')
-          .update({
-            'status': 'accepted',
-            'responded_at': DateTime.now().toIso8601String(),
-          })
-          .eq('requester_id', requesterId)
-          .eq('addressee_id', me);
-      return true;
+      final res = await sb.rpc<dynamic>(
+        'accept_friend_request',
+        params: {'p_requester': requesterId},
+      );
+      return res == true;
     } catch (_) {
-      return false;
+      // Fallback auf direktes Update — alte App-Version, RPC fehlt.
+      try {
+        await sb
+            .from('friendships')
+            .update({
+              'status': 'accepted',
+              'responded_at': DateTime.now().toIso8601String(),
+            })
+            .eq('requester_id', requesterId)
+            .eq('addressee_id', me);
+        return true;
+      } catch (_) {
+        return false;
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
@@ -310,7 +311,10 @@ class EventsRepository {
   }
 
   /// Bild-Upload zu Supabase Storage. Returns public-URL oder null bei Fehler.
-  /// Bucket order: 'event-images' → fallback 'chat-images'.
+  /// Vorher: silently auf 'chat-images' gefallen, wenn 'event-images' Fehler
+  /// warf → Event-Bilder landeten im Chat-Bucket. Jetzt: nur event-images,
+  /// Fehler wird sichtbar (debugPrint) und null zurückgegeben, damit die UI
+  /// einen Hinweis zeigen kann.
   static Future<String?> uploadEventImage({
     required Uint8List bytes,
     required String userId,
@@ -318,19 +322,17 @@ class EventsRepository {
   }) async {
     final filename = '${DateTime.now().millisecondsSinceEpoch}.$fileExt';
     final path = '$userId/$filename';
-    for (final bucket in const ['event-images', 'chat-images']) {
-      try {
-        await sb.storage.from(bucket).uploadBinary(
-              path,
-              bytes,
-              fileOptions: FileOptions(contentType: 'image/$fileExt'),
-            );
-        return sb.storage.from(bucket).getPublicUrl(path);
-      } catch (_) {
-        continue;
-      }
+    try {
+      await sb.storage.from('event-images').uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: 'image/$fileExt'),
+          );
+      return sb.storage.from('event-images').getPublicUrl(path);
+    } catch (e) {
+      debugPrint('uploadEventImage failed: $e');
+      return null;
     }
-    return null;
   }
 }
 
