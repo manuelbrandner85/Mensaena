@@ -34,6 +34,7 @@ import '../../../widgets/event_attendees_section.dart';
 import '../../../widgets/events/event_photos_gallery.dart';
 import '../../../widgets/shared/premium_image.dart';
 import '../../../widgets/events/event_qr_checkin_sheet.dart';
+import '../../../widgets/effects/parallax_image_header.dart';
 import '../../../widgets/event_countdown.dart';
 import '../../../widgets/event_reminder_widget.dart';
 import '../../../widgets/event_share_sheet.dart';
@@ -138,12 +139,26 @@ class EventDetailScreen extends ConsumerWidget {
   }
 }
 
-class _EventDetailBody extends ConsumerWidget {
+class _EventDetailBody extends ConsumerStatefulWidget {
   const _EventDetailBody({required this.event});
   final EventItem event;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_EventDetailBody> createState() => _EventDetailBodyState();
+}
+
+class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
+  final _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final event = widget.event;
     final accent = _categoryColor(event.category);
     final now = DateTime.now();
     final isUpcoming = event.startDate.isAfter(now);
@@ -156,12 +171,13 @@ class _EventDetailBody extends ConsumerWidget {
     final rsvp = rsvpAsync.asData?.value;
 
     return SingleChildScrollView(
+      controller: _scroll,
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── 1) Hero ──────────────────────────────────────────────
-          _HeroBlock(event: event, accent: accent),
+          _HeroBlock(event: event, accent: accent, scrollController: _scroll),
 
           // ── 2) Status-Badges ─────────────────────────────────────
           if (isCancelled || isFull) ...[
@@ -750,9 +766,14 @@ class _EventDetailBody extends ConsumerWidget {
 // Hero
 // ──────────────────────────────────────────────────────────────────
 class _HeroBlock extends StatelessWidget {
-  const _HeroBlock({required this.event, required this.accent});
+  const _HeroBlock({
+    required this.event,
+    required this.accent,
+    required this.scrollController,
+  });
   final EventItem event;
   final Color accent;
+  final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -788,9 +809,11 @@ class _HeroBlock extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          SizedBox(
+          // Cinema: Parallax-Hero (Bild scrollt langsamer) + Scrim.
+          ParallaxImageHeader(
+            scrollController: scrollController,
             height: 240,
-            width: double.infinity,
+            borderRadius: 0,
             child: PremiumImage(
               url: event.imageUrl,
               height: 240,
