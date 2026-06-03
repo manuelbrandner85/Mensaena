@@ -21,6 +21,7 @@ import 'widgets/shared/fcm_foreground_listener.dart';
 import 'widgets/shared/incoming_call_listener.dart';
 import 'widgets/shared/battery_optimization_prompt.dart';
 import 'widgets/shared/notification_permission_banner.dart';
+import 'widgets/shared/permissions_bootstrap.dart';
 import 'widgets/shared/update_gate.dart';
 
 /// SKILL: mensaena-architektur
@@ -136,6 +137,12 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
                     // → sonst verpasste Anrufe). Rendert nichts, zeigt nur
                     // nach 12s einmalig einen Dialog falls nötig.
                     const BatteryOptimizationPrompt(),
+                    // Einmaliger Permissions-Bootstrap: feuert alle System-
+                    // Dialoge in einer Sequenz beim ersten Login ab, damit
+                    // der Nutzer nur einmal durchklickt. Läuft nach dem
+                    // BatteryPrompt (Sekunde 16) und merkt sich erfolgreichen
+                    // Lauf im SecureStorage — keine Wiederholung.
+                    const PermissionsBootstrap(),
                   ],
                 ),
               ),
