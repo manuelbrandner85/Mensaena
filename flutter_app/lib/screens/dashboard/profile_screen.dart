@@ -11,6 +11,7 @@ import '../../widgets/profile/status_editor_sheet.dart';
 import 'call/scheduled_calls_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../widgets/effects/bloom.dart';
 import '../../widgets/effects/tilt_card.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -156,9 +157,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             }
             return Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                  child: _Header(profile: p, isMe: effectiveIsMe),
+                // Cinema-Cover: dezenter Bronze-Spotlight hinter dem Header
+                // (der Header scrollt nicht → kein Parallax, dafür ein
+                // filmisches Cover-Backdrop).
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.bronze.withValues(alpha: 0.14),
+                        AppColors.surface.withValues(alpha: 0.0),
+                      ],
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                          color: AppColors.bronze.withValues(alpha: 0.16)),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                    child: _Header(profile: p, isMe: effectiveIsMe),
+                  ),
                 ),
                 TabBar(
                   controller: _tab,
@@ -733,7 +753,11 @@ class _Header extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TiltCard(
+            Bloom(
+              color: AppColors.bronze,
+              intensity: 0.5,
+              radius: 22,
+              child: TiltCard(
               intensity: 1.2,
               borderRadius: 999,
               child: profile.avatarUrl != null
@@ -772,6 +796,7 @@ class _Header extends StatelessWidget {
                         ),
                       ),
                     ),
+            ),
             ),
             const SizedBox(width: 16),
             Expanded(
