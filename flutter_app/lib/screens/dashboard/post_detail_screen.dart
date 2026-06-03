@@ -49,6 +49,8 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   int _score = 0;
   List<Map<String, dynamic>> _comments = const [];
   final _commentCtrl = TextEditingController();
+  // Cinema: ScrollController treibt den Parallax-Hero (Bild scrollt langsamer).
+  final _scrollCtrl = ScrollController();
   // Phase 5.7: optional parent for nested-reply (depth-1)
   String? _replyToParentId;
   String? _replyToAuthor;
@@ -61,6 +63,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
   @override
   void dispose() {
+    _scrollCtrl.dispose();
     _commentCtrl.dispose();
     super.dispose();
   }
@@ -430,9 +433,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                           backgroundColor: AppColors.surface,
                           onRefresh: _load,
                           child: ListView(
+                          controller: _scrollCtrl,
                           padding: const EdgeInsets.all(16),
                           children: [
-                            _Hero(post: _post!),
+                            _Hero(post: _post!, scrollController: _scrollCtrl),
                             // P6 Status-Lifecycle: Badge für alle + Steuerung
                             // für den Autor.
                             if ((_statusOverride ?? _post!.status) !=
@@ -540,24 +544,88 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────
-class _Hero extends StatelessWidget {
-  const _Hero({required this.post});
+class _Hero extends StatefulWidget {
+  const _Hero({required this.post, required this.scrollController});
   final Post post;
+  final ScrollController scrollController;
+
+  @override
+  State<_Hero> createState() => _HeroState();
+}
+
+class _HeroState extends State<_Hero> {
+  double _offset = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!widget.scrollController.hasClients) return;
+    final o = widget.scrollController.offset;
+    if (o > 300) return; // außerhalb des Hero-Bereichs → nicht mehr updaten
+    setState(() => _offset = o);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final post = widget.post;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Phase 5.6: shared ImageCarousel mit Indicator-Dots + Lightbox-Tap
         // Hero-Tag matched die PostCard-Liste (smooth fly-in beim Open).
+        // Cinema: Parallax (Bild scrollt 40 % langsamer) + Bottom-Scrim für
+        // filmische Tiefe.
         if (post.allImageUrls.isNotEmpty) ...[
-          Hero(
-            tag: 'post-image-${post.id}',
-            child: ImageCarousel(
-              urls: post.allImageUrls,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: SizedBox(
               height: 240,
-              borderRadius: 14,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Transform.translate(
+                    offset: Offset(0, -_offset * 0.4),
+                    child: Transform.scale(
+                      // Leichter Overscale, damit beim Parallax-Verschieben
+                      // keine Kante sichtbar wird.
+                      scale: 1.12,
+                      child: Hero(
+                        tag: 'post-image-${post.id}',
+                        child: ImageCarousel(
+                          urls: post.allImageUrls,
+                          height: 240,
+                          borderRadius: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Bottom-Scrim (cinematischer Gradient-Verlauf).
+                  IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.center,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            AppColors.voidColor.withValues(alpha: 0.55),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 14),
