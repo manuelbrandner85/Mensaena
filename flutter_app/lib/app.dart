@@ -19,9 +19,8 @@ import 'widgets/shared/biometric_lock_gate.dart';
 import 'widgets/shared/critical_crisis_alert_listener.dart';
 import 'widgets/shared/fcm_foreground_listener.dart';
 import 'widgets/shared/incoming_call_listener.dart';
-import 'widgets/shared/battery_optimization_prompt.dart';
 import 'widgets/shared/notification_permission_banner.dart';
-import 'widgets/shared/permissions_bootstrap.dart';
+import 'widgets/shared/permissions_gate_guard.dart';
 import 'widgets/shared/update_gate.dart';
 
 /// SKILL: mensaena-architektur
@@ -124,7 +123,17 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
               child: _ShakeFeedbackListener(
                 child: Stack(
                   children: [
-                    navChild ?? const SizedBox.shrink(),
+                    // PermissionsGateGuard prüft post-login + bei jedem
+                    // App-Start, ob der Vollbild-Gate angezeigt werden muss
+                    // (mind. eine Berechtigung offen UND noch nicht 3 ×
+                    // versucht). Falls ja: pusht /gate (PopScope canPop:false).
+                    // Falls alle erteilt oder erschöpft: ggf. ein einmaliger
+                    // Hinweis-Snackbar pro Session. Ersetzt die früheren
+                    // BatteryOptimizationPrompt + PermissionsBootstrap
+                    // Auto-Dialoge — beide Funktionen leben jetzt im Gate.
+                    PermissionsGateGuard(
+                      child: navChild ?? const SizedBox.shrink(),
+                    ),
                     // Globaler Push-Permission-Soft-Prompt — slidet 5s nach
                     // Start ein, falls Status notDetermined/denied ist.
                     const Positioned(
@@ -133,16 +142,6 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
                       right: 0,
                       child: NotificationPermissionBanner(),
                     ),
-                    // Einmaliger Akku-Optimierungs-Hinweis (Android/OEM-Doze
-                    // → sonst verpasste Anrufe). Rendert nichts, zeigt nur
-                    // nach 12s einmalig einen Dialog falls nötig.
-                    const BatteryOptimizationPrompt(),
-                    // Einmaliger Permissions-Bootstrap: feuert alle System-
-                    // Dialoge in einer Sequenz beim ersten Login ab, damit
-                    // der Nutzer nur einmal durchklickt. Läuft nach dem
-                    // BatteryPrompt (Sekunde 16) und merkt sich erfolgreichen
-                    // Lauf im SecureStorage — keine Wiederholung.
-                    const PermissionsBootstrap(),
                   ],
                 ),
               ),

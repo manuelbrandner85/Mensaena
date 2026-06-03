@@ -2863,6 +2863,22 @@
           "body": "Perché Mensaena appaia durante una chiamata, qualunque app sia aperta — anche sulla schermata di blocco. Lo stesso comportamento di WhatsApp."
         }
       }
+    },
+    "gate": {
+      "title": "Prima di iniziare",
+      "subtitle": "Perché Mensaena funzioni al meglio, concedi tutte le autorizzazioni. È veloce — un tocco a ciascuna e hai finito.",
+      "continue": "Fatto",
+      "continueLocked": "Prima concedi tutte le autorizzazioni",
+      "actionGrant": "Consenti",
+      "actionRetry": "Riprova",
+      "actionSettings": "Concedi nelle impostazioni",
+      "statusGranted": "Concessa",
+      "statusMissing": "Da concedere",
+      "statusExhausted": "Solo dalle impostazioni",
+      "attemptsRemaining": "{n} tentativi rimasti",
+      "attemptLast": "Ultimo tentativo",
+      "exhaustedHint": "Alcune autorizzazioni si trovano in Impostazioni → Push → Autorizzazioni.",
+      "snackbarHint": "Puoi concedere alcune autorizzazioni in Impostazioni → Push → Autorizzazioni."
     }
   }
 }

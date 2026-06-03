@@ -3627,6 +3627,22 @@
           "body": "Damit Mensaena beim Anruf erscheint, egal welche App offen ist — auch auf dem Sperrbildschirm. Genau das Verhalten, das du von WhatsApp kennst."
         }
       }
+    },
+    "gate": {
+      "title": "Bevor's losgeht",
+      "subtitle": "Damit Mensaena reibungslos läuft, aktiviere bitte alle Berechtigungen. Wir minimieren die Reibung — du klickst einmal durch und bist danach fertig.",
+      "continue": "Fertig",
+      "continueLocked": "Erst alle Berechtigungen erteilen",
+      "actionGrant": "Erlauben",
+      "actionRetry": "Nochmal versuchen",
+      "actionSettings": "In Einstellungen erteilen",
+      "statusGranted": "Erteilt",
+      "statusMissing": "Offen",
+      "statusExhausted": "Nur in Einstellungen",
+      "attemptsRemaining": "Noch {n} Versuche",
+      "attemptLast": "Letzter Versuch",
+      "exhaustedHint": "Manche Berechtigungen findest du in Einstellungen → Push → Berechtigungen.",
+      "snackbarHint": "Einige Berechtigungen kannst du in Einstellungen → Push → Berechtigungen erteilen."
     }
   }
 }

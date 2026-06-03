@@ -3628,6 +3628,22 @@
           "body": "So Mensaena appears on a call no matter which app is open — also on the lock screen. Exactly the behavior you know from WhatsApp."
         }
       }
+    },
+    "gate": {
+      "title": "Before we start",
+      "subtitle": "For Mensaena to work smoothly, please grant all permissions. We keep it short — one tap-through and you're done.",
+      "continue": "Done",
+      "continueLocked": "Grant all permissions first",
+      "actionGrant": "Allow",
+      "actionRetry": "Try again",
+      "actionSettings": "Grant in settings",
+      "statusGranted": "Granted",
+      "statusMissing": "Open",
+      "statusExhausted": "Only in settings",
+      "attemptsRemaining": "{n} attempts left",
+      "attemptLast": "Last attempt",
+      "exhaustedHint": "Some permissions are available in Settings → Push → Permissions.",
+      "snackbarHint": "You can grant some permissions in Settings → Push → Permissions."
     }
   }
 }

@@ -2863,6 +2863,22 @@
           "body": "Para que Mensaena aparezca durante una llamada, sea cual sea la app abierta — también en pantalla bloqueada. El mismo comportamiento que WhatsApp."
         }
       }
+    },
+    "gate": {
+      "title": "Antes de empezar",
+      "subtitle": "Para que Mensaena funcione bien, concede todos los permisos. Es rápido — un toque en cada uno y listo.",
+      "continue": "Listo",
+      "continueLocked": "Concede primero todos los permisos",
+      "actionGrant": "Permitir",
+      "actionRetry": "Intentar de nuevo",
+      "actionSettings": "Conceder en ajustes",
+      "statusGranted": "Concedido",
+      "statusMissing": "Pendiente",
+      "statusExhausted": "Solo desde ajustes",
+      "attemptsRemaining": "{n} intentos restantes",
+      "attemptLast": "Último intento",
+      "exhaustedHint": "Algunos permisos están en Ajustes → Push → Permisos.",
+      "snackbarHint": "Puedes conceder algunos permisos en Ajustes → Push → Permisos."
     }
   }
 }

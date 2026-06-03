@@ -2863,6 +2863,22 @@
           "body": "Pour que Mensaena apparaisse lors d'un appel, peu importe l'app ouverte — y compris sur l'écran verrouillé. Exactement le comportement de WhatsApp."
         }
       }
+    },
+    "gate": {
+      "title": "Avant de commencer",
+      "subtitle": "Pour que Mensaena fonctionne sans accroc, accorde toutes les autorisations. C'est rapide — un appui sur chacune et c'est bon.",
+      "continue": "Terminé",
+      "continueLocked": "Accorde d'abord toutes les autorisations",
+      "actionGrant": "Autoriser",
+      "actionRetry": "Réessayer",
+      "actionSettings": "Accorder dans les paramètres",
+      "statusGranted": "Accordée",
+      "statusMissing": "À accorder",
+      "statusExhausted": "Uniquement via les paramètres",
+      "attemptsRemaining": "{n} tentatives restantes",
+      "attemptLast": "Dernière tentative",
+      "exhaustedHint": "Certaines autorisations se trouvent dans Paramètres → Push → Autorisations.",
+      "snackbarHint": "Tu peux accorder certaines autorisations dans Paramètres → Push → Autorisations."
     }
   }
 }

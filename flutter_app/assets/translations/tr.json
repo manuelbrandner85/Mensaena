@@ -2862,6 +2862,22 @@
           "body": "Hangi uygulama açık olursa olsun Mensaena arama sırasında belirsin — kilit ekranında da. WhatsApp'taki davranışın aynısı."
         }
       }
+    },
+    "gate": {
+      "title": "Başlamadan önce",
+      "subtitle": "Mensaena sorunsuz çalışsın diye lütfen tüm izinleri ver. Hızlıdır — her birine bir kez dokun ve hazırsın.",
+      "continue": "Bitti",
+      "continueLocked": "Önce tüm izinleri ver",
+      "actionGrant": "İzin ver",
+      "actionRetry": "Yeniden dene",
+      "actionSettings": "Ayarlardan ver",
+      "statusGranted": "Verildi",
+      "statusMissing": "Açık",
+      "statusExhausted": "Sadece ayarlardan",
+      "attemptsRemaining": "{n} deneme kaldı",
+      "attemptLast": "Son deneme",
+      "exhaustedHint": "Bazı izinler Ayarlar → Push → İzinler altında bulunur.",
+      "snackbarHint": "Bazı izinleri Ayarlar → Push → İzinler altından verebilirsin."
     }
   }
 }
