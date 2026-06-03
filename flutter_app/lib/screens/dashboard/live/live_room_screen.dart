@@ -35,7 +35,12 @@ import '../../../services/livekit_token_service.dart';
 import '../../../services/stream_room_holder.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../config/theme/cinema_theme.dart' show LightLeakSpot;
+import '../../../widgets/effects/atmospheric_layers.dart';
 import '../../../widgets/effects/bloom.dart';
+import '../../../widgets/effects/film_grain.dart';
+import '../../../widgets/effects/light_leaks.dart';
+import '../../../widgets/effects/vignette.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/livestream/livestream_chat_resolver.dart';
 import '../../../widgets/shared/user_picker_sheet.dart';
@@ -561,6 +566,10 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Atmosphäre wächst mit der Anzahl der Live-Teilnehmer: leere Bühne
+    // ist dezent, volle Bühne strahlt. Bezugspunkt ~8 Personen für volle
+    // Sättigung — danach bleibt's konstant.
+    final crowdGlow = (_participantCount.clamp(1, 8) / 8.0);
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       body: SafeArea(
@@ -573,12 +582,44 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   center: const Alignment(0, -0.4),
                   radius: 1.2,
                   colors: [
-                    AppColors.bronze.withValues(alpha: 0.15),
+                    AppColors.bronze
+                        .withValues(alpha: 0.10 + crowdGlow * 0.18),
                     AppColors.voidColor,
                   ],
                 ),
               ),
             ),
+            // Cinema-Atmosphäre — AtmosphericHaze + 2 LightLeaks + Grain + Vignette.
+            const Positioned.fill(
+              child: AtmosphericHaze(
+                topColor: AppColors.bronze,
+                bottomColor: AppColors.tealDeep,
+                intensity: 0.35,
+              ),
+            ),
+            Positioned.fill(
+              child: LightLeaksOverlay(
+                intensity: 0.30 + crowdGlow * 0.20,
+                spots: const <LightLeakSpot>[
+                  LightLeakSpot(
+                    alignment: Alignment(-0.9, -0.85),
+                    color: AppColors.bronze,
+                    radius: 220,
+                    opacity: 0.28,
+                    pulse: true,
+                  ),
+                  LightLeakSpot(
+                    alignment: Alignment(0.95, 0.7),
+                    color: AppColors.herzrotWarm,
+                    radius: 240,
+                    opacity: 0.18,
+                    pulse: true,
+                  ),
+                ],
+              ),
+            ),
+            const Positioned.fill(child: VignetteOverlay(intensity: 0.42)),
+            const Positioned.fill(child: FilmGrainOverlay(opacity: 0.025)),
             Column(
               children: [
                 _ElegantHeader(
@@ -1137,41 +1178,60 @@ class _ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.voidColor.withValues(alpha: 0),
-            AppColors.voidColor,
+    // Frosted-Glass-Pille, gleiche Design-Sprache wie DM-Call.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.surface.withValues(alpha: 0.85),
+              AppColors.deep.withValues(alpha: 0.95),
+            ],
+          ),
+          border: Border.all(
+              color: AppColors.bronze.withValues(alpha: 0.28)),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.40),
+              blurRadius: 24,
+              spreadRadius: -6,
+              offset: const Offset(0, 10),
+            ),
           ],
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _RoundAction(
-            icon: micEnabled ? LucideIcons.mic : LucideIcons.micOff,
-            label: micEnabled ? 'Mikro an' : 'Stumm',
-            color: micEnabled ? AppColors.leben : AppColors.mute,
-            onTap: enabled ? onMicTap : null,
-          ),
-          _RoundAction(
-            icon: camEnabled ? LucideIcons.video : LucideIcons.videoOff,
-            label: camEnabled ? 'Kamera an' : 'Kamera aus',
-            color: camEnabled ? AppColors.bronze : AppColors.mute,
-            onTap: enabled ? onCamTap : null,
-          ),
-          _RoundAction(
-            icon: LucideIcons.phoneOff,
-            label: 'Verlassen',
-            color: AppColors.herzrot,
-            onTap: onLeaveTap,
-            big: true,
-          ),
-        ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _RoundAction(
+              icon: micEnabled ? LucideIcons.mic : LucideIcons.micOff,
+              label: micEnabled
+                  ? 'liveAction.micOn'.tr()
+                  : 'liveAction.muted'.tr(),
+              color: micEnabled ? AppColors.leben : AppColors.mute,
+              onTap: enabled ? onMicTap : null,
+            ),
+            _RoundAction(
+              icon: LucideIcons.phoneOff,
+              label: 'liveAction.leave'.tr(),
+              color: AppColors.herzrot,
+              onTap: onLeaveTap,
+              big: true,
+            ),
+            _RoundAction(
+              icon: camEnabled ? LucideIcons.video : LucideIcons.videoOff,
+              label: camEnabled
+                  ? 'liveAction.camOn'.tr()
+                  : 'liveAction.camOff'.tr(),
+              color: camEnabled ? AppColors.bronze : AppColors.mute,
+              onTap: enabled ? onCamTap : null,
+            ),
+          ],
+        ),
       ),
     );
   }

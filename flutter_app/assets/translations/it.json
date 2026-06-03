@@ -2892,5 +2892,12 @@
       "exhaustedHint": "Alcune autorizzazioni si trovano in Impostazioni → Push → Autorizzazioni.",
       "snackbarHint": "Puoi concedere alcune autorizzazioni in Impostazioni → Push → Autorizzazioni."
     }
+  },
+  "liveAction": {
+    "micOn": "Microfono",
+    "muted": "Muto",
+    "camOn": "Cam on",
+    "camOff": "Cam off",
+    "leave": "Esci"
   }
 }

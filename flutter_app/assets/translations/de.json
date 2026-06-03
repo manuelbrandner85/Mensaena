@@ -3656,5 +3656,12 @@
       "exhaustedHint": "Manche Berechtigungen findest du in Einstellungen → Push → Berechtigungen.",
       "snackbarHint": "Einige Berechtigungen kannst du in Einstellungen → Push → Berechtigungen erteilen."
     }
+  },
+  "liveAction": {
+    "micOn": "Mikro an",
+    "muted": "Stumm",
+    "camOn": "Kamera an",
+    "camOff": "Kamera aus",
+    "leave": "Verlassen"
   }
 }

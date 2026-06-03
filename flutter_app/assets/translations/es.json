@@ -2892,5 +2892,12 @@
       "exhaustedHint": "Algunos permisos están en Ajustes → Push → Permisos.",
       "snackbarHint": "Puedes conceder algunos permisos en Ajustes → Push → Permisos."
     }
+  },
+  "liveAction": {
+    "micOn": "Micro",
+    "muted": "Silenciado",
+    "camOn": "Cám on",
+    "camOff": "Cám off",
+    "leave": "Salir"
   }
 }

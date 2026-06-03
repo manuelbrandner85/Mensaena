@@ -3657,5 +3657,12 @@
       "exhaustedHint": "Some permissions are available in Settings → Push → Permissions.",
       "snackbarHint": "You can grant some permissions in Settings → Push → Permissions."
     }
+  },
+  "liveAction": {
+    "micOn": "Mic on",
+    "muted": "Muted",
+    "camOn": "Cam on",
+    "camOff": "Cam off",
+    "leave": "Leave"
   }
 }

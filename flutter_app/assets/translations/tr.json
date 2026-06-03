@@ -2891,5 +2891,12 @@
       "exhaustedHint": "Bazı izinler Ayarlar → Push → İzinler altında bulunur.",
       "snackbarHint": "Bazı izinleri Ayarlar → Push → İzinler altından verebilirsin."
     }
+  },
+  "liveAction": {
+    "micOn": "Mikro",
+    "muted": "Sessiz",
+    "camOn": "Kamera",
+    "camOff": "Kam kapalı",
+    "leave": "Ayrıl"
   }
 }
