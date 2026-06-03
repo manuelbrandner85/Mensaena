@@ -2812,6 +2812,45 @@
       "biometricDesc": "Sblocca l'app con impronta o volto.",
       "battery": "Ottimizzazione batteria",
       "batteryDesc": "Perché le chiamate arrivino ad app chiusa."
+    },
+    "rationales": {
+      "continue": "Continua",
+      "later": "Più tardi",
+      "intro": "Perché Mensaena funzioni senza intoppi, ti chiediamo brevemente alcune autorizzazioni. Decidi tu — le usiamo solo se sei tu a far partire qualcosa.",
+      "items": {
+        "notification": {
+          "title": "Per non perderti nulla di importante",
+          "body": "Chiamate da vicini, nuovi messaggi e richieste d'aiuto — senza notifiche non li vedi. Mai pubblicità, solo le cose vere."
+        },
+        "camera": {
+          "title": "Per foto, video e videochiamate",
+          "body": "Post con foto tue, immagine profilo, videochiamate con i vicini. La fotocamera si attiva solo quando la avvii tu."
+        },
+        "microphone": {
+          "title": "Perché gli altri ti sentano",
+          "body": "Chiamate vocali e video, messaggi vocali e dirette hanno bisogno del microfono. Si attiva solo quando parli tu."
+        },
+        "photos": {
+          "title": "Foto dalla tua galleria",
+          "body": "Per post, profilo e condivisioni con i vicini. Accediamo solo a ciò che scegli tu."
+        },
+        "audio": {
+          "title": "Audio dalla tua libreria",
+          "body": "Per allegare clip vocali, musica e file audio direttamente dal tuo dispositivo in chat e post."
+        },
+        "location": {
+          "title": "Trova i vicini intorno a te",
+          "body": "Mensaena vive del quartiere — aiuti, scambi, incontri, emergenze. Senza posizione vedi solo una mappa vuota."
+        },
+        "nearby": {
+          "title": "Auricolari Bluetooth per le chiamate",
+          "body": "Per riconoscere cuffie e auricolari quando chiami qualcuno. MAI ti chiediamo la posizione."
+        },
+        "phone": {
+          "title": "Chiamate come WhatsApp",
+          "body": "Perché le chiamate in arrivo appaiano a schermo intero sulla schermata di blocco — anche ad app chiusa."
+        }
+      }
     }
   }
 }

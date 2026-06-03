@@ -18,6 +18,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/battery_optimization_prompt.dart';
+import '../../widgets/shared/permission_rationale_sheet.dart';
 
 class PermissionsScreen extends StatefulWidget {
   const PermissionsScreen({super.key});
@@ -76,12 +77,14 @@ class _PermissionsScreenState extends State<PermissionsScreen>
         icon: LucideIcons.camera,
         labelKey: 'permissions.items.camera',
         descKey: 'permissions.items.cameraDesc',
+        rationale: PermissionRationaleKey.camera,
       ),
       _PermEntry(
         permission: Permission.microphone,
         icon: LucideIcons.mic,
         labelKey: 'permissions.items.microphone',
         descKey: 'permissions.items.microphoneDesc',
+        rationale: PermissionRationaleKey.microphone,
       ),
       _PermEntry(
         // Android 13+: READ_MEDIA_IMAGES + _VIDEO laufen über `photos`.
@@ -90,6 +93,7 @@ class _PermissionsScreenState extends State<PermissionsScreen>
         icon: LucideIcons.image,
         labelKey: 'permissions.items.photos',
         descKey: 'permissions.items.photosDesc',
+        rationale: PermissionRationaleKey.photos,
       ),
       if (useMediaPerms)
         _PermEntry(
@@ -97,18 +101,21 @@ class _PermissionsScreenState extends State<PermissionsScreen>
           icon: LucideIcons.music,
           labelKey: 'permissions.items.audioFiles',
           descKey: 'permissions.items.audioFilesDesc',
+          rationale: PermissionRationaleKey.audio,
         ),
       _PermEntry(
         permission: Permission.locationWhenInUse,
         icon: LucideIcons.mapPin,
         labelKey: 'permissions.items.location',
         descKey: 'permissions.items.locationDesc',
+        rationale: PermissionRationaleKey.location,
       ),
       _PermEntry(
         permission: Permission.notification,
         icon: LucideIcons.bell,
         labelKey: 'permissions.items.notifications',
         descKey: 'permissions.items.notificationsDesc',
+        rationale: PermissionRationaleKey.notification,
       ),
       // "Geräte in der Nähe" — Android 12+ (Bluetooth-Headset für Calls).
       if (_androidSdk == 0 || _androidSdk >= 31)
@@ -117,12 +124,14 @@ class _PermissionsScreenState extends State<PermissionsScreen>
           icon: LucideIcons.bluetooth,
           labelKey: 'permissions.items.nearby',
           descKey: 'permissions.items.nearbyDesc',
+          rationale: PermissionRationaleKey.nearby,
         ),
       _PermEntry(
         permission: Permission.phone,
         icon: LucideIcons.phoneCall,
         labelKey: 'permissions.items.phone',
         descKey: 'permissions.items.phoneDesc',
+        rationale: PermissionRationaleKey.phone,
       ),
       // Spezialfall: Akku-Optimierung läuft über eigenen Setup-Flow
       // (Samsung braucht 2 Schritte) — kein einfaches request().
@@ -154,16 +163,29 @@ class _PermissionsScreenState extends State<PermissionsScreen>
       await _refreshAll();
       return;
     }
+    final current = _status[e.permission] ?? PermissionStatus.denied;
+    // Permanent verweigerte Permissions können wir nicht mehr per Dialog
+    // anfordern — Rationale wäre verwirrend (nichts würde danach passieren),
+    // also gehen wir direkt in die App-Einstellungen.
+    if (current.isPermanentlyDenied || current.isRestricted) {
+      setState(() => _busy.add(e.permission));
+      try {
+        await openAppSettings();
+        _status[e.permission] = await e.permission.status;
+      } catch (_) {} finally {
+        if (mounted) setState(() => _busy.remove(e.permission));
+      }
+      return;
+    }
+    // Vor dem System-Dialog kurz erklären, warum — User klickt danach mit
+    // höherer Wahrscheinlichkeit „Erlauben".
+    if (e.rationale != null) {
+      final cont = await showPermissionRationale(context, e.rationale!);
+      if (!cont || !mounted) return;
+    }
     setState(() => _busy.add(e.permission));
     try {
-      final current = _status[e.permission] ?? PermissionStatus.denied;
-      if (current.isPermanentlyDenied || current.isRestricted) {
-        // Android öffnet das System-Dialog bei permanent-denied nicht mehr —
-        // direkt in die App-Einstellungen, da kann der User es manuell setzen.
-        await openAppSettings();
-      } else {
-        await e.permission.request();
-      }
+      await e.permission.request();
       _status[e.permission] = await e.permission.status;
     } catch (_) {/* permission_handler-Edgecase ignorieren */} finally {
       if (mounted) {
@@ -178,7 +200,14 @@ class _PermissionsScreenState extends State<PermissionsScreen>
     for (final e in _entries()) {
       if (e.customAction != null) continue; // Akku separat
       final s = _status[e.permission];
-      if (s != null && s.isGranted) continue;
+      if (s != null && (s.isGranted || s.isLimited)) continue;
+      if (s != null && (s.isPermanentlyDenied || s.isRestricted)) continue;
+      if (e.rationale != null) {
+        if (!mounted) return;
+        final cont = await showPermissionRationale(context, e.rationale!);
+        if (!mounted) return;
+        if (!cont) continue;
+      }
       try {
         await e.permission.request();
       } catch (_) {}
@@ -355,6 +384,7 @@ class _PermEntry {
     required this.labelKey,
     required this.descKey,
     this.customAction,
+    this.rationale,
   });
 
   final Permission permission;
@@ -363,4 +393,7 @@ class _PermEntry {
   final String descKey;
   // Wenn gesetzt, übersteuert sie den Standard-request()-Flow (z. B. Akku).
   final Future<void> Function()? customAction;
+  // Optionales Pre-Dialog-Sheet, das nutzwertfokussiert erklärt, warum
+  // wir diese Berechtigung brauchen — vor dem eigentlichen System-Dialog.
+  final PermissionRationaleKey? rationale;
 }

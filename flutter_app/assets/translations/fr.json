@@ -2812,6 +2812,45 @@
       "biometricDesc": "Déverrouille l'app avec empreinte ou visage.",
       "battery": "Optimisation batterie",
       "batteryDesc": "Pour que les appels arrivent app fermée."
+    },
+    "rationales": {
+      "continue": "Continuer",
+      "later": "Plus tard",
+      "intro": "Pour que Mensaena fonctionne sans friction, on te demande brièvement quelques autorisations. Tu décides — on ne s'en sert que si tu lances quelque chose.",
+      "items": {
+        "notification": {
+          "title": "Pour ne rien rater d'important",
+          "body": "Appels des voisins, nouveaux messages et demandes d'aide — sans notifications tu ne les vois pas. Jamais de pub, juste l'essentiel."
+        },
+        "camera": {
+          "title": "Pour photos, vidéos et appels vidéo",
+          "body": "Publications avec tes photos, photo de profil, face à face avec les voisins. La caméra ne s'active que si tu la lances."
+        },
+        "microphone": {
+          "title": "Pour que les autres t'entendent",
+          "body": "Appels voix et vidéo, messages vocaux et lives ont besoin du micro. Il ne s'active que quand tu parles."
+        },
+        "photos": {
+          "title": "Photos de ta galerie",
+          "body": "Pour les publications, ton profil et le partage avec les voisins. On accède uniquement à ce que tu choisis toi-même."
+        },
+        "audio": {
+          "title": "Audio de ta bibliothèque",
+          "body": "Pour joindre des notes vocales, de la musique et des fichiers audio directement depuis ton appareil dans les chats et publications."
+        },
+        "location": {
+          "title": "Trouver des voisins à proximité",
+          "body": "Mensaena vit du quartier — entraide, échanges, rencontres, urgences. Sans localisation tu ne vois qu'une carte vide."
+        },
+        "nearby": {
+          "title": "Casque Bluetooth pour les appels",
+          "body": "Pour que tes écouteurs ou ton casque soient détectés quand tu appelles quelqu'un. On ne demande JAMAIS la localisation."
+        },
+        "phone": {
+          "title": "Appels comme WhatsApp",
+          "body": "Pour que les appels entrants apparaissent en plein écran sur l'écran verrouillé — même app fermée."
+        }
+      }
     }
   }
 }

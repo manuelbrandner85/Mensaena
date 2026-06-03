@@ -2812,6 +2812,45 @@
       "biometricDesc": "Desbloquea la app con huella o rostro.",
       "battery": "Optimización de batería",
       "batteryDesc": "Para que las llamadas lleguen con la app cerrada."
+    },
+    "rationales": {
+      "continue": "Continuar",
+      "later": "Más tarde",
+      "intro": "Para que Mensaena funcione sin fricción, te pedimos brevemente algunos permisos. Tú decides — solo los usamos cuando tú haces algo.",
+      "items": {
+        "notification": {
+          "title": "Para no perderte nada importante",
+          "body": "Llamadas de vecinos, mensajes nuevos y peticiones de ayuda — sin notificaciones no los ves. Nunca te molestamos con publicidad, solo lo de verdad."
+        },
+        "camera": {
+          "title": "Para fotos, vídeos y videollamadas",
+          "body": "Publicaciones con tus propias fotos, tu foto de perfil, videollamadas cara a cara. La cámara solo se activa cuando tú la abres."
+        },
+        "microphone": {
+          "title": "Para que los demás te oigan",
+          "body": "Llamadas de voz y vídeo, mensajes de voz y directos necesitan el micrófono. Solo se activa cuando hablas tú."
+        },
+        "photos": {
+          "title": "Imágenes de tu galería",
+          "body": "Para publicaciones, perfil y compartir con vecinos. Solo accedemos a lo que tú eliges."
+        },
+        "audio": {
+          "title": "Audio de tu biblioteca",
+          "body": "Para adjuntar notas de voz, música y archivos de audio directamente desde tu dispositivo en chats y publicaciones."
+        },
+        "location": {
+          "title": "Encuentra vecinos cerca",
+          "body": "Mensaena vive del barrio — ayudas, intercambios, encuentros, emergencias. Sin ubicación solo verás un mapa vacío."
+        },
+        "nearby": {
+          "title": "Auriculares Bluetooth para llamadas",
+          "body": "Para que se detecten tus cascos o auriculares cuando llamas a alguien. NUNCA pedimos la ubicación."
+        },
+        "phone": {
+          "title": "Llamadas como WhatsApp",
+          "body": "Para que las llamadas entrantes aparezcan como timbre a pantalla completa en el bloqueo — incluso con la app cerrada."
+        }
+      }
     }
   }
 }

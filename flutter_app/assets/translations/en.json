@@ -3577,6 +3577,45 @@
       "biometricDesc": "Unlock the app with fingerprint or face.",
       "battery": "Battery optimization",
       "batteryDesc": "So calls arrive when the app is closed."
+    },
+    "rationales": {
+      "continue": "Continue",
+      "later": "Later",
+      "intro": "So Mensaena works smoothly, we'll briefly ask for a few permissions. You decide what's OK — we only use them when you trigger something yourself.",
+      "items": {
+        "notification": {
+          "title": "So you don't miss anything important",
+          "body": "Calls from neighbours, new messages and help requests — without notifications you won't see them. We never nag with ads, only the real stuff."
+        },
+        "camera": {
+          "title": "For photos, videos & video calls",
+          "body": "Posts with your own pictures, your profile picture, face-to-face with neighbours. The camera only activates when you start it yourself."
+        },
+        "microphone": {
+          "title": "So others can hear you",
+          "body": "Voice and video calls, voice messages and livestreams need the microphone. It's only active when you speak yourself."
+        },
+        "photos": {
+          "title": "Pictures from your gallery",
+          "body": "For posts, your profile and sharing with neighbours. We only access what you pick yourself."
+        },
+        "audio": {
+          "title": "Audio from your library",
+          "body": "So you can attach voice clips, music and sound files straight from your device in chats and posts."
+        },
+        "location": {
+          "title": "Find neighbours nearby",
+          "body": "Mensaena thrives on what's around you — help, swaps, meetups, emergencies. Without location you just see an empty map."
+        },
+        "nearby": {
+          "title": "Bluetooth headset for calls",
+          "body": "So your headphones or earbuds are picked up automatically when you call someone. We NEVER ask for location."
+        },
+        "phone": {
+          "title": "Calls like WhatsApp",
+          "body": "So incoming calls appear as real fullscreen ringing on the lock screen — even when the app is closed."
+        }
+      }
     }
   }
 }

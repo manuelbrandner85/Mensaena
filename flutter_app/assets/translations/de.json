@@ -3576,6 +3576,45 @@
       "biometricDesc": "App per Fingerabdruck oder Gesicht entsperren.",
       "battery": "Akku-Optimierung",
       "batteryDesc": "Damit Anrufe bei geschlossener App ankommen."
+    },
+    "rationales": {
+      "continue": "Weiter",
+      "later": "Später",
+      "intro": "Damit du Mensaena ohne Reibung nutzen kannst, fragen wir kurz nach ein paar Berechtigungen. Du sagst, was OK ist — wir nutzen sie nur, wenn du es selbst auslöst.",
+      "items": {
+        "notification": {
+          "title": "Damit du nichts Wichtiges verpasst",
+          "body": "Anrufe von Nachbar:innen, neue Nachrichten und Hilfegesuche — ohne Benachrichtigungen siehst du davon nichts. Wir nerven nie mit Werbung, nur Echtes."
+        },
+        "camera": {
+          "title": "Für Fotos, Videos & Video-Anrufe",
+          "body": "Beiträge mit eigenen Bildern, dein Profilbild, Face-to-Face mit Nachbar:innen. Die Kamera geht nur an, wenn du sie selbst startest."
+        },
+        "microphone": {
+          "title": "Damit dich andere hören",
+          "body": "Sprach- und Video-Anrufe, Sprachnachrichten und Livestreams brauchen das Mikrofon. Es wird nur aktiv, wenn du selbst sprichst."
+        },
+        "photos": {
+          "title": "Bilder aus deiner Galerie",
+          "body": "Für Beiträge, dein Profil und das Teilen mit Nachbar:innen. Wir greifen nur auf das zu, was du selbst aussuchst."
+        },
+        "audio": {
+          "title": "Audio aus deiner Mediathek",
+          "body": "Damit du Sprachclips, Musik und Sound-Dateien direkt aus deinem Gerät in Chats und Beiträgen anhängen kannst."
+        },
+        "location": {
+          "title": "Nachbar:innen in deiner Nähe finden",
+          "body": "Mensaena lebt vom direkten Umfeld — Hilfen, Tausch, Treffen, Notfälle. Ohne Standort siehst du nur eine leere Karte."
+        },
+        "nearby": {
+          "title": "Bluetooth-Headset für Anrufe",
+          "body": "Damit Kopfhörer und Headsets automatisch erkannt werden, wenn du jemanden anrufst. Wir fragen NIE nach Standort."
+        },
+        "phone": {
+          "title": "Anrufe wie bei WhatsApp",
+          "body": "Damit eingehende Anrufe auf dem Sperrbildschirm als echtes Vollbild-Klingeln erscheinen — auch bei geschlossener App."
+        }
+      }
     }
   }
 }

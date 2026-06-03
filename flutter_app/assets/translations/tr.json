@@ -2811,6 +2811,45 @@
       "biometricDesc": "Uygulamayı parmak izi veya yüzle aç.",
       "battery": "Pil optimizasyonu",
       "batteryDesc": "Uygulama kapalıyken aramalar gelsin diye."
+    },
+    "rationales": {
+      "continue": "Devam",
+      "later": "Sonra",
+      "intro": "Mensaena sorunsuz çalışsın diye birkaç izni kısaca soruyoruz. Karar senin — yalnızca sen bir şey başlattığında kullanırız.",
+      "items": {
+        "notification": {
+          "title": "Önemli hiçbir şeyi kaçırma",
+          "body": "Komşulardan aramalar, yeni mesajlar ve yardım istekleri — bildirimsiz göremezsin. Asla reklamla rahatsız etmeyiz, sadece gerçek olan."
+        },
+        "camera": {
+          "title": "Fotoğraf, video ve görüntülü arama için",
+          "body": "Kendi fotoğraflarınla gönderiler, profil fotoğrafı, komşularla yüz yüze. Kamera sadece sen başlatınca açılır."
+        },
+        "microphone": {
+          "title": "Başkaları seni duysun diye",
+          "body": "Sesli ve görüntülü aramalar, sesli mesajlar ve canlı yayınlar mikrofon gerektirir. Sadece sen konuşunca aktif olur."
+        },
+        "photos": {
+          "title": "Galerindeki resimler",
+          "body": "Gönderiler, profil ve komşularla paylaşım için. Sadece kendi seçtiklerine erişiriz."
+        },
+        "audio": {
+          "title": "Kütüphanenden ses",
+          "body": "Sohbet ve gönderilerde sesli kayıt, müzik ve ses dosyalarını doğrudan cihazından eklemek için."
+        },
+        "location": {
+          "title": "Yakındaki komşuları bul",
+          "body": "Mensaena çevreyle yaşar — yardımlar, takaslar, buluşmalar, acil durumlar. Konum olmadan sadece boş bir harita görürsün."
+        },
+        "nearby": {
+          "title": "Aramalar için Bluetooth kulaklık",
+          "body": "Birini ararken kulaklıklarının otomatik tanınması için. ASLA konum istemeyiz."
+        },
+        "phone": {
+          "title": "WhatsApp gibi aramalar",
+          "body": "Gelen aramaların kilit ekranında tam ekran gerçek çalar gibi görünmesi için — uygulama kapalı olsa bile."
+        }
+      }
     }
   }
 }
