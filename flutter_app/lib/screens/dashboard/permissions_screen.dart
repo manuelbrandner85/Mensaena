@@ -12,11 +12,13 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../services/incoming_call_overlay.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/battery_optimization_prompt.dart';
 import '../../widgets/shared/permission_rationale_sheet.dart';
@@ -164,15 +166,30 @@ class _PermissionsScreenState extends State<PermissionsScreen>
         },
       ),
       // "Über andere Apps anzeigen" (SYSTEM_ALERT_WINDOW): Samsung One UI
-      // degradiert Anrufe ohne dieses Recht auf Heads-up, selbst wenn
-      // Fullscreen-Intent erteilt ist. Erfordert einen separaten System-
-      // Dialog-Flow (request() leitet zu Settings).
-      const _PermEntry(
+      // degradiert Anrufe ohne dieses Recht auf Heads-up. Status + Request
+      // gehen durch die flutter_overlay_window Plugin-API — permission_handler
+      // ist hier auf Samsung NICHT mit dem Plugin-State synchron, was bisher
+      // dazu führte, dass die App „erteilt" sah obwohl das Overlay nichts
+      // anzeigte.
+      _PermEntry(
         permission: Permission.systemAlertWindow,
         icon: LucideIcons.layers,
         labelKey: 'permissions.items.overlay',
         descKey: 'permissions.items.overlayDesc',
         rationale: PermissionRationaleKey.overlay,
+        customStatus: () async {
+          try {
+            final ok = await FlutterOverlayWindow.isPermissionGranted();
+            return ok == true
+                ? PermissionStatus.granted
+                : PermissionStatus.denied;
+          } catch (_) {
+            return PermissionStatus.denied;
+          }
+        },
+        customAction: () async {
+          await IncomingCallOverlay.requestPermission();
+        },
       ),
       // Nicht const — referenziert Instance-Method `_openBatterySetup`.
       // Spezialfall: Akku-Optimierung läuft über eigenen Setup-Flow

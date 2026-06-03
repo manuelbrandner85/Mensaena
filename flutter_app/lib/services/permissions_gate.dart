@@ -13,11 +13,13 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show IconData;
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../widgets/shared/permission_rationale_sheet.dart';
+import 'incoming_call_overlay.dart';
 
 const int kPermissionsGateMaxAttempts = 3;
 const String _kAttemptsStorageKey = 'mensaena_perms_gate_attempts_v1';
@@ -182,13 +184,31 @@ class PermissionsGate {
         },
       ),
       // SYSTEM_ALERT_WINDOW (Samsung-Vollbild-Anruf).
-      const GateItem(
+      // FIX: permission_handler und das flutter_overlay_window-Plugin haben
+      // beide einen Permission-State für SYSTEM_ALERT_WINDOW, der NICHT
+      // immer synchron ist (Samsung One UI route je Quelle anders).
+      // Wir routen Status + Request hier durch die Plugin-API → das ist
+      // die einzige, die der Overlay-Code tatsächlich prüft.
+      GateItem(
         key: 'overlay',
         labelKey: 'permissions.items.overlay',
         descKey: 'permissions.items.overlayDesc',
         icon: LucideIcons.layers,
         rationale: PermissionRationaleKey.overlay,
-        permission: Permission.systemAlertWindow,
+        customStatus: () async {
+          try {
+            final ok = await FlutterOverlayWindow.isPermissionGranted();
+            return ok == true
+                ? PermissionStatus.granted
+                : PermissionStatus.denied;
+          } catch (_) {
+            return PermissionStatus.denied;
+          }
+        },
+        customAction: () async {
+          // Plugin-API → öffnet die Samsung-„Über anderen Apps anzeigen"-Seite.
+          return IncomingCallOverlay.requestPermission();
+        },
       ),
     ];
   }

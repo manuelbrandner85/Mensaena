@@ -79,6 +79,10 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   lk.EventsListener<lk.RoomEvent>? _listener;
   _CallState _state = _CallState.connecting;
   bool _micEnabled = true;
+  // FIX Audio-Aussetzer: Track-Publication-Bestätigung. Falls trotz mehrerer
+  // Retries kein LocalTrackPublishedEvent für AUDIO kam, wissen wir, dass die
+  // Gegenseite uns nicht hört.
+  bool _micPublished = false;
   bool _camEnabled = false;
   bool _speakerOn = false;
   String? _error;
@@ -108,6 +112,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   // F11: Connection-Quality
   lk.ConnectionQuality _quality = lk.ConnectionQuality.unknown;
   bool _poorWarningShown = false;
+  // Throttle für ParticipantConnectionQualityUpdatedEvent (max 1/Sek).
+  DateTime? _lastQualityUpdate;
   // F12: Screen-Share
   bool _screenShareEnabled = false;
   // Punkt 6: true nur bei echtem Auflegen — steuert ob dispose() den
@@ -400,7 +406,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
     try {
       await room.connect(tok.url, tok.token);
-      await room.localParticipant?.setMicrophoneEnabled(true);
+      // FIX (User-Report Audio-Aussetzer): setMicrophoneEnabled wird HIER
+      // versucht UND zusätzlich nach RoomConnectedEvent (siehe Listener).
+      // Beides idempotent. Vorher konnte das Mic-Enable auf einen noch nicht
+      // initialisierten LocalParticipant treffen → Track wurde nie publiziert,
+      // Gegenseite hörte gar nichts.
+      unawaited(_ensureMicPublished(room));
       if (!mounted) return;
       // ACHTUNG: room.connect() ist NUR der SFU-Handshake. Die echte Peer-
       // Connection (RoomConnectedEvent + RemoteParticipant) kann noch
@@ -488,9 +499,29 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         // 'active' — der Gegenseiten-Stream-Listener sieht das und springt
         // ebenfalls auf 'connecting'/'connected'. Idempotent.
         unawaited(_markActive());
+        // FIX Audio-Aussetzer: Mic-Enable JETZT (nach echtem Connect) noch
+        // einmal anstoßen. Idempotent — falls bereits publiziert, no-op.
+        unawaited(_ensureMicPublished(room));
         if (_state == _CallState.joining ||
             _state == _CallState.connecting) {
           setState(() => _state = _CallState.connected);
+        }
+      })
+      // Bestätigung dass der Audio-Track wirklich publiziert wurde.
+      ..on<lk.LocalTrackPublishedEvent>((ev) {
+        if (!mounted) return;
+        if (ev.publication.kind == lk.TrackType.AUDIO) {
+          _micPublished = true;
+        }
+      })
+      ..on<lk.LocalTrackUnpublishedEvent>((ev) {
+        if (!mounted) return;
+        if (ev.publication.kind == lk.TrackType.AUDIO) {
+          _micPublished = false;
+          // Verlorenen Mic-Track sofort wieder publizieren — kommt vor wenn
+          // die Audio-Session kurz unterbricht (Bluetooth-Switch, andere
+          // App will Mic etc.).
+          unawaited(_ensureMicPublished(room));
         }
       })
       ..on<lk.ParticipantConnectedEvent>((_) {
@@ -530,13 +561,22 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         if (!mounted) return;
         setState(() => _state = _CallState.connected);
       })
-      // F11: Verbindungsqualität live tracken. Bei 'poor' Snackbar-Warnung,
-      // Indicator-Badge oben rechts zeigt die aktuelle Stufe.
+      // F11: Verbindungsqualität live tracken — aber NUR bei echter Änderung
+      // und max 1×/Sek (vorher feuerte das alle 50-100 ms → setState auf den
+      // gesamten Call-Stack inkl. Atmospheric-Layern = Flicker auf schwachen
+      // Netzen).
       ..on<lk.ParticipantConnectionQualityUpdatedEvent>((ev) {
         if (!mounted) return;
         if (ev.participant.identity != room.localParticipant?.identity) {
           return;
         }
+        if (ev.connectionQuality == _quality) return;
+        final now = DateTime.now();
+        if (_lastQualityUpdate != null &&
+            now.difference(_lastQualityUpdate!).inMilliseconds < 1000) {
+          return;
+        }
+        _lastQualityUpdate = now;
         setState(() => _quality = ev.connectionQuality);
         if (ev.connectionQuality == lk.ConnectionQuality.poor &&
             !_poorWarningShown) {
@@ -586,6 +626,29 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     final next = !_micEnabled;
     await lp.setMicrophoneEnabled(next);
     setState(() => _micEnabled = next);
+  }
+
+  /// FIX Audio-Aussetzer: Robustes Publizieren des Mikro-Tracks mit Retry.
+  /// Wird sowohl direkt nach room.connect() als auch im RoomConnectedEvent
+  /// aufgerufen (mehrere Pfade sind gewollt, das setMicrophoneEnabled ist
+  /// idempotent). Wenn nach 5 Versuchen mit 300 ms Pause kein
+  /// LocalTrackPublishedEvent für AUDIO kam, geben wir auf.
+  Future<void> _ensureMicPublished(lk.Room room) async {
+    if (_micPublished || !_micEnabled) return;
+    for (var attempt = 0; attempt < 5; attempt++) {
+      if (!mounted || _micPublished) return;
+      try {
+        await room.localParticipant?.setMicrophoneEnabled(true);
+      } catch (e) {
+        debugPrint('[CallScreen] setMicrophoneEnabled attempt $attempt: $e');
+      }
+      // Warten ob das Publication-Event ankommt; sonst nächster Versuch.
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      if (_micPublished) return;
+    }
+    // Fallback-Signal: trotz aller Versuche kein Publish. UI bekommt das
+    // mit (badge/snackbar wäre der nächste Schritt) — hier still loggen.
+    debugPrint('[CallScreen] mic publish failed after 5 attempts');
   }
 
   /// F12: Screen-Share toggeln. Auf Android braucht das ggf. eine
@@ -838,37 +901,47 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       backgroundColor: AppColors.voidColor,
       body: Stack(
         children: [
-          // Cinema-Atmosphäre HINTER allem.
+          // Cinema-Atmosphäre HINTER allem. RepaintBoundary isoliert die
+          // teuren Layer (eigene Animations-Cycles) vom restlichen Rebuild —
+          // verhindert Flicker bei setState() für State-/Quality-Updates.
           const Positioned.fill(
-            child: AtmosphericHaze(
-              topColor: AppColors.bronze,
-              bottomColor: AppColors.tealDeep,
-              intensity: 0.35,
+            child: RepaintBoundary(
+              child: AtmosphericHaze(
+                topColor: AppColors.bronze,
+                bottomColor: AppColors.tealDeep,
+                intensity: 0.35,
+              ),
             ),
           ),
           const Positioned.fill(
-            child: LightLeaksOverlay(
-              intensity: 0.25,
-              spots: <LightLeakSpot>[
-                LightLeakSpot(
-                  alignment: Alignment(-0.9, -0.7),
-                  color: AppColors.bronze,
-                  radius: 200,
-                  opacity: 0.22,
-                  pulse: true,
-                ),
-                LightLeakSpot(
-                  alignment: Alignment(0.9, 0.8),
-                  color: AppColors.tealSoft,
-                  radius: 240,
-                  opacity: 0.15,
-                  pulse: true,
-                ),
-              ],
+            child: RepaintBoundary(
+              child: LightLeaksOverlay(
+                intensity: 0.25,
+                spots: <LightLeakSpot>[
+                  LightLeakSpot(
+                    alignment: Alignment(-0.9, -0.7),
+                    color: AppColors.bronze,
+                    radius: 200,
+                    opacity: 0.22,
+                    pulse: true,
+                  ),
+                  LightLeakSpot(
+                    alignment: Alignment(0.9, 0.8),
+                    color: AppColors.tealSoft,
+                    radius: 240,
+                    opacity: 0.15,
+                    pulse: true,
+                  ),
+                ],
+              ),
             ),
           ),
-          const Positioned.fill(child: VignetteOverlay(intensity: 0.4)),
-          const Positioned.fill(child: FilmGrainOverlay(opacity: 0.025)),
+          const Positioned.fill(
+              child: RepaintBoundary(
+                  child: VignetteOverlay(intensity: 0.4))),
+          const Positioned.fill(
+              child: RepaintBoundary(
+                  child: FilmGrainOverlay(opacity: 0.025))),
           SafeArea(child: _buildBody()),
           // F11: Connection-Quality-Badge oben rechts (während Call aktiv).
           if (_state == _CallState.connected &&

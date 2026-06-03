@@ -76,8 +76,15 @@ class IncomingCallOverlay {
   }) async {
     if (!Platform.isAndroid) return;
     try {
+      // KRITISCH: Die Plugin-eigene isPermissionGranted prüfen.
+      // `Permission.systemAlertWindow` (permission_handler) und die Plugin-
+      // interne Permission sind auf Samsung One UI NICHT immer synchron —
+      // der User kann den einen Switch erteilt haben, den anderen nicht.
       final granted = await FlutterOverlayWindow.isPermissionGranted();
-      if (granted != true) return;
+      if (granted != true) {
+        debugPrint('[IncomingCallOverlay] not granted — abort');
+        return;
+      }
       if ((await FlutterOverlayWindow.isActive()) == true) {
         try {
           await FlutterOverlayWindow.closeOverlay();
@@ -87,8 +94,10 @@ class IncomingCallOverlay {
         height: WindowSize.fullCover,
         width: WindowSize.matchParent,
         enableDrag: false,
-        // Über Lockscreen UND System-Bars — das ist der ganze Sinn.
-        flag: OverlayFlag.defaultFlag,
+        // focusPointer = bekommt Input-Focus → Buttons fangen Taps zuverlässig
+        // auch auf Samsung One UI / Android 14+. defaultFlag war NOT_FOCUSABLE,
+        // was bei einigen OEMs den Tap-Empfang killte.
+        flag: OverlayFlag.focusPointer,
         visibility: NotificationVisibility.visibilityPublic,
         positionGravity: PositionGravity.auto,
         overlayTitle: labelIncoming,
@@ -107,8 +116,24 @@ class IncomingCallOverlay {
         'labelAccept': labelAccept,
         'labelDecline': labelDecline,
       });
+    } catch (e, st) {
+      debugPrint('[IncomingCallOverlay] show failed: $e\n$st');
+    }
+  }
+
+  /// Fordert die SYSTEM_ALERT_WINDOW-Permission über die Plugin-eigene API
+  /// an. WICHTIG: Auf Samsung One UI führt sie zur OEM-spezifischen
+  /// „Über anderen Apps anzeigen"-Settings-Seite — der User muss dort
+  /// den Schalter manuell umlegen. Liefert true zurück, wenn nach dem
+  /// Aufruf erteilt ist.
+  static Future<bool> requestPermission() async {
+    if (!Platform.isAndroid) return false;
+    try {
+      await FlutterOverlayWindow.requestPermission();
+      return (await FlutterOverlayWindow.isPermissionGranted()) == true;
     } catch (e) {
-      debugPrint('[IncomingCallOverlay] show failed: $e');
+      debugPrint('[IncomingCallOverlay] requestPermission failed: $e');
+      return false;
     }
   }
 
