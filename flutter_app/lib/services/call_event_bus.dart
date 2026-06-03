@@ -104,6 +104,19 @@ class CallEventBus {
     _contexts.clear();
   }
 
+  /// Liest, ob ein Call schon angenommen wurde — vom IncomingCallListener
+  /// genutzt, um Cold-Start-Doppel-Trigger zu unterdrücken (Realtime initial
+  /// snapshot würde sonst die noch-nicht-auf-active-gesetzte Row erneut als
+  /// "neuer ringing-Call" interpretieren).
+  static bool isHandledAccept(String callId) =>
+      _handledAccepts.contains(callId);
+
+  /// Markiert einen Call extern als "bereits angenommen" — fürs Seeding
+  /// aus CallKit.activeCalls() beim Cold-Start.
+  static void recordHandledAccept(String callId) {
+    _handledAccepts.add(callId);
+  }
+
   static void _handle(CallEvent? event) {
     if (event == null) return;
     final body = event.body;

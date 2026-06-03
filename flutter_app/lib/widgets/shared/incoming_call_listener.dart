@@ -158,25 +158,51 @@ class _IncomingCallListenerState
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
 
-    try {
-      _realtimeSub = sb
-          .from('dm_calls')
-          .stream(primaryKey: ['id'])
-          .eq('callee_id', uid)
-          .listen(
-            _handleRealtimeBatch,
-            onError: (_) {/* swallow timeouts / network drops */},
-            cancelOnError: false,
-          );
-    } catch (_) {/* fail-open */}
+    // Cold-Start-Race verhindern: wenn der User den Anruf vom Sperrbildschirm
+    // aus angenommen hat, läuft die App frisch hoch, die dm_calls-Row steht
+    // aber noch auf 'ringing' (DB-Update von _onAccept ist fire-and-forget).
+    // Erst die nativen Active-Calls abfragen und ihre IDs in beide Dedupe-
+    // Sets stecken, damit der Initial-Snapshot des Realtime-Streams NICHT
+    // ein zweites Popup auslöst.
+    unawaited(_seedHandledFromActiveCalls().then((_) {
+      if (!mounted) return;
+      try {
+        _realtimeSub = sb
+            .from('dm_calls')
+            .stream(primaryKey: ['id'])
+            .eq('callee_id', uid)
+            .listen(
+              _handleRealtimeBatch,
+              onError: (_) {/* swallow timeouts / network drops */},
+              cancelOnError: false,
+            );
+      } catch (_) {/* fail-open */}
 
+      try {
+        _fcmSub = FirebaseMessaging.onMessage.listen(
+          _handleFcmMessage,
+          onError: (_) {},
+          cancelOnError: false,
+        );
+      } catch (_) {/* fail-open */}
+    }));
+  }
+
+  Future<void> _seedHandledFromActiveCalls() async {
     try {
-      _fcmSub = FirebaseMessaging.onMessage.listen(
-        _handleFcmMessage,
-        onError: (_) {},
-        cancelOnError: false,
-      );
-    } catch (_) {/* fail-open */}
+      final calls = await CallkitService.activeCalls();
+      if (calls is! List) return;
+      for (final c in calls) {
+        if (c is! Map) continue;
+        final id = c['id'] as String?;
+        final state = c['state'] as String?;
+        if (id == null) continue;
+        if (state == 'accepted' || state == 'connected') {
+          _handledCallIds.add(id);
+          CallEventBus.recordHandledAccept(id);
+        }
+      }
+    } catch (_) {/* non-fatal */}
   }
 
   void _teardownSubs() {
@@ -200,7 +226,8 @@ class _IncomingCallListenerState
         continue;
       }
       if (status != 'ringing') continue;
-      if (_handledCallIds.contains(id)) continue;
+      if (_handledCallIds.contains(id) ||
+          CallEventBus.isHandledAccept(id)) continue;
       // Ignore stale calls older than 60s.
       final createdAt =
           DateTime.tryParse(r['created_at'] as String? ?? '') ?? now;
@@ -219,7 +246,9 @@ class _IncomingCallListenerState
   void _handleFcmMessage(RemoteMessage m) {
     if (m.data['type'] != 'incoming_call') return;
     final id = m.data['call_id'] as String?;
-    if (id == null || _handledCallIds.contains(id)) return;
+    if (id == null ||
+        _handledCallIds.contains(id) ||
+        CallEventBus.isHandledAccept(id)) return;
     _handledCallIds.add(id);
     _triggerIncoming(
       callId: id,
