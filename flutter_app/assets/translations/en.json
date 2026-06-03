@@ -2466,7 +2466,9 @@
     "videoAction": "Video call",
     "postCallNoteTitle": "Note about this call?",
     "postCallNoteHint": "Saved as chat note.",
-    "postCallNotePlaceholder": "e.g. \"Meeting Saturday at 2pm\""
+    "postCallNotePlaceholder": "e.g. \"Meeting Saturday at 2pm\"",
+    "callingLabel": "Calling",
+    "ringingHint": "Tap ↓ to hang up"
   },
   "quickReply": {
     "title": "Reply to {name}?",

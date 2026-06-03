@@ -2251,7 +2251,9 @@
     "callMissed": "Appel manqué",
     "callBack": "Rappeler",
     "callEnded": "Appel terminé",
-    "notReachable": "Personne injoignable"
+    "notReachable": "Personne injoignable",
+    "callingLabel": "Appel en cours",
+    "ringingHint": "Touche ↓ pour raccrocher"
   },
   "voice": {
     "micDenied": "Autorisation du micro refusée."

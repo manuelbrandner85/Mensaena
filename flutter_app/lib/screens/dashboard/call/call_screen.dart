@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -26,7 +27,12 @@ import '../../../services/livekit_token_service.dart';
 import '../../../services/room_events_service.dart';
 import '../../../services/sound_service.dart';
 import '../../../services/supabase_service.dart';
+import '../../../config/theme/cinema_theme.dart' show LightLeakSpot;
+import '../../../widgets/effects/atmospheric_layers.dart';
 import '../../../widgets/effects/bloom.dart';
+import '../../../widgets/effects/film_grain.dart';
+import '../../../widgets/effects/light_leaks.dart';
+import '../../../widgets/effects/vignette.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/shared/user_picker_sheet.dart';
 
@@ -1117,132 +1123,278 @@ class _OutgoingRingingViewState extends State<_OutgoingRingingView>
     final initial = widget.peerName.isNotEmpty
         ? widget.peerName[0].toUpperCase()
         : '?';
+    // Mit fortlaufender Klingelzeit wird das Cancel-Glow röter — sanfter
+    // Spannungsbogen, signalisiert „bald vorbei" ohne zu drohen.
+    final urgency = ((45 - widget.remainingSeconds) / 45).clamp(0.0, 1.0);
     return Scaffold(
       backgroundColor: AppColors.voidColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(),
-            AnimatedBuilder(
-              animation: _pulse,
-              builder: (_, __) {
-                final scale = 1.0 + _pulse.value * 0.18;
-                final opacity = 0.55 - _pulse.value * 0.35;
-                return SizedBox(
-                  width: 240,
-                  height: 240,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Transform.scale(
-                        scale: scale,
-                        child: Container(
-                          width: 220,
-                          height: 220,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.bronze
-                                  .withValues(alpha: opacity),
-                              width: 3,
-                            ),
-                          ),
+      body: Stack(
+        children: [
+          // ── 1. Atmosphäre ─────────────────────────────────────────
+          const Positioned.fill(
+            child: AtmosphericHaze(
+              topColor: AppColors.bronze,
+              bottomColor: AppColors.tealDeep,
+              intensity: 0.5,
+            ),
+          ),
+          const Positioned.fill(
+            child: LightLeaksOverlay(
+              intensity: 0.35,
+              spots: <LightLeakSpot>[
+                LightLeakSpot(
+                  alignment: Alignment(-0.8, -0.6),
+                  color: AppColors.bronze,
+                  radius: 220,
+                  opacity: 0.30,
+                  pulse: true,
+                ),
+                LightLeakSpot(
+                  alignment: Alignment(0.85, 0.7),
+                  color: AppColors.tealSoft,
+                  radius: 260,
+                  opacity: 0.18,
+                  pulse: true,
+                ),
+              ],
+            ),
+          ),
+          const Positioned.fill(child: VignetteOverlay(intensity: 0.45)),
+          const Positioned.fill(child: FilmGrainOverlay(opacity: 0.03)),
+          // ── 2. Letterbox-Bars (statisch, dezent) ──────────────────
+          const Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: double.infinity,
+              height: 28,
+              child: ColoredBox(color: Colors.black),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              width: double.infinity,
+              height: 28,
+              child: ColoredBox(color: Colors.black),
+            ),
+          ),
+          // ── 3. Content ────────────────────────────────────────────
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(28, 28, 28, 28),
+              child: Column(
+                children: [
+                  const Spacer(),
+                  // RUFE…-Tagline
+                  Text(
+                    'call.callingLabel'.tr().toUpperCase(),
+                    style: AppTypography.label(
+                      size: 11,
+                      color: AppColors.bronze,
+                      letterSpacing: 2.0,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    widget.peerName,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.display(
+                      size: 30,
+                      color: AppColors.ink,
+                      height: 1.2,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.bronze
+                              .withValues(alpha: 0.35),
+                          blurRadius: 14,
                         ),
-                      ),
-                      Container(
-                        width: 160,
-                        height: 160,
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  // Sonar-Pings + Sweep-Ring + Avatar
+                  AnimatedBuilder(
+                    animation: _pulse,
+                    builder: (_, __) {
+                      final t = _pulse.value;
+                      return SizedBox(
+                        width: 320,
+                        height: 320,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            for (var i = 0; i < 4; i++)
+                              _radarPing(t, i),
+                            _sweepRing(t),
+                            _avatarCore(initial),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const Spacer(),
+                  // Mono-Countdown — beat-style. Wird beim Endspurt rot.
+                  Text(
+                    _fmtCountdown(widget.remainingSeconds),
+                    style: AppTypography.mono(
+                      size: 22,
+                      color: widget.remainingSeconds < 10
+                          ? AppColors.herzrot
+                          : AppColors.inkSoft,
+                      weight: widget.remainingSeconds < 10
+                          ? FontWeight.w800
+                          : FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'call.ringingHint'.tr(),
+                    style: AppTypography.label(
+                      size: 10,
+                      color: AppColors.inkSoft.withValues(alpha: 0.6),
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  // Cancel-Button: 60 px, Glow steigt mit Klingelzeit.
+                  Bloom(
+                    color: AppColors.herzrot,
+                    intensity: 0.4 + urgency * 0.55,
+                    radius: 24,
+                    child: InkWell(
+                      onTap: widget.onCancel,
+                      borderRadius: BorderRadius.circular(60),
+                      child: Container(
+                        width: 60,
+                        height: 60,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.bronze.withValues(alpha: 0.18),
-                          border:
-                              Border.all(color: AppColors.bronze, width: 2),
+                          color: AppColors.herzrot
+                              .withValues(alpha: 0.18 + urgency * 0.25),
+                          border: Border.all(
+                            color: AppColors.herzrot.withValues(
+                                alpha: 0.55 + urgency * 0.4),
+                            width: 2,
+                          ),
                         ),
-                        clipBehavior: Clip.antiAlias,
-                        child: widget.avatarUrl != null &&
-                                widget.avatarUrl!.isNotEmpty
-                            ? CachedNetworkImage(
-                                imageUrl: widget.avatarUrl!,
-                                fit: BoxFit.cover,
-                                placeholder: (_, __) => Text(
-                                  initial,
-                                  style: AppTypography.display(
-                                      size: 56, color: AppColors.bronze),
-                                ),
-                                errorWidget: (_, __, ___) => Text(
-                                  initial,
-                                  style: AppTypography.display(
-                                      size: 56, color: AppColors.bronze),
-                                ),
-                              )
-                            : Text(
-                                initial,
-                                style: AppTypography.display(
-                                    size: 56, color: AppColors.bronze),
-                              ),
+                        child: const Icon(LucideIcons.phoneOff,
+                            color: AppColors.herzrot, size: 26),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 32),
-            Text(
-              widget.peerName,
-              style: AppTypography.display(
-                  size: 28, color: AppColors.ink, height: 1.2),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'call.ringingCountdown'.tr(
-                  namedArgs: {'n': '${widget.remainingSeconds}'}),
-              style: AppTypography.body(
-                size: 14,
-                color: widget.remainingSeconds < 10
-                    ? AppColors.herzrot
-                    : AppColors.inkSoft,
-                weight: widget.remainingSeconds < 10
-                    ? FontWeight.w700
-                    : FontWeight.w400,
-              ),
-            ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 56),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  InkWell(
-                    onTap: widget.onCancel,
-                    borderRadius: BorderRadius.circular(72),
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.herzrot.withValues(alpha: 0.22),
-                        border:
-                            Border.all(color: AppColors.herzrot, width: 2),
-                      ),
-                      child: const Icon(LucideIcons.phoneOff,
-                          color: AppColors.herzrot, size: 32),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(
                     'call.cancelCall'.tr(),
                     style: AppTypography.label(
-                        size: 11, color: AppColors.inkSoft),
+                        size: 10, color: AppColors.inkSoft),
                   ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _radarPing(double t, int i) {
+    final phase = ((t + i * 0.25) % 1.0);
+    final size = 180.0 + phase * 130.0;
+    final opacity = (1.0 - phase) * 0.45;
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: AppColors.bronze.withValues(alpha: opacity),
+            width: 1.5,
+          ),
         ),
       ),
     );
+  }
+
+  Widget _sweepRing(double t) {
+    return IgnorePointer(
+      child: Transform.rotate(
+        angle: t * math.pi * 2,
+        child: Container(
+          width: 240,
+          height: 240,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: SweepGradient(
+              colors: [
+                AppColors.bronze.withValues(alpha: 0.0),
+                AppColors.bronze.withValues(alpha: 0.7),
+                AppColors.bronzeSoft.withValues(alpha: 0.55),
+                AppColors.bronze.withValues(alpha: 0.0),
+              ],
+              stops: const [0.0, 0.4, 0.65, 1.0],
+            ),
+          ),
+          child: Center(
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.voidColor,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _avatarCore(String initial) {
+    final hasAvatar =
+        widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty;
+    return Bloom(
+      color: AppColors.bronze,
+      intensity: 0.6,
+      radius: 26,
+      child: Container(
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.surface,
+          border: Border.all(
+            color: AppColors.bronze.withValues(alpha: 0.85),
+            width: 2,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: hasAvatar
+            ? CachedNetworkImage(
+                imageUrl: widget.avatarUrl!,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => _initialBlock(initial),
+                errorWidget: (_, __, ___) => _initialBlock(initial),
+              )
+            : _initialBlock(initial),
+      ),
+    );
+  }
+
+  Widget _initialBlock(String c) => Center(
+        child: Text(
+          c,
+          style: AppTypography.display(size: 68, color: AppColors.bronze),
+        ),
+      );
+
+  String _fmtCountdown(int seconds) {
+    final s = seconds.clamp(0, 99);
+    final m = (s / 60).floor();
+    final r = s % 60;
+    return '${m.toString().padLeft(2, '0')}:${r.toString().padLeft(2, '0')}';
   }
 }
 

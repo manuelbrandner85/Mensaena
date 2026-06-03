@@ -2251,7 +2251,9 @@
     "callMissed": "Chiamata persa",
     "callBack": "Richiama",
     "callEnded": "Chiamata terminata",
-    "notReachable": "Non è stato possibile contattarlo"
+    "notReachable": "Non è stato possibile contattarlo",
+    "callingLabel": "Chiamata in corso",
+    "ringingHint": "Tocca ↓ per riagganciare"
   },
   "voice": {
     "micDenied": "Permesso microfono negato."

@@ -2250,7 +2250,9 @@
     "callMissed": "Cevapsız arama",
     "callBack": "Geri ara",
     "callEnded": "Arama sona erdi",
-    "notReachable": "Ulaşılamadı"
+    "notReachable": "Ulaşılamadı",
+    "callingLabel": "Aranıyor",
+    "ringingHint": "Kapatmak için ↓ dokun"
   },
   "voice": {
     "micDenied": "Mikrofon izni reddedildi."

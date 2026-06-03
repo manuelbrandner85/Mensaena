@@ -2251,7 +2251,9 @@
     "callMissed": "Llamada perdida",
     "callBack": "Devolver llamada",
     "callEnded": "Llamada finalizada",
-    "notReachable": "No se ha podido contactar"
+    "notReachable": "No se ha podido contactar",
+    "callingLabel": "Llamando",
+    "ringingHint": "Toca ↓ para colgar"
   },
   "voice": {
     "micDenied": "Permiso de micrófono denegado."
