@@ -53,19 +53,46 @@ class DmCallService {
         6, (_) => 'abcdefghijklmnopqrstuvwxyz0123456789'[rng.nextInt(36)]).join();
     final roomName =
         'dm-${DateTime.now().millisecondsSinceEpoch}-$suffix';
+    Future<Map<String, dynamic>?> doInsert() => sb
+        .from('dm_calls')
+        .insert({
+          'caller_id': caller,
+          'callee_id': calleeId,
+          'conversation_id': conversationId,
+          'call_type': callType,
+          'status': 'ringing',
+          'room_name': roomName,
+        })
+        .select('id, room_name')
+        .maybeSingle();
+
     try {
-      final row = await sb
-          .from('dm_calls')
-          .insert({
-            'caller_id': caller,
-            'callee_id': calleeId,
-            'conversation_id': conversationId,
-            'call_type': callType,
-            'status': 'ringing',
-            'room_name': roomName,
-          })
-          .select('id, room_name')
-          .maybeSingle();
+      Map<String, dynamic>? row;
+      try {
+        row = await doInsert();
+      } catch (e) {
+        // 23505-Recovery: ein vorheriger Call derselben Konversation steckt
+        // noch im Status ringing/active und kollidiert mit dem partiellen
+        // Unique-Index. Wir setzen ihn auf 'ended' und versuchen es einmal
+        // neu. Greift, falls die DB-seitige BEFORE-INSERT-Bereinigung noch
+        // nicht deployed ist oder ein Edge-Case durchgerutscht ist.
+        if (e.toString().contains('23505')) {
+          try {
+            await sb.from('dm_calls').update({
+              'status': 'ended',
+              'ended_at': DateTime.now().toUtc().toIso8601String(),
+              'ended_reason': 'completed',
+            }).match({
+              'conversation_id': conversationId,
+            }).inFilter('status', const ['ringing', 'active']);
+            row = await doInsert();
+          } catch (_) {
+            rethrow;
+          }
+        } else {
+          rethrow;
+        }
+      }
       if (row == null) {
         return const DmCallStartResult(
             success: false, errorReason: 'Insert blockiert (RLS)');
