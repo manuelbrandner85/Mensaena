@@ -11,6 +11,7 @@ import 'dart:io' show Platform;
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show IconData;
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -85,7 +86,7 @@ class PermissionsGate {
     }
     final useMediaPerms = sdk == 0 || sdk >= 33;
     return <GateItem>[
-      GateItem(
+      const GateItem(
         key: 'notification',
         labelKey: 'permissions.items.notifications',
         descKey: 'permissions.items.notificationsDesc',
@@ -93,7 +94,7 @@ class PermissionsGate {
         rationale: PermissionRationaleKey.notification,
         permission: Permission.notification,
       ),
-      GateItem(
+      const GateItem(
         key: 'microphone',
         labelKey: 'permissions.items.microphone',
         descKey: 'permissions.items.microphoneDesc',
@@ -101,7 +102,7 @@ class PermissionsGate {
         rationale: PermissionRationaleKey.microphone,
         permission: Permission.microphone,
       ),
-      GateItem(
+      const GateItem(
         key: 'camera',
         labelKey: 'permissions.items.camera',
         descKey: 'permissions.items.cameraDesc',
@@ -109,7 +110,7 @@ class PermissionsGate {
         rationale: PermissionRationaleKey.camera,
         permission: Permission.camera,
       ),
-      GateItem(
+      const GateItem(
         key: 'location',
         labelKey: 'permissions.items.location',
         descKey: 'permissions.items.locationDesc',
@@ -117,6 +118,8 @@ class PermissionsGate {
         rationale: PermissionRationaleKey.location,
         permission: Permission.locationWhenInUse,
       ),
+      // Photos-Eintrag ist NICHT const, weil `permission` über einen
+      // Runtime-Ternary aus useMediaPerms gesetzt wird.
       GateItem(
         key: 'photos',
         labelKey: 'permissions.items.photos',
@@ -134,7 +137,7 @@ class PermissionsGate {
           rationale: PermissionRationaleKey.audio,
           permission: Permission.audio,
         ),
-      GateItem(
+      const GateItem(
         key: 'phone',
         labelKey: 'permissions.items.phone',
         descKey: 'permissions.items.phoneDesc',
@@ -179,7 +182,7 @@ class PermissionsGate {
         },
       ),
       // SYSTEM_ALERT_WINDOW (Samsung-Vollbild-Anruf).
-      GateItem(
+      const GateItem(
         key: 'overlay',
         labelKey: 'permissions.items.overlay',
         descKey: 'permissions.items.overlayDesc',

@@ -75,20 +75,21 @@ class _PermissionsScreenState extends State<PermissionsScreen>
   List<_PermEntry> _entries() {
     final useMediaPerms = _androidSdk >= 33;
     return [
-      _PermEntry(
+      const _PermEntry(
         permission: Permission.camera,
         icon: LucideIcons.camera,
         labelKey: 'permissions.items.camera',
         descKey: 'permissions.items.cameraDesc',
         rationale: PermissionRationaleKey.camera,
       ),
-      _PermEntry(
+      const _PermEntry(
         permission: Permission.microphone,
         icon: LucideIcons.mic,
         labelKey: 'permissions.items.microphone',
         descKey: 'permissions.items.microphoneDesc',
         rationale: PermissionRationaleKey.microphone,
       ),
+      // Nicht const — `permission` über Runtime-Ternary.
       _PermEntry(
         // Android 13+: READ_MEDIA_IMAGES + _VIDEO laufen über `photos`.
         // Android ≤12: storage deckt READ_EXTERNAL_STORAGE ab.
@@ -99,21 +100,21 @@ class _PermissionsScreenState extends State<PermissionsScreen>
         rationale: PermissionRationaleKey.photos,
       ),
       if (useMediaPerms)
-        _PermEntry(
+        const _PermEntry(
           permission: Permission.audio,
           icon: LucideIcons.music,
           labelKey: 'permissions.items.audioFiles',
           descKey: 'permissions.items.audioFilesDesc',
           rationale: PermissionRationaleKey.audio,
         ),
-      _PermEntry(
+      const _PermEntry(
         permission: Permission.locationWhenInUse,
         icon: LucideIcons.mapPin,
         labelKey: 'permissions.items.location',
         descKey: 'permissions.items.locationDesc',
         rationale: PermissionRationaleKey.location,
       ),
-      _PermEntry(
+      const _PermEntry(
         permission: Permission.notification,
         icon: LucideIcons.bell,
         labelKey: 'permissions.items.notifications',
@@ -122,20 +123,21 @@ class _PermissionsScreenState extends State<PermissionsScreen>
       ),
       // "Geräte in der Nähe" — Android 12+ (Bluetooth-Headset für Calls).
       if (_androidSdk == 0 || _androidSdk >= 31)
-        _PermEntry(
+        const _PermEntry(
           permission: Permission.bluetoothConnect,
           icon: LucideIcons.bluetooth,
           labelKey: 'permissions.items.nearby',
           descKey: 'permissions.items.nearbyDesc',
           rationale: PermissionRationaleKey.nearby,
         ),
-      _PermEntry(
+      const _PermEntry(
         permission: Permission.phone,
         icon: LucideIcons.phoneCall,
         labelKey: 'permissions.items.phone',
         descKey: 'permissions.items.phoneDesc',
         rationale: PermissionRationaleKey.phone,
       ),
+      // Nicht const — Closures für customStatus/customAction.
       // Vollbild-Klingeln (USE_FULL_SCREEN_INTENT, Android 14+): hat kein
       // Permission.X-Enum — wir mappen den Bool-Status der CallKit-Bridge
       // selbst auf granted/denied und triggern dort auch das Request.
@@ -165,13 +167,14 @@ class _PermissionsScreenState extends State<PermissionsScreen>
       // degradiert Anrufe ohne dieses Recht auf Heads-up, selbst wenn
       // Fullscreen-Intent erteilt ist. Erfordert einen separaten System-
       // Dialog-Flow (request() leitet zu Settings).
-      _PermEntry(
+      const _PermEntry(
         permission: Permission.systemAlertWindow,
         icon: LucideIcons.layers,
         labelKey: 'permissions.items.overlay',
         descKey: 'permissions.items.overlayDesc',
         rationale: PermissionRationaleKey.overlay,
       ),
+      // Nicht const — referenziert Instance-Method `_openBatterySetup`.
       // Spezialfall: Akku-Optimierung läuft über eigenen Setup-Flow
       // (Samsung braucht 2 Schritte) — kein einfaches request().
       _PermEntry(
