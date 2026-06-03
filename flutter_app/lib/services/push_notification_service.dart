@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 
 import 'callkit_service.dart';
+import 'incoming_call_overlay.dart';
 import 'notification_router.dart';
 import 'supabase_service.dart';
 
@@ -389,7 +390,8 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
       final callerAvatar = m.data['caller_avatar'] as String?;
       final callType = (m.data['call_type'] as String?) ?? 'audio';
 
-      // 1) Primaer: native CallKit-Bridge.
+      var callkitOk = false;
+      // 1) Primaer: native CallKit-Bridge (Lockscreen + System-Ringtone).
       try {
         if (callId.isNotEmpty) {
           await CallkitService.showIncoming(
@@ -401,11 +403,32 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
             callerId: callerId,
             callType: callType,
           );
-          return;
+          callkitOk = true;
         }
       } catch (e) {
         debugPrint('[BG-Handler] CallKit failed → Fallback Notification: $e');
       }
+
+      // 1b) Zusätzlich Vollbild-System-Overlay (SYSTEM_ALERT_WINDOW): Samsung
+      // One UI demotet fullScreenIntent auf Heads-up sobald entsperrt — das
+      // Overlay zeichnet unsere Vollbild-UI direkt über alles. No-op falls
+      // Permission nicht erteilt. Labels hartcodiert auf Deutsch, weil der
+      // BG-Isolate kein easy_localization initialisiert hat.
+      if (callId.isNotEmpty) {
+        try {
+          await IncomingCallOverlay.show(
+            callId: callId,
+            callerName: callerName,
+            callerAvatar: callerAvatar,
+            callType: callType,
+          );
+        } catch (e) {
+          debugPrint('[BG-Handler] Overlay failed: $e');
+        }
+      }
+
+      // CallKit lief schon → Fallback-Notification-Pfad nicht mehr nötig.
+      if (callkitOk) return;
 
       // 2) Fallback: alte fullScreenIntent-Notification.
       final callsChannel = AndroidNotificationChannel(

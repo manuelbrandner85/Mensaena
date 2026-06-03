@@ -24,6 +24,7 @@ import '../../services/call_busy_state.dart';
 import '../../services/call_event_bus.dart';
 import '../../services/callkit_service.dart';
 import '../../services/dm_call_service.dart';
+import '../../services/incoming_call_overlay.dart';
 import '../../services/supabase_service.dart';
 
 class IncomingCallListener extends ConsumerStatefulWidget {
@@ -222,6 +223,7 @@ class _IncomingCallListenerState
       if (status == 'cancelled' || status == 'ended' || status == 'missed') {
         if (_handledCallIds.contains(id)) {
           CallkitService.endCall(id);
+          unawaited(IncomingCallOverlay.close());
         }
         continue;
       }
@@ -317,6 +319,19 @@ class _IncomingCallListenerState
     } catch (_) {
       _handledCallIds.remove(callId);
     }
+    // Zusätzlich Vollbild-System-Overlay zeigen (Samsung One UI demotet
+    // fullScreenIntent auf Heads-up sobald entsperrt — das Overlay löst
+    // das, weil es als SYSTEM_ALERT_WINDOW über alles gezeichnet wird).
+    // No-op falls Berechtigung nicht erteilt.
+    unawaited(IncomingCallOverlay.show(
+      callId: callId,
+      callerName: resolvedName,
+      callerAvatar: avatarUrl,
+      callType: callType,
+      labelIncoming: 'chat.incomingCall'.tr(),
+      labelAccept: 'chat.accept'.tr(),
+      labelDecline: 'chat.decline'.tr(),
+    ));
   }
 
   @override

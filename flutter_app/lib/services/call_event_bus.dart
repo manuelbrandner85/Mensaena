@@ -22,6 +22,7 @@ import 'package:go_router/go_router.dart';
 import '../config/routes/app_router.dart' show rootNavigatorKey;
 import 'callkit_service.dart';
 import 'dm_call_service.dart';
+import 'incoming_call_overlay.dart';
 import 'supabase_service.dart';
 
 void _logDev(String msg) {
@@ -115,6 +116,54 @@ class CallEventBus {
   /// aus CallKit.activeCalls() beim Cold-Start.
   static void recordHandledAccept(String callId) {
     _handledAccepts.add(callId);
+  }
+
+  /// Annahme aus dem System-Overlay (SYSTEM_ALERT_WINDOW) — entweder
+  /// Main-Isolate war wach und der Listener fängt den Tap direkt, oder
+  /// die App lebt nur im Overlay-Isolate; in beiden Fällen brauchen wir
+  /// am Ende einen Call-Screen-Aufbau. Der Context wird ggf. aus der DB
+  /// nachgeladen, falls _contexts den Eintrag noch nicht kennt.
+  static Future<void> acceptFromOverlay(String callId) async {
+    if (_handledAccepts.contains(callId)) return;
+    // CallKit-Notification (falls parallel aktiv) beenden.
+    unawaited(CallkitService.endCall(callId));
+
+    CallContext? ctx = _contexts[callId];
+    if (ctx == null) {
+      // Cold-Start-Path: Anrufer-Daten aus der DB ziehen.
+      try {
+        final row = await sb
+            .from('dm_calls')
+            .select('id, caller_id, conversation_id, room_name, call_type')
+            .eq('id', callId)
+            .maybeSingle();
+        if (row == null) return;
+        String callerName = 'Nachbar:in';
+        try {
+          final p = await sb
+              .from('profiles')
+              .select('display_name, name')
+              .eq('id', row['caller_id'] as String)
+              .maybeSingle();
+          if (p != null) {
+            callerName = (p['display_name'] as String?) ??
+                (p['name'] as String?) ??
+                callerName;
+          }
+        } catch (_) {/* ignore */}
+        ctx = CallContext(
+          callId: callId,
+          roomName: (row['room_name'] as String?) ?? '',
+          callerName: callerName,
+          conversationId: row['conversation_id'] as String?,
+        );
+        _contexts[callId] = ctx;
+      } catch (e) {
+        _logDev('[CallEventBus] acceptFromOverlay context lookup failed: $e');
+        return;
+      }
+    }
+    await _onAccept(ctx);
   }
 
   static void _handle(CallEvent? event) {
@@ -215,6 +264,10 @@ class CallEventBus {
 
     _contexts.remove(ctx.callId);
 
+    // System-Overlay (falls offen) sofort schließen, damit nicht parallel
+    // zur Call-Screen-Animation noch das Vollbild-Ringen rendert.
+    unawaited(IncomingCallOverlay.close());
+
     // SPEED: Status-Update + Navigation parallel. Vorher wurde 200-500ms
     // auf DB-Update gewartet bevor navigiert wird → User sah lange weiss.
     // Jetzt: Navigation startet sofort (Call-Screen kann sich aufbauen),
@@ -270,6 +323,7 @@ class CallEventBus {
   static String? _pendingAcceptRoute;
 
   static Future<void> _onDecline(CallContext ctx) async {
+    unawaited(IncomingCallOverlay.close());
     await _updateStatus(ctx.callId, 'cancelled');
     _contexts.remove(ctx.callId);
     // UI-Schicht (IncomingCallListener) hoert hier und zeigt ein
@@ -281,6 +335,7 @@ class CallEventBus {
   }
 
   static Future<void> _onTimeout(CallContext ctx) async {
+    unawaited(IncomingCallOverlay.close());
     await _updateStatus(ctx.callId, 'missed');
     _contexts.remove(ctx.callId);
   }

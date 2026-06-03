@@ -18,8 +18,13 @@ import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
 import 'services/device_tier_service.dart';
+import 'services/incoming_call_overlay.dart';
 import 'services/offline_queue_service.dart';
 import 'services/push_notification_service.dart';
+// Re-Export der Overlay-Entry-Point-Funktion (`@pragma('vm:entry-point')`),
+// damit das Plugin sie beim Overlay-Start erreichen kann.
+import 'widgets/overlays/incoming_call_overlay_app.dart'
+    show incomingCallOverlayEntry;
 import 'services/shorebird_patch_service.dart';
 import 'services/sleep_reminder_service.dart';
 import 'services/supabase_service.dart';
@@ -34,6 +39,12 @@ import 'repositories/wave_final_repositories.dart';
 ///   3. Alles andere (Firebase, FCM-Token, Auth-Listener) wird NICHT
 ///      awaitet — laeuft im Background nach erstem Frame. Das verhindert
 ///      "App baut sich nicht auf"-Verhalten wenn Firebase langsam ist.
+/// Entry-Point für das Overlay-Isolate. flutter_overlay_window startet
+/// dies, wenn der Main-Isolate `FlutterOverlayWindow.showOverlay()` ruft.
+/// Der Name `overlayMain` ist vom Plugin fest vorgegeben.
+@pragma('vm:entry-point')
+void overlayMain() => incomingCallOverlayEntry();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -94,6 +105,11 @@ Future<void> main() async {
   // muss der Listener jetzt schon hoeren. Sonst Accept → Dashboard statt
   // Call-Screen.
   CallEventBus.init();
+  // System-Overlay-Aktions-Listener: hört auf 'overlay_action' Messages aus
+  // dem Overlay-Isolate (Annehmen/Ablehnen-Taps) und routet sie an
+  // CallEventBus. MUSS vor runApp() laufen, damit Aktionen, die VOR dem
+  // ersten Frame eintreffen (Cold-Start aus dem Overlay), nicht verloren gehen.
+  IncomingCallOverlay.attachActionListener();
 
   // L18: Globaler Error-Boundary — verhindert Red-Screen-of-Death.
   // Statt Flutter's Default-Widget zeigen wir eine Cinema-Style Karte mit

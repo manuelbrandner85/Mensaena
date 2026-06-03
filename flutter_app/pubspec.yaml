@@ -135,6 +135,10 @@ dependencies:
   # Auch im Background/Killed-State zeigt Android das native CallScreen
   # statt einer Heads-Up-Notification.
   flutter_callkit_incoming: ^2.5.4
+  # System-Overlay (SYSTEM_ALERT_WINDOW) — zeichnet unsere eigene Vollbild-
+  # Anruf-UI über jede App / das Sperrbildschirm-System, weil Samsung One UI
+  # ab Android 14 fullScreenIntent auf Heads-up degradiert sobald entsperrt.
+  flutter_overlay_window: ^0.4.5
 
 dev_dependencies:
   flutter_test:
