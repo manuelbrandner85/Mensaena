@@ -11,6 +11,7 @@ import 'dart:io' show Platform;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -31,11 +32,13 @@ class _PermissionsScreenState extends State<PermissionsScreen>
     with WidgetsBindingObserver {
   // androidSdk == 0 → nicht-Android oder noch nicht geladen.
   int _androidSdk = 0;
-  // Statuskarte aller relevanten Berechtigungen.
-  final Map<Permission, PermissionStatus> _status = {};
-  // Pro Eintrag: nutzt einen eigenen async-Refresh-Lock, damit ein Tap nicht
-  // im Doppelclick mehrere Permission-Dialoge stapelt.
-  final Set<Permission> _busy = {};
+  // Statuskarte aller relevanten Berechtigungen, gekeyed per labelKey damit
+  // mehrere Einträge auf dieselbe Permission (oder ein Custom-Status) sich
+  // gegenseitig nicht überschreiben.
+  final Map<String, PermissionStatus> _status = {};
+  // Pro Eintrag: nutzt einen eigenen async-Refresh-Lock (gleicher Key wie
+  // im Status-Cache), damit ein Doppeltap nicht mehrere Dialoge stapelt.
+  final Set<String> _busy = {};
 
   @override
   void initState() {
@@ -133,6 +136,42 @@ class _PermissionsScreenState extends State<PermissionsScreen>
         descKey: 'permissions.items.phoneDesc',
         rationale: PermissionRationaleKey.phone,
       ),
+      // Vollbild-Klingeln (USE_FULL_SCREEN_INTENT, Android 14+): hat kein
+      // Permission.X-Enum — wir mappen den Bool-Status der CallKit-Bridge
+      // selbst auf granted/denied und triggern dort auch das Request.
+      _PermEntry(
+        permission: Permission.notification,
+        icon: LucideIcons.maximize2,
+        labelKey: 'permissions.items.fullscreenCall',
+        descKey: 'permissions.items.fullscreenCallDesc',
+        rationale: PermissionRationaleKey.fullscreenCall,
+        customStatus: () async {
+          try {
+            final ok = await FlutterCallkitIncoming.canUseFullScreenIntent();
+            return ok == true
+                ? PermissionStatus.granted
+                : PermissionStatus.denied;
+          } catch (_) {
+            return PermissionStatus.denied;
+          }
+        },
+        customAction: () async {
+          try {
+            await FlutterCallkitIncoming.requestFullIntentPermission();
+          } catch (_) {/* nicht auf jeder Android-Version verfügbar */}
+        },
+      ),
+      // "Über andere Apps anzeigen" (SYSTEM_ALERT_WINDOW): Samsung One UI
+      // degradiert Anrufe ohne dieses Recht auf Heads-up, selbst wenn
+      // Fullscreen-Intent erteilt ist. Erfordert einen separaten System-
+      // Dialog-Flow (request() leitet zu Settings).
+      _PermEntry(
+        permission: Permission.systemAlertWindow,
+        icon: LucideIcons.layers,
+        labelKey: 'permissions.items.overlay',
+        descKey: 'permissions.items.overlayDesc',
+        rationale: PermissionRationaleKey.overlay,
+      ),
       // Spezialfall: Akku-Optimierung läuft über eigenen Setup-Flow
       // (Samsung braucht 2 Schritte) — kein einfaches request().
       _PermEntry(
@@ -148,48 +187,50 @@ class _PermissionsScreenState extends State<PermissionsScreen>
   Future<void> _refreshAll() async {
     for (final e in _entries()) {
       try {
-        _status[e.permission] = await e.permission.status;
+        _status[e.labelKey] = e.customStatus != null
+            ? await e.customStatus!()
+            : await e.permission.status;
       } catch (_) {
-        _status[e.permission] = PermissionStatus.denied;
+        _status[e.labelKey] = PermissionStatus.denied;
       }
     }
     if (mounted) setState(() {});
   }
 
   Future<void> _onTap(_PermEntry e) async {
-    if (_busy.contains(e.permission)) return;
-    if (e.customAction != null) {
-      await e.customAction!();
-      await _refreshAll();
-      return;
-    }
-    final current = _status[e.permission] ?? PermissionStatus.denied;
-    // Permanent verweigerte Permissions können wir nicht mehr per Dialog
-    // anfordern — Rationale wäre verwirrend (nichts würde danach passieren),
-    // also gehen wir direkt in die App-Einstellungen.
-    if (current.isPermanentlyDenied || current.isRestricted) {
-      setState(() => _busy.add(e.permission));
-      try {
-        await openAppSettings();
-        _status[e.permission] = await e.permission.status;
-      } catch (_) {} finally {
-        if (mounted) setState(() => _busy.remove(e.permission));
-      }
-      return;
-    }
-    // Vor dem System-Dialog kurz erklären, warum — User klickt danach mit
-    // höherer Wahrscheinlichkeit „Erlauben".
+    if (_busy.contains(e.labelKey)) return;
+    // Erst Rationale (außer wenn customAction die Erklärung selbst übernimmt
+    // wie der Battery-Setup-Flow).
     if (e.rationale != null) {
       final cont = await showPermissionRationale(context, e.rationale!);
       if (!cont || !mounted) return;
     }
-    setState(() => _busy.add(e.permission));
+    if (e.customAction != null) {
+      setState(() => _busy.add(e.labelKey));
+      try {
+        await e.customAction!();
+      } finally {
+        if (mounted) setState(() => _busy.remove(e.labelKey));
+      }
+      await _refreshAll();
+      return;
+    }
+    final current = _status[e.labelKey] ?? PermissionStatus.denied;
+    setState(() => _busy.add(e.labelKey));
     try {
-      await e.permission.request();
-      _status[e.permission] = await e.permission.status;
+      // Permanent verweigerte Permissions können wir nicht mehr per Dialog
+      // anfordern — Android lässt nur den Weg in die App-Einstellungen.
+      if (current.isPermanentlyDenied || current.isRestricted) {
+        await openAppSettings();
+      } else {
+        await e.permission.request();
+      }
+      _status[e.labelKey] = e.customStatus != null
+          ? await e.customStatus!()
+          : await e.permission.status;
     } catch (_) {/* permission_handler-Edgecase ignorieren */} finally {
       if (mounted) {
-        setState(() => _busy.remove(e.permission));
+        setState(() => _busy.remove(e.labelKey));
       }
     }
   }
@@ -198,8 +239,7 @@ class _PermissionsScreenState extends State<PermissionsScreen>
 
   Future<void> _grantAll() async {
     for (final e in _entries()) {
-      if (e.customAction != null) continue; // Akku separat
-      final s = _status[e.permission];
+      final s = _status[e.labelKey];
       if (s != null && (s.isGranted || s.isLimited)) continue;
       if (s != null && (s.isPermanentlyDenied || s.isRestricted)) continue;
       if (e.rationale != null) {
@@ -209,7 +249,11 @@ class _PermissionsScreenState extends State<PermissionsScreen>
         if (!cont) continue;
       }
       try {
-        await e.permission.request();
+        if (e.customAction != null) {
+          await e.customAction!();
+        } else {
+          await e.permission.request();
+        }
       } catch (_) {}
     }
     await _refreshAll();
@@ -309,9 +353,9 @@ class _PermissionsScreenState extends State<PermissionsScreen>
   }
 
   Widget _tile(_PermEntry e) {
-    final s = _status[e.permission] ?? PermissionStatus.denied;
+    final s = _status[e.labelKey] ?? PermissionStatus.denied;
     final badge = _statusBadge(s);
-    final busy = _busy.contains(e.permission);
+    final busy = _busy.contains(e.labelKey);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -384,6 +428,7 @@ class _PermEntry {
     required this.labelKey,
     required this.descKey,
     this.customAction,
+    this.customStatus,
     this.rationale,
   });
 
@@ -393,6 +438,9 @@ class _PermEntry {
   final String descKey;
   // Wenn gesetzt, übersteuert sie den Standard-request()-Flow (z. B. Akku).
   final Future<void> Function()? customAction;
+  // Eigene Status-Abfrage (z. B. Fullscreen-Intent, das kein
+  // Permission.X-Enum hat — gemappt auf granted/denied).
+  final Future<PermissionStatus> Function()? customStatus;
   // Optionales Pre-Dialog-Sheet, das nutzwertfokussiert erklärt, warum
   // wir diese Berechtigung brauchen — vor dem eigentlichen System-Dialog.
   final PermissionRationaleKey? rationale;

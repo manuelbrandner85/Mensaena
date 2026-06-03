@@ -3575,7 +3575,11 @@
       "biometric": "Biometrie",
       "biometricDesc": "App per Fingerabdruck oder Gesicht entsperren.",
       "battery": "Akku-Optimierung",
-      "batteryDesc": "Damit Anrufe bei geschlossener App ankommen."
+      "batteryDesc": "Damit Anrufe bei geschlossener App ankommen.",
+      "fullscreenCall": "Vollbild-Klingeln",
+      "fullscreenCallDesc": "Eingehende Anrufe übernehmen das ganze Display — sonst nur ein kleiner Banner.",
+      "overlay": "Über andere Apps",
+      "overlayDesc": "Mensaena erscheint beim Anruf, egal welche App gerade offen ist."
     },
     "rationales": {
       "continue": "Weiter",
@@ -3613,6 +3617,14 @@
         "phone": {
           "title": "Anrufe wie bei WhatsApp",
           "body": "Damit eingehende Anrufe auf dem Sperrbildschirm als echtes Vollbild-Klingeln erscheinen — auch bei geschlossener App."
+        },
+        "fullscreenCall": {
+          "title": "Anrufe in echtem Vollbild",
+          "body": "Damit eingehende Anrufe das ganze Display übernehmen — wie bei WhatsApp. Ohne diese Erlaubnis siehst du nur einen kleinen Banner oben."
+        },
+        "overlay": {
+          "title": "Anrufe über andere Apps anzeigen",
+          "body": "Damit Mensaena beim Anruf erscheint, egal welche App offen ist — auch auf dem Sperrbildschirm. Genau das Verhalten, das du von WhatsApp kennst."
         }
       }
     }

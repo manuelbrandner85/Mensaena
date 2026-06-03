@@ -2810,7 +2810,11 @@
       "biometric": "Biyometri",
       "biometricDesc": "Uygulamayı parmak izi veya yüzle aç.",
       "battery": "Pil optimizasyonu",
-      "batteryDesc": "Uygulama kapalıyken aramalar gelsin diye."
+      "batteryDesc": "Uygulama kapalıyken aramalar gelsin diye.",
+      "fullscreenCall": "Tam ekran çalma",
+      "fullscreenCallDesc": "Gelen aramalar tüm ekranı kaplar — yoksa sadece küçük bir banner.",
+      "overlay": "Diğer uygulamaların üzerinde göster",
+      "overlayDesc": "Hangi uygulama açık olursa olsun, arama sırasında Mensaena belirir."
     },
     "rationales": {
       "continue": "Devam",
@@ -2848,6 +2852,14 @@
         "phone": {
           "title": "WhatsApp gibi aramalar",
           "body": "Gelen aramaların kilit ekranında tam ekran gerçek çalar gibi görünmesi için — uygulama kapalı olsa bile."
+        },
+        "fullscreenCall": {
+          "title": "Aramalar gerçek tam ekranda",
+          "body": "Gelen aramaların tüm ekranı kaplaması için — WhatsApp gibi. Bu izin olmadan yalnızca üstte küçük bir banner görürsün."
+        },
+        "overlay": {
+          "title": "Aramaları diğer uygulamaların üzerinde göster",
+          "body": "Hangi uygulama açık olursa olsun Mensaena arama sırasında belirsin — kilit ekranında da. WhatsApp'taki davranışın aynısı."
         }
       }
     }

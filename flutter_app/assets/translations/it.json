@@ -2811,7 +2811,11 @@
       "biometric": "Biometria",
       "biometricDesc": "Sblocca l'app con impronta o volto.",
       "battery": "Ottimizzazione batteria",
-      "batteryDesc": "Perché le chiamate arrivino ad app chiusa."
+      "batteryDesc": "Perché le chiamate arrivino ad app chiusa.",
+      "fullscreenCall": "Squillo a schermo intero",
+      "fullscreenCallDesc": "Le chiamate in arrivo occupano tutto lo schermo — altrimenti solo un piccolo banner.",
+      "overlay": "Mostra sopra altre app",
+      "overlayDesc": "Mensaena appare durante una chiamata, qualunque app sia aperta."
     },
     "rationales": {
       "continue": "Continua",
@@ -2849,6 +2853,14 @@
         "phone": {
           "title": "Chiamate come WhatsApp",
           "body": "Perché le chiamate in arrivo appaiano a schermo intero sulla schermata di blocco — anche ad app chiusa."
+        },
+        "fullscreenCall": {
+          "title": "Chiamate davvero a schermo intero",
+          "body": "Perché le chiamate in arrivo occupino tutto il display — come su WhatsApp. Senza questo permesso vedi solo un piccolo banner."
+        },
+        "overlay": {
+          "title": "Mostra le chiamate sopra altre app",
+          "body": "Perché Mensaena appaia durante una chiamata, qualunque app sia aperta — anche sulla schermata di blocco. Lo stesso comportamento di WhatsApp."
         }
       }
     }

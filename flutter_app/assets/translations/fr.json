@@ -2811,7 +2811,11 @@
       "biometric": "Biométrie",
       "biometricDesc": "Déverrouille l'app avec empreinte ou visage.",
       "battery": "Optimisation batterie",
-      "batteryDesc": "Pour que les appels arrivent app fermée."
+      "batteryDesc": "Pour que les appels arrivent app fermée.",
+      "fullscreenCall": "Sonnerie plein écran",
+      "fullscreenCallDesc": "Les appels entrants prennent tout l'écran — sinon juste une petite bannière.",
+      "overlay": "Afficher au-dessus des autres apps",
+      "overlayDesc": "Mensaena apparaît lors d'un appel, peu importe quelle app est ouverte."
     },
     "rationales": {
       "continue": "Continuer",
@@ -2849,6 +2853,14 @@
         "phone": {
           "title": "Appels comme WhatsApp",
           "body": "Pour que les appels entrants apparaissent en plein écran sur l'écran verrouillé — même app fermée."
+        },
+        "fullscreenCall": {
+          "title": "Appels en vrai plein écran",
+          "body": "Pour que les appels entrants prennent tout l'écran — comme sur WhatsApp. Sans cette autorisation tu ne vois qu'une petite bannière en haut."
+        },
+        "overlay": {
+          "title": "Afficher les appels au-dessus des autres apps",
+          "body": "Pour que Mensaena apparaisse lors d'un appel, peu importe l'app ouverte — y compris sur l'écran verrouillé. Exactement le comportement de WhatsApp."
         }
       }
     }

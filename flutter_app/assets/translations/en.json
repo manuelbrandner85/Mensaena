@@ -3576,7 +3576,11 @@
       "biometric": "Biometrics",
       "biometricDesc": "Unlock the app with fingerprint or face.",
       "battery": "Battery optimization",
-      "batteryDesc": "So calls arrive when the app is closed."
+      "batteryDesc": "So calls arrive when the app is closed.",
+      "fullscreenCall": "Fullscreen ringing",
+      "fullscreenCallDesc": "Incoming calls take over the entire screen — otherwise only a small banner.",
+      "overlay": "Display over other apps",
+      "overlayDesc": "Mensaena pops up on a call no matter which app is currently open."
     },
     "rationales": {
       "continue": "Continue",
@@ -3614,6 +3618,14 @@
         "phone": {
           "title": "Calls like WhatsApp",
           "body": "So incoming calls appear as real fullscreen ringing on the lock screen — even when the app is closed."
+        },
+        "fullscreenCall": {
+          "title": "Calls in true fullscreen",
+          "body": "So incoming calls take over the whole display — like WhatsApp. Without this permission you only see a small banner at the top."
+        },
+        "overlay": {
+          "title": "Show calls over other apps",
+          "body": "So Mensaena appears on a call no matter which app is open — also on the lock screen. Exactly the behavior you know from WhatsApp."
         }
       }
     }

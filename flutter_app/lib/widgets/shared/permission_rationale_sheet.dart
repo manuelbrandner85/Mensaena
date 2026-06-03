@@ -25,6 +25,8 @@ enum PermissionRationaleKey {
   location,
   nearby,
   phone,
+  fullscreenCall,
+  overlay,
 }
 
 extension on PermissionRationaleKey {
@@ -37,6 +39,8 @@ extension on PermissionRationaleKey {
         PermissionRationaleKey.location => 'location',
         PermissionRationaleKey.nearby => 'nearby',
         PermissionRationaleKey.phone => 'phone',
+        PermissionRationaleKey.fullscreenCall => 'fullscreenCall',
+        PermissionRationaleKey.overlay => 'overlay',
       };
 
   IconData get icon => switch (this) {
@@ -48,6 +52,8 @@ extension on PermissionRationaleKey {
         PermissionRationaleKey.location => LucideIcons.mapPin,
         PermissionRationaleKey.nearby => LucideIcons.bluetooth,
         PermissionRationaleKey.phone => LucideIcons.phoneCall,
+        PermissionRationaleKey.fullscreenCall => LucideIcons.maximize2,
+        PermissionRationaleKey.overlay => LucideIcons.layers,
       };
 
   Color get accent => switch (this) {
@@ -59,6 +65,8 @@ extension on PermissionRationaleKey {
         PermissionRationaleKey.location => AppColors.tealSoft,
         PermissionRationaleKey.nearby => AppColors.tealSoft,
         PermissionRationaleKey.phone => AppColors.amber,
+        PermissionRationaleKey.fullscreenCall => AppColors.herzrotWarm,
+        PermissionRationaleKey.overlay => AppColors.herzrotWarm,
       };
 }
 

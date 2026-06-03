@@ -2811,7 +2811,11 @@
       "biometric": "Biometría",
       "biometricDesc": "Desbloquea la app con huella o rostro.",
       "battery": "Optimización de batería",
-      "batteryDesc": "Para que las llamadas lleguen con la app cerrada."
+      "batteryDesc": "Para que las llamadas lleguen con la app cerrada.",
+      "fullscreenCall": "Timbre a pantalla completa",
+      "fullscreenCallDesc": "Las llamadas entrantes ocupan toda la pantalla — si no, solo un pequeño banner.",
+      "overlay": "Mostrar sobre otras apps",
+      "overlayDesc": "Mensaena aparece durante una llamada, sea cual sea la app abierta."
     },
     "rationales": {
       "continue": "Continuar",
@@ -2849,6 +2853,14 @@
         "phone": {
           "title": "Llamadas como WhatsApp",
           "body": "Para que las llamadas entrantes aparezcan como timbre a pantalla completa en el bloqueo — incluso con la app cerrada."
+        },
+        "fullscreenCall": {
+          "title": "Llamadas a pantalla completa real",
+          "body": "Para que las llamadas entrantes ocupen toda la pantalla — como en WhatsApp. Sin este permiso solo verás un pequeño banner arriba."
+        },
+        "overlay": {
+          "title": "Mostrar llamadas sobre otras apps",
+          "body": "Para que Mensaena aparezca durante una llamada, sea cual sea la app abierta — también en pantalla bloqueada. El mismo comportamiento que WhatsApp."
         }
       }
     }

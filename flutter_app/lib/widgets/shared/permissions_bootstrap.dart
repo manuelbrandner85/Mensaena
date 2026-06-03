@@ -15,6 +15,7 @@ import 'dart:io' show Platform;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -24,9 +25,10 @@ import '../../config/theme/app_typography.dart';
 import 'battery_optimization_prompt.dart';
 import 'permission_rationale_sheet.dart';
 
-// v2: zusammen mit den nutzwertfokussierten Rationale-Sheets neu ausspielen,
-// damit Bestandsnutzer die verbesserte Erklär-Sequenz einmalig sehen.
-const String kPermsBootstrapKey = 'mensaena_perms_bootstrap_v2';
+// v3: zusätzlich zur Rationale-Sequenz fragen wir jetzt nach Fullscreen-
+// Intent + SYSTEM_ALERT_WINDOW (Samsung-Vollbild-Anrufe). Existierende
+// Nutzer sehen die erweiterte Sequenz einmalig.
+const String kPermsBootstrapKey = 'mensaena_perms_bootstrap_v3';
 
 class PermissionsBootstrap extends StatefulWidget {
   const PermissionsBootstrap({super.key});
@@ -125,6 +127,39 @@ class _PermissionsBootstrapState extends State<PermissionsBootstrap> {
         await step.perm.request();
       } catch (_) {/* Plattform-Edgecase still ignorieren */}
     }
+
+    // Vollbild-Klingeln (Android 14+ USE_FULL_SCREEN_INTENT) — eigene
+    // CallKit-Bridge-API statt permission_handler.
+    if (!mounted) return;
+    try {
+      final canFs = await FlutterCallkitIncoming.canUseFullScreenIntent();
+      if (canFs != true) {
+        final cont = await showPermissionRationale(
+            context, PermissionRationaleKey.fullscreenCall);
+        if (mounted && cont) {
+          try {
+            await FlutterCallkitIncoming.requestFullIntentPermission();
+          } catch (_) {/* nicht auf jeder Android-Version */}
+        }
+      }
+    } catch (_) {/* non-fatal */}
+
+    // SYSTEM_ALERT_WINDOW („Über andere Apps anzeigen") — Samsung One UI
+    // zwingt Anrufe ohne dieses Recht auf Heads-up. Eigene Sektion damit
+    // der User die Wichtigkeit für echte WhatsApp-artige Anrufe versteht.
+    if (!mounted) return;
+    try {
+      final overlay = await Permission.systemAlertWindow.status;
+      if (!overlay.isGranted) {
+        final cont = await showPermissionRationale(
+            context, PermissionRationaleKey.overlay);
+        if (mounted && cont) {
+          try {
+            await Permission.systemAlertWindow.request();
+          } catch (_) {/* öffnet bei manchen OEMs nur Settings */}
+        }
+      }
+    } catch (_) {/* non-fatal */}
 
     // Akku-Optimierung ist ein eigener System-Dialog (kein simples request);
     // auf Samsung führt der gemeinsame Setup-Flow zusätzlich in die
