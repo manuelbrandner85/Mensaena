@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/groups_repository.dart';
 import '../../../services/supabase_service.dart';
+import '../../../widgets/effects/parallax_image_header.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/premium_image.dart';
 
@@ -22,6 +23,7 @@ class GroupDetailScreen extends ConsumerStatefulWidget {
 
 class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   final _postCtrl = TextEditingController();
+  final _scroll = ScrollController();
   // PERF/BUG (Audit): vorher konnte der Send-Button durch schnelle Doppel-
   // Taps zwei identische Posts in die Gruppe schicken (Submit war nicht
   // gegen In-Flight-Aufrufe geschützt). Flag verhindert das.
@@ -30,6 +32,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
   @override
   void dispose() {
     _postCtrl.dispose();
+    _scroll.dispose();
     super.dispose();
   }
 
@@ -292,16 +295,21 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
               children: [
                 Expanded(
                   child: ListView(
+                    controller: _scroll,
                     padding: const EdgeInsets.all(16),
                     children: [
                       if (g.bannerUrl != null)
-                        PremiumImage(
-                          url: g.bannerUrl,
+                        ParallaxImageHeader(
+                          scrollController: _scroll,
                           height: 140,
-                          width: double.infinity,
-                          borderRadius: BorderRadius.circular(14),
-                          bottomGradient: true,
-                          heroTag: 'group_banner_${g.id}',
+                          child: PremiumImage(
+                            url: g.bannerUrl,
+                            height: 140,
+                            width: double.infinity,
+                            borderRadius: BorderRadius.circular(14),
+                            bottomGradient: true,
+                            heroTag: 'group_banner_${g.id}',
+                          ),
                         ),
                       const SizedBox(height: 12),
                       Row(

@@ -20,6 +20,7 @@ import '../../../repositories/content_reports_repository.dart';
 import '../../../repositories/conversations_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
+import '../../../widgets/effects/parallax_image_header.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/marketplace/barter_matches_carousel.dart';
@@ -45,12 +46,28 @@ String _typeLabel(String v) =>
     _kTypeLabels[v] != null ? _kTypeLabels[v]!.tr() : v.toUpperCase();
 String _condLabel(String v) => _kCondLabels[v] != null ? _kCondLabels[v]!.tr() : v;
 
-class MarketplaceDetailScreen extends ConsumerWidget {
+class MarketplaceDetailScreen extends ConsumerStatefulWidget {
   const MarketplaceDetailScreen({required this.listingId, super.key});
   final String listingId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MarketplaceDetailScreen> createState() =>
+      _MarketplaceDetailScreenState();
+}
+
+class _MarketplaceDetailScreenState
+    extends ConsumerState<MarketplaceDetailScreen> {
+  final _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final listingId = widget.listingId;
     final async = ref.watch(marketplaceDetailProvider(listingId));
     return DashboardScaffold(
       title: 'marketplace.listing'.tr(),
@@ -76,6 +93,7 @@ class MarketplaceDetailScreen extends ConsumerWidget {
             final isClaimed = l.status == 'claimed' || l.status == 'sold';
 
             return ListView(
+              controller: _scroll,
               padding: const EdgeInsets.all(16),
               children: [
                 _buildHero(l, isClaimed),
@@ -341,28 +359,28 @@ class MarketplaceDetailScreen extends ConsumerWidget {
         ),
       );
     } else if (l.images.isNotEmpty) {
-      base = SizedBox(
+      // Cinema: Einzelbild → Parallax-Hero (Carousel-Fall bleibt ohne
+      // Parallax, da Paging-Gesten sonst mit dem Translate kollidieren).
+      base = ParallaxImageHeader(
+        scrollController: _scroll,
         height: 240,
         child: Hero(
           tag: 'marketplace-image-${l.id}',
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: CachedNetworkImage(
-              imageUrl: l.images.first,
-              fadeInDuration: const Duration(milliseconds: 200),
-              fit: BoxFit.cover,
+          child: CachedNetworkImage(
+            imageUrl: l.images.first,
+            fadeInDuration: const Duration(milliseconds: 200),
+            fit: BoxFit.cover,
+            width: double.infinity,
+            placeholder: (_, __) => const ShimmerBox(
               width: double.infinity,
-              placeholder: (_, __) => const ShimmerBox(
-                width: double.infinity,
-                height: 240,
-                borderRadius: 14,
-              ),
-              errorWidget: (_, __, ___) => Container(
-                color: AppColors.elevated,
-                alignment: Alignment.center,
-                child: const Icon(LucideIcons.imageOff,
-                    size: 20, color: AppColors.mute),
-              ),
+              height: 240,
+              borderRadius: 14,
+            ),
+            errorWidget: (_, __, ___) => Container(
+              color: AppColors.elevated,
+              alignment: Alignment.center,
+              child: const Icon(LucideIcons.imageOff,
+                  size: 20, color: AppColors.mute),
             ),
           ),
         ),
