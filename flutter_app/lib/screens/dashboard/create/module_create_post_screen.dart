@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/location_service.dart';
 import '../../../services/post_draft_service.dart';
 import '../../../services/rate_limit_service.dart';
@@ -81,6 +82,24 @@ class _ModuleCreatePostScreenState
     }
     _titleCtrl.addListener(_scheduleDraftSave);
     _descCtrl.addListener(_scheduleDraftSave);
+    // Fallback-Geo aus dem Profil vorbelegen. Ohne diesen Schritt blieben
+    // Posts auf der Karte unsichtbar, sobald der User den GPS-Button nicht
+    // explizit antippt — der Map-Filter braucht lat/lng auf DB-Seite.
+    _seedProfileLocation();
+  }
+
+  Future<void> _seedProfileLocation() async {
+    try {
+      final p = await ref.read(myProfileProvider.future);
+      if (!mounted) return;
+      if (_lat == null && _lng == null &&
+          p?.latitude != null && p?.longitude != null) {
+        setState(() {
+          _lat = p!.latitude;
+          _lng = p.longitude;
+        });
+      }
+    } catch (_) {/* still null → Post wird ohne Geo gespeichert */}
   }
 
   void _scheduleDraftSave() {
