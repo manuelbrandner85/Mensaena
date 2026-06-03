@@ -2766,5 +2766,8 @@
     "ctaJoin": "Участвовать",
     "ctaLearnMore": "Подробнее",
     "ctaHelpSearch": "Помогу искать"
+  },
+  "splash": {
+    "tagline": "Соседская помощь"
   }
 }

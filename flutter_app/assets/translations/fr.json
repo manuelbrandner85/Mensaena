@@ -2767,5 +2767,8 @@
     "ctaJoin": "Participer",
     "ctaLearnMore": "En savoir plus",
     "ctaHelpSearch": "J'aide à chercher"
+  },
+  "splash": {
+    "tagline": "Entraide de quartier"
   }
 }

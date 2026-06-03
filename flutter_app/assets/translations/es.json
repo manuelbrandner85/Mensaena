@@ -2767,5 +2767,8 @@
     "ctaJoin": "Apuntarse",
     "ctaLearnMore": "Saber más",
     "ctaHelpSearch": "Ayudo a buscar"
+  },
+  "splash": {
+    "tagline": "Ayuda vecinal"
   }
 }

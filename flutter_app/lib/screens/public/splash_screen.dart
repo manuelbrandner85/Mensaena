@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -147,6 +148,10 @@ class _SplashScreenState extends State<SplashScreen>
           final wordT = ((t - 0.50) / 0.28).clamp(0.0, 1.0);
           // "Tudum"-Höhepunkt: kurzer Spike-Curve 0..1..0 zwischen 0.78–0.88.
           final climaxT = _bump((t - 0.78) / 0.10);
+          // Schockwelle: monotoner 0→1-Verlauf ab Höhepunkt-Start, treibt die
+          // expandierenden Energie-Ringe (Radius wächst, Alpha verblasst).
+          final ringT = ((t - 0.78) / 0.18).clamp(0.0, 1.0);
+          final ringEased = 1.0 - math.pow(1.0 - ringT, 2).toDouble();
           // Shimmer-Sweep über die Wortmarke: einmaliger L→R-Lauf 0.78–0.92.
           final shimmerT = ((t - 0.78) / 0.14).clamp(0.0, 1.0);
           // Cinematic-Exit: kurzer Weiß-Flash (cross-cut) 0.96–0.99,
@@ -154,12 +159,13 @@ class _SplashScreenState extends State<SplashScreen>
           final flashT = _bump((t - 0.96) / 0.03);
           final exitT = ((t - 0.97) / 0.03).clamp(0.0, 1.0);
 
-          // Logo-Scale: Grund-Reveal + Tudum-Punch (kurzer Spike +0.08)
-          // − exit-Schrumpfen.
+          // Logo-Scale: Grund-Reveal + Tudum-Punch (kurzer Spike +0.08).
+          // Exit ist ein „Zoom-Through": das Logo wächst stark und verblasst,
+          // als würde man in die App hineintauchen (statt simplem Fade).
           final logoScale =
-              0.80 + logoT * 0.20 + climaxT * 0.08 - exitT * 0.04;
+              0.80 + logoT * 0.20 + climaxT * 0.08 + exitT * 0.65;
           final logoOpacity =
-              logoT.clamp(0.0, 1.0) * (1.0 - exitT * 0.30);
+              logoT.clamp(0.0, 1.0) * (1.0 - exitT);
           // Ken-Burns: BG zoomt 1.00 → 1.06 über den gesamten Verlauf.
           final bgScale = 1.0 + t * 0.06;
 
@@ -232,6 +238,73 @@ class _SplashScreenState extends State<SplashScreen>
               // ── Fireflies (12 Punkte auf Lissajous-Kurven) ──────
               ..._buildFireflies(size, palette, bgT),
 
+              // ── Volumetric God-Rays (rotierendes Licht hinter Logo) ──
+              // Langsam drehende Strahlenkrone via SweepGradient. Beim
+              // Höhepunkt schnellerer Spin + hellere Strahlen. GPU-leicht
+              // (ein Transform + ein Gradient, kein Shader).
+              if (logoT > 0)
+                Center(
+                  child: IgnorePointer(
+                    child: Transform.rotate(
+                      angle: _haloCtrl.value * 2 * math.pi * 0.06 +
+                          climaxT * 0.35,
+                      child: Opacity(
+                        opacity:
+                            (logoT * 0.40 + climaxT * 0.45).clamp(0.0, 0.9),
+                        child: Container(
+                          width: size.width * 0.95,
+                          height: size.width * 0.95,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: SweepGradient(
+                              colors: _rayColors(
+                                  palette.halo, 0.12 + 0.10 * climaxT),
+                              stops: _rayStops,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              // ── Schockwellen-Ringe (Energie-Puls beim 'Tudum') ──
+              if (ringT > 0 && ringT < 1) ...[
+                Center(
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 80 + ringEased * 320,
+                      height: 80 + ringEased * 320,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: palette.halo
+                              .withValues(alpha: 0.55 * (1 - ringT)),
+                          width: 2.5 * (1 - ringT) + 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // zweiter, nachlaufender Ring für mehr Tiefe
+                Center(
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 80 + ringEased * 210,
+                      height: 80 + ringEased * 210,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: palette.accent
+                              .withValues(alpha: 0.40 * (1 - ringT)),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+
               // ── Logo + Halo + Wortmarke (zentriert) ────────────
               Center(
                 child: Transform.scale(
@@ -289,29 +362,36 @@ class _SplashScreenState extends State<SplashScreen>
                                   ),
                                 ),
                               ),
-                              // Logo
-                              Container(
-                                width: 96,
-                                height: 96,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.voidColor
-                                      .withValues(alpha: 0.5),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: palette.halo.withValues(
-                                          alpha: 0.5),
-                                      blurRadius: 36,
-                                      spreadRadius: 4,
+                              // Logo — fliegt mit 3D-Perspektive ein
+                              // (Tilt-Settle), dann ruhig zentriert.
+                              Transform(
+                                alignment: Alignment.center,
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, 0.0012)
+                                  ..rotateX((1 - logoT) * 0.6),
+                                child: Container(
+                                  width: 96,
+                                  height: 96,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.voidColor
+                                        .withValues(alpha: 0.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: palette.halo.withValues(
+                                            alpha: 0.5 + 0.3 * climaxT),
+                                        blurRadius: 36 + 24 * climaxT,
+                                        spreadRadius: 4 + 6 * climaxT,
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      'assets/images/mensaena-logo.png',
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox.shrink(),
                                     ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/images/mensaena-logo.png',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) =>
-                                        const SizedBox.shrink(),
                                   ),
                                 ),
                               ),
@@ -337,7 +417,7 @@ class _SplashScreenState extends State<SplashScreen>
                         Opacity(
                           opacity: wordT,
                           child: Text(
-                            'Nachbarschaftshilfe',
+                            'splash.tagline'.tr(),
                             style: AppTypography.label(
                               size: 10,
                               color: AppColors.mute,
@@ -515,6 +595,27 @@ class _SplashScreenState extends State<SplashScreen>
     final c = t.clamp(0.0, 1.0);
     return math.sin(c * math.pi);
   }
+
+  // ── God-Ray-Gradient ───────────────────────────────────────
+  // 12 Strahlen über 360°: pro Segment transparent → Farbe → transparent.
+  // 36 gleichmäßige Stops ergeben 12 helle „Speichen".
+  static final List<double> _rayStops = [
+    for (var i = 0; i <= 36; i++) i / 36,
+  ];
+
+  List<Color> _rayColors(Color c, double alpha) {
+    final on = c.withValues(alpha: alpha);
+    const off = Colors.transparent;
+    final out = <Color>[];
+    for (var i = 0; i < 12; i++) {
+      out
+        ..add(off)
+        ..add(on)
+        ..add(off);
+    }
+    out.add(off);
+    return out;
+  }
 }
 
 class _Palette {
@@ -650,16 +751,22 @@ class _Letter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Spring-Overshoot: jeder Buchstabe „poppt" beim Erscheinen kurz auf
+    // (+18 % in der Mitte des Reveals) und setzt sich dann auf 1.0.
+    final pop = 1.0 + 0.18 * math.sin(visibility.clamp(0.0, 1.0) * math.pi);
     return Opacity(
       opacity: visibility,
       child: Transform.translate(
-        offset: Offset(0, 6 * (1 - visibility)),
-        child: Text(
-          letter,
-          style: AppTypography.display(
-            size: 36,
-            color: color ?? AppColors.ink,
-            height: 1.0,
+        offset: Offset(0, 8 * (1 - visibility)),
+        child: Transform.scale(
+          scale: pop,
+          child: Text(
+            letter,
+            style: AppTypography.display(
+              size: 36,
+              color: color ?? AppColors.ink,
+              height: 1.0,
+            ),
           ),
         ),
       ),

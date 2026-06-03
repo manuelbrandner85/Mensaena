@@ -3532,5 +3532,8 @@
     "ctaJoin": "Join",
     "ctaLearnMore": "Learn more",
     "ctaHelpSearch": "Help search"
+  },
+  "splash": {
+    "tagline": "Neighbourhood help"
   }
 }

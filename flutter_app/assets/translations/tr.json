@@ -2766,5 +2766,8 @@
     "ctaJoin": "Katıl",
     "ctaLearnMore": "Daha fazla",
     "ctaHelpSearch": "Aramaya yardım"
+  },
+  "splash": {
+    "tagline": "Mahalle yardımlaşması"
   }
 }
