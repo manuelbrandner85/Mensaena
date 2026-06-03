@@ -313,6 +313,11 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                 ? e.participant.name
                 : 'Nachbar:in',
             JoinLeaveKind.leave);
+        // Auto-Close: wenn der letzte Zuschauer den Livestream verlässt
+        // (keine Remote-Teilnehmer mehr), beendet der Host den Stream
+        // automatisch. Nur der Host darf live_rooms via RLS auf 'ended'
+        // setzen — daher ist sein Client der korrekte Trigger-Punkt.
+        _autoCloseIfEmpty();
       });
   }
 
@@ -387,6 +392,22 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
       content: Text(msg,
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
+  }
+
+  // Auto-Close-Guard: verhindert doppeltes Beenden, falls mehrere
+  // Disconnect-Events kurz hintereinander feuern.
+  bool _autoClosing = false;
+
+  /// Beendet den Livestream automatisch, sobald der letzte Zuschauer ihn
+  /// verlassen hat (keine Remote-Teilnehmer mehr). Nur der Host darf den
+  /// Stream serverseitig auf 'ended' setzen (RLS) → daher löst nur dessen
+  /// Client aus. Zuschauer-Clients tun nichts (Host-Leave beendet ohnehin).
+  void _autoCloseIfEmpty() {
+    if (_autoClosing || _left || !widget.isHost) return;
+    final remote = _room?.remoteParticipants.length ?? 0;
+    if (remote > 0) return;
+    _autoClosing = true;
+    _leave();
   }
 
   Future<void> _leave() async {
