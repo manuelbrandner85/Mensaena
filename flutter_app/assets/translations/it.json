@@ -516,7 +516,9 @@
     "languageByLocationDesc": "L'app si adatta alla lingua del paese in cui ti trovi.",
     "detectedNow": "Rilevato ora: {lang}",
     "noLocationFallback": "Nessuna posizione disponibile — viene usato il tedesco.",
-    "profileSettingsHint": "Le impostazioni del profilo (notifiche email, ciclo di vita del token push) restano separate nell'area account."
+    "profileSettingsHint": "Le impostazioni del profilo (notifiche email, ciclo di vita del token push) restano separate nell'area account.",
+    "bgCalls": "Chiamate in background",
+    "bgCallsDesc": "Configura ottimizzazione batteria e sospensione così le chiamate arrivano ad app chiusa."
   },
   "chat": {
     "writeMessage": "Scrivi un messaggio …",
@@ -2696,7 +2698,10 @@
     "title": "Ricevi le chiamate in modo affidabile",
     "body": "Affinché chiamate e messaggi importanti ti raggiungano subito anche ad app chiusa, escludi Mensaena dall’ottimizzazione della batteria. Altrimenti Android può fermare l’app in background.",
     "allow": "Consenti",
-    "later": "Più tardi"
+    "later": "Più tardi",
+    "samsungBody": "Perché le chiamate ti raggiungano subito anche ad app chiusa, su Samsung servono due passaggi:\n1. Escludi Mensaena dall'ottimizzazione batteria (tocca »Consenti« nel prossimo dialogo).\n2. In Impostazioni app → Batteria → scegli »Senza restrizioni« e rimuovi Mensaena dalle »App in sospensione«.",
+    "openSettings": "Apri impostazioni",
+    "done": "Fatto"
   },
   "gas": {
     "navigate": "Calcola percorso",

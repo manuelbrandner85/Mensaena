@@ -531,7 +531,9 @@
     "languageByLocationDesc": "The app adapts to the language of the country you're in.",
     "detectedNow": "Currently detected: {lang}",
     "noLocationFallback": "No location available — German is used.",
-    "profileSettingsHint": "Profile settings (email notifications, push token lifecycle) stay separate in the account area."
+    "profileSettingsHint": "Profile settings (email notifications, push token lifecycle) stay separate in the account area.",
+    "bgCalls": "Calls in background",
+    "bgCallsDesc": "Set up battery optimization & deep sleep so calls arrive when the app is closed."
   },
   "chat": {
     "writeMessage": "Write a message …",
@@ -3483,7 +3485,10 @@
     "title": "Receive calls reliably",
     "body": "So calls and important messages reach you instantly even when the app is closed, exempt Mensaena from battery optimization. Otherwise Android may stop the app in the background.",
     "allow": "Allow",
-    "later": "Later"
+    "later": "Later",
+    "samsungBody": "So calls reach you instantly even when the app is closed, Samsung needs two steps:\n1. Exclude Mensaena from battery optimization (tap »Allow« in the next dialog).\n2. In App settings → Battery → choose »Unrestricted« and remove Mensaena from »Sleeping apps«.",
+    "openSettings": "Open settings",
+    "done": "Done"
   },
   "report": {
     "reasonFraud": "Fraud / scam",

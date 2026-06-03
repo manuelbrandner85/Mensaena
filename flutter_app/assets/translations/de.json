@@ -531,7 +531,9 @@
     "languageByLocationDesc": "Die App passt sich an die Sprache des Landes an, in dem du dich befindest.",
     "detectedNow": "Aktuell erkannt: {lang}",
     "noLocationFallback": "Kein Standort verfügbar — Deutsch wird verwendet.",
-    "profileSettingsHint": "Profil-Einstellungen (E-Mail-Benachrichtigungen, Push-Token-Lifecycle) bleiben separat im Konto-Bereich."
+    "profileSettingsHint": "Profil-Einstellungen (E-Mail-Benachrichtigungen, Push-Token-Lifecycle) bleiben separat im Konto-Bereich.",
+    "bgCalls": "Anrufe im Hintergrund",
+    "bgCallsDesc": "Akku-Optimierung & Tiefschlaf einrichten, damit Anrufe bei geschlossener App ankommen."
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",
@@ -3482,7 +3484,10 @@
     "title": "Anrufe zuverlässig empfangen",
     "body": "Damit dich Anrufe und wichtige Nachrichten auch bei geschlossener App sofort erreichen, nimm Mensaena von der Akku-Optimierung aus. Sonst kann Android die App im Hintergrund stoppen.",
     "allow": "Erlauben",
-    "later": "Später"
+    "later": "Später",
+    "samsungBody": "Damit Anrufe dich auch bei geschlossener App sofort erreichen, sind auf Samsung zwei Schritte nötig:\n1. Mensaena von der Akku-Optimierung ausnehmen (im nächsten Dialog auf »Zulassen«).\n2. App-Einstellungen → Akku → »Unbegrenzt« wählen und Mensaena aus »Apps im Tiefschlaf« entfernen.",
+    "openSettings": "Einstellungen öffnen",
+    "done": "Erledigt"
   },
   "report": {
     "reasonFraud": "Betrug / Abzocke",

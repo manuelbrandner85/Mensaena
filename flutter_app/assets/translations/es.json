@@ -516,7 +516,9 @@
     "languageByLocationDesc": "La app se adapta al idioma del país en el que te encuentras.",
     "detectedNow": "Detectado ahora: {lang}",
     "noLocationFallback": "No hay ubicación disponible — se usa alemán.",
-    "profileSettingsHint": "Los ajustes del perfil (notificaciones por email, ciclo de vida del token push) permanecen separados en el área de cuenta."
+    "profileSettingsHint": "Los ajustes del perfil (notificaciones por email, ciclo de vida del token push) permanecen separados en el área de cuenta.",
+    "bgCalls": "Llamadas en segundo plano",
+    "bgCallsDesc": "Configura la optimización de batería y suspensión para recibir llamadas con la app cerrada."
   },
   "chat": {
     "writeMessage": "Escribe un mensaje …",
@@ -2696,7 +2698,10 @@
     "title": "Recibe llamadas de forma fiable",
     "body": "Para que las llamadas y los mensajes importantes te lleguen al instante incluso con la app cerrada, excluye Mensaena de la optimización de batería. De lo contrario, Android puede detener la app en segundo plano.",
     "allow": "Permitir",
-    "later": "Más tarde"
+    "later": "Más tarde",
+    "samsungBody": "Para que las llamadas te lleguen al instante con la app cerrada, en Samsung hacen falta dos pasos:\n1. Excluye Mensaena de la optimización de batería (pulsa »Permitir« en el siguiente diálogo).\n2. En Ajustes de la app → Batería → elige »Sin restricciones« y quita Mensaena de »Apps en suspensión«.",
+    "openSettings": "Abrir ajustes",
+    "done": "Hecho"
   },
   "gas": {
     "navigate": "Calcular ruta",

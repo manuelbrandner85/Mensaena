@@ -516,7 +516,9 @@
     "languageByLocationDesc": "L'app s'adapte à la langue du pays où tu te trouves.",
     "detectedNow": "Détecté actuellement : {lang}",
     "noLocationFallback": "Aucune localisation disponible — l'allemand est utilisé.",
-    "profileSettingsHint": "Les paramètres du profil (notifications e-mail, cycle de vie du jeton push) restent séparés dans l'espace compte."
+    "profileSettingsHint": "Les paramètres du profil (notifications e-mail, cycle de vie du jeton push) restent séparés dans l'espace compte.",
+    "bgCalls": "Appels en arrière-plan",
+    "bgCallsDesc": "Configure l'optimisation de la batterie et la veille pour recevoir les appels app fermée."
   },
   "chat": {
     "writeMessage": "Écrire un message …",
@@ -2696,7 +2698,10 @@
     "title": "Recevoir les appels de façon fiable",
     "body": "Pour que les appels et messages importants te parviennent immédiatement même app fermée, exclus Mensaena de l’optimisation de la batterie. Sinon Android peut arrêter l’app en arrière-plan.",
     "allow": "Autoriser",
-    "later": "Plus tard"
+    "later": "Plus tard",
+    "samsungBody": "Pour que les appels te parviennent immédiatement même app fermée, Samsung demande deux étapes :\n1. Exclure Mensaena de l'optimisation de la batterie (touche »Autoriser« au prochain dialogue).\n2. Dans Paramètres de l'app → Batterie → choisis »Sans restriction« et retire Mensaena des »Applications en veille«.",
+    "openSettings": "Ouvrir les paramètres",
+    "done": "Terminé"
   },
   "gas": {
     "navigate": "Itinéraire",

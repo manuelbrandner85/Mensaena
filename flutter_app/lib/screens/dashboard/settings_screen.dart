@@ -32,6 +32,7 @@ import '../../services/sleep_reminder_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/battery_optimization_prompt.dart';
 import '../../widgets/shared/release_notes_sheet.dart';
 
 /// SKILL: mensaena-features
@@ -457,6 +458,21 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
               label: 'settings.pushEnabled'.tr(),
               value: prefs.enabled,
               onChanged: (v) => _update(prefs.copyWith(enabled: v)),
+            ),
+            // Hintergrund-Anrufe: jederzeit erreichbarer Setup-Eintrag für
+            // Akku-Optimierung / Samsung-Tiefschlaf (der Auto-Prompt zeigt
+            // nur einmal — hier kann der Nutzer es nachholen).
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(LucideIcons.phoneCall,
+                  size: 18, color: AppColors.amber),
+              title: Text('settings.bgCalls'.tr(),
+                  style: AppTypography.body(size: 14, color: AppColors.ink)),
+              subtitle: Text('settings.bgCallsDesc'.tr(),
+                  style: AppTypography.body(size: 12, color: AppColors.mute)),
+              trailing: const Icon(LucideIcons.chevronRight,
+                  size: 16, color: AppColors.mute),
+              onTap: () => showBatteryOptimizationSetup(context),
             ),
             const SizedBox(height: 18),
             Text('settings.sections.categories'.tr(),

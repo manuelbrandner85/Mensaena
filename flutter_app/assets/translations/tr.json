@@ -516,7 +516,9 @@
     "languageByLocationDesc": "Uygulama, bulunduğun ülkenin diline uyum sağlar.",
     "detectedNow": "Şu an algılanan: {lang}",
     "noLocationFallback": "Konum yok — Almanca kullanılıyor.",
-    "profileSettingsHint": "Profil ayarları (e-posta bildirimleri, push token yaşam döngüsü) hesap bölümünde ayrı kalır."
+    "profileSettingsHint": "Profil ayarları (e-posta bildirimleri, push token yaşam döngüsü) hesap bölümünde ayrı kalır.",
+    "bgCalls": "Arka planda aramalar",
+    "bgCallsDesc": "Uygulama kapalıyken aramaların gelmesi için pil optimizasyonu ve uykuyu ayarla."
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",
@@ -2695,7 +2697,10 @@
     "title": "Aramaları güvenilir şekilde al",
     "body": "Uygulama kapalıyken bile aramaların ve önemli mesajların sana anında ulaşması için Mensaena’yı pil optimizasyonundan muaf tut. Aksi halde Android uygulamayı arka planda durdurabilir.",
     "allow": "İzin ver",
-    "later": "Sonra"
+    "later": "Sonra",
+    "samsungBody": "Aramalar uygulama kapalıyken bile hemen ulaşsın diye Samsung'da iki adım gerekir:\n1. Mensaena'yı pil optimizasyonundan çıkar (sıradaki pencerede »İzin ver«e dokun).\n2. Uygulama ayarları → Pil → »Sınırsız« seç ve Mensaena'yı »Uyuyan uygulamalar«dan çıkar.",
+    "openSettings": "Ayarları aç",
+    "done": "Tamam"
   },
   "gas": {
     "navigate": "Rota oluştur",
