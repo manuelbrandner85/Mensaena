@@ -2467,7 +2467,17 @@
     "postCallNoteHint": "Wird als Chat-Notiz gespeichert.",
     "postCallNotePlaceholder": "z. B. „Treffen am Samstag um 14 Uhr“.",
     "callingLabel": "Ruft",
-    "ringingHint": "Tippe ↓ zum Auflegen"
+    "ringingHint": "Tippe ↓ zum Auflegen",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "camOff": "Kamera aus",
+    "camOn": "Kamera an",
+    "speaker": "Lautspr.",
+    "earpiece": "Hörer",
+    "hangup": "Auflegen",
+    "connecting": "Verbinde…",
+    "reconnecting": "Verbindung wird wiederhergestellt…",
+    "failed": "Verbindung fehlgeschlagen"
   },
   "quickReply": {
     "title": "Antwort an {name} senden?",

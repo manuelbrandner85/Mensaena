@@ -2252,7 +2252,17 @@
     "callEnded": "Arama sona erdi",
     "notReachable": "Ulaşılamadı",
     "callingLabel": "Aranıyor",
-    "ringingHint": "Kapatmak için ↓ dokun"
+    "ringingHint": "Kapatmak için ↓ dokun",
+    "mute": "Sustur",
+    "unmute": "Aç",
+    "camOff": "Kam kapalı",
+    "camOn": "Kam açık",
+    "speaker": "Hoparlör",
+    "earpiece": "Kulaklık",
+    "hangup": "Kapat",
+    "connecting": "Bağlanılıyor…",
+    "reconnecting": "Yeniden bağlanılıyor…",
+    "failed": "Bağlantı başarısız"
   },
   "voice": {
     "micDenied": "Mikrofon izni reddedildi."

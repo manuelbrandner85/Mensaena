@@ -2253,7 +2253,17 @@
     "callEnded": "Chiamata terminata",
     "notReachable": "Non è stato possibile contattarlo",
     "callingLabel": "Chiamata in corso",
-    "ringingHint": "Tocca ↓ per riagganciare"
+    "ringingHint": "Tocca ↓ per riagganciare",
+    "mute": "Muto",
+    "unmute": "Audio",
+    "camOff": "Cam off",
+    "camOn": "Cam on",
+    "speaker": "Altop.",
+    "earpiece": "Auricolare",
+    "hangup": "Riaggancia",
+    "connecting": "Connessione…",
+    "reconnecting": "Ricollegamento…",
+    "failed": "Connessione fallita"
   },
   "voice": {
     "micDenied": "Permesso microfono negato."

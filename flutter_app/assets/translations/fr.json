@@ -2253,7 +2253,17 @@
     "callEnded": "Appel terminé",
     "notReachable": "Personne injoignable",
     "callingLabel": "Appel en cours",
-    "ringingHint": "Touche ↓ pour raccrocher"
+    "ringingHint": "Touche ↓ pour raccrocher",
+    "mute": "Muet",
+    "unmute": "Activer",
+    "camOff": "Cam off",
+    "camOn": "Cam on",
+    "speaker": "Haut-parl.",
+    "earpiece": "Écouteur",
+    "hangup": "Raccrocher",
+    "connecting": "Connexion…",
+    "reconnecting": "Reconnexion…",
+    "failed": "Connexion échouée"
   },
   "voice": {
     "micDenied": "Autorisation du micro refusée."

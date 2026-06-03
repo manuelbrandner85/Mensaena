@@ -2468,7 +2468,17 @@
     "postCallNoteHint": "Saved as chat note.",
     "postCallNotePlaceholder": "e.g. \"Meeting Saturday at 2pm\"",
     "callingLabel": "Calling",
-    "ringingHint": "Tap ↓ to hang up"
+    "ringingHint": "Tap ↓ to hang up",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "camOff": "Camera off",
+    "camOn": "Camera on",
+    "speaker": "Speaker",
+    "earpiece": "Earpiece",
+    "hangup": "Hang up",
+    "connecting": "Connecting…",
+    "reconnecting": "Reconnecting…",
+    "failed": "Connection failed"
   },
   "quickReply": {
     "title": "Reply to {name}?",

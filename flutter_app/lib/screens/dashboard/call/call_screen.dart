@@ -838,6 +838,37 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       backgroundColor: AppColors.voidColor,
       body: Stack(
         children: [
+          // Cinema-Atmosphäre HINTER allem.
+          const Positioned.fill(
+            child: AtmosphericHaze(
+              topColor: AppColors.bronze,
+              bottomColor: AppColors.tealDeep,
+              intensity: 0.35,
+            ),
+          ),
+          const Positioned.fill(
+            child: LightLeaksOverlay(
+              intensity: 0.25,
+              spots: <LightLeakSpot>[
+                LightLeakSpot(
+                  alignment: Alignment(-0.9, -0.7),
+                  color: AppColors.bronze,
+                  radius: 200,
+                  opacity: 0.22,
+                  pulse: true,
+                ),
+                LightLeakSpot(
+                  alignment: Alignment(0.9, 0.8),
+                  color: AppColors.tealSoft,
+                  radius: 240,
+                  opacity: 0.15,
+                  pulse: true,
+                ),
+              ],
+            ),
+          ),
+          const Positioned.fill(child: VignetteOverlay(intensity: 0.4)),
+          const Positioned.fill(child: FilmGrainOverlay(opacity: 0.025)),
           SafeArea(child: _buildBody()),
           // F11: Connection-Quality-Badge oben rechts (während Call aktiv).
           if (_state == _CallState.connected &&
@@ -934,7 +965,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                     icon: _camEnabled
                         ? LucideIcons.video
                         : LucideIcons.videoOff,
-                    label: _camEnabled ? 'Cam aus' : 'Cam an',
+                    label: _camEnabled
+                        ? 'call.camOff'.tr()
+                        : 'call.camOn'.tr(),
                     color: _camEnabled
                         ? AppColors.bronze
                         : AppColors.mute,
@@ -979,40 +1012,74 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                 ],
               ),
             ),
-            // Primär-Bar: Mic — Auflegen (groß, mittig) — Lautsprecher.
-            // Drei feste Slots, garantiert kein Overflow.
+            // Primär-Bar in einer frosted-glass Pille: Mic — Auflegen — Speaker.
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 36),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _CircleAction(
-                    icon: _micEnabled
-                        ? LucideIcons.mic
-                        : LucideIcons.micOff,
-                    label: _micEnabled ? 'Mute' : 'Unmute',
-                    color: _micEnabled
-                        ? AppColors.bronze
-                        : AppColors.herzrotWarm,
-                    onTap: _state == _CallState.connected ? _toggleMic : null,
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                decoration: BoxDecoration(
+                  // Frosted-Glass-Anmutung: dunkles Halbtransparent + Bronze-
+                  // Border + sanfter Schatten. Kein BackdropFilter (GPU-leicht).
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.surface.withValues(alpha: 0.85),
+                      AppColors.deep.withValues(alpha: 0.95),
+                    ],
                   ),
-                  _CircleAction(
-                    icon: LucideIcons.phoneOff,
-                    label: 'Auflegen',
-                    color: AppColors.herzrot,
-                    big: true,
-                    onTap: _hangUp,
-                  ),
-                  _CircleAction(
-                    icon: _speakerOn
-                        ? LucideIcons.volume2
-                        : LucideIcons.volumeX,
-                    label: _speakerOn ? 'Lautspr.' : 'Hörer',
-                    color: _speakerOn ? AppColors.bronze : AppColors.mute,
-                    onTap:
-                        _state == _CallState.connected ? _toggleSpeaker : null,
-                  ),
-                ],
+                  border: Border.all(
+                      color: AppColors.bronze.withValues(alpha: 0.28)),
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.40),
+                      blurRadius: 24,
+                      spreadRadius: -6,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _CircleAction(
+                      icon: _micEnabled
+                          ? LucideIcons.mic
+                          : LucideIcons.micOff,
+                      label: _micEnabled
+                          ? 'call.mute'.tr()
+                          : 'call.unmute'.tr(),
+                      color: _micEnabled
+                          ? AppColors.bronze
+                          : AppColors.herzrotWarm,
+                      onTap: _state == _CallState.connected
+                          ? _toggleMic
+                          : null,
+                    ),
+                    _CircleAction(
+                      icon: LucideIcons.phoneOff,
+                      label: 'call.hangup'.tr(),
+                      color: AppColors.herzrot,
+                      big: true,
+                      onTap: _hangUp,
+                    ),
+                    _CircleAction(
+                      icon: _speakerOn
+                          ? LucideIcons.volume2
+                          : LucideIcons.volumeX,
+                      label: _speakerOn
+                          ? 'call.speaker'.tr()
+                          : 'call.earpiece'.tr(),
+                      color:
+                          _speakerOn ? AppColors.bronze : AppColors.mute,
+                      onTap: _state == _CallState.connected
+                          ? _toggleSpeaker
+                          : null,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -1060,15 +1127,15 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         return 'call.calling'.tr();
       case _CallState.connecting:
       case _CallState.joining:
-        return 'Verbinde…';
+        return 'call.connecting'.tr();
       case _CallState.connected:
         return _formatDuration(_stopwatch.elapsed);
       case _CallState.reconnecting:
-        return 'Verbindung wird wiederhergestellt…';
+        return 'call.reconnecting'.tr();
       case _CallState.ended:
         return 'call.callEnded'.tr();
       case _CallState.failed:
-        return 'Verbindung fehlgeschlagen';
+        return 'call.failed'.tr();
     }
   }
 

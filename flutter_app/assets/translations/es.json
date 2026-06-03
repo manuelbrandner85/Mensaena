@@ -2253,7 +2253,17 @@
     "callEnded": "Llamada finalizada",
     "notReachable": "No se ha podido contactar",
     "callingLabel": "Llamando",
-    "ringingHint": "Toca ↓ para colgar"
+    "ringingHint": "Toca ↓ para colgar",
+    "mute": "Silenciar",
+    "unmute": "Activar",
+    "camOff": "Cám off",
+    "camOn": "Cám on",
+    "speaker": "Altavoz",
+    "earpiece": "Auricular",
+    "hangup": "Colgar",
+    "connecting": "Conectando…",
+    "reconnecting": "Reconectando…",
+    "failed": "Conexión fallida"
   },
   "voice": {
     "micDenied": "Permiso de micrófono denegado."
