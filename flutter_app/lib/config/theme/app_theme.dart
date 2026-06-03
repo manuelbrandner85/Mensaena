@@ -288,16 +288,37 @@ class AppTheme {
         ),
         side: const BorderSide(color: AppColors.line),
       ),
+      // Cinema-Snackbar: dunkle Glass-Fläche + Bronze-Hairline + abgerundet.
+      // Greift global für ALLE showSnackBar-Aufrufe (~70 Dateien) ohne dass
+      // jede Stelle angefasst werden muss.
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.elevated,
+        backgroundColor: const Color(0xF0141C28),
         contentTextStyle: AppTypography.body(size: 14, color: AppColors.ink),
+        actionTextColor: AppColors.bronze,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.30)),
         ),
         behavior: SnackBarBehavior.floating,
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+        elevation: 10,
+      ),
+      // Cinema-Dialog: dunkle Fläche, Bronze-Hairline, Display-Titel-Farbe.
+      // Greift global für AlertDialog/Dialog ohne eigenes Styling.
+      dialogTheme: DialogTheme(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.22)),
+        ),
+        titleTextStyle: AppTypography.display(size: 18, color: AppColors.ink),
+        contentTextStyle:
+            AppTypography.body(size: 14, color: AppColors.inkSoft, height: 1.5),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.amber,
+        color: AppColors.bronze,
       ),
       // Cinematic Page-Transitions: Fade-Through-Black auf allen Plattformen.
       pageTransitionsTheme: const PageTransitionsTheme(
