@@ -120,13 +120,13 @@
             android:exported="false"
             android:foregroundServiceType="microphone|phoneCall" />
 
-        <!-- flutter_overlay_window: vom Plugin dokumentierte Service-
-             Deklaration. KEIN foregroundServiceType hier — das Plugin-eigene
-             Library-Manifest steuert den Typ bei; eine abweichende Angabe
-             würde beim Manifest-Merge (targetSdk 36) kollidieren. -->
-        <service
-            android:name="flutter.overlay.window.flutter_overlay_window.OverlayService"
-            android:exported="false" />
+        <!-- flutter_overlay_window's OverlayService bekommt seine Manifest-
+             Deklaration über das Library-Manifest des Plugins (inkl. dem auf
+             Android 14+ zwingenden foregroundServiceType). NICHT hier
+             erneut deklarieren — die App-Manifest-Variante überschreibt
+             beim Merge die Plugin-Konfiguration und der Service startet
+             dann ohne Typ → App crash (Samsung One UI: 'wird wiederholt
+             beendet'). -->
     </application>
 
     <queries>
