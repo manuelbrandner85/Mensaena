@@ -52,11 +52,20 @@ class _EmptyStateCardState extends State<EmptyStateCard>
   Widget build(BuildContext context) {
     final accent = widget.color ?? AppColors.amber;
     return Container(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.4),
-        border: Border.all(color: AppColors.line),
-        borderRadius: BorderRadius.circular(14),
+        // Dezenter Akzent-Verlauf gibt dem leeren Zustand Atmosphäre statt
+        // flacher Box.
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            accent.withValues(alpha: 0.06),
+            AppColors.surface.withValues(alpha: 0.45),
+          ],
+        ),
+        border: Border.all(color: accent.withValues(alpha: 0.16)),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
         children: [
@@ -64,34 +73,58 @@ class _EmptyStateCardState extends State<EmptyStateCard>
             animation: _pulse,
             builder: (_, child) {
               final t = _pulse.value;
-              return Container(
-                width: 48,
-                height: 48,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.10 + t * 0.08),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: accent.withValues(alpha: 0.10 + t * 0.22),
-                      blurRadius: 12 + t * 12,
-                      spreadRadius: t * 2,
+              return SizedBox(
+                width: 88,
+                height: 88,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Atmender Außenring.
+                    Container(
+                      width: 72 + t * 12,
+                      height: 72 + t * 12,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: accent.withValues(alpha: 0.10 + t * 0.18),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    // Glühender Orb mit Radial-Gradient.
+                    Container(
+                      width: 64,
+                      height: 64,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(colors: [
+                          accent.withValues(alpha: 0.28 + t * 0.10),
+                          accent.withValues(alpha: 0.06),
+                        ]),
+                        boxShadow: [
+                          BoxShadow(
+                            color: accent.withValues(alpha: 0.14 + t * 0.22),
+                            blurRadius: 18 + t * 16,
+                            spreadRadius: t * 3,
+                          ),
+                        ],
+                      ),
+                      child: child,
                     ),
                   ],
                 ),
-                child: child,
               );
             },
-            child: Icon(widget.icon, color: accent, size: 22),
+            child: Icon(widget.icon, color: accent, size: 28),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             widget.title,
             textAlign: TextAlign.center,
-            style: AppTypography.body(
-              size: 14,
+            style: AppTypography.display(
+              size: 19,
               color: AppColors.ink,
-              weight: FontWeight.w700,
             ),
           ),
           if (widget.description != null) ...[
