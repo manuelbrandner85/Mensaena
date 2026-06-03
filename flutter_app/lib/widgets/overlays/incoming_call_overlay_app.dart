@@ -155,11 +155,12 @@ class _IncomingCallOverlayRootState extends State<IncomingCallOverlayRoot>
 
   Future<void> _launchMainApp() async {
     try {
-      const intent = AndroidIntent(
+      // ignore: prefer_const_constructors
+      final intent = AndroidIntent(
         action: 'android.intent.action.MAIN',
         package: 'de.mensaena.app',
         componentName: 'de.mensaena.app/.MainActivity',
-        flags: <int>[
+        flags: const <int>[
           Flag.FLAG_ACTIVITY_NEW_TASK,
           Flag.FLAG_ACTIVITY_REORDER_TO_FRONT,
           Flag.FLAG_ACTIVITY_SINGLE_TOP,
