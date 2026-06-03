@@ -12,6 +12,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/profiles_repository.dart';
+import '../../../services/geocoding_service.dart';
 import '../../../services/location_service.dart';
 import '../../../services/post_draft_service.dart';
 import '../../../services/rate_limit_service.dart';
@@ -99,7 +100,51 @@ class _ModuleCreatePostScreenState
           _lng = p.longitude;
         });
       }
-    } catch (_) {/* still null → Post wird ohne Geo gespeichert */}
+    } catch (_) {/* still null → _resolveCoordinates greift beim Submit */}
+  }
+
+  /// Robuste Koordinaten-Auflösung beim Absenden, damit JEDER Beitrag auf
+  /// der Karte landet. Kette (erstes Treffer-Ergebnis gewinnt):
+  ///   1. bereits gesetzt (GPS-Button / Adress-Auswahl / Profil-Seed)
+  ///   2. eingegebener Standort-Text → Forward-Geocoding (Nominatim)
+  ///   3. Profil-Koordinaten
+  ///   4. Profil-Heimatstadt / Profil-Standort-Text → Forward-Geocoding
+  Future<void> _resolveCoordinates() async {
+    if (_lat != null && _lng != null) return;
+
+    // 2. Freitext-Standort des Beitrags geocodieren (außer GPS-Platzhalter).
+    final txt = _locationCtrl.text.trim();
+    if (txt.isNotEmpty && !txt.startsWith('GPS:')) {
+      final hits = await GeocodingService.search(query: txt, limit: 1);
+      if (hits.isNotEmpty) {
+        _lat = hits.first.lat;
+        _lng = hits.first.lng;
+        return;
+      }
+    }
+
+    try {
+      final p = await ref.read(myProfileProvider.future);
+      // 3. Profil-Koordinaten.
+      if (p?.latitude != null && p?.longitude != null) {
+        _lat = p!.latitude;
+        _lng = p.longitude;
+        return;
+      }
+      // 4. Profil-Heimatstadt bzw. Profil-Standort geocodieren.
+      final cityQuery = (p?.homeCity?.trim().isNotEmpty ?? false)
+          ? p!.homeCity!.trim()
+          : (p?.location?.trim().isNotEmpty ?? false)
+              ? p!.location!.trim()
+              : null;
+      if (cityQuery != null) {
+        final hits = await GeocodingService.search(query: cityQuery, limit: 1);
+        if (hits.isNotEmpty) {
+          _lat = hits.first.lat;
+          _lng = hits.first.lng;
+        }
+      }
+    } catch (_) {/* letzter Fallback fehlgeschlagen → Post ohne Geo */}
   }
 
   void _scheduleDraftSave() {
@@ -244,6 +289,9 @@ class _ModuleCreatePostScreenState
       });
       return;
     }
+
+    // Geo sicherstellen: JEDER Beitrag soll auf der Karte erscheinen.
+    await _resolveCoordinates();
 
     final urls = await _uploadImages();
     final tags = _tagsCtrl.text
