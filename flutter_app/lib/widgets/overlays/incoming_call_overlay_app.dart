@@ -12,12 +12,21 @@ library;
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+
+/// Shared zwischen Overlay-Isolate und Main-Isolate: kleiner Brückenspeicher
+/// für „User hat im Overlay angenommen/abgelehnt, Main soll's übernehmen".
+/// Same Process = same EncryptedSharedPreferences, beide Isolates sehen es.
+const String kOverlayPendingActionKey =
+    'mensaena_overlay_pending_action_v1';
 
 /// Vom Main-Isolate via overlay registriert (`@pragma('vm:entry-point')`).
 /// Liest die Anrufer-Daten vom Listener-Stream und rendert den Vollbild-Screen.
@@ -103,15 +112,13 @@ class _IncomingCallOverlayRootState extends State<IncomingCallOverlayRoot>
 
   Future<void> _onAccept() async {
     HapticFeedback.selectionClick();
-    // Main-Isolate informieren — der weiß, wie er die App in den Vordergrund
-    // bringt und den Call-Screen aufmacht.
-    try {
-      await FlutterOverlayWindow.shareData({
-        'type': 'overlay_action',
-        'action': 'accept',
-        'callId': _callId,
-      });
-    } catch (_) {}
+    await _signalAction('accept');
+    // Wenn das Main-Isolate lebt, fängt es das shareData-Event direkt ab.
+    // Wenn nicht, schreiben wir die Aktion zusätzlich in SecureStorage und
+    // starten MainActivity per Intent — der Boot liest die SecureStorage-
+    // Brücke und führt den Accept aus.
+    await _persistPendingAction('accept');
+    await _launchMainApp();
     try {
       await FlutterOverlayWindow.closeOverlay();
     } catch (_) {}
@@ -119,16 +126,47 @@ class _IncomingCallOverlayRootState extends State<IncomingCallOverlayRoot>
 
   Future<void> _onDecline() async {
     HapticFeedback.selectionClick();
-    try {
-      await FlutterOverlayWindow.shareData({
-        'type': 'overlay_action',
-        'action': 'decline',
-        'callId': _callId,
-      });
-    } catch (_) {}
+    await _signalAction('decline');
+    await _persistPendingAction('decline');
     try {
       await FlutterOverlayWindow.closeOverlay();
     } catch (_) {}
+  }
+
+  Future<void> _signalAction(String action) async {
+    try {
+      await FlutterOverlayWindow.shareData(<String, dynamic>{
+        'type': 'overlay_action',
+        'action': action,
+        'callId': _callId,
+      });
+    } catch (_) {/* non-fatal */}
+  }
+
+  Future<void> _persistPendingAction(String action) async {
+    try {
+      const storage = FlutterSecureStorage();
+      await storage.write(
+        key: kOverlayPendingActionKey,
+        value: '$action:$_callId',
+      );
+    } catch (_) {/* non-fatal */}
+  }
+
+  Future<void> _launchMainApp() async {
+    try {
+      const intent = AndroidIntent(
+        action: 'android.intent.action.MAIN',
+        package: 'de.mensaena.app',
+        componentName: 'de.mensaena.app/.MainActivity',
+        flags: <int>[
+          Flag.FLAG_ACTIVITY_NEW_TASK,
+          Flag.FLAG_ACTIVITY_REORDER_TO_FRONT,
+          Flag.FLAG_ACTIVITY_SINGLE_TOP,
+        ],
+      );
+      await intent.launch();
+    } catch (_) {/* non-fatal: User kann CallKit-Notification antippen */}
   }
 
   @override

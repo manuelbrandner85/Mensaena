@@ -139,6 +139,10 @@ dependencies:
   # Anruf-UI über jede App / das Sperrbildschirm-System, weil Samsung One UI
   # ab Android 14 fullScreenIntent auf Heads-up degradiert sobald entsperrt.
   flutter_overlay_window: ^0.4.5
+  # Android-Intent: erlaubt dem Overlay-Isolate MainActivity per Intent in den
+  # Vordergrund zu holen, wenn der User dort auf Annehmen tippt (sonst landet
+  # die Annahme nicht im Main-Isolate weil das im killed-State war).
+  android_intent_plus: ^5.1.0
 
 dev_dependencies:
   flutter_test:

@@ -17,6 +17,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import '../config/routes/app_router.dart' show rootNavigatorKey;
@@ -67,10 +68,16 @@ class CallEventBus {
     _contexts[ctx.callId] = ctx;
   }
 
-  /// Cold-Start-Recovery: liest aktive Plugin-Calls. Wenn einer schon
-  /// im "accepted" State ist (User hat aus killed-State getappt),
-  /// fuehrt Accept-Flow aus. Muss NACH GoRouter-Mount aufgerufen werden.
+  /// Cold-Start-Recovery: liest aktive Plugin-Calls UND die SecureStorage-
+  /// Brücke des Overlay-Isolates. Wenn der User aus killed-State im Overlay
+  /// auf Annehmen/Ablehnen getappt hat, lebt diese Aktion in
+  /// `kOverlayPendingActionKey` und wird hier abgearbeitet. Muss NACH
+  /// GoRouter-Mount aufgerufen werden.
   static Future<void> recoverColdStart() async {
+    // 1. Overlay-Bridge zuerst (Samsung-Path) — schneller im Boot.
+    await _recoverOverlayPending();
+
+    // 2. CallKit-State (Lockscreen-Accept-Path).
     try {
       final pending = await CallkitService.recoverPendingCall();
       if (pending == null) return;
@@ -95,6 +102,40 @@ class CallEventBus {
       }
     } catch (e) {
       _logDev('[CallEventBus] recoverColdStart failed: $e');
+    }
+  }
+
+  /// Liest die SecureStorage-Brücke vom Overlay-Isolate. Format: 'action:callId'.
+  /// Wird sofort gelöscht damit derselbe Eintrag nicht beim nächsten Start
+  /// erneut feuert.
+  static Future<void> _recoverOverlayPending() async {
+    const storage = FlutterSecureStorage();
+    String? raw;
+    try {
+      raw = await storage.read(key: 'mensaena_overlay_pending_action_v1');
+      if (raw == null || raw.isEmpty) return;
+      // Direkt löschen — egal ob erfolgreich abgearbeitet, sonst läuft die
+      // Aktion bei jedem App-Start erneut.
+      await storage.delete(key: 'mensaena_overlay_pending_action_v1');
+    } catch (_) {
+      return;
+    }
+    final colon = raw.indexOf(':');
+    if (colon <= 0) return;
+    final action = raw.substring(0, colon);
+    final callId = raw.substring(colon + 1);
+    if (callId.isEmpty) return;
+    try {
+      if (action == 'accept') {
+        await acceptFromOverlay(callId);
+      } else if (action == 'decline') {
+        // Server-State setzen + CallKit-Notification beenden.
+        unawaited(DmCallService.cancel(callId));
+        unawaited(CallkitService.endCall(callId));
+        _handledAccepts.add(callId);
+      }
+    } catch (e) {
+      _logDev('[CallEventBus] _recoverOverlayPending failed: $e');
     }
   }
 
