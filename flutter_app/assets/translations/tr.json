@@ -518,7 +518,9 @@
     "noLocationFallback": "Konum yok — Almanca kullanılıyor.",
     "profileSettingsHint": "Profil ayarları (e-posta bildirimleri, push token yaşam döngüsü) hesap bölümünde ayrı kalır.",
     "bgCalls": "Arka planda aramalar",
-    "bgCallsDesc": "Uygulama kapalıyken aramaların gelmesi için pil optimizasyonu ve uykuyu ayarla."
+    "bgCallsDesc": "Uygulama kapalıyken aramaların gelmesi için pil optimizasyonu ve uykuyu ayarla.",
+    "permissions": "İzinler",
+    "permissionsDesc": "Kamera, mikrofon, konum ve daha fazlasının tek bir yerde genel bakışı."
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",
@@ -2774,5 +2776,41 @@
   },
   "splash": {
     "tagline": "Mahalle yardımlaşması"
+  },
+  "permissions": {
+    "title": "İzinler",
+    "intro": "Her şeyin düzgün çalışması için genel bakış — bir öğeye dokun, izni ver veya ayarlarda kontrol et.",
+    "grant": "İzin ver",
+    "granted": "Verildi",
+    "denied": "Verilmedi",
+    "permanent": "Ayarlardan ver",
+    "restricted": "Kısıtlı",
+    "limited": "Sınırlı",
+    "provisional": "Geçici",
+    "unknown": "Durum bilinmiyor",
+    "openAppSettings": "Uygulama ayarlarını aç",
+    "grantAll": "Hepsini iste",
+    "items": {
+      "camera": "Kamera",
+      "cameraDesc": "Gönderiler, profil fotoğrafı, görüntülü arama için.",
+      "microphone": "Mikrofon",
+      "microphoneDesc": "Sesli ve görüntülü aramalar, sesli mesajlar, canlı yayın.",
+      "photos": "Fotoğraflar ve videolar",
+      "photosDesc": "Galeriden gönderi ve profil için seçim yap.",
+      "audioFiles": "Müzik ve ses",
+      "audioFilesDesc": "Cihazdan ses ekle, ör. kendi ses kliplerin.",
+      "location": "Konum",
+      "locationDesc": "Yakınındaki gönderileri bul, haritayı merkezle, acil durum bildir.",
+      "notifications": "Bildirimler",
+      "notificationsDesc": "Mesajlar, aramalar, tepkiler — kapalı uygulama dahil.",
+      "nearby": "Yakındaki cihazlar",
+      "nearbyDesc": "Aramalar ve ses çıkışı için Bluetooth kulaklık bul.",
+      "phone": "Telefon",
+      "phoneDesc": "Kilit ekranında ve kapalı durumda yerel arama arayüzü.",
+      "biometric": "Biyometri",
+      "biometricDesc": "Uygulamayı parmak izi veya yüzle aç.",
+      "battery": "Pil optimizasyonu",
+      "batteryDesc": "Uygulama kapalıyken aramalar gelsin diye."
+    }
   }
 }

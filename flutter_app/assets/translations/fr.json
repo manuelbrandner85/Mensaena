@@ -518,7 +518,9 @@
     "noLocationFallback": "Aucune localisation disponible — l'allemand est utilisé.",
     "profileSettingsHint": "Les paramètres du profil (notifications e-mail, cycle de vie du jeton push) restent séparés dans l'espace compte.",
     "bgCalls": "Appels en arrière-plan",
-    "bgCallsDesc": "Configure l'optimisation de la batterie et la veille pour recevoir les appels app fermée."
+    "bgCallsDesc": "Configure l'optimisation de la batterie et la veille pour recevoir les appels app fermée.",
+    "permissions": "Autorisations",
+    "permissionsDesc": "Aperçu de la caméra, du micro, de la localisation et plus — au même endroit."
   },
   "chat": {
     "writeMessage": "Écrire un message …",
@@ -2775,5 +2777,41 @@
   },
   "splash": {
     "tagline": "Entraide de quartier"
+  },
+  "permissions": {
+    "title": "Autorisations",
+    "intro": "Pour que tout fonctionne, voici un aperçu — touche un élément pour l'accorder ou le vérifier dans les paramètres.",
+    "grant": "Autoriser",
+    "granted": "Accordé",
+    "denied": "Non accordé",
+    "permanent": "Accorder dans les paramètres",
+    "restricted": "Restreint",
+    "limited": "Limité",
+    "provisional": "Provisoire",
+    "unknown": "Statut inconnu",
+    "openAppSettings": "Ouvrir les paramètres de l'app",
+    "grantAll": "Tout demander",
+    "items": {
+      "camera": "Caméra",
+      "cameraDesc": "Photo/vidéo pour les publications, photo de profil, appels vidéo.",
+      "microphone": "Microphone",
+      "microphoneDesc": "Appels voix et vidéo, messages vocaux, lives.",
+      "photos": "Photos & vidéos",
+      "photosDesc": "Choisis des photos/vidéos depuis la galerie pour publications et profil.",
+      "audioFiles": "Musique & audio",
+      "audioFilesDesc": "Joins de l'audio depuis l'appareil, p. ex. messages vocaux.",
+      "location": "Localisation",
+      "locationDesc": "Trouve les publications à proximité, centre la carte, signale les urgences.",
+      "notifications": "Notifications",
+      "notificationsDesc": "Messages, appels, réactions — même app fermée.",
+      "nearby": "Appareils à proximité",
+      "nearbyDesc": "Trouve un casque Bluetooth pour les appels et l'audio.",
+      "phone": "Téléphone",
+      "phoneDesc": "UI d'appel native sur écran verrouillé et app fermée.",
+      "biometric": "Biométrie",
+      "biometricDesc": "Déverrouille l'app avec empreinte ou visage.",
+      "battery": "Optimisation batterie",
+      "batteryDesc": "Pour que les appels arrivent app fermée."
+    }
   }
 }

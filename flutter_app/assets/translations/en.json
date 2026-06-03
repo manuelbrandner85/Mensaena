@@ -533,7 +533,9 @@
     "noLocationFallback": "No location available — German is used.",
     "profileSettingsHint": "Profile settings (email notifications, push token lifecycle) stay separate in the account area.",
     "bgCalls": "Calls in background",
-    "bgCallsDesc": "Set up battery optimization & deep sleep so calls arrive when the app is closed."
+    "bgCallsDesc": "Set up battery optimization & deep sleep so calls arrive when the app is closed.",
+    "permissions": "Permissions",
+    "permissionsDesc": "Overview of camera, microphone, location and more — in one place."
   },
   "chat": {
     "writeMessage": "Write a message …",
@@ -3540,5 +3542,41 @@
   },
   "splash": {
     "tagline": "Neighbourhood help"
+  },
+  "permissions": {
+    "title": "Permissions",
+    "intro": "For everything to work smoothly, here's an overview — tap an item to grant it or check it in system settings.",
+    "grant": "Allow",
+    "granted": "Granted",
+    "denied": "Not granted",
+    "permanent": "Grant in settings",
+    "restricted": "Restricted",
+    "limited": "Limited",
+    "provisional": "Provisional",
+    "unknown": "Status unknown",
+    "openAppSettings": "Open app settings",
+    "grantAll": "Request all",
+    "items": {
+      "camera": "Camera",
+      "cameraDesc": "Photo/video for posts, profile picture, video calls.",
+      "microphone": "Microphone",
+      "microphoneDesc": "Voice and video calls, voice messages, livestreams.",
+      "photos": "Photos & videos",
+      "photosDesc": "Pick photos/videos from gallery for posts and profile.",
+      "audioFiles": "Music & audio",
+      "audioFilesDesc": "Attach audio from your device, e.g. own voice clips.",
+      "location": "Location",
+      "locationDesc": "Find posts nearby, center the map, report emergencies.",
+      "notifications": "Notifications",
+      "notificationsDesc": "Messages, calls, reactions — also when the app is closed.",
+      "nearby": "Nearby devices",
+      "nearbyDesc": "Find Bluetooth headset for calls and audio output.",
+      "phone": "Phone",
+      "phoneDesc": "Native call UI on lock screen and from killed state.",
+      "biometric": "Biometrics",
+      "biometricDesc": "Unlock the app with fingerprint or face.",
+      "battery": "Battery optimization",
+      "batteryDesc": "So calls arrive when the app is closed."
+    }
   }
 }

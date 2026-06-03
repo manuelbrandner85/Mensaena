@@ -518,7 +518,9 @@
     "noLocationFallback": "Nessuna posizione disponibile — viene usato il tedesco.",
     "profileSettingsHint": "Le impostazioni del profilo (notifiche email, ciclo di vita del token push) restano separate nell'area account.",
     "bgCalls": "Chiamate in background",
-    "bgCallsDesc": "Configura ottimizzazione batteria e sospensione così le chiamate arrivano ad app chiusa."
+    "bgCallsDesc": "Configura ottimizzazione batteria e sospensione così le chiamate arrivano ad app chiusa.",
+    "permissions": "Autorizzazioni",
+    "permissionsDesc": "Panoramica di fotocamera, microfono, posizione e altro — in un solo posto."
   },
   "chat": {
     "writeMessage": "Scrivi un messaggio …",
@@ -2775,5 +2777,41 @@
   },
   "splash": {
     "tagline": "Aiuto di quartiere"
+  },
+  "permissions": {
+    "title": "Autorizzazioni",
+    "intro": "Perché tutto funzioni, ecco una panoramica — tocca una voce per concederla o controllarla nelle impostazioni.",
+    "grant": "Consenti",
+    "granted": "Concessa",
+    "denied": "Non concessa",
+    "permanent": "Concedi nelle impostazioni",
+    "restricted": "Limitata",
+    "limited": "Parzialmente concessa",
+    "provisional": "Provvisoria",
+    "unknown": "Stato sconosciuto",
+    "openAppSettings": "Apri impostazioni app",
+    "grantAll": "Richiedi tutte",
+    "items": {
+      "camera": "Fotocamera",
+      "cameraDesc": "Foto/video per post, immagine profilo, videochiamate.",
+      "microphone": "Microfono",
+      "microphoneDesc": "Chiamate vocali e video, messaggi vocali, dirette.",
+      "photos": "Foto e video",
+      "photosDesc": "Seleziona foto/video dalla galleria per post e profilo.",
+      "audioFiles": "Musica e audio",
+      "audioFilesDesc": "Allega audio dal dispositivo, es. clip vocali.",
+      "location": "Posizione",
+      "locationDesc": "Trova post vicini, centra la mappa, segnala emergenze.",
+      "notifications": "Notifiche",
+      "notificationsDesc": "Messaggi, chiamate, reazioni — anche ad app chiusa.",
+      "nearby": "Dispositivi nelle vicinanze",
+      "nearbyDesc": "Trova auricolari Bluetooth per chiamate e audio.",
+      "phone": "Telefono",
+      "phoneDesc": "UI di chiamata nativa su schermo bloccato e da chiusa.",
+      "biometric": "Biometria",
+      "biometricDesc": "Sblocca l'app con impronta o volto.",
+      "battery": "Ottimizzazione batteria",
+      "batteryDesc": "Perché le chiamate arrivino ad app chiusa."
+    }
   }
 }

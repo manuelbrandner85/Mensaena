@@ -9,13 +9,25 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- Kamera (image_picker + LiveKit-Video-Calls) -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Medien (Android 13+ ersetzen READ_EXTERNAL_STORAGE für Bilder/Videos/Musik) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <!-- Legacy-Storage für Android 12 und älter (auf 13+ ignoriert) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+                     android:maxSdkVersion="32"/>
     <!-- LiveKit-Calls: Audio-Output-Routing + Bluetooth-Headsets -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <!-- "Geräte in der Nähe" (Android 12+): SCAN + CONNECT zusammen,
+         sonst kein Bluetooth-Headset-Routing für Calls -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+                     android:usesPermissionFlags="neverForLocation"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
-    <!-- Foreground-Service fuer laufende Calls -->
+    <!-- Foreground-Service fuer laufende Calls (Android 14+ braucht typisierte FGS) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
     <!-- Wake-Lock damit Audio-Call nicht beim Screen-Off abbricht -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <!-- Akku-Optimierung ausnehmen: ohne das drosseln aggressive OEMs
@@ -100,11 +112,13 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Punkt 11: Foreground-Service für Live-/Call-Audio im Hintergrund. -->
+        <!-- Punkt 11: Foreground-Service für Live-/Call-Audio im Hintergrund.
+             Android 14+ akzeptiert mehrere FGS-Typen pipe-getrennt — "phoneCall"
+             ist zwingend, sobald der Dienst während aktiver VoIP-Anrufe läuft. -->
         <service
             android:name=".LiveAudioService"
             android:exported="false"
-            android:foregroundServiceType="microphone" />
+            android:foregroundServiceType="microphone|phoneCall" />
     </application>
 
     <queries>

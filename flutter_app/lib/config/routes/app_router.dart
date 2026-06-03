@@ -89,6 +89,7 @@ import '../../screens/dashboard/post_detail_screen.dart';
 import '../../screens/dashboard/posts_list_screen.dart';
 import '../../screens/dashboard/profile_screen.dart';
 import '../../screens/dashboard/ratings_hub_screen.dart';
+import '../../screens/dashboard/permissions_screen.dart';
 import '../../screens/dashboard/settings_screen.dart';
 import '../../screens/legal/legal_page_screen.dart';
 import '../../screens/legal/unsubscribe_screen.dart';
@@ -424,6 +425,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const SettingsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/settings/permissions',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const PermissionsScreen(),
         ),
       ),
       GoRoute(

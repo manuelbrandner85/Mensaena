@@ -474,6 +474,20 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                   size: 16, color: AppColors.mute),
               onTap: () => showBatteryOptimizationSetup(context),
             ),
+            // Zentrale Berechtigungs-Übersicht (Kamera/Mikro/Standort/etc.).
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(LucideIcons.shieldCheck,
+                  size: 18, color: AppColors.bronze),
+              title: Text('settings.permissions'.tr(),
+                  style: AppTypography.body(size: 14, color: AppColors.ink)),
+              subtitle: Text('settings.permissionsDesc'.tr(),
+                  style: AppTypography.body(size: 12, color: AppColors.mute)),
+              trailing: const Icon(LucideIcons.chevronRight,
+                  size: 16, color: AppColors.mute),
+              onTap: () =>
+                  context.push('/dashboard/settings/permissions'),
+            ),
             const SizedBox(height: 18),
             Text('settings.sections.categories'.tr(),
                 style: AppTypography.label(size: 10, color: AppColors.mute)),

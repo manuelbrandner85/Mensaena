@@ -533,7 +533,9 @@
     "noLocationFallback": "Kein Standort verfügbar — Deutsch wird verwendet.",
     "profileSettingsHint": "Profil-Einstellungen (E-Mail-Benachrichtigungen, Push-Token-Lifecycle) bleiben separat im Konto-Bereich.",
     "bgCalls": "Anrufe im Hintergrund",
-    "bgCallsDesc": "Akku-Optimierung & Tiefschlaf einrichten, damit Anrufe bei geschlossener App ankommen."
+    "bgCallsDesc": "Akku-Optimierung & Tiefschlaf einrichten, damit Anrufe bei geschlossener App ankommen.",
+    "permissions": "Berechtigungen",
+    "permissionsDesc": "Übersicht über Kamera, Mikrofon, Standort und Co. — alles an einem Ort."
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",
@@ -3539,5 +3541,41 @@
   },
   "splash": {
     "tagline": "Nachbarschaftshilfe"
+  },
+  "permissions": {
+    "title": "Berechtigungen",
+    "intro": "Damit alle Funktionen sauber laufen, hier ein Überblick: tippe auf einen Eintrag, um die Berechtigung zu erteilen oder in den Einstellungen zu prüfen.",
+    "grant": "Erlauben",
+    "granted": "Erteilt",
+    "denied": "Nicht erteilt",
+    "permanent": "In Einstellungen erteilen",
+    "restricted": "Eingeschränkt",
+    "limited": "Eingeschränkt erteilt",
+    "provisional": "Vorläufig",
+    "unknown": "Status unklar",
+    "openAppSettings": "App-Einstellungen öffnen",
+    "grantAll": "Alle abfragen",
+    "items": {
+      "camera": "Kamera",
+      "cameraDesc": "Foto/Video für Beiträge, Profilbild und Video-Anrufe.",
+      "microphone": "Mikrofon",
+      "microphoneDesc": "Sprach- und Video-Anrufe, Sprachnachrichten, Livestreams.",
+      "photos": "Bilder & Videos",
+      "photosDesc": "Bilder/Videos aus der Galerie für Beiträge und Profil auswählen.",
+      "audioFiles": "Musik & Audio",
+      "audioFilesDesc": "Audio aus dem Gerät anhängen, z. B. eigene Sprachclips.",
+      "location": "Standort",
+      "locationDesc": "Beiträge in deiner Nähe finden, Karte zentrieren, Notfälle melden.",
+      "notifications": "Benachrichtigungen",
+      "notificationsDesc": "Nachrichten, Anrufe, Reaktionen — auch bei geschlossener App.",
+      "nearby": "Geräte in der Nähe",
+      "nearbyDesc": "Bluetooth-Headset für Anrufe und Audio-Ausgabe finden.",
+      "phone": "Telefon",
+      "phoneDesc": "Native Anruf-UI auf Sperrbildschirm und im Killed-State.",
+      "biometric": "Biometrie",
+      "biometricDesc": "App per Fingerabdruck oder Gesicht entsperren.",
+      "battery": "Akku-Optimierung",
+      "batteryDesc": "Damit Anrufe bei geschlossener App ankommen."
+    }
   }
 }
