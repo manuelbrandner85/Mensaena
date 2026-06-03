@@ -1,0 +1,82 @@
+name: Backfill Post-Geo (einmalig)
+
+# Einmaliger Geocoding-Backfill für Altdaten: ruft die backfill-geo
+# Edge Function in einer Schleife auf, bis alle koordinatenlosen Beiträge
+# mit location_text geocodiert sind (remaining == 0). Manuell auslösbar
+# über Actions-Tab → "Backfill Post-Geo (einmalig)" → "Run workflow".
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: 'Posts pro Aufruf (1-100)'
+        required: false
+        default: '40'
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Resolve project ref
+        id: ref
+        env:
+          REF_VAR: ${{ vars.SUPABASE_PROJECT_REF }}
+          REF_SECRET: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          raw="${REF_VAR:-$REF_SECRET}"
+          if [ -z "$raw" ]; then
+            echo "::error title=Missing project ref::SUPABASE_PROJECT_REF (Variable oder Secret) fehlt."
+            exit 1
+          fi
+          ref=$(echo "$raw" | tr -d '[:space:]' | sed -E 's|https?://||; s|\.supabase\.co.*||; s|/.*||' | tr 'A-Z' 'a-z')
+          if ! echo "$ref" | grep -Eq '^[a-z]{20}$'; then
+            echo "::error title=Invalid project ref::Format muss 20 Kleinbuchstaben sein. Bekommen: '$ref'"
+            exit 1
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      - name: Validate service-role key
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SERVICE_KEY" ]; then
+            echo "::error title=Missing secret::SUPABASE_SERVICE_ROLE_KEY fehlt (Dashboard → Project Settings → API → service_role)."
+            exit 1
+          fi
+
+      - name: Run backfill loop
+        env:
+          REF: ${{ steps.ref.outputs.ref }}
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BATCH: ${{ github.event.inputs.batch_size }}
+        run: |
+          set -euo pipefail
+          url="https://${REF}.supabase.co/functions/v1/backfill-geo"
+          batch="${BATCH:-40}"
+          echo "Backfill-Endpoint: $url  (batch=$batch)"
+          total_updated=0
+          for i in $(seq 1 60); do
+            resp=$(curl -fsS -X POST "$url" \
+              -H "Authorization: Bearer ${SERVICE_KEY}" \
+              -H "Content-Type: application/json" \
+              -d "{\"limit\": ${batch}}") || {
+                echo "::error title=Request failed::Aufruf $i fehlgeschlagen"
+                exit 1
+              }
+            echo "Aufruf $i → $resp"
+            updated=$(echo "$resp" | jq -r '.updated // 0')
+            remaining=$(echo "$resp" | jq -r '.remaining // 0')
+            processed=$(echo "$resp" | jq -r '.processed // 0')
+            total_updated=$((total_updated + updated))
+            # Fertig, wenn nichts mehr übrig ist ODER ein Durchlauf nichts
+            # mehr verarbeiten konnte (nur noch nicht-geocodierbare Reste).
+            if [ "$remaining" = "0" ] || [ "$processed" = "0" ]; then
+              echo "Fertig. Insgesamt geocodiert: $total_updated. Rest (nicht geocodierbar): $remaining"
+              break
+            fi
+          done
+          echo "::notice title=Backfill abgeschlossen::Geocodiert: $total_updated, verbleibend: ${remaining:-?}"
