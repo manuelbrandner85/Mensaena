@@ -35,7 +35,10 @@ class PostsRepository {
     int limit = 10,
   }) async {
     if (lat == null || lng == null) {
-      return _latestActive(limit: limit);
+      // „Alle anzeigen": hole die neuesten Beiträge mit Geo-Koordinaten.
+      // Vorher fiel das auf eine geo-agnostische Abfrage zurück → die Map
+      // filtert client-seitig auf hasGeo und blieb deshalb häufig leer.
+      return _latestActive(limit: limit, geoOnly: true);
     }
     try {
       final result = await sb.rpc<dynamic>(
@@ -148,13 +151,22 @@ class PostsRepository {
     }
   }
 
-  static Future<List<Post>> _latestActive({int limit = 10}) async {
+  static Future<List<Post>> _latestActive({
+    int limit = 10,
+    bool geoOnly = false,
+  }) async {
     try {
       // expires_at-Filter passiert in _filterBlocked client-seitig.
-      final rows = await sb
+      var query = sb
           .from('posts')
           .select()
-          .inFilter('status', const ['active', 'in_progress'])
+          .inFilter('status', const ['active', 'in_progress']);
+      if (geoOnly) {
+        // Map-Path: nur Posts mit lat/lng — sonst werden bei "Alle anzeigen"
+        // viele geo-lose Beiträge geholt und die Map bleibt leer.
+        query = query.not('latitude', 'is', null).not('longitude', 'is', null);
+      }
+      final rows = await query
           .order('created_at', ascending: false)
           .limit(limit);
       final posts = (rows as List)
