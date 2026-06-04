@@ -318,10 +318,18 @@ class DashboardWidgetConfig {
   /// Books + Health werden jetzt standardmaessig angezeigt — User-Feedback:
   /// "lieferten keine Daten" weil sie versteckt waren. Traffic bleibt aus,
   /// weil 9 Autobahn-API-Calls bei jedem Open kostspielig sind.
-  /// NASA APOD + OnThisDay sind neu, default-an fuer Discovery-Effekt.
   /// Phase 10 E3/E4: weather/moon/sun → sky; karma/streak/helpStreak →
   /// progress_trio. Die alten Widgets bleiben verfügbar (Settings),
   /// werden aber bei Neu-Usern nicht direkt eingeblendet.
+  ///
+  /// Release-Declutter (2026-06): Das Dashboard war mit ~37 sichtbaren
+  /// Widgets überladen — die Kern-Tools der Nachbarschaftshilfe (Smart-Match,
+  /// Nearby-Posts, Daily-Challenges, Community-Puls) gingen zwischen reinen
+  /// "Discovery-Gadgets" unter. Diese Gadgets sind jetzt default-AUS (bleiben
+  /// in "Dashboard bearbeiten" jederzeit aktivierbar — KEINE Funktion entfällt):
+  ///   nasa_apod, on_this_day, quote, affirmation, books.
+  /// Ausserdem weekly_digest → default-aus, da weekly_summary (Tabs:
+  /// eigene Aktivität + Community-Digest) denselben Wochenrückblick abdeckt.
   static const Set<String> _defaultHidden = {
     'traffic',
     'weather',
@@ -335,6 +343,15 @@ class DashboardWidgetConfig {
     'digest',
     'safety',
     'water_level',
+    // Release-Declutter: Discovery-Gadgets ohne Nachbarschaftsbezug +
+    // weekly_digest (durch weekly_summary abgelöst). Alle in Settings
+    // reaktivierbar.
+    'nasa_apod',
+    'on_this_day',
+    'quote',
+    'affirmation',
+    'books',
+    'weekly_digest',
   };
 
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(
