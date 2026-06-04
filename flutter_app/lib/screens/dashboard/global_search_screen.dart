@@ -235,6 +235,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                       size: 18, color: AppColors.mute),
                   suffixIcon: _query.isNotEmpty
                       ? IconButton(
+                        tooltip: 'common.close'.tr(),
                           icon: const Icon(LucideIcons.x,
                               size: 16, color: AppColors.mute),
                           onPressed: () {

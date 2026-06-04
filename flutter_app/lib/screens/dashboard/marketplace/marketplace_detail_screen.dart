@@ -242,12 +242,14 @@ class _MarketplaceDetailScreenState
                       const SizedBox(width: 8),
                       _CircleIconButton(
                         icon: LucideIcons.bookmark,
+                        tooltip: 'marketplace.reserve_request'.tr(),
                         onTap: () => _reserveAsBuyer(context, ref, l),
                       ),
                     ],
                     const SizedBox(width: 8),
                     _CircleIconButton(
                       icon: LucideIcons.share2,
+                      tooltip: 'common.share'.tr(),
                       onTap: () => _share(l),
                     ),
                     const SizedBox(width: 8),
@@ -673,14 +675,17 @@ class _CircleIconButton extends StatelessWidget {
   const _CircleIconButton({
     required this.icon,
     required this.onTap,
+    this.tooltip,
   });
 
   final IconData icon;
   final VoidCallback onTap;
+  // a11y: Screenreader-Label + Long-Press-Tooltip für das sonst nackte Icon.
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final btn = Material(
       color: AppColors.elevated,
       shape: const CircleBorder(),
       child: InkWell(
@@ -692,6 +697,11 @@ class _CircleIconButton extends StatelessWidget {
           child: Icon(icon, size: 16, color: AppColors.inkSoft),
         ),
       ),
+    );
+    if (tooltip == null) return btn;
+    return Tooltip(
+      message: tooltip!,
+      child: Semantics(button: true, label: tooltip, child: btn),
     );
   }
 }
@@ -920,6 +930,7 @@ class _CommentsSectionState extends ConsumerState<_CommentsSection> {
             ),
             const SizedBox(width: 6),
             IconButton(
+              tooltip: 'common.send'.tr(),
               onPressed: _sending ? null : _send,
               icon: _sending
                   ? const SizedBox(

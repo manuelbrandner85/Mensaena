@@ -135,6 +135,7 @@ class _PollCreateSheetState extends ConsumerState<PollCreateSheet> {
                   ),
                   if (_opts.length > 2)
                     IconButton(
+                      tooltip: 'common.remove'.tr(),
                       onPressed: () => _removeOption(i),
                       icon: const Icon(LucideIcons.minus, size: 16),
                     ),

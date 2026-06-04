@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "Abmelden?",
     "logoutConfirmBody": "Du wirst von diesem Gerät abgemeldet und musst dich neu anmelden.",
     "offlineBanner": "Keine Internetverbindung",
-    "backOnline": "Wieder online"
+    "backOnline": "Wieder online",
+    "refresh": "Aktualisieren",
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "previous": "Vorherige",
+    "pause": "Pause",
+    "filters": "Filter",
+    "flashlight": "Blitz",
+    "switchCamera": "Kamera wechseln",
+    "showPassword": "Passwort anzeigen",
+    "pin": "Anpinnen"
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",

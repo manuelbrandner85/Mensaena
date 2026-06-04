@@ -87,6 +87,7 @@ class _UnsubscribeScreenState extends State<UnsubscribeScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.deep,
         leading: IconButton(
+          tooltip: 'common.back'.tr(),
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.ink),
           onPressed: () {
             if (context.canPop()) {

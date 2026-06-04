@@ -500,6 +500,7 @@ class _ModuleCreatePostScreenState
                     style: AppTypography.label(size: 10)),
                 const Spacer(),
                 IconButton(
+                  tooltip: 'events.add_photo'.tr(),
                   onPressed: _pickImage,
                   icon: Icon(LucideIcons.imagePlus,
                       size: 18, color: c.accentColor),

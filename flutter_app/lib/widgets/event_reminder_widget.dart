@@ -93,6 +93,7 @@ class _EventReminderWidgetState extends ConsumerState<EventReminderWidget> {
                 ),
               ),
               IconButton(
+                tooltip: 'common.close'.tr(),
                 onPressed: _busy ? null : _removeReminder,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),

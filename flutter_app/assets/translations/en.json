@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "Sign out?",
     "logoutConfirmBody": "You'll be signed out on this device and need to log in again.",
     "offlineBanner": "No internet connection",
-    "backOnline": "Back online"
+    "backOnline": "Back online",
+    "refresh": "Refresh",
+    "add": "Add",
+    "remove": "Remove",
+    "previous": "Previous",
+    "pause": "Pause",
+    "filters": "Filters",
+    "flashlight": "Flashlight",
+    "switchCamera": "Switch camera",
+    "showPassword": "Show password",
+    "pin": "Pin"
   },
   "safe": {
     "critical_nearby_title": "Critical crisis near you",

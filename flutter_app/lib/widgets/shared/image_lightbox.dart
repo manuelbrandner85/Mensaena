@@ -115,6 +115,7 @@ class _ImageLightboxState extends State<ImageLightbox> {
                 top: 8,
                 right: 8,
                 child: IconButton(
+                  tooltip: 'common.close'.tr(),
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(LucideIcons.x,
                       color: Colors.white, size: 24),

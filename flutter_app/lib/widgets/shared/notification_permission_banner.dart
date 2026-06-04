@@ -234,6 +234,7 @@ class _NotificationPermissionBannerState
                   ),
                 ),
                 IconButton(
+                  tooltip: 'common.close'.tr(),
                   onPressed: _onClose,
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,

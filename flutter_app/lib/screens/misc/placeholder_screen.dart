@@ -25,6 +25,7 @@ class PlaceholderScreen extends StatelessWidget {
       appBar: AppBar(
         leading: Navigator.of(context).canPop()
             ? IconButton(
+              tooltip: 'common.back'.tr(),
                 icon: const Icon(LucideIcons.arrowLeft),
                 onPressed: () => Navigator.of(context).pop(),
               )

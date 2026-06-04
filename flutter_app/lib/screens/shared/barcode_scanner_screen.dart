@@ -102,6 +102,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                 child: Row(
                   children: [
                     IconButton(
+                      tooltip: 'common.close'.tr(),
                       onPressed: () => context.pop(),
                       icon: const Icon(LucideIcons.x, color: AppColors.ink),
                     ),
@@ -116,11 +117,13 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                       ),
                     ),
                     IconButton(
+                      tooltip: 'common.flashlight'.tr(),
                       onPressed: () => _ctrl.toggleTorch(),
                       icon: const Icon(LucideIcons.zap,
                           color: AppColors.amber),
                     ),
                     IconButton(
+                      tooltip: 'common.switchCamera'.tr(),
                       onPressed: () => _ctrl.switchCamera(),
                       icon: const Icon(LucideIcons.switchCamera,
                           color: AppColors.ink),

@@ -1099,6 +1099,7 @@ class _Hero extends StatelessWidget {
               right: 12,
               child: _RoundIconButton(
                 icon: LucideIcons.camera,
+                tooltip: 'identify.takePhoto'.tr(),
                 onTap: onPickCover,
               ),
             ),
@@ -1216,23 +1217,30 @@ class _Hero extends StatelessWidget {
 }
 
 class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({required this.icon, required this.onTap});
+  const _RoundIconButton({required this.icon, required this.onTap, this.tooltip});
   final IconData icon;
   final VoidCallback onTap;
+  // a11y: Screenreader-Label + Long-Press-Tooltip für das sonst nackte Icon.
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final btn = Material(
       color: AppColors.voidColor.withValues(alpha: 0.7),
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onTap,
-        child: const Padding(
-          padding: EdgeInsets.all(8),
-          child: Icon(LucideIcons.camera, size: 14, color: AppColors.ink),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(icon, size: 14, color: AppColors.ink),
         ),
       ),
+    );
+    if (tooltip == null) return btn;
+    return Tooltip(
+      message: tooltip!,
+      child: Semantics(button: true, label: tooltip, child: btn),
     );
   }
 }
@@ -1359,6 +1367,7 @@ class _TagChipEditorState extends State<_TagChipEditor> {
             ),
             const SizedBox(width: 8),
             IconButton(
+              tooltip: 'common.add'.tr(),
               onPressed: () => _add(_ctrl.text),
               icon: const Icon(LucideIcons.plus,
                   size: 18, color: AppColors.amber),
@@ -1439,6 +1448,7 @@ class _GpsRow extends StatelessWidget {
           ),
           if (has)
             IconButton(
+              tooltip: 'common.close'.tr(),
               onPressed: onClear,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -1565,6 +1575,7 @@ class _EmergencyEditorState extends State<_EmergencyEditor> {
               ),
               const SizedBox(width: 8),
               IconButton(
+                tooltip: 'common.delete'.tr(),
                 onPressed: widget.onRemove,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),

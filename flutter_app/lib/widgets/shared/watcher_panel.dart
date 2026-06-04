@@ -67,6 +67,7 @@ class WatcherPanel extends StatelessWidget {
                       ),
                     ),
                     IconButton(
+                      tooltip: 'common.close'.tr(),
                       onPressed: onClose,
                       icon: const Icon(LucideIcons.x,
                           size: 18, color: AppColors.mute),

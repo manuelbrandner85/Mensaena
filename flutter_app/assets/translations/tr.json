@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "Çıkış yapılsın mı?",
     "logoutConfirmBody": "Bu cihazdan çıkış yapılacak ve yeniden giriş yapman gerekecek.",
     "offlineBanner": "İnternet bağlantısı yok",
-    "backOnline": "Tekrar çevrimiçi"
+    "backOnline": "Tekrar çevrimiçi",
+    "refresh": "Yenile",
+    "add": "Ekle",
+    "remove": "Kaldır",
+    "previous": "Önceki",
+    "pause": "Duraklat",
+    "filters": "Filtreler",
+    "flashlight": "Flaş",
+    "switchCamera": "Kamerayı değiştir",
+    "showPassword": "Şifreyi göster",
+    "pin": "Sabitle"
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",

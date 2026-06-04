@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "Se déconnecter ?",
     "logoutConfirmBody": "Tu seras déconnecté sur cet appareil et devras te reconnecter.",
     "offlineBanner": "Pas de connexion Internet",
-    "backOnline": "De nouveau en ligne"
+    "backOnline": "De nouveau en ligne",
+    "refresh": "Actualiser",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "previous": "Précédent",
+    "pause": "Pause",
+    "filters": "Filtres",
+    "flashlight": "Lampe",
+    "switchCamera": "Changer de caméra",
+    "showPassword": "Afficher le mot de passe",
+    "pin": "Épingler"
   },
   "safe": {
     "critical_nearby_title": "Crise critique près de toi",

@@ -879,6 +879,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                     ),
                     IconButton(
+                      tooltip: 'common.close'.tr(),
                       onPressed: () => setState(() => _replyTo = null),
                       icon: const Icon(LucideIcons.x,
                           size: 14, color: AppColors.mute),

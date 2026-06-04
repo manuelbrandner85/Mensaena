@@ -346,6 +346,7 @@ class _BotChatSheetState extends ConsumerState<_BotChatSheet> {
                         ),
                       ),
                       IconButton(
+                        tooltip: 'common.close'.tr(),
                         icon: const Icon(LucideIcons.x,
                             size: 18, color: AppColors.mute),
                         onPressed: () {

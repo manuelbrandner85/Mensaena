@@ -522,6 +522,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                                 ),
                               ),
                               IconButton(
+                                tooltip: 'common.close'.tr(),
                                 onPressed: () => setState(() {
                                   _replyToParentId = null;
                                   _replyToAuthor = null;
@@ -1209,6 +1210,7 @@ class _CommentInput extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             IconButton(
+              tooltip: 'common.send'.tr(),
               onPressed: onSubmit,
               icon: const Icon(LucideIcons.send, color: AppColors.amber),
             ),

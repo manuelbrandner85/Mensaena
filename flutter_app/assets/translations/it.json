@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "Disconnettersi?",
     "logoutConfirmBody": "Verrai disconnesso da questo dispositivo e dovrai accedere di nuovo.",
     "offlineBanner": "Nessuna connessione a Internet",
-    "backOnline": "Di nuovo online"
+    "backOnline": "Di nuovo online",
+    "refresh": "Aggiorna",
+    "add": "Aggiungi",
+    "remove": "Rimuovi",
+    "previous": "Precedente",
+    "pause": "Pausa",
+    "filters": "Filtri",
+    "flashlight": "Flash",
+    "switchCamera": "Cambia fotocamera",
+    "showPassword": "Mostra password",
+    "pin": "Fissa"
   },
   "safe": {
     "critical_nearby_title": "Crisi critica vicino a te",

@@ -451,6 +451,7 @@ class _SearchBarState extends State<_SearchBar> {
             size: 16, color: AppColors.mute),
         suffixIcon: _ctrl.text.isNotEmpty
             ? IconButton(
+              tooltip: 'common.close'.tr(),
                 icon: const Icon(LucideIcons.x,
                     size: 14, color: AppColors.mute),
                 onPressed: () {

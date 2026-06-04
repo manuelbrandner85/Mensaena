@@ -86,6 +86,7 @@ class BecomeMentorCta extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: 'common.next'.tr(),
                     onPressed: () =>
                         context.push('/dashboard/profile/edit'),
                     icon: const Icon(LucideIcons.arrowRight,

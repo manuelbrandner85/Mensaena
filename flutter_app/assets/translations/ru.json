@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "Выйти?",
     "logoutConfirmBody": "Вы выйдете на этом устройстве и потребуется войти снова.",
     "offlineBanner": "Нет подключения к интернету",
-    "backOnline": "Снова в сети"
+    "backOnline": "Снова в сети",
+    "refresh": "Обновить",
+    "add": "Добавить",
+    "remove": "Удалить",
+    "previous": "Назад",
+    "pause": "Пауза",
+    "filters": "Фильтры",
+    "flashlight": "Вспышка",
+    "switchCamera": "Сменить камеру",
+    "showPassword": "Показать пароль",
+    "pin": "Закрепить"
   },
   "safe": {
     "critical_nearby_title": "Критический кризис рядом",

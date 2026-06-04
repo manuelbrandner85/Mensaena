@@ -161,6 +161,7 @@ class _VoicemailScreenState extends ConsumerState<VoicemailScreen> {
                       ),
                     ),
                     IconButton(
+                      tooltip: 'common.pause'.tr(),
                       onPressed: () => _play(v),
                       icon: Icon(
                         playing ? LucideIcons.pause : LucideIcons.play,

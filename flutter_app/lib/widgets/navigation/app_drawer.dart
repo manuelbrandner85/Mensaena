@@ -765,6 +765,7 @@ class _PinnedSectionState extends State<_PinnedSection> {
                 _QuickLinkTile(
                   route: r,
                   trailing: IconButton(
+                    tooltip: 'common.close'.tr(),
                     icon: const Icon(LucideIcons.x,
                         size: 14, color: AppColors.mute),
                     onPressed: () async {

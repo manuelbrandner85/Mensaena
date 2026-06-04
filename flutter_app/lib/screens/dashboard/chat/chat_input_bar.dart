@@ -169,6 +169,7 @@ class ChatSendButton extends StatelessWidget {
               : null,
         ),
         child: IconButton(
+          tooltip: 'common.send'.tr(),
           padding: EdgeInsets.zero,
           onPressed: enabled ? onPressed : null,
           icon: Icon(

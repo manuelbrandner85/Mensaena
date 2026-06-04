@@ -563,6 +563,7 @@ class _SosSheetState extends State<_SosSheet> {
                             size: 18, color: AppColors.ink)),
                   ),
                   IconButton(
+                    tooltip: 'common.close'.tr(),
                     icon: const Icon(LucideIcons.x, color: AppColors.mute),
                     onPressed: () => Navigator.pop(ctx),
                   ),

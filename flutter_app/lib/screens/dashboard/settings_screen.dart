@@ -2053,6 +2053,7 @@ class _LanguageTab extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
+                  tooltip: 'common.refresh'.tr(),
                   iconSize: 16,
                   onPressed: () => notifier.refreshDetected(context),
                   icon: const Icon(LucideIcons.refreshCcw,

@@ -355,6 +355,7 @@ class _CalendarView extends StatelessWidget {
         Row(
           children: [
             IconButton(
+              tooltip: 'common.previous'.tr(),
               icon: const Icon(LucideIcons.chevronLeft,
                   size: 18, color: AppColors.inkSoft),
               onPressed: () => onMonthChange(
@@ -369,6 +370,7 @@ class _CalendarView extends StatelessWidget {
               ),
             ),
             IconButton(
+              tooltip: 'common.next'.tr(),
               icon: const Icon(LucideIcons.chevronRight,
                   size: 18, color: AppColors.inkSoft),
               onPressed: () => onMonthChange(

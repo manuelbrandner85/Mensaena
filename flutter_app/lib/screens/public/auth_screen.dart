@@ -308,6 +308,19 @@ class _AuthScreenState extends State<AuthScreen>
       String msg;
       if (low.contains('already registered') ||
           low.contains('user already')) {
+        // Email-Enumeration-Schutz: Bei der Registrierung NICHT verraten, dass
+        // die Adresse bereits existiert. Stattdessen exakt dieselbe Antwort wie
+        // bei einer echten Neu-Registrierung anzeigen — so kann ein Angreifer
+        // über das Register-Formular keine bestehenden Konten abklopfen.
+        // (Login bleibt unverändert: 'invalid credentials' ist ohnehin identisch
+        //  für falsches Passwort und nicht existierende Adresse.)
+        if (_mode == _AuthMode.register) {
+          setState(() {
+            _info = 'auth.infoAccountCreated'.tr();
+            _showResendConfirm = true;
+          });
+          return;
+        }
         msg = 'auth.errAlreadyRegistered'.tr();
       } else if (low.contains('email not confirmed') ||
           low.contains('not confirmed')) {
@@ -553,6 +566,7 @@ class _AuthScreenState extends State<AuthScreen>
                                   obscure: _obscure,
                                   validator: _validatePassword,
                                   suffixIcon: IconButton(
+                                    tooltip: 'common.showPassword'.tr(),
                                     icon: Icon(
                                       _obscure
                                           ? LucideIcons.eyeOff

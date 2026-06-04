@@ -486,6 +486,7 @@ class _AuditSectionWithFiltersState
                 ),
               ),
               IconButton(
+                tooltip: 'common.refresh'.tr(),
                 icon: const Icon(LucideIcons.refreshCw,
                     size: 16, color: AppColors.mute),
                 onPressed: _refresh,

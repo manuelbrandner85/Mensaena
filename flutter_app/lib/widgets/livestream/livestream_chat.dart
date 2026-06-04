@@ -190,6 +190,7 @@ class _LivestreamChatState extends ConsumerState<LivestreamChat> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
+                  tooltip: 'common.send'.tr(),
                   onPressed: _sending ? null : _send,
                   icon: const Icon(LucideIcons.send, color: AppColors.bronze),
                   style: IconButton.styleFrom(

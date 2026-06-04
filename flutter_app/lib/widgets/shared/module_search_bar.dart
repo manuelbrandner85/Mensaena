@@ -80,6 +80,7 @@ class _ModuleSearchBarState extends State<ModuleSearchBar> {
           ),
           if (_ctrl.text.isNotEmpty)
             IconButton(
+              tooltip: 'common.close'.tr(),
               padding: EdgeInsets.zero,
               constraints:
                   const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -100,6 +101,7 @@ class _ModuleSearchBarState extends State<ModuleSearchBar> {
             Stack(
               children: [
                 IconButton(
+                  tooltip: 'common.filters'.tr(),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
                       minWidth: 44, minHeight: 44),

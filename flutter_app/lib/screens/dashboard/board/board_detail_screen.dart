@@ -155,6 +155,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                               onPressed: () => _reportPost(p.id),
                             ),
                           IconButton(
+                            tooltip: 'common.pin'.tr(),
                             icon: Icon(
                               LucideIcons.pin,
                               size: 18,
@@ -286,6 +287,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                         ),
                       ),
                       IconButton(
+                        tooltip: 'common.send'.tr(),
                         onPressed: _submitComment,
                         icon: const Icon(LucideIcons.send,
                             color: AppColors.amber),

@@ -217,6 +217,7 @@ class _MonthView extends StatelessWidget {
         Row(
           children: [
             IconButton(
+              tooltip: 'common.previous'.tr(),
               onPressed: () => onShiftMonth(-1),
               icon: const Icon(LucideIcons.chevronLeft,
                   size: 18, color: AppColors.amber),
@@ -232,6 +233,7 @@ class _MonthView extends StatelessWidget {
               ),
             ),
             IconButton(
+              tooltip: 'common.next'.tr(),
               onPressed: () => onShiftMonth(1),
               icon: const Icon(LucideIcons.chevronRight,
                   size: 18, color: AppColors.amber),

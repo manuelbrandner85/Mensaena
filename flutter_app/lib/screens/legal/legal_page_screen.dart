@@ -32,6 +32,7 @@ class LegalPageScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.deep,
         leading: IconButton(
+          tooltip: 'common.back'.tr(),
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.ink),
           onPressed: () {
             if (context.canPop()) {
@@ -119,6 +120,7 @@ class SpendenScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.deep,
         leading: IconButton(
+          tooltip: 'common.back'.tr(),
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.ink),
           onPressed: () {
             if (context.canPop()) {

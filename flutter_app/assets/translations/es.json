@@ -45,7 +45,17 @@
     "logoutConfirmTitle": "¿Cerrar sesión?",
     "logoutConfirmBody": "Se cerrará la sesión en este dispositivo y tendrás que volver a iniciarla.",
     "offlineBanner": "Sin conexión a Internet",
-    "backOnline": "De nuevo en línea"
+    "backOnline": "De nuevo en línea",
+    "refresh": "Actualizar",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "previous": "Anterior",
+    "pause": "Pausa",
+    "filters": "Filtros",
+    "flashlight": "Linterna",
+    "switchCamera": "Cambiar cámara",
+    "showPassword": "Mostrar contraseña",
+    "pin": "Anclar"
   },
   "safe": {
     "critical_nearby_title": "Crisis crítica cerca de ti",

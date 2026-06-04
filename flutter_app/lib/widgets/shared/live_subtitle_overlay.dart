@@ -154,6 +154,7 @@ class _SubtitleComposerState extends State<SubtitleComposer> {
             ),
           ),
           IconButton(
+            tooltip: 'common.send'.tr(),
             onPressed: _send,
             icon: const Icon(LucideIcons.send,
                 size: 14, color: AppColors.bronze),

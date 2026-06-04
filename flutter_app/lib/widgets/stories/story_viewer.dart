@@ -205,6 +205,7 @@ class _StoryViewerState extends State<StoryViewer>
                       ),
                     ),
                     IconButton(
+                      tooltip: 'common.close'.tr(),
                       icon: const Icon(LucideIcons.x,
                           color: Colors.white),
                       onPressed: () {

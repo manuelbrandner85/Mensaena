@@ -583,6 +583,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                           ),
                         ),
                         IconButton(
+                          tooltip: 'common.send'.tr(),
                           onPressed: _sending ? null : _submit,
                           icon: _sending
                               ? const SizedBox(
