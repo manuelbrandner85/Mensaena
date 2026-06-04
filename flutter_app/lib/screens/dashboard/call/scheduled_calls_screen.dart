@@ -2,6 +2,7 @@
 /// Liste eigener scheduled_calls + Cancel-Option.
 library;
 
+import 'package:add_2_calendar/add_2_calendar.dart' as a2c;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,23 @@ class ScheduledCallsScreen extends ConsumerWidget {
           .update({'is_cancelled': true}).eq('id', id);
       ref.invalidate(scheduledCallsProvider);
     } catch (_) {}
+  }
+
+  /// Öffnet das System-„Termin hinzufügen"-Dialog mit vorausgefüllten Daten.
+  /// Keine CALENDAR-Permission nötig (Intent-basiert via add_2_calendar).
+  Future<void> _addToCalendar(
+    BuildContext context, {
+    required String name,
+    required DateTime when,
+  }) async {
+    final entry = a2c.Event(
+      title: 'call.videoAction'.tr() + ' — ' + name,
+      startDate: when,
+      endDate: when.add(const Duration(minutes: 30)),
+      iosParams: const a2c.IOSParams(reminder: Duration(minutes: 15)),
+      androidParams: const a2c.AndroidParams(emailInvites: <String>[]),
+    );
+    await a2c.Add2Calendar.addEvent2Cal(entry);
   }
 
   @override
@@ -148,6 +166,14 @@ class ScheduledCallsScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    if (when != null)
+                      IconButton(
+                        tooltip: 'contact.cta.add_calendar'.tr(),
+                        onPressed: () =>
+                            _addToCalendar(context, name: name, when: when),
+                        icon: const Icon(LucideIcons.calendarPlus,
+                            size: 18, color: AppColors.bronze),
+                      ),
                     IconButton(
                       tooltip: 'common.cancel'.tr(),
                       onPressed: () => _cancel(ref, r['id'] as String),
