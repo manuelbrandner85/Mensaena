@@ -4,10 +4,12 @@
     "cancel": "Annuler",
     "save": "Enregistrer",
     "delete": "Supprimer",
+    "undo": "Annuler",
     "edit": "Modifier",
     "close": "Fermer",
     "back": "Retour",
     "next": "Suivant",
+    "openProfile": "Ouvrir le profil",
     "send": "Envoyer",
     "search": "Rechercher",
     "loading": "Chargement …",
@@ -83,7 +85,9 @@
     "skills": "Compétences",
     "badges": "Badges",
     "calendar": "Calendrier",
+    "friends": "Amis",
     "followedTags": "Suivre des sujets",
+    "savedPosts": "Publications enregistrées",
     "invite": "Inviter des voisins",
     "interactions": "Interactions",
     "organizations": "Organisations",
@@ -195,6 +199,8 @@
     "editProfile": "Modifier le profil",
     "share": "Partager le profil",
     "shareMessage": "Découvre {name} sur Mensaena : {url}",
+    "follow": "Suivre",
+    "unfollow": "Ne plus suivre",
     "saved": "Enregistrés",
     "name": "Nom",
     "bio": "À propos",
@@ -379,9 +385,14 @@
       "cinemaMode": "MODE CINÉMA",
       "effectStrength": "INTENSITÉ DE L'EFFET",
       "sound": "SON",
+      "callSound": "SON ET VOLUME DES APPELS",
       "uiSounds": "Sons d'interface",
       "automatic": "AUTOMATIQUE",
       "chooseManually": "CHOIX MANUEL"
+    },
+    "callSound": {
+      "ringVolume": "Volume de la sonnerie",
+      "vibration": "Vibrer pendant les appels"
     },
     "tabs": {
       "account": "Compte",
@@ -426,6 +437,10 @@
     "nameLabel": "Nom",
     "appVersionLabel": "VERSION DE L'APP",
     "bugReport": "Signaler un bug",
+    "checkForUpdate": "Rechercher une mise à jour",
+    "checkingForUpdate": "Recherche de mises à jour …",
+    "patchReady": "Patch #{n} prêt — redémarrer l'app",
+    "noUpdate": "Vous êtes à jour",
     "errorPrefix": "Erreur : {error}",
     "profileVisibility": "Visibilité du profil",
     "locationLabel": "Localisation",
@@ -531,6 +546,13 @@
   },
   "chat": {
     "writeMessage": "Écrire un message …",
+    "share_live_location": "Partager la position en direct",
+    "share_live_location_hint": "Votre position sera partagée en direct avec la conversation.",
+    "share_duration": "{min} minutes",
+    "share_stop": "Arrêter le partage",
+    "share_no_permission": "Permission de localisation manquante.",
+    "mute": "Couper le son",
+    "unmute": "Réactiver",
     "communityChannel": "Canal communautaire",
     "groupSubtitle": "Groupe",
     "noConversations": "Pas encore de messages.",
@@ -545,7 +567,6 @@
     "accept": "Accepter",
     "decline": "Refuser",
     "callMissed": "Appel manqué",
-    "callBack": "Rappeler",
     "livestreamFailed": "Impossible de démarrer le direct.",
     "messageNotSent": "Le message n'a pas pu être envoyé.",
     "editMessage": "Modifier le message",
@@ -588,6 +609,24 @@
     "editFailed": "Échec de la modification.",
     "deleted": "Message supprimé.",
     "deleteFailed": "Échec de la suppression.",
+    "postCardLabel": "À PROPOS DE CE POST",
+    "postCardFallback": "Post indisponible.",
+    "forward": "Transférer",
+    "forwarded": "TRANSFÉRÉ",
+    "forwardTitle": "Transférer à qui ?",
+    "forwardSearchHint": "Rechercher une conversation …",
+    "forwardNoTargets": "Aucune autre conversation trouvée.",
+    "forwardedTo": "Transféré à {name}.",
+    "forwardFailed": "Échec du transfert.",
+    "recapMenuTitle": "Récapitulatif rapide",
+    "recapMenuHint": "Stats + mots-clés des 100 derniers messages",
+    "recapTitle": "Résumé : {name}",
+    "recapEmpty": "Aucun message dans cette conversation.",
+    "recapMessageCount": "Messages",
+    "recapParticipants": "Participants",
+    "recapTimespan": "Période",
+    "recapKeywords": "Mots-clés",
+    "recapLastMessage": "Dernier message",
     "pinned": "📌 Message épinglé.",
     "unpinned": "Épingle retirée.",
     "welcomeChannelTitle": "Bienvenue dans #{name}",
@@ -604,7 +643,8 @@
     "callBtn": "Appeler",
     "hangupBtn": "Raccrocher",
     "searchOpen": "Rechercher",
-    "searchClose": "Fermer la recherche"
+    "searchClose": "Fermer la recherche",
+    "callBack": "Rappeler"
   },
   "languages": {
     "de": "Allemand",
@@ -698,6 +738,7 @@
     "notAuthenticated": "Non connecté."
   },
   "home": {
+    "tapAgainToExit": "Appuyez à nouveau pour quitter",
     "quickActions": "Actions rapides",
     "viewAll": "Tout voir",
     "trust": "Confiance",
@@ -729,6 +770,7 @@
     "statInteractions": "Interactions",
     "statTrust": "Confiance",
     "qaPost": "Publier",
+    "qaModules": "Modules",
     "qaMap": "Carte",
     "qaChat": "Chat",
     "qaSos": "SOS crise",
@@ -787,6 +829,9 @@
       "botFeedback": "Retours du bot",
       "groups": "Groupes"
     },
+    "crash_logs": "Journaux de plantage",
+    "no_crashes": "Aucun plantage ces 7 derniers jours.",
+    "no_access": "Vous n'avez pas la permission d'accéder à cette section.",
     "statusSetTo": "Statut défini sur « {s} ».",
     "statusUpdateFailed": "Échec de la mise à jour du statut.",
     "actionFailed": "Échec de l'action.",
@@ -838,6 +883,40 @@
     "searchUsersHint": "Rechercher nom ou e-mail…",
     "searchReason": "Rechercher un motif…",
     "adminTitle": "Admin",
+    "verifiedBadge": "Vérifié",
+    "bannedBadge": "Bloqué",
+    "users": {
+      "totalCount": "{n} utilisateurs trouvés",
+      "empty": "Aucun utilisateur trouvé.",
+      "profile": "Profil",
+      "ban": "Bloquer",
+      "unban": "Débloquer",
+      "editTitle": "Modifier l'utilisateur",
+      "name": "Nom",
+      "nickname": "Pseudo",
+      "role": "Rôle",
+      "roleUser": "Utilisateur",
+      "roleModerator": "Modérateur",
+      "roleAdmin": "Administrateur",
+      "banConfirmTitle": "Bloquer cet utilisateur ?",
+      "banReason": "Motif du blocage (obligatoire)",
+      "banAction": "Bloquer",
+      "banSuccess": "Utilisateur bloqué pour 30 jours.",
+      "unbanSuccess": "Utilisateur débloqué.",
+      "deleteConfirmTitle": "Supprimer l'utilisateur ?",
+      "deleteConfirmMsg": "Toutes les données seront définitivement supprimées.",
+      "deleteSuccess": "Utilisateur supprimé.",
+      "editSaved": "Utilisateur mis à jour.",
+      "editError": "Impossible d'enregistrer les modifications.",
+      "roleFilter": "Rôle",
+      "allRoles": "Tous les rôles",
+      "pageInfo": "Page {page} sur {total}",
+      "prev": "Retour",
+      "next": "Suivant",
+      "unbanConfirmTitle": "Lever le bannissement ?",
+      "unbanConfirmBody": "La personne pourra de nouveau utiliser l’app sans restriction.",
+      "unbanConfirmBtn": "Débannir"
+    },
     "tiles": {
       "users": "Utilisateurs",
       "posts": "Posts",
@@ -890,40 +969,6 @@
     "subUpcoming": "{n} à venir",
     "subVerified": "{n} vérifiés",
     "subConversations": "{n} fils",
-    "verifiedBadge": "Vérifié",
-    "bannedBadge": "Bloqué",
-    "users": {
-      "totalCount": "{n} utilisateurs trouvés",
-      "empty": "Aucun utilisateur trouvé.",
-      "profile": "Profil",
-      "ban": "Bloquer",
-      "unban": "Débloquer",
-      "editTitle": "Modifier l'utilisateur",
-      "name": "Nom",
-      "nickname": "Pseudo",
-      "role": "Rôle",
-      "roleUser": "Utilisateur",
-      "roleModerator": "Modérateur",
-      "roleAdmin": "Administrateur",
-      "banConfirmTitle": "Bloquer cet utilisateur ?",
-      "banReason": "Motif du blocage (obligatoire)",
-      "banAction": "Bloquer",
-      "banSuccess": "Utilisateur bloqué pour 30 jours.",
-      "unbanSuccess": "Utilisateur débloqué.",
-      "deleteConfirmTitle": "Supprimer l'utilisateur ?",
-      "deleteConfirmMsg": "Toutes les données seront définitivement supprimées.",
-      "deleteSuccess": "Utilisateur supprimé.",
-      "editSaved": "Utilisateur mis à jour.",
-      "editError": "Impossible d'enregistrer les modifications.",
-      "roleFilter": "Rôle",
-      "allRoles": "Tous les rôles",
-      "pageInfo": "Page {page} sur {total}",
-      "prev": "Retour",
-      "next": "Suivant",
-      "unbanConfirmTitle": "Lever le bannissement ?",
-      "unbanConfirmBody": "La personne pourra de nouveau utiliser l’app sans restriction.",
-      "unbanConfirmBtn": "Débannir"
-    },
     "chatMod": {
       "title": "Modération du chat",
       "communityChat": "Chat communautaire",
@@ -1054,10 +1099,37 @@
     "broadcastSentInfo": "Envoyé à {count}"
   },
   "create": {
+    "titleRequired": "Le titre est obligatoire.",
+    "nameRequired": "Le nom est obligatoire.",
+    "descRequired": "La description est obligatoire.",
+    "contentRequired": "Le contenu est obligatoire.",
+    "fillTypeAndTitle": "Renseignez le type et le titre.",
+    "fillTitleAndDesc": "Renseignez titre et description.",
+    "picker_title": "Que voulez-vous créer ?",
+    "picker_subtitle": "Choisissez un type.",
+    "picker": {
+      "post": "Publication",
+      "post_desc": "Demande d'aide, offre ou info",
+      "event": "Événement",
+      "event_desc": "Rencontre, atelier, promenade",
+      "marketplace": "Marché",
+      "marketplace_desc": "Donner, échanger, vendre",
+      "group": "Groupe",
+      "group_desc": "Lancer une communauté thématique",
+      "knowledge": "Article wiki",
+      "knowledge_desc": "Partager savoir et guides",
+      "crisis": "Signaler une crise",
+      "crisis_desc": "Signaler une urgence à proximité"
+    },
     "locationUnavailable": "Position non disponible.",
     "maxImages": "Maximum 5 images.",
     "kind": "Type",
     "category": "Catégorie",
+    "scheduling": "Planification",
+    "scheduled_at": "Publication programmée",
+    "expires_at": "Expire",
+    "publish_now": "Publier maintenant",
+    "never": "Jamais",
     "imagesMax5": "Images (max. 5)",
     "contactOptional": "Contact (facultatif)",
     "phoneOnlyInterested": "Téléphone uniquement aux personnes intéressées",
@@ -1085,6 +1157,7 @@
     "description": "Description",
     "tagsCommaSeparated": "Tags (séparés par des virgules)",
     "tagsHint": "courses, seniors, samedi",
+    "tagSuggestions": "Suggestions — touchez pour ajouter",
     "imagesOptional": "Images (optionnel, max. 5)",
     "anonymousSubtitle": "Ton nom et ton avatar ne seront pas affichés.",
     "maybeMean": "Tu veux peut-être dire « {type} » ?",
@@ -1315,6 +1388,10 @@
   },
   "posts": {
     "title": "Publications",
+    "similarTitle": "Publications similaires",
+    "drafts": "Brouillons",
+    "no_drafts": "Aucun brouillon.",
+    "translate": "Traduire",
     "allPosts": "Toutes les publications",
     "linkCopied": "Lien copié dans le presse-papiers",
     "readTime": "{min} min de lecture",
@@ -1397,6 +1474,12 @@
     "listingNotFound": "Annonce introuvable.",
     "condition": "État : {state}",
     "contact": "Contacter",
+    "reserve_request": "Réserver",
+    "reserve_hint": "Envoyez au vendeur une demande de réservation.",
+    "reserve_message": "Message (facultatif)",
+    "reserve_send": "Envoyer la demande",
+    "reserve_sent": "Demande de réservation envoyée.",
+    "reserve_failed": "Échec de la demande.",
     "reserved": "Réservé",
     "sold": "Cédé",
     "contactFailed": "Impossible de contacter le vendeur.",
@@ -1430,6 +1513,10 @@
     "noMatchesHint": "Réinitialise les filtres ou choisis-en d'autres.",
     "beFirstHint": "Sois la première personne — bouton +.",
     "resetFilters": "Réinitialiser les filtres",
+    "badgeFree": "GRATUIT",
+    "badgeSwap": "ÉCHANGE",
+    "badgeLend": "PRÊT",
+    "barterMatchesTitle": "Suggestions d'échange dans cette catégorie",
     "statsActive": "{n} annonces",
     "statsFree": "{n} gratuits",
     "statsClaimed": "{n} attribués",
@@ -1508,6 +1595,16 @@
   },
   "events": {
     "title": "Événement",
+    "checkin_title": "Enregistrement à l'événement",
+    "checkin_count": "{n} enregistrés",
+    "checkin_success": "Enregistré !",
+    "checkin_failed": "Échec de l'enregistrement.",
+    "checkin_organizer_hint": "Les participants scannent ce code pour s'enregistrer.",
+    "checkin_scan_hint": "Pointez la caméra sur le QR de l'organisateur.",
+    "photos": "PHOTOS",
+    "add_photo": "Ajouter une photo",
+    "no_photos": "Aucune photo pour le moment.",
+    "photo_upload_failed": "Échec de l'envoi de la photo.",
     "notFound": "Événement introuvable.",
     "openOnlineLink": "Ouvrir le lien en ligne",
     "bring": "À apporter",
@@ -1697,9 +1794,13 @@
   },
   "groups": {
     "title": "Groupe",
+    "nearbyTitle": "Groupes près de chez vous",
+    "memberCount": "{count} membres",
     "notFound": "Groupe introuvable.",
     "leave": "Quitter",
     "join": "Rejoindre",
+    "joinedSnack": "Vous avez rejoint le groupe.",
+    "leftSnack": "Vous avez quitté le groupe.",
     "posts": "Publications",
     "noPostsYet": "Pas encore de publication dans le groupe.",
     "writePost": "Écrire une publication…",
@@ -1709,7 +1810,6 @@
     "inviteSend": "Inviter",
     "inviteSentTo": "Invitation envoyée à {email}",
     "inviteFailed": "Échec de l’invitation.",
-    "memberCount": "{count} membres",
     "create": "Créer un groupe",
     "categoryLabel": "Catégorie",
     "searchPlaceholder": "Rechercher des groupes…",
@@ -1945,7 +2045,67 @@
     "officialBadge": "OFFICIEL",
     "openSearch": "Chercher un emploi",
     "openPortal": "Ouvrir le portail",
-    "noneInCountry": "Aucun portail d'emploi disponible pour votre pays."
+    "noneInCountry": "Aucun portail d'emploi disponible pour votre pays.",
+    "liveSearchTitle": "Recherche d'emploi en direct (Agence fédérale allemande)",
+    "liveSearchSubtitle": "Offres en temps réel depuis la plus grande base officielle d'Allemagne.",
+    "searchHint": "Métier ou mot-clé …",
+    "radiusKm": "Rayon : {km} km",
+    "enterPlzPrompt": "Entrez un code postal pour trouver des offres proches.",
+    "noneFound": "Aucun résultat",
+    "noneFoundHint": "Essayez un rayon plus large ou un autre mot-clé."
+  },
+  "nasaApod": {
+    "title": "Image du jour",
+    "error": "Impossible de charger l'image NASA.",
+    "empty": "Aucune image disponible aujourd'hui."
+  },
+  "onThisDay": {
+    "title": "Ce jour-là dans l'histoire",
+    "yearsAgo": "il y a {n} ans",
+    "error": "Impossible de charger Wikipédia.",
+    "empty": "Aucun événement pour aujourd'hui."
+  },
+  "identify": {
+    "section": "Identifier",
+    "title": "Identifier une plante ou un animal",
+    "subtitle": "Prenez ou téléversez une photo — l'IA iNaturalist reconnaît l'espèce.",
+    "takePhoto": "Prendre une photo",
+    "fromGallery": "Depuis la galerie",
+    "noPhoto": "Pas encore de photo",
+    "results": "IDENTIFICATION",
+    "noResults": "Aucune identification. Essayez une autre photo.",
+    "disclaimer": "Identification basée sur l'IA iNaturalist. Pour les plantes comestibles, ne vous fiez jamais à l'IA seule."
+  },
+  "wildPicks": {
+    "section": "Points de cueillette",
+    "title": "Fruits sauvages et boîtes à dons",
+    "subtitle": "Arbres fruitiers, boîtes à dons et bibliothèques publiques à proximité — données OpenStreetMap.",
+    "radius": "Rayon : {km} km",
+    "loading": "Chargement …",
+    "count": "{n} spots",
+    "none": "Aucun spot dans cette zone. Déplacez la carte ou dézoomez.",
+    "noneHint": "Essayez un rayon plus large ou une autre position.",
+    "recenter": "Centrer sur ma position",
+    "source": "Source : OpenStreetMap (tags produce, give_box, public_bookcase).",
+    "kind": {
+      "fruit": "Arbre fruitier",
+      "giveBox": "Boîte à dons",
+      "bookcase": "Bibliothèque publique"
+    }
+  },
+  "charge": {
+    "section": "Mobilité électrique",
+    "title": "Bornes de recharge VE",
+    "subtitle": "Bornes publiques à proximité — données OpenStreetMap.",
+    "radius": "Rayon : {km} km",
+    "loading": "Chargement …",
+    "count": "{n} bornes",
+    "none": "Aucune borne trouvée",
+    "noneHint": "Déplacez la carte ou dézoomez pour élargir la zone.",
+    "recenter": "Centrer sur ma position",
+    "unnamed": "Borne de recharge",
+    "fee": "Payant",
+    "free": "Gratuit"
   },
   "civil": {
     "navTitle": "Alertes",
@@ -2054,7 +2214,17 @@
     "savePinTitle": "Enregistrer un repère",
     "savePinHint": "p. ex. café préféré, point de RDV…",
     "removePin": "Supprimer le repère",
+    "removePinConfirm": "Supprimer ce lieu enregistré ?",
     "longPressHint": "Astuce : appuie longuement sur la carte pour enregistrer ton repère.",
+    "a11y": {
+      "unnamed": "Lieu sans nom",
+      "source": "Source : OpenStreetMap (tag wheelchair)",
+      "status": {
+        "yes": "Entièrement accessible",
+        "limited": "Accessibilité limitée",
+        "no": "Non accessible"
+      }
+    },
     "toggleCrises": "Afficher/masquer crises",
     "toggleEvents": "Afficher/masquer événements",
     "routeTo": "Itinéraire",
@@ -2079,6 +2249,8 @@
   },
   "timebank": {
     "history": "Historique",
+    "confirmedSnack": "Entrée confirmée.",
+    "rejectedSnack": "Entrée rejetée.",
     "zeitbankConfirmation": "CONFIRMATION BANQUE DE TEMPS",
     "reject": "Refuser",
     "confirm": "Confirmer",
@@ -2248,9 +2420,42 @@
   "live": {
     "connectionFailed": "Échec de la connexion",
     "waitingParticipants": "En attente des participants …",
-    "tooltipLeave": "Quitter"
+    "tooltipLeave": "Quitter",
+    "openChat": "Ouvrir le chat en direct",
+    "inviteSent": "Invitation envoyée à {name}.",
+    "chatUnavailable": "Chat en direct pas encore disponible.",
+    "scheduled_title": "Lives programmés",
+    "schedule_title": "Programmer un live",
+    "schedule_title_field": "Titre",
+    "schedule_description": "Description (facultative)",
+    "schedule_button": "Programmer le live",
+    "no_scheduled": "Aucun live programmé.",
+    "pick_time": "Choisir date et heure",
+    "reminder_on": "Me rappeler",
+    "reminder_off": "Retirer le rappel",
+    "clip_save": "Enregistrer le clip",
+    "clip_saved": "Clip enregistré."
   },
   "call": {
+    "audio": "Audio",
+    "video": "Vidéo",
+    "qualityExcellent": "Excellent",
+    "qualityGood": "Correct",
+    "qualityPoor": "Faible",
+    "poorConnection": "Connexion faible — la vidéo peut être désactivée.",
+    "screenShareOn": "Partager l'écran",
+    "screenShareOff": "Arrêter le partage",
+    "screenShareFailed": "Le partage d'écran n'est pas pris en charge sur cet appareil.",
+    "pip": "Mini fenêtre",
+    "minimize": "Réduire",
+    "addParticipant": "Ajouter",
+    "addNoFriends": "Vous n'avez pas encore d'amis à inviter.",
+    "addRinging": "Sonne chez {name} …",
+    "addFailed": "Échec de l'invitation.",
+    "cameraDenied": "Permission caméra refusée.",
+    "cameraDeniedPermanent": "La caméra est bloquée. Autorisez l'accès dans les paramètres de l'application.",
+    "cameraFailed": "Impossible d'activer la caméra. Une autre application l'utilise peut-être.",
+    "openSettings": "Paramètres",
     "incoming": "Appel entrant",
     "calling": "Sonne …",
     "ringing": "Appel entrant",
@@ -2260,6 +2465,16 @@
     "callBack": "Rappeler",
     "callEnded": "Appel terminé",
     "notReachable": "Personne injoignable",
+    "confirmTitle": "Démarrer l'appel ?",
+    "confirmBody": "Appeler {name} ?",
+    "confirmStart": "Appeler",
+    "ringingCountdown": "Sonnerie encore {n}s …",
+    "active": "Appel en cours – {name}",
+    "miniPlayerActive": "Appel en cours",
+    "videoAction": "Appel vidéo",
+    "postCallNoteTitle": "Note sur cet appel ?",
+    "postCallNoteHint": "Enregistrée comme note dans la conversation.",
+    "postCallNotePlaceholder": "p. ex. « Rendez-vous samedi à 14h ».",
     "callingLabel": "Appel en cours",
     "ringingHint": "Touche ↓ pour raccrocher",
     "mute": "Muet",
@@ -2273,6 +2488,134 @@
     "reconnecting": "Reconnexion…",
     "failed": "Connexion échouée"
   },
+  "quickReply": {
+    "title": "Répondre à {name} ?",
+    "subtitle": "Pour ne pas laisser l'autre dans le flou.",
+    "in5Min": "De retour dans 5 min 🙏",
+    "busy": "Pas dispo là — je te recontacte.",
+    "willCallBack": "Je te rappelle tout de suite 📞"
+  },
+  "livePoll": {
+    "create": "Lancer un sondage",
+    "questionHint": "Votre question …",
+    "option": "Option {n}",
+    "addOption": "Ajouter une option",
+    "start": "Lancer le sondage",
+    "totalVotes": "{n} votes au total"
+  },
+  "liveSubtitle": {
+    "hint": "Tapez un sous-titre — traduit en direct …"
+  },
+  "watchers": {
+    "title": "Spectateurs ({n})",
+    "empty": "Personne ne regarde encore.",
+    "show": "Liste des spectateurs",
+    "joined": "🙋 {name} a rejoint",
+    "left": "{name} est parti"
+  },
+  "mood": {
+    "title": "Comment vas-tu aujourd'hui ?",
+    "howAreYou": "Choisissez ce que vous ressentez.",
+    "note": "Note facultative …",
+    "save": "Enregistrer",
+    "saveFailed": "Impossible d'enregistrer.",
+    "chartTitle": "Tendance d'humeur (7 j)",
+    "logNow": "Enregistrer",
+    "loadError": "Impossible de charger l'historique.",
+    "empty": "Aucune entrée. Touchez « Enregistrer ».",
+    "streakBadge": "🔥 {count} jours",
+    "helpTitle": "Tu n'es pas seul·e 💚",
+    "helpHint": "Tu as signalé une humeur lourde ces derniers jours. Pour parler : SOS Amitié est gratuit et anonyme, 24/7.",
+    "callTelefonseelsorge": "Appeler le 0800 111 0 111"
+  },
+  "sun": {
+    "title": "Soleil",
+    "sunrise": "Lever",
+    "sunset": "Coucher",
+    "dayLength": "Durée du jour",
+    "goldenHour": "✨ Heure dorée",
+    "pathTitle": "Position du soleil aujourd'hui",
+    "solarNoon": "Midi solaire"
+  },
+  "quote": {
+    "title": "Citation du jour",
+    "share": "Partager la citation",
+    "error": "Impossible de charger la citation.",
+    "empty": "Aucune citation disponible aujourd'hui."
+  },
+  "callHistory": {
+    "title": "Historique des appels",
+    "emptyTitle": "Aucun appel",
+    "emptyDescription": "Vos 30 derniers appels DM apparaîtront ici.",
+    "unknownPeer": "Inconnu",
+    "statusMissed": "Manqué",
+    "statusCancelled": "Annulé",
+    "statusRinging": "Sonne …",
+    "statusEnded": "Terminé",
+    "callbackNoConv": "Aucune conversation trouvée",
+    "callbackFailed": "Échec du rappel",
+    "openHistory": "Ouvrir l'historique des appels",
+    "clearAll": "Effacer l'historique",
+    "clearAllTitle": "Effacer l'historique des appels ?",
+    "clearAllBody": "Tous les appels seront supprimés de votre historique. Les autres conservent le leur.",
+    "cleared": "{n} appels supprimés."
+  },
+  "videoPreview": {
+    "title": "Appel vidéo à {name}",
+    "subtitle": "Vérifiez la caméra et l'éclairage avant de commencer.",
+    "start": "Démarrer",
+    "cameraDenied": "Permission caméra refusée."
+  },
+  "systemCall": {
+    "ended": "Appel audio",
+    "missed": "Appel manqué",
+    "cancelled": "Appel annulé",
+    "declined": "Appel refusé",
+    "duration": "Durée : {d}",
+    "callback": "Rappeler",
+    "callbackFailed": "Échec du rappel"
+  },
+  "sos": {
+    "title": "Urgence",
+    "subtitle": "Touchez un numéro pour appeler immédiatement.",
+    "tooltip": "Urgence",
+    "reportCrisis": "Signaler une crise",
+    "is24h": "24/7",
+    "isFree": "Gratuit",
+    "empty": "Aucun numéro d'urgence configuré pour votre pays."
+  },
+  "drawer": {
+    "pinned": "Épinglé",
+    "unpinned": "Désépinglé",
+    "pinnedSection": "📌 Épinglés",
+    "recentSection": "🕐 Récents"
+  },
+  "traffic": {
+    "title": "Trafic",
+    "error": "Impossible de charger les données de trafic.",
+    "empty": "Aucune perturbation sur les grandes autoroutes."
+  },
+  "books": {
+    "title": "Recommandations de livres",
+    "source": "Open Library",
+    "error": "Impossible de charger les recommandations.",
+    "empty": "Aucune recommandation pour le moment."
+  },
+  "health": {
+    "title": "Astuce santé du jour",
+    "error": "Impossible de charger l'astuce.",
+    "empty": "Aucune astuce disponible aujourd'hui."
+  },
+  "time": {
+    "justNow": "à l'instant",
+    "minutesShort": "il y a {n} min",
+    "hoursShort": "il y a {n} h",
+    "daysShort": "il y a {n} j",
+    "minutesAgo": "il y a {n} min",
+    "hoursAgo": "il y a {n} h",
+    "daysAgo": "il y a {n} jours",
+    "yesterday": "Hier"
+  },
   "voice": {
     "micDenied": "Autorisation du micro refusée."
   },
@@ -2284,6 +2627,10 @@
     "hide": "Masquer",
     "resetDefault": "Restaurer les valeurs par défaut",
     "titles": {
+      "sky": "Ciel",
+      "progressTrio": "Progression",
+      "weeklySummary": "Résumé hebdomadaire",
+      "alertsBadge": "Alertes",
       "greeting": "Salutation",
       "safetyAlerts": "Alertes de sécurité",
       "startup": "Pour commencer",
@@ -2303,9 +2650,33 @@
       "holiday": "Jour férié",
       "successStory": "Réussite",
       "botTip": "Astuce MensaenaBot",
-      "nearYou": "Près de toi"
+      "nearYou": "Près de toi",
+      "traffic": "Trafic",
+      "books": "Recommandations de livres",
+      "health": "Astuce santé",
+      "nasaApod": "NASA — Image du jour",
+      "onThisDay": "Ce jour-là",
+      "mood": "Suivi de l'humeur",
+      "sun": "Soleil",
+      "quote": "Citation du jour",
+      "streak": "Série de connexions",
+      "gratitude": "Gratitude",
+      "karma": "Karma & niveau",
+      "recap": "Récap hebdomadaire",
+      "heatmap": "Carte d'activité",
+      "quickNote": "Note rapide",
+      "helpStreak": "Série d'entraide",
+      "moon": "Phase lunaire",
+      "personalBest": "Record personnel",
+      "affirmation": "Affirmation du jour",
+      "todayEvents": "Événements aujourd'hui / demain",
+      "dailyChallenges": "Défis quotidiens"
     },
     "descriptions": {
+      "sky": "Météo, soleil, lune — balayez pour passer",
+      "progressTrio": "Karma, série, entraide en une ligne",
+      "weeklySummary": "Votre activité + digest communauté en onglets",
+      "alertsBadge": "NINA + niveaux d'eau + rappels alimentaires — compact",
       "greeting": "En-tête personnalisé selon l'heure de la journée",
       "safetyAlerts": "NINA + rappels alimentaires",
       "startup": "Liste d'accueil pour les nouveaux voisins",
@@ -2325,7 +2696,27 @@
       "holiday": "Indication du prochain jour férié",
       "successStory": "Inspiration de la communauté",
       "botTip": "Impulsion quotidienne du voisinage",
-      "nearYou": "Messages locaux à proximité"
+      "nearYou": "Messages locaux à proximité",
+      "traffic": "Principales alertes sur les autoroutes",
+      "books": "Sélection livres communauté et durabilité",
+      "health": "Un petit rappel quotidien pour la santé",
+      "nasaApod": "Photo astronomique du jour + explication",
+      "onThisDay": "Que s'est-il passé ce jour-là ?",
+      "mood": "Check-in quotidien + tendance 7 jours",
+      "sun": "Lever/coucher + heure dorée",
+      "quote": "Une citation par jour pour la réflexion",
+      "streak": "Jours consécutifs dans l'app",
+      "gratitude": "Pour quoi es-tu reconnaissant aujourd'hui ?",
+      "karma": "Vos points karma et niveau actuel",
+      "recap": "Vos 7 derniers jours vs la semaine d'avant",
+      "heatmap": "Vue 12 semaines de votre activité",
+      "quickNote": "Note perso, uniquement sur cet appareil",
+      "helpStreak": "Jours consécutifs où tu as aidé",
+      "moon": "Phase lunaire et illumination du jour",
+      "personalBest": "Vos records pour rester motivé",
+      "affirmation": "Un rappel apaisant par jour",
+      "todayEvents": "Prochain événement dans les 24 h",
+      "dailyChallenges": "3 petits défis quotidiens avec bonus karma"
     }
   },
   "hubs": {
@@ -2411,14 +2802,35 @@
     }
   },
   "notif": {
+    "send_test": "Envoyer une notification test",
+    "test_title": "Test Mensaena",
+    "test_body": "Si vous voyez ceci, les notifications fonctionnent.",
+    "test_sent": "Notification test envoyée.",
+    "radiusSection": "Rayon de notifications",
+    "nearbyToggle": "Push pour les demandes d'aide à proximité",
+    "radiusValue": "Rayon {km} km",
+    "radiusHint": "Seuls les posts help_needed dans ce rayon déclenchent des notifications push.",
     "enable": "Activer les notifications",
     "bannerTitle": "Restez informé",
     "bannerBody": "Activez les notifications pour voir tout de suite les appels, messages et demandes."
   },
+  "reading": {
+    "enter": "Mode lecture",
+    "exit": "Vue normale"
+  },
+  "badges": {
+    "shareBtn": "Partager la réussite",
+    "shareCaption": "Je viens de débloquer le badge ‹{name}› sur Mensaena 🏅",
+    "newlyEarned": "{n} nouveau badge obtenu !"
+  },
   "streak": {
     "title": "Continue",
     "days": "{count} jours d'affilée",
-    "best": "Record"
+    "best": "Record",
+    "freezeAvailable": "Utiliser un freeze — 1× par semaine",
+    "freezeUsed": "Déjà utilisé cette semaine",
+    "freezeApplied": "Freeze activé ❄️ — série préservée",
+    "freezeFailed": "Impossible d'activer le freeze"
   },
   "gratitude": {
     "title": "Gratitude",
@@ -2499,8 +2911,32 @@
     "posts": "publications",
     "comments": "commentaires"
   },
+  "account": {
+    "title": "Mon compte",
+    "export_title": "Exporter mes données",
+    "export_body": "Téléchargez toutes vos données en JSON — posts, messages, évaluations, karma.",
+    "export_button": "Exporter les données",
+    "export_failed": "Échec de l'export. Réessayez plus tard.",
+    "export_subject": "Export de mes données Mensaena",
+    "delete_title": "Supprimer le compte",
+    "delete_intro": "En supprimant votre compte, toutes vos données seront effacées définitivement après un délai de 14 jours.",
+    "delete_body": "Êtes-vous sûr ? Après 14 jours, vos posts, messages et données de profil seront supprimés. Action irréversible.",
+    "delete_button": "Supprimer le compte",
+    "delete_confirm": "Oui, supprimer",
+    "delete_pending": "Suppression demandée",
+    "delete_scheduled_for": "Votre compte sera supprimé le {date}.",
+    "delete_cancel": "Annuler la suppression",
+    "verifyTitle": "Vérification e-mail",
+    "verifyDone": "Votre e-mail {email} est vérifié. ✓",
+    "verifyPending": "Votre e-mail {email} n'est pas encore vérifié. Confirmez-le pour obtenir le badge vérifié.",
+    "verifyResend": "Renvoyer la vérification",
+    "verifySent": "E-mail de vérification envoyé. Vérifiez votre boîte.",
+    "verifyFailed": "Impossible d'envoyer la vérification."
+  },
   "karma": {
     "title": "Karma",
+    "history_title": "Historique karma",
+    "no_history": "Aucune activité karma.",
     "toNext": "Encore {count} points pour le niveau suivant",
     "maxLevel": "Niveau maximum atteint — merci pour tout ce que tu apportes !",
     "helps": "aides",
@@ -2515,6 +2951,145 @@
       "beacon": "Phare"
     }
   },
+  "mentorship": {
+    "title": "Mentorat",
+    "empty": "Vous n'avez aucun mentorat pour le moment.",
+    "you_are_mentor": "Vous êtes mentor",
+    "you_are_mentee": "Vous êtes mentoré·e",
+    "find_title": "Trouver un mentor",
+    "no_mentors": "Aucun mentor disponible pour l'instant.",
+    "match_overlap": "{n} sujet en commun",
+    "request": "Demander",
+    "request_sent": "Demande envoyée.",
+    "request_failed": "Échec de la demande.",
+    "become_title": "Devenir mentor",
+    "become_body": "Vous avez déjà plusieurs compétences — partagez votre savoir.",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "message": "Message",
+    "accepted": "Mentorat accepté.",
+    "declined": "Demande refusée.",
+    "statusPending": "En attente",
+    "statusActive": "Actif",
+    "statusDeclined": "Refusé",
+    "statusEnded": "Terminé",
+    "requested": "Demandé",
+    "requestSent": "Demande de mentorat envoyée.",
+    "requestFailed": "Échec de la demande."
+  },
+  "scheduled_calls": {
+    "title": "Appels programmés",
+    "create_title": "Programmer un appel",
+    "empty": "Aucun appel programmé."
+  },
+  "collections": {
+    "pick_title": "Choisir une collection",
+    "create_title": "Nouvelle collection",
+    "name": "Nom",
+    "emoji": "Emoji (facultatif)",
+    "new": "Nouveau",
+    "default": "Général",
+    "empty": "Aucune collection — appuyez sur + pour en créer une."
+  },
+  "vanish": {
+    "title": "Mode disparition",
+    "description": "Les messages de cette conversation s'effacent automatiquement après la durée choisie.",
+    "enable": "Activer",
+    "lifetime": "Durée",
+    "banner": "Disparition active · les messages disparaissent après {duration}"
+  },
+  "voicemail": {
+    "title": "Messagerie vocale",
+    "empty": "Aucun message vocal.",
+    "send_to": "Envoyer un message vocal",
+    "tap_to_record": "Appuyez pour enregistrer",
+    "recording": "Enregistrement en cours — appuyez pour arrêter.",
+    "sending": "Envoi …",
+    "sent": "Message vocal envoyé.",
+    "error_record": "Échec de l'enregistrement.",
+    "error_upload": "Échec du téléversement.",
+    "error_permission": "Permission micro manquante."
+  },
+  "polls": {
+    "total_votes": "{n} votes",
+    "closed": "Sondage clos · {n} votes",
+    "create_title": "Créer un sondage",
+    "question": "Question",
+    "option_n": "Option {n}",
+    "add_option": "Ajouter une option",
+    "add_to_post": "Joindre le sondage",
+    "no_close": "Laisser ouvert",
+    "duration_hours": "{n} h",
+    "duration_days": "{n} jours"
+  },
+  "status": {
+    "title": "Définir le statut",
+    "set": "Définir le statut",
+    "hint": "Quoi de neuf ?",
+    "clear": "Effacer",
+    "until_cleared": "Jusqu'à ce que je le change",
+    "duration_hours": "{n} heures",
+    "duration_days": "{n} jours"
+  },
+  "sleep_reminder": {
+    "title": "Heure de te déconnecter",
+    "body": "Pose ton téléphone — un bon sommeil fait une journée plus forte.",
+    "section": "Rappel sommeil",
+    "enable": "Activer le rappel sommeil",
+    "time_label": "Me rappeler à {time}",
+    "pick_time": "Choisir une heure"
+  },
+  "event_reminders": {
+    "channelName": "Rappels d'événements",
+    "channelDescription": "Rappel avant les événements enregistrés.",
+    "title": "Rappel d'événement",
+    "body": "{title} commence dans {minutes} minutes."
+  },
+  "modulesHub": {
+    "title": "Tous les modules",
+    "intro": "Parcours les 22 modules de la plateforme Mensaena."
+  },
+  "block": {
+    "cannotInteract": "Impossible de contacter cette personne.",
+    "userBlocked": "Vous avez bloqué cette personne.",
+    "youAreBlocked": "Cette personne vous a bloqué."
+  },
+  "tts": {
+    "read": "Lire à voix haute",
+    "stop": "Stop"
+  },
+  "group_call": {
+    "removedNotice": "Appel de groupe indisponible.",
+    "title": "Appel de groupe",
+    "startBtn": "Appel de groupe",
+    "inviteLabel": "APPEL DE GROUPE",
+    "inviteTitle": "Appel en direct",
+    "inviteCta": "Rejoindre →",
+    "inviteFailed": "Impossible d'envoyer l'invitation.",
+    "connectFailed": "Connexion à l'appel impossible.",
+    "full": "Appel complet — max 10 participants.",
+    "you": "Vous"
+  },
+  "thanks": {
+    "sheetTitle": "Envoyer une carte de remerciement",
+    "recipient": "À {name}",
+    "pickDesign": "Choisir le design",
+    "messageHint": "Note personnelle (facultative) …",
+    "sendBtn": "Envoyer la carte",
+    "sent": "Carte envoyée à {name} 💛",
+    "sendFailed": "Envoi échoué."
+  },
+  "followed_tags": {
+    "title": "Suivre des sujets",
+    "intro": "Suis des hashtags pour personnaliser ton fil.",
+    "addHint": "Saisis un tag (ex. récolte)",
+    "mine": "Tu suis",
+    "empty": "Tu ne suis encore aucun sujet.",
+    "suggested": "Sujets populaires",
+    "noSuggestions": "Pas encore de suggestions.",
+    "added": "#{tag} ajouté.",
+    "removed": "#{tag} retiré."
+  },
   "a11y": {
     "section": "Accessibilité",
     "textScale": "Taille du texte : {pct} %",
@@ -2522,6 +3097,10 @@
     "reduceMotionHint": "Désactive confettis, pulsations et grandes animations.",
     "highContrast": "Contraste élevé",
     "highContrastHint": "Bordures plus marquées et couleurs de texte plus fortes.",
+    "oledMode": "Noir OLED",
+    "oledModeHint": "Fond noir pur pour écrans AMOLED — économise la batterie.",
+    "seniorMode": "Mode senior",
+    "seniorModeHint": "Texte plus grand, moins d'animations, plus de contraste.",
     "performanceMode": "Mode performance",
     "liteAuto": "Automatique (recommandé)",
     "liteOn": "Mode léger : activé",
@@ -2551,26 +3130,252 @@
     "continue": "Continuer quand même",
     "pause": "Fermer l'app"
   },
-  "event_reminders": {
-    "channelName": "Rappels d'événements",
-    "channelDescription": "Rappel avant les événements enregistrés.",
-    "title": "Rappel d'événement",
-    "body": "{title} commence dans {minutes} minutes."
+  "post_intent": {
+    "title": "De quoi s'agit-il ?",
+    "help_needed": "J'ai besoin d'aide",
+    "help_offered": "J'offre mon aide",
+    "item_offered": "J'offre quelque chose",
+    "item_wanted": "Je cherche quelque chose",
+    "event_invite": "Événement",
+    "info_share": "Partager une info",
+    "warning": "Avertissement",
+    "lost_found": "Perdu / Trouvé",
+    "social": "Faire connaissance",
+    "general": "Autre"
   },
-  "modulesHub": {
-    "title": "Tous les modules",
-    "intro": "Parcours les 22 modules de la plateforme Mensaena."
+  "contact": {
+    "title": "Options de contact",
+    "how_to_reach": "Comment souhaitez-vous être contacté ?",
+    "in_app_chat": "Chat dans l'app",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "whatsapp": "WhatsApp",
+    "location_meetup": "Rencontre en personne",
+    "meetup_hint": "Indication du lieu de rendez-vous",
+    "availability": "Disponibilité",
+    "from": "De",
+    "until": "À",
+    "days": "Jours",
+    "note": "Note pour les personnes qui vous contactent",
+    "note_placeholder": "p. ex. appelez seulement l'après-midi",
+    "at_least_one": "Sélectionnez au moins une méthode de contact",
+    "request_sent": "Demande envoyée !",
+    "already_requested": "Vous avez déjà une demande ouverte",
+    "request_pending": "Demande envoyée ⏳",
+    "request_accepted": "Demande acceptée ✅",
+    "request_declined": "Demande refusée",
+    "manage_requests": "Gérer les demandes",
+    "cta": {
+      "offer_help": "Aider maintenant",
+      "request_help": "Accepter l'aide",
+      "contact_seller": "Contacter",
+      "offer_item": "Je l'ai !",
+      "join_event": "Rejoindre",
+      "thanks": "Merci pour l'info !",
+      "report_update": "Signaler une mise à jour",
+      "i_found_it": "Je l'ai trouvé !",
+      "connect": "Se connecter",
+      "contact": "Prendre contact",
+      "add_calendar": "Ajouter au calendrier",
+      "ask_question": "Poser une question",
+      "share": "Partager",
+      "call_now": "Appeler maintenant"
+    },
+    "requests": {
+      "title": "Demandes de contact",
+      "empty": "Aucune demande pour le moment",
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "complete": "Marquer comme terminé",
+      "pending": "ouvert",
+      "accepted": "acceptée",
+      "completed": "terminée",
+      "via": "Via",
+      "helpers_count": "{count} personnes aident déjà",
+      "participants_count": "{count} participants",
+      "message_placeholder": "Message facultatif …",
+      "choose_method": "Comment souhaitez-vous prendre contact ?"
+    },
+    "notification": {
+      "request_received": "{name} veut vous contacter",
+      "request_accepted": "Votre demande a été acceptée !",
+      "request_declined": "Votre demande a été refusée",
+      "completed": "Action terminée ! +{karma} Karma"
+    }
   },
-  "followed_tags": {
-    "title": "Suivre des sujets",
-    "intro": "Suis des hashtags pour personnaliser ton fil.",
-    "addHint": "Saisis un tag (ex. récolte)",
-    "mine": "Tu suis",
-    "empty": "Tu ne suis encore aucun sujet.",
-    "suggested": "Sujets populaires",
-    "noSuggestions": "Pas encore de suggestions.",
-    "added": "#{tag} ajouté.",
-    "removed": "#{tag} retiré."
+  "stories": {
+    "add": "Ta",
+    "uploading": "Envoi de la story …",
+    "upload_failed": "Échec de l'envoi.",
+    "expired": "Expirée"
+  },
+  "livestream": {
+    "chat": "Chat du live",
+    "send_message": "Envoyer un message …",
+    "viewers": "Spectateurs",
+    "applause": "Applaudissements",
+    "star": "Étoile",
+    "diamond": "Diamant",
+    "not_enough_karma": "Pas assez de karma pour ce cadeau."
+  },
+  "community": {
+    "polls": "Sondages de la communauté",
+    "create_poll": "Créer un sondage",
+    "publish": "Publier",
+    "pollCreated": "Sondage créé.",
+    "pollFailed": "Impossible de créer le sondage.",
+    "question": "Question",
+    "option": "Option",
+    "add_option": "Ajouter une option",
+    "anonymous": "Voter anonymement",
+    "votes": "votes",
+    "no_polls": "Aucun sondage pour l'instant.",
+    "leaderboard": "Classement",
+    "this_week": "CETTE SEMAINE",
+    "no_leaderboard": "Pas encore de données.",
+    "daily_challenges": "Défis quotidiens",
+    "price_below_avg": "Sous la moyenne (∅ {avg} €)",
+    "price_above_avg": "Au-dessus de la moyenne (∅ {avg} €)"
+  },
+  "smartReply": {
+    "sheetTitle": "Message à propos du post",
+    "sheetHint": "Touchez une suggestion ou écrivez la vôtre.",
+    "placeholder": "Écrivez votre message …",
+    "openOnly": "Ouvrir le chat seulement",
+    "send": "Envoyer",
+    "helpNeeded": {
+      "1": "Salut ! J'ai vu ton post „{title}\" — quand as-tu besoin d'aide ?",
+      "2": "Salut, je peux aider pour „{title}\". On se voit où ?",
+      "3": "Salut ! Avec plaisir. Dis-moi quand ça t'arrange."
+    },
+    "helpOffered": {
+      "1": "Salut ! Ton offre „{title}\" est super — j'aimerais l'accepter.",
+      "2": "Salut, c'est exactement ce dont j'ai besoin. Quand ça t'arrange ?",
+      "3": "Salut ! J'accepte volontiers. Comment on procède ?"
+    },
+    "itemOffered": {
+      "1": "Salut ! „{title}\" est encore dispo ?",
+      "2": "Bonjour ! „{title}\" m'intéresse — quand puis-je passer ?",
+      "3": "Salut, c'est toujours dispo ? J'aimerais le récupérer."
+    },
+    "itemWanted": {
+      "1": "Salut ! J'ai ce que tu cherches — „{title}\". On s'organise comment ?",
+      "2": "Salut ! Je peux te fournir ce que tu cherches.",
+      "3": "Salut, je réponds à ta demande — je l'ai chez moi."
+    },
+    "eventInvite": {
+      "1": "Salut ! J'aimerais venir à „{title}\" — il reste des places ?",
+      "2": "Salut ! „{title}\" a l'air super, je viens.",
+      "3": "Salut, je viens. Faut-il apporter quelque chose ?"
+    },
+    "lostFound": {
+      "1": "Bonjour ! Je crois avoir vu „{title}\" — on peut discuter ?",
+      "2": "Salut ! Je vais aider à chercher. D'autres indices ?",
+      "3": "Salut, je te dis si je trouve quelque chose."
+    },
+    "social": {
+      "1": "Salut ! J'ai vu ton profil — j'aimerais te rencontrer.",
+      "2": "Salut, on se voit un de ces jours !",
+      "3": "Salut ! Ça va ? Un café ?"
+    },
+    "general": {
+      "1": "Salut ! J'ai vu ton post „{title}\".",
+      "2": "Salut, une question rapide sur ton post.",
+      "3": "Salut ! On peut discuter brièvement ?"
+    }
+  },
+  "neighbors": {
+    "title": "Nouveau dans ton quartier"
+  },
+  "recent": {
+    "title": "Visités récemment"
+  },
+  "friends": {
+    "screenTitle": "Amis",
+    "tabAll": "Tes amis",
+    "tabOnline": "En ligne",
+    "tabRequests": "Demandes",
+    "tabFind": "Trouver",
+    "searchHint": "Rechercher des amis …",
+    "findHint": "Tape un nom pour trouver des utilisateurs …",
+    "findPrompt": "Tape au moins 2 caractères pour trouver des utilisateurs et envoyer des demandes.",
+    "findNoResults": "Aucun utilisateur trouvé.",
+    "stateAdd": "Ajouter",
+    "requestSent": "Demande envoyée à {name}.",
+    "requestAccepted": "Demande acceptée.",
+    "requestDeclined": "Demande refusée.",
+    "requestFailed": "Impossible d'envoyer la demande.",
+    "stateRequested": "Demandée",
+    "stateAccept": "Accepter",
+    "stateFriends": "Amis",
+    "noFriends": "Pas encore d'amis — rencontre-en via posts et événements.",
+    "noOnline": "Personne en ligne pour l'instant.",
+    "noRequests": "Aucune demande en attente.",
+    "wantsToConnect": "veut se connecter avec toi",
+    "chatTooltip": "Message direct",
+    "suggestionsTitle": "Personnes que tu pourrais connaître",
+    "fromYourArea": "De ta région",
+    "incomingTitle": "Demandes pour toi",
+    "outgoingTitle": "Envoyées par toi",
+    "stateRequestedTo": "Demande à {name}",
+    "cancelRequest": "Retirer"
+  },
+  "friend": {
+    "request": "Envoyer une demande d'ami",
+    "request_again": "Renvoyer la demande",
+    "requested": "Demande envoyée",
+    "accept": "Accepter la demande",
+    "friends": "Amis",
+    "request_sent": "Demande envoyée.",
+    "request_canceled": "Demande retirée.",
+    "request_failed": "Action échouée.",
+    "accepted": "Amitié confirmée.",
+    "removed": "Amitié terminée.",
+    "unfriend_title": "Mettre fin à l'amitié ?",
+    "unfriend_body": "Vous ne serez plus amis — le suivi reste inchangé.",
+    "unfriend_confirm": "Terminer"
+  },
+  "gas": {
+    "title": "Prix du carburant à proximité",
+    "empty": "Aucune station trouvée — GPS activé ?",
+    "closed": "fermé",
+    "navigate": "Itinéraire",
+    "demoTitle": "Prix en direct indisponibles",
+    "demoBody": "La clé démo Tankerkönig est utilisée — toutes les stations affichent les mêmes prix. Admin : définir une vraie clé dans private.push_config."
+  },
+  "dashboard": {
+    "edit": {
+      "title": "Modifier le tableau de bord",
+      "hint": "Faites glisser les widgets pour les réorganiser",
+      "done": "Terminé",
+      "reset": "Réinitialiser",
+      "reset_confirm": "Réinitialiser le tableau ? Votre disposition sera perdue.",
+      "reset_yes": "Réinitialiser",
+      "reset_no": "Annuler",
+      "add_widget": "Ajouter un widget",
+      "all_active": "Tous les widgets sont actifs",
+      "onboarding": "Appuyez longuement sur le tableau pour réorganiser et personnaliser",
+      "onboarding_ok": "Compris",
+      "widget_disabled": "Widget désactivé",
+      "widget_enabled": "Widget activé"
+    },
+    "sections": {
+      "myDay": "Ma journée",
+      "community": "Communauté et activité",
+      "gamification": "Progression",
+      "environment": "Environnement et nature",
+      "knowledge": "Savoir et réflexion",
+      "events": "Événements et banque de temps"
+    },
+    "collapseAll": "Tout réduire",
+    "expandAll": "Tout développer",
+    "summary": {
+      "mine": "Mon activité",
+      "community": "Communauté"
+    },
+    "alerts": {
+      "allClear": "Tout va bien"
+    }
   },
   "interactions": {
     "noneTitle": "Aucune activité d'aide pour l'instant",
@@ -2627,14 +3432,6 @@
     "phone": "Numéro de téléphone",
     "community": "Confiance de la communauté",
     "admin": "Vérifié par admin"
-  },
-  "account": {
-    "verifyTitle": "Vérification e-mail",
-    "verifyDone": "Votre e-mail {email} est vérifié. ✓",
-    "verifyPending": "Votre e-mail {email} n'est pas encore vérifié. Confirmez-le pour obtenir le badge vérifié.",
-    "verifyResend": "Renvoyer la vérification",
-    "verifySent": "E-mail de vérification envoyé. Vérifiez votre boîte.",
-    "verifyFailed": "Impossible d'envoyer la vérification."
   },
   "firstAid": {
     "title": "Premiers secours (hors ligne)",
@@ -2709,13 +3506,6 @@
     "sosFrom": "SOS de {name}",
     "safeFrom": "{name} est en sécurité"
   },
-  "friends": {
-    "incomingTitle": "Demandes pour toi",
-    "outgoingTitle": "Envoyées par toi",
-    "stateRequestedTo": "Demande à {name}",
-    "cancelRequest": "Retirer",
-    "tabAll": "Tes amis"
-  },
   "battery": {
     "title": "Recevoir les appels de façon fiable",
     "body": "Pour que les appels et messages importants te parviennent immédiatement même app fermée, exclus Mensaena de l’optimisation de la batterie. Sinon Android peut arrêter l’app en arrière-plan.",
@@ -2725,11 +3515,6 @@
     "openSettings": "Ouvrir les paramètres",
     "done": "Terminé"
   },
-  "gas": {
-    "navigate": "Itinéraire",
-    "demoTitle": "Prix en direct indisponibles",
-    "demoBody": "La clé démo Tankerkönig est utilisée — toutes les stations affichent les mêmes prix. Admin : définir une vraie clé dans private.push_config."
-  },
   "report": {
     "reasonFraud": "Fraude / arnaque",
     "reasonSpam": "Spam",
@@ -2738,25 +3523,8 @@
     "reasonOther": "Autre",
     "thanks": "Signalement envoyé. Merci !"
   },
-  "badges": {
-    "newlyEarned": "{n} nouveau badge obtenu !"
-  },
   "mentalSupport": {
     "launchFailed": "Impossible de lancer l’appel."
-  },
-  "mentorship": {
-    "accept": "Accepter",
-    "decline": "Refuser",
-    "message": "Message",
-    "accepted": "Mentorat accepté.",
-    "declined": "Demande refusée.",
-    "statusPending": "En attente",
-    "statusActive": "Actif",
-    "statusDeclined": "Refusé",
-    "statusEnded": "Terminé",
-    "requested": "Demandé",
-    "requestSent": "Demande de mentorat envoyée.",
-    "requestFailed": "Échec de la demande."
   },
   "postCard": {
     "savedToast": "✓ Publication enregistrée.",

@@ -4,10 +4,12 @@
     "cancel": "İptal",
     "save": "Kaydet",
     "delete": "Sil",
+    "undo": "Geri al",
     "edit": "Düzenle",
     "close": "Kapat",
     "back": "Geri",
     "next": "İleri",
+    "openProfile": "Profili aç",
     "send": "Gönder",
     "search": "Ara",
     "loading": "Yükleniyor …",
@@ -83,7 +85,9 @@
     "skills": "Beceriler",
     "badges": "Rozetler",
     "calendar": "Takvim",
+    "friends": "Arkadaşlar",
     "followedTags": "Konuları takip et",
+    "savedPosts": "Kayıtlı gönderiler",
     "invite": "Komşuları davet et",
     "interactions": "Etkileşimler",
     "organizations": "Kuruluşlar",
@@ -195,6 +199,8 @@
     "editProfile": "Profili düzenle",
     "share": "Profili paylaş",
     "shareMessage": "{name} adlı kişiyi Mensaena'da gör: {url}",
+    "follow": "Takip et",
+    "unfollow": "Takipten çık",
     "saved": "Kaydedildi",
     "name": "İsim",
     "bio": "Hakkımda",
@@ -379,9 +385,14 @@
       "cinemaMode": "SİNEMA MODU",
       "effectStrength": "EFEKT YOĞUNLUĞU",
       "sound": "SES",
+      "callSound": "ARAMA SESİ VE SES SEVİYESİ",
       "uiSounds": "Arayüz sesleri",
       "automatic": "OTOMATİK",
       "chooseManually": "ELLE SEÇ"
+    },
+    "callSound": {
+      "ringVolume": "Zil sesi seviyesi",
+      "vibration": "Aramalarda titreşim"
     },
     "tabs": {
       "account": "Hesap",
@@ -426,6 +437,10 @@
     "nameLabel": "İsim",
     "appVersionLabel": "UYGULAMA SÜRÜMÜ",
     "bugReport": "Hata bildir",
+    "checkForUpdate": "Güncelleme ara",
+    "checkingForUpdate": "Güncellemeler aranıyor …",
+    "patchReady": "Yama #{n} hazır — lütfen uygulamayı yeniden başlat",
+    "noUpdate": "En son sürümdesin",
     "errorPrefix": "Hata: {error}",
     "profileVisibility": "Profil görünürlüğü",
     "locationLabel": "Konum",
@@ -531,6 +546,13 @@
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",
+    "share_live_location": "Canlı konum paylaş",
+    "share_live_location_hint": "Konumun sohbet ile canlı paylaşılır.",
+    "share_duration": "{min} dakika",
+    "share_stop": "Paylaşımı durdur",
+    "share_no_permission": "Konum izni eksik.",
+    "mute": "Sessize al",
+    "unmute": "Sesi aç",
     "communityChannel": "Topluluk kanalı",
     "groupSubtitle": "Grup",
     "noConversations": "Henüz mesaj yok.",
@@ -587,6 +609,24 @@
     "editFailed": "Düzenleme başarısız.",
     "deleted": "Mesaj silindi.",
     "deleteFailed": "Silme başarısız.",
+    "postCardLabel": "GÖNDERİ HAKKINDA",
+    "postCardFallback": "Gönderi artık mevcut değil.",
+    "forward": "İlet",
+    "forwarded": "İLETİLDİ",
+    "forwardTitle": "Kime iletilsin?",
+    "forwardSearchHint": "Sohbet ara …",
+    "forwardNoTargets": "Başka sohbet bulunamadı.",
+    "forwardedTo": "{name} kişisine iletildi.",
+    "forwardFailed": "İletme başarısız.",
+    "recapMenuTitle": "Hızlı özet",
+    "recapMenuHint": "Son 100 mesajın istatistik ve anahtar kelimeleri",
+    "recapTitle": "Özet: {name}",
+    "recapEmpty": "Bu sohbette henüz mesaj yok.",
+    "recapMessageCount": "Mesajlar",
+    "recapParticipants": "Katılımcılar",
+    "recapTimespan": "Süre",
+    "recapKeywords": "Anahtar kelimeler",
+    "recapLastMessage": "Son mesaj",
     "pinned": "📌 Mesaj sabitlendi.",
     "unpinned": "Sabit kaldırıldı.",
     "welcomeChannelTitle": "#{name} kanalına hoş geldin",
@@ -697,6 +737,7 @@
     "notAuthenticated": "Oturum açılmamış."
   },
   "home": {
+    "tapAgainToExit": "Çıkmak için tekrar dokun",
     "quickActions": "Hızlı işlemler",
     "viewAll": "Tümünü gör",
     "trust": "Güven",
@@ -728,6 +769,7 @@
     "statInteractions": "Etkileşim",
     "statTrust": "Güven",
     "qaPost": "Paylaş",
+    "qaModules": "Modüller",
     "qaMap": "Harita",
     "qaChat": "Sohbet",
     "qaSos": "Kriz SOS",
@@ -786,6 +828,9 @@
       "botFeedback": "Bot geri bildirimi",
       "groups": "Gruplar"
     },
+    "crash_logs": "Çökme kayıtları",
+    "no_crashes": "Son 7 günde çökme yok.",
+    "no_access": "Bu alana erişim yetkin yok.",
     "statusSetTo": "Durum \"{s}\" olarak ayarlandı.",
     "statusUpdateFailed": "Durum güncellemesi başarısız.",
     "actionFailed": "İşlem başarısız.",
@@ -837,6 +882,40 @@
     "searchUsersHint": "İsim veya e-posta ara…",
     "searchReason": "Sebep ara…",
     "adminTitle": "Admin",
+    "verifiedBadge": "Doğrulandı",
+    "bannedBadge": "Yasaklı",
+    "users": {
+      "totalCount": "{n} kullanıcı bulundu",
+      "empty": "Kullanıcı bulunamadı.",
+      "profile": "Profil",
+      "ban": "Yasakla",
+      "unban": "Yasağı kaldır",
+      "editTitle": "Kullanıcıyı düzenle",
+      "name": "Ad",
+      "nickname": "Takma ad",
+      "role": "Rol",
+      "roleUser": "Kullanıcı",
+      "roleModerator": "Moderatör",
+      "roleAdmin": "Yönetici",
+      "banConfirmTitle": "Bu kullanıcı yasaklansın mı?",
+      "banReason": "Yasaklama nedeni (zorunlu)",
+      "banAction": "Yasakla",
+      "banSuccess": "Kullanıcı 30 gün boyunca yasaklandı.",
+      "unbanSuccess": "Kullanıcının yasağı kaldırıldı.",
+      "deleteConfirmTitle": "Kullanıcı silinsin mi?",
+      "deleteConfirmMsg": "Tüm veriler kalıcı olarak silinecek.",
+      "deleteSuccess": "Kullanıcı silindi.",
+      "editSaved": "Kullanıcı güncellendi.",
+      "editError": "Değişiklikler kaydedilemedi.",
+      "roleFilter": "Rol",
+      "allRoles": "Tüm roller",
+      "pageInfo": "{total} sayfadan {page}. sayfa",
+      "prev": "Geri",
+      "next": "İleri",
+      "unbanConfirmTitle": "Yasak kaldırılsın mı?",
+      "unbanConfirmBody": "Kişi uygulamayı yeniden kısıtlamasız kullanabilecek.",
+      "unbanConfirmBtn": "Yasağı kaldır"
+    },
     "tiles": {
       "users": "Kullanıcılar",
       "posts": "Gönderiler",
@@ -889,40 +968,6 @@
     "subUpcoming": "{n} yaklaşan",
     "subVerified": "{n} doğrulanmış",
     "subConversations": "{n} sohbet",
-    "verifiedBadge": "Doğrulandı",
-    "bannedBadge": "Yasaklı",
-    "users": {
-      "totalCount": "{n} kullanıcı bulundu",
-      "empty": "Kullanıcı bulunamadı.",
-      "profile": "Profil",
-      "ban": "Yasakla",
-      "unban": "Yasağı kaldır",
-      "editTitle": "Kullanıcıyı düzenle",
-      "name": "Ad",
-      "nickname": "Takma ad",
-      "role": "Rol",
-      "roleUser": "Kullanıcı",
-      "roleModerator": "Moderatör",
-      "roleAdmin": "Yönetici",
-      "banConfirmTitle": "Bu kullanıcı yasaklansın mı?",
-      "banReason": "Yasaklama nedeni (zorunlu)",
-      "banAction": "Yasakla",
-      "banSuccess": "Kullanıcı 30 gün boyunca yasaklandı.",
-      "unbanSuccess": "Kullanıcının yasağı kaldırıldı.",
-      "deleteConfirmTitle": "Kullanıcı silinsin mi?",
-      "deleteConfirmMsg": "Tüm veriler kalıcı olarak silinecek.",
-      "deleteSuccess": "Kullanıcı silindi.",
-      "editSaved": "Kullanıcı güncellendi.",
-      "editError": "Değişiklikler kaydedilemedi.",
-      "roleFilter": "Rol",
-      "allRoles": "Tüm roller",
-      "pageInfo": "{total} sayfadan {page}. sayfa",
-      "prev": "Geri",
-      "next": "İleri",
-      "unbanConfirmTitle": "Yasak kaldırılsın mı?",
-      "unbanConfirmBody": "Kişi uygulamayı yeniden kısıtlamasız kullanabilecek.",
-      "unbanConfirmBtn": "Yasağı kaldır"
-    },
     "chatMod": {
       "title": "Sohbet moderasyonu",
       "communityChat": "Topluluk sohbeti",
@@ -1053,10 +1098,37 @@
     "broadcastSentInfo": "{count} kişiye gönderildi"
   },
   "create": {
+    "titleRequired": "Başlık gerekli.",
+    "nameRequired": "İsim gerekli.",
+    "descRequired": "Açıklama gerekli.",
+    "contentRequired": "İçerik gerekli.",
+    "fillTypeAndTitle": "Lütfen tür ve başlığı doldur.",
+    "fillTitleAndDesc": "Lütfen başlık ve açıklamayı doldur.",
+    "picker_title": "Ne oluşturmak istersin?",
+    "picker_subtitle": "Bir tür seç.",
+    "picker": {
+      "post": "Gönderi",
+      "post_desc": "Yardım isteği, teklif veya bilgi",
+      "event": "Etkinlik",
+      "event_desc": "Buluşma, atölye, yürüyüş",
+      "marketplace": "Pazar",
+      "marketplace_desc": "Ver, takas et, sat",
+      "group": "Grup",
+      "group_desc": "Konu topluluğu kur",
+      "knowledge": "Wiki makalesi",
+      "knowledge_desc": "Bilgi ve rehber paylaş",
+      "crisis": "Kriz bildir",
+      "crisis_desc": "Yakındaki bir acil durumu bildir"
+    },
     "locationUnavailable": "Konum mevcut değil.",
     "maxImages": "En fazla 5 resim.",
     "kind": "Tür",
     "category": "Kategori",
+    "scheduling": "Zamanlama",
+    "scheduled_at": "Planlanan yayın",
+    "expires_at": "Sona erer",
+    "publish_now": "Hemen yayınla",
+    "never": "Hiçbir zaman",
     "imagesMax5": "Resimler (en fazla 5)",
     "contactOptional": "İletişim (isteğe bağlı)",
     "phoneOnlyInterested": "Telefonu sadece ilgilenenlerle paylaş",
@@ -1084,6 +1156,7 @@
     "description": "Açıklama",
     "tagsCommaSeparated": "Etiketler (virgülle)",
     "tagsHint": "alışveriş, yaşlılar, cumartesi",
+    "tagSuggestions": "Öneriler — eklemek için dokun",
     "imagesOptional": "Görseller (opsiyonel, en fazla 5)",
     "anonymousSubtitle": "İsmin ve avatarın gösterilmez.",
     "maybeMean": "Belki şunu kastettin: \"{type}\"?",
@@ -1314,6 +1387,10 @@
   },
   "posts": {
     "title": "Gönderiler",
+    "similarTitle": "Benzer gönderiler",
+    "drafts": "Taslaklar",
+    "no_drafts": "Henüz taslak yok.",
+    "translate": "Çevir",
     "allPosts": "Tüm gönderiler",
     "linkCopied": "Bağlantı panoya kopyalandı",
     "readTime": "{min} dk okuma",
@@ -1396,6 +1473,12 @@
     "listingNotFound": "İlan bulunamadı.",
     "condition": "Durum: {state}",
     "contact": "İletişim",
+    "reserve_request": "Rezerve et",
+    "reserve_hint": "Satıcıya bir rezervasyon isteği gönder.",
+    "reserve_message": "Mesaj (isteğe bağlı)",
+    "reserve_send": "İsteği gönder",
+    "reserve_sent": "Rezervasyon isteği gönderildi.",
+    "reserve_failed": "İstek başarısız.",
     "reserved": "Rezerve",
     "sold": "Verildi",
     "contactFailed": "Satıcıya ulaşılamadı.",
@@ -1429,6 +1512,10 @@
     "noMatchesHint": "Filtreleri sıfırla veya başka dene.",
     "beFirstHint": "İlk sen ol — artı düğmesi.",
     "resetFilters": "Filtreleri sıfırla",
+    "badgeFree": "BEDAVA",
+    "badgeSwap": "TAKAS",
+    "badgeLend": "ÖDÜNÇ",
+    "barterMatchesTitle": "Bu kategoride takas önerileri",
     "statsActive": "{n} ilan",
     "statsFree": "{n} ücretsiz",
     "statsClaimed": "{n} verildi",
@@ -1507,6 +1594,16 @@
   },
   "events": {
     "title": "Etkinlik",
+    "checkin_title": "Etkinlik girişi",
+    "checkin_count": "{n} kişi giriş yaptı",
+    "checkin_success": "Giriş yapıldı!",
+    "checkin_failed": "Giriş başarısız.",
+    "checkin_organizer_hint": "Katılımcılar girmek için bu kodu tarar.",
+    "checkin_scan_hint": "Kamerayı organizatörün QR koduna doğrult.",
+    "photos": "FOTOĞRAFLAR",
+    "add_photo": "Fotoğraf ekle",
+    "no_photos": "Henüz fotoğraf yok.",
+    "photo_upload_failed": "Fotoğraf yüklenemedi.",
     "notFound": "Etkinlik bulunamadı.",
     "openOnlineLink": "Çevrimiçi bağlantıyı aç",
     "bring": "Yanında getir",
@@ -1696,9 +1793,13 @@
   },
   "groups": {
     "title": "Grup",
+    "nearbyTitle": "Yakındaki gruplar",
+    "memberCount": "{count} üye",
     "notFound": "Grup bulunamadı.",
     "leave": "Ayrıl",
     "join": "Katıl",
+    "joinedSnack": "Gruba katıldın.",
+    "leftSnack": "Gruptan ayrıldın.",
     "posts": "Gönderiler",
     "noPostsYet": "Henüz grupta gönderi yok.",
     "writePost": "Bir gönderi yaz…",
@@ -1708,7 +1809,6 @@
     "inviteSend": "Davet et",
     "inviteSentTo": "Davet gönderildi: {email}",
     "inviteFailed": "Davet başarısız oldu.",
-    "memberCount": "{count} üye",
     "create": "Grup oluştur",
     "categoryLabel": "Kategori",
     "searchPlaceholder": "Grupları ara…",
@@ -1944,7 +2044,67 @@
     "officialBadge": "RESMİ",
     "openSearch": "İş ara",
     "openPortal": "Portalı aç",
-    "noneInCountry": "Ülkeniz için iş portalı bulunmuyor."
+    "noneInCountry": "Ülkeniz için iş portalı bulunmuyor.",
+    "liveSearchTitle": "Canlı iş arama (Almanya İş Kurumu)",
+    "liveSearchSubtitle": "Almanya'nın en büyük resmi veri tabanından gerçek zamanlı ilanlar.",
+    "searchHint": "Meslek veya anahtar kelime …",
+    "radiusKm": "Yarıçap: {km} km",
+    "enterPlzPrompt": "Yakındaki ilanları görmek için posta kodu gir.",
+    "noneFound": "Sonuç yok",
+    "noneFoundHint": "Daha geniş bir yarıçap veya farklı bir anahtar kelime dene."
+  },
+  "nasaApod": {
+    "title": "Günün resmi",
+    "error": "NASA resmi yüklenemedi.",
+    "empty": "Bugün için resim yok."
+  },
+  "onThisDay": {
+    "title": "Tarihte bugün",
+    "yearsAgo": "{n} yıl önce",
+    "error": "Wikipedia yüklenemedi.",
+    "empty": "Bugün için olay yok."
+  },
+  "identify": {
+    "section": "Tanımla",
+    "title": "Bitki veya hayvan tanımla",
+    "subtitle": "Bir fotoğraf çek veya yükle — iNaturalist YZ türü tanır.",
+    "takePhoto": "Fotoğraf çek",
+    "fromGallery": "Galeriden",
+    "noPhoto": "Henüz fotoğraf yok",
+    "results": "TANIMLAMA",
+    "noResults": "Tanımlanamadı. Başka bir fotoğraf dene.",
+    "disclaimer": "iNaturalist YZ tabanlı. Yenilebilir bitkilerde asla yalnızca YZ'ye güvenme."
+  },
+  "wildPicks": {
+    "section": "Toplama noktaları",
+    "title": "Yabani meyveler ve paylaşım kutuları",
+    "subtitle": "Yakındaki meyve ağaçları, paylaşım kutuları ve kitap dolapları — veriler OpenStreetMap'ten.",
+    "radius": "Yarıçap: {km} km",
+    "loading": "Yükleniyor …",
+    "count": "{n} nokta",
+    "none": "Bu alanda nokta yok. Haritayı kaydır veya uzaklaş.",
+    "noneHint": "Daha geniş bir yarıçap veya farklı bir konum dene.",
+    "recenter": "Konumumda merkezle",
+    "source": "Kaynak: OpenStreetMap (produce, give_box, public_bookcase etiketleri).",
+    "kind": {
+      "fruit": "Meyve ağacı",
+      "giveBox": "Paylaşım kutusu",
+      "bookcase": "Kitap dolabı"
+    }
+  },
+  "charge": {
+    "section": "E-mobilite",
+    "title": "EV şarj istasyonları",
+    "subtitle": "Yakındaki genel şarj noktaları — veriler OpenStreetMap'ten.",
+    "radius": "Yarıçap: {km} km",
+    "loading": "Yükleniyor …",
+    "count": "{n} istasyon",
+    "none": "İstasyon bulunamadı",
+    "noneHint": "Alanı genişletmek için haritayı kaydır veya uzaklaş.",
+    "recenter": "Konumumda merkezle",
+    "unnamed": "Şarj istasyonu",
+    "fee": "Ücretli",
+    "free": "Ücretsiz"
   },
   "civil": {
     "navTitle": "Uyarılar",
@@ -2053,7 +2213,17 @@
     "savePinTitle": "İğne kaydet",
     "savePinHint": "ör. favori kafe, buluşma noktası…",
     "removePin": "İğneyi sil",
+    "removePinConfirm": "Bu kayıtlı yer silinsin mi?",
     "longPressHint": "İpucu: kendi iğneni kaydetmek için haritaya uzun bas.",
+    "a11y": {
+      "unnamed": "İsimsiz yer",
+      "source": "Kaynak: OpenStreetMap (wheelchair etiketi)",
+      "status": {
+        "yes": "Tamamen erişilebilir",
+        "limited": "Sınırlı erişilebilirlik",
+        "no": "Erişilebilir değil"
+      }
+    },
     "toggleCrises": "Krizleri aç/kapat",
     "toggleEvents": "Etkinlikleri aç/kapat",
     "routeTo": "Yol tarifi",
@@ -2078,6 +2248,8 @@
   },
   "timebank": {
     "history": "Geçmiş",
+    "confirmedSnack": "Kayıt onaylandı.",
+    "rejectedSnack": "Kayıt reddedildi.",
     "zeitbankConfirmation": "ZAMAN BANKASI ONAYI",
     "reject": "Reddet",
     "confirm": "Onayla",
@@ -2247,9 +2419,42 @@
   "live": {
     "connectionFailed": "Bağlantı başarısız",
     "waitingParticipants": "Katılımcılar bekleniyor …",
-    "tooltipLeave": "Ayrıl"
+    "tooltipLeave": "Ayrıl",
+    "openChat": "Canlı sohbeti aç",
+    "inviteSent": "{name} kişisine davet gönderildi.",
+    "chatUnavailable": "Canlı sohbet henüz mevcut değil.",
+    "scheduled_title": "Planlanan canlı yayınlar",
+    "schedule_title": "Yayın planla",
+    "schedule_title_field": "Başlık",
+    "schedule_description": "Açıklama (isteğe bağlı)",
+    "schedule_button": "Yayını planla",
+    "no_scheduled": "Planlanan yayın yok.",
+    "pick_time": "Tarih ve saat seç",
+    "reminder_on": "Hatırlat",
+    "reminder_off": "Hatırlatmayı kaldır",
+    "clip_save": "Klibi kaydet",
+    "clip_saved": "Klip kaydedildi."
   },
   "call": {
+    "audio": "Sesli",
+    "video": "Görüntülü",
+    "qualityExcellent": "Güçlü",
+    "qualityGood": "Tamam",
+    "qualityPoor": "Zayıf",
+    "poorConnection": "Bağlantı zayıf — video kapatılabilir.",
+    "screenShareOn": "Ekranı paylaş",
+    "screenShareOff": "Paylaşımı durdur",
+    "screenShareFailed": "Ekran paylaşımı bu cihazda desteklenmiyor.",
+    "pip": "Mini pencere",
+    "minimize": "Küçült",
+    "addParticipant": "Ekle",
+    "addNoFriends": "Davet edebileceğin arkadaşın yok.",
+    "addRinging": "{name} kişisi aranıyor …",
+    "addFailed": "Davet başarısız.",
+    "cameraDenied": "Kamera izni reddedildi.",
+    "cameraDeniedPermanent": "Kamera kalıcı olarak engellendi. Uygulama ayarlarından izin ver.",
+    "cameraFailed": "Kamera açılamadı. Başka bir uygulama kullanıyor olabilir.",
+    "openSettings": "Ayarlar",
     "incoming": "Gelen arama",
     "calling": "Çalıyor …",
     "ringing": "Gelen arama",
@@ -2259,6 +2464,16 @@
     "callBack": "Geri ara",
     "callEnded": "Arama sona erdi",
     "notReachable": "Ulaşılamadı",
+    "confirmTitle": "Arama başlatılsın mı?",
+    "confirmBody": "{name} aransın mı?",
+    "confirmStart": "Ara",
+    "ringingCountdown": "{n}s daha çalıyor …",
+    "active": "Arama sürüyor – {name}",
+    "miniPlayerActive": "Arama sürüyor",
+    "videoAction": "Görüntülü arama",
+    "postCallNoteTitle": "Arama hakkında not?",
+    "postCallNoteHint": "Sohbet notu olarak kaydedilir.",
+    "postCallNotePlaceholder": "örn. „Cumartesi 14:00 buluşma\".",
     "callingLabel": "Aranıyor",
     "ringingHint": "Kapatmak için ↓ dokun",
     "mute": "Sustur",
@@ -2272,6 +2487,134 @@
     "reconnecting": "Yeniden bağlanılıyor…",
     "failed": "Bağlantı başarısız"
   },
+  "quickReply": {
+    "title": "{name} kişisine yanıt verilsin mi?",
+    "subtitle": "Karşı taraf bilinmezlik içinde kalmasın.",
+    "in5Min": "5 dk içinde dönerim 🙏",
+    "busy": "Şu an müsait değilim — sonra yazarım.",
+    "willCallBack": "Hemen geri ararım 📞"
+  },
+  "livePoll": {
+    "create": "Anket başlat",
+    "questionHint": "Sorun …",
+    "option": "Seçenek {n}",
+    "addOption": "Seçenek ekle",
+    "start": "Anketi başlat",
+    "totalVotes": "Toplam {n} oy"
+  },
+  "liveSubtitle": {
+    "hint": "Alt yazı yaz — anlık çevrilir …"
+  },
+  "watchers": {
+    "title": "İzleyiciler ({n})",
+    "empty": "Henüz kimse izlemiyor.",
+    "show": "İzleyici listesi",
+    "joined": "🙋 {name} katıldı",
+    "left": "{name} ayrıldı"
+  },
+  "mood": {
+    "title": "Bugün nasılsın?",
+    "howAreYou": "Şu an nasıl hissettiğini seç.",
+    "note": "İsteğe bağlı not …",
+    "save": "Kaydet",
+    "saveFailed": "Kaydedilemedi.",
+    "chartTitle": "Ruh hali eğilimi (7g)",
+    "logNow": "Kaydet",
+    "loadError": "Geçmiş yüklenemedi.",
+    "empty": "Henüz giriş yok. „Kaydet\"e dokun.",
+    "streakBadge": "🔥 {count} gün",
+    "helpTitle": "Yalnız değilsin 💚",
+    "helpHint": "Son günlerde ağır bir ruh hali kaydettin. Konuşmak istersen: ücretsiz ve anonim 7/24 destek hatları mevcut.",
+    "callTelefonseelsorge": "0800 111 0 111'i ara"
+  },
+  "sun": {
+    "title": "Güneş",
+    "sunrise": "Doğuş",
+    "sunset": "Batış",
+    "dayLength": "Gün ışığı",
+    "goldenHour": "✨ Altın saat",
+    "pathTitle": "Bugün güneşin konumu",
+    "solarNoon": "Güneş öğlesi"
+  },
+  "quote": {
+    "title": "Günün alıntısı",
+    "share": "Alıntıyı paylaş",
+    "error": "Alıntı yüklenemedi.",
+    "empty": "Bugün alıntı yok."
+  },
+  "callHistory": {
+    "title": "Arama geçmişi",
+    "emptyTitle": "Henüz arama yok",
+    "emptyDescription": "Son 30 DM araman burada görünür.",
+    "unknownPeer": "Bilinmiyor",
+    "statusMissed": "Cevapsız",
+    "statusCancelled": "İptal edildi",
+    "statusRinging": "Çalıyor …",
+    "statusEnded": "Bitti",
+    "callbackNoConv": "Sohbet bulunamadı",
+    "callbackFailed": "Geri arama başarısız",
+    "openHistory": "Arama geçmişini aç",
+    "clearAll": "Geçmişi temizle",
+    "clearAllTitle": "Arama geçmişi silinsin mi?",
+    "clearAllBody": "Tüm aramalar geçmişinden silinir. Diğer katılımcıların geçmişi etkilenmez.",
+    "cleared": "{n} arama silindi."
+  },
+  "videoPreview": {
+    "title": "{name} ile görüntülü arama",
+    "subtitle": "Başlamadan önce kamera ve ışığı kontrol et.",
+    "start": "Başlat",
+    "cameraDenied": "Kamera izni reddedildi."
+  },
+  "systemCall": {
+    "ended": "Sesli arama",
+    "missed": "Cevapsız arama",
+    "cancelled": "Arama iptal edildi",
+    "declined": "Arama reddedildi",
+    "duration": "Süre: {d}",
+    "callback": "Geri ara",
+    "callbackFailed": "Geri arama başarısız"
+  },
+  "sos": {
+    "title": "Acil durum",
+    "subtitle": "Hemen aramak için bir numaraya dokun.",
+    "tooltip": "Acil",
+    "reportCrisis": "Kriz bildir",
+    "is24h": "7/24",
+    "isFree": "Ücretsiz",
+    "empty": "Ülken için yapılandırılmış acil durum numarası yok."
+  },
+  "drawer": {
+    "pinned": "Sabitlendi",
+    "unpinned": "Sabitleme kaldırıldı",
+    "pinnedSection": "📌 Sabitlenenler",
+    "recentSection": "🕐 Son zamanlarda"
+  },
+  "traffic": {
+    "title": "Trafik",
+    "error": "Trafik verileri yüklenemedi.",
+    "empty": "Büyük otoyollarda olay yok."
+  },
+  "books": {
+    "title": "Kitap önerileri",
+    "source": "Open Library",
+    "error": "Öneriler yüklenemedi.",
+    "empty": "Şu an öneri yok."
+  },
+  "health": {
+    "title": "Günün sağlık tüyosu",
+    "error": "Tüyo yüklenemedi.",
+    "empty": "Bugün tüyo yok."
+  },
+  "time": {
+    "justNow": "az önce",
+    "minutesShort": "{n} dk önce",
+    "hoursShort": "{n} sa önce",
+    "daysShort": "{n} g önce",
+    "minutesAgo": "{n} dk önce",
+    "hoursAgo": "{n} sa önce",
+    "daysAgo": "{n} gün önce",
+    "yesterday": "Dün"
+  },
   "voice": {
     "micDenied": "Mikrofon izni reddedildi."
   },
@@ -2283,6 +2626,10 @@
     "hide": "Gizle",
     "resetDefault": "Varsayılanlara dön",
     "titles": {
+      "sky": "Gökyüzü",
+      "progressTrio": "İlerleme",
+      "weeklySummary": "Haftalık özet",
+      "alertsBadge": "Uyarılar",
       "greeting": "Karşılama",
       "safetyAlerts": "Güvenlik uyarıları",
       "startup": "Başlangıç",
@@ -2302,9 +2649,33 @@
       "holiday": "Tatil",
       "successStory": "Başarı hikayesi",
       "botTip": "MensaenaBot ipucu",
-      "nearYou": "Yakınında"
+      "nearYou": "Yakınında",
+      "traffic": "Trafik",
+      "books": "Kitap önerileri",
+      "health": "Sağlık tüyosu",
+      "nasaApod": "NASA — Günün resmi",
+      "onThisDay": "Tarihte bugün",
+      "mood": "Ruh hali takipçisi",
+      "sun": "Güneş",
+      "quote": "Günün alıntısı",
+      "streak": "Giriş serisi",
+      "gratitude": "Şükran",
+      "karma": "Karma ve seviye",
+      "recap": "Haftalık özet",
+      "heatmap": "Etkinlik haritası",
+      "quickNote": "Hızlı not",
+      "helpStreak": "Yardım serisi",
+      "moon": "Ay evresi",
+      "personalBest": "Kişisel rekor",
+      "affirmation": "Günün olumlaması",
+      "todayEvents": "Bugün / yarın etkinlikleri",
+      "dailyChallenges": "Günlük görevler"
     },
     "descriptions": {
+      "sky": "Hava, güneş, ay — kaydırarak geç",
+      "progressTrio": "Karma, seri ve yardım tek satırda",
+      "weeklySummary": "Etkinliğin + topluluk özeti sekmeli",
+      "alertsBadge": "NINA + su seviyesi + gıda geri çağırma — kompakt",
       "greeting": "Günün saatine göre kişiselleştirilmiş karşılama",
       "safetyAlerts": "NINA + gıda geri çağırma",
       "startup": "Yeni komşular için başlangıç listesi",
@@ -2324,7 +2695,27 @@
       "holiday": "Yaklaşan resmi tatil bilgisi",
       "successStory": "Topluluktan ilham",
       "botTip": "Günlük komşuluk ilhamı",
-      "nearYou": "Yakındaki yerel gönderiler"
+      "nearYou": "Yakındaki yerel gönderiler",
+      "traffic": "Büyük otoyollardaki başlıca uyarılar",
+      "books": "Topluluk ve sürdürülebilirlik için kitap önerileri",
+      "health": "Sağlığın için günde küçük bir hatırlatma",
+      "nasaApod": "Günlük astronomi fotoğrafı + açıklama",
+      "onThisDay": "Tarihte bugün ne oldu?",
+      "mood": "Günlük kontrol + 7 günlük eğilim",
+      "sun": "Doğuş/batış + altın saat",
+      "quote": "Düşünmek için günlük alıntı",
+      "streak": "Uygulamada üst üste günler",
+      "gratitude": "Bugün ne için minnettar­sın?",
+      "karma": "Karma puanın ve mevcut seviyen",
+      "recap": "Son 7 günün ile önceki haftan",
+      "heatmap": "12 haftalık günlük etkinliğine bakış",
+      "quickNote": "Kişisel not, sadece cihazında",
+      "helpStreak": "Yardım ettiğin üst üste günler",
+      "moon": "Bugünkü ay evresi ve aydınlanma",
+      "personalBest": "Seni motive eden tüm zamanların en iyileri",
+      "affirmation": "Günde bir sakin hatırlatma",
+      "todayEvents": "Önümüzdeki 24 saat içindeki etkinlik",
+      "dailyChallenges": "Karma bonuslu 3 küçük günlük görev"
     }
   },
   "hubs": {
@@ -2410,14 +2801,35 @@
     }
   },
   "notif": {
+    "send_test": "Test bildirimi gönder",
+    "test_title": "Mensaena testi",
+    "test_body": "Bunu görüyorsan bildirimler çalışıyor.",
+    "test_sent": "Test bildirimi gönderildi.",
+    "radiusSection": "Bildirim yarıçapı",
+    "nearbyToggle": "Yakındaki yardım istekleri için bildirim",
+    "radiusValue": "{km} km yarıçap",
+    "radiusHint": "Yalnızca bu yarıçaptaki help_needed gönderileri push bildirimi tetikler.",
     "enable": "Bildirimleri aç",
     "bannerTitle": "Hiçbir şeyi kaçırma",
     "bannerBody": "Bildirimleri açarak çağrıları, mesajları ve yardım isteklerini anında gör."
   },
+  "reading": {
+    "enter": "Okuma modu",
+    "exit": "Normal görünüm"
+  },
+  "badges": {
+    "shareBtn": "Başarıyı paylaş",
+    "shareCaption": "Mensaena'da ‹{name}› rozetini açtım 🏅",
+    "newlyEarned": "{n} yeni rozet kazanıldı!"
+  },
   "streak": {
     "title": "Devam et",
     "days": "{count} gün üst üste",
-    "best": "Rekor"
+    "best": "Rekor",
+    "freezeAvailable": "Donmayı kullan — haftada 1×",
+    "freezeUsed": "Bu hafta zaten kullanıldı",
+    "freezeApplied": "Donma etkin ❄️ — seri korundu",
+    "freezeFailed": "Donma etkinleştirilemedi"
   },
   "gratitude": {
     "title": "Şükran",
@@ -2498,8 +2910,32 @@
     "posts": "gönderi",
     "comments": "yorum"
   },
+  "account": {
+    "title": "Hesabım",
+    "export_title": "Verileri dışa aktar",
+    "export_body": "Tüm verilerini JSON olarak indir — gönderiler, mesajlar, değerlendirmeler, karma.",
+    "export_button": "Verileri dışa aktar",
+    "export_failed": "Dışa aktarma başarısız. Sonra tekrar dene.",
+    "export_subject": "Mensaena veri dışa aktarımım",
+    "delete_title": "Hesabı sil",
+    "delete_intro": "Hesabını sildiğinde 14 günlük bekleme sonrası tüm verilerin geri dönüşsüz silinir.",
+    "delete_body": "Emin misin? 14 gün sonra tüm gönderilerin, mesajların ve profil verilerin silinir. Geri alınamaz.",
+    "delete_button": "Hesabı sil",
+    "delete_confirm": "Evet, sil",
+    "delete_pending": "Silme talep edildi",
+    "delete_scheduled_for": "Hesabın {date} tarihinde silinecek.",
+    "delete_cancel": "Silmeyi iptal et",
+    "verifyTitle": "E-posta doğrulama",
+    "verifyDone": "E-postan {email} doğrulandı. ✓",
+    "verifyPending": "E-postan {email} henüz doğrulanmadı. Doğrulanmış rozeti için onayla.",
+    "verifyResend": "Doğrulamayı tekrar gönder",
+    "verifySent": "Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.",
+    "verifyFailed": "Doğrulama gönderilemedi."
+  },
   "karma": {
     "title": "Karma",
+    "history_title": "Karma geçmişi",
+    "no_history": "Henüz karma hareketi yok.",
     "toNext": "Sonraki seviye için {count} puan daha",
     "maxLevel": "En yüksek seviyeye ulaştın — verdiğin her şey için teşekkürler!",
     "helps": "yardım",
@@ -2514,6 +2950,145 @@
       "beacon": "Fener"
     }
   },
+  "mentorship": {
+    "title": "Mentorluk",
+    "empty": "Şu anda mentorluğun yok.",
+    "you_are_mentor": "Mentor sensin",
+    "you_are_mentee": "Mentee sensin",
+    "find_title": "Mentor bul",
+    "no_mentors": "Şu an müsait mentor yok.",
+    "match_overlap": "{n} ortak konu",
+    "request": "Talep et",
+    "request_sent": "Talep gönderildi.",
+    "request_failed": "Talep başarısız.",
+    "become_title": "Mentor ol",
+    "become_body": "Zaten birkaç beceri eklemişsin — bilgini paylaş.",
+    "accept": "Kabul et",
+    "decline": "Reddet",
+    "message": "Mesaj",
+    "accepted": "Mentorluk kabul edildi.",
+    "declined": "İstek reddedildi.",
+    "statusPending": "Beklemede",
+    "statusActive": "Aktif",
+    "statusDeclined": "Reddedildi",
+    "statusEnded": "Bitti",
+    "requested": "İstendi",
+    "requestSent": "Mentorluk isteği gönderildi.",
+    "requestFailed": "İstek başarısız."
+  },
+  "scheduled_calls": {
+    "title": "Planlanan aramalar",
+    "create_title": "Arama planla",
+    "empty": "Planlanan arama yok."
+  },
+  "collections": {
+    "pick_title": "Koleksiyon seç",
+    "create_title": "Yeni koleksiyon",
+    "name": "İsim",
+    "emoji": "Emoji (isteğe bağlı)",
+    "new": "Yeni",
+    "default": "Genel",
+    "empty": "Henüz koleksiyon yok — oluşturmak için +'ya dokun."
+  },
+  "vanish": {
+    "title": "Yok olma modu",
+    "description": "Bu sohbetteki mesajlar seçtiğin süre sonra otomatik silinir.",
+    "enable": "Etkinleştir",
+    "lifetime": "Süre",
+    "banner": "Yok olma etkin · mesajlar {duration} sonra silinir"
+  },
+  "voicemail": {
+    "title": "Sesli mesaj",
+    "empty": "Sesli mesaj yok.",
+    "send_to": "Sesli mesaj gönder",
+    "tap_to_record": "Kaydetmek için dokun",
+    "recording": "Kayıt sürüyor — durdurmak için dokun.",
+    "sending": "Gönderiliyor …",
+    "sent": "Sesli mesaj gönderildi.",
+    "error_record": "Kayıt başarısız.",
+    "error_upload": "Yükleme başarısız.",
+    "error_permission": "Mikrofon izni eksik."
+  },
+  "polls": {
+    "total_votes": "{n} oy",
+    "closed": "Anket kapandı · {n} oy",
+    "create_title": "Anket oluştur",
+    "question": "Soru",
+    "option_n": "Seçenek {n}",
+    "add_option": "Seçenek ekle",
+    "add_to_post": "Anket ekle",
+    "no_close": "Açık tut",
+    "duration_hours": "{n} sa",
+    "duration_days": "{n} gün"
+  },
+  "status": {
+    "title": "Durum belirle",
+    "set": "Durum belirle",
+    "hint": "Aklında ne var?",
+    "clear": "Temizle",
+    "until_cleared": "Değiştirene kadar",
+    "duration_hours": "{n} saat",
+    "duration_days": "{n} gün"
+  },
+  "sleep_reminder": {
+    "title": "Dinlenme zamanı",
+    "body": "Telefonunu bırak — iyi uyku daha güçlü bir gün demek.",
+    "section": "Uyku hatırlatması",
+    "enable": "Uyku hatırlatmasını aç",
+    "time_label": "{time}'da hatırlat",
+    "pick_time": "Saat seç"
+  },
+  "event_reminders": {
+    "channelName": "Etkinlik hatırlatıcıları",
+    "channelDescription": "Kayıtlı etkinliklerden önce hatırlatma.",
+    "title": "Etkinlik hatırlatıcısı",
+    "body": "{title} {minutes} dakika içinde başlıyor."
+  },
+  "modulesHub": {
+    "title": "Tüm modüller",
+    "intro": "Mensaena'nın 22 modülünü keşfet."
+  },
+  "block": {
+    "cannotInteract": "Bu kişiyle iletişim mümkün değil.",
+    "userBlocked": "Bu kişiyi engelledin.",
+    "youAreBlocked": "Bu kişi seni engelledi."
+  },
+  "tts": {
+    "read": "Sesli oku",
+    "stop": "Dur"
+  },
+  "group_call": {
+    "removedNotice": "Grup araması artık mevcut değil.",
+    "title": "Grup araması",
+    "startBtn": "Grup araması",
+    "inviteLabel": "GRUP ARAMASI",
+    "inviteTitle": "Arama canlı",
+    "inviteCta": "Katıl →",
+    "inviteFailed": "Davet gönderilemedi.",
+    "connectFailed": "Aramaya bağlanılamadı.",
+    "full": "Arama dolu — en fazla 10 katılımcı.",
+    "you": "Sen"
+  },
+  "thanks": {
+    "sheetTitle": "Teşekkür kartı gönder",
+    "recipient": "{name} için",
+    "pickDesign": "Tasarım seç",
+    "messageHint": "Kişisel not (isteğe bağlı) …",
+    "sendBtn": "Kartı gönder",
+    "sent": "{name} kişisine kart gönderildi 💛",
+    "sendFailed": "Gönderim başarısız."
+  },
+  "followed_tags": {
+    "title": "Konuları takip et",
+    "intro": "Akışını özelleştirmek için hashtag'leri takip et.",
+    "addHint": "Etiket yaz (örn. hasat)",
+    "mine": "Takip ediyorsun",
+    "empty": "Henüz hiçbir konuyu takip etmiyorsun.",
+    "suggested": "Popüler konular",
+    "noSuggestions": "Henüz öneri yok.",
+    "added": "#{tag} eklendi.",
+    "removed": "#{tag} kaldırıldı."
+  },
   "a11y": {
     "section": "Erişilebilirlik",
     "textScale": "Metin boyutu: %{pct}",
@@ -2521,6 +3096,10 @@
     "reduceMotionHint": "Konfeti, nabız parıltıları ve büyük animasyonları kapatır.",
     "highContrast": "Yüksek kontrast",
     "highContrastHint": "Daha belirgin kenarlıklar ve canlı metin renkleri.",
+    "oledMode": "OLED siyah",
+    "oledModeHint": "AMOLED ekranlar için saf siyah arka plan — pil tasarrufu sağlar.",
+    "seniorMode": "Yaşlı modu",
+    "seniorModeHint": "Daha büyük yazı, daha az animasyon, daha fazla kontrast.",
     "performanceMode": "Performans modu",
     "liteAuto": "Otomatik (önerilen)",
     "liteOn": "Lite mod: açık",
@@ -2550,26 +3129,252 @@
     "continue": "Yine de devam et",
     "pause": "Uygulamayı kapat"
   },
-  "event_reminders": {
-    "channelName": "Etkinlik hatırlatıcıları",
-    "channelDescription": "Kayıtlı etkinliklerden önce hatırlatma.",
-    "title": "Etkinlik hatırlatıcısı",
-    "body": "{title} {minutes} dakika içinde başlıyor."
+  "post_intent": {
+    "title": "Bu ne hakkında?",
+    "help_needed": "Yardıma ihtiyacım var",
+    "help_offered": "Yardım sunuyorum",
+    "item_offered": "Bir şey sunuyorum",
+    "item_wanted": "Bir şey arıyorum",
+    "event_invite": "Etkinlik",
+    "info_share": "Bilgi paylaşımı",
+    "warning": "Uyarı",
+    "lost_found": "Kayıp / Bulundu",
+    "social": "Tanışma",
+    "general": "Diğer"
   },
-  "modulesHub": {
-    "title": "Tüm modüller",
-    "intro": "Mensaena'nın 22 modülünü keşfet."
+  "contact": {
+    "title": "İletişim seçenekleri",
+    "how_to_reach": "Sana nasıl ulaşılsın?",
+    "in_app_chat": "Uygulama içi sohbet",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "whatsapp": "WhatsApp",
+    "location_meetup": "Yüz yüze buluşma",
+    "meetup_hint": "Buluşma noktası ipucu",
+    "availability": "Müsaitlik",
+    "from": "Başlangıç",
+    "until": "Bitiş",
+    "days": "Günler",
+    "note": "Sana ulaşanlar için not",
+    "note_placeholder": "örn. lütfen sadece öğleden sonra ara",
+    "at_least_one": "En az bir iletişim yöntemi seç",
+    "request_sent": "İstek gönderildi!",
+    "already_requested": "Zaten açık bir isteğin var",
+    "request_pending": "İstek gönderildi ⏳",
+    "request_accepted": "İstek kabul edildi ✅",
+    "request_declined": "İstek reddedildi",
+    "manage_requests": "İstekleri yönet",
+    "cta": {
+      "offer_help": "Şimdi yardım et",
+      "request_help": "Yardımı kabul et",
+      "contact_seller": "İletişime geç",
+      "offer_item": "Bende var!",
+      "join_event": "Katıl",
+      "thanks": "Bilgi için teşekkürler!",
+      "report_update": "Güncelleme bildir",
+      "i_found_it": "Buldum!",
+      "connect": "Bağlan",
+      "contact": "İletişime geç",
+      "add_calendar": "Takvime ekle",
+      "ask_question": "Soru sor",
+      "share": "Paylaş",
+      "call_now": "Hemen ara"
+    },
+    "requests": {
+      "title": "İletişim istekleri",
+      "empty": "Henüz istek yok",
+      "accept": "Kabul et",
+      "decline": "Reddet",
+      "complete": "Tamamlandı olarak işaretle",
+      "pending": "açık",
+      "accepted": "kabul edildi",
+      "completed": "tamamlandı",
+      "via": "Üzerinden",
+      "helpers_count": "{count} kişi zaten yardım ediyor",
+      "participants_count": "{count} katılıyor",
+      "message_placeholder": "İsteğe bağlı mesaj …",
+      "choose_method": "Nasıl iletişim kurmak istersin?"
+    },
+    "notification": {
+      "request_received": "{name} seninle iletişime geçmek istiyor",
+      "request_accepted": "İsteğin kabul edildi!",
+      "request_declined": "İsteğin reddedildi",
+      "completed": "Eylem tamamlandı! +{karma} Karma"
+    }
   },
-  "followed_tags": {
-    "title": "Konuları takip et",
-    "intro": "Akışını özelleştirmek için hashtag'leri takip et.",
-    "addHint": "Etiket yaz (örn. hasat)",
-    "mine": "Takip ediyorsun",
-    "empty": "Henüz hiçbir konuyu takip etmiyorsun.",
-    "suggested": "Popüler konular",
-    "noSuggestions": "Henüz öneri yok.",
-    "added": "#{tag} eklendi.",
-    "removed": "#{tag} kaldırıldı."
+  "stories": {
+    "add": "Senin",
+    "uploading": "Hikâye yükleniyor …",
+    "upload_failed": "Yükleme başarısız.",
+    "expired": "Süresi doldu"
+  },
+  "livestream": {
+    "chat": "Yayın sohbeti",
+    "send_message": "Mesaj gönder …",
+    "viewers": "İzleyiciler",
+    "applause": "Alkış",
+    "star": "Yıldız",
+    "diamond": "Elmas",
+    "not_enough_karma": "Bu hediye için karman yetmiyor."
+  },
+  "community": {
+    "polls": "Topluluk anketleri",
+    "create_poll": "Anket oluştur",
+    "publish": "Yayınla",
+    "pollCreated": "Anket oluşturuldu.",
+    "pollFailed": "Anket oluşturulamadı.",
+    "question": "Soru",
+    "option": "Seçenek",
+    "add_option": "Seçenek ekle",
+    "anonymous": "Anonim oyla",
+    "votes": "oy",
+    "no_polls": "Henüz anket yok.",
+    "leaderboard": "Lider tablosu",
+    "this_week": "BU HAFTA",
+    "no_leaderboard": "Henüz veri yok.",
+    "daily_challenges": "Günlük görevler",
+    "price_below_avg": "Ortalamanın altında (∅ {avg} €)",
+    "price_above_avg": "Ortalamanın üstünde (∅ {avg} €)"
+  },
+  "smartReply": {
+    "sheetTitle": "Gönderi için mesaj",
+    "sheetHint": "Bir öneriye dokun veya kendin yaz.",
+    "placeholder": "Mesajını yaz …",
+    "openOnly": "Sadece sohbeti aç",
+    "send": "Gönder",
+    "helpNeeded": {
+      "1": "Selam! „{title}\" gönderini gördüm — ne zaman yardım lazım?",
+      "2": "Selam, „{title}\" konusunda yardım edebilirim. Nerede buluşalım?",
+      "3": "Selam! Memnuniyetle yardım ederim. Sana ne zaman uyar?"
+    },
+    "helpOffered": {
+      "1": "Selam! „{title}\" teklifin harika — kabul etmek isterim.",
+      "2": "Selam, sunduğun şeye tam ihtiyacım var. Sana ne zaman uyar?",
+      "3": "Selam! Teklifini memnuniyetle kabul ederim. Nasıl ilerleyelim?"
+    },
+    "itemOffered": {
+      "1": "Selam! „{title}\" hâlâ var mı?",
+      "2": "Selam! „{title}\" ilgimi çekti — ne zaman uğrayabilirim?",
+      "3": "Selam, hâlâ duruyor mu? Alıp gelirim."
+    },
+    "itemWanted": {
+      "1": "Selam! Aradığın şey bende — „{title}\". Nasıl yapalım?",
+      "2": "Selam! Aradığın şeyi sağlayabilirim.",
+      "3": "Selam, isteğine yanıt veriyorum — evimde var."
+    },
+    "eventInvite": {
+      "1": "Selam! „{title}\" etkinliğine gelmek isterim — yer var mı?",
+      "2": "Selam! „{title}\" harika görünüyor, geliyorum.",
+      "3": "Selam, geliyorum. Bir şey getirmem gerekiyor mu?"
+    },
+    "lostFound": {
+      "1": "Selam! „{title}\"'yi gördüğüm sanırım — kısa konuşabilir miyiz?",
+      "2": "Selam! Aramaya yardım edeyim. Başka ipucu var mı?",
+      "3": "Selam, bir şey bulursam haber veririm."
+    },
+    "social": {
+      "1": "Selam! Profilini gördüm — tanışmak isterim.",
+      "2": "Selam, bir ara takılalım!",
+      "3": "Selam! Nasılsın? Bir kahve içelim mi?"
+    },
+    "general": {
+      "1": "Selam! „{title}\" gönderini gördüm.",
+      "2": "Selam, gönderin hakkında kısa bir sorum var.",
+      "3": "Selam! Kısaca yazışabilir miyiz?"
+    }
+  },
+  "neighbors": {
+    "title": "Mahallene yeni gelenler"
+  },
+  "recent": {
+    "title": "Son ziyaret edilenler"
+  },
+  "friends": {
+    "screenTitle": "Arkadaşlar",
+    "tabAll": "Arkadaşların",
+    "tabOnline": "Çevrimiçi",
+    "tabRequests": "İstekler",
+    "tabFind": "Bul",
+    "searchHint": "Arkadaş ara …",
+    "findHint": "Kullanıcı bulmak için isim yaz …",
+    "findPrompt": "Kullanıcı bulup arkadaşlık isteği göndermek için en az 2 karakter yaz.",
+    "findNoResults": "Kullanıcı bulunamadı.",
+    "stateAdd": "Ekle",
+    "requestSent": "{name} kişisine arkadaşlık isteği gönderildi.",
+    "requestAccepted": "Arkadaşlık isteği kabul edildi.",
+    "requestDeclined": "İstek reddedildi.",
+    "requestFailed": "İstek gönderilemedi.",
+    "stateRequested": "İstek gönderildi",
+    "stateAccept": "Kabul et",
+    "stateFriends": "Arkadaş",
+    "noFriends": "Henüz arkadaş yok — gönderiler ve etkinliklerle tanış.",
+    "noOnline": "Şu an kimse çevrimiçi değil.",
+    "noRequests": "Bekleyen istek yok.",
+    "wantsToConnect": "seninle bağlantı kurmak istiyor",
+    "chatTooltip": "Doğrudan mesaj",
+    "suggestionsTitle": "Tanıyor olabileceğin kişiler",
+    "fromYourArea": "Bölgenden",
+    "incomingTitle": "Sana gelen istekler",
+    "outgoingTitle": "Gönderdiklerin",
+    "stateRequestedTo": "{name} kişisine istek",
+    "cancelRequest": "Geri çek"
+  },
+  "friend": {
+    "request": "Arkadaşlık isteği gönder",
+    "request_again": "Tekrar iste",
+    "requested": "İstek gönderildi",
+    "accept": "İsteği kabul et",
+    "friends": "Arkadaşlar",
+    "request_sent": "Arkadaşlık isteği gönderildi.",
+    "request_canceled": "İstek geri çekildi.",
+    "request_failed": "İşlem başarısız.",
+    "accepted": "Arkadaşlık onaylandı.",
+    "removed": "Arkadaşlık sonlandırıldı.",
+    "unfriend_title": "Arkadaşlık sonlandırılsın mı?",
+    "unfriend_body": "Artık arkadaş olmayacaksın — takip durumu değişmez.",
+    "unfriend_confirm": "Sonlandır"
+  },
+  "gas": {
+    "title": "Yakındaki yakıt fiyatları",
+    "empty": "İstasyon bulunamadı — GPS açık mı?",
+    "closed": "kapalı",
+    "navigate": "Rota oluştur",
+    "demoTitle": "Canlı fiyatlar şu anda kullanılamıyor",
+    "demoBody": "Tankerkönig demo anahtarı kullanılıyor — tüm istasyonlar aynı fiyatı gösteriyor. Yönetici: private.push_config içinde gerçek bir anahtar ayarlayın."
+  },
+  "dashboard": {
+    "edit": {
+      "title": "Panoyu düzenle",
+      "hint": "Yeniden sıralamak için widget'ları sürükle",
+      "done": "Tamam",
+      "reset": "Varsayılana sıfırla",
+      "reset_confirm": "Pano varsayılana sıfırlansın mı? Düzenin kaybolur.",
+      "reset_yes": "Sıfırla",
+      "reset_no": "İptal",
+      "add_widget": "Widget ekle",
+      "all_active": "Tüm widget'lar etkin",
+      "onboarding": "Widget'ları düzenlemek ve özelleştirmek için panoya basılı tut",
+      "onboarding_ok": "Anladım",
+      "widget_disabled": "Widget kapatıldı",
+      "widget_enabled": "Widget açıldı"
+    },
+    "sections": {
+      "myDay": "Günüm",
+      "community": "Topluluk ve etkinlik",
+      "gamification": "İlerleme",
+      "environment": "Çevre ve doğa",
+      "knowledge": "Bilgi ve düşünce",
+      "events": "Etkinlikler ve zaman bankası"
+    },
+    "collapseAll": "Hepsini daralt",
+    "expandAll": "Hepsini genişlet",
+    "summary": {
+      "mine": "Etkinliğim",
+      "community": "Topluluk"
+    },
+    "alerts": {
+      "allClear": "Her şey yolunda"
+    }
   },
   "interactions": {
     "noneTitle": "Henüz yardım etkinliği yok",
@@ -2626,14 +3431,6 @@
     "phone": "Telefon numarası",
     "community": "Topluluk güveni",
     "admin": "Yönetici onaylı"
-  },
-  "account": {
-    "verifyTitle": "E-posta doğrulama",
-    "verifyDone": "E-postan {email} doğrulandı. ✓",
-    "verifyPending": "E-postan {email} henüz doğrulanmadı. Doğrulanmış rozeti için onayla.",
-    "verifyResend": "Doğrulamayı tekrar gönder",
-    "verifySent": "Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.",
-    "verifyFailed": "Doğrulama gönderilemedi."
   },
   "firstAid": {
     "title": "İlk yardım (çevrimdışı)",
@@ -2708,13 +3505,6 @@
     "sosFrom": "{name} kişisinden SOS",
     "safeFrom": "{name} güvende"
   },
-  "friends": {
-    "incomingTitle": "Sana gelen istekler",
-    "outgoingTitle": "Gönderdiklerin",
-    "stateRequestedTo": "{name} kişisine istek",
-    "cancelRequest": "Geri çek",
-    "tabAll": "Arkadaşların"
-  },
   "battery": {
     "title": "Aramaları güvenilir şekilde al",
     "body": "Uygulama kapalıyken bile aramaların ve önemli mesajların sana anında ulaşması için Mensaena’yı pil optimizasyonundan muaf tut. Aksi halde Android uygulamayı arka planda durdurabilir.",
@@ -2724,11 +3514,6 @@
     "openSettings": "Ayarları aç",
     "done": "Tamam"
   },
-  "gas": {
-    "navigate": "Rota oluştur",
-    "demoTitle": "Canlı fiyatlar şu anda kullanılamıyor",
-    "demoBody": "Tankerkönig demo anahtarı kullanılıyor — tüm istasyonlar aynı fiyatı gösteriyor. Yönetici: private.push_config içinde gerçek bir anahtar ayarlayın."
-  },
   "report": {
     "reasonFraud": "Dolandırıcılık",
     "reasonSpam": "Spam",
@@ -2737,25 +3522,8 @@
     "reasonOther": "Diğer",
     "thanks": "Bildirim gönderildi. Teşekkürler!"
   },
-  "badges": {
-    "newlyEarned": "{n} yeni rozet kazanıldı!"
-  },
   "mentalSupport": {
     "launchFailed": "Arama başlatılamadı."
-  },
-  "mentorship": {
-    "accept": "Kabul et",
-    "decline": "Reddet",
-    "message": "Mesaj",
-    "accepted": "Mentorluk kabul edildi.",
-    "declined": "İstek reddedildi.",
-    "statusPending": "Beklemede",
-    "statusActive": "Aktif",
-    "statusDeclined": "Reddedildi",
-    "statusEnded": "Bitti",
-    "requested": "İstendi",
-    "requestSent": "Mentorluk isteği gönderildi.",
-    "requestFailed": "İstek başarısız."
   },
   "postCard": {
     "savedToast": "✓ Gönderi kaydedildi.",
