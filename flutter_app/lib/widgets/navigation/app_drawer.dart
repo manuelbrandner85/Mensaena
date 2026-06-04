@@ -51,6 +51,22 @@ class AppDrawer extends ConsumerWidget {
     label: 'modulesHub.title',
     route: '/dashboard/modules',
   );
+  // Release-Aufräumen (2026-06): Die beiden Konsolidierungs-Hubs sind jetzt
+  // direkte Top-Level-Shortcuts statt eigener (überladener) Drawer-Gruppen.
+  // Sämtliche Einzelmodule (supply, harvest, rescuer, housing, mobility, jobs,
+  // marketplace, timebank, wiki, knowledge, skills …) bleiben vollständig über
+  // den "Module"-Katalog (/dashboard/modules, 25 Karten) und die Hubs selbst
+  // erreichbar — es geht KEINE Funktion verloren, das Menü wird nur kürzer.
+  static const _NavLink _shareHub = _NavLink(
+    icon: LucideIcons.repeat,
+    label: 'navGroups.shareAndResources',
+    route: '/dashboard/teilen',
+  );
+  static const _NavLink _knowledgeHub = _NavLink(
+    icon: LucideIcons.bookOpen,
+    label: 'navGroups.knowledgeAndSkills',
+    route: '/dashboard/wissen',
+  );
   static const _NavLink _notifications = _NavLink(
     icon: LucideIcons.bell,
     label: 'nav.notifications',
@@ -116,36 +132,11 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/challenges'),
       ],
     ),
-    _NavGroup(
-      label: 'navGroups.shareAndResources',
-      headIcon: LucideIcons.repeat,
-      items: [
-        // Konsolidiert: Sharing + Marketplace + Timebank → 1 Hub.
-        _NavLink(icon: LucideIcons.repeat, label: 'navGroups.shareAndResources',
-            route: '/dashboard/teilen'),
-        _NavLink(icon: LucideIcons.package, label: 'nav.supply',
-            route: '/dashboard/supply'),
-        _NavLink(icon: LucideIcons.wheat, label: 'nav.harvest',
-            route: '/dashboard/harvest'),
-        _NavLink(icon: LucideIcons.lifeBuoy, label: 'nav.rescuer',
-            route: '/dashboard/rescuer'),
-        _NavLink(icon: LucideIcons.home, label: 'nav.housing',
-            route: '/dashboard/housing'),
-        _NavLink(icon: LucideIcons.car, label: 'nav.mobility',
-            route: '/dashboard/mobility'),
-        _NavLink(icon: LucideIcons.briefcase, label: 'nav.jobs',
-            route: '/dashboard/jobs'),
-      ],
-    ),
-    _NavGroup(
-      label: 'navGroups.knowledgeAndSkills',
-      headIcon: LucideIcons.bookOpen,
-      items: [
-        // Konsolidiert: Wiki + Bildung + Skills → 1 Hub.
-        _NavLink(icon: LucideIcons.bookOpen, label: 'navGroups.knowledgeAndSkills',
-            route: '/dashboard/wissen'),
-      ],
-    ),
+    // navGroups.shareAndResources + navGroups.knowledgeAndSkills sind als
+    // Top-Level-Shortcuts (_shareHub / _knowledgeHub) nach oben gewandert —
+    // siehe Render-Liste. Damit entfallen zwei überladene Gruppen (vormals
+    // 7 bzw. 1 Eintrag); alle Module bleiben über den "Module"-Katalog
+    // und die Hub-Seiten erreichbar.
     _NavGroup(
       label: 'navGroups.myArea',
       headIcon: LucideIcons.userCircle,
@@ -214,6 +205,9 @@ class AppDrawer extends ConsumerWidget {
                       _LinkTile(link: _home, currentLoc: currentLoc),
                       _LinkTile(
                           link: _modulesHub, currentLoc: currentLoc),
+                      _LinkTile(link: _shareHub, currentLoc: currentLoc),
+                      _LinkTile(
+                          link: _knowledgeHub, currentLoc: currentLoc),
                       _LinkTile(
                           link: _notifications, currentLoc: currentLoc),
                       const _PinnedSection(),
