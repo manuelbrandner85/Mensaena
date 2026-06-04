@@ -4,8 +4,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -127,7 +129,12 @@ class _MarketplaceCreateScreenState
       content: Text('marketplace.searching'.tr(namedArgs: {'code': code}),
           style: AppTypography.body(size: 12, color: AppColors.inkSoft)),
     ));
-    final p = await OpenFoodFactsService.lookup(code);
+    // Sprache mitgeben → OFF liefert wo möglich lokalisierte
+    // product_name_<lang>, ingredients_text_<lang>, categories_<lang>.
+    final p = await OpenFoodFactsService.lookup(
+      code,
+      lang: context.locale.languageCode,
+    );
     if (!mounted) return;
     if (p == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -148,6 +155,26 @@ class _MarketplaceCreateScreenState
       ];
       if (parts.isNotEmpty) _desc.text = parts.join('\n\n');
     });
+
+    // Foto vom OFF-Server auto-anhängen, falls noch Platz im _images-Array
+    // ist. Failsafe — wenn der Download scheitert, kein UI-Fehler (der User
+    // hat ja Titel + Beschreibung schon).
+    if (p.imageUrl != null && _images.length < _maxImages) {
+      try {
+        final res = await http
+            .get(Uri.parse(p.imageUrl!))
+            .timeout(const Duration(seconds: 6));
+        if (mounted && res.statusCode == 200 && res.bodyBytes.isNotEmpty) {
+          final tmpDir = await getTemporaryDirectory();
+          final file = File(
+              '${tmpDir.path}/off_${DateTime.now().millisecondsSinceEpoch}.jpg');
+          await file.writeAsBytes(res.bodyBytes);
+          if (mounted) setState(() => _images.add(file));
+        }
+      } catch (_) {/* still title+desc gefüllt — kein Snackbar nötig */}
+    }
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text(
