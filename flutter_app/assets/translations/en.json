@@ -43,7 +43,9 @@
     "failed": "Action failed.",
     "linkOpenFailed": "Could not be opened.",
     "logoutConfirmTitle": "Sign out?",
-    "logoutConfirmBody": "You'll be signed out on this device and need to log in again."
+    "logoutConfirmBody": "You'll be signed out on this device and need to log in again.",
+    "offlineBanner": "No internet connection",
+    "backOnline": "Back online"
   },
   "safe": {
     "critical_nearby_title": "Critical crisis near you",

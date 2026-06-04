@@ -41,7 +41,9 @@
     "failed": "İşlem başarısız.",
     "linkOpenFailed": "Açılamadı.",
     "logoutConfirmTitle": "Çıkış yapılsın mı?",
-    "logoutConfirmBody": "Bu cihazdan çıkış yapılacak ve yeniden giriş yapman gerekecek."
+    "logoutConfirmBody": "Bu cihazdan çıkış yapılacak ve yeniden giriş yapman gerekecek.",
+    "offlineBanner": "İnternet bağlantısı yok",
+    "backOnline": "Tekrar çevrimiçi"
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",

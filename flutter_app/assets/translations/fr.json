@@ -41,7 +41,9 @@
     "failed": "Action échouée.",
     "linkOpenFailed": "Impossible d’ouvrir.",
     "logoutConfirmTitle": "Se déconnecter ?",
-    "logoutConfirmBody": "Tu seras déconnecté sur cet appareil et devras te reconnecter."
+    "logoutConfirmBody": "Tu seras déconnecté sur cet appareil et devras te reconnecter.",
+    "offlineBanner": "Pas de connexion Internet",
+    "backOnline": "De nouveau en ligne"
   },
   "safe": {
     "critical_nearby_title": "Crise critique près de toi",

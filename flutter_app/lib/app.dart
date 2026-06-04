@@ -19,6 +19,7 @@ import 'widgets/shared/biometric_lock_gate.dart';
 import 'widgets/shared/critical_crisis_alert_listener.dart';
 import 'widgets/shared/fcm_foreground_listener.dart';
 import 'widgets/shared/incoming_call_listener.dart';
+import 'widgets/shared/connectivity_banner.dart';
 import 'widgets/shared/notification_permission_banner.dart';
 import 'widgets/shared/permissions_gate_guard.dart';
 import 'widgets/shared/update_gate.dart';
@@ -141,6 +142,14 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
                       left: 0,
                       right: 0,
                       child: NotificationPermissionBanner(),
+                    ),
+                    // H6: Globaler Offline-Banner — zeigt app-weit, wenn keine
+                    // Internetverbindung besteht (statt stiller Fehler).
+                    const Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: ConnectivityBanner(),
                     ),
                   ],
                 ),

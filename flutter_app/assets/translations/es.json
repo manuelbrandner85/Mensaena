@@ -41,7 +41,9 @@
     "failed": "Acción fallida.",
     "linkOpenFailed": "No se pudo abrir.",
     "logoutConfirmTitle": "¿Cerrar sesión?",
-    "logoutConfirmBody": "Se cerrará la sesión en este dispositivo y tendrás que volver a iniciarla."
+    "logoutConfirmBody": "Se cerrará la sesión en este dispositivo y tendrás que volver a iniciarla.",
+    "offlineBanner": "Sin conexión a Internet",
+    "backOnline": "De nuevo en línea"
   },
   "safe": {
     "critical_nearby_title": "Crisis crítica cerca de ti",

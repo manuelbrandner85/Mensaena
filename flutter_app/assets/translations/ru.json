@@ -41,7 +41,9 @@
     "failed": "Действие не удалось.",
     "linkOpenFailed": "Не удалось открыть.",
     "logoutConfirmTitle": "Выйти?",
-    "logoutConfirmBody": "Вы выйдете на этом устройстве и потребуется войти снова."
+    "logoutConfirmBody": "Вы выйдете на этом устройстве и потребуется войти снова.",
+    "offlineBanner": "Нет подключения к интернету",
+    "backOnline": "Снова в сети"
   },
   "safe": {
     "critical_nearby_title": "Критический кризис рядом",

@@ -43,7 +43,9 @@
     "failed": "Aktion fehlgeschlagen.",
     "linkOpenFailed": "Konnte nicht geöffnet werden.",
     "logoutConfirmTitle": "Abmelden?",
-    "logoutConfirmBody": "Du wirst von diesem Gerät abgemeldet und musst dich neu anmelden."
+    "logoutConfirmBody": "Du wirst von diesem Gerät abgemeldet und musst dich neu anmelden.",
+    "offlineBanner": "Keine Internetverbindung",
+    "backOnline": "Wieder online"
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",
