@@ -187,7 +187,10 @@
       "signIn": "Anmelden",
       "pwRememberedQ": "Passwort wieder eingefallen? ",
       "backToLogin": "Zurück zum Login"
-    }
+    },
+    "resendConfirm": "Bestätigungs-E-Mail erneut senden",
+    "resendConfirmSent": "E-Mail gesendet — prüfe auch deinen Spam-Ordner.",
+    "resendConfirmFailed": "Konnte nicht senden. Versuch es später erneut."
   },
   "profile": {
     "myProfile": "Mein Profil",

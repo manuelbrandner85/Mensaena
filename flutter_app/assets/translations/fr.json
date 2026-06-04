@@ -183,7 +183,10 @@
       "signIn": "Se connecter",
       "pwRememberedQ": "Tu te souviens du mot de passe ? ",
       "backToLogin": "Retour à la connexion"
-    }
+    },
+    "resendConfirm": "Renvoyer l'e-mail de confirmation",
+    "resendConfirmSent": "E-mail envoyé — vérifie aussi tes spams.",
+    "resendConfirmFailed": "Échec de l'envoi. Réessaie plus tard."
   },
   "profile": {
     "myProfile": "Mon profil",

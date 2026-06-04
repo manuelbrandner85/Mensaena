@@ -183,7 +183,10 @@
       "signIn": "Giriş yap",
       "pwRememberedQ": "Parolan aklına geldi mi? ",
       "backToLogin": "Girişe dön"
-    }
+    },
+    "resendConfirm": "Onay e-postasını yeniden gönder",
+    "resendConfirmSent": "E-posta gönderildi — spam klasörünü de kontrol et.",
+    "resendConfirmFailed": "Gönderilemedi. Daha sonra dene."
   },
   "profile": {
     "myProfile": "Profilim",

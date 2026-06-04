@@ -183,7 +183,10 @@
       "signIn": "Iniciar sesión",
       "pwRememberedQ": "¿Recordaste la contraseña? ",
       "backToLogin": "Volver al login"
-    }
+    },
+    "resendConfirm": "Reenviar email de confirmación",
+    "resendConfirmSent": "Email enviado — revisa también el spam.",
+    "resendConfirmFailed": "No se pudo enviar. Inténtalo más tarde."
   },
   "profile": {
     "myProfile": "Mi perfil",

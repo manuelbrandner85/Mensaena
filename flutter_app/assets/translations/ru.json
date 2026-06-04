@@ -183,7 +183,10 @@
       "signIn": "Войти",
       "pwRememberedQ": "Вспомнили пароль? ",
       "backToLogin": "Назад ко входу"
-    }
+    },
+    "resendConfirm": "Отправить письмо подтверждения снова",
+    "resendConfirmSent": "Письмо отправлено — проверьте и папку спам.",
+    "resendConfirmFailed": "Не удалось отправить. Повторите позже."
   },
   "profile": {
     "myProfile": "Мой профиль",

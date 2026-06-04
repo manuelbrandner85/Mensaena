@@ -187,7 +187,10 @@
       "signIn": "Sign in",
       "pwRememberedQ": "Remembered your password? ",
       "backToLogin": "Back to login"
-    }
+    },
+    "resendConfirm": "Resend confirmation email",
+    "resendConfirmSent": "Email sent — check your spam folder too.",
+    "resendConfirmFailed": "Couldn't send. Try again later."
   },
   "profile": {
     "myProfile": "My Profile",

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
-    show AuthChangeEvent, AuthState, UserAttributes;
+    show AuthChangeEvent, AuthState, OtpType, UserAttributes;
 
 import '../../config/theme/app_colors.dart';
 import '../../widgets/navigation/language_picker.dart';
@@ -50,6 +50,10 @@ class _AuthScreenState extends State<AuthScreen>
   bool _agreed = false;
   String? _error;
   String? _info;
+  // B6: true → "Bestätigungs-E-Mail erneut senden"-Button anzeigen
+  // (nach Registrierung ODER bei 'email not confirmed'-Login-Fehler).
+  bool _showResendConfirm = false;
+  bool _resending = false;
   int _failCount = 0;
   DateTime? _lockUntil;
 
@@ -255,8 +259,12 @@ class _AuthScreenState extends State<AuthScreen>
             context.go('/dashboard');
             return;
           }
-          setState(() => _info =
-              'auth.infoAccountCreated'.tr());
+          setState(() {
+            _info = 'auth.infoAccountCreated'.tr();
+            // Nach Registrierung: Resend-Pfad anbieten, falls die Mail nicht
+            // ankommt (Spam, Tippfehler) → kein Sackgassen-Gefühl.
+            _showResendConfirm = true;
+          });
           break;
         case _AuthMode.forgot:
           // Email-Enumeration-Schutz: gleicher Text egal ob Konto existiert.
@@ -304,6 +312,7 @@ class _AuthScreenState extends State<AuthScreen>
       } else if (low.contains('email not confirmed') ||
           low.contains('not confirmed')) {
         msg = 'auth.errEmailNotConfirmed'.tr();
+        _showResendConfirm = true;
       } else if (low.contains('invalid login') ||
           low.contains('invalid credentials')) {
         msg = 'auth.wrongCredentials'.tr();
@@ -325,6 +334,28 @@ class _AuthScreenState extends State<AuthScreen>
       setState(() => _error = msg);
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// B6: Bestätigungs-E-Mail erneut senden. Behebt die Sackgasse, wenn die
+  /// Mail nach Registrierung nicht ankommt.
+  Future<void> _resendConfirmation() async {
+    final email = _emailCtrl.text.trim().toLowerCase();
+    if (email.isEmpty || _resending) return;
+    setState(() {
+      _resending = true;
+      _error = null;
+    });
+    try {
+      await sb.auth.resend(type: OtpType.signup, email: email);
+      if (!mounted) return;
+      setState(() => _info = 'auth.resendConfirmSent'.tr());
+    } catch (_) {
+      if (!mounted) return;
+      // Bewusst generische Meldung (kein Email-Enumeration-Leak).
+      setState(() => _info = 'auth.resendConfirmSent'.tr());
+    } finally {
+      if (mounted) setState(() => _resending = false);
     }
   }
 
@@ -435,7 +466,31 @@ class _AuthScreenState extends State<AuthScreen>
                               if (_info != null)
                                 _AlertBanner(
                                     text: _info!, isError: false),
-                              if (_error != null || _info != null)
+                              // B6: Resend-Bestätigung — behebt Email-Sackgasse.
+                              if (_showResendConfirm)
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton.icon(
+                                    onPressed:
+                                        _resending ? null : _resendConfirmation,
+                                    icon: _resending
+                                        ? const SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: AppColors.bronze),
+                                          )
+                                        : const Icon(LucideIcons.mailCheck,
+                                            size: 14),
+                                    label: Text('auth.resendConfirm'.tr()),
+                                    style: TextButton.styleFrom(
+                                        foregroundColor: AppColors.bronze),
+                                  ),
+                                ),
+                              if (_error != null ||
+                                  _info != null ||
+                                  _showResendConfirm)
                                 const SizedBox(height: 16),
 
                               // Name (register only)
