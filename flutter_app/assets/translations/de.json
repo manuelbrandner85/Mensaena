@@ -1239,7 +1239,8 @@
       "rescuer": "Rette Lebensmittel, Kleidung oder Gegenstände vor dem Wegwerfen."
     },
     "imageUploadFailed": "Bild konnte nicht hochgeladen werden. Bitte erneut versuchen.",
-    "imagePartialFailed": "Einige Bilder konnten nicht hochgeladen werden."
+    "imagePartialFailed": "Einige Bilder konnten nicht hochgeladen werden.",
+    "saveFailed": "Beitrag konnte nicht gespeichert werden. Dein Entwurf bleibt erhalten — versuch es erneut."
   },
   "crisis": {
     "error": "Fehler: {error}",

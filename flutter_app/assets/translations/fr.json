@@ -1167,7 +1167,8 @@
       "rescuer": "Sauve aliments, vêtements ou objets de la poubelle."
     },
     "imageUploadFailed": "Impossible d’envoyer l’image. Réessaie.",
-    "imagePartialFailed": "Certaines images n’ont pas pu être envoyées."
+    "imagePartialFailed": "Certaines images n’ont pas pu être envoyées.",
+    "saveFailed": "Impossible d'enregistrer la publication. Ton brouillon est conservé — réessaie."
   },
   "crisis": {
     "error": "Erreur : {error}",

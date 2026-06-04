@@ -1166,7 +1166,8 @@
       "rescuer": "Çöpe gitmeden gıda, kıyafet ya da eşyaları kurtar."
     },
     "imageUploadFailed": "Görsel yüklenemedi. Lütfen tekrar deneyin.",
-    "imagePartialFailed": "Bazı görseller yüklenemedi."
+    "imagePartialFailed": "Bazı görseller yüklenemedi.",
+    "saveFailed": "Gönderi kaydedilemedi. Taslağın korunuyor — tekrar dene."
   },
   "crisis": {
     "error": "Hata: {error}",

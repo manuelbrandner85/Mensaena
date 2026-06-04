@@ -1167,7 +1167,8 @@
       "rescuer": "Salva cibo, vestiti o oggetti dallo spreco."
     },
     "imageUploadFailed": "Impossibile caricare l’immagine. Riprova.",
-    "imagePartialFailed": "Alcune immagini non sono state caricate."
+    "imagePartialFailed": "Alcune immagini non sono state caricate.",
+    "saveFailed": "Impossibile salvare il post. La bozza è conservata — riprova."
   },
   "crisis": {
     "error": "Errore: {error}",

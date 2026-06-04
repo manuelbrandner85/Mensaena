@@ -1167,7 +1167,8 @@
       "rescuer": "Rescata alimentos, ropa u objetos antes de tirarlos."
     },
     "imageUploadFailed": "No se pudo subir la imagen. Inténtalo de nuevo.",
-    "imagePartialFailed": "Algunas imágenes no se pudieron subir."
+    "imagePartialFailed": "Algunas imágenes no se pudieron subir.",
+    "saveFailed": "No se pudo guardar la publicación. Tu borrador se conserva — inténtalo de nuevo."
   },
   "crisis": {
     "error": "Error: {error}",

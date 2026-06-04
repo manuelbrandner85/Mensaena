@@ -1240,7 +1240,8 @@
       "rescuer": "Rescue food, clothing or items from being thrown away."
     },
     "imageUploadFailed": "Image could not be uploaded. Please try again.",
-    "imagePartialFailed": "Some images could not be uploaded."
+    "imagePartialFailed": "Some images could not be uploaded.",
+    "saveFailed": "Couldn't save the post. Your draft is kept — try again."
   },
   "crisis": {
     "error": "Error: {error}",

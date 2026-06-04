@@ -255,6 +255,9 @@ class _ModuleCreatePostScreenState
   }
 
   Future<void> _submit() async {
+    // Doppel-Submit-Schutz: schneller Doppel-Tap könnte zwei identische
+    // Posts erzeugen, bevor das _submitting-Flag den Button disabled.
+    if (_submitting) return;
     final titleEmpty = _titleCtrl.text.trim().isEmpty;
     if (_type == null || titleEmpty) {
       setState(() {
@@ -276,7 +279,7 @@ class _ModuleCreatePostScreenState
     if (!ok) {
       setState(() {
         _submitting = false;
-        _error = 'Zu viele Beiträge — versuche es später noch einmal.';
+        _error = 'create.rateLimited'.tr();
       });
       return;
     }
@@ -285,7 +288,7 @@ class _ModuleCreatePostScreenState
     if (uid == null) {
       setState(() {
         _submitting = false;
-        _error = 'Nicht eingeloggt.';
+        _error = 'create.notLoggedIn'.tr();
       });
       return;
     }
@@ -362,7 +365,7 @@ class _ModuleCreatePostScreenState
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _error = 'Konnte Beitrag nicht speichern.';
+        _error = 'create.saveFailed'.tr();
       });
     }
   }
