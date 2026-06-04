@@ -91,23 +91,6 @@ class AppDrawer extends ConsumerWidget {
       ],
     ),
     _NavGroup(
-      label: 'navGroups.helpAndFind',
-      headIcon: LucideIcons.heart,
-      items: [
-        _NavLink(icon: LucideIcons.map, label: 'nav.map', route: '/dashboard/map'),
-        _NavLink(icon: LucideIcons.fileText, label: 'nav.posts',
-            route: '/dashboard/posts'),
-        _NavLink(icon: LucideIcons.building2, label: 'nav.organizations',
-            route: '/dashboard/organizations'),
-        _NavLink(icon: LucideIcons.helpingHand, label: 'nav.interactions',
-            route: '/dashboard/interactions', badgeKey: 'interactionRequests'),
-        _NavLink(icon: LucideIcons.inbox, label: 'contact.requests.title',
-            route: '/contact-requests', badgeKey: 'incomingContactRequests'),
-        _NavLink(icon: LucideIcons.dog, label: 'nav.animals',
-            route: '/dashboard/animals'),
-      ],
-    ),
-    _NavGroup(
       label: 'navGroups.emergencyAndSafety',
       headIcon: LucideIcons.alertTriangle,
       items: [
@@ -118,31 +101,24 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/mental-support'),
       ],
     ),
-    _NavGroup(
-      label: 'navGroups.community',
-      headIcon: LucideIcons.users,
-      items: [
-        _NavLink(icon: LucideIcons.users2, label: 'nav.groups',
-            route: '/dashboard/groups'),
-        _NavLink(icon: LucideIcons.calendar, label: 'nav.events',
-            route: '/dashboard/events'),
-        _NavLink(icon: LucideIcons.stickyNote, label: 'nav.board',
-            route: '/dashboard/board'),
-        _NavLink(icon: LucideIcons.trophy, label: 'nav.challenges',
-            route: '/dashboard/challenges'),
-      ],
-    ),
-    // navGroups.shareAndResources + navGroups.knowledgeAndSkills sind als
-    // Top-Level-Shortcuts (_shareHub / _knowledgeHub) nach oben gewandert —
-    // siehe Render-Liste. Damit entfallen zwei überladene Gruppen (vormals
-    // 7 bzw. 1 Eintrag); alle Module bleiben über den "Module"-Katalog
-    // und die Hub-Seiten erreichbar.
+    // Release-Aufräumen (2026-06): navGroups.helpAndFind (Karte, Posts,
+    // Organisationen, Tiere …) und navGroups.community (Gruppen, Events,
+    // Board, Challenges) sind weg — sie duplizierten den Module-Hub. Alle
+    // Module bleiben über den "Module"-Katalog (Top-Level-Shortcut, 25
+    // Karten in sortierten Sektionen) und ihre Direktrouten erreichbar.
+    // Interaktionen + Kontaktanfragen sind keine "Module", sondern
+    // persönliche Anfragen — sie wandern unter "Mein Bereich".
+    // Karte bleibt zusätzlich als Bottom-Nav-Tab dauerhaft erreichbar.
     _NavGroup(
       label: 'navGroups.myArea',
       headIcon: LucideIcons.userCircle,
       items: [
         _NavLink(icon: LucideIcons.user, label: 'nav.profile',
             route: '/dashboard/profile'),
+        _NavLink(icon: LucideIcons.helpingHand, label: 'nav.interactions',
+            route: '/dashboard/interactions', badgeKey: 'interactionRequests'),
+        _NavLink(icon: LucideIcons.inbox, label: 'contact.requests.title',
+            route: '/contact-requests', badgeKey: 'incomingContactRequests'),
         _NavLink(icon: LucideIcons.share2, label: 'nav.invite',
             route: '/dashboard/invite', variant: _NavVariant.highlight),
         _NavLink(icon: LucideIcons.award, label: 'nav.badges',
