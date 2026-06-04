@@ -192,7 +192,21 @@ serve(async (req) => {
     })
   }
 
-  if (config.webhookSecret) {
+  // SECURITY-FIX B2: Webhook-Secret ist PFLICHT. Vorher wurde die Prüfung
+  // bei leerem/fehlendem Secret übersprungen → jeder konnte send-push aufrufen
+  // und Push-Spam an beliebige user_id triggern. Jetzt: ohne konfiguriertes
+  // Secret wird die Function gesperrt (503), und jeder Request MUSS das Secret
+  // mitliefern.
+  if (!config.webhookSecret) {
+    return new Response(
+      JSON.stringify({ error: 'push_webhook_secret not configured' }),
+      {
+        status: 503,
+        headers: { ...corsHeaders(origin), 'Content-Type': 'application/json' },
+      },
+    )
+  }
+  {
     const p = req.headers.get('x-webhook-secret') ?? ''
     if (p !== config.webhookSecret) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
