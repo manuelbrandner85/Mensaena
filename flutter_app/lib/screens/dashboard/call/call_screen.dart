@@ -102,6 +102,10 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   final Stopwatch _stopwatch = Stopwatch();
   final ValueNotifier<int> _elapsedSec = ValueNotifier<int>(0);
   Timer? _ticker;
+  // Connection-Watchdog: wenn der Call nach room.connect() nicht binnen
+  // 25 s wirklich 'connected' ist (kein RoomConnectedEvent / Remote),
+  // brechen wir mit failed-State ab statt den User ewig im Spinner zu lassen.
+  Timer? _connectWatchdog;
   // Mini-Cam-Preview-Position (draggable).
   Offset _camPreviewPos = const Offset(16, 100);
   // Floating Reactions + Room-Events (DataChannel-Wrapper).
@@ -423,6 +427,19 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         setState(() => _state = _CallState.connected);
       } else {
         setState(() => _state = _CallState.joining);
+        // Watchdog: hängt der Connect (Token ok, aber kein RoomConnected/
+        // Remote), nach 25 s sauber als failed beenden statt ewig Spinner.
+        _connectWatchdog?.cancel();
+        _connectWatchdog = Timer(const Duration(seconds: 25), () {
+          if (!mounted) return;
+          if (_state == _CallState.joining ||
+              _state == _CallState.connecting) {
+            setState(() {
+              _state = _CallState.failed;
+              _error = 'call.failed'.tr();
+            });
+          }
+        });
       }
       // Call-Duration-Timer starten.
       _stopwatch
@@ -495,6 +512,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       // — vorher Buttons disabled (siehe enum _CallState.joining).
       ..on<lk.RoomConnectedEvent>((_) {
         if (!mounted) return;
+        _connectWatchdog?.cancel();
         // Erst beim echten Connect markieren wir den Call in der DB als
         // 'active' — der Gegenseiten-Stream-Listener sieht das und springt
         // ebenfalls auf 'connecting'/'connected'. Idempotent.
@@ -526,6 +544,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       })
       ..on<lk.ParticipantConnectedEvent>((_) {
         if (!mounted) return;
+        _connectWatchdog?.cancel();
         // Remote ist tatsächlich da → spätestens jetzt sind Action-Buttons
         // sinnvoll bedienbar (Mute mutet einen echten Track, Hangup beendet
         // eine echte Connection).
@@ -768,6 +787,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _ringbackHaptic?.cancel();
     _callStatusSub?.cancel();
     _ticker?.cancel();
+    _connectWatchdog?.cancel();
     _stopwatch.stop();
     _elapsedSec.dispose();
     try {
