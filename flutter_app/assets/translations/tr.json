@@ -55,7 +55,8 @@
     "flashlight": "Flaş",
     "switchCamera": "Kamerayı değiştir",
     "showPassword": "Şifreyi göster",
-    "pin": "Sabitle"
+    "pin": "Sabitle",
+    "crop": "Kırp"
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",
@@ -378,7 +379,9 @@
     "noRatingsForUser": "Bu kullanıcı için henüz değerlendirme yok.",
     "ratingsOutOf": "{total} değerlendirmeden",
     "trustScoreExplain": "Güven puanı, tamamlanmış tüm etkileşimlerden otomatik olarak hesaplanır.",
-    "qr_code": "QR kodu"
+    "qr_code": "QR kodu",
+    "editAvatar": "Avatarı düzenle",
+    "editCover": "Kapağı düzenle"
   },
   "settings": {
     "title": "Ayarlar",

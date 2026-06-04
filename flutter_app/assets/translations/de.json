@@ -55,7 +55,8 @@
     "flashlight": "Blitz",
     "switchCamera": "Kamera wechseln",
     "showPassword": "Passwort anzeigen",
-    "pin": "Anpinnen"
+    "pin": "Anpinnen",
+    "crop": "Zuschneiden"
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",
@@ -378,7 +379,9 @@
     "noRatingsForUser": "Noch keine Bewertungen für diesen Nutzer.",
     "ratingsOutOf": "aus {total} Bewertungen",
     "trustScoreExplain": "Trust-Score wird automatisch berechnet aus allen abgeschlossenen Interaktionen.",
-    "qr_code": "QR-Code"
+    "qr_code": "QR-Code",
+    "editAvatar": "Profilbild bearbeiten",
+    "editCover": "Titelbild bearbeiten"
   },
   "settings": {
     "title": "Einstellungen",

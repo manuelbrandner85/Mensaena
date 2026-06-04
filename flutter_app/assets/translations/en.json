@@ -55,7 +55,8 @@
     "flashlight": "Flashlight",
     "switchCamera": "Switch camera",
     "showPassword": "Show password",
-    "pin": "Pin"
+    "pin": "Pin",
+    "crop": "Crop"
   },
   "safe": {
     "critical_nearby_title": "Critical crisis near you",
@@ -378,7 +379,9 @@
     "noRatingsForUser": "No ratings for this user yet.",
     "ratingsOutOf": "out of {total} ratings",
     "trustScoreExplain": "Trust score is computed automatically from all completed interactions.",
-    "qr_code": "QR code"
+    "qr_code": "QR code",
+    "editAvatar": "Edit avatar",
+    "editCover": "Edit cover"
   },
   "settings": {
     "title": "Settings",

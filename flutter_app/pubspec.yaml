@@ -64,6 +64,9 @@ dependencies:
 
   # Media
   image_picker: ^1.1.2
+  # Schneiden vor Upload (Avatar, Cover, Marktplatz-Foto). Drop-in nach
+  # image_picker — native UCropActivity-Eintrag im AndroidManifest.
+  image_cropper: ^12.2.1
   cached_network_image: ^3.3.1
 
   # Geo
