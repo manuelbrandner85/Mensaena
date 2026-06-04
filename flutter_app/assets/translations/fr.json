@@ -2302,7 +2302,8 @@
     "crises": "Crises",
     "recentTitle": "Recherches récentes",
     "recentClear": "Effacer l'historique",
-    "hintAllSources": "Posts, voisins, événements, groupes, marché …"
+    "hintAllSources": "Posts, voisins, événements, groupes, marché …",
+    "modules": "Modules"
   },
   "skills": {
     "offerSkill": "Proposer une compétence",

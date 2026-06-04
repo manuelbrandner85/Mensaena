@@ -2301,7 +2301,8 @@
     "crises": "Krizler",
     "recentTitle": "Son aramalar",
     "recentClear": "Geçmişi temizle",
-    "hintAllSources": "Gönderiler, komşular, etkinlikler, gruplar, pazar …"
+    "hintAllSources": "Gönderiler, komşular, etkinlikler, gruplar, pazar …",
+    "modules": "Modüller"
   },
   "skills": {
     "offerSkill": "Beceri öner",

@@ -15,8 +15,8 @@ import '../../services/haptics.dart';
 import '../../widgets/effects/tilt_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
-class _ModuleTile {
-  const _ModuleTile({
+class ModuleTile {
+  const ModuleTile({
     required this.label,
     required this.route,
     required this.icon,
@@ -30,139 +30,139 @@ class _ModuleTile {
   final String section;
 }
 
-const _modules = <_ModuleTile>[
+const kModulesCatalog = <ModuleTile>[
   // Helfen & Finden
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.map',
       route: '/dashboard/map',
       icon: LucideIcons.map,
       tint: Color(0xFF66C7C8),
       section: 'navGroups.helpAndFind'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.posts',
       route: '/dashboard/posts',
       icon: LucideIcons.fileText,
       tint: Color(0xFFC79363),
       section: 'navGroups.helpAndFind'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.organizations',
       route: '/dashboard/organizations',
       icon: LucideIcons.building2,
       tint: Color(0xFFB48455),
       section: 'navGroups.helpAndFind'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.interactions',
       route: '/dashboard/interactions',
       icon: LucideIcons.helpingHand,
       tint: Color(0xFFE8A24A),
       section: 'navGroups.helpAndFind'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.animals',
       route: '/dashboard/animals',
       icon: LucideIcons.dog,
       tint: Color(0xFF7BD389),
       section: 'navGroups.helpAndFind'),
   // Notfall & Sicherheit
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.crisis',
       route: '/dashboard/crisis',
       icon: LucideIcons.alertTriangle,
       tint: Color(0xFFE26B6B),
       section: 'navGroups.emergencyAndSafety'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.mentalSupport',
       route: '/dashboard/mental-support',
       icon: LucideIcons.brain,
       tint: Color(0xFFC084FC),
       section: 'navGroups.emergencyAndSafety'),
   // Gemeinschaft
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.groups',
       route: '/dashboard/groups',
       icon: LucideIcons.users2,
       tint: Color(0xFFC79363),
       section: 'navGroups.community'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.events',
       route: '/dashboard/events',
       icon: LucideIcons.calendar,
       tint: Color(0xFFF59E0B),
       section: 'navGroups.community'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.board',
       route: '/dashboard/board',
       icon: LucideIcons.stickyNote,
       tint: Color(0xFFE8A24A),
       section: 'navGroups.community'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.challenges',
       route: '/dashboard/challenges',
       icon: LucideIcons.trophy,
       tint: Color(0xFFF59E0B),
       section: 'navGroups.community'),
   // Teilen & Ressourcen
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.marketplace',
       route: '/dashboard/marketplace',
       icon: LucideIcons.shoppingBag,
       tint: Color(0xFFC79363),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.supply',
       route: '/dashboard/supply',
       icon: LucideIcons.package,
       tint: Color(0xFFE8A24A),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.harvest',
       route: '/dashboard/harvest',
       icon: LucideIcons.wheat,
       tint: Color(0xFF7BD389),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.rescuer',
       route: '/dashboard/rescuer',
       icon: LucideIcons.lifeBuoy,
       tint: Color(0xFFE26B6B),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.housing',
       route: '/dashboard/housing',
       icon: LucideIcons.home,
       tint: Color(0xFF66C7C8),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.mobility',
       route: '/dashboard/mobility',
       icon: LucideIcons.car,
       tint: Color(0xFF66C7C8),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.jobs',
       route: '/dashboard/jobs',
       icon: LucideIcons.briefcase,
       tint: Color(0xFFB48455),
       section: 'navGroups.shareAndResources'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.timebank',
       route: '/dashboard/timebank',
       icon: LucideIcons.timer,
       tint: Color(0xFFC79363),
       section: 'navGroups.shareAndResources'),
   // Wissen & Skills
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.wiki',
       route: '/dashboard/wiki',
       icon: LucideIcons.bookOpen,
       tint: Color(0xFFB48455),
       section: 'navGroups.knowledgeAndSkills'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.knowledge',
       route: '/dashboard/knowledge',
       icon: LucideIcons.graduationCap,
       tint: Color(0xFFE8A24A),
       section: 'navGroups.knowledgeAndSkills'),
-  _ModuleTile(
+  ModuleTile(
       label: 'nav.skills',
       route: '/dashboard/skills',
       icon: LucideIcons.wrench,
@@ -175,8 +175,8 @@ class ModulesHubScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bySection = <String, List<_ModuleTile>>{};
-    for (final m in _modules) {
+    final bySection = <String, List<ModuleTile>>{};
+    for (final m in kModulesCatalog) {
       bySection.putIfAbsent(m.section, () => []).add(m);
     }
     return DashboardScaffold(
@@ -250,7 +250,7 @@ class ModulesHubScreen extends ConsumerWidget {
 
 class _ModuleCard extends StatelessWidget {
   const _ModuleCard({required this.tile});
-  final _ModuleTile tile;
+  final ModuleTile tile;
 
   @override
   Widget build(BuildContext context) {

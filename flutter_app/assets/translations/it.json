@@ -2302,7 +2302,8 @@
     "crises": "Crisi",
     "recentTitle": "Ricerche recenti",
     "recentClear": "Svuota cronologia",
-    "hintAllSources": "Post, vicini, eventi, gruppi, mercato …"
+    "hintAllSources": "Post, vicini, eventi, gruppi, mercato …",
+    "modules": "Moduli"
   },
   "skills": {
     "offerSkill": "Offri un'abilità",

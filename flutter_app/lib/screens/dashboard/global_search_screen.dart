@@ -13,6 +13,7 @@ import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/skeleton_card.dart';
+import 'modules_hub_screen.dart' show ModuleTile, kModulesCatalog;
 
 /// SKILL: mensaena-features
 /// Global-Search — aggregiert Posts + Profile + Events + Organisationen.
@@ -53,6 +54,19 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
     _debounce?.cancel();
     _ctrl.dispose();
     super.dispose();
+  }
+
+  /// Lokale, synchrone Modul-Suche über kModulesCatalog. So findet ein
+  /// Nutzer "Tiere", "Wohnen", "Karte" usw. direkt als Modul-Treffer und
+  /// nicht nur als Inhalts-Treffer in Posts/Profilen. Case-insensitive,
+  /// matched gegen die übersetzte Label-Anzeige.
+  List<ModuleTile> _matchModules(String q) {
+    final needle = q.trim().toLowerCase();
+    if (needle.length < 2) return const [];
+    return [
+      for (final m in kModulesCatalog)
+        if (m.label.tr().toLowerCase().contains(needle)) m,
+    ];
   }
 
   Future<_SearchResults> _runSearch(String q) async {
@@ -123,6 +137,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
             .limit(10)),
       ]);
       return _SearchResults(
+        modules: _matchModules(query),
         posts: results[0],
         profiles: results[1],
         events: results[2],
@@ -133,7 +148,19 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
         knowledge: results[7],
       );
     } catch (_) {
-      return const _SearchResults.empty();
+      // Auch bei DB-Fehlern wenigstens die Module-Treffer zeigen — die sind
+      // rein lokal und immer verfügbar.
+      return _SearchResults(
+        modules: _matchModules(query),
+        posts: const [],
+        profiles: const [],
+        events: const [],
+        organizations: const [],
+        groups: const [],
+        marketplace: const [],
+        board: const [],
+        knowledge: const [],
+      );
     }
   }
 
@@ -276,6 +303,26 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                         return ListView(
                           padding: const EdgeInsets.all(12),
                           children: [
+                            // Module-Direkt-Treffer GANZ OBEN: ein Tap
+                            // bringt den User direkt zum Modul (z.B. "Tier"
+                            // → Tiere-Modul). Ohne diese Sektion findet die
+                            // Suche nur Inhalte, nicht die Modul-Einstiege.
+                            if (r.modules.isNotEmpty) ...[
+                              _SectionHeader(
+                                  label: 'search.modules'.tr(),
+                                  count: r.modules.length),
+                              for (final m in r.modules)
+                                _ResultTile(
+                                  icon: m.icon,
+                                  color: m.tint,
+                                  title: m.label.tr(),
+                                  subtitle: m.section.tr(),
+                                  onTap: () {
+                                    _pushRecent(_query);
+                                    context.go(m.route);
+                                  },
+                                ),
+                            ],
                             if (r.posts.isNotEmpty) ...[
                               _SectionHeader(
                                   label: 'search.posts'.tr(),
@@ -435,6 +482,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
 
 class _SearchResults {
   const _SearchResults({
+    required this.modules,
     required this.posts,
     required this.profiles,
     required this.events,
@@ -445,7 +493,8 @@ class _SearchResults {
     required this.knowledge,
   });
   const _SearchResults.empty()
-      : posts = const [],
+      : modules = const [],
+        posts = const [],
         profiles = const [],
         events = const [],
         organizations = const [],
@@ -454,6 +503,9 @@ class _SearchResults {
         board = const [],
         knowledge = const [];
 
+  // Modul-Direkt-Treffer aus kModulesCatalog — wird OBEN angezeigt, damit
+  // ein User der "Tier" tippt sofort zum Tiere-Modul springen kann.
+  final List<ModuleTile> modules;
   final List<Map<String, dynamic>> posts;
   final List<Map<String, dynamic>> profiles;
   final List<Map<String, dynamic>> events;
@@ -464,6 +516,7 @@ class _SearchResults {
   final List<Map<String, dynamic>> knowledge;
 
   bool get isEmpty =>
+      modules.isEmpty &&
       posts.isEmpty &&
       profiles.isEmpty &&
       events.isEmpty &&

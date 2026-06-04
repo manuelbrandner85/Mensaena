@@ -2302,7 +2302,8 @@
     "crises": "Crisis",
     "recentTitle": "Búsquedas recientes",
     "recentClear": "Borrar historial",
-    "hintAllSources": "Publicaciones, vecinos, eventos, grupos, mercado …"
+    "hintAllSources": "Publicaciones, vecinos, eventos, grupos, mercado …",
+    "modules": "Módulos"
   },
   "skills": {
     "offerSkill": "Ofrecer habilidad",

@@ -2301,7 +2301,8 @@
     "crises": "Krisen",
     "recentTitle": "Zuletzt gesucht",
     "recentClear": "Verlauf löschen",
-    "hintAllSources": "Beiträge, Nachbar:innen, Events, Gruppen, Marktplatz …"
+    "hintAllSources": "Beiträge, Nachbar:innen, Events, Gruppen, Marktplatz …",
+    "modules": "Module"
   },
   "skills": {
     "offerSkill": "Skill anbieten",
