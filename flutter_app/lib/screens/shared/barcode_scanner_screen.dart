@@ -3,6 +3,7 @@
 /// Wird genutzt von: Marketplace-Create (Food-Lookup), Org-Invite (Code).
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
