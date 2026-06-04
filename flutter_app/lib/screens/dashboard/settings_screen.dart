@@ -31,6 +31,7 @@ import '../../services/shorebird_patch_service.dart';
 import '../../services/sleep_reminder_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
+import '../../widgets/confirm_dialog.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/battery_optimization_prompt.dart';
 import '../../widgets/shared/release_notes_sheet.dart';
@@ -947,6 +948,14 @@ class _DangerTabState extends State<_DangerTab> {
         const SizedBox(height: 10),
         OutlinedButton.icon(
           onPressed: () async {
+            final ok = await ConfirmDialog.show(
+              context,
+              title: 'common.logoutConfirmTitle'.tr(),
+              message: 'common.logoutConfirmBody'.tr(),
+              confirmLabel: 'common.logout'.tr(),
+              danger: true,
+            );
+            if (!ok || !context.mounted) return;
             await sb.auth.signOut();
             if (context.mounted) context.go('/');
           },

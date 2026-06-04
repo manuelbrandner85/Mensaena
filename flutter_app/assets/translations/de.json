@@ -41,7 +41,9 @@
     "share": "Teilen",
     "errorGeneric": "Etwas ist schiefgelaufen.",
     "failed": "Aktion fehlgeschlagen.",
-    "linkOpenFailed": "Konnte nicht geöffnet werden."
+    "linkOpenFailed": "Konnte nicht geöffnet werden.",
+    "logoutConfirmTitle": "Abmelden?",
+    "logoutConfirmBody": "Du wirst von diesem Gerät abgemeldet und musst dich neu anmelden."
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",

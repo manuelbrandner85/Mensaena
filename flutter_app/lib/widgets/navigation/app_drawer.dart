@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../confirm_dialog.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/conversations_repository.dart';
@@ -244,6 +245,14 @@ class AppDrawer extends ConsumerWidget {
                           ),
                         ),
                         onTap: () async {
+                          final ok = await ConfirmDialog.show(
+                            context,
+                            title: 'common.logoutConfirmTitle'.tr(),
+                            message: 'common.logoutConfirmBody'.tr(),
+                            confirmLabel: 'common.logout'.tr(),
+                            danger: true,
+                          );
+                          if (!ok || !context.mounted) return;
                           await sb.auth.signOut();
                           if (context.mounted) context.go('/');
                         },

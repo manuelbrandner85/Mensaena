@@ -39,7 +39,9 @@
     "share": "Paylaş",
     "errorGeneric": "Bir şeyler ters gitti.",
     "failed": "İşlem başarısız.",
-    "linkOpenFailed": "Açılamadı."
+    "linkOpenFailed": "Açılamadı.",
+    "logoutConfirmTitle": "Çıkış yapılsın mı?",
+    "logoutConfirmBody": "Bu cihazdan çıkış yapılacak ve yeniden giriş yapman gerekecek."
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",

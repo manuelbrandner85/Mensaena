@@ -39,7 +39,9 @@
     "share": "Condividi",
     "errorGeneric": "Qualcosa è andato storto.",
     "failed": "Azione non riuscita.",
-    "linkOpenFailed": "Impossibile aprire."
+    "linkOpenFailed": "Impossibile aprire.",
+    "logoutConfirmTitle": "Disconnettersi?",
+    "logoutConfirmBody": "Verrai disconnesso da questo dispositivo e dovrai accedere di nuovo."
   },
   "safe": {
     "critical_nearby_title": "Crisi critica vicino a te",

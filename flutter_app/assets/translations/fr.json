@@ -39,7 +39,9 @@
     "share": "Partager",
     "errorGeneric": "Une erreur s'est produite.",
     "failed": "Action échouée.",
-    "linkOpenFailed": "Impossible d’ouvrir."
+    "linkOpenFailed": "Impossible d’ouvrir.",
+    "logoutConfirmTitle": "Se déconnecter ?",
+    "logoutConfirmBody": "Tu seras déconnecté sur cet appareil et devras te reconnecter."
   },
   "safe": {
     "critical_nearby_title": "Crise critique près de toi",

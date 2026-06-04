@@ -39,7 +39,9 @@
     "share": "Поделиться",
     "errorGeneric": "Что-то пошло не так.",
     "failed": "Действие не удалось.",
-    "linkOpenFailed": "Не удалось открыть."
+    "linkOpenFailed": "Не удалось открыть.",
+    "logoutConfirmTitle": "Выйти?",
+    "logoutConfirmBody": "Вы выйдете на этом устройстве и потребуется войти снова."
   },
   "safe": {
     "critical_nearby_title": "Критический кризис рядом",
