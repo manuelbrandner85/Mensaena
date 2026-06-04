@@ -162,7 +162,11 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     _attachListeners(room);
 
     try {
-      await room.connect(tok.url, tok.token);
+      // B5: Timeout gegen ewigen Spinner, falls die SFU-Verbindung hängt
+      // (Token ok, aber Server/Netz unerreichbar). 25 s → failed-State.
+      await room.connect(tok.url, tok.token).timeout(
+        const Duration(seconds: 25),
+      );
       // Mikro an, Kamera aus (User entscheidet via Toggle).
       await room.localParticipant?.setMicrophoneEnabled(_micEnabled);
       if (!mounted) return;
