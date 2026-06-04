@@ -230,10 +230,17 @@ class _IncomingCallListenerState
       if (status != 'ringing') continue;
       if (_handledCallIds.contains(id) ||
           CallEventBus.isHandledAccept(id)) continue;
-      // Ignore stale calls older than 60s.
+      // Stale-Call-Filter — der WICHTIGE Punkt: wir prüfen sowohl
+      // created_at-Alter ALS AUCH ended_at. Vorher wurde NUR created_at
+      // gegen 60 s geprüft → wenn die App nach Anruf-Ende geöffnet wurde,
+      // ploppte ein längst beendeter Anruf auf, weil Realtime den letzten
+      // Snapshot mitlieferte.
+      final endedAt = r['ended_at'] as String?;
+      if (endedAt != null && endedAt.isNotEmpty) continue;
       final createdAt =
           DateTime.tryParse(r['created_at'] as String? ?? '') ?? now;
-      if (now.difference(createdAt).inSeconds > 60) continue;
+      // 50 s = 45 s Klingelfrist + Puffer; danach hat der Caller eh aufgegeben.
+      if (now.difference(createdAt).inSeconds > 50) continue;
       _handledCallIds.add(id);
       _triggerIncoming(
         callId: id,

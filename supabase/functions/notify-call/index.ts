@@ -116,8 +116,13 @@ async function sendCallFcm(
   accessToken: string,
   fcmToken: string,
   callerName: string,
+  callerAvatar: string | null,
   call: CallRow,
 ) {
+  // Daten-only Push mit HIGH-Priority + 45 s TTL. KEIN notification-Feld
+  // sonst rendert Android selbst eine zweite Notification PARALLEL zur
+  // CallKit-UI, was zu Doppel-Klingeln und Verwirrung führt. WhatsApp macht
+  // es identisch so.
   const payload = {
     message: {
       token: fcmToken,
@@ -126,8 +131,10 @@ async function sendCallFcm(
         call_id: call.id,
         room_name: call.room_name,
         caller_name: callerName,
+        caller_avatar: callerAvatar ?? '',
         caller_id: call.caller_id,
         conversation_id: call.conversation_id,
+        call_type: (call as { call_type?: string }).call_type ?? 'audio',
         title: 'Eingehender Anruf',
         body: `${callerName} ruft dich an`,
       },
@@ -192,10 +199,10 @@ serve(async (req) => {
         ? JSON.parse(cfg.fcm_service_account_json)
         : cfg.fcm_service_account_json;
 
-    // Caller display name
+    // Caller display name + avatar (CallKit-UI braucht Foto, sonst nur Initial).
     const { data: caller } = await ADMIN
       .from('profiles')
-      .select('display_name, name, nickname')
+      .select('display_name, name, nickname, avatar_url')
       .eq('id', call.caller_id)
       .maybeSingle();
     const callerName =
@@ -203,6 +210,7 @@ serve(async (req) => {
       (caller?.name as string | undefined) ??
       (caller?.nickname as string | undefined) ??
       'Nachbar:in';
+    const callerAvatar = (caller?.avatar_url as string | undefined) ?? null;
 
     // Callee FCM tokens
     const { data: tokens } = await ADMIN
@@ -230,6 +238,7 @@ serve(async (req) => {
           accessToken,
           row.token,
           callerName,
+          callerAvatar,
           call,
         );
         if (r.ok) {

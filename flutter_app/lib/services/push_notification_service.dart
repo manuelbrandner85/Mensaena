@@ -309,6 +309,7 @@ class PushNotificationService {
         return token;
       }
 
+      // 1. Aktuellen Token upserten als active.
       await sb.from('fcm_tokens').upsert(
         {
           'user_id': uid,
@@ -319,11 +320,19 @@ class PushNotificationService {
         },
         onConflict: 'user_id,token',
       );
+      // 2. ALLE anderen Tokens dieses Users auf inactive setzen — sonst
+      // sendet die notify-call Edge-Function Pushes an alte Geräte (Tablets
+      // / vorheriges Phone), die nie ankommen oder spät. Das ist die
+      // wahrscheinliche Ursache für "Anruf kommt erst beim App-Öffnen".
+      await sb
+          .from('fcm_tokens')
+          .update({'active': false})
+          .eq('user_id', uid)
+          .neq('token', token);
       lastRegisterError = null;
-      debugPrint('[Push] Token registriert fuer User $uid');
+      debugPrint('[Push] Token registriert + alte deaktiviert fuer User $uid');
       return token;
     } catch (e) {
-      // BUG-FIX #3: Vorher silent catch → User glaubte Push aktiviert
       lastRegisterError = e.toString();
       debugPrint('[Push] registerToken FAILED: $e');
       return null;
