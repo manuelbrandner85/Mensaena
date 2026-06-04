@@ -27,6 +27,7 @@ import '../../../repositories/interactions_repository.dart';
 import '../../../repositories/notifications_repository.dart';
 import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
+import '../../../services/permissions_gate.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
 import '../../../widgets/dashboard/alerts_badge_widget.dart';
 import '../../../widgets/dashboard/dashboard_section.dart';
@@ -107,13 +108,40 @@ class _DashboardHomeScreenState
   @override
   void initState() {
     super.initState();
-    _data = _loadAll().then((d) {
-      _maybeShowLocationOnboarding(d.profile);
-      return d;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) OnboardingTour.maybeShow(context);
-    });
+    _data = _loadAll();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _runFirstRunFlow());
+  }
+
+  /// Erststart-Reihenfolge OHNE Stapeln (Release-UX 2026-06).
+  /// Früher feuerten Permissions-Gate, Onboarding-Tour und Standort-Sheet
+  /// unabhängig voneinander → bis zu drei Overlays gleichzeitig. Jetzt
+  /// strikt sequenziell: 1. Berechtigungs-Gate abwarten, 2. eine Tour,
+  /// 3. danach erst die Standort-Abfrage.
+  Future<void> _runFirstRunFlow() async {
+    // Schritt 1: Warten, bis der Permissions-Gate nicht mehr nötig ist. Er wird
+    //    von PermissionsGateGuard als eigener /gate-Screen oben gepusht; solange
+    //    halten wir Tour + Standort zurück. Bounded auf ~20s als Sicherheitsnetz.
+    for (var i = 0; i < 40; i++) {
+      if (!mounted) return;
+      bool gatePending;
+      try {
+        gatePending = await PermissionsGate.shouldShowGate();
+      } catch (_) {
+        gatePending = false;
+      }
+      if (!mounted) return;
+      final onGateRoute = GoRouterState.of(context).uri.path == '/gate';
+      if (!gatePending && !onGateRoute) break;
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+    if (!mounted) return;
+    // Schritt 2: Eine Tour — kehrt sofort zurück, falls bereits gesehen.
+    await OnboardingTour.maybeShow(context);
+    if (!mounted) return;
+    // Schritt 3: Erst JETZT die Standort-Abfrage, nie gleichzeitig zur Tour.
+    final d = await _data;
+    if (!mounted) return;
+    await _maybeShowLocationOnboarding(d.profile);
   }
 
   Future<void> _maybeShowLocationOnboarding(Profile? p) async {
@@ -123,7 +151,6 @@ class _DashboardHomeScreenState
       return;
     }
     _locationCheckDone = true;
-    await Future<void>.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
     showModalBottomSheet<void>(
       context: context,
