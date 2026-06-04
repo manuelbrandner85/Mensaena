@@ -140,6 +140,47 @@ serve(async (req) => {
         { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } });
   }
 
+  // ── SECURITY-FIX B3: Raum-Mitgliedschaft prüfen ──────────────────────
+  // Vorher gab die Function für JEDEN roomName ein Token aus → ein
+  // authentifizierter Angreifer konnte sich (mit bekanntem Raum-Namen) in
+  // fremde 1:1-Anrufe einklinken. Jetzt:
+  //   - DM-Räume (dm-*): es muss eine dm_calls-Row mit diesem room_name
+  //     geben, die der User per RLS sehen darf (= er ist caller ODER callee).
+  //     RLS erzwingt die Privatsphäre automatisch.
+  //   - Livestream/Gruppen-Räume: müssen in live_rooms existieren
+  //     (öffentliches Zuschauen/Hosten ist gewollt). Prüfung via service-role,
+  //     damit eine evtl. restriktive live_rooms-RLS den Existenz-Check nicht
+  //     fälschlich blockt.
+  let allowed = false;
+  try {
+    if (roomName.startsWith('dm-')) {
+      const { data: dm } = await supabase
+        .from('dm_calls')
+        .select('id')
+        .eq('room_name', roomName)
+        .limit(1);
+      allowed = Array.isArray(dm) && dm.length > 0;
+    } else {
+      const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
+        auth: { persistSession: false },
+      });
+      const { data: lr } = await admin
+        .from('live_rooms')
+        .select('id')
+        .eq('room_name', roomName)
+        .limit(1);
+      allowed = Array.isArray(lr) && lr.length > 0;
+    }
+  } catch (_) {
+    allowed = false;
+  }
+  if (!allowed) {
+    return new Response(
+      JSON.stringify({ error: 'not_authorized_for_room' }),
+      { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } },
+    );
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
