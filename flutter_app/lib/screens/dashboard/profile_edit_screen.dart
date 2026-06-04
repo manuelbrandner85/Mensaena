@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,7 +16,6 @@ import '../../config/theme/app_typography.dart';
 import '../../models/profile.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/avatar_generator_service.dart';
-import '../../services/cropped_image_picker.dart';
 import '../../services/locale_country_service.dart';
 import '../../services/location_service.dart';
 import '../../services/supabase_service.dart';
@@ -299,18 +299,28 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   }
 
   Future<void> _pickAvatar() async {
-    // CroppedImagePicker: pick + ucrop in einem Schritt, Avatar fix 1:1.
-    // User schneidet selbst → keine schiefen Profilbilder mehr.
-    final path = await CroppedImagePicker.pickAvatar(context);
-    if (path == null || !mounted) return;
-    setState(() => _newAvatar = File(path));
+    final picker = ImagePicker();
+    // R6: Avatar 400px reicht für 2x-Retina-Display, viel kleinere Upload.
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 400,
+      maxHeight: 400,
+      imageQuality: 75,
+    );
+    if (picked == null) return;
+    setState(() => _newAvatar = File(picked.path));
   }
 
   Future<void> _pickCover() async {
-    // Cover wird auf 16:9 zugeschnitten — passend zum Header-Aspect-Ratio.
-    final path = await CroppedImagePicker.pickCover(context);
-    if (path == null || !mounted) return;
-    setState(() => _newCover = File(path));
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+      maxHeight: 900,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+    setState(() => _newCover = File(picked.path));
   }
 
   Future<String?> _uploadImage({

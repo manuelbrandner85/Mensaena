@@ -127,12 +127,6 @@
              beim Merge die Plugin-Konfiguration und der Service startet
              dann ohne Typ → App crash (Samsung One UI: 'wird wiederholt
              beendet'). -->
-
-        <!-- image_cropper (uCrop). Pflicht-Eintrag laut Plugin-Doku. -->
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
     <queries>

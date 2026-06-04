@@ -64,11 +64,6 @@ dependencies:
 
   # Media
   image_picker: ^1.1.2
-  # Schneiden vor Upload (Avatar, Cover, Marktplatz-Foto). Drop-in nach
-  # image_picker — native UCropActivity-Eintrag im AndroidManifest.
-  # Version pinned an Flutter SDK 3.27 (Mensaena's aktueller Stand): 11.x/12.x
-  # verlangen Flutter ≥3.28 (image_cropper_platform_interface 8.x).
-  image_cropper: ^10.0.0+1
   cached_network_image: ^3.3.1
 
   # Geo
