@@ -140,7 +140,7 @@ class _DashboardHomeScreenState
     if (!mounted) return;
     // Schritt 3: Erst JETZT die Standort-Abfrage, nie gleichzeitig zur Tour.
     final d = await _data;
-    if (!mounted) return;
+    if (!mounted || d == null) return;
     await _maybeShowLocationOnboarding(d.profile);
   }
 
