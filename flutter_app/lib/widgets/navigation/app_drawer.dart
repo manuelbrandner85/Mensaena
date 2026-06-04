@@ -51,22 +51,13 @@ class AppDrawer extends ConsumerWidget {
     label: 'modulesHub.title',
     route: '/dashboard/modules',
   );
-  // Release-Aufräumen (2026-06): Die beiden Konsolidierungs-Hubs sind jetzt
-  // direkte Top-Level-Shortcuts statt eigener (überladener) Drawer-Gruppen.
-  // Sämtliche Einzelmodule (supply, harvest, rescuer, housing, mobility, jobs,
-  // marketplace, timebank, wiki, knowledge, skills …) bleiben vollständig über
-  // den "Module"-Katalog (/dashboard/modules, 25 Karten) und die Hubs selbst
-  // erreichbar — es geht KEINE Funktion verloren, das Menü wird nur kürzer.
-  static const _NavLink _shareHub = _NavLink(
-    icon: LucideIcons.repeat,
-    label: 'navGroups.shareAndResources',
-    route: '/dashboard/teilen',
-  );
-  static const _NavLink _knowledgeHub = _NavLink(
-    icon: LucideIcons.bookOpen,
-    label: 'navGroups.knowledgeAndSkills',
-    route: '/dashboard/wissen',
-  );
+  // Drawer-Strategie (2026-06, finale Version): ALLE Module sind im Drawer in
+  // klar benannten Kategorien sichtbar — gespiegelt von den Module-Hub-
+  // Sektionen, damit ein Nutzer NIE raten muss, wo etwas zu finden ist.
+  // Der "Module"-Shortcut bleibt als visuelle Übersichts-Seite (Karten-Grid),
+  // ersetzt aber nicht die Kategorien — sie ergänzen sich.
+  // KEINE Hub-Shortcuts auf Top-Level (Teilen/Wissen) mehr — die Kategorien
+  // im Drawer machen sie redundant.
   static const _NavLink _notifications = _NavLink(
     icon: LucideIcons.bell,
     label: 'nav.notifications',
@@ -83,11 +74,28 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/messages', badgeKey: 'unreadMessages'),
         _NavLink(icon: LucideIcons.messageCircle, label: 'nav.communityChat',
             route: '/dashboard/chat'),
-        // Freunde gehören zu Kommunikation (zuvor irrtümlich in "Mein Bereich").
         _NavLink(icon: LucideIcons.users, label: 'nav.friends',
             route: '/dashboard/friends', badgeKey: 'friendRequests'),
         _NavLink(icon: LucideIcons.sparkles, label: 'nav.matching',
             route: '/dashboard/matching', badgeKey: 'suggestedMatches'),
+      ],
+    ),
+    _NavGroup(
+      label: 'navGroups.helpAndFind',
+      headIcon: LucideIcons.heart,
+      items: [
+        _NavLink(icon: LucideIcons.map, label: 'nav.map',
+            route: '/dashboard/map'),
+        _NavLink(icon: LucideIcons.fileText, label: 'nav.posts',
+            route: '/dashboard/posts'),
+        _NavLink(icon: LucideIcons.building2, label: 'nav.organizations',
+            route: '/dashboard/organizations'),
+        _NavLink(icon: LucideIcons.helpingHand, label: 'nav.interactions',
+            route: '/dashboard/interactions', badgeKey: 'interactionRequests'),
+        _NavLink(icon: LucideIcons.inbox, label: 'contact.requests.title',
+            route: '/contact-requests', badgeKey: 'incomingContactRequests'),
+        _NavLink(icon: LucideIcons.dog, label: 'nav.animals',
+            route: '/dashboard/animals'),
       ],
     ),
     _NavGroup(
@@ -101,24 +109,60 @@ class AppDrawer extends ConsumerWidget {
             route: '/dashboard/mental-support'),
       ],
     ),
-    // Release-Aufräumen (2026-06): navGroups.helpAndFind (Karte, Posts,
-    // Organisationen, Tiere …) und navGroups.community (Gruppen, Events,
-    // Board, Challenges) sind weg — sie duplizierten den Module-Hub. Alle
-    // Module bleiben über den "Module"-Katalog (Top-Level-Shortcut, 25
-    // Karten in sortierten Sektionen) und ihre Direktrouten erreichbar.
-    // Interaktionen + Kontaktanfragen sind keine "Module", sondern
-    // persönliche Anfragen — sie wandern unter "Mein Bereich".
-    // Karte bleibt zusätzlich als Bottom-Nav-Tab dauerhaft erreichbar.
+    _NavGroup(
+      label: 'navGroups.community',
+      headIcon: LucideIcons.users,
+      items: [
+        _NavLink(icon: LucideIcons.users2, label: 'nav.groups',
+            route: '/dashboard/groups'),
+        _NavLink(icon: LucideIcons.calendar, label: 'nav.events',
+            route: '/dashboard/events'),
+        _NavLink(icon: LucideIcons.stickyNote, label: 'nav.board',
+            route: '/dashboard/board'),
+        _NavLink(icon: LucideIcons.trophy, label: 'nav.challenges',
+            route: '/dashboard/challenges'),
+      ],
+    ),
+    _NavGroup(
+      label: 'navGroups.shareAndResources',
+      headIcon: LucideIcons.repeat,
+      items: [
+        _NavLink(icon: LucideIcons.shoppingBag, label: 'nav.marketplace',
+            route: '/dashboard/marketplace'),
+        _NavLink(icon: LucideIcons.package, label: 'nav.supply',
+            route: '/dashboard/supply'),
+        _NavLink(icon: LucideIcons.wheat, label: 'nav.harvest',
+            route: '/dashboard/harvest'),
+        _NavLink(icon: LucideIcons.lifeBuoy, label: 'nav.rescuer',
+            route: '/dashboard/rescuer'),
+        _NavLink(icon: LucideIcons.home, label: 'nav.housing',
+            route: '/dashboard/housing'),
+        _NavLink(icon: LucideIcons.car, label: 'nav.mobility',
+            route: '/dashboard/mobility'),
+        _NavLink(icon: LucideIcons.briefcase, label: 'nav.jobs',
+            route: '/dashboard/jobs'),
+        _NavLink(icon: LucideIcons.timer, label: 'nav.timebank',
+            route: '/dashboard/timebank'),
+      ],
+    ),
+    _NavGroup(
+      label: 'navGroups.knowledgeAndSkills',
+      headIcon: LucideIcons.bookOpen,
+      items: [
+        _NavLink(icon: LucideIcons.bookOpen, label: 'nav.wiki',
+            route: '/dashboard/wiki'),
+        _NavLink(icon: LucideIcons.graduationCap, label: 'nav.knowledge',
+            route: '/dashboard/knowledge'),
+        _NavLink(icon: LucideIcons.wrench, label: 'nav.skills',
+            route: '/dashboard/skills'),
+      ],
+    ),
     _NavGroup(
       label: 'navGroups.myArea',
       headIcon: LucideIcons.userCircle,
       items: [
         _NavLink(icon: LucideIcons.user, label: 'nav.profile',
             route: '/dashboard/profile'),
-        _NavLink(icon: LucideIcons.helpingHand, label: 'nav.interactions',
-            route: '/dashboard/interactions', badgeKey: 'interactionRequests'),
-        _NavLink(icon: LucideIcons.inbox, label: 'contact.requests.title',
-            route: '/contact-requests', badgeKey: 'incomingContactRequests'),
         _NavLink(icon: LucideIcons.share2, label: 'nav.invite',
             route: '/dashboard/invite', variant: _NavVariant.highlight),
         _NavLink(icon: LucideIcons.award, label: 'nav.badges',
@@ -181,9 +225,6 @@ class AppDrawer extends ConsumerWidget {
                       _LinkTile(link: _home, currentLoc: currentLoc),
                       _LinkTile(
                           link: _modulesHub, currentLoc: currentLoc),
-                      _LinkTile(link: _shareHub, currentLoc: currentLoc),
-                      _LinkTile(
-                          link: _knowledgeHub, currentLoc: currentLoc),
                       _LinkTile(
                           link: _notifications, currentLoc: currentLoc),
                       const _PinnedSection(),
