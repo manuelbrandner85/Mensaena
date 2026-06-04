@@ -57,21 +57,39 @@ class UserBlocksRepository {
     }
   }
 
-  /// Liste der von mir blockierten User-IDs.
+  /// IDs aller User die ICH blockiert habe ODER die MICH blockiert haben.
+  /// FIX H2: bidirektional über die SECURITY-DEFINER-RPC my_block_filter_ids —
+  /// so verschwinden auch Beiträge/Aktivitäten von Usern, die mich blockiert
+  /// haben, aus meinem Feed (Stalking-/Harassment-Schutz). Die RPC verrät
+  /// NICHT, wer in welche Richtung blockiert hat.
   static Future<Set<String>> myBlockedIds() async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return const {};
     try {
-      final rows = await sb
-          .from('user_blocks')
-          .select('blocked_id')
-          .eq('blocker_id', uid);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map((r) => r['blocked_id'] as String)
-          .toSet();
-    } catch (_) {
+      final rows = await sb.rpc<dynamic>('my_block_filter_ids');
+      if (rows is List) {
+        return rows
+            .whereType<Map<String, dynamic>>()
+            .map((r) => r['user_id'] as String?)
+            .whereType<String>()
+            .toSet();
+      }
       return const {};
+    } catch (_) {
+      // Fallback auf einseitig (besser als gar kein Filter), falls die RPC
+      // noch nicht deployed ist.
+      try {
+        final rows = await sb
+            .from('user_blocks')
+            .select('blocked_id')
+            .eq('blocker_id', uid);
+        return (rows as List)
+            .whereType<Map<String, dynamic>>()
+            .map((r) => r['blocked_id'] as String)
+            .toSet();
+      } catch (_) {
+        return const {};
+      }
     }
   }
 }
