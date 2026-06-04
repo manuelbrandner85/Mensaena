@@ -9,7 +9,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 
 import 'callkit_service.dart';
-import 'incoming_call_overlay.dart';
 import 'notification_router.dart';
 import 'supabase_service.dart';
 
@@ -391,7 +390,15 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
       final callType = (m.data['call_type'] as String?) ?? 'audio';
 
       var callkitOk = false;
-      // 1) Primaer: native CallKit-Bridge (Lockscreen + System-Ringtone).
+      // WhatsApp-1:1-Pattern im Killed/Background-State: NUR CallKit/Telecom.
+      // Das ist die native Android-ConnectionService-UI, die zuverlässig
+      // Vollbild auf dem Sperrbildschirm zeigt — genau wie WhatsApp. Das
+      // Custom-Overlay (SYSTEM_ALERT_WINDOW) wird hier BEWUSST NICHT
+      // aufgerufen: aus dem FCM-Background-Isolate ein zweites Flutter-
+      // Overlay-Isolate zu starten ist fragil/langsam und kostet die knappe
+      // BG-Isolate-Lebenszeit. Das Overlay läuft nur im Foreground-Pfad
+      // (IncomingCallListener), wo Samsung fullScreenIntent auf Heads-up
+      // demotet.
       try {
         if (callId.isNotEmpty) {
           await CallkitService.showIncoming(
@@ -409,25 +416,7 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage m) async {
         debugPrint('[BG-Handler] CallKit failed → Fallback Notification: $e');
       }
 
-      // 1b) Zusätzlich Vollbild-System-Overlay (SYSTEM_ALERT_WINDOW): Samsung
-      // One UI demotet fullScreenIntent auf Heads-up sobald entsperrt — das
-      // Overlay zeichnet unsere Vollbild-UI direkt über alles. No-op falls
-      // Permission nicht erteilt. Labels hartcodiert auf Deutsch, weil der
-      // BG-Isolate kein easy_localization initialisiert hat.
-      if (callId.isNotEmpty) {
-        try {
-          await IncomingCallOverlay.show(
-            callId: callId,
-            callerName: callerName,
-            callerAvatar: callerAvatar,
-            callType: callType,
-          );
-        } catch (e) {
-          debugPrint('[BG-Handler] Overlay failed: $e');
-        }
-      }
-
-      // CallKit lief schon → Fallback-Notification-Pfad nicht mehr nötig.
+      // CallKit lief → Fallback-Notification-Pfad nicht mehr nötig.
       if (callkitOk) return;
 
       // 2) Fallback: alte fullScreenIntent-Notification.
