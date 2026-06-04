@@ -2505,14 +2505,6 @@
     "busy": "Ahora no puedo — te escribo luego.",
     "willCallBack": "Te llamo enseguida 📞"
   },
-  "livePoll": {
-    "create": "Iniciar encuesta",
-    "questionHint": "Tu pregunta …",
-    "option": "Opción {n}",
-    "addOption": "Añadir opción",
-    "start": "Iniciar encuesta",
-    "totalVotes": "{n} votos totales"
-  },
   "liveSubtitle": {
     "hint": "Escribe subtítulo — se traduce en vivo …"
   },
@@ -3035,7 +3027,7 @@
   "status": {
     "title": "Establecer estado",
     "set": "Establecer estado",
-    "hint": "¿Qué tienes en mente?",
+    "hint": "¿Qué estás haciendo?",
     "clear": "Borrar",
     "until_cleared": "Hasta que lo cambie",
     "duration_hours": "{n} horas",

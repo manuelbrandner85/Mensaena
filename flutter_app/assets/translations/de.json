@@ -2504,14 +2504,6 @@
     "busy": "Kann gerade leider nicht — ich melde mich.",
     "willCallBack": "Ich rufe dich gleich zurück 📞"
   },
-  "livePoll": {
-    "create": "Umfrage starten",
-    "questionHint": "Deine Frage …",
-    "option": "Option {n}",
-    "addOption": "Option hinzufügen",
-    "start": "Umfrage starten",
-    "totalVotes": "{n} Stimmen insgesamt"
-  },
   "liveSubtitle": {
     "hint": "Untertitel tippen — wird live übersetzt …"
   },
@@ -3031,7 +3023,7 @@
   "status": {
     "title": "Status setzen",
     "set": "Status setzen",
-    "hint": "Wie geht es dir gerade?",
+    "hint": "Was machst du gerade?",
     "clear": "Löschen",
     "until_cleared": "Bis ich es ändere",
     "duration_hours": "{n} Stunden",

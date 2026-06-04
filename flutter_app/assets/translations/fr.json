@@ -2505,14 +2505,6 @@
     "busy": "Pas dispo là — je te recontacte.",
     "willCallBack": "Je te rappelle tout de suite 📞"
   },
-  "livePoll": {
-    "create": "Lancer un sondage",
-    "questionHint": "Votre question …",
-    "option": "Option {n}",
-    "addOption": "Ajouter une option",
-    "start": "Lancer le sondage",
-    "totalVotes": "{n} votes au total"
-  },
   "liveSubtitle": {
     "hint": "Tapez un sous-titre — traduit en direct …"
   },
@@ -3035,7 +3027,7 @@
   "status": {
     "title": "Définir le statut",
     "set": "Définir le statut",
-    "hint": "Quoi de neuf ?",
+    "hint": "Que fais-tu en ce moment ?",
     "clear": "Effacer",
     "until_cleared": "Jusqu'à ce que je le change",
     "duration_hours": "{n} heures",

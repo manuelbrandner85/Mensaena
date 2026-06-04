@@ -2504,14 +2504,6 @@
     "busy": "Şu an müsait değilim — sonra yazarım.",
     "willCallBack": "Hemen geri ararım 📞"
   },
-  "livePoll": {
-    "create": "Anket başlat",
-    "questionHint": "Sorun …",
-    "option": "Seçenek {n}",
-    "addOption": "Seçenek ekle",
-    "start": "Anketi başlat",
-    "totalVotes": "Toplam {n} oy"
-  },
   "liveSubtitle": {
     "hint": "Alt yazı yaz — anlık çevrilir …"
   },
@@ -3034,7 +3026,7 @@
   "status": {
     "title": "Durum belirle",
     "set": "Durum belirle",
-    "hint": "Aklında ne var?",
+    "hint": "Şu an ne yapıyorsun?",
     "clear": "Temizle",
     "until_cleared": "Değiştirene kadar",
     "duration_hours": "{n} saat",

@@ -2505,14 +2505,6 @@
     "busy": "Can't right now — I'll get back to you.",
     "willCallBack": "I'll call you right back 📞"
   },
-  "livePoll": {
-    "create": "Start poll",
-    "questionHint": "Your question …",
-    "option": "Option {n}",
-    "addOption": "Add option",
-    "start": "Start poll",
-    "totalVotes": "{n} votes total"
-  },
   "liveSubtitle": {
     "hint": "Type subtitle — live-translated …"
   },
@@ -3032,7 +3024,7 @@
   "status": {
     "title": "Set status",
     "set": "Set status",
-    "hint": "What's on your mind?",
+    "hint": "What are you up to?",
     "clear": "Clear",
     "until_cleared": "Until I change it",
     "duration_hours": "{n} hours",

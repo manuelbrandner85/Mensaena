@@ -2505,14 +2505,6 @@
     "busy": "Adesso non posso — ti scrivo dopo.",
     "willCallBack": "Ti richiamo subito 📞"
   },
-  "livePoll": {
-    "create": "Avvia sondaggio",
-    "questionHint": "La tua domanda …",
-    "option": "Opzione {n}",
-    "addOption": "Aggiungi opzione",
-    "start": "Avvia sondaggio",
-    "totalVotes": "{n} voti in totale"
-  },
   "liveSubtitle": {
     "hint": "Scrivi un sottotitolo — tradotto in tempo reale …"
   },
@@ -3035,7 +3027,7 @@
   "status": {
     "title": "Imposta stato",
     "set": "Imposta stato",
-    "hint": "A cosa stai pensando?",
+    "hint": "Cosa stai facendo?",
     "clear": "Cancella",
     "until_cleared": "Finché non lo cambio",
     "duration_hours": "{n} ore",
