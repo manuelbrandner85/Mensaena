@@ -656,7 +656,8 @@
     "callBtn": "Ara",
     "hangupBtn": "Kapat",
     "searchOpen": "Ara",
-    "searchClose": "Aramayı kapat"
+    "searchClose": "Aramayı kapat",
+    "blockedWord": "Bu mesaj uygunsuz ifade içeriyor ve gönderilmedi."
   },
   "languages": {
     "de": "Almanca",

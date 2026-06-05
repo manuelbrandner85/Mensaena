@@ -657,7 +657,8 @@
     "callBtn": "Call",
     "hangupBtn": "Hang up",
     "searchOpen": "Search",
-    "searchClose": "Close search"
+    "searchClose": "Close search",
+    "blockedWord": "This message contains inappropriate language and was not sent."
   },
   "languages": {
     "de": "German",

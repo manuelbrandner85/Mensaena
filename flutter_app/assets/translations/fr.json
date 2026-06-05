@@ -657,7 +657,8 @@
     "hangupBtn": "Raccrocher",
     "searchOpen": "Rechercher",
     "searchClose": "Fermer la recherche",
-    "callBack": "Rappeler"
+    "callBack": "Rappeler",
+    "blockedWord": "Ce message contient un langage inapproprié et n'a pas été envoyé."
   },
   "languages": {
     "de": "Allemand",

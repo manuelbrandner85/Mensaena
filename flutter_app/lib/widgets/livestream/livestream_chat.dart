@@ -14,6 +14,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/mega_models.dart';
 import '../../providers/mega_providers.dart';
 import '../../repositories/mega_repositories.dart';
+import '../../services/chat_word_filter_service.dart';
 import '../../services/haptics.dart';
 
 class LivestreamChat extends ConsumerStatefulWidget {
@@ -39,6 +40,16 @@ class _LivestreamChatState extends ConsumerState<LivestreamChat> {
   Future<void> _send() async {
     final txt = _ctrl.text.trim();
     if (txt.isEmpty || _sending) return;
+    // Wortfilter auch im öffentlichen Livestream-Chat — hier sehen es
+    // potenziell viele Zuschauer gleichzeitig.
+    if (!ChatWordFilterService.instance.isClean(txt)) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.herzrot,
+        content: Text('chat.blockedWord'.tr(),
+            style: AppTypography.body(size: 13, color: Colors.white)),
+      ));
+      return;
+    }
     setState(() => _sending = true);
     Haptics.tap();
     await LivestreamMessagesRepository.send(

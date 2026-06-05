@@ -657,7 +657,8 @@
     "hangupBtn": "Colgar",
     "searchOpen": "Buscar",
     "searchClose": "Cerrar búsqueda",
-    "callBack": "Devolver llamada"
+    "callBack": "Devolver llamada",
+    "blockedWord": "Este mensaje contiene lenguaje inapropiado y no se envió."
   },
   "languages": {
     "de": "Alemán",

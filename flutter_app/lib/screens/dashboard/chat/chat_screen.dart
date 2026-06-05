@@ -15,6 +15,7 @@ import '../../../config/theme/cinema_accents.dart';
 import '../../../providers/cinema_provider.dart';
 import '../../../repositories/conversations_repository.dart';
 import '../../../services/chat_context_service.dart';
+import '../../../services/chat_word_filter_service.dart';
 import '../../../services/conversation_mute_service.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
@@ -425,6 +426,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (_sending) return;
     final text = _ctrl.text.trim();
     if (text.isEmpty) return;
+    // Wortfilter: bekannte Slurs/Harassment vor dem Senden abfangen mit
+    // sofortigem Feedback. Server + Mod-Queue bleiben zweite Instanz.
+    if (!ChatWordFilterService.instance.isClean(text)) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.herzrot,
+        content: Text('chat.blockedWord'.tr(),
+            style: AppTypography.body(size: 13, color: Colors.white)),
+      ));
+      return;
+    }
     Haptics.tap();
     final reply = _replyTo;
     final replyId = reply?['id'] as String?;

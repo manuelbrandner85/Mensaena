@@ -656,7 +656,8 @@
     "callBtn": "Anrufen",
     "hangupBtn": "Auflegen",
     "searchOpen": "Suchen",
-    "searchClose": "Suche schließen"
+    "searchClose": "Suche schließen",
+    "blockedWord": "Diese Nachricht enthält unangemessene Sprache und wurde nicht gesendet."
   },
   "languages": {
     "de": "Deutsch",

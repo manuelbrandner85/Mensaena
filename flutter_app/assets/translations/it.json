@@ -657,7 +657,8 @@
     "hangupBtn": "Riaggancia",
     "searchOpen": "Cerca",
     "searchClose": "Chiudi ricerca",
-    "callBack": "Richiama"
+    "callBack": "Richiama",
+    "blockedWord": "Questo messaggio contiene linguaggio inappropriato e non è stato inviato."
   },
   "languages": {
     "de": "Tedesco",
