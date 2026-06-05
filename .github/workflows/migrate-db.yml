@@ -88,8 +88,10 @@ jobs:
             exit 1
           fi
 
-          # 5) Pooler braucht ein paar Sekunden, bis das neue PW aktiv ist.
-          sleep 15
+          # 5) Pooler braucht Zeit, bis ALLE Supavisor-Worker das neue PW haben
+          #    (Eventual Consistency hinter derselben IP). 45s reduziert die
+          #    Wahrscheinlichkeit, dass pg_dump einen veralteten Worker trifft.
+          sleep 45
 
           # 6) SRC-Connection-String selbst bauen (Tippfehler unmoeglich).
           SRC="postgresql://postgres.${SRC_REF}:${PW}@${SRC_HOST}:5432/postgres"
@@ -107,28 +109,48 @@ jobs:
             exit 1
           fi
 
-      - name: SRC-Verbindung testen (mit Retry, falls PW noch propagiert)
+      - name: SRC-Verbindung aufwaermen (mehrere konsekutive Erfolge)
         run: |
           set -e
-          for i in 1 2 3 4 5; do
+          # Warte, bis 5 SELECT-1 HINTEREINANDER klappen -> hohe Wahrscheinlich-
+          # keit, dass alle Pooler-Worker das neue PW kennen.
+          streak=0
+          for i in $(seq 1 30); do
             if psql "$SRC" -At -c "SELECT 1;" >/dev/null 2>&1; then
-              echo "SRC-Verbindung ok (Versuch $i)."
-              exit 0
+              streak=$((streak+1))
+              echo "SELECT 1 ok ($streak in Folge, Runde $i)."
+              [ "$streak" -ge 5 ] && { echo "SRC stabil."; exit 0; }
+            else
+              streak=0
+              echo "SRC noch nicht bereit (Runde $i)."
             fi
-            echo "SRC noch nicht bereit (Versuch $i) - warte 10s..."
-            sleep 10
+            sleep 5
           done
-          echo "::error::SRC-Verbindung nach 5 Versuchen fehlgeschlagen."
-          exit 1
+          echo "::warning::SRC nicht durchgehend stabil - pg_dump-Retry uebernimmt."
 
-      - name: Dump (public + auth + storage) aus huaqld
+      - name: Dump (public + auth + storage) aus huaqld -- mit Retry
         run: |
-          set -e
-          pg_dump "$SRC" \
-            --schema=public --schema=auth --schema=storage \
-            --no-owner --no-privileges --no-publications --no-subscriptions \
-            --quote-all-identifiers \
-            -f mensaena_full.sql
+          # pg_dump nutzt EINE Verbindung: authentifiziert sie sich an einem
+          # aktuellen Pooler-Worker, laeuft der gesamte Dump durch. Bei einem
+          # veralteten Worker -> Auth-Fehler -> neuer Versuch.
+          ok=0
+          for i in $(seq 1 10); do
+            if pg_dump "$SRC" \
+                 --schema=public --schema=auth --schema=storage \
+                 --no-owner --no-privileges --no-publications --no-subscriptions \
+                 --quote-all-identifiers \
+                 -f mensaena_full.sql 2> dump_err.log; then
+              ok=1; break
+            fi
+            echo "pg_dump Versuch $i fehlgeschlagen (Pooler-PW-Propagation?) - warte 15s..."
+            tail -2 dump_err.log || true
+            sleep 15
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::pg_dump nach 10 Versuchen fehlgeschlagen."
+            cat dump_err.log || true
+            exit 1
+          fi
           echo "Dump-Groesse: $(wc -l < mensaena_full.sql) Zeilen"
 
       - name: Restore nach gyquj
