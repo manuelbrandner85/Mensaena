@@ -658,7 +658,10 @@
     "searchOpen": "Cerca",
     "searchClose": "Chiudi ricerca",
     "callBack": "Richiama",
-    "blockedWord": "Questo messaggio contiene linguaggio inappropriato e non è stato inviato."
+    "blockedWord": "Questo messaggio contiene linguaggio inappropriato e non è stato inviato.",
+    "pinnedBanner": "📌 Fissato",
+    "jumpToMessage": "Vai al messaggio",
+    "unpin": "Rimuovi pin"
   },
   "languages": {
     "de": "Tedesco",

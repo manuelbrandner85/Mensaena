@@ -657,7 +657,10 @@
     "hangupBtn": "Kapat",
     "searchOpen": "Ara",
     "searchClose": "Aramayı kapat",
-    "blockedWord": "Bu mesaj uygunsuz ifade içeriyor ve gönderilmedi."
+    "blockedWord": "Bu mesaj uygunsuz ifade içeriyor ve gönderilmedi.",
+    "pinnedBanner": "📌 Sabitlendi",
+    "jumpToMessage": "Mesaja git",
+    "unpin": "Sabitlemeyi kaldır"
   },
   "languages": {
     "de": "Almanca",

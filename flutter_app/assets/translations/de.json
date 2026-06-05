@@ -657,7 +657,10 @@
     "hangupBtn": "Auflegen",
     "searchOpen": "Suchen",
     "searchClose": "Suche schließen",
-    "blockedWord": "Diese Nachricht enthält unangemessene Sprache und wurde nicht gesendet."
+    "blockedWord": "Diese Nachricht enthält unangemessene Sprache und wurde nicht gesendet.",
+    "pinnedBanner": "📌 Angepinnt",
+    "jumpToMessage": "Zur Nachricht springen",
+    "unpin": "Lösen"
   },
   "languages": {
     "de": "Deutsch",

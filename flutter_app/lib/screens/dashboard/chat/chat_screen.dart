@@ -621,8 +621,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 channelTitle: _context!.title,
                 myUserId: SupabaseService.currentUser?.id,
               ),
-            // Pinned-Messages-Panel — nur in Channels
-            if (_context?.kind == ChatKind.channel)
+            // Pinned-Messages-Panel — fuer alle Chat-Kinds (DM/Gruppe/
+            // Channel). Ohne sichtbares Panel kann der User zwar pinnen,
+            // sieht die Pins aber nirgends — Pinnen wirkte wie kaputt.
+            // unknown bleibt aussen vor (ungepruefter Zustand).
+            if (_context != null && _context!.kind != ChatKind.unknown)
               ChatPinnedMessagesPanel(conversationId: widget.conversationId),
             VanishModeBanner(conversationId: widget.conversationId),
             Expanded(

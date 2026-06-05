@@ -658,7 +658,10 @@
     "searchOpen": "Buscar",
     "searchClose": "Cerrar búsqueda",
     "callBack": "Devolver llamada",
-    "blockedWord": "Este mensaje contiene lenguaje inapropiado y no se envió."
+    "blockedWord": "Este mensaje contiene lenguaje inapropiado y no se envió.",
+    "pinnedBanner": "📌 Anclado",
+    "jumpToMessage": "Ir al mensaje",
+    "unpin": "Desanclar"
   },
   "languages": {
     "de": "Alemán",
