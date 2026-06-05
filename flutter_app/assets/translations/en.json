@@ -3706,6 +3706,8 @@
     "crisis_summary_title": "AI summary",
     "crisis_summary_generate": "Generate summary",
     "match_reason_button": "Why this match?",
-    "match_reason_title": "Why this matches"
+    "match_reason_title": "Why this matches",
+    "translate": "Translate",
+    "show_original": "Show original"
   }
 }

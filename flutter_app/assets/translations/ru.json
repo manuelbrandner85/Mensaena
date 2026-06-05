@@ -3708,6 +3708,8 @@
     "crisis_summary_title": "ИИ-сводка",
     "crisis_summary_generate": "Создать сводку",
     "match_reason_button": "Почему подходит?",
-    "match_reason_title": "Почему это подходит"
+    "match_reason_title": "Почему это подходит",
+    "translate": "Перевести",
+    "show_original": "Показать оригинал"
   }
 }

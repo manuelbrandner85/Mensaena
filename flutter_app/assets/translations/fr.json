@@ -3709,6 +3709,8 @@
     "crisis_summary_title": "Résumé IA",
     "crisis_summary_generate": "Générer le résumé",
     "match_reason_button": "Pourquoi ça colle ?",
-    "match_reason_title": "Pourquoi ça correspond"
+    "match_reason_title": "Pourquoi ça correspond",
+    "translate": "Traduire",
+    "show_original": "Voir l'original"
   }
 }

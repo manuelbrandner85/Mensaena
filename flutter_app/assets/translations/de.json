@@ -3705,6 +3705,8 @@
     "crisis_summary_title": "KI-Zusammenfassung",
     "crisis_summary_generate": "Zusammenfassung erstellen",
     "match_reason_button": "Warum passt das?",
-    "match_reason_title": "Warum das passt"
+    "match_reason_title": "Warum das passt",
+    "translate": "Übersetzen",
+    "show_original": "Original anzeigen"
   }
 }

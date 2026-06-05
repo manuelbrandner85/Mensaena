@@ -9,6 +9,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../models/post_intent.dart';
+import '../../repositories/ai_features_repository.dart';
 import '../../services/haptics.dart';
 import 'post_reactions_button.dart';
 import '../../repositories/post_interactions_repository.dart'
@@ -37,6 +38,31 @@ class PostCard extends ConsumerStatefulWidget {
 class _PostCardState extends ConsumerState<PostCard> {
   bool _saved = false;
   bool _savedKnown = false;
+  // C) Übersetzung (inline, Original behaltbar via Toggle).
+  String? _translated;
+  bool _translating = false;
+  bool _showTranslated = false;
+
+  Future<void> _translate() async {
+    final src = widget.post.description;
+    if (src == null || src.isEmpty || _translating) return;
+    if (_translated != null) {
+      setState(() => _showTranslated = !_showTranslated);
+      return;
+    }
+    setState(() => _translating = true);
+    String? out;
+    try {
+      out = await AiFeaturesRepository()
+          .translate(src, context.locale.languageCode);
+    } catch (_) {/* ignore */}
+    if (!mounted) return;
+    setState(() {
+      _translating = false;
+      _translated = out;
+      _showTranslated = out != null;
+    });
+  }
 
   @override
   void initState() {
@@ -383,13 +409,42 @@ class _PostCardState extends ConsumerState<PostCard> {
             if (post.description != null && post.description!.isNotEmpty) ...[
               const SizedBox(height: 6),
               Text(
-                post.description!,
-                maxLines: 2,
+                _showTranslated && _translated != null
+                    ? _translated!
+                    : post.description!,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: AppTypography.body(
                   size: 13,
                   color: AppColors.inkSoft,
                   height: 1.45,
+                ),
+              ),
+              InkWell(
+                onTap: _translate,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _translating
+                          ? const SizedBox(
+                              width: 11,
+                              height: 11,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 1.6, color: AppColors.bronze))
+                          : const Icon(LucideIcons.languages,
+                              size: 12, color: AppColors.bronze),
+                      const SizedBox(width: 4),
+                      Text(
+                        _showTranslated
+                            ? 'assistant.show_original'.tr()
+                            : 'assistant.translate'.tr(),
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.bronze),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

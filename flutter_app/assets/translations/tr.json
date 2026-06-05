@@ -3708,6 +3708,8 @@
     "crisis_summary_title": "Yapay zeka özeti",
     "crisis_summary_generate": "Özet oluştur",
     "match_reason_button": "Neden uyuyor?",
-    "match_reason_title": "Neden uyuyor"
+    "match_reason_title": "Neden uyuyor",
+    "translate": "Çevir",
+    "show_original": "Orijinali göster"
   }
 }

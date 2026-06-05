@@ -3709,6 +3709,8 @@
     "crisis_summary_title": "Resumen IA",
     "crisis_summary_generate": "Generar resumen",
     "match_reason_button": "¿Por qué encaja?",
-    "match_reason_title": "Por qué encaja"
+    "match_reason_title": "Por qué encaja",
+    "translate": "Traducir",
+    "show_original": "Ver original"
   }
 }

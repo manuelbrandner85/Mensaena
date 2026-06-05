@@ -3709,6 +3709,8 @@
     "crisis_summary_title": "Riassunto IA",
     "crisis_summary_generate": "Genera riassunto",
     "match_reason_button": "Perché è adatto?",
-    "match_reason_title": "Perché è adatto"
+    "match_reason_title": "Perché è adatto",
+    "translate": "Traduci",
+    "show_original": "Mostra originale"
   }
 }
