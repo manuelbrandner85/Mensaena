@@ -11,6 +11,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../models/match_summary.dart';
+import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/matching_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -514,6 +515,17 @@ class _MatchCard extends StatelessWidget {
             title: theirPost.title,
             type: theirPost.type,
             color: AppColors.tealSoft,
+          ),
+          // G) KI-Begründung "Warum passt das?"
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => _showMatchReason(context, match.id),
+              icon: const Icon(Icons.auto_awesome,
+                  size: 14, color: AppColors.bronze),
+              label: Text('assistant.match_reason_button'.tr(),
+                  style: AppTypography.label(size: 11, color: AppColors.bronze)),
+            ),
           ),
           const SizedBox(height: 12),
           if (match.status == 'accepted' && match.conversationId != null)
@@ -1224,4 +1236,48 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _RingPainter old) =>
       old.progress != progress;
+}
+
+// G) KI-Match-Begründung im Dialog (lädt on-demand).
+void _showMatchReason(BuildContext context, String matchId) {
+  showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.surface,
+      title: Row(
+        children: [
+          const Icon(Icons.auto_awesome, size: 16, color: AppColors.bronze),
+          const SizedBox(width: 8),
+          Text('assistant.match_reason_title'.tr(),
+              style: AppTypography.display(size: 15, color: AppColors.ink)),
+        ],
+      ),
+      content: FutureBuilder<String?>(
+        future: AiFeaturesRepository()
+            .matchReason(matchId, ctx.locale.languageCode),
+        builder: (c, snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            return const SizedBox(
+              height: 48,
+              child: Center(
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: AppColors.bronze),
+              ),
+            );
+          }
+          final r = snap.data;
+          return Text(
+            (r == null || r.isEmpty) ? 'assistant.error'.tr() : r,
+            style: AppTypography.body(size: 14, color: AppColors.ink),
+          );
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: Text('common.close'.tr()),
+        ),
+      ],
+    ),
+  );
 }

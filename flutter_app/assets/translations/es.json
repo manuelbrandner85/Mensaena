@@ -3705,6 +3705,10 @@
     "improve_button": "Mejorar con IA",
     "improve_empty": "Escribe primero algunas palabras clave.",
     "improve_title": "Sugerencia de IA",
-    "improve_apply": "Aplicar"
+    "improve_apply": "Aplicar",
+    "crisis_summary_title": "Resumen IA",
+    "crisis_summary_generate": "Generar resumen",
+    "match_reason_button": "¿Por qué encaja?",
+    "match_reason_title": "Por qué encaja"
   }
 }

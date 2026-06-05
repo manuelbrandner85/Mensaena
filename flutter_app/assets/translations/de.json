@@ -3701,6 +3701,10 @@
     "improve_button": "Mit KI verbessern",
     "improve_empty": "Schreib zuerst ein paar Stichworte.",
     "improve_title": "KI-Vorschlag",
-    "improve_apply": "Übernehmen"
+    "improve_apply": "Übernehmen",
+    "crisis_summary_title": "KI-Zusammenfassung",
+    "crisis_summary_generate": "Zusammenfassung erstellen",
+    "match_reason_button": "Warum passt das?",
+    "match_reason_title": "Warum das passt"
   }
 }

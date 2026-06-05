@@ -3704,6 +3704,10 @@
     "improve_button": "Улучшить с ИИ",
     "improve_empty": "Сначала напиши несколько ключевых слов.",
     "improve_title": "Предложение ИИ",
-    "improve_apply": "Применить"
+    "improve_apply": "Применить",
+    "crisis_summary_title": "ИИ-сводка",
+    "crisis_summary_generate": "Создать сводку",
+    "match_reason_button": "Почему подходит?",
+    "match_reason_title": "Почему это подходит"
   }
 }

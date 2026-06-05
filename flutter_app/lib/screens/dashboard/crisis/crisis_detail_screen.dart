@@ -11,6 +11,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/crisis.dart';
 import '../../../models/crisis_helper.dart';
 import '../../../models/crisis_update.dart';
+import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -51,6 +52,9 @@ class CrisisDetailScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               children: [
                 _Header(crisis: c),
+                const SizedBox(height: 16),
+                // F) KI-Zusammenfassung (gecacht serverseitig in crises.ai_summary).
+                _AiCrisisSummaryCard(crisisId: c.id),
                 const SizedBox(height: 16),
                 _ContactBlock(crisis: c),
                 const SizedBox(height: 16),
@@ -993,6 +997,96 @@ class _UpdatesFeed extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// F) KI-Krisen-Zusammenfassung — lädt die (serverseitig gecachte) Summary.
+class _AiCrisisSummaryCard extends ConsumerStatefulWidget {
+  const _AiCrisisSummaryCard({required this.crisisId});
+  final String crisisId;
+  @override
+  ConsumerState<_AiCrisisSummaryCard> createState() =>
+      _AiCrisisSummaryCardState();
+}
+
+class _AiCrisisSummaryCardState extends ConsumerState<_AiCrisisSummaryCard> {
+  String? _summary;
+  bool _loading = false;
+
+  Future<void> _load() async {
+    if (_loading) return;
+    setState(() => _loading = true);
+    String? s;
+    try {
+      s = await AiFeaturesRepository()
+          .crisisSummary(widget.crisisId, context.locale.languageCode);
+    } catch (_) {/* ignore */}
+    if (!mounted) return;
+    setState(() {
+      _summary = s;
+      _loading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.bronze.withValues(alpha: 0.08),
+        border: Border.all(color: AppColors.bronze.withValues(alpha: 0.30)),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome, size: 15, color: AppColors.bronze),
+              const SizedBox(width: 6),
+              Text('assistant.crisis_summary_title'.tr(),
+                  style: AppTypography.label(size: 10, color: AppColors.bronze)),
+              const Spacer(),
+              if (_summary != null && !_loading)
+                InkWell(
+                  onTap: _load,
+                  child: const Icon(LucideIcons.refreshCw,
+                      size: 13, color: AppColors.bronze),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (_loading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(6),
+                child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.bronze)),
+              ),
+            )
+          else if (_summary != null)
+            Text(_summary!,
+                style: AppTypography.body(
+                    size: 13, color: AppColors.ink, height: 1.4))
+          else
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: _load,
+                icon: const Icon(Icons.auto_awesome,
+                    size: 15, color: AppColors.bronze),
+                label: Text('assistant.crisis_summary_generate'.tr(),
+                    style:
+                        AppTypography.label(size: 12, color: AppColors.bronze)),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

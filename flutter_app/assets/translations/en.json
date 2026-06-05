@@ -3702,6 +3702,10 @@
     "improve_button": "Improve with AI",
     "improve_empty": "Write a few keywords first.",
     "improve_title": "AI suggestion",
-    "improve_apply": "Apply"
+    "improve_apply": "Apply",
+    "crisis_summary_title": "AI summary",
+    "crisis_summary_generate": "Generate summary",
+    "match_reason_button": "Why this match?",
+    "match_reason_title": "Why this matches"
   }
 }

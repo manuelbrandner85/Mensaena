@@ -3704,6 +3704,10 @@
     "improve_button": "Yapay zeka ile iyileştir",
     "improve_empty": "Önce birkaç anahtar kelime yaz.",
     "improve_title": "Yapay zeka önerisi",
-    "improve_apply": "Uygula"
+    "improve_apply": "Uygula",
+    "crisis_summary_title": "Yapay zeka özeti",
+    "crisis_summary_generate": "Özet oluştur",
+    "match_reason_button": "Neden uyuyor?",
+    "match_reason_title": "Neden uyuyor"
   }
 }
