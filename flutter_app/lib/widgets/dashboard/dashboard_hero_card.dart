@@ -1,5 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -7,12 +11,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/profile.dart';
+import '../../../services/device_tier_service.dart';
+import '../navigation/notification_bell.dart';
 
 /// SKILL: mensaena-design + mensaena-features
 /// 1:1-Spiegel von `src/app/dashboard/components/DashboardHeroCard.tsx`.
 /// Time-of-Day-Gradient + Radial-Spotlight + Avatar-mit-Online-Dot +
 /// Daily-Whisper (deterministisch per Tag im Jahr) + Dabei-seit-Counter.
-class DashboardHeroCard extends StatelessWidget {
+class DashboardHeroCard extends ConsumerWidget {
   const DashboardHeroCard({
     required this.profile,
     required this.memberSinceDays,
@@ -66,7 +72,11 @@ class DashboardHeroCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Tier-aware: on lite/low-end devices the animated aurora + orb pulse
+    // are skipped (static fallback). Keeps the cinematic look on capable
+    // phones without hurting old ARM devices.
+    final lite = ref.watch(liteModeActiveProvider);
     final h = DateTime.now().hour;
     final g = _greetingFor(h);
     final p = profile;
@@ -117,6 +127,16 @@ class DashboardHeroCard extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          // Animated aurora backdrop (Welten-inspired cinematic hero).
+          // Two slow-drifting radial glows in the time-of-day accent color.
+          // GPU-light (no shaders), tier-gated to static on lite devices.
+          if (!lite)
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: _HeroAurora(accent: _spotlightColor(g.tod)),
+              ),
+            ),
           // Feiner innerer Glanz oben (Glasmorphismus-Kante).
           Positioned(
             top: 0,
@@ -179,17 +199,27 @@ class DashboardHeroCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Date label
-              _MetaSubtle(text: dateStr),
+              // Date label + notification bell as one compact header row,
+              // mirroring Welten's hero header composition.
+              Row(
+                children: [
+                  Expanded(child: _MetaSubtle(text: dateStr)),
+                  const NotificationBell(),
+                ],
+              ),
               const SizedBox(height: 14),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar with online dot
+                  // Avatar with online dot. Wrapped in a slow pulsing orb
+                  // (breathing glow) -- Welten-inspired, tier-gated.
                   Stack(
                     children: [
                       // Feiner Bronze-Verlaufsring um den Avatar (Premium).
-                      Container(
+                      _PulsingOrb(
+                        enabled: !lite,
+                        accent: AppColors.bronze,
+                        child: Container(
                         width: 68,
                         height: 68,
                         padding: const EdgeInsets.all(2),
@@ -263,6 +293,7 @@ class DashboardHeroCard extends StatelessWidget {
                                   color: AppColors.bronze,
                                 ),
                               ),
+                      ),
                       ),
                       ),
                       // Online dot
@@ -367,6 +398,12 @@ class DashboardHeroCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 14),
+              // Inline search bar (Welten-inspired) -> global search.
+              // Replaces the need to hunt for the AppBar magnifier.
+              _HeroSearchBar(
+                onTap: () => context.push('/dashboard/search'),
+              ),
+              const SizedBox(height: 12),
               // Action Chips
               Row(
                 children: [
@@ -568,6 +605,200 @@ class _ActionChip extends StatelessWidget {
               ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cinematic hero helpers (Welten-inspired, Mensaena palette, tier-gated).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Slow-drifting aurora backdrop for the hero card. Two soft radial glows in
+/// the time-of-day accent color, animated on a long loop. GPU-light: pure
+/// Container/Transform, no shaders. Only mounted when not in lite mode.
+class _HeroAurora extends StatefulWidget {
+  const _HeroAurora({required this.accent});
+  final Color accent;
+
+  @override
+  State<_HeroAurora> createState() => _HeroAuroraState();
+}
+
+class _HeroAuroraState extends State<_HeroAurora>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 14),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (context, _) {
+          // Map [0..1] to two gentle orbit positions, offset by half a phase.
+          final a = _ctrl.value * 2 * math.pi;
+          final dx1 = 0.25 + 0.12 * (1 + math.cos(a)) / 2;
+          final dy1 = 0.10 + 0.10 * (1 + math.sin(a)) / 2;
+          final dx2 = 0.70 - 0.14 * (1 + math.cos(a + 2.1)) / 2;
+          final dy2 = 0.80 - 0.12 * (1 + math.sin(a + 2.1)) / 2;
+          return Stack(
+            children: [
+              Align(
+                alignment: Alignment(dx1 * 2 - 1, dy1 * 2 - 1),
+                child: _glow(widget.accent.withValues(alpha: 0.18), 220),
+              ),
+              Align(
+                alignment: Alignment(dx2 * 2 - 1, dy2 * 2 - 1),
+                child: _glow(
+                    AppColors.bronze.withValues(alpha: 0.12), 180),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _glow(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color, Colors.transparent],
+        ),
+      ),
+    );
+  }
+}
+
+/// Slow breathing glow + micro-scale around a child (e.g. the avatar ring).
+/// Disabled (static passthrough) on lite devices.
+class _PulsingOrb extends StatefulWidget {
+  const _PulsingOrb({
+    required this.child,
+    required this.enabled,
+    required this.accent,
+  });
+  final Widget child;
+  final bool enabled;
+  final Color accent;
+
+  @override
+  State<_PulsingOrb> createState() => _PulsingOrbState();
+}
+
+class _PulsingOrbState extends State<_PulsingOrb>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    );
+    if (widget.enabled) _ctrl.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(covariant _PulsingOrb old) {
+    super.didUpdateWidget(old);
+    if (widget.enabled && !_ctrl.isAnimating) {
+      _ctrl.repeat(reverse: true);
+    } else if (!widget.enabled && _ctrl.isAnimating) {
+      _ctrl.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.enabled) return widget.child;
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, child) {
+        final t = _ctrl.value; // 0..1..0
+        return Transform.scale(
+          scale: 1.0 + 0.02 * t,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: widget.accent.withValues(alpha: 0.10 + 0.18 * t),
+                  blurRadius: 18 + 14 * t,
+                  spreadRadius: -2,
+                ),
+              ],
+            ),
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+/// Inline search field in the hero. Read-only -- a tap opens the full global
+/// search screen. Mirrors Welten's prominent hero search.
+class _HeroSearchBar extends StatelessWidget {
+  const _HeroSearchBar({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: AppColors.deep.withValues(alpha: 0.45),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.bronze.withValues(alpha: 0.22)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.bronze.withValues(alpha: 0.10),
+              blurRadius: 14,
+              spreadRadius: -6,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(LucideIcons.search,
+                size: 17, color: AppColors.bronze.withValues(alpha: 0.85)),
+            const SizedBox(width: 10),
+            Text(
+              'common.search'.tr(),
+              style: AppTypography.body(size: 13, color: AppColors.mute),
+            ),
+          ],
         ),
       ),
     );
