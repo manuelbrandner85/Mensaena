@@ -29,6 +29,22 @@ export DST="postgresql://postgres.gyqujitkvymlmgroovch:[DST_PW]@aws-0-eu-west-1.
 
 ---
 
+## STATUS (2026-06-05)
+- ✅ **Phase 1 (Schema + Daten + Auth)** — erledigt via `.github/workflows/migrate-db.yml`
+  (Run #12 gruen). Ziel gyquj verifiziert: **161 Tabellen, 49 auth.users**.
+- ✅ **Phase 3 (Cron-Jobs)** — im selben Workflow mit uebertragen (20 Jobs).
+- ✅ **Phase 2 (Storage-Dateien)** — erledigt direkt via rclone + Session-Token-S3-Auth
+  (anon+service_role aus der Management-API, keine Dashboard-S3-Keys noetig).
+  Alle 15 Buckets verifiziert (Objektzahl + Bytes identisch). ~50 MiB.
+- ⏳ **Phase 4 (Edge Functions + Secrets)** — offen.
+- ⏳ **Phase 5/6 (App-Cutover)** — offen (env.dart-Branch erst zum Schluss mergen).
+
+> Hinweis: huaqld-DB-Passwort wurde im Zuge der Migration neu gesetzt (Workflow,
+> Zufallswert). Die Live-App nutzt es nicht. Die genutzten Management-Tokens
+> (`sbp_…`) nach Abschluss in Supabase -> Account -> Tokens widerrufen.
+
+---
+
 ## Phase 1 -- Schema + Daten + Auth (das Herzstueck)
 `pg_dump` der drei relevanten Schemas. **`auth` traegt die Passwort-Hashes**
 (auth.users.encrypted_password) -> alle 49 Logins funktionieren danach.
