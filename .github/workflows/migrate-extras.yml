@@ -1,9 +1,11 @@
-# Einmal-Werkzeug (Nachzug): Schemas `private` + `enya` huaqld -> gyquj.
+# Einmal-Werkzeug (Nachzug): Schema `private` huaqld -> gyquj.
 #
-# Phase 1 (migrate-db.yml) hat nur public/auth/storage migriert. huaqld hat
-# aber zwei weitere Schemas mit Daten:
+# Phase 1 (migrate-db.yml) hat nur public/auth/storage migriert. Mensaena nutzt
+# zusaetzlich das Schema `private`:
 #   private.email_config / private.push_config  (Konfig fuer send-email/send-push)
-#   enya.*  (eingebettete Lern-App; nur enya.profiles hat Zeilen)
+#
+# HINWEIS: Das ebenfalls vorhandene Schema `enya` ist ein EIGENES, fremdes
+# Projekt und wird BEWUSST NICHT migriert.
 #
 # Nutzt dieselbe bewaehrte Logik wie migrate-db.yml (Passwort-Reset zur Laufzeit,
 # PG-17-Binaries, Pooler-Aufwaermen, pg_dump-Retry). KEINE neuen Secrets noetig:
@@ -11,7 +13,7 @@
 #
 # Additiv/idempotent: ON_ERROR_STOP=0; 'already exists' ist erwartbar.
 
-name: 'Schema-Nachzug private+enya huaqld -> gyquj'
+name: 'Schema-Nachzug private huaqld -> gyquj'
 
 on:
   workflow_dispatch:
@@ -74,12 +76,12 @@ jobs:
           done
           echo "::warning::nicht stabil - Retry uebernimmt"
 
-      - name: Dump private+enya (mit Retry)
+      - name: Dump private (mit Retry)
         run: |
           ok=0
           for i in $(seq 1 10); do
             if "$PGBIN/pg_dump" "$SRC" \
-                 --schema=private --schema=enya \
+                 --schema=private \
                  --no-owner --no-privileges --no-publications --no-subscriptions \
                  --quote-all-identifiers -f extras.sql 2> dump_err.log; then
               ok=1; break
@@ -97,9 +99,6 @@ jobs:
 
       - name: Verifikation
         run: |
-          for s in private enya; do
-            echo "Schema $s -- Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='$s' AND c.relkind='r';")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='$s' AND c.relkind='r';")"
-          done
+          echo "Schema private -- Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='private' AND c.relkind='r';")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='private' AND c.relkind='r';")"
           echo "private.push_config Ziel-Zeilen: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM private.push_config;" 2>/dev/null || echo '?')"
           echo "private.email_config Ziel-Zeilen: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM private.email_config;" 2>/dev/null || echo '?')"
-          echo "enya.profiles Ziel-Zeilen: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM enya.profiles;" 2>/dev/null || echo '?')"
