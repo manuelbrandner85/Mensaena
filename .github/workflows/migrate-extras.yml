@@ -1,0 +1,104 @@
+# Einmal-Werkzeug (Nachzug): Schema `private` huaqld -> gyquj.
+#
+# Phase 1 (migrate-db.yml) hat nur public/auth/storage migriert. Mensaena nutzt
+# zusaetzlich das Schema `private`:
+#   private.email_config / private.push_config  (Konfig fuer send-email/send-push)
+#
+# HINWEIS: Das ebenfalls vorhandene Schema `enya` ist ein EIGENES, fremdes
+# Projekt und wird BEWUSST NICHT migriert.
+#
+# Nutzt dieselbe bewaehrte Logik wie migrate-db.yml (Passwort-Reset zur Laufzeit,
+# PG-17-Binaries, Pooler-Aufwaermen, pg_dump-Retry). KEINE neuen Secrets noetig:
+#   SUPABASE_ACCESS_TOKEN (huaqld) + DST_DB_URL (gyquj) sind schon gesetzt.
+#
+# Additiv/idempotent: ON_ERROR_STOP=0; 'already exists' ist erwartbar.
+
+name: 'Schema-Nachzug private huaqld -> gyquj'
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Zum Bestaetigen exakt EXTRAS eintippen'
+        required: true
+        default: ''
+
+jobs:
+  extras:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'EXTRAS' }}
+    env:
+      SRC_REF: huaqldjkgyosefzfhjnf
+      SRC_HOST: aws-1-eu-central-1.pooler.supabase.com
+      PGBIN: /usr/lib/postgresql/17/bin
+    steps:
+      - name: PostgreSQL-Client 17 installieren
+        run: |
+          set -e
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          "$PGBIN/pg_dump" --version
+
+      - name: Verbindungen vorbereiten (DST bereinigen + SRC-PW selbst setzen)
+        env:
+          DST_RAW: ${{ secrets.DST_DB_URL }}
+          TOKEN_RAW: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          DST="$(printf '%s' "$DST_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$DST"; echo "DST=$DST" >> "$GITHUB_ENV"
+          TOKEN="$(printf '%s' "$TOKEN_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$TOKEN"
+          [ -n "$TOKEN" ] || { echo "::error::SUPABASE_ACCESS_TOKEN leer"; exit 1; }
+          PW="$(openssl rand -hex 16)"; echo "::add-mask::$PW"
+          code=$(curl -s -o /tmp/pwresp.json -w '%{http_code}' -X PATCH \
+            "https://api.supabase.com/v1/projects/${SRC_REF}/database/password" \
+            -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+            -d "{\"password\":\"$PW\"}")
+          echo "Management-API HTTP $code"
+          [ "$code" = "200" ] || [ "$code" = "201" ] || { echo "::error::PW-Reset HTTP $code"; cat /tmp/pwresp.json; exit 1; }
+          sleep 45
+          SRC="postgresql://postgres.${SRC_REF}:${PW}@${SRC_HOST}:5432/postgres"
+          echo "::add-mask::$SRC"; echo "SRC=$SRC" >> "$GITHUB_ENV"
+
+      - name: SRC aufwaermen (5 konsekutive Erfolge)
+        run: |
+          set -e
+          streak=0
+          for i in $(seq 1 30); do
+            if "$PGBIN/psql" "$SRC" -At -c "SELECT 1;" >/dev/null 2>&1; then
+              streak=$((streak+1)); echo "ok ($streak/5)"
+              [ "$streak" -ge 5 ] && { echo "stabil"; exit 0; }
+            else streak=0; echo "noch nicht ($i)"; fi
+            sleep 5
+          done
+          echo "::warning::nicht stabil - Retry uebernimmt"
+
+      - name: Dump private (mit Retry)
+        run: |
+          ok=0
+          for i in $(seq 1 10); do
+            if "$PGBIN/pg_dump" "$SRC" \
+                 --schema=private \
+                 --no-owner --no-privileges --no-publications --no-subscriptions \
+                 --quote-all-identifiers -f extras.sql 2> dump_err.log; then
+              ok=1; break
+            fi
+            echo "pg_dump Versuch $i fehlgeschlagen - warte 15s..."; tail -2 dump_err.log || true; sleep 15
+          done
+          [ "$ok" = "1" ] || { echo "::error::pg_dump fehlgeschlagen"; cat dump_err.log; exit 1; }
+          echo "Dump-Groesse: $(wc -l < extras.sql) Zeilen"
+
+      - name: Restore nach gyquj
+        run: |
+          "$PGBIN/psql" "$DST" -v ON_ERROR_STOP=0 -f extras.sql 2> restore_err.log || true
+          echo "=== Nicht-'already exists'-Fehler: ==="
+          grep -iv "already exists\|bereits vorhanden" restore_err.log | head -40 || true
+
+      - name: Verifikation
+        run: |
+          echo "Schema private -- Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='private' AND c.relkind='r';")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='private' AND c.relkind='r';")"
+          echo "private.push_config Ziel-Zeilen: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM private.push_config;" 2>/dev/null || echo '?')"
+          echo "private.email_config Ziel-Zeilen: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM private.email_config;" 2>/dev/null || echo '?')"

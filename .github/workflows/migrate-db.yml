@@ -3,13 +3,21 @@
 # Laeuft auf einem GitHub-Runner (der KANN die Supabase-DBs erreichen, anders
 # als die Claude-Sandbox). Manuell ausloesbar. Quelle wird NUR gelesen.
 #
+# ROBUSTE VARIANTE (v2): Das huaqld-Passwort wird NICHT mehr als Secret
+# eingetippt (zu fehleranfaellig auf dem Handy -> Zeilenumbruch/Leerzeichen
+# kaputt). Stattdessen setzt der Workflow das huaqld-DB-Passwort SELBST zur
+# Laufzeit ueber die Supabase-Management-API und baut den Connection-String
+# selbst zusammen. Tippfehler im Passwort sind damit unmoeglich.
+#
 # VORAUSSETZUNG -- diese GitHub-Secrets anlegen (Repo -> Settings -> Secrets):
-#   SRC_DB_URL = postgresql://postgres.huaqldjkgyosefzfhjnf:<PW>@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
+#   SUPABASE_ACCESS_TOKEN = sbp_... (Management-Token mit Zugriff auf huaqld)
 #   DST_DB_URL = postgresql://postgres.gyqujitkvymlmgroovch:<PW>@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
-#   (Passwoerter: Dashboard -> Project Settings -> Database -> Reset database password)
+#   (DST_DB_URL funktioniert bereits -> der Schutz-Check laeuft gruen.)
+#   SRC_DB_URL wird NICHT mehr gebraucht.
 #
 # Sicherheit: Bricht ab, wenn das Ziel-public-Schema NICHT leer ist
-# (Schutz gegen versehentliches Doppel-Einspielen). Quelle bleibt unangetastet.
+# (Schutz gegen versehentliches Doppel-Einspielen). Quelle bleibt unangetastet
+# (nur Passwort-Reset + Lesen). Alle Secrets werden whitespace-bereinigt.
 #
 # Deckt NICHT ab (siehe docs/MIGRATION_huaqld_to_gyquj.md):
 #   - Storage-Dateien (Phase 2, rclone/S3)
@@ -30,63 +38,148 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.confirm == 'MIGRATE' }}
+    env:
+      SRC_REF: huaqldjkgyosefzfhjnf
+      SRC_HOST: aws-1-eu-central-1.pooler.supabase.com
+      # Voller Pfad zu den PG-17-Binaries (Wrapper /usr/bin/pg_dump zeigt im
+      # Runner-Image evtl. weiter auf 16 -> Server-Version-Mismatch).
+      PGBIN: /usr/lib/postgresql/17/bin
     steps:
-      - name: PostgreSQL-Client 16 installieren
+      - name: PostgreSQL-Client 17 installieren (huaqld laeuft auf PG 17)
         run: |
+          set -e
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
           sudo apt-get update
-          sudo apt-get install -y postgresql-client-16
+          sudo apt-get install -y postgresql-client-17
+          # Das Runner-Image hat client-16 vorinstalliert -> /usr/bin/pg_dump
+          # zeigt evtl. weiter auf 16. Wir rufen den 17er-Binary direkt per
+          # vollem Pfad auf. Hier verifizieren, dass er existiert + Version 17.
+          ls -la /usr/lib/postgresql/*/bin/pg_dump || true
+          /usr/lib/postgresql/17/bin/pg_dump --version
+          /usr/lib/postgresql/17/bin/psql --version
+
+      - name: Verbindungen vorbereiten (DST bereinigen + SRC-PW selbst setzen)
+        env:
+          DST_RAW: ${{ secrets.DST_DB_URL }}
+          TOKEN_RAW: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          # 1) DST aus Secret holen + JEDE Whitespace entfernen (mobile-Copy-Falle).
+          DST="$(printf '%s' "$DST_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$DST"
+          echo "DST=$DST" >> "$GITHUB_ENV"
+
+          # 2) Management-Token bereinigen.
+          TOKEN="$(printf '%s' "$TOKEN_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$TOKEN"
+          if [ -z "$TOKEN" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN ist leer - Secret anlegen."
+            exit 1
+          fi
+
+          # 3) Frisches, rein alphanumerisches huaqld-Passwort generieren
+          #    (openssl rand -hex: 32 Zeichen 0-9a-f, keine Sonderzeichen ->
+          #    keine URL-Encoding-Probleme, KEINE Pipe -> kein Broken-Pipe
+          #    unter set -o pipefail).
+          PW="$(openssl rand -hex 16)"
+          echo "::add-mask::$PW"
+
+          # 4) Passwort via Management-API setzen.
+          code=$(curl -s -o /tmp/pwresp.json -w '%{http_code}' -X PATCH \
+            "https://api.supabase.com/v1/projects/${SRC_REF}/database/password" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"password\":\"$PW\"}")
+          echo "Management-API HTTP $code"
+          if [ "$code" != "200" ] && [ "$code" != "201" ]; then
+            echo "::error::Passwort-Reset fehlgeschlagen (HTTP $code). Token pruefen."
+            cat /tmp/pwresp.json || true
+            exit 1
+          fi
+
+          # 5) Pooler braucht Zeit, bis ALLE Supavisor-Worker das neue PW haben
+          #    (Eventual Consistency hinter derselben IP). 45s reduziert die
+          #    Wahrscheinlichkeit, dass pg_dump einen veralteten Worker trifft.
+          sleep 45
+
+          # 6) SRC-Connection-String selbst bauen (Tippfehler unmoeglich).
+          SRC="postgresql://postgres.${SRC_REF}:${PW}@${SRC_HOST}:5432/postgres"
+          echo "::add-mask::$SRC"
+          echo "SRC=$SRC" >> "$GITHUB_ENV"
+          echo "Verbindungen vorbereitet."
 
       - name: Ziel muss leer sein (Schutz)
-        env:
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
           set -e
-          cnt=$(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")
+          cnt=$("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")
           echo "Ziel hat $cnt public-Tabellen."
           if [ "$cnt" != "0" ]; then
             echo "::error::Ziel-public-Schema ist NICHT leer ($cnt Tabellen) - Abbruch."
             exit 1
           fi
 
-      - name: Dump (public + auth + storage) aus huaqld
-        env:
-          SRC: ${{ secrets.SRC_DB_URL }}
+      - name: SRC-Verbindung aufwaermen (mehrere konsekutive Erfolge)
         run: |
           set -e
-          pg_dump "$SRC" \
-            --schema=public --schema=auth --schema=storage \
-            --no-owner --no-privileges --no-publications --no-subscriptions \
-            --quote-all-identifiers \
-            -f mensaena_full.sql
+          # Warte, bis 5 SELECT-1 HINTEREINANDER klappen -> hohe Wahrscheinlich-
+          # keit, dass alle Pooler-Worker das neue PW kennen.
+          streak=0
+          for i in $(seq 1 30); do
+            if "$PGBIN/psql" "$SRC" -At -c "SELECT 1;" >/dev/null 2>&1; then
+              streak=$((streak+1))
+              echo "SELECT 1 ok ($streak in Folge, Runde $i)."
+              [ "$streak" -ge 5 ] && { echo "SRC stabil."; exit 0; }
+            else
+              streak=0
+              echo "SRC noch nicht bereit (Runde $i)."
+            fi
+            sleep 5
+          done
+          echo "::warning::SRC nicht durchgehend stabil - pg_dump-Retry uebernimmt."
+
+      - name: Dump (public + auth + storage) aus huaqld -- mit Retry
+        run: |
+          # pg_dump nutzt EINE Verbindung: authentifiziert sie sich an einem
+          # aktuellen Pooler-Worker, laeuft der gesamte Dump durch. Bei einem
+          # veralteten Worker -> Auth-Fehler -> neuer Versuch.
+          ok=0
+          for i in $(seq 1 10); do
+            if "$PGBIN/pg_dump" "$SRC" \
+                 --schema=public --schema=auth --schema=storage \
+                 --no-owner --no-privileges --no-publications --no-subscriptions \
+                 --quote-all-identifiers \
+                 -f mensaena_full.sql 2> dump_err.log; then
+              ok=1; break
+            fi
+            echo "pg_dump Versuch $i fehlgeschlagen (Pooler-PW-Propagation?) - warte 15s..."
+            tail -2 dump_err.log || true
+            sleep 15
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::pg_dump nach 10 Versuchen fehlgeschlagen."
+            cat dump_err.log || true
+            exit 1
+          fi
           echo "Dump-Groesse: $(wc -l < mensaena_full.sql) Zeilen"
 
       - name: Restore nach gyquj
-        env:
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
           # ON_ERROR_STOP=0: auth/storage-Schema existiert im Ziel schon ->
           # einige CREATE kollidieren (erwartbar). Daten-INSERTs laufen durch.
-          psql "$DST" -v ON_ERROR_STOP=0 -f mensaena_full.sql 2> restore_errors.log || true
+          "$PGBIN/psql" "$DST" -v ON_ERROR_STOP=0 -f mensaena_full.sql 2> restore_errors.log || true
           echo "=== Nicht-'already exists'-Fehler (pruefen!): ==="
           grep -iv "already exists\|bereits vorhanden" restore_errors.log | head -40 || true
 
       - name: Cron-Jobs uebertragen
-        env:
-          SRC: ${{ secrets.SRC_DB_URL }}
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
           set -e
-          psql "$DST" -c "CREATE EXTENSION IF NOT EXISTS pg_cron;" || true
-          psql "$SRC" -At -c "SELECT format('SELECT cron.schedule(%L,%L,%L);', jobname, schedule, command) FROM cron.job;" > cron_jobs.sql || true
-          if [ -s cron_jobs.sql ]; then psql "$DST" -f cron_jobs.sql || true; fi
+          "$PGBIN/psql" "$DST" -c "CREATE EXTENSION IF NOT EXISTS pg_cron;" || true
+          "$PGBIN/psql" "$SRC" -At -c "SELECT format('SELECT cron.schedule(%L,%L,%L);', jobname, schedule, command) FROM cron.job;" > cron_jobs.sql || true
+          if [ -s cron_jobs.sql ]; then "$PGBIN/psql" "$DST" -f cron_jobs.sql || true; fi
 
       - name: Verifikation
-        env:
-          SRC: ${{ secrets.SRC_DB_URL }}
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
-          echo "Tabellen  Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")"
-          echo "auth.users Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM auth.users;")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM auth.users;")"
+          echo "Tabellen  Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")"
+          echo "auth.users Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM auth.users;")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM auth.users;")"
           echo "FERTIG (DB-Teil). Storage-Dateien + Edge-Functions + App-Cutover: siehe docs/MIGRATION_huaqld_to_gyquj.md"

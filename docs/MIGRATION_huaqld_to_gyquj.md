@@ -29,6 +29,38 @@ export DST="postgresql://postgres.gyqujitkvymlmgroovch:[DST_PW]@aws-0-eu-west-1.
 
 ---
 
+## STATUS (2026-06-05)
+- ✅ **Phase 1 (Schema + Daten + Auth)** — `.github/workflows/migrate-db.yml`
+  (Run #12 gruen). gyquj verifiziert: **161 Tabellen, 49 auth.users**.
+- ✅ **Phase 3 (Cron-Jobs)** — im selben Workflow uebertragen (20 Jobs). Keine
+  hardcodierte huaqld-Referenz; `invoke_edge_function` liest URL/anon aus
+  `private.push_config` (auf gyquj umgebogen).
+- ✅ **Phase 2 (Storage-Dateien)** — direkt via rclone + Session-Token-S3-Auth
+  (anon+service_role aus Management-API, keine Dashboard-S3-Keys). Alle 15
+  Buckets verifiziert (Objektzahl + Bytes identisch). ~50 MiB.
+- ✅ **Phase 4a (Schema `private`)** — email_config (8) + push_config (12) via
+  Query-API kopiert. `push_config.supabase_url` + `supabase_anon_key` auf gyquj
+  umgestellt. (`enya`-Schema = FREMDES Projekt, bewusst NICHT migriert.)
+- ✅ **Phase 4b (Edge Functions)** — 9 Functions nach gyquj deployt (backfill-geo,
+  delete-user, fuel-prices, livekit-token, notify-call, send-email, send-push,
+  import-farms-overpass, import-nina-warnings). `run-migrations` = obsoletes
+  Ops-Tool, weggelassen. Die 2 Import-Funktionen aus huaqld ins Repo geholt.
+- ✅ **Phase 4c (URL-Rewrite)** — gespeicherte absolute huaqld-Storage-URLs in
+  gyquj auf gyquj umgeschrieben: profiles.avatar_url(4)/cover_url(3),
+  notifications.body(10)/content(10). (error_logs.message = nur Diagnose, belassen.)
+- ✅ **Projekt-Audit (alle 6 Projekte)** — Mensaena-Inhalte NUR in huaqld:
+  - WELTENBIBLIOTHEKAPP (adtvi), Weltenbibliothek (zctuf): reiner Welten-Content.
+  - eakdl ("manuelbrandner85's Project"): E-Learning (courses/modules/...), fremd.
+  - runpsy (Weltenbibliothekstream): >90 Tage pausiert, nicht restaurierbar (tot).
+- ⏳ **Phase 5/6 (App-Cutover)** — OFFEN. env.dart-Branch erst zum Schluss mergen,
+  dann APK + Web neu bauen. Danach huaqld als Rollback-Anker behalten.
+
+> Hinweis: huaqld-DB-Passwort wurde im Zuge der Migration neu gesetzt (Workflow,
+> Zufallswert). Die Live-App nutzt es nicht. Die genutzten Management-Tokens
+> (`sbp_…`) nach Abschluss in Supabase -> Account -> Tokens widerrufen.
+
+---
+
 ## Phase 1 -- Schema + Daten + Auth (das Herzstueck)
 `pg_dump` der drei relevanten Schemas. **`auth` traegt die Passwort-Hashes**
 (auth.users.encrypted_password) -> alle 49 Logins funktionieren danach.
