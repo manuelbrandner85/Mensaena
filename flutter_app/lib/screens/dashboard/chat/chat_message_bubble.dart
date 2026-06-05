@@ -12,8 +12,10 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/conversations_repository.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
+import '../../../services/link_preview_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
+import '../../../widgets/chat/chat_link_preview_card.dart';
 import '../../../widgets/chat/post_card_chat_bubble.dart';
 import '../../../widgets/shared/image_lightbox.dart';
 import '../../../widgets/shared/voice_message_bubble.dart';
@@ -127,6 +129,11 @@ class ChatMessageBubble extends ConsumerWidget {
     final textWithoutImages = hasImages
         ? content.replaceAll(_imgRegex, '').trim()
         : content;
+
+    // Erste HTTP/HTTPS-URL für Link-Vorschau extrahieren. Hat ein Treffer
+    // existiert, rendern wir unter dem Text eine ChatLinkPreviewCard
+    // (Open-Graph/Twitter-Meta — siehe services/link_preview_service.dart).
+    final previewUrl = LinkPreviewService.firstUrl(textWithoutImages);
 
     // #4 Swipe-to-Reply: nach RECHTS wischen → Reply-Modus mit Haptic.
     // Dismissible mit confirmDismiss=false damit Widget nicht entfernt
@@ -326,6 +333,8 @@ class ChatMessageBubble extends ConsumerWidget {
                           height: 1.35,
                         ),
                       ),
+                      if (previewUrl != null)
+                        ChatLinkPreviewCard(url: previewUrl),
                     ],
                   ),
                 )
@@ -337,23 +346,33 @@ class ChatMessageBubble extends ConsumerWidget {
                   // #6 Emoji-Only Large: wenn die ganze Nachricht nur aus
                   // Emojis besteht (max 3), groesser darstellen ohne
                   // Bubble-Begrenzung. Wirkt wie iMessage/Telegram.
-                  child: _isEmojiOnly(textWithoutImages)
-                      ? Text(
-                          textWithoutImages,
-                          style: AppTypography.body(
-                            size: 32,
-                            color: AppColors.ink,
-                            height: 1.2,
-                          ),
-                        )
-                      : _MentionAwareText(
-                          text: textWithoutImages,
-                          baseStyle: AppTypography.body(
-                            size: 14,
-                            color: AppColors.ink,
-                            height: 1.4,
-                          ),
-                        ),
+                  // Falls eine URL im Text steht, Link-Preview-Card direkt
+                  // unter dem Text als zweites Column-Kind.
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _isEmojiOnly(textWithoutImages)
+                          ? Text(
+                              textWithoutImages,
+                              style: AppTypography.body(
+                                size: 32,
+                                color: AppColors.ink,
+                                height: 1.2,
+                              ),
+                            )
+                          : _MentionAwareText(
+                              text: textWithoutImages,
+                              baseStyle: AppTypography.body(
+                                size: 14,
+                                color: AppColors.ink,
+                                height: 1.4,
+                              ),
+                            ),
+                      if (previewUrl != null)
+                        ChatLinkPreviewCard(url: previewUrl),
+                    ],
+                  ),
                 ),
               const SizedBox(height: 2),
               // Reactions-Pills
