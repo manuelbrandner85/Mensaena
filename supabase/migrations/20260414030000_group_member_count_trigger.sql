@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Migration: group_members → member_count Trigger + groups UPDATE Policy Fix
--- Ausfuehren: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Ausfuehren: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================================
 
 -- ── 1) Trigger-Funktion: member_count automatisch pflegen ────────────────────

@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `bot_scheduled_messages` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `bot_scheduled_messages` (gyqujitkvymlmgroovch).
 class BotScheduledMessage {
   const BotScheduledMessage({
     required this.id,

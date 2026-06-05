@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { sendEmail } from '@/lib/email/send'
 import { buildDeletionConfirmEmail, REENGAGEMENT_SCHEDULE_DAYS } from '@/lib/email/templates/deletion'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co'
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 const BASE_URL     = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mensaena.de'
 

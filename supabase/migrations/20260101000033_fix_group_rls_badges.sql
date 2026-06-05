@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Migration 033: Fix group_members/group_posts RLS infinite recursion + badge seeds
 -- Ausfuehren: Supabase SQL Editor
--- https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================================
 
 -- ── Fix 1: group_members – drop all policies, recreate simple ones ──────────

@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `challenge_progress` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `challenge_progress` (gyqujitkvymlmgroovch).
 /// Schema: id, challenge_id, user_id, status, progress_pct, completed_at,
 /// joined_at, date, checked_in, verified_by_admin.
 class ChallengeProgress {

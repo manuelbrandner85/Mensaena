@@ -5,7 +5,7 @@ import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
 /// Matching-Repository — wrappt die RPCs get_my_matches, respond_to_match,
-/// get_match_counts (huaqldjkgyosefzfhjnf).
+/// get_match_counts (gyqujitkvymlmgroovch).
 class MatchingRepository {
   const MatchingRepository._();
 

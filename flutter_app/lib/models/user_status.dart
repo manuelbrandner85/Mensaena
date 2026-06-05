@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `user_status` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `user_status` (gyqujitkvymlmgroovch).
 class UserStatus {
   const UserStatus({
     required this.userId,

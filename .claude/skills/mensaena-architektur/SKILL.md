@@ -31,7 +31,7 @@ globs: ["src/**", "package.json", "tailwind.config.*"]
 
 ## URLs
 - Production: https://www.mensaena.de
-- Supabase: https://huaqldjkgyosefzfhjnf.supabase.co
+- Supabase: https://gyqujitkvymlmgroovch.supabase.co
 - Cloudflare Pages: https://mensaena.pages.dev
 
 ## Wichtige Regeln

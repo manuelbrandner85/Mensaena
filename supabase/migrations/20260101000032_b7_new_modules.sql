@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Migration 032: B7 New Modules – Groups, Marketplace, Challenges, Badges
 -- Ausfuehren: Supabase SQL Editor
--- https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================================
 
 -- ── 1) groups ───────────────────────────────────────────────────────────────

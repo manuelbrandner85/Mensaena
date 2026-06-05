@@ -5,7 +5,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'fs'
 
-const SUPABASE_URL = 'https://huaqldjkgyosefzfhjnf.supabase.co'
+const SUPABASE_URL = 'https://gyqujitkvymlmgroovch.supabase.co'
 const SUPABASE_ANON_KEY = 'sb_publishable_5ajpvusstpgooHkm4LNzPQ_xrs_8TAN'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -40,7 +40,7 @@ if (!postsError) {
 
 console.log('\n📋 ANLEITUNG: Schema manuell im Supabase SQL Editor einfügen')
 console.log('─'.repeat(60))
-console.log('1. Öffne: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new')
+console.log('1. Öffne: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new')
 console.log('2. Füge den Inhalt von supabase/migrations/001_schema.sql ein')
 console.log('3. Klicke auf "Run"')
 console.log('4. Dann 002_seed.sql und 003_realtime.sql ausführen')

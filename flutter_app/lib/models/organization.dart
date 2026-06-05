@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `organizations` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `organizations` (gyqujitkvymlmgroovch).
 ///
 /// Hinweis: `openingHours` (String) bleibt fuer Legacy-Daten/Anzeige,
 /// `openingHoursJson` (Map<String, dynamic>) ist die neue JSONB-Quelle.

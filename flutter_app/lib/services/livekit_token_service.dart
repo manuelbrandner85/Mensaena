@@ -14,7 +14,7 @@ class LivekitTokenService {
   const LivekitTokenService._();
 
   static const _tokenUrl =
-      'https://huaqldjkgyosefzfhjnf.supabase.co/functions/v1/livekit-token';
+      'https://gyqujitkvymlmgroovch.supabase.co/functions/v1/livekit-token';
 
   /// Holt JWT + WSS-URL fuer einen Room.
   /// Wirft LivekitTokenError mit lesbarer Message statt null —

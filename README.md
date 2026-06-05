@@ -8,7 +8,7 @@
 |----------|-----|
 | **Production** | https://www.mensaena.de |
 | **Cloudflare Pages** | https://mensaena.pages.dev |
-| **Supabase Dashboard** | https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf |
+| **Supabase Dashboard** | https://supabase.com/dashboard/project/gyqujitkvymlmgroovch |
 | **Cloudflare Dashboard** | https://dash.cloudflare.com |
 
 ---

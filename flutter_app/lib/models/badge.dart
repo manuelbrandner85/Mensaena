@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `badges` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `badges` (gyqujitkvymlmgroovch).
 /// Renamed to BadgeModel to avoid collision with Flutter Material Badge.
 class BadgeModel {
   const BadgeModel({

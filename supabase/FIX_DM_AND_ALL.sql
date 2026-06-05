@@ -1,6 +1,6 @@
 -- ============================================================
 -- MENSAENA – Complete DM Fix + Production Polish
--- Run at: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Run at: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================
 
 -- 1. Ensure helper functions exist (idempotent)

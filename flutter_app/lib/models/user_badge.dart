@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `user_badges` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `user_badges` (gyqujitkvymlmgroovch).
 class UserBadge {
   const UserBadge({
     required this.id,

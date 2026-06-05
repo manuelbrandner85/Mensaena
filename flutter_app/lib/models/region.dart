@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `regions` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `regions` (gyqujitkvymlmgroovch).
 class Region {
   const Region({
     required this.id,

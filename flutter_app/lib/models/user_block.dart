@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `user_blocks` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `user_blocks` (gyqujitkvymlmgroovch).
 class UserBlock {
   const UserBlock({
     required this.id,

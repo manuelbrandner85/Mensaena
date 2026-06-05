@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Migration: challenges – Admin kann Challenges löschen (RLS Override)
--- Ausfuehren: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Ausfuehren: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================================
 
 -- Bestehende Delete-Policy ersetzen: Ersteller ODER Admin darf löschen

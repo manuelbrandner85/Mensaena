@@ -155,7 +155,7 @@ fi
 # ── Supabase Project Ref ─────────────────────────────────────────────────
 step "Supabase: Project Ref"
 info "Steht im Dashboard-URL: https://supabase.com/dashboard/project/<REF>"
-ask "SUPABASE_PROJECT_REF (z.B. huaqldjkgyosefzfhjnf):"
+ask "SUPABASE_PROJECT_REF (z.B. gyqujitkvymlmgroovch):"
 read -r sb_ref
 if [ -n "$sb_ref" ]; then
   gh variable set SUPABASE_PROJECT_REF --repo "$repo_slug" --body "$sb_ref"

@@ -8,7 +8,7 @@
 //
 // Aufruf (wiederholen bis remaining == 0):
 //   curl -X POST \
-//     "https://huaqldjkgyosefzfhjnf.supabase.co/functions/v1/backfill-geo" \
+//     "https://gyqujitkvymlmgroovch.supabase.co/functions/v1/backfill-geo" \
 //     -H "Authorization: Bearer <SERVICE_ROLE_KEY>" \
 //     -H "Content-Type: application/json" \
 //     -d '{"limit": 40}'

@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `message_pins` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `message_pins` (gyqujitkvymlmgroovch).
 class MessagePin {
   const MessagePin({
     required this.id,

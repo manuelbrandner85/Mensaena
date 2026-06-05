@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `profiles` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `profiles` (gyqujitkvymlmgroovch).
 class Profile {
   const Profile({
     required this.id,

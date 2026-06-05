@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `challenges` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `challenges` (gyqujitkvymlmgroovch).
 /// Schema: id, title, description, category, difficulty, points,
 /// max_participants, participant_count, start_date, end_date, status,
 /// creator_id, created_at, is_weekly, week_of.

@@ -1,10 +1,10 @@
 -- ============================================================
 -- MENSAENA – Vollständiges Deployment SQL
 -- Datum: 2026-03-31
--- Projekt: huaqldjkgyosefzfhjnf
+-- Projekt: gyqujitkvymlmgroovch
 -- ============================================================
 -- Anleitung:
--- 1. Öffne: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- 1. Öffne: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- 2. Kopiere diesen gesamten Inhalt
 -- 3. Klicke 'Run' (▶)
 -- ============================================================

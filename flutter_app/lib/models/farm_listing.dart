@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `farm_listings` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `farm_listings` (gyqujitkvymlmgroovch).
 class FarmListing {
   const FarmListing({
     required this.id,

@@ -23,7 +23,7 @@ KEINE AUSNAHME. AUCH BEI EINZEILERN.
 Tabelle nicht unter §4 "Existierend"?
 1. KEINE Migration-Datei im Repo
 2. Komplettes SQL als 1 kopierbaren Block ausgeben
-3. Darüber: "SQL AUSFÜHREN: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new"
+3. Darüber: "SQL AUSFÜHREN: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new"
 4. SQL = CREATE TABLE+Constraints+Indexes+ENABLE RLS+Policies+updated_at Trigger+Realtime
 5. Frontend mit Error-Handling falls Tabelle noch fehlt
 6. Tabelle in AI_CONTEXT.md §4 von Fehlend→Existierend verschieben + Schema eintragen
@@ -51,8 +51,8 @@ Das kostet ~2000 Token statt ~50000 wenn du den Chat durchsuchst oder Dateien cr
 ## §1 Projekt
 Repo: github.com/manuelbrandner85/Mensaena (privat)
 Live: mensaena.pages.dev | Domain: mensaena.de + www.mensaena.de (aktiv, SSL)
-SB-ID: huaqldjkgyosefzfhjnf
-SB-SQL: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+SB-ID: gyqujitkvymlmgroovch
+SB-SQL: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 Owner: Manuel Brandner
 
 ## §2 Stack

@@ -19,7 +19,7 @@
 # ════════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-SUPABASE_PROJECT_REF="huaqldjkgyosefzfhjnf"
+SUPABASE_PROJECT_REF="gyqujitkvymlmgroovch"
 LIVEKIT_SERVER_URL="wss://livekit.mensaena.de"
 LIVEKIT_HTTP_URL="https://livekit.mensaena.de"
 

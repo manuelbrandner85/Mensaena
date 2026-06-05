@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `notifications` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `notifications` (gyqujitkvymlmgroovch).
 /// Renamed to AppNotification to avoid collision with Flutter's Notification class.
 class AppNotification {
   const AppNotification({

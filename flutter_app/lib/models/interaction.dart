@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `interactions` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `interactions` (gyqujitkvymlmgroovch).
 class Interaction {
   const Interaction({
     required this.id,

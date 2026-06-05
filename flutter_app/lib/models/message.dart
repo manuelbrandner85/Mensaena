@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `messages` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `messages` (gyqujitkvymlmgroovch).
 class Message {
   const Message({
     required this.id,

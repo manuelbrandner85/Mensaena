@@ -5,7 +5,7 @@
 -- LÖSUNG: Security-Definer-Funktionen als recursion-breaker
 -- ============================================================
 -- ANLEITUNG:
--- 1. Öffne: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- 1. Öffne: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- 2. Kompletten Inhalt kopieren und einfügen
 -- 3. "Run" klicken
 -- ============================================================

@@ -1,6 +1,6 @@
 -- ============================================================
 -- Mensaena – Pinnwand (Board) Feature Migration
--- Run in: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Run in: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================
 
 -- 1) Handle updated_at trigger function (if missing)

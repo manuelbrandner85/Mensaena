@@ -1,6 +1,6 @@
 -- =========================================
 -- MENSAENA: Fix avatars bucket + all storage policies
--- Run in: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Run in: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- Date: 2026-04-11
 -- Purpose: Ensure avatars bucket exists with correct RLS
 -- =========================================

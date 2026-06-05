@@ -5,7 +5,7 @@ import '../config/env.dart';
 
 /// SKILL: supabase
 /// Initialisierung + Singleton-Zugriff auf Supabase. Gleiches Projekt wie
-/// www.mensaena.de (huaqldjkgyosefzfhjnf).
+/// www.mensaena.de (gyqujitkvymlmgroovch).
 class SupabaseService {
   const SupabaseService._();
 

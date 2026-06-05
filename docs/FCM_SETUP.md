@@ -62,7 +62,7 @@ Supabase-Dashboard-Zugriff für das Mensaena-Projekt.
 
 1. Service-Account-JSON mit Editor öffnen
 2. Den Wert von `"project_id"` (oben in der Datei, z.B. `mensaena-edd7b`) merken
-3. https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+3. https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 4. Diese SQL einfügen:
 
 ```sql
@@ -103,11 +103,11 @@ statt service-account JSON).
 
 Wenn du die Supabase-CLI lokal hast:
 ```bash
-npx supabase functions deploy send-push --project-ref huaqldjkgyosefzfhjnf --no-verify-jwt
+npx supabase functions deploy send-push --project-ref gyqujitkvymlmgroovch --no-verify-jwt
 ```
 
 Sonst über das Dashboard:
-1. https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/functions/send-push
+1. https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/functions/send-push
 2. Tab „Code"
 3. Inhalt komplett ersetzen mit dem Code aus
    https://raw.githubusercontent.com/manuelbrandner85/Mensaena/main/supabase/functions/send-push/index.ts

@@ -1,5 +1,5 @@
 // SKILL: mensaena-architektur + flutter-implement-json-serialization
-// Spiegel der Supabase-Tabelle `posts` (huaqldjkgyosefzfhjnf).
+// Spiegel der Supabase-Tabelle `posts` (gyqujitkvymlmgroovch).
 import 'post_intent.dart';
 
 class Post {

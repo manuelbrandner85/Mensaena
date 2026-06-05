@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `group_members` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `group_members` (gyqujitkvymlmgroovch).
 class GroupMember {
   const GroupMember({
     required this.id,

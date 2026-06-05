@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `volunteer_signups` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `volunteer_signups` (gyqujitkvymlmgroovch).
 class VolunteerSignup {
   const VolunteerSignup({
     required this.id,

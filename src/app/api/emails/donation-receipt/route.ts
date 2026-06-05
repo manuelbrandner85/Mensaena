@@ -4,7 +4,7 @@ import { sendEmail } from '@/lib/email/send'
 import { buildDonationReceiptEmail } from '@/lib/email/templates/donation-receipt'
 import { calculateDonorTier } from '@/lib/donorTier'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co'
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
 let _admin: ReturnType<typeof createClient> | null = null
