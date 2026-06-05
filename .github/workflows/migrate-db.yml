@@ -41,13 +41,23 @@ jobs:
     env:
       SRC_REF: huaqldjkgyosefzfhjnf
       SRC_HOST: aws-1-eu-central-1.pooler.supabase.com
+      # Voller Pfad zu den PG-17-Binaries (Wrapper /usr/bin/pg_dump zeigt im
+      # Runner-Image evtl. weiter auf 16 -> Server-Version-Mismatch).
+      PGBIN: /usr/lib/postgresql/17/bin
     steps:
       - name: PostgreSQL-Client 17 installieren (huaqld laeuft auf PG 17)
         run: |
+          set -e
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
+          # Das Runner-Image hat client-16 vorinstalliert -> /usr/bin/pg_dump
+          # zeigt evtl. weiter auf 16. Wir rufen den 17er-Binary direkt per
+          # vollem Pfad auf. Hier verifizieren, dass er existiert + Version 17.
+          ls -la /usr/lib/postgresql/*/bin/pg_dump || true
+          /usr/lib/postgresql/17/bin/pg_dump --version
+          /usr/lib/postgresql/17/bin/psql --version
 
       - name: Verbindungen vorbereiten (DST bereinigen + SRC-PW selbst setzen)
         env:
@@ -102,7 +112,7 @@ jobs:
       - name: Ziel muss leer sein (Schutz)
         run: |
           set -e
-          cnt=$(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")
+          cnt=$("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")
           echo "Ziel hat $cnt public-Tabellen."
           if [ "$cnt" != "0" ]; then
             echo "::error::Ziel-public-Schema ist NICHT leer ($cnt Tabellen) - Abbruch."
@@ -116,7 +126,7 @@ jobs:
           # keit, dass alle Pooler-Worker das neue PW kennen.
           streak=0
           for i in $(seq 1 30); do
-            if psql "$SRC" -At -c "SELECT 1;" >/dev/null 2>&1; then
+            if "$PGBIN/psql" "$SRC" -At -c "SELECT 1;" >/dev/null 2>&1; then
               streak=$((streak+1))
               echo "SELECT 1 ok ($streak in Folge, Runde $i)."
               [ "$streak" -ge 5 ] && { echo "SRC stabil."; exit 0; }
@@ -135,7 +145,7 @@ jobs:
           # veralteten Worker -> Auth-Fehler -> neuer Versuch.
           ok=0
           for i in $(seq 1 10); do
-            if pg_dump "$SRC" \
+            if "$PGBIN/pg_dump" "$SRC" \
                  --schema=public --schema=auth --schema=storage \
                  --no-owner --no-privileges --no-publications --no-subscriptions \
                  --quote-all-identifiers \
@@ -157,19 +167,19 @@ jobs:
         run: |
           # ON_ERROR_STOP=0: auth/storage-Schema existiert im Ziel schon ->
           # einige CREATE kollidieren (erwartbar). Daten-INSERTs laufen durch.
-          psql "$DST" -v ON_ERROR_STOP=0 -f mensaena_full.sql 2> restore_errors.log || true
+          "$PGBIN/psql" "$DST" -v ON_ERROR_STOP=0 -f mensaena_full.sql 2> restore_errors.log || true
           echo "=== Nicht-'already exists'-Fehler (pruefen!): ==="
           grep -iv "already exists\|bereits vorhanden" restore_errors.log | head -40 || true
 
       - name: Cron-Jobs uebertragen
         run: |
           set -e
-          psql "$DST" -c "CREATE EXTENSION IF NOT EXISTS pg_cron;" || true
-          psql "$SRC" -At -c "SELECT format('SELECT cron.schedule(%L,%L,%L);', jobname, schedule, command) FROM cron.job;" > cron_jobs.sql || true
-          if [ -s cron_jobs.sql ]; then psql "$DST" -f cron_jobs.sql || true; fi
+          "$PGBIN/psql" "$DST" -c "CREATE EXTENSION IF NOT EXISTS pg_cron;" || true
+          "$PGBIN/psql" "$SRC" -At -c "SELECT format('SELECT cron.schedule(%L,%L,%L);', jobname, schedule, command) FROM cron.job;" > cron_jobs.sql || true
+          if [ -s cron_jobs.sql ]; then "$PGBIN/psql" "$DST" -f cron_jobs.sql || true; fi
 
       - name: Verifikation
         run: |
-          echo "Tabellen  Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")"
-          echo "auth.users Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM auth.users;")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM auth.users;")"
+          echo "Tabellen  Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")"
+          echo "auth.users Quelle: $("$PGBIN/psql" "$SRC" -At -c "SELECT count(*) FROM auth.users;")  Ziel: $("$PGBIN/psql" "$DST" -At -c "SELECT count(*) FROM auth.users;")"
           echo "FERTIG (DB-Teil). Storage-Dateien + Edge-Functions + App-Cutover: siehe docs/MIGRATION_huaqld_to_gyquj.md"
