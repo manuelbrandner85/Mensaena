@@ -1,0 +1,92 @@
+# Einmal-Werkzeug: Mensaena-DB von huaqld nach gyquj migrieren.
+#
+# Laeuft auf einem GitHub-Runner (der KANN die Supabase-DBs erreichen, anders
+# als die Claude-Sandbox). Manuell ausloesbar. Quelle wird NUR gelesen.
+#
+# VORAUSSETZUNG -- diese GitHub-Secrets anlegen (Repo -> Settings -> Secrets):
+#   SRC_DB_URL = postgresql://postgres.huaqldjkgyosefzfhjnf:<PW>@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
+#   DST_DB_URL = postgresql://postgres.gyqujitkvymlmgroovch:<PW>@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
+#   (Passwoerter: Dashboard -> Project Settings -> Database -> Reset database password)
+#
+# Sicherheit: Bricht ab, wenn das Ziel-public-Schema NICHT leer ist
+# (Schutz gegen versehentliches Doppel-Einspielen). Quelle bleibt unangetastet.
+#
+# Deckt NICHT ab (siehe docs/MIGRATION_huaqld_to_gyquj.md):
+#   - Storage-Dateien (Phase 2, rclone/S3)
+#   - Edge-Functions + Secrets (Phase 4)
+#   - App-Re-Pointing (Phase 5, dieser Branch)
+
+name: 'DB-Migration huaqld -> gyquj (einmalig)'
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Zum Bestaetigen exakt MIGRATE eintippen'
+        required: true
+        default: ''
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'MIGRATE' }}
+    steps:
+      - name: PostgreSQL-Client 16 installieren
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-16
+
+      - name: Ziel muss leer sein (Schutz)
+        env:
+          DST: ${{ secrets.DST_DB_URL }}
+        run: |
+          set -e
+          cnt=$(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")
+          echo "Ziel hat $cnt public-Tabellen."
+          if [ "$cnt" != "0" ]; then
+            echo "::error::Ziel-public-Schema ist NICHT leer ($cnt Tabellen) - Abbruch."
+            exit 1
+          fi
+
+      - name: Dump (public + auth + storage) aus huaqld
+        env:
+          SRC: ${{ secrets.SRC_DB_URL }}
+        run: |
+          set -e
+          pg_dump "$SRC" \
+            --schema=public --schema=auth --schema=storage \
+            --no-owner --no-privileges --no-publications --no-subscriptions \
+            --quote-all-identifiers \
+            -f mensaena_full.sql
+          echo "Dump-Groesse: $(wc -l < mensaena_full.sql) Zeilen"
+
+      - name: Restore nach gyquj
+        env:
+          DST: ${{ secrets.DST_DB_URL }}
+        run: |
+          # ON_ERROR_STOP=0: auth/storage-Schema existiert im Ziel schon ->
+          # einige CREATE kollidieren (erwartbar). Daten-INSERTs laufen durch.
+          psql "$DST" -v ON_ERROR_STOP=0 -f mensaena_full.sql 2> restore_errors.log || true
+          echo "=== Nicht-'already exists'-Fehler (pruefen!): ==="
+          grep -iv "already exists\|bereits vorhanden" restore_errors.log | head -40 || true
+
+      - name: Cron-Jobs uebertragen
+        env:
+          SRC: ${{ secrets.SRC_DB_URL }}
+          DST: ${{ secrets.DST_DB_URL }}
+        run: |
+          set -e
+          psql "$DST" -c "CREATE EXTENSION IF NOT EXISTS pg_cron;" || true
+          psql "$SRC" -At -c "SELECT format('SELECT cron.schedule(%L,%L,%L);', jobname, schedule, command) FROM cron.job;" > cron_jobs.sql || true
+          if [ -s cron_jobs.sql ]; then psql "$DST" -f cron_jobs.sql || true; fi
+
+      - name: Verifikation
+        env:
+          SRC: ${{ secrets.SRC_DB_URL }}
+          DST: ${{ secrets.DST_DB_URL }}
+        run: |
+          echo "Tabellen  Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")"
+          echo "auth.users Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM auth.users;")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM auth.users;")"
+          echo "FERTIG (DB-Teil). Storage-Dateien + Edge-Functions + App-Cutover: siehe docs/MIGRATION_huaqld_to_gyquj.md"
