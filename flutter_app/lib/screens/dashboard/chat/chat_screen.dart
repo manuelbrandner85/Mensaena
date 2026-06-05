@@ -15,6 +15,7 @@ import '../../../config/theme/cinema_accents.dart';
 import '../../../providers/cinema_provider.dart';
 import '../../../repositories/conversations_repository.dart';
 import '../../../services/chat_context_service.dart';
+import '../../../services/chat_draft_service.dart';
 import '../../../services/chat_word_filter_service.dart';
 import '../../../services/conversation_mute_service.dart';
 import '../../../services/dm_call_service.dart';
@@ -88,6 +89,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       MessagesRepository.markRead(widget.conversationId);
     });
     _setupPresence();
+    // Ungesendeten Entwurf dieser Konversation wiederherstellen (Session-
+    // weit, in-memory). Verlässt der User den Chat mit halbem Text und
+    // kommt zurück, steht er wieder im Feld.
+    final draft = ChatDraftService.instance.get(widget.conversationId);
+    if (draft.isNotEmpty) _ctrl.text = draft;
     _ctrl.addListener(_onTextChanged);
     _loadContext();
   }
@@ -221,6 +227,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     // @-Mention detection (debounced 150ms to keep input responsive)
     _mentionDebounce?.cancel();
     _mentionDebounce = Timer(const Duration(milliseconds: 150), _detectMention);
+    // Entwurf festhalten (in-memory, pro Konversation).
+    ChatDraftService.instance.set(widget.conversationId, _ctrl.text);
   }
 
   /// Detects an active '@xxx' token at the cursor position and triggers
@@ -458,6 +466,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       _ctrl.clear();
       _replyTo = null;
     });
+    // Entwurf ist mit dem Senden hinfällig.
+    ChatDraftService.instance.clear(widget.conversationId);
 
     final ok = await MessagesRepository.send(
       conversationId: widget.conversationId,
