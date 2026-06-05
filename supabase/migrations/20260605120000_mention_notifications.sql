@@ -22,27 +22,35 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- 1. 'mention' als gültigen notifications.type erlauben.
-ALTER TABLE public.notifications DROP CONSTRAINT IF EXISTS notifications_type_check;
-ALTER TABLE public.notifications ADD CONSTRAINT notifications_type_check CHECK (
-  type = ANY (ARRAY[
-    'message'::text,
-    'interaction'::text,
-    'post_update'::text,
-    'system'::text,
-    'help_found'::text,
-    'crisis_alert'::text,
-    'new_match'::text,
-    'match_both_accepted'::text,
-    'match_partner_accepted'::text,
-    'interaction_created'::text,
-    'post_nearby'::text,
-    'comment'::text,
-    'rating'::text,
-    'incoming_call'::text,
-    'live_room_started'::text,
-    'mention'::text
-  ])
-);
+--
+-- WICHTIG: Der Constraint wird DYNAMISCH gebaut — aus allen bereits in der
+-- Tabelle vorhandenen type-Werten PLUS der bekannten Liste PLUS 'mention'.
+-- Eine hartkodierte Liste schlug fehl (SQLSTATE 23514: bestehende Zeilen
+-- enthielten type-Werte, die nicht in der Liste standen — z.B. aus späteren
+-- Migrationen oder Altdaten). So kann KEINE existierende Zeile den neuen
+-- Constraint verletzen, und 'mention' ist garantiert erlaubt.
+DO $mention_constraint$
+DECLARE
+  v_types text;
+BEGIN
+  SELECT string_agg(DISTINCT quote_literal(t), ', ')
+  INTO v_types
+  FROM (
+    SELECT type AS t FROM public.notifications WHERE type IS NOT NULL
+    UNION
+    SELECT unnest(ARRAY[
+      'message','interaction','post_update','system','help_found',
+      'crisis_alert','new_match','match_both_accepted','match_partner_accepted',
+      'interaction_created','post_nearby','comment','rating','incoming_call',
+      'live_room_started','mention'
+    ])
+  ) s;
+
+  EXECUTE 'ALTER TABLE public.notifications DROP CONSTRAINT IF EXISTS notifications_type_check';
+  EXECUTE 'ALTER TABLE public.notifications ADD CONSTRAINT notifications_type_check '
+       || 'CHECK (type = ANY (ARRAY[' || v_types || ']::text[]))';
+END
+$mention_constraint$;
 
 -- 2. Hilfsfunktionen ZUERST definieren (vor dem Trigger, der sie aufruft).
 
