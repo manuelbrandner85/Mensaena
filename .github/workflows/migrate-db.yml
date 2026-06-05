@@ -69,8 +69,10 @@ jobs:
           fi
 
           # 3) Frisches, rein alphanumerisches huaqld-Passwort generieren
-          #    (keine Sonderzeichen -> keine URL-Encoding-Probleme).
-          PW="$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 28)"
+          #    (openssl rand -hex: 32 Zeichen 0-9a-f, keine Sonderzeichen ->
+          #    keine URL-Encoding-Probleme, KEINE Pipe -> kein Broken-Pipe
+          #    unter set -o pipefail).
+          PW="$(openssl rand -hex 16)"
           echo "::add-mask::$PW"
 
           # 4) Passwort via Management-API setzen.
