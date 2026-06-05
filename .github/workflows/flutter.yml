@@ -562,6 +562,12 @@ jobs:
         env:
           SUPABASE_URL: https://gyqujitkvymlmgroovch.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Uebergangs-Bruecke: Bestandskunden zeigen noch auf huaqld und lesen
+          # dort app_releases. Bis alle auf >=4.1.3 (gyquj) migriert sind, wird
+          # die Pflicht-Zeile auch nach huaqld gespiegelt. Optional (skip wenn
+          # Secret fehlt). Spaeter entfernen, wenn huaqld pausiert wird.
+          SUPABASE_URL_HUAQLD: https://huaqldjkgyosefzfhjnf.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY_HUAQLD: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_HUAQLD }}
           FULL: ${{ steps.apk.outputs.version }}
           TAG: ${{ steps.apk.outputs.tag }}
         run: |
@@ -647,4 +653,20 @@ jobs:
             echo "::warning::APK + GitHub-Release sind trotzdem live — Insert kann manuell via SQL nachgeholt werden."
             cat /tmp/ar_resp.json || true
             exit 1
+          fi
+
+          # ── Uebergangs-Bruecke: dieselbe Zeile nach huaqld spiegeln ─────────
+          # Bestandskunden (Apps vor dem gyquj-Cutover) lesen app_releases noch
+          # in huaqld. merge-duplicates, damit mandatory garantiert gesetzt ist.
+          if [ -n "$SUPABASE_SERVICE_ROLE_KEY_HUAQLD" ]; then
+            MIRROR=$(curl -sS --max-time 30 -o /dev/null -w "%{http_code}" \
+              -X POST "${SUPABASE_URL_HUAQLD}/rest/v1/app_releases?on_conflict=version" \
+              -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY_HUAQLD}" \
+              -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY_HUAQLD}" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: resolution=merge-duplicates" \
+              -d "$PAYLOAD") || MIRROR="000"
+            echo "huaqld-Bruecke: HTTP $MIRROR"
+          else
+            echo "::notice::SUPABASE_SERVICE_ROLE_KEY_HUAQLD nicht gesetzt — huaqld-Bruecke uebersprungen (Bestandskunden bekommen Pflicht-Update erst nach manuellem Mirror)."
           fi

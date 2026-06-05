@@ -3701,6 +3701,10 @@
     "greeting_evening": "Bonsoir",
     "greeting_late": "Bonne soirée",
     "greeting_named": "{greeting}, {name} ! Je suis Mensa 🌱 Demande-moi tout sur l'appli ou sur des thèmes comme l'entraide, la communauté, la liberté et la compassion.",
-    "greeting_plain": "{greeting} ! Je suis Mensa 🌱 Demande-moi tout sur l'appli ou sur des thèmes comme l'entraide, la communauté, la liberté et la compassion."
+    "greeting_plain": "{greeting} ! Je suis Mensa 🌱 Demande-moi tout sur l'appli ou sur des thèmes comme l'entraide, la communauté, la liberté et la compassion.",
+    "improve_button": "Améliorer avec l'IA",
+    "improve_empty": "Écris d'abord quelques mots-clés.",
+    "improve_title": "Suggestion IA",
+    "improve_apply": "Appliquer"
   }
 }

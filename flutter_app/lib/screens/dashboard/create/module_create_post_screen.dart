@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/geocoding_service.dart';
 import '../../../services/location_service.dart';
@@ -66,6 +67,7 @@ class _ModuleCreatePostScreenState
   double? _lat;
   double? _lng;
   bool _submitting = false;
+  bool _aiImproving = false;
   bool _titleError = false;
   String? _error;
   Timer? _draftTimer;
@@ -252,6 +254,57 @@ class _ModuleCreatePostScreenState
       }
     }
     return urls;
+  }
+
+  // A) KI-Texthilfe: Stichworte/Beschreibung -> klarer Beitrag.
+  Future<void> _improveWithAi() async {
+    final raw = _descCtrl.text.trim().isNotEmpty
+        ? _descCtrl.text.trim()
+        : _titleCtrl.text.trim();
+    if (raw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('assistant.improve_empty'.tr())));
+      return;
+    }
+    setState(() => _aiImproving = true);
+    String? improved;
+    try {
+      improved = await AiFeaturesRepository()
+          .improvePost(raw, context.locale.languageCode);
+    } catch (_) {/* unten als Fehler behandelt */}
+    if (!mounted) return;
+    setState(() => _aiImproving = false);
+    if (improved == null || improved.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('assistant.error'.tr())));
+      return;
+    }
+    final suggestion = improved;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('assistant.improve_title'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: SingleChildScrollView(
+          child: Text(suggestion,
+              style: AppTypography.body(size: 14, color: AppColors.ink)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('assistant.improve_apply'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (accepted == true && mounted) {
+      setState(() => _descCtrl.text = suggestion);
+    }
   }
 
   Future<void> _submit() async {
@@ -491,7 +544,25 @@ class _ModuleCreatePostScreenState
                 alignLabelWithHint: true,
               ),
             ),
-            const SizedBox(height: 14),
+            // A) KI-Texthilfe: Stichworte -> klarer Beitrag (Nutzer übernimmt/verwirft).
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: _aiImproving ? null : _improveWithAi,
+                icon: _aiImproving
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.bronze),
+                      )
+                    : const Icon(Icons.auto_awesome,
+                        size: 16, color: AppColors.bronze),
+                label: Text('assistant.improve_button'.tr(),
+                    style: AppTypography.label(size: 12, color: AppColors.bronze)),
+              ),
+            ),
+            const SizedBox(height: 6),
 
             // Bilder
             Row(

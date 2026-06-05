@@ -3698,6 +3698,10 @@
     "greeting_evening": "Good evening",
     "greeting_late": "Good late evening",
     "greeting_named": "{greeting}, {name}! I'm Mensa 🌱 Ask me anything about the app or topics like help, community, freedom and compassion.",
-    "greeting_plain": "{greeting}! I'm Mensa 🌱 Ask me anything about the app or topics like help, community, freedom and compassion."
+    "greeting_plain": "{greeting}! I'm Mensa 🌱 Ask me anything about the app or topics like help, community, freedom and compassion.",
+    "improve_button": "Improve with AI",
+    "improve_empty": "Write a few keywords first.",
+    "improve_title": "AI suggestion",
+    "improve_apply": "Apply"
   }
 }

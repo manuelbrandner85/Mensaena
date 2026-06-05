@@ -3701,6 +3701,10 @@
     "greeting_evening": "Buenas tardes",
     "greeting_late": "Buenas noches",
     "greeting_named": "{greeting}, {name}! Soy Mensa 🌱 Pregúntame lo que quieras sobre la app o sobre temas como ayuda, comunidad, libertad y compasión.",
-    "greeting_plain": "{greeting}! Soy Mensa 🌱 Pregúntame lo que quieras sobre la app o sobre temas como ayuda, comunidad, libertad y compasión."
+    "greeting_plain": "{greeting}! Soy Mensa 🌱 Pregúntame lo que quieras sobre la app o sobre temas como ayuda, comunidad, libertad y compasión.",
+    "improve_button": "Mejorar con IA",
+    "improve_empty": "Escribe primero algunas palabras clave.",
+    "improve_title": "Sugerencia de IA",
+    "improve_apply": "Aplicar"
   }
 }

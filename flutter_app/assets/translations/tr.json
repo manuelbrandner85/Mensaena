@@ -3700,6 +3700,10 @@
     "greeting_evening": "İyi akşamlar",
     "greeting_late": "İyi geceler",
     "greeting_named": "{greeting}, {name}! Ben Mensa 🌱 Uygulama ya da yardım, topluluk, özgürlük ve şefkat gibi konularda bana her şeyi sorabilirsin.",
-    "greeting_plain": "{greeting}! Ben Mensa 🌱 Uygulama ya da yardım, topluluk, özgürlük ve şefkat gibi konularda bana her şeyi sorabilirsin."
+    "greeting_plain": "{greeting}! Ben Mensa 🌱 Uygulama ya da yardım, topluluk, özgürlük ve şefkat gibi konularda bana her şeyi sorabilirsin.",
+    "improve_button": "Yapay zeka ile iyileştir",
+    "improve_empty": "Önce birkaç anahtar kelime yaz.",
+    "improve_title": "Yapay zeka önerisi",
+    "improve_apply": "Uygula"
   }
 }

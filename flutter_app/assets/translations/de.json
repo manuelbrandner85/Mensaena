@@ -3697,6 +3697,10 @@
     "greeting_evening": "Guten Abend",
     "greeting_late": "Schönen späten Abend",
     "greeting_named": "{greeting}, {name}! Ich bin Mensa 🌱 Frag mich alles zur App oder zu Themen wie Hilfe, Gemeinschaft, Freiheit und Mitgefühl.",
-    "greeting_plain": "{greeting}! Ich bin Mensa 🌱 Frag mich alles zur App oder zu Themen wie Hilfe, Gemeinschaft, Freiheit und Mitgefühl."
+    "greeting_plain": "{greeting}! Ich bin Mensa 🌱 Frag mich alles zur App oder zu Themen wie Hilfe, Gemeinschaft, Freiheit und Mitgefühl.",
+    "improve_button": "Mit KI verbessern",
+    "improve_empty": "Schreib zuerst ein paar Stichworte.",
+    "improve_title": "KI-Vorschlag",
+    "improve_apply": "Übernehmen"
   }
 }
