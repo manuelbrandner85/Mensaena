@@ -3,13 +3,21 @@
 # Laeuft auf einem GitHub-Runner (der KANN die Supabase-DBs erreichen, anders
 # als die Claude-Sandbox). Manuell ausloesbar. Quelle wird NUR gelesen.
 #
+# ROBUSTE VARIANTE (v2): Das huaqld-Passwort wird NICHT mehr als Secret
+# eingetippt (zu fehleranfaellig auf dem Handy -> Zeilenumbruch/Leerzeichen
+# kaputt). Stattdessen setzt der Workflow das huaqld-DB-Passwort SELBST zur
+# Laufzeit ueber die Supabase-Management-API und baut den Connection-String
+# selbst zusammen. Tippfehler im Passwort sind damit unmoeglich.
+#
 # VORAUSSETZUNG -- diese GitHub-Secrets anlegen (Repo -> Settings -> Secrets):
-#   SRC_DB_URL = postgresql://postgres.huaqldjkgyosefzfhjnf:<PW>@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
+#   SUPABASE_ACCESS_TOKEN = sbp_... (Management-Token mit Zugriff auf huaqld)
 #   DST_DB_URL = postgresql://postgres.gyqujitkvymlmgroovch:<PW>@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
-#   (Passwoerter: Dashboard -> Project Settings -> Database -> Reset database password)
+#   (DST_DB_URL funktioniert bereits -> der Schutz-Check laeuft gruen.)
+#   SRC_DB_URL wird NICHT mehr gebraucht.
 #
 # Sicherheit: Bricht ab, wenn das Ziel-public-Schema NICHT leer ist
-# (Schutz gegen versehentliches Doppel-Einspielen). Quelle bleibt unangetastet.
+# (Schutz gegen versehentliches Doppel-Einspielen). Quelle bleibt unangetastet
+# (nur Passwort-Reset + Lesen). Alle Secrets werden whitespace-bereinigt.
 #
 # Deckt NICHT ab (siehe docs/MIGRATION_huaqld_to_gyquj.md):
 #   - Storage-Dateien (Phase 2, rclone/S3)
@@ -30,6 +38,9 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.confirm == 'MIGRATE' }}
+    env:
+      SRC_REF: huaqldjkgyosefzfhjnf
+      SRC_HOST: aws-1-eu-central-1.pooler.supabase.com
     steps:
       - name: PostgreSQL-Client 16 installieren
         run: |
@@ -38,9 +49,53 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client-16
 
-      - name: Ziel muss leer sein (Schutz)
+      - name: Verbindungen vorbereiten (DST bereinigen + SRC-PW selbst setzen)
         env:
-          DST: ${{ secrets.DST_DB_URL }}
+          DST_RAW: ${{ secrets.DST_DB_URL }}
+          TOKEN_RAW: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          # 1) DST aus Secret holen + JEDE Whitespace entfernen (mobile-Copy-Falle).
+          DST="$(printf '%s' "$DST_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$DST"
+          echo "DST=$DST" >> "$GITHUB_ENV"
+
+          # 2) Management-Token bereinigen.
+          TOKEN="$(printf '%s' "$TOKEN_RAW" | tr -d '[:space:]')"
+          echo "::add-mask::$TOKEN"
+          if [ -z "$TOKEN" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN ist leer - Secret anlegen."
+            exit 1
+          fi
+
+          # 3) Frisches, rein alphanumerisches huaqld-Passwort generieren
+          #    (keine Sonderzeichen -> keine URL-Encoding-Probleme).
+          PW="$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 28)"
+          echo "::add-mask::$PW"
+
+          # 4) Passwort via Management-API setzen.
+          code=$(curl -s -o /tmp/pwresp.json -w '%{http_code}' -X PATCH \
+            "https://api.supabase.com/v1/projects/${SRC_REF}/database/password" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"password\":\"$PW\"}")
+          echo "Management-API HTTP $code"
+          if [ "$code" != "200" ] && [ "$code" != "201" ]; then
+            echo "::error::Passwort-Reset fehlgeschlagen (HTTP $code). Token pruefen."
+            cat /tmp/pwresp.json || true
+            exit 1
+          fi
+
+          # 5) Pooler braucht ein paar Sekunden, bis das neue PW aktiv ist.
+          sleep 15
+
+          # 6) SRC-Connection-String selbst bauen (Tippfehler unmoeglich).
+          SRC="postgresql://postgres.${SRC_REF}:${PW}@${SRC_HOST}:5432/postgres"
+          echo "::add-mask::$SRC"
+          echo "SRC=$SRC" >> "$GITHUB_ENV"
+          echo "Verbindungen vorbereitet."
+
+      - name: Ziel muss leer sein (Schutz)
         run: |
           set -e
           cnt=$(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")
@@ -50,9 +105,21 @@ jobs:
             exit 1
           fi
 
+      - name: SRC-Verbindung testen (mit Retry, falls PW noch propagiert)
+        run: |
+          set -e
+          for i in 1 2 3 4 5; do
+            if psql "$SRC" -At -c "SELECT 1;" >/dev/null 2>&1; then
+              echo "SRC-Verbindung ok (Versuch $i)."
+              exit 0
+            fi
+            echo "SRC noch nicht bereit (Versuch $i) - warte 10s..."
+            sleep 10
+          done
+          echo "::error::SRC-Verbindung nach 5 Versuchen fehlgeschlagen."
+          exit 1
+
       - name: Dump (public + auth + storage) aus huaqld
-        env:
-          SRC: ${{ secrets.SRC_DB_URL }}
         run: |
           set -e
           pg_dump "$SRC" \
@@ -63,8 +130,6 @@ jobs:
           echo "Dump-Groesse: $(wc -l < mensaena_full.sql) Zeilen"
 
       - name: Restore nach gyquj
-        env:
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
           # ON_ERROR_STOP=0: auth/storage-Schema existiert im Ziel schon ->
           # einige CREATE kollidieren (erwartbar). Daten-INSERTs laufen durch.
@@ -73,9 +138,6 @@ jobs:
           grep -iv "already exists\|bereits vorhanden" restore_errors.log | head -40 || true
 
       - name: Cron-Jobs uebertragen
-        env:
-          SRC: ${{ secrets.SRC_DB_URL }}
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
           set -e
           psql "$DST" -c "CREATE EXTENSION IF NOT EXISTS pg_cron;" || true
@@ -83,9 +145,6 @@ jobs:
           if [ -s cron_jobs.sql ]; then psql "$DST" -f cron_jobs.sql || true; fi
 
       - name: Verifikation
-        env:
-          SRC: ${{ secrets.SRC_DB_URL }}
-          DST: ${{ secrets.DST_DB_URL }}
         run: |
           echo "Tabellen  Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r';")"
           echo "auth.users Quelle: $(psql "$SRC" -At -c "SELECT count(*) FROM auth.users;")  Ziel: $(psql "$DST" -At -c "SELECT count(*) FROM auth.users;")"
