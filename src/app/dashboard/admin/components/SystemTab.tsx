@@ -84,7 +84,7 @@ export default function SystemTab() {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <InfoCard icon={<Wrench className="w-4 h-4 text-mn-mute" />} label="Version" value="1.0.0-beta" />
-          <InfoCard icon={<Database className="w-4 h-4 text-mn-mute" />} label="Supabase" value="huaqldjkgyosefzfhjnf" />
+          <InfoCard icon={<Database className="w-4 h-4 text-mn-mute" />} label="Supabase" value="gyqujitkvymlmgroovch" />
           <InfoCard icon={<CheckCircle2 className="w-4 h-4 text-mn-leben" />} label="Deploy" value="Cloudflare Pages" />
           <InfoCard icon={<AlertTriangle className="w-4 h-4 text-amber-500" />} label="Stack" value="Next.js 15.3 + React 19" />
         </div>
@@ -100,8 +100,8 @@ export default function SystemTab() {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
-            { label: 'Supabase Dashboard', url: 'https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf' },
-            { label: 'Supabase SQL Editor', url: 'https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new' },
+            { label: 'Supabase Dashboard', url: 'https://supabase.com/dashboard/project/gyqujitkvymlmgroovch' },
+            { label: 'Supabase SQL Editor', url: 'https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new' },
             { label: 'Cloudflare Dashboard', url: 'https://dash.cloudflare.com' },
             { label: 'GitHub Repository', url: 'https://github.com/manuelbrandner85/Mensaena' },
           ].map(link => (

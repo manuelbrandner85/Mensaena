@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `skill_offers` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `skill_offers` (gyqujitkvymlmgroovch).
 class SkillOffer {
   const SkillOffer({
     required this.id,

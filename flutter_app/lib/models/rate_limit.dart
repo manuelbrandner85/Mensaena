@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `rate_limits` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `rate_limits` (gyqujitkvymlmgroovch).
 class RateLimit {
   const RateLimit({
     required this.id,

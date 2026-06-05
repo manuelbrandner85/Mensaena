@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `organization_reviews` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `organization_reviews` (gyqujitkvymlmgroovch).
 ///
 /// DB-Spalten-Namen sind exakt: `content`, `is_flagged`, `admin_responded_at`.
 /// Die Felder hier heissen `content`, `isReported` (kompatibel zur UI),

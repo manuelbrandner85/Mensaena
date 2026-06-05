@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `timebank_entries` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `timebank_entries` (gyqujitkvymlmgroovch).
 class TimebankEntry {
   const TimebankEntry({
     required this.id,

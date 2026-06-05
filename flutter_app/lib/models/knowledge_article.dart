@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `knowledge_articles` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `knowledge_articles` (gyqujitkvymlmgroovch).
 class KnowledgeArticle {
   const KnowledgeArticle({
     required this.id,

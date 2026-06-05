@@ -4,7 +4,7 @@ import { getApiClient, err } from '@/lib/supabase/api-auth'
 
 export const runtime = 'nodejs'
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co'
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co'
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
 /** Mindestabstand zwischen Live-Raum-Benachrichtigungen pro Kanal (5 Minuten) */

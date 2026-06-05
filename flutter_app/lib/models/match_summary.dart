@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Flatter Mapping der `get_my_matches` RPC-Response (huaqldjkgyosefzfhjnf).
+/// Flatter Mapping der `get_my_matches` RPC-Response (gyqujitkvymlmgroovch).
 /// Enthaelt eingebettete Post-/User-Infos fuer die Listen-Anzeige.
 class MatchSummary {
   const MatchSummary({

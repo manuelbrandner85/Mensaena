@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `post_shares` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `post_shares` (gyqujitkvymlmgroovch).
 class PostShare {
   const PostShare({
     required this.id,

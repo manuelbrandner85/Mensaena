@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `trust_ratings` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `trust_ratings` (gyqujitkvymlmgroovch).
 class TrustRating {
   const TrustRating({
     required this.id,

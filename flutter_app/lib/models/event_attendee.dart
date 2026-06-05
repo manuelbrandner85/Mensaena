@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `event_attendees` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `event_attendees` (gyqujitkvymlmgroovch).
 class EventAttendee {
   const EventAttendee({
     required this.id,

@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `marketplace_listings` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `marketplace_listings` (gyqujitkvymlmgroovch).
 class MarketplaceListing {
   const MarketplaceListing({
     required this.id,

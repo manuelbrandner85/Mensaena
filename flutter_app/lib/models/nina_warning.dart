@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `nina_warnings` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `nina_warnings` (gyqujitkvymlmgroovch).
 class NinaWarning {
   const NinaWarning({
     required this.id,

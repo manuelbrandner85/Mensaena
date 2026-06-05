@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `chat_banned_users` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `chat_banned_users` (gyqujitkvymlmgroovch).
 class ChatBannedUser {
   const ChatBannedUser({
     required this.id,

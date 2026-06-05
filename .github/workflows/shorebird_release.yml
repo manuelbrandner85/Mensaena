@@ -135,7 +135,7 @@ jobs:
             --no-confirm \
             -- \
             --target-platform=android-arm64,android-arm \
-            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
           echo "✅ Release ${{ steps.version.outputs.full }} angelegt — shorebird_patch.yml kann ab jetzt patchen."
 

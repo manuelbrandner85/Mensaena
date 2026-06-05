@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `matches` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `matches` (gyqujitkvymlmgroovch).
 /// Renamed to MatchModel to avoid collision with Dart pattern-match syntax.
 class MatchModel {
   const MatchModel({

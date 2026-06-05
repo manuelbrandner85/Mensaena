@@ -38,7 +38,7 @@ jobs:
       # User kann die SUPABASE_PROJECT_REF als Variable ODER als Secret
       # angelegt haben. Wir akzeptieren beide Quellen, strippen Whitespace
       # und akzeptieren auch wenn der User aus Versehen die ganze URL gepastet hat
-      # (https://huaqldjkgyosefzfhjnf.supabase.co → huaqldjkgyosefzfhjnf).
+      # (https://gyqujitkvymlmgroovch.supabase.co → gyqujitkvymlmgroovch).
       - name: Resolve project ref
         id: ref
         env:
@@ -47,7 +47,7 @@ jobs:
         run: |
           raw="${REF_VAR:-$REF_SECRET}"
           if [ -z "$raw" ]; then
-            echo "::error title=Missing project ref::Setze entweder Repository-Variable ODER Secret namens SUPABASE_PROJECT_REF (Wert: 20 Kleinbuchstaben, z.B. huaqldjkgyosefzfhjnf)"
+            echo "::error title=Missing project ref::Setze entweder Repository-Variable ODER Secret namens SUPABASE_PROJECT_REF (Wert: 20 Kleinbuchstaben, z.B. gyqujitkvymlmgroovch)"
             exit 1
           fi
           # Whitespace, https://, .supabase.co, /-Slashes wegputzen

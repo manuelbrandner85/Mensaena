@@ -181,7 +181,7 @@ jobs:
             --allow-asset-diffs \
             -- \
             --target-platform=android-arm64,android-arm \
-            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
           echo "✅ Patch an Release ${{ steps.version.outputs.full }} gesendet"
 
@@ -195,7 +195,7 @@ jobs:
       - name: 📝 Changelog in app_releases schreiben
         if: success() && steps.status.outputs.skip != 'true'
         env:
-          SUPABASE_URL: https://huaqldjkgyosefzfhjnf.supabase.co
+          SUPABASE_URL: https://gyqujitkvymlmgroovch.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FULL: ${{ steps.version.outputs.full }}
           BUILD: ${{ steps.version.outputs.build }}

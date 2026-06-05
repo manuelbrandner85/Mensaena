@@ -7,7 +7,7 @@ import '../models/user_badge.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
-/// Challenges + Badges Repository (huaqldjkgyosefzfhjnf).
+/// Challenges + Badges Repository (gyqujitkvymlmgroovch).
 class ChallengesRepository {
   const ChallengesRepository._();
 

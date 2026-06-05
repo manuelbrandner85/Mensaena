@@ -286,7 +286,7 @@ async function deploySchema() {
   console.log('\n5️⃣  SQL-Schema Export...');
   console.log('\n' + '─'.repeat(60));
   console.log('Das vollständige Schema ist bereit zum Kopieren in den');
-  console.log('Supabase SQL Editor: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new');
+  console.log('Supabase SQL Editor: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new');
   console.log('─'.repeat(60) + '\n');
   
   // Speichere bereinigtes SQL

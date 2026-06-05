@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Migration 031: post_comments, post_votes, post_shares, push_subscriptions
 -- Tabellen fuer Kommentar-System, Voting, Share-Tracking und Push-Benachrichtigungen
--- Ausfuehren: Supabase SQL Editor → https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new
+-- Ausfuehren: Supabase SQL Editor → https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new
 -- ============================================================================
 
 -- ── 1) post_comments ─────────────────────────────────────────────────────────

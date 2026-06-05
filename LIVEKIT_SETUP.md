@@ -9,7 +9,7 @@ hinterlegt sein.
 
 ```bash
 curl -X POST \
-  "https://huaqldjkgyosefzfhjnf.supabase.co/functions/v1/livekit-token?check=1" \
+  "https://gyqujitkvymlmgroovch.supabase.co/functions/v1/livekit-token?check=1" \
   -H "Content-Type: application/json" -d '{}'
 ```
 
@@ -32,7 +32,7 @@ Wenn `has_key` oder `has_secret` = `false` → Secrets fehlen → siehe unten.
 cd /home/user/Mensaena
 npx supabase login         # einmalig, Browser öffnet sich
 npx supabase secrets set \
-  --project-ref huaqldjkgyosefzfhjnf \
+  --project-ref gyqujitkvymlmgroovch \
   LIVEKIT_SELF_KEY='mensaena-<dein-key-aus-livekit.yaml>' \
   LIVEKIT_SELF_SECRET='<dein-secret-aus-livekit.yaml>'
 ```
@@ -40,13 +40,13 @@ npx supabase secrets set \
 Optional auch URL überschreiben (sonst Default `wss://livekit.mensaena.de`):
 ```bash
 npx supabase secrets set \
-  --project-ref huaqldjkgyosefzfhjnf \
+  --project-ref gyqujitkvymlmgroovch \
   LIVEKIT_SELF_URL='wss://livekit.mensaena.de'
 ```
 
 ### Option B: Supabase Dashboard (UI)
 
-1. https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/functions/secrets
+1. https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/functions/secrets
 2. Klick **"Add new secret"**
 3. Name: `LIVEKIT_SELF_KEY` — Value: (der API-Key von Hostinger livekit.yaml)
 4. Wiederholen für `LIVEKIT_SELF_SECRET`
@@ -75,7 +75,7 @@ Der Value (`<secret-string>`) ist der `LIVEKIT_SELF_SECRET`.
 Nach dem Setzen:
 
 ```bash
-curl "https://huaqldjkgyosefzfhjnf.supabase.co/functions/v1/livekit-token?check=1" \
+curl "https://gyqujitkvymlmgroovch.supabase.co/functions/v1/livekit-token?check=1" \
   -X POST -H "Content-Type: application/json" -d '{}'
 # → {"livekit_url":"wss://livekit.mensaena.de","has_key":true,"has_secret":true}
 ```

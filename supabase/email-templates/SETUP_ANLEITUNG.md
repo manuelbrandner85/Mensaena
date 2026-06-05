@@ -2,7 +2,7 @@
 
 ## So richtest du die Templates ein (2 Minuten)
 
-1. Öffne: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/auth/templates
+1. Öffne: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/auth/templates
 
 2. **"Confirm signup"** → Betreff + HTML aus `confirm-signup.html` einfügen
 3. **"Reset password"** → Betreff + HTML aus `reset-password.html` einfügen  
@@ -16,7 +16,7 @@
 - Magic:    `Dein Mensaena Anmeldelink 🌿`
 
 ## Wichtige Supabase-Auth-Einstellungen
-→ https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/auth/url-configuration
+→ https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/auth/url-configuration
 
 - **Site URL** MUSS eine reine Basis-URL sein: `https://www.mensaena.de`
   (KEIN Pfad, KEINE Query-Parameter!)
@@ -35,7 +35,7 @@
 > (Management API `PATCH /v1/projects/{ref}/config/auth`).
 
 ## SMTP / E-Mail-Versand
-→ https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/auth/providers
+→ https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/auth/providers
 (Auth → Emails → SMTP Settings)
 
 Der Mensaena-Account nutzt Custom-SMTP via `mail.lima-city.de:465` mit

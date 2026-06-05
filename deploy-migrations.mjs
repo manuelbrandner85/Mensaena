@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // Format: postgresql://postgres.[project-ref]:[DB-PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres
 const DB_PASSWORD = process.env.DB_PASSWORD || 'REPLACE_WITH_DB_PASSWORD'
 
-const connectionString = `postgresql://postgres.huaqldjkgyosefzfhjnf:${DB_PASSWORD}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require`
+const connectionString = `postgresql://postgres.gyqujitkvymlmgroovch:${DB_PASSWORD}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require`
 
 const { Client } = pg
 
@@ -51,7 +51,7 @@ async function main() {
     await runMigration(client, join(migrationsDir, '003_realtime.sql'), '003 Realtime')
 
     console.log('\n🎉 Alle Migrationen abgeschlossen!')
-    console.log('🌐 Dashboard: https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf')
+    console.log('🌐 Dashboard: https://supabase.com/dashboard/project/gyqujitkvymlmgroovch')
 
   } catch (err) {
     console.error('❌ Verbindungsfehler:', err.message)

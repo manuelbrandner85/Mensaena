@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `crises` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `crises` (gyqujitkvymlmgroovch).
 class Crisis {
   const Crisis({
     required this.id,

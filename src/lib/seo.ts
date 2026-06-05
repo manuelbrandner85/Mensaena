@@ -16,7 +16,7 @@ export const TWITTER_HANDLE = '@mensaena'
 export const CONTACT_EMAIL = 'info@mensaena.de'
 
 export const SUPABASE_PROJECT_URL =
-  'https://huaqldjkgyosefzfhjnf.supabase.co'
+  'https://gyqujitkvymlmgroovch.supabase.co'
 
 // ── Helper functions ─────────────────────────────────────────────────
 

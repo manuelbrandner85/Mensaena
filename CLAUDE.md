@@ -99,7 +99,7 @@ Kein Shadow-DB-Problem, funktioniert direkt. Claude braucht nur den **Supabase A
 
 Claude führt dann aus:
 ```bash
-curl -X POST "https://api.supabase.com/v1/projects/huaqldjkgyosefzfhjnf/database/query" \
+curl -X POST "https://api.supabase.com/v1/projects/gyqujitkvymlmgroovch/database/query" \
   -H "Authorization: Bearer <access_token>" \
   -H "Content-Type: application/json" \
   -d "{\"query\": \"<SQL-Inhalt>\"}"

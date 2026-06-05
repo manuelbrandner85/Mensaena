@@ -378,7 +378,7 @@ jobs:
             --no-confirm \
             -- \
             --target-platform=android-arm64,android-arm \
-            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de \
             2>&1 | tee build.log
           rc=${PIPESTATUS[0]}
@@ -395,7 +395,7 @@ jobs:
             echo "ℹ️  APK nicht von Shorebird gebaut — fallback auf flutter build apk"
             flutter build apk --release \
               --target-platform=android-arm64,android-arm \
-              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+              --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
               --dart-define=API_BASE_URL=https://www.mensaena.de
             rc=$?
           fi
@@ -412,7 +412,7 @@ jobs:
         run: |
           set +e
           flutter build apk --release \
-            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://huaqldjkgyosefzfhjnf.supabase.co' }} \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de \
             2>&1 | tee build.log
           rc=${PIPESTATUS[0]}
@@ -560,7 +560,7 @@ jobs:
       - name: app_releases-Eintrag (APK)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         env:
-          SUPABASE_URL: https://huaqldjkgyosefzfhjnf.supabase.co
+          SUPABASE_URL: https://gyqujitkvymlmgroovch.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           FULL: ${{ steps.apk.outputs.version }}
           TAG: ${{ steps.apk.outputs.tag }}

@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `push_subscriptions` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `push_subscriptions` (gyqujitkvymlmgroovch).
 class PushSubscription {
   const PushSubscription({
     required this.id,

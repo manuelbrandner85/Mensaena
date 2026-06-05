@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `chat_announcements` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `chat_announcements` (gyqujitkvymlmgroovch).
 class ChatAnnouncement {
   const ChatAnnouncement({
     required this.id,

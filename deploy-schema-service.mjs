@@ -8,8 +8,8 @@ import { dirname, join } from 'path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const SUPABASE_URL = 'https://huaqldjkgyosefzfhjnf.supabase.co'
-const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YXFsZGprZ3lvc2VmemZoam5mIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDk4NzExOCwiZXhwIjoyMDkwNTYzMTE4fQ.t09nG5IbpDPAuBuTLuOedep9ZEmi1dcNjD0xsPzFZVQ'
+const SUPABASE_URL = 'https://gyqujitkvymlmgroovch.supabase.co'
+const SERVICE_ROLE_KEY = ''
 
 const headers = {
   'apikey': SERVICE_ROLE_KEY,
@@ -31,7 +31,7 @@ async function execSQL(sql, label) {
     if (!res.ok) {
       const body = await res.text()
       // Try Management API
-      const res2 = await fetch(`https://api.supabase.com/v1/projects/huaqldjkgyosefzfhjnf/database/query`, {
+      const res2 = await fetch(`https://api.supabase.com/v1/projects/gyqujitkvymlmgroovch/database/query`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
@@ -82,7 +82,7 @@ async function deployViaPooler() {
     console.log(`\n📄 Deploying: ${label}`)
     try {
       const res = await fetch(
-        `https://api.supabase.com/v1/projects/huaqldjkgyosefzfhjnf/database/query`,
+        `https://api.supabase.com/v1/projects/gyqujitkvymlmgroovch/database/query`,
         {
           method: 'POST',
           headers: mgmtHeaders,
@@ -115,14 +115,14 @@ async function main() {
   console.log('🌿 Mensaena – Schema Deployment')
   console.log('='.repeat(50))
   console.log('🔑 Service Role Key: aktiv')
-  console.log('📡 Projekt: huaqldjkgyosefzfhjnf')
+  console.log('📡 Projekt: gyqujitkvymlmgroovch')
 
   const success = await deployViaPooler()
 
   if (!success) {
     console.log('\n⚠️  Management API nicht verfügbar mit diesem Token-Typ.')
     console.log('📋 Bitte Schema manuell einfügen:')
-    console.log('🔗 https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new')
+    console.log('🔗 https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new')
   }
 }
 

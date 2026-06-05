@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `reports` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `reports` (gyqujitkvymlmgroovch).
 /// L1: Migration von content_reports → reports. Spalten-Mapping:
 ///   details → comment, resolvedBy → reviewedBy, resolvedAt → reviewedAt.
 ///   resolveNote entfällt (Spalte existiert in `reports` nicht).

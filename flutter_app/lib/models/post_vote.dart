@@ -1,5 +1,5 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `post_votes` (huaqldjkgyosefzfhjnf).
+/// Spiegel der Supabase-Tabelle `post_votes` (gyqujitkvymlmgroovch).
 class PostVote {
   const PostVote({
     required this.id,

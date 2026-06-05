@@ -84,7 +84,7 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
             _cleanupSection(),
             const SizedBox(height: 14),
             _section('Backend', [
-              _kv('Supabase Project', 'huaqldjkgyosefzfhjnf'),
+              _kv('Supabase Project', 'gyqujitkvymlmgroovch'),
               _kv('Region', 'EU (Frankfurt)'),
               _kv('Auth', 'JWT + RLS'),
               _kv('Storage', 'avatars · post-images · chat-images'),
@@ -275,12 +275,12 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
       _QuickLink(
         icon: LucideIcons.database,
         label: 'admin.system.linkSupabase'.tr(),
-        url: 'https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf',
+        url: 'https://supabase.com/dashboard/project/gyqujitkvymlmgroovch',
       ),
       _QuickLink(
         icon: LucideIcons.terminal,
         label: 'admin.system.linkSql'.tr(),
-        url: 'https://supabase.com/dashboard/project/huaqldjkgyosefzfhjnf/sql/new',
+        url: 'https://supabase.com/dashboard/project/gyqujitkvymlmgroovch/sql/new',
       ),
       _QuickLink(
         icon: LucideIcons.cloud,
