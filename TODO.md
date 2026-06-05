@@ -9,6 +9,7 @@
 - [ ] [!] pg_cron-Job für ai-weekly-recap anlegen (SQL siehe unten / Antwort) — 1x/Woche Mo 9:00
 - [x] UI A "Mit KI verbessern" im Module-Create-Screen (Dialog Übernehmen/Verwerfen, i18n assistant.improve_* in 7 Sprachen)
 - [ ] UI restliche KI-Buttons: C "Übersetzen" (PostCard+Chat), F Krisen-Summary (Crisis-Detail), G "Warum passt das?" (Match-Karte), E Wiki-Generator (Admin), H Recap-Widget (Dashboard) — Repository fertig, nur UI-Hooks offen
+- [x] Shorebird-Patch-Guard: skippt bei Versions-Bump (Patch nur fuer Dart-only-Commits ohne Bump). shorebird_patch+release bereits 100% gyquj (0 huaqld)
 - [x] [!] Update-Bug behoben: Bestandskunden zeigten auf huaqld, app_releases-Pflichtzeile lag aber nur in gyquj. Brücke: 4.1.3 mandatory in huaqld nachgetragen + flutter.yml schreibt jetzt Dual (gyquj+huaqld, optional SUPABASE_SERVICE_ROLE_KEY_HUAQLD). OTA-Patch-Befund: jeder Push bumpt Version -> shorebird_patch patcht brandneue Version ohne Nutzerbasis -> Patches erreichen niemanden (Architektur, nicht Reihenfolge)
 - [x] Supabase-Migration huaqld → gyquj komplett (DB 161 Tab./49 Logins, Storage 15 Buckets, private-Schema, 9 Edge Functions, Cron, URL-Rewrites) + App-Cutover (PR #583 gemergt, Web live + APK 4.1.3 Pflicht-Update)
 - [x] Mensa KI-Assistent von Grund auf: Edge Function chat-ai (4-Provider-Fallback) + chat_ai_repository + chat_ai_provider + mensaena_assistant_fab (in dashboard_scaffold, ersetzt MensaenaBotButton) + i18n assistant.* in 7 Sprachen
