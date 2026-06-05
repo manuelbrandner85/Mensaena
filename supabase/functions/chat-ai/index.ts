@@ -11,51 +11,8 @@
 // (Supabase Secrets) — NIEMALS im Client-Code, Repo oder Logs.
 // ════════════════════════════════════════════════════════════════════════
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
-
-type ProviderFormat = 'gemini' | 'openai'
-interface Provider {
-  id: string
-  format: ProviderFormat
-  model: string
-  keyEnv: string
-  url: string // <model>/<key> werden für gemini ersetzt
-}
-
-// Modellnamen als Konfig oben halten — sie ändern sich.
-// Cerebras "llama-3.3-70b" ist aktuell bestätigt; bei "model not found"
-// im Cerebras Model Catalog (inference-docs.cerebras.ai/models) nachsehen.
-const PROVIDERS: Provider[] = [
-  {
-    id: 'gemini',
-    format: 'gemini',
-    model: 'gemini-2.5-flash',
-    keyEnv: 'GEMINI_API_KEY',
-    url: 'https://generativelanguage.googleapis.com/v1beta/models/<model>:generateContent?key=<key>',
-  },
-  {
-    id: 'groq',
-    format: 'openai',
-    model: 'llama-3.3-70b-versatile',
-    keyEnv: 'GROQ_API_KEY',
-    url: 'https://api.groq.com/openai/v1/chat/completions',
-  },
-  {
-    id: 'cerebras',
-    format: 'openai',
-    model: 'llama-3.3-70b',
-    keyEnv: 'CEREBRAS_API_KEY',
-    url: 'https://api.cerebras.ai/v1/chat/completions',
-  },
-  {
-    id: 'openrouter',
-    format: 'openai',
-    model: 'openrouter/free',
-    keyEnv: 'OPENROUTER_API_KEY',
-    url: 'https://openrouter.ai/api/v1/chat/completions',
-  },
-]
-
-const PROVIDER_TIMEOUT_MS = 12_000
+// Gemeinsame Fallback-Kette (gemini->groq->cerebras->openrouter) aus _shared.
+import { callAiChain } from '../_shared/ai.ts'
 
 // NAV-Whitelist — Keys -> echte go_router-Pfade (verifiziert in app_router.dart).
 const NAV_WHITELIST: Record<string, { route: string; label: string }> = {
@@ -220,74 +177,13 @@ NAVIGATION: Wenn (und nur wenn) es wirklich hilft, hänge GANZ AM ENDE deiner
 Antwort EINEN Befehl im Format [[NAV:key]] an. Erlaubte keys: ${navKeysList}.
 Nichts anderes. Lass ihn weg, wenn keine Navigation nötig ist.`
 
-  // ── Nachrichten für OpenAI-kompatible Anbieter ─────────────────────────
-  const openaiMessages = [
-    { role: 'system', content: system },
-    ...history
-      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && m.content)
-      .map((m) => ({ role: m.role, content: m.content.toString().slice(0, 2000) })),
-    { role: 'user', content: message },
-  ]
-
-  // ── Fallback-Kette ──────────────────────────────────────────────────────
-  let reply = ''
-  let usedProvider: string | null = null
-
-  for (const p of PROVIDERS) {
-    const key = Deno.env.get(p.keyEnv)
-    if (!key) continue
-    const ctrl = new AbortController()
-    const timer = setTimeout(() => ctrl.abort(), PROVIDER_TIMEOUT_MS)
-    try {
-      let text = ''
-      if (p.format === 'gemini') {
-        const url = p.url.replace('<model>', p.model).replace('<key>', key)
-        const contents = [
-          ...history
-            .filter((m) => m && m.content)
-            .map((m) => ({
-              role: m.role === 'assistant' ? 'model' : 'user',
-              parts: [{ text: m.content.toString().slice(0, 2000) }],
-            })),
-          { role: 'user', parts: [{ text: message }] },
-        ]
-        const r = await fetch(url, {
-          method: 'POST',
-          signal: ctrl.signal,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            system_instruction: { parts: [{ text: system }] },
-            contents,
-          }),
-        })
-        if (!r.ok) throw new Error(`gemini ${r.status}`)
-        const j = await r.json()
-        text = j?.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
-      } else {
-        const r = await fetch(p.url, {
-          method: 'POST',
-          signal: ctrl.signal,
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${key}`,
-          },
-          body: JSON.stringify({ model: p.model, messages: openaiMessages }),
-        })
-        if (!r.ok) throw new Error(`${p.id} ${r.status}`)
-        const j = await r.json()
-        text = j?.choices?.[0]?.message?.content ?? ''
-      }
-      if (text && text.trim()) {
-        reply = text.trim()
-        usedProvider = p.id
-        break
-      }
-    } catch (_) {
-      // fehlgeschlagen/Timeout/Rate-Limit -> nächster Anbieter
-    } finally {
-      clearTimeout(timer)
-    }
-  }
+  // ── Fallback-Kette (gemeinsames _shared/ai.ts) ─────────────────────────
+  const chain = await callAiChain(system, message, {
+    timeoutMs: 12_000,
+    history,
+  })
+  let reply = chain.text
+  const usedProvider = chain.provider
 
   if (!reply) {
     return json({
@@ -314,6 +210,7 @@ Nichts anderes. Lass ihn weg, wenn keine Navigation nötig ist.`
   try {
     await admin.from('ai_chat_analytics').insert({
       user_id: user.id,
+      feature: 'chat_ai',
       provider: usedProvider,
       nav_key: navMatch ? navMatch[1].toLowerCase() : null,
       had_knowledge: hadKnowledge,
