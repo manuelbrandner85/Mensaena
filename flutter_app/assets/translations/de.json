@@ -3681,5 +3681,22 @@
     "camOn": "Kamera an",
     "camOff": "Kamera aus",
     "leave": "Verlassen"
+  },
+  "assistant": {
+    "title": "Mensa",
+    "hint": "Frag Mensa etwas …",
+    "open": "Öffnen",
+    "error": "Entschuldige 🌱 ich kann gerade nicht antworten. Versuch es bitte gleich nochmal.",
+    "feedback_thanks": "Danke für dein Feedback!",
+    "chip_post": "Wie erstelle ich einen Beitrag?",
+    "chip_karma": "Was ist mein Karma?",
+    "chip_help_nearby": "Hilfe in meiner Nähe finden",
+    "chip_crisis": "Krise melden",
+    "greeting_morning": "Guten Morgen",
+    "greeting_day": "Hallo",
+    "greeting_evening": "Guten Abend",
+    "greeting_late": "Schönen späten Abend",
+    "greeting_named": "{greeting}, {name}! Ich bin Mensa 🌱 Frag mich alles zur App oder zu Themen wie Hilfe, Gemeinschaft, Freiheit und Mitgefühl.",
+    "greeting_plain": "{greeting}! Ich bin Mensa 🌱 Frag mich alles zur App oder zu Themen wie Hilfe, Gemeinschaft, Freiheit und Mitgefühl."
   }
 }

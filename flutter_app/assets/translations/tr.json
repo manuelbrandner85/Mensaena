@@ -3684,5 +3684,22 @@
     "camOn": "Kamera",
     "camOff": "Kam kapalı",
     "leave": "Ayrıl"
+  },
+  "assistant": {
+    "title": "Mensa",
+    "hint": "Mensa'ya bir şey sor …",
+    "open": "Aç",
+    "error": "Üzgünüm 🌱 şu anda yanıt veremiyorum. Lütfen birazdan tekrar dene.",
+    "feedback_thanks": "Geri bildirimin için teşekkürler!",
+    "chip_post": "Nasıl gönderi oluştururum?",
+    "chip_karma": "Karmam nedir?",
+    "chip_help_nearby": "Yakınımda yardım bul",
+    "chip_crisis": "Kriz bildir",
+    "greeting_morning": "Günaydın",
+    "greeting_day": "Merhaba",
+    "greeting_evening": "İyi akşamlar",
+    "greeting_late": "İyi geceler",
+    "greeting_named": "{greeting}, {name}! Ben Mensa 🌱 Uygulama ya da yardım, topluluk, özgürlük ve şefkat gibi konularda bana her şeyi sorabilirsin.",
+    "greeting_plain": "{greeting}! Ben Mensa 🌱 Uygulama ya da yardım, topluluk, özgürlük ve şefkat gibi konularda bana her şeyi sorabilirsin."
   }
 }

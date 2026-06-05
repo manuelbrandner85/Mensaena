@@ -3682,5 +3682,22 @@
     "camOn": "Cam on",
     "camOff": "Cam off",
     "leave": "Leave"
+  },
+  "assistant": {
+    "title": "Mensa",
+    "hint": "Ask Mensa something …",
+    "open": "Open",
+    "error": "Sorry 🌱 I can't answer right now. Please try again in a moment.",
+    "feedback_thanks": "Thanks for your feedback!",
+    "chip_post": "How do I create a post?",
+    "chip_karma": "What is my karma?",
+    "chip_help_nearby": "Find help near me",
+    "chip_crisis": "Report a crisis",
+    "greeting_morning": "Good morning",
+    "greeting_day": "Hello",
+    "greeting_evening": "Good evening",
+    "greeting_late": "Good late evening",
+    "greeting_named": "{greeting}, {name}! I'm Mensa 🌱 Ask me anything about the app or topics like help, community, freedom and compassion.",
+    "greeting_plain": "{greeting}! I'm Mensa 🌱 Ask me anything about the app or topics like help, community, freedom and compassion."
   }
 }

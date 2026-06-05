@@ -1,7 +1,14 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-05-27 (Mega-Prompt Phase-2-12 Foundation + Phase 6/4/11 implementiert)
+> Aktualisiert: 2026-06-06 (Mensa KI-Assistent + Supabase-Migration huaqld→gyquj live)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
+
+## Ad-hoc (2026-06-06)
+- [x] Supabase-Migration huaqld → gyquj komplett (DB 161 Tab./49 Logins, Storage 15 Buckets, private-Schema, 9 Edge Functions, Cron, URL-Rewrites) + App-Cutover (PR #583 gemergt, Web live + APK 4.1.3 Pflicht-Update)
+- [x] Mensa KI-Assistent von Grund auf: Edge Function chat-ai (4-Provider-Fallback) + chat_ai_repository + chat_ai_provider + mensaena_assistant_fab (in dashboard_scaffold, ersetzt MensaenaBotButton) + i18n assistant.* in 7 Sprachen
+- [x] [SQL] ai_chat_analytics + ai_chat_feedback (auf gyquj angewandt, RLS aktiv)
+- [ ] Mensa: optionaler einmaliger Pulse-Hinweis beim ersten Öffnen komplexer Screens (Karte/Beitrag) via flutter_secure_storage — offen
+- [ ] Canva-Connector für Agent-Session freigeben (Asset-Generierung), aktuell nicht durchgereicht
 
 ## CACHE — Mega-Prompt v2.1 Status (2026-05-27)
 OPEN=Phase 0 + 1 + 2 (8/8) + 3 (4/5: F12+F13 done, iOS-PiP defer) + 5 + 6 (ZUSATZ-4 done) + 7 + 8 + 9 + 10 (Sektionen+E3/E4/E6/E9/E10) + 11 PiP + 12 (S8 done) + 14. 40+ Commits.

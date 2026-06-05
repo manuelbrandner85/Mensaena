@@ -26,7 +26,7 @@ import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
 import '../shared/active_call_mini_player.dart';
 import '../shared/active_stream_mini_player.dart';
-import '../shared/mensaena_bot_button.dart';
+import '../assistant/mensaena_assistant_fab.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
 /// Dashboard-Shell V20 — Performance-Fix mit 100% Optik-Erhalt.
@@ -276,11 +276,16 @@ class DashboardScaffold extends ConsumerWidget {
                   Expanded(child: refreshed),
                 ],
               ),
-              const Positioned(
-                left: 16,
-                bottom: 16,
-                child: SafeArea(child: MensaenaBotButton()),
-              ),
+              // "Mensa"-Assistent: schwebt rechts ÜBER der BottomNav.
+              // Ausgeblendet im Chat/Krisen-Kontext (eigene Eingabe-/
+              // Notfall-Flows haben dort Vorrang).
+              if (!activeRoute.contains('/chat') &&
+                  !activeRoute.contains('/crisis'))
+                Positioned(
+                  right: 16,
+                  bottom: 88,
+                  child: MensaenaAssistantFab(screenLabel: title),
+                ),
               if (activeCall != null &&
                   !activeRoute.startsWith('/dashboard/call/'))
                 ActiveCallMiniPlayer(info: activeCall),
