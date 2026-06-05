@@ -55,7 +55,7 @@ class ScheduledCallsScreen extends ConsumerWidget {
     required DateTime when,
   }) async {
     final entry = a2c.Event(
-      title: 'call.videoAction'.tr() + ' — ' + name,
+      title: '${'call.videoAction'.tr()} — $name',
       startDate: when,
       endDate: when.add(const Duration(minutes: 30)),
       iosParams: const a2c.IOSParams(reminder: Duration(minutes: 15)),

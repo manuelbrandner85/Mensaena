@@ -229,7 +229,9 @@ class _IncomingCallListenerState
       }
       if (status != 'ringing') continue;
       if (_handledCallIds.contains(id) ||
-          CallEventBus.isHandledAccept(id)) continue;
+          CallEventBus.isHandledAccept(id)) {
+        continue;
+      }
       // Stale-Call-Filter — der WICHTIGE Punkt: wir prüfen sowohl
       // created_at-Alter ALS AUCH ended_at. Vorher wurde NUR created_at
       // gegen 60 s geprüft → wenn die App nach Anruf-Ende geöffnet wurde,
@@ -257,7 +259,9 @@ class _IncomingCallListenerState
     final id = m.data['call_id'] as String?;
     if (id == null ||
         _handledCallIds.contains(id) ||
-        CallEventBus.isHandledAccept(id)) return;
+        CallEventBus.isHandledAccept(id)) {
+      return;
+    }
     _handledCallIds.add(id);
     _triggerIncoming(
       callId: id,

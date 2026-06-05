@@ -201,7 +201,7 @@ class AiFeaturesRepository {
         .select('week_start, content, stats, created_at')
         .order('week_start', ascending: false)
         .limit(1);
-    if (rows is List && rows.isNotEmpty) {
+    if (rows.isNotEmpty) {
       return Map<String, dynamic>.from(rows.first as Map);
     }
     return null;
