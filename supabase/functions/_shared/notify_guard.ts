@@ -11,7 +11,7 @@
 //  • Stille Zeiten 22:00–08:00 (Europe/Berlin, Primaerlocale): nicht sofort
 //    pushen -> scheduledFor auf den naechsten 08:00-Slot legen.
 // ════════════════════════════════════════════════════════════════════════
-import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 export interface GuardResult {
   allowed: boolean

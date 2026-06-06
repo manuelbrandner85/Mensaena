@@ -65,6 +65,12 @@ CREATE TABLE IF NOT EXISTS public.live_rooms (
   ended_at        timestamptz
 );
 
+-- conversation_id may be missing if the table was created by an earlier
+-- migration without this column; add it idempotently before indexing.
+ALTER TABLE public.live_rooms
+  ADD COLUMN IF NOT EXISTS conversation_id uuid
+    REFERENCES public.conversations(id) ON DELETE CASCADE;
+
 CREATE INDEX IF NOT EXISTS live_rooms_channel_active_idx
   ON public.live_rooms(channel_id)
   WHERE status = 'live';

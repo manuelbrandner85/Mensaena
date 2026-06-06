@@ -10,7 +10,7 @@
 // Defaults) BEWUSST zuerst. Alle Schlüssel kommen aus Deno.env
 // (Supabase Secrets) — NIEMALS im Client-Code, Repo oder Logs.
 // ════════════════════════════════════════════════════════════════════════
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 // Gemeinsame Fallback-Kette (gemini->groq->cerebras->openrouter) aus _shared.
 import { callAiChain } from '../_shared/ai.ts'
 
