@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.1.9+40109
+version: 4.2.0+40200
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -50,9 +50,6 @@ dependencies:
   # Push Notifications
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3
-  # Crashlytics: erfasst native + Dart-Fatal-Crashes mit Stacktrace (Diagnose
-  # des "App schließt sich"-Bugs). Gradle-Plugin in android/settings+app.
-  firebase_crashlytics: ^4.1.3
   # Lokale Notifications fuer FCM-Foreground + Background-Data-Messages
   # (data-only Pushes muessen vom Client als sichtbare Notification angezeigt
   # werden, sonst nur stille Updates → kein User-Feedback bei geschlossener App).
@@ -64,10 +61,6 @@ dependencies:
 
   # Icons (Web-konsistent)
   lucide_icons: ^0.257.0
-
-  # HTML-Render für die E-Mail-Vorschau im Marketing-Admin (pure Dart, kein
-  # natives Webview → keine Plattform-Konfig nötig).
-  flutter_widget_from_html_core: ^0.16.0
 
   # Media
   image_picker: ^1.1.2
@@ -182,12 +175,6 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
-    # WICHTIG: shorebird.yaml MUSS als Asset gebündelt sein — sonst schlägt
-    # `shorebird release`/`patch` mit "pubspec.yaml does not have shorebird.yaml
-    # as a flutter asset" fehl. Ohne diese Zeile fiel flutter.yml auf plain
-    # `flutter build apk` zurück (kein OTA-Updater) und shorebird_patch.yml
-    # übersprang JEDEN Patch → Änderungen erreichten nie die App.
-    - shorebird.yaml
     - assets/images/
     - assets/launcher/
     - assets/translations/

@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -50,14 +48,6 @@ void overlayMain() => incomingCallOverlayEntry();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase + Crashlytics SO FRÜH WIE MÖGLICH initialisieren, damit auch
-  // Startup-Crashes (vor Supabase-Init) einen Stacktrace liefern. Native
-  // Signals (SIGSEGV/SIGABRT) fängt das Crashlytics-Gradle-Plugin ab.
-  try {
-    await Firebase.initializeApp();
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-  } catch (_) {/* Firebase evtl. nativ schon initialisiert — egal */}
-
   // CRASH-FIX (App-langsam-/crasht-Report): Image-Cache eng deckeln.
   // Default-Flutter: 1000 Bilder / 100 MB. Auf Low-RAM-Android-Geräten
   // reicht ein einziges vom Server unsanft groß ausgeliefertes Avatar/
@@ -82,7 +72,6 @@ Future<void> main() async {
   // Per fail-silent: ErrorLogsRepository fängt eigene Exceptions ab.
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    FirebaseCrashlytics.instance.recordFlutterError(details);
     ErrorLogsRepository.log(
       errorType: 'FlutterError',
       message: details.exceptionAsString(),
@@ -90,7 +79,6 @@ Future<void> main() async {
     );
   };
   PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     ErrorLogsRepository.log(
       errorType: 'Uncaught',
       message: error.toString(),
