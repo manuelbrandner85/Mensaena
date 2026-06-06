@@ -42,20 +42,23 @@ CREATE INDEX IF NOT EXISTS idx_notifications_push_pending
 
 -- ── 6. pg_cron: Frequenz von 15min auf 60min reduzieren ──────────────────
 -- event_reminders sind 24h-Erinnerungen – stündlich reicht vollkommen aus.
-DO $$
+DO $cron$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
-    PERFORM cron.unschedule('mensaena-event-reminders')
-      WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'mensaena-event-reminders');
-    PERFORM cron.schedule(
-      'mensaena-event-reminders',
-      '0 * * * *',   -- jede volle Stunde statt alle 15 min
-      $cron$SELECT public.send_event_reminders();$cron$
-    );
+  IF to_regnamespace('cron') IS NULL THEN
+    RAISE NOTICE 'pg_cron nicht vorhanden — überspringe Event-Reminder-Frequenz-Update.';
+    RETURN;
   END IF;
-EXCEPTION WHEN OTHERS THEN
-  RAISE NOTICE 'pg_cron update: %', SQLERRM;
-END $$;
+
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'mensaena-event-reminders') THEN
+    PERFORM cron.unschedule('mensaena-event-reminders');
+  END IF;
+
+  PERFORM cron.schedule(
+    'mensaena-event-reminders',
+    '0 * * * *',   -- jede volle Stunde statt alle 15 min
+    $job$SELECT public.send_event_reminders();$job$
+  );
+END $cron$;
 
 -- ── 7. VACUUM ANALYZE auf die am häufigsten geschriebenen Tabellen ────────
 -- Räumt dead tuples auf und aktualisiert Statistiken → bessere Query-Pläne

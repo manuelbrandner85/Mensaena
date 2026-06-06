@@ -34,14 +34,23 @@ BEGIN
 END;
 $$;
 
-SELECT cron.unschedule('purge_channel_messages_6h')
-WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'purge_channel_messages_6h');
+DO $cron$
+BEGIN
+  IF to_regnamespace('cron') IS NULL THEN
+    RAISE NOTICE 'pg_cron nicht vorhanden — überspringe Channel-Purge-Cron-Setup.';
+    RETURN;
+  END IF;
 
-SELECT cron.schedule(
-  'purge_channel_messages_6h',
-  '0 */6 * * *',
-  $$SELECT public.purge_channel_messages_6h();$$
-);
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'purge_channel_messages_6h') THEN
+    PERFORM cron.unschedule('purge_channel_messages_6h');
+  END IF;
+
+  PERFORM cron.schedule(
+    'purge_channel_messages_6h',
+    '0 */6 * * *',
+    $job$SELECT public.purge_channel_messages_6h();$job$
+  );
+END $cron$;
 
 -- B) Clear-DM-History RPC.
 -- User-callable; loescht ALLE messages in einer Conversation HART aus der DB.
