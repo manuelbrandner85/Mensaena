@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
   // Kandidaten: opt-in + seit 7+ Tagen inaktiv (user_status.updated_at-Proxy).
   const { data: cands, error } = await admin
     .from('profiles')
-    .select('id, name, nickname, latitude, longitude, region_id, '
+    .select('id, name, nickname, latitude, longitude, region, '
       + 'user_status!left(updated_at)')
     .eq('reactivation_opt_in', true)
     .limit(300)
@@ -57,11 +57,11 @@ Deno.serve(async (req: Request) => {
           x.type === 'help_needed' || x.type === 'crisis')
         if (help) { reasonKind = 'nearby_help'; detail = (help.title ?? '').toString().slice(0, 80) }
       }
-      if (reasonKind === 'generic' && p.region_id) {
+      if (reasonKind === 'generic' && p.region) {
         const { count } = await admin
           .from('profiles')
           .select('id', { count: 'exact', head: true })
-          .eq('region_id', p.region_id)
+          .eq('region', p.region)
           .gte('created_at', cutoff)
         if ((count ?? 0) > 0) { reasonKind = 'new_neighbors'; detail = String(count) }
       }
