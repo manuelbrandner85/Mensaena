@@ -184,7 +184,7 @@ class _PausedBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(children: [
-        const Icon(LucideIcons.octagonAlert,
+        const Icon(LucideIcons.alertOctagon,
             size: 18, color: AppColors.herzrot),
         const SizedBox(width: 10),
         Expanded(
@@ -561,7 +561,7 @@ class _SettingsTabState extends State<_SettingsTab> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              const Icon(LucideIcons.octagonAlert,
+              const Icon(LucideIcons.alertOctagon,
                   size: 18, color: AppColors.herzrot),
               const SizedBox(width: 8),
               Text('marketing.kill_switch'.tr(),
@@ -573,7 +573,6 @@ class _SettingsTabState extends State<_SettingsTab> {
             const SizedBox(height: 10),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              activeThumbColor: AppColors.herzrot,
               title: Text('marketing.kill_switch_label'.tr(),
                   style: AppTypography.body(size: 13, color: AppColors.ink)),
               value: _paused ?? false,

@@ -21,25 +21,27 @@ class MarketingDashboardStats {
   bool get marketingPaused => raw['marketing_paused'] == true;
   List<Map<String, dynamic>> get topRegions =>
       ((raw['top_regions'] as List?) ?? const [])
-          .whereType<Map>()
+          .whereType<Map<String, dynamic>>()
           .map((m) => Map<String, dynamic>.from(m))
           .toList();
 }
 
 class MarketingRepository {
   Future<MarketingDashboardStats> stats() async {
-    final res = await SupabaseService.client.rpc('marketing_dashboard_stats');
+    final dynamic res =
+        await SupabaseService.client.rpc('marketing_dashboard_stats');
     return MarketingDashboardStats(
         Map<String, dynamic>.from((res as Map?) ?? const {}));
   }
 
   Future<Map<String, dynamic>> segmentCounts() async {
-    final res = await SupabaseService.client.rpc('marketing_segment_counts');
+    final dynamic res =
+        await SupabaseService.client.rpc('marketing_segment_counts');
     return Map<String, dynamic>.from((res as Map?) ?? const {});
   }
 
   Future<bool> setPaused(bool paused) async {
-    final res = await SupabaseService.client
+    final dynamic res = await SupabaseService.client
         .rpc('set_marketing_paused', params: {'p_paused': paused});
     return res == true;
   }
