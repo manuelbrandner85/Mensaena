@@ -202,7 +202,6 @@ jobs:
             --no-confirm \
             --allow-asset-diffs \
             -- \
-            --target-platform=android-arm64,android-arm \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
           echo "✅ Patch an Release ${{ steps.version.outputs.full }} gesendet"
