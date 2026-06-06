@@ -3828,7 +3828,22 @@
     "reg_signal_lebt": "vivo",
     "reg_signal_braucht_hilfe": "serve aiuto",
     "reg_signal_klein": "piccolo",
-    "reg_signal_normal": "ok"
+    "reg_signal_normal": "ok",
+    "tab_content": "Pianificatore",
+    "cp_new": "Nuova voce",
+    "cp_edit": "Modifica voce",
+    "cp_title": "Titolo",
+    "cp_body": "Contenuto",
+    "cp_share_text": "Testo da condividere",
+    "cp_empty": "Ancora nessun contenuto pianificato.",
+    "cp_publish": "Pubblica",
+    "cp_kind_announcement": "Annuncio",
+    "cp_kind_recap": "Riepilogo",
+    "cp_kind_social": "Social",
+    "cp_kind_milestone": "Traguardo",
+    "cp_status_draft": "Bozza",
+    "cp_status_scheduled": "Programmato",
+    "cp_status_published": "Pubblicato"
   },
   "download": {
     "title": "Installa Mensaena",
