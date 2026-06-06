@@ -127,10 +127,13 @@ class MatchingRepository {
   static Stream<List<MatchSummary>> watchMine() {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return Stream.value(const []);
+    // MEMORY-FIX: .limit(200) — ohne Limit werden ALLE Matches geladen,
+    // dann client-seitig gefiltert. Bei vielen historischen Matches: OOM.
     return sb
         .from('matches')
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
+        .limit(200)
         .map((rows) => rows
             .where((r) =>
                 r['offer_user_id'] == uid || r['request_user_id'] == uid)

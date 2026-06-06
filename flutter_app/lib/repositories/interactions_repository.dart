@@ -63,10 +63,14 @@ class InteractionsRepository {
   static Stream<List<Interaction>> watchActive() {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return Stream.value(const []);
+    // MEMORY-FIX: .limit(100) — Aktive Interaktionen sind immer wenige;
+    // historische (completed/cancelled) sind irrelevant für diesen Stream.
+    // Ohne Limit: alle Interaktionen aller Zeiten laden + client-filtern.
     return sb
         .from('interactions')
         .stream(primaryKey: ['id'])
         .order('updated_at', ascending: false)
+        .limit(100)
         .map((rows) => rows
             .where((r) =>
                 (r['helper_id'] == uid || r['helped_id'] == uid) &&

@@ -200,11 +200,17 @@ class MessagesRepository {
 
   /// Realtime-Stream der Messages einer Conversation, sortiert aufsteigend.
   static Stream<List<Map<String, dynamic>>> watch(String conversationId) {
+    // MEMORY-FIX: Descending + limit(200) → letzte 200 Messages.
+    // Ohne Limit: Supabase .stream() lädt ALLE Messages einer Conversation
+    // in den RAM und re-emittiert sie bei jeder neuen Nachricht vollständig.
+    // Bei 5000 Nachrichten und 10 geöffneten Chats = 50 000 Rows im Speicher.
+    // Nach dem Limit wird in Dart aufsteigend sortiert für korrekte Anzeige.
     return sb
         .from('messages')
         .stream(primaryKey: ['id'])
         .eq('conversation_id', conversationId)
-        .order('created_at')
+        .order('created_at', ascending: false)
+        .limit(200)
         .map((rows) {
           final list = rows.where((r) => r['deleted_at'] == null).toList()
             ..sort((a, b) {
@@ -418,14 +424,16 @@ class MessagesRepository {
   /// Realtime: alle Reaktionen einer Conversation (joinable).
   static Stream<List<Map<String, dynamic>>> watchReactions(
       String conversationId) {
+    // MEMORY-FIX: .eq() + .limit() hinzugefügt.
+    // Vorher: kein Server-Filter → lädt ALLE message_reactions der gesamten
+    // Datenbank in den Client, dann client-seitig gefiltert.
+    // KRITISCH: Bei tausenden Usern und Reactions → massive OOM-Gefahr.
     return sb
         .from('message_reactions')
         .stream(primaryKey: ['id'])
-        .map((rows) => rows
-            .where((r) =>
-                r['conversation_id'] == null ||
-                r['conversation_id'] == conversationId)
-            .toList());
+        .eq('conversation_id', conversationId)
+        .limit(500)
+        .map((rows) => rows.toList());
   }
 
   /// Live-Stream der last_read_at-Werte der anderen Mitglieder
@@ -456,14 +464,20 @@ final conversationsProvider =
   return ConversationsRepository.listMine();
 });
 
+// MEMORY-FIX: autoDispose — ohne autoDispose blieben geöffnete Chats mit
+// ALLEN Messages im RAM (StreamProvider.family cached pro conversationId).
+// 10 geöffnete Chats × 5000 Messages × ~400 Bytes = 20 MB blockiert.
+// autoDispose gibt den Provider frei sobald kein Widget mehr lauscht.
 final messagesStreamProvider =
-    StreamProvider.family<List<Map<String, dynamic>>, String>(
+    StreamProvider.family.autoDispose<List<Map<String, dynamic>>, String>(
         (ref, conversationId) {
   return MessagesRepository.watch(conversationId);
 });
 
 /// Stream der zuletzt-gelesen-Zeit der anderen Mitglieder (fuer Read-Receipts).
+// MEMORY-FIX: autoDispose — wie messagesStreamProvider, sonst bleibt
+// pro geöffnetem Chat ein Supabase-Realtime-Channel für immer offen.
 final peerLastReadProvider =
-    StreamProvider.family<DateTime?, String>((ref, conversationId) {
+    StreamProvider.family.autoDispose<DateTime?, String>((ref, conversationId) {
   return MessagesRepository.watchPeerLastRead(conversationId);
 });
