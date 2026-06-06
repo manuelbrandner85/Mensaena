@@ -359,12 +359,11 @@ jobs:
       # das Release direkt bei Shorebird registriert (= shorebird_patch.yml
       # findet es automatisch) und die Engine-Snapshots matchen zwischen
       # Release-APK und späteren Patches.
-      # CLI-Version gepinnt auf 1.6.92 (= shorebird_patch.yml).
+      # setup-shorebird@v1 hat KEINEN version-Input (nur `cache`). Der frueher
+      # gesetzte `shorebird-version` wurde von der Action ignoriert (Warning).
       - name: 🐦 Shorebird
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: shorebirdtech/setup-shorebird@v1
-        with:
-          shorebird-version: 1.6.92
 
       - name: 🏗️ Build signed Release APK (via Shorebird)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

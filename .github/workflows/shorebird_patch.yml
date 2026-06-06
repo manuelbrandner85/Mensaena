@@ -64,9 +64,11 @@ jobs:
       # Client auf dem Gerät still verworfen weil die Engine-Bytes nicht zum
       # registrierten Release passen.
       - name: 🐦 Shorebird
+        # setup-shorebird@v1 hat KEINEN version-Input (nur `cache`).
+        # Frueher `shorebird-version: 1.6.92` wurde ignoriert -> Warning
+        # "Unexpected input(s) 'shorebird-version'". Pin daher entfernt;
+        # release + patch nutzen so dieselbe (jeweils aktuelle) CLI.
         uses: shorebirdtech/setup-shorebird@v1
-        with:
-          shorebird-version: 1.6.92
 
       - name: 📋 Version lesen
         id: version

@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-06)
+- [x] Shorebird-Workflow-Cleanup: ungueltigen `shorebird-version`-Input aus allen 3 Workflows entfernt (Action hat ihn ignoriert -> Warning). `--platforms=android` (Plural, ungueltig) in shorebird_release.yml und shorebird_patch.yml auf `--platform=android` (Singular) korrigiert. Update-Pipeline ab jetzt 100% gyquj. Funnel ab 4.0.0 verifiziert: UpdateGate sieht latest=4.1.4 mandatory in gyquj -> alle 4.0.x/4.1.x-Nutzer werden forciert; Alt-Nutzer (huaqld) ueber 4.1.3-Bruecke nach gyquj.
 - [x] [!] Shorebird-OTA-Bug gefunden+gefixt: `releases list --platforms` (Plural) war ungueltig -> Patch wurde IMMER uebersprungen (OTA lieferte nie). Jetzt --platform. Versions-Pin-Input wird von setup-shorebird ignoriert (CLI driftet) -> offen/Hinweis.
 - [x] [force-update] release 4.1.4+40104 — liefert KI-Features (Assistent + 8 Funktionen + 6 UI-Buttons + Wiki-Generator + Chat-Translate) als Pflicht-APK an gyquj.
 - [x] Update-Pipeline gyquj-only: huaqld-Dual-Write aus flutter.yml entfernt; Patches+Pflichtupdates gehen ab jetzt NUR nach gyquj. shorebird_patch.yml ohnehin 0 huaqld. Einmalige 4.1.3-Pflichtzeile in huaqld bleibt als Funnel fuer Altnutzer.

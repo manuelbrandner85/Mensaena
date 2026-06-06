@@ -48,9 +48,8 @@ jobs:
           java-version: '17'
 
       - name: 🐦 Shorebird
+        # setup-shorebird@v1 hat KEINEN version-Input (nur `cache`).
         uses: shorebirdtech/setup-shorebird@v1
-        with:
-          shorebird-version: 1.6.92
 
       - name: 📋 Version lesen
         id: version
@@ -118,8 +117,8 @@ jobs:
           fi
           echo "── shorebird --version ──"
           shorebird --version || true
-          echo "── shorebird releases list --platforms=android (vor Release) ──"
-          shorebird releases list --platforms=android 2>&1 || true
+          echo "── shorebird releases list --platform=android (vor Release) ──"
+          shorebird releases list --platform=android 2>&1 || true
 
       # flutter_webrtc Flutter-3.27-Patch (idempotent)
       - name: Patch flutter_webrtc
@@ -143,5 +142,5 @@ jobs:
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         run: |
-          echo "── shorebird releases list --platforms=android (nach Release) ──"
-          shorebird releases list --platforms=android 2>&1 || true
+          echo "── shorebird releases list --platform=android (nach Release) ──"
+          shorebird releases list --platform=android 2>&1 || true
