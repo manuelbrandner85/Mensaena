@@ -63,6 +63,7 @@ class CrisisRepository {
         .stream(primaryKey: ['id'])
         .eq('crisis_id', crisisId)
         .order('created_at')
+        .limit(200)
         .map((rows) => rows.map(CrisisHelper.fromJson).toList());
   }
 
@@ -73,6 +74,7 @@ class CrisisRepository {
         .stream(primaryKey: ['id'])
         .eq('crisis_id', crisisId)
         .order('created_at', ascending: false)
+        .limit(100)
         .map((rows) => rows.map(CrisisUpdate.fromJson).toList());
   }
 
@@ -184,6 +186,7 @@ class CrisisRepository {
         .stream(primaryKey: ['id'])
         .eq('crisis_id', crisisId)
         .order('created_at')
+        .limit(200)
         .map((rows) => rows.whereType<Map<String, dynamic>>().toList());
   }
 

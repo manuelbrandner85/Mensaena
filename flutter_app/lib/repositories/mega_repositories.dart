@@ -452,10 +452,13 @@ class LivestreamMessagesRepository {
         .from('livestream_messages')
         .stream(primaryKey: ['id'])
         .eq('room_id', roomId)
-        .order('created_at')
+        .order('created_at', ascending: false)
+        .limit(200)
         .map((rows) => rows
             .cast<Map<String, dynamic>>()
             .map(LivestreamMessage.fromJson)
+            .toList()
+            .reversed
             .toList());
   }
 
@@ -515,7 +518,8 @@ class LivestreamGiftsRepository {
         .from('livestream_gifts')
         .stream(primaryKey: ['id'])
         .eq('room_id', roomId)
-        .order('created_at')
+        .order('created_at', ascending: false)
+        .limit(100)
         .map((rows) => rows.cast<Map<String, dynamic>>());
   }
 }

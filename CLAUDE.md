@@ -31,6 +31,30 @@ Imports: `import 'package:easy_localization/easy_localization.dart';`
 Provider/Settings: `lib/providers/locale_provider.dart`
 Translation-Files: `flutter_app/assets/translations/`
 
+## Supabase-Streams: Pflicht-Regeln (gegen OOM-Crash)
+
+**Root-Cause des 4.1.x-Crashs (2026-06-06):** App wurde über Stunden langsamer
+und crashte. Ursache: Supabase `.stream()` ohne `.limit()` lädt ALLE Rows einer
+Tabelle in den RAM und re-emittiert sie bei jedem Event. Nach Monaten Nutzung
+= OOM-Kill durch Android.
+
+**Regeln (vom CI erzwungen via `scripts/check_stream_limits.py`):**
+
+1. **JEDER** `sb.from(...).stream(primaryKey: [...])` MUSS ein `.limit(N)` haben.
+   Richtwerte: Notifications 150, Messages 200, Reactions 500, Calls 20, Pins 50.
+   Ohne Limit = Build scheitert.
+2. **JEDER** `StreamProvider.family<...>` MUSS `.autoDispose` sein. Ohne autoDispose
+   bleibt der Realtime-Channel offen sobald ein Widget den Provider einmal gelesen
+   hat — auch nach Verlassen des Screens.
+3. **Server-Filter vor Client-Filter:** `.eq(...)` IMMER vor dem `.map()`-Block.
+   Niemals "alle Rows laden + client-seitig filtern".
+4. **MemoryWatchdogService läuft global** (`lib/services/memory_watchdog_service.dart`):
+   Soft-Evict bei 80% Cache, Full-Clear bei OS-MemoryPressure, Pause-Cleanup.
+   Nicht deaktivieren ohne Ersatz.
+
+Ausnahmen (sehr selten): Tabellen mit garantiert <10 Rows pro User (z.B.
+Singleton-Settings) — trotzdem `.limit(10)` setzen, kostet nichts.
+
 ## Tech-Stack
 - Next.js 15.3.0 (App Router, SSR), React 19, TypeScript (strict, kein `any`)
 - Tailwind CSS 3.4 (`clsx` + `tailwind-merge`), Zustand 4.5

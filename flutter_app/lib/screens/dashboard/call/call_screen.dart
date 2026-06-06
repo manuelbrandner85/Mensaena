@@ -218,6 +218,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
           .from('dm_calls')
           .stream(primaryKey: ['id'])
           .eq('id', widget.callId)
+          .limit(1)
           .listen((rows) async {
             if (rows.isEmpty) return;
             final r = rows.first;

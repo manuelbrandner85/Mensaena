@@ -111,6 +111,7 @@ import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
 import '../../screens/public/onboarding_tour_screen.dart';
 import '../../screens/public/splash_screen.dart';
+import '../../services/memory_watchdog_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/shared/filter_chip_bar.dart';
 import 'page_transitions.dart';
@@ -133,6 +134,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final loggedIn = SupabaseService.isLoggedIn;
       final loc = state.matchedLocation;
+      // Watchdog-Telemetrie: aktuelle Route mitschneiden, damit RAM-Alarme
+      // sagen können WO der Speicher knapp wurde (route=/dashboard/chat/...).
+      MemoryWatchdogService.instance.updateRoute(loc);
       final isSplash = loc == '/splash';
       final isAuthRoute =
           loc == '/auth' || loc == '/login' || loc == '/register';

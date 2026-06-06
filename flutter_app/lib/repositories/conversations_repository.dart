@@ -305,6 +305,7 @@ class MessagesRepository {
         .from('message_pins')
         .stream(primaryKey: ['id'])
         .eq('conversation_id', conversationId)
+        .limit(50)
         .map((rows) => rows
             .map<Map<String, dynamic>>((r) =>
                 Map<String, dynamic>.from(r as Map))
@@ -444,6 +445,7 @@ class MessagesRepository {
         .from('conversation_members')
         .stream(primaryKey: ['conversation_id', 'user_id'])
         .eq('conversation_id', conversationId)
+        .limit(200)
         .map((rows) {
           final peers = rows.where((r) => r['user_id'] != uid);
           DateTime? latest;

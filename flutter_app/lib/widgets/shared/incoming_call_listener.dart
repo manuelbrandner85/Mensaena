@@ -172,6 +172,8 @@ class _IncomingCallListenerState
             .from('dm_calls')
             .stream(primaryKey: ['id'])
             .eq('callee_id', uid)
+            .order('created_at', ascending: false)
+            .limit(20)
             .listen(
               _handleRealtimeBatch,
               onError: (_) {/* swallow timeouts / network drops */},

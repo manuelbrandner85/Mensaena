@@ -25,6 +25,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+import '../repositories/extra_repositories.dart';
+
 class MemoryWatchdogService {
   MemoryWatchdogService._();
   static final MemoryWatchdogService instance = MemoryWatchdogService._();
@@ -36,6 +38,14 @@ class MemoryWatchdogService {
   /// nicht-sichtbaren Cache-Anteil auf, bevor das harte Limit greift (das
   /// greift erst beim Decode des nächsten Bildes → kurzer Ruckler).
   static const double _softThreshold = 0.80;
+
+  /// Telemetrie-Schwelle: ab 90 % melden wir nach error_logs, damit Admin
+  /// sieht WO der Speicher knapp wird. Damit der Logger nicht spammt:
+  /// frühestens alle 5 Min ein Event pro Session.
+  static const double _telemetryThreshold = 0.90;
+  static const Duration _telemetryCooldown = Duration(minutes: 5);
+  DateTime? _lastTelemetryAt;
+  String? _currentRoute;
 
   /// Startet den periodischen Soft-Check. Idempotent — mehrfacher Aufruf
   /// (z. B. Hot-Reload) legt keinen zweiten Timer an.
@@ -49,6 +59,13 @@ class MemoryWatchdogService {
     _timer?.cancel();
     _timer = null;
     _started = false;
+  }
+
+  /// Letzte bekannte Route — wird vom GoRouter-Listener gesetzt, damit
+  /// Telemetrie-Events sagen können WO der Speicher knapp wurde.
+  /// Aufruf typischerweise aus `app_router.dart` redirect/observer.
+  void updateRoute(String route) {
+    _currentRoute = route;
   }
 
   /// Soft-Check: Nur den "lebenden" (nicht sichtbar gehaltenen) Cache-Anteil
@@ -71,17 +88,60 @@ class MemoryWatchdogService {
         );
       }
     }
+    // Telemetrie: höhere Schwelle (90 %) — meldet an Admin, dass der Speicher
+    // hier knapp wird. Mit Cooldown gegen Spam.
+    if (ratio >= _telemetryThreshold) {
+      _maybeReport(
+        kind: 'soft_high',
+        ratio: ratio,
+        liveCount: cache.liveImageCount,
+        pendingCount: cache.pendingImageCount,
+      );
+    }
+  }
+
+  void _maybeReport({
+    required String kind,
+    required double ratio,
+    int? liveCount,
+    int? pendingCount,
+  }) {
+    final now = DateTime.now();
+    final last = _lastTelemetryAt;
+    if (last != null && now.difference(last) < _telemetryCooldown) return;
+    _lastTelemetryAt = now;
+    final cache = PaintingBinding.instance.imageCache;
+    final mb = (cache.currentSizeBytes / 1024 / 1024).toStringAsFixed(1);
+    // Fire-and-forget — der Logger selbst fängt Fehler ab.
+    unawaited(ErrorLogsRepository.log(
+      errorType: 'memory_pressure',
+      message: '[$kind] ratio=${(ratio * 100).toStringAsFixed(0)}% '
+          'size=${mb}MB live=${liveCount ?? '?'} pending=${pendingCount ?? '?'} '
+          'route=${_currentRoute ?? 'unknown'}',
+    ));
   }
 
   /// OS meldet akuten Speichermangel → kompletter Cache-Reset.
   /// Aufruf aus `WidgetsBindingObserver.didHaveMemoryPressure`.
   void onMemoryPressure() {
     final cache = PaintingBinding.instance.imageCache;
+    final ratioBefore = cache.maximumSizeBytes > 0
+        ? cache.currentSizeBytes / cache.maximumSizeBytes
+        : 0.0;
     cache.clear();
     cache.clearLiveImages();
     if (kDebugMode) {
       debugPrint('[MemoryWatchdog] OS-MemoryPressure → Cache komplett geleert');
     }
+    // OS-MemoryPressure ist ALWAYS reportwürdig (ohne Cooldown). Das ist
+    // ein echtes Warnsignal — der nächste Schritt ist OOM-Kill durch Android.
+    _lastTelemetryAt = null;
+    _maybeReport(
+      kind: 'os_pressure',
+      ratio: ratioBefore,
+      liveCount: cache.liveImageCount,
+      pendingCount: cache.pendingImageCount,
+    );
   }
 
   /// App geht in den Hintergrund → "lebende" Bilder freigeben (der User
