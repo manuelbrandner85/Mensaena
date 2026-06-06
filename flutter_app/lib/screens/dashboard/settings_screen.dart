@@ -26,6 +26,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../providers/role_provider.dart';
 import '../../services/biometric_service.dart';
 import '../../services/device_tier_service.dart';
+import '../../services/memory_watchdog_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
 import '../../services/sleep_reminder_service.dart';
@@ -578,12 +579,6 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 style: AppTypography.label(size: 10, color: AppColors.mute)),
             const SizedBox(height: 8),
             _NotifyRadiusRow(),
-            const SizedBox(height: 24),
-            // DSGVO-Opt-out: Marketing + Reaktivierung (eigene profiles-Spalten).
-            Text('privacy_prefs.section'.tr().toUpperCase(),
-                style: AppTypography.label(size: 10, color: AppColors.mute)),
-            const SizedBox(height: 8),
-            const _MarketingPrefsSection(),
             const SizedBox(height: 24),
             OutlinedButton.icon(
               onPressed: _sendTestNotification,
@@ -1311,6 +1306,28 @@ class _AppearanceTab extends ConsumerWidget {
               ),
             );
           },
+        ),
+        const SizedBox(height: 16),
+        // MEMORY: Manueller Bild-/Cache-Reset. Hilft bei subjektiver
+        // Langsamkeit nach langer Nutzung, ohne die App neu zu starten.
+        Text('settings.sections.storage'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        OutlinedButton.icon(
+          onPressed: () {
+            final freedMb = MemoryWatchdogService.instance.clearAll();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('settings.clearCacheDone'.tr(
+                  namedArgs: {'mb': freedMb.toStringAsFixed(1)})),
+            ));
+          },
+          icon: const Icon(LucideIcons.trash2, size: 16),
+          label: Text('settings.clearCache'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
         ),
         const SizedBox(height: 24),
         Container(
@@ -2724,99 +2741,6 @@ class _PerformanceModeRow extends ConsumerWidget {
           ],
         );
       },
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// DSGVO-Marketing/Reaktivierungs-Opt-out — schreibt direkt in profiles.
-class _MarketingPrefsSection extends StatefulWidget {
-  const _MarketingPrefsSection();
-  @override
-  State<_MarketingPrefsSection> createState() => _MarketingPrefsSectionState();
-}
-
-class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
-  bool _loading = true;
-  bool _marketing = true;
-  bool _reactivation = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final uid = sb.auth.currentUser?.id;
-    if (uid == null) {
-      setState(() => _loading = false);
-      return;
-    }
-    try {
-      final row = await sb
-          .from('profiles')
-          .select('marketing_opt_in, reactivation_opt_in')
-          .eq('id', uid)
-          .maybeSingle();
-      if (!mounted) return;
-      setState(() {
-        _marketing = (row?['marketing_opt_in'] as bool?) ?? true;
-        _reactivation = (row?['reactivation_opt_in'] as bool?) ?? true;
-        _loading = false;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _set(String col, bool v) async {
-    final uid = sb.auth.currentUser?.id;
-    if (uid == null) return;
-    setState(() {
-      if (col == 'marketing_opt_in') _marketing = v;
-      if (col == 'reactivation_opt_in') _reactivation = v;
-    });
-    try {
-      await sb.from('profiles').update({col: v}).eq('id', uid);
-    } catch (_) {
-      // bei Fehler zuruecksetzen
-      if (mounted) _load();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 12),
-        child: Center(
-          child: SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ),
-      );
-    }
-    return Column(
-      children: [
-        _BoolTile(
-          label: 'privacy_prefs.marketing'.tr(),
-          value: _marketing,
-          onChanged: (v) => _set('marketing_opt_in', v),
-        ),
-        _BoolTile(
-          label: 'privacy_prefs.reactivation'.tr(),
-          value: _reactivation,
-          onChanged: (v) => _set('reactivation_opt_in', v),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text('privacy_prefs.hint'.tr(),
-              style: AppTypography.caption()),
-        ),
-      ],
     );
   }
 }

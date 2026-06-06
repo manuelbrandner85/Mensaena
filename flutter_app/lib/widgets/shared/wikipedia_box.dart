@@ -135,6 +135,9 @@ class _WikipediaBoxState extends State<WikipediaBox> {
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
+                      // MEMORY-FIX: 50px-Thumbnail hielt sonst das volle
+                      // Wikipedia-Originalbild (oft 2 MB+) im Decoder-Cache.
+                      memCacheWidth: 150,
                       errorWidget: (_, __, ___) => const SizedBox.shrink(),
                     ),
                   ),

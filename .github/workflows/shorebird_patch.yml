@@ -196,12 +196,14 @@ jobs:
         run: |
           set -euo pipefail
           echo "Ziel-Release-Version: ${{ steps.version.outputs.full }}"
+          # KEIN --flutter-version hier: `shorebird patch` kennt das Flag nicht
+          # (nur `shorebird release`). Der Patch übernimmt die Flutter-Version
+          # automatisch vom Ziel-Release. Mit dem Flag → Exit 64 (Usage-Fehler).
           shorebird patch android \
             --release-version="${{ steps.version.outputs.full }}" \
             --no-confirm \
             --allow-asset-diffs \
             -- \
-            --target-platform=android-arm64,android-arm \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
           echo "✅ Patch an Release ${{ steps.version.outputs.full }} gesendet"

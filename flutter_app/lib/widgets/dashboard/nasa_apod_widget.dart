@@ -102,6 +102,9 @@ class _ApodContentState extends State<_ApodContent> {
                 imageUrl: apod.url,
                 fit: BoxFit.cover,
                 width: double.infinity,
+                // MEMORY-FIX: NASA-APOD-Bilder sind oft mehrere MB groß.
+                // Auf 1000px Breite decken → reicht für die Card-Vorschau.
+                memCacheWidth: 1000,
                 placeholder: (_, __) => Container(
                   height: 200,
                   color: AppColors.elevated,

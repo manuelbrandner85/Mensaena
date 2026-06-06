@@ -372,11 +372,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set +e
+          # KEIN --target-platform hier: Shorebird setzt selbst
+          # android-arm,android-arm64,android-x64. Ein zusätzliches
+          # --target-platform führte zu doppeltem libapp.so → Build-Fehler
+          # (duplicate) → Fallback. Ohne den Flag baut Shorebird sauber
+          # alle ABIs (gut für alte 32-bit-Geräte).
           shorebird release android \
             --artifact=apk \
+            --flutter-version=3.27.4 \
             --no-confirm \
             -- \
-            --target-platform=android-arm64,android-arm \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de \
             2>&1 | tee build.log

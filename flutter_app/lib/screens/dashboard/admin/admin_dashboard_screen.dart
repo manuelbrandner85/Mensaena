@@ -767,13 +767,6 @@ class _QuickActions extends StatelessWidget {
             label: 'assistant.wiki_generator_title'.tr(),
             onTap: () => showAiWikiGenerator(context),
           ),
-          const SizedBox(height: 8),
-          // Marketing-Bereich (nur Admin)
-          _ActionButton(
-            icon: LucideIcons.megaphone,
-            label: 'marketing.title'.tr(),
-            route: '/dashboard/admin/marketing',
-          ),
         ],
       ),
     );
