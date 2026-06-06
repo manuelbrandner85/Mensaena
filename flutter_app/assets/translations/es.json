@@ -3711,6 +3711,12 @@
     "match_reason_button": "¿Por qué encaja?",
     "match_reason_title": "Por qué encaja",
     "translate": "Traducir",
-    "show_original": "Ver original"
+    "show_original": "Ver original",
+    "community_recap_title": "Esta semana en la comunidad",
+    "wiki_generator_title": "Generador de Wiki con IA",
+    "wiki_generator_hint": "Escribe un tema — la IA crea un borrador guardado como borrador. Tú lo publicas después.",
+    "wiki_topic_label": "Tema",
+    "wiki_generate": "Generar borrador",
+    "wiki_saved_draft": "Guardado como borrador — revísalo y publícalo."
   }
 }

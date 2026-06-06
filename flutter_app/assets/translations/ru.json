@@ -3710,6 +3710,12 @@
     "match_reason_button": "Почему подходит?",
     "match_reason_title": "Почему это подходит",
     "translate": "Перевести",
-    "show_original": "Показать оригинал"
+    "show_original": "Показать оригинал",
+    "community_recap_title": "На этой неделе в сообществе",
+    "wiki_generator_title": "ИИ-генератор вики",
+    "wiki_generator_hint": "Введите тему — ИИ создаст черновик и сохранит как черновик. Вы публикуете его потом.",
+    "wiki_topic_label": "Тема",
+    "wiki_generate": "Создать черновик",
+    "wiki_saved_draft": "Сохранено как черновик — проверьте и опубликуйте."
   }
 }

@@ -3707,6 +3707,12 @@
     "match_reason_button": "Warum passt das?",
     "match_reason_title": "Warum das passt",
     "translate": "Übersetzen",
-    "show_original": "Original anzeigen"
+    "show_original": "Original anzeigen",
+    "community_recap_title": "Diese Woche in der Gemeinschaft",
+    "wiki_generator_title": "KI-Wiki-Generator",
+    "wiki_generator_hint": "Gib ein Thema ein — die KI erstellt einen Entwurf, der als Entwurf gespeichert wird. Du gibst ihn anschließend frei.",
+    "wiki_topic_label": "Thema",
+    "wiki_generate": "Entwurf generieren",
+    "wiki_saved_draft": "Als Entwurf gespeichert — bitte prüfen und freigeben."
   }
 }

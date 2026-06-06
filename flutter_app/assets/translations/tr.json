@@ -3710,6 +3710,12 @@
     "match_reason_button": "Neden uyuyor?",
     "match_reason_title": "Neden uyuyor",
     "translate": "Çevir",
-    "show_original": "Orijinali göster"
+    "show_original": "Orijinali göster",
+    "community_recap_title": "Bu hafta toplulukta",
+    "wiki_generator_title": "Yapay Zeka Wiki Üreteci",
+    "wiki_generator_hint": "Bir konu gir — yapay zeka taslak oluşturur ve taslak olarak kaydeder. Sonra sen yayınlarsın.",
+    "wiki_topic_label": "Konu",
+    "wiki_generate": "Taslak oluştur",
+    "wiki_saved_draft": "Taslak olarak kaydedildi — lütfen kontrol edip yayınla."
   }
 }

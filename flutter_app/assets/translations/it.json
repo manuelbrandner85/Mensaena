@@ -3711,6 +3711,12 @@
     "match_reason_button": "Perché è adatto?",
     "match_reason_title": "Perché è adatto",
     "translate": "Traduci",
-    "show_original": "Mostra originale"
+    "show_original": "Mostra originale",
+    "community_recap_title": "Questa settimana nella comunità",
+    "wiki_generator_title": "Generatore Wiki IA",
+    "wiki_generator_hint": "Inserisci un argomento — l'IA crea una bozza salvata come bozza. La pubblichi tu dopo.",
+    "wiki_topic_label": "Argomento",
+    "wiki_generate": "Genera bozza",
+    "wiki_saved_draft": "Salvato come bozza — controlla e pubblica."
   }
 }

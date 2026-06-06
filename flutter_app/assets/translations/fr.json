@@ -3711,6 +3711,12 @@
     "match_reason_button": "Pourquoi ça colle ?",
     "match_reason_title": "Pourquoi ça correspond",
     "translate": "Traduire",
-    "show_original": "Voir l'original"
+    "show_original": "Voir l'original",
+    "community_recap_title": "Cette semaine dans la communauté",
+    "wiki_generator_title": "Générateur de Wiki IA",
+    "wiki_generator_hint": "Saisis un sujet — l'IA crée un brouillon enregistré comme brouillon. Tu le publies ensuite.",
+    "wiki_topic_label": "Sujet",
+    "wiki_generate": "Générer le brouillon",
+    "wiki_saved_draft": "Enregistré comme brouillon — à vérifier et publier."
   }
 }

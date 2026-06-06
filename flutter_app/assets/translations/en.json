@@ -3708,6 +3708,12 @@
     "match_reason_button": "Why this match?",
     "match_reason_title": "Why this matches",
     "translate": "Translate",
-    "show_original": "Show original"
+    "show_original": "Show original",
+    "community_recap_title": "This week in the community",
+    "wiki_generator_title": "AI Wiki Generator",
+    "wiki_generator_hint": "Enter a topic — the AI creates a draft saved as draft. You publish it afterwards.",
+    "wiki_topic_label": "Topic",
+    "wiki_generate": "Generate draft",
+    "wiki_saved_draft": "Saved as draft — please review and publish."
   }
 }

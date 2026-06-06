@@ -759,6 +759,13 @@ class _QuickActions extends StatelessWidget {
             label: 'admin.checkTimebank'.tr(),
             route: '/dashboard/admin/timebank',
           ),
+          const SizedBox(height: 8),
+          // E) KI-Wiki-Generator (nur Admin)
+          _ActionButton(
+            icon: LucideIcons.sparkles,
+            label: 'assistant.wiki_generator_title'.tr(),
+            route: '/dashboard/admin/wiki-ai',
+          ),
         ],
       ),
     );

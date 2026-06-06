@@ -9,12 +9,20 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/ai_features_repository.dart';
 import '../../services/weekly_recap_service.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
 
 final _recapProvider = FutureProvider<WeeklyRecap>((ref) async {
   return WeeklyRecapService.compute();
+});
+
+// H) KI-generierte Community-Zusammenfassung (community_recaps, via Cron erzeugt).
+final _aiRecapProvider = FutureProvider<String?>((ref) async {
+  final row = await AiFeaturesRepository().latestRecap();
+  final c = row?['content'];
+  return c == null ? null : c.toString();
 });
 
 class WeeklyRecapWidget extends ConsumerWidget {
@@ -34,11 +42,31 @@ class WeeklyRecapWidget extends ConsumerWidget {
         final deltaColor = delta > 0
             ? AppColors.lebenSoft
             : (delta < 0 ? AppColors.herzrotWarm : AppColors.mute);
+        final aiRecap = ref.watch(_aiRecapProvider).asData?.value;
         return GlassCard(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (aiRecap != null && aiRecap.trim().isNotEmpty) ...[
+                Row(
+                  children: [
+                    const Icon(Icons.auto_awesome,
+                        size: 14, color: AppColors.bronze),
+                    const SizedBox(width: 6),
+                    Text('assistant.community_recap_title'.tr(),
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.bronze)),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(aiRecap,
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.ink, height: 1.4)),
+                const SizedBox(height: 12),
+                Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
+                const SizedBox(height: 12),
+              ],
               Row(
                 children: [
                   const Bloom(
