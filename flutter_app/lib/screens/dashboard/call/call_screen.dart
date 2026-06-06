@@ -817,14 +817,19 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     // Sheet erscheint NUR wenn der Call laenger als 10s ging.
     if (_stopwatch.elapsed.inSeconds < 10) return;
     if (!mounted) return;
-    final note = await showModalBottomSheet<String>(
+    // MEMORY-FIX: Controller außerhalb des builder erzeugen + im finally
+    // disposen. Vorher lebte pro Call ein TextEditingController weiter,
+    // weil er im builder erzeugt und nie freigegeben wurde.
+    final ctrl = TextEditingController();
+    final String? note;
+    try {
+      note = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: const Color(0xF0121A28),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        final ctrl = TextEditingController();
         return SafeArea(
           child: Padding(
             padding: EdgeInsets.only(
@@ -884,6 +889,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         );
       },
     );
+    } finally {
+      ctrl.dispose();
+    }
     if (note == null || note.isEmpty) return;
     // Notiz als SYSTEM-Chat-Message speichern. Conv-ID per Call-Lookup.
     try {

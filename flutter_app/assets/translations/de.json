@@ -401,7 +401,8 @@
       "callSound": "ANRUF-TON & LAUTSTÄRKE",
       "uiSounds": "UI-Sounds",
       "automatic": "AUTOMATIK",
-      "chooseManually": "MANUELL WÄHLEN"
+      "chooseManually": "MANUELL WÄHLEN",
+      "storage": "Speicher"
     },
     "callSound": {
       "ringVolume": "Klingelton-Lautstärke",
@@ -555,7 +556,9 @@
     "bgCalls": "Anrufe im Hintergrund",
     "bgCallsDesc": "Akku-Optimierung & Tiefschlaf einrichten, damit Anrufe bei geschlossener App ankommen.",
     "permissions": "Berechtigungen",
-    "permissionsDesc": "Übersicht über Kamera, Mikrofon, Standort und Co. — alles an einem Ort."
+    "permissionsDesc": "Übersicht über Kamera, Mikrofon, Standort und Co. — alles an einem Ort.",
+    "clearCache": "Cache leeren",
+    "clearCacheDone": "{mb} MB Bild-Cache geleert"
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",

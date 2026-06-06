@@ -109,6 +109,9 @@ class _StoryViewerState extends State<StoryViewer>
                 child: CachedNetworkImage(
                   imageUrl: story.mediaUrl,
                   fit: BoxFit.contain,
+                  // MEMORY-FIX: Story-Vollbild auf 1080px Breite decodieren
+                  // (Phone-Auflösung), statt das volle Upload-Original.
+                  memCacheWidth: 1080,
                   placeholder: (_, __) => Container(
                     color: Colors.black,
                     alignment: Alignment.center,

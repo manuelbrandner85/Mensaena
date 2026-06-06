@@ -401,7 +401,8 @@
       "callSound": "CALL SOUND & VOLUME",
       "uiSounds": "UI sounds",
       "automatic": "AUTOMATIC",
-      "chooseManually": "CHOOSE MANUALLY"
+      "chooseManually": "CHOOSE MANUALLY",
+      "storage": "Storage"
     },
     "callSound": {
       "ringVolume": "Ringtone volume",
@@ -555,7 +556,9 @@
     "bgCalls": "Calls in background",
     "bgCallsDesc": "Set up battery optimization & deep sleep so calls arrive when the app is closed.",
     "permissions": "Permissions",
-    "permissionsDesc": "Overview of camera, microphone, location and more — in one place."
+    "permissionsDesc": "Overview of camera, microphone, location and more — in one place.",
+    "clearCache": "Clear cache",
+    "clearCacheDone": "Cleared {mb} MB image cache"
   },
   "chat": {
     "writeMessage": "Write a message …",

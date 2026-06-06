@@ -401,7 +401,8 @@
       "callSound": "ARAMA SESİ VE SES SEVİYESİ",
       "uiSounds": "Arayüz sesleri",
       "automatic": "OTOMATİK",
-      "chooseManually": "ELLE SEÇ"
+      "chooseManually": "ELLE SEÇ",
+      "storage": "Depolama"
     },
     "callSound": {
       "ringVolume": "Zil sesi seviyesi",
@@ -555,7 +556,9 @@
     "bgCalls": "Arka planda aramalar",
     "bgCallsDesc": "Uygulama kapalıyken aramaların gelmesi için pil optimizasyonu ve uykuyu ayarla.",
     "permissions": "İzinler",
-    "permissionsDesc": "Kamera, mikrofon, konum ve daha fazlasının tek bir yerde genel bakışı."
+    "permissionsDesc": "Kamera, mikrofon, konum ve daha fazlasının tek bir yerde genel bakışı.",
+    "clearCache": "Önbelleği temizle",
+    "clearCacheDone": "{mb} MB görsel önbelleği temizlendi"
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",
