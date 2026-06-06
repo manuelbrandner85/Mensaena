@@ -29,20 +29,20 @@ class MarketingDashboardStats {
 class MarketingRepository {
   Future<MarketingDashboardStats> stats() async {
     final dynamic res =
-        await SupabaseService.client.rpc('marketing_dashboard_stats');
+        await SupabaseService.client.rpc<dynamic>('marketing_dashboard_stats');
     return MarketingDashboardStats(
         Map<String, dynamic>.from((res as Map?) ?? const {}));
   }
 
   Future<Map<String, dynamic>> segmentCounts() async {
     final dynamic res =
-        await SupabaseService.client.rpc('marketing_segment_counts');
+        await SupabaseService.client.rpc<dynamic>('marketing_segment_counts');
     return Map<String, dynamic>.from((res as Map?) ?? const {});
   }
 
   Future<bool> setPaused(bool paused) async {
     final dynamic res = await SupabaseService.client
-        .rpc('set_marketing_paused', params: {'p_paused': paused});
+        .rpc<dynamic>('set_marketing_paused', params: {'p_paused': paused});
     return res == true;
   }
 
