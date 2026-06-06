@@ -3827,7 +3827,22 @@
     "reg_signal_lebt": "zhivoj",
     "reg_signal_braucht_hilfe": "nuzhna pomoshch",
     "reg_signal_klein": "malenkij",
-    "reg_signal_normal": "ok"
+    "reg_signal_normal": "ok",
+    "tab_content": "Контент-план",
+    "cp_new": "Новая запись",
+    "cp_edit": "Изменить запись",
+    "cp_title": "Заголовок",
+    "cp_body": "Содержание",
+    "cp_share_text": "Текст для публикации",
+    "cp_empty": "Пока нет запланированного контента.",
+    "cp_publish": "Опубликовать",
+    "cp_kind_announcement": "Объявление",
+    "cp_kind_recap": "Итоги",
+    "cp_kind_social": "Соцсети",
+    "cp_kind_milestone": "Веха",
+    "cp_status_draft": "Черновик",
+    "cp_status_scheduled": "Запланировано",
+    "cp_status_published": "Опубликовано"
   },
   "download": {
     "title": "Установить Mensaena",

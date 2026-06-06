@@ -8,6 +8,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -24,7 +25,7 @@ class AdminMarketingScreen extends ConsumerStatefulWidget {
 
 class _AdminMarketingScreenState extends ConsumerState<AdminMarketingScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tab = TabController(length: 8, vsync: this);
+  late final TabController _tab = TabController(length: 9, vsync: this);
   final _repo = MarketingRepository();
 
   @override
@@ -56,6 +57,7 @@ class _AdminMarketingScreenState extends ConsumerState<AdminMarketingScreen>
                 Tab(text: 'marketing.tab_templates'.tr()),
                 Tab(text: 'marketing.tab_referrals'.tr()),
                 Tab(text: 'marketing.tab_regions'.tr()),
+                Tab(text: 'marketing.tab_content'.tr()),
                 Tab(text: 'marketing.tab_settings'.tr()),
               ],
             ),
@@ -70,6 +72,7 @@ class _AdminMarketingScreenState extends ConsumerState<AdminMarketingScreen>
                   _TemplatesTab(repo: _repo),
                   _ReferralsTab(repo: _repo),
                   _RegionsTab(repo: _repo),
+                  _ContentTab(repo: _repo),
                   _SettingsTab(repo: _repo),
                 ],
               ),
@@ -962,5 +965,243 @@ class _RegionsTabState extends State<_RegionsTab> {
         },
       ),
     );
+  }
+}
+
+// ── Phase 4: 9) Content-Planer ──────────────────────────────────────────────
+class _ContentTab extends StatefulWidget {
+  const _ContentTab({required this.repo});
+  final MarketingRepository repo;
+  @override
+  State<_ContentTab> createState() => _ContentTabState();
+}
+
+class _ContentTabState extends State<_ContentTab> {
+  late Future<List<Map<String, dynamic>>> _f = widget.repo.listContentPlan();
+  void _refresh() => setState(() => _f = widget.repo.listContentPlan());
+
+  static const List<String> _kinds = ['announcement', 'recap', 'social', 'milestone'];
+
+  IconData _kindIcon(String kind) {
+    switch (kind) {
+      case 'recap':
+        return LucideIcons.calendarDays;
+      case 'social':
+        return LucideIcons.share2;
+      case 'milestone':
+        return LucideIcons.award;
+      default:
+        return LucideIcons.megaphone;
+    }
+  }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'published':
+        return AppColors.leben;
+      case 'scheduled':
+        return AppColors.amber;
+      default:
+        return AppColors.mute;
+    }
+  }
+
+  Future<void> _edit({Map<String, dynamic>? existing}) async {
+    final titleCtrl =
+        TextEditingController(text: existing?['title']?.toString() ?? '');
+    final bodyCtrl =
+        TextEditingController(text: existing?['body']?.toString() ?? '');
+    final shareCtrl = TextEditingController(
+        text: existing?['share_text']?.toString() ?? '');
+    String kind = existing?['kind']?.toString() ?? 'announcement';
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(existing == null
+              ? 'marketing.cp_new'.tr()
+              : 'marketing.cp_edit'.tr()),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Wrap(
+                spacing: 6,
+                children: _kinds
+                    .map((k) => ChoiceChip(
+                          label: Text('marketing.cp_kind_$k'.tr()),
+                          selected: kind == k,
+                          onSelected: (_) => setLocal(() => kind = k),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                  controller: titleCtrl,
+                  decoration:
+                      InputDecoration(labelText: 'marketing.cp_title'.tr())),
+              const SizedBox(height: 8),
+              TextField(
+                  controller: bodyCtrl,
+                  maxLines: 5,
+                  decoration:
+                      InputDecoration(labelText: 'marketing.cp_body'.tr())),
+              const SizedBox(height: 8),
+              TextField(
+                  controller: shareCtrl,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                      labelText: 'marketing.cp_share_text'.tr())),
+            ]),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('common.cancel'.tr())),
+            ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('common.save'.tr())),
+          ],
+        ),
+      ),
+    );
+    if (ok == true) {
+      final t = titleCtrl.text.trim();
+      if (t.isEmpty) return;
+      await widget.repo.upsertContentPlan(
+        id: existing?['id']?.toString(),
+        kind: kind,
+        title: t,
+        body: bodyCtrl.text.trim(),
+        shareText: shareCtrl.text.trim().isEmpty ? null : shareCtrl.text.trim(),
+      );
+      if (mounted) _refresh();
+    }
+  }
+
+  Future<void> _share(Map<String, dynamic> r) async {
+    final text = (r['share_text'] ?? r['body'] ?? r['title'] ?? '').toString();
+    if (text.isEmpty) return;
+    await Share.share(text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      RefreshIndicator(
+        color: AppColors.bronze,
+        onRefresh: () async => _refresh(),
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _f,
+          builder: (c, snap) {
+            final rows = snap.data ?? const <Map<String, dynamic>>[];
+            if (rows.isEmpty) {
+              return ListView(children: [
+                Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Center(
+                      child: Text('marketing.cp_empty'.tr(),
+                          style: AppTypography.caption())),
+                ),
+              ]);
+            }
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+              children: rows.map((r) {
+                final kind = (r['kind'] ?? 'announcement').toString();
+                final status = (r['status'] ?? 'draft').toString();
+                final published = status == 'published';
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.elevated,
+                    borderRadius: BorderRadius.circular(12),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Icon(_kindIcon(kind), size: 18, color: AppColors.bronze),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(r['title']?.toString() ?? '–',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.body(
+                                  size: 14,
+                                  color: AppColors.ink,
+                                  weight: FontWeight.w700)),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: _statusColor(status).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text('marketing.cp_status_$status'.tr(),
+                              style: AppTypography.label(
+                                  size: 9, color: _statusColor(status))),
+                        ),
+                      ]),
+                      if ((r['body']?.toString() ?? '').isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(r['body'].toString(),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.body(
+                                size: 12, color: AppColors.inkSoft)),
+                      ],
+                      const SizedBox(height: 4),
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        IconButton(
+                            tooltip: 'common.share'.tr(),
+                            onPressed: () => _share(r),
+                            icon: const Icon(LucideIcons.share2,
+                                size: 16, color: AppColors.bronze)),
+                        IconButton(
+                            onPressed: () => _edit(existing: r),
+                            icon: const Icon(LucideIcons.pencil,
+                                size: 16, color: AppColors.mute)),
+                        if (!published)
+                          IconButton(
+                              tooltip: 'marketing.cp_publish'.tr(),
+                              onPressed: () async {
+                                await widget.repo
+                                    .publishContentPlan(r['id'].toString());
+                                if (mounted) _refresh();
+                              },
+                              icon: const Icon(LucideIcons.checkCircle2,
+                                  size: 16, color: AppColors.leben)),
+                        IconButton(
+                            onPressed: () async {
+                              await widget.repo
+                                  .deleteContentPlan(r['id'].toString());
+                              if (mounted) _refresh();
+                            },
+                            icon: const Icon(LucideIcons.trash2,
+                                size: 16, color: AppColors.herzrot)),
+                      ]),
+                    ],
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ),
+      Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton.extended(
+            backgroundColor: AppColors.bronze,
+            foregroundColor: AppColors.voidColor,
+            onPressed: () => _edit(),
+            icon: const Icon(LucideIcons.plus, size: 18),
+            label: Text('marketing.cp_new'.tr()),
+          )),
+    ]);
   }
 }

@@ -167,4 +167,55 @@ class MarketingRepository {
     }
     return const [];
   }
+
+  // ── Phase 4: Content-Planer ─────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> listContentPlan({int limit = 100}) async {
+    final rows = await SupabaseService.client
+        .from('content_plan')
+        .select('id, kind, title, body, share_text, status, scheduled_for, '
+            'source, published_at, created_at')
+        .order('created_at', ascending: false)
+        .limit(limit);
+    return (rows as List).cast<Map<String, dynamic>>();
+  }
+
+  Future<String?> upsertContentPlan({
+    String? id,
+    required String kind,
+    required String title,
+    String? body,
+    String? shareText,
+    String status = 'draft',
+    DateTime? scheduledFor,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    final payload = <String, dynamic>{
+      if (id != null) 'id': id,
+      'kind': kind,
+      'title': title,
+      'body': body ?? '',
+      'share_text': shareText,
+      'status': status,
+      'scheduled_for': scheduledFor?.toIso8601String(),
+      if (id == null) 'source': 'manual',
+      if (id == null && uid != null) 'created_by': uid,
+    };
+    final res = await SupabaseService.client
+        .from('content_plan')
+        .upsert(payload)
+        .select('id')
+        .maybeSingle();
+    return (res as Map?)?['id']?.toString();
+  }
+
+  Future<void> publishContentPlan(String id) async {
+    await SupabaseService.client.from('content_plan').update({
+      'status': 'published',
+      'published_at': DateTime.now().toIso8601String(),
+    }).eq('id', id);
+  }
+
+  Future<void> deleteContentPlan(String id) async {
+    await SupabaseService.client.from('content_plan').delete().eq('id', id);
+  }
 }

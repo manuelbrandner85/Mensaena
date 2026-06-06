@@ -3827,7 +3827,22 @@
     "reg_signal_lebt": "canli",
     "reg_signal_braucht_hilfe": "yardim gerek",
     "reg_signal_klein": "kucuk",
-    "reg_signal_normal": "ok"
+    "reg_signal_normal": "ok",
+    "tab_content": "İçerik planı",
+    "cp_new": "Yeni kayıt",
+    "cp_edit": "Kaydı düzenle",
+    "cp_title": "Başlık",
+    "cp_body": "İçerik",
+    "cp_share_text": "Paylaşım metni",
+    "cp_empty": "Henüz planlanmış içerik yok.",
+    "cp_publish": "Yayınla",
+    "cp_kind_announcement": "Duyuru",
+    "cp_kind_recap": "Özet",
+    "cp_kind_social": "Sosyal",
+    "cp_kind_milestone": "Dönüm noktası",
+    "cp_status_draft": "Taslak",
+    "cp_status_scheduled": "Planlandı",
+    "cp_status_published": "Yayınlandı"
   },
   "download": {
     "title": "Mensaena'yı yükle",

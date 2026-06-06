@@ -89,3 +89,85 @@ Dienst (z. B. Resend/Postmark) gewünscht ist: API-Key als Supabase-Secret
 - **Meilenstein-Feier-Sheet** (erste Hilfe / Karma-Stufe / 1. Event/Gruppe →
   CelebrateBurst → „Teile deinen Moment" / „Lade Nachbarn ein").
 - **Next.js Region-Landingpages** + sitemap (Punkt 4).
+
+---
+
+## Phase 3 + 4 — Automatik (Backend, selbstlaufend via pg_cron)
+
+Alle sendenden Funktionen erzwingen `_shared/notify_guard.ts` (Notbremse
+`marketing_paused`, Opt-out je Spalte, Frequenz 1/72h & 2/7d, stille Zeiten
+22–8 Berlin). Automatik nur gegenüber bestehenden, eingewilligten Nutzern —
+**kein** automatisches externes Posten/Anschreiben.
+
+### Phase 3 (bereits live)
+- `auto-milestones-dates` — Jubiläen („1 Jahr dabei") + runde Hilfe-Zahlen → Karma + Glückwunsch.
+- `reactivate-dormant` — Eskalation 7/21/45 Tage (`reactivation_log`), danach Ruhe.
+- `region-ignite-alert` — Region ≥ 20 aktiv → Admin-Notification + KI-Tipp (idempotent).
+- Empfehlungs-Belohnung (3/5/10) → Karma + Badge + Gratulation (DB-Trigger).
+
+### Phase 4 (neu, dieser Stand)
+| Function | Zweck | Tabelle |
+|---|---|---|
+| `auto-social-content` | KI erzeugt aus anonymen Wochenzahlen teilbare Posts → Entwürfe | `content_plan` (status=draft) |
+| `auto-health-report` | KI-Wochenbericht (Wachstum/Regionen/Empfehlungen) → Admin-Notif + optional Owner-Mail | — |
+| `auto-smart-timing` | lernt beste Versand-Stunde (global + pro Region) aus Öffnungen | `send_time_pref` ← `campaign_events` |
+| `feedback-after-help` | freundliche Bitte um Erfahrungsbericht nach abgeschlossener Hilfe | (→ `testimonials`) |
+| `auto-winback` | bei abbestelltem Kanal sparsam verbleibenden erlaubten Kanal nutzen | — |
+
+**Content-Planer (Flutter-Admin, Tab „Content-Planer"):** listet `content_plan`,
+erstellen/bearbeiten/teilen (`share_plus`) und **manuell** veröffentlichen.
+KI-Social-Posts landen als Entwurf — Freigabe ausschließlich per Klick (kein Auto-Posting).
+
+### Deploy
+Functions deployen automatisch über `.github/workflows/supabase.yml` bei Push
+auf `main` (Ordner `supabase/functions/*`). Migration `20260606170000_marketing_phase4.sql`
+(`content_plan`, `send_time_pref`, `campaign_events` + RLS) deployt im selben Lauf.
+
+Benötigte Secrets (Supabase → Edge Functions → Secrets): `MAIL_API_KEY` (Resend,
+bereits gesetzt), optional `MAIL_OWNER` (Empfänger des Health-Reports) **oder**
+`app_settings`-Key `owner_email`.
+
+### pg_cron — neue Jobs (im Supabase SQL-Editor ausführen)
+> Stille Zeiten werden vom `notify_guard` erzwungen; die Cron-Zeiten liegen
+> bewusst tagsüber (UTC). `:service_key` durch den **service_role**-Key ersetzen
+> (oder via Vault lösen). Projekt-URL: `https://gyqujitkvymlmgroovch.supabase.co`.
+
+```sql
+-- Hilfsfunktion (einmalig), ruft eine Edge Function per pg_net auf:
+create extension if not exists pg_net;
+
+-- feedback-after-help: täglich 16:00 UTC
+select cron.schedule('feedback-after-help', '0 16 * * *', $$
+  select net.http_post(
+    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/feedback-after-help',
+    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
+  );$$);
+
+-- auto-winback: wöchentlich Mi 15:00 UTC
+select cron.schedule('auto-winback', '0 15 * * 3', $$
+  select net.http_post(
+    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-winback',
+    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
+  );$$);
+
+-- auto-smart-timing: wöchentlich So 23:00 UTC (reine Analyse, kein Versand)
+select cron.schedule('auto-smart-timing', '0 23 * * 0', $$
+  select net.http_post(
+    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-smart-timing',
+    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
+  );$$);
+
+-- auto-social-content: wöchentlich Mo 08:00 UTC
+select cron.schedule('auto-social-content', '0 8 * * 1', $$
+  select net.http_post(
+    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-social-content',
+    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
+  );$$);
+
+-- auto-health-report: wöchentlich Mo 07:00 UTC
+select cron.schedule('auto-health-report', '0 7 * * 1', $$
+  select net.http_post(
+    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-health-report',
+    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
+  );$$);
+```

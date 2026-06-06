@@ -3824,7 +3824,22 @@
     "reg_signal_lebt": "lebt",
     "reg_signal_braucht_hilfe": "braucht Hilfe",
     "reg_signal_klein": "klein",
-    "reg_signal_normal": "ok"
+    "reg_signal_normal": "ok",
+    "tab_content": "Content-Planer",
+    "cp_new": "Neuer Eintrag",
+    "cp_edit": "Eintrag bearbeiten",
+    "cp_title": "Titel",
+    "cp_body": "Inhalt",
+    "cp_share_text": "Teilen-Text",
+    "cp_empty": "Noch keine geplanten Inhalte.",
+    "cp_publish": "Veröffentlichen",
+    "cp_kind_announcement": "Ankündigung",
+    "cp_kind_recap": "Rückblick",
+    "cp_kind_social": "Social",
+    "cp_kind_milestone": "Meilenstein",
+    "cp_status_draft": "Entwurf",
+    "cp_status_scheduled": "Geplant",
+    "cp_status_published": "Veröffentlicht"
   },
   "download": {
     "title": "Mensaena installieren",
