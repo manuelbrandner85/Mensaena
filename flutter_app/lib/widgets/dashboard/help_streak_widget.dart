@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/help_streak_service.dart';
+import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
 
@@ -26,7 +27,7 @@ class HelpStreakWidget extends ConsumerWidget {
     final async = ref.watch(_helpStreakProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_helpStreakProvider)),
       data: (d) {
         if (d.current <= 0) return const SizedBox.shrink();
         return GlassCard(

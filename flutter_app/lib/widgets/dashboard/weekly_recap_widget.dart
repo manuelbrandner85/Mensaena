@@ -11,6 +11,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/ai_features_repository.dart';
 import '../../services/weekly_recap_service.dart';
+import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
 
@@ -33,7 +34,7 @@ class WeeklyRecapWidget extends ConsumerWidget {
     final async = ref.watch(_recapProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_recapProvider)),
       data: (r) {
         if (r.totalThisWeek == 0 && r.totalLastWeek == 0) {
           return const SizedBox.shrink();

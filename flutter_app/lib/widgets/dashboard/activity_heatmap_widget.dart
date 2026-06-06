@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/activity_heatmap_service.dart';
+import 'tile_error.dart';
 import '../effects/glass_card.dart';
 
 final _heatmapProvider =
@@ -33,7 +34,7 @@ class ActivityHeatmapWidget extends ConsumerWidget {
     final async = ref.watch(_heatmapProvider(userId));
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_heatmapProvider)),
       data: (h) {
         if (h.totalCount == 0) return const SizedBox.shrink();
         return GlassCard(

@@ -3428,7 +3428,8 @@
     },
     "alerts": {
       "allClear": "Todo despejado"
-    }
+    },
+    "tileLoadError": "No se pudo cargar · Toca para reintentar"
   },
   "interactions": {
     "noneTitle": "Aún no hay actividades de ayuda",

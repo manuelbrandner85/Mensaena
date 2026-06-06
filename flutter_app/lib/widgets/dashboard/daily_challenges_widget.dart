@@ -15,6 +15,7 @@ import '../../services/haptics.dart';
 import '../effects/bloom.dart';
 import '../effects/celebrate_burst.dart';
 import '../effects/glass_card.dart';
+import 'tile_error.dart';
 
 class DailyChallengesWidget extends ConsumerWidget {
   const DailyChallengesWidget({super.key});
@@ -24,7 +25,7 @@ class DailyChallengesWidget extends ConsumerWidget {
     final async = ref.watch(todayChallengesProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(todayChallengesProvider)),
       data: (challenges) {
         if (challenges.isEmpty) return const SizedBox.shrink();
         final done = challenges.where((c) => c.isCompleted).length;

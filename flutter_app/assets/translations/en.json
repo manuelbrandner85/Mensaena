@@ -3425,7 +3425,8 @@
     },
     "alerts": {
       "allClear": "All clear"
-    }
+    },
+    "tileLoadError": "Couldn’t load · Tap to retry"
   },
   "interactions": {
     "noneTitle": "No help activities yet",

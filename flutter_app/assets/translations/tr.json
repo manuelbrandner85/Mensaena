@@ -3427,7 +3427,8 @@
     },
     "alerts": {
       "allClear": "Her şey yolunda"
-    }
+    },
+    "tileLoadError": "Yüklenemedi · Yeniden denemek için dokun"
   },
   "interactions": {
     "noneTitle": "Henüz yardım etkinliği yok",

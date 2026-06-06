@@ -12,6 +12,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/streak_service.dart';
+import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/celebrate_burst.dart';
 import '../effects/glass_card.dart';
@@ -57,7 +58,7 @@ class _StreakWidgetState extends ConsumerState<StreakWidget> {
     final async = ref.watch(_streakProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_streakProvider)),
       data: (data) {
         if (data.current <= 0) return const SizedBox.shrink();
         WidgetsBinding.instance

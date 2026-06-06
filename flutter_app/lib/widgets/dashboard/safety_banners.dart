@@ -8,6 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import 'tile_error.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-Pendant zu Web `NinaWarningBanner` + `FoodWarningBanner`.
@@ -29,7 +30,7 @@ class SafetyBanners extends ConsumerWidget {
       children: [
         ninaAsync.when(
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(ninaWarningsProvider)),
           data: (list) {
             if (list.isEmpty) return const SizedBox.shrink();
             return _NinaCard(warnings: list);
@@ -37,7 +38,7 @@ class SafetyBanners extends ConsumerWidget {
         ),
         foodAsync.when(
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(foodWarningsProvider)),
           data: (list) {
             if (list.isEmpty) return const SizedBox.shrink();
             return Padding(

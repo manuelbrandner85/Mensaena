@@ -3424,7 +3424,8 @@
     },
     "alerts": {
       "allClear": "Alles sicher"
-    }
+    },
+    "tileLoadError": "Konnte nicht laden · Tippen zum Wiederholen"
   },
   "interactions": {
     "noneTitle": "Noch keine Hilfe-Vorgänge",

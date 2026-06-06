@@ -9,6 +9,7 @@ import '../../models/zeitbank_notification.dart';
 import '../../repositories/timebank_repository.dart';
 import '../../services/haptics.dart';
 import '../effects/glass_card.dart';
+import 'tile_error.dart';
 
 /// SKILL: mensaena-features
 /// Globaler Zeitbank-Confirmation-Banner. Streamt `zeitbank_notifications` mit
@@ -36,7 +37,7 @@ class _ZeitbankConfirmationBannerState
     final stream = ref.watch(zeitbankNotificationsStreamProvider);
     return stream.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(zeitbankNotificationsStreamProvider)),
       data: (list) {
         final banners = list
             .where((n) => !_dismissed.contains(n.id))

@@ -3428,7 +3428,8 @@
     },
     "alerts": {
       "allClear": "Tout va bien"
-    }
+    },
+    "tileLoadError": "Échec du chargement · Appuyez pour réessayer"
   },
   "interactions": {
     "noneTitle": "Aucune activité d'aide pour l'instant",

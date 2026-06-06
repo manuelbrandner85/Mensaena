@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/matching_repository.dart';
+import 'tile_error.dart';
 
 class SmartMatchWidget extends ConsumerWidget {
   const SmartMatchWidget({super.key});
@@ -20,7 +21,7 @@ class SmartMatchWidget extends ConsumerWidget {
     final async = ref.watch(matchingListProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(matchingListProvider)),
       data: (matches) {
         final pending =
             matches.where((m) => m.status == 'pending').take(3).toList();
