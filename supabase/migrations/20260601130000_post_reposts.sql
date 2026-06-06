@@ -27,6 +27,18 @@ create policy pr_delete on public.post_reposts
 
 -- Feed der Follower: Posts, die Leute denen ICH folge in den letzten 7
 -- Tagen verstärkt haben.
+--
+-- Drift-Vorsorge: user_follows wurde zwischenzeitlich gedroppt (Migration
+-- 20260602110000_remove_user_follows.sql), existiert aber zum Zeitpunkt dieser
+-- Migration noch. Auf Preview-Branches fehlt sie → wir legen einen minimalen
+-- Stub an, damit die SQL-Funktion (early-bound) compiliert. Die Folge-Migration
+-- droppt user_follows endgültig wieder.
+create table if not exists public.user_follows (
+  follower_id  uuid not null,
+  following_id uuid not null,
+  primary key (follower_id, following_id)
+);
+
 create or replace function public.get_reposted_feed(p_limit int default 20)
 returns table(post_id uuid, reposter_id uuid, reposted_at timestamptz)
 language sql
