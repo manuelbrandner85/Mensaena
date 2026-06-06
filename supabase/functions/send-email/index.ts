@@ -48,7 +48,7 @@ function appendFooter(html: string, category?: string) {
   const unsub = category === 'reactivation'
     ? 'https://www.mensaena.de/unsubscribe?kind=reactivation'
     : 'https://www.mensaena.de/unsubscribe?kind=marketing'
-  return `${html}<hr style="margin:32px 0;border:0;border-top:1px solid #e6e3df"><p style="font-size:12px;color:#6b665e;line-height:1.5">Mensaena · hallo@mensaena.de · <a href="https://www.mensaena.de/impressum" style="color:#6b665e">Impressum</a> · <a href="${unsub}" style="color:#6b665e">Abmelden</a></p>`
+  return `${html}<hr style="margin:32px 0;border:0;border-top:1px solid #e6e3df"><p style="font-size:12px;color:#6b665e;line-height:1.5">Mensaena · <a href="mailto:info@mensaena.de" style="color:#6b665e">info@mensaena.de</a> · <a href="https://www.mensaena.de/impressum" style="color:#6b665e">Impressum</a> · <a href="${unsub}" style="color:#6b665e">Abmelden</a></p>`
 }
 
 async function sendViaResend(opts: {

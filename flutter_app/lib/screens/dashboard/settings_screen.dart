@@ -223,7 +223,7 @@ class _AccountTab extends StatelessWidget {
                 '\n\n---\nApp: ${info.version} (${info.buildNumber})\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
             final uri = Uri(
               scheme: 'mailto',
-              path: 'kontakt@mensaena.de',
+              path: 'info@mensaena.de',
               query: 'subject=Bug-Report Mensaena App&body=${Uri.encodeComponent(body)}',
             );
             await launchUrl(uri);

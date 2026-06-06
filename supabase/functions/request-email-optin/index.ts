@@ -53,6 +53,10 @@ Deno.serve(async (req: Request) => {
         Wenn du das nicht warst, ignoriere diese Mail einfach — ohne Bestätigung
         passiert nichts.
       </p>
+      <p style="font-size:12px;color:#6b665e;line-height:1.5">
+        Fragen zum Datenschutz? Schreib uns an
+        <a href="mailto:info@mensaena.de" style="color:#147170">info@mensaena.de</a>.
+      </p>
     </div>`
 
   // Versand über die bestehende send-email-Function (service_role-Auth).
