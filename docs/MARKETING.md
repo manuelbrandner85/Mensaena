@@ -127,47 +127,25 @@ Benötigte Secrets (Supabase → Edge Functions → Secrets): `MAIL_API_KEY` (Re
 bereits gesetzt), optional `MAIL_OWNER` (Empfänger des Health-Reports) **oder**
 `app_settings`-Key `owner_email`.
 
-### pg_cron — neue Jobs (im Supabase SQL-Editor ausführen)
-> Stille Zeiten werden vom `notify_guard` erzwungen; die Cron-Zeiten liegen
-> bewusst tagsüber (UTC). `:service_key` durch den **service_role**-Key ersetzen
-> (oder via Vault lösen). Projekt-URL: `https://gyqujitkvymlmgroovch.supabase.co`.
+### pg_cron — neue Jobs (✅ automatisch via Migration, KEIN manueller Schritt)
+> **Status: eingerichtet.** Migration `20260606200000_marketing_phase4_cron.sql`
+> legt einen Helper `private.invoke_edge_function(text)` + die 5 Cron-Jobs an.
+> Deployt automatisch über `.github/workflows/supabase.yml` (`supabase db push`)
+> bei Push auf `main` gegen `gyqujitkvymlmgroovch`.
+>
+> Auth läuft über den öffentlichen anon-Key aus `private.push_config` — kein
+> service_role-Key im Repo nötig (die Functions sind `--no-verify-jwt` deployed,
+> der anon-Key genügt zum Routing; intern nutzen sie SERVICE_ROLE aus ihrer
+> eigenen Secret-Env). Stille Zeiten erzwingt der `notify_guard`; die Cron-Zeiten
+> liegen bewusst tagsüber (UTC). Das Scheduling ist idempotent (Upsert pro
+> Jobname) und drift-tolerant (no-op wenn `cron`-Schema fehlt, z. B. Preview).
 
-```sql
--- Hilfsfunktion (einmalig), ruft eine Edge Function per pg_net auf:
-create extension if not exists pg_net;
+| Job | Zeitplan (UTC) | Function |
+|---|---|---|
+| `auto-social-content` | Mo 08:00 (`0 8 * * 1`) | KI-Social-Entwürfe → `content_plan` |
+| `auto-health-report` | Mo 07:00 (`0 7 * * 1`) | KI-Wochenbericht → Admin/Owner |
+| `auto-smart-timing` | So 23:00 (`0 23 * * 0`) | beste Versand-Stunde lernen |
+| `feedback-after-help` | täglich 16:00 (`0 16 * * *`) | Bitte um Erfahrungsbericht |
+| `auto-winback` | Mi 15:00 (`0 15 * * 3`) | sparsamer Win-Back |
 
--- feedback-after-help: täglich 16:00 UTC
-select cron.schedule('feedback-after-help', '0 16 * * *', $$
-  select net.http_post(
-    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/feedback-after-help',
-    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
-  );$$);
-
--- auto-winback: wöchentlich Mi 15:00 UTC
-select cron.schedule('auto-winback', '0 15 * * 3', $$
-  select net.http_post(
-    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-winback',
-    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
-  );$$);
-
--- auto-smart-timing: wöchentlich So 23:00 UTC (reine Analyse, kein Versand)
-select cron.schedule('auto-smart-timing', '0 23 * * 0', $$
-  select net.http_post(
-    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-smart-timing',
-    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
-  );$$);
-
--- auto-social-content: wöchentlich Mo 08:00 UTC
-select cron.schedule('auto-social-content', '0 8 * * 1', $$
-  select net.http_post(
-    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-social-content',
-    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
-  );$$);
-
--- auto-health-report: wöchentlich Mo 07:00 UTC
-select cron.schedule('auto-health-report', '0 7 * * 1', $$
-  select net.http_post(
-    url:='https://gyqujitkvymlmgroovch.supabase.co/functions/v1/auto-health-report',
-    headers:='{"Authorization":"Bearer :service_key","Content-Type":"application/json"}'::jsonb
-  );$$);
-```
+Jobs prüfen: `select jobname, schedule, active from cron.job order by jobname;`
