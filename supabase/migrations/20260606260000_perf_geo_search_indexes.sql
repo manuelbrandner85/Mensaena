@@ -36,7 +36,22 @@ CREATE INDEX IF NOT EXISTS idx_posts_geog
   WHERE status = 'active';
 
 -- get_nearby_posts: index-gestützt via ST_DWithin + KNN-Nearest-First.
--- Gleiche Signatur & Rückgabe-Form (SETOF json) wie zuvor → kein Drift.
+-- Die alte Funktion (20260405000000) gab `SETOF posts` zurück — wir wollen
+-- `SETOF json` mit kontrolliertem Output. Postgres erlaubt keinen Return-Type-
+-- Wechsel via CREATE OR REPLACE (42P13), darum vorher ALLE Overloads droppen.
+DO $$
+DECLARE r RECORD;
+BEGIN
+  FOR r IN
+    SELECT oid::regprocedure AS sig
+      FROM pg_proc
+     WHERE proname = 'get_nearby_posts'
+       AND pronamespace = 'public'::regnamespace
+  LOOP
+    EXECUTE 'DROP FUNCTION ' || r.sig || ' CASCADE';
+  END LOOP;
+END $$;
+
 CREATE OR REPLACE FUNCTION get_nearby_posts(
   p_lat double precision,
   p_lng double precision,

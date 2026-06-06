@@ -119,9 +119,10 @@ ALTER TABLE public.matches DROP CONSTRAINT IF EXISTS matches_declined_by_fkey;
 ALTER TABLE public.matches ADD CONSTRAINT matches_declined_by_fkey
   FOREIGN KEY (declined_by) REFERENCES auth.users(id) ON DELETE SET NULL;
 
-ALTER TABLE public.reports DROP CONSTRAINT IF EXISTS reports_resolved_by_fkey;
-ALTER TABLE public.reports ADD CONSTRAINT reports_resolved_by_fkey
-  FOREIGN KEY (resolved_by) REFERENCES auth.users(id) ON DELETE SET NULL;
+-- reports.reviewed_by (Moderator, der den Report bearbeitet hat).
+ALTER TABLE public.reports DROP CONSTRAINT IF EXISTS reports_reviewed_by_fkey;
+ALTER TABLE public.reports ADD CONSTRAINT reports_reviewed_by_fkey
+  FOREIGN KEY (reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL;
 
 -- live_rooms.host_id ist NOT NULL → CASCADE (Räume des Hosts gehen mit).
 ALTER TABLE public.live_rooms DROP CONSTRAINT IF EXISTS live_rooms_host_id_fkey;
