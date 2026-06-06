@@ -59,11 +59,22 @@ Deno.serve(async (req) => {
 
   let articleId: string | null = null
   try {
+    // slug ist NOT NULL ohne Default -> aus Titel ableiten + Kollisions-Suffix.
+    const slug =
+      (title
+        .toLowerCase()
+        .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue')
+        .replace(/ß/g, 'ss')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60) || 'wiki') +
+      '-' + crypto.randomUUID().slice(0, 8)
     const { data: ins } = await admin
       .from('knowledge_articles')
       .insert({
         author_id: user.id,
         title,
+        slug,
         content,
         category,
         tags,
