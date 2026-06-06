@@ -89,6 +89,15 @@ Beide Workflows laufen grün auf jedem Push zu `main`:
 Bekannte Abhängigkeit: `@anthropic-ai/sdk` muss in `package.json` stehen
 (für `/api/emails/optimize-subject`). Fehlt es → Build-Fehler "Module not found".
 
+### ⚠️ Shorebird MUSS Flutter 3.27.4 pinnen (sonst Crash auf allen Geräten)
+`shorebird release/patch` nutzt ohne Pin Shorebirds gebundeltes Flutter (z. B.
+3.44.x). Der App-Code ist aber auf **Flutter 3.27.4** ausgelegt (flutter.yml
+`subosito 3.27.x`, plus 3.27-spezifische Plugin-Patches wie
+`scripts/patch_flutter_webrtc.sh`). Ein Engine-Sprung 3.27→3.44 ließ die 4.1.5-
+APK auf JEDE Interaktion nativ abstürzen. Deshalb in `flutter.yml` UND
+`shorebird_patch.yml` immer `--flutter-version=3.27.4` setzen. Release- und
+Patch-Engine MÜSSEN identisch sein, sonst verwirft der Client den Patch.
+
 ### Deploy-Workflow (.github/workflows/deploy.yml)
 Der Workflow macht genau diese 4 Schritte – **nichts weiter, nichts anderes**:
 1. `npm ci` – Dependencies installieren
