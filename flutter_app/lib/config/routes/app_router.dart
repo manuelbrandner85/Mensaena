@@ -93,6 +93,7 @@ import '../../screens/dashboard/ratings_hub_screen.dart';
 import '../../screens/dashboard/permissions_screen.dart';
 import '../../screens/dashboard/settings_screen.dart';
 import '../../screens/public/permissions_gate_screen.dart';
+import '../../screens/legal/download_screen.dart';
 import '../../screens/legal/legal_page_screen.dart';
 import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
@@ -271,7 +272,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const LegalPageScreen(contentKey: 'community-guidelines'),
         ),
       ),
-      _placeholder('/download', 'Download'),
+      GoRoute(
+        path: '/download',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const DownloadScreen(),
+        ),
+      ),
       GoRoute(
         path: '/search',
         pageBuilder: (_, s) => mensaenaTransition<void>(
