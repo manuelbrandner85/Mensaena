@@ -374,6 +374,7 @@ jobs:
           set +e
           shorebird release android \
             --artifact=apk \
+            --flutter-version=3.27.4 \
             --no-confirm \
             -- \
             --target-platform=android-arm64,android-arm \

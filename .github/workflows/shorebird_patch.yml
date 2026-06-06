@@ -198,6 +198,7 @@ jobs:
           echo "Ziel-Release-Version: ${{ steps.version.outputs.full }}"
           shorebird patch android \
             --release-version="${{ steps.version.outputs.full }}" \
+            --flutter-version=3.27.4 \
             --no-confirm \
             --allow-asset-diffs \
             -- \
