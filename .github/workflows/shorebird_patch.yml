@@ -158,8 +158,11 @@ jobs:
             exit 0
           fi
 
-          echo "── shorebird releases list --platforms=android ──"
-          RELEASES=$(shorebird releases list --platforms=android 2>&1 || true)
+          # FIX: Option heißt --platform (Singular). --platforms war ungültig
+          # -> Befehl scheiterte -> Release-Check fand nie ein Release ->
+          # JEDER Patch wurde uebersprungen (OTA hat nie ausgeliefert).
+          echo "── shorebird releases list --platform=android ──"
+          RELEASES=$(shorebird releases list --platform=android 2>&1 || true)
           echo "$RELEASES"
 
           # Wenn kein Release für die aktuelle pubspec-Version existiert, skippen.

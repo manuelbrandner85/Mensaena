@@ -4,6 +4,8 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-06)
+- [x] [!] Shorebird-OTA-Bug gefunden+gefixt: `releases list --platforms` (Plural) war ungueltig -> Patch wurde IMMER uebersprungen (OTA lieferte nie). Jetzt --platform. Versions-Pin-Input wird von setup-shorebird ignoriert (CLI driftet) -> offen/Hinweis.
+- [x] [force-update] release 4.1.4+40104 — liefert KI-Features (Assistent + 8 Funktionen + 6 UI-Buttons + Wiki-Generator + Chat-Translate) als Pflicht-APK an gyquj.
 - [x] Update-Pipeline gyquj-only: huaqld-Dual-Write aus flutter.yml entfernt; Patches+Pflichtupdates gehen ab jetzt NUR nach gyquj. shorebird_patch.yml ohnehin 0 huaqld. Einmalige 4.1.3-Pflichtzeile in huaqld bleibt als Funnel fuer Altnutzer.
 - [x] KI-Zusatzfunktionen (8) auf gemeinsamer Fallback-Kette: _shared/ai.ts (callAiChain) + _shared/util.ts; chat-ai refactored. ai-improve-post/classify-post/translate/moderate/wiki-draft/crisis-summary/match-reason/weekly-recap. Flutter ai_features_repository.dart (lokale Heuristik für Klassifikation+Moderation zuerst, Kostenschutz)
 - [x] [SQL] crises.ai_summary+ai_summary_at, ai_chat_analytics.feature, community_recaps (auf gyquj angewandt)
