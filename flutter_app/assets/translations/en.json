@@ -3714,6 +3714,9 @@
     "wiki_generator_hint": "Enter a topic — the AI creates a draft saved as draft. You publish it afterwards.",
     "wiki_topic_label": "Topic",
     "wiki_generate": "Generate draft",
-    "wiki_saved_draft": "Saved as draft — please review and publish."
+    "wiki_saved_draft": "Saved as draft — please review and publish.",
+    "wiki_publish": "Publish now",
+    "wiki_keep_draft": "Keep as draft",
+    "wiki_published": "Published ✅"
   }
 }

@@ -18,6 +18,7 @@ import '../../../services/voice_recorder_service.dart';
 import '../../../widgets/chat/chat_link_preview_card.dart';
 import '../../../widgets/chat/post_card_chat_bubble.dart';
 import '../../../widgets/shared/image_lightbox.dart';
+import '../../../widgets/shared/translate_button.dart';
 import '../../../widgets/shared/voice_message_bubble.dart';
 import 'chat_action_sheet.dart';
 
@@ -369,6 +370,12 @@ class ChatMessageBubble extends ConsumerWidget {
                                 height: 1.4,
                               ),
                             ),
+                      // C) Übersetzen — nur fremde Text-Nachrichten (kein Emoji-Only).
+                      if (!mine && !_isEmojiOnly(textWithoutImages))
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: TranslateInlineButton(text: textWithoutImages),
+                        ),
                       if (previewUrl != null)
                         ChatLinkPreviewCard(url: previewUrl),
                     ],

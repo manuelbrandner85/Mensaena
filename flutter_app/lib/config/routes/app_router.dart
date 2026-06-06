@@ -19,7 +19,6 @@ import '../../screens/dashboard/admin/admin_groups_screen.dart';
 import '../../screens/dashboard/admin/admin_system_screen.dart';
 import '../../screens/dashboard/admin/admin_table_screen.dart';
 import '../../screens/dashboard/admin/admin_users_screen.dart';
-import '../../screens/dashboard/admin/admin_wiki_generator_screen.dart';
 import '../../screens/dashboard/admin/admin_zeitbank_screen.dart';
 import '../../screens/dashboard/badges/badges_screen.dart';
 import '../../screens/dashboard/call/call_history_screen.dart';
@@ -1304,13 +1303,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const AdminSystemScreen(),
-        ),
-      ),
-      GoRoute(
-        path: '/dashboard/admin/wiki-ai',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
-          key: state.pageKey,
-          child: const AdminWikiGeneratorScreen(),
         ),
       ),
       // Profile-Edit + Saved-Posts werden jetzt als Subroutes unter

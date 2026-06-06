@@ -12,6 +12,7 @@ import '../../../repositories/admin_repository.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/animated_stat_number.dart';
+import '../../../widgets/wiki/ai_wiki_generator_sheet.dart';
 
 /// SKILL: mensaena-features (Admin Phase 6)
 /// Web-parity admin dashboard: open-reports alert, stat-cards strip,
@@ -760,11 +761,11 @@ class _QuickActions extends StatelessWidget {
             route: '/dashboard/admin/timebank',
           ),
           const SizedBox(height: 8),
-          // E) KI-Wiki-Generator (nur Admin)
+          // E) KI-Wiki-Generator (nur Admin) — öffnet das Generator-Sheet.
           _ActionButton(
             icon: LucideIcons.sparkles,
             label: 'assistant.wiki_generator_title'.tr(),
-            route: '/dashboard/admin/wiki-ai',
+            onTap: () => showAiWikiGenerator(context),
           ),
         ],
       ),
@@ -776,11 +777,13 @@ class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.icon,
     required this.label,
-    required this.route,
+    this.route,
+    this.onTap,
   });
   final IconData icon;
   final String label;
-  final String route;
+  final String? route;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -788,7 +791,7 @@ class _ActionButton extends StatelessWidget {
       height: 48,
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () => context.go(route),
+        onPressed: onTap ?? (route != null ? () => context.go(route!) : null),
         icon: Icon(icon, size: 18, color: AppColors.ink),
         label: Align(
           alignment: Alignment.centerLeft,

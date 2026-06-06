@@ -172,6 +172,18 @@ class AiFeaturesRepository {
     return null;
   }
 
+  /// Veröffentlicht einen zuvor generierten Wiki-Entwurf (status draft -> published).
+  Future<bool> publishWikiArticle(String id) async {
+    try {
+      await SupabaseService.client
+          .from('knowledge_articles')
+          .update({'status': 'published'}).eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // ── F) Krisen-Zusammenfassung (gecacht serverseitig) ────────────────────
   Future<String?> crisisSummary(String crisisId, String lang) async {
     final res = await SupabaseService.client.functions.invoke(

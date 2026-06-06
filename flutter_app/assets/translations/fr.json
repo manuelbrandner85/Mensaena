@@ -3717,6 +3717,9 @@
     "wiki_generator_hint": "Saisis un sujet — l'IA crée un brouillon enregistré comme brouillon. Tu le publies ensuite.",
     "wiki_topic_label": "Sujet",
     "wiki_generate": "Générer le brouillon",
-    "wiki_saved_draft": "Enregistré comme brouillon — à vérifier et publier."
+    "wiki_saved_draft": "Enregistré comme brouillon — à vérifier et publier.",
+    "wiki_publish": "Publier maintenant",
+    "wiki_keep_draft": "Garder le brouillon",
+    "wiki_published": "Publié ✅"
   }
 }

@@ -3717,6 +3717,9 @@
     "wiki_generator_hint": "Escribe un tema — la IA crea un borrador guardado como borrador. Tú lo publicas después.",
     "wiki_topic_label": "Tema",
     "wiki_generate": "Generar borrador",
-    "wiki_saved_draft": "Guardado como borrador — revísalo y publícalo."
+    "wiki_saved_draft": "Guardado como borrador — revísalo y publícalo.",
+    "wiki_publish": "Publicar ahora",
+    "wiki_keep_draft": "Mantener borrador",
+    "wiki_published": "Publicado ✅"
   }
 }

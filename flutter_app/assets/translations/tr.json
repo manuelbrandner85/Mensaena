@@ -3716,6 +3716,9 @@
     "wiki_generator_hint": "Bir konu gir — yapay zeka taslak oluşturur ve taslak olarak kaydeder. Sonra sen yayınlarsın.",
     "wiki_topic_label": "Konu",
     "wiki_generate": "Taslak oluştur",
-    "wiki_saved_draft": "Taslak olarak kaydedildi — lütfen kontrol edip yayınla."
+    "wiki_saved_draft": "Taslak olarak kaydedildi — lütfen kontrol edip yayınla.",
+    "wiki_publish": "Şimdi yayınla",
+    "wiki_keep_draft": "Taslak olarak tut",
+    "wiki_published": "Yayınlandı ✅"
   }
 }

@@ -11,8 +11,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/knowledge_article.dart';
+import '../../../providers/role_provider.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/wiki/ai_wiki_generator_sheet.dart';
 
 /// Lesezeit-Helper. Annahme: 200 Woerter / Minute.
 int _readingTimeMin(String? content) {
@@ -133,12 +135,34 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     return DashboardScaffold(
       title: widget.title,
       currentRoute: widget.routePath,
-      fab: FloatingActionButton.extended(
-        backgroundColor: AppColors.bronze,
-        foregroundColor: AppColors.voidColor,
-        onPressed: () => context.go('${widget.routePath}/create'),
-        icon: const Icon(LucideIcons.plus),
-        label: Text('knowledge.createArticle'.tr()),
+      fab: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // E) KI-Wiki-Generator — NUR für Admins, in Wiki UND Bildung.
+          if (UserRoleCache.isAdmin) ...[
+            FloatingActionButton.small(
+              heroTag: 'ai-wiki-gen',
+              backgroundColor: AppColors.leben,
+              foregroundColor: AppColors.voidColor,
+              tooltip: 'assistant.wiki_generator_title'.tr(),
+              onPressed: () async {
+                final created = await showAiWikiGenerator(context);
+                if (created && mounted) _refresh();
+              },
+              child: const Icon(Icons.auto_awesome),
+            ),
+            const SizedBox(height: 12),
+          ],
+          FloatingActionButton.extended(
+            heroTag: 'create-article',
+            backgroundColor: AppColors.bronze,
+            foregroundColor: AppColors.voidColor,
+            onPressed: () => context.go('${widget.routePath}/create'),
+            icon: const Icon(LucideIcons.plus),
+            label: Text('knowledge.createArticle'.tr()),
+          ),
+        ],
       ),
       body: SafeArea(
         child: RefreshIndicator(

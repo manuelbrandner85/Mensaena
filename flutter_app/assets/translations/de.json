@@ -3713,6 +3713,9 @@
     "wiki_generator_hint": "Gib ein Thema ein — die KI erstellt einen Entwurf, der als Entwurf gespeichert wird. Du gibst ihn anschließend frei.",
     "wiki_topic_label": "Thema",
     "wiki_generate": "Entwurf generieren",
-    "wiki_saved_draft": "Als Entwurf gespeichert — bitte prüfen und freigeben."
+    "wiki_saved_draft": "Als Entwurf gespeichert — bitte prüfen und freigeben.",
+    "wiki_publish": "Direkt veröffentlichen",
+    "wiki_keep_draft": "Als Entwurf behalten",
+    "wiki_published": "Veröffentlicht ✅"
   }
 }

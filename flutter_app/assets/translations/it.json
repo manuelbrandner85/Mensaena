@@ -3717,6 +3717,9 @@
     "wiki_generator_hint": "Inserisci un argomento — l'IA crea una bozza salvata come bozza. La pubblichi tu dopo.",
     "wiki_topic_label": "Argomento",
     "wiki_generate": "Genera bozza",
-    "wiki_saved_draft": "Salvato come bozza — controlla e pubblica."
+    "wiki_saved_draft": "Salvato come bozza — controlla e pubblica.",
+    "wiki_publish": "Pubblica ora",
+    "wiki_keep_draft": "Mantieni bozza",
+    "wiki_published": "Pubblicato ✅"
   }
 }
