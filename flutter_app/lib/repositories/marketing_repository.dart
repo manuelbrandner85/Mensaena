@@ -149,17 +149,19 @@ class MarketingRepository {
 
   // ── Phase 2: Empfehlungs-Übersicht ──────────────────────────────────────
   Future<Map<String, dynamic>> referralsOverview() async {
-    final res =
-        await SupabaseService.client.rpc('marketing_referrals_overview');
-    return Map<String, dynamic>.from((res as Map?) ?? const {});
+    final res = await SupabaseService.client
+        .rpc<dynamic>('marketing_referrals_overview');
+    return Map<String, dynamic>.from(
+        (res as Map<dynamic, dynamic>?) ?? const <dynamic, dynamic>{});
   }
 
   // ── Phase 2: Region-Manager ─────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> regionsOverview() async {
-    final res = await SupabaseService.client.rpc('marketing_regions_overview');
+    final res = await SupabaseService.client
+        .rpc<dynamic>('marketing_regions_overview');
     if (res is List) {
       return res
-          .whereType<Map>()
+          .whereType<Map<dynamic, dynamic>>()
           .map((m) => Map<String, dynamic>.from(m))
           .toList();
     }

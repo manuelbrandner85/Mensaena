@@ -793,7 +793,7 @@ class _ReferralsTabState extends State<_ReferralsTab> {
           final d = snap.data!;
           final totals = Map<String, dynamic>.from((d['totals'] as Map?) ?? const {});
           final top = ((d['top_referrers'] as List?) ?? const [])
-              .whereType<Map>()
+              .whereType<Map<dynamic, dynamic>>()
               .map((m) => Map<String, dynamic>.from(m))
               .toList();
           return ListView(
