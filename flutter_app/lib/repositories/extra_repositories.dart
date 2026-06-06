@@ -6,11 +6,6 @@
 /// UI flexibel auf die Felder zugreifen kann ohne Boilerplate-Modelle.
 library;
 
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-
-import '../config/env.dart';
 import '../services/supabase_service.dart';
 
 // ─── Post-Features ────────────────────────────────────────────────────
@@ -1365,38 +1360,17 @@ class ErrorLogsRepository {
     String? appVersion,
     String? deviceInfo,
   }) async {
-    // ROBUST: direkter REST-POST an crash_logs (RLS: anon INSERT erlaubt,
-    // CHECK(true)). Funktioniert SOFORT — auch VOR Supabase.initialize() und
-    // im Logout-State, weil weder Client noch Session nötig sind. So landen
-    // auch Startup-Crashes in einer Tabelle, die serverseitig auslesbar ist.
-    String? uid;
     try {
-      uid = SupabaseService.currentUser?.id;
-    } catch (_) {/* Client evtl. noch nicht initialisiert */}
-    try {
-      await http
-          .post(
-            Uri.parse('${Env.supabaseUrl}/rest/v1/crash_logs'),
-            headers: {
-              'apikey': Env.supabaseAnonKey,
-              'Authorization': 'Bearer ${Env.supabaseAnonKey}',
-              'Content-Type': 'application/json',
-              'Prefer': 'return=minimal',
-            },
-            body: jsonEncode({
-              'user_id': uid,
-              'platform': 'android',
-              'error_type': errorType,
-              'error_message':
-                  message.substring(0, message.length.clamp(0, 4000)),
-              'stack_trace': stack == null
-                  ? null
-                  : stack.substring(0, stack.length.clamp(0, 8000)),
-              'context': deviceInfo,
-              'app_version': appVersion,
-            }),
-          )
-          .timeout(const Duration(seconds: 8));
+      await sb.from('error_logs').insert({
+        'user_id': SupabaseService.currentUser?.id,
+        'platform': 'android',
+        'error_type': errorType,
+        'message': message.substring(0, message.length.clamp(0, 4000)),
+        if (stack != null)
+          'stack': stack.substring(0, stack.length.clamp(0, 8000)),
+        if (appVersion != null) 'app_version': appVersion,
+        if (deviceInfo != null) 'device_info': deviceInfo,
+      });
     } catch (_) {/* don't recurse */}
   }
 }
@@ -1424,5 +1398,3 @@ class AuditLogsRepository {
     } catch (_) {}
   }
 }
-
-// OTA-Patch-Trigger: crash_logs-REST-Logger auf 4.1.8 ausliefern (kein Bump).

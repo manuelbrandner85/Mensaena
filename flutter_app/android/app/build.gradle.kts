@@ -15,8 +15,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
     // Firebase Cloud Messaging — wendet google-services.json an.
     id("com.google.gms.google-services")
-    // Crashlytics — native + Dart Crash-Reporting (Stacktrace-Upload).
-    id("com.google.firebase.crashlytics")
 }
 
 // Release-Keystore laden (persistenter Key für APK-Updates ohne Deinstallation).
