@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-06)
+- [x] Update-Pipeline gyquj-only: huaqld-Dual-Write aus flutter.yml entfernt; Patches+Pflichtupdates gehen ab jetzt NUR nach gyquj. shorebird_patch.yml ohnehin 0 huaqld. Einmalige 4.1.3-Pflichtzeile in huaqld bleibt als Funnel fuer Altnutzer.
 - [x] KI-Zusatzfunktionen (8) auf gemeinsamer Fallback-Kette: _shared/ai.ts (callAiChain) + _shared/util.ts; chat-ai refactored. ai-improve-post/classify-post/translate/moderate/wiki-draft/crisis-summary/match-reason/weekly-recap. Flutter ai_features_repository.dart (lokale Heuristik für Klassifikation+Moderation zuerst, Kostenschutz)
 - [x] [SQL] crises.ai_summary+ai_summary_at, ai_chat_analytics.feature, community_recaps (auf gyquj angewandt)
 - [ ] [!] pg_cron-Job für ai-weekly-recap anlegen (SQL siehe unten / Antwort) — 1x/Woche Mo 9:00
