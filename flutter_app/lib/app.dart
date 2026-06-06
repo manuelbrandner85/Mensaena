@@ -13,6 +13,7 @@ import 'providers/theme_mode_provider.dart';
 import 'repositories/extra_repositories.dart';
 import 'repositories/notification_prefs_repository.dart';
 import 'services/deep_link_service.dart';
+import 'services/memory_watchdog_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
@@ -44,12 +45,24 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Globaler Speicher-Wächter: einmalige Initialisierung. Räumt den
+    // Image-Cache proaktiv, bevor er das harte Limit reißt (→ kein OOM-Crash
+    // / kein Langsamer-Werden über Stunden). Siehe MemoryWatchdogService.
+    MemoryWatchdogService.instance.start();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    MemoryWatchdogService.instance.stop();
     super.dispose();
+  }
+
+  @override
+  void didHaveMemoryPressure() {
+    // Android meldet akuten RAM-Mangel → kompletter Cache-Reset, bevor das
+    // System uns hart killt.
+    MemoryWatchdogService.instance.onMemoryPressure();
   }
 
   @override
@@ -60,6 +73,13 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
     // DashboardScaffold — er bleibt sichtbar sobald activeCallProvider
     // gesetzt ist + der User vom Call-Screen weg navigiert.
     // System-PiP-Mode wird hier NICHT mehr automatisch getriggert.
+    //
+    // MEMORY: Beim Minimieren die "lebenden" (nicht sichtbaren) Bilder
+    // freigeben — andere Apps bekommen den RAM, beim Zurückkehren werden
+    // sie bei Bedarf neu decodiert.
+    if (state == AppLifecycleState.paused) {
+      MemoryWatchdogService.instance.onAppPaused();
+    }
   }
 
   @override

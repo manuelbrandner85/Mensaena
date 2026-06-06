@@ -401,7 +401,8 @@
       "callSound": "SON ET VOLUME DES APPELS",
       "uiSounds": "Sons d'interface",
       "automatic": "AUTOMATIQUE",
-      "chooseManually": "CHOIX MANUEL"
+      "chooseManually": "CHOIX MANUEL",
+      "storage": "Stockage"
     },
     "callSound": {
       "ringVolume": "Volume de la sonnerie",
@@ -555,7 +556,9 @@
     "bgCalls": "Appels en arrière-plan",
     "bgCallsDesc": "Configure l'optimisation de la batterie et la veille pour recevoir les appels app fermée.",
     "permissions": "Autorisations",
-    "permissionsDesc": "Aperçu de la caméra, du micro, de la localisation et plus — au même endroit."
+    "permissionsDesc": "Aperçu de la caméra, du micro, de la localisation et plus — au même endroit.",
+    "clearCache": "Vider le cache",
+    "clearCacheDone": "{mb} Mo de cache d’images libérés"
   },
   "chat": {
     "writeMessage": "Écrire un message …",

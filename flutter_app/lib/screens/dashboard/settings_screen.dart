@@ -26,6 +26,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../providers/role_provider.dart';
 import '../../services/biometric_service.dart';
 import '../../services/device_tier_service.dart';
+import '../../services/memory_watchdog_service.dart';
 import '../../services/screen_time_service.dart';
 import '../../services/shorebird_patch_service.dart';
 import '../../services/sleep_reminder_service.dart';
@@ -1305,6 +1306,28 @@ class _AppearanceTab extends ConsumerWidget {
               ),
             );
           },
+        ),
+        const SizedBox(height: 16),
+        // MEMORY: Manueller Bild-/Cache-Reset. Hilft bei subjektiver
+        // Langsamkeit nach langer Nutzung, ohne die App neu zu starten.
+        Text('settings.sections.storage'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 4),
+        OutlinedButton.icon(
+          onPressed: () {
+            final freedMb = MemoryWatchdogService.instance.clearAll();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('settings.clearCacheDone'.tr(
+                  namedArgs: {'mb': freedMb.toStringAsFixed(1)})),
+            ));
+          },
+          icon: const Icon(LucideIcons.trash2, size: 16),
+          label: Text('settings.clearCache'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.bronze,
+            side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
+            minimumSize: const Size.fromHeight(44),
+          ),
         ),
         const SizedBox(height: 24),
         Container(

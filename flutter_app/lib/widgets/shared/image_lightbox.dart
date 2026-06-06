@@ -99,6 +99,11 @@ class _ImageLightboxState extends State<ImageLightbox> {
                       child: CachedNetworkImage(
                         imageUrl: widget.urls[i],
                         fit: BoxFit.contain,
+                        // MEMORY-FIX: Fullscreen-Viewer decodierte sonst das
+                        // Originalbild (4000px+ = ~60 MB/Bild). 1600px Breite
+                        // deckelt den RAM und erlaubt trotzdem brauchbaren Zoom.
+                        // Nur Breite gesetzt → Aspect-Ratio bleibt erhalten.
+                        memCacheWidth: 1600,
                         placeholder: (_, __) => const CircularProgressIndicator(
                             color: AppColors.bronze),
                         errorWidget: (_, __, ___) => const Icon(
