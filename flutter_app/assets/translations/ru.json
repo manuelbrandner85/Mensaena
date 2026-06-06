@@ -3771,6 +3771,25 @@
     "seg_marketing_subs": "Soglasie marketing",
     "kill_switch": "Globalnyj stop",
     "kill_switch_hint": "Nemedlenno ostanavlivaet vsyo avtomaticheskoe.",
-    "kill_switch_label": "Postavit na pauzu"
+    "kill_switch_label": "Postavit na pauzu",
+    "tab_templates": "Shablony",
+    "tab_referrals": "Priglasheniya",
+    "tab_regions": "Regiony",
+    "tpl_new": "Novyj shablon",
+    "tpl_edit": "Redaktirovat shablon",
+    "tpl_name": "Nazvanie",
+    "tpl_subject": "Tema",
+    "tpl_body": "Soderzhanie (placeholdery)",
+    "tpl_empty": "Shablonov net.",
+    "ref_completed_30d": "Zaversheno 30d",
+    "ref_pending_30d": "V ozhidanii 30d",
+    "top_referrers": "Top priglashayushchie",
+    "ref_meta": "Zaversheno {completed} / Vsego {total} - Karma {karma}",
+    "reg_empty": "Net regionov s polzovatelyami.",
+    "reg_meta": "{users} polzov. - {new} novye (7d) - {active} aktivnye (7d)",
+    "reg_signal_lebt": "zhivoj",
+    "reg_signal_braucht_hilfe": "nuzhna pomoshch",
+    "reg_signal_klein": "malenkij",
+    "reg_signal_normal": "ok"
   }
 }

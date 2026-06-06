@@ -3769,6 +3769,25 @@
     "seg_marketing_subs": "Marketing opt-in",
     "kill_switch": "Global kill switch",
     "kill_switch_hint": "Immediately stops ALL automated marketing/reactivation pushes.",
-    "kill_switch_label": "Pause marketing"
+    "kill_switch_label": "Pause marketing",
+    "tab_templates": "Templates",
+    "tab_referrals": "Referrals",
+    "tab_regions": "Regions",
+    "tpl_new": "New template",
+    "tpl_edit": "Edit template",
+    "tpl_name": "Name",
+    "tpl_subject": "Subject",
+    "tpl_body": "Body (placeholders allowed)",
+    "tpl_empty": "No templates yet.",
+    "ref_completed_30d": "Completed 30d",
+    "ref_pending_30d": "Pending 30d",
+    "top_referrers": "Top referrers",
+    "ref_meta": "Completed {completed} / Total {total} - Karma {karma}",
+    "reg_empty": "No regions with users yet.",
+    "reg_meta": "{users} users - {new} new (7d) - {active} active (7d)",
+    "reg_signal_lebt": "alive",
+    "reg_signal_braucht_hilfe": "needs help",
+    "reg_signal_klein": "small",
+    "reg_signal_normal": "ok"
   }
 }

@@ -3768,6 +3768,25 @@
     "seg_marketing_subs": "Marketing-Erlaubnis",
     "kill_switch": "Globale Notbremse",
     "kill_switch_hint": "Stoppt sofort ALLE automatischen Marketing-/Reaktivierungs-Pushes.",
-    "kill_switch_label": "Marketing pausieren"
+    "kill_switch_label": "Marketing pausieren",
+    "tab_templates": "Vorlagen",
+    "tab_referrals": "Empfehlungen",
+    "tab_regions": "Regionen",
+    "tpl_new": "Neue Vorlage",
+    "tpl_edit": "Vorlage bearbeiten",
+    "tpl_name": "Name",
+    "tpl_subject": "Betreff",
+    "tpl_body": "Inhalt (Platzhalter erlaubt)",
+    "tpl_empty": "Noch keine Vorlagen.",
+    "ref_completed_30d": "Erfolgreich 30T",
+    "ref_pending_30d": "Offen 30T",
+    "top_referrers": "Top-Werber",
+    "ref_meta": "Erfolgreich {completed} / Gesamt {total} - Karma {karma}",
+    "reg_empty": "Noch keine Regionen mit Nutzern.",
+    "reg_meta": "{users} Nutzer - {new} neu (7T) - {active} aktiv (7T)",
+    "reg_signal_lebt": "lebt",
+    "reg_signal_braucht_hilfe": "braucht Hilfe",
+    "reg_signal_klein": "klein",
+    "reg_signal_normal": "ok"
   }
 }

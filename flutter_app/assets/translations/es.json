@@ -3772,6 +3772,25 @@
     "seg_marketing_subs": "Marketing opt-in",
     "kill_switch": "Interruptor global",
     "kill_switch_hint": "Detiene de inmediato TODOS los push automaticos.",
-    "kill_switch_label": "Pausar marketing"
+    "kill_switch_label": "Pausar marketing",
+    "tab_templates": "Plantillas",
+    "tab_referrals": "Invitaciones",
+    "tab_regions": "Regiones",
+    "tpl_new": "Nueva plantilla",
+    "tpl_edit": "Editar plantilla",
+    "tpl_name": "Nombre",
+    "tpl_subject": "Asunto",
+    "tpl_body": "Contenido (marcadores permitidos)",
+    "tpl_empty": "Sin plantillas.",
+    "ref_completed_30d": "Completadas 30d",
+    "ref_pending_30d": "Pendientes 30d",
+    "top_referrers": "Top invitantes",
+    "ref_meta": "Completadas {completed} / Total {total} - Karma {karma}",
+    "reg_empty": "Sin regiones con usuarios.",
+    "reg_meta": "{users} usuarios - {new} nuevos (7d) - {active} activos (7d)",
+    "reg_signal_lebt": "viva",
+    "reg_signal_braucht_hilfe": "necesita ayuda",
+    "reg_signal_klein": "pequena",
+    "reg_signal_normal": "ok"
   }
 }

@@ -3772,6 +3772,25 @@
     "seg_marketing_subs": "Consenso marketing",
     "kill_switch": "Interruttore generale",
     "kill_switch_hint": "Ferma subito TUTTI i push automatici.",
-    "kill_switch_label": "Metti in pausa il marketing"
+    "kill_switch_label": "Metti in pausa il marketing",
+    "tab_templates": "Modelli",
+    "tab_referrals": "Inviti",
+    "tab_regions": "Regioni",
+    "tpl_new": "Nuovo modello",
+    "tpl_edit": "Modifica modello",
+    "tpl_name": "Nome",
+    "tpl_subject": "Oggetto",
+    "tpl_body": "Contenuto (segnaposto consentiti)",
+    "tpl_empty": "Nessun modello.",
+    "ref_completed_30d": "Completati 30g",
+    "ref_pending_30d": "In sospeso 30g",
+    "top_referrers": "Top invitanti",
+    "ref_meta": "Completati {completed} / Totale {total} - Karma {karma}",
+    "reg_empty": "Nessuna regione con utenti.",
+    "reg_meta": "{users} utenti - {new} nuovi (7g) - {active} attivi (7g)",
+    "reg_signal_lebt": "vivo",
+    "reg_signal_braucht_hilfe": "serve aiuto",
+    "reg_signal_klein": "piccolo",
+    "reg_signal_normal": "ok"
   }
 }

@@ -24,7 +24,7 @@ class AdminMarketingScreen extends ConsumerStatefulWidget {
 
 class _AdminMarketingScreenState extends ConsumerState<AdminMarketingScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tab = TabController(length: 5, vsync: this);
+  late final TabController _tab = TabController(length: 8, vsync: this);
   final _repo = MarketingRepository();
 
   @override
@@ -53,6 +53,9 @@ class _AdminMarketingScreenState extends ConsumerState<AdminMarketingScreen>
                 Tab(text: 'marketing.tab_email'.tr()),
                 Tab(text: 'marketing.tab_push'.tr()),
                 Tab(text: 'marketing.tab_segments'.tr()),
+                Tab(text: 'marketing.tab_templates'.tr()),
+                Tab(text: 'marketing.tab_referrals'.tr()),
+                Tab(text: 'marketing.tab_regions'.tr()),
                 Tab(text: 'marketing.tab_settings'.tr()),
               ],
             ),
@@ -64,6 +67,9 @@ class _AdminMarketingScreenState extends ConsumerState<AdminMarketingScreen>
                   _EmailTab(repo: _repo),
                   _PushTab(repo: _repo),
                   _SegmentsTab(repo: _repo),
+                  _TemplatesTab(repo: _repo),
+                  _ReferralsTab(repo: _repo),
+                  _RegionsTab(repo: _repo),
                   _SettingsTab(repo: _repo),
                 ],
               ),
@@ -581,6 +587,380 @@ class _SettingsTabState extends State<_SettingsTab> {
           ]),
         ),
       ],
+    );
+  }
+}
+
+// ── Phase 2: 5) Vorlagen-Editor ────────────────────────────────────────────
+class _TemplatesTab extends StatefulWidget {
+  const _TemplatesTab({required this.repo});
+  final MarketingRepository repo;
+  @override
+  State<_TemplatesTab> createState() => _TemplatesTabState();
+}
+
+class _TemplatesTabState extends State<_TemplatesTab> {
+  late Future<List<Map<String, dynamic>>> _f = widget.repo.listTemplates();
+  void _refresh() => setState(() => _f = widget.repo.listTemplates());
+
+  Future<void> _edit({Map<String, dynamic>? existing}) async {
+    final nameCtrl = TextEditingController(
+        text: existing?['name']?.toString() ?? '');
+    final subjCtrl = TextEditingController(
+        text: existing?['subject']?.toString() ?? '');
+    final bodyCtrl = TextEditingController(
+        text: (existing?['body_html'] ?? existing?['body_text'] ?? '').toString());
+    String kind = existing?['kind']?.toString() ?? 'email';
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text(existing == null
+              ? 'marketing.tpl_new'.tr()
+              : 'marketing.tpl_edit'.tr()),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(labelText: 'marketing.tpl_name'.tr())),
+              const SizedBox(height: 8),
+              Row(children: [
+                ChoiceChip(
+                  label: const Text('E-Mail'),
+                  selected: kind == 'email',
+                  onSelected: (_) => setLocal(() => kind = 'email'),
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Push'),
+                  selected: kind == 'push',
+                  onSelected: (_) => setLocal(() => kind = 'push'),
+                ),
+              ]),
+              const SizedBox(height: 8),
+              TextField(
+                  controller: subjCtrl,
+                  decoration: InputDecoration(
+                      labelText: 'marketing.tpl_subject'.tr())),
+              const SizedBox(height: 8),
+              TextField(
+                  controller: bodyCtrl,
+                  maxLines: 8,
+                  decoration: InputDecoration(
+                      labelText: 'marketing.tpl_body'.tr(),
+                      hintText: '{vorname} {region} {karma}')),
+            ]),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('common.cancel'.tr())),
+            ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('common.save'.tr())),
+          ],
+        ),
+      ),
+    );
+    if (ok == true) {
+      final n = nameCtrl.text.trim();
+      if (n.isEmpty) return;
+      await widget.repo.upsertTemplate(
+        id: existing?['id']?.toString(),
+        name: n,
+        kind: kind,
+        subject: subjCtrl.text.trim(),
+        bodyHtml: kind == 'email' ? bodyCtrl.text : null,
+        bodyText: kind == 'push' ? bodyCtrl.text : null,
+      );
+      if (mounted) _refresh();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      RefreshIndicator(
+        color: AppColors.bronze,
+        onRefresh: () async => _refresh(),
+        child: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _f,
+          builder: (c, snap) {
+            final rows = snap.data ?? const <Map<String, dynamic>>[];
+            if (rows.isEmpty) {
+              return ListView(children: [
+                Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Center(
+                      child: Text('marketing.tpl_empty'.tr(),
+                          style: AppTypography.caption())),
+                ),
+              ]);
+            }
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+              children: rows.map((r) {
+                final kind = (r['kind'] ?? 'email').toString();
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.elevated,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.06)),
+                  ),
+                  child: Row(children: [
+                    Icon(
+                        kind == 'email'
+                            ? LucideIcons.mail
+                            : LucideIcons.bell,
+                        size: 18,
+                        color: AppColors.bronze),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(r['name']?.toString() ?? '–',
+                                style: AppTypography.body(
+                                    size: 14,
+                                    color: AppColors.ink,
+                                    weight: FontWeight.w700)),
+                            if (r['subject'] != null)
+                              Text(r['subject'].toString(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.label(
+                                      size: 10, color: AppColors.mute)),
+                          ]),
+                    ),
+                    IconButton(
+                        onPressed: () => _edit(existing: r),
+                        icon: const Icon(LucideIcons.pencil,
+                            size: 16, color: AppColors.mute)),
+                    IconButton(
+                        onPressed: () async {
+                          await widget.repo.deleteTemplate(r['id'].toString());
+                          if (mounted) _refresh();
+                        },
+                        icon: const Icon(LucideIcons.trash2,
+                            size: 16, color: AppColors.herzrot)),
+                  ]),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ),
+      Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton.extended(
+            backgroundColor: AppColors.bronze,
+            foregroundColor: AppColors.voidColor,
+            onPressed: () => _edit(),
+            icon: const Icon(LucideIcons.plus, size: 18),
+            label: Text('marketing.tpl_new'.tr()),
+          )),
+    ]);
+  }
+}
+
+// ── Phase 2: 7) Empfehlungs-Übersicht ──────────────────────────────────────
+class _ReferralsTab extends StatefulWidget {
+  const _ReferralsTab({required this.repo});
+  final MarketingRepository repo;
+  @override
+  State<_ReferralsTab> createState() => _ReferralsTabState();
+}
+
+class _ReferralsTabState extends State<_ReferralsTab> {
+  late Future<Map<String, dynamic>> _f = widget.repo.referralsOverview();
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      color: AppColors.bronze,
+      onRefresh: () async => setState(() => _f = widget.repo.referralsOverview()),
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: _f,
+        builder: (c, snap) {
+          if (!snap.hasData) {
+            return const Center(
+                child: CircularProgressIndicator(color: AppColors.bronze));
+          }
+          final d = snap.data!;
+          final totals = Map<String, dynamic>.from((d['totals'] as Map?) ?? const {});
+          final top = ((d['top_referrers'] as List?) ?? const [])
+              .whereType<Map>()
+              .map((m) => Map<String, dynamic>.from(m))
+              .toList();
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Row(children: [
+                Expanded(
+                    child: _StatTile(
+                        label: 'marketing.ref_completed_30d'.tr(),
+                        value: '${totals['completed_30d'] ?? 0}')),
+                const SizedBox(width: 10),
+                Expanded(
+                    child: _StatTile(
+                        label: 'marketing.ref_pending_30d'.tr(),
+                        value: '${totals['pending_30d'] ?? 0}')),
+              ]),
+              const SizedBox(height: 18),
+              Text('marketing.top_referrers'.tr(),
+                  style: AppTypography.label(size: 11, color: AppColors.mute)),
+              const SizedBox(height: 8),
+              ...top.map((r) => Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      borderRadius: BorderRadius.circular(12),
+                      border:
+                          Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                    ),
+                    child: Row(children: [
+                      const Icon(LucideIcons.userPlus,
+                          size: 18, color: AppColors.bronze),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  (r['name'] ?? r['nickname'] ?? '–').toString(),
+                                  style: AppTypography.body(
+                                      size: 14, color: AppColors.ink)),
+                              Text(
+                                  'marketing.ref_meta'.tr(namedArgs: {
+                                    'completed': '${r['completed'] ?? 0}',
+                                    'total': '${r['total'] ?? 0}',
+                                    'karma': '${r['karma_points'] ?? 0}',
+                                  }),
+                                  style: AppTypography.label(
+                                      size: 10, color: AppColors.mute)),
+                            ]),
+                      ),
+                    ]),
+                  )),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ── Phase 2: 8) Region-Manager ─────────────────────────────────────────────
+class _RegionsTab extends StatefulWidget {
+  const _RegionsTab({required this.repo});
+  final MarketingRepository repo;
+  @override
+  State<_RegionsTab> createState() => _RegionsTabState();
+}
+
+class _RegionsTabState extends State<_RegionsTab> {
+  late Future<List<Map<String, dynamic>>> _f = widget.repo.regionsOverview();
+  Color _signal(String s) {
+    switch (s) {
+      case 'lebt':
+        return AppColors.leben;
+      case 'braucht_hilfe':
+        return AppColors.herzrot;
+      case 'klein':
+        return AppColors.mute;
+      default:
+        return AppColors.bronze;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      color: AppColors.bronze,
+      onRefresh: () async => setState(() => _f = widget.repo.regionsOverview()),
+      child: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _f,
+        builder: (c, snap) {
+          if (!snap.hasData) {
+            return const Center(
+                child: CircularProgressIndicator(color: AppColors.bronze));
+          }
+          final rows = snap.data!;
+          if (rows.isEmpty) {
+            return ListView(children: [
+              Padding(
+                padding: const EdgeInsets.all(40),
+                child: Center(
+                    child: Text('marketing.reg_empty'.tr(),
+                        style: AppTypography.caption())),
+              ),
+            ]);
+          }
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: rows.map((r) {
+              final signal = (r['signal'] ?? 'normal').toString();
+              final color = _signal(signal);
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.elevated,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: color.withValues(alpha: 0.35)),
+                ),
+                child: Row(children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(r['name']?.toString() ?? '–',
+                              style: AppTypography.body(
+                                  size: 14,
+                                  color: AppColors.ink,
+                                  weight: FontWeight.w700)),
+                          Text(
+                              'marketing.reg_meta'.tr(namedArgs: {
+                                'users': '${r['users'] ?? 0}',
+                                'new': '${r['new_users_7d'] ?? 0}',
+                                'active': '${r['active_7d'] ?? 0}',
+                              }),
+                              style: AppTypography.label(
+                                  size: 10, color: AppColors.mute)),
+                        ]),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: color.withValues(alpha: 0.40)),
+                    ),
+                    child: Text(
+                        'marketing.reg_signal_$signal'.tr(),
+                        style: AppTypography.label(size: 9, color: color)),
+                  ),
+                ]),
+              );
+            }).toList(),
+          );
+        },
+      ),
     );
   }
 }

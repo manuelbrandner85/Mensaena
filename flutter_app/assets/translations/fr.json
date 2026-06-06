@@ -3772,6 +3772,25 @@
     "seg_marketing_subs": "Consentement marketing",
     "kill_switch": "Coupe-circuit global",
     "kill_switch_hint": "Stoppe immediatement TOUS les pushes automatiques.",
-    "kill_switch_label": "Mettre marketing en pause"
+    "kill_switch_label": "Mettre marketing en pause",
+    "tab_templates": "Modeles",
+    "tab_referrals": "Parrainages",
+    "tab_regions": "Regions",
+    "tpl_new": "Nouveau modele",
+    "tpl_edit": "Modifier le modele",
+    "tpl_name": "Nom",
+    "tpl_subject": "Objet",
+    "tpl_body": "Contenu (espaces reserves)",
+    "tpl_empty": "Aucun modele.",
+    "ref_completed_30d": "Terminees 30j",
+    "ref_pending_30d": "En attente 30j",
+    "top_referrers": "Top parrains",
+    "ref_meta": "Termines {completed} / Total {total} - Karma {karma}",
+    "reg_empty": "Aucune region avec utilisateurs.",
+    "reg_meta": "{users} utilisateurs - {new} nouveaux (7j) - {active} actifs (7j)",
+    "reg_signal_lebt": "vivante",
+    "reg_signal_braucht_hilfe": "a besoin daide",
+    "reg_signal_klein": "petite",
+    "reg_signal_normal": "ok"
   }
 }

@@ -103,4 +103,66 @@ class MarketingRepository {
     );
     return Map<String, dynamic>.from((res.data as Map?) ?? const {});
   }
+
+  // ── Phase 2: Vorlagen-Editor ────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> listTemplates() async {
+    final rows = await SupabaseService.client
+        .from('message_templates')
+        .select('id, name, kind, subject, body_html, body_text, description, updated_at')
+        .order('updated_at', ascending: false)
+        .limit(100);
+    return (rows as List).cast<Map<String, dynamic>>();
+  }
+
+  Future<String?> upsertTemplate({
+    String? id,
+    required String name,
+    required String kind,
+    String? subject,
+    String? bodyHtml,
+    String? bodyText,
+    String? description,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    final payload = <String, dynamic>{
+      if (id != null) 'id': id,
+      'name': name,
+      'kind': kind,
+      'subject': subject,
+      'body_html': bodyHtml,
+      'body_text': bodyText,
+      'description': description,
+      'updated_at': DateTime.now().toIso8601String(),
+      if (id == null && uid != null) 'created_by': uid,
+    };
+    final res = await SupabaseService.client
+        .from('message_templates')
+        .upsert(payload)
+        .select('id')
+        .maybeSingle();
+    return (res as Map?)?['id']?.toString();
+  }
+
+  Future<void> deleteTemplate(String id) async {
+    await SupabaseService.client.from('message_templates').delete().eq('id', id);
+  }
+
+  // ── Phase 2: Empfehlungs-Übersicht ──────────────────────────────────────
+  Future<Map<String, dynamic>> referralsOverview() async {
+    final res =
+        await SupabaseService.client.rpc('marketing_referrals_overview');
+    return Map<String, dynamic>.from((res as Map?) ?? const {});
+  }
+
+  // ── Phase 2: Region-Manager ─────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> regionsOverview() async {
+    final res = await SupabaseService.client.rpc('marketing_regions_overview');
+    if (res is List) {
+      return res
+          .whereType<Map>()
+          .map((m) => Map<String, dynamic>.from(m))
+          .toList();
+    }
+    return const [];
+  }
 }

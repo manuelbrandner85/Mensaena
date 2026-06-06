@@ -3771,6 +3771,25 @@
     "seg_marketing_subs": "Pazarlama izni",
     "kill_switch": "Global acil durdur",
     "kill_switch_hint": "Tum otomatik bildirimleri aninda durdurur.",
-    "kill_switch_label": "Pazarlamayi duraklat"
+    "kill_switch_label": "Pazarlamayi duraklat",
+    "tab_templates": "Sablonlar",
+    "tab_referrals": "Davetler",
+    "tab_regions": "Bolgeler",
+    "tpl_new": "Yeni sablon",
+    "tpl_edit": "Sablonu duzenle",
+    "tpl_name": "Ad",
+    "tpl_subject": "Konu",
+    "tpl_body": "Icerik (yer tutucular)",
+    "tpl_empty": "Henuz sablon yok.",
+    "ref_completed_30d": "Tamamlanan 30g",
+    "ref_pending_30d": "Bekleyen 30g",
+    "top_referrers": "Top davet edenler",
+    "ref_meta": "Tamamlandi {completed} / Toplam {total} - Karma {karma}",
+    "reg_empty": "Henuz kullanicili bolge yok.",
+    "reg_meta": "{users} kullanici - {new} yeni (7g) - {active} aktif (7g)",
+    "reg_signal_lebt": "canli",
+    "reg_signal_braucht_hilfe": "yardim gerek",
+    "reg_signal_klein": "kucuk",
+    "reg_signal_normal": "ok"
   }
 }
