@@ -812,311 +812,823 @@ CREATE TABLE IF NOT EXISTS public.stream_clips (
 -- ----------------------------------------------------------------------------
 
 -- badges
-ALTER TABLE public.badges
-  ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+DO $$ BEGIN
+  IF to_regclass('public.badges') IS NOT NULL THEN
+    ALTER TABLE public.badges
+      ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+  END IF;
+END $$;
 
 -- board_posts
-ALTER TABLE public.board_posts
-  ADD COLUMN IF NOT EXISTS fts tsvector;
+DO $$ BEGIN
+  IF to_regclass('public.board_posts') IS NOT NULL THEN
+    ALTER TABLE public.board_posts
+      ADD COLUMN IF NOT EXISTS fts tsvector;
+  END IF;
+END $$;
 
 -- chat_banned_users
-ALTER TABLE public.chat_banned_users
-  ADD COLUMN IF NOT EXISTS channel_id uuid REFERENCES public.chat_channels(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  IF to_regclass('public.chat_banned_users') IS NOT NULL THEN
+    ALTER TABLE public.chat_banned_users
+      ADD COLUMN IF NOT EXISTS channel_id uuid REFERENCES public.chat_channels(id) ON DELETE CASCADE;
+  END IF;
+END $$;
 
 -- conversation_members
-ALTER TABLE public.conversation_members
-  ADD COLUMN IF NOT EXISTS is_muted boolean DEFAULT false;
-ALTER TABLE public.conversation_members
-  ADD COLUMN IF NOT EXISTS muted_until timestamptz;
-ALTER TABLE public.conversation_members
-  ADD COLUMN IF NOT EXISTS vanish_mode boolean DEFAULT false;
+DO $$ BEGIN
+  IF to_regclass('public.conversation_members') IS NOT NULL THEN
+    ALTER TABLE public.conversation_members
+      ADD COLUMN IF NOT EXISTS is_muted boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.conversation_members') IS NOT NULL THEN
+    ALTER TABLE public.conversation_members
+      ADD COLUMN IF NOT EXISTS muted_until timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.conversation_members') IS NOT NULL THEN
+    ALTER TABLE public.conversation_members
+      ADD COLUMN IF NOT EXISTS vanish_mode boolean DEFAULT false;
+  END IF;
+END $$;
 
 -- conversations
-ALTER TABLE public.conversations
-  ADD COLUMN IF NOT EXISTS vanish_mode_enabled boolean DEFAULT false;
-ALTER TABLE public.conversations
-  ADD COLUMN IF NOT EXISTS vanish_seconds integer DEFAULT 3600;
+DO $$ BEGIN
+  IF to_regclass('public.conversations') IS NOT NULL THEN
+    ALTER TABLE public.conversations
+      ADD COLUMN IF NOT EXISTS vanish_mode_enabled boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.conversations') IS NOT NULL THEN
+    ALTER TABLE public.conversations
+      ADD COLUMN IF NOT EXISTS vanish_seconds integer DEFAULT 3600;
+  END IF;
+END $$;
 
 -- crises
-ALTER TABLE public.crises
-  ADD COLUMN IF NOT EXISTS ai_summary text;
-ALTER TABLE public.crises
-  ADD COLUMN IF NOT EXISTS ai_summary_at timestamptz;
+DO $$ BEGIN
+  IF to_regclass('public.crises') IS NOT NULL THEN
+    ALTER TABLE public.crises
+      ADD COLUMN IF NOT EXISTS ai_summary text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.crises') IS NOT NULL THEN
+    ALTER TABLE public.crises
+      ADD COLUMN IF NOT EXISTS ai_summary_at timestamptz;
+  END IF;
+END $$;
 
 -- dm_calls
-ALTER TABLE public.dm_calls
-  ADD COLUMN IF NOT EXISTS callee_hidden_at timestamptz;
-ALTER TABLE public.dm_calls
-  ADD COLUMN IF NOT EXISTS caller_hidden_at timestamptz;
-ALTER TABLE public.dm_calls
-  ADD COLUMN IF NOT EXISTS duration_seconds integer;
+DO $$ BEGIN
+  IF to_regclass('public.dm_calls') IS NOT NULL THEN
+    ALTER TABLE public.dm_calls
+      ADD COLUMN IF NOT EXISTS callee_hidden_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.dm_calls') IS NOT NULL THEN
+    ALTER TABLE public.dm_calls
+      ADD COLUMN IF NOT EXISTS caller_hidden_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.dm_calls') IS NOT NULL THEN
+    ALTER TABLE public.dm_calls
+      ADD COLUMN IF NOT EXISTS duration_seconds integer;
+  END IF;
+END $$;
 
 -- email_campaigns
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS ab_group text;
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS ab_variant text;
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS body_html text;
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS body_text text;
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS failure_count integer DEFAULT 0;
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS preheader text;
-ALTER TABLE public.email_campaigns
-  ADD COLUMN IF NOT EXISTS success_count integer DEFAULT 0;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS ab_group text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS ab_variant text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS body_html text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS body_text text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS failure_count integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS preheader text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.email_campaigns') IS NOT NULL THEN
+    ALTER TABLE public.email_campaigns
+      ADD COLUMN IF NOT EXISTS success_count integer DEFAULT 0;
+  END IF;
+END $$;
 
 -- email_opens
-ALTER TABLE public.email_opens
-  ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  IF to_regclass('public.email_opens') IS NOT NULL THEN
+    ALTER TABLE public.email_opens
+      ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
+  END IF;
+END $$;
 
 -- events
-ALTER TABLE public.events
-  ADD COLUMN IF NOT EXISTS is_online boolean DEFAULT false;
-ALTER TABLE public.events
-  ADD COLUMN IF NOT EXISTS online_url text;
-ALTER TABLE public.events
-  ADD COLUMN IF NOT EXISTS parent_event_id uuid REFERENCES public.events(id) ON DELETE NO ACTION;
-ALTER TABLE public.events
-  ADD COLUMN IF NOT EXISTS recurrence_parent_id uuid REFERENCES public.events(id) ON DELETE SET NULL;
-ALTER TABLE public.events
-  ADD COLUMN IF NOT EXISTS recurrence_rule text;
+DO $$ BEGIN
+  IF to_regclass('public.events') IS NOT NULL THEN
+    ALTER TABLE public.events
+      ADD COLUMN IF NOT EXISTS is_online boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.events') IS NOT NULL THEN
+    ALTER TABLE public.events
+      ADD COLUMN IF NOT EXISTS online_url text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.events') IS NOT NULL THEN
+    ALTER TABLE public.events
+      ADD COLUMN IF NOT EXISTS parent_event_id uuid REFERENCES public.events(id) ON DELETE NO ACTION;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.events') IS NOT NULL THEN
+    ALTER TABLE public.events
+      ADD COLUMN IF NOT EXISTS recurrence_parent_id uuid REFERENCES public.events(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.events') IS NOT NULL THEN
+    ALTER TABLE public.events
+      ADD COLUMN IF NOT EXISTS recurrence_rule text;
+  END IF;
+END $$;
 
 -- group_posts
-ALTER TABLE public.group_posts
-  ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+DO $$ BEGIN
+  IF to_regclass('public.group_posts') IS NOT NULL THEN
+    ALTER TABLE public.group_posts
+      ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+  END IF;
+END $$;
 
 -- groups
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS cover_image_url text;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS created_by uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS is_archived boolean DEFAULT false;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS is_public boolean DEFAULT true;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS latitude double precision;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS longitude double precision;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS max_members integer DEFAULT 100;
-ALTER TABLE public.groups
-  ADD COLUMN IF NOT EXISTS radius_km integer DEFAULT 5;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS cover_image_url text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS created_by uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS is_archived boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS is_public boolean DEFAULT true;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS latitude double precision;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS longitude double precision;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS max_members integer DEFAULT 100;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.groups') IS NOT NULL THEN
+    ALTER TABLE public.groups
+      ADD COLUMN IF NOT EXISTS radius_km integer DEFAULT 5;
+  END IF;
+END $$;
 
 -- live_rooms
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS category text;
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS description text;
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS max_viewers integer DEFAULT 0;
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS recording_url text;
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS scheduled_for timestamptz;
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS thumbnail_url text;
-ALTER TABLE public.live_rooms
-  ADD COLUMN IF NOT EXISTS viewer_count integer DEFAULT 0;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS category text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS description text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS max_viewers integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS recording_url text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS scheduled_for timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS thumbnail_url text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    ALTER TABLE public.live_rooms
+      ADD COLUMN IF NOT EXISTS viewer_count integer DEFAULT 0;
+  END IF;
+END $$;
 
 -- marketplace_listings
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS condition text;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS expires_at timestamptz DEFAULT (now() + '30 days'::interval);
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS favorite_count integer DEFAULT 0;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS fts tsvector;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS images text[] DEFAULT '{}'::text[];
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS latitude double precision;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS listing_type text;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS longitude double precision;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS radius_km integer DEFAULT 10;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS reserved_for uuid REFERENCES public.profiles(id) ON DELETE SET NULL;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS tags text[] DEFAULT '{}'::text[];
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS thumbnail_url text;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
-ALTER TABLE public.marketplace_listings
-  ADD COLUMN IF NOT EXISTS view_count integer DEFAULT 0;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS condition text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS expires_at timestamptz DEFAULT (now() + '30 days'::interval);
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS favorite_count integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS fts tsvector;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS images text[] DEFAULT '{}'::text[];
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS latitude double precision;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS listing_type text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS longitude double precision;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS radius_km integer DEFAULT 10;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS reserved_for uuid REFERENCES public.profiles(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS tags text[] DEFAULT '{}'::text[];
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS thumbnail_url text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    ALTER TABLE public.marketplace_listings
+      ADD COLUMN IF NOT EXISTS view_count integer DEFAULT 0;
+  END IF;
+END $$;
 
 -- match_preferences
-ALTER TABLE public.match_preferences
-  ADD COLUMN IF NOT EXISTS excluded_categories text[] DEFAULT '{}'::text[];
+DO $$ BEGIN
+  IF to_regclass('public.match_preferences') IS NOT NULL THEN
+    ALTER TABLE public.match_preferences
+      ADD COLUMN IF NOT EXISTS excluded_categories text[] DEFAULT '{}'::text[];
+  END IF;
+END $$;
 
 -- messages
-ALTER TABLE public.messages
-  ADD COLUMN IF NOT EXISTS auto_delete_at timestamptz;
+DO $$ BEGIN
+  IF to_regclass('public.messages') IS NOT NULL THEN
+    ALTER TABLE public.messages
+      ADD COLUMN IF NOT EXISTS auto_delete_at timestamptz;
+  END IF;
+END $$;
 
 -- notifications
-ALTER TABLE public.notifications
-  ADD COLUMN IF NOT EXISTS priority text DEFAULT 'normal'::text;
+DO $$ BEGIN
+  IF to_regclass('public.notifications') IS NOT NULL THEN
+    ALTER TABLE public.notifications
+      ADD COLUMN IF NOT EXISTS priority text DEFAULT 'normal'::text;
+  END IF;
+END $$;
 
 -- organization_reviews
-ALTER TABLE public.organization_reviews
-  ADD COLUMN IF NOT EXISTS admin_responded_at timestamptz;
-ALTER TABLE public.organization_reviews
-  ADD COLUMN IF NOT EXISTS is_flagged boolean DEFAULT false;
+DO $$ BEGIN
+  IF to_regclass('public.organization_reviews') IS NOT NULL THEN
+    ALTER TABLE public.organization_reviews
+      ADD COLUMN IF NOT EXISTS admin_responded_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.organization_reviews') IS NOT NULL THEN
+    ALTER TABLE public.organization_reviews
+      ADD COLUMN IF NOT EXISTS is_flagged boolean DEFAULT false;
+  END IF;
+END $$;
 
 -- organizations
-ALTER TABLE public.organizations
-  ADD COLUMN IF NOT EXISTS opening_hours_text text;
-ALTER TABLE public.organizations
-  ADD COLUMN IF NOT EXISTS rating_sum integer DEFAULT 0;
+DO $$ BEGIN
+  IF to_regclass('public.organizations') IS NOT NULL THEN
+    ALTER TABLE public.organizations
+      ADD COLUMN IF NOT EXISTS opening_hours_text text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.organizations') IS NOT NULL THEN
+    ALTER TABLE public.organizations
+      ADD COLUMN IF NOT EXISTS rating_sum integer DEFAULT 0;
+  END IF;
+END $$;
 
 -- post_comments
-ALTER TABLE public.post_comments
-  ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+DO $$ BEGIN
+  IF to_regclass('public.post_comments') IS NOT NULL THEN
+    ALTER TABLE public.post_comments
+      ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+  END IF;
+END $$;
 
 -- posts
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS availability_days text[];
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS availability_end time;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS availability_start time;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS comment_count integer DEFAULT 0;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS expires_at timestamptz;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS fts tsvector;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS is_example boolean DEFAULT false;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS is_pinned boolean DEFAULT false;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS is_recurring boolean DEFAULT false;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS media_urls text[];
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS meeting_point text;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS module_key text;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS module_slug text;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS post_intent text DEFAULT 'general'::text;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS reaction_count integer DEFAULT 0;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS recurring_interval text;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS scheduled_at timestamptz;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS scheduled_for timestamptz;
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS time_hours numeric;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS availability_days text[];
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS availability_end time;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS availability_start time;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS comment_count integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS expires_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS fts tsvector;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS is_example boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS is_pinned boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS is_recurring boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS media_urls text[];
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS meeting_point text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS module_key text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS module_slug text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS post_intent text DEFAULT 'general'::text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS reaction_count integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS recurring_interval text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS scheduled_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS scheduled_for timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.posts') IS NOT NULL THEN
+    ALTER TABLE public.posts
+      ADD COLUMN IF NOT EXISTS time_hours numeric;
+  END IF;
+END $$;
 
 -- profiles
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS banned_at timestamptz;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS banned_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS country text DEFAULT 'DE'::text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS dashboard_config jsonb DEFAULT '{}'::jsonb;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS emergency_contact_1_name text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS emergency_contact_1_phone text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS emergency_contact_2_name text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS emergency_contact_2_phone text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS inactive_reminder_count integer DEFAULT 0;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS is_verified boolean DEFAULT false;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS karma_points integer DEFAULT 0;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS last_login_at timestamptz;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS last_seen_at timestamptz;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS level text DEFAULT 'nachbar'::text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS neighborhood_group_id uuid REFERENCES public.groups(id) ON DELETE SET NULL;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS onboarding_completed boolean DEFAULT false;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS points integer DEFAULT 0;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS preferred_modules text[];
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS region text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS show_profile_views boolean DEFAULT true;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS status_emoji text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS status_text text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS status_until timestamptz;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS timezone text DEFAULT 'Europe/Berlin'::text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS username text;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS verified_at timestamptz;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS verified_community boolean DEFAULT false;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS verified_email boolean DEFAULT false;
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS verified_phone boolean DEFAULT false;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS banned_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS banned_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS country text DEFAULT 'DE'::text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS dashboard_config jsonb DEFAULT '{}'::jsonb;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS emergency_contact_1_name text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS emergency_contact_1_phone text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS emergency_contact_2_name text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS emergency_contact_2_phone text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS inactive_reminder_count integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS is_verified boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS karma_points integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS last_login_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS last_seen_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS level text DEFAULT 'nachbar'::text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS neighborhood_group_id uuid REFERENCES public.groups(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS onboarding_completed boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS points integer DEFAULT 0;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS preferred_modules text[];
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS region text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS show_profile_views boolean DEFAULT true;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS status_emoji text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS status_text text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS status_until timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS timezone text DEFAULT 'Europe/Berlin'::text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS username text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS verified_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS verified_community boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS verified_email boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.profiles') IS NOT NULL THEN
+    ALTER TABLE public.profiles
+      ADD COLUMN IF NOT EXISTS verified_phone boolean DEFAULT false;
+  END IF;
+END $$;
 
 -- reports
-ALTER TABLE public.reports
-  ADD COLUMN IF NOT EXISTS reviewed_at timestamptz;
-ALTER TABLE public.reports
-  ADD COLUMN IF NOT EXISTS reviewed_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  IF to_regclass('public.reports') IS NOT NULL THEN
+    ALTER TABLE public.reports
+      ADD COLUMN IF NOT EXISTS reviewed_at timestamptz;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.reports') IS NOT NULL THEN
+    ALTER TABLE public.reports
+      ADD COLUMN IF NOT EXISTS reviewed_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL;
+  END IF;
+END $$;
 
 -- saved_posts
-ALTER TABLE public.saved_posts
-  ADD COLUMN IF NOT EXISTS collection_id uuid REFERENCES public.save_collections(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  IF to_regclass('public.saved_posts') IS NOT NULL THEN
+    ALTER TABLE public.saved_posts
+      ADD COLUMN IF NOT EXISTS collection_id uuid REFERENCES public.save_collections(id) ON DELETE SET NULL;
+  END IF;
+END $$;
 
 -- skill_offers
-ALTER TABLE public.skill_offers
-  ADD COLUMN IF NOT EXISTS is_active boolean DEFAULT true;
-ALTER TABLE public.skill_offers
-  ADD COLUMN IF NOT EXISTS is_online boolean DEFAULT false;
-ALTER TABLE public.skill_offers
-  ADD COLUMN IF NOT EXISTS location_address text;
-ALTER TABLE public.skill_offers
-  ADD COLUMN IF NOT EXISTS location_lat double precision;
-ALTER TABLE public.skill_offers
-  ADD COLUMN IF NOT EXISTS location_lng double precision;
-ALTER TABLE public.skill_offers
-  ADD COLUMN IF NOT EXISTS radius_km integer DEFAULT 10;
+DO $$ BEGIN
+  IF to_regclass('public.skill_offers') IS NOT NULL THEN
+    ALTER TABLE public.skill_offers
+      ADD COLUMN IF NOT EXISTS is_active boolean DEFAULT true;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.skill_offers') IS NOT NULL THEN
+    ALTER TABLE public.skill_offers
+      ADD COLUMN IF NOT EXISTS is_online boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.skill_offers') IS NOT NULL THEN
+    ALTER TABLE public.skill_offers
+      ADD COLUMN IF NOT EXISTS location_address text;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.skill_offers') IS NOT NULL THEN
+    ALTER TABLE public.skill_offers
+      ADD COLUMN IF NOT EXISTS location_lat double precision;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.skill_offers') IS NOT NULL THEN
+    ALTER TABLE public.skill_offers
+      ADD COLUMN IF NOT EXISTS location_lng double precision;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.skill_offers') IS NOT NULL THEN
+    ALTER TABLE public.skill_offers
+      ADD COLUMN IF NOT EXISTS radius_km integer DEFAULT 10;
+  END IF;
+END $$;
 
 -- testimonials
-ALTER TABLE public.testimonials
-  ADD COLUMN IF NOT EXISTS consent_public boolean DEFAULT false;
-ALTER TABLE public.testimonials
-  ADD COLUMN IF NOT EXISTS interaction_id uuid REFERENCES public.interactions(id) ON DELETE SET NULL;
-ALTER TABLE public.testimonials
-  ADD COLUMN IF NOT EXISTS rating smallint;
+DO $$ BEGIN
+  IF to_regclass('public.testimonials') IS NOT NULL THEN
+    ALTER TABLE public.testimonials
+      ADD COLUMN IF NOT EXISTS consent_public boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.testimonials') IS NOT NULL THEN
+    ALTER TABLE public.testimonials
+      ADD COLUMN IF NOT EXISTS interaction_id uuid REFERENCES public.interactions(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.testimonials') IS NOT NULL THEN
+    ALTER TABLE public.testimonials
+      ADD COLUMN IF NOT EXISTS rating smallint;
+  END IF;
+END $$;
 
 -- user_notification_prefs
-ALTER TABLE public.user_notification_prefs
-  ADD COLUMN IF NOT EXISTS daily_digest_enabled boolean DEFAULT false;
-ALTER TABLE public.user_notification_prefs
-  ADD COLUMN IF NOT EXISTS daily_digest_hour integer DEFAULT 8;
+DO $$ BEGIN
+  IF to_regclass('public.user_notification_prefs') IS NOT NULL THEN
+    ALTER TABLE public.user_notification_prefs
+      ADD COLUMN IF NOT EXISTS daily_digest_enabled boolean DEFAULT false;
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF to_regclass('public.user_notification_prefs') IS NOT NULL THEN
+    ALTER TABLE public.user_notification_prefs
+      ADD COLUMN IF NOT EXISTS daily_digest_hour integer DEFAULT 8;
+  END IF;
+END $$;
