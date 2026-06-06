@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/personal_best_service.dart';
+import 'tile_error.dart';
 import '../effects/glass_card.dart';
 
 final _personalBestProvider = FutureProvider<PersonalBest>((ref) async {
@@ -24,7 +25,7 @@ class PersonalBestWidget extends ConsumerWidget {
     final async = ref.watch(_personalBestProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_personalBestProvider)),
       data: (b) {
         final total =
             b.totalHelps + b.totalPosts + b.totalComments + b.bestLoginStreak;

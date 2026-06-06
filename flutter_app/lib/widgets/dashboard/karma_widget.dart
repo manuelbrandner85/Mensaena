@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/karma_service.dart';
+import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
 
@@ -26,7 +27,7 @@ class KarmaWidget extends ConsumerWidget {
     final async = ref.watch(_karmaProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_karmaProvider)),
       data: (k) {
         if (k.points == 0) return const SizedBox.shrink();
         final level = k.level;

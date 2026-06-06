@@ -14,6 +14,7 @@ import '../../services/gratitude_service.dart';
 import '../../services/haptics.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
+import 'tile_error.dart';
 
 final _gratitudeTodayProvider =
     FutureProvider.autoDispose<GratitudeEntry?>((ref) async {
@@ -121,7 +122,7 @@ class GratitudeWidget extends ConsumerWidget {
             ),
           ),
         ),
-        error: (_, __) => const SizedBox.shrink(),
+        error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_gratitudeTodayProvider)),
         data: (entry) {
           final hasEntry = entry != null;
           return InkWell(

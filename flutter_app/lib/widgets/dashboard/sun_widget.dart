@@ -13,6 +13,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/sun_service.dart';
+import 'tile_error.dart';
 import '../effects/glass_card.dart';
 
 final _sunProvider = FutureProvider<SunData?>((ref) async {
@@ -31,7 +32,7 @@ class SunWidget extends ConsumerWidget {
     final async = ref.watch(_sunProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_sunProvider)),
       data: (sun) {
         if (sun == null) return const SizedBox.shrink();
         final fmt = DateFormat.Hm();

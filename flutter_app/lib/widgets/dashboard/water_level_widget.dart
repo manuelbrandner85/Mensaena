@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/water_level_service.dart';
+import 'tile_error.dart';
 import '../effects/glass_card.dart';
 
 final _waterLevelProvider = FutureProvider.autoDispose
@@ -57,7 +58,7 @@ class WaterLevelWidget extends ConsumerWidget {
     final async = ref.watch(_waterLevelProvider((lat: lat, lng: lng)));
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_waterLevelProvider)),
       data: (list) {
         if (list.isEmpty) return const SizedBox.shrink();
         final w = list.first;

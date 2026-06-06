@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/interactions_repository.dart';
+import 'tile_error.dart';
 
 class ActivityFeedWidget extends ConsumerWidget {
   const ActivityFeedWidget({super.key});
@@ -20,7 +21,7 @@ class ActivityFeedWidget extends ConsumerWidget {
     final stream = ref.watch(interactionsStreamProvider);
     return stream.when(
       loading: () => const SizedBox(height: 80),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(interactionsStreamProvider)),
       data: (interactions) {
         if (interactions.isEmpty) return const SizedBox.shrink();
         return Container(

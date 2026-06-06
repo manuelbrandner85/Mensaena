@@ -91,7 +91,8 @@ class NearbyNeighborsWidget extends ConsumerWidget {
                         separatorBuilder: (_, __) => const SizedBox(width: 12),
                         itemBuilder: (_, i) {
                           final p = list[i];
-                          final id = p['id'] as String;
+                          final id = p['id']?.toString();
+                          if (id == null) return const SizedBox.shrink();
                           final name =
                               (p['display_name'] as String?) ?? 'mensaena';
                           final avatar = p['avatar_url'] as String?;

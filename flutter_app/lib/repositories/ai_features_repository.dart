@@ -2,7 +2,15 @@
 /// Datenschicht für alle KI-Zusatzfunktionen (aufbauend auf der Fallback-Kette
 /// in den Edge Functions). KOSTENSCHUTZ: Klassifikation + Moderation laufen
 /// ZUERST lokal (Heuristik) und rufen die KI nur im Zweifel.
+///
+/// STABILITÄT: Alle Edge-Function-Calls laufen über [_safeInvoke] — mit
+/// Timeout (gegen Hänger bei schlechtem Netz) und try/catch (ein Netzwerk-
+/// fehler darf NIE bis in die UI durchschlagen). Bei Fehler: null → die
+/// jeweilige Funktion liefert ihren sicheren Default (lokales Teilergebnis
+/// bzw. null/fail-open).
 library;
+
+import 'package:flutter/foundation.dart' show debugPrint;
 
 import '../services/supabase_service.dart';
 
@@ -27,6 +35,24 @@ class AiModerationResult {
 }
 
 class AiFeaturesRepository {
+  /// KI-Generierung kann serverseitig (LLM) einige Sekunden dauern, aber NIE
+  /// ewig — danach lieber sauberer Fehler als toter Spinner.
+  static const Duration _aiTimeout = Duration(seconds: 30);
+
+  /// Ruft eine Edge Function auf und gibt `res.data` zurück — oder null bei
+  /// Timeout/Netzwerk-/Funktionsfehler. Wirft NIE.
+  Future<dynamic> _safeInvoke(String fn, Map<String, dynamic> body) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke(fn, body: body)
+          .timeout(_aiTimeout);
+      return res.data;
+    } catch (e) {
+      debugPrint('[AiFeatures] $fn failed: $e');
+      return null;
+    }
+  }
+
   static const _types = [
     'help_needed', 'help_offered', 'rescue', 'animal', 'housing', 'supply',
     'mobility', 'sharing', 'crisis', 'community',
@@ -38,11 +64,8 @@ class AiFeaturesRepository {
 
   // ── A) Beitrags-Texthilfe ───────────────────────────────────────────────
   Future<String?> improvePost(String rawText, String lang) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'ai-improve-post',
-      body: {'rawText': rawText, 'lang': lang},
-    );
-    final d = res.data;
+    final d = await _safeInvoke('ai-improve-post',
+        {'rawText': rawText, 'lang': lang});
     if (d is Map && d['improved'] != null) return d['improved'].toString();
     return null;
   }
@@ -82,22 +105,17 @@ class AiFeaturesRepository {
       return AiClassifyResult(type: type, category: category);
     }
     // Unklar -> KI-Fallback (gedrosselt serverseitig via ai_classify).
-    try {
-      final res = await SupabaseService.client.functions.invoke(
-        'ai-classify-post',
-        body: {'title': title, 'description': description},
+    final d = await _safeInvoke('ai-classify-post',
+        {'title': title, 'description': description});
+    if (d is Map) {
+      final t = d['type']?.toString();
+      final c = d['category']?.toString();
+      return AiClassifyResult(
+        type: _types.contains(t) ? t : type,
+        category: _cats.contains(c) ? c : category,
+        fromAi: true,
       );
-      final d = res.data;
-      if (d is Map) {
-        final t = d['type']?.toString();
-        final c = d['category']?.toString();
-        return AiClassifyResult(
-          type: _types.contains(t) ? t : type,
-          category: _cats.contains(c) ? c : category,
-          fromAi: true,
-        );
-      }
-    } catch (_) {/* lokale Teilergebnisse behalten */}
+    }
     return AiClassifyResult(type: type, category: category);
   }
 
@@ -112,11 +130,8 @@ class AiFeaturesRepository {
 
   // ── C) Übersetzung ───────────────────────────────────────────────────────
   Future<String?> translate(String text, String targetLang) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'ai-translate',
-      body: {'text': text, 'targetLang': targetLang},
-    );
-    final d = res.data;
+    final d = await _safeInvoke('ai-translate',
+        {'text': text, 'targetLang': targetLang});
     if (d is Map && d['translated'] != null) return d['translated'].toString();
     return null;
   }
@@ -137,35 +152,26 @@ class AiFeaturesRepository {
           flagged: true, reason: 'Offensichtlicher Verstoß', severity: 'high');
     }
     // Graubereich -> KI (serverseitig gedrosselt; legt ggf. reports-Eintrag an).
-    try {
-      final res = await SupabaseService.client.functions.invoke(
-        'ai-moderate',
-        body: {
-          'text': text,
-          if (contentType != null) 'contentType': contentType,
-          if (contentId != null) 'contentId': contentId,
-        },
+    final d = await _safeInvoke('ai-moderate', {
+      'text': text,
+      if (contentType != null) 'contentType': contentType,
+      if (contentId != null) 'contentId': contentId,
+    });
+    if (d is Map) {
+      return AiModerationResult(
+        flagged: d['flagged'] == true,
+        reason: (d['reason'] ?? '').toString(),
+        severity: (d['severity'] ?? 'low').toString(),
+        fromAi: true,
       );
-      final d = res.data;
-      if (d is Map) {
-        return AiModerationResult(
-          flagged: d['flagged'] == true,
-          reason: (d['reason'] ?? '').toString(),
-          severity: (d['severity'] ?? 'low').toString(),
-          fromAi: true,
-        );
-      }
-    } catch (_) {/* fail-open: nicht blockieren */}
+    }
+    // fail-open: bei Fehler nicht blockieren.
     return const AiModerationResult(flagged: false);
   }
 
   // ── E) Wiki-Entwurf (nur Admin; serverseitig geprüft) ───────────────────
   Future<Map<String, dynamic>?> wikiDraft(String topic, String lang) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'ai-wiki-draft',
-      body: {'topic': topic, 'lang': lang},
-    );
-    final d = res.data;
+    final d = await _safeInvoke('ai-wiki-draft', {'topic': topic, 'lang': lang});
     if (d is Map && d['draft'] != null) {
       return Map<String, dynamic>.from(d['draft'] as Map);
     }
@@ -186,35 +192,33 @@ class AiFeaturesRepository {
 
   // ── F) Krisen-Zusammenfassung (gecacht serverseitig) ────────────────────
   Future<String?> crisisSummary(String crisisId, String lang) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'ai-crisis-summary',
-      body: {'crisis_id': crisisId, 'lang': lang},
-    );
-    final d = res.data;
+    final d = await _safeInvoke('ai-crisis-summary',
+        {'crisis_id': crisisId, 'lang': lang});
     if (d is Map && d['summary'] != null) return d['summary'].toString();
     return null;
   }
 
   // ── G) Match-Begründung ──────────────────────────────────────────────────
   Future<String?> matchReason(String matchId, String lang) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'ai-match-reason',
-      body: {'match_id': matchId, 'lang': lang},
-    );
-    final d = res.data;
+    final d = await _safeInvoke('ai-match-reason',
+        {'match_id': matchId, 'lang': lang});
     if (d is Map && d['reason'] != null) return d['reason'].toString();
     return null;
   }
 
   // ── H) Wöchentliche Community-Zusammenfassung (lesen; Erzeugung via Cron) ─
   Future<Map<String, dynamic>?> latestRecap() async {
-    final rows = await SupabaseService.client
-        .from('community_recaps')
-        .select('week_start, content, stats, created_at')
-        .order('week_start', ascending: false)
-        .limit(1);
-    if (rows.isNotEmpty) {
-      return Map<String, dynamic>.from(rows.first as Map);
+    try {
+      final rows = await SupabaseService.client
+          .from('community_recaps')
+          .select('week_start, content, stats, created_at')
+          .order('week_start', ascending: false)
+          .limit(1);
+      if (rows.isNotEmpty) {
+        return Map<String, dynamic>.from(rows.first as Map);
+      }
+    } catch (e) {
+      debugPrint('[AiFeatures] latestRecap failed: $e');
     }
     return null;
   }

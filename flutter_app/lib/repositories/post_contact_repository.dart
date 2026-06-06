@@ -83,6 +83,10 @@ class PostContactRepository {
     if ((existing as List).isNotEmpty) {
       throw StateError('already_open');
     }
+    // .maybeSingle() statt .single(): wenn RLS den Returning-Select auf 0
+    // Zeilen bringt, würde .single() eine rohe PostgrestException werfen.
+    // So bleibt das Fehlermodell konsistent (StateError, vom Aufrufer
+    // freundlich behandelt) statt eines ungefangenen Crashs.
     final row = await sb
         .from('post_contact_requests')
         .insert({
@@ -93,7 +97,10 @@ class PostContactRepository {
           if (message != null && message.isNotEmpty) 'message': message,
         })
         .select()
-        .single();
+        .maybeSingle();
+    if (row == null) {
+      throw StateError('insert_failed');
+    }
     return PostContactRequest.fromJson(row);
   }
 

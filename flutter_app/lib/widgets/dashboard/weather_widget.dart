@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/weather_service.dart';
+import 'tile_error.dart';
 
 final _weatherProvider = FutureProvider.autoDispose
     .family<List<WeatherDay>, ({double lat, double lng})>((ref, geo) async {
@@ -52,7 +53,7 @@ class WeatherWidget extends ConsumerWidget {
     final async = ref.watch(_weatherProvider((lat: lat, lng: lng)));
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_weatherProvider)),
       data: (list) {
         if (list.isEmpty) return const SizedBox.shrink();
         final d = list.first;

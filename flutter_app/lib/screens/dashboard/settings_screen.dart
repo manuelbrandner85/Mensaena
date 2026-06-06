@@ -223,7 +223,7 @@ class _AccountTab extends StatelessWidget {
                 '\n\n---\nApp: ${info.version} (${info.buildNumber})\nPlatform: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n';
             final uri = Uri(
               scheme: 'mailto',
-              path: 'kontakt@mensaena.de',
+              path: 'info@mensaena.de',
               query: 'subject=Bug-Report Mensaena App&body=${Uri.encodeComponent(body)}',
             );
             await launchUrl(uri);
@@ -580,6 +580,12 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
             const SizedBox(height: 8),
             _NotifyRadiusRow(),
             const SizedBox(height: 24),
+            // DSGVO-Opt-out: Marketing + Reaktivierung (eigene profiles-Spalten).
+            Text('privacy_prefs.section'.tr().toUpperCase(),
+                style: AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            const _MarketingPrefsSection(),
+            const SizedBox(height: 24),
             OutlinedButton.icon(
               onPressed: _sendTestNotification,
               icon: const Icon(LucideIcons.bellRing, size: 16),
@@ -753,11 +759,26 @@ class _DangerTabState extends State<_DangerTab> {
         'group_members': 'user_id',
         'marketplace_listings': 'user_id',
         'community_poll_votes': 'user_id',
+        // DSGVO Art. 20 — Vervollständigung: Kommunikation, Matching, Krisen,
+        // E-Mail-Engagement, Geräte, Einwilligungs-Historie.
+        'conversation_members': 'user_id',
+        'match_preferences': 'user_id',
+        'crisis_helpers': 'user_id',
+        'crisis_updates': 'user_id',
+        'user_blocks': 'blocker_id',
+        'email_subscriptions': 'user_id',
+        'email_logs': 'user_id',
+        'fcm_tokens': 'user_id',
+        'push_subscriptions': 'user_id',
+        'user_notification_prefs': 'user_id',
+        'consents': 'user_id',
       };
       // Tabellen mit zwei beteiligten Spalten (beide Richtungen exportieren).
       const dual = <String, String>{
         'interactions': 'helper_id,helped_id',
         'trust_ratings': 'rater_id,rated_id',
+        'matches': 'offer_user_id,request_user_id',
+        'dm_calls': 'caller_id,callee_id',
       };
       final collected = <String, dynamic>{};
       await Future.wait([
@@ -2741,6 +2762,152 @@ class _PerformanceModeRow extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// DSGVO-Marketing/Reaktivierungs-Opt-out — schreibt direkt in profiles.
+class _MarketingPrefsSection extends StatefulWidget {
+  const _MarketingPrefsSection();
+  @override
+  State<_MarketingPrefsSection> createState() => _MarketingPrefsSectionState();
+}
+
+class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
+  bool _loading = true;
+  bool _marketing = false;
+  bool _reactivation = false;
+  bool _email = false;
+  bool _emailBusy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final uid = sb.auth.currentUser?.id;
+    if (uid == null) {
+      setState(() => _loading = false);
+      return;
+    }
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('marketing_opt_in, reactivation_opt_in, email_opt_in')
+          .eq('id', uid)
+          .maybeSingle();
+      if (!mounted) return;
+      setState(() {
+        // Privacy by default: fehlender/null Wert = NICHT eingewilligt.
+        _marketing = (row?['marketing_opt_in'] as bool?) ?? false;
+        _reactivation = (row?['reactivation_opt_in'] as bool?) ?? false;
+        _email = (row?['email_opt_in'] as bool?) ?? false;
+        _loading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// E-Mail-Newsletter: Einschalten löst Double-Opt-in aus (Bestätigungs-Mail);
+  /// das Abo wird erst nach dem Klick im Postfach aktiv. Ausschalten widerruft
+  /// sofort.
+  Future<void> _toggleEmail(bool v) async {
+    final uid = sb.auth.currentUser?.id;
+    if (uid == null) return;
+    setState(() => _emailBusy = true);
+    try {
+      if (v) {
+        await sb.functions.invoke('request-email-optin');
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('privacy_prefs.emailConfirmSent'.tr()),
+        ));
+        // Bleibt aus, bis im Postfach bestätigt wurde.
+        setState(() => _email = false);
+      } else {
+        await sb.from('profiles').update({'email_opt_in': false}).eq('id', uid);
+        await sb.from('email_subscriptions').update({
+          'subscribed': false,
+          'unsubscribed_at': DateTime.now().toUtc().toIso8601String(),
+        }).eq('user_id', uid);
+        await sb.rpc<dynamic>('record_consent', params: {
+          'p_type': 'email',
+          'p_granted': false,
+          'p_source': 'settings',
+        });
+        if (mounted) setState(() => _email = false);
+      }
+    } catch (_) {
+      if (mounted) _load();
+    } finally {
+      if (mounted) setState(() => _emailBusy = false);
+    }
+  }
+
+  Future<void> _set(String col, bool v) async {
+    final uid = sb.auth.currentUser?.id;
+    if (uid == null) return;
+    setState(() {
+      if (col == 'marketing_opt_in') _marketing = v;
+      if (col == 'reactivation_opt_in') _reactivation = v;
+    });
+    try {
+      await sb.from('profiles').update({col: v}).eq('id', uid);
+      // DSGVO Art. 7(1): Einwilligung/Widerruf revisionssicher protokollieren.
+      final type = col == 'marketing_opt_in' ? 'marketing' : 'reactivation';
+      await sb.rpc<dynamic>('record_consent', params: {
+        'p_type': type,
+        'p_granted': v,
+        'p_source': 'settings',
+      });
+    } catch (_) {
+      if (mounted) _load();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        child: Center(
+          child: SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+    return Column(
+      children: [
+        _BoolTile(
+          label: 'privacy_prefs.marketing'.tr(),
+          value: _marketing,
+          onChanged: (v) => _set('marketing_opt_in', v),
+        ),
+        _BoolTile(
+          label: 'privacy_prefs.reactivation'.tr(),
+          value: _reactivation,
+          onChanged: (v) => _set('reactivation_opt_in', v),
+        ),
+        _BoolTile(
+          label: 'privacy_prefs.email'.tr(),
+          value: _email,
+          onChanged: (v) {
+            if (!_emailBusy) _toggleEmail(v);
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text('privacy_prefs.hint'.tr(),
+              style: AppTypography.caption()),
+        ),
+      ],
     );
   }
 }

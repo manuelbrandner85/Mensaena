@@ -25,9 +25,11 @@ class PostsRepository {
   }
 
   /// Posts in einem Umkreis um (lat, lng). Nutzt get_nearby_posts RPC.
-  /// HINWEIS: Die RPC existiert in der DB aktuell nicht (nur get_nearby_crises).
-  /// Bis die Funktion angelegt wird, fallen Calls immer auf _latestActive
-  /// zurueck — wir loggen den Fehler aber damit man im LogCat sieht warum.
+  /// Die RPC ist seit Migration 20260606210000 PostGIS-/GiST-gestützt
+  /// (ST_DWithin + KNN-Nearest-First). Die Parameter-Namen MÜSSEN der DB-
+  /// Signatur (p_lat, p_lng, p_radius_km, p_limit) entsprechen — vorher
+  /// hießen sie lat/lng/radius/limit_count, matchten daher nie und JEDER
+  /// Call fiel auf _latestActive (Load-All + Client-Filter) zurück.
   static Future<List<Post>> getNearby({
     double? lat,
     double? lng,
@@ -44,10 +46,10 @@ class PostsRepository {
       final result = await sb.rpc<dynamic>(
         'get_nearby_posts',
         params: <String, dynamic>{
-          'lat': lat,
-          'lng': lng,
-          'radius': radiusKm,
-          'limit_count': limit,
+          'p_lat': lat,
+          'p_lng': lng,
+          'p_radius_km': radiusKm,
+          'p_limit': limit,
         },
       );
       if (result is List) {

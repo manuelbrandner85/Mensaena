@@ -12,6 +12,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/event.dart';
 import '../../repositories/events_repository.dart';
+import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
 
@@ -32,7 +33,7 @@ class TodayEventsWidget extends ConsumerWidget {
     final async = ref.watch(_todayEventProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_todayEventProvider)),
       data: (e) {
         if (e == null) return const SizedBox.shrink();
         final time = DateFormat.Hm().format(e.startDate.toLocal());

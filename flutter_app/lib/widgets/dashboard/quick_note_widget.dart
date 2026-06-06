@@ -12,6 +12,7 @@ import '../../config/theme/app_typography.dart';
 import '../../services/haptics.dart';
 import '../../services/quick_note_service.dart';
 import '../effects/glass_card.dart';
+import 'tile_error.dart';
 
 final _quickNoteProvider =
     FutureProvider.autoDispose<String>((ref) async {
@@ -125,7 +126,7 @@ class QuickNoteWidget extends ConsumerWidget {
     final async = ref.watch(_quickNoteProvider);
     return async.when(
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(_quickNoteProvider)),
       data: (note) {
         final empty = note.trim().isEmpty;
         return GlassCard(

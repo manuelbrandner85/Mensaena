@@ -8,6 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import 'tile_error.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-Pendant zu Web `NinaWarningBanner` + `FoodWarningBanner`.
@@ -29,7 +30,7 @@ class SafetyBanners extends ConsumerWidget {
       children: [
         ninaAsync.when(
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(ninaWarningsProvider)),
           data: (list) {
             if (list.isEmpty) return const SizedBox.shrink();
             return _NinaCard(warnings: list);
@@ -37,7 +38,7 @@ class SafetyBanners extends ConsumerWidget {
         ),
         foodAsync.when(
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, __) => DashboardTileError(onRetry: () => ref.invalidate(foodWarningsProvider)),
           data: (list) {
             if (list.isEmpty) return const SizedBox.shrink();
             return Padding(
@@ -168,6 +169,7 @@ class _NinaCardState extends State<_NinaCard> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.warnings.isEmpty) return const SizedBox.shrink();
     final top = widget.warnings.first;
     final color = _severityColor(top.severity);
     final more = widget.warnings.length - 1;
@@ -350,6 +352,7 @@ class _FoodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (warnings.isEmpty) return const SizedBox.shrink();
     final top = warnings.first;
     return Container(
       padding: const EdgeInsets.all(12),
