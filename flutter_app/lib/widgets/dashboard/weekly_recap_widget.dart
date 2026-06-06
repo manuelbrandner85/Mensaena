@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
@@ -19,10 +20,14 @@ final _recapProvider = FutureProvider<WeeklyRecap>((ref) async {
 });
 
 // H) KI-generierte Community-Zusammenfassung (community_recaps, via Cron erzeugt).
-final _aiRecapProvider = FutureProvider<String?>((ref) async {
+final _aiRecapProvider =
+    FutureProvider<({String? content, String? shareText})?>((ref) async {
   final row = await AiFeaturesRepository().latestRecap();
-  final c = row?['content'];
-  return c == null ? null : c.toString();
+  if (row == null) return null;
+  return (
+    content: row['content']?.toString(),
+    shareText: row['share_text']?.toString(),
+  );
 });
 
 class WeeklyRecapWidget extends ConsumerWidget {
@@ -42,7 +47,9 @@ class WeeklyRecapWidget extends ConsumerWidget {
         final deltaColor = delta > 0
             ? AppColors.lebenSoft
             : (delta < 0 ? AppColors.herzrotWarm : AppColors.mute);
-        final aiRecap = ref.watch(_aiRecapProvider).asData?.value;
+        final aiData = ref.watch(_aiRecapProvider).asData?.value;
+        final aiRecap = aiData?.content;
+        final shareText = aiData?.shareText;
         return GlassCard(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
           child: Column(
@@ -63,6 +70,19 @@ class WeeklyRecapWidget extends ConsumerWidget {
                 Text(aiRecap,
                     style: AppTypography.body(
                         size: 13, color: AppColors.ink, height: 1.4)),
+                // 2) Teilbarer Wochenrückblick — Veröffentlichen bleibt manuell.
+                if (shareText != null && shareText.trim().isNotEmpty)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () => Share.share(shareText),
+                      icon: const Icon(LucideIcons.share2,
+                          size: 14, color: AppColors.bronze),
+                      label: Text('recap.share_week'.tr(),
+                          style: AppTypography.label(
+                              size: 11, color: AppColors.bronze)),
+                    ),
+                  ),
                 const SizedBox(height: 12),
                 Divider(height: 1, color: Colors.white.withValues(alpha: 0.06)),
                 const SizedBox(height: 12),

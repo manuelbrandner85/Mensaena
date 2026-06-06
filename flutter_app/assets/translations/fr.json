@@ -2919,7 +2919,8 @@
     "subtitle": "Activité des 7 derniers jours",
     "helps": "aides",
     "posts": "publications",
-    "comments": "commentaires"
+    "comments": "commentaires",
+    "share_week": "Partager la semaine"
   },
   "account": {
     "title": "Mon compte",
@@ -3721,5 +3722,11 @@
     "wiki_publish": "Publier maintenant",
     "wiki_keep_draft": "Garder le brouillon",
     "wiki_published": "Publié ✅"
+  },
+  "privacy_prefs": {
+    "section": "Marketing et réactivation",
+    "marketing": "Autoriser conseils et actualités",
+    "reactivation": "Rappels après une absence",
+    "hint": "Modifiable à tout moment. Nous envoyons rarement et seulement l'utile."
   }
 }

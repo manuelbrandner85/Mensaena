@@ -2915,7 +2915,8 @@
     "subtitle": "Aktivität der letzten 7 Tage",
     "helps": "Hilfen",
     "posts": "Beiträge",
-    "comments": "Kommentare"
+    "comments": "Kommentare",
+    "share_week": "Diese Woche teilen"
   },
   "account": {
     "title": "Mein Konto",
@@ -3717,5 +3718,11 @@
     "wiki_publish": "Direkt veröffentlichen",
     "wiki_keep_draft": "Als Entwurf behalten",
     "wiki_published": "Veröffentlicht ✅"
+  },
+  "privacy_prefs": {
+    "section": "Marketing & Reaktivierung",
+    "marketing": "Tipps & Neuigkeiten erlauben",
+    "reactivation": "Erinnerungen, wenn du länger weg warst",
+    "hint": "Du kannst das jederzeit ändern. Wir senden höchstens selten und nur Nützliches."
   }
 }

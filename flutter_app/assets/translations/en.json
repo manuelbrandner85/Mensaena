@@ -2916,7 +2916,8 @@
     "subtitle": "Activity in the past 7 days",
     "helps": "helps",
     "posts": "posts",
-    "comments": "comments"
+    "comments": "comments",
+    "share_week": "Share this week"
   },
   "account": {
     "title": "My account",
@@ -3718,5 +3719,11 @@
     "wiki_publish": "Publish now",
     "wiki_keep_draft": "Keep as draft",
     "wiki_published": "Published ✅"
+  },
+  "privacy_prefs": {
+    "section": "Marketing & re-engagement",
+    "marketing": "Allow tips & news",
+    "reactivation": "Reminders when you've been away",
+    "hint": "You can change this anytime. We send rarely and only useful things."
   }
 }

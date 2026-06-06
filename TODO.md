@@ -4,6 +4,8 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-06)
+- [x] Marketing/Retention-System (DSGVO, Flutter-fokussiert): notify_guard.ts (Notbremse+Opt-out+Frequenz+stille Zeiten), reactivate-dormant (Cron 17:00 UTC), ai-weekly-recap +share_text, Settings-Opt-out-Toggles, WeeklyRecapWidget Teilen-Button. [SQL] profiles opt-in-Spalten + email_confirmations + community_recaps.share_text + marketing_paused. docs/MARKETING.md.
+- [ ] Marketing OFFEN: E-Mail-Willkommensserie (send-welcome-email/confirm-email + Double-Opt-in-Toggle + Mailtexte 7 Sprachen), Meilenstein-Feier-Sheet (CelebrateBurst -> Teilen/Einladen), Next.js Region-Landingpages /regionen/[slug] + sitemap.
 - [x] [!] Fix Wiki-Generator 'Veroeffentlichen geht nicht': ai-wiki-draft setzte keinen slug (NOT NULL ohne Default) -> Insert scheiterte -> Entwurf kam mit id=null -> Publish-Button no-op. slug aus Titel + Suffix ergaenzt. Reiner Server-Fix (Function-Redeploy via supabase.yml), kein APK noetig.
 - [x] Shorebird-Workflow-Cleanup: ungueltigen `shorebird-version`-Input aus allen 3 Workflows entfernt (Action hat ihn ignoriert -> Warning). `--platforms=android` (Plural, ungueltig) in shorebird_release.yml und shorebird_patch.yml auf `--platform=android` (Singular) korrigiert. Update-Pipeline ab jetzt 100% gyquj. Funnel ab 4.0.0 verifiziert: UpdateGate sieht latest=4.1.4 mandatory in gyquj -> alle 4.0.x/4.1.x-Nutzer werden forciert; Alt-Nutzer (huaqld) ueber 4.1.3-Bruecke nach gyquj.
 - [x] [!] Shorebird-OTA-Bug gefunden+gefixt: `releases list --platforms` (Plural) war ungueltig -> Patch wurde IMMER uebersprungen (OTA lieferte nie). Jetzt --platform. Versions-Pin-Input wird von setup-shorebird ignoriert (CLI driftet) -> offen/Hinweis.

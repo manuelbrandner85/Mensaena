@@ -58,11 +58,22 @@ Deno.serve(async (req) => {
     `Diese Woche habt ihr ${stats.posts} Beiträge geteilt und ${stats.helps} mal ` +
     'füreinander geholfen. Danke, dass ihr Mensaena lebendig macht 🌱'
 
+  // Zusaetzlich: fertiger, teilbarer Social-Text (vom Owner manuell zu posten).
+  const shareSystem =
+    'Schreibe einen kurzen, warmen, teilbaren Social-Media-Beitrag (max 3 Saetze, '
+    + '1-2 passende Emojis) ueber die Woche in der Nachbarschaftshilfe-App Mensaena. '
+    + 'Nutze nur die gegebenen Zahlen, kein Werbe-Sprech. Beende mit dem Link '
+    + 'https://www.mensaena.de'
+  const { text: shareRaw } = await callAiChain(shareSystem, content, { timeoutMs: 12_000 })
+  const shareText = shareRaw ||
+    `Diese Woche in unserer Nachbarschaft: ${stats.posts} Beiträge, ${stats.helps} mal `
+    + `geholfen, ${stats.events} Events 🌱 Mach mit: https://www.mensaena.de`
+
   let recapId: string | null = null
   try {
     const { data: ins } = await admin
       .from('community_recaps')
-      .insert({ week_start: weekStart, content: recapText, stats })
+      .insert({ week_start: weekStart, content: recapText, share_text: shareText, stats })
       .select('id')
       .maybeSingle()
     recapId = ins?.id ?? null

@@ -2918,7 +2918,8 @@
     "subtitle": "Son 7 günün aktivitesi",
     "helps": "yardım",
     "posts": "gönderi",
-    "comments": "yorum"
+    "comments": "yorum",
+    "share_week": "Bu haftayı paylaş"
   },
   "account": {
     "title": "Hesabım",
@@ -3720,5 +3721,11 @@
     "wiki_publish": "Şimdi yayınla",
     "wiki_keep_draft": "Taslak olarak tut",
     "wiki_published": "Yayınlandı ✅"
+  },
+  "privacy_prefs": {
+    "section": "Pazarlama ve geri kazanım",
+    "marketing": "İpuçları ve haberlere izin ver",
+    "reactivation": "Bir süre uzak kaldığında hatırlatmalar",
+    "hint": "İstediğin zaman değiştirebilirsin. Nadiren ve sadece faydalı şeyler göndeririz."
   }
 }
