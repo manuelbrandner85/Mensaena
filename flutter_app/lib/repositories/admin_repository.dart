@@ -12,10 +12,13 @@ class AdminRepository {
   const AdminRepository._();
 
   /// Zaehlt Rows einer Tabelle (best-effort, fallback 0).
+  /// PERF: nutzt HEAD-Count (CountOption.exact) — überträgt KEINE Zeilen,
+  /// nur die Zahl. Vorher wurden bis zu 2000 id-Zeilen geladen und in Dart
+  /// gezählt (Full-Table-Transfer pro Tabelle).
   static Future<int> count(String table) async {
     try {
-      final rows = await sb.from(table).select('id').limit(2000);
-      return (rows as List).length;
+      final res = await sb.from(table).select('id').count(CountOption.exact);
+      return res.count;
     } catch (_) {
       return 0;
     }
@@ -182,109 +185,93 @@ class AdminRepository {
       count('trust_ratings'),
     ]);
 
-    int verifiedOrganizations = 0;
-    try {
-      final rows =
-          await sb.from('organizations').select('id').eq('is_verified', true);
-      verifiedOrganizations = (rows as List).length;
-    } catch (_) {}
-
-    int verifiedFarms = 0;
-    try {
-      final rows =
-          await sb.from('farm_listings').select('id').eq('is_verified', true);
-      verifiedFarms = (rows as List).length;
-    } catch (_) {}
-
-    int upcomingEvents = 0;
-    try {
-      final now = DateTime.now().toUtc().toIso8601String();
-      final rows =
-          await sb.from('events').select('id').gte('start_date', now);
-      upcomingEvents = (rows as List).length;
-    } catch (_) {}
-
-    int activeBoardPosts = 0;
-    try {
-      final rows =
-          await sb.from('board_posts').select('id').eq('status', 'active');
-      activeBoardPosts = (rows as List).length;
-    } catch (_) {}
-
-    int activeCrises = 0;
-    try {
-      final rows = await sb.from('crises').select('id').eq('status', 'active');
-      activeCrises = (rows as List).length;
-    } catch (_) {}
-
-    int activePosts = 0;
-    try {
-      final rows = await sb.from('posts').select('id').eq('status', 'active');
-      activePosts = (rows as List).length;
-    } catch (_) {}
-
-    int activeChallenges = 0;
-    try {
-      final rows =
-          await sb.from('challenges').select('id').eq('status', 'active');
-      activeChallenges = (rows as List).length;
-    } catch (_) {}
-
-    int activeGroups = 0;
-    try {
-      // BUGFIX: DB hat kein is_active — Schema nutzt is_archived. Eine
-      // 'aktive' Gruppe ist eine die NICHT archiviert ist.
-      final rows = await sb
+    // PERF: alle Status-/Zeitfenster-Zählungen als parallele HEAD-Counts
+    // (CountOption.exact) statt sequenzieller .select('id')-Full-Transfers.
+    // Überträgt nur die Zahlen; nutzt die vorhandenen (Teil-)Indizes.
+    final now = DateTime.now().toUtc().toIso8601String();
+    final since7d = _ago(const Duration(days: 7));
+    final since30d = _ago(const Duration(days: 30));
+    final fallbackCounts = await Future.wait<int>([
+      safeCount(() => sb
+          .from('organizations')
+          .select('id')
+          .eq('is_verified', true)
+          .count(CountOption.exact)), // 0 verifiedOrganizations
+      safeCount(() => sb
+          .from('farm_listings')
+          .select('id')
+          .eq('is_verified', true)
+          .count(CountOption.exact)), // 1 verifiedFarms
+      safeCount(() => sb
+          .from('events')
+          .select('id')
+          .gte('start_date', now)
+          .count(CountOption.exact)), // 2 upcomingEvents
+      safeCount(() => sb
+          .from('board_posts')
+          .select('id')
+          .eq('status', 'active')
+          .count(CountOption.exact)), // 3 activeBoardPosts
+      safeCount(() => sb
+          .from('crises')
+          .select('id')
+          .eq('status', 'active')
+          .count(CountOption.exact)), // 4 activeCrises
+      safeCount(() => sb
+          .from('posts')
+          .select('id')
+          .eq('status', 'active')
+          .count(CountOption.exact)), // 5 activePosts
+      safeCount(() => sb
+          .from('challenges')
+          .select('id')
+          .eq('status', 'active')
+          .count(CountOption.exact)), // 6 activeChallenges
+      // BUGFIX: DB hat kein is_active — eine 'aktive' Gruppe ist NICHT archiviert.
+      safeCount(() => sb
           .from('groups')
           .select('id')
-          .eq('is_archived', false);
-      activeGroups = (rows as List).length;
-    } catch (_) {}
-
-    int openReports = 0;
-    try {
-      final rows =
-          await sb.from('reports').select('id').eq('status', 'pending');
-      openReports = (rows as List).length;
-    } catch (_) {}
-
-    int newUsers7d = 0;
-    try {
-      final since = DateTime.now()
-          .subtract(const Duration(days: 7))
-          .toUtc()
-          .toIso8601String();
-      final rows = await sb.from('profiles').select('id').gte('created_at', since);
-      newUsers7d = (rows as List).length;
-    } catch (_) {}
-
-    int newPosts7d = 0;
-    try {
-      final since = DateTime.now()
-          .subtract(const Duration(days: 7))
-          .toUtc()
-          .toIso8601String();
-      final rows = await sb.from('posts').select('id').gte('created_at', since);
-      newPosts7d = (rows as List).length;
-    } catch (_) {}
-
-    int activeUsers30d = 0;
-    try {
-      final since = DateTime.now()
-          .subtract(const Duration(days: 30))
-          .toUtc()
-          .toIso8601String();
-      final rows =
-          await sb.from('profiles').select('id').gte('last_seen_at', since);
-      activeUsers30d = (rows as List).length;
-    } catch (_) {}
-
-    int unreadNotifications = 0;
-    try {
-      final rows =
-          await sb.from('notifications').select('id').eq('is_read', false);
-      unreadNotifications = (rows as List).length;
-    } catch (_) {}
+          .eq('is_archived', false)
+          .count(CountOption.exact)), // 7 activeGroups
+      safeCount(() => sb
+          .from('reports')
+          .select('id')
+          .eq('status', 'pending')
+          .count(CountOption.exact)), // 8 openReports
+      safeCount(() => sb
+          .from('profiles')
+          .select('id')
+          .gte('created_at', since7d)
+          .count(CountOption.exact)), // 9 newUsers7d
+      safeCount(() => sb
+          .from('posts')
+          .select('id')
+          .gte('created_at', since7d)
+          .count(CountOption.exact)), // 10 newPosts7d
+      safeCount(() => sb
+          .from('profiles')
+          .select('id')
+          .gte('last_seen_at', since30d)
+          .count(CountOption.exact)), // 11 activeUsers30d
+      safeCount(() => sb
+          .from('notifications')
+          .select('id')
+          .eq('is_read', false)
+          .count(CountOption.exact)), // 12 unreadNotifications
+    ]);
+    final verifiedOrganizations = fallbackCounts[0];
+    final verifiedFarms = fallbackCounts[1];
+    final upcomingEvents = fallbackCounts[2];
+    final activeBoardPosts = fallbackCounts[3];
+    final activeCrises = fallbackCounts[4];
+    final activePosts = fallbackCounts[5];
+    final activeChallenges = fallbackCounts[6];
+    final activeGroups = fallbackCounts[7];
+    final openReports = fallbackCounts[8];
+    final newUsers7d = fallbackCounts[9];
+    final newPosts7d = fallbackCounts[10];
+    final activeUsers30d = fallbackCounts[11];
+    final unreadNotifications = fallbackCounts[12];
 
     double avgTrustScore = 0.0;
     try {
