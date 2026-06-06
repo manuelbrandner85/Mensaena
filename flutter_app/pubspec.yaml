@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.1.4+40104
+version: 4.1.5+40105
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -175,6 +175,12 @@ flutter_launcher_icons:
 flutter:
   uses-material-design: true
   assets:
+    # WICHTIG: shorebird.yaml MUSS als Asset gebündelt sein — sonst schlägt
+    # `shorebird release`/`patch` mit "pubspec.yaml does not have shorebird.yaml
+    # as a flutter asset" fehl. Ohne diese Zeile fiel flutter.yml auf plain
+    # `flutter build apk` zurück (kein OTA-Updater) und shorebird_patch.yml
+    # übersprang JEDEN Patch → Änderungen erreichten nie die App.
+    - shorebird.yaml
     - assets/images/
     - assets/launcher/
     - assets/translations/
