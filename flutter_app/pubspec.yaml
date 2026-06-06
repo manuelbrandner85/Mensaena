@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.1.5+40105
+version: 4.1.6+40106
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -61,6 +61,10 @@ dependencies:
 
   # Icons (Web-konsistent)
   lucide_icons: ^0.257.0
+
+  # HTML-Render für die E-Mail-Vorschau im Marketing-Admin (pure Dart, kein
+  # natives Webview → keine Plattform-Konfig nötig).
+  flutter_widget_from_html_core: ^0.16.0
 
   # Media
   image_picker: ^1.1.2
