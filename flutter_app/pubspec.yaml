@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.1.7+40107
+version: 4.1.8+40108
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -50,6 +50,9 @@ dependencies:
   # Push Notifications
   firebase_core: ^3.6.0
   firebase_messaging: ^15.1.3
+  # Crashlytics: erfasst native + Dart-Fatal-Crashes mit Stacktrace (Diagnose
+  # des "App schließt sich"-Bugs). Gradle-Plugin in android/settings+app.
+  firebase_crashlytics: ^4.1.3
   # Lokale Notifications fuer FCM-Foreground + Background-Data-Messages
   # (data-only Pushes muessen vom Client als sichtbare Notification angezeigt
   # werden, sonst nur stille Updates → kein User-Feedback bei geschlossener App).
