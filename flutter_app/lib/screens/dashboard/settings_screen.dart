@@ -2819,7 +2819,7 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
       await sb.from('profiles').update({col: v}).eq('id', uid);
       // DSGVO Art. 7(1): Einwilligung/Widerruf revisionssicher protokollieren.
       final type = col == 'marketing_opt_in' ? 'marketing' : 'reactivation';
-      await sb.rpc('record_consent', params: {
+      await sb.rpc<dynamic>('record_consent', params: {
         'p_type': type,
         'p_granted': v,
         'p_source': 'settings',

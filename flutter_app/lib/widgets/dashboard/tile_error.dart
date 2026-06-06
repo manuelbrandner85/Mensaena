@@ -33,7 +33,7 @@ class DashboardTileError extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.refreshCw, size: 13, color: AppColors.mute),
+            const Icon(LucideIcons.refreshCw, size: 13, color: AppColors.mute),
             const SizedBox(width: 6),
             Flexible(
               child: Text(
