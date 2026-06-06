@@ -2761,8 +2761,8 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
           .maybeSingle();
       if (!mounted) return;
       setState(() {
-        _marketing = row?['marketing_opt_in'] ?? true;
-        _reactivation = row?['reactivation_opt_in'] ?? true;
+        _marketing = (row?['marketing_opt_in'] as bool?) ?? true;
+        _reactivation = (row?['reactivation_opt_in'] as bool?) ?? true;
         _loading = false;
       });
     } catch (_) {

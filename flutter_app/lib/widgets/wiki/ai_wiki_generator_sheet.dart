@@ -179,7 +179,7 @@ class _AiWikiGeneratorSheetState extends State<_AiWikiGeneratorSheet> {
                         onPressed: () => Navigator.pop(context, _created),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.ink,
-                          side: BorderSide(
+                          side: const BorderSide(
                               color: AppColors.line),
                           minimumSize: const Size(0, 46),
                         ),
