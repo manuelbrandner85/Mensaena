@@ -3769,7 +3769,9 @@
     "section": "Pazarlama ve geri kazanım",
     "marketing": "İpuçları ve haberlere izin ver",
     "reactivation": "Bir süre uzak kaldığında hatırlatmalar",
-    "hint": "İstediğin zaman değiştirebilirsin. Nadiren ve sadece faydalı şeyler göndeririz."
+    "hint": "İstediğin zaman değiştirebilirsin. Nadiren ve sadece faydalı şeyler göndeririz.",
+    "email": "E-posta bülteni (onaylı)",
+    "emailConfirmSent": "Onay e-postası gönderildi — lütfen gelen kutundaki bağlantıyı onayla."
   },
   "marketing": {
     "title": "Pazarlama",

@@ -3770,7 +3770,9 @@
     "section": "Marketing et réactivation",
     "marketing": "Autoriser conseils et actualités",
     "reactivation": "Rappels après une absence",
-    "hint": "Modifiable à tout moment. Nous envoyons rarement et seulement l'utile."
+    "hint": "Modifiable à tout moment. Nous envoyons rarement et seulement l'utile.",
+    "email": "Newsletter par e-mail (avec confirmation)",
+    "emailConfirmSent": "E-mail de confirmation envoyé — confirme le lien dans ta boîte."
   },
   "marketing": {
     "title": "Marketing",

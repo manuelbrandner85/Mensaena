@@ -3770,7 +3770,9 @@
     "section": "Marketing y reactivación",
     "marketing": "Permitir consejos y novedades",
     "reactivation": "Recordatorios cuando llevas tiempo sin entrar",
-    "hint": "Puedes cambiarlo cuando quieras. Enviamos pocas veces y solo cosas útiles."
+    "hint": "Puedes cambiarlo cuando quieras. Enviamos pocas veces y solo cosas útiles.",
+    "email": "Boletín por correo (con confirmación)",
+    "emailConfirmSent": "Correo de confirmación enviado — confirma el enlace en tu bandeja."
   },
   "marketing": {
     "title": "Marketing",

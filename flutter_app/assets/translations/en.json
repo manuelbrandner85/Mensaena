@@ -3767,7 +3767,9 @@
     "section": "Marketing & re-engagement",
     "marketing": "Allow tips & news",
     "reactivation": "Reminders when you've been away",
-    "hint": "You can change this anytime. We send rarely and only useful things."
+    "hint": "You can change this anytime. We send rarely and only useful things.",
+    "email": "Email newsletter (with confirmation)",
+    "emailConfirmSent": "Confirmation email sent — please confirm the link in your inbox."
   },
   "marketing": {
     "title": "Marketing",

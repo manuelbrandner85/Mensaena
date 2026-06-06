@@ -3770,7 +3770,9 @@
     "section": "Marketing e riattivazione",
     "marketing": "Consenti consigli e novità",
     "reactivation": "Promemoria quando manchi da un po'",
-    "hint": "Puoi cambiarlo quando vuoi. Inviamo di rado e solo cose utili."
+    "hint": "Puoi cambiarlo quando vuoi. Inviamo di rado e solo cose utili.",
+    "email": "Newsletter via e-mail (con conferma)",
+    "emailConfirmSent": "E-mail di conferma inviata — conferma il link nella tua casella."
   },
   "marketing": {
     "title": "Marketing",

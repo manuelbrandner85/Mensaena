@@ -3766,7 +3766,9 @@
     "section": "Marketing & Reaktivierung",
     "marketing": "Tipps & Neuigkeiten erlauben",
     "reactivation": "Erinnerungen, wenn du länger weg warst",
-    "hint": "Du kannst das jederzeit ändern. Wir senden höchstens selten und nur Nützliches."
+    "hint": "Du kannst das jederzeit ändern. Wir senden höchstens selten und nur Nützliches.",
+    "email": "E-Mail-Newsletter (mit Bestätigung)",
+    "emailConfirmSent": "Bestätigungs-Mail gesendet — bitte bestätige den Link in deinem Postfach."
   },
   "marketing": {
     "title": "Marketing",

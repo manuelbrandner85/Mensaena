@@ -70,14 +70,44 @@ export default function DatenschutzPage() {
         <h2>5. Cloudflare</h2>
         <p>Wir nutzen Cloudflare für CDN, Sicherheit und Performance. Cloudflare kann temporäre Verbindungsdaten verarbeiten.</p>
 
-        <h2>6. Deine Rechte</h2>
+        <h2>6. Marketing- &amp; Info-E-Mails</h2>
         <p>
-          Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten.
-          Kontakt:{' '}
+          Werbliche bzw. reaktivierende E-Mails senden wir <strong>nur mit deiner ausdrücklichen Einwilligung</strong> (Opt-in).
+          Die E-Mail-Anmeldung erfolgt im <strong>Double-Opt-in-Verfahren</strong> (Bestätigung per Klick).
+          Du kannst die Einwilligung jederzeit in den Einstellungen oder über den Abmelde-Link in jeder E-Mail widerrufen.
+          Einwilligung und Widerruf werden zum Nachweis protokolliert (Zeitpunkt, Art).
+        </p>
+
+        <h2>7. KI-Funktionen</h2>
+        <p>
+          Für optionale KI-Funktionen (z. B. Texthilfe, Assistent, Übersetzung) werden die jeweiligen Eingaben an einen
+          KI-Dienst als Auftragsverarbeiter übermittelt. Es werden <strong>keine Chat-Klartexte zu Analysezwecken</strong> gespeichert,
+          lediglich Metadaten (z. B. genutzte Funktion, Sprache). Freiwilliges Feedback zu einer KI-Antwort speichern wir zur
+          Qualitätsverbesserung; es wird bei Konto-Löschung mit entfernt.
+        </p>
+
+        <h2>8. Push-Benachrichtigungen</h2>
+        <p>
+          Mit deiner Zustimmung verarbeiten wir ein Geräte-Token, um dir Push-Benachrichtigungen zu senden.
+          Du kannst dies in den System- und App-Einstellungen jederzeit deaktivieren.
+        </p>
+
+        <h2>9. Standortdaten</h2>
+        <p>
+          Die Standorterhebung ist <strong>optional</strong> und erfolgt nur nach deiner Freigabe. Standardmäßig ist dein
+          Standort <strong>nicht öffentlich sichtbar</strong>. Anderen Nutzer:innen werden Positionen nur <strong>gerundet</strong>
+          (ungefähr) angezeigt, nicht als exakte Koordinaten.
+        </p>
+
+        <h2>10. Deine Rechte</h2>
+        <p>
+          Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung und Datenübertragbarkeit.
+          In der App kannst du unter <strong>Einstellungen</strong> deine Daten als Datei <strong>exportieren</strong> (Art. 20)
+          und dein <strong>Konto inkl. aller Daten löschen</strong> (Art. 17). Kontakt:{' '}
           <a href="mailto:info@mensaena.de">info@mensaena.de</a>
         </p>
 
-        <p className="text-xs text-mn-ghost pt-6 mt-6 border-t border-white/8 tracking-wide uppercase">Stand: April 2026</p>
+        <p className="text-xs text-mn-ghost pt-6 mt-6 border-t border-white/8 tracking-wide uppercase">Stand: Juni 2026</p>
       </LegalPageShell>
     </>
   )

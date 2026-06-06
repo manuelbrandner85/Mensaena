@@ -2776,8 +2776,10 @@ class _MarketingPrefsSection extends StatefulWidget {
 
 class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
   bool _loading = true;
-  bool _marketing = true;
-  bool _reactivation = true;
+  bool _marketing = false;
+  bool _reactivation = false;
+  bool _email = false;
+  bool _emailBusy = false;
 
   @override
   void initState() {
@@ -2794,17 +2796,55 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
     try {
       final row = await sb
           .from('profiles')
-          .select('marketing_opt_in, reactivation_opt_in')
+          .select('marketing_opt_in, reactivation_opt_in, email_opt_in')
           .eq('id', uid)
           .maybeSingle();
       if (!mounted) return;
       setState(() {
-        _marketing = (row?['marketing_opt_in'] as bool?) ?? true;
-        _reactivation = (row?['reactivation_opt_in'] as bool?) ?? true;
+        // Privacy by default: fehlender/null Wert = NICHT eingewilligt.
+        _marketing = (row?['marketing_opt_in'] as bool?) ?? false;
+        _reactivation = (row?['reactivation_opt_in'] as bool?) ?? false;
+        _email = (row?['email_opt_in'] as bool?) ?? false;
         _loading = false;
       });
     } catch (_) {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// E-Mail-Newsletter: Einschalten löst Double-Opt-in aus (Bestätigungs-Mail);
+  /// das Abo wird erst nach dem Klick im Postfach aktiv. Ausschalten widerruft
+  /// sofort.
+  Future<void> _toggleEmail(bool v) async {
+    final uid = sb.auth.currentUser?.id;
+    if (uid == null) return;
+    setState(() => _emailBusy = true);
+    try {
+      if (v) {
+        await sb.functions.invoke('request-email-optin');
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('privacy_prefs.emailConfirmSent'.tr()),
+        ));
+        // Bleibt aus, bis im Postfach bestätigt wurde.
+        setState(() => _email = false);
+      } else {
+        await sb.from('profiles').update({'email_opt_in': false}).eq('id', uid);
+        await sb.from('email_subscriptions').update({
+          'subscribed': false,
+          'unsubscribed_at': DateTime.now().toUtc().toIso8601String(),
+        }).eq('user_id', uid);
+        await sb.rpc<dynamic>('record_consent', params: {
+          'p_type': 'email',
+          'p_granted': false,
+          'p_source': 'settings',
+        });
+        if (mounted) setState(() => _email = false);
+      }
+    } catch (_) {
+      if (mounted) _load();
+    } finally {
+      if (mounted) setState(() => _emailBusy = false);
     }
   }
 
@@ -2854,6 +2894,13 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
           label: 'privacy_prefs.reactivation'.tr(),
           value: _reactivation,
           onChanged: (v) => _set('reactivation_opt_in', v),
+        ),
+        _BoolTile(
+          label: 'privacy_prefs.email'.tr(),
+          value: _email,
+          onChanged: (v) {
+            if (!_emailBusy) _toggleEmail(v);
+          },
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4),
