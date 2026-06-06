@@ -30,6 +30,12 @@ BEGIN
     'email_bounces', 'drip_campaigns', 'drip_steps',
     'social_media_channels', 'social_media_posts'
   ] LOOP
+    -- Drift-Vorsorge: einige Tabellen existieren nur auf Prod, nicht auf
+    -- frischem Preview-Replay. RLS-Härtung darf das nicht stoppen.
+    IF to_regclass('public.' || t) IS NULL THEN
+      RAISE NOTICE 'Skip RLS — Tabelle % nicht vorhanden.', t;
+      CONTINUE;
+    END IF;
     EXECUTE format(
       'ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format(
@@ -46,49 +52,43 @@ BEGIN
 END $$;
 
 -- ── poll_votes: Channel-Abstimmungen ───────────────────────────────────────
-ALTER TABLE public.poll_votes ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS poll_votes_select ON public.poll_votes;
-CREATE POLICY poll_votes_select ON public.poll_votes
-  FOR SELECT TO authenticated
-  USING (auth.uid() IS NOT NULL);
-
-DROP POLICY IF EXISTS poll_votes_insert_own ON public.poll_votes;
-CREATE POLICY poll_votes_insert_own ON public.poll_votes
-  FOR INSERT TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS poll_votes_update_own ON public.poll_votes;
-CREATE POLICY poll_votes_update_own ON public.poll_votes
-  FOR UPDATE TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS poll_votes_delete_own ON public.poll_votes;
-CREATE POLICY poll_votes_delete_own ON public.poll_votes
-  FOR DELETE TO authenticated
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF to_regclass('public.poll_votes') IS NULL THEN
+    RAISE NOTICE 'Skip RLS — poll_votes nicht vorhanden.';
+    RETURN;
+  END IF;
+  ALTER TABLE public.poll_votes ENABLE ROW LEVEL SECURITY;
+  DROP POLICY IF EXISTS poll_votes_select ON public.poll_votes;
+  CREATE POLICY poll_votes_select ON public.poll_votes
+    FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+  DROP POLICY IF EXISTS poll_votes_insert_own ON public.poll_votes;
+  CREATE POLICY poll_votes_insert_own ON public.poll_votes
+    FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+  DROP POLICY IF EXISTS poll_votes_update_own ON public.poll_votes;
+  CREATE POLICY poll_votes_update_own ON public.poll_votes
+    FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+  DROP POLICY IF EXISTS poll_votes_delete_own ON public.poll_votes;
+  CREATE POLICY poll_votes_delete_own ON public.poll_votes
+    FOR DELETE TO authenticated USING (auth.uid() = user_id);
+END $$;
 
 -- ── event_rsvps: Channel-Event-Teilnahmen ──────────────────────────────────
-ALTER TABLE public.event_rsvps ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS event_rsvps_select ON public.event_rsvps;
-CREATE POLICY event_rsvps_select ON public.event_rsvps
-  FOR SELECT TO authenticated
-  USING (auth.uid() IS NOT NULL);
-
-DROP POLICY IF EXISTS event_rsvps_insert_own ON public.event_rsvps;
-CREATE POLICY event_rsvps_insert_own ON public.event_rsvps
-  FOR INSERT TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS event_rsvps_update_own ON public.event_rsvps;
-CREATE POLICY event_rsvps_update_own ON public.event_rsvps
-  FOR UPDATE TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS event_rsvps_delete_own ON public.event_rsvps;
-CREATE POLICY event_rsvps_delete_own ON public.event_rsvps
-  FOR DELETE TO authenticated
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF to_regclass('public.event_rsvps') IS NULL THEN
+    RAISE NOTICE 'Skip RLS — event_rsvps nicht vorhanden.';
+    RETURN;
+  END IF;
+  ALTER TABLE public.event_rsvps ENABLE ROW LEVEL SECURITY;
+  DROP POLICY IF EXISTS event_rsvps_select ON public.event_rsvps;
+  CREATE POLICY event_rsvps_select ON public.event_rsvps
+    FOR SELECT TO authenticated USING (auth.uid() IS NOT NULL);
+  DROP POLICY IF EXISTS event_rsvps_insert_own ON public.event_rsvps;
+  CREATE POLICY event_rsvps_insert_own ON public.event_rsvps
+    FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+  DROP POLICY IF EXISTS event_rsvps_update_own ON public.event_rsvps;
+  CREATE POLICY event_rsvps_update_own ON public.event_rsvps
+    FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+  DROP POLICY IF EXISTS event_rsvps_delete_own ON public.event_rsvps;
+  CREATE POLICY event_rsvps_delete_own ON public.event_rsvps
+    FOR DELETE TO authenticated USING (auth.uid() = user_id);
+END $$;

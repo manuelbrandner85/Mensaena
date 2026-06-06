@@ -167,18 +167,21 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
--- pg_cron Job registrieren (idempotent, mit EXCEPTION-Handler)
-DO $$
+-- pg_cron Job registrieren (idempotent, no-op wenn cron-Schema fehlt)
+DO $cron$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
-    PERFORM cron.unschedule('mensaena-event-reminders')
-      WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'mensaena-event-reminders');
-    PERFORM cron.schedule(
-      'mensaena-event-reminders',
-      '15 * * * *',
-      $cron$SELECT public.send_event_reminders();$cron$
-    );
+  IF to_regnamespace('cron') IS NULL THEN
+    RAISE NOTICE 'pg_cron nicht vorhanden — überspringe Event-Reminder-Cron-Setup.';
+    RETURN;
   END IF;
-EXCEPTION WHEN OTHERS THEN
-  RAISE NOTICE 'pg_cron nicht verfügbar – Event-Reminder muss manuell gescheduled werden: %', SQLERRM;
-END $$;
+
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'mensaena-event-reminders') THEN
+    PERFORM cron.unschedule('mensaena-event-reminders');
+  END IF;
+
+  PERFORM cron.schedule(
+    'mensaena-event-reminders',
+    '15 * * * *',
+    $job$SELECT public.send_event_reminders();$job$
+  );
+END $cron$;

@@ -22,11 +22,20 @@ BEGIN
 END;
 $$;
 
-SELECT cron.unschedule('cleanup_stale_dm_calls')
-WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'cleanup_stale_dm_calls');
+DO $cron$
+BEGIN
+  IF to_regnamespace('cron') IS NULL THEN
+    RAISE NOTICE 'pg_cron nicht vorhanden — überspringe DM-Calls-Cleanup-Cron-Setup.';
+    RETURN;
+  END IF;
 
-SELECT cron.schedule(
-  'cleanup_stale_dm_calls',
-  '* * * * *',
-  $$SELECT public.cleanup_stale_dm_calls();$$
-);
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'cleanup_stale_dm_calls') THEN
+    PERFORM cron.unschedule('cleanup_stale_dm_calls');
+  END IF;
+
+  PERFORM cron.schedule(
+    'cleanup_stale_dm_calls',
+    '* * * * *',
+    $job$SELECT public.cleanup_stale_dm_calls();$job$
+  );
+END $cron$;

@@ -124,8 +124,16 @@ $$;
 revoke all on function public.process_scheduled_broadcasts() from public;
 
 -- pg_cron: jede Minute fällige Broadcasts verarbeiten.
-select cron.schedule(
-  'process-scheduled-broadcasts',
-  '* * * * *',
-  $$select public.process_scheduled_broadcasts();$$
-);
+DO $cron$
+BEGIN
+  IF to_regnamespace('cron') IS NULL THEN
+    RAISE NOTICE 'pg_cron nicht vorhanden — überspringe Scheduled-Broadcasts-Cron-Setup.';
+    RETURN;
+  END IF;
+
+  PERFORM cron.schedule(
+    'process-scheduled-broadcasts',
+    '* * * * *',
+    $job$select public.process_scheduled_broadcasts();$job$
+  );
+END $cron$;

@@ -258,27 +258,27 @@ END;
 $$;
 
 -- pg_cron-Scheduled-Job registrieren, falls die Extension verfügbar ist.
--- Wenn pg_cron nicht installiert ist (selten in Supabase): manueller Aufruf
+-- Wenn pg_cron nicht installiert ist (Preview-Branches): manueller Aufruf
 -- via `SELECT notify_match_expiry_reminders();` oder per Edge Function-Cron.
-DO $$
+DO $cron$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
-    -- Alte Schedule entfernen (idempotent)
-    PERFORM cron.unschedule('mensaena_match_expiry_reminders')
-      WHERE EXISTS (
-        SELECT 1 FROM cron.job
-        WHERE jobname = 'mensaena_match_expiry_reminders'
-      );
-    -- Stündlich: prüft matches die in <24h ablaufen
-    PERFORM cron.schedule(
-      'mensaena_match_expiry_reminders',
-      '0 * * * *',
-      $cron$SELECT public.notify_match_expiry_reminders();$cron$
-    );
+  IF to_regnamespace('cron') IS NULL THEN
+    RAISE NOTICE 'pg_cron nicht vorhanden — überspringe Match-Expiry-Reminder-Cron-Setup.';
+    RETURN;
   END IF;
-EXCEPTION WHEN OTHERS THEN
-  RAISE NOTICE 'pg_cron nicht verfügbar – Match-Expiry-Reminder muss manuell gescheduled werden';
-END $$;
+
+  -- Alte Schedule entfernen (idempotent)
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'mensaena_match_expiry_reminders') THEN
+    PERFORM cron.unschedule('mensaena_match_expiry_reminders');
+  END IF;
+
+  -- Stündlich: prüft matches die in <24h ablaufen
+  PERFORM cron.schedule(
+    'mensaena_match_expiry_reminders',
+    '0 * * * *',
+    $job$SELECT public.notify_match_expiry_reminders();$job$
+  );
+END $cron$;
 
 
 -- ── Verifikation ────────────────────────────────────────────────────────
