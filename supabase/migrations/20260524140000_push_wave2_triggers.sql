@@ -12,6 +12,12 @@
 --    E) Profile/Org                E1-E5
 --    F) Reminders (cron-based)     Separat — siehe pg_cron-Migration
 --    G) Bot-Broadcast              G1 separat
+--
+-- DRIFT-TOLERANZ: Alle Trigger werden nur angelegt, wenn ihre Zieltabelle
+-- existiert (to_regclass). So bleibt die Migration auf einem frischen Replay
+-- (z. B. Supabase Preview) lauffähig, auch wenn manche Tabellen dort (noch)
+-- nicht existieren. Die Funktionskörper sind spät-gebundenes plpgsql und
+-- referenzieren Tabellen erst zur Laufzeit — sie sind daher unkritisch.
 -- ════════════════════════════════════════════════════════════════════════
 
 -- ── 1. User-Notification-Prefs ───────────────────────────────────────
@@ -116,9 +122,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_crisis ON public.crises;
-CREATE TRIGGER trg_notify_on_new_crisis AFTER INSERT ON public.crises
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_crisis();
+DO $$ BEGIN
+  IF to_regclass('public.crises') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_crisis ON public.crises;
+    CREATE TRIGGER trg_notify_on_new_crisis AFTER INSERT ON public.crises
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_crisis();
+  END IF;
+END $$;
 
 -- A2. crisis_helpers INSERT → Krise-Reporter
 CREATE OR REPLACE FUNCTION public.notify_on_crisis_helper()
@@ -134,9 +144,13 @@ BEGIN
     '/dashboard/crisis/' || NEW.crisis_id, 'crisis', 'high', NEW.user_id, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_crisis_helper ON public.crisis_helpers;
-CREATE TRIGGER trg_notify_on_crisis_helper AFTER INSERT ON public.crisis_helpers
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_crisis_helper();
+DO $$ BEGIN
+  IF to_regclass('public.crisis_helpers') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_crisis_helper ON public.crisis_helpers;
+    CREATE TRIGGER trg_notify_on_crisis_helper AFTER INSERT ON public.crisis_helpers
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_crisis_helper();
+  END IF;
+END $$;
 
 -- A3. crisis_resources INSERT → Krise-Reporter
 CREATE OR REPLACE FUNCTION public.notify_on_crisis_resource()
@@ -154,9 +168,13 @@ BEGIN
     NEW.provider_id, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_crisis_resource ON public.crisis_resources;
-CREATE TRIGGER trg_notify_on_crisis_resource AFTER INSERT ON public.crisis_resources
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_crisis_resource();
+DO $$ BEGIN
+  IF to_regclass('public.crisis_resources') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_crisis_resource ON public.crisis_resources;
+    CREATE TRIGGER trg_notify_on_crisis_resource AFTER INSERT ON public.crisis_resources
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_crisis_resource();
+  END IF;
+END $$;
 
 -- A4. crisis_reports INSERT → User im Radius (P2 — selteneres Event)
 CREATE OR REPLACE FUNCTION public.notify_on_new_crisis_report()
@@ -183,9 +201,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_crisis_report ON public.crisis_reports;
-CREATE TRIGGER trg_notify_on_new_crisis_report AFTER INSERT ON public.crisis_reports
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_crisis_report();
+DO $$ BEGIN
+  IF to_regclass('public.crisis_reports') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_crisis_report ON public.crisis_reports;
+    CREATE TRIGGER trg_notify_on_new_crisis_report AFTER INSERT ON public.crisis_reports
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_crisis_report();
+  END IF;
+END $$;
 
 -- ════════════════════════════════════════════════════════════════════
 -- B) COMMUNITY-ENGAGEMENT
@@ -205,9 +227,13 @@ BEGIN
     '/dashboard/posts/' || NEW.post_id, 'social', 'normal', NEW.user_id, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_volunteer_signup ON public.volunteer_signups;
-CREATE TRIGGER trg_notify_on_volunteer_signup AFTER INSERT ON public.volunteer_signups
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_volunteer_signup();
+DO $$ BEGIN
+  IF to_regclass('public.volunteer_signups') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_volunteer_signup ON public.volunteer_signups;
+    CREATE TRIGGER trg_notify_on_volunteer_signup AFTER INSERT ON public.volunteer_signups
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_volunteer_signup();
+  END IF;
+END $$;
 
 -- B2. events INSERT → Nutzer im Radius (30 km)
 CREATE OR REPLACE FUNCTION public.notify_on_new_event()
@@ -234,9 +260,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_event ON public.events;
-CREATE TRIGGER trg_notify_on_new_event AFTER INSERT ON public.events
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_event();
+DO $$ BEGIN
+  IF to_regclass('public.events') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_event ON public.events;
+    CREATE TRIGGER trg_notify_on_new_event AFTER INSERT ON public.events
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_event();
+  END IF;
+END $$;
 
 -- B3. event_attendees INSERT → Event-Host
 CREATE OR REPLACE FUNCTION public.notify_on_event_attendee()
@@ -252,9 +282,13 @@ BEGIN
     '/dashboard/events/' || NEW.event_id, 'events', 'normal', NEW.user_id, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_event_attendee ON public.event_attendees;
-CREATE TRIGGER trg_notify_on_event_attendee AFTER INSERT ON public.event_attendees
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_event_attendee();
+DO $$ BEGIN
+  IF to_regclass('public.event_attendees') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_event_attendee ON public.event_attendees;
+    CREATE TRIGGER trg_notify_on_event_attendee AFTER INSERT ON public.event_attendees
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_event_attendee();
+  END IF;
+END $$;
 
 -- B4. event_rideshares INSERT → Event-Attendees
 CREATE OR REPLACE FUNCTION public.notify_on_new_rideshare()
@@ -275,9 +309,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_rideshare ON public.event_rideshares;
-CREATE TRIGGER trg_notify_on_new_rideshare AFTER INSERT ON public.event_rideshares
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_rideshare();
+DO $$ BEGIN
+  IF to_regclass('public.event_rideshares') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_rideshare ON public.event_rideshares;
+    CREATE TRIGGER trg_notify_on_new_rideshare AFTER INSERT ON public.event_rideshares
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_rideshare();
+  END IF;
+END $$;
 
 -- B5. live_rooms INSERT (status='live') → Channel-Mitglieder (alle die je
 --     in der zugehörigen conversation geschrieben haben)
@@ -301,9 +339,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_live_room_start ON public.live_rooms;
-CREATE TRIGGER trg_notify_on_live_room_start AFTER INSERT ON public.live_rooms
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_live_room_start();
+DO $$ BEGIN
+  IF to_regclass('public.live_rooms') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_live_room_start ON public.live_rooms;
+    CREATE TRIGGER trg_notify_on_live_room_start AFTER INSERT ON public.live_rooms
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_live_room_start();
+  END IF;
+END $$;
 
 -- B6. matches INSERT → beide Match-Partner (offer + request)
 CREATE OR REPLACE FUNCTION public.notify_on_new_match()
@@ -327,9 +369,13 @@ BEGIN
   END IF;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_match ON public.matches;
-CREATE TRIGGER trg_notify_on_new_match AFTER INSERT ON public.matches
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_match();
+DO $$ BEGIN
+  IF to_regclass('public.matches') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_match ON public.matches;
+    CREATE TRIGGER trg_notify_on_new_match AFTER INSERT ON public.matches
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_match();
+  END IF;
+END $$;
 
 -- B7. user_badges INSERT → Badge-Empfänger
 CREATE OR REPLACE FUNCTION public.notify_on_badge_earned()
@@ -345,9 +391,13 @@ BEGIN
     jsonb_build_object('badge_id', NEW.badge_id));
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_badge_earned ON public.user_badges;
-CREATE TRIGGER trg_notify_on_badge_earned AFTER INSERT ON public.user_badges
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_badge_earned();
+DO $$ BEGIN
+  IF to_regclass('public.user_badges') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_badge_earned ON public.user_badges;
+    CREATE TRIGGER trg_notify_on_badge_earned AFTER INSERT ON public.user_badges
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_badge_earned();
+  END IF;
+END $$;
 
 -- ════════════════════════════════════════════════════════════════════
 -- C) GROUP-FEATURES
@@ -368,9 +418,13 @@ BEGIN
     '/dashboard/groups/' || _grp, 'social', 'normal', NEW.user_id, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_group_post_reaction ON public.group_post_reactions;
-CREATE TRIGGER trg_notify_on_group_post_reaction AFTER INSERT ON public.group_post_reactions
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_group_post_reaction();
+DO $$ BEGIN
+  IF to_regclass('public.group_post_reactions') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_group_post_reaction ON public.group_post_reactions;
+    CREATE TRIGGER trg_notify_on_group_post_reaction AFTER INSERT ON public.group_post_reactions
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_group_post_reaction();
+  END IF;
+END $$;
 
 -- C2. channel_polls INSERT → Channel-Mitglieder
 CREATE OR REPLACE FUNCTION public.notify_on_new_channel_poll()
@@ -393,9 +447,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_channel_poll ON public.channel_polls;
-CREATE TRIGGER trg_notify_on_new_channel_poll AFTER INSERT ON public.channel_polls
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_channel_poll();
+DO $$ BEGIN
+  IF to_regclass('public.channel_polls') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_channel_poll ON public.channel_polls;
+    CREATE TRIGGER trg_notify_on_new_channel_poll AFTER INSERT ON public.channel_polls
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_channel_poll();
+  END IF;
+END $$;
 
 -- C3. channel_events INSERT → Channel-Mitglieder
 CREATE OR REPLACE FUNCTION public.notify_on_new_channel_event()
@@ -418,9 +476,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_channel_event ON public.channel_events;
-CREATE TRIGGER trg_notify_on_new_channel_event AFTER INSERT ON public.channel_events
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_channel_event();
+DO $$ BEGIN
+  IF to_regclass('public.channel_events') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_channel_event ON public.channel_events;
+    CREATE TRIGGER trg_notify_on_new_channel_event AFTER INSERT ON public.channel_events
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_channel_event();
+  END IF;
+END $$;
 
 -- ════════════════════════════════════════════════════════════════════
 -- D) MARKTPLATZ / VERSORGUNG
@@ -453,9 +515,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_new_marketplace_listing ON public.marketplace_listings;
-CREATE TRIGGER trg_notify_on_new_marketplace_listing AFTER INSERT ON public.marketplace_listings
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_marketplace_listing();
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_new_marketplace_listing ON public.marketplace_listings;
+    CREATE TRIGGER trg_notify_on_new_marketplace_listing AFTER INSERT ON public.marketplace_listings
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_new_marketplace_listing();
+  END IF;
+END $$;
 
 -- D2. marketplace_listings UPDATE status → reserved → User der reserviert hat
 CREATE OR REPLACE FUNCTION public.notify_on_marketplace_reserved()
@@ -471,9 +537,13 @@ BEGIN
   END IF;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_marketplace_reserved ON public.marketplace_listings;
-CREATE TRIGGER trg_notify_on_marketplace_reserved AFTER UPDATE ON public.marketplace_listings
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_marketplace_reserved();
+DO $$ BEGIN
+  IF to_regclass('public.marketplace_listings') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_marketplace_reserved ON public.marketplace_listings;
+    CREATE TRIGGER trg_notify_on_marketplace_reserved AFTER UPDATE ON public.marketplace_listings
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_marketplace_reserved();
+  END IF;
+END $$;
 
 -- D3. farm_favorites INSERT → Farm-Owner (falls Bauer angemeldet)
 CREATE OR REPLACE FUNCTION public.notify_on_farm_favorite()
@@ -512,9 +582,13 @@ BEGIN
   END LOOP;
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_org_review ON public.organization_reviews;
-CREATE TRIGGER trg_notify_on_org_review AFTER INSERT ON public.organization_reviews
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_org_review();
+DO $$ BEGIN
+  IF to_regclass('public.organization_reviews') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_org_review ON public.organization_reviews;
+    CREATE TRIGGER trg_notify_on_org_review AFTER INSERT ON public.organization_reviews
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_org_review();
+  END IF;
+END $$;
 
 -- E2. organization_invites UPDATE use_count steigt → Org-Owner (Beitritt-Code verwendet)
 -- (Skipping — UPDATE-Trigger zu eng am Anwendungs-Flow, schlecht testbar
@@ -535,9 +609,13 @@ BEGIN
     'chat', 'normal', NULL, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_conversation_member_added ON public.conversation_members;
-CREATE TRIGGER trg_notify_on_conversation_member_added AFTER INSERT ON public.conversation_members
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_conversation_member_added();
+DO $$ BEGIN
+  IF to_regclass('public.conversation_members') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_conversation_member_added ON public.conversation_members;
+    CREATE TRIGGER trg_notify_on_conversation_member_added AFTER INSERT ON public.conversation_members
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_conversation_member_added();
+  END IF;
+END $$;
 
 -- E4. message_reactions INSERT → Message-Autor
 CREATE OR REPLACE FUNCTION public.notify_on_message_reaction()
@@ -554,9 +632,13 @@ BEGIN
     '/dashboard/messages/' || _conv, 'chat', 'low', NEW.user_id, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_message_reaction ON public.message_reactions;
-CREATE TRIGGER trg_notify_on_message_reaction AFTER INSERT ON public.message_reactions
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_message_reaction();
+DO $$ BEGIN
+  IF to_regclass('public.message_reactions') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_message_reaction ON public.message_reactions;
+    CREATE TRIGGER trg_notify_on_message_reaction AFTER INSERT ON public.message_reactions
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_message_reaction();
+  END IF;
+END $$;
 
 -- E5. message_pins INSERT → Message-Autor
 CREATE OR REPLACE FUNCTION public.notify_on_message_pinned()
@@ -572,6 +654,10 @@ BEGIN
     '/dashboard/messages/' || _conv, 'social', 'normal', NEW.pinned_by, NULL);
   RETURN NEW;
 END $$;
-DROP TRIGGER IF EXISTS trg_notify_on_message_pinned ON public.message_pins;
-CREATE TRIGGER trg_notify_on_message_pinned AFTER INSERT ON public.message_pins
-  FOR EACH ROW EXECUTE FUNCTION public.notify_on_message_pinned();
+DO $$ BEGIN
+  IF to_regclass('public.message_pins') IS NOT NULL THEN
+    DROP TRIGGER IF EXISTS trg_notify_on_message_pinned ON public.message_pins;
+    CREATE TRIGGER trg_notify_on_message_pinned AFTER INSERT ON public.message_pins
+      FOR EACH ROW EXECUTE FUNCTION public.notify_on_message_pinned();
+  END IF;
+END $$;
