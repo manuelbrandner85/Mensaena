@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.2.0+40200
+version: 4.3.0+40300
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -65,6 +65,9 @@ dependencies:
   # Media
   image_picker: ^1.1.2
   cached_network_image: ^3.3.1
+  # HTML-Render für die E-Mail-Vorschau im Marketing-Admin (pure Dart, kein
+  # natives Webview → keine Plattform-Konfig nötig).
+  flutter_widget_from_html_core: ^0.16.0
 
   # Geo
   geolocator: ^12.0.0
@@ -180,3 +183,7 @@ flutter:
     - assets/translations/
     - assets/data/
     - assets/sounds/
+    # WICHTIG: shorebird.yaml MUSS als Asset gebündelt sein — sonst schlägt
+    # `shorebird release`/`patch` mit "pubspec.yaml does not have shorebird.yaml
+    # as a flutter asset" fehl.
+    - shorebird.yaml

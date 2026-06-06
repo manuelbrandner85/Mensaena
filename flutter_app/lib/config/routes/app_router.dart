@@ -15,6 +15,7 @@ import '../../screens/dashboard/admin/admin_challenges_screen.dart';
 import '../../screens/dashboard/admin/admin_chat_moderation_screen.dart';
 import '../../screens/dashboard/admin/admin_contact_screen.dart';
 import '../../screens/dashboard/admin/admin_dashboard_screen.dart';
+import '../../screens/dashboard/admin/admin_marketing_screen.dart';
 import '../../screens/dashboard/admin/admin_groups_screen.dart';
 import '../../screens/dashboard/admin/admin_system_screen.dart';
 import '../../screens/dashboard/admin/admin_table_screen.dart';
@@ -92,6 +93,7 @@ import '../../screens/dashboard/ratings_hub_screen.dart';
 import '../../screens/dashboard/permissions_screen.dart';
 import '../../screens/dashboard/settings_screen.dart';
 import '../../screens/public/permissions_gate_screen.dart';
+import '../../screens/legal/download_screen.dart';
 import '../../screens/legal/legal_page_screen.dart';
 import '../../screens/legal/unsubscribe_screen.dart';
 import '../../screens/dashboard/timebank_screen.dart';
@@ -274,7 +276,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const LegalPageScreen(contentKey: 'community-guidelines'),
         ),
       ),
-      _placeholder('/download', 'Download'),
+      GoRoute(
+        path: '/download',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const DownloadScreen(),
+        ),
+      ),
       GoRoute(
         path: '/search',
         pageBuilder: (_, s) => mensaenaTransition<void>(
@@ -1307,6 +1315,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const AdminSystemScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/marketing',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminMarketingScreen(),
         ),
       ),
       // Profile-Edit + Saved-Posts werden jetzt als Subroutes unter
