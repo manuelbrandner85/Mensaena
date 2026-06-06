@@ -69,6 +69,23 @@ Beide Workflows laufen grün auf jedem Push zu `main`:
 - **deploy.yml** → www.mensaena.de + mensaena.de (Cloudflare Workers) ✅
 - **android.yml** → Signierte APK + GitHub Release + F-Droid Index ✅
 
+### Bestätigter Status (2026-06-06) — Update-Pipeline repariert
+- **Shorebird-Fix:** `shorebird.yaml` ist jetzt als Flutter-Asset in
+  `flutter_app/pubspec.yaml` gebündelt. Vorher fehlte das → `shorebird release`
+  fiel auf plain `flutter build apk` zurück (kein OTA-Updater, kein Release
+  registriert) und `shorebird_patch.yml` übersprang JEDEN Patch. Änderungen
+  erreichten nie die App.
+- **flutter.yml (Run #985)** baut `4.1.5+40105` jetzt **via Shorebird** (kein
+  Fallback), publiziert das GitHub-Release `v4.1.5-40105` und schreibt die
+  `app_releases`-Pflichtzeile (`mandatory=true`). Ab dieser Basis greifen OTA-
+  Patches für künftige Dart-only-Commits. ✅
+- **supabase.yml (Run #125)** deployt Migrationen + Edge Functions grün; die
+  Phase-4 **pg_cron-Jobs** sind via Migration `20260606200000` automatisch auf
+  gyquj eingerichtet (Helper `private.invoke_edge_function`). ✅
+- **Regel:** Reine Dart-Änderungen → OTA-Patch (kein Version-Bump). Dependencies/
+  native Änderungen oder eine Pflicht-Auslieferung → Version bumpen (`flutter.yml`
+  registriert dann ein neues Shorebird-Release).
+
 Bekannte Abhängigkeit: `@anthropic-ai/sdk` muss in `package.json` stehen
 (für `/api/emails/optimize-subject`). Fehlt es → Build-Fehler "Module not found".
 
