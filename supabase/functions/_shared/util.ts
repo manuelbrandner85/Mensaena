@@ -2,7 +2,7 @@
 // _shared/util.ts — gemeinsame Helfer für alle KI-Functions.
 // CORS, JSON-Response, Auth (getUser), Rate-Limit, Analytics-Logging.
 // ════════════════════════════════════════════════════════════════════════
-import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 export const CORS = {
   'Access-Control-Allow-Origin': '*',
