@@ -14,17 +14,20 @@ class NotificationsRepository {
   static Stream<List<AppNotification>> watchMine() {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return Stream.value(const []);
+    // MEMORY-FIX: .limit(150) — Supabase .stream() ohne Limit lädt ALLE
+    // Notifications eines Users (nach Monaten Nutzung: Tausende Rows) in den
+    // RAM. 150 reichen für Inbox + History; ältere sind per Scroll nicht
+    // erreichbar, aber ein täglicher Cleanup-Cron könnte alte löschen.
     return sb
         .from('notifications')
         .stream(primaryKey: ['id'])
         .eq('user_id', uid)
-        .order('created_at')
+        .order('created_at', ascending: false)
+        .limit(150)
         .map(
           (rows) => rows
               .map(AppNotification.fromJson)
               .where((n) => n.deletedAt == null)
-              .toList()
-              .reversed
               .toList(),
         );
   }

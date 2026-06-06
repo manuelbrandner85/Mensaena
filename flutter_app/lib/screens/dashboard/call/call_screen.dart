@@ -218,6 +218,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
           .from('dm_calls')
           .stream(primaryKey: ['id'])
           .eq('id', widget.callId)
+          .limit(1)
           .listen((rows) async {
             if (rows.isEmpty) return;
             final r = rows.first;
@@ -490,6 +491,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     CallBusyState.inCall = true;
     LiveAudioService.start(); // Punkt 11: Hintergrund-/Screen-off-Audio.
     _attachRoomListeners(room);
+    // MEMORY-FIX: Alte Event-Bus-Subscription vor Reattach disposen.
+    // Vorher: _events wurde überschrieben ohne dispose → RoomEventsService-
+    // Listener stapelten sich auf demselben LiveKit-Room.
+    _eventsSub?.cancel();
+    _events?.dispose();
     _attachEventsBus(room);
     if (!mounted) return;
     setState(() => _state = _CallState.connected);

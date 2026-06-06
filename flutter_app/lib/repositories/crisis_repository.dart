@@ -63,6 +63,7 @@ class CrisisRepository {
         .stream(primaryKey: ['id'])
         .eq('crisis_id', crisisId)
         .order('created_at')
+        .limit(200)
         .map((rows) => rows.map(CrisisHelper.fromJson).toList());
   }
 
@@ -73,6 +74,7 @@ class CrisisRepository {
         .stream(primaryKey: ['id'])
         .eq('crisis_id', crisisId)
         .order('created_at', ascending: false)
+        .limit(100)
         .map((rows) => rows.map(CrisisUpdate.fromJson).toList());
   }
 
@@ -184,6 +186,7 @@ class CrisisRepository {
         .stream(primaryKey: ['id'])
         .eq('crisis_id', crisisId)
         .order('created_at')
+        .limit(200)
         .map((rows) => rows.whereType<Map<String, dynamic>>().toList());
   }
 
@@ -338,19 +341,22 @@ final crisisDetailProvider =
   return CrisisRepository.getById(id);
 });
 
+// MEMORY-FIX: autoDispose auf alle Crisis-Detail-Stream-Provider.
+// Ein geöffneter Krisen-Screen öffnete 3 Supabase-Realtime-Channels,
+// die nach Verlassen des Screens nie geschlossen wurden.
 final crisisHelpersStreamProvider =
-    StreamProvider.family<List<CrisisHelper>, String>((ref, crisisId) {
+    StreamProvider.family.autoDispose<List<CrisisHelper>, String>((ref, crisisId) {
   return CrisisRepository.watchHelpers(crisisId);
 });
 
 final crisisUpdatesStreamProvider =
-    StreamProvider.family<List<CrisisUpdate>, String>((ref, crisisId) {
+    StreamProvider.family.autoDispose<List<CrisisUpdate>, String>((ref, crisisId) {
   return CrisisRepository.watchUpdates(crisisId);
 });
 
 /// R2: Aufgaben-Stream für das Krisen-Team.
 final crisisTasksStreamProvider =
-    StreamProvider.family<List<Map<String, dynamic>>, String>((ref, crisisId) {
+    StreamProvider.family.autoDispose<List<Map<String, dynamic>>, String>((ref, crisisId) {
   return CrisisRepository.watchTasks(crisisId);
 });
 

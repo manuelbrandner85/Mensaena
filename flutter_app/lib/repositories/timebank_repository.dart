@@ -132,7 +132,8 @@ class TimebankRepository {
         .from('zeitbank_notifications')
         .stream(primaryKey: ['id'])
         .eq('user_id', uid)
-        .order('created_at')
+        .order('created_at', ascending: false)
+        .limit(100)
         .map((rows) => rows
             .map(ZeitbankNotification.fromJson)
             .where((n) => !n.seen && n.type == 'confirmation_request')

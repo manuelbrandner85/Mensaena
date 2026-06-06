@@ -312,6 +312,7 @@ class LiveStreamService {
         .from('live_rooms')
         .stream(primaryKey: ['id'])
         .eq('conversation_id', conversationId)
+        .limit(20)
         .map((rows) {
           final active = rows.where((r) => r['status'] == 'live').toList()
             ..sort((a, b) {

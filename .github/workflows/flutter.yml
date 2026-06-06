@@ -306,6 +306,13 @@ jobs:
           fi
           exit $rc
 
+      # Stream-Guard: scheitert wenn jemand .stream() ohne .limit() oder
+      # StreamProvider.family ohne .autoDispose committet — beides war die
+      # Root-Cause des OOM-Crashs (2026-06-06).
+      - name: Stream-Limits Guard
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/check_stream_limits.py
+
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"
 
