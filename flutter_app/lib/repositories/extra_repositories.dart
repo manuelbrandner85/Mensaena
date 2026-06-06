@@ -1424,3 +1424,5 @@ class AuditLogsRepository {
     } catch (_) {}
   }
 }
+
+// OTA-Patch-Trigger: crash_logs-REST-Logger auf 4.1.8 ausliefern (kein Bump).
