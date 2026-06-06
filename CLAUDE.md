@@ -97,6 +97,9 @@ Bekannte Abhängigkeit: `@anthropic-ai/sdk` muss in `package.json` stehen
 APK auf JEDE Interaktion nativ abstürzen. Deshalb in `flutter.yml` UND
 `shorebird_patch.yml` immer `--flutter-version=3.27.4` setzen. Release- und
 Patch-Engine MÜSSEN identisch sein, sonst verwirft der Client den Patch.
+**ABER:** `--flutter-version` NUR bei `shorebird release` setzen — `shorebird patch`
+kennt das Flag NICHT (→ Exit 64) und übernimmt die Flutter-Version automatisch
+vom Ziel-Release. Im Patch-Command also KEIN `--flutter-version`.
 
 ### Deploy-Workflow (.github/workflows/deploy.yml)
 Der Workflow macht genau diese 4 Schritte – **nichts weiter, nichts anderes**:
