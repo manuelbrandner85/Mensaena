@@ -14,6 +14,8 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/marketing_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../services/supabase_service.dart';
+import '../../../widgets/admin/marketing_preview.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class AdminMarketingScreen extends ConsumerStatefulWidget {
@@ -215,6 +217,15 @@ class _EmailTab extends StatefulWidget {
 
 class _EmailTabState extends State<_EmailTab> {
   late Future<List<Map<String, dynamic>>> _f = widget.repo.listEmailCampaigns();
+  int? _audience; // Anzahl email_opt_in (Empfänger-Vorschau)
+
+  @override
+  void initState() {
+    super.initState();
+    widget.repo.segmentCounts().then((m) {
+      if (mounted) setState(() => _audience = (m['email_subs'] as num?)?.toInt());
+    });
+  }
 
   void _refresh() => setState(() => _f = widget.repo.listEmailCampaigns());
 
@@ -230,16 +241,23 @@ class _EmailTabState extends State<_EmailTab> {
             final rows = snap.data ?? const <Map<String, dynamic>>[];
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-              children: rows.isEmpty
-                  ? [
-                      Center(
-                          child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Text('marketing.email_empty'.tr(),
-                            style: AppTypography.caption()),
-                      ))
-                    ]
-                  : rows.map(_row).toList(),
+              children: [
+                _AudienceBanner(
+                  icon: LucideIcons.mail,
+                  label: 'marketing.audience_email'.tr(
+                      namedArgs: {'count': '${_audience ?? '…'}'}),
+                ),
+                const SizedBox(height: 12),
+                if (rows.isEmpty)
+                  Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Text('marketing.email_empty'.tr(),
+                        style: AppTypography.caption()),
+                  ))
+                else
+                  ...rows.map(_row),
+              ],
             );
           },
         ),
@@ -289,17 +307,37 @@ class _EmailTabState extends State<_EmailTab> {
             }),
             style: AppTypography.label(size: 10, color: AppColors.mute),
           ),
-          if (status == 'draft')
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () => _confirmSend(id),
-                icon: const Icon(LucideIcons.send,
-                    size: 14, color: AppColors.bronze),
-                label: Text('marketing.email_send'.tr(),
-                    style: AppTypography.label(size: 11, color: AppColors.bronze)),
-              ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Wrap(
+              spacing: 4,
+              children: [
+                TextButton.icon(
+                  onPressed: () => _previewCampaign(id),
+                  icon: const Icon(LucideIcons.eye,
+                      size: 14, color: AppColors.mute),
+                  label: Text('marketing.preview'.tr(),
+                      style: AppTypography.label(size: 11, color: AppColors.mute)),
+                ),
+                TextButton.icon(
+                  onPressed: () => _testSend(id),
+                  icon: const Icon(LucideIcons.send,
+                      size: 14, color: AppColors.teal),
+                  label: Text('marketing.test_send'.tr(),
+                      style: AppTypography.label(size: 11, color: AppColors.teal)),
+                ),
+                if (status == 'draft')
+                  TextButton.icon(
+                    onPressed: () => _confirmSend(id),
+                    icon: const Icon(LucideIcons.megaphone,
+                        size: 14, color: AppColors.bronze),
+                    label: Text('marketing.email_send'.tr(),
+                        style: AppTypography.label(
+                            size: 11, color: AppColors.bronze)),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -308,36 +346,53 @@ class _EmailTabState extends State<_EmailTab> {
   Future<void> _composeDialog(BuildContext context) async {
     final subjectCtrl = TextEditingController();
     final htmlCtrl = TextEditingController();
+    bool preview = false;
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text('marketing.email_compose'.tr(),
-            style: AppTypography.display(size: 16, color: AppColors.ink)),
-        content: SingleChildScrollView(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextField(
-              controller: subjectCtrl,
-              decoration: InputDecoration(
-                  labelText: 'marketing.email_subject'.tr()),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Row(children: [
+            Expanded(
+              child: Text('marketing.email_compose'.tr(),
+                  style: AppTypography.display(size: 16, color: AppColors.ink)),
             ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: htmlCtrl,
-              maxLines: 8,
-              decoration: InputDecoration(
-                  labelText: 'marketing.email_html'.tr()),
-            ),
+            _PreviewToggle(
+                preview: preview,
+                onChanged: (v) => setLocal(() => preview = v)),
           ]),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: preview
+                  ? EmailPreview(
+                      subject: subjectCtrl.text, html: htmlCtrl.text)
+                  : Column(mainAxisSize: MainAxisSize.min, children: [
+                      TextField(
+                        controller: subjectCtrl,
+                        decoration: InputDecoration(
+                            labelText: 'marketing.email_subject'.tr()),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: htmlCtrl,
+                        maxLines: 8,
+                        decoration: InputDecoration(
+                            labelText: 'marketing.email_html'.tr(),
+                            hintText: '<h1>…</h1>  {vorname} {region}'),
+                      ),
+                    ]),
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text('common.cancel'.tr())),
+            ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text('marketing.email_save_draft'.tr())),
+          ],
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text('common.cancel'.tr())),
-          ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text('marketing.email_save_draft'.tr())),
-        ],
       ),
     );
     if (ok == true) {
@@ -350,13 +405,72 @@ class _EmailTabState extends State<_EmailTab> {
     }
   }
 
+  /// Vollbild-Vorschau einer bestehenden Kampagne (lädt den Body nach).
+  Future<void> _previewCampaign(String id) async {
+    final c = await widget.repo.getEmailCampaign(id);
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('marketing.preview'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: EmailPreview(
+              subject: c['subject']?.toString() ?? '',
+              html: (c['body_html'] ?? c['body_text'] ?? '').toString(),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('common.close'.tr())),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
+            onPressed: () {
+              Navigator.pop(ctx);
+              _testSend(id);
+            },
+            icon: const Icon(LucideIcons.send, size: 16),
+            label: Text('marketing.test_send'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Test-Versand an die eigene Admin-Adresse (Backend `test_to`).
+  Future<void> _testSend(String id) async {
+    final email = SupabaseService.currentUser?.email;
+    if (email == null || email.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('marketing.test_no_email'.tr())),
+      );
+      return;
+    }
+    Haptics.tap();
+    final r = await widget.repo.sendEmailCampaign(id, testTo: email);
+    if (!mounted) return;
+    final ok = r['ok'] == true;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(ok
+          ? 'marketing.test_sent'.tr(namedArgs: {'email': email})
+          : 'marketing.test_failed'.tr()),
+    ));
+  }
+
   Future<void> _confirmSend(String id) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: Text('marketing.email_send_confirm_title'.tr()),
-        content: Text('marketing.email_send_confirm_body'.tr()),
+        content: Text('marketing.email_send_confirm_count'.tr(
+            namedArgs: {'count': '${_audience ?? '…'}'})),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -378,6 +492,60 @@ class _EmailTabState extends State<_EmailTab> {
       })),
     ));
     _refresh();
+  }
+}
+
+/// Banner, das vor dem Versand zeigt, wie viele Empfänger es betrifft.
+class _AudienceBanner extends StatelessWidget {
+  const _AudienceBanner({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.bronze.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.bronze.withValues(alpha: 0.30)),
+      ),
+      child: Row(children: [
+        Icon(icon, size: 16, color: AppColors.bronze),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(label,
+              style: AppTypography.body(size: 12, color: AppColors.ink)),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Editor/Vorschau-Umschalter (kleiner Segmented-Toggle).
+class _PreviewToggle extends StatelessWidget {
+  const _PreviewToggle({required this.preview, required this.onChanged});
+  final bool preview;
+  final ValueChanged<bool> onChanged;
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<bool>(
+      style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        textStyle: WidgetStatePropertyAll(AppTypography.label(size: 10)),
+      ),
+      segments: [
+        ButtonSegment(
+            value: false,
+            icon: const Icon(LucideIcons.pencil, size: 13),
+            label: Text('marketing.editor'.tr())),
+        ButtonSegment(
+            value: true,
+            icon: const Icon(LucideIcons.eye, size: 13),
+            label: Text('marketing.preview'.tr())),
+      ],
+      selected: {preview},
+      onSelectionChanged: (s) => onChanged(s.first),
+    );
   }
 }
 
@@ -413,6 +581,42 @@ class _PushTabState extends State<_PushTab> {
   final _link = TextEditingController(text: '/dashboard/settings');
   bool _sending = false;
   String? _result;
+  int? _audience; // marketing_opt_in
+
+  @override
+  void initState() {
+    super.initState();
+    widget.repo.segmentCounts().then((m) {
+      if (mounted) {
+        setState(() => _audience = (m['marketing_subs'] as num?)?.toInt());
+      }
+    });
+  }
+
+  Future<void> _confirm() async {
+    final t = _title.text.trim();
+    final b = _body.text.trim();
+    if (t.isEmpty || b.isEmpty) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('marketing.push_send'.tr()),
+        content: Text('marketing.push_send_confirm'.tr(
+            namedArgs: {'count': '${_audience ?? '…'}'})),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('common.cancel'.tr())),
+          FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.bronze),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('marketing.push_send'.tr())),
+        ],
+      ),
+    );
+    if (ok == true) _send();
+  }
 
   Future<void> _send() async {
     if (_sending) return;
@@ -433,17 +637,31 @@ class _PushTabState extends State<_PushTab> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        _AudienceBanner(
+          icon: LucideIcons.bell,
+          label: 'marketing.audience_push'.tr(
+              namedArgs: {'count': '${_audience ?? '…'}'}),
+        ),
+        const SizedBox(height: 12),
         Text('marketing.push_hint'.tr(),
             style: AppTypography.caption()),
         const SizedBox(height: 12),
+        // Live-Vorschau wie die Notification auf dem Gerät aussieht.
+        Text('marketing.preview'.tr(),
+            style: AppTypography.label(size: 11, color: AppColors.mute)),
+        const SizedBox(height: 6),
+        PushPreview(title: _title.text, body: _body.text),
+        const SizedBox(height: 14),
         TextField(
             controller: _title,
+            onChanged: (_) => setState(() {}),
             decoration:
                 InputDecoration(labelText: 'marketing.push_title'.tr())),
         const SizedBox(height: 8),
         TextField(
             controller: _body,
             maxLines: 3,
+            onChanged: (_) => setState(() {}),
             decoration: InputDecoration(labelText: 'marketing.push_body'.tr())),
         const SizedBox(height: 8),
         TextField(
@@ -455,7 +673,7 @@ class _PushTabState extends State<_PushTab> {
               backgroundColor: AppColors.bronze,
               foregroundColor: AppColors.voidColor,
               minimumSize: const Size.fromHeight(48)),
-          onPressed: _sending ? null : _send,
+          onPressed: _sending ? null : _confirm,
           icon: _sending
               ? const SizedBox(
                   width: 16,
@@ -614,46 +832,67 @@ class _TemplatesTabState extends State<_TemplatesTab> {
     final bodyCtrl = TextEditingController(
         text: (existing?['body_html'] ?? existing?['body_text'] ?? '').toString());
     String kind = existing?['kind']?.toString() ?? 'email';
+    bool preview = false;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
           backgroundColor: AppColors.surface,
-          title: Text(existing == null
-              ? 'marketing.tpl_new'.tr()
-              : 'marketing.tpl_edit'.tr()),
-          content: SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              TextField(
-                  controller: nameCtrl,
-                  decoration: InputDecoration(labelText: 'marketing.tpl_name'.tr())),
-              const SizedBox(height: 8),
-              Row(children: [
-                ChoiceChip(
-                  label: const Text('E-Mail'),
-                  selected: kind == 'email',
-                  onSelected: (_) => setLocal(() => kind = 'email'),
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Push'),
-                  selected: kind == 'push',
-                  onSelected: (_) => setLocal(() => kind = 'push'),
-                ),
-              ]),
-              const SizedBox(height: 8),
-              TextField(
-                  controller: subjCtrl,
-                  decoration: InputDecoration(
-                      labelText: 'marketing.tpl_subject'.tr())),
-              const SizedBox(height: 8),
-              TextField(
-                  controller: bodyCtrl,
-                  maxLines: 8,
-                  decoration: InputDecoration(
-                      labelText: 'marketing.tpl_body'.tr(),
-                      hintText: '{vorname} {region} {karma}')),
-            ]),
+          title: Row(children: [
+            Expanded(
+              child: Text(existing == null
+                  ? 'marketing.tpl_new'.tr()
+                  : 'marketing.tpl_edit'.tr()),
+            ),
+            _PreviewToggle(
+                preview: preview,
+                onChanged: (v) => setLocal(() => preview = v)),
+          ]),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: preview
+                  ? (kind == 'email'
+                      ? EmailPreview(
+                          subject: subjCtrl.text, html: bodyCtrl.text)
+                      : PushPreview(
+                          title: subjCtrl.text.isEmpty
+                              ? nameCtrl.text
+                              : subjCtrl.text,
+                          body: bodyCtrl.text))
+                  : Column(mainAxisSize: MainAxisSize.min, children: [
+                      TextField(
+                          controller: nameCtrl,
+                          decoration: InputDecoration(
+                              labelText: 'marketing.tpl_name'.tr())),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        ChoiceChip(
+                          label: const Text('E-Mail'),
+                          selected: kind == 'email',
+                          onSelected: (_) => setLocal(() => kind = 'email'),
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          label: const Text('Push'),
+                          selected: kind == 'push',
+                          onSelected: (_) => setLocal(() => kind = 'push'),
+                        ),
+                      ]),
+                      const SizedBox(height: 8),
+                      TextField(
+                          controller: subjCtrl,
+                          decoration: InputDecoration(
+                              labelText: 'marketing.tpl_subject'.tr())),
+                      const SizedBox(height: 8),
+                      TextField(
+                          controller: bodyCtrl,
+                          maxLines: 8,
+                          decoration: InputDecoration(
+                              labelText: 'marketing.tpl_body'.tr(),
+                              hintText: '{vorname} {region} {karma}')),
+                    ]),
+            ),
           ),
           actions: [
             TextButton(
@@ -1084,6 +1323,67 @@ class _ContentTabState extends State<_ContentTab> {
     await Share.share(text);
   }
 
+  Future<void> _previewContent(Map<String, dynamic> r) async {
+    final title = sampleFill(r['title']?.toString() ?? '');
+    final body = sampleFill(r['body']?.toString() ?? '');
+    final share = sampleFill(r['share_text']?.toString() ?? '');
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('marketing.preview'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(title,
+                  style: AppTypography.body(
+                      size: 15, color: AppColors.ink, weight: FontWeight.w700)),
+              if (body.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(body,
+                    style: AppTypography.body(size: 13, color: AppColors.inkSoft)),
+              ],
+              if (share.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text('marketing.cp_share_text'.tr(),
+                    style: AppTypography.label(size: 10, color: AppColors.mute)),
+                const SizedBox(height: 4),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.elevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Text(share,
+                      style: AppTypography.body(size: 13, color: AppColors.ink)),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('common.close'.tr())),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.bronze),
+            onPressed: () {
+              Navigator.pop(ctx);
+              _share(r);
+            },
+            icon: const Icon(LucideIcons.share2, size: 16),
+            label: Text('common.share'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -1156,6 +1456,11 @@ class _ContentTabState extends State<_ContentTab> {
                       ],
                       const SizedBox(height: 4),
                       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        IconButton(
+                            tooltip: 'marketing.preview'.tr(),
+                            onPressed: () => _previewContent(r),
+                            icon: const Icon(LucideIcons.eye,
+                                size: 16, color: AppColors.mute)),
                         IconButton(
                             tooltip: 'common.share'.tr(),
                             onPressed: () => _share(r),

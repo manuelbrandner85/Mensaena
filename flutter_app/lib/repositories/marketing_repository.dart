@@ -56,6 +56,17 @@ class MarketingRepository {
     return (rows as List).cast<Map<String, dynamic>>();
   }
 
+  /// Volle Kampagne inkl. Body (Liste liefert den Body aus Performance-Gründen
+  /// nicht mit) — für Vorschau + Test-Versand.
+  Future<Map<String, dynamic>> getEmailCampaign(String id) async {
+    final res = await SupabaseService.client
+        .from('email_campaigns')
+        .select('id, subject, body_html, body_text, status')
+        .eq('id', id)
+        .maybeSingle();
+    return Map<String, dynamic>.from((res as Map?) ?? const {});
+  }
+
   Future<String?> createEmailCampaign({
     required String subject,
     required String html,
