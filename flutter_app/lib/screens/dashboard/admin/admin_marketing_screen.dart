@@ -16,6 +16,7 @@ import '../../../repositories/marketing_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/admin/marketing_preview.dart';
+import '../../../widgets/shared/error_state_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class AdminMarketingScreen extends ConsumerStatefulWidget {
@@ -105,6 +106,11 @@ class _OverviewTabState extends State<_OverviewTab> {
       child: FutureBuilder<MarketingDashboardStats>(
         future: _f,
         builder: (c, snap) {
+          if (snap.hasError) {
+            return ErrorStateCard(
+              onRetry: () => setState(() => _f = widget.repo.stats()),
+            );
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator(color: AppColors.bronze));
           }
@@ -712,6 +718,11 @@ class _SegmentsTabState extends State<_SegmentsTab> {
       child: FutureBuilder<Map<String, dynamic>>(
         future: _f,
         builder: (c, snap) {
+          if (snap.hasError) {
+            return ErrorStateCard(
+              onRetry: () => setState(() => _f = widget.repo.segmentCounts()),
+            );
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator(color: AppColors.bronze));
           }
@@ -1028,6 +1039,12 @@ class _ReferralsTabState extends State<_ReferralsTab> {
       child: FutureBuilder<Map<String, dynamic>>(
         future: _f,
         builder: (c, snap) {
+          if (snap.hasError) {
+            return ErrorStateCard(
+              onRetry: () =>
+                  setState(() => _f = widget.repo.referralsOverview()),
+            );
+          }
           if (!snap.hasData) {
             return const Center(
                 child: CircularProgressIndicator(color: AppColors.bronze));
@@ -1128,6 +1145,12 @@ class _RegionsTabState extends State<_RegionsTab> {
       child: FutureBuilder<List<Map<String, dynamic>>>(
         future: _f,
         builder: (c, snap) {
+          if (snap.hasError) {
+            return ErrorStateCard(
+              onRetry: () =>
+                  setState(() => _f = widget.repo.regionsOverview()),
+            );
+          }
           if (!snap.hasData) {
             return const Center(
                 child: CircularProgressIndicator(color: AppColors.bronze));

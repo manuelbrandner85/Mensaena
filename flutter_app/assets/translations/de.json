@@ -754,7 +754,9 @@
     "permissionDenied": "Berechtigung verweigert.",
     "noApkUrl": "Keine APK-URL hinterlegt.",
     "locationFailed": "Standort konnte nicht ermittelt werden.",
-    "notAuthenticated": "Nicht angemeldet."
+    "notAuthenticated": "Nicht angemeldet.",
+    "loadFailed": "Laden fehlgeschlagen.",
+    "retry": "Erneut versuchen"
   },
   "home": {
     "tapAgainToExit": "Erneut tippen zum Beenden",

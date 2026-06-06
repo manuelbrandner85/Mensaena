@@ -3,6 +3,8 @@
 /// Liest Stats/Segmente per RPC, listet/erstellt/sendet Kampagnen.
 library;
 
+import 'package:flutter/foundation.dart' show debugPrint;
+
 import '../services/supabase_service.dart';
 
 class MarketingDashboardStats {
@@ -85,15 +87,22 @@ class MarketingRepository {
 
   Future<Map<String, dynamic>> sendEmailCampaign(String campaignId,
       {String? segmentId, String? testTo}) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'send-email-campaign',
-      body: {
-        'campaign_id': campaignId,
-        if (segmentId != null) 'segment_id': segmentId,
-        if (testTo != null) 'test_to': testTo,
-      },
-    );
-    return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    // Versand kann je nach Empfängerzahl dauern → großzügiges Timeout, aber
+    // nicht unendlich. Fehler als {'error': …} statt ungefangener Crash.
+    try {
+      final res = await SupabaseService.client.functions.invoke(
+        'send-email-campaign',
+        body: {
+          'campaign_id': campaignId,
+          if (segmentId != null) 'segment_id': segmentId,
+          if (testTo != null) 'test_to': testTo,
+        },
+      ).timeout(const Duration(seconds: 45));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[Marketing] sendEmailCampaign failed: $e');
+      return {'error': e.toString()};
+    }
   }
 
   // ── Push-Kampagnen ──────────────────────────────────────────────────────
@@ -103,16 +112,21 @@ class MarketingRepository {
     String? link,
     String? segmentId,
   }) async {
-    final res = await SupabaseService.client.functions.invoke(
-      'send-push-campaign',
-      body: {
-        'title': title,
-        'body': body,
-        if (link != null) 'link': link,
-        if (segmentId != null) 'segment_id': segmentId,
-      },
-    );
-    return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    try {
+      final res = await SupabaseService.client.functions.invoke(
+        'send-push-campaign',
+        body: {
+          'title': title,
+          'body': body,
+          if (link != null) 'link': link,
+          if (segmentId != null) 'segment_id': segmentId,
+        },
+      ).timeout(const Duration(seconds: 45));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[Marketing] sendPushCampaign failed: $e');
+      return {'error': e.toString()};
+    }
   }
 
   // ── Phase 2: Vorlagen-Editor ────────────────────────────────────────────

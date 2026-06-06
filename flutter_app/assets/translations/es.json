@@ -755,7 +755,9 @@
     "permissionDenied": "Permiso denegado.",
     "noApkUrl": "No hay URL de APK configurada.",
     "locationFailed": "No se pudo obtener la ubicación.",
-    "notAuthenticated": "No has iniciado sesión."
+    "notAuthenticated": "No has iniciado sesión.",
+    "loadFailed": "Error al cargar.",
+    "retry": "Reintentar"
   },
   "home": {
     "tapAgainToExit": "Toca de nuevo para salir",

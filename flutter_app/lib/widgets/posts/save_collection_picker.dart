@@ -175,7 +175,7 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
                                     color: AppColors.ink,
                                     weight: FontWeight.w600)),
                             onTap: () => Navigator.pop(context,
-                                (cancelled: false, id: c['id'] as String)),
+                                (cancelled: false, id: c['id']?.toString() ?? '')),
                           );
                         },
                       ),

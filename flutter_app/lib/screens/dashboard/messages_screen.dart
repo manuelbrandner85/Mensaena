@@ -19,6 +19,7 @@ import '../../services/supabase_service.dart';
 import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
+import '../../widgets/shared/error_state_card.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
 
 /// SKILL: mensaena-features
@@ -409,6 +410,18 @@ class _DmListView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             itemCount: 6,
             itemBuilder: (_, __) => const ConversationTileSkeleton(),
+          );
+        }
+        // Fehler sichtbar machen statt still „keine Konversationen" zu zeigen
+        // (sonst nicht von echtem Leerzustand unterscheidbar). Scrollbar für
+        // Pull-to-Refresh-Konsistenz.
+        if (snap.hasError) {
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              const SizedBox(height: 80),
+              ErrorStateCard(onRetry: onChanged),
+            ],
           );
         }
         final all = snap.data ?? const <Map<String, dynamic>>[];

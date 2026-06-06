@@ -755,7 +755,9 @@
     "permissionDenied": "Autorizzazione negata.",
     "noApkUrl": "Nessun URL APK configurato.",
     "locationFailed": "Impossibile rilevare la posizione.",
-    "notAuthenticated": "Non hai effettuato l'accesso."
+    "notAuthenticated": "Non hai effettuato l'accesso.",
+    "loadFailed": "Caricamento non riuscito.",
+    "retry": "Riprova"
   },
   "home": {
     "tapAgainToExit": "Tocca di nuovo per uscire",

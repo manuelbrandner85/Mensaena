@@ -755,7 +755,9 @@
     "permissionDenied": "Permission denied.",
     "noApkUrl": "No APK URL configured.",
     "locationFailed": "Could not determine location.",
-    "notAuthenticated": "Not signed in."
+    "notAuthenticated": "Not signed in.",
+    "loadFailed": "Loading failed.",
+    "retry": "Try again"
   },
   "home": {
     "tapAgainToExit": "Tap again to exit",

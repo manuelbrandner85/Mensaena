@@ -121,7 +121,7 @@ class _SimilarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final id = post['id'] as String;
+    final id = post['id']?.toString() ?? '';
     final title = (post['title'] as String?) ?? '—';
     final media = (post['media_urls'] as List?)?.cast<String>() ??
         const <String>[];

@@ -754,7 +754,9 @@
     "permissionDenied": "İzin reddedildi.",
     "noApkUrl": "APK URL'si tanımlanmamış.",
     "locationFailed": "Konum belirlenemedi.",
-    "notAuthenticated": "Oturum açılmamış."
+    "notAuthenticated": "Oturum açılmamış.",
+    "loadFailed": "Yükleme başarısız.",
+    "retry": "Tekrar dene"
   },
   "home": {
     "tapAgainToExit": "Çıkmak için tekrar dokun",

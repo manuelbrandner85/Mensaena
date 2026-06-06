@@ -754,7 +754,9 @@
     "permissionDenied": "Доступ запрещён.",
     "noApkUrl": "URL APK не указан.",
     "locationFailed": "Не удалось определить местоположение.",
-    "notAuthenticated": "Вход не выполнен."
+    "notAuthenticated": "Вход не выполнен.",
+    "loadFailed": "Не удалось загрузить.",
+    "retry": "Повторить"
   },
   "home": {
     "tapAgainToExit": "Нажми ещё раз для выхода",

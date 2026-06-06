@@ -168,6 +168,7 @@ class _NinaCardState extends State<_NinaCard> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.warnings.isEmpty) return const SizedBox.shrink();
     final top = widget.warnings.first;
     final color = _severityColor(top.severity);
     final more = widget.warnings.length - 1;
@@ -350,6 +351,7 @@ class _FoodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (warnings.isEmpty) return const SizedBox.shrink();
     final top = warnings.first;
     return Container(
       padding: const EdgeInsets.all(12),
