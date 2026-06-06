@@ -759,11 +759,26 @@ class _DangerTabState extends State<_DangerTab> {
         'group_members': 'user_id',
         'marketplace_listings': 'user_id',
         'community_poll_votes': 'user_id',
+        // DSGVO Art. 20 — Vervollständigung: Kommunikation, Matching, Krisen,
+        // E-Mail-Engagement, Geräte, Einwilligungs-Historie.
+        'conversation_members': 'user_id',
+        'match_preferences': 'user_id',
+        'crisis_helpers': 'user_id',
+        'crisis_updates': 'user_id',
+        'user_blocks': 'blocker_id',
+        'email_subscriptions': 'user_id',
+        'email_logs': 'user_id',
+        'fcm_tokens': 'user_id',
+        'push_subscriptions': 'user_id',
+        'user_notification_prefs': 'user_id',
+        'consents': 'user_id',
       };
       // Tabellen mit zwei beteiligten Spalten (beide Richtungen exportieren).
       const dual = <String, String>{
         'interactions': 'helper_id,helped_id',
         'trust_ratings': 'rater_id,rated_id',
+        'matches': 'offer_user_id,request_user_id',
+        'dm_calls': 'caller_id,callee_id',
       };
       final collected = <String, dynamic>{};
       await Future.wait([
@@ -2802,6 +2817,13 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
     });
     try {
       await sb.from('profiles').update({col: v}).eq('id', uid);
+      // DSGVO Art. 7(1): Einwilligung/Widerruf revisionssicher protokollieren.
+      final type = col == 'marketing_opt_in' ? 'marketing' : 'reactivation';
+      await sb.rpc('record_consent', params: {
+        'p_type': type,
+        'p_granted': v,
+        'p_source': 'settings',
+      });
     } catch (_) {
       if (mounted) _load();
     }

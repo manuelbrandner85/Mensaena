@@ -88,11 +88,27 @@ Du kannst alle localStorage-Einträge jederzeit im Browser löschen (Entwickler-
 
 Wir nutzen Cloudflare für CDN, Sicherheit und Performance. Cloudflare kann temporäre Verbindungsdaten verarbeiten.
 
-## 6. Deine Rechte
+## 6. Marketing- & Info-E-Mails
 
-Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten. Kontakt: info@mensaena.de
+Werbliche bzw. reaktivierende E-Mails senden wir **nur mit deiner ausdrücklichen Einwilligung** (Opt-in). Die E-Mail-Anmeldung erfolgt im **Double-Opt-in-Verfahren** (Bestätigung per Klick). Du kannst die Einwilligung jederzeit in den Einstellungen oder über den Abmelde-Link in jeder E-Mail widerrufen. Wir protokollieren Einwilligung und Widerruf zum Nachweis (Zeitpunkt, Art).
 
-Stand: April 2026
+## 7. KI-Funktionen
+
+Für optionale KI-Funktionen (z. B. Texthilfe, Assistent, Übersetzung) werden die jeweiligen Eingaben an einen KI-Dienst als Auftragsverarbeiter übermittelt. Es werden **keine Chat-Klartexte zu Analysezwecken** gespeichert; lediglich Metadaten (z. B. genutzte Funktion, Sprache). Gibst du freiwillig Feedback zu einer KI-Antwort, speichern wir dieses zur Qualitätsverbesserung; es wird bei Konto-Löschung mit entfernt.
+
+## 8. Push-Benachrichtigungen
+
+Wenn du zustimmst, verarbeiten wir ein Geräte-Token, um dir Push-Benachrichtigungen zu senden. Du kannst dies in den System- und App-Einstellungen jederzeit deaktivieren.
+
+## 9. Standortdaten
+
+Die Standorterhebung ist **optional** und erfolgt nur nach deiner Freigabe. Standardmäßig ist dein Standort **nicht öffentlich sichtbar**. Anderen Nutzer:innen werden Positionen nur **gerundet** (ungefähr) angezeigt, nicht als exakte Koordinaten.
+
+## 10. Deine Rechte
+
+Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung und Datenübertragbarkeit. In der App kannst du unter **Einstellungen** deine Daten als Datei **exportieren** (Art. 20) und dein **Konto inkl. aller Daten löschen** (Art. 17). Kontakt: info@mensaena.de
+
+Stand: Juni 2026
 ''';
 
   static const String agb = '''
