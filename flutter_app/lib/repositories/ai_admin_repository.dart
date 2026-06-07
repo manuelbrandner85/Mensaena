@@ -56,7 +56,7 @@ class AiAdminRepository {
           .select('key, category, label, description, enabled, sort_order')
           .order('sort_order');
       return (rows as List)
-          .map((r) => AiFeatureFlag.fromMap(Map<String, dynamic>.from(r)))
+          .map((r) => AiFeatureFlag.fromMap(Map<String, dynamic>.from(r as Map)))
           .toList();
     } catch (e) {
       debugPrint('[AiAdmin] fetchFlags failed: $e');
@@ -67,7 +67,7 @@ class AiAdminRepository {
   /// Schaltet ein Feature an/aus. true bei Erfolg.
   static Future<bool> toggleFlag(String key, bool enabled) async {
     try {
-      final res = await sb.rpc('set_ai_feature_flag',
+      final res = await sb.rpc<dynamic>('set_ai_feature_flag',
           params: {'p_key': key, 'p_enabled': enabled});
       return res == true;
     } catch (e) {
@@ -114,7 +114,7 @@ class AiAdminRepository {
           .order('created_at', ascending: false)
           .limit(limit);
       return (rows as List)
-          .map((r) => Map<String, dynamic>.from(r))
+          .map((r) => Map<String, dynamic>.from(r as Map))
           .toList();
     } catch (e) {
       debugPrint('[AiAdmin] recentAudit failed: $e');
