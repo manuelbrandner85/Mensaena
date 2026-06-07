@@ -17,7 +17,7 @@ const _storageKey = 'mensaena_theme_mode_v1';
 const _storage = FlutterSecureStorage();
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.system) {
+  ThemeModeNotifier() : super(ThemeMode.light) {
     // Deferred — analog cinema_provider V2. Storage-Read im Constructor
     // (sync I/O) verursachte Mid-Frame-State-Changes beim App-Start.
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
@@ -41,7 +41,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     } catch (_) {/* ignore */}
   }
 
-  /// Toggle dark <-> light (System wird in dark gewechselt).
+  /// Toggle dark <-> light.
   Future<void> toggle() async {
     if (!mounted) return;
     switch (state) {
@@ -65,10 +65,10 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 
   static ThemeMode _fromKey(String? k) {
     switch (k) {
-      case 'dark':  return ThemeMode.dark;
-      case 'light': return ThemeMode.light;
-      case 'system':
-      default:      return ThemeMode.system;
+      case 'dark':   return ThemeMode.dark;
+      case 'light':  return ThemeMode.light;
+      case 'system': return ThemeMode.system;
+      default:       return ThemeMode.light;
     }
   }
 }
