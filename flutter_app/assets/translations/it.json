@@ -1156,6 +1156,57 @@
       "activeCrises": "Crisi attive"
     }
   },
+  "adminModeration": {
+    "title": "Coda Moderazione IA",
+    "subtitle": "Segnalazioni in attesa con suggerimenti IA",
+    "analyze": "Avvia analisi IA",
+    "analyzing": "Analisi in corso…",
+    "empty": "Nessuna segnalazione in attesa",
+    "disabled": "Moderazione IA disabilitata",
+    "analyzeFailed": "Analisi fallita",
+    "rec": {
+      "remove": "Rimuovi",
+      "keep": "Mantieni",
+      "escalate": "Escalation",
+      "needs_review": "Da revisionare"
+    },
+    "confidence": "Certezza {pct}%",
+    "contentType": {
+      "post": "Post",
+      "comment": "Commento",
+      "message": "Messaggio",
+      "user": "Utente",
+      "board_post": "Bacheca",
+      "event": "Evento",
+      "organization": "Organizzazione"
+    },
+    "actionKeep": "Mantieni",
+    "actionRemove": "Rimuovi",
+    "actionEscalate": "Escalation",
+    "actionDone": "Fatto",
+    "actionFailed": "Azione fallita"
+  },
+  "adminCrisis": {
+    "title": "Triage Crisi",
+    "subtitle": "Valutazione urgenza tramite IA",
+    "analyze": "Valuta crisi",
+    "analyzing": "Valutazione…",
+    "empty": "Nessuna crisi attiva",
+    "disabled": "Triage crisi disabilitato",
+    "analyzeFailed": "Triage fallito",
+    "urgency": {
+      "critical": "Critico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Basso"
+    },
+    "aiUrgency": "Urgenza IA",
+    "reportedUrgency": "Segnalata",
+    "suggestedActions": "Azioni consigliate",
+    "helpers": "{current}/{needed} volontari",
+    "affected": "{n} coinvolti",
+    "openCrisis": "Apri crisi"
+  },
   "create": {
     "titleRequired": "Il titolo è obbligatorio.",
     "nameRequired": "Il nome è obbligatorio.",

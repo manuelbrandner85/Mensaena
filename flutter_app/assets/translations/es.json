@@ -1156,6 +1156,57 @@
       "activeCrises": "Crisis activas"
     }
   },
+  "adminModeration": {
+    "title": "Cola de Moderación IA",
+    "subtitle": "Reportes pendientes con recomendaciones de IA",
+    "analyze": "Iniciar análisis IA",
+    "analyzing": "Analizando…",
+    "empty": "No hay reportes pendientes",
+    "disabled": "Moderación IA desactivada",
+    "analyzeFailed": "Análisis fallido",
+    "rec": {
+      "remove": "Eliminar",
+      "keep": "Mantener",
+      "escalate": "Escalar",
+      "needs_review": "Revisar"
+    },
+    "confidence": "Confianza {pct}%",
+    "contentType": {
+      "post": "Publicación",
+      "comment": "Comentario",
+      "message": "Mensaje",
+      "user": "Usuario",
+      "board_post": "Tablón",
+      "event": "Evento",
+      "organization": "Organización"
+    },
+    "actionKeep": "Mantener",
+    "actionRemove": "Eliminar",
+    "actionEscalate": "Escalar",
+    "actionDone": "Hecho",
+    "actionFailed": "Acción fallida"
+  },
+  "adminCrisis": {
+    "title": "Triaje de Crisis",
+    "subtitle": "Evaluación de urgencia por IA",
+    "analyze": "Evaluar crisis",
+    "analyzing": "Evaluando…",
+    "empty": "No hay crisis activas",
+    "disabled": "Triaje de crisis desactivado",
+    "analyzeFailed": "Triaje fallido",
+    "urgency": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "aiUrgency": "Urgencia IA",
+    "reportedUrgency": "Reportada",
+    "suggestedActions": "Acciones recomendadas",
+    "helpers": "{current}/{needed} voluntarios",
+    "affected": "{n} afectados",
+    "openCrisis": "Abrir crisis"
+  },
   "create": {
     "titleRequired": "El título es obligatorio.",
     "nameRequired": "El nombre es obligatorio.",

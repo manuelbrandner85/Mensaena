@@ -1156,6 +1156,57 @@
       "activeCrises": "Active crises"
     }
   },
+  "adminModeration": {
+    "title": "AI Moderation Queue",
+    "subtitle": "Pending reports with AI recommendations",
+    "analyze": "Run AI Analysis",
+    "analyzing": "Analyzing…",
+    "empty": "No pending reports",
+    "disabled": "AI moderation is disabled",
+    "analyzeFailed": "Analysis failed",
+    "rec": {
+      "remove": "Remove",
+      "keep": "Keep",
+      "escalate": "Escalate",
+      "needs_review": "Review"
+    },
+    "confidence": "Confidence {pct}%",
+    "contentType": {
+      "post": "Post",
+      "comment": "Comment",
+      "message": "Message",
+      "user": "User",
+      "board_post": "Board",
+      "event": "Event",
+      "organization": "Organization"
+    },
+    "actionKeep": "Keep",
+    "actionRemove": "Remove",
+    "actionEscalate": "Escalate",
+    "actionDone": "Done",
+    "actionFailed": "Action failed"
+  },
+  "adminCrisis": {
+    "title": "Crisis Triage",
+    "subtitle": "AI urgency assessment",
+    "analyze": "Assess crises",
+    "analyzing": "Assessing…",
+    "empty": "No active crises",
+    "disabled": "Crisis triage is disabled",
+    "analyzeFailed": "Triage failed",
+    "urgency": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "aiUrgency": "AI urgency",
+    "reportedUrgency": "Reported",
+    "suggestedActions": "Suggested actions",
+    "helpers": "{current}/{needed} helpers",
+    "affected": "{n} affected",
+    "openCrisis": "Open crisis"
+  },
   "create": {
     "titleRequired": "Title is required.",
     "nameRequired": "Name is required.",

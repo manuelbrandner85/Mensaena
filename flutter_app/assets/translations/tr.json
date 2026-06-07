@@ -1155,6 +1155,57 @@
       "activeCrises": "Aktif krizler"
     }
   },
+  "adminModeration": {
+    "title": "YZ Moderasyon Kuyruğu",
+    "subtitle": "YZ önerileriyle bekleyen şikayetler",
+    "analyze": "YZ Analizi Başlat",
+    "analyzing": "Analiz ediliyor…",
+    "empty": "Bekleyen şikayet yok",
+    "disabled": "YZ moderasyonu devre dışı",
+    "analyzeFailed": "Analiz başarısız",
+    "rec": {
+      "remove": "Kaldır",
+      "keep": "Koru",
+      "escalate": "Yükselt",
+      "needs_review": "İncele"
+    },
+    "confidence": "Güven {pct}%",
+    "contentType": {
+      "post": "Gönderi",
+      "comment": "Yorum",
+      "message": "Mesaj",
+      "user": "Kullanıcı",
+      "board_post": "Pano",
+      "event": "Etkinlik",
+      "organization": "Kuruluş"
+    },
+    "actionKeep": "Koru",
+    "actionRemove": "Kaldır",
+    "actionEscalate": "Yükselt",
+    "actionDone": "Tamam",
+    "actionFailed": "İşlem başarısız"
+  },
+  "adminCrisis": {
+    "title": "Kriz Triyajı",
+    "subtitle": "YZ aciliyet değerlendirmesi",
+    "analyze": "Krizleri değerlendir",
+    "analyzing": "Değerlendiriliyor…",
+    "empty": "Aktif kriz yok",
+    "disabled": "Kriz triyajı devre dışı",
+    "analyzeFailed": "Triyaj başarısız",
+    "urgency": {
+      "critical": "Kritik",
+      "high": "Yüksek",
+      "medium": "Orta",
+      "low": "Düşük"
+    },
+    "aiUrgency": "YZ aciliyeti",
+    "reportedUrgency": "Bildirilen",
+    "suggestedActions": "Önerilen eylemler",
+    "helpers": "{current}/{needed} gönüllü",
+    "affected": "{n} etkilenen",
+    "openCrisis": "Krizi aç"
+  },
   "create": {
     "titleRequired": "Başlık gerekli.",
     "nameRequired": "İsim gerekli.",

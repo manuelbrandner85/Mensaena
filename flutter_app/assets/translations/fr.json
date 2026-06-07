@@ -1156,6 +1156,57 @@
       "activeCrises": "Crises actives"
     }
   },
+  "adminModeration": {
+    "title": "File de Modération IA",
+    "subtitle": "Signalements en attente avec recommandations IA",
+    "analyze": "Lancer l'analyse IA",
+    "analyzing": "Analyse en cours…",
+    "empty": "Aucun signalement en attente",
+    "disabled": "Modération IA désactivée",
+    "analyzeFailed": "Analyse échouée",
+    "rec": {
+      "remove": "Supprimer",
+      "keep": "Conserver",
+      "escalate": "Escalader",
+      "needs_review": "À vérifier"
+    },
+    "confidence": "Confiance {pct}%",
+    "contentType": {
+      "post": "Publication",
+      "comment": "Commentaire",
+      "message": "Message",
+      "user": "Utilisateur",
+      "board_post": "Tableau",
+      "event": "Événement",
+      "organization": "Organisation"
+    },
+    "actionKeep": "Conserver",
+    "actionRemove": "Supprimer",
+    "actionEscalate": "Escalader",
+    "actionDone": "Fait",
+    "actionFailed": "Action échouée"
+  },
+  "adminCrisis": {
+    "title": "Triage de Crises",
+    "subtitle": "Évaluation d'urgence par IA",
+    "analyze": "Évaluer les crises",
+    "analyzing": "Évaluation…",
+    "empty": "Aucune crise active",
+    "disabled": "Triage de crises désactivé",
+    "analyzeFailed": "Triage échoué",
+    "urgency": {
+      "critical": "Critique",
+      "high": "Élevé",
+      "medium": "Moyen",
+      "low": "Faible"
+    },
+    "aiUrgency": "Urgence IA",
+    "reportedUrgency": "Signalée",
+    "suggestedActions": "Actions recommandées",
+    "helpers": "{current}/{needed} bénévoles",
+    "affected": "{n} personnes touchées",
+    "openCrisis": "Ouvrir la crise"
+  },
   "create": {
     "titleRequired": "Le titre est obligatoire.",
     "nameRequired": "Le nom est obligatoire.",
