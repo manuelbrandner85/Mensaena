@@ -291,6 +291,22 @@ class LiveStreamService {
     }
   }
 
+  /// Gibt den room_name des aktuell laufenden Streams in einer Conversation,
+  /// oder null wenn kein aktiver Stream existiert.
+  static Future<String?> getActiveRoom(String conversationId) async {
+    try {
+      final row = await sb
+          .from('live_rooms')
+          .select('room_name')
+          .eq('conversation_id', conversationId)
+          .eq('status', 'live')
+          .maybeSingle();
+      return row?['room_name'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Beendet einen Live-Stream.
   static Future<void> endChannelStream(String roomName) async {
     try {

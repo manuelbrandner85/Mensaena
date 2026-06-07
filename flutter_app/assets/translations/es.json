@@ -1207,6 +1207,60 @@
     "affected": "{n} afectados",
     "openCrisis": "Abrir crisis"
   },
+  "adminRisk": {
+    "title": "Perfiles de Riesgo",
+    "subtitle": "La IA evalúa las señales de riesgo de los usuarios",
+    "analyze": "Analizar riesgos",
+    "analyzing": "Analizando…",
+    "empty": "No hay perfiles de riesgo disponibles",
+    "disabled": "El análisis de riesgo está desactivado",
+    "analyzeFailed": "Análisis fallido",
+    "level": {
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+    "score": "Puntuación: {score}/100",
+    "signals": "Señales",
+    "reportsReceived": "Denuncias recibidas",
+    "reportsSubmitted": "Denuncias enviadas",
+    "openUser": "Abrir perfil de usuario"
+  },
+  "adminTrend": {
+    "title": "Detección de Tendencias",
+    "subtitle": "La IA analiza picos temáticos de las últimas 24h",
+    "refresh": "Actualizar",
+    "trendsTitle": "Tendencias detectadas",
+    "posts24h": "{n} publicaciones (24h)",
+    "posts6h": "{n} publicaciones (6h)",
+    "cached": "En caché",
+    "empty": "No se detectaron tendencias",
+    "disabled": "Detección de tendencias desactivada",
+    "analyzeFailed": "Análisis fallido",
+    "volume": "{n} publicaciones",
+    "direction": {
+      "up": "En aumento",
+      "stable": "Estable",
+      "down": "En descenso"
+    },
+    "sentiment": {
+      "positiv": "Positivo",
+      "neutral": "Neutral",
+      "negativ": "Negativo"
+    }
+  },
+  "adminNl": {
+    "title": "Analítica IA",
+    "subtitle": "Consulta los datos en lenguaje natural — sin SQL",
+    "placeholder": "ej. \"¿Cuántos usuarios nuevos esta semana?\"",
+    "thinking": "La IA está procesando…",
+    "failed": "No se recibió respuesta. Por favor, inténtalo de nuevo.",
+    "clear": "Limpiar",
+    "sug1": "¿Cuántos usuarios se registraron esta semana?",
+    "sug2": "¿Cuántas denuncias abiertas hay?",
+    "sug3": "¿Cuántas crisis activas hay ahora mismo?",
+    "sug4": "¿Cuántas publicaciones se crearon hoy?"
+  },
   "create": {
     "titleRequired": "El título es obligatorio.",
     "nameRequired": "El nombre es obligatorio.",
@@ -1317,6 +1371,7 @@
     "priceEuro": "Precio en €",
     "location": "Ubicación",
     "place": "Lugar",
+    "shareExactLocation": "Compartir ubicación exacta en el mapa (opcional)",
     "maxParticipants": "Máx. participantes (opcional)",
     "eventTitle": "Crear evento",
     "groupName": "Nombre del grupo",

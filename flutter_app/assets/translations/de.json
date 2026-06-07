@@ -1206,6 +1206,60 @@
     "affected": "{n} Betroffene",
     "openCrisis": "Krise öffnen"
   },
+  "adminRisk": {
+    "title": "Risikoprofile",
+    "subtitle": "KI bewertet Nutzer-Risikosignale",
+    "analyze": "Risiken analysieren",
+    "analyzing": "Analysiere…",
+    "empty": "Keine Risikoprofile vorhanden",
+    "disabled": "Risiko-Analyse ist deaktiviert",
+    "analyzeFailed": "Analyse fehlgeschlagen",
+    "level": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch"
+    },
+    "score": "Score: {score}/100",
+    "signals": "Signale",
+    "reportsReceived": "Meldungen erhalten",
+    "reportsSubmitted": "Meldungen abgegeben",
+    "openUser": "Nutzerprofil öffnen"
+  },
+  "adminTrend": {
+    "title": "Trend-Erkennung",
+    "subtitle": "KI analysiert Themen-Spikes der letzten 24h",
+    "refresh": "Aktualisieren",
+    "trendsTitle": "Erkannte Trends",
+    "posts24h": "{n} Beiträge (24h)",
+    "posts6h": "{n} Beiträge (6h)",
+    "cached": "Gecacht",
+    "empty": "Keine Trends erkannt",
+    "disabled": "Trend-Erkennung ist deaktiviert",
+    "analyzeFailed": "Analyse fehlgeschlagen",
+    "volume": "{n} Beiträge",
+    "direction": {
+      "up": "Steigend",
+      "stable": "Stabil",
+      "down": "Fallend"
+    },
+    "sentiment": {
+      "positiv": "Positiv",
+      "neutral": "Neutral",
+      "negativ": "Negativ"
+    }
+  },
+  "adminNl": {
+    "title": "KI-Analytik",
+    "subtitle": "Frag die Daten auf Deutsch — ohne SQL",
+    "placeholder": "z. B. „Wie viele neue Nutzer diese Woche?"",
+    "thinking": "KI denkt nach…",
+    "failed": "Keine Antwort erhalten. Bitte erneut versuchen.",
+    "clear": "Leeren",
+    "sug1": "Wie viele Nutzer sind neu diese Woche?",
+    "sug2": "Wie viele offene Meldungen gibt es?",
+    "sug3": "Wie viele aktive Krisen laufen gerade?",
+    "sug4": "Wie viele Beiträge wurden heute erstellt?"
+  },
   "create": {
     "titleRequired": "Titel ist erforderlich.",
     "nameRequired": "Name ist erforderlich.",
@@ -1316,6 +1370,7 @@
     "priceEuro": "Preis in €",
     "location": "Standort",
     "place": "Ort",
+    "shareExactLocation": "Genauen Standort mit der Karte teilen (optional)",
     "maxParticipants": "Max. Teilnehmer:innen (optional)",
     "eventTitle": "Event erstellen",
     "groupName": "Gruppenname",

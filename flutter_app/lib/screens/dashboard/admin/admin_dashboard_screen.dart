@@ -793,6 +793,24 @@ class _QuickActions extends StatelessWidget {
             label: 'adminCrisis.title'.tr(),
             route: '/dashboard/admin/crisis-triage',
           ),
+          const SizedBox(height: 8),
+          _ActionButton(
+            icon: LucideIcons.shieldOff,
+            label: 'adminRisk.title'.tr(),
+            route: '/dashboard/admin/risk',
+          ),
+          const SizedBox(height: 8),
+          _ActionButton(
+            icon: LucideIcons.trendingUp,
+            label: 'adminTrend.title'.tr(),
+            route: '/dashboard/admin/trends',
+          ),
+          const SizedBox(height: 8),
+          _ActionButton(
+            icon: LucideIcons.messageSquare,
+            label: 'adminNl.title'.tr(),
+            route: '/dashboard/admin/nl-analytics',
+          ),
         ],
       ),
     );

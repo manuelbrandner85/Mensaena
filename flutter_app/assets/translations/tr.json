@@ -1206,6 +1206,60 @@
     "affected": "{n} etkilenen",
     "openCrisis": "Krizi aç"
   },
+  "adminRisk": {
+    "title": "Risk Profilleri",
+    "subtitle": "YZ, kullanıcı risk sinyallerini değerlendirir",
+    "analyze": "Riskleri analiz et",
+    "analyzing": "Analiz ediliyor…",
+    "empty": "Mevcut risk profili yok",
+    "disabled": "Risk analizi devre dışı",
+    "analyzeFailed": "Analiz başarısız",
+    "level": {
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek"
+    },
+    "score": "Puan: {score}/100",
+    "signals": "Sinyaller",
+    "reportsReceived": "Alınan şikayetler",
+    "reportsSubmitted": "Gönderilen şikayetler",
+    "openUser": "Kullanıcı profilini aç"
+  },
+  "adminTrend": {
+    "title": "Trend Tespiti",
+    "subtitle": "YZ, son 24 saatteki konu artışlarını analiz eder",
+    "refresh": "Yenile",
+    "trendsTitle": "Tespit edilen trendler",
+    "posts24h": "{n} gönderi (24sa)",
+    "posts6h": "{n} gönderi (6sa)",
+    "cached": "Önbellekten",
+    "empty": "Trend tespit edilmedi",
+    "disabled": "Trend tespiti devre dışı",
+    "analyzeFailed": "Analiz başarısız",
+    "volume": "{n} gönderi",
+    "direction": {
+      "up": "Yükseliyor",
+      "stable": "Stabil",
+      "down": "Düşüyor"
+    },
+    "sentiment": {
+      "positiv": "Olumlu",
+      "neutral": "Nötr",
+      "negativ": "Olumsuz"
+    }
+  },
+  "adminNl": {
+    "title": "YZ Analitiği",
+    "subtitle": "Verileri doğal dilde sorgula — SQL gerekmez",
+    "placeholder": "ör. \"Bu hafta kaç yeni kullanıcı var?\"",
+    "thinking": "YZ düşünüyor…",
+    "failed": "Yanıt alınamadı. Lütfen tekrar deneyin.",
+    "clear": "Temizle",
+    "sug1": "Bu hafta kaç kullanıcı kayıt oldu?",
+    "sug2": "Kaç açık şikayet var?",
+    "sug3": "Şu anda kaç aktif kriz var?",
+    "sug4": "Bugün kaç gönderi oluşturuldu?"
+  },
   "create": {
     "titleRequired": "Başlık gerekli.",
     "nameRequired": "İsim gerekli.",
@@ -1316,6 +1370,7 @@
     "priceEuro": "Fiyat (€)",
     "location": "Konum",
     "place": "Yer",
+    "shareExactLocation": "Haritada tam konumu paylaş (isteğe bağlı)",
     "maxParticipants": "Maks. katılımcı (opsiyonel)",
     "eventTitle": "Etkinlik oluştur",
     "groupName": "Grup adı",

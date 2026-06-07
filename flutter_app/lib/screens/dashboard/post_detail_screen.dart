@@ -14,6 +14,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
 import '../../repositories/post_interactions_repository.dart';
 import '../../repositories/posts_repository.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/share_service.dart';
 import '../../services/supabase_service.dart';
@@ -406,10 +407,13 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   Widget build(BuildContext context) {
     final isMyPost =
         _post != null && _post!.userId == SupabaseService.currentUser?.id;
+    final myRole =
+        ref.watch(myProfileProvider).asData?.value?.role ?? 'user';
+    final isAdmin = myRole == 'admin' || myRole == 'moderator';
     return DashboardScaffold(
       title: 'posts.detailTitle'.tr(),
       currentRoute: '/dashboard/posts',
-      fab: isMyPost
+      fab: (isMyPost || isAdmin) && _post != null
           ? FloatingActionButton.small(
               backgroundColor: AppColors.herzrot,
               foregroundColor: AppColors.ink,

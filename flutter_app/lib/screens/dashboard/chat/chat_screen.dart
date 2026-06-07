@@ -163,6 +163,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (ctx == null || ctx.kind != ChatKind.channel || ctx.slug == null) {
       return;
     }
+    // Prüfe ob bereits ein aktiver Stream läuft — wenn ja, direkt beitreten
+    // statt einen zweiten Raum aufzumachen.
+    final existing =
+        await LiveStreamService.getActiveRoom(widget.conversationId);
+    if (!mounted) return;
+    if (existing != null) {
+      final title = Uri.encodeComponent(ctx.title);
+      final r = Uri.encodeComponent(existing);
+      context.push('/dashboard/live/$r?title=$title&host=0');
+      return;
+    }
     final room = await LiveStreamService.startChannelStream(
       conversationId: widget.conversationId,
       channelSlug: ctx.slug!,

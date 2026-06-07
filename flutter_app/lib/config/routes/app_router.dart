@@ -12,7 +12,10 @@ import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_crisis_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_moderation_screen.dart';
+import '../../screens/dashboard/admin/admin_ai_nl_screen.dart';
+import '../../screens/dashboard/admin/admin_ai_risk_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_screen.dart';
+import '../../screens/dashboard/admin/admin_ai_trend_screen.dart';
 import '../../screens/dashboard/admin/admin_bot_feedback_screen.dart';
 import '../../screens/dashboard/admin/admin_challenges_screen.dart';
 import '../../screens/dashboard/admin/admin_chat_moderation_screen.dart';
@@ -1346,6 +1349,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const AdminAiCrisisScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/risk',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminAiRiskScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/trends',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminAiTrendScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/nl-analytics',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminAiNlScreen(),
         ),
       ),
       // Profile-Edit + Saved-Posts werden jetzt als Subroutes unter

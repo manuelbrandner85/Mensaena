@@ -1207,6 +1207,60 @@
     "affected": "{n} personnes touchées",
     "openCrisis": "Ouvrir la crise"
   },
+  "adminRisk": {
+    "title": "Profils de Risque",
+    "subtitle": "L'IA évalue les signaux de risque des utilisateurs",
+    "analyze": "Analyser les risques",
+    "analyzing": "Analyse en cours…",
+    "empty": "Aucun profil de risque disponible",
+    "disabled": "L'analyse des risques est désactivée",
+    "analyzeFailed": "Analyse échouée",
+    "level": {
+      "low": "Faible",
+      "medium": "Moyen",
+      "high": "Élevé"
+    },
+    "score": "Score : {score}/100",
+    "signals": "Signaux",
+    "reportsReceived": "Signalements reçus",
+    "reportsSubmitted": "Signalements soumis",
+    "openUser": "Ouvrir le profil utilisateur"
+  },
+  "adminTrend": {
+    "title": "Détection de Tendances",
+    "subtitle": "L'IA analyse les pics thématiques des dernières 24h",
+    "refresh": "Actualiser",
+    "trendsTitle": "Tendances détectées",
+    "posts24h": "{n} publications (24h)",
+    "posts6h": "{n} publications (6h)",
+    "cached": "En cache",
+    "empty": "Aucune tendance détectée",
+    "disabled": "Détection des tendances désactivée",
+    "analyzeFailed": "Analyse échouée",
+    "volume": "{n} publications",
+    "direction": {
+      "up": "En hausse",
+      "stable": "Stable",
+      "down": "En baisse"
+    },
+    "sentiment": {
+      "positiv": "Positif",
+      "neutral": "Neutre",
+      "negativ": "Négatif"
+    }
+  },
+  "adminNl": {
+    "title": "Analytique IA",
+    "subtitle": "Interrogez les données en langage naturel — sans SQL",
+    "placeholder": "ex. « Combien de nouveaux utilisateurs cette semaine ? »",
+    "thinking": "L'IA réfléchit…",
+    "failed": "Aucune réponse reçue. Veuillez réessayer.",
+    "clear": "Effacer",
+    "sug1": "Combien d'utilisateurs se sont inscrits cette semaine ?",
+    "sug2": "Combien de signalements ouverts y a-t-il ?",
+    "sug3": "Combien de crises actives en ce moment ?",
+    "sug4": "Combien de publications ont été créées aujourd'hui ?"
+  },
   "create": {
     "titleRequired": "Le titre est obligatoire.",
     "nameRequired": "Le nom est obligatoire.",
@@ -1317,6 +1371,7 @@
     "priceEuro": "Prix en €",
     "location": "Lieu",
     "place": "Endroit",
+    "shareExactLocation": "Partager la localisation exacte sur la carte (optionnel)",
     "maxParticipants": "Max. participants (optionnel)",
     "eventTitle": "Créer un événement",
     "groupName": "Nom du groupe",

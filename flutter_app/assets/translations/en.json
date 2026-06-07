@@ -1207,6 +1207,60 @@
     "affected": "{n} affected",
     "openCrisis": "Open crisis"
   },
+  "adminRisk": {
+    "title": "Risk Profiles",
+    "subtitle": "AI evaluates user risk signals",
+    "analyze": "Analyze risks",
+    "analyzing": "Analyzing…",
+    "empty": "No risk profiles available",
+    "disabled": "Risk analysis is disabled",
+    "analyzeFailed": "Analysis failed",
+    "level": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "score": "Score: {score}/100",
+    "signals": "Signals",
+    "reportsReceived": "Reports received",
+    "reportsSubmitted": "Reports submitted",
+    "openUser": "Open user profile"
+  },
+  "adminTrend": {
+    "title": "Trend Detection",
+    "subtitle": "AI analyses topic spikes in the last 24h",
+    "refresh": "Refresh",
+    "trendsTitle": "Detected trends",
+    "posts24h": "{n} posts (24h)",
+    "posts6h": "{n} posts (6h)",
+    "cached": "Cached",
+    "empty": "No trends detected",
+    "disabled": "Trend detection is disabled",
+    "analyzeFailed": "Analysis failed",
+    "volume": "{n} posts",
+    "direction": {
+      "up": "Rising",
+      "stable": "Stable",
+      "down": "Falling"
+    },
+    "sentiment": {
+      "positiv": "Positive",
+      "neutral": "Neutral",
+      "negativ": "Negative"
+    }
+  },
+  "adminNl": {
+    "title": "AI Analytics",
+    "subtitle": "Ask the data in plain language — no SQL needed",
+    "placeholder": "e.g. \"How many new users this week?\"",
+    "thinking": "AI is thinking…",
+    "failed": "No answer received. Please try again.",
+    "clear": "Clear",
+    "sug1": "How many users joined this week?",
+    "sug2": "How many open reports are there?",
+    "sug3": "How many active crises are there right now?",
+    "sug4": "How many posts were created today?"
+  },
   "create": {
     "titleRequired": "Title is required.",
     "nameRequired": "Name is required.",
@@ -1317,6 +1371,7 @@
     "priceEuro": "Price in €",
     "location": "Location",
     "place": "Place",
+    "shareExactLocation": "Share exact location on the map (optional)",
     "maxParticipants": "Max. participants (optional)",
     "eventTitle": "Create event",
     "groupName": "Group name",

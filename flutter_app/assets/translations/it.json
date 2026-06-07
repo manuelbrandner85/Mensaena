@@ -1207,6 +1207,60 @@
     "affected": "{n} coinvolti",
     "openCrisis": "Apri crisi"
   },
+  "adminRisk": {
+    "title": "Profili di Rischio",
+    "subtitle": "L'IA valuta i segnali di rischio degli utenti",
+    "analyze": "Analizza rischi",
+    "analyzing": "Analisi in corso…",
+    "empty": "Nessun profilo di rischio disponibile",
+    "disabled": "Analisi del rischio disabilitata",
+    "analyzeFailed": "Analisi fallita",
+    "level": {
+      "low": "Basso",
+      "medium": "Medio",
+      "high": "Alto"
+    },
+    "score": "Punteggio: {score}/100",
+    "signals": "Segnali",
+    "reportsReceived": "Segnalazioni ricevute",
+    "reportsSubmitted": "Segnalazioni inviate",
+    "openUser": "Apri profilo utente"
+  },
+  "adminTrend": {
+    "title": "Rilevamento Tendenze",
+    "subtitle": "L'IA analizza i picchi tematici delle ultime 24h",
+    "refresh": "Aggiorna",
+    "trendsTitle": "Tendenze rilevate",
+    "posts24h": "{n} post (24h)",
+    "posts6h": "{n} post (6h)",
+    "cached": "In cache",
+    "empty": "Nessuna tendenza rilevata",
+    "disabled": "Rilevamento tendenze disabilitato",
+    "analyzeFailed": "Analisi fallita",
+    "volume": "{n} post",
+    "direction": {
+      "up": "In aumento",
+      "stable": "Stabile",
+      "down": "In calo"
+    },
+    "sentiment": {
+      "positiv": "Positivo",
+      "neutral": "Neutro",
+      "negativ": "Negativo"
+    }
+  },
+  "adminNl": {
+    "title": "Analisi IA",
+    "subtitle": "Interroga i dati in linguaggio naturale — senza SQL",
+    "placeholder": "es. \"Quanti nuovi utenti questa settimana?\"",
+    "thinking": "L'IA sta elaborando…",
+    "failed": "Nessuna risposta ricevuta. Riprova.",
+    "clear": "Cancella",
+    "sug1": "Quanti utenti si sono registrati questa settimana?",
+    "sug2": "Quante segnalazioni aperte ci sono?",
+    "sug3": "Quante crisi attive ci sono adesso?",
+    "sug4": "Quanti post sono stati creati oggi?"
+  },
   "create": {
     "titleRequired": "Il titolo è obbligatorio.",
     "nameRequired": "Il nome è obbligatorio.",
@@ -1317,6 +1371,7 @@
     "priceEuro": "Prezzo in €",
     "location": "Posizione",
     "place": "Luogo",
+    "shareExactLocation": "Condividi la posizione esatta sulla mappa (opzionale)",
     "maxParticipants": "Max partecipanti (opzionale)",
     "eventTitle": "Crea evento",
     "groupName": "Nome del gruppo",
