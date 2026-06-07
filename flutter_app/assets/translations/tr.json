@@ -2476,6 +2476,8 @@
     "descRequired": "Lütfen kurumu açıkla (en az 20 karakter).",
     "categoryRequired": "Lütfen bir kategori seç.",
     "pickCategory": "Kategori seç",
+    "logoLabel": "Logo / Fotoğraf (isteğe bağlı)",
+    "logoHint": "Eklemek için dokun",
     "country": "Ülke",
     "email": "E-posta"
   },

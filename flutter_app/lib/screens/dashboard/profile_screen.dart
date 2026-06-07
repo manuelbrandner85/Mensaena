@@ -753,50 +753,82 @@ class _Header extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Bloom(
-              color: AppColors.bronze,
-              intensity: 0.5,
-              radius: 22,
-              child: TiltCard(
-              intensity: 1.2,
-              borderRadius: 999,
-              child: profile.avatarUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: profile.avatarUrl!,
-                      fadeInDuration: const Duration(milliseconds: 200),
-                      imageBuilder: (_, img) => CircleAvatar(
-                        radius: 36,
-                        backgroundColor: AppColors.surface,
-                        backgroundImage: img,
-                      ),
-                      placeholder: (_, __) => const CircleAvatar(
-                        radius: 36,
-                        backgroundColor: AppColors.surface,
-                      ),
-                      errorWidget: (_, __, ___) => CircleAvatar(
-                        radius: 36,
-                        backgroundColor: AppColors.surface,
-                        child: Text(
-                          (profile.name ?? '?').substring(0, 1).toUpperCase(),
-                          style: AppTypography.display(
-                            size: 28,
-                            color: AppColors.amber,
+            GestureDetector(
+              onTap: isMe
+                  ? () => context.push('/dashboard/profile/edit')
+                  : null,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Bloom(
+                    color: AppColors.bronze,
+                    intensity: 0.5,
+                    radius: 22,
+                    child: TiltCard(
+                    intensity: 1.2,
+                    borderRadius: 999,
+                    child: profile.avatarUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: profile.avatarUrl!,
+                            fadeInDuration: const Duration(milliseconds: 200),
+                            imageBuilder: (_, img) => CircleAvatar(
+                              radius: 36,
+                              backgroundColor: AppColors.surface,
+                              backgroundImage: img,
+                            ),
+                            placeholder: (_, __) => const CircleAvatar(
+                              radius: 36,
+                              backgroundColor: AppColors.surface,
+                            ),
+                            errorWidget: (_, __, ___) => CircleAvatar(
+                              radius: 36,
+                              backgroundColor: AppColors.surface,
+                              child: Text(
+                                (profile.name ?? '?').substring(0, 1).toUpperCase(),
+                                style: AppTypography.display(
+                                  size: 28,
+                                  color: AppColors.amber,
+                                ),
+                              ),
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 36,
+                            backgroundColor: AppColors.surface,
+                            child: Text(
+                              (profile.name ?? '?').substring(0, 1).toUpperCase(),
+                              style: AppTypography.display(
+                                size: 28,
+                                color: AppColors.amber,
+                              ),
+                            ),
+                          ),
+                  ),
+                  ),
+                  if (isMe)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: AppColors.amber,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.lightVoid,
+                            width: 1.5,
                           ),
                         ),
-                      ),
-                    )
-                  : CircleAvatar(
-                      radius: 36,
-                      backgroundColor: AppColors.surface,
-                      child: Text(
-                        (profile.name ?? '?').substring(0, 1).toUpperCase(),
-                        style: AppTypography.display(
-                          size: 28,
-                          color: AppColors.amber,
+                        child: const Icon(
+                          LucideIcons.camera,
+                          size: 11,
+                          color: Colors.black,
                         ),
                       ),
                     ),
-            ),
+                ],
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(

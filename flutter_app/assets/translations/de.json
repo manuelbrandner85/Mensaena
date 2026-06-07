@@ -2476,6 +2476,8 @@
     "descRequired": "Bitte beschreibe die Organisation (mind. 20 Zeichen).",
     "categoryRequired": "Bitte wähle eine Kategorie.",
     "pickCategory": "Kategorie wählen",
+    "logoLabel": "Logo / Foto (optional)",
+    "logoHint": "Tippe zum Hinzufügen",
     "country": "Land",
     "email": "E-Mail"
   },

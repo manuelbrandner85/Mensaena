@@ -90,6 +90,7 @@ class OrganizationsRepository {
     String? phone,
     String? email,
     String? website,
+    String? logoUrl,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
@@ -106,6 +107,7 @@ class OrganizationsRepository {
         'email': email,
         'website': website,
         'status': 'pending',
+        if (logoUrl != null) 'logo_url': logoUrl,
       });
       return true;
     } catch (_) {
