@@ -795,7 +795,7 @@ class _QuickActions extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _ActionButton(
-            icon: LucideIcons.shieldBan,
+            icon: LucideIcons.shieldOff,
             label: 'adminRisk.title'.tr(),
             route: '/dashboard/admin/risk',
           ),

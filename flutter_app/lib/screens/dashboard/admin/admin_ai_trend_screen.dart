@@ -48,7 +48,7 @@ class _AdminAiTrendScreenState extends ConsumerState<AdminAiTrendScreen> {
             ?.map((t) => Map<String, dynamic>.from(t as Map))
             .toList() ??
         [];
-    final stats = _result['stats'] as Map?;
+    final stats = _result['stats'] as Map<String, dynamic>?;
     final cached = _result['cached'] == true;
 
     return DashboardScaffold(
@@ -103,7 +103,7 @@ class _SummaryCard extends StatelessWidget {
     required this.onRefresh,
   });
   final String? summary;
-  final Map? stats;
+  final Map<String, dynamic>? stats;
   final bool cached;
   final VoidCallback onRefresh;
 

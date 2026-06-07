@@ -103,7 +103,7 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Row(
         children: [
-          Icon(LucideIcons.shieldBan, size: 20, color: Colors.orange.shade700),
+          Icon(LucideIcons.shieldOff, size: 20, color: Colors.orange.shade700),
           const SizedBox(width: 10),
           Expanded(
             child: Text('adminRisk.subtitle'.tr(),
@@ -237,7 +237,7 @@ class _RiskCard extends StatelessWidget {
                   tooltip: 'adminRisk.reportsReceived'.tr(),
                 ),
                 _SignalChip(
-                  icon: LucideIcons.messageSquareWarning,
+                  icon: LucideIcons.alertTriangle,
                   label: '$reportsSubmitted',
                   tooltip: 'adminRisk.reportsSubmitted'.tr(),
                 ),
