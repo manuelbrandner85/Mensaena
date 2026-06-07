@@ -1123,6 +1123,39 @@
     "broadcastScheduledTitle": "Broadcast pianificati",
     "broadcastSentInfo": "Inviato a {count}"
   },
+  "adminAi": {
+    "title": "Controllo IA",
+    "subtitle": "Centro di comando per tutte le funzioni IA della piattaforma. Attiva le funzioni una per una e tieni tutto sotto controllo.",
+    "digestTitle": "Riepilogo giornaliero",
+    "digestRefresh": "Aggiorna",
+    "digestGenerating": "Generazione…",
+    "digestEmpty": "Ancora nessun riepilogo. Tocca Aggiorna.",
+    "digestFailed": "Riepilogo non riuscito. Riprova più tardi.",
+    "digestDisabled": "Il riepilogo giornaliero è disattivato. Attivalo sotto, nelle Funzioni.",
+    "digestSource": "Generato da {provider}",
+    "featuresTitle": "Funzioni IA",
+    "featuresHint": "Attiva o disattiva singole funzioni IA per tutta l'app.",
+    "featuresEmpty": "Nessuna funzione disponibile.",
+    "toggleFailed": "Modifica non riuscita. Solo gli amministratori possono cambiare le funzioni.",
+    "auditTitle": "Attività IA",
+    "auditEmpty": "Ancora nessuna attività IA.",
+    "cat": {
+      "moderation": "Sicurezza e moderazione",
+      "growth": "Crescita e community",
+      "insights": "Approfondimenti e analisi",
+      "content": "Contenuti e operazioni",
+      "trust": "Fiducia e verifica",
+      "productivity": "Produttività admin"
+    },
+    "stat": {
+      "newUsers": "Nuovi utenti",
+      "newPosts": "Nuovi post",
+      "openReports": "Segnalazioni aperte",
+      "newMessages": "Nuovi messaggi",
+      "newEvents": "Nuovi eventi",
+      "activeCrises": "Crisi attive"
+    }
+  },
   "create": {
     "titleRequired": "Il titolo è obbligatorio.",
     "nameRequired": "Il nome è obbligatorio.",

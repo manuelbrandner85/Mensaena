@@ -774,6 +774,13 @@ class _QuickActions extends StatelessWidget {
             label: 'marketing.title'.tr(),
             route: '/dashboard/admin/marketing',
           ),
+          const SizedBox(height: 8),
+          // KI-Steuerung (nur Admin) — zentrales Panel für alle KI-Features.
+          _ActionButton(
+            icon: LucideIcons.sparkles,
+            label: 'adminAi.title'.tr(),
+            route: '/dashboard/admin/ai',
+          ),
         ],
       ),
     );

@@ -1122,6 +1122,39 @@
     "broadcastScheduledTitle": "Planlanmış yayınlar",
     "broadcastSentInfo": "{count} kişiye gönderildi"
   },
+  "adminAi": {
+    "title": "Yapay Zekâ Kontrolü",
+    "subtitle": "Platformun tüm yapay zekâ özelliklerinin merkezi. Özellikleri tek tek aç ve genel duruma hâkim ol.",
+    "digestTitle": "Günlük Özet",
+    "digestRefresh": "Yenile",
+    "digestGenerating": "Oluşturuluyor…",
+    "digestEmpty": "Henüz özet yok. Yenile'ye dokun.",
+    "digestFailed": "Özet oluşturulamadı. Lütfen daha sonra tekrar dene.",
+    "digestDisabled": "Günlük özet kapalı. Aşağıdaki Özellikler bölümünden aç.",
+    "digestSource": "{provider} tarafından oluşturuldu",
+    "featuresTitle": "Yapay Zekâ Özellikleri",
+    "featuresHint": "Tek tek yapay zekâ özelliklerini tüm uygulama için aç veya kapat.",
+    "featuresEmpty": "Kullanılabilir özellik yok.",
+    "toggleFailed": "Değiştirilemedi. Özellikleri yalnızca yöneticiler değiştirebilir.",
+    "auditTitle": "Yapay Zekâ Etkinliği",
+    "auditEmpty": "Henüz yapay zekâ etkinliği yok.",
+    "cat": {
+      "moderation": "Güvenlik ve Moderasyon",
+      "growth": "Büyüme ve Topluluk",
+      "insights": "İçgörüler ve Analiz",
+      "content": "İçerik ve İşletim",
+      "trust": "Güven ve Doğrulama",
+      "productivity": "Yönetici Verimliliği"
+    },
+    "stat": {
+      "newUsers": "Yeni kullanıcılar",
+      "newPosts": "Yeni gönderiler",
+      "openReports": "Açık bildirimler",
+      "newMessages": "Yeni mesajlar",
+      "newEvents": "Yeni etkinlikler",
+      "activeCrises": "Aktif krizler"
+    }
+  },
   "create": {
     "titleRequired": "Başlık gerekli.",
     "nameRequired": "İsim gerekli.",
