@@ -381,7 +381,10 @@
     "trustScoreExplain": "Il punteggio di fiducia è calcolato automaticamente da tutte le interazioni completate.",
     "qr_code": "Codice QR",
     "editAvatar": "Modifica avatar",
-    "editCover": "Modifica copertina"
+    "editCover": "Modifica copertina",
+    "blockOrMuteBody": "Non vedrai più i post né i messaggi di questa persona. Il silenzia dura 24 ore e scade automaticamente; il blocco è permanente.",
+    "mute24h": "Silenzia 24h",
+    "userMuted24h": "Silenziato per 24 ore."
   },
   "settings": {
     "title": "Impostazioni",

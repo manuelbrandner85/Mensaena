@@ -7,15 +7,51 @@ import '../services/supabase_service.dart';
 class UserBlocksRepository {
   const UserBlocksRepository._();
 
-  /// Blockiert einen anderen Nutzer.
+  /// Blockiert einen anderen Nutzer DAUERHAFT.
+  /// Upsert: ein bestehender Temp-Mute wird dabei zu einem dauerhaften Block
+  /// (expires_at → NULL). Fällt auf einfachen Insert zurück, falls die DB die
+  /// expires_at-Spalte noch nicht kennt (Migration noch nicht deployed).
   static Future<bool> block(String blockedUserId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null || uid == blockedUserId) return false;
     try {
-      await sb.from('user_blocks').insert({
+      await sb.from('user_blocks').upsert({
         'blocker_id': uid,
         'blocked_id': blockedUserId,
-      });
+        'expires_at': null,
+      }, onConflict: 'blocker_id,blocked_id');
+      BlockGuard.invalidate(blockedUserId);
+      return true;
+    } catch (_) {
+      try {
+        await sb.from('user_blocks').insert({
+          'blocker_id': uid,
+          'blocked_id': blockedUserId,
+        });
+        BlockGuard.invalidate(blockedUserId);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+  }
+
+  /// Schaltet einen Nutzer für [duration] stumm — ein zeitlich begrenzter
+  /// Block, der automatisch ausläuft (Standard 24 h). Wirkt wie ein Block
+  /// (Inhalte ausgeblendet + Kontakt gesperrt), endet aber von selbst.
+  static Future<bool> muteFor(
+    String blockedUserId, {
+    Duration duration = const Duration(hours: 24),
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null || uid == blockedUserId) return false;
+    try {
+      final expires = DateTime.now().toUtc().add(duration);
+      await sb.from('user_blocks').upsert({
+        'blocker_id': uid,
+        'blocked_id': blockedUserId,
+        'expires_at': expires.toIso8601String(),
+      }, onConflict: 'blocker_id,blocked_id');
       BlockGuard.invalidate(blockedUserId);
       return true;
     } catch (_) {
@@ -45,15 +81,30 @@ class UserBlocksRepository {
   static Future<bool> isBlockedEitherWay(String otherUserId) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
+    final dir =
+        'and(blocker_id.eq.$uid,blocked_id.eq.$otherUserId),and(blocker_id.eq.$otherUserId,blocked_id.eq.$uid)';
+    final nowIso = DateTime.now().toUtc().toIso8601String();
     try {
+      // Ablauf-Filter: abgelaufene Temp-Mutes zählen NICHT mehr als Block.
       final rows = await sb
           .from('user_blocks')
           .select('id')
-          .or('and(blocker_id.eq.$uid,blocked_id.eq.$otherUserId),and(blocker_id.eq.$otherUserId,blocked_id.eq.$uid)')
+          .or(dir)
+          .or('expires_at.is.null,expires_at.gt.$nowIso')
           .limit(1);
       return (rows as List).isNotEmpty;
     } catch (_) {
-      return false;
+      // Fallback (alte DB ohne expires_at-Spalte): ohne Ablauf-Filter.
+      try {
+        final rows = await sb
+            .from('user_blocks')
+            .select('id')
+            .or(dir)
+            .limit(1);
+        return (rows as List).isNotEmpty;
+      } catch (_) {
+        return false;
+      }
     }
   }
 

@@ -381,7 +381,10 @@
     "trustScoreExplain": "Trust score is computed automatically from all completed interactions.",
     "qr_code": "QR code",
     "editAvatar": "Edit avatar",
-    "editCover": "Edit cover"
+    "editCover": "Edit cover",
+    "blockOrMuteBody": "You will no longer see this person's posts or messages. Muting lasts 24 hours and expires automatically; blocking is permanent.",
+    "mute24h": "Mute 24h",
+    "userMuted24h": "Muted for 24 hours."
   },
   "settings": {
     "title": "Settings",
