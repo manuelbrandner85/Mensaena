@@ -1,6 +1,12 @@
 /// SKILL: mensaena-features (P12) — Offline-Queue.
 /// Buffert Post-Inserts und Message-Sends wenn keine Verbindung besteht.
 /// Bei Reconnect (`ConnectivityResult != none`) wird die Queue ausgespielt.
+///
+/// Retry-Härtung: Schlägt ein Insert beim Flush fehl (z.B. Supabase kurz
+/// nicht erreichbar), bleibt das Item NICHT für immer stuck. Stattdessen
+/// wird `retry_count` hochgezählt. Erst nach [_maxRetries] Versuchen wird
+/// das Item verworfen, damit ein dauerhaft fehlerhafter Eintrag (z.B.
+/// RLS-Verstoß) die ganze Queue nicht blockiert.
 library;
 
 import 'dart:async';
@@ -18,7 +24,14 @@ class OfflineQueueService {
   static const _storage = FlutterSecureStorage();
   static const _key = 'mensaena_offline_queue_v1';
 
+  /// Max. Flush-Versuche pro Item, bevor es verworfen wird.
+  static const int _maxRetries = 3;
+
   StreamSubscription<List<ConnectivityResult>>? _sub;
+
+  /// Verhindert parallele Flushes (z.B. Reconnect-Event + Initial-Check
+  /// gleichzeitig) — sonst könnte dasselbe Item doppelt inserted werden.
+  bool _flushing = false;
 
   Future<void> install() async {
     try {
@@ -65,6 +78,7 @@ class OfflineQueueService {
       'table': table,
       'payload': payload,
       'queued_at': DateTime.now().toIso8601String(),
+      'retry_count': 0,
     });
     await _write(items);
   }
@@ -72,19 +86,32 @@ class OfflineQueueService {
   Future<int> pendingCount() async => (await _read()).length;
 
   Future<void> flush() async {
-    final items = await _read();
-    if (items.isEmpty) return;
-    final remaining = <Map<String, dynamic>>[];
-    for (final item in items) {
-      try {
-        final table = item['table'] as String;
-        final payload = (item['payload'] as Map).cast<String, dynamic>();
-        await sb.from(table).insert(payload);
-      } catch (_) {
-        remaining.add(item);
+    if (_flushing) return;
+    _flushing = true;
+    try {
+      final items = await _read();
+      if (items.isEmpty) return;
+      final remaining = <Map<String, dynamic>>[];
+      for (final item in items) {
+        try {
+          final table = item['table'] as String;
+          final payload = (item['payload'] as Map).cast<String, dynamic>();
+          await sb.from(table).insert(payload);
+        } catch (_) {
+          // Fehlgeschlagen → Retry-Zähler erhöhen. Items mit Bestandsschutz
+          // (alte Queue ohne retry_count) starten bei 0.
+          final tries = (item['retry_count'] as num?)?.toInt() ?? 0;
+          if (tries + 1 < _maxRetries) {
+            remaining.add({...item, 'retry_count': tries + 1});
+          }
+          // Bei Erreichen von _maxRetries: Item wird NICHT übernommen →
+          // verworfen, damit ein Dauerfehler die Queue nicht blockiert.
+        }
       }
+      await _write(remaining);
+    } finally {
+      _flushing = false;
     }
-    await _write(remaining);
   }
 
   Future<void> dispose() async {

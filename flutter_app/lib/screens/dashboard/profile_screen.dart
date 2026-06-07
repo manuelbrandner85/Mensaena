@@ -1004,7 +1004,9 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
   bool _busy = false;
 
   Future<void> _confirmBlock() async {
-    final confirmed = await showDialog<bool>(
+    // Drei Optionen: Abbrechen · 24 Std. stummschalten (sanft, läuft aus) ·
+    // dauerhaft blockieren.
+    final action = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
@@ -1012,16 +1014,21 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
             style: AppTypography.body(
                 size: 15, color: AppColors.ink, weight: FontWeight.w700)),
         content: Text(
-            'profile.blockBody'.tr(),
+            'profile.blockOrMuteBody'.tr(),
             style:
                 AppTypography.body(size: 13, color: AppColors.inkSoft)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
+            onPressed: () => Navigator.pop(ctx),
             child: Text('common.cancel'.tr()),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
+            onPressed: () => Navigator.pop(ctx, 'mute'),
+            style: TextButton.styleFrom(foregroundColor: AppColors.amber),
+            child: Text('profile.mute24h'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'block'),
             style:
                 TextButton.styleFrom(foregroundColor: AppColors.herzrot),
             child: Text('profile.block'.tr()),
@@ -1029,15 +1036,21 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (action == null || !mounted) return;
     setState(() => _busy = true);
-    final ok = await UserBlocksRepository.block(widget.targetUserId);
+    final ok = action == 'mute'
+        ? await UserBlocksRepository.muteFor(widget.targetUserId)
+        : await UserBlocksRepository.block(widget.targetUserId);
     if (!mounted) return;
     setState(() => _busy = false);
+    final msg = !ok
+        ? 'profile.blockFailed'.tr()
+        : (action == 'mute'
+            ? 'profile.userMuted24h'.tr()
+            : 'profile.userBlocked'.tr());
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
-      content: Text(
-          ok ? 'profile.userBlocked'.tr() : 'profile.blockFailed'.tr(),
+      content: Text(msg,
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
   }

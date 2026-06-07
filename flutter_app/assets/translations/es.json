@@ -381,7 +381,10 @@
     "trustScoreExplain": "La puntuación de confianza se calcula automáticamente a partir de todas las interacciones completadas.",
     "qr_code": "Código QR",
     "editAvatar": "Editar avatar",
-    "editCover": "Editar portada"
+    "editCover": "Editar portada",
+    "blockOrMuteBody": "Ya no verás las publicaciones ni los mensajes de esta persona. Silenciar dura 24 horas y caduca automáticamente; bloquear es permanente.",
+    "mute24h": "Silenciar 24h",
+    "userMuted24h": "Silenciado durante 24 horas."
   },
   "settings": {
     "title": "Ajustes",
@@ -2494,7 +2497,17 @@
     "reminder_on": "Recordarme",
     "reminder_off": "Quitar recordatorio",
     "clip_save": "Guardar clip",
-    "clip_saved": "Clip guardado."
+    "clip_saved": "Clip guardado.",
+    "participantFallback": "Participante",
+    "youSuffix": "{name} (tú)",
+    "handRaisedBy": "{name} ha levantado la mano",
+    "mutedByHost": "Silenciado por el anfitrión",
+    "removedByHost": "Expulsado de la sala por el anfitrión",
+    "moderateTitle": "Moderar a {name}",
+    "moderateMute": "Silenciar",
+    "moderateRemove": "Expulsar de la sala",
+    "moderateMuteDone": "{name} silenciado",
+    "moderateRemoveDone": "{name} expulsado"
   },
   "call": {
     "audio": "Audio",
@@ -3728,7 +3741,9 @@
     "muted": "Silenciado",
     "camOn": "Cám on",
     "camOff": "Cám off",
-    "leave": "Salir"
+    "leave": "Salir",
+    "raiseHand": "Levantar la mano",
+    "lowerHand": "Bajar la mano"
   },
   "assistant": {
     "title": "Mensa",

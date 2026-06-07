@@ -91,6 +91,10 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
   String? _toastName;
   JoinLeaveKind? _toastKind;
   Timer? _toastTimer;
+  // Hand-Heben: eigene Hand + Set ALLER Identities (inkl. self) mit erhobener
+  // Hand. Wird via RoomEventType.handRaise über den DataChannel synchronisiert.
+  bool _handRaised = false;
+  final Set<String> _raisedHands = {};
   @override
   void initState() {
     super.initState();
@@ -481,9 +485,120 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
       case RoomEventType.subtitle:
         // User-Wunsch: Highlights + Untertitel aus Livestream entfernt.
         break;
+      case RoomEventType.handRaise:
+        final raised = ev.data['raised'] == true;
+        if (!mounted) break;
+        setState(() {
+          if (raised) {
+            _raisedHands.add(ev.senderIdentity);
+          } else {
+            _raisedHands.remove(ev.senderIdentity);
+          }
+        });
+        if (raised) {
+          final name = _profiles[ev.senderIdentity]?.name ??
+              'live.participantFallback'.tr();
+          _toast('live.handRaisedBy'.tr(namedArgs: {'name': name}));
+        }
+        break;
+      case RoomEventType.moderate:
+        // Kooperatives Moderations-Modell (gleiche Vertrauensbasis wie alle
+        // anderen DataChannel-Events): Nur der Host blendet die Controls ein,
+        // der Ziel-Client führt die Aktion an SICH selbst aus. Eine echte
+        // serverseitige Durchsetzung (LiveKit RemoveParticipant) wäre ein
+        // separater Edge-Function-Schritt.
+        final target = ev.data['target'] as String?;
+        final action = ev.data['action'] as String?;
+        final myId = SupabaseService.currentUser?.id;
+        if (target == null || myId == null || target != myId) break;
+        if (action == 'mute') {
+          _forceMuteSelf();
+        } else if (action == 'remove') {
+          _toast('live.removedByHost'.tr());
+          _leave();
+        }
+        break;
       default:
         break;
     }
+  }
+
+  /// Eigene Hand heben/senken und an alle im Raum broadcasten.
+  void _toggleHand() {
+    final next = !_handRaised;
+    final myId = SupabaseService.currentUser?.id ?? 'guest';
+    setState(() {
+      _handRaised = next;
+      if (next) {
+        _raisedHands.add(myId);
+      } else {
+        _raisedHands.remove(myId);
+      }
+    });
+    _events?.send(RoomEventType.handRaise, {'raised': next});
+  }
+
+  /// Wird vom Host-Moderations-Event ausgelöst — schaltet das eigene Mikro aus.
+  Future<void> _forceMuteSelf() async {
+    final lp = _room?.localParticipant;
+    if (lp == null) return;
+    try {
+      await lp.setMicrophoneEnabled(false);
+      if (mounted) setState(() => _micEnabled = false);
+      _toast('live.mutedByHost'.tr());
+    } catch (_) {}
+  }
+
+  /// Host-Moderations-Sheet für einen Teilnehmer (stummschalten / entfernen).
+  void _showModerationSheet(String identity, String name) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xF0121A28),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+              child: Text(
+                'live.moderateTitle'.tr(namedArgs: {'name': name}),
+                style: AppTypography.body(
+                    size: 14, color: AppColors.ink, weight: FontWeight.w700),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.micOff,
+                  color: AppColors.amber, size: 20),
+              title: Text('live.moderateMute'.tr(),
+                  style: AppTypography.body(size: 13, color: AppColors.ink)),
+              onTap: () {
+                Navigator.of(sheetCtx).pop();
+                _events?.send(RoomEventType.moderate,
+                    {'action': 'mute', 'target': identity});
+                _toast('live.moderateMuteDone'.tr(namedArgs: {'name': name}));
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.userX,
+                  color: AppColors.herzrot, size: 20),
+              title: Text('live.moderateRemove'.tr(),
+                  style: AppTypography.body(
+                      size: 13, color: AppColors.herzrotWarm)),
+              onTap: () {
+                Navigator.of(sheetCtx).pop();
+                _events?.send(RoomEventType.moderate,
+                    {'action': 'remove', 'target': identity});
+                _toast('live.moderateRemoveDone'.tr(namedArgs: {'name': name}));
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showJoinLeaveToast(String name, JoinLeaveKind kind) {
@@ -648,6 +763,9 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                               room: _room,
                               profiles: _profiles,
                               myMicEnabled: _micEnabled,
+                              raisedHands: _raisedHands,
+                              isHost: widget.isHost,
+                              onModerate: _showModerationSheet,
                             ),
                 ),
                 // User-Wunsch: Umfragen + Highlights + Untertitel raus.
@@ -664,8 +782,10 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                   camEnabled: _camEnabled,
                   enabled: _state == _RoomState.connected,
                   isHost: widget.isHost,
+                  handRaised: _handRaised,
                   onMicTap: _toggleMic,
                   onCamTap: _toggleCam,
+                  onHandTap: _toggleHand,
                   onLeaveTap: _leave,
                 ),
               ],
@@ -898,10 +1018,16 @@ class _RoomGrid extends StatefulWidget {
     required this.room,
     required this.profiles,
     required this.myMicEnabled,
+    required this.raisedHands,
+    required this.isHost,
+    required this.onModerate,
   });
   final lk.Room? room;
   final Map<String, _ParticipantProfile> profiles;
   final bool myMicEnabled;
+  final Set<String> raisedHands;
+  final bool isHost;
+  final void Function(String identity, String name) onModerate;
 
   @override
   State<_RoomGrid> createState() => _RoomGridState();
@@ -988,12 +1114,19 @@ class _RoomGridState extends State<_RoomGrid> {
             isLocal ? !widget.myMicEnabled : _isMicMuted(p);
         final profile = widget.profiles[p.identity];
         final name = profile?.name ??
-            (p.name.isNotEmpty ? p.name : 'Teilnehmer:in');
+            (p.name.isNotEmpty ? p.name : 'live.participantFallback'.tr());
+        final handRaised = widget.raisedHands.contains(p.identity);
+        // Host darf entfernte Teilnehmer per Tap moderieren (nicht sich selbst).
+        final canModerate = widget.isHost && !isLocal;
         return _ParticipantTile(
           video: video,
-          name: isLocal ? '$name (du)' : name,
+          name: isLocal ? 'live.youSuffix'.tr(namedArgs: {'name': name}) : name,
           avatarUrl: profile?.avatarUrl,
           micMuted: micMuted,
+          handRaised: handRaised,
+          onTap: canModerate
+              ? () => widget.onModerate(p.identity, name)
+              : null,
         );
       },
     );
@@ -1006,16 +1139,22 @@ class _ParticipantTile extends StatelessWidget {
     required this.name,
     required this.avatarUrl,
     required this.micMuted,
+    this.handRaised = false,
+    this.onTap,
   });
 
   final lk.VideoTrack? video;
   final String name;
   final String? avatarUrl;
   final bool micMuted;
+  final bool handRaised;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -1097,7 +1236,23 @@ class _ParticipantTile extends StatelessWidget {
                     size: 11, color: AppColors.mute),
               ),
             ),
+          // Erhobene-Hand-Badge oben links.
+          if (handRaised)
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: AppColors.amber.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(LucideIcons.hand,
+                    size: 12, color: AppColors.voidColor),
+              ),
+            ),
         ],
+      ),
       ),
     );
   }
@@ -1169,6 +1324,8 @@ class _ActionBar extends StatelessWidget {
     required this.onMicTap,
     required this.onCamTap,
     required this.onLeaveTap,
+    required this.handRaised,
+    required this.onHandTap,
     this.isHost = false,
   });
 
@@ -1176,8 +1333,10 @@ class _ActionBar extends StatelessWidget {
   final bool camEnabled;
   final bool enabled;
   final bool isHost;
+  final bool handRaised;
   final VoidCallback onMicTap;
   final VoidCallback onCamTap;
+  final VoidCallback onHandTap;
   final VoidCallback onLeaveTap;
 
   @override
@@ -1218,6 +1377,14 @@ class _ActionBar extends StatelessWidget {
                   : 'liveAction.muted'.tr(),
               color: micEnabled ? AppColors.leben : AppColors.mute,
               onTap: enabled ? onMicTap : null,
+            ),
+            _RoundAction(
+              icon: LucideIcons.hand,
+              label: handRaised
+                  ? 'liveAction.lowerHand'.tr()
+                  : 'liveAction.raiseHand'.tr(),
+              color: handRaised ? AppColors.amber : AppColors.mute,
+              onTap: enabled ? onHandTap : null,
             ),
             _RoundAction(
               icon: LucideIcons.phoneOff,

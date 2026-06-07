@@ -381,7 +381,10 @@
     "trustScoreExplain": "Рейтинг доверия рассчитывается автоматически по всем завершённым взаимодействиям.",
     "qr_code": "QR-код",
     "editAvatar": "Изменить аватар",
-    "editCover": "Изменить обложку"
+    "editCover": "Изменить обложку",
+    "blockOrMuteBody": "Вы больше не будете видеть публикации и сообщения этого человека. Заглушение длится 24 часа и истекает автоматически; блокировка постоянна.",
+    "mute24h": "Заглушить 24ч",
+    "userMuted24h": "Заглушено на 24 часа."
   },
   "settings": {
     "title": "Настройки",
@@ -2493,7 +2496,17 @@
     "reminder_on": "Напомнить",
     "reminder_off": "Убрать напоминание",
     "clip_save": "Сохранить клип",
-    "clip_saved": "Клип сохранён."
+    "clip_saved": "Клип сохранён.",
+    "participantFallback": "Участник",
+    "youSuffix": "{name} (вы)",
+    "handRaisedBy": "{name} поднял(а) руку",
+    "mutedByHost": "Заглушено ведущим",
+    "removedByHost": "Удалён из комнаты ведущим",
+    "moderateTitle": "Модерировать {name}",
+    "moderateMute": "Заглушить",
+    "moderateRemove": "Удалить из комнаты",
+    "moderateMuteDone": "{name} заглушён",
+    "moderateRemoveDone": "{name} удалён"
   },
   "call": {
     "audio": "Аудио",
@@ -3727,7 +3740,9 @@
     "muted": "Без звука",
     "camOn": "Камера",
     "camOff": "Камера выкл",
-    "leave": "Выйти"
+    "leave": "Выйти",
+    "raiseHand": "Поднять руку",
+    "lowerHand": "Опустить руку"
   },
   "assistant": {
     "title": "Менса",

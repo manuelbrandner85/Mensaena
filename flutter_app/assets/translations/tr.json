@@ -381,7 +381,10 @@
     "trustScoreExplain": "Güven puanı, tamamlanmış tüm etkileşimlerden otomatik olarak hesaplanır.",
     "qr_code": "QR kodu",
     "editAvatar": "Avatarı düzenle",
-    "editCover": "Kapağı düzenle"
+    "editCover": "Kapağı düzenle",
+    "blockOrMuteBody": "Bu kişinin gönderilerini ve mesajlarını artık görmezsin. Susturma 24 saat sürer ve otomatik olarak sona erer; engelleme kalıcıdır.",
+    "mute24h": "24 sa. sustur",
+    "userMuted24h": "24 saat boyunca susturuldu."
   },
   "settings": {
     "title": "Ayarlar",
@@ -2493,7 +2496,17 @@
     "reminder_on": "Hatırlat",
     "reminder_off": "Hatırlatmayı kaldır",
     "clip_save": "Klibi kaydet",
-    "clip_saved": "Klip kaydedildi."
+    "clip_saved": "Klip kaydedildi.",
+    "participantFallback": "Katılımcı",
+    "youSuffix": "{name} (sen)",
+    "handRaisedBy": "{name} el kaldırdı",
+    "mutedByHost": "Sunucu tarafından susturuldu",
+    "removedByHost": "Sunucu tarafından odadan çıkarıldı",
+    "moderateTitle": "{name} moderasyonu",
+    "moderateMute": "Sustur",
+    "moderateRemove": "Odadan çıkar",
+    "moderateMuteDone": "{name} susturuldu",
+    "moderateRemoveDone": "{name} çıkarıldı"
   },
   "call": {
     "audio": "Sesli",
@@ -3727,7 +3740,9 @@
     "muted": "Sessiz",
     "camOn": "Kamera",
     "camOff": "Kam kapalı",
-    "leave": "Ayrıl"
+    "leave": "Ayrıl",
+    "raiseHand": "El kaldır",
+    "lowerHand": "El indir"
   },
   "assistant": {
     "title": "Mensa",

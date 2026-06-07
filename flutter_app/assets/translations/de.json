@@ -381,7 +381,10 @@
     "trustScoreExplain": "Trust-Score wird automatisch berechnet aus allen abgeschlossenen Interaktionen.",
     "qr_code": "QR-Code",
     "editAvatar": "Profilbild bearbeiten",
-    "editCover": "Titelbild bearbeiten"
+    "editCover": "Titelbild bearbeiten",
+    "blockOrMuteBody": "Du siehst Beiträge und Nachrichten dieser Person nicht mehr. Stummschalten gilt 24 Stunden und läuft dann automatisch ab; Blockieren bleibt dauerhaft.",
+    "mute24h": "24 Std. stumm",
+    "userMuted24h": "Für 24 Stunden stummgeschaltet."
   },
   "settings": {
     "title": "Einstellungen",
@@ -2493,7 +2496,17 @@
     "reminder_on": "Erinnern",
     "reminder_off": "Erinnerung entfernen",
     "clip_save": "Clip speichern",
-    "clip_saved": "Clip wurde gespeichert."
+    "clip_saved": "Clip wurde gespeichert.",
+    "participantFallback": "Teilnehmer:in",
+    "youSuffix": "{name} (du)",
+    "handRaisedBy": "{name} hat die Hand gehoben",
+    "mutedByHost": "Vom Host stummgeschaltet",
+    "removedByHost": "Vom Host aus dem Raum entfernt",
+    "moderateTitle": "{name} moderieren",
+    "moderateMute": "Stummschalten",
+    "moderateRemove": "Aus Raum entfernen",
+    "moderateMuteDone": "{name} stummgeschaltet",
+    "moderateRemoveDone": "{name} entfernt"
   },
   "call": {
     "audio": "Audio",
@@ -3724,7 +3737,9 @@
     "muted": "Stumm",
     "camOn": "Kamera an",
     "camOff": "Kamera aus",
-    "leave": "Verlassen"
+    "leave": "Verlassen",
+    "raiseHand": "Hand heben",
+    "lowerHand": "Hand senken"
   },
   "assistant": {
     "title": "Mensa",

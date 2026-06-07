@@ -8,6 +8,9 @@
 ///   - highlight: Host markiert wichtige Sekunde (Stream)
 ///   - subtitle: Host tippt Untertitel, alle uebersetzen lokal (Beide)
 ///   - cheer: kurze Vibration + sound zur Begruessung (Beide)
+///   - handRaise: Teilnehmer hebt/senkt die Hand (Beide). data: {'raised': bool}
+///   - moderate: Host stummschaltet/entfernt einen Teilnehmer (Stream/Gruppe).
+///               data: {'action': 'mute'|'remove', 'target': identity}
 ///
 /// Verwendung:
 ///   final ev = RoomEventsService(room: room);
@@ -29,6 +32,8 @@ enum RoomEventType {
   highlight,
   subtitle,
   cheer,
+  handRaise,
+  moderate,
   unknown,
 }
 
@@ -117,6 +122,10 @@ class RoomEventsService {
         return 'subtitle';
       case RoomEventType.cheer:
         return 'cheer';
+      case RoomEventType.handRaise:
+        return 'hand_raise';
+      case RoomEventType.moderate:
+        return 'moderate';
       case RoomEventType.unknown:
         return 'unknown';
     }
@@ -138,6 +147,10 @@ class RoomEventsService {
         return RoomEventType.subtitle;
       case 'cheer':
         return RoomEventType.cheer;
+      case 'hand_raise':
+        return RoomEventType.handRaise;
+      case 'moderate':
+        return RoomEventType.moderate;
       default:
         return RoomEventType.unknown;
     }
