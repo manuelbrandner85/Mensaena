@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/organization_categories.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/organizations_repository.dart';
+import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/effects/tilt_card.dart';
@@ -38,6 +42,8 @@ class _OrganizationSuggestScreenState
   final _website = TextEditingController();
   String? _category;
   String _country = 'DE';
+  File? _logoFile;
+  bool _logoUploading = false;
   bool _submitting = false;
   bool _submitted = false;
   String? _error;
@@ -66,9 +72,23 @@ class _OrganizationSuggestScreenState
     setState(() {
       _category = null;
       _country = 'DE';
+      _logoFile = null;
       _submitted = false;
       _error = null;
     });
+  }
+
+  Future<void> _pickLogo() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 85,
+    );
+    if (picked != null && mounted) {
+      setState(() => _logoFile = File(picked.path));
+    }
   }
 
   Future<void> _openCategoryPicker() async {
@@ -165,6 +185,16 @@ class _OrganizationSuggestScreenState
       _submitting = true;
       _error = null;
     });
+    String? logoUrl;
+    if (_logoFile != null) {
+      setState(() => _logoUploading = true);
+      final urls = await ImageUploadService.upload(
+        [_logoFile!],
+        bucket: 'post-images',
+      );
+      if (mounted) setState(() => _logoUploading = false);
+      if (urls.isNotEmpty) logoUrl = urls.first;
+    }
     final ok = await OrganizationsRepository.suggest(
       name: _name.text.trim(),
       category: _category!,
@@ -175,6 +205,7 @@ class _OrganizationSuggestScreenState
       phone: _phone.text.trim().isEmpty ? null : _phone.text.trim(),
       email: _email.text.trim().isEmpty ? null : _email.text.trim(),
       website: _website.text.trim().isEmpty ? null : _website.text.trim(),
+      logoUrl: logoUrl,
     );
     if (!mounted) return;
     setState(() {
@@ -356,6 +387,13 @@ class _OrganizationSuggestScreenState
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 16),
+            _label('organizations.logoLabel'.tr()),
+            _LogoPicker(
+              file: _logoFile,
+              uploading: _logoUploading,
+              onTap: _pickLogo,
             ),
             const SizedBox(height: 16),
             _label('organizations.phone'.tr()),
@@ -656,6 +694,93 @@ class _CategoryCell extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LogoPicker extends StatelessWidget {
+  const _LogoPicker({
+    required this.file,
+    required this.uploading,
+    required this.onTap,
+  });
+
+  final File? file;
+  final bool uploading;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: uploading ? null : onTap,
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: AppColors.surface.withValues(alpha: 0.40),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: file != null
+                ? AppColors.amber.withValues(alpha: 0.50)
+                : Colors.white.withValues(alpha: 0.08),
+          ),
+        ),
+        child: uploading
+            ? const Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.amber,
+                  ),
+                ),
+              )
+            : file != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(11),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.file(file!, fit: BoxFit.cover),
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.55),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              LucideIcons.pencil,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        LucideIcons.image,
+                        size: 18,
+                        color: AppColors.inkSoft,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'organizations.logoHint'.tr(),
+                        style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.inkSoft,
+                        ),
+                      ),
+                    ],
+                  ),
       ),
     );
   }

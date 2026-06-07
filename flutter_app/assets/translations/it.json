@@ -2477,6 +2477,8 @@
     "descRequired": "Descrivi l'organizzazione (almeno 20 caratteri).",
     "categoryRequired": "Seleziona una categoria.",
     "pickCategory": "Scegli categoria",
+    "logoLabel": "Logo / Foto (opzionale)",
+    "logoHint": "Tocca per aggiungere",
     "country": "Paese",
     "email": "Email"
   },
