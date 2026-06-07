@@ -1123,6 +1123,39 @@
     "broadcastScheduledTitle": "Difusiones programadas",
     "broadcastSentInfo": "Enviado a {count}"
   },
+  "adminAi": {
+    "title": "Control de IA",
+    "subtitle": "Centro de control de todas las funciones de IA de la plataforma. Activa funciones una a una y mantén la visión general.",
+    "digestTitle": "Resumen diario",
+    "digestRefresh": "Actualizar",
+    "digestGenerating": "Generando…",
+    "digestEmpty": "Aún no hay resumen. Toca Actualizar.",
+    "digestFailed": "Error al generar el resumen. Inténtalo más tarde.",
+    "digestDisabled": "El resumen diario está desactivado. Actívalo abajo en Funciones.",
+    "digestSource": "Generado por {provider}",
+    "featuresTitle": "Funciones de IA",
+    "featuresHint": "Activa o desactiva funciones de IA concretas para toda la app.",
+    "featuresEmpty": "No hay funciones disponibles.",
+    "toggleFailed": "Error al cambiar. Solo los administradores pueden modificar funciones.",
+    "auditTitle": "Actividad de IA",
+    "auditEmpty": "Aún no hay actividad de IA.",
+    "cat": {
+      "moderation": "Seguridad y moderación",
+      "growth": "Crecimiento y comunidad",
+      "insights": "Análisis e insights",
+      "content": "Contenido y operaciones",
+      "trust": "Confianza y verificación",
+      "productivity": "Productividad de admin"
+    },
+    "stat": {
+      "newUsers": "Usuarios nuevos",
+      "newPosts": "Publicaciones nuevas",
+      "openReports": "Reportes abiertos",
+      "newMessages": "Mensajes nuevos",
+      "newEvents": "Eventos nuevos",
+      "activeCrises": "Crisis activas"
+    }
+  },
   "create": {
     "titleRequired": "El título es obligatorio.",
     "nameRequired": "El nombre es obligatorio.",

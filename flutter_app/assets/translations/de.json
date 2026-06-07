@@ -1122,6 +1122,39 @@
     "broadcastScheduledTitle": "Geplante Broadcasts",
     "broadcastSentInfo": "Gesendet an {count}"
   },
+  "adminAi": {
+    "title": "KI-Steuerung",
+    "subtitle": "Zentrale Schaltzentrale für alle KI-Funktionen der Plattform. Schalte Features einzeln frei und behalte den Überblick.",
+    "digestTitle": "Tages-Zusammenfassung",
+    "digestRefresh": "Aktualisieren",
+    "digestGenerating": "Erstelle…",
+    "digestEmpty": "Noch keine Zusammenfassung. Tippe auf Aktualisieren.",
+    "digestFailed": "Zusammenfassung fehlgeschlagen. Bitte später erneut versuchen.",
+    "digestDisabled": "Die Tages-Zusammenfassung ist deaktiviert. Aktiviere sie unten bei den Features.",
+    "digestSource": "Erstellt von {provider}",
+    "featuresTitle": "KI-Features",
+    "featuresHint": "Schalte einzelne KI-Funktionen für die gesamte App an oder aus.",
+    "featuresEmpty": "Keine Features verfügbar.",
+    "toggleFailed": "Umschalten fehlgeschlagen. Nur Admins dürfen Features ändern.",
+    "auditTitle": "KI-Aktivität",
+    "auditEmpty": "Noch keine KI-Aktivität.",
+    "cat": {
+      "moderation": "Sicherheit & Moderation",
+      "growth": "Wachstum & Community",
+      "insights": "Einblicke & Analytik",
+      "content": "Inhalte & Betrieb",
+      "trust": "Vertrauen & Verifizierung",
+      "productivity": "Admin-Produktivität"
+    },
+    "stat": {
+      "newUsers": "Neue Nutzer",
+      "newPosts": "Neue Beiträge",
+      "openReports": "Offene Meldungen",
+      "newMessages": "Neue Nachrichten",
+      "newEvents": "Neue Events",
+      "activeCrises": "Aktive Krisen"
+    }
+  },
   "create": {
     "titleRequired": "Titel ist erforderlich.",
     "nameRequired": "Name ist erforderlich.",
