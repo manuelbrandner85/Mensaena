@@ -1371,6 +1371,7 @@
     "priceEuro": "Prix en €",
     "location": "Lieu",
     "place": "Endroit",
+    "shareExactLocation": "Partager la localisation exacte sur la carte (optionnel)",
     "maxParticipants": "Max. participants (optionnel)",
     "eventTitle": "Créer un événement",
     "groupName": "Nom du groupe",

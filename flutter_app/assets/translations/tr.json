@@ -1370,6 +1370,7 @@
     "priceEuro": "Fiyat (€)",
     "location": "Konum",
     "place": "Yer",
+    "shareExactLocation": "Haritada tam konumu paylaş (isteğe bağlı)",
     "maxParticipants": "Maks. katılımcı (opsiyonel)",
     "eventTitle": "Etkinlik oluştur",
     "groupName": "Grup adı",

@@ -62,6 +62,7 @@ class _ModuleCreatePostScreenState
   bool _privacyPhone = false;
   bool _privacyEmail = false;
   bool _isAnonymous = false;
+  bool _shareExactLocation = false;
   int _urgency = 2;
   final List<File> _images = [];
   double? _lat;
@@ -92,26 +93,18 @@ class _ModuleCreatePostScreenState
   }
 
   Future<void> _seedProfileLocation() async {
-    try {
-      final p = await ref.read(myProfileProvider.future);
-      if (!mounted) return;
-      if (_lat == null && _lng == null &&
-          p?.latitude != null && p?.longitude != null) {
-        setState(() {
-          _lat = p!.latitude;
-          _lng = p.longitude;
-        });
-      }
-    } catch (_) {/* still null → _resolveCoordinates greift beim Submit */}
+    // Exakte Koordinaten werden nur gespeichert wenn der User explizit zustimmt.
+    // Daher kein automatisches Vorbelegen aus dem Profil.
   }
 
-  /// Robuste Koordinaten-Auflösung beim Absenden, damit JEDER Beitrag auf
-  /// der Karte landet. Kette (erstes Treffer-Ergebnis gewinnt):
-  ///   1. bereits gesetzt (GPS-Button / Adress-Auswahl / Profil-Seed)
-  ///   2. eingegebener Standort-Text → Forward-Geocoding (Nominatim)
-  ///   3. Profil-Koordinaten
-  ///   4. Profil-Heimatstadt / Profil-Standort-Text → Forward-Geocoding
+  /// Koordinaten-Auflösung beim Absenden — NUR wenn der User der Weitergabe
+  /// des genauen Standorts zugestimmt hat (_shareExactLocation).
   Future<void> _resolveCoordinates() async {
+    if (!_shareExactLocation) {
+      _lat = null;
+      _lng = null;
+      return;
+    }
     if (_lat != null && _lng != null) return;
 
     // 2. Freitext-Standort des Beitrags geocodieren (außer GPS-Platzhalter).
@@ -190,6 +183,7 @@ class _ModuleCreatePostScreenState
       setState(() {
         _lat = pos.latitude;
         _lng = pos.longitude;
+        _shareExactLocation = true; // GPS-Nutzung = implizite Zustimmung
         _locationCtrl.text =
             'GPS: ${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}';
       });
@@ -631,6 +625,7 @@ class _ModuleCreatePostScreenState
                     onSelected: (s) => setState(() {
                       _lat = s.lat;
                       _lng = s.lng;
+                      _shareExactLocation = true;
                     }),
                   ),
                 ),
@@ -645,7 +640,36 @@ class _ModuleCreatePostScreenState
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            // Datenschutz-Checkbox genauen Standort
+            InkWell(
+              onTap: () =>
+                  setState(() => _shareExactLocation = !_shareExactLocation),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: _shareExactLocation,
+                      onChanged: (v) =>
+                          setState(() => _shareExactLocation = v ?? false),
+                      activeColor: AppColors.teal,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        'create.shareExactLocation'.tr(),
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.inkSoft),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
 
             // Tags mit antippbaren Vorschlägen
             TagSuggestionField(

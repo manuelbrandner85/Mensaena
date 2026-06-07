@@ -1371,6 +1371,7 @@
     "priceEuro": "Price in €",
     "location": "Location",
     "place": "Place",
+    "shareExactLocation": "Share exact location on the map (optional)",
     "maxParticipants": "Max. participants (optional)",
     "eventTitle": "Create event",
     "groupName": "Group name",

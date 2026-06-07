@@ -1370,6 +1370,7 @@
     "priceEuro": "Preis in €",
     "location": "Standort",
     "place": "Ort",
+    "shareExactLocation": "Genauen Standort mit der Karte teilen (optional)",
     "maxParticipants": "Max. Teilnehmer:innen (optional)",
     "eventTitle": "Event erstellen",
     "groupName": "Gruppenname",
