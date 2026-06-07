@@ -2493,7 +2493,17 @@
     "reminder_on": "Напомнить",
     "reminder_off": "Убрать напоминание",
     "clip_save": "Сохранить клип",
-    "clip_saved": "Клип сохранён."
+    "clip_saved": "Клип сохранён.",
+    "participantFallback": "Участник",
+    "youSuffix": "{name} (вы)",
+    "handRaisedBy": "{name} поднял(а) руку",
+    "mutedByHost": "Заглушено ведущим",
+    "removedByHost": "Удалён из комнаты ведущим",
+    "moderateTitle": "Модерировать {name}",
+    "moderateMute": "Заглушить",
+    "moderateRemove": "Удалить из комнаты",
+    "moderateMuteDone": "{name} заглушён",
+    "moderateRemoveDone": "{name} удалён"
   },
   "call": {
     "audio": "Аудио",
@@ -3727,7 +3737,9 @@
     "muted": "Без звука",
     "camOn": "Камера",
     "camOff": "Камера выкл",
-    "leave": "Выйти"
+    "leave": "Выйти",
+    "raiseHand": "Поднять руку",
+    "lowerHand": "Опустить руку"
   },
   "assistant": {
     "title": "Менса",

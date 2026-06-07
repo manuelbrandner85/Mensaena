@@ -2494,7 +2494,17 @@
     "reminder_on": "Me rappeler",
     "reminder_off": "Retirer le rappel",
     "clip_save": "Enregistrer le clip",
-    "clip_saved": "Clip enregistré."
+    "clip_saved": "Clip enregistré.",
+    "participantFallback": "Participant·e",
+    "youSuffix": "{name} (vous)",
+    "handRaisedBy": "{name} a levé la main",
+    "mutedByHost": "Coupé par l'hôte",
+    "removedByHost": "Retiré du salon par l'hôte",
+    "moderateTitle": "Modérer {name}",
+    "moderateMute": "Couper le micro",
+    "moderateRemove": "Retirer du salon",
+    "moderateMuteDone": "{name} coupé",
+    "moderateRemoveDone": "{name} retiré"
   },
   "call": {
     "audio": "Audio",
@@ -3728,7 +3738,9 @@
     "muted": "Muet",
     "camOn": "Cam on",
     "camOff": "Cam off",
-    "leave": "Quitter"
+    "leave": "Quitter",
+    "raiseHand": "Lever la main",
+    "lowerHand": "Baisser la main"
   },
   "assistant": {
     "title": "Mensa",

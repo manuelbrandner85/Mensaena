@@ -2493,7 +2493,17 @@
     "reminder_on": "Hatırlat",
     "reminder_off": "Hatırlatmayı kaldır",
     "clip_save": "Klibi kaydet",
-    "clip_saved": "Klip kaydedildi."
+    "clip_saved": "Klip kaydedildi.",
+    "participantFallback": "Katılımcı",
+    "youSuffix": "{name} (sen)",
+    "handRaisedBy": "{name} el kaldırdı",
+    "mutedByHost": "Sunucu tarafından susturuldu",
+    "removedByHost": "Sunucu tarafından odadan çıkarıldı",
+    "moderateTitle": "{name} moderasyonu",
+    "moderateMute": "Sustur",
+    "moderateRemove": "Odadan çıkar",
+    "moderateMuteDone": "{name} susturuldu",
+    "moderateRemoveDone": "{name} çıkarıldı"
   },
   "call": {
     "audio": "Sesli",
@@ -3727,7 +3737,9 @@
     "muted": "Sessiz",
     "camOn": "Kamera",
     "camOff": "Kam kapalı",
-    "leave": "Ayrıl"
+    "leave": "Ayrıl",
+    "raiseHand": "El kaldır",
+    "lowerHand": "El indir"
   },
   "assistant": {
     "title": "Mensa",

@@ -2494,7 +2494,17 @@
     "reminder_on": "Remind me",
     "reminder_off": "Remove reminder",
     "clip_save": "Save clip",
-    "clip_saved": "Clip saved."
+    "clip_saved": "Clip saved.",
+    "participantFallback": "Participant",
+    "youSuffix": "{name} (you)",
+    "handRaisedBy": "{name} raised their hand",
+    "mutedByHost": "Muted by the host",
+    "removedByHost": "Removed from the room by the host",
+    "moderateTitle": "Moderate {name}",
+    "moderateMute": "Mute",
+    "moderateRemove": "Remove from room",
+    "moderateMuteDone": "{name} muted",
+    "moderateRemoveDone": "{name} removed"
   },
   "call": {
     "audio": "Audio",
@@ -3725,7 +3735,9 @@
     "muted": "Muted",
     "camOn": "Cam on",
     "camOff": "Cam off",
-    "leave": "Leave"
+    "leave": "Leave",
+    "raiseHand": "Raise hand",
+    "lowerHand": "Lower hand"
   },
   "assistant": {
     "title": "Mensa",
