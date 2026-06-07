@@ -58,6 +58,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # Flutter 3.27.x explizit — nur damit `flutter pub get` das pub-cache
+      # füllt BEVOR der flutter_webrtc-Patch läuft. Ohne dieses SDK lief das
+      # Patch-Skript ins Leere (Paket noch nicht heruntergeladen) und Shorebird
+      # kompilierte danach das UNGEPATCHTE flutter_webrtc → Build-Fehler
+      # `onSurfaceDestroyed() not overridden`. Die Patch-Engine selbst übernimmt
+      # Shorebird weiterhin vom Ziel-Release (kein --flutter-version beim patch).
+      - name: 🐦 Flutter 3.27.x (nur für pub get + Patch)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.x'
+          channel: stable
+          cache: true
+
       # Pinned wie Weltenbibliothek: ohne Pin driftet setup-shorebird@v1 auf
       # die jeweils neueste CLI und damit auf einen anderen Flutter-Engine-
       # Snapshot — Patches uploaden dann zwar erfolgreich, werden aber vom
@@ -177,6 +190,13 @@ jobs:
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+
+      # pub-cache MUSS gefüllt sein bevor der Patch greift — sonst patcht das
+      # Skript ein nicht vorhandenes flutter_webrtc und Shorebird kompiliert
+      # später die ungepatchte Version.
+      - name: 📦 flutter pub get (pub-cache füllen)
+        if: steps.status.outputs.skip != 'true'
+        run: flutter pub get
 
       # ── flutter_webrtc Flutter-3.27-Patch ──
       # Idempotenter Java-Patch: onSurfaceCleanup → onSurfaceDestroyed
