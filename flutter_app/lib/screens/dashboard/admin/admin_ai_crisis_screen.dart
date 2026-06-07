@@ -26,6 +26,8 @@ class _AdminAiCrisisScreenState extends ConsumerState<AdminAiCrisisScreen> {
   bool _loading = false;
   bool _analyzing = false;
 
+  static const _urgencyOrder = ['critical', 'high', 'medium', 'low'];
+
   @override
   void initState() {
     super.initState();
@@ -39,13 +41,12 @@ class _AdminAiCrisisScreenState extends ConsumerState<AdminAiCrisisScreen> {
   }
 
   List<Map<String, dynamic>> _sorted(List<Map<String, dynamic>> list) {
-    const order = ['critical', 'high', 'medium', 'low'];
     final copy = List<Map<String, dynamic>>.from(list);
     copy.sort((a, b) {
-      final ai = order.indexOf(a['ai_triage_urgency'] as String? ?? '');
-      final bi = order.indexOf(b['ai_triage_urgency'] as String? ?? '');
-      final ar = ai == -1 ? order.length : ai;
-      final br = bi == -1 ? order.length : bi;
+      final ai = _urgencyOrder.indexOf(a['ai_triage_urgency'] as String? ?? '');
+      final bi = _urgencyOrder.indexOf(b['ai_triage_urgency'] as String? ?? '');
+      final ar = ai == -1 ? _urgencyOrder.length : ai;
+      final br = bi == -1 ? _urgencyOrder.length : bi;
       return ar.compareTo(br);
     });
     return copy;
@@ -128,7 +129,7 @@ class _Header extends StatelessWidget {
           Expanded(
             child: Text(
               'adminCrisis.subtitle'.tr(),
-              style: AppTypography.bodySmall.copyWith(color: Colors.grey[600]),
+              style: AppTypography.body(size: 12, color: AppColors.lightMute),
             ),
           ),
           const SizedBox(width: 8),
@@ -204,11 +205,12 @@ class _CrisisCard extends StatelessWidget {
     final affected = crisis['affected_count'] as int? ?? 0;
 
     final urgencyHasChanged = aiUrgency != null &&
+        reportedUrgency != null &&
         aiUrgency != reportedUrgency &&
         _urgencyOrder.contains(aiUrgency) &&
         _urgencyOrder.contains(reportedUrgency) &&
         _urgencyOrder.indexOf(aiUrgency) <
-            _urgencyOrder.indexOf(reportedUrgency!);
+            _urgencyOrder.indexOf(reportedUrgency);
 
     return Container(
       decoration: BoxDecoration(
@@ -233,8 +235,9 @@ class _CrisisCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     crisis['title'] as String? ?? '',
-                    style: AppTypography.bodySmall
-                        .copyWith(fontWeight: FontWeight.w700),
+                    style: AppTypography.body(
+                        size: 13, color: AppColors.lightInk,
+                        weight: FontWeight.w700),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -255,8 +258,7 @@ class _CrisisCard extends StatelessWidget {
                             size: 11, color: _urgencyColor(aiUrgency)),
                         const SizedBox(width: 4),
                         Text(
-                          'adminCrisis.urgency.$aiUrgency'.tr(
-                              fallback: aiUrgency),
+                          'adminCrisis.urgency.$aiUrgency'.tr(),
                           style: TextStyle(
                               fontSize: 11,
                               color: _urgencyColor(aiUrgency),
@@ -268,37 +270,43 @@ class _CrisisCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            Row(
+            Wrap(
+              spacing: 6,
               children: [
                 Text(
-                  '${crisis['category'] ?? ''} · ',
-                  style:
-                      const TextStyle(fontSize: 11, color: Colors.grey),
+                  '${crisis['category'] ?? ''}',
+                  style: AppTypography.body(
+                      size: 11, color: AppColors.lightMute),
                 ),
                 Text(
-                  'adminCrisis.helpers'
-                      .tr(namedArgs: {'current': '$helpers', 'needed': '$needed'}),
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  'adminCrisis.helpers'.tr(namedArgs: {
+                    'current': '$helpers',
+                    'needed': '$needed'
+                  }),
+                  style: AppTypography.body(
+                      size: 11, color: AppColors.lightMute),
                 ),
-                const SizedBox(width: 6),
                 Text(
                   'adminCrisis.affected'
                       .tr(namedArgs: {'n': '$affected'}),
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: AppTypography.body(
+                      size: 11, color: AppColors.lightMute),
                 ),
-                if (urgencyHasChanged) ...[
-                  const SizedBox(width: 6),
-                  Icon(LucideIcons.trendingUp,
-                      size: 12, color: Colors.red.shade500),
-                  const SizedBox(width: 2),
-                  Text(
-                    'adminCrisis.reportedUrgency'.tr() + ': ' +
-                        'adminCrisis.urgency.$reportedUrgency'.tr(
-                            fallback: reportedUrgency ?? ''),
-                    style: TextStyle(
-                        fontSize: 10, color: Colors.red.shade400),
+                if (urgencyHasChanged)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.trendingUp,
+                          size: 12, color: Colors.red.shade500),
+                      const SizedBox(width: 2),
+                      Text(
+                        '${'adminCrisis.reportedUrgency'.tr()}: '
+                        '${'adminCrisis.urgency.$reportedUrgency'.tr()}',
+                        style: TextStyle(
+                            fontSize: 10, color: Colors.red.shade400),
+                      ),
+                    ],
                   ),
-                ],
               ],
             ),
             if (triage != null && triage.isNotEmpty) ...[
@@ -314,12 +322,12 @@ class _CrisisCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(LucideIcons.sparkles,
-                        size: 13, color: AppColors.primary500),
+                        size: 13, color: AppColors.teal),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(triage,
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.black87)),
+                          style: AppTypography.body(
+                              size: 12, color: AppColors.lightInk)),
                     ),
                   ],
                 ),
@@ -328,10 +336,10 @@ class _CrisisCard extends StatelessWidget {
             if (actions.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text('adminCrisis.suggestedActions'.tr(),
-                  style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w600)),
+                  style: AppTypography.body(
+                      size: 11,
+                      color: AppColors.lightMute,
+                      weight: FontWeight.w600)),
               const SizedBox(height: 4),
               ...actions.map((a) => Padding(
                     padding: const EdgeInsets.only(bottom: 2),
@@ -339,11 +347,12 @@ class _CrisisCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Icon(LucideIcons.chevronRight,
-                            size: 13, color: AppColors.primary500),
+                            size: 13, color: AppColors.teal),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(a,
-                              style: const TextStyle(fontSize: 12)),
+                              style: AppTypography.body(
+                                  size: 12, color: AppColors.lightInk)),
                         ),
                       ],
                     ),
@@ -355,11 +364,10 @@ class _CrisisCard extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: () =>
                     context.push('/crisis/${crisis['id']}'),
-                icon: const Icon(LucideIcons.externalLink,
-                    size: 13),
+                icon: const Icon(LucideIcons.externalLink, size: 13),
                 label: Text('adminCrisis.openCrisis'.tr()),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary500,
+                  foregroundColor: AppColors.teal,
                   textStyle: const TextStyle(fontSize: 12),
                 ),
               ),
@@ -382,7 +390,7 @@ class _EmptyState extends StatelessWidget {
               size: 48, color: Colors.green.shade300),
           const SizedBox(height: 12),
           Text('adminCrisis.empty'.tr(),
-              style: AppTypography.bodySmall.copyWith(color: Colors.grey)),
+              style: AppTypography.body(size: 13, color: AppColors.lightMute)),
         ],
       ),
     );

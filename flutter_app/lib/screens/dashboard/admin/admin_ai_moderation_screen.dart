@@ -125,16 +125,16 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.primary500.withValues(alpha: 0.06),
+      color: AppColors.teal.withValues(alpha: 0.06),
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Row(
         children: [
-          const Icon(LucideIcons.shieldAlert, size: 20, color: AppColors.primary500),
+          const Icon(LucideIcons.shieldAlert, size: 20, color: AppColors.teal),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'adminModeration.subtitle'.tr(),
-              style: AppTypography.bodySmall.copyWith(color: Colors.grey[600]),
+              style: AppTypography.body(size: 12, color: AppColors.lightMute),
             ),
           ),
           const SizedBox(width: 8),
@@ -150,7 +150,7 @@ class _Header extends StatelessWidget {
                 ? 'adminModeration.analyzing'.tr()
                 : 'adminModeration.analyze'.tr()),
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary500,
+              backgroundColor: AppColors.teal,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
@@ -209,8 +209,10 @@ class _ReportCard extends StatelessWidget {
                 if (pct != null) ...[
                   const SizedBox(width: 6),
                   Text(
-                    'adminModeration.confidence'.tr(namedArgs: {'pct': '$pct'}),
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    'adminModeration.confidence'
+                        .tr(namedArgs: {'pct': '$pct'}),
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute),
                   ),
                 ],
               ],
@@ -218,8 +220,9 @@ class _ReportCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               report['reason'] as String? ?? '',
-              style: AppTypography.bodySmall
-                  .copyWith(fontWeight: FontWeight.w500),
+              style: AppTypography.body(
+                  size: 13, color: AppColors.lightInk,
+                  weight: FontWeight.w500),
             ),
             if (reason != null && reason.isNotEmpty) ...[
               const SizedBox(height: 6),
@@ -234,13 +237,13 @@ class _ReportCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(LucideIcons.sparkles,
-                        size: 13, color: AppColors.primary500),
+                        size: 13, color: AppColors.teal),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         reason,
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.black87),
+                        style: AppTypography.body(
+                            size: 12, color: AppColors.lightInk),
                       ),
                     ),
                   ],
@@ -285,20 +288,18 @@ class _TypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = 'adminModeration.contentType.$type'.tr(
-      fallback: type.replaceAll('_', ' '),
-    );
+    final label = 'adminModeration.contentType.$type'.tr();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.primary500.withValues(alpha: 0.1),
+        color: AppColors.teal.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(label,
-          style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.primary500,
-              fontWeight: FontWeight.w600)),
+          style: AppTypography.body(
+              size: 11,
+              color: AppColors.teal,
+              weight: FontWeight.w600)),
     );
   }
 }
@@ -332,7 +333,7 @@ class _RecBadge extends StatelessWidget {
       decoration: BoxDecoration(
           color: _bg, borderRadius: BorderRadius.circular(20)),
       child: Text(
-        'adminModeration.rec.$rec'.tr(fallback: rec),
+        'adminModeration.rec.$rec'.tr(),
         style: TextStyle(
             fontSize: 11, color: _fg, fontWeight: FontWeight.w700),
       ),
@@ -383,7 +384,7 @@ class _EmptyState extends StatelessWidget {
               size: 48, color: Colors.green.shade300),
           const SizedBox(height: 12),
           Text('adminModeration.empty'.tr(),
-              style: AppTypography.bodySmall.copyWith(color: Colors.grey)),
+              style: AppTypography.body(size: 13, color: AppColors.lightMute)),
         ],
       ),
     );
