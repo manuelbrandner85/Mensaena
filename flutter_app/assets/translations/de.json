@@ -1155,6 +1155,57 @@
       "activeCrises": "Aktive Krisen"
     }
   },
+  "adminModeration": {
+    "title": "KI-Moderations-Queue",
+    "subtitle": "Offene Meldungen mit KI-Empfehlung",
+    "analyze": "KI-Analyse starten",
+    "analyzing": "Analysiere…",
+    "empty": "Keine offenen Meldungen",
+    "disabled": "KI-Moderation ist deaktiviert",
+    "analyzeFailed": "Analyse fehlgeschlagen",
+    "rec": {
+      "remove": "Entfernen",
+      "keep": "Behalten",
+      "escalate": "Eskalieren",
+      "needs_review": "Prüfen"
+    },
+    "confidence": "Sicherheit {pct}%",
+    "contentType": {
+      "post": "Beitrag",
+      "comment": "Kommentar",
+      "message": "Nachricht",
+      "user": "Nutzer",
+      "board_post": "Pinnwand",
+      "event": "Event",
+      "organization": "Organisation"
+    },
+    "actionKeep": "Behalten",
+    "actionRemove": "Entfernen",
+    "actionEscalate": "Eskalieren",
+    "actionDone": "Erledigt",
+    "actionFailed": "Aktion fehlgeschlagen"
+  },
+  "adminCrisis": {
+    "title": "Krisen-Triage",
+    "subtitle": "KI-Dringlichkeitsbewertung",
+    "analyze": "Krisen bewerten",
+    "analyzing": "Bewerte…",
+    "empty": "Keine aktiven Krisen",
+    "disabled": "Krisen-Triage ist deaktiviert",
+    "analyzeFailed": "Triage fehlgeschlagen",
+    "urgency": {
+      "critical": "Kritisch",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "aiUrgency": "KI-Dringlichkeit",
+    "reportedUrgency": "Gemeldet",
+    "suggestedActions": "Empfohlene Maßnahmen",
+    "helpers": "{current}/{needed} Helfer",
+    "affected": "{n} Betroffene",
+    "openCrisis": "Krise öffnen"
+  },
   "create": {
     "titleRequired": "Titel ist erforderlich.",
     "nameRequired": "Name ist erforderlich.",

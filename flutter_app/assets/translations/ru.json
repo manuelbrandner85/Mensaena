@@ -1155,6 +1155,57 @@
       "activeCrises": "Активные кризисы"
     }
   },
+  "adminModeration": {
+    "title": "Очередь модерации ИИ",
+    "subtitle": "Жалобы с рекомендациями ИИ",
+    "analyze": "Запустить анализ ИИ",
+    "analyzing": "Анализирую…",
+    "empty": "Нет ожидающих жалоб",
+    "disabled": "Модерация ИИ отключена",
+    "analyzeFailed": "Ошибка анализа",
+    "rec": {
+      "remove": "Удалить",
+      "keep": "Оставить",
+      "escalate": "Эскалировать",
+      "needs_review": "На проверку"
+    },
+    "confidence": "Уверенность {pct}%",
+    "contentType": {
+      "post": "Пост",
+      "comment": "Комментарий",
+      "message": "Сообщение",
+      "user": "Пользователь",
+      "board_post": "Доска",
+      "event": "Событие",
+      "organization": "Организация"
+    },
+    "actionKeep": "Оставить",
+    "actionRemove": "Удалить",
+    "actionEscalate": "Эскалировать",
+    "actionDone": "Готово",
+    "actionFailed": "Действие не выполнено"
+  },
+  "adminCrisis": {
+    "title": "Триаж кризисов",
+    "subtitle": "Оценка срочности с помощью ИИ",
+    "analyze": "Оценить кризисы",
+    "analyzing": "Оцениваю…",
+    "empty": "Нет активных кризисов",
+    "disabled": "Триаж кризисов отключён",
+    "analyzeFailed": "Ошибка триажа",
+    "urgency": {
+      "critical": "Критический",
+      "high": "Высокий",
+      "medium": "Средний",
+      "low": "Низкий"
+    },
+    "aiUrgency": "Срочность ИИ",
+    "reportedUrgency": "Заявлено",
+    "suggestedActions": "Рекомендуемые действия",
+    "helpers": "{current}/{needed} волонтёров",
+    "affected": "{n} пострадавших",
+    "openCrisis": "Открыть кризис"
+  },
   "create": {
     "titleRequired": "Заголовок обязателен.",
     "nameRequired": "Имя обязательно.",
