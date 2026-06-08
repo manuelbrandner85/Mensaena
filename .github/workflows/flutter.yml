@@ -52,6 +52,23 @@ jobs:
           flutter-version: '3.27.x'
           cache: true
 
+      # Gradle-Caches (Dependencies + Wrapper + transformierte Artefakte).
+      # Spart ~3-5 Min pro Build: ohne Cache lädt Gradle alle Plugin-AARs
+      # (LiveKit, WebRTC, Firebase …) und kompiliert sie jedes Mal neu.
+      # Key auf pubspec.lock (= effektive Plugin-Versionen) + Workflow-Datei;
+      # restore-keys fängt Teiltreffer ab, damit auch bei neuem Lock noch ein
+      # warmer Cache greift.
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            flutter_app/android/.gradle
+          key: gradle-${{ runner.os }}-${{ hashFiles('flutter_app/pubspec.lock', '.github/workflows/flutter.yml') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
       - name: Generate native scaffolding (android/)
         run: |
           if [ ! -d android ]; then
@@ -413,16 +430,20 @@ jobs:
           ls -la build/app/outputs/flutter-apk/ 2>/dev/null || echo "(no flutter-apk/ dir)"
           exit $rc
 
-      # Non-Main-Builds (PR + Feature-Branch) → klassischer flutter build apk
-      # damit Branch-Pushes/PRs CI-grün laufen ohne Shorebird-Release zu erzeugen.
-      - name: 🏗️ Build signed Release APK (Branch/PR)
+      # Non-Main-Builds (PR + Feature-Branch) → DEBUG-Build als reines
+      # Kompilier-Gate. Ein Debug-Build überspringt R8/Minification und die
+      # Multi-ABI-Release-Optimierung → ~5-8 Min schneller als --release,
+      # kompiliert aber den GESAMTEN Dart- + nativen Gradle-Code, fängt also
+      # jeden Compile-Fehler ab. Die echte signierte Release-APK + der OTA-
+      # Patch entstehen erst nach dem Merge (Shorebird-Step + shorebird_patch).
+      - name: 🏗️ Build Debug APK (Branch/PR — schnelles Compile-Gate)
         if: github.event_name != 'push' || github.ref != 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set +e
-          flutter build apk --release \
+          flutter build apk --debug \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de \
             2>&1 | tee build.log
@@ -441,11 +462,15 @@ jobs:
           fi
           exit $rc
 
-      - name: Upload Release APK
+      # Auf main liegt app-release.apk, im PR-Gate app-debug.apk. Beide Pfade
+      # angeben: if-no-files-found:error schlägt nur an, wenn KEINER matcht.
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: mensaena-flutter-release-apk
-          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+          path: |
+            flutter_app/build/app/outputs/flutter-apk/app-release.apk
+            flutter_app/build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
 
       # ── GitHub Release: stable public download URL (nur auf main) ─────────
