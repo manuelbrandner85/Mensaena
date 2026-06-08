@@ -1,11 +1,10 @@
 name: 🔧 Agent Auto-Fix (rotes CI)
 
 # ════════════════════════════════════════════════════════════════════════
-# Wenn das Flutter-CI eines Agent-PRs (Branch agent/task-*) ROT wird, liest
-# dieser Workflow das Fehler-Log, lässt die Claude Code CLI den Fehler beheben
-# und pusht den Fix auf denselben Branch → CI läuft erneut. Ziel: im besten
-# Fall wird das CI grün, agent_automerge.yml merged automatisch und der
-# Shorebird-OTA-Patch macht die Änderung in der App aktiv.
+# Wenn das Flutter-CI eines Agent-PRs (Branch agent/task-*) ROT wird,
+# lässt dieser Workflow anthropics/claude-code-action@v1 den Fehler
+# beheben und pushen → CI läuft erneut.
+# Ziel: CI wird grün → agent_automerge.yml merged → OTA-Patch aktiv.
 #
 # Begrenzung: max. 3 automatische Versuche (admin_dev_tasks.ci_attempts).
 # Danach bleibt der PR offen zur manuellen Prüfung.
@@ -22,11 +21,12 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
   actions: read
+  id-token: write  # Pflicht für anthropics/claude-code-action (OIDC-Token)
 
 env:
   SUPABASE_REF: gyqujitkvymlmgroovch
-  AGENT_MODEL: claude-sonnet-4-6
   SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   MAX_ATTEMPTS: 3
 
@@ -52,7 +52,6 @@ jobs:
         run: |
           TASK_ID="${BRANCH#agent/task-}"
           echo "task_id=$TASK_ID" >> "$GITHUB_OUTPUT"
-          # aktuellen ci_attempts-Stand lesen
           ATTEMPTS=$(curl -sS \
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=ci_attempts,instruction" \
             -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}")
@@ -75,12 +74,6 @@ jobs:
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
             -d "{\"ci_status\":\"failure\",\"summary\":\"Auto-Fix nach ${MAX_ATTEMPTS} Versuchen erschöpft — PR bleibt offen zur manuellen Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
-      - name: Setup Node
-        if: steps.gate.outputs.proceed == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: CI-Fehler-Log holen
         if: steps.gate.outputs.proceed == 'true'
         env:
@@ -88,13 +81,8 @@ jobs:
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           gh run view "$RUN_ID" --repo "${{ github.repository }}" --log-failed > /tmp/ci_fail.log 2>&1 || true
-          # Nur die letzten 300 Zeilen sind relevant (Fehlermeldungen am Ende).
           tail -n 300 /tmp/ci_fail.log > /tmp/ci_fail_tail.log || true
           echo "Log-Zeilen: $(wc -l < /tmp/ci_fail_tail.log 2>/dev/null || echo 0)"
-
-      - name: Claude Code CLI installieren
-        if: steps.gate.outputs.proceed == 'true'
-        run: npm install -g @anthropic-ai/claude-code
 
       - name: Status -> running (Auto-Fix)
         if: steps.gate.outputs.proceed == 'true'
@@ -107,65 +95,38 @@ jobs:
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
             -d "{\"status\":\"running\",\"ci_status\":\"running\",\"ci_attempts\":${NEXT},\"summary\":\"Auto-Fix Versuch ${NEXT}/${MAX_ATTEMPTS} läuft …\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
-      - name: Fix-Prompt schreiben
-        if: steps.gate.outputs.proceed == 'true'
-        run: |
-          {
-            echo "Du bist der Mensaena-Reparatur-Agent. Das Flutter-CI für deinen"
-            echo "letzten Commit ist FEHLGESCHLAGEN. Behebe die Ursache, damit das CI"
-            echo "grün wird. Ändere nur, was nötig ist."
-            echo ""
-            echo "=== URSPRÜNGLICHE AUFGABE ==="
-            cat /tmp/instruction.txt
-            echo ""
-            echo "=== CI-FEHLER-LOG (Auszug) ==="
-            cat /tmp/ci_fail_tail.log
-            echo "=== ENDE LOG ==="
-            echo ""
-            echo "Regeln:"
-            echo "- Befolge CLAUDE.md (i18n-Pflicht in ALLEN 7 JSON-Dateien,"
-            echo "  Supabase-Stream-Limits mit .limit()+autoDispose, Design teal/primary,"
-            echo "  KEINE emerald-Farben)."
-            echo "- Typische Fehler: fehlende Imports, erfundene LucideIcons, falsche"
-            echo "  Typen, fehlende .tr()-Keys, Analyzer-Warnungen als Fehler."
-            echo "- Der Code MUSS kompilieren ('flutter analyze' sauber)."
-            echo "- Committe/pushe NICHT selbst — das übernimmt der Workflow."
-          } > /tmp/fix_prompt.txt
-
       - name: Auto-Fix ausführen
         if: steps.gate.outputs.proceed == 'true'
-        env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          set +e
-          claude -p "$(cat /tmp/fix_prompt.txt)" \
-            --model "$AGENT_MODEL" \
-            --dangerously-skip-permissions \
-            --max-turns 60 \
-            > /tmp/fix_output.log 2>&1
-          echo "Exit: $?"
-          tail -n 40 /tmp/fix_output.log || true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.AGENT_PAT }}
+          claude_args: "--max-turns 60"
+          prompt: |
+            Du bist der Mensaena-Reparatur-Agent. Das Flutter-CI für den Branch
+            ${{ github.event.workflow_run.head_branch }} ist FEHLGESCHLAGEN.
+            Behebe die Ursache, damit das CI grün wird. Ändere nur, was nötig ist.
 
-      - name: Fix committen & pushen
-        if: steps.gate.outputs.proceed == 'true'
-        env:
-          BRANCH: ${{ github.event.workflow_run.head_branch }}
+            Die ursprüngliche Aufgabe steht in /tmp/instruction.txt.
+            Das CI-Fehler-Log steht in /tmp/ci_fail_tail.log — lies es zuerst.
+
+            Regeln aus CLAUDE.md:
+            - i18n-Pflicht in ALLEN 7 JSON-Dateien, Supabase-Streams mit
+              .limit()+autoDispose, Design teal/primary, KEINE emerald-Farben.
+            - Typische Fehler: fehlende Imports, erfundene LucideIcons, falsche
+              Typen, fehlende .tr()-Keys, Analyzer-Warnungen als Fehler.
+            - Der Code MUSS kompilieren (flutter analyze sauber).
+            - Committe und pushe den Fix auf den Branch
+              ${{ github.event.workflow_run.head_branch }}.
+
+      - name: Status -> Fix committed
+        if: steps.gate.outputs.proceed == 'true' && success()
         run: |
           TASK_ID="${{ steps.gate.outputs.task_id }}"
           NEXT=$(( ${{ steps.gate.outputs.current }} + 1 ))
-          git config user.name "Mensaena Agent"
-          git config user.email "agent@mensaena.de"
-          if git diff --quiet && git diff --cached --quiet; then
-            echo "Auto-Fix hat keine Änderung erzeugt."
-            curl -sS -X PATCH \
-              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
-              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
-              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-              -d "{\"ci_status\":\"failure\",\"summary\":\"Auto-Fix Versuch ${NEXT}: keine Änderung möglich — PR bleibt offen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
-            exit 0
-          fi
-          git add -A
-          TASK_TITLE="$(printf '%s' "$(cat /tmp/instruction.txt)" | head -c 60 | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
-          git commit -m "agent: Fix CI – $TASK_TITLE (Versuch ${NEXT})"
-          git push origin "HEAD:${BRANCH}"
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"ci_status\":\"running\",\"summary\":\"Auto-Fix Versuch ${NEXT} gepusht — CI läuft erneut …\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
