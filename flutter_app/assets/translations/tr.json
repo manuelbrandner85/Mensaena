@@ -1464,6 +1464,33 @@
     "voice": {
       "tooltip": "Sesle yaz",
       "unavailable": "Sesli giriş kullanılamıyor."
+    },
+    "modules": {
+      "title": "Modül Zekası",
+      "subtitle": "YZ tüm uygulama modüllerini zayıf noktalar, eksik özellikler ve ilham için analiz eder",
+      "scanStart": "Akıllı tarama başlat",
+      "scanning": "Modüller analiz ediliyor …",
+      "scanDone": "Tarama tamamlandı — {count} bulgu",
+      "scanFailed": "Tarama başarısız.",
+      "scanStarted": "Modül taraması başlatıldı — birkaç dakika sürebilir.",
+      "empty": "Henüz bulgu yok. Bir tarama başlatın.",
+      "accept": "Görev olarak uygula",
+      "dismiss": "Yok say",
+      "insightsLabel": "Modül Bulgular",
+      "types": {
+        "improvement": "İyileştirme",
+        "new_module": "Yeni Modül",
+        "vulnerability": "Güvenlik Açığı",
+        "inspiration": "İlham"
+      },
+      "sources": {
+        "analysis": "Kod Analizi",
+        "github": "GitHub",
+        "research": "Araştırma"
+      },
+      "acceptedOk": "Görev oluşturuldu — uygulama başladı.",
+      "dismissedOk": "Yok sayıldı.",
+      "actionFailed": "İşlem başarısız."
     }
   },
   "create": {

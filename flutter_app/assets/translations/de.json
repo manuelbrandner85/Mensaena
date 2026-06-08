@@ -1464,6 +1464,33 @@
     "voice": {
       "tooltip": "Per Sprache diktieren",
       "unavailable": "Spracheingabe nicht verfügbar."
+    },
+    "modules": {
+      "title": "Modul-Intelligenz",
+      "subtitle": "KI analysiert alle App-Module auf Schwachstellen, fehlende Features & Inspiration",
+      "scanStart": "Intelligenz-Scan starten",
+      "scanning": "Module werden analysiert …",
+      "scanDone": "Scan abgeschlossen — {count} Erkenntnisse",
+      "scanFailed": "Scan fehlgeschlagen.",
+      "scanStarted": "Modul-Scan gestartet — das dauert einige Minuten.",
+      "empty": "Noch keine Erkenntnisse. Starte einen Scan.",
+      "accept": "Als Auftrag umsetzen",
+      "dismiss": "Verwerfen",
+      "insightsLabel": "Modul-Erkenntnisse",
+      "types": {
+        "improvement": "Verbesserung",
+        "new_module": "Neues Modul",
+        "vulnerability": "Schwachstelle",
+        "inspiration": "Inspiration"
+      },
+      "sources": {
+        "analysis": "Codeanalyse",
+        "github": "GitHub",
+        "research": "Recherche"
+      },
+      "acceptedOk": "Auftrag erstellt — Umsetzung läuft.",
+      "dismissedOk": "Verworfen.",
+      "actionFailed": "Aktion fehlgeschlagen."
     }
   },
   "create": {

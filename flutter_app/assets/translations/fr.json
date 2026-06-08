@@ -1465,6 +1465,33 @@
     "voice": {
       "tooltip": "Dicter à la voix",
       "unavailable": "Saisie vocale indisponible."
+    },
+    "modules": {
+      "title": "Intelligence Modules",
+      "subtitle": "L'IA analyse tous les modules pour déceler faiblesses, fonctionnalités manquantes et inspirations",
+      "scanStart": "Lancer le scan intelligent",
+      "scanning": "Analyse des modules …",
+      "scanDone": "Scan terminé — {count} insights",
+      "scanFailed": "Scan échoué.",
+      "scanStarted": "Scan des modules lancé — cela peut prendre quelques minutes.",
+      "empty": "Aucun insight pour l'instant. Lancez un scan.",
+      "accept": "Implémenter comme tâche",
+      "dismiss": "Ignorer",
+      "insightsLabel": "Insights Modules",
+      "types": {
+        "improvement": "Amélioration",
+        "new_module": "Nouveau Module",
+        "vulnerability": "Vulnérabilité",
+        "inspiration": "Inspiration"
+      },
+      "sources": {
+        "analysis": "Analyse du Code",
+        "github": "GitHub",
+        "research": "Recherche"
+      },
+      "acceptedOk": "Tâche créée — implémentation en cours.",
+      "dismissedOk": "Ignoré.",
+      "actionFailed": "Action échouée."
     }
   },
   "create": {
