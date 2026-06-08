@@ -105,4 +105,65 @@ class AiInsightsRepository {
       return const [];
     }
   }
+
+  // ── KI-Tiefenanalyse / Vorschläge (Admin) ──────────────────────────────────
+
+  /// Lädt offene KI-Vorschläge (optional nach Kategorie gefiltert) plus den
+  /// Status des letzten Scan-Laufs. Rückgabe: {suggestions: [...], scan: {...}}.
+  static Future<Map<String, dynamic>> fetchDevSuggestions(
+      {String? category}) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions', body: {
+            'action': 'list',
+            if (category != null) 'category': category,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevSuggestions failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Startet die Tiefenanalyse der gesamten App (triggert admin_scan.yml).
+  static Future<Map<String, dynamic>> scanApp() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions', body: {'action': 'scan'})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] scanApp failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Nimmt einen Vorschlag an → erzeugt einen Dev-Auftrag (PR → CI → OTA).
+  static Future<Map<String, dynamic>> acceptSuggestion(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions',
+              body: {'action': 'accept', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] acceptSuggestion failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lehnt einen Vorschlag ab.
+  static Future<Map<String, dynamic>> rejectSuggestion(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions',
+              body: {'action': 'reject', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] rejectSuggestion failed: $e');
+      return {'error': e.toString()};
+    }
+  }
 }

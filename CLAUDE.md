@@ -177,10 +177,13 @@ Leeres Array `[]` als Antwort = Erfolg. Token wird nur für die Dauer der Sitzun
 | `ANTHROPIC_API_KEY` | console.anthropic.com → API Keys (Alternative zum Abo-Token) | admin_agent.yml (Code-Agent) |
 | `AGENT_PAT` | GitHub → Settings → Developer settings → Fine-grained PAT (contents:write, pull-requests:write) auf `manuelbrandner85/Mensaena` | admin_agent.yml + agent_automerge.yml (Push/PR/Merge MÜSSEN über PAT laufen, sonst triggert das PR-CI nicht) |
 
-### Admin-Entwicklungs-Agent (Code aus dem Dashboard)
+### Admin-Entwicklungs-Agent „Godmode" (Code aus dem Dashboard)
 Admins (NUR `role='admin'`) können im Dashboard unter „KI-Entwicklungs-Agent"
-(`/dashboard/admin/dev-agent`) in natürlicher Sprache Features, Bugfixes, UI/UX
-und App-Konfiguration beauftragen. Ablauf:
+(`/dashboard/admin/dev-agent`) die gesamte App weiterentwickeln: Features,
+Bugfixes, UI/UX, Performance, i18n, Datenbank, Sicherheit, Konfiguration —
+kategorisiert über eine Chip-Leiste. Zwei Modi:
+
+**A) Freie Aufträge (natürliche Sprache):**
 1. Edge Function `admin-dev-agent` verifiziert Admin, legt `admin_dev_tasks`-Zeile
    an und triggert `admin_agent.yml` via `workflow_dispatch`.
 2. `admin_agent.yml` lässt die Claude Code CLI den Code ändern (liest CLAUDE.md
@@ -188,6 +191,23 @@ und App-Konfiguration beauftragen. Ablauf:
 3. Das echte Flutter-CI (`flutter.yml` Job `build`) ist das Sicherheits-Tor.
 4. `agent_automerge.yml` merged **NUR bei grünem CI**; sonst bleibt der PR offen.
 5. Merge auf `main` → `shorebird_patch.yml` liefert den Dart-Patch als OTA aus.
+
+**B) KI-Tiefenanalyse (Vorschläge zum Annehmen/Ablehnen):**
+1. „Scan starten" → Edge Function `admin-dev-suggestions` (action='scan')
+   verifiziert Admin, legt `admin_scan_runs`-Zeile an und triggert `admin_scan.yml`.
+2. `admin_scan.yml` lässt die Claude Code CLI die **gesamte** App lesen (jeden
+   Screen, jedes Detail) und schreibt konkrete Vorschläge (logische Fehler, Bugs,
+   UI/UX, Performance, i18n, DB, Security) als JSON nach `admin_dev_suggestions`.
+   Dieser Workflow ändert KEINEN Code und erstellt KEINEN PR — er analysiert nur.
+3. Der Admin sieht die Vorschläge (mit Kategorie + Severity) im Dashboard und
+   nimmt sie an (→ `admin-dev-suggestions` action='accept' → erzeugt einen
+   `admin_dev_tasks`-Auftrag → Pfad A ab Schritt 2) oder lehnt sie ab.
+
+Tabellen: `admin_dev_tasks`, `admin_dev_suggestions`, `admin_scan_runs`
+(alle RLS: nur `role='admin'` liest, Schreiben nur via service_role).
+Beide Scan-/Agent-Workflows brauchen dieselben Secrets (kein neues nötig):
+`CLAUDE_CODE_OAUTH_TOKEN` ODER `ANTHROPIC_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+(GitHub) sowie `GH_AGENT_TOKEN` (Supabase).
 
 **Supabase Project Secret (NICHT in GitHub):**
 - `GH_AGENT_TOKEN` — fine-grained PAT (contents:write, pull-requests:write,
