@@ -1261,6 +1261,28 @@
     "sug3": "Quante crisi attive ci sono adesso?",
     "sug4": "Quanti post sono stati creati oggi?"
   },
+  "adminDev": {
+    "title": "Agente di sviluppo IA",
+    "subtitle": "Descrivi cosa modificare nell'app — l'IA lo realizza e lo distribuisce con un aggiornamento.",
+    "placeholder": "es. \"Aggiungi un interruttore modalità scura al profilo\"",
+    "empty": "Ancora nessuna richiesta. Descrivi sotto una modifica, una nuova funzione o una correzione.",
+    "queued": "Richiesta avviata — l'IA ci sta lavorando.",
+    "failed": "Impossibile avviare la richiesta. Riprova.",
+    "notConfigured": "L'agente non è ancora configurato (token GitHub mancante).",
+    "openPr": "Vedi PR",
+    "openRun": "Vedi log",
+    "sug1": "Correggi i bug nel filtro del marketplace",
+    "sug2": "Aggiungi un interruttore modalità scura nelle impostazioni",
+    "sug3": "Ingrandisci i pulsanti nella schermata principale",
+    "status": {
+      "queued": "In coda",
+      "running": "IA al lavoro…",
+      "pr_open": "Verifica (CI)",
+      "merged": "Distribuito",
+      "failed": "Fallito",
+      "no_changes": "Nessuna modifica"
+    }
+  },
   "create": {
     "titleRequired": "Il titolo è obbligatorio.",
     "nameRequired": "Il nome è obbligatorio.",

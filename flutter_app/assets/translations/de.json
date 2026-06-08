@@ -1251,7 +1251,7 @@
   "adminNl": {
     "title": "KI-Analytik",
     "subtitle": "Frag die Daten auf Deutsch — ohne SQL",
-    "placeholder": "z. B. „Wie viele neue Nutzer diese Woche?"",
+    "placeholder": "z. B. „Wie viele neue Nutzer diese Woche?“",
     "thinking": "KI denkt nach…",
     "failed": "Keine Antwort erhalten. Bitte erneut versuchen.",
     "clear": "Leeren",
@@ -1259,6 +1259,28 @@
     "sug2": "Wie viele offene Meldungen gibt es?",
     "sug3": "Wie viele aktive Krisen laufen gerade?",
     "sug4": "Wie viele Beiträge wurden heute erstellt?"
+  },
+  "adminDev": {
+    "title": "KI-Entwicklungs-Agent",
+    "subtitle": "Beschreibe, was an der App geändert werden soll — die KI baut es und liefert es per Update aus.",
+    "placeholder": "z. B. „Füge dem Profil einen Dark-Mode-Schalter hinzu“",
+    "empty": "Noch keine Aufträge. Beschreibe unten eine Änderung, ein neues Feature oder einen Bugfix.",
+    "queued": "Auftrag gestartet — die KI arbeitet daran.",
+    "failed": "Auftrag konnte nicht gestartet werden. Bitte erneut versuchen.",
+    "notConfigured": "Der Agent ist noch nicht konfiguriert (GitHub-Token fehlt).",
+    "openPr": "PR ansehen",
+    "openRun": "Log ansehen",
+    "sug1": "Behebe Fehler im Marktplatz-Filter",
+    "sug2": "Füge einen Dark-Mode-Schalter in den Einstellungen hinzu",
+    "sug3": "Mache die Buttons auf der Startseite größer",
+    "status": {
+      "queued": "In Warteschlange",
+      "running": "KI arbeitet…",
+      "pr_open": "Wird geprüft (CI)",
+      "merged": "Ausgeliefert",
+      "failed": "Fehlgeschlagen",
+      "no_changes": "Keine Änderung"
+    }
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",

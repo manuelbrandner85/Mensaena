@@ -71,4 +71,38 @@ class AiInsightsRepository {
       return {'error': e.toString()};
     }
   }
+
+  // ── Entwicklungs-Agent (Admin) ────────────────────────────────────────────
+
+  /// Schickt einen Entwicklungs-Auftrag an den Admin-Dev-Agenten.
+  /// Triggert die GitHub Action (Code-Änderung → PR → CI → Auto-Merge → OTA).
+  static Future<Map<String, dynamic>> createDevTask(String instruction) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'instruction': instruction})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] createDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lädt die letzten Entwicklungs-Aufträge (Admin-only via RLS).
+  static Future<List<Map<String, dynamic>>> fetchDevTasks() async {
+    try {
+      final rows = await sb
+          .from('admin_dev_tasks')
+          .select('id, instruction, status, pr_url, pr_number, run_url, '
+              'error, summary, created_at, updated_at')
+          .order('created_at', ascending: false)
+          .limit(40);
+      return (rows as List)
+          .map((r) => Map<String, dynamic>.from(r as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevTasks failed: $e');
+      return const [];
+    }
+  }
 }

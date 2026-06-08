@@ -1,0 +1,175 @@
+name: 🤖 Admin Dev Agent
+
+# ════════════════════════════════════════════════════════════════════════
+# Wird vom Admin-Dashboard via Edge Function `admin-dev-agent` getriggert
+# (workflow_dispatch). Führt den Auftrag mit der Claude Code CLI aus,
+# ändert den Code (i. d. R. flutter_app/**), erstellt einen PR und meldet
+# den Status zurück an Supabase (admin_dev_tasks).
+#
+# Auto-Merge übernimmt `agent_automerge.yml` – NUR wenn das Flutter-CI
+# ("Flutter Android Build") grün ist. Danach liefert shorebird_patch.yml
+# die Dart-Änderung als lautlosen OTA-Patch an die App aus.
+#
+# Benötigte GitHub Secrets:
+#   CLAUDE_CODE_OAUTH_TOKEN    — Claude-Abo-Token (`claude setup-token`,
+#                                empfohlen, nutzt dein Pro/Max-Abo) ODER
+#   ANTHROPIC_API_KEY          — Anthropic-API-Key (pay-per-use). Eines genügt.
+#   AGENT_PAT                  — fine-grained PAT (contents:write,
+#                                pull-requests:write). Push/PR MÜSSEN über
+#                                den PAT laufen, damit das pull_request-CI
+#                                (flutter.yml) überhaupt triggert.
+#   SUPABASE_SERVICE_ROLE_KEY  — Statusupdates in admin_dev_tasks
+#
+# Hinweis: Die Aufgabe (inputs.instruction) wird AUSSCHLIESSLICH über
+# Umgebungsvariablen in Bash genutzt — niemals via ${{ }}-Interpolation in
+# run-Blöcken (Script-Injection-Schutz).
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      instruction:
+        description: 'Aufgabe vom Admin-Dashboard'
+        required: true
+      task_id:
+        description: 'admin_dev_tasks.id (UUID)'
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+  AGENT_MODEL: claude-sonnet-4-6
+  SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  TASK_ID: ${{ inputs.task_id }}
+  INSTRUCTION: ${{ inputs.instruction }}
+
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (mit PAT, damit PR-CI triggert)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AGENT_PAT }}
+          fetch-depth: 0
+
+      - name: Branch anlegen
+        id: branch
+        run: |
+          BR="agent/task-${TASK_ID}"
+          git config user.name "Mensaena Agent"
+          git config user.email "agent@mensaena.de"
+          git checkout -b "$BR"
+          echo "branch=$BR" >> "$GITHUB_OUTPUT"
+
+      - name: Status -> running
+        run: |
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"running\",\"branch\":\"${{ steps.branch.outputs.branch }}\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Claude Code CLI installieren
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Prompt schreiben (injection-sicher via env)
+        run: |
+          {
+            echo "Du bist der Mensaena-Entwicklungs-Agent. Ein Admin hat aus dem"
+            echo "Admin-Dashboard folgende Aufgabe gestellt. Setze sie vollständig um."
+            echo ""
+            echo "=== AUFGABE ==="
+            printf '%s\n' "$INSTRUCTION"
+            echo "=== ENDE AUFGABE ==="
+            echo ""
+            echo "Verbindliche Regeln:"
+            echo "- Befolge STRIKT die Projektregeln in CLAUDE.md, besonders:"
+            echo "  * i18n-Pflicht: JEDER neue user-facing String via easy_localization"
+            echo "    .tr() mit Key in ALLEN 7 Dateien"
+            echo "    (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json)."
+            echo "  * Supabase-Stream-Regeln (immer .limit(), autoDispose)."
+            echo "  * Design-System (primary/teal, KEINE emerald-Farben)."
+            echo "- Die meisten Änderungen betreffen die Flutter-App unter flutter_app/."
+            echo "- Halte die Änderung minimal und fokussiert auf die Aufgabe."
+            echo "- Der Flutter-Code MUSS kompilieren (keine fehlenden Imports, keine"
+            echo "  erfundenen LucideIcons, korrekte Typen). Dieser Code geht live an"
+            echo "  echte Nutzer."
+            echo "- Schreibe NIEMALS Secrets, Tokens oder Keys in den Code."
+            echo "- Committe NICHT und pushe NICHT selbst — das übernimmt der Workflow."
+          } > /tmp/agent_prompt.txt
+
+      - name: Agent ausführen
+        env:
+          # Abo-Token bevorzugt (nutzt Claude Pro/Max, kein API-Key nötig).
+          # Fällt automatisch auf den API-Key zurück, falls nur der gesetzt ist.
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set +e
+          claude -p "$(cat /tmp/agent_prompt.txt)" \
+            --model "$AGENT_MODEL" \
+            --dangerously-skip-permissions \
+            --max-turns 80 \
+            > /tmp/agent_output.log 2>&1
+          echo "Exit: $?"
+          echo "----- Agent-Ausgabe (letzte 60 Zeilen) -----"
+          tail -n 60 /tmp/agent_output.log || true
+
+      - name: Änderungen prüfen, committen, PR erstellen
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "Keine Änderungen vom Agenten."
+            echo "no_changes=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add -A
+          TITLE="$(printf '%s' "$INSTRUCTION" | head -c 60 | tr '\n' ' ')"
+          git commit -m "agent: Admin-Auftrag #${TASK_ID}" -m "$INSTRUCTION"
+          git push -u origin "${{ steps.branch.outputs.branch }}"
+
+          PR_BODY="$(printf '🤖 Automatisch erstellt durch den Admin-Dev-Agenten.\n\n**Auftrag:**\n%s\n\nAuto-Merge erfolgt automatisch, sobald das Flutter-CI grün ist.' "$INSTRUCTION")"
+          PR_URL="$(gh pr create \
+            --base main \
+            --head "${{ steps.branch.outputs.branch }}" \
+            --title "🤖 Agent: $TITLE" \
+            --body "$PR_BODY" \
+            --label "agent-automerge")"
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$(echo "$PR_URL" | grep -oE '[0-9]+$')" >> "$GITHUB_OUTPUT"
+
+      - name: Status -> pr_open / no_changes
+        run: |
+          if [ "${{ steps.pr.outputs.no_changes }}" = "true" ]; then
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"no_changes\",\"summary\":\"Der Agent hat keine Änderungen vorgenommen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          else
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"pr_open\",\"pr_url\":\"${{ steps.pr.outputs.pr_url }}\",\"pr_number\":${{ steps.pr.outputs.pr_number }},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          fi
+
+      - name: Status -> failed (bei Fehler)
+        if: failure()
+        run: |
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"failed\",\"error\":\"Workflow fehlgeschlagen. Siehe Action-Log.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

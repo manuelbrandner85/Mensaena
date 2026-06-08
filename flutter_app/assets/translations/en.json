@@ -1261,6 +1261,28 @@
     "sug3": "How many active crises are there right now?",
     "sug4": "How many posts were created today?"
   },
+  "adminDev": {
+    "title": "AI Development Agent",
+    "subtitle": "Describe what to change in the app — the AI builds it and ships it via update.",
+    "placeholder": "e.g. \"Add a dark-mode toggle to the profile\"",
+    "empty": "No tasks yet. Describe a change, a new feature, or a bug fix below.",
+    "queued": "Task started — the AI is working on it.",
+    "failed": "Could not start the task. Please try again.",
+    "notConfigured": "The agent is not configured yet (GitHub token missing).",
+    "openPr": "View PR",
+    "openRun": "View log",
+    "sug1": "Fix bugs in the marketplace filter",
+    "sug2": "Add a dark-mode toggle in settings",
+    "sug3": "Make the buttons on the home screen larger",
+    "status": {
+      "queued": "Queued",
+      "running": "AI working…",
+      "pr_open": "Checking (CI)",
+      "merged": "Shipped",
+      "failed": "Failed",
+      "no_changes": "No changes"
+    }
+  },
   "create": {
     "titleRequired": "Title is required.",
     "nameRequired": "Name is required.",
