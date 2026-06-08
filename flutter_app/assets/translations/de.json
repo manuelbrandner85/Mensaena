@@ -2610,6 +2610,8 @@
     "failed": "Update fehlgeschlagen.",
     "patchBannerTitle": "Verbesserung bereit",
     "patchBannerSubtitle": "Neustart für das neueste Update",
+    "patchDownloadingTitle": "Update wird geladen …",
+    "patchDownloadingSubtitle": "Eine neue Verbesserung kommt gerade rein",
     "patchRestart": "Neustarten",
     "closeApp": "App schließen",
     "installManualHint": "Nach der Installation startet die App automatisch aktualisiert. Falls der Installer nicht erscheint, schließe die App und öffne die heruntergeladene Datei manuell."

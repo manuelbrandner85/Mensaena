@@ -2611,6 +2611,8 @@
     "failed": "Échec de la mise à jour.",
     "patchBannerTitle": "Amélioration prête",
     "patchBannerSubtitle": "Redémarrez pour la dernière mise à jour",
+    "patchDownloadingTitle": "Téléchargement de la mise à jour …",
+    "patchDownloadingSubtitle": "Une nouvelle amélioration arrive",
     "patchRestart": "Redémarrer",
     "closeApp": "Fermer l'app",
     "installManualHint": "Après l'installation, l'application redémarre à jour. Si l'installeur n'apparaît pas, fermez l'app et ouvrez le fichier téléchargé manuellement."

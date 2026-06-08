@@ -2611,6 +2611,8 @@
     "failed": "Update failed.",
     "patchBannerTitle": "Improvement ready",
     "patchBannerSubtitle": "Restart for the latest update",
+    "patchDownloadingTitle": "Downloading update …",
+    "patchDownloadingSubtitle": "A new improvement is coming in",
     "patchRestart": "Restart",
     "closeApp": "Close app",
     "installManualHint": "After installation, the app will start with the latest version. If the installer doesn't appear, close the app and open the downloaded file manually."

@@ -2610,6 +2610,8 @@
     "failed": "Güncelleme başarısız.",
     "patchBannerTitle": "İyileştirme hazır",
     "patchBannerSubtitle": "En son güncelleme için yeniden başlat",
+    "patchDownloadingTitle": "Güncelleme indiriliyor …",
+    "patchDownloadingSubtitle": "Yeni bir iyileştirme geliyor",
     "patchRestart": "Yeniden başlat",
     "closeApp": "Uygulamayı kapat",
     "installManualHint": "Yüklemeden sonra uygulama güncel olarak başlar. Yükleyici görünmüyorsa uygulamayı kapat ve indirilen dosyayı elle aç."
