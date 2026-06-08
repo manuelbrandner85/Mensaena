@@ -811,6 +811,13 @@ class _QuickActions extends StatelessWidget {
             label: 'adminNl.title'.tr(),
             route: '/dashboard/admin/nl-analytics',
           ),
+          const SizedBox(height: 8),
+          // KI-Entwicklungs-Agent (nur Admin) — baut Features/Bugfixes/UI per OTA.
+          _ActionButton(
+            icon: LucideIcons.bot,
+            label: 'adminDev.title'.tr(),
+            route: '/dashboard/admin/dev-agent',
+          ),
         ],
       ),
     );

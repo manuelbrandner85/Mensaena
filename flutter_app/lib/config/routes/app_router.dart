@@ -11,6 +11,7 @@ import '../../screens/dashboard/board/board_create_screen.dart';
 import '../../screens/dashboard/board/board_detail_screen.dart';
 import '../../screens/dashboard/board/board_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_crisis_screen.dart';
+import '../../screens/dashboard/admin/admin_ai_dev_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_moderation_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_nl_screen.dart';
 import '../../screens/dashboard/admin/admin_ai_risk_screen.dart';
@@ -1370,6 +1371,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const AdminAiNlScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/admin/dev-agent',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const AdminAiDevScreen(),
         ),
       ),
       // Profile-Edit + Saved-Posts werden jetzt als Subroutes unter

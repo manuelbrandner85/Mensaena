@@ -1260,6 +1260,28 @@
     "sug3": "Şu anda kaç aktif kriz var?",
     "sug4": "Bugün kaç gönderi oluşturuldu?"
   },
+  "adminDev": {
+    "title": "YZ Geliştirme Asistanı",
+    "subtitle": "Uygulamada neyin değişeceğini anlat — YZ bunu oluşturur ve güncellemeyle yayınlar.",
+    "placeholder": "örn. \"Profile karanlık mod düğmesi ekle\"",
+    "empty": "Henüz görev yok. Aşağıda bir değişiklik, yeni özellik veya hata düzeltmesi tarif et.",
+    "queued": "Görev başlatıldı — YZ üzerinde çalışıyor.",
+    "failed": "Görev başlatılamadı. Lütfen tekrar deneyin.",
+    "notConfigured": "Asistan henüz yapılandırılmadı (GitHub jetonu eksik).",
+    "openPr": "PR'yi görüntüle",
+    "openRun": "Günlüğü görüntüle",
+    "sug1": "Pazar yeri filtresindeki hataları düzelt",
+    "sug2": "Ayarlara karanlık mod düğmesi ekle",
+    "sug3": "Ana ekrandaki düğmeleri büyüt",
+    "status": {
+      "queued": "Sırada",
+      "running": "YZ çalışıyor…",
+      "pr_open": "Kontrol ediliyor (CI)",
+      "merged": "Yayınlandı",
+      "failed": "Başarısız",
+      "no_changes": "Değişiklik yok"
+    }
+  },
   "create": {
     "titleRequired": "Başlık gerekli.",
     "nameRequired": "İsim gerekli.",

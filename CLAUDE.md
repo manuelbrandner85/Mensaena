@@ -172,7 +172,28 @@ Leeres Array `[]` als Antwort = Erfolg. Token wird nur für die Dauer der Sitzun
 | `ANDROID_KEY_ALIAS` | Key-Alias (Standard: `mensaena`) | flutter.yml + shorebird_*.yml |
 | `ANDROID_KEY_PASSWORD` | Key-Passwort | flutter.yml + shorebird_*.yml |
 | `SHOREBIRD_TOKEN` | `shorebird login:ci` → Token kopieren | shorebird_patch.yml + shorebird_release.yml |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Project Settings → API → service_role | flutter.yml (app_releases-Insert) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Project Settings → API → service_role | flutter.yml (app_releases-Insert) + admin_agent.yml |
+| `ANTHROPIC_API_KEY` | console.anthropic.com → API Keys | admin_agent.yml (Code-Agent) |
+| `AGENT_PAT` | GitHub → Settings → Developer settings → Fine-grained PAT (contents:write, pull-requests:write) auf `manuelbrandner85/Mensaena` | admin_agent.yml + agent_automerge.yml (Push/PR/Merge MÜSSEN über PAT laufen, sonst triggert das PR-CI nicht) |
+
+### Admin-Entwicklungs-Agent (Code aus dem Dashboard)
+Admins (NUR `role='admin'`) können im Dashboard unter „KI-Entwicklungs-Agent"
+(`/dashboard/admin/dev-agent`) in natürlicher Sprache Features, Bugfixes, UI/UX
+und App-Konfiguration beauftragen. Ablauf:
+1. Edge Function `admin-dev-agent` verifiziert Admin, legt `admin_dev_tasks`-Zeile
+   an und triggert `admin_agent.yml` via `workflow_dispatch`.
+2. `admin_agent.yml` lässt die Claude Code CLI den Code ändern (liest CLAUDE.md
+   automatisch → i18n/Stream-Regeln/Design gelten), erstellt einen PR (`agent/*`).
+3. Das echte Flutter-CI (`flutter.yml` Job `build`) ist das Sicherheits-Tor.
+4. `agent_automerge.yml` merged **NUR bei grünem CI**; sonst bleibt der PR offen.
+5. Merge auf `main` → `shorebird_patch.yml` liefert den Dart-Patch als OTA aus.
+
+**Supabase Project Secret (NICHT in GitHub):**
+- `GH_AGENT_TOKEN` — fine-grained PAT (contents:write, pull-requests:write,
+  **actions:write**) auf `manuelbrandner85/Mensaena`. Nutzt die Edge Function,
+  um den Workflow zu dispatchen. Setzen via Supabase Dashboard → Edge Functions
+  → Secrets (oder kann denselben Wert wie `AGENT_PAT` haben, sofern `actions:write`
+  ebenfalls aktiviert ist).
 
 ### Update-Flow (Flutter 4.0+)
 

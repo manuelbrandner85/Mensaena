@@ -1,0 +1,81 @@
+name: ✅ Agent Auto-Merge
+
+# ════════════════════════════════════════════════════════════════════════
+# Merged Agent-PRs (Branch `agent/*`, Label `agent-automerge`) automatisch –
+# ABER NUR wenn das Flutter-CI ("Flutter Android Build") grün ist und kein
+# anderer Check fehlgeschlagen ist. So geht niemals nicht-kompilierender
+# Code live an die Nutzer.
+#
+# Der Merge läuft über AGENT_PAT, damit der Push auf main anschließend
+# shorebird_patch.yml triggert → OTA-Patch an die App.
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_run:
+    workflows: ["Flutter Android Build"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      startsWith(github.event.workflow_run.head_branch, 'agent/task-')
+    steps:
+      - name: Auswerten & mergen
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+          TASK_ID="${BRANCH#agent/task-}"
+
+          patch_status() {
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "$1" || true
+          }
+
+          # 1) Flutter-CI muss grün sein
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "Flutter-CI nicht grün ($CONCLUSION) — kein Merge."
+            patch_status "{\"summary\":\"Flutter-CI fehlgeschlagen ($CONCLUSION) — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 0
+          fi
+
+          # 2) PR zum Branch finden
+          PR_NUM=$(gh pr list --repo "${{ github.repository }}" --head "$BRANCH" \
+                     --state open --json number --jq '.[0].number // empty')
+          if [ -z "$PR_NUM" ]; then
+            echo "Kein offener PR für $BRANCH — evtl. bereits gemergt."
+            exit 0
+          fi
+
+          # 3) Kein anderer abgeschlossener Check darf fehlgeschlagen sein
+          FAILED=$(gh api "repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs" \
+                     --jq '[.check_runs[] | select(.status=="completed") | select(.conclusion=="failure" or .conclusion=="cancelled" or .conclusion=="timed_out" or .conclusion=="action_required")] | length')
+          if [ "${FAILED:-0}" -gt 0 ]; then
+            echo "$FAILED fehlgeschlagene Checks — kein Merge."
+            patch_status "{\"summary\":\"Andere CI-Checks fehlgeschlagen — PR bleibt offen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 0
+          fi
+
+          # 4) Squash-Merge via PAT (triggert shorebird_patch.yml auf main)
+          echo "Alles grün — merge PR #$PR_NUM"
+          gh pr merge "$PR_NUM" --repo "${{ github.repository }}" \
+             --squash --delete-branch --admin
+
+          patch_status "{\"status\":\"merged\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

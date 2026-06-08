@@ -1261,6 +1261,28 @@
     "sug3": "Combien de crises actives en ce moment ?",
     "sug4": "Combien de publications ont été créées aujourd'hui ?"
   },
+  "adminDev": {
+    "title": "Agent de développement IA",
+    "subtitle": "Décris ce qu'il faut modifier dans l'app — l'IA le crée et le déploie via une mise à jour.",
+    "placeholder": "p. ex. « Ajoute un interrupteur mode sombre au profil »",
+    "empty": "Aucune tâche pour l'instant. Décris ci-dessous une modification, une nouvelle fonctionnalité ou une correction.",
+    "queued": "Tâche lancée — l'IA y travaille.",
+    "failed": "Impossible de lancer la tâche. Réessaie.",
+    "notConfigured": "L'agent n'est pas encore configuré (jeton GitHub manquant).",
+    "openPr": "Voir la PR",
+    "openRun": "Voir le journal",
+    "sug1": "Corrige les bugs du filtre de la place de marché",
+    "sug2": "Ajoute un interrupteur mode sombre dans les paramètres",
+    "sug3": "Agrandis les boutons de l'écran d'accueil",
+    "status": {
+      "queued": "En file",
+      "running": "IA au travail…",
+      "pr_open": "Vérification (CI)",
+      "merged": "Déployé",
+      "failed": "Échec",
+      "no_changes": "Aucune modification"
+    }
+  },
   "create": {
     "titleRequired": "Le titre est obligatoire.",
     "nameRequired": "Le nom est obligatoire.",
