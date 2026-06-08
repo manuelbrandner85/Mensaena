@@ -11,7 +11,9 @@ name: 🤖 Admin Dev Agent
 # die Dart-Änderung als lautlosen OTA-Patch an die App aus.
 #
 # Benötigte GitHub Secrets:
-#   ANTHROPIC_API_KEY          — für die Claude Code CLI
+#   CLAUDE_CODE_OAUTH_TOKEN    — Claude-Abo-Token (`claude setup-token`,
+#                                empfohlen, nutzt dein Pro/Max-Abo) ODER
+#   ANTHROPIC_API_KEY          — Anthropic-API-Key (pay-per-use). Eines genügt.
 #   AGENT_PAT                  — fine-grained PAT (contents:write,
 #                                pull-requests:write). Push/PR MÜSSEN über
 #                                den PAT laufen, damit das pull_request-CI
@@ -107,6 +109,9 @@ jobs:
 
       - name: Agent ausführen
         env:
+          # Abo-Token bevorzugt (nutzt Claude Pro/Max, kein API-Key nötig).
+          # Fällt automatisch auf den API-Key zurück, falls nur der gesetzt ist.
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set +e

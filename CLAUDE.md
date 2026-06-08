@@ -173,7 +173,8 @@ Leeres Array `[]` als Antwort = Erfolg. Token wird nur für die Dauer der Sitzun
 | `ANDROID_KEY_PASSWORD` | Key-Passwort | flutter.yml + shorebird_*.yml |
 | `SHOREBIRD_TOKEN` | `shorebird login:ci` → Token kopieren | shorebird_patch.yml + shorebird_release.yml |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Project Settings → API → service_role | flutter.yml (app_releases-Insert) + admin_agent.yml |
-| `ANTHROPIC_API_KEY` | console.anthropic.com → API Keys | admin_agent.yml (Code-Agent) |
+| `CLAUDE_CODE_OAUTH_TOKEN` | `claude setup-token` (nutzt Claude Pro/Max-Abo, **empfohlen** — kein API-Key/keine Pay-per-use) | admin_agent.yml (Code-Agent) |
+| `ANTHROPIC_API_KEY` | console.anthropic.com → API Keys (Alternative zum Abo-Token) | admin_agent.yml (Code-Agent) |
 | `AGENT_PAT` | GitHub → Settings → Developer settings → Fine-grained PAT (contents:write, pull-requests:write) auf `manuelbrandner85/Mensaena` | admin_agent.yml + agent_automerge.yml (Push/PR/Merge MÜSSEN über PAT laufen, sonst triggert das PR-CI nicht) |
 
 ### Admin-Entwicklungs-Agent (Code aus dem Dashboard)
