@@ -102,7 +102,10 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.AGENT_PAT }}
-          claude_args: "--max-turns 60"
+          # bypassPermissions: gleiche Begruendung wie admin_agent.yml — in der
+          # isolierten CI-Sandbox sollen keine Permission-Denials Turns verbrennen,
+          # sonst laeuft auch der Autofix-Agent unnoetig ins max-turns-Limit.
+          claude_args: "--max-turns 100 --permission-mode bypassPermissions"
           prompt: |
             Du bist der Mensaena-Reparatur-Agent. Das Flutter-CI für den Branch
             ${{ github.event.workflow_run.head_branch }} ist FEHLGESCHLAGEN.
