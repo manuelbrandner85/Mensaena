@@ -4178,9 +4178,8 @@ class _ModuleIntelligenceCard extends StatelessWidget {
                         Text(
                           'adminDev.modules.title'.tr(),
                           style: AppTypography.body(
-                              size: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.lightInk),
+                                  size: 13, color: AppColors.lightInk)
+                              .copyWith(fontWeight: FontWeight.w600),
                         ),
                         if (_scanning)
                           Text(
@@ -4387,10 +4386,8 @@ class _ModuleInsightCard extends StatelessWidget {
           const SizedBox(height: 7),
           Text(
             title,
-            style: AppTypography.body(
-                size: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.lightInk),
+            style: AppTypography.body(size: 12, color: AppColors.lightInk)
+                .copyWith(fontWeight: FontWeight.w600),
           ),
           if (description.isNotEmpty) ...[
             const SizedBox(height: 3),
@@ -4424,7 +4421,7 @@ class _ModuleInsightCard extends StatelessWidget {
               if (refUrl != null && refUrl.isNotEmpty) ...[
                 const SizedBox(width: 4),
                 GestureDetector(
-                  onTap: () => safeLaunch(context, refUrl),
+                  onTap: () => safeLaunch(refUrl),
                   child: Text(
                     '↗',
                     style: AppTypography.body(
