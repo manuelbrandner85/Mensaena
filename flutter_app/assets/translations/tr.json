@@ -1271,6 +1271,8 @@
     "openPr": "PR'ı gör",
     "openRun": "Günlüğü gör",
     "tasksLabel": "Görevler",
+    "clearDone": "Tamamlananları sil",
+    "deleteFailed": "Silinemedi.",
     "suggestions": "Yapay zekâ önerileri",
     "implement": "Uygula",
     "accept": "Kabul et",
@@ -1316,6 +1318,44 @@
       "merged": "Teslim edildi",
       "failed": "Başarısız",
       "no_changes": "Değişiklik yok"
+    },
+    "scanAnalyzing": "{file} analiz ediliyor",
+    "scanFilesRead": "{count} dosya analiz edildi",
+    "scanFoundSoFar": "{count} bulundu",
+    "scanWorking": "Aracı çalışıyor …",
+    "lastScan": "Son tarama: {count} öneri",
+    "select": "Seç",
+    "selectAll": "Tümü",
+    "clearSelection": "Temizle",
+    "selectedCount": "{count} seçildi",
+    "acceptedMany": "{count} kabul edildi — uygulanıyor.",
+    "cancel": "İptal",
+    "ci": {
+      "pending": "CI bekliyor",
+      "running": "CI çalışıyor",
+      "success": "CI başarılı",
+      "failure": "CI başarısız"
+    },
+    "stage": {
+      "agent": "Aracı",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Birleştir",
+      "ota": "OTA"
+    },
+    "why": "Neden",
+    "kind": {
+      "bug": "Hata/Bug",
+      "improvement": "İyileştirme",
+      "new": "Yenilik"
+    },
+    "chat": {
+      "title": "Godmode Sohbet",
+      "placeholder": "Görevini açıkla …",
+      "thinking": "Düşünüyor …",
+      "confirmYes": "Evet, uygula",
+      "confirmNo": "Düzenlemeye devam",
+      "error": "Yapay zeka şu anda erişilemiyor."
     }
   },
   "create": {

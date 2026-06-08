@@ -1272,6 +1272,8 @@
     "openPr": "View PR",
     "openRun": "View log",
     "tasksLabel": "Tasks",
+    "clearDone": "Clear completed",
+    "deleteFailed": "Could not delete.",
     "suggestions": "AI suggestions",
     "implement": "Implement",
     "accept": "Accept",
@@ -1317,6 +1319,44 @@
       "merged": "Delivered",
       "failed": "Failed",
       "no_changes": "No change"
+    },
+    "scanAnalyzing": "Analyzing {file}",
+    "scanFilesRead": "{count} files analyzed",
+    "scanFoundSoFar": "{count} found",
+    "scanWorking": "The agent is working …",
+    "lastScan": "Last scan: {count} suggestions",
+    "select": "Select",
+    "selectAll": "All",
+    "clearSelection": "Clear",
+    "selectedCount": "{count} selected",
+    "acceptedMany": "{count} accepted — work in progress.",
+    "cancel": "Cancel",
+    "ci": {
+      "pending": "CI pending",
+      "running": "CI running",
+      "success": "CI passed",
+      "failure": "CI failed"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
+    },
+    "why": "Why",
+    "kind": {
+      "bug": "Bug",
+      "improvement": "Improvement",
+      "new": "New"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Describe your task …",
+      "thinking": "Thinking …",
+      "confirmYes": "Yes, do it",
+      "confirmNo": "Keep refining",
+      "error": "The AI is currently unavailable."
     }
   },
   "create": {

@@ -1272,6 +1272,8 @@
     "openPr": "Voir la PR",
     "openRun": "Voir le journal",
     "tasksLabel": "Tâches",
+    "clearDone": "Effacer les terminées",
+    "deleteFailed": "Échec de la suppression.",
     "suggestions": "Suggestions IA",
     "implement": "Réaliser",
     "accept": "Accepter",
@@ -1317,6 +1319,44 @@
       "merged": "Livré",
       "failed": "Échoué",
       "no_changes": "Aucun changement"
+    },
+    "scanAnalyzing": "Analyse de {file}",
+    "scanFilesRead": "{count} fichiers analysés",
+    "scanFoundSoFar": "{count} trouvés",
+    "scanWorking": "L'agent travaille …",
+    "lastScan": "Dernière analyse : {count} suggestions",
+    "select": "Sélectionner",
+    "selectAll": "Tout",
+    "clearSelection": "Effacer",
+    "selectedCount": "{count} sélectionnés",
+    "acceptedMany": "{count} acceptés — exécution en cours.",
+    "cancel": "Annuler",
+    "ci": {
+      "pending": "CI en attente",
+      "running": "CI en cours",
+      "success": "CI réussi",
+      "failure": "CI échoué"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Fusion",
+      "ota": "OTA"
+    },
+    "why": "Pourquoi",
+    "kind": {
+      "bug": "Erreur/Bug",
+      "improvement": "Amélioration",
+      "new": "Nouveauté"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Décris ta tâche …",
+      "thinking": "Réflexion …",
+      "confirmYes": "Oui, exécuter",
+      "confirmNo": "Continuer à affiner",
+      "error": "L'IA est actuellement indisponible."
     }
   },
   "create": {

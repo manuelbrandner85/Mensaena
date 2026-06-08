@@ -1271,6 +1271,8 @@
     "openPr": "Открыть PR",
     "openRun": "Открыть лог",
     "tasksLabel": "Задачи",
+    "clearDone": "Удалить завершённые",
+    "deleteFailed": "Не удалось удалить.",
     "suggestions": "Предложения ИИ",
     "implement": "Внедрить",
     "accept": "Принять",
@@ -1316,6 +1318,44 @@
       "merged": "Доставлено",
       "failed": "Ошибка",
       "no_changes": "Без изменений"
+    },
+    "scanAnalyzing": "Анализ {file}",
+    "scanFilesRead": "Проанализировано файлов: {count}",
+    "scanFoundSoFar": "Найдено: {count}",
+    "scanWorking": "Агент работает …",
+    "lastScan": "Последний скан: {count} предложений",
+    "select": "Выбрать",
+    "selectAll": "Все",
+    "clearSelection": "Сброс",
+    "selectedCount": "Выбрано: {count}",
+    "acceptedMany": "Принято: {count} — выполняется.",
+    "cancel": "Отмена",
+    "ci": {
+      "pending": "CI ожидает",
+      "running": "CI выполняется",
+      "success": "CI пройден",
+      "failure": "CI провален"
+    },
+    "stage": {
+      "agent": "Агент",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Мердж",
+      "ota": "OTA"
+    },
+    "why": "Почему",
+    "kind": {
+      "bug": "Ошибка/Баг",
+      "improvement": "Улучшение",
+      "new": "Новое"
+    },
+    "chat": {
+      "title": "Godmode чат",
+      "placeholder": "Опиши задачу …",
+      "thinking": "Думает …",
+      "confirmYes": "Да, выполнить",
+      "confirmNo": "Уточнить дальше",
+      "error": "ИИ сейчас недоступен."
     }
   },
   "create": {

@@ -88,13 +88,29 @@ class AiInsightsRepository {
     }
   }
 
+  /// Chatbot-Modus: schickt den Gesprächsverlauf an die KI und bekommt eine
+  /// Antwort zurück. Erst wenn `ready==true` ist, liegt ein bestätigungsreifer
+  /// Auftrag (`instruction`) vor, den der Admin per createDevTask absenden kann.
+  static Future<Map<String, dynamic>> chatDev(
+      List<Map<String, String>> messages) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-chat', body: {'messages': messages})
+          .timeout(const Duration(seconds: 40));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] chatDev failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   /// Lädt die letzten Entwicklungs-Aufträge (Admin-only via RLS).
   static Future<List<Map<String, dynamic>>> fetchDevTasks() async {
     try {
       final rows = await sb
           .from('admin_dev_tasks')
           .select('id, instruction, status, pr_url, pr_number, run_url, '
-              'error, summary, created_at, updated_at')
+              'ci_status, ci_run_url, error, summary, created_at, updated_at')
           .order('created_at', ascending: false)
           .limit(40);
       return (rows as List)
@@ -103,6 +119,32 @@ class AiInsightsRepository {
     } catch (e) {
       debugPrint('[AiInsights] fetchDevTasks failed: $e');
       return const [];
+    }
+  }
+
+  /// Löscht einen einzelnen Entwicklungs-Auftrag (nur abgeschlossene).
+  static Future<Map<String, dynamic>> deleteDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht alle abgeschlossenen Aufträge (merged/failed/no_changes) auf einmal.
+  static Future<Map<String, dynamic>> clearDevTasks() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'clear'})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] clearDevTasks failed: $e');
+      return {'error': e.toString()};
     }
   }
 
@@ -163,6 +205,36 @@ class AiInsightsRepository {
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
     } catch (e) {
       debugPrint('[AiInsights] rejectSuggestion failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Nimmt mehrere Vorschläge auf einmal an (je ein Dev-Auftrag pro Vorschlag).
+  static Future<Map<String, dynamic>> acceptManySuggestions(
+      List<String> ids) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions',
+              body: {'action': 'accept_many', 'ids': ids})
+          .timeout(const Duration(seconds: 90));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] acceptManySuggestions failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lehnt mehrere Vorschläge auf einmal ab.
+  static Future<Map<String, dynamic>> rejectManySuggestions(
+      List<String> ids) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions',
+              body: {'action': 'reject_many', 'ids': ids})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] rejectManySuggestions failed: $e');
       return {'error': e.toString()};
     }
   }

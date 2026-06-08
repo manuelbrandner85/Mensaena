@@ -1272,6 +1272,8 @@
     "openPr": "Vedi PR",
     "openRun": "Vedi log",
     "tasksLabel": "Attività",
+    "clearDone": "Elimina completate",
+    "deleteFailed": "Eliminazione non riuscita.",
     "suggestions": "Suggerimenti IA",
     "implement": "Realizza",
     "accept": "Accetta",
@@ -1317,6 +1319,44 @@
       "merged": "Distribuito",
       "failed": "Fallito",
       "no_changes": "Nessuna modifica"
+    },
+    "scanAnalyzing": "Analisi di {file}",
+    "scanFilesRead": "{count} file analizzati",
+    "scanFoundSoFar": "{count} trovati",
+    "scanWorking": "L'agente sta lavorando …",
+    "lastScan": "Ultima scansione: {count} proposte",
+    "select": "Seleziona",
+    "selectAll": "Tutti",
+    "clearSelection": "Annulla",
+    "selectedCount": "{count} selezionati",
+    "acceptedMany": "{count} accettati — esecuzione in corso.",
+    "cancel": "Annulla",
+    "ci": {
+      "pending": "CI in attesa",
+      "running": "CI in corso",
+      "success": "CI superato",
+      "failure": "CI fallito"
+    },
+    "stage": {
+      "agent": "Agente",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
+    },
+    "why": "Perché",
+    "kind": {
+      "bug": "Errore/Bug",
+      "improvement": "Miglioramento",
+      "new": "Novità"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Descrivi il tuo compito …",
+      "thinking": "Sto pensando …",
+      "confirmYes": "Sì, esegui",
+      "confirmNo": "Continua a perfezionare",
+      "error": "L'IA non è al momento disponibile."
     }
   },
   "create": {

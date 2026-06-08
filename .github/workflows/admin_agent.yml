@@ -135,17 +135,26 @@ jobs:
             exit 0
           fi
           git add -A
-          TITLE="$(printf '%s' "$INSTRUCTION" | head -c 60 | tr '\n' ' ')"
-          git commit -m "agent: Admin-Auftrag #${TASK_ID}" -m "$INSTRUCTION"
+          TITLE="$(printf '%s' "$INSTRUCTION" | head -c 72 | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+          git commit -m "agent: $TITLE"
           git push -u origin "${{ steps.branch.outputs.branch }}"
 
           PR_BODY="$(printf '🤖 Automatisch erstellt durch den Admin-Dev-Agenten.\n\n**Auftrag:**\n%s\n\nAuto-Merge erfolgt automatisch, sobald das Flutter-CI grün ist.' "$INSTRUCTION")"
+          # Label idempotent sicherstellen (darf NIEMALS die PR-Erstellung
+          # blockieren — Auto-Merge erkennt Agent-PRs am Branch-Präfix, nicht
+          # am Label). Früher ließ ein fehlendes Label `gh pr create` mit Exit 1
+          # scheitern → Auftrag galt fälschlich als „fehlgeschlagen".
+          gh label create "agent-automerge" \
+            --color "1EAAA6" \
+            --description "Auto-Merge für Agent-PRs" \
+            --force >/dev/null 2>&1 || true
           PR_URL="$(gh pr create \
             --base main \
             --head "${{ steps.branch.outputs.branch }}" \
-            --title "🤖 Agent: $TITLE" \
-            --body "$PR_BODY" \
-            --label "agent-automerge")"
+            --title "$TITLE" \
+            --body "$PR_BODY")"
+          # Label nachträglich anhängen (rein kosmetisch, daher non-fatal).
+          gh pr edit "$PR_URL" --add-label "agent-automerge" >/dev/null 2>&1 || true
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
           echo "pr_number=$(echo "$PR_URL" | grep -oE '[0-9]+$')" >> "$GITHUB_OUTPUT"
 

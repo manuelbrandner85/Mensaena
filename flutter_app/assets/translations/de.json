@@ -1271,6 +1271,8 @@
     "openPr": "PR ansehen",
     "openRun": "Log ansehen",
     "tasksLabel": "Aufträge",
+    "clearDone": "Abgeschlossene löschen",
+    "deleteFailed": "Löschen fehlgeschlagen.",
     "suggestions": "KI-Vorschläge",
     "implement": "Umsetzen",
     "accept": "Annehmen",
@@ -1316,6 +1318,44 @@
       "merged": "Ausgeliefert",
       "failed": "Fehlgeschlagen",
       "no_changes": "Keine Änderung"
+    },
+    "scanAnalyzing": "Analysiere {file}",
+    "scanFilesRead": "{count} Dateien analysiert",
+    "scanFoundSoFar": "{count} gefunden",
+    "scanWorking": "Der Agent arbeitet …",
+    "lastScan": "Letzter Scan: {count} Vorschläge",
+    "select": "Auswählen",
+    "selectAll": "Alle",
+    "clearSelection": "Aufheben",
+    "selectedCount": "{count} ausgewählt",
+    "acceptedMany": "{count} angenommen — Umsetzung läuft.",
+    "cancel": "Abbrechen",
+    "ci": {
+      "pending": "CI ausstehend",
+      "running": "CI läuft",
+      "success": "CI grün",
+      "failure": "CI rot"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
+    },
+    "why": "Warum",
+    "kind": {
+      "bug": "Fehler/Bug",
+      "improvement": "Verbesserung",
+      "new": "Neuerung"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Beschreibe deine Aufgabe …",
+      "thinking": "Denkt nach …",
+      "confirmYes": "Ja, umsetzen",
+      "confirmNo": "Weiter anpassen",
+      "error": "Die KI ist gerade nicht erreichbar."
     }
   },
   "create": {
