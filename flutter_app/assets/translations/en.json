@@ -1410,7 +1410,62 @@
     "scanPhase": "Phase: {phase}",
     "scanLongHint": "Analysis may take a few minutes — please wait.",
     "retry": "Retry",
-    "duplicateWarning": "Similar task already exists: \"{task}\""
+    "duplicateWarning": "Similar task already exists: \"{task}\"",
+    "health": {
+      "title": "System Health",
+      "total": "Tasks",
+      "merged": "Shipped",
+      "active": "Active",
+      "failed": "Failed",
+      "successRate": "Success rate",
+      "avgMerge": "Avg. merge time",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "schedules": {
+      "title": "Recurring Tasks",
+      "add": "New schedule",
+      "empty": "No recurring tasks yet.",
+      "saveFailed": "Could not save schedule.",
+      "titleField": "Title",
+      "instructionField": "Task",
+      "weekday": "Weekday",
+      "hour": "Time",
+      "cadence": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "weekdays": {
+        "0": "Sun",
+        "1": "Mon",
+        "2": "Tue",
+        "3": "Wed",
+        "4": "Thu",
+        "5": "Fri",
+        "6": "Sat"
+      }
+    },
+    "rollback": {
+      "button": "Roll back",
+      "confirmTitle": "Roll back change?",
+      "confirmBody": "This merged change will be reverted and shipped as an OTA update. Continue?",
+      "confirm": "Roll back",
+      "failed": "Rollback failed."
+    },
+    "plan": {
+      "title": "Implementation plan",
+      "intro": "The AI would work through these steps:",
+      "confirm": "Confirm plan & start",
+      "toggle": "Plan mode (break into steps)"
+    },
+    "screens": {
+      "toggle": "Before/after screenshots"
+    },
+    "voice": {
+      "tooltip": "Dictate by voice",
+      "unavailable": "Voice input unavailable."
+    }
   },
   "create": {
     "titleRequired": "Title is required.",

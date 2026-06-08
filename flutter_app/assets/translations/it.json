@@ -1410,7 +1410,62 @@
     "scanPhase": "Fase: {phase}",
     "scanLongHint": "L'analisi può richiedere alcuni minuti — attendere.",
     "retry": "Riprova",
-    "duplicateWarning": "Attività simile già presente: \"{task}\""
+    "duplicateWarning": "Attività simile già presente: \"{task}\"",
+    "health": {
+      "title": "Salute del sistema",
+      "total": "Attività",
+      "merged": "Pubblicate",
+      "active": "Attive",
+      "failed": "Fallite",
+      "successRate": "Tasso di successo",
+      "avgMerge": "Tempo medio merge",
+      "accepted": "Accettati",
+      "rejected": "Rifiutati"
+    },
+    "schedules": {
+      "title": "Attività ricorrenti",
+      "add": "Nuova pianificazione",
+      "empty": "Nessuna attività ricorrente.",
+      "saveFailed": "Impossibile salvare la pianificazione.",
+      "titleField": "Titolo",
+      "instructionField": "Attività",
+      "weekday": "Giorno",
+      "hour": "Ora",
+      "cadence": {
+        "daily": "Giornaliera",
+        "weekly": "Settimanale",
+        "monthly": "Mensile"
+      },
+      "weekdays": {
+        "0": "Dom",
+        "1": "Lun",
+        "2": "Mar",
+        "3": "Mer",
+        "4": "Gio",
+        "5": "Ven",
+        "6": "Sab"
+      }
+    },
+    "rollback": {
+      "button": "Annulla",
+      "confirmTitle": "Annullare la modifica?",
+      "confirmBody": "Questa modifica verrà annullata (revert) e distribuita come aggiornamento OTA. Continuare?",
+      "confirm": "Annulla",
+      "failed": "Rollback fallito."
+    },
+    "plan": {
+      "title": "Piano di attuazione",
+      "intro": "L'IA seguirà questi passi:",
+      "confirm": "Conferma piano e avvia",
+      "toggle": "Modalità piano (in passi)"
+    },
+    "screens": {
+      "toggle": "Screenshot prima/dopo"
+    },
+    "voice": {
+      "tooltip": "Detta con la voce",
+      "unavailable": "Input vocale non disponibile."
+    }
   },
   "create": {
     "titleRequired": "Il titolo è obbligatorio.",

@@ -1,0 +1,103 @@
+name: ↩️ Admin Dev Rollback
+
+# ════════════════════════════════════════════════════════════════════════
+# Macht eine gemergte Godmode-Änderung rückgängig. Wird von der Edge Function
+# `admin-dev-agent` (action='rollback') via workflow_dispatch getriggert.
+#
+# Strategie: `git revert` des Merge-Commits auf einem neuen Branch
+# `agent/task-<task_id>`. Dadurch greift automatisch `agent_automerge.yml`
+# (gleiche Branch-Konvention) → bei grünem Flutter-CI wird der Revert gemergt
+# und per Shorebird-OTA an die App ausgeliefert.
+#
+# Secrets: AGENT_PAT (Push/PR, triggert PR-CI), SUPABASE_SERVICE_ROLE_KEY.
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: 'admin_dev_tasks.id des Rollback-Auftrags (UUID)'
+        required: true
+      sha:
+        description: 'Merge-Commit-SHA, der rückgängig gemacht werden soll'
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+  SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  TASK_ID: ${{ inputs.task_id }}
+  SHA: ${{ inputs.sha }}
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout (mit PAT, damit PR-CI triggert)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AGENT_PAT }}
+          fetch-depth: 0
+
+      - name: Status -> running
+        run: |
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"running\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Revert-Commit erstellen & PR öffnen
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+        run: |
+          set -euo pipefail
+          git config user.name "mensaena-agent"
+          git config user.email "agent@mensaena.de"
+
+          BRANCH="agent/task-${TASK_ID}"
+          git checkout -b "$BRANCH"
+
+          # Revert des (Squash-)Merge-Commits. -m 1 nur falls es ein echter
+          # Merge-Commit mit zwei Eltern ist; Squash-Commits haben nur einen.
+          if git revert --no-edit -m 1 "$SHA" 2>/dev/null; then
+            echo "Revert (merge-commit) ok"
+          elif git revert --no-edit "$SHA"; then
+            echo "Revert (single-parent) ok"
+          else
+            echo "::error title=Revert fehlgeschlagen::Konflikt beim git revert"
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"failed\",\"error\":\"Rollback-Konflikt — bitte manuell reverten.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 1
+          fi
+
+          git push -u origin "$BRANCH"
+
+          PR_URL=$(gh pr create --repo "${{ github.repository }}" \
+            --base main --head "$BRANCH" \
+            --title "Rollback: Revert ${SHA:0:8}" \
+            --body "Automatischer Rollback einer Godmode-Änderung (Commit ${SHA}). Auto-Merge erfolgt, sobald das Flutter-CI grün ist.")
+          echo "PR: $PR_URL"
+
+          PR_NUM=$(gh pr view "$PR_URL" --repo "${{ github.repository }}" --json number --jq '.number')
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"pr_open\",\"pr_url\":\"${PR_URL}\",\"pr_number\":${PR_NUM},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Status -> failed (bei Fehler)
+        if: failure()
+        run: |
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"failed\",\"error\":\"Rollback-Workflow fehlgeschlagen. Siehe Action-Log.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

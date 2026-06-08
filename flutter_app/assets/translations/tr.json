@@ -1409,7 +1409,62 @@
     "scanPhase": "Aşama: {phase}",
     "scanLongHint": "Analiz birkaç dakika sürebilir — lütfen bekleyin.",
     "retry": "Tekrar dene",
-    "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\""
+    "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
+    "health": {
+      "title": "Sistem Sağlığı",
+      "total": "Görevler",
+      "merged": "Yayınlandı",
+      "active": "Aktif",
+      "failed": "Başarısız",
+      "successRate": "Başarı oranı",
+      "avgMerge": "Ort. merge süresi",
+      "accepted": "Kabul",
+      "rejected": "Reddedildi"
+    },
+    "schedules": {
+      "title": "Tekrarlayan Görevler",
+      "add": "Yeni zamanlama",
+      "empty": "Henüz tekrarlayan görev yok.",
+      "saveFailed": "Zamanlama kaydedilemedi.",
+      "titleField": "Başlık",
+      "instructionField": "Görev",
+      "weekday": "Gün",
+      "hour": "Saat",
+      "cadence": {
+        "daily": "Günlük",
+        "weekly": "Haftalık",
+        "monthly": "Aylık"
+      },
+      "weekdays": {
+        "0": "Paz",
+        "1": "Pzt",
+        "2": "Sal",
+        "3": "Çar",
+        "4": "Per",
+        "5": "Cum",
+        "6": "Cmt"
+      }
+    },
+    "rollback": {
+      "button": "Geri al",
+      "confirmTitle": "Değişiklik geri alınsın mı?",
+      "confirmBody": "Bu birleştirilmiş değişiklik geri alınacak ve OTA güncellemesi olarak yayınlanacak. Devam edilsin mi?",
+      "confirm": "Geri al",
+      "failed": "Geri alma başarısız."
+    },
+    "plan": {
+      "title": "Uygulama planı",
+      "intro": "Yapay zeka şu adımları izleyecek:",
+      "confirm": "Planı onayla ve başlat",
+      "toggle": "Plan modu (adımlara böl)"
+    },
+    "screens": {
+      "toggle": "Önce/sonra ekran görüntüleri"
+    },
+    "voice": {
+      "tooltip": "Sesle yaz",
+      "unavailable": "Sesli giriş kullanılamıyor."
+    }
   },
   "create": {
     "titleRequired": "Başlık gerekli.",

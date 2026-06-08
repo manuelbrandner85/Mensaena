@@ -1410,7 +1410,62 @@
     "scanPhase": "Phase : {phase}",
     "scanLongHint": "L'analyse peut prendre quelques minutes — veuillez patienter.",
     "retry": "Réessayer",
-    "duplicateWarning": "Tâche similaire déjà présente : « {task} »"
+    "duplicateWarning": "Tâche similaire déjà présente : « {task} »",
+    "health": {
+      "title": "Santé du système",
+      "total": "Tâches",
+      "merged": "Livrées",
+      "active": "Actives",
+      "failed": "Échouées",
+      "successRate": "Taux de réussite",
+      "avgMerge": "Temps moyen merge",
+      "accepted": "Acceptées",
+      "rejected": "Rejetées"
+    },
+    "schedules": {
+      "title": "Tâches récurrentes",
+      "add": "Nouvelle planification",
+      "empty": "Aucune tâche récurrente.",
+      "saveFailed": "Impossible de sauvegarder la planification.",
+      "titleField": "Titre",
+      "instructionField": "Tâche",
+      "weekday": "Jour",
+      "hour": "Heure",
+      "cadence": {
+        "daily": "Quotidienne",
+        "weekly": "Hebdomadaire",
+        "monthly": "Mensuelle"
+      },
+      "weekdays": {
+        "0": "Dim",
+        "1": "Lun",
+        "2": "Mar",
+        "3": "Mer",
+        "4": "Jeu",
+        "5": "Ven",
+        "6": "Sam"
+      }
+    },
+    "rollback": {
+      "button": "Annuler",
+      "confirmTitle": "Annuler la modification ?",
+      "confirmBody": "Cette modification fusionnée sera annulée (revert) et livrée via une mise à jour OTA. Continuer ?",
+      "confirm": "Annuler",
+      "failed": "Échec du rollback."
+    },
+    "plan": {
+      "title": "Plan de mise en œuvre",
+      "intro": "L'IA suivrait ces étapes :",
+      "confirm": "Confirmer le plan et démarrer",
+      "toggle": "Mode plan (en étapes)"
+    },
+    "screens": {
+      "toggle": "Captures avant/après"
+    },
+    "voice": {
+      "tooltip": "Dicter à la voix",
+      "unavailable": "Saisie vocale indisponible."
+    }
   },
   "create": {
     "titleRequired": "Le titre est obligatoire.",

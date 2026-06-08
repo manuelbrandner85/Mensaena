@@ -130,6 +130,33 @@ jobs:
             echo "des Codes ausgiebig — sei gründlich, geh in die Tiefe."
           } > /tmp/scan_prompt.txt
 
+          # ── Selbstlernend: bereits abgelehnte/angenommene Vorschläge laden ──
+          # Der Agent soll abgelehnte NIEMALS erneut vorschlagen und bereits
+          # angenommene/umgesetzte nicht duplizieren.
+          REJECTED=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_suggestions?select=title&status=eq.rejected&order=reviewed_at.desc&limit=80" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(a.map(x=>"- "+x.title).join("\n"))}catch{process.stdout.write("")}})' || true)
+          ACCEPTED=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_suggestions?select=title&status=eq.accepted&order=reviewed_at.desc&limit=80" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(a.map(x=>"- "+x.title).join("\n"))}catch{process.stdout.write("")}})' || true)
+          {
+            echo ""
+            echo "=== SELBSTLERNEND — NICHT WIEDERHOLEN ==="
+            if [ -n "$REJECTED" ]; then
+              echo "Diese Vorschläge wurden vom Admin ABGELEHNT. Schlage sie NIEMALS"
+              echo "erneut vor (auch nicht ähnlich formuliert):"
+              echo "$REJECTED"
+              echo ""
+            fi
+            if [ -n "$ACCEPTED" ]; then
+              echo "Diese Vorschläge wurden bereits ANGENOMMEN/umgesetzt. Dupliziere"
+              echo "sie nicht — schlage höchstens sinnvolle Folge-Verbesserungen vor:"
+              echo "$ACCEPTED"
+            fi
+          } >> /tmp/scan_prompt.txt
+
       # Live-Fortschritt-Tailer: liest den stream-json-Output der Claude CLI,
       # erkennt jede gelesene Datei (Read/Grep/Glob) und schreibt laufend
       # current_file + analyzed_files + heartbeat nach admin_scan_runs. So sieht
