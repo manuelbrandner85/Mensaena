@@ -88,6 +88,22 @@ class AiInsightsRepository {
     }
   }
 
+  /// Chatbot-Modus: schickt den Gesprächsverlauf an die KI und bekommt eine
+  /// Antwort zurück. Erst wenn `ready==true` ist, liegt ein bestätigungsreifer
+  /// Auftrag (`instruction`) vor, den der Admin per createDevTask absenden kann.
+  static Future<Map<String, dynamic>> chatDev(
+      List<Map<String, String>> messages) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-chat', body: {'messages': messages})
+          .timeout(const Duration(seconds: 40));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] chatDev failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   /// Lädt die letzten Entwicklungs-Aufträge (Admin-only via RLS).
   static Future<List<Map<String, dynamic>>> fetchDevTasks() async {
     try {

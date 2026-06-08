@@ -1346,6 +1346,14 @@
       "bug": "Hata/Bug",
       "improvement": "İyileştirme",
       "new": "Yenilik"
+    },
+    "chat": {
+      "title": "Godmode Sohbet",
+      "placeholder": "Görevini açıkla …",
+      "thinking": "Düşünüyor …",
+      "confirmYes": "Evet, uygula",
+      "confirmNo": "Düzenlemeye devam",
+      "error": "Yapay zeka şu anda erişilemiyor."
     }
   },
   "create": {

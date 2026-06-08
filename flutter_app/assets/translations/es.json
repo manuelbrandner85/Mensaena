@@ -1347,6 +1347,14 @@
       "bug": "Error/Bug",
       "improvement": "Mejora",
       "new": "Novedad"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Describe tu tarea …",
+      "thinking": "Pensando …",
+      "confirmYes": "Sí, hazlo",
+      "confirmNo": "Seguir ajustando",
+      "error": "La IA no está disponible ahora."
     }
   },
   "create": {

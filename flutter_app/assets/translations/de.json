@@ -1346,6 +1346,14 @@
       "bug": "Fehler/Bug",
       "improvement": "Verbesserung",
       "new": "Neuerung"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Beschreibe deine Aufgabe …",
+      "thinking": "Denkt nach …",
+      "confirmYes": "Ja, umsetzen",
+      "confirmNo": "Weiter anpassen",
+      "error": "Die KI ist gerade nicht erreichbar."
     }
   },
   "create": {

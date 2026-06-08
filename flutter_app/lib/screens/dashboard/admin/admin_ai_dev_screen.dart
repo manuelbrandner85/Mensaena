@@ -331,39 +331,44 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     );
   }
 
+  String _categoryPrefix() {
+    if (_categoryKey == 'all') return '';
+    final bc = _builtinCategory;
+    final label = bc != null
+        ? bc.englishName
+        : (_categories.firstWhere(
+            (c) => c['key'] == _categoryKey,
+            orElse: () => {'label': _categoryKey},
+          )['label'] as String);
+    return '[$label] ';
+  }
+
+  // Manueller Eingang → Chatbot-Modus: erst nachfragen, dann bei „Ja" absenden.
   Future<void> _send([String? preset]) async {
     final text = (preset ?? _ctrl.text).trim();
     if (text.isEmpty || _sending) return;
+    _ctrl.clear();
+    FocusScope.of(context).unfocus();
     setState(() => _sending = true);
-
-    String prefix = '';
-    if (_categoryKey != 'all') {
-      final bc = _builtinCategory;
-      final label = bc != null
-          ? bc.englishName
-          : (_categories.firstWhere(
-              (c) => c['key'] == _categoryKey,
-              orElse: () => {'label': _categoryKey},
-            )['label'] as String);
-      prefix = '[$label] ';
-    }
-    final res = await AiInsightsRepository.createDevTask('$prefix$text');
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _DevChatSheet(
+        initialText: text,
+        onConfirm: _confirmChatTask,
+      ),
+    );
     if (!mounted) return;
-
-    final error = res['error'] as String?;
-    final ok = res['ok'] == true;
     setState(() => _sending = false);
+    await _refresh(silent: true);
+  }
 
-    if (ok) {
-      _ctrl.clear();
-      FocusScope.of(context).unfocus();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.queued'.tr())),
-      );
-      await _refresh(silent: true);
-    } else {
-      _showError(error);
-    }
+  // Wird vom Chat-Sheet aufgerufen, sobald der Admin „Ja, umsetzen" tippt.
+  Future<bool> _confirmChatTask(String instruction) async {
+    final res =
+        await AiInsightsRepository.createDevTask('${_categoryPrefix()}$instruction');
+    return res['ok'] == true;
   }
 
   String get _placeholder {
@@ -582,7 +587,7 @@ class _CategoryRow extends StatelessWidget {
           ...extras.map((c) => _chip(
                 key: c['key'] as String? ?? '',
                 label: (c['label'] as String?) ?? (c['key'] as String? ?? ''),
-                icon: LucideIcons.sparkle,
+                icon: LucideIcons.sparkles,
                 active: c['key'] == selectedKey,
                 isNew: true,
               )),
@@ -761,7 +766,7 @@ class _LiveScanCardState extends State<_LiveScanCard>
                   ? FadeTransition(
                       opacity:
                           Tween(begin: 0.35, end: 1.0).animate(_ac),
-                      child: const Icon(LucideIcons.radar,
+                      child: const Icon(LucideIcons.scanLine,
                           size: 20, color: AppColors.teal),
                     )
                   : const Icon(LucideIcons.scanLine,
@@ -940,7 +945,7 @@ class _SuggestionsHeader extends StatelessWidget {
           TextButton.icon(
             onPressed: onToggleMode,
             icon: Icon(
-                selectionMode ? LucideIcons.x : LucideIcons.listChecks,
+                selectionMode ? LucideIcons.x : LucideIcons.checkCircle2,
                 size: 13),
             label: Text(
               selectionMode ? 'adminDev.cancel'.tr() : 'adminDev.select'.tr(),
@@ -1064,7 +1069,7 @@ class _SuggestionCard extends StatelessWidget {
                 Icon(
                   selected
                       ? LucideIcons.checkSquare
-                      : LucideIcons.square,
+                      : LucideIcons.circle,
                   size: 18,
                   color: selected ? AppColors.teal : AppColors.lightMute,
                 ),
@@ -1238,7 +1243,7 @@ class _SuggestionCard extends StatelessWidget {
       case 'new':
         return LucideIcons.sparkles;
       default: // improvement
-        return LucideIcons.wrench;
+        return LucideIcons.settings;
     }
   }
 }
@@ -1744,6 +1749,334 @@ class _InputBar extends StatelessWidget {
                 : const Icon(LucideIcons.send, size: 18, color: Colors.white),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Chat-Sheet (manueller Modus, Bestätigung wie bei Claude) ────────────────
+
+class _DevChatSheet extends StatefulWidget {
+  const _DevChatSheet({required this.initialText, required this.onConfirm});
+  final String initialText;
+  final Future<bool> Function(String) onConfirm;
+
+  @override
+  State<_DevChatSheet> createState() => _DevChatSheetState();
+}
+
+class _DevChatSheetState extends State<_DevChatSheet> {
+  final _ctrl = TextEditingController();
+  final _scroll = ScrollController();
+  final List<Map<String, String>> _messages = [];
+  bool _sending = false;
+  bool _ready = false;
+  bool _confirming = false;
+  String _instruction = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialText.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _sendMessage(widget.initialText),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _scrollToEnd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scroll.hasClients) {
+        _scroll.animateTo(
+          _scroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<void> _sendMessage([String? preset]) async {
+    final text = (preset ?? _ctrl.text).trim();
+    if (text.isEmpty || _sending) return;
+    setState(() {
+      _messages.add({'role': 'user', 'content': text});
+      _sending = true;
+      _ready = false;
+      _ctrl.clear();
+    });
+    _scrollToEnd();
+    final res = await AiInsightsRepository.chatDev(_messages);
+    if (!mounted) return;
+    final reply = (res['reply'] as String?) ?? 'adminDev.chat.error'.tr();
+    setState(() {
+      _messages.add({'role': 'assistant', 'content': reply});
+      _ready = res['ready'] == true;
+      _instruction = (res['instruction'] as String?) ?? '';
+      _sending = false;
+    });
+    _scrollToEnd();
+  }
+
+  Future<void> _confirm() async {
+    if (_instruction.isEmpty || _confirming) return;
+    setState(() => _confirming = true);
+    final ok = await widget.onConfirm(_instruction);
+    if (!mounted) return;
+    setState(() => _confirming = false);
+    if (ok) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.queued'.tr())),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('adminDev.failed'.tr()),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.82,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 8, 8),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.bot, size: 18, color: AppColors.teal),
+                  const SizedBox(width: 8),
+                  Text(
+                    'adminDev.chat.title'.tr(),
+                    style: AppTypography.body(
+                        size: 14,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w700),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(LucideIcons.x, size: 18),
+                    color: AppColors.lightMute,
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView.builder(
+                controller: _scroll,
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                itemCount: _messages.length + (_sending ? 1 : 0),
+                itemBuilder: (context, i) {
+                  if (i >= _messages.length) return const _ChatThinking();
+                  final m = _messages[i];
+                  return _ChatBubble(
+                    text: m['content'] ?? '',
+                    isUser: m['role'] == 'user',
+                  );
+                },
+              ),
+            ),
+            if (_ready)
+              Container(
+                padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+                decoration: BoxDecoration(
+                  color: AppColors.teal.withValues(alpha: 0.06),
+                  border: Border(
+                      top: BorderSide(
+                          color: AppColors.teal.withValues(alpha: 0.2))),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: _confirming ? null : _confirm,
+                        icon: _confirming
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white))
+                            : const Icon(LucideIcons.check, size: 15),
+                        label: Text('adminDev.chat.confirmYes'.tr()),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.teal,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    OutlinedButton(
+                      onPressed: _confirming
+                          ? null
+                          : () => setState(() => _ready = false),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.lightMute,
+                        side: BorderSide(color: Colors.grey.shade300),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                      ),
+                      child: Text('adminDev.chat.confirmNo'.tr()),
+                    ),
+                  ],
+                ),
+              ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: Colors.grey.shade200)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _ctrl,
+                      enabled: !_sending,
+                      maxLines: 4,
+                      minLines: 1,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(),
+                      decoration: InputDecoration(
+                        hintText: 'adminDev.chat.placeholder'.tr(),
+                        hintStyle: AppTypography.body(
+                            size: 13, color: AppColors.lightMute),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(22),
+                          borderSide: const BorderSide(color: AppColors.teal),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _sending ? null : () => _sendMessage(),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.teal,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(13),
+                    ),
+                    child: const Icon(LucideIcons.send,
+                        size: 17, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChatBubble extends StatelessWidget {
+  const _ChatBubble({required this.text, required this.isUser});
+  final String text;
+  final bool isUser;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.78,
+        ),
+        decoration: BoxDecoration(
+          color: isUser ? AppColors.teal : Colors.grey.shade100,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(14),
+            topRight: const Radius.circular(14),
+            bottomLeft: Radius.circular(isUser ? 14 : 4),
+            bottomRight: Radius.circular(isUser ? 4 : 14),
+          ),
+        ),
+        child: Text(
+          text,
+          style: AppTypography.body(
+            size: 13,
+            color: isUser ? Colors.white : AppColors.lightInk,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChatThinking extends StatelessWidget {
+  const _ChatThinking();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 13,
+              height: 13,
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, color: AppColors.teal),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'adminDev.chat.thinking'.tr(),
+              style: AppTypography.body(size: 12, color: AppColors.lightMute),
+            ),
+          ],
+        ),
       ),
     );
   }

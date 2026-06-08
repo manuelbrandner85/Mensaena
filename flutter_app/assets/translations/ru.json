@@ -1346,6 +1346,14 @@
       "bug": "Ошибка/Баг",
       "improvement": "Улучшение",
       "new": "Новое"
+    },
+    "chat": {
+      "title": "Godmode чат",
+      "placeholder": "Опиши задачу …",
+      "thinking": "Думает …",
+      "confirmYes": "Да, выполнить",
+      "confirmNo": "Уточнить дальше",
+      "error": "ИИ сейчас недоступен."
     }
   },
   "create": {
