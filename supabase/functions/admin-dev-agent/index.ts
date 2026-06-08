@@ -19,12 +19,38 @@
 //                     actions:write) auf manuelbrandner85/Mensaena.
 // ════════════════════════════════════════════════════════════════════════
 import { CORS, json, getUser, adminClient } from '../_shared/util.ts'
+import { callAiChain, parseAiJson } from '../_shared/ai.ts'
 
 const GH_OWNER = 'manuelbrandner85'
 const GH_REPO = 'Mensaena'
 const GH_WORKFLOW = 'admin_agent.yml'
+const GH_ROLLBACK_WORKFLOW = 'admin_rollback.yml'
 const GH_REF = 'main'
 const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}`
+
+// Berechnet den nächsten Lauf-Zeitpunkt (UTC) für einen Schedule.
+// deno-lint-ignore no-explicit-any
+function computeNextRun(s: any): string {
+  const now = new Date()
+  const next = new Date(Date.UTC(
+    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+    Number(s.hour_utc ?? 6), 0, 0, 0,
+  ))
+  const cadence = String(s.cadence ?? 'weekly')
+  if (cadence === 'daily') {
+    if (next <= now) next.setUTCDate(next.getUTCDate() + 1)
+  } else if (cadence === 'weekly') {
+    const target = Number(s.day_of_week ?? 1) // 0=So..6=Sa
+    let delta = (target - next.getUTCDay() + 7) % 7
+    if (delta === 0 && next <= now) delta = 7
+    next.setUTCDate(next.getUTCDate() + delta)
+  } else { // monthly
+    const dom = Math.min(Math.max(Number(s.day_of_month ?? 1), 1), 28)
+    next.setUTCDate(dom)
+    if (next <= now) next.setUTCMonth(next.getUTCMonth() + 1, dom)
+  }
+  return next.toISOString()
+}
 
 function ghHeaders(token: string): HeadersInit {
   return {
@@ -119,6 +145,191 @@ Deno.serve(async (req) => {
     return json({ ok: true, deleted: 1 })
   }
 
+  // ── Health-/Metrics-Dashboard ─────────────────────────────────────────────
+  if (action === 'metrics') {
+    const { data: tasks } = await admin
+      .from('admin_dev_tasks')
+      .select('status, created_at, updated_at')
+      .order('created_at', { ascending: false })
+      .limit(500)
+    const { data: sugs } = await admin
+      .from('admin_dev_suggestions')
+      .select('status')
+      .limit(1000)
+
+    const rows = tasks ?? []
+    const byStatus: Record<string, number> = {}
+    let mergedDurSum = 0, mergedDurCount = 0
+    for (const t of rows) {
+      const s = String(t.status ?? 'queued')
+      byStatus[s] = (byStatus[s] ?? 0) + 1
+      if (s === 'merged' && t.created_at && t.updated_at) {
+        const d = (new Date(t.updated_at).getTime() - new Date(t.created_at).getTime()) / 1000
+        if (d > 0 && d < 86400) { mergedDurSum += d; mergedDurCount++ }
+      }
+    }
+    const total = rows.length
+    const merged = byStatus['merged'] ?? 0
+    const failed = (byStatus['failed'] ?? 0) + (byStatus['no_changes'] ?? 0)
+    const finished = merged + failed + (byStatus['cancelled'] ?? 0)
+    const successRate = finished > 0 ? Math.round((merged / finished) * 100) : 0
+    const avgMergeMin = mergedDurCount > 0 ? Math.round(mergedDurSum / mergedDurCount / 60) : 0
+
+    const sugRows = sugs ?? []
+    const accepted = sugRows.filter((s) => s.status === 'accepted').length
+    const rejected = sugRows.filter((s) => s.status === 'rejected').length
+
+    return json({
+      ok: true,
+      metrics: {
+        total, merged, failed,
+        active: (byStatus['queued'] ?? 0) + (byStatus['running'] ?? 0) +
+          (byStatus['pr_open'] ?? 0) + (byStatus['awaiting_review'] ?? 0),
+        success_rate: successRate,
+        avg_merge_minutes: avgMergeMin,
+        suggestions_accepted: accepted,
+        suggestions_rejected: rejected,
+      },
+    })
+  }
+
+  // ── Plan-Generierung (Multi-Step) ─────────────────────────────────────────
+  // Zerlegt eine Aufgabe in eine nachvollziehbare Schritt-Liste (JSON).
+  if (action === 'plan') {
+    const instruction = String(body?.instruction ?? '').trim().slice(0, 4000)
+    if (instruction.length < 5) return json({ error: 'instruction_required' }, 400)
+
+    const sys = `Du bist ein Senior-Softwarearchitekt für die Flutter-App Mensaena.
+Zerlege die Aufgabe des Admins in 2–6 konkrete, logisch aufeinander aufbauende
+Umsetzungs-Schritte. Jeder Schritt ist eine kurze, prägnante deutsche
+Handlungsanweisung (z. B. "Datenmodell erweitern", "UI-Karte bauen",
+"Übersetzungen in 7 Sprachen ergänzen"). Keine Erklärungen, nur die Schritte.
+Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
+    const { text } = await callAiChain(sys, instruction, {
+      jsonMode: true, timeoutMs: 20_000,
+    })
+    const parsed = parseAiJson<{ steps?: string[] }>(text ?? '')
+    const steps = Array.isArray(parsed?.steps)
+      ? parsed!.steps.map((s) => String(s).slice(0, 200)).filter(Boolean).slice(0, 6)
+      : []
+    if (steps.length === 0) {
+      return json({ ok: true, steps: [], fallback: true })
+    }
+    return json({ ok: true, steps })
+  }
+
+  // ── Wiederkehrende Aufträge (Schedules) ────────────────────────────────────
+  if (action === 'schedules_list') {
+    const { data, error } = await admin
+      .from('admin_dev_schedules')
+      .select('id, title, instruction, cadence, day_of_week, day_of_month, ' +
+        'hour_utc, await_review, enabled, last_run_at, next_run_at, created_at')
+      .order('created_at', { ascending: false })
+      .limit(100)
+    if (error) return json({ error: 'schedules_failed', detail: error.message }, 500)
+    return json({ ok: true, schedules: data ?? [] })
+  }
+
+  if (action === 'schedule_save') {
+    const title = String(body?.title ?? '').trim().slice(0, 200)
+    const instruction = String(body?.instruction ?? '').trim().slice(0, 4000)
+    if (title.length < 2 || instruction.length < 5) {
+      return json({ error: 'fields_required' }, 400)
+    }
+    const row = {
+      title,
+      instruction,
+      cadence: ['daily', 'weekly', 'monthly'].includes(String(body?.cadence))
+        ? String(body.cadence) : 'weekly',
+      day_of_week: Math.min(Math.max(Number(body?.day_of_week ?? 1), 0), 6),
+      day_of_month: Math.min(Math.max(Number(body?.day_of_month ?? 1), 1), 28),
+      hour_utc: Math.min(Math.max(Number(body?.hour_utc ?? 6), 0), 23),
+      await_review: body?.await_review === true,
+      enabled: body?.enabled !== false,
+    }
+    const next_run_at = computeNextRun(row)
+    const id = body?.id ? String(body.id) : null
+    if (id) {
+      const { error } = await admin.from('admin_dev_schedules')
+        .update({ ...row, next_run_at, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) return json({ error: 'schedule_update_failed', detail: error.message }, 500)
+      return json({ ok: true, id, next_run_at })
+    }
+    const { data, error } = await admin.from('admin_dev_schedules')
+      .insert({ ...row, created_by: user.id, next_run_at })
+      .select('id').single()
+    if (error || !data) return json({ error: 'schedule_insert_failed', detail: error?.message }, 500)
+    return json({ ok: true, id: data.id, next_run_at })
+  }
+
+  if (action === 'schedule_toggle') {
+    const id = String(body?.id ?? '')
+    if (!id) return json({ error: 'id_required' }, 400)
+    const enabled = body?.enabled === true
+    const { error } = await admin.from('admin_dev_schedules')
+      .update({ enabled, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    if (error) return json({ error: 'toggle_failed', detail: error.message }, 500)
+    return json({ ok: true, enabled })
+  }
+
+  if (action === 'schedule_delete') {
+    const id = String(body?.id ?? '')
+    if (!id) return json({ error: 'id_required' }, 400)
+    const { error } = await admin.from('admin_dev_schedules').delete().eq('id', id)
+    if (error) return json({ error: 'schedule_delete_failed', detail: error.message }, 500)
+    return json({ ok: true, deleted: 1 })
+  }
+
+  // ── Ein-Tap-Rollback ───────────────────────────────────────────────────────
+  // Setzt eine gemergte Godmode-Änderung zurück: triggert admin_rollback.yml,
+  // das den Merge-Commit per `git revert` rückgängig macht und einen PR öffnet
+  // (der dann via agent_automerge bei grünem CI als OTA-Patch live geht).
+  if (action === 'rollback') {
+    const id = String(body?.id ?? '')
+    if (!id) return json({ error: 'id_required' }, 400)
+    if (!token) return json({ error: 'agent_not_configured' }, 503)
+
+    const { data: t } = await admin.from('admin_dev_tasks')
+      .select('id, status, merge_commit_sha, instruction').eq('id', id).maybeSingle()
+    if (!t) return json({ error: 'not_found' }, 404)
+    if (t.status !== 'merged') return json({ error: 'not_merged' }, 409)
+    if (!t.merge_commit_sha) return json({ error: 'no_merge_commit' }, 409)
+
+    // Neuen Rollback-Auftrag anlegen (eigene Zeile, origin='rollback').
+    const { data: rb, error: rbErr } = await admin
+      .from('admin_dev_tasks')
+      .insert({
+        created_by: user.id,
+        instruction: `Rollback: macht "${String(t.instruction).slice(0, 200)}" rückgängig.`,
+        status: 'queued',
+        origin: 'rollback',
+        parent_task_id: t.id,
+      })
+      .select('id').single()
+    if (rbErr || !rb) return json({ error: 'insert_failed', detail: rbErr?.message }, 500)
+
+    const res = await fetch(
+      `${GH_API}/actions/workflows/${GH_ROLLBACK_WORKFLOW}/dispatches`,
+      {
+        method: 'POST', headers: ghHeaders(token),
+        body: JSON.stringify({
+          ref: GH_REF,
+          inputs: { task_id: rb.id, sha: t.merge_commit_sha },
+        }),
+      },
+    )
+    if (res.status !== 204) {
+      const detail = await res.text().catch(() => '')
+      await admin.from('admin_dev_tasks')
+        .update({ status: 'failed', error: `dispatch ${res.status}: ${detail.slice(0, 300)}`, updated_at: new Date().toISOString() })
+        .eq('id', rb.id)
+      return json({ error: 'dispatch_failed', status: res.status, detail: detail.slice(0, 300) }, 502)
+    }
+    return json({ ok: true, task_id: rb.id, status: 'queued' })
+  }
+
   // ── Laufenden Auftrag abbrechen ──────────────────────────────────────────
   if (action === 'cancel') {
     const id = String(body?.id ?? '')
@@ -201,8 +412,11 @@ Deno.serve(async (req) => {
       const detail = await res.text().catch(() => '')
       return json({ error: 'merge_failed', status: res.status, detail: detail.slice(0, 300) }, 502)
     }
+    // Merge-Commit-SHA für späteren Rollback merken.
+    const mergeData = await res.json().catch(() => ({} as Record<string, unknown>))
+    const sha = mergeData?.sha ? String(mergeData.sha) : null
     await admin.from('admin_dev_tasks').update({
-      status: 'merged', ci_status: 'success',
+      status: 'merged', ci_status: 'success', merge_commit_sha: sha,
       summary: `Manuell freigegeben & gemergt (PR #${t.pr_number}). OTA-Auslieferung läuft.`,
       updated_at: new Date().toISOString(),
     }).eq('id', id)
@@ -214,20 +428,40 @@ Deno.serve(async (req) => {
   if (instruction.length < 5) return json({ error: 'instruction_required' }, 400)
   if (!token) return json({ error: 'agent_not_configured' }, 503)
 
-  // Optionale Screenshots (Vision) + Review-Gate.
+  // Optionale Screenshots (Vision) + Review-Gate + Multi-Step-Plan.
   const imageUrls: string[] = Array.isArray(body?.image_urls)
     ? body.image_urls.map((x: unknown) => String(x)).filter(Boolean).slice(0, 6)
     : []
   const awaitReview = body?.await_review === true
+  const wantScreens = body?.want_screens === true
+  const planSteps: string[] = Array.isArray(body?.plan)
+    ? body.plan.map((x: unknown) => String(x).slice(0, 200)).filter(Boolean).slice(0, 6)
+    : []
+
+  // Wenn ein Plan vorliegt: hänge ihn an die Instruction (Agent arbeitet ihn ab).
+  let finalInstruction = instruction
+  if (planSteps.length > 0) {
+    finalInstruction = `${instruction}\n\nArbeite diesen Plan strikt Schritt für Schritt ab:\n` +
+      planSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')
+  }
+  if (wantScreens) {
+    finalInstruction += `\n\nWICHTIG (Screenshots): Wenn du UI-Dateien änderst, ` +
+      `lege/aktualisiere für die wichtigste geänderte Komponente einen Golden-` +
+      `Test unter flutter_app/test/golden/ an und führe ihn aus, damit ` +
+      `Vorher/Nachher-Bilder als CI-Artefakt entstehen.`
+  }
 
   const { data: task, error: insErr } = await admin
     .from('admin_dev_tasks')
     .insert({
       created_by: user.id,
-      instruction,
+      instruction: finalInstruction,
       status: 'queued',
       image_urls: imageUrls,
       await_review: awaitReview,
+      origin: ['manual', 'suggestion', 'schedule', 'rollback'].includes(String(body?.origin))
+        ? String(body.origin) : 'manual',
+      plan: planSteps.length > 0 ? planSteps : null,
     })
     .select('id')
     .single()
@@ -246,7 +480,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           ref: GH_REF,
           inputs: {
-            instruction,
+            instruction: finalInstruction,
             task_id: task.id,
             image_urls: JSON.stringify(imageUrls),
           },

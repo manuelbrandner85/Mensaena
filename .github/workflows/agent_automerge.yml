@@ -96,4 +96,8 @@ jobs:
           gh pr merge "$PR_NUM" --repo "${{ github.repository }}" \
              --squash --delete-branch --admin
 
-          patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          # Merge-Commit-SHA für späteren Ein-Tap-Rollback speichern.
+          MERGE_SHA=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
+                        --json mergeCommit --jq '.mergeCommit.oid // empty' || true)
+
+          patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

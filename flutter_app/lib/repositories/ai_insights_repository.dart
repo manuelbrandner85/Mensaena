@@ -82,6 +82,8 @@ class AiInsightsRepository {
     String instruction, {
     List<String> imageUrls = const [],
     bool awaitReview = false,
+    List<String> plan = const [],
+    bool wantScreens = false,
   }) async {
     try {
       final res = await SupabaseService.client.functions
@@ -89,11 +91,142 @@ class AiInsightsRepository {
             'instruction': instruction,
             if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
             if (awaitReview) 'await_review': true,
+            if (plan.isNotEmpty) 'plan': plan,
+            if (wantScreens) 'want_screens': true,
           })
           .timeout(const Duration(seconds: 30));
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
     } catch (e) {
       debugPrint('[AiInsights] createDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Zerlegt eine Aufgabe in einen Multi-Step-Plan (Liste von Schritten).
+  static Future<List<String>> planDevTask(String instruction) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent',
+              body: {'action': 'plan', 'instruction': instruction})
+          .timeout(const Duration(seconds: 35));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['steps'] as List?) ?? const [])
+          .map((e) => e.toString())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] planDevTask failed: $e');
+      return const [];
+    }
+  }
+
+  /// Setzt eine gemergte Godmode-Änderung zurück (Revert-PR → OTA).
+  static Future<Map<String, dynamic>> rollbackDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'rollback', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] rollbackDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lädt die Health-/Metrics-Kennzahlen des Godmode-Systems.
+  static Future<Map<String, dynamic>> fetchDevMetrics() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'metrics'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return Map<String, dynamic>.from((data['metrics'] as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevMetrics failed: $e');
+      return const {};
+    }
+  }
+
+  // ── Wiederkehrende Aufträge (Schedules) ────────────────────────────────────
+
+  /// Lädt alle wiederkehrenden Godmode-Aufträge.
+  static Future<List<Map<String, dynamic>>> fetchDevSchedules() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'schedules_list'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['schedules'] as List?) ?? const [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevSchedules failed: $e');
+      return const [];
+    }
+  }
+
+  /// Speichert einen wiederkehrenden Auftrag (neu, wenn [id] null; sonst Update).
+  static Future<Map<String, dynamic>> saveDevSchedule({
+    String? id,
+    required String title,
+    required String instruction,
+    required String cadence,
+    int dayOfWeek = 1,
+    int dayOfMonth = 1,
+    int hourUtc = 6,
+    bool awaitReview = false,
+    bool enabled = true,
+  }) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'schedule_save',
+            if (id != null) 'id': id,
+            'title': title,
+            'instruction': instruction,
+            'cadence': cadence,
+            'day_of_week': dayOfWeek,
+            'day_of_month': dayOfMonth,
+            'hour_utc': hourUtc,
+            'await_review': awaitReview,
+            'enabled': enabled,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] saveDevSchedule failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Aktiviert/deaktiviert einen wiederkehrenden Auftrag.
+  static Future<Map<String, dynamic>> toggleDevSchedule(
+      String id, bool enabled) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'schedule_toggle',
+            'id': id,
+            'enabled': enabled,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] toggleDevSchedule failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht einen wiederkehrenden Auftrag.
+  static Future<Map<String, dynamic>> deleteDevSchedule(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent',
+              body: {'action': 'schedule_delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevSchedule failed: $e');
       return {'error': e.toString()};
     }
   }
@@ -209,7 +342,8 @@ class AiInsightsRepository {
           .from('admin_dev_tasks')
           .select('id, instruction, status, pr_url, pr_number, run_url, '
               'ci_status, ci_run_url, error, summary, image_urls, '
-              'await_review, created_at, updated_at')
+              'await_review, plan, origin, merge_commit_sha, '
+              'created_at, updated_at')
           .order('created_at', ascending: false)
           .limit(40);
       return (rows as List)

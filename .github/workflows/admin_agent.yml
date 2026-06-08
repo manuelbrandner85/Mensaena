@@ -126,6 +126,18 @@ jobs:
             - Design: primary/teal, KEINE emerald-Farben.
             - Schreibe NIEMALS Secrets, Tokens oder Keys in den Code.
 
+      - name: Screenshots/Goldens als Artefakt sichern (best-effort)
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: godmode-screenshots-${{ inputs.task_id }}
+          path: |
+            flutter_app/test/golden/**/*.png
+            flutter_app/test/**/failures/*.png
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: PR ermitteln
         id: findpr
         uses: actions/github-script@v7

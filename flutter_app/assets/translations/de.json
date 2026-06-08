@@ -1409,7 +1409,62 @@
     "scanPhase": "Phase: {phase}",
     "scanLongHint": "Die Analyse kann mehrere Minuten dauern — bitte warten.",
     "retry": "Wiederholen",
-    "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\""
+    "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
+    "health": {
+      "title": "System-Health",
+      "total": "Aufträge",
+      "merged": "Ausgeliefert",
+      "active": "Aktiv",
+      "failed": "Fehlgeschl.",
+      "successRate": "Erfolgsquote",
+      "avgMerge": "Ø Merge-Zeit",
+      "accepted": "Angenommen",
+      "rejected": "Abgelehnt"
+    },
+    "schedules": {
+      "title": "Wiederkehrende Aufträge",
+      "add": "Neuer Zeitplan",
+      "empty": "Noch keine wiederkehrenden Aufträge.",
+      "saveFailed": "Zeitplan konnte nicht gespeichert werden.",
+      "titleField": "Titel",
+      "instructionField": "Auftrag",
+      "weekday": "Wochentag",
+      "hour": "Uhrzeit",
+      "cadence": {
+        "daily": "Täglich",
+        "weekly": "Wöchentlich",
+        "monthly": "Monatlich"
+      },
+      "weekdays": {
+        "0": "So",
+        "1": "Mo",
+        "2": "Di",
+        "3": "Mi",
+        "4": "Do",
+        "5": "Fr",
+        "6": "Sa"
+      }
+    },
+    "rollback": {
+      "button": "Rückgängig machen",
+      "confirmTitle": "Änderung zurückrollen?",
+      "confirmBody": "Diese gemergte Änderung wird per Revert rückgängig gemacht und als OTA-Update ausgeliefert. Fortfahren?",
+      "confirm": "Zurückrollen",
+      "failed": "Rollback fehlgeschlagen."
+    },
+    "plan": {
+      "title": "Umsetzungs-Plan",
+      "intro": "Die KI würde diese Schritte abarbeiten:",
+      "confirm": "Plan bestätigen & starten",
+      "toggle": "Plan-Modus (in Schritte zerlegen)"
+    },
+    "screens": {
+      "toggle": "Vorher/Nachher-Screenshots"
+    },
+    "voice": {
+      "tooltip": "Per Sprache diktieren",
+      "unavailable": "Spracheingabe nicht verfügbar."
+    }
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",

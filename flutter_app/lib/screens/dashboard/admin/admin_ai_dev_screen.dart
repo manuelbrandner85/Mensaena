@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -112,7 +113,15 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   // Anhänge (Screenshots/Vision) + Review-Gate für den nächsten Auftrag.
   final List<File> _pendingImages = [];
   bool _awaitReview = false;
+  bool _wantScreens = false; // Vorher/Nachher-Screenshots (Golden-Tests)
+  bool _planMode = false; // Multi-Step-Plan vor dem Absenden erzeugen
   bool _suggestionsLoading = false;
+
+  // Health-Dashboard + wiederkehrende Aufträge (v4).
+  Map<String, dynamic> _metrics = const {};
+  bool _metricsExpanded = false;
+  List<Map<String, dynamic>> _schedules = const [];
+  bool _schedulesExpanded = false;
   String _categoryKey = 'all';
   List<Map<String, dynamic>> _categories = const []; // selbstlernende Kategorien
   String _severity = 'all';
@@ -130,6 +139,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     _refresh();
     _loadSuggestions();
     _loadNotes();
+    _loadMetrics();
+    _loadSchedules();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
       if (_scanning) _loadSuggestions(silent: true);
       if (_hasActive) _refresh(silent: true);
@@ -430,18 +441,98 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
         bucket: 'post-images',
       );
     }
+
+    // Multi-Step-Plan: Schritte erzeugen + vom Admin bestätigen lassen.
+    var plan = const <String>[];
+    if (_planMode) {
+      final steps = await AiInsightsRepository.planDevTask(instruction);
+      if (!mounted) return false;
+      if (steps.isNotEmpty) {
+        final ok = await _confirmPlan(steps);
+        if (ok != true) return false; // Admin hat den Plan verworfen.
+        plan = steps;
+      }
+    }
+
     final res = await AiInsightsRepository.createDevTask(
       '${_categoryPrefix()}$instruction',
       imageUrls: urls,
       awaitReview: _awaitReview,
+      plan: plan,
+      wantScreens: _wantScreens,
     );
     if (res['ok'] == true) {
       setState(() {
         _pendingImages.clear();
         _awaitReview = false;
+        _wantScreens = false;
+        _planMode = false;
       });
     }
     return res['ok'] == true;
+  }
+
+  // Zeigt den generierten Plan als Checkliste — Admin bestätigt oder verwirft.
+  Future<bool?> _confirmPlan(List<String> steps) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(LucideIcons.listChecks, size: 18, color: AppColors.teal),
+            const SizedBox(width: 8),
+            Expanded(child: Text('adminDev.plan.title'.tr())),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('adminDev.plan.intro'.tr(),
+                style: AppTypography.body(size: 12, color: AppColors.lightMute)),
+            const SizedBox(height: 10),
+            for (var i = 0; i < steps.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.teal.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text('${i + 1}',
+                          style: AppTypography.body(
+                              size: 11, color: AppColors.teal)),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(steps[i],
+                          style: AppTypography.body(
+                              size: 13, color: AppColors.lightInk)),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
+            child: Text('adminDev.plan.confirm'.tr()),
+          ),
+        ],
+      ),
+    );
   }
 
   // Screenshots zum Auftrag auswählen (Vision — der Agent „sieht" sie).
@@ -517,6 +608,77 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     final rows = await AiInsightsRepository.fetchDevNotes();
     if (!mounted) return;
     setState(() => _notes = rows);
+  }
+
+  Future<void> _loadMetrics() async {
+    final m = await AiInsightsRepository.fetchDevMetrics();
+    if (!mounted) return;
+    setState(() => _metrics = m);
+  }
+
+  Future<void> _loadSchedules() async {
+    final rows = await AiInsightsRepository.fetchDevSchedules();
+    if (!mounted) return;
+    setState(() => _schedules = rows);
+  }
+
+  // Wiederkehrenden Auftrag anlegen/bearbeiten (Dialog).
+  Future<void> _editSchedule({Map<String, dynamic>? existing}) async {
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ScheduleSheet(existing: existing),
+    );
+    if (saved == true) await _loadSchedules();
+  }
+
+  Future<void> _toggleSchedule(String id, bool enabled) async {
+    await AiInsightsRepository.toggleDevSchedule(id, enabled);
+    await _loadSchedules();
+  }
+
+  Future<void> _deleteSchedule(String id) async {
+    final res = await AiInsightsRepository.deleteDevSchedule(id);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      setState(() => _schedules =
+          _schedules.where((s) => s['id'] != id).toList());
+    }
+  }
+
+  // Gemergte Änderung zurückrollen (Revert-PR → OTA).
+  Future<void> _rollbackTask(String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('adminDev.rollback.confirmTitle'.tr()),
+        content: Text('adminDev.rollback.confirmBody'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red.shade600),
+            child: Text('adminDev.rollback.confirm'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.rollbackDevTask(id);
+    if (!mounted) return;
+    setState(() => _deletingTasks.remove(id));
+    if (res['ok'] == true) {
+      await _refresh(silent: true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.rollback.failed'.tr())),
+      );
+    }
   }
 
   // Notiz anlegen oder bearbeiten (Dialog mit Textfeld).
@@ -640,6 +802,24 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                     : ListView(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         children: [
+                          _HealthCard(
+                            metrics: _metrics,
+                            expanded: _metricsExpanded,
+                            onToggle: () => setState(
+                                () => _metricsExpanded = !_metricsExpanded),
+                          ),
+                          const SizedBox(height: 10),
+                          _SchedulesCard(
+                            schedules: _schedules,
+                            expanded: _schedulesExpanded,
+                            onToggle: () => setState(
+                                () => _schedulesExpanded = !_schedulesExpanded),
+                            onAdd: () => _editSchedule(),
+                            onEdit: (s) => _editSchedule(existing: s),
+                            onToggleEnabled: _toggleSchedule,
+                            onDelete: _deleteSchedule,
+                          ),
+                          const SizedBox(height: 10),
                           _NotesCard(
                             notes: _notes,
                             expanded: _notesExpanded,
@@ -713,6 +893,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                 status == 'awaiting_review' && id != null;
                             final canRetry = id != null &&
                                 (status == 'failed' || status == 'no_changes');
+                            // Rollback nur bei gemergten Aufträgen mit Commit
+                            // (kein Rollback eines Rollbacks).
+                            final canRollback = id != null &&
+                                status == 'merged' &&
+                                (t['merge_commit_sha'] as String?) != null &&
+                                (t['origin'] as String?) != 'rollback';
                             return _TaskCard(
                               task: t,
                               busy: _deletingTasks.contains(id),
@@ -728,6 +914,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                   ? () => _retryTask(
                                       t['instruction'] as String? ?? '')
                                   : null,
+                              onRollback:
+                                  canRollback ? () => _rollbackTask(id) : null,
                             );
                           }),
                           const SizedBox(height: 12),
@@ -752,6 +940,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
               onRemoveImage: _removeImage,
               awaitReview: _awaitReview,
               onToggleReview: (v) => setState(() => _awaitReview = v),
+              wantScreens: _wantScreens,
+              onToggleScreens: (v) => setState(() => _wantScreens = v),
+              planMode: _planMode,
+              onTogglePlan: (v) => setState(() => _planMode = v),
               onTemplate: (t) {
                 _ctrl.text = t;
                 _ctrl.selection = TextSelection.collapsed(offset: t.length);
@@ -1925,6 +2117,7 @@ class _TaskCard extends StatelessWidget {
     this.onMerge,
     this.onShowDiff,
     this.onRetry,
+    this.onRollback,
     this.busy = false,
   });
   final Map<String, dynamic> task;
@@ -1933,6 +2126,7 @@ class _TaskCard extends StatelessWidget {
   final VoidCallback? onMerge;
   final VoidCallback? onShowDiff;
   final VoidCallback? onRetry;
+  final VoidCallback? onRollback;
   final bool busy;
 
   @override
@@ -2021,6 +2215,34 @@ class _TaskCard extends StatelessWidget {
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
           ),
+          // Multi-Step-Plan als Checkliste (wenn vorhanden). Bei 'merged' gelten
+          // alle Schritte als erledigt.
+          if (task['plan'] is List && (task['plan'] as List).isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ...List.generate((task['plan'] as List).length, (i) {
+              final step = (task['plan'] as List)[i].toString();
+              final done = status == 'merged';
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      done ? LucideIcons.checkCircle2 : LucideIcons.circle,
+                      size: 13,
+                      color: done ? Colors.green.shade600 : AppColors.lightMute,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(step,
+                          style: AppTypography.body(
+                              size: 11, color: AppColors.lightMute)),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
           if (summary != null && summary.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(summary,
@@ -2072,6 +2294,24 @@ class _TaskCard extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.teal,
                   side: BorderSide(color: AppColors.teal.withValues(alpha: 0.4)),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          ],
+          // Ein-Tap-Rollback für gemergte Änderungen.
+          if (onRollback != null) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: busy ? null : onRollback,
+                icon: const Icon(LucideIcons.rotateCcw, size: 14),
+                label: Text('adminDev.rollback.button'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red.shade600,
+                  side: BorderSide(color: Colors.red.shade200),
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -2337,6 +2577,10 @@ class _InputBar extends StatefulWidget {
     required this.onRemoveImage,
     required this.awaitReview,
     required this.onToggleReview,
+    required this.wantScreens,
+    required this.onToggleScreens,
+    required this.planMode,
+    required this.onTogglePlan,
     required this.onTemplate,
     required this.existingInstructions,
   });
@@ -2349,6 +2593,10 @@ class _InputBar extends StatefulWidget {
   final void Function(int) onRemoveImage;
   final bool awaitReview;
   final void Function(bool) onToggleReview;
+  final bool wantScreens;
+  final void Function(bool) onToggleScreens;
+  final bool planMode;
+  final void Function(bool) onTogglePlan;
   final void Function(String) onTemplate;
   // Für Duplikat-Erkennung (simple Keyword-Überschneidung).
   final List<String> existingInstructions;
@@ -2360,10 +2608,68 @@ class _InputBar extends StatefulWidget {
 class _InputBarState extends State<_InputBar> {
   late List<String> _visibleTemplates;
 
+  // Voice-Eingabe (Speech-to-Text).
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _speechAvailable = false;
+  bool _listening = false;
+  String _baseTextBeforeListen = '';
+
   @override
   void initState() {
     super.initState();
     _visibleTemplates = _pickTemplates();
+  }
+
+  @override
+  void dispose() {
+    if (_listening) _speech.stop();
+    super.dispose();
+  }
+
+  // Mikrofon: Diktat starten/stoppen. Erkannter Text wird ans Eingabefeld
+  // angehängt (an das, was vor dem Start drinstand).
+  Future<void> _toggleListening() async {
+    if (_listening) {
+      await _speech.stop();
+      if (mounted) setState(() => _listening = false);
+      return;
+    }
+    if (!_speechAvailable) {
+      _speechAvailable = await _speech.initialize(
+        onStatus: (s) {
+          if ((s == 'done' || s == 'notListening') && mounted) {
+            setState(() => _listening = false);
+          }
+        },
+        onError: (_) {
+          if (mounted) setState(() => _listening = false);
+        },
+      );
+    }
+    if (!_speechAvailable) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('adminDev.voice.unavailable'.tr())),
+        );
+      }
+      return;
+    }
+    _baseTextBeforeListen = widget.ctrl.text;
+    setState(() => _listening = true);
+    await _speech.listen(
+      localeId: context.locale.toString().replaceAll('_', '-'),
+      onResult: (r) {
+        final spoken = r.recognizedWords;
+        final sep = _baseTextBeforeListen.isEmpty ||
+                _baseTextBeforeListen.endsWith(' ')
+            ? ''
+            : ' ';
+        widget.ctrl.text = '$_baseTextBeforeListen$sep$spoken';
+        widget.ctrl.selection =
+            TextSelection.collapsed(offset: widget.ctrl.text.length);
+        setState(() {});
+      },
+    );
   }
 
   // Wählt 4 zufällige Templates aus dem Pool.
@@ -2392,6 +2698,33 @@ class _InputBarState extends State<_InputBar> {
       }
     }
     return null;
+  }
+
+  // Kompakte Schalter-Zeile (Icon + Label + Switch).
+  Widget _toggleRow({
+    required IconData icon,
+    required String label,
+    required bool value,
+    required void Function(bool)? onChanged,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 13, color: AppColors.lightMute),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(label,
+              style: AppTypography.body(size: 11, color: AppColors.lightMute)),
+        ),
+        Transform.scale(
+          scale: 0.8,
+          child: Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.teal,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -2497,23 +2830,24 @@ class _InputBarState extends State<_InputBar> {
               ),
             ),
           ],
-          // Review-Gate-Schalter.
-          Row(
-            children: [
-              const Icon(LucideIcons.gitPullRequest,
-                  size: 13, color: AppColors.lightMute),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text('adminDev.reviewBeforeMerge'.tr(),
-                    style: AppTypography.body(
-                        size: 11, color: AppColors.lightMute)),
-              ),
-              Switch(
-                value: widget.awaitReview,
-                onChanged: widget.sending ? null : widget.onToggleReview,
-                activeColor: AppColors.teal,
-              ),
-            ],
+          // Optionen-Schalter: Review-Gate · Plan-Modus · Screenshots.
+          _toggleRow(
+            icon: LucideIcons.gitPullRequest,
+            label: 'adminDev.reviewBeforeMerge'.tr(),
+            value: widget.awaitReview,
+            onChanged: widget.sending ? null : widget.onToggleReview,
+          ),
+          _toggleRow(
+            icon: LucideIcons.listChecks,
+            label: 'adminDev.plan.toggle'.tr(),
+            value: widget.planMode,
+            onChanged: widget.sending ? null : widget.onTogglePlan,
+          ),
+          _toggleRow(
+            icon: LucideIcons.image,
+            label: 'adminDev.screens.toggle'.tr(),
+            value: widget.wantScreens,
+            onChanged: widget.sending ? null : widget.onToggleScreens,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -2523,6 +2857,13 @@ class _InputBarState extends State<_InputBar> {
                 icon: const Icon(LucideIcons.imagePlus, size: 20),
                 color: AppColors.teal,
                 tooltip: 'adminDev.attachImage'.tr(),
+              ),
+              IconButton(
+                onPressed: widget.sending ? null : _toggleListening,
+                icon: Icon(_listening ? LucideIcons.micOff : LucideIcons.mic,
+                    size: 20),
+                color: _listening ? Colors.red.shade600 : AppColors.teal,
+                tooltip: 'adminDev.voice.tooltip'.tr(),
               ),
               Expanded(
                 child: TextField(
@@ -3098,6 +3439,577 @@ class _DiffPatch extends StatelessWidget {
                           : const Color(0xFFC9D1D9),
             ),
           ),
+      ],
+    );
+  }
+}
+
+// ── Health-/Metrics-Dashboard ───────────────────────────────────────────────
+
+class _HealthCard extends StatelessWidget {
+  const _HealthCard({
+    required this.metrics,
+    required this.expanded,
+    required this.onToggle,
+  });
+  final Map<String, dynamic> metrics;
+  final bool expanded;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = (metrics['total'] as num?)?.toInt() ?? 0;
+    final merged = (metrics['merged'] as num?)?.toInt() ?? 0;
+    final failed = (metrics['failed'] as num?)?.toInt() ?? 0;
+    final active = (metrics['active'] as num?)?.toInt() ?? 0;
+    final rate = (metrics['success_rate'] as num?)?.toInt() ?? 0;
+    final avgMin = (metrics['avg_merge_minutes'] as num?)?.toInt() ?? 0;
+    final accepted = (metrics['suggestions_accepted'] as num?)?.toInt() ?? 0;
+    final rejected = (metrics['suggestions_rejected'] as num?)?.toInt() ?? 0;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.activity,
+                      size: 18, color: AppColors.teal),
+                  const SizedBox(width: 10),
+                  Text(
+                    'adminDev.health.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 8),
+                  // Erfolgsquote als kompakter Badge immer sichtbar.
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.teal.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('$rate%',
+                        style: AppTypography.body(
+                            size: 11,
+                            color: AppColors.teal,
+                            weight: FontWeight.w700)),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    expanded
+                        ? LucideIcons.chevronUp
+                        : LucideIcons.chevronDown,
+                    size: 18,
+                    color: AppColors.lightMute,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  _stat('adminDev.health.total'.tr(), '$total',
+                      LucideIcons.gitPullRequest),
+                  _stat('adminDev.health.merged'.tr(), '$merged',
+                      LucideIcons.checkCircle2, color: Colors.green.shade600),
+                  _stat('adminDev.health.active'.tr(), '$active',
+                      LucideIcons.loader, color: AppColors.amber),
+                  _stat('adminDev.health.failed'.tr(), '$failed',
+                      LucideIcons.xCircle, color: Colors.red.shade600),
+                  _stat('adminDev.health.successRate'.tr(), '$rate%',
+                      LucideIcons.trendingUp, color: AppColors.teal),
+                  _stat('adminDev.health.avgMerge'.tr(),
+                      avgMin > 0 ? '$avgMin min' : '—', LucideIcons.clock),
+                  _stat('adminDev.health.accepted'.tr(), '$accepted',
+                      LucideIcons.checkCheck, color: Colors.green.shade600),
+                  _stat('adminDev.health.rejected'.tr(), '$rejected',
+                      LucideIcons.x, color: AppColors.lightMute),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(String label, String value, IconData icon, {Color? color}) {
+    return Container(
+      width: 96,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 14, color: color ?? AppColors.lightMute),
+          const SizedBox(height: 4),
+          Text(value,
+              style: AppTypography.body(
+                  size: 15,
+                  color: AppColors.lightInk,
+                  weight: FontWeight.w700)),
+          Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.body(size: 10, color: AppColors.lightMute)),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Wiederkehrende Aufträge ──────────────────────────────────────────────────
+
+class _SchedulesCard extends StatelessWidget {
+  const _SchedulesCard({
+    required this.schedules,
+    required this.expanded,
+    required this.onToggle,
+    required this.onAdd,
+    required this.onEdit,
+    required this.onToggleEnabled,
+    required this.onDelete,
+  });
+  final List<Map<String, dynamic>> schedules;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onAdd;
+  final void Function(Map<String, dynamic>) onEdit;
+  final void Function(String, bool) onToggleEnabled;
+  final void Function(String) onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.repeat,
+                      size: 18, color: AppColors.trust),
+                  const SizedBox(width: 10),
+                  Text(
+                    'adminDev.schedules.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('${schedules.length}',
+                        style: AppTypography.body(
+                            size: 10, color: AppColors.lightMute)),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    expanded
+                        ? LucideIcons.chevronUp
+                        : LucideIcons.chevronDown,
+                    size: 18,
+                    color: AppColors.lightMute,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            if (schedules.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+                child: Text('adminDev.schedules.empty'.tr(),
+                    style: AppTypography.body(
+                        size: 12, color: AppColors.lightMute)),
+              )
+            else
+              ...schedules.map((s) => _ScheduleTile(
+                    schedule: s,
+                    onEdit: () => onEdit(s),
+                    onDelete: () => onDelete(s['id'] as String),
+                    onToggleEnabled: (v) =>
+                        onToggleEnabled(s['id'] as String, v),
+                  )),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
+              child: TextButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text('adminDev.schedules.add'.tr()),
+                style: TextButton.styleFrom(foregroundColor: AppColors.teal),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ScheduleTile extends StatelessWidget {
+  const _ScheduleTile({
+    required this.schedule,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onToggleEnabled,
+  });
+  final Map<String, dynamic> schedule;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final void Function(bool) onToggleEnabled;
+
+  String _cadenceLabel() {
+    final c = schedule['cadence'] as String? ?? 'weekly';
+    return 'adminDev.schedules.cadence.$c'.tr();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = schedule['title'] as String? ?? '';
+    final enabled = schedule['enabled'] == true;
+    final hour = (schedule['hour_utc'] as num?)?.toInt() ?? 6;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      padding: const EdgeInsets.fromLTRB(12, 8, 6, 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(title,
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+              ),
+              Transform.scale(
+                scale: 0.7,
+                child: Switch(
+                  value: enabled,
+                  onChanged: onToggleEnabled,
+                  activeColor: AppColors.teal,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Icon(LucideIcons.clock, size: 11, color: AppColors.lightMute),
+              const SizedBox(width: 4),
+              Text(
+                '${_cadenceLabel()} · ${hour.toString().padLeft(2, '0')}:00 UTC',
+                style: AppTypography.body(size: 10, color: AppColors.lightMute),
+              ),
+              const Spacer(),
+              IconButton(
+                onPressed: onEdit,
+                icon: const Icon(LucideIcons.pencil, size: 14),
+                color: AppColors.lightMute,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'common.edit'.tr(),
+              ),
+              IconButton(
+                onPressed: onDelete,
+                icon: const Icon(LucideIcons.trash2, size: 14),
+                color: AppColors.lightMute,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'common.delete'.tr(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Bottom-Sheet zum Anlegen/Bearbeiten eines wiederkehrenden Auftrags.
+class _ScheduleSheet extends StatefulWidget {
+  const _ScheduleSheet({this.existing});
+  final Map<String, dynamic>? existing;
+
+  @override
+  State<_ScheduleSheet> createState() => _ScheduleSheetState();
+}
+
+class _ScheduleSheetState extends State<_ScheduleSheet> {
+  late final TextEditingController _titleCtrl;
+  late final TextEditingController _instrCtrl;
+  String _cadence = 'weekly';
+  int _dayOfWeek = 1;
+  int _hourUtc = 6;
+  bool _awaitReview = false;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final e = widget.existing;
+    _titleCtrl = TextEditingController(text: e?['title'] as String? ?? '');
+    _instrCtrl =
+        TextEditingController(text: e?['instruction'] as String? ?? '');
+    _cadence = e?['cadence'] as String? ?? 'weekly';
+    _dayOfWeek = (e?['day_of_week'] as num?)?.toInt() ?? 1;
+    _hourUtc = (e?['hour_utc'] as num?)?.toInt() ?? 6;
+    _awaitReview = e?['await_review'] == true;
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _instrCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_titleCtrl.text.trim().length < 2 ||
+        _instrCtrl.text.trim().length < 5) {
+      return;
+    }
+    setState(() => _saving = true);
+    final res = await AiInsightsRepository.saveDevSchedule(
+      id: widget.existing?['id'] as String?,
+      title: _titleCtrl.text.trim(),
+      instruction: _instrCtrl.text.trim(),
+      cadence: _cadence,
+      dayOfWeek: _dayOfWeek,
+      hourUtc: _hourUtc,
+      awaitReview: _awaitReview,
+    );
+    if (!mounted) return;
+    setState(() => _saving = false);
+    if (res['ok'] == true) {
+      Navigator.of(context).pop(true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.schedules.saveFailed'.tr())),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Text('adminDev.schedules.add'.tr(),
+                style: AppTypography.body(
+                    size: 16,
+                    color: AppColors.lightInk,
+                    weight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _titleCtrl,
+              decoration: InputDecoration(
+                labelText: 'adminDev.schedules.titleField'.tr(),
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _instrCtrl,
+              maxLines: 4,
+              minLines: 2,
+              decoration: InputDecoration(
+                labelText: 'adminDev.schedules.instructionField'.tr(),
+                hintText: 'adminDev.placeholder'.tr(),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Frequenz-Auswahl.
+            Row(
+              children: [
+                for (final c in const ['daily', 'weekly', 'monthly'])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      label: Text('adminDev.schedules.cadence.$c'.tr(),
+                          style: AppTypography.body(
+                              size: 11,
+                              color: _cadence == c
+                                  ? Colors.white
+                                  : AppColors.lightInk)),
+                      selected: _cadence == c,
+                      selectedColor: AppColors.teal,
+                      onSelected: (_) => setState(() => _cadence = c),
+                    ),
+                  ),
+              ],
+            ),
+            if (_cadence == 'weekly') ...[
+              const SizedBox(height: 10),
+              Text('adminDev.schedules.weekday'.tr(),
+                  style:
+                      AppTypography.body(size: 11, color: AppColors.lightMute)),
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 6,
+                children: [
+                  for (var d = 0; d < 7; d++)
+                    ChoiceChip(
+                      label: Text('adminDev.schedules.weekdays.$d'.tr(),
+                          style: AppTypography.body(
+                              size: 11,
+                              color: _dayOfWeek == d
+                                  ? Colors.white
+                                  : AppColors.lightInk)),
+                      selected: _dayOfWeek == d,
+                      selectedColor: AppColors.teal,
+                      onSelected: (_) => setState(() => _dayOfWeek = d),
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Text('adminDev.schedules.hour'.tr(),
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Slider(
+                    value: _hourUtc.toDouble(),
+                    min: 0,
+                    max: 23,
+                    divisions: 23,
+                    label: '${_hourUtc.toString().padLeft(2, '0')}:00 UTC',
+                    activeColor: AppColors.teal,
+                    onChanged: (v) => setState(() => _hourUtc = v.round()),
+                  ),
+                ),
+                Text('${_hourUtc.toString().padLeft(2, '0')}:00',
+                    style: AppTypography.body(
+                        size: 12, color: AppColors.lightInk)),
+              ],
+            ),
+            _MiniToggle(
+              label: 'adminDev.reviewBeforeMerge'.tr(),
+              value: _awaitReview,
+              onChanged: (v) => setState(() => _awaitReview = v),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _saving ? null : _save,
+                style:
+                    FilledButton.styleFrom(backgroundColor: AppColors.teal),
+                child: _saving
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                    : Text('common.save'.tr()),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniToggle extends StatelessWidget {
+  const _MiniToggle({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+  final String label;
+  final bool value;
+  final void Function(bool) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(label,
+              style: AppTypography.body(size: 12, color: AppColors.lightMute)),
+        ),
+        Transform.scale(
+          scale: 0.8,
+          child: Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.teal,
+          ),
+        ),
       ],
     );
   }

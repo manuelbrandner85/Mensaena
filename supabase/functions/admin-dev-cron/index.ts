@@ -1,0 +1,117 @@
+// ════════════════════════════════════════════════════════════════════════
+// admin-dev-cron — von pg_cron (stündlich) aufgerufen. Findet fällige
+// wiederkehrende Godmode-Aufträge (admin_dev_schedules, next_run_at <= now,
+// enabled), legt je einen admin_dev_tasks-Auftrag an (origin='schedule'),
+// triggert admin_agent.yml und setzt last_run_at + next_run_at neu.
+//
+// Kein User-JWT (interner Cron-Call) — nutzt adminClient() wie die auto-* Fns.
+// Secret: GH_AGENT_TOKEN (Workflow-Dispatch).
+// ════════════════════════════════════════════════════════════════════════
+import { CORS, json, adminClient } from '../_shared/util.ts'
+
+const GH_OWNER = 'manuelbrandner85'
+const GH_REPO = 'Mensaena'
+const GH_WORKFLOW = 'admin_agent.yml'
+const GH_REF = 'main'
+const GH_API = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}`
+
+function ghHeaders(token: string): HeadersInit {
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'Content-Type': 'application/json',
+    'User-Agent': 'mensaena-admin-dev-cron',
+  }
+}
+
+// deno-lint-ignore no-explicit-any
+function computeNextRun(s: any): string {
+  const now = new Date()
+  const next = new Date(Date.UTC(
+    now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+    Number(s.hour_utc ?? 6), 0, 0, 0,
+  ))
+  const cadence = String(s.cadence ?? 'weekly')
+  if (cadence === 'daily') {
+    if (next <= now) next.setUTCDate(next.getUTCDate() + 1)
+  } else if (cadence === 'weekly') {
+    const target = Number(s.day_of_week ?? 1)
+    let delta = (target - next.getUTCDay() + 7) % 7
+    if (delta === 0 && next <= now) delta = 7
+    next.setUTCDate(next.getUTCDate() + delta)
+  } else {
+    const dom = Math.min(Math.max(Number(s.day_of_month ?? 1), 1), 28)
+    next.setUTCDate(dom)
+    if (next <= now) next.setUTCMonth(next.getUTCMonth() + 1, dom)
+  }
+  return next.toISOString()
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
+
+  const admin = adminClient()
+  const token = Deno.env.get('GH_AGENT_TOKEN') ?? ''
+  const nowIso = new Date().toISOString()
+
+  // Fällige, aktive Schedules.
+  const { data: due, error } = await admin
+    .from('admin_dev_schedules')
+    .select('*')
+    .eq('enabled', true)
+    .lte('next_run_at', nowIso)
+    .limit(20)
+  if (error) return json({ error: 'query_failed', detail: error.message }, 500)
+  if (!due || due.length === 0) return json({ ok: true, dispatched: 0 })
+
+  let dispatched = 0
+  for (const s of due) {
+    // Auftrag anlegen.
+    const { data: task, error: tErr } = await admin
+      .from('admin_dev_tasks')
+      .insert({
+        created_by: s.created_by,
+        instruction: s.instruction,
+        status: 'queued',
+        origin: 'schedule',
+        await_review: s.await_review === true,
+      })
+      .select('id').single()
+    if (tErr || !task) continue
+
+    // Workflow dispatchen (best-effort).
+    let ok = false
+    if (token) {
+      const res = await fetch(
+        `${GH_API}/actions/workflows/${GH_WORKFLOW}/dispatches`,
+        {
+          method: 'POST', headers: ghHeaders(token),
+          body: JSON.stringify({
+            ref: GH_REF,
+            inputs: { instruction: s.instruction, task_id: task.id, image_urls: '[]' },
+          }),
+        },
+      ).catch(() => null)
+      ok = !!res && res.status === 204
+    }
+    if (!ok) {
+      await admin.from('admin_dev_tasks')
+        .update({ status: 'failed', error: 'Schedule-Dispatch fehlgeschlagen.', updated_at: nowIso })
+        .eq('id', task.id)
+    } else {
+      dispatched++
+    }
+
+    // next_run_at fortschreiben (auch bei Dispatch-Fehler, sonst Endlos-Retry).
+    await admin.from('admin_dev_schedules')
+      .update({
+        last_run_at: nowIso,
+        next_run_at: computeNextRun(s),
+        updated_at: nowIso,
+      })
+      .eq('id', s.id)
+  }
+
+  return json({ ok: true, dispatched })
+})

@@ -1410,7 +1410,62 @@
     "scanPhase": "Fase: {phase}",
     "scanLongHint": "El análisis puede tardar varios minutos — espere.",
     "retry": "Reintentar",
-    "duplicateWarning": "Tarea similar ya existe: \"{task}\""
+    "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
+    "health": {
+      "title": "Estado del sistema",
+      "total": "Tareas",
+      "merged": "Publicadas",
+      "active": "Activas",
+      "failed": "Fallidas",
+      "successRate": "Tasa de éxito",
+      "avgMerge": "Tiempo medio merge",
+      "accepted": "Aceptadas",
+      "rejected": "Rechazadas"
+    },
+    "schedules": {
+      "title": "Tareas recurrentes",
+      "add": "Nueva programación",
+      "empty": "Aún no hay tareas recurrentes.",
+      "saveFailed": "No se pudo guardar la programación.",
+      "titleField": "Título",
+      "instructionField": "Tarea",
+      "weekday": "Día",
+      "hour": "Hora",
+      "cadence": {
+        "daily": "Diaria",
+        "weekly": "Semanal",
+        "monthly": "Mensual"
+      },
+      "weekdays": {
+        "0": "Dom",
+        "1": "Lun",
+        "2": "Mar",
+        "3": "Mié",
+        "4": "Jue",
+        "5": "Vie",
+        "6": "Sáb"
+      }
+    },
+    "rollback": {
+      "button": "Revertir",
+      "confirmTitle": "¿Revertir el cambio?",
+      "confirmBody": "Este cambio fusionado se revertirá y se entregará como actualización OTA. ¿Continuar?",
+      "confirm": "Revertir",
+      "failed": "Error al revertir."
+    },
+    "plan": {
+      "title": "Plan de implementación",
+      "intro": "La IA seguiría estos pasos:",
+      "confirm": "Confirmar plan e iniciar",
+      "toggle": "Modo plan (dividir en pasos)"
+    },
+    "screens": {
+      "toggle": "Capturas antes/después"
+    },
+    "voice": {
+      "tooltip": "Dictar por voz",
+      "unavailable": "Entrada de voz no disponible."
+    }
   },
   "create": {
     "titleRequired": "El título es obligatorio.",
