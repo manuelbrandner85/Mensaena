@@ -86,6 +86,26 @@ jobs:
             echo "Supabase-Stream-Limits, Design-System teal/primary, KEINE"
             echo "emerald-Farben). Verstöße dagegen sind valide Vorschläge."
             echo ""
+            echo "WICHTIG — schlage AUSDRÜCKLICH auch NEUERUNGEN vor (komplett"
+            echo "neue Features/Module/Ideen, die die App besser machen), nicht"
+            echo "nur Korrekturen. Mische Bugs, Verbesserungen UND Neuerungen."
+            echo ""
+            echo "Markiere jeden Vorschlag mit 'kind':"
+            echo "  - bug          = ein Fehler/Bug, der behoben werden muss"
+            echo "  - improvement  = Verbesserung von etwas Vorhandenem"
+            echo "  - new          = Neuerung / komplett neues Feature"
+            echo ""
+            echo "Gib zu JEDEM Vorschlag eine 'reason' an — leicht verständlich,"
+            echo "WARUM das geändert/verbessert/neu gemacht werden soll (1-2 Sätze,"
+            echo "Deutsch, konkreter Nutzen für die Nutzer)."
+            echo ""
+            echo "Du DARFST eigene, treffendere Kategorien vergeben (selbstlernend),"
+            echo "wenn die Standardkategorien nicht passen. 'category' ist ein kurzer"
+            echo "Schlüssel (klein, ohne Leerzeichen, z. B. 'accessibility',"
+            echo "'onboarding', 'monetization'). 'category_label' ist der lesbare"
+            echo "deutsche Name dazu. Standardkategorien:"
+            echo "  ui, feature, bug, performance, i18n, database, security, config."
+            echo ""
             echo "Konzentriere dich auf die wirkungsvollsten 12-25 Vorschläge."
             echo "Jeder Vorschlag MUSS so formuliert sein, dass ein Entwickler-Agent"
             echo "ihn ohne Rückfragen umsetzen kann (instruction = klare Anweisung,"
@@ -94,10 +114,13 @@ jobs:
             echo "Schreibe das Ergebnis als reines JSON in die Datei"
             echo "/tmp/suggestions.json (NICHTS sonst dorthin). Format:"
             echo '{ "suggestions": [ {'
-            echo '  "category": "bug|ui|feature|performance|i18n|database|security|config",'
+            echo '  "category": "kurzer-schlüssel (Standard oder eigene Kategorie)",'
+            echo '  "category_label": "Lesbarer deutscher Name der Kategorie",'
+            echo '  "kind": "bug|improvement|new",'
             echo '  "severity": "low|medium|high|critical",'
             echo '  "title": "Kurzer Titel (Deutsch)",'
             echo '  "description": "Was ist das Problem / der Nutzen (1-3 Sätze, Deutsch)",'
+            echo '  "reason": "WARUM (leicht verständlich, 1-2 Sätze, Deutsch)",'
             echo '  "instruction": "Präzise Umsetzungs-Anweisung für den Dev-Agenten (Deutsch)",'
             echo '  "file_hint": "relativer Pfad zur betroffenen Datei"'
             echo '} ] }'
@@ -221,7 +244,9 @@ jobs:
           fi
 
           # JSON in REST-Bulk-Insert-Rows umwandeln (scan_id anreichern, validieren).
-          ROWS="$(SCAN_ID="$SCAN_ID" node -e '
+          # Schreibt zwei Dateien: /tmp/rows.json (Vorschläge) + /tmp/cats.json
+          # (neu entdeckte Kategorien für admin_dev_categories).
+          SCAN_ID="$SCAN_ID" node -e '
             const fs = require("fs");
             const raw = fs.readFileSync("/tmp/suggestions.json", "utf8");
             let parsed;
@@ -230,25 +255,52 @@ jobs:
               const a = raw.indexOf("{"); const b = raw.lastIndexOf("}");
               parsed = JSON.parse(raw.slice(a, b + 1));
             }
-            const cats = ["ui","feature","bug","performance","i18n","database","security","config"];
+            const builtin = ["ui","feature","bug","performance","i18n","database","security","config"];
             const sevs = ["low","medium","high","critical"];
+            const kinds = ["bug","improvement","new"];
+            const slug = (s) => String(s || "").toLowerCase().trim()
+              .replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40);
+            const newCats = {};
             const out = (parsed.suggestions || [])
               .filter(s => s && s.title && s.instruction)
               .slice(0, 40)
-              .map(s => ({
-                scan_id: process.env.SCAN_ID,
-                category: cats.includes(s.category) ? s.category : "feature",
-                severity: sevs.includes(s.severity) ? s.severity : "medium",
-                title: String(s.title).slice(0, 200),
-                description: s.description ? String(s.description).slice(0, 1000) : null,
-                instruction: String(s.instruction).slice(0, 2000),
-                file_hint: s.file_hint ? String(s.file_hint).slice(0, 300) : null,
-              }));
-            process.stdout.write(JSON.stringify(out));
-          ')"
+              .map(s => {
+                let cat = slug(s.category) || "feature";
+                if (!builtin.includes(cat)) {
+                  const label = String(s.category_label || s.category || cat).slice(0, 60);
+                  newCats[cat] = { key: cat, label, source: "ai" };
+                }
+                return {
+                  scan_id: process.env.SCAN_ID,
+                  category: cat,
+                  kind: kinds.includes(s.kind) ? s.kind : "improvement",
+                  severity: sevs.includes(s.severity) ? s.severity : "medium",
+                  title: String(s.title).slice(0, 200),
+                  description: s.description ? String(s.description).slice(0, 1000) : null,
+                  reason: s.reason ? String(s.reason).slice(0, 600) : null,
+                  instruction: String(s.instruction).slice(0, 2000),
+                  file_hint: s.file_hint ? String(s.file_hint).slice(0, 300) : null,
+                };
+              });
+            fs.writeFileSync("/tmp/rows.json", JSON.stringify(out));
+            fs.writeFileSync("/tmp/cats.json", JSON.stringify(Object.values(newCats)));
+          '
+          ROWS="$(cat /tmp/rows.json)"
+          CATS="$(cat /tmp/cats.json)"
 
           COUNT="$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).length))' "$ROWS")"
-          echo "Erzeugte Vorschläge: $COUNT"
+          CATCOUNT="$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).length))' "$CATS")"
+          echo "Erzeugte Vorschläge: $COUNT | Neue Kategorien: $CATCOUNT"
+
+          # Neu entdeckte Kategorien selbstlernend anlegen (Konflikt = ignorieren).
+          if [ "$CATCOUNT" -gt 0 ]; then
+            curl -sS -X POST \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_categories?on_conflict=key" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: return=minimal,resolution=ignore-duplicates" \
+              -d "$CATS" || true
+          fi
 
           if [ "$COUNT" -gt 0 ]; then
             curl -sS -X POST \

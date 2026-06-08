@@ -1340,6 +1340,12 @@
       "ci": "CI",
       "merge": "Merge",
       "ota": "OTA"
+    },
+    "why": "Warum",
+    "kind": {
+      "bug": "Fehler/Bug",
+      "improvement": "Verbesserung",
+      "new": "Neuerung"
     }
   },
   "create": {

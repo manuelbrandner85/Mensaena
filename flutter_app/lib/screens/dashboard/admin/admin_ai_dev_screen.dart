@@ -101,7 +101,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   bool _loading = true;
   bool _sending = false;
   bool _suggestionsLoading = false;
-  _DevCategory _category = _DevCategory.all;
+  String _categoryKey = 'all';
+  List<Map<String, dynamic>> _categories = const []; // selbstlernende Kategorien
   String _severity = 'all';
 
   // Mehrfachauswahl
@@ -165,14 +166,36 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     });
   }
 
+  // Built-in-Kategorie zum aktuellen Key (null wenn dynamische/eigene Kategorie).
+  _DevCategory? get _builtinCategory {
+    for (final c in _DevCategory.values) {
+      if (c.name == _categoryKey) return c;
+    }
+    return null;
+  }
+
+  // Lesbares Label einer Kategorie (Built-in übersetzt, sonst dynamisches Label).
+  String _categoryLabel(String key) {
+    final builtin = _DevCategory.values.where((c) => c.name == key);
+    if (builtin.isNotEmpty) return 'adminDev.categories.$key'.tr();
+    final m = _categories.firstWhere(
+      (c) => c['key'] == key,
+      orElse: () => const {},
+    );
+    return (m['label'] as String?) ?? key;
+  }
+
   Future<void> _loadSuggestions({bool silent = false}) async {
     if (!silent) setState(() => _suggestionsLoading = true);
     final data = await AiInsightsRepository.fetchDevSuggestions(
-      category: _category == _DevCategory.all ? null : _category.name,
+      category: _categoryKey == 'all' ? null : _categoryKey,
     );
     if (!mounted) return;
     setState(() {
       _suggestions = ((data['suggestions'] as List?) ?? const [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+      _categories = ((data['categories'] as List?) ?? const [])
           .map((e) => Map<String, dynamic>.from(e as Map))
           .toList();
       _scan = data['scan'] as Map<String, dynamic>?;
@@ -313,8 +336,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (text.isEmpty || _sending) return;
     setState(() => _sending = true);
 
-    final prefix =
-        _category != _DevCategory.all ? '[${_category.englishName}] ' : '';
+    String prefix = '';
+    if (_categoryKey != 'all') {
+      final bc = _builtinCategory;
+      final label = bc != null
+          ? bc.englishName
+          : (_categories.firstWhere(
+              (c) => c['key'] == _categoryKey,
+              orElse: () => {'label': _categoryKey},
+            )['label'] as String);
+      prefix = '[$label] ';
+    }
     final res = await AiInsightsRepository.createDevTask('$prefix$text');
     if (!mounted) return;
 
@@ -335,7 +367,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   }
 
   String get _placeholder {
-    switch (_category) {
+    switch (_builtinCategory) {
       case _DevCategory.ui:
         return 'adminDev.placeholders.ui'.tr();
       case _DevCategory.feature:
@@ -368,9 +400,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
           children: [
             _GodmodeHeader(),
             _CategoryRow(
-              selected: _category,
-              onSelect: (c) {
-                setState(() => _category = c);
+              selectedKey: _categoryKey,
+              dynamicCategories: _categories,
+              onSelect: (key) {
+                setState(() => _categoryKey = key);
                 _loadSuggestions();
               },
             ),
@@ -408,6 +441,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             const SizedBox(height: 8),
                             ...visible.map((s) => _SuggestionCard(
                                   suggestion: s,
+                                  categoryLabel: _categoryLabel(
+                                      s['category'] as String? ?? 'feature'),
                                   busy: _busySuggestions
                                       .contains(s['id'] as String?),
                                   selectionMode: _selectionMode,
@@ -513,52 +548,88 @@ class _GodmodeHeader extends StatelessWidget {
 // ── Category Row ──────────────────────────────────────────────────────────────
 
 class _CategoryRow extends StatelessWidget {
-  const _CategoryRow({required this.selected, required this.onSelect});
-  final _DevCategory selected;
-  final void Function(_DevCategory) onSelect;
+  const _CategoryRow({
+    required this.selectedKey,
+    required this.dynamicCategories,
+    required this.onSelect,
+  });
+  final String selectedKey;
+  final List<Map<String, dynamic>> dynamicCategories;
+  final void Function(String) onSelect;
 
   @override
   Widget build(BuildContext context) {
+    // Eigene Kategorien, die nicht schon Built-in sind (selbstlernend).
+    final builtinKeys = _DevCategory.values.map((c) => c.name).toSet();
+    final extras = dynamicCategories
+        .where((c) => !builtinKeys.contains(c['key']))
+        .toList();
+
     return Container(
       height: 46,
       color: Colors.white,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        children: _DevCategory.values.map((cat) {
-          final active = cat == selected;
-          return GestureDetector(
-            onTap: () => onSelect(cat),
-            child: Container(
-              margin: const EdgeInsets.only(right: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-              decoration: BoxDecoration(
-                color: active ? AppColors.teal : Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: active ? AppColors.teal : Colors.grey.shade200,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(cat.icon,
-                      size: 12,
-                      color: active ? Colors.white : AppColors.lightMute),
-                  const SizedBox(width: 5),
-                  Text(
-                    cat.i18nKey.tr(),
-                    style: AppTypography.body(
-                      size: 12,
-                      color: active ? Colors.white : AppColors.lightInk,
-                      weight: active ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                  ),
-                ],
+        children: [
+          ..._DevCategory.values.map((cat) => _chip(
+                key: cat.name,
+                label: cat.i18nKey.tr(),
+                icon: cat.icon,
+                active: cat.name == selectedKey,
+                isNew: false,
+              )),
+          ...extras.map((c) => _chip(
+                key: c['key'] as String? ?? '',
+                label: (c['label'] as String?) ?? (c['key'] as String? ?? ''),
+                icon: LucideIcons.sparkle,
+                active: c['key'] == selectedKey,
+                isNew: true,
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _chip({
+    required String key,
+    required String label,
+    required IconData icon,
+    required bool active,
+    required bool isNew,
+  }) {
+    return GestureDetector(
+      onTap: () => onSelect(key),
+      child: Container(
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+        decoration: BoxDecoration(
+          color: active ? AppColors.teal : Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: active
+                ? AppColors.teal
+                : (isNew
+                    ? AppColors.teal.withValues(alpha: 0.4)
+                    : Colors.grey.shade200),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon,
+                size: 12, color: active ? Colors.white : AppColors.lightMute),
+            const SizedBox(width: 5),
+            Text(
+              label,
+              style: AppTypography.body(
+                size: 12,
+                color: active ? Colors.white : AppColors.lightInk,
+                weight: active ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
-          );
-        }).toList(),
+          ],
+        ),
       ),
     );
   }
@@ -932,6 +1003,7 @@ class _SectionLabel extends StatelessWidget {
 class _SuggestionCard extends StatelessWidget {
   const _SuggestionCard({
     required this.suggestion,
+    required this.categoryLabel,
     required this.busy,
     required this.selectionMode,
     required this.selected,
@@ -940,6 +1012,7 @@ class _SuggestionCard extends StatelessWidget {
     required this.onReject,
   });
   final Map<String, dynamic> suggestion;
+  final String categoryLabel;
   final bool busy;
   final bool selectionMode;
   final bool selected;
@@ -952,10 +1025,13 @@ class _SuggestionCard extends StatelessWidget {
     final id = suggestion['id'] as String? ?? '';
     final title = suggestion['title'] as String? ?? '';
     final description = suggestion['description'] as String? ?? '';
-    final category = suggestion['category'] as String? ?? 'feature';
+    final reason = suggestion['reason'] as String?;
+    final kind = suggestion['kind'] as String? ?? 'improvement';
     final severity = suggestion['severity'] as String? ?? 'medium';
     final fileHint = suggestion['file_hint'] as String?;
     final sevColor = _severityColor(severity);
+    final kindColor = _kindColor(kind);
+    final kindIcon = _kindIcon(kind);
 
     final card = Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -994,12 +1070,23 @@ class _SuggestionCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
               ],
-              _Badge(
-                  text: 'adminDev.categories.$category'.tr(),
-                  color: AppColors.teal),
-              const SizedBox(width: 6),
-              _Badge(
-                  text: 'adminDev.severity.$severity'.tr(), color: sevColor),
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    // Typ-Marker zuerst (Bug/Neuerung/Verbesserung) mit Icon.
+                    _KindBadge(
+                        text: 'adminDev.kind.$kind'.tr(),
+                        color: kindColor,
+                        icon: kindIcon),
+                    _Badge(text: categoryLabel, color: AppColors.teal),
+                    _Badge(
+                        text: 'adminDev.severity.$severity'.tr(),
+                        color: sevColor),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -1013,6 +1100,43 @@ class _SuggestionCard extends StatelessWidget {
             Text(
               description,
               style: AppTypography.body(size: 12, color: AppColors.lightMute),
+            ),
+          ],
+          // „Warum" — leicht verständliche Begründung.
+          if (reason != null && reason.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: AppColors.amber.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(LucideIcons.lightbulb,
+                      size: 13, color: AppColors.amber),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        style: AppTypography.body(
+                            size: 11, color: AppColors.lightInk),
+                        children: [
+                          TextSpan(
+                            text: '${'adminDev.why'.tr()}: ',
+                            style: AppTypography.body(
+                                size: 11,
+                                color: AppColors.lightInk,
+                                weight: FontWeight.w700),
+                          ),
+                          TextSpan(text: reason),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
           if (fileHint != null && fileHint.isNotEmpty) ...[
@@ -1094,6 +1218,61 @@ class _SuggestionCard extends StatelessWidget {
       default:
         return AppColors.lightMute;
     }
+  }
+
+  Color _kindColor(String kind) {
+    switch (kind) {
+      case 'bug':
+        return Colors.red.shade700;
+      case 'new':
+        return Colors.indigo.shade400;
+      default: // improvement
+        return AppColors.teal;
+    }
+  }
+
+  IconData _kindIcon(String kind) {
+    switch (kind) {
+      case 'bug':
+        return LucideIcons.bug;
+      case 'new':
+        return LucideIcons.sparkles;
+      default: // improvement
+        return LucideIcons.wrench;
+    }
+  }
+}
+
+// Typ-Marker mit Icon (Bug/Neuerung/Verbesserung).
+class _KindBadge extends StatelessWidget {
+  const _KindBadge(
+      {required this.text, required this.color, required this.icon});
+  final String text;
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 10, color: color),
+          const SizedBox(width: 3),
+          Text(
+            text,
+            style: AppTypography.body(
+                size: 10, color: color, weight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
   }
 }
 

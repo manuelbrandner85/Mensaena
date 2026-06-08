@@ -1341,6 +1341,12 @@
       "ci": "CI",
       "merge": "Merge",
       "ota": "OTA"
+    },
+    "why": "Por qué",
+    "kind": {
+      "bug": "Error/Bug",
+      "improvement": "Mejora",
+      "new": "Novedad"
     }
   },
   "create": {

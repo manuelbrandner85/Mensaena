@@ -120,9 +120,8 @@ Deno.serve(async (req) => {
     const category = body?.category ? String(body.category) : null
     let q = admin
       .from('admin_dev_suggestions')
-      .select('id, category, severity, title, description, instruction, file_hint, status, created_at')
+      .select('id, category, kind, severity, title, description, reason, instruction, file_hint, status, created_at')
       .eq('status', 'pending')
-      .order('severity', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(60)
     if (category) q = q.eq('category', category)
@@ -138,7 +137,19 @@ Deno.serve(async (req) => {
       .limit(1)
       .maybeSingle()
 
-    return json({ ok: true, suggestions: data ?? [], scan: scan ?? null })
+    // Selbstlernende Kategorien (vom Agenten entdeckt oder manuell angelegt).
+    const { data: cats } = await admin
+      .from('admin_dev_categories')
+      .select('key, label, description, source')
+      .order('created_at', { ascending: true })
+      .limit(60)
+
+    return json({
+      ok: true,
+      suggestions: data ?? [],
+      scan: scan ?? null,
+      categories: cats ?? [],
+    })
   }
 
   // ── SCAN ──────────────────────────────────────────────────────────────────

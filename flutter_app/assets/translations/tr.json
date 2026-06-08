@@ -1340,6 +1340,12 @@
       "ci": "CI",
       "merge": "Birleştir",
       "ota": "OTA"
+    },
+    "why": "Neden",
+    "kind": {
+      "bug": "Hata/Bug",
+      "improvement": "İyileştirme",
+      "new": "Yenilik"
     }
   },
   "create": {
