@@ -55,11 +55,17 @@ $$;
 GRANT EXECUTE ON FUNCTION public.clear_ai_audit() TO authenticated;
 
 -- ── pg_cron: täglich 00:30 UTC — Einträge älter als 24 Stunden löschen ──
+-- cron.schedule() kennt KEIN "ON CONFLICT". Idempotenz daher über vorheriges
+-- unschedule (Fehler ignoriert, falls der Job noch nicht existiert).
+DO $$
+BEGIN
+  PERFORM cron.unschedule('ai_audit_24h_cleanup');
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;
+
 SELECT cron.schedule(
   'ai_audit_24h_cleanup',
   '30 0 * * *',
-  $$DELETE FROM public.ai_admin_audit WHERE created_at < now() - interval '24 hours'$$
-)
-ON CONFLICT (jobname) DO UPDATE
-  SET schedule = EXCLUDED.schedule,
-      command  = EXCLUDED.command;
+  'DELETE FROM public.ai_admin_audit WHERE created_at < now() - interval ''24 hours'''
+);
