@@ -27,6 +27,13 @@ on:
       scan_id:
         description: 'admin_scan_runs.id (UUID)'
         required: true
+  # Automatischer Cron-Scan: alle 30 Min, 12:00–18:00 Uhr deutscher Zeit.
+  # GitHub-Cron läuft in UTC ohne Sommer-/Winterzeit → fest auf Sommer (CEST,
+  # UTC+2): 10:00–16:00 UTC = 12:00–18:00 Uhr lokal. Im Winter (CET) verschiebt
+  # sich das Fenster lokal auf 11:00–17:00 Uhr.
+  schedule:
+    - cron: '0,30 10-15 * * *'  # 12:00–17:30 Uhr lokal (Sommer)
+    - cron: '0 16 * * *'        # 18:00 Uhr lokal (Sommer)
 
 permissions:
   contents: read
@@ -46,7 +53,40 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Bei Cron-Trigger gibt es keine vorab angelegte scan_id (die kommt sonst
+      # von der Edge Function). Wir legen die admin_scan_runs-Zeile hier selbst
+      # via service_role an. Wenn bereits ein Scan läuft (queued/running),
+      # überspringen wir lautlos, um Doppel-Scans/Kosten zu vermeiden.
+      - name: Cron-Scan vorbereiten (scan_run anlegen)
+        if: github.event_name == 'schedule'
+        run: |
+          # Nur kürzlich aktualisierte Runs zählen als aktiv — verwaiste
+          # "running"-Zeilen (abgestürzter Runner) älter als 2 h ignorieren,
+          # sonst würde ein Steckenbleiber alle künftigen Cron-Scans blockieren.
+          STALE=$(date -u -d '2 hours ago' +%FT%TZ)
+          ACTIVE=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_scan_runs?select=id&status=in.(queued,running)&updated_at=gt.${STALE}&limit=1" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(String(JSON.parse(s).length))}catch{process.stdout.write("0")}})')
+          if [ "$ACTIVE" != "0" ]; then
+            echo "Es läuft bereits ein Deep-Scan — Cron-Lauf wird übersprungen."
+            echo "SKIP_SCAN=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          NEW_ID=$(curl -sS -X POST \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_scan_runs" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=representation" \
+            -d "{\"status\":\"queued\"}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s)[0].id)}catch{process.stdout.write("")}})')
+          if [ -z "$NEW_ID" ]; then
+            echo "Konnte keine scan_run-Zeile anlegen."; exit 1
+          fi
+          echo "Cron-Scan angelegt: $NEW_ID"
+          echo "SCAN_ID=$NEW_ID" >> "$GITHUB_ENV"
+
       - name: Status -> running
+        if: env.SKIP_SCAN != '1'
         run: |
           curl -sS -X PATCH \
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_scan_runs?id=eq.${SCAN_ID}" \
@@ -55,14 +95,17 @@ jobs:
             -d "{\"status\":\"running\",\"phase\":\"scanning\",\"analyzed_files\":0,\"found_so_far\":0,\"heartbeat_at\":\"$(date -u +%FT%TZ)\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
       - name: Setup Node
+        if: env.SKIP_SCAN != '1'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Claude Code CLI installieren
+        if: env.SKIP_SCAN != '1'
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Analyse-Prompt schreiben
+        if: env.SKIP_SCAN != '1'
         run: |
           {
             echo "Du bist der Mensaena-Qualitäts-Analyst. Analysiere die GESAMTE"
@@ -162,6 +205,7 @@ jobs:
       # current_file + analyzed_files + heartbeat nach admin_scan_runs. So sieht
       # das Dashboard in Echtzeit, welche Datei gerade analysiert wird.
       - name: Fortschritt-Tailer schreiben
+        if: env.SKIP_SCAN != '1'
         run: |
           cat > /tmp/progress_tailer.js <<'TAILER'
           const https = require('https');
@@ -238,6 +282,7 @@ jobs:
           echo "Tailer geschrieben."
 
       - name: Analyse ausführen
+        if: env.SKIP_SCAN != '1'
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -258,6 +303,7 @@ jobs:
           tail -n 20 /tmp/scan_err.log || true
 
       - name: Vorschläge nach Supabase schreiben
+        if: env.SKIP_SCAN != '1'
         run: |
           set -e
           if [ ! -s /tmp/suggestions.json ]; then
@@ -344,7 +390,7 @@ jobs:
             -d "{\"status\":\"done\",\"phase\":\"done\",\"found\":${COUNT},\"found_so_far\":${COUNT},\"current_file\":null,\"heartbeat_at\":\"$(date -u +%FT%TZ)\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
       - name: Status -> failed (bei Fehler)
-        if: failure()
+        if: failure() && env.SKIP_SCAN != '1' && env.SCAN_ID != ''
         run: |
           curl -sS -X PATCH \
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_scan_runs?id=eq.${SCAN_ID}" \
