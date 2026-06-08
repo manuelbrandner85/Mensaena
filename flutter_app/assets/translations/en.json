@@ -1465,6 +1465,33 @@
     "voice": {
       "tooltip": "Dictate by voice",
       "unavailable": "Voice input unavailable."
+    },
+    "modules": {
+      "title": "Module Intelligence",
+      "subtitle": "AI analyses all app modules for weaknesses, missing features & inspiration",
+      "scanStart": "Start intelligence scan",
+      "scanning": "Analysing modules …",
+      "scanDone": "Scan complete — {count} insights",
+      "scanFailed": "Scan failed.",
+      "scanStarted": "Module scan started — this may take a few minutes.",
+      "empty": "No insights yet. Start a scan.",
+      "accept": "Implement as task",
+      "dismiss": "Dismiss",
+      "insightsLabel": "Module Insights",
+      "types": {
+        "improvement": "Improvement",
+        "new_module": "New Module",
+        "vulnerability": "Vulnerability",
+        "inspiration": "Inspiration"
+      },
+      "sources": {
+        "analysis": "Code Analysis",
+        "github": "GitHub",
+        "research": "Research"
+      },
+      "acceptedOk": "Task created — implementation running.",
+      "dismissedOk": "Dismissed.",
+      "actionFailed": "Action failed."
     }
   },
   "create": {

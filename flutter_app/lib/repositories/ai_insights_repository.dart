@@ -319,6 +319,73 @@ class AiInsightsRepository {
     }
   }
 
+  // ── Modul-Intelligenz (Admin) ─────────────────────────────────────────────
+
+  /// Lädt ausstehende Modul-Erkenntnisse + letzten Scan-Lauf.
+  static Future<Map<String, dynamic>> fetchModuleInsights() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-modules', body: {'action': 'list'})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] fetchModuleInsights failed: $e');
+      return const {};
+    }
+  }
+
+  /// Startet einen Modul-Intelligenz-Scan.
+  static Future<Map<String, dynamic>> startModuleScan() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-modules', body: {'action': 'scan_start'})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] startModuleScan failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Nimmt eine Modul-Erkenntnis an → erstellt Dev-Task.
+  static Future<Map<String, dynamic>> acceptModuleInsight(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-modules', body: {'action': 'accept', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] acceptModuleInsight failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Verwirft eine Modul-Erkenntnis.
+  static Future<Map<String, dynamic>> dismissModuleInsight(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-modules', body: {'action': 'dismiss', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] dismissModuleInsight failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht eine Modul-Erkenntnis dauerhaft.
+  static Future<Map<String, dynamic>> deleteModuleInsight(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-modules', body: {'action': 'delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteModuleInsight failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   /// Chatbot-Modus: schickt den Gesprächsverlauf an die KI und bekommt eine
   /// Antwort zurück. Erst wenn `ready==true` ist, liegt ein bestätigungsreifer
   /// Auftrag (`instruction`) vor, den der Admin per createDevTask absenden kann.

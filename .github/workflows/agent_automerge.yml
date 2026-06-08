@@ -100,4 +100,14 @@ jobs:
           MERGE_SHA=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
                         --json mergeCommit --jq '.mergeCommit.oid // empty' || true)
 
+          # 5) OTA sicherstellen: shorebird_patch.yml explizit dispatchen.
+          # Die push-Pfadfilter greifen nur bei flutter_app/**-Änderungen —
+          # dieser Dispatch ist der Safety-Net für alle anderen Fälle.
+          # Falls der Token keine actions:write-Berechtigung hat, schlägt das
+          # fehl (||true), der normale Push-Trigger ist dann das Backup.
+          gh workflow run shorebird_patch.yml \
+            --repo "${{ github.repository }}" \
+            --ref main \
+            --field source_branch=main 2>/dev/null || true
+
           patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

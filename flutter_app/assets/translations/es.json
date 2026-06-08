@@ -1465,6 +1465,33 @@
     "voice": {
       "tooltip": "Dictar por voz",
       "unavailable": "Entrada de voz no disponible."
+    },
+    "modules": {
+      "title": "Inteligencia de Módulos",
+      "subtitle": "La IA analiza todos los módulos en busca de debilidades, funciones faltantes e inspiración",
+      "scanStart": "Iniciar escaneo inteligente",
+      "scanning": "Analizando módulos …",
+      "scanDone": "Escaneo completo — {count} hallazgos",
+      "scanFailed": "Escaneo fallido.",
+      "scanStarted": "Escaneo de módulos iniciado — puede tardar unos minutos.",
+      "empty": "Sin hallazgos aún. Inicia un escaneo.",
+      "accept": "Implementar como tarea",
+      "dismiss": "Descartar",
+      "insightsLabel": "Hallazgos de Módulos",
+      "types": {
+        "improvement": "Mejora",
+        "new_module": "Nuevo Módulo",
+        "vulnerability": "Vulnerabilidad",
+        "inspiration": "Inspiración"
+      },
+      "sources": {
+        "analysis": "Análisis de Código",
+        "github": "GitHub",
+        "research": "Investigación"
+      },
+      "acceptedOk": "Tarea creada — implementación en marcha.",
+      "dismissedOk": "Descartado.",
+      "actionFailed": "Acción fallida."
     }
   },
   "create": {

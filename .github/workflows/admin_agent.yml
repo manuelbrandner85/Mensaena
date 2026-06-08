@@ -93,38 +93,39 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.AGENT_PAT }}
-          claude_args: "--max-turns 80"
+          claude_args: "--max-turns 40"
           prompt: |
-            Du bist der Mensaena-Entwicklungs-Agent. Ein Admin hat aus dem
-            Admin-Dashboard folgende Aufgabe gestellt. Setze sie vollständig um.
+            Du bist der Mensaena-Entwicklungs-Agent. Setze die Aufgabe DIREKT
+            und EFFIZIENT um — ohne langen Planungs-Overhead.
 
             === AUFGABE ===
             ${{ inputs.instruction }}
             === ENDE AUFGABE ===
 
             WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
-            liegen, sieh sie dir ZUERST mit dem Read-Tool an. Das sind
-            Screenshots, die der Admin zum Auftrag hochgeladen hat (z. B. um
-            ein Problem oder den gewünschten Zustand zu zeigen). Beziehe sie
-            in deine Umsetzung ein. Diese Bilder NIEMALS mit committen.
+            liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
+            NIEMALS committen.
 
-            Vorgehen (Schritt für Schritt):
-            1. Lies CLAUDE.md vollständig — halte ALLE Regeln ein.
-            2. Erstelle einen neuen Branch: agent/task-${{ inputs.task_id }}
-            3. Setze die Aufgabe um.
-            4. Stelle sicher: keine fehlenden Imports, keine erfundenen
-               LucideIcons, korrekte Dart-Typen.
-            5. Committe mit einer prägnanten Beschreibung der Änderung.
-            6. Pushe den Branch und erstelle einen PR gegen main mit:
-               - Der Aufgabe im Body
-               - "Auto-Merge erfolgt automatisch, sobald das Flutter-CI grün ist."
+            Ablauf (so kurz wie möglich):
+            1. Lies CLAUDE.md (Pflichtregeln) + beteiligte Dateien (gezielt lesen,
+               nicht den ganzen Codebase).
+            2. Branch erstellen: agent/task-${{ inputs.task_id }}
+            3. Änderungen umsetzen.
+            4. flutter analyze prüfen (nur wenn Dart-Dateien geändert).
+            5. Commit + Push + PR gegen main erstellen.
 
-            Verbindliche Regeln aus CLAUDE.md:
-            - i18n-Pflicht: JEDER neue user-facing String via .tr() in ALLEN
-              7 JSON-Dateien (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json).
+            Effizienz-Regeln:
+            - Lese NUR Dateien, die du wirklich brauchst (Glob/Grep statt
+              blind alle Files lesen).
+            - Verändere NIEMALS pubspec.yaml Version ohne explizite Anweisung.
+            - Für Breaking-Changes: füge [mandatory] in die Commit-Message ein.
+
+            Verbindliche Regeln (CLAUDE.md):
+            - i18n: JEDER neue UI-String via .tr() in ALLEN 7 JSON-Dateien
+              (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json).
             - Supabase-Streams: IMMER .limit() + autoDispose.
             - Design: primary/teal, KEINE emerald-Farben.
-            - Schreibe NIEMALS Secrets, Tokens oder Keys in den Code.
+            - NIEMALS Secrets/Tokens/Keys in den Code.
 
       - name: Screenshots/Goldens als Artefakt sichern (best-effort)
         if: always()
