@@ -103,6 +103,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   List<Map<String, dynamic>> _suggestions = const [];
   List<Map<String, dynamic>> _notes = const [];
   bool _notesExpanded = false;
+  // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
+  // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
+  String? _pendingNoteId;
   Map<String, dynamic>? _scan;
   final Set<String> _busySuggestions = {};
   final Set<String> _deletingTasks = {};
@@ -437,6 +440,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     );
     if (!mounted) return;
     setState(() => _sending = false);
+    // Falls der Send über eine Notiz lief und der Auftrag NICHT erstellt wurde
+    // (Admin hat im Sheet abgebrochen), bleibt die Notiz erhalten — Reset hier.
+    _pendingNoteId = null;
     await _refresh(silent: true);
   }
 
@@ -477,6 +483,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
         _wantScreens = false;
         _planMode = false;
       });
+      // Auftrag wurde erstellt → Notiz aus dem Backlog leeren (falls der Send
+      // über eine Notiz ausgelöst wurde).
+      final noteId = _pendingNoteId;
+      if (noteId != null && noteId.isNotEmpty) {
+        _pendingNoteId = null;
+        await AiInsightsRepository.deleteDevNote(noteId);
+        if (mounted) {
+          setState(() =>
+              _notes = _notes.where((n) => n['id'] != noteId).toList());
+        }
+      }
     }
     return res['ok'] == true;
   }
@@ -816,18 +833,15 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     }
   }
 
-  // Notiz „in den Auftrag übernehmen": Text ins Eingabefeld laden, damit der
-  // Admin ihn NOCH bearbeiten kann. Abgesendet wird erst über den normalen
-  // Senden-Button — und dort kommt dann die Bestätigung (Ja/Nein).
-  void _useNote(String content) {
-    setState(() {
-      _ctrl.text = content;
-      _ctrl.selection = TextSelection.collapsed(offset: content.length);
-      _notesExpanded = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('adminDev.notes.loadedIntoInput'.tr())),
-    );
+  // Notiz „senden": macht die Notiz direkt zum Auftrag (über den normalen
+  // Bestätigungs-Flow mit Ja/Nein). Nach erfolgreicher Auftragserstellung wird
+  // die Notiz automatisch aus dem Backlog gelöscht. Bricht der Admin im
+  // Bestätigungs-Sheet ab, bleibt die Notiz erhalten.
+  Future<void> _sendNote(String id, String content) async {
+    if (content.trim().isEmpty || _sending) return;
+    setState(() => _notesExpanded = false);
+    _pendingNoteId = id;
+    await _send(content);
   }
 
   String get _placeholder {
@@ -922,7 +936,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             onAdd: () => _editNote(),
                             onEdit: (n) => _editNote(existing: n),
                             onDelete: (id) => _deleteNote(id),
-                            onUse: (c) => _useNote(c),
+                            onUse: (id, c) => _sendNote(id, c),
                           ),
                           const SizedBox(height: 10),
                           _LiveScanCard(
@@ -1283,7 +1297,7 @@ class _NotesCard extends StatelessWidget {
   final VoidCallback onAdd;
   final void Function(Map<String, dynamic>) onEdit;
   final void Function(String) onDelete;
-  final void Function(String) onUse;
+  final void Function(String id, String content) onUse;
 
   @override
   Widget build(BuildContext context) {
@@ -1351,7 +1365,10 @@ class _NotesCard extends StatelessWidget {
                     note: n,
                     onEdit: () => onEdit(n),
                     onDelete: () => onDelete(n['id'] as String),
-                    onUse: () => onUse(n['content'] as String? ?? ''),
+                    onUse: () => onUse(
+                          n['id'] as String? ?? '',
+                          n['content'] as String? ?? '',
+                        ),
                   )),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
@@ -1421,7 +1438,7 @@ class _NoteTile extends StatelessWidget {
               TextButton.icon(
                 onPressed: onUse,
                 icon: const Icon(LucideIcons.send, size: 14),
-                label: Text('adminDev.notes.use'.tr()),
+                label: Text('common.send'.tr()),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.teal,
                   visualDensity: VisualDensity.compact,
@@ -2708,6 +2725,11 @@ class _InputBarState extends State<_InputBar> {
   bool _listening = false;
   String _baseTextBeforeListen = '';
 
+  // Eingabeleiste standardmäßig eingeklappt: unten nur das Eingabefeld. Tippt
+  // der Admin ins Feld, klappt der volle Funktionsumfang aus (Vorlagen,
+  // Schalter, Anhänge, Mikro). Manuelles Einklappen über den Chevron oben.
+  bool _expanded = false;
+
   @override
   void initState() {
     super.initState();
@@ -2833,12 +2855,31 @@ class _InputBarState extends State<_InputBar> {
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Collapse-Handle — nur sichtbar wenn ausgeklappt. Tap klappt ein.
+          if (_expanded)
+            Center(
+              child: InkWell(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  setState(() => _expanded = false);
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 2),
+                  child: Icon(LucideIcons.chevronDown,
+                      size: 20, color: AppColors.lightMute),
+                ),
+              ),
+            ),
           // Vorlagen-Chips (rotierender Pool — ändert sich nach jedem Tap).
-          SizedBox(
-            height: 30,
-            child: ListView(
+          if (_expanded)
+            SizedBox(
+              height: 30,
+              child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
                 for (final k in _visibleTemplates)
@@ -2859,7 +2900,7 @@ class _InputBarState extends State<_InputBar> {
             ),
           ),
           // Duplikat-Warnung: nur wenn starke Überschneidung mit bestehendem Auftrag.
-          if (dupWarning != null) ...[
+          if (_expanded && dupWarning != null) ...[
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -2888,7 +2929,7 @@ class _InputBarState extends State<_InputBar> {
             ),
           ],
           // Angehängte Screenshots (Vorschau + Entfernen).
-          if (widget.images.isNotEmpty) ...[
+          if (_expanded && widget.images.isNotEmpty) ...[
             const SizedBox(height: 8),
             SizedBox(
               height: 60,
@@ -2925,46 +2966,56 @@ class _InputBarState extends State<_InputBar> {
             ),
           ],
           // Optionen-Schalter: Review-Gate · Plan-Modus · Screenshots.
-          _toggleRow(
-            icon: LucideIcons.gitPullRequest,
-            label: 'adminDev.reviewBeforeMerge'.tr(),
-            value: widget.awaitReview,
-            onChanged: widget.sending ? null : widget.onToggleReview,
-          ),
-          _toggleRow(
-            icon: LucideIcons.listChecks,
-            label: 'adminDev.plan.toggle'.tr(),
-            value: widget.planMode,
-            onChanged: widget.sending ? null : widget.onTogglePlan,
-          ),
-          _toggleRow(
-            icon: LucideIcons.image,
-            label: 'adminDev.screens.toggle'.tr(),
-            value: widget.wantScreens,
-            onChanged: widget.sending ? null : widget.onToggleScreens,
-          ),
+          if (_expanded)
+            _toggleRow(
+              icon: LucideIcons.gitPullRequest,
+              label: 'adminDev.reviewBeforeMerge'.tr(),
+              value: widget.awaitReview,
+              onChanged: widget.sending ? null : widget.onToggleReview,
+            ),
+          if (_expanded)
+            _toggleRow(
+              icon: LucideIcons.listChecks,
+              label: 'adminDev.plan.toggle'.tr(),
+              value: widget.planMode,
+              onChanged: widget.sending ? null : widget.onTogglePlan,
+            ),
+          if (_expanded)
+            _toggleRow(
+              icon: LucideIcons.image,
+              label: 'adminDev.screens.toggle'.tr(),
+              value: widget.wantScreens,
+              onChanged: widget.sending ? null : widget.onToggleScreens,
+            ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              IconButton(
-                onPressed: widget.sending || widget.images.length >= 6 ? null : widget.onAttach,
-                icon: const Icon(LucideIcons.imagePlus, size: 20),
-                color: AppColors.teal,
-                tooltip: 'adminDev.attachImage'.tr(),
-              ),
-              IconButton(
-                onPressed: widget.sending ? null : _toggleListening,
-                icon: Icon(_listening ? LucideIcons.micOff : LucideIcons.mic,
-                    size: 20),
-                color: _listening ? Colors.red.shade600 : AppColors.teal,
-                tooltip: 'adminDev.voice.tooltip'.tr(),
-              ),
+              if (_expanded)
+                IconButton(
+                  onPressed: widget.sending || widget.images.length >= 6
+                      ? null
+                      : widget.onAttach,
+                  icon: const Icon(LucideIcons.imagePlus, size: 20),
+                  color: AppColors.teal,
+                  tooltip: 'adminDev.attachImage'.tr(),
+                ),
+              if (_expanded)
+                IconButton(
+                  onPressed: widget.sending ? null : _toggleListening,
+                  icon: Icon(_listening ? LucideIcons.micOff : LucideIcons.mic,
+                      size: 20),
+                  color: _listening ? Colors.red.shade600 : AppColors.teal,
+                  tooltip: 'adminDev.voice.tooltip'.tr(),
+                ),
               Expanded(
                 child: TextField(
                   controller: widget.ctrl,
                   onChanged: (_) => setState(() {}),
+                  onTap: _expanded
+                      ? null
+                      : () => setState(() => _expanded = true),
                   enabled: !widget.sending,
-                  maxLines: 4,
+                  maxLines: _expanded ? 4 : 1,
                   minLines: 1,
                   decoration: InputDecoration(
                     hintText: widget.placeholder,
