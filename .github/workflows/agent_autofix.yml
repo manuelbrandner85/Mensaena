@@ -166,5 +166,6 @@ jobs:
             exit 0
           fi
           git add -A
-          git commit -m "agent: Auto-Fix CI #${TASK_ID} (Versuch ${NEXT})"
+          TASK_TITLE="$(printf '%s' "$(cat /tmp/instruction.txt)" | head -c 60 | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+          git commit -m "agent: Fix CI – $TASK_TITLE (Versuch ${NEXT})"
           git push origin "HEAD:${BRANCH}"

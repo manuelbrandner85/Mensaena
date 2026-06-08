@@ -135,15 +135,15 @@ jobs:
             exit 0
           fi
           git add -A
-          TITLE="$(printf '%s' "$INSTRUCTION" | head -c 60 | tr '\n' ' ')"
-          git commit -m "agent: Admin-Auftrag #${TASK_ID}" -m "$INSTRUCTION"
+          TITLE="$(printf '%s' "$INSTRUCTION" | head -c 72 | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+          git commit -m "agent: $TITLE"
           git push -u origin "${{ steps.branch.outputs.branch }}"
 
           PR_BODY="$(printf '🤖 Automatisch erstellt durch den Admin-Dev-Agenten.\n\n**Auftrag:**\n%s\n\nAuto-Merge erfolgt automatisch, sobald das Flutter-CI grün ist.' "$INSTRUCTION")"
           PR_URL="$(gh pr create \
             --base main \
             --head "${{ steps.branch.outputs.branch }}" \
-            --title "🤖 Agent: $TITLE" \
+            --title "$TITLE" \
             --body "$PR_BODY" \
             --label "agent-automerge")"
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
