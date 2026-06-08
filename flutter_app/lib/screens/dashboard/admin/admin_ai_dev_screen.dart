@@ -1514,7 +1514,7 @@ class _ClearTasksButton extends StatelessWidget {
                     strokeWidth: 2, color: AppColors.lightMute),
               )
             else
-              Icon(LucideIcons.trash2, size: 12, color: AppColors.lightMute),
+              const Icon(LucideIcons.trash2, size: 12, color: AppColors.lightMute),
             const SizedBox(width: 4),
             Text('adminDev.clearDone'.tr(),
                 style:
@@ -1976,7 +1976,7 @@ class _TaskCard extends StatelessWidget {
               ),
               if (imageCount > 0) ...[
                 const SizedBox(width: 6),
-                Icon(LucideIcons.image, size: 12, color: AppColors.lightMute),
+                const Icon(LucideIcons.image, size: 12, color: AppColors.lightMute),
                 const SizedBox(width: 2),
                 Text('$imageCount',
                     style: AppTypography.body(
@@ -1994,8 +1994,8 @@ class _TaskCard extends StatelessWidget {
                 InkWell(
                   onTap: onCancel,
                   borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2),
+                  child: const Padding(
+                    padding: EdgeInsets.all(2),
                     child: Icon(LucideIcons.x,
                         size: 16, color: AppColors.lightMute),
                   ),
@@ -2004,8 +2004,8 @@ class _TaskCard extends StatelessWidget {
                 InkWell(
                   onTap: onDelete,
                   borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2),
+                  child: const Padding(
+                    padding: EdgeInsets.all(2),
                     child: Icon(LucideIcons.trash2,
                         size: 15, color: AppColors.lightMute),
                   ),
@@ -2128,21 +2128,21 @@ class _TaskCard extends StatelessWidget {
   _StatusMeta _statusMeta(String status) {
     switch (status) {
       case 'merged':
-        return _StatusMeta(LucideIcons.checkCircle2, Colors.green.shade600);
+        return const _StatusMeta(LucideIcons.checkCircle2, Colors.green);
       case 'pr_open':
-        return _StatusMeta(LucideIcons.gitPullRequest, AppColors.teal);
+        return const _StatusMeta(LucideIcons.gitPullRequest, AppColors.teal);
       case 'awaiting_review':
-        return _StatusMeta(LucideIcons.eye, AppColors.amber);
+        return const _StatusMeta(LucideIcons.eye, AppColors.amber);
       case 'running':
-        return _StatusMeta(LucideIcons.loader, AppColors.amber);
+        return const _StatusMeta(LucideIcons.loader, AppColors.amber);
       case 'failed':
-        return _StatusMeta(LucideIcons.xCircle, Colors.red.shade600);
+        return const _StatusMeta(LucideIcons.xCircle, Colors.red);
       case 'cancelled':
-        return _StatusMeta(LucideIcons.ban, AppColors.lightMute);
+        return const _StatusMeta(LucideIcons.ban, AppColors.lightMute);
       case 'no_changes':
-        return _StatusMeta(LucideIcons.minusCircle, AppColors.lightMute);
+        return const _StatusMeta(LucideIcons.minusCircle, AppColors.lightMute);
       default:
-        return _StatusMeta(LucideIcons.clock, AppColors.lightMute);
+        return const _StatusMeta(LucideIcons.clock, AppColors.lightMute);
     }
   }
 }
@@ -2449,7 +2449,7 @@ class _InputBarState extends State<_InputBar> {
                   Expanded(
                     child: Text(
                       'adminDev.duplicateWarning'
-                          .tr(namedArgs: {'task': dupWarning ?? ''}),
+                          .tr(namedArgs: {'task': dupWarning!}),
                       style: AppTypography.body(
                           size: 10, color: Colors.orange.shade800),
                       maxLines: 2,
@@ -2500,7 +2500,7 @@ class _InputBarState extends State<_InputBar> {
           // Review-Gate-Schalter.
           Row(
             children: [
-              Icon(LucideIcons.gitPullRequest,
+              const Icon(LucideIcons.gitPullRequest,
                   size: 13, color: AppColors.lightMute),
               const SizedBox(width: 6),
               Expanded(
