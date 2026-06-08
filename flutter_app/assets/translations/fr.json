@@ -1484,6 +1484,7 @@
       "types": {
         "improvement": "Amélioration",
         "new_module": "Nouveau Module",
+        "extension": "Extension",
         "vulnerability": "Vulnérabilité",
         "inspiration": "Inspiration"
       },

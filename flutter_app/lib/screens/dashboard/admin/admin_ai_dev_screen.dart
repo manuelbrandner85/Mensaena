@@ -4178,6 +4178,8 @@ class _ModuleIntelligenceCard extends StatelessWidget {
         return Colors.red.shade600;
       case 'new_module':
         return Colors.indigo.shade500;
+      case 'extension':
+        return Colors.purple.shade500;
       case 'inspiration':
         return Colors.blue.shade500;
       default:

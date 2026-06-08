@@ -1483,6 +1483,7 @@
       "types": {
         "improvement": "İyileştirme",
         "new_module": "Yeni Modül",
+        "extension": "Genişletme",
         "vulnerability": "Güvenlik Açığı",
         "inspiration": "İlham"
       },

@@ -1483,6 +1483,7 @@
       "types": {
         "improvement": "Verbesserung",
         "new_module": "Neues Modul",
+        "extension": "Erweiterung",
         "vulnerability": "Schwachstelle",
         "inspiration": "Inspiration"
       },

@@ -1483,6 +1483,7 @@
       "types": {
         "improvement": "Улучшение",
         "new_module": "Новый Модуль",
+        "extension": "Расширение",
         "vulnerability": "Уязвимость",
         "inspiration": "Вдохновение"
       },
