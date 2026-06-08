@@ -1,3 +1,6 @@
+// OTA-Patch-Trigger: liefert die KI-Admin-Features (Risikoprofil, Trends,
+// NL-Analytik) + Standort-Datenschutz + Livestream-Fix via Shorebird an
+// bestehende Installationen aus (reparierter Patch-Workflow, PR #610).
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
