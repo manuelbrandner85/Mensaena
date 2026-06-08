@@ -1,14 +1,18 @@
 // ignore_for_file: lines_longer_than_80_chars
 import 'dart:async';
+import 'dart:io';
+import 'dart:math' show Random;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_insights_repository.dart';
+import '../../../services/image_upload_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -96,12 +100,18 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   final _ctrl = TextEditingController();
   List<Map<String, dynamic>> _tasks = const [];
   List<Map<String, dynamic>> _suggestions = const [];
+  List<Map<String, dynamic>> _notes = const [];
+  bool _notesExpanded = false;
   Map<String, dynamic>? _scan;
   final Set<String> _busySuggestions = {};
   final Set<String> _deletingTasks = {};
   bool _clearingTasks = false;
   bool _loading = true;
   bool _sending = false;
+
+  // Anhänge (Screenshots/Vision) + Review-Gate für den nächsten Auftrag.
+  final List<File> _pendingImages = [];
+  bool _awaitReview = false;
   bool _suggestionsLoading = false;
   String _categoryKey = 'all';
   List<Map<String, dynamic>> _categories = const []; // selbstlernende Kategorien
@@ -119,6 +129,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     super.initState();
     _refresh();
     _loadSuggestions();
+    _loadNotes();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
       if (_scanning) _loadSuggestions(silent: true);
       if (_hasActive) _refresh(silent: true);
@@ -168,9 +179,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     });
   }
 
-  // Ein abgeschlossener Auftrag ist löschbar (merged/failed/no_changes).
+  // Ein abgeschlossener Auftrag ist löschbar.
   bool _deletable(String? status) =>
-      status == 'merged' || status == 'failed' || status == 'no_changes';
+      status == 'merged' ||
+      status == 'failed' ||
+      status == 'no_changes' ||
+      status == 'cancelled';
 
   // Anzahl löschbarer (abgeschlossener) Aufträge.
   int get _doneCount =>
@@ -407,10 +421,170 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   }
 
   // Wird vom Chat-Sheet aufgerufen, sobald der Admin „Ja, umsetzen" tippt.
+  // Lädt zuvor angehängte Screenshots hoch und übergibt sie + das Review-Gate.
   Future<bool> _confirmChatTask(String instruction) async {
-    final res =
-        await AiInsightsRepository.createDevTask('${_categoryPrefix()}$instruction');
+    var urls = const <String>[];
+    if (_pendingImages.isNotEmpty) {
+      urls = await ImageUploadService.upload(
+        List<File>.from(_pendingImages),
+        bucket: 'post-images',
+      );
+    }
+    final res = await AiInsightsRepository.createDevTask(
+      '${_categoryPrefix()}$instruction',
+      imageUrls: urls,
+      awaitReview: _awaitReview,
+    );
+    if (res['ok'] == true) {
+      setState(() {
+        _pendingImages.clear();
+        _awaitReview = false;
+      });
+    }
     return res['ok'] == true;
+  }
+
+  // Screenshots zum Auftrag auswählen (Vision — der Agent „sieht" sie).
+  Future<void> _pickImages() async {
+    try {
+      final picked = await ImagePicker().pickMultiImage(imageQuality: 80);
+      if (picked.isEmpty || !mounted) return;
+      setState(() {
+        for (final x in picked) {
+          if (_pendingImages.length >= 6) break;
+          _pendingImages.add(File(x.path));
+        }
+      });
+    } catch (_) {/* Picker abgebrochen/kein Zugriff */}
+  }
+
+  void _removeImage(int index) {
+    setState(() => _pendingImages.removeAt(index));
+  }
+
+  // Fehlgeschlagenen Auftrag wiederholen — lädt Instruction ins Eingabefeld
+  // und öffnet den Chat-Bestätigungs-Flow wie bei einem neuen Auftrag.
+  Future<void> _retryTask(String instruction) async {
+    setState(() {
+      _ctrl.text = instruction;
+      _ctrl.selection = TextSelection.collapsed(offset: instruction.length);
+    });
+    await _send(instruction);
+  }
+
+  // Laufenden Auftrag abbrechen.
+  Future<void> _cancelTask(String id) async {
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.cancelDevTask(id);
+    if (!mounted) return;
+    setState(() => _deletingTasks.remove(id));
+    if (res['ok'] == true) {
+      await _refresh(silent: true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.cancelFailed'.tr())),
+      );
+    }
+  }
+
+  // Wartenden Auftrag (Review-Gate) freigeben & mergen.
+  Future<void> _mergeTask(String id) async {
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.mergeDevTask(id);
+    if (!mounted) return;
+    setState(() => _deletingTasks.remove(id));
+    if (res['ok'] == true) {
+      await _refresh(silent: true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.mergeFailed'.tr())),
+      );
+    }
+  }
+
+  // Diff/geänderte Dateien des PRs anzeigen.
+  Future<void> _showDiff(String id) async {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _DiffSheet(taskId: id),
+    );
+  }
+
+  // ── Notizen / Backlog ──────────────────────────────────────────────────────
+  Future<void> _loadNotes() async {
+    final rows = await AiInsightsRepository.fetchDevNotes();
+    if (!mounted) return;
+    setState(() => _notes = rows);
+  }
+
+  // Notiz anlegen oder bearbeiten (Dialog mit Textfeld).
+  Future<void> _editNote({Map<String, dynamic>? existing}) async {
+    final ctrl = TextEditingController(
+        text: existing?['content'] as String? ?? '');
+    final content = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(existing == null
+            ? 'adminDev.notes.add'.tr()
+            : 'adminDev.notes.edit'.tr()),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: 6,
+          minLines: 3,
+          decoration: InputDecoration(
+            hintText: 'adminDev.notes.placeholder'.tr(),
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(ctrl.text.trim()),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
+            child: Text('common.save'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (content == null || content.isEmpty) return;
+    final res = await AiInsightsRepository.saveDevNote(
+        id: existing?['id'] as String?, content: content);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      await _loadNotes();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.notes.saveFailed'.tr())),
+      );
+    }
+  }
+
+  Future<void> _deleteNote(String id) async {
+    final res = await AiInsightsRepository.deleteDevNote(id);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      setState(() => _notes = _notes.where((n) => n['id'] != id).toList());
+    }
+  }
+
+  // Notiz „in den Auftrag übernehmen": Text ins Eingabefeld laden, damit der
+  // Admin ihn NOCH bearbeiten kann. Abgesendet wird erst über den normalen
+  // Senden-Button — und dort kommt dann die Bestätigung (Ja/Nein).
+  void _useNote(String content) {
+    setState(() {
+      _ctrl.text = content;
+      _ctrl.selection = TextSelection.collapsed(offset: content.length);
+      _notesExpanded = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('adminDev.notes.loadedIntoInput'.tr())),
+    );
   }
 
   String get _placeholder {
@@ -466,6 +640,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                     : ListView(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         children: [
+                          _NotesCard(
+                            notes: _notes,
+                            expanded: _notesExpanded,
+                            onToggle: () => setState(
+                                () => _notesExpanded = !_notesExpanded),
+                            onAdd: () => _editNote(),
+                            onEdit: (n) => _editNote(existing: n),
+                            onDelete: (id) => _deleteNote(id),
+                            onUse: (c) => _useNote(c),
+                          ),
+                          const SizedBox(height: 10),
                           _LiveScanCard(
                             scanning: _scanning,
                             scan: _scan,
@@ -517,15 +702,32 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             _EmptyHint(),
                           ..._tasks.map((t) {
                             final id = t['id'] as String?;
-                            final canDelete =
-                                _deletable(t['status'] as String?) &&
-                                    id != null;
+                            final status = t['status'] as String?;
+                            final canDelete = _deletable(status) && id != null;
+                            final canCancel = id != null &&
+                                (status == 'queued' ||
+                                    status == 'running' ||
+                                    status == 'pr_open' ||
+                                    status == 'awaiting_review');
+                            final isReview =
+                                status == 'awaiting_review' && id != null;
+                            final canRetry = id != null &&
+                                (status == 'failed' || status == 'no_changes');
                             return _TaskCard(
                               task: t,
-                              onDelete: canDelete
-                                  ? () => _deleteTask(id)
+                              busy: _deletingTasks.contains(id),
+                              onDelete:
+                                  canDelete ? () => _deleteTask(id) : null,
+                              onCancel:
+                                  canCancel ? () => _cancelTask(id) : null,
+                              onMerge: isReview ? () => _mergeTask(id) : null,
+                              onShowDiff: id != null && t['pr_number'] != null
+                                  ? () => _showDiff(id)
                                   : null,
-                              deleting: _deletingTasks.contains(id),
+                              onRetry: canRetry
+                                  ? () => _retryTask(
+                                      t['instruction'] as String? ?? '')
+                                  : null,
                             );
                           }),
                           const SizedBox(height: 12),
@@ -545,6 +747,19 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
               sending: _sending,
               placeholder: _placeholder,
               onSend: _send,
+              images: _pendingImages,
+              onAttach: _pickImages,
+              onRemoveImage: _removeImage,
+              awaitReview: _awaitReview,
+              onToggleReview: (v) => setState(() => _awaitReview = v),
+              onTemplate: (t) {
+                _ctrl.text = t;
+                _ctrl.selection = TextSelection.collapsed(offset: t.length);
+              },
+              existingInstructions: _tasks
+                  .map((t) => t['instruction'] as String? ?? '')
+                  .where((s) => s.isNotEmpty)
+                  .toList(),
             ),
           ],
         ),
@@ -764,6 +979,176 @@ class _SeverityRow extends StatelessWidget {
 
 // ── Live Scan Card ──────────────────────────────────────────────────────────
 
+// ── Notizen / Backlog (ausklappbar) ─────────────────────────────────────────
+
+class _NotesCard extends StatelessWidget {
+  const _NotesCard({
+    required this.notes,
+    required this.expanded,
+    required this.onToggle,
+    required this.onAdd,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onUse,
+  });
+  final List<Map<String, dynamic>> notes;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onAdd;
+  final void Function(Map<String, dynamic>) onEdit;
+  final void Function(String) onDelete;
+  final void Function(String) onUse;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.scrollText,
+                      size: 18, color: AppColors.trust),
+                  const SizedBox(width: 10),
+                  Text(
+                    'adminDev.notes.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('${notes.length}',
+                        style: AppTypography.body(
+                            size: 10, color: AppColors.lightMute)),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    expanded
+                        ? LucideIcons.chevronUp
+                        : LucideIcons.chevronDown,
+                    size: 18,
+                    color: AppColors.lightMute,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            if (notes.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+                child: Text('adminDev.notes.empty'.tr(),
+                    style: AppTypography.body(
+                        size: 12, color: AppColors.lightMute)),
+              )
+            else
+              ...notes.map((n) => _NoteTile(
+                    note: n,
+                    onEdit: () => onEdit(n),
+                    onDelete: () => onDelete(n['id'] as String),
+                    onUse: () => onUse(n['content'] as String? ?? ''),
+                  )),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
+              child: TextButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text('adminDev.notes.add'.tr()),
+                style: TextButton.styleFrom(foregroundColor: AppColors.teal),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _NoteTile extends StatelessWidget {
+  const _NoteTile({
+    required this.note,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onUse,
+  });
+  final Map<String, dynamic> note;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onUse;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = note['content'] as String? ?? '';
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            content,
+            style: AppTypography.body(size: 12, color: AppColors.lightInk),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: onEdit,
+                icon: const Icon(LucideIcons.pencil, size: 15),
+                color: AppColors.lightMute,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'adminDev.notes.edit'.tr(),
+              ),
+              IconButton(
+                onPressed: onDelete,
+                icon: const Icon(LucideIcons.trash2, size: 15),
+                color: AppColors.lightMute,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'common.delete'.tr(),
+              ),
+              TextButton.icon(
+                onPressed: onUse,
+                icon: const Icon(LucideIcons.send, size: 14),
+                label: Text('adminDev.notes.use'.tr()),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.teal,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LiveScanCard extends StatefulWidget {
   const _LiveScanCard({
     required this.scanning,
@@ -783,6 +1168,7 @@ class _LiveScanCard extends StatefulWidget {
 class _LiveScanCardState extends State<_LiveScanCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ac;
+  Timer? _tick; // sekündlicher Tick für die Laufzeit-Anzeige
 
   @override
   void initState() {
@@ -791,12 +1177,29 @@ class _LiveScanCardState extends State<_LiveScanCard>
       vsync: this,
       duration: const Duration(milliseconds: 1100),
     )..repeat(reverse: true);
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted && widget.scanning) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _ac.dispose();
+    _tick?.cancel();
     super.dispose();
+  }
+
+  // Laufzeit seit Scan-Start als mm:ss (aus created_at).
+  String _elapsed(Map<String, dynamic>? scan) {
+    final raw = scan?['created_at'] as String?;
+    if (raw == null) return '';
+    final start = DateTime.tryParse(raw);
+    if (start == null) return '';
+    final secs = DateTime.now().toUtc().difference(start.toUtc()).inSeconds;
+    if (secs < 0) return '';
+    final m = (secs ~/ 60).toString().padLeft(2, '0');
+    final s = (secs % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   @override
@@ -804,10 +1207,12 @@ class _LiveScanCardState extends State<_LiveScanCard>
     final scan = widget.scan;
     final scanning = widget.scanning;
     final currentFile = scan?['current_file'] as String?;
+    final phase = scan?['phase'] as String?;
     final analyzed = (scan?['analyzed_files'] as num?)?.toInt() ?? 0;
     final foundSoFar = (scan?['found_so_far'] as num?)?.toInt() ?? 0;
     final found = (scan?['found'] as num?)?.toInt() ?? 0;
     final isDone = (scan?['status'] as String?) == 'done';
+    final elapsed = scanning ? _elapsed(scan) : '';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -941,7 +1346,24 @@ class _LiveScanCardState extends State<_LiveScanCard>
                         AppTypography.body(size: 10, color: AppColors.teal),
                   ),
                 ],
+                const Spacer(),
+                if (elapsed.isNotEmpty) ...[
+                  const Icon(LucideIcons.clock,
+                      size: 12, color: AppColors.lightMute),
+                  const SizedBox(width: 4),
+                  Text(elapsed,
+                      style: AppTypography.body(
+                          size: 10, color: AppColors.lightMute)),
+                ],
               ],
+            ),
+            const SizedBox(height: 6),
+            // Aktuelle Phase + Beruhigungs-Hinweis (Audit dauert ein paar Min.).
+            Text(
+              (phase != null && phase.isNotEmpty)
+                  ? 'adminDev.scanPhase'.tr(namedArgs: {'phase': phase})
+                  : 'adminDev.scanLongHint'.tr(),
+              style: AppTypography.body(size: 10, color: AppColors.lightMute),
             ),
           ],
         ],
@@ -1092,7 +1514,7 @@ class _ClearTasksButton extends StatelessWidget {
                     strokeWidth: 2, color: AppColors.lightMute),
               )
             else
-              Icon(LucideIcons.trash2, size: 12, color: AppColors.lightMute),
+              const Icon(LucideIcons.trash2, size: 12, color: AppColors.lightMute),
             const SizedBox(width: 4),
             Text('adminDev.clearDone'.tr(),
                 style:
@@ -1496,10 +1918,22 @@ class _EmptyHint extends StatelessWidget {
 // ── Task Card (mit Live-Pipeline) ───────────────────────────────────────────
 
 class _TaskCard extends StatelessWidget {
-  const _TaskCard({required this.task, this.onDelete, this.deleting = false});
+  const _TaskCard({
+    required this.task,
+    this.onDelete,
+    this.onCancel,
+    this.onMerge,
+    this.onShowDiff,
+    this.onRetry,
+    this.busy = false,
+  });
   final Map<String, dynamic> task;
   final VoidCallback? onDelete;
-  final bool deleting;
+  final VoidCallback? onCancel;
+  final VoidCallback? onMerge;
+  final VoidCallback? onShowDiff;
+  final VoidCallback? onRetry;
+  final bool busy;
 
   @override
   Widget build(BuildContext context) {
@@ -1511,6 +1945,7 @@ class _TaskCard extends StatelessWidget {
     final ciRunUrl = task['ci_run_url'] as String?;
     final summary = task['summary'] as String?;
     final error = task['error'] as String?;
+    final imageCount = (task['image_urls'] as List?)?.length ?? 0;
     final meta = _statusMeta(status);
 
     return Container(
@@ -1539,33 +1974,42 @@ class _TaskCard extends StatelessWidget {
                 style: AppTypography.body(
                     size: 12, color: meta.color, weight: FontWeight.w600),
               ),
+              if (imageCount > 0) ...[
+                const SizedBox(width: 6),
+                const Icon(LucideIcons.image, size: 12, color: AppColors.lightMute),
+                const SizedBox(width: 2),
+                Text('$imageCount',
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+              ],
               const Spacer(),
-              if (status == 'queued' ||
-                  status == 'running' ||
-                  status == 'pr_open')
+              if (busy)
                 const SizedBox(
                   width: 13,
                   height: 13,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppColors.teal),
+                      strokeWidth: 2, color: AppColors.lightMute),
+                )
+              else if (onCancel != null)
+                InkWell(
+                  onTap: onCancel,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.all(2),
+                    child: Icon(LucideIcons.x,
+                        size: 16, color: AppColors.lightMute),
+                  ),
                 )
               else if (onDelete != null)
-                deleting
-                    ? const SizedBox(
-                        width: 13,
-                        height: 13,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.lightMute),
-                      )
-                    : InkWell(
-                        onTap: onDelete,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Icon(LucideIcons.trash2,
-                              size: 15, color: AppColors.lightMute),
-                        ),
-                      ),
+                InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.all(2),
+                    child: Icon(LucideIcons.trash2,
+                        size: 15, color: AppColors.lightMute),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -1616,6 +2060,66 @@ class _TaskCard extends StatelessWidget {
               ],
             ),
           ],
+          // Wiederholen-Button für fehlgeschlagene Aufträge.
+          if (onRetry != null) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: busy ? null : onRetry,
+                icon: const Icon(LucideIcons.refreshCw, size: 14),
+                label: Text('adminDev.retry'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.teal,
+                  side: BorderSide(color: AppColors.teal.withValues(alpha: 0.4)),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          ],
+          // Diff-Vorschau + (bei Review-Gate) manuelle Freigabe.
+          if (onShowDiff != null || onMerge != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                if (onShowDiff != null)
+                  OutlinedButton.icon(
+                    onPressed: busy ? null : onShowDiff,
+                    icon: const Icon(LucideIcons.fileSearch, size: 14),
+                    label: Text('adminDev.viewDiff'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.teal,
+                      side: BorderSide(
+                          color: AppColors.teal.withValues(alpha: 0.4)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                if (onMerge != null) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: busy ? null : onMerge,
+                      icon: busy
+                          ? const SizedBox(
+                              width: 13,
+                              height: 13,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
+                          : const Icon(LucideIcons.checkCircle2, size: 15),
+                      label: Text('adminDev.approveMerge'.tr()),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.teal,
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -1624,17 +2128,21 @@ class _TaskCard extends StatelessWidget {
   _StatusMeta _statusMeta(String status) {
     switch (status) {
       case 'merged':
-        return _StatusMeta(LucideIcons.checkCircle2, Colors.green.shade600);
+        return const _StatusMeta(LucideIcons.checkCircle2, Colors.green);
       case 'pr_open':
-        return _StatusMeta(LucideIcons.gitPullRequest, AppColors.teal);
+        return const _StatusMeta(LucideIcons.gitPullRequest, AppColors.teal);
+      case 'awaiting_review':
+        return const _StatusMeta(LucideIcons.eye, AppColors.amber);
       case 'running':
-        return _StatusMeta(LucideIcons.loader, AppColors.amber);
+        return const _StatusMeta(LucideIcons.loader, AppColors.amber);
       case 'failed':
-        return _StatusMeta(LucideIcons.xCircle, Colors.red.shade600);
+        return const _StatusMeta(LucideIcons.xCircle, Colors.red);
+      case 'cancelled':
+        return const _StatusMeta(LucideIcons.ban, AppColors.lightMute);
       case 'no_changes':
-        return _StatusMeta(LucideIcons.minusCircle, AppColors.lightMute);
+        return const _StatusMeta(LucideIcons.minusCircle, AppColors.lightMute);
       default:
-        return _StatusMeta(LucideIcons.clock, AppColors.lightMute);
+        return const _StatusMeta(LucideIcons.clock, AppColors.lightMute);
     }
   }
 }
@@ -1676,6 +2184,13 @@ class _PipelineStepper extends StatelessWidget {
           s[2] = _Stage.active; // pending/running
         }
         break;
+      case 'awaiting_review':
+        // CI grün, wartet auf manuelle Freigabe (Merge-Schritt aktiv).
+        s[0] = _Stage.done;
+        s[1] = _Stage.done;
+        s[2] = _Stage.done;
+        s[3] = _Stage.active;
+        break;
       case 'merged':
         s[0] = _Stage.done;
         s[1] = _Stage.done;
@@ -1684,6 +2199,9 @@ class _PipelineStepper extends StatelessWidget {
         s[4] = _Stage.active; // OTA läuft
         break;
       case 'failed':
+        s[0] = _Stage.error;
+        break;
+      case 'cancelled':
         s[0] = _Stage.error;
         break;
       default:
@@ -1800,73 +2318,260 @@ class _LinkButton extends StatelessWidget {
 
 // ── Input Bar ─────────────────────────────────────────────────────────────────
 
-class _InputBar extends StatelessWidget {
+// Vollständiger Pool aller Auftrags-Vorlagen. Bei jedem Tap werden 4 zufällige
+// aus diesem Pool angezeigt — so erscheinen nie zweimal dieselben Chips.
+const _allTemplateKeys = [
+  'i18nCheck', 'perfCheck', 'darkMode', 'a11y',
+  'onboarding', 'security', 'animations', 'crashes',
+  'dependencies', 'notifications', 'offline', 'emptyStates',
+];
+
+class _InputBar extends StatefulWidget {
   const _InputBar({
     required this.ctrl,
     required this.sending,
     required this.placeholder,
     required this.onSend,
+    required this.images,
+    required this.onAttach,
+    required this.onRemoveImage,
+    required this.awaitReview,
+    required this.onToggleReview,
+    required this.onTemplate,
+    required this.existingInstructions,
   });
   final TextEditingController ctrl;
   final bool sending;
   final String placeholder;
   final Future<void> Function([String?]) onSend;
+  final List<File> images;
+  final VoidCallback onAttach;
+  final void Function(int) onRemoveImage;
+  final bool awaitReview;
+  final void Function(bool) onToggleReview;
+  final void Function(String) onTemplate;
+  // Für Duplikat-Erkennung (simple Keyword-Überschneidung).
+  final List<String> existingInstructions;
+
+  @override
+  State<_InputBar> createState() => _InputBarState();
+}
+
+class _InputBarState extends State<_InputBar> {
+  late List<String> _visibleTemplates;
+
+  @override
+  void initState() {
+    super.initState();
+    _visibleTemplates = _pickTemplates();
+  }
+
+  // Wählt 4 zufällige Templates aus dem Pool.
+  List<String> _pickTemplates() {
+    final pool = List<String>.from(_allTemplateKeys)..shuffle(Random());
+    return pool.take(4).toList();
+  }
+
+  void _onTemplateTap(String key) {
+    widget.onTemplate('adminDev.templateTexts.$key'.tr());
+    // Nach jedem Tap neuen Mix anzeigen.
+    setState(() => _visibleTemplates = _pickTemplates());
+  }
+
+  // Einfache Duplikat-Warnung: prüft ob der Eingabe-Text signifikante
+  // Wortüberschneidung mit einem bestehenden Auftrag hat.
+  String? _duplicateWarning(String text) {
+    if (text.length < 10) return null;
+    final words = text.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
+    if (words.isEmpty) return null;
+    for (final instr in widget.existingInstructions) {
+      final existWords = instr.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
+      final overlap = words.intersection(existWords).length;
+      if (overlap >= 3 && overlap / words.length > 0.4) {
+        return instr.length > 60 ? '${instr.substring(0, 60)}…' : instr;
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final inputText = widget.ctrl.text;
+    final dupWarning = _duplicateWarning(inputText);
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: TextField(
-              controller: ctrl,
-              enabled: !sending,
-              maxLines: 4,
-              minLines: 1,
-              decoration: InputDecoration(
-                hintText: placeholder,
-                hintStyle:
-                    AppTypography.body(size: 13, color: AppColors.lightMute),
-                filled: true,
-                fillColor: Colors.grey.shade50,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: const BorderSide(color: AppColors.teal),
+          // Vorlagen-Chips (rotierender Pool — ändert sich nach jedem Tap).
+          SizedBox(
+            height: 30,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                for (final k in _visibleTemplates)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ActionChip(
+                      label: Text('adminDev.templates.$k'.tr(),
+                          style: AppTypography.body(
+                              size: 11, color: AppColors.teal)),
+                      backgroundColor: AppColors.teal.withValues(alpha: 0.07),
+                      side: BorderSide(
+                          color: AppColors.teal.withValues(alpha: 0.25)),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: widget.sending ? null : () => _onTemplateTap(k),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          // Duplikat-Warnung: nur wenn starke Überschneidung mit bestehendem Auftrag.
+          if (dupWarning != null) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(LucideIcons.alertTriangle,
+                      size: 13, color: Colors.orange.shade700),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'adminDev.duplicateWarning'
+                          .tr(namedArgs: {'task': dupWarning}),
+                      style: AppTypography.body(
+                          size: 10, color: Colors.orange.shade800),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          // Angehängte Screenshots (Vorschau + Entfernen).
+          if (widget.images.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 60,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: widget.images.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, i) => Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(widget.images[i],
+                          width: 60, height: 60, fit: BoxFit.cover),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () => widget.onRemoveImage(i),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: const Icon(LucideIcons.x,
+                              size: 12, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
+          ],
+          // Review-Gate-Schalter.
+          Row(
+            children: [
+              const Icon(LucideIcons.gitPullRequest,
+                  size: 13, color: AppColors.lightMute),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text('adminDev.reviewBeforeMerge'.tr(),
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+              ),
+              Switch(
+                value: widget.awaitReview,
+                onChanged: widget.sending ? null : widget.onToggleReview,
+                activeColor: AppColors.teal,
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          FilledButton(
-            onPressed: sending ? null : () => onSend(),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.teal,
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(14),
-            ),
-            child: sending
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
-                : const Icon(LucideIcons.send, size: 18, color: Colors.white),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: widget.sending || widget.images.length >= 6 ? null : widget.onAttach,
+                icon: const Icon(LucideIcons.imagePlus, size: 20),
+                color: AppColors.teal,
+                tooltip: 'adminDev.attachImage'.tr(),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: widget.ctrl,
+                  onChanged: (_) => setState(() {}),
+                  enabled: !widget.sending,
+                  maxLines: 4,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                    hintText: widget.placeholder,
+                    hintStyle: AppTypography.body(
+                        size: 13, color: AppColors.lightMute),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: const BorderSide(color: AppColors.teal),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              FilledButton(
+                onPressed: widget.sending ? null : () => widget.onSend(),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.teal,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(14),
+                ),
+                child: widget.sending
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                    : const Icon(LucideIcons.send,
+                        size: 18, color: Colors.white),
+              ),
+            ],
           ),
         ],
       ),
@@ -2198,6 +2903,202 @@ class _ChatThinking extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Diff-Sheet: zeigt die geänderten Dateien (Patch) des PRs ────────────────
+
+class _DiffSheet extends StatefulWidget {
+  const _DiffSheet({required this.taskId});
+  final String taskId;
+
+  @override
+  State<_DiffSheet> createState() => _DiffSheetState();
+}
+
+class _DiffSheetState extends State<_DiffSheet> {
+  bool _loading = true;
+  String? _error;
+  List<Map<String, dynamic>> _files = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final res = await AiInsightsRepository.fetchDevTaskDiff(widget.taskId);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      if (res['ok'] == true) {
+        _files = ((res['files'] as List?) ?? const [])
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      } else {
+        _error = 'adminDev.diffError'.tr();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 8, 8),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.fileSearch,
+                    size: 18, color: AppColors.teal),
+                const SizedBox(width: 8),
+                Text(
+                  'adminDev.diffTitle'.tr(),
+                  style: AppTypography.body(
+                      size: 14,
+                      color: AppColors.lightInk,
+                      weight: FontWeight.w700),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(LucideIcons.x, size: 18),
+                  color: AppColors.lightMute,
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                    ? Center(
+                        child: Text(_error!,
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.lightMute)))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(14),
+                        itemCount: _files.length,
+                        itemBuilder: (context, i) => _DiffFileTile(file: _files[i]),
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DiffFileTile extends StatelessWidget {
+  const _DiffFileTile({required this.file});
+  final Map<String, dynamic> file;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = file['filename'] as String? ?? '';
+    final additions = file['additions'] as int? ?? 0;
+    final deletions = file['deletions'] as int? ?? 0;
+    final patch = file['patch'] as String?;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: EdgeInsets.zero,
+          title: Text(
+            name,
+            style: AppTypography.body(
+                size: 12, color: AppColors.lightInk, weight: FontWeight.w600),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Row(
+            children: [
+              Text('+$additions',
+                  style: AppTypography.body(
+                      size: 11, color: Colors.green.shade600)),
+              const SizedBox(width: 8),
+              Text('-$deletions',
+                  style: AppTypography.body(
+                      size: 11, color: Colors.red.shade600)),
+            ],
+          ),
+          children: [
+            if (patch != null && patch.isNotEmpty)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFF0D1117),
+                padding: const EdgeInsets.all(10),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _DiffPatch(patch: patch),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text('adminDev.diffBinary'.tr(),
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Färbt Diff-Zeilen (+ grün, - rot, @@ teal) im Monospace-Stil.
+class _DiffPatch extends StatelessWidget {
+  const _DiffPatch({required this.patch});
+  final String patch;
+
+  @override
+  Widget build(BuildContext context) {
+    final lines = patch.split('\n');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final line in lines)
+          Text(
+            line.isEmpty ? ' ' : line,
+            style: TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 11,
+              height: 1.35,
+              color: line.startsWith('+')
+                  ? const Color(0xFF7EE787)
+                  : line.startsWith('-')
+                      ? const Color(0xFFFFA198)
+                      : line.startsWith('@@')
+                          ? const Color(0xFF79C0FF)
+                          : const Color(0xFFC9D1D9),
+            ),
+          ),
+      ],
     );
   }
 }

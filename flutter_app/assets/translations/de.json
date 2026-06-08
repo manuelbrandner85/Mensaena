@@ -1317,7 +1317,9 @@
       "pr_open": "Wird geprüft (CI)",
       "merged": "Ausgeliefert",
       "failed": "Fehlgeschlagen",
-      "no_changes": "Keine Änderung"
+      "no_changes": "Keine Änderung",
+      "awaiting_review": "Wartet auf Freigabe",
+      "cancelled": "Abgebrochen"
     },
     "scanAnalyzing": "Analysiere {file}",
     "scanFilesRead": "{count} Dateien analysiert",
@@ -1356,7 +1358,58 @@
       "confirmYes": "Ja, umsetzen",
       "confirmNo": "Weiter anpassen",
       "error": "Die KI ist gerade nicht erreichbar."
-    }
+    },
+    "cancelFailed": "Abbruch fehlgeschlagen.",
+    "mergeFailed": "Freigabe/Merge fehlgeschlagen.",
+    "viewDiff": "Diff ansehen",
+    "approveMerge": "Freigeben & mergen",
+    "attachImage": "Screenshot anhängen",
+    "reviewBeforeMerge": "Vor Merge prüfen (manuelle Freigabe)",
+    "diffTitle": "Änderungen (Diff)",
+    "diffError": "Diff konnte nicht geladen werden.",
+    "diffBinary": "Keine Textänderung (Binärdatei o. Ä.).",
+    "templates": {
+      "i18nCheck": "Übersetzungen",
+      "perfCheck": "Performance",
+      "darkMode": "Dark-Mode",
+      "a11y": "Barrierefreiheit",
+      "onboarding": "Onboarding",
+      "security": "Sicherheit",
+      "animations": "Animationen",
+      "crashes": "Abstürze",
+      "dependencies": "Dependencies",
+      "notifications": "Benachrichtigungen",
+      "offline": "Offline-Modus",
+      "emptyStates": "Leerzustände"
+    },
+    "templateTexts": {
+      "i18nCheck": "Prüfe alle Übersetzungen auf fehlende Schlüssel und unnatürliche Formulierungen in allen 7 Sprachen und korrigiere sie.",
+      "perfCheck": "Analysiere die App auf Performance-Probleme (unnötige Rebuilds, fehlende Stream-Limits) und behebe sie.",
+      "darkMode": "Füge einen Dark-Mode-Schalter in den Einstellungen hinzu und stelle sicher, dass alle Screens ihn unterstützen.",
+      "a11y": "Verbessere die Barrierefreiheit: Kontraste, Touch-Zielgrößen und Screenreader-Labels.",
+      "onboarding": "Verbessere den Onboarding-Flow für neue Nutzer: klarere Schritte, bessere Erklärungen und eine motivierende Abschluss-Seite.",
+      "security": "Prüfe alle RLS-Regeln und Sicherheitskonfigurationen — identifiziere und schließe Sicherheitslücken.",
+      "animations": "Füge subtile, elegante Animationen zu den Hauptscreens hinzu: sanfte Übergänge, Hero-Animationen und Feedback-Effekte.",
+      "crashes": "Analysiere die häufigsten Abstürze und Fehler in der App und behebe die kritischsten davon.",
+      "dependencies": "Aktualisiere alle veralteten Dependencies auf die neuesten stabilen Versionen und behebe Kompatibilitätsprobleme.",
+      "notifications": "Verbessere den Push-Benachrichtigungs-Flow: bessere Texte, smarte Zeitplanung und Gruppen-Benachrichtigungen.",
+      "offline": "Verbessere die Offline-Funktionalität: sinnvolle Fehlermeldungen, lokales Caching wichtiger Daten und Sync nach Reconnect.",
+      "emptyStates": "Füge ansprechende Leerzustände mit Illustrationen, motivierenden Texten und Handlungsaufforderungen zu allen Screens hinzu."
+    },
+    "notes": {
+      "title": "Backlog / Notizen",
+      "add": "Neue Notiz",
+      "edit": "Notiz bearbeiten",
+      "empty": "Noch keine Notizen. Füge Ideen oder geplante Aufgaben hinzu.",
+      "placeholder": "Idee oder Aufgabe beschreiben …",
+      "saveFailed": "Notiz konnte nicht gespeichert werden.",
+      "loadedIntoInput": "Notiz in Eingabe geladen — jetzt bearbeiten und absenden.",
+      "use": "Verwenden"
+    },
+    "scanPhase": "Phase: {phase}",
+    "scanLongHint": "Die Analyse kann mehrere Minuten dauern — bitte warten.",
+    "retry": "Wiederholen",
+    "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\""
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",
