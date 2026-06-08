@@ -1138,6 +1138,9 @@
     "toggleFailed": "Değiştirilemedi. Özellikleri yalnızca yöneticiler değiştirebilir.",
     "auditTitle": "Yapay Zekâ Etkinliği",
     "auditEmpty": "Henüz yapay zekâ etkinliği yok.",
+    "auditClearAll": "Tümünü sil",
+    "auditAutoDeleteNote": "Girişler 24 saat sonra otomatik olarak silinir.",
+    "clearFailed": "Silme başarısız.",
     "cat": {
       "moderation": "Güvenlik ve Moderasyon",
       "growth": "Büyüme ve Topluluk",
@@ -1480,6 +1483,7 @@
       "types": {
         "improvement": "İyileştirme",
         "new_module": "Yeni Modül",
+        "extension": "Genişletme",
         "vulnerability": "Güvenlik Açığı",
         "inspiration": "İlham"
       },

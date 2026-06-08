@@ -1139,6 +1139,9 @@
     "toggleFailed": "Error al cambiar. Solo los administradores pueden modificar funciones.",
     "auditTitle": "Actividad de IA",
     "auditEmpty": "Aún no hay actividad de IA.",
+    "auditClearAll": "Eliminar todo",
+    "auditAutoDeleteNote": "Las entradas se eliminan automáticamente después de 24 horas.",
+    "clearFailed": "Error al eliminar.",
     "cat": {
       "moderation": "Seguridad y moderación",
       "growth": "Crecimiento y comunidad",
@@ -1481,6 +1484,7 @@
       "types": {
         "improvement": "Mejora",
         "new_module": "Nuevo Módulo",
+        "extension": "Ampliación",
         "vulnerability": "Vulnerabilidad",
         "inspiration": "Inspiración"
       },

@@ -438,8 +438,17 @@ class _FlagTileState extends ConsumerState<_FlagTile> {
 // KI-Audit
 // ---------------------------------------------------------------------------
 
-class _AuditCard extends ConsumerWidget {
+class _AuditCard extends ConsumerStatefulWidget {
   const _AuditCard();
+
+  @override
+  ConsumerState<_AuditCard> createState() => _AuditCardState();
+}
+
+class _AuditCardState extends ConsumerState<_AuditCard> {
+  final Set<String> _deleting = {};
+  bool _clearing = false;
+  List<Map<String, dynamic>>? _localRows;
 
   String _relativeTime(DateTime? then) {
     if (then == null) return '';
@@ -453,8 +462,39 @@ class _AuditCard extends ConsumerWidget {
     return 'admin.relTime.dAgo'.tr(namedArgs: {'d': '${diff.inDays}'});
   }
 
+  Future<void> _deleteEntry(String id) async {
+    setState(() => _deleting.add(id));
+    final ok = await AiAdminRepository.deleteAuditEntry(id);
+    if (!mounted) return;
+    if (ok) {
+      setState(() {
+        _localRows = (_localRows ?? []).where((r) => r['id'] != id).toList();
+        _deleting.remove(id);
+      });
+    } else {
+      setState(() => _deleting.remove(id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminAi.clearFailed'.tr())),
+      );
+    }
+  }
+
+  Future<void> _clearAll() async {
+    setState(() => _clearing = true);
+    final deleted = await AiAdminRepository.clearAudit();
+    if (!mounted) return;
+    setState(() => _clearing = false);
+    if (deleted >= 0) {
+      setState(() => _localRows = []);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminAi.clearFailed'.tr())),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final audit = ref.watch(aiAuditProvider);
     return Container(
       padding: const EdgeInsets.all(16),
@@ -466,8 +506,45 @@ class _AuditCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('adminAi.auditTitle'.tr(),
-              style: AppTypography.display(size: 16, color: AppColors.ink)),
+          Row(
+            children: [
+              Expanded(
+                child: Text('adminAi.auditTitle'.tr(),
+                    style:
+                        AppTypography.display(size: 16, color: AppColors.ink)),
+              ),
+              audit.maybeWhen(
+                data: (rows) {
+                  final effective = _localRows ?? rows;
+                  if (effective.isEmpty) return const SizedBox.shrink();
+                  return TextButton.icon(
+                    onPressed: _clearing ? null : _clearAll,
+                    icon: _clearing
+                        ? const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.mute))
+                        : const Icon(LucideIcons.trash2, size: 13),
+                    label: Text('adminAi.auditClearAll'.tr(),
+                        style: AppTypography.body(
+                            size: 12,
+                            color: AppColors.mute,
+                            weight: FontWeight.w600)),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.mute,
+                      minimumSize: const Size(0, 28),
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                  );
+                },
+                orElse: () => const SizedBox.shrink(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('adminAi.auditAutoDeleteNote'.tr(),
+              style: AppTypography.caption()),
           const SizedBox(height: 8),
           audit.when(
             loading: () => Column(
@@ -482,15 +559,20 @@ class _AuditCard extends ConsumerWidget {
             error: (_, __) => Text('adminAi.auditEmpty'.tr(),
                 style: AppTypography.caption()),
             data: (rows) {
-              if (rows.isEmpty) {
+              if (_localRows == null) {
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => setState(() => _localRows = rows));
+              }
+              final effective = _localRows ?? rows;
+              if (effective.isEmpty) {
                 return Text('adminAi.auditEmpty'.tr(),
                     style: AppTypography.caption());
               }
               return Column(
                 children: [
-                  for (var i = 0; i < rows.length; i++) ...[
-                    _auditRow(rows[i]),
-                    if (i < rows.length - 1)
+                  for (var i = 0; i < effective.length; i++) ...[
+                    _auditRow(effective[i]),
+                    if (i < effective.length - 1)
                       const Divider(
                           color: AppColors.line, height: 1, thickness: 1),
                   ],
@@ -504,16 +586,21 @@ class _AuditCard extends ConsumerWidget {
   }
 
   Widget _auditRow(Map<String, dynamic> e) {
+    final id = (e['id'] ?? '').toString();
     final feature = (e['feature'] ?? '').toString();
     final summary = (e['summary'] ?? '').toString();
     final createdRaw = e['created_at']?.toString();
     final created = createdRaw != null ? DateTime.tryParse(createdRaw) : null;
+    final isBusy = _deleting.contains(id);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(LucideIcons.sparkles, size: 15, color: AppColors.mute),
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(LucideIcons.sparkles, size: 15, color: AppColors.mute),
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -533,7 +620,27 @@ class _AuditCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(_relativeTime(created), style: AppTypography.caption()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(_relativeTime(created), style: AppTypography.caption()),
+              const SizedBox(height: 4),
+              GestureDetector(
+                onTap: isBusy || id.isEmpty ? null : () => _deleteEntry(id),
+                child: isBusy
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.mute))
+                    : Icon(LucideIcons.x,
+                        size: 14,
+                        color: id.isEmpty
+                            ? AppColors.line
+                            : AppColors.mute.withValues(alpha: 0.6)),
+              ),
+            ],
+          ),
         ],
       ),
     );

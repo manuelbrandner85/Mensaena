@@ -161,13 +161,23 @@ jobs:
             echo "   Beispiele: Nachbarschaftswachen, Hausmeister-Pool, Tier-Hilfe,"
             echo "   Pflanzen-Tausch, Lesekreis, Repair-Café..."
             echo ""
+            echo "5. BESTEHENDE MODULE ERWEITERN (insight_type='extension')"
+            echo "   Schlage Erweiterungen vor, die ein VORHANDENES Modul um neue"
+            echo "   Fähigkeiten ausbauen — mehr als eine kleine Verbesserung, aber"
+            echo "   kein komplett neues Modul. Beispiele: Chat um Sprachnachrichten-"
+            echo "   Transkription erweitern, Marktplatz um Tausch-Modus, Events um"
+            echo "   Wiederkehr-Termine, Profil um Fähigkeiten-Tags. Nutze das"
+            echo "   bestehende Modul als Basis und beschreibe konkret die neue"
+            echo "   Funktion. Liefere für JEDES größere Modul mindestens eine"
+            echo "   sinnvolle Erweiterung."
+            echo ""
             echo "=== OUTPUT-FORMAT ==="
             echo ""
             echo "Schreibe das Ergebnis als reines JSON in /tmp/module_insights.json:"
             echo '{ "insights": [ {'
             echo '  "module_name":   "Name des Moduls (z.B. Chat, Marktplatz, Events)",'
             echo '  "screen_path":   "relativer Pfad (z.B. flutter_app/lib/screens/chat/)",'
-            echo '  "insight_type":  "improvement|new_module|vulnerability|inspiration",'
+            echo '  "insight_type":  "improvement|new_module|extension|vulnerability|inspiration",'
             echo '  "title":         "Kurzer Titel (Deutsch, max 120 Zeichen)",'
             echo '  "description":   "Problem/Nutzen (1-3 Sätze, Deutsch)",'
             echo '  "instruction":   "Präzise Umsetzungs-Anweisung für den Dev-Agenten",'
@@ -239,7 +249,7 @@ jobs:
               const a = raw.indexOf("{"); const b = raw.lastIndexOf("}");
               parsed = JSON.parse(raw.slice(a, b + 1));
             }
-            const types = ["improvement","new_module","vulnerability","inspiration"];
+            const types = ["improvement","new_module","extension","vulnerability","inspiration"];
             const sevs  = ["critical","high","medium","low"];
             const cats  = ["ux","feature","security","performance","i18n","new_module"];
             const srcs  = ["analysis","github","research"];
