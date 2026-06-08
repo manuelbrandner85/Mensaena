@@ -54,7 +54,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.AGENT_PAT }}
-          fetch-depth: 0
+          # Shallow Checkout: der Agent erstellt einen frischen Branch vom
+          # main-Tip + PR — die volle Historie braucht er nicht. fetch-depth:1
+          # spart bei großem Repo ~1-2 Min Klon-Zeit.
+          fetch-depth: 1
 
       - name: Status -> running
         run: |
