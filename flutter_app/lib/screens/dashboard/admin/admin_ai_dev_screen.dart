@@ -2725,6 +2725,11 @@ class _InputBarState extends State<_InputBar> {
   bool _listening = false;
   String _baseTextBeforeListen = '';
 
+  // Eingabeleiste standardmäßig eingeklappt: unten nur das Eingabefeld. Tippt
+  // der Admin ins Feld, klappt der volle Funktionsumfang aus (Vorlagen,
+  // Schalter, Anhänge, Mikro). Manuelles Einklappen über den Chevron oben.
+  bool _expanded = false;
+
   @override
   void initState() {
     super.initState();
@@ -2850,12 +2855,31 @@ class _InputBarState extends State<_InputBar> {
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Collapse-Handle — nur sichtbar wenn ausgeklappt. Tap klappt ein.
+          if (_expanded)
+            Center(
+              child: InkWell(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  setState(() => _expanded = false);
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 2),
+                  child: Icon(LucideIcons.chevronDown,
+                      size: 20, color: AppColors.lightMute),
+                ),
+              ),
+            ),
           // Vorlagen-Chips (rotierender Pool — ändert sich nach jedem Tap).
-          SizedBox(
-            height: 30,
-            child: ListView(
+          if (_expanded)
+            SizedBox(
+              height: 30,
+              child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
                 for (final k in _visibleTemplates)
@@ -2876,7 +2900,7 @@ class _InputBarState extends State<_InputBar> {
             ),
           ),
           // Duplikat-Warnung: nur wenn starke Überschneidung mit bestehendem Auftrag.
-          if (dupWarning != null) ...[
+          if (_expanded && dupWarning != null) ...[
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -2905,7 +2929,7 @@ class _InputBarState extends State<_InputBar> {
             ),
           ],
           // Angehängte Screenshots (Vorschau + Entfernen).
-          if (widget.images.isNotEmpty) ...[
+          if (_expanded && widget.images.isNotEmpty) ...[
             const SizedBox(height: 8),
             SizedBox(
               height: 60,
@@ -2942,46 +2966,56 @@ class _InputBarState extends State<_InputBar> {
             ),
           ],
           // Optionen-Schalter: Review-Gate · Plan-Modus · Screenshots.
-          _toggleRow(
-            icon: LucideIcons.gitPullRequest,
-            label: 'adminDev.reviewBeforeMerge'.tr(),
-            value: widget.awaitReview,
-            onChanged: widget.sending ? null : widget.onToggleReview,
-          ),
-          _toggleRow(
-            icon: LucideIcons.listChecks,
-            label: 'adminDev.plan.toggle'.tr(),
-            value: widget.planMode,
-            onChanged: widget.sending ? null : widget.onTogglePlan,
-          ),
-          _toggleRow(
-            icon: LucideIcons.image,
-            label: 'adminDev.screens.toggle'.tr(),
-            value: widget.wantScreens,
-            onChanged: widget.sending ? null : widget.onToggleScreens,
-          ),
+          if (_expanded)
+            _toggleRow(
+              icon: LucideIcons.gitPullRequest,
+              label: 'adminDev.reviewBeforeMerge'.tr(),
+              value: widget.awaitReview,
+              onChanged: widget.sending ? null : widget.onToggleReview,
+            ),
+          if (_expanded)
+            _toggleRow(
+              icon: LucideIcons.listChecks,
+              label: 'adminDev.plan.toggle'.tr(),
+              value: widget.planMode,
+              onChanged: widget.sending ? null : widget.onTogglePlan,
+            ),
+          if (_expanded)
+            _toggleRow(
+              icon: LucideIcons.image,
+              label: 'adminDev.screens.toggle'.tr(),
+              value: widget.wantScreens,
+              onChanged: widget.sending ? null : widget.onToggleScreens,
+            ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              IconButton(
-                onPressed: widget.sending || widget.images.length >= 6 ? null : widget.onAttach,
-                icon: const Icon(LucideIcons.imagePlus, size: 20),
-                color: AppColors.teal,
-                tooltip: 'adminDev.attachImage'.tr(),
-              ),
-              IconButton(
-                onPressed: widget.sending ? null : _toggleListening,
-                icon: Icon(_listening ? LucideIcons.micOff : LucideIcons.mic,
-                    size: 20),
-                color: _listening ? Colors.red.shade600 : AppColors.teal,
-                tooltip: 'adminDev.voice.tooltip'.tr(),
-              ),
+              if (_expanded)
+                IconButton(
+                  onPressed: widget.sending || widget.images.length >= 6
+                      ? null
+                      : widget.onAttach,
+                  icon: const Icon(LucideIcons.imagePlus, size: 20),
+                  color: AppColors.teal,
+                  tooltip: 'adminDev.attachImage'.tr(),
+                ),
+              if (_expanded)
+                IconButton(
+                  onPressed: widget.sending ? null : _toggleListening,
+                  icon: Icon(_listening ? LucideIcons.micOff : LucideIcons.mic,
+                      size: 20),
+                  color: _listening ? Colors.red.shade600 : AppColors.teal,
+                  tooltip: 'adminDev.voice.tooltip'.tr(),
+                ),
               Expanded(
                 child: TextField(
                   controller: widget.ctrl,
                   onChanged: (_) => setState(() {}),
+                  onTap: _expanded
+                      ? null
+                      : () => setState(() => _expanded = true),
                   enabled: !widget.sending,
-                  maxLines: 4,
+                  maxLines: _expanded ? 4 : 1,
                   minLines: 1,
                   decoration: InputDecoration(
                     hintText: widget.placeholder,
