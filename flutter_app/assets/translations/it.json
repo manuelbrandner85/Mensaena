@@ -1318,7 +1318,9 @@
       "pr_open": "In revisione (CI)",
       "merged": "Distribuito",
       "failed": "Fallito",
-      "no_changes": "Nessuna modifica"
+      "no_changes": "Nessuna modifica",
+      "awaiting_review": "In attesa di approvazione",
+      "cancelled": "Annullato"
     },
     "scanAnalyzing": "Analisi di {file}",
     "scanFilesRead": "{count} file analizzati",
@@ -1357,6 +1359,27 @@
       "confirmYes": "Sì, esegui",
       "confirmNo": "Continua a perfezionare",
       "error": "L'IA non è al momento disponibile."
+    },
+    "cancelFailed": "Annullamento non riuscito.",
+    "mergeFailed": "Approvazione/merge non riuscito.",
+    "viewDiff": "Vedi diff",
+    "approveMerge": "Approva e unisci",
+    "attachImage": "Allega screenshot",
+    "reviewBeforeMerge": "Rivedi prima del merge (approvazione manuale)",
+    "diffTitle": "Modifiche (diff)",
+    "diffError": "Impossibile caricare il diff.",
+    "diffBinary": "Nessuna modifica testuale (file binario ecc.).",
+    "templates": {
+      "i18nCheck": "Traduzioni",
+      "perfCheck": "Prestazioni",
+      "darkMode": "Modalità scura",
+      "a11y": "Accessibilità"
+    },
+    "templateTexts": {
+      "i18nCheck": "Controlla tutte le traduzioni per chiavi mancanti e formulazioni innaturali in tutte le 7 lingue e correggile.",
+      "perfCheck": "Analizza l’app per problemi di prestazioni (rebuild inutili, limiti di stream mancanti) e correggili.",
+      "darkMode": "Aggiungi un interruttore per la modalità scura nelle impostazioni e assicurati che tutte le schermate la supportino.",
+      "a11y": "Migliora l’accessibilità: contrasti, dimensioni dei target touch ed etichette per screen reader."
     }
   },
   "create": {

@@ -1317,7 +1317,9 @@
       "pr_open": "Wird geprüft (CI)",
       "merged": "Ausgeliefert",
       "failed": "Fehlgeschlagen",
-      "no_changes": "Keine Änderung"
+      "no_changes": "Keine Änderung",
+      "awaiting_review": "Wartet auf Freigabe",
+      "cancelled": "Abgebrochen"
     },
     "scanAnalyzing": "Analysiere {file}",
     "scanFilesRead": "{count} Dateien analysiert",
@@ -1356,6 +1358,27 @@
       "confirmYes": "Ja, umsetzen",
       "confirmNo": "Weiter anpassen",
       "error": "Die KI ist gerade nicht erreichbar."
+    },
+    "cancelFailed": "Abbruch fehlgeschlagen.",
+    "mergeFailed": "Freigabe/Merge fehlgeschlagen.",
+    "viewDiff": "Diff ansehen",
+    "approveMerge": "Freigeben & mergen",
+    "attachImage": "Screenshot anhängen",
+    "reviewBeforeMerge": "Vor Merge prüfen (manuelle Freigabe)",
+    "diffTitle": "Änderungen (Diff)",
+    "diffError": "Diff konnte nicht geladen werden.",
+    "diffBinary": "Keine Textänderung (Binärdatei o. Ä.).",
+    "templates": {
+      "i18nCheck": "Übersetzungen",
+      "perfCheck": "Performance",
+      "darkMode": "Dark-Mode",
+      "a11y": "Barrierefreiheit"
+    },
+    "templateTexts": {
+      "i18nCheck": "Prüfe alle Übersetzungen auf fehlende Schlüssel und unnatürliche Formulierungen in allen 7 Sprachen und korrigiere sie.",
+      "perfCheck": "Analysiere die App auf Performance-Probleme (unnötige Rebuilds, fehlende Stream-Limits) und behebe sie.",
+      "darkMode": "Füge einen Dark-Mode-Schalter in den Einstellungen hinzu und stelle sicher, dass alle Screens ihn unterstützen.",
+      "a11y": "Verbessere die Barrierefreiheit: Kontraste, Touch-Zielgrößen und Screenreader-Labels."
     }
   },
   "create": {

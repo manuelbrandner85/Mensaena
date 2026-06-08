@@ -68,6 +68,20 @@ jobs:
             exit 0
           fi
 
+          # 2b) Review-Gate: wenn der Admin "Vor Merge prüfen" gewählt hat
+          #     (await_review=true), NICHT automatisch mergen — stattdessen
+          #     auf 'awaiting_review' setzen. Der Admin gibt im Dashboard frei.
+          AWAIT=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=await_review" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(String(a[0]&&a[0].await_review===true))}catch{process.stdout.write("false")}})')
+          if [ "$AWAIT" = "true" ]; then
+            echo "Review-Gate aktiv — warte auf manuelle Freigabe."
+            patch_status "{\"status\":\"awaiting_review\",\"ci_status\":\"success\",\"ci_run_url\":\"${CI_RUN_URL}\",\"pr_number\":${PR_NUM},\"summary\":\"CI grün — wartet auf deine Freigabe (Diff prüfen, dann mergen).\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 0
+          fi
+
           # 3) Kein anderer abgeschlossener Check darf fehlgeschlagen sein
           FAILED=$(gh api "repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs" \
                      --jq '[.check_runs[] | select(.status=="completed") | select(.conclusion=="failure" or .conclusion=="cancelled" or .conclusion=="timed_out" or .conclusion=="action_required")] | length')

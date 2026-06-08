@@ -29,6 +29,10 @@ on:
       task_id:
         description: 'admin_dev_tasks.id (UUID)'
         required: true
+      image_urls:
+        description: 'JSON-Array mit Screenshot-URLs (optional, für Vision)'
+        required: false
+        default: '[]'
 
 permissions:
   contents: write
@@ -60,6 +64,29 @@ jobs:
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
             -d "{\"status\":\"running\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
+      - name: Screenshots herunterladen (Vision)
+        env:
+          IMGS: ${{ inputs.image_urls }}
+        run: |
+          # Bilder in einen lokalen Ordner laden. Per .git/info/exclude vom
+          # Commit ausgeschlossen, damit der Agent sie NICHT versehentlich
+          # mit eincheckt — sie dienen nur als visueller Kontext.
+          mkdir -p .godmode_images
+          echo ".godmode_images/" >> .git/info/exclude
+          COUNT=$(node -e 'const a=JSON.parse(process.env.IMGS||"[]"); process.stdout.write(String(Array.isArray(a)?a.length:0))')
+          echo "Bilder: $COUNT"
+          [ "$COUNT" = "0" ] && exit 0
+          node -e 'const a=JSON.parse(process.env.IMGS||"[]"); a.forEach(u=>console.log(u))' > /tmp/img_urls.txt
+          i=0
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            ext=$(printf '%s' "$url" | sed -E 's/.*\.([a-zA-Z0-9]{1,4})($|\?).*/\1/')
+            case "$ext" in jpg|jpeg|png|gif|webp) ;; *) ext=jpg;; esac
+            curl -sSL "$url" -o ".godmode_images/screenshot_${i}.${ext}" || true
+            i=$((i+1))
+          done < /tmp/img_urls.txt
+          ls -la .godmode_images/ || true
+
       - name: Agent ausführen
         uses: anthropics/claude-code-action@v1
         with:
@@ -74,6 +101,12 @@ jobs:
             === AUFGABE ===
             ${{ inputs.instruction }}
             === ENDE AUFGABE ===
+
+            WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
+            liegen, sieh sie dir ZUERST mit dem Read-Tool an. Das sind
+            Screenshots, die der Admin zum Auftrag hochgeladen hat (z. B. um
+            ein Problem oder den gewünschten Zustand zu zeigen). Beziehe sie
+            in deine Umsetzung ein. Diese Bilder NIEMALS mit committen.
 
             Vorgehen (Schritt für Schritt):
             1. Lies CLAUDE.md vollständig — halte ALLE Regeln ein.

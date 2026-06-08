@@ -1317,7 +1317,9 @@
       "pr_open": "İnceleniyor (CI)",
       "merged": "Teslim edildi",
       "failed": "Başarısız",
-      "no_changes": "Değişiklik yok"
+      "no_changes": "Değişiklik yok",
+      "awaiting_review": "Onay bekliyor",
+      "cancelled": "İptal edildi"
     },
     "scanAnalyzing": "{file} analiz ediliyor",
     "scanFilesRead": "{count} dosya analiz edildi",
@@ -1356,6 +1358,27 @@
       "confirmYes": "Evet, uygula",
       "confirmNo": "Düzenlemeye devam",
       "error": "Yapay zeka şu anda erişilemiyor."
+    },
+    "cancelFailed": "İptal başarısız.",
+    "mergeFailed": "Onay/birleştirme başarısız.",
+    "viewDiff": "Diff’i gör",
+    "approveMerge": "Onayla ve birleştir",
+    "attachImage": "Ekran görüntüsü ekle",
+    "reviewBeforeMerge": "Birleştirmeden önce incele (manuel onay)",
+    "diffTitle": "Değişiklikler (diff)",
+    "diffError": "Diff yüklenemedi.",
+    "diffBinary": "Metin değişikliği yok (ikili dosya vb.).",
+    "templates": {
+      "i18nCheck": "Çeviriler",
+      "perfCheck": "Performans",
+      "darkMode": "Karanlık mod",
+      "a11y": "Erişilebilirlik"
+    },
+    "templateTexts": {
+      "i18nCheck": "Tüm çevirileri 7 dilde eksik anahtarlar ve doğal olmayan ifadeler için kontrol et ve düzelt.",
+      "perfCheck": "Uygulamayı performans sorunları (gereksiz yeniden oluşturmalar, eksik stream limitleri) için analiz et ve düzelt.",
+      "darkMode": "Ayarlara bir karanlık mod düğmesi ekle ve tüm ekranların bunu desteklediğinden emin ol.",
+      "a11y": "Erişilebilirliği iyileştir: kontrastlar, dokunma hedefi boyutları ve ekran okuyucu etiketleri."
     }
   },
   "create": {

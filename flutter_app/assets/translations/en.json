@@ -1318,7 +1318,9 @@
       "pr_open": "Under review (CI)",
       "merged": "Delivered",
       "failed": "Failed",
-      "no_changes": "No change"
+      "no_changes": "No change",
+      "awaiting_review": "Awaiting approval",
+      "cancelled": "Cancelled"
     },
     "scanAnalyzing": "Analyzing {file}",
     "scanFilesRead": "{count} files analyzed",
@@ -1357,6 +1359,27 @@
       "confirmYes": "Yes, do it",
       "confirmNo": "Keep refining",
       "error": "The AI is currently unavailable."
+    },
+    "cancelFailed": "Cancellation failed.",
+    "mergeFailed": "Approve/merge failed.",
+    "viewDiff": "View diff",
+    "approveMerge": "Approve & merge",
+    "attachImage": "Attach screenshot",
+    "reviewBeforeMerge": "Review before merge (manual approval)",
+    "diffTitle": "Changes (diff)",
+    "diffError": "Could not load diff.",
+    "diffBinary": "No text change (binary file etc.).",
+    "templates": {
+      "i18nCheck": "Translations",
+      "perfCheck": "Performance",
+      "darkMode": "Dark mode",
+      "a11y": "Accessibility"
+    },
+    "templateTexts": {
+      "i18nCheck": "Check all translations for missing keys and unnatural wording across all 7 languages and fix them.",
+      "perfCheck": "Analyze the app for performance issues (unnecessary rebuilds, missing stream limits) and fix them.",
+      "darkMode": "Add a dark mode toggle in settings and make sure every screen supports it.",
+      "a11y": "Improve accessibility: contrast, touch target sizes and screen reader labels."
     }
   },
   "create": {

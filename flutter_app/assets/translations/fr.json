@@ -1318,7 +1318,9 @@
       "pr_open": "En révision (CI)",
       "merged": "Livré",
       "failed": "Échoué",
-      "no_changes": "Aucun changement"
+      "no_changes": "Aucun changement",
+      "awaiting_review": "En attente d’approbation",
+      "cancelled": "Annulé"
     },
     "scanAnalyzing": "Analyse de {file}",
     "scanFilesRead": "{count} fichiers analysés",
@@ -1357,6 +1359,27 @@
       "confirmYes": "Oui, exécuter",
       "confirmNo": "Continuer à affiner",
       "error": "L'IA est actuellement indisponible."
+    },
+    "cancelFailed": "Échec de l’annulation.",
+    "mergeFailed": "Échec de l’approbation/fusion.",
+    "viewDiff": "Voir le diff",
+    "approveMerge": "Approuver et fusionner",
+    "attachImage": "Joindre une capture",
+    "reviewBeforeMerge": "Vérifier avant la fusion (approbation manuelle)",
+    "diffTitle": "Modifications (diff)",
+    "diffError": "Impossible de charger le diff.",
+    "diffBinary": "Aucune modification de texte (fichier binaire, etc.).",
+    "templates": {
+      "i18nCheck": "Traductions",
+      "perfCheck": "Performance",
+      "darkMode": "Mode sombre",
+      "a11y": "Accessibilité"
+    },
+    "templateTexts": {
+      "i18nCheck": "Vérifie toutes les traductions pour les clés manquantes et les formulations peu naturelles dans les 7 langues et corrige-les.",
+      "perfCheck": "Analyse l’app pour les problèmes de performance (reconstructions inutiles, limites de flux manquantes) et corrige-les.",
+      "darkMode": "Ajoute un interrupteur de mode sombre dans les paramètres et assure-toi que tous les écrans le prennent en charge.",
+      "a11y": "Améliore l’accessibilité : contrastes, taille des cibles tactiles et étiquettes pour lecteurs d’écran."
     }
   },
   "create": {

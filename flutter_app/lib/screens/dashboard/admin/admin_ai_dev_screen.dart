@@ -1,14 +1,17 @@
 // ignore_for_file: lines_longer_than_80_chars
 import 'dart:async';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_insights_repository.dart';
+import '../../../services/image_upload_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -102,6 +105,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   bool _clearingTasks = false;
   bool _loading = true;
   bool _sending = false;
+
+  // Anhänge (Screenshots/Vision) + Review-Gate für den nächsten Auftrag.
+  final List<File> _pendingImages = [];
+  bool _awaitReview = false;
   bool _suggestionsLoading = false;
   String _categoryKey = 'all';
   List<Map<String, dynamic>> _categories = const []; // selbstlernende Kategorien
@@ -168,9 +175,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     });
   }
 
-  // Ein abgeschlossener Auftrag ist löschbar (merged/failed/no_changes).
+  // Ein abgeschlossener Auftrag ist löschbar.
   bool _deletable(String? status) =>
-      status == 'merged' || status == 'failed' || status == 'no_changes';
+      status == 'merged' ||
+      status == 'failed' ||
+      status == 'no_changes' ||
+      status == 'cancelled';
 
   // Anzahl löschbarer (abgeschlossener) Aufträge.
   int get _doneCount =>
@@ -407,10 +417,85 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   }
 
   // Wird vom Chat-Sheet aufgerufen, sobald der Admin „Ja, umsetzen" tippt.
+  // Lädt zuvor angehängte Screenshots hoch und übergibt sie + das Review-Gate.
   Future<bool> _confirmChatTask(String instruction) async {
-    final res =
-        await AiInsightsRepository.createDevTask('${_categoryPrefix()}$instruction');
+    var urls = const <String>[];
+    if (_pendingImages.isNotEmpty) {
+      urls = await ImageUploadService.upload(
+        List<File>.from(_pendingImages),
+        bucket: 'post-images',
+      );
+    }
+    final res = await AiInsightsRepository.createDevTask(
+      '${_categoryPrefix()}$instruction',
+      imageUrls: urls,
+      awaitReview: _awaitReview,
+    );
+    if (res['ok'] == true) {
+      setState(() {
+        _pendingImages.clear();
+        _awaitReview = false;
+      });
+    }
     return res['ok'] == true;
+  }
+
+  // Screenshots zum Auftrag auswählen (Vision — der Agent „sieht" sie).
+  Future<void> _pickImages() async {
+    try {
+      final picked = await ImagePicker().pickMultiImage(imageQuality: 80);
+      if (picked.isEmpty || !mounted) return;
+      setState(() {
+        for (final x in picked) {
+          if (_pendingImages.length >= 6) break;
+          _pendingImages.add(File(x.path));
+        }
+      });
+    } catch (_) {/* Picker abgebrochen/kein Zugriff */}
+  }
+
+  void _removeImage(int index) {
+    setState(() => _pendingImages.removeAt(index));
+  }
+
+  // Laufenden Auftrag abbrechen.
+  Future<void> _cancelTask(String id) async {
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.cancelDevTask(id);
+    if (!mounted) return;
+    setState(() => _deletingTasks.remove(id));
+    if (res['ok'] == true) {
+      await _refresh(silent: true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.cancelFailed'.tr())),
+      );
+    }
+  }
+
+  // Wartenden Auftrag (Review-Gate) freigeben & mergen.
+  Future<void> _mergeTask(String id) async {
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.mergeDevTask(id);
+    if (!mounted) return;
+    setState(() => _deletingTasks.remove(id));
+    if (res['ok'] == true) {
+      await _refresh(silent: true);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.mergeFailed'.tr())),
+      );
+    }
+  }
+
+  // Diff/geänderte Dateien des PRs anzeigen.
+  Future<void> _showDiff(String id) async {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _DiffSheet(taskId: id),
+    );
   }
 
   String get _placeholder {
@@ -517,15 +602,26 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             _EmptyHint(),
                           ..._tasks.map((t) {
                             final id = t['id'] as String?;
-                            final canDelete =
-                                _deletable(t['status'] as String?) &&
-                                    id != null;
+                            final status = t['status'] as String?;
+                            final canDelete = _deletable(status) && id != null;
+                            final canCancel = id != null &&
+                                (status == 'queued' ||
+                                    status == 'running' ||
+                                    status == 'pr_open' ||
+                                    status == 'awaiting_review');
+                            final isReview =
+                                status == 'awaiting_review' && id != null;
                             return _TaskCard(
                               task: t,
-                              onDelete: canDelete
-                                  ? () => _deleteTask(id)
+                              busy: _deletingTasks.contains(id),
+                              onDelete:
+                                  canDelete ? () => _deleteTask(id) : null,
+                              onCancel:
+                                  canCancel ? () => _cancelTask(id) : null,
+                              onMerge: isReview ? () => _mergeTask(id) : null,
+                              onShowDiff: id != null && t['pr_number'] != null
+                                  ? () => _showDiff(id)
                                   : null,
-                              deleting: _deletingTasks.contains(id),
                             );
                           }),
                           const SizedBox(height: 12),
@@ -545,6 +641,15 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
               sending: _sending,
               placeholder: _placeholder,
               onSend: _send,
+              images: _pendingImages,
+              onAttach: _pickImages,
+              onRemoveImage: _removeImage,
+              awaitReview: _awaitReview,
+              onToggleReview: (v) => setState(() => _awaitReview = v),
+              onTemplate: (t) {
+                _ctrl.text = t;
+                _ctrl.selection = TextSelection.collapsed(offset: t.length);
+              },
             ),
           ],
         ),
@@ -1496,10 +1601,20 @@ class _EmptyHint extends StatelessWidget {
 // ── Task Card (mit Live-Pipeline) ───────────────────────────────────────────
 
 class _TaskCard extends StatelessWidget {
-  const _TaskCard({required this.task, this.onDelete, this.deleting = false});
+  const _TaskCard({
+    required this.task,
+    this.onDelete,
+    this.onCancel,
+    this.onMerge,
+    this.onShowDiff,
+    this.busy = false,
+  });
   final Map<String, dynamic> task;
   final VoidCallback? onDelete;
-  final bool deleting;
+  final VoidCallback? onCancel;
+  final VoidCallback? onMerge;
+  final VoidCallback? onShowDiff;
+  final bool busy;
 
   @override
   Widget build(BuildContext context) {
@@ -1511,6 +1626,7 @@ class _TaskCard extends StatelessWidget {
     final ciRunUrl = task['ci_run_url'] as String?;
     final summary = task['summary'] as String?;
     final error = task['error'] as String?;
+    final imageCount = (task['image_urls'] as List?)?.length ?? 0;
     final meta = _statusMeta(status);
 
     return Container(
@@ -1539,33 +1655,42 @@ class _TaskCard extends StatelessWidget {
                 style: AppTypography.body(
                     size: 12, color: meta.color, weight: FontWeight.w600),
               ),
+              if (imageCount > 0) ...[
+                const SizedBox(width: 6),
+                Icon(LucideIcons.image, size: 12, color: AppColors.lightMute),
+                const SizedBox(width: 2),
+                Text('$imageCount',
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+              ],
               const Spacer(),
-              if (status == 'queued' ||
-                  status == 'running' ||
-                  status == 'pr_open')
+              if (busy)
                 const SizedBox(
                   width: 13,
                   height: 13,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppColors.teal),
+                      strokeWidth: 2, color: AppColors.lightMute),
+                )
+              else if (onCancel != null)
+                InkWell(
+                  onTap: onCancel,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: Icon(LucideIcons.x,
+                        size: 16, color: AppColors.lightMute),
+                  ),
                 )
               else if (onDelete != null)
-                deleting
-                    ? const SizedBox(
-                        width: 13,
-                        height: 13,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.lightMute),
-                      )
-                    : InkWell(
-                        onTap: onDelete,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Icon(LucideIcons.trash2,
-                              size: 15, color: AppColors.lightMute),
-                        ),
-                      ),
+                InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: Icon(LucideIcons.trash2,
+                        size: 15, color: AppColors.lightMute),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -1616,6 +1741,48 @@ class _TaskCard extends StatelessWidget {
               ],
             ),
           ],
+          // Diff-Vorschau + (bei Review-Gate) manuelle Freigabe.
+          if (onShowDiff != null || onMerge != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                if (onShowDiff != null)
+                  OutlinedButton.icon(
+                    onPressed: busy ? null : onShowDiff,
+                    icon: const Icon(LucideIcons.fileSearch, size: 14),
+                    label: Text('adminDev.viewDiff'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.teal,
+                      side: BorderSide(
+                          color: AppColors.teal.withValues(alpha: 0.4)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                if (onMerge != null) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: busy ? null : onMerge,
+                      icon: busy
+                          ? const SizedBox(
+                              width: 13,
+                              height: 13,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
+                          : const Icon(LucideIcons.checkCircle2, size: 15),
+                      label: Text('adminDev.approveMerge'.tr()),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.teal,
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -1627,10 +1794,14 @@ class _TaskCard extends StatelessWidget {
         return _StatusMeta(LucideIcons.checkCircle2, Colors.green.shade600);
       case 'pr_open':
         return _StatusMeta(LucideIcons.gitPullRequest, AppColors.teal);
+      case 'awaiting_review':
+        return _StatusMeta(LucideIcons.eye, AppColors.amber);
       case 'running':
         return _StatusMeta(LucideIcons.loader, AppColors.amber);
       case 'failed':
         return _StatusMeta(LucideIcons.xCircle, Colors.red.shade600);
+      case 'cancelled':
+        return _StatusMeta(LucideIcons.ban, AppColors.lightMute);
       case 'no_changes':
         return _StatusMeta(LucideIcons.minusCircle, AppColors.lightMute);
       default:
@@ -1676,6 +1847,13 @@ class _PipelineStepper extends StatelessWidget {
           s[2] = _Stage.active; // pending/running
         }
         break;
+      case 'awaiting_review':
+        // CI grün, wartet auf manuelle Freigabe (Merge-Schritt aktiv).
+        s[0] = _Stage.done;
+        s[1] = _Stage.done;
+        s[2] = _Stage.done;
+        s[3] = _Stage.active;
+        break;
       case 'merged':
         s[0] = _Stage.done;
         s[1] = _Stage.done;
@@ -1684,6 +1862,9 @@ class _PipelineStepper extends StatelessWidget {
         s[4] = _Stage.active; // OTA läuft
         break;
       case 'failed':
+        s[0] = _Stage.error;
+        break;
+      case 'cancelled':
         s[0] = _Stage.error;
         break;
       default:
@@ -1800,73 +1981,180 @@ class _LinkButton extends StatelessWidget {
 
 // ── Input Bar ─────────────────────────────────────────────────────────────────
 
+// Häufige Auftrags-Vorlagen (Schnell-Buttons). Keys → übersetzte Texte.
+const _devTemplateKeys = ['i18nCheck', 'perfCheck', 'darkMode', 'a11y'];
+
 class _InputBar extends StatelessWidget {
   const _InputBar({
     required this.ctrl,
     required this.sending,
     required this.placeholder,
     required this.onSend,
+    required this.images,
+    required this.onAttach,
+    required this.onRemoveImage,
+    required this.awaitReview,
+    required this.onToggleReview,
+    required this.onTemplate,
   });
   final TextEditingController ctrl;
   final bool sending;
   final String placeholder;
   final Future<void> Function([String?]) onSend;
+  final List<File> images;
+  final VoidCallback onAttach;
+  final void Function(int) onRemoveImage;
+  final bool awaitReview;
+  final void Function(bool) onToggleReview;
+  final void Function(String) onTemplate;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: TextField(
-              controller: ctrl,
-              enabled: !sending,
-              maxLines: 4,
-              minLines: 1,
-              decoration: InputDecoration(
-                hintText: placeholder,
-                hintStyle:
-                    AppTypography.body(size: 13, color: AppColors.lightMute),
-                filled: true,
-                fillColor: Colors.grey.shade50,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: const BorderSide(color: AppColors.teal),
+          // Vorlagen-Chips (Schnell-Aufträge).
+          SizedBox(
+            height: 30,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                for (final k in _devTemplateKeys)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ActionChip(
+                      label: Text('adminDev.templates.$k'.tr(),
+                          style: AppTypography.body(
+                              size: 11, color: AppColors.teal)),
+                      backgroundColor: AppColors.teal.withValues(alpha: 0.07),
+                      side: BorderSide(
+                          color: AppColors.teal.withValues(alpha: 0.25)),
+                      visualDensity: VisualDensity.compact,
+                      onPressed: sending
+                          ? null
+                          : () => onTemplate('adminDev.templateTexts.$k'.tr()),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          // Angehängte Screenshots (Vorschau + Entfernen).
+          if (images.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 60,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: images.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, i) => Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(images[i],
+                          width: 60, height: 60, fit: BoxFit.cover),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () => onRemoveImage(i),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: const Icon(LucideIcons.x,
+                              size: 12, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
+          ],
+          // Review-Gate-Schalter.
+          Row(
+            children: [
+              Icon(LucideIcons.gitPullRequest,
+                  size: 13, color: AppColors.lightMute),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text('adminDev.reviewBeforeMerge'.tr(),
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+              ),
+              Switch(
+                value: awaitReview,
+                onChanged: sending ? null : onToggleReview,
+                activeColor: AppColors.teal,
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          FilledButton(
-            onPressed: sending ? null : () => onSend(),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.teal,
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(14),
-            ),
-            child: sending
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
-                : const Icon(LucideIcons.send, size: 18, color: Colors.white),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: sending || images.length >= 6 ? null : onAttach,
+                icon: const Icon(LucideIcons.imagePlus, size: 20),
+                color: AppColors.teal,
+                tooltip: 'adminDev.attachImage'.tr(),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: ctrl,
+                  enabled: !sending,
+                  maxLines: 4,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                    hintText: placeholder,
+                    hintStyle: AppTypography.body(
+                        size: 13, color: AppColors.lightMute),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(22),
+                      borderSide: const BorderSide(color: AppColors.teal),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              FilledButton(
+                onPressed: sending ? null : () => onSend(),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.teal,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(14),
+                ),
+                child: sending
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                    : const Icon(LucideIcons.send,
+                        size: 18, color: Colors.white),
+              ),
+            ],
           ),
         ],
       ),
@@ -2198,6 +2486,202 @@ class _ChatThinking extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Diff-Sheet: zeigt die geänderten Dateien (Patch) des PRs ────────────────
+
+class _DiffSheet extends StatefulWidget {
+  const _DiffSheet({required this.taskId});
+  final String taskId;
+
+  @override
+  State<_DiffSheet> createState() => _DiffSheetState();
+}
+
+class _DiffSheetState extends State<_DiffSheet> {
+  bool _loading = true;
+  String? _error;
+  List<Map<String, dynamic>> _files = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final res = await AiInsightsRepository.fetchDevTaskDiff(widget.taskId);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      if (res['ok'] == true) {
+        _files = ((res['files'] as List?) ?? const [])
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList();
+      } else {
+        _error = 'adminDev.diffError'.tr();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 8, 8),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.fileSearch,
+                    size: 18, color: AppColors.teal),
+                const SizedBox(width: 8),
+                Text(
+                  'adminDev.diffTitle'.tr(),
+                  style: AppTypography.body(
+                      size: 14,
+                      color: AppColors.lightInk,
+                      weight: FontWeight.w700),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(LucideIcons.x, size: 18),
+                  color: AppColors.lightMute,
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                    ? Center(
+                        child: Text(_error!,
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.lightMute)))
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(14),
+                        itemCount: _files.length,
+                        itemBuilder: (context, i) => _DiffFileTile(file: _files[i]),
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DiffFileTile extends StatelessWidget {
+  const _DiffFileTile({required this.file});
+  final Map<String, dynamic> file;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = file['filename'] as String? ?? '';
+    final additions = file['additions'] as int? ?? 0;
+    final deletions = file['deletions'] as int? ?? 0;
+    final patch = file['patch'] as String?;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+          childrenPadding: EdgeInsets.zero,
+          title: Text(
+            name,
+            style: AppTypography.body(
+                size: 12, color: AppColors.lightInk, weight: FontWeight.w600),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Row(
+            children: [
+              Text('+$additions',
+                  style: AppTypography.body(
+                      size: 11, color: Colors.green.shade600)),
+              const SizedBox(width: 8),
+              Text('-$deletions',
+                  style: AppTypography.body(
+                      size: 11, color: Colors.red.shade600)),
+            ],
+          ),
+          children: [
+            if (patch != null && patch.isNotEmpty)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFF0D1117),
+                padding: const EdgeInsets.all(10),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: _DiffPatch(patch: patch),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text('adminDev.diffBinary'.tr(),
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightMute)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Färbt Diff-Zeilen (+ grün, - rot, @@ teal) im Monospace-Stil.
+class _DiffPatch extends StatelessWidget {
+  const _DiffPatch({required this.patch});
+  final String patch;
+
+  @override
+  Widget build(BuildContext context) {
+    final lines = patch.split('\n');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final line in lines)
+          Text(
+            line.isEmpty ? ' ' : line,
+            style: TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 11,
+              height: 1.35,
+              color: line.startsWith('+')
+                  ? const Color(0xFF7EE787)
+                  : line.startsWith('-')
+                      ? const Color(0xFFFFA198)
+                      : line.startsWith('@@')
+                          ? const Color(0xFF79C0FF)
+                          : const Color(0xFFC9D1D9),
+            ),
+          ),
+      ],
     );
   }
 }

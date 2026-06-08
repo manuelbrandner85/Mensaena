@@ -76,14 +76,63 @@ class AiInsightsRepository {
 
   /// Schickt einen Entwicklungs-Auftrag an den Admin-Dev-Agenten.
   /// Triggert die GitHub Action (Code-Änderung → PR → CI → Auto-Merge → OTA).
-  static Future<Map<String, dynamic>> createDevTask(String instruction) async {
+  /// Optional mit Screenshots ([imageUrls], Vision) und Review-Gate
+  /// ([awaitReview]=true → manuelle Freigabe statt Auto-Merge).
+  static Future<Map<String, dynamic>> createDevTask(
+    String instruction, {
+    List<String> imageUrls = const [],
+    bool awaitReview = false,
+  }) async {
     try {
       final res = await SupabaseService.client.functions
-          .invoke('admin-dev-agent', body: {'instruction': instruction})
+          .invoke('admin-dev-agent', body: {
+            'instruction': instruction,
+            if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
+            if (awaitReview) 'await_review': true,
+          })
           .timeout(const Duration(seconds: 30));
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
     } catch (e) {
       debugPrint('[AiInsights] createDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Bricht einen laufenden Auftrag ab (Workflow + offener PR).
+  static Future<Map<String, dynamic>> cancelDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'cancel', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] cancelDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Gibt einen wartenden Auftrag (await_review) frei und mergt den PR.
+  static Future<Map<String, dynamic>> mergeDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'merge', 'id': id})
+          .timeout(const Duration(seconds: 40));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] mergeDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lädt die geänderten Dateien (Diff) des PRs eines Auftrags.
+  static Future<Map<String, dynamic>> fetchDevTaskDiff(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'diff', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevTaskDiff failed: $e');
       return {'error': e.toString()};
     }
   }
@@ -110,7 +159,8 @@ class AiInsightsRepository {
       final rows = await sb
           .from('admin_dev_tasks')
           .select('id, instruction, status, pr_url, pr_number, run_url, '
-              'ci_status, ci_run_url, error, summary, created_at, updated_at')
+              'ci_status, ci_run_url, error, summary, image_urls, '
+              'await_review, created_at, updated_at')
           .order('created_at', ascending: false)
           .limit(40);
       return (rows as List)

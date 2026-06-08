@@ -1318,7 +1318,9 @@
       "pr_open": "En revisión (CI)",
       "merged": "Entregado",
       "failed": "Fallido",
-      "no_changes": "Sin cambios"
+      "no_changes": "Sin cambios",
+      "awaiting_review": "Esperando aprobación",
+      "cancelled": "Cancelado"
     },
     "scanAnalyzing": "Analizando {file}",
     "scanFilesRead": "{count} archivos analizados",
@@ -1357,6 +1359,27 @@
       "confirmYes": "Sí, hazlo",
       "confirmNo": "Seguir ajustando",
       "error": "La IA no está disponible ahora."
+    },
+    "cancelFailed": "Error al cancelar.",
+    "mergeFailed": "Error al aprobar/fusionar.",
+    "viewDiff": "Ver diff",
+    "approveMerge": "Aprobar y fusionar",
+    "attachImage": "Adjuntar captura",
+    "reviewBeforeMerge": "Revisar antes de fusionar (aprobación manual)",
+    "diffTitle": "Cambios (diff)",
+    "diffError": "No se pudo cargar el diff.",
+    "diffBinary": "Sin cambios de texto (archivo binario, etc.).",
+    "templates": {
+      "i18nCheck": "Traducciones",
+      "perfCheck": "Rendimiento",
+      "darkMode": "Modo oscuro",
+      "a11y": "Accesibilidad"
+    },
+    "templateTexts": {
+      "i18nCheck": "Revisa todas las traducciones en busca de claves faltantes y redacción poco natural en los 7 idiomas y corrígelas.",
+      "perfCheck": "Analiza la app en busca de problemas de rendimiento (reconstrucciones innecesarias, límites de stream faltantes) y corrígelos.",
+      "darkMode": "Añade un interruptor de modo oscuro en los ajustes y asegúrate de que todas las pantallas lo admitan.",
+      "a11y": "Mejora la accesibilidad: contraste, tamaño de los objetivos táctiles y etiquetas para lectores de pantalla."
     }
   },
   "create": {
