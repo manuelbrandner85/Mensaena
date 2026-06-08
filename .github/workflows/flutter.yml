@@ -38,6 +38,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # fetch-depth 2 → wir können die pubspec-Version mit dem Vor-Commit
+          # vergleichen. Ein Versions-Bump (4.3.1 → 4.3.2) bricht die OTA-Patch-
+          # Kontinuität: Shorebird-Patches sind versionsgebunden, also stranden
+          # sie auf der neuen Version bis alle User die neue APK haben. Darum
+          # MUSS ein Versions-Bump automatisch mandatory=true werden (siehe
+          # app_releases-Insert-Step unten).
+          fetch-depth: 2
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -614,12 +622,33 @@ jobs:
           TITLE=$(git log -1 --pretty=%s | sed 's/^[a-z]*([a-z]*): //' | head -c 100)
           BODY=$(git log -1 --pretty=%b | head -c 240 | tr '\n' ' ')
 
-          # Force-Update-Detection: Keyword im Commit-Subject ODER -Body.
-          if git log -1 --pretty=%B | grep -iqE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:'; then
+          # ── Force-Update-Detection ──────────────────────────────────────
+          # MANDATORY=true, wenn EINER dieser Fälle zutrifft:
+          #
+          # 1) Versions-Bump gegenüber dem Vor-Commit. Das ist der WICHTIGE
+          #    Fall: Shorebird-OTA-Patches sind an die exakte Release-Version
+          #    gebunden. Sobald pubspec.version bumpt (z.B. 4.3.1 → 4.3.2),
+          #    gehen ALLE künftigen Patches auf die neue Version. User auf der
+          #    alten Version bekommen sie NIE — es sei denn, sie installieren
+          #    die neue APK. Darum MUSS ein Bump zwangsläufig mandatory sein,
+          #    sonst stranden die Patches (genau der 4.3.2-Bug am 2026-06-08).
+          #
+          # 2) Explizites Keyword im Commit (Subject ODER Body). Neben den
+          #    englischen Tokens auch die deutschen „Pflicht-Update"/
+          #    „Pflichtupdate" — ein solcher Commit wurde vorher NICHT erkannt
+          #    (nur das Literal [mandatory] zählte) und landete als
+          #    mandatory=false → keiner wurde gezogen.
+          MANDATORY=false
+          PREV_VER=$(git show HEAD~1:flutter_app/pubspec.yaml 2>/dev/null \
+            | grep '^version:' | sed 's/version: *//' | tr -d '[:space:]' || echo "")
+          if [ -n "$PREV_VER" ] && [ "$PREV_VER" != "$FULL" ]; then
             MANDATORY=true
-            echo "🚨 Pflicht-Update markiert"
+            echo "🚨 Versions-Bump $PREV_VER → $FULL erkannt — mandatory=true (OTA-Kontinuität)"
+          elif git log -1 --pretty=%B | grep -iqE '\[mandatory\]|\[force-update\]|BREAKING( CHANGE)?:|Pflicht-?[Uu]pdate'; then
+            MANDATORY=true
+            echo "🚨 Pflicht-Update-Keyword erkannt — mandatory=true"
           else
-            MANDATORY=false
+            echo "ℹ️  Kein Bump, kein Keyword — mandatory=false (OTA-Patch genügt)"
           fi
 
           APK_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/mensaena-v${FULL}.apk"
