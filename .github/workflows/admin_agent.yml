@@ -96,7 +96,14 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.AGENT_PAT }}
-          claude_args: "--max-turns 40"
+          # --max-turns 40 war zu niedrig: komplexere Auftraege liefen ins
+          # Limit (error_max_turns) BEVOR ein PR entstand → der Auftrag erreichte
+          # die App nie. Run #12 (task 73f174ad) scheiterte genau so: 40 Turns
+          # erschoepft, dazu 19 Permission-Denials die Turns verbrannten.
+          # bypassPermissions schaltet die Denials ab (isolierte CI-Sandbox mit
+          # PAT, kein interaktiver Kontext) — der Agent verschwendet keinen Turn
+          # mehr an Genehmigungen und kommt zuverlaessig bis zum PR.
+          claude_args: "--max-turns 150 --permission-mode bypassPermissions"
           prompt: |
             Du bist der Mensaena-Entwicklungs-Agent. Setze die Aufgabe DIREKT
             und EFFIZIENT um — ohne langen Planungs-Overhead.

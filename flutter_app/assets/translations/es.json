@@ -2611,6 +2611,8 @@
     "failed": "La actualización falló.",
     "patchBannerTitle": "Mejora lista",
     "patchBannerSubtitle": "Reinicia para aplicar la última actualización",
+    "patchDownloadingTitle": "Descargando actualización …",
+    "patchDownloadingSubtitle": "Llega una nueva mejora",
     "patchRestart": "Reiniciar",
     "closeApp": "Cerrar app",
     "installManualHint": "Tras la instalación la app se abrirá actualizada. Si el instalador no aparece, cierra la app y abre el archivo descargado manualmente."

@@ -160,6 +160,10 @@ class _UpdateGateState extends ConsumerState<UpdateGate>
       loading: () => widget.child,
       error: (_, __) => widget.child,
       data: (result) {
+        // Während der Patch gerade geladen wird → dezenter Lade-Hinweis.
+        if (result.downloading) {
+          return _PatchDownloadingBanner(child: widget.child);
+        }
         if (!result.patchReady) return widget.child;
         return _PatchRestartBanner(
           patchNumber: result.nextPatchNumber,
@@ -900,6 +904,89 @@ class _MandatoryLoadingPlaceholder extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Dezenter, nicht-blockierender Banner WAEHREND ein Shorebird OTA-Patch
+/// gerade geladen wird. Verschwindet automatisch sobald der Patch fertig
+/// ist (dann uebernimmt der gruene _PatchRestartBanner). Kein Schliessen-X,
+/// weil der Zustand kurzlebig ist und sich selbst aufloest.
+class _PatchDownloadingBanner extends StatelessWidget {
+  const _PatchDownloadingBanner({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Material(
+        color: AppColors.voidColor,
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      AppColors.bronzeDeep.withValues(alpha: 0.95),
+                      AppColors.bronze.withValues(alpha: 0.80),
+                    ],
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: AppColors.bronzeSoft.withValues(alpha: 0.35),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.inkWarm,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'update.patchDownloadingTitle'.tr(),
+                            style: AppTypography.body(
+                              size: 13,
+                              color: AppColors.inkWarm,
+                            ),
+                          ),
+                          Text(
+                            'update.patchDownloadingSubtitle'.tr(),
+                            style: AppTypography.caption(
+                              color: AppColors.bronzeSoft,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(child: child),
+          ],
         ),
       ),
     );

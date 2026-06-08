@@ -26,6 +26,7 @@ import 'package:shorebird_code_push/shorebird_code_push.dart';
 class PatchCheckResult {
   const PatchCheckResult({
     this.patchReady = false,
+    this.downloading = false,
     this.currentPatchNumber,
     this.nextPatchNumber,
   });
@@ -33,6 +34,11 @@ class PatchCheckResult {
   /// true wenn ein Patch heruntergeladen ist und beim naechsten App-Start
   /// aktiv wird.
   final bool patchReady;
+
+  /// true waehrend gerade ein Patch vom Shorebird-Server geladen wird
+  /// (zwischen erkanntem `outdated` und Download-Ende). Erlaubt der UI
+  /// einen "Update wird geladen…"-Hinweis BEVOR der Restart-Banner kommt.
+  final bool downloading;
 
   /// Aktuell installierte Patch-Nummer (null bei kein Patch / Debug).
   final int? currentPatchNumber;
@@ -120,6 +126,12 @@ class ShorebirdPatchService {
       }
       final status = await _updater.checkForUpdate();
       if (status != UpdateStatus.outdated) return;
+      // Download startet jetzt → UI sofort "wird geladen…" zeigen, damit
+      // der User sieht dass gerade ein Patch reinkommt (vorher war der
+      // Download komplett unsichtbar bis er fertig war).
+      if (!_patchReadyController.isClosed) {
+        _patchReadyController.add(const PatchCheckResult(downloading: true));
+      }
       await _updater.update();
       // Re-check: jetzt sollte readNextPatch != null sein.
       final post = await checkPatchReady();

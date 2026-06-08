@@ -2611,6 +2611,8 @@
     "failed": "Aggiornamento non riuscito.",
     "patchBannerTitle": "Miglioramento pronto",
     "patchBannerSubtitle": "Riavvia per applicare l'ultimo aggiornamento",
+    "patchDownloadingTitle": "Download aggiornamento …",
+    "patchDownloadingSubtitle": "Sta arrivando un nuovo miglioramento",
     "patchRestart": "Riavvia",
     "closeApp": "Chiudi app",
     "installManualHint": "Dopo l'installazione l'app si avvia aggiornata. Se l'installer non appare, chiudi l'app e apri manualmente il file scaricato."
