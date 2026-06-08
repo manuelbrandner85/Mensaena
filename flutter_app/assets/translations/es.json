@@ -3827,7 +3827,10 @@
     "ctaOffer": "Lo ofrezco",
     "ctaJoin": "Apuntarse",
     "ctaLearnMore": "Saber más",
-    "ctaHelpSearch": "Ayudo a buscar"
+    "ctaHelpSearch": "Ayudo a buscar",
+    "expiresToday": "Vence hoy",
+    "expiresTomorrow": "Vence mañana",
+    "expiresInDays": "Vence en {n} días"
   },
   "splash": {
     "tagline": "Ayuda vecinal"

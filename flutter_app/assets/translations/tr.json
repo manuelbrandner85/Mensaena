@@ -3826,7 +3826,10 @@
     "ctaOffer": "Teklif ediyorum",
     "ctaJoin": "Katıl",
     "ctaLearnMore": "Daha fazla",
-    "ctaHelpSearch": "Aramaya yardım"
+    "ctaHelpSearch": "Aramaya yardım",
+    "expiresToday": "Bugün sona eriyor",
+    "expiresTomorrow": "Yarın sona eriyor",
+    "expiresInDays": "{n} gün içinde sona eriyor"
   },
   "splash": {
     "tagline": "Mahalle yardımlaşması"

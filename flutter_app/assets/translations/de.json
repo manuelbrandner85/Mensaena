@@ -3823,7 +3823,10 @@
     "ctaOffer": "Ich biete an",
     "ctaJoin": "Dabei sein",
     "ctaLearnMore": "Mehr erfahren",
-    "ctaHelpSearch": "Ich helfe suchen"
+    "ctaHelpSearch": "Ich helfe suchen",
+    "expiresToday": "Läuft heute ab",
+    "expiresTomorrow": "Läuft morgen ab",
+    "expiresInDays": "Läuft in {n} Tagen ab"
   },
   "splash": {
     "tagline": "Nachbarschaftshilfe"

@@ -397,6 +397,26 @@ class _PostCardState extends ConsumerState<PostCard> {
               PostStatusBadge(status: post.status, compact: true),
               const SizedBox(height: 8),
             ],
+            // Ablauf-Warnung: sichtbar wenn ≤ 7 Tage verbleiben.
+            if (post.status == 'active' &&
+                post.expiresAt != null &&
+                !post.isExpired &&
+                post.expiresAt!.difference(DateTime.now()).inDays <= 7) ...[
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(LucideIcons.clock,
+                      size: 10, color: AppColors.amber),
+                  const SizedBox(width: 4),
+                  Text(
+                    _expiryLabel(post.expiresAt!),
+                    style:
+                        AppTypography.label(size: 9, color: AppColors.amber),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+            ],
             Text(
               post.title,
               style: AppTypography.body(
@@ -558,6 +578,13 @@ class _PostCardState extends ConsumerState<PostCard> {
       ),
       ),
     );
+  }
+
+  static String _expiryLabel(DateTime expiresAt) {
+    final diff = expiresAt.difference(DateTime.now());
+    if (diff.inDays <= 0) return 'postCard.expiresToday'.tr();
+    if (diff.inDays == 1) return 'postCard.expiresTomorrow'.tr();
+    return 'postCard.expiresInDays'.tr(namedArgs: {'n': '${diff.inDays}'});
   }
 
   static String _relativeTime(DateTime t) {

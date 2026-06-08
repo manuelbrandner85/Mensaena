@@ -3826,7 +3826,10 @@
     "ctaOffer": "Предлагаю",
     "ctaJoin": "Участвовать",
     "ctaLearnMore": "Подробнее",
-    "ctaHelpSearch": "Помогу искать"
+    "ctaHelpSearch": "Помогу искать",
+    "expiresToday": "Истекает сегодня",
+    "expiresTomorrow": "Истекает завтра",
+    "expiresInDays": "Истекает через {n} дней"
   },
   "splash": {
     "tagline": "Соседская помощь"

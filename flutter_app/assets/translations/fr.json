@@ -3827,7 +3827,10 @@
     "ctaOffer": "Je propose",
     "ctaJoin": "Participer",
     "ctaLearnMore": "En savoir plus",
-    "ctaHelpSearch": "J'aide à chercher"
+    "ctaHelpSearch": "J'aide à chercher",
+    "expiresToday": "Expire aujourd'hui",
+    "expiresTomorrow": "Expire demain",
+    "expiresInDays": "Expire dans {n} jours"
   },
   "splash": {
     "tagline": "Entraide de quartier"
