@@ -219,10 +219,20 @@ jobs:
           # KEIN --flutter-version hier: `shorebird patch` kennt das Flag nicht
           # (nur `shorebird release`). Der Patch übernimmt die Flutter-Version
           # automatisch vom Ziel-Release. Mit dem Flag → Exit 64 (Usage-Fehler).
+          #
+          # --allow-native-diffs: R8/ProGuard erzeugt zwischen Release- und
+          # Patch-Build nicht-deterministische DEX-Ausgabe (umbenannte Klassen,
+          # z.B. Ly2/a). Shorebird wertet das als "native changes" und bricht
+          # mit Exit 70 ab — obwohl der Commit reines Dart ist (kein Kotlin/Java,
+          # keine Plugin-Änderung). Das Flag erlaubt den Dart-only-Patch trotz
+          # dieser Pseudo-Diffs. Die native Schicht auf dem Gerät bleibt die des
+          # Release; nur der Dart-Code wird gepatcht. Siehe Shorebird-Doku
+          # "native changes warning even though you haven't changed native code".
           shorebird patch android \
             --release-version="${{ steps.version.outputs.full }}" \
             --no-confirm \
             --allow-asset-diffs \
+            --allow-native-diffs \
             -- \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://gyqujitkvymlmgroovch.supabase.co' }} \
             --dart-define=API_BASE_URL=https://www.mensaena.de
