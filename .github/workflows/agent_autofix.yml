@@ -1,0 +1,132 @@
+name: 🔧 Agent Auto-Fix (rotes CI)
+
+# ════════════════════════════════════════════════════════════════════════
+# Wenn das Flutter-CI eines Agent-PRs (Branch agent/task-*) ROT wird,
+# lässt dieser Workflow anthropics/claude-code-action@v1 den Fehler
+# beheben und pushen → CI läuft erneut.
+# Ziel: CI wird grün → agent_automerge.yml merged → OTA-Patch aktiv.
+#
+# Begrenzung: max. 3 automatische Versuche (admin_dev_tasks.ci_attempts).
+# Danach bleibt der PR offen zur manuellen Prüfung.
+#
+# Secrets: AGENT_PAT, CLAUDE_CODE_OAUTH_TOKEN | ANTHROPIC_API_KEY,
+#          SUPABASE_SERVICE_ROLE_KEY.
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_run:
+    workflows: ["Flutter Android Build"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  id-token: write  # Pflicht für anthropics/claude-code-action (OIDC-Token)
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+  SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  MAX_ATTEMPTS: 3
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      startsWith(github.event.workflow_run.head_branch, 'agent/task-') &&
+      github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: Checkout Agent-Branch (mit PAT)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AGENT_PAT }}
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Versuchszähler prüfen
+        id: gate
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          TASK_ID="${BRANCH#agent/task-}"
+          echo "task_id=$TASK_ID" >> "$GITHUB_OUTPUT"
+          ATTEMPTS=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=ci_attempts,instruction" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}")
+          CUR=$(node -e 'const a=JSON.parse(process.argv[1]); process.stdout.write(String((a[0]&&a[0].ci_attempts)||0))' "$ATTEMPTS")
+          echo "current=$CUR" >> "$GITHUB_OUTPUT"
+          node -e 'const a=JSON.parse(process.argv[1]); process.stdout.write((a[0]&&a[0].instruction)||"")' "$ATTEMPTS" > /tmp/instruction.txt
+          if [ "$CUR" -ge "$MAX_ATTEMPTS" ]; then
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Auto-Fix erschöpft → PR offen lassen
+        if: steps.gate.outputs.proceed == 'false'
+        run: |
+          TASK_ID="${{ steps.gate.outputs.task_id }}"
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"ci_status\":\"failure\",\"summary\":\"Auto-Fix nach ${MAX_ATTEMPTS} Versuchen erschöpft — PR bleibt offen zur manuellen Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: CI-Fehler-Log holen
+        if: steps.gate.outputs.proceed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          gh run view "$RUN_ID" --repo "${{ github.repository }}" --log-failed > /tmp/ci_fail.log 2>&1 || true
+          tail -n 300 /tmp/ci_fail.log > /tmp/ci_fail_tail.log || true
+          echo "Log-Zeilen: $(wc -l < /tmp/ci_fail_tail.log 2>/dev/null || echo 0)"
+
+      - name: Status -> running (Auto-Fix)
+        if: steps.gate.outputs.proceed == 'true'
+        run: |
+          TASK_ID="${{ steps.gate.outputs.task_id }}"
+          NEXT=$(( ${{ steps.gate.outputs.current }} + 1 ))
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"running\",\"ci_status\":\"running\",\"ci_attempts\":${NEXT},\"summary\":\"Auto-Fix Versuch ${NEXT}/${MAX_ATTEMPTS} läuft …\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Auto-Fix ausführen
+        if: steps.gate.outputs.proceed == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.AGENT_PAT }}
+          claude_args: "--max-turns 60"
+          prompt: |
+            Du bist der Mensaena-Reparatur-Agent. Das Flutter-CI für den Branch
+            ${{ github.event.workflow_run.head_branch }} ist FEHLGESCHLAGEN.
+            Behebe die Ursache, damit das CI grün wird. Ändere nur, was nötig ist.
+
+            Die ursprüngliche Aufgabe steht in /tmp/instruction.txt.
+            Das CI-Fehler-Log steht in /tmp/ci_fail_tail.log — lies es zuerst.
+
+            Regeln aus CLAUDE.md:
+            - i18n-Pflicht in ALLEN 7 JSON-Dateien, Supabase-Streams mit
+              .limit()+autoDispose, Design teal/primary, KEINE emerald-Farben.
+            - Typische Fehler: fehlende Imports, erfundene LucideIcons, falsche
+              Typen, fehlende .tr()-Keys, Analyzer-Warnungen als Fehler.
+            - Der Code MUSS kompilieren (flutter analyze sauber).
+            - Committe und pushe den Fix auf den Branch
+              ${{ github.event.workflow_run.head_branch }}.
+
+      - name: Status -> Fix committed
+        if: steps.gate.outputs.proceed == 'true' && success()
+        run: |
+          TASK_ID="${{ steps.gate.outputs.task_id }}"
+          NEXT=$(( ${{ steps.gate.outputs.current }} + 1 ))
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"ci_status\":\"running\",\"summary\":\"Auto-Fix Versuch ${NEXT} gepusht — CI läuft erneut …\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

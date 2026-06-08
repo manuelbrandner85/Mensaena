@@ -89,6 +89,6 @@ final activeInteractionsCountProvider = FutureProvider<int>((ref) async {
 
 /// Realtime-Stream aller aktiven Interaktionen.
 final interactionsStreamProvider =
-    StreamProvider<List<Interaction>>((ref) {
+    StreamProvider.autoDispose<List<Interaction>>((ref) {
   return InteractionsRepository.watchActive();
 });

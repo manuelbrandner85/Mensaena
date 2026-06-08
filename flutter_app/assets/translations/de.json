@@ -1271,6 +1271,8 @@
     "openPr": "PR ansehen",
     "openRun": "Log ansehen",
     "tasksLabel": "Aufträge",
+    "clearDone": "Abgeschlossene löschen",
+    "deleteFailed": "Löschen fehlgeschlagen.",
     "suggestions": "KI-Vorschläge",
     "implement": "Umsetzen",
     "accept": "Annehmen",
@@ -1315,7 +1317,153 @@
       "pr_open": "Wird geprüft (CI)",
       "merged": "Ausgeliefert",
       "failed": "Fehlgeschlagen",
-      "no_changes": "Keine Änderung"
+      "no_changes": "Keine Änderung",
+      "awaiting_review": "Wartet auf Freigabe",
+      "cancelled": "Abgebrochen"
+    },
+    "scanAnalyzing": "Analysiere {file}",
+    "scanFilesRead": "{count} Dateien analysiert",
+    "scanFoundSoFar": "{count} gefunden",
+    "scanWorking": "Der Agent arbeitet …",
+    "lastScan": "Letzter Scan: {count} Vorschläge",
+    "select": "Auswählen",
+    "selectAll": "Alle",
+    "clearSelection": "Aufheben",
+    "selectedCount": "{count} ausgewählt",
+    "acceptedMany": "{count} angenommen — Umsetzung läuft.",
+    "cancel": "Abbrechen",
+    "ci": {
+      "pending": "CI ausstehend",
+      "running": "CI läuft",
+      "success": "CI grün",
+      "failure": "CI rot"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
+    },
+    "why": "Warum",
+    "kind": {
+      "bug": "Fehler/Bug",
+      "improvement": "Verbesserung",
+      "new": "Neuerung"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Beschreibe deine Aufgabe …",
+      "thinking": "Denkt nach …",
+      "confirmYes": "Ja, umsetzen",
+      "confirmNo": "Weiter anpassen",
+      "error": "Die KI ist gerade nicht erreichbar."
+    },
+    "cancelFailed": "Abbruch fehlgeschlagen.",
+    "mergeFailed": "Freigabe/Merge fehlgeschlagen.",
+    "viewDiff": "Diff ansehen",
+    "approveMerge": "Freigeben & mergen",
+    "attachImage": "Screenshot anhängen",
+    "reviewBeforeMerge": "Vor Merge prüfen (manuelle Freigabe)",
+    "diffTitle": "Änderungen (Diff)",
+    "diffError": "Diff konnte nicht geladen werden.",
+    "diffBinary": "Keine Textänderung (Binärdatei o. Ä.).",
+    "templates": {
+      "i18nCheck": "Übersetzungen",
+      "perfCheck": "Performance",
+      "darkMode": "Dark-Mode",
+      "a11y": "Barrierefreiheit",
+      "onboarding": "Onboarding",
+      "security": "Sicherheit",
+      "animations": "Animationen",
+      "crashes": "Abstürze",
+      "dependencies": "Dependencies",
+      "notifications": "Benachrichtigungen",
+      "offline": "Offline-Modus",
+      "emptyStates": "Leerzustände"
+    },
+    "templateTexts": {
+      "i18nCheck": "Prüfe alle Übersetzungen auf fehlende Schlüssel und unnatürliche Formulierungen in allen 7 Sprachen und korrigiere sie.",
+      "perfCheck": "Analysiere die App auf Performance-Probleme (unnötige Rebuilds, fehlende Stream-Limits) und behebe sie.",
+      "darkMode": "Füge einen Dark-Mode-Schalter in den Einstellungen hinzu und stelle sicher, dass alle Screens ihn unterstützen.",
+      "a11y": "Verbessere die Barrierefreiheit: Kontraste, Touch-Zielgrößen und Screenreader-Labels.",
+      "onboarding": "Verbessere den Onboarding-Flow für neue Nutzer: klarere Schritte, bessere Erklärungen und eine motivierende Abschluss-Seite.",
+      "security": "Prüfe alle RLS-Regeln und Sicherheitskonfigurationen — identifiziere und schließe Sicherheitslücken.",
+      "animations": "Füge subtile, elegante Animationen zu den Hauptscreens hinzu: sanfte Übergänge, Hero-Animationen und Feedback-Effekte.",
+      "crashes": "Analysiere die häufigsten Abstürze und Fehler in der App und behebe die kritischsten davon.",
+      "dependencies": "Aktualisiere alle veralteten Dependencies auf die neuesten stabilen Versionen und behebe Kompatibilitätsprobleme.",
+      "notifications": "Verbessere den Push-Benachrichtigungs-Flow: bessere Texte, smarte Zeitplanung und Gruppen-Benachrichtigungen.",
+      "offline": "Verbessere die Offline-Funktionalität: sinnvolle Fehlermeldungen, lokales Caching wichtiger Daten und Sync nach Reconnect.",
+      "emptyStates": "Füge ansprechende Leerzustände mit Illustrationen, motivierenden Texten und Handlungsaufforderungen zu allen Screens hinzu."
+    },
+    "notes": {
+      "title": "Backlog / Notizen",
+      "add": "Neue Notiz",
+      "edit": "Notiz bearbeiten",
+      "empty": "Noch keine Notizen. Füge Ideen oder geplante Aufgaben hinzu.",
+      "placeholder": "Idee oder Aufgabe beschreiben …",
+      "saveFailed": "Notiz konnte nicht gespeichert werden.",
+      "loadedIntoInput": "Notiz in Eingabe geladen — jetzt bearbeiten und absenden.",
+      "use": "Verwenden"
+    },
+    "scanPhase": "Phase: {phase}",
+    "scanLongHint": "Die Analyse kann mehrere Minuten dauern — bitte warten.",
+    "retry": "Wiederholen",
+    "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
+    "health": {
+      "title": "System-Health",
+      "total": "Aufträge",
+      "merged": "Ausgeliefert",
+      "active": "Aktiv",
+      "failed": "Fehlgeschl.",
+      "successRate": "Erfolgsquote",
+      "avgMerge": "Ø Merge-Zeit",
+      "accepted": "Angenommen",
+      "rejected": "Abgelehnt"
+    },
+    "schedules": {
+      "title": "Wiederkehrende Aufträge",
+      "add": "Neuer Zeitplan",
+      "empty": "Noch keine wiederkehrenden Aufträge.",
+      "saveFailed": "Zeitplan konnte nicht gespeichert werden.",
+      "titleField": "Titel",
+      "instructionField": "Auftrag",
+      "weekday": "Wochentag",
+      "hour": "Uhrzeit",
+      "cadence": {
+        "daily": "Täglich",
+        "weekly": "Wöchentlich",
+        "monthly": "Monatlich"
+      },
+      "weekdays": {
+        "0": "So",
+        "1": "Mo",
+        "2": "Di",
+        "3": "Mi",
+        "4": "Do",
+        "5": "Fr",
+        "6": "Sa"
+      }
+    },
+    "rollback": {
+      "button": "Rückgängig machen",
+      "confirmTitle": "Änderung zurückrollen?",
+      "confirmBody": "Diese gemergte Änderung wird per Revert rückgängig gemacht und als OTA-Update ausgeliefert. Fortfahren?",
+      "confirm": "Zurückrollen",
+      "failed": "Rollback fehlgeschlagen."
+    },
+    "plan": {
+      "title": "Umsetzungs-Plan",
+      "intro": "Die KI würde diese Schritte abarbeiten:",
+      "confirm": "Plan bestätigen & starten",
+      "toggle": "Plan-Modus (in Schritte zerlegen)"
+    },
+    "screens": {
+      "toggle": "Vorher/Nachher-Screenshots"
+    },
+    "voice": {
+      "tooltip": "Per Sprache diktieren",
+      "unavailable": "Spracheingabe nicht verfügbar."
     }
   },
   "create": {

@@ -276,16 +276,11 @@ class DashboardScaffold extends ConsumerWidget {
                   Expanded(child: refreshed),
                 ],
               ),
-              // "Mensa"-Assistent: schwebt rechts ÜBER der BottomNav.
-              // Ausgeblendet im Chat/Krisen-Kontext (eigene Eingabe-/
-              // Notfall-Flows haben dort Vorrang).
+              // "Mensa"-Assistent: schwebt über der BottomNav, verschiebbar.
+              // Ausgeblendet im Chat/Krisen-Kontext.
               if (!activeRoute.contains('/chat') &&
                   !activeRoute.contains('/crisis'))
-                Positioned(
-                  right: 16,
-                  bottom: 88,
-                  child: MensaenaAssistantFab(screenLabel: title),
-                ),
+                _DraggableAssistantFab(screenLabel: title),
               if (activeCall != null &&
                   !activeRoute.startsWith('/dashboard/call/'))
                 ActiveCallMiniPlayer(info: activeCall),
@@ -534,6 +529,43 @@ class _BottomItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Draggable FAB-Wrapper ─────────────────────────────────────────────────────
+// Merkt sich die Position des "Mensa"-Assistenten (In-Memory — reset on
+// App-Restart). Standardposition: rechts unten, knapp über der BottomNav.
+// Ziehen verschiebt den Button; Tap öffnet weiterhin das Chat-Sheet.
+class _DraggableAssistantFab extends StatefulWidget {
+  const _DraggableAssistantFab({required this.screenLabel});
+  final String screenLabel;
+
+  @override
+  State<_DraggableAssistantFab> createState() => _DraggableAssistantFabState();
+}
+
+class _DraggableAssistantFabState extends State<_DraggableAssistantFab> {
+  // right / bottom Abstände in Logical Pixels.
+  double _right = 16;
+  double _bottom = 88;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return Positioned(
+      right: _right,
+      bottom: _bottom,
+      child: GestureDetector(
+        // onPanUpdate: Button verschieben.
+        onPanUpdate: (d) {
+          setState(() {
+            _right = (_right - d.delta.dx).clamp(8.0, size.width - 66.0);
+            _bottom = (_bottom - d.delta.dy).clamp(88.0, size.height - 160.0);
+          });
+        },
+        child: MensaenaAssistantFab(screenLabel: widget.screenLabel),
       ),
     );
   }

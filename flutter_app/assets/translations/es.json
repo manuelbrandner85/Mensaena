@@ -1272,6 +1272,8 @@
     "openPr": "Ver PR",
     "openRun": "Ver registro",
     "tasksLabel": "Tareas",
+    "clearDone": "Borrar completadas",
+    "deleteFailed": "No se pudo eliminar.",
     "suggestions": "Sugerencias IA",
     "implement": "Implementar",
     "accept": "Aceptar",
@@ -1316,7 +1318,153 @@
       "pr_open": "En revisión (CI)",
       "merged": "Entregado",
       "failed": "Fallido",
-      "no_changes": "Sin cambios"
+      "no_changes": "Sin cambios",
+      "awaiting_review": "Esperando aprobación",
+      "cancelled": "Cancelado"
+    },
+    "scanAnalyzing": "Analizando {file}",
+    "scanFilesRead": "{count} archivos analizados",
+    "scanFoundSoFar": "{count} encontrados",
+    "scanWorking": "El agente está trabajando …",
+    "lastScan": "Último escaneo: {count} sugerencias",
+    "select": "Seleccionar",
+    "selectAll": "Todos",
+    "clearSelection": "Quitar",
+    "selectedCount": "{count} seleccionados",
+    "acceptedMany": "{count} aceptados — ejecución en curso.",
+    "cancel": "Cancelar",
+    "ci": {
+      "pending": "CI pendiente",
+      "running": "CI en curso",
+      "success": "CI correcto",
+      "failure": "CI fallido"
+    },
+    "stage": {
+      "agent": "Agente",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
+    },
+    "why": "Por qué",
+    "kind": {
+      "bug": "Error/Bug",
+      "improvement": "Mejora",
+      "new": "Novedad"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Describe tu tarea …",
+      "thinking": "Pensando …",
+      "confirmYes": "Sí, hazlo",
+      "confirmNo": "Seguir ajustando",
+      "error": "La IA no está disponible ahora."
+    },
+    "cancelFailed": "Error al cancelar.",
+    "mergeFailed": "Error al aprobar/fusionar.",
+    "viewDiff": "Ver diff",
+    "approveMerge": "Aprobar y fusionar",
+    "attachImage": "Adjuntar captura",
+    "reviewBeforeMerge": "Revisar antes de fusionar (aprobación manual)",
+    "diffTitle": "Cambios (diff)",
+    "diffError": "No se pudo cargar el diff.",
+    "diffBinary": "Sin cambios de texto (archivo binario, etc.).",
+    "templates": {
+      "i18nCheck": "Traducciones",
+      "perfCheck": "Rendimiento",
+      "darkMode": "Modo oscuro",
+      "a11y": "Accesibilidad",
+      "onboarding": "Onboarding",
+      "security": "Seguridad",
+      "animations": "Animaciones",
+      "crashes": "Fallos",
+      "dependencies": "Dependencias",
+      "notifications": "Notificaciones",
+      "offline": "Modo sin conexión",
+      "emptyStates": "Estados vacíos"
+    },
+    "templateTexts": {
+      "i18nCheck": "Revisa todas las traducciones en busca de claves faltantes y redacción poco natural en los 7 idiomas y corrígelas.",
+      "perfCheck": "Analiza la app en busca de problemas de rendimiento (reconstrucciones innecesarias, límites de stream faltantes) y corrígelos.",
+      "darkMode": "Añade un interruptor de modo oscuro en los ajustes y asegúrate de que todas las pantallas lo admitan.",
+      "a11y": "Mejora la accesibilidad: contraste, tamaño de los objetivos táctiles y etiquetas para lectores de pantalla.",
+      "onboarding": "Mejora el flujo de incorporación para nuevos usuarios: pasos más claros, mejores explicaciones y una página de finalización motivadora.",
+      "security": "Revisa todas las reglas RLS y configuraciones de seguridad — identifica y cierra las brechas de seguridad.",
+      "animations": "Añade animaciones sutiles y elegantes a las pantallas principales: transiciones suaves, animaciones hero y efectos de retroalimentación.",
+      "crashes": "Analiza los fallos y errores más comunes en la app y corrige los más críticos.",
+      "dependencies": "Actualiza todas las dependencias obsoletas a las últimas versiones estables y corrige los problemas de compatibilidad.",
+      "notifications": "Mejora el flujo de notificaciones push: mejores textos, programación inteligente y notificaciones agrupadas.",
+      "offline": "Mejora la funcionalidad sin conexión: mensajes de error significativos, caché local de datos importantes y sincronización tras la reconexión.",
+      "emptyStates": "Añade estados vacíos atractivos con ilustraciones, textos motivadores y llamadas a la acción a todas las pantallas."
+    },
+    "notes": {
+      "title": "Backlog / Notas",
+      "add": "Nueva nota",
+      "edit": "Editar nota",
+      "empty": "Sin notas. Añade ideas o tareas planificadas.",
+      "placeholder": "Describe una idea o tarea …",
+      "saveFailed": "No se pudo guardar la nota.",
+      "loadedIntoInput": "Nota cargada en el campo — edita y envía.",
+      "use": "Usar"
+    },
+    "scanPhase": "Fase: {phase}",
+    "scanLongHint": "El análisis puede tardar varios minutos — espere.",
+    "retry": "Reintentar",
+    "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
+    "health": {
+      "title": "Estado del sistema",
+      "total": "Tareas",
+      "merged": "Publicadas",
+      "active": "Activas",
+      "failed": "Fallidas",
+      "successRate": "Tasa de éxito",
+      "avgMerge": "Tiempo medio merge",
+      "accepted": "Aceptadas",
+      "rejected": "Rechazadas"
+    },
+    "schedules": {
+      "title": "Tareas recurrentes",
+      "add": "Nueva programación",
+      "empty": "Aún no hay tareas recurrentes.",
+      "saveFailed": "No se pudo guardar la programación.",
+      "titleField": "Título",
+      "instructionField": "Tarea",
+      "weekday": "Día",
+      "hour": "Hora",
+      "cadence": {
+        "daily": "Diaria",
+        "weekly": "Semanal",
+        "monthly": "Mensual"
+      },
+      "weekdays": {
+        "0": "Dom",
+        "1": "Lun",
+        "2": "Mar",
+        "3": "Mié",
+        "4": "Jue",
+        "5": "Vie",
+        "6": "Sáb"
+      }
+    },
+    "rollback": {
+      "button": "Revertir",
+      "confirmTitle": "¿Revertir el cambio?",
+      "confirmBody": "Este cambio fusionado se revertirá y se entregará como actualización OTA. ¿Continuar?",
+      "confirm": "Revertir",
+      "failed": "Error al revertir."
+    },
+    "plan": {
+      "title": "Plan de implementación",
+      "intro": "La IA seguiría estos pasos:",
+      "confirm": "Confirmar plan e iniciar",
+      "toggle": "Modo plan (dividir en pasos)"
+    },
+    "screens": {
+      "toggle": "Capturas antes/después"
+    },
+    "voice": {
+      "tooltip": "Dictar por voz",
+      "unavailable": "Entrada de voz no disponible."
     }
   },
   "create": {

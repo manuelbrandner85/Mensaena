@@ -1271,6 +1271,8 @@
     "openPr": "PR'ı gör",
     "openRun": "Günlüğü gör",
     "tasksLabel": "Görevler",
+    "clearDone": "Tamamlananları sil",
+    "deleteFailed": "Silinemedi.",
     "suggestions": "Yapay zekâ önerileri",
     "implement": "Uygula",
     "accept": "Kabul et",
@@ -1315,7 +1317,153 @@
       "pr_open": "İnceleniyor (CI)",
       "merged": "Teslim edildi",
       "failed": "Başarısız",
-      "no_changes": "Değişiklik yok"
+      "no_changes": "Değişiklik yok",
+      "awaiting_review": "Onay bekliyor",
+      "cancelled": "İptal edildi"
+    },
+    "scanAnalyzing": "{file} analiz ediliyor",
+    "scanFilesRead": "{count} dosya analiz edildi",
+    "scanFoundSoFar": "{count} bulundu",
+    "scanWorking": "Aracı çalışıyor …",
+    "lastScan": "Son tarama: {count} öneri",
+    "select": "Seç",
+    "selectAll": "Tümü",
+    "clearSelection": "Temizle",
+    "selectedCount": "{count} seçildi",
+    "acceptedMany": "{count} kabul edildi — uygulanıyor.",
+    "cancel": "İptal",
+    "ci": {
+      "pending": "CI bekliyor",
+      "running": "CI çalışıyor",
+      "success": "CI başarılı",
+      "failure": "CI başarısız"
+    },
+    "stage": {
+      "agent": "Aracı",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Birleştir",
+      "ota": "OTA"
+    },
+    "why": "Neden",
+    "kind": {
+      "bug": "Hata/Bug",
+      "improvement": "İyileştirme",
+      "new": "Yenilik"
+    },
+    "chat": {
+      "title": "Godmode Sohbet",
+      "placeholder": "Görevini açıkla …",
+      "thinking": "Düşünüyor …",
+      "confirmYes": "Evet, uygula",
+      "confirmNo": "Düzenlemeye devam",
+      "error": "Yapay zeka şu anda erişilemiyor."
+    },
+    "cancelFailed": "İptal başarısız.",
+    "mergeFailed": "Onay/birleştirme başarısız.",
+    "viewDiff": "Diff’i gör",
+    "approveMerge": "Onayla ve birleştir",
+    "attachImage": "Ekran görüntüsü ekle",
+    "reviewBeforeMerge": "Birleştirmeden önce incele (manuel onay)",
+    "diffTitle": "Değişiklikler (diff)",
+    "diffError": "Diff yüklenemedi.",
+    "diffBinary": "Metin değişikliği yok (ikili dosya vb.).",
+    "templates": {
+      "i18nCheck": "Çeviriler",
+      "perfCheck": "Performans",
+      "darkMode": "Karanlık mod",
+      "a11y": "Erişilebilirlik",
+      "onboarding": "Onboarding",
+      "security": "Güvenlik",
+      "animations": "Animasyonlar",
+      "crashes": "Çökmeler",
+      "dependencies": "Bağımlılıklar",
+      "notifications": "Bildirimler",
+      "offline": "Çevrimdışı modu",
+      "emptyStates": "Boş durumlar"
+    },
+    "templateTexts": {
+      "i18nCheck": "Tüm çevirileri 7 dilde eksik anahtarlar ve doğal olmayan ifadeler için kontrol et ve düzelt.",
+      "perfCheck": "Uygulamayı performans sorunları (gereksiz yeniden oluşturmalar, eksik stream limitleri) için analiz et ve düzelt.",
+      "darkMode": "Ayarlara bir karanlık mod düğmesi ekle ve tüm ekranların bunu desteklediğinden emin ol.",
+      "a11y": "Erişilebilirliği iyileştir: kontrastlar, dokunma hedefi boyutları ve ekran okuyucu etiketleri.",
+      "onboarding": "Yeni kullanıcılar için katılım akışını iyileştir: daha net adımlar, daha iyi açıklamalar ve motive edici bir tamamlama sayfası.",
+      "security": "Tüm RLS kurallarını ve güvenlik yapılandırmalarını incele — güvenlik açıklarını tespit et ve kapat.",
+      "animations": "Ana ekranlara ince, zarif animasyonlar ekle: yumuşak geçişler, hero animasyonları ve geri bildirim efektleri.",
+      "crashes": "Uygulamadaki en yaygın çökmeleri ve hataları analiz et ve en kritik olanları düzelt.",
+      "dependencies": "Tüm güncel olmayan bağımlılıkları en son kararlı sürümlere güncelle ve uyumluluk sorunlarını düzelt.",
+      "notifications": "Anlık bildirim akışını iyileştir: daha iyi metinler, akıllı zamanlama ve gruplu bildirimler.",
+      "offline": "Çevrimdışı işlevselliği iyileştir: anlamlı hata mesajları, önemli verilerin yerel önbelleğe alınması ve yeniden bağlanma sonrası senkronizasyon.",
+      "emptyStates": "Tüm ekranlara illüstrasyonlar, motive edici metinler ve harekete geçirici mesajlarla çekici boş durumlar ekle."
+    },
+    "notes": {
+      "title": "Birikim / Notlar",
+      "add": "Yeni not",
+      "edit": "Notu düzenle",
+      "empty": "Henüz not yok. Fikir veya planlanan görevler ekleyin.",
+      "placeholder": "Bir fikir veya görev tanımlayın …",
+      "saveFailed": "Not kaydedilemedi.",
+      "loadedIntoInput": "Not girişe yüklendi — düzenleyip gönderin.",
+      "use": "Kullan"
+    },
+    "scanPhase": "Aşama: {phase}",
+    "scanLongHint": "Analiz birkaç dakika sürebilir — lütfen bekleyin.",
+    "retry": "Tekrar dene",
+    "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
+    "health": {
+      "title": "Sistem Sağlığı",
+      "total": "Görevler",
+      "merged": "Yayınlandı",
+      "active": "Aktif",
+      "failed": "Başarısız",
+      "successRate": "Başarı oranı",
+      "avgMerge": "Ort. merge süresi",
+      "accepted": "Kabul",
+      "rejected": "Reddedildi"
+    },
+    "schedules": {
+      "title": "Tekrarlayan Görevler",
+      "add": "Yeni zamanlama",
+      "empty": "Henüz tekrarlayan görev yok.",
+      "saveFailed": "Zamanlama kaydedilemedi.",
+      "titleField": "Başlık",
+      "instructionField": "Görev",
+      "weekday": "Gün",
+      "hour": "Saat",
+      "cadence": {
+        "daily": "Günlük",
+        "weekly": "Haftalık",
+        "monthly": "Aylık"
+      },
+      "weekdays": {
+        "0": "Paz",
+        "1": "Pzt",
+        "2": "Sal",
+        "3": "Çar",
+        "4": "Per",
+        "5": "Cum",
+        "6": "Cmt"
+      }
+    },
+    "rollback": {
+      "button": "Geri al",
+      "confirmTitle": "Değişiklik geri alınsın mı?",
+      "confirmBody": "Bu birleştirilmiş değişiklik geri alınacak ve OTA güncellemesi olarak yayınlanacak. Devam edilsin mi?",
+      "confirm": "Geri al",
+      "failed": "Geri alma başarısız."
+    },
+    "plan": {
+      "title": "Uygulama planı",
+      "intro": "Yapay zeka şu adımları izleyecek:",
+      "confirm": "Planı onayla ve başlat",
+      "toggle": "Plan modu (adımlara böl)"
+    },
+    "screens": {
+      "toggle": "Önce/sonra ekran görüntüleri"
+    },
+    "voice": {
+      "tooltip": "Sesle yaz",
+      "unavailable": "Sesli giriş kullanılamıyor."
     }
   },
   "create": {

@@ -1272,6 +1272,8 @@
     "openPr": "Voir la PR",
     "openRun": "Voir le journal",
     "tasksLabel": "Tâches",
+    "clearDone": "Effacer les terminées",
+    "deleteFailed": "Échec de la suppression.",
     "suggestions": "Suggestions IA",
     "implement": "Réaliser",
     "accept": "Accepter",
@@ -1316,7 +1318,153 @@
       "pr_open": "En révision (CI)",
       "merged": "Livré",
       "failed": "Échoué",
-      "no_changes": "Aucun changement"
+      "no_changes": "Aucun changement",
+      "awaiting_review": "En attente d’approbation",
+      "cancelled": "Annulé"
+    },
+    "scanAnalyzing": "Analyse de {file}",
+    "scanFilesRead": "{count} fichiers analysés",
+    "scanFoundSoFar": "{count} trouvés",
+    "scanWorking": "L'agent travaille …",
+    "lastScan": "Dernière analyse : {count} suggestions",
+    "select": "Sélectionner",
+    "selectAll": "Tout",
+    "clearSelection": "Effacer",
+    "selectedCount": "{count} sélectionnés",
+    "acceptedMany": "{count} acceptés — exécution en cours.",
+    "cancel": "Annuler",
+    "ci": {
+      "pending": "CI en attente",
+      "running": "CI en cours",
+      "success": "CI réussi",
+      "failure": "CI échoué"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Fusion",
+      "ota": "OTA"
+    },
+    "why": "Pourquoi",
+    "kind": {
+      "bug": "Erreur/Bug",
+      "improvement": "Amélioration",
+      "new": "Nouveauté"
+    },
+    "chat": {
+      "title": "Godmode Chat",
+      "placeholder": "Décris ta tâche …",
+      "thinking": "Réflexion …",
+      "confirmYes": "Oui, exécuter",
+      "confirmNo": "Continuer à affiner",
+      "error": "L'IA est actuellement indisponible."
+    },
+    "cancelFailed": "Échec de l’annulation.",
+    "mergeFailed": "Échec de l’approbation/fusion.",
+    "viewDiff": "Voir le diff",
+    "approveMerge": "Approuver et fusionner",
+    "attachImage": "Joindre une capture",
+    "reviewBeforeMerge": "Vérifier avant la fusion (approbation manuelle)",
+    "diffTitle": "Modifications (diff)",
+    "diffError": "Impossible de charger le diff.",
+    "diffBinary": "Aucune modification de texte (fichier binaire, etc.).",
+    "templates": {
+      "i18nCheck": "Traductions",
+      "perfCheck": "Performance",
+      "darkMode": "Mode sombre",
+      "a11y": "Accessibilité",
+      "onboarding": "Onboarding",
+      "security": "Sécurité",
+      "animations": "Animations",
+      "crashes": "Plantages",
+      "dependencies": "Dépendances",
+      "notifications": "Notifications",
+      "offline": "Mode hors ligne",
+      "emptyStates": "États vides"
+    },
+    "templateTexts": {
+      "i18nCheck": "Vérifie toutes les traductions pour les clés manquantes et les formulations peu naturelles dans les 7 langues et corrige-les.",
+      "perfCheck": "Analyse l’app pour les problèmes de performance (reconstructions inutiles, limites de flux manquantes) et corrige-les.",
+      "darkMode": "Ajoute un interrupteur de mode sombre dans les paramètres et assure-toi que tous les écrans le prennent en charge.",
+      "a11y": "Améliore l’accessibilité : contrastes, taille des cibles tactiles et étiquettes pour lecteurs d’écran.",
+      "onboarding": "Améliore le flux d'intégration des nouveaux utilisateurs : étapes plus claires, meilleures explications et page de finalisation motivante.",
+      "security": "Vérifie toutes les règles RLS et les configurations de sécurité — identifie et comble les failles de sécurité.",
+      "animations": "Ajoute des animations subtiles et élégantes aux écrans principaux : transitions fluides, animations hero et effets de retour.",
+      "crashes": "Analyse les plantages et erreurs les plus courants dans l'app et corrige les plus critiques.",
+      "dependencies": "Met à jour toutes les dépendances obsolètes vers les dernières versions stables et corrige les problèmes de compatibilité.",
+      "notifications": "Améliore le flux des notifications push : meilleurs textes, planification intelligente et notifications groupées.",
+      "offline": "Améliore la fonctionnalité hors ligne : messages d'erreur significatifs, mise en cache locale des données importantes et synchronisation après reconnexion.",
+      "emptyStates": "Ajoute des états vides attrayants avec des illustrations, des textes motivants et des appels à l'action sur tous les écrans."
+    },
+    "notes": {
+      "title": "Backlog / Notes",
+      "add": "Nouvelle note",
+      "edit": "Modifier la note",
+      "empty": "Aucune note. Ajoutez des idées ou des tâches planifiées.",
+      "placeholder": "Décrivez une idée ou une tâche …",
+      "saveFailed": "Impossible de sauvegarder la note.",
+      "loadedIntoInput": "Note chargée — modifiez et envoyez.",
+      "use": "Utiliser"
+    },
+    "scanPhase": "Phase : {phase}",
+    "scanLongHint": "L'analyse peut prendre quelques minutes — veuillez patienter.",
+    "retry": "Réessayer",
+    "duplicateWarning": "Tâche similaire déjà présente : « {task} »",
+    "health": {
+      "title": "Santé du système",
+      "total": "Tâches",
+      "merged": "Livrées",
+      "active": "Actives",
+      "failed": "Échouées",
+      "successRate": "Taux de réussite",
+      "avgMerge": "Temps moyen merge",
+      "accepted": "Acceptées",
+      "rejected": "Rejetées"
+    },
+    "schedules": {
+      "title": "Tâches récurrentes",
+      "add": "Nouvelle planification",
+      "empty": "Aucune tâche récurrente.",
+      "saveFailed": "Impossible de sauvegarder la planification.",
+      "titleField": "Titre",
+      "instructionField": "Tâche",
+      "weekday": "Jour",
+      "hour": "Heure",
+      "cadence": {
+        "daily": "Quotidienne",
+        "weekly": "Hebdomadaire",
+        "monthly": "Mensuelle"
+      },
+      "weekdays": {
+        "0": "Dim",
+        "1": "Lun",
+        "2": "Mar",
+        "3": "Mer",
+        "4": "Jeu",
+        "5": "Ven",
+        "6": "Sam"
+      }
+    },
+    "rollback": {
+      "button": "Annuler",
+      "confirmTitle": "Annuler la modification ?",
+      "confirmBody": "Cette modification fusionnée sera annulée (revert) et livrée via une mise à jour OTA. Continuer ?",
+      "confirm": "Annuler",
+      "failed": "Échec du rollback."
+    },
+    "plan": {
+      "title": "Plan de mise en œuvre",
+      "intro": "L'IA suivrait ces étapes :",
+      "confirm": "Confirmer le plan et démarrer",
+      "toggle": "Mode plan (en étapes)"
+    },
+    "screens": {
+      "toggle": "Captures avant/après"
+    },
+    "voice": {
+      "tooltip": "Dicter à la voix",
+      "unavailable": "Saisie vocale indisponible."
     }
   },
   "create": {

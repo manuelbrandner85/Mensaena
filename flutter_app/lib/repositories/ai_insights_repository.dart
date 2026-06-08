@@ -76,14 +76,261 @@ class AiInsightsRepository {
 
   /// Schickt einen Entwicklungs-Auftrag an den Admin-Dev-Agenten.
   /// Triggert die GitHub Action (Code-Änderung → PR → CI → Auto-Merge → OTA).
-  static Future<Map<String, dynamic>> createDevTask(String instruction) async {
+  /// Optional mit Screenshots ([imageUrls], Vision) und Review-Gate
+  /// ([awaitReview]=true → manuelle Freigabe statt Auto-Merge).
+  static Future<Map<String, dynamic>> createDevTask(
+    String instruction, {
+    List<String> imageUrls = const [],
+    bool awaitReview = false,
+    List<String> plan = const [],
+    bool wantScreens = false,
+  }) async {
     try {
       final res = await SupabaseService.client.functions
-          .invoke('admin-dev-agent', body: {'instruction': instruction})
+          .invoke('admin-dev-agent', body: {
+            'instruction': instruction,
+            if (imageUrls.isNotEmpty) 'image_urls': imageUrls,
+            if (awaitReview) 'await_review': true,
+            if (plan.isNotEmpty) 'plan': plan,
+            if (wantScreens) 'want_screens': true,
+          })
           .timeout(const Duration(seconds: 30));
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
     } catch (e) {
       debugPrint('[AiInsights] createDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Zerlegt eine Aufgabe in einen Multi-Step-Plan (Liste von Schritten).
+  static Future<List<String>> planDevTask(String instruction) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent',
+              body: {'action': 'plan', 'instruction': instruction})
+          .timeout(const Duration(seconds: 35));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['steps'] as List?) ?? const [])
+          .map((e) => e.toString())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] planDevTask failed: $e');
+      return const [];
+    }
+  }
+
+  /// Setzt eine gemergte Godmode-Änderung zurück (Revert-PR → OTA).
+  static Future<Map<String, dynamic>> rollbackDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'rollback', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] rollbackDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lädt die Health-/Metrics-Kennzahlen des Godmode-Systems.
+  static Future<Map<String, dynamic>> fetchDevMetrics() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'metrics'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return Map<String, dynamic>.from((data['metrics'] as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevMetrics failed: $e');
+      return const {};
+    }
+  }
+
+  // ── Wiederkehrende Aufträge (Schedules) ────────────────────────────────────
+
+  /// Lädt alle wiederkehrenden Godmode-Aufträge.
+  static Future<List<Map<String, dynamic>>> fetchDevSchedules() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'schedules_list'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['schedules'] as List?) ?? const [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevSchedules failed: $e');
+      return const [];
+    }
+  }
+
+  /// Speichert einen wiederkehrenden Auftrag (neu, wenn [id] null; sonst Update).
+  static Future<Map<String, dynamic>> saveDevSchedule({
+    String? id,
+    required String title,
+    required String instruction,
+    required String cadence,
+    int dayOfWeek = 1,
+    int dayOfMonth = 1,
+    int hourUtc = 6,
+    bool awaitReview = false,
+    bool enabled = true,
+  }) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'schedule_save',
+            if (id != null) 'id': id,
+            'title': title,
+            'instruction': instruction,
+            'cadence': cadence,
+            'day_of_week': dayOfWeek,
+            'day_of_month': dayOfMonth,
+            'hour_utc': hourUtc,
+            'await_review': awaitReview,
+            'enabled': enabled,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] saveDevSchedule failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Aktiviert/deaktiviert einen wiederkehrenden Auftrag.
+  static Future<Map<String, dynamic>> toggleDevSchedule(
+      String id, bool enabled) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'schedule_toggle',
+            'id': id,
+            'enabled': enabled,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] toggleDevSchedule failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht einen wiederkehrenden Auftrag.
+  static Future<Map<String, dynamic>> deleteDevSchedule(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent',
+              body: {'action': 'schedule_delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevSchedule failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Bricht einen laufenden Auftrag ab (Workflow + offener PR).
+  static Future<Map<String, dynamic>> cancelDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'cancel', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] cancelDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Gibt einen wartenden Auftrag (await_review) frei und mergt den PR.
+  static Future<Map<String, dynamic>> mergeDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'merge', 'id': id})
+          .timeout(const Duration(seconds: 40));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] mergeDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lädt die geänderten Dateien (Diff) des PRs eines Auftrags.
+  static Future<Map<String, dynamic>> fetchDevTaskDiff(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'diff', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevTaskDiff failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  // ── Notizen / Backlog (Admin) ──────────────────────────────────────────────
+
+  /// Lädt die gespeicherten Godmode-Notizen (Ideen/Prompts).
+  static Future<List<Map<String, dynamic>>> fetchDevNotes() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'notes_list'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['notes'] as List?) ?? const [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevNotes failed: $e');
+      return const [];
+    }
+  }
+
+  /// Speichert eine Notiz (neu, wenn [id] null; sonst Update).
+  static Future<Map<String, dynamic>> saveDevNote(
+      {String? id, required String content}) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'note_save',
+            if (id != null) 'id': id,
+            'content': content,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] saveDevNote failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht eine Notiz.
+  static Future<Map<String, dynamic>> deleteDevNote(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'note_delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevNote failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Chatbot-Modus: schickt den Gesprächsverlauf an die KI und bekommt eine
+  /// Antwort zurück. Erst wenn `ready==true` ist, liegt ein bestätigungsreifer
+  /// Auftrag (`instruction`) vor, den der Admin per createDevTask absenden kann.
+  static Future<Map<String, dynamic>> chatDev(
+      List<Map<String, String>> messages) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-chat', body: {'messages': messages})
+          .timeout(const Duration(seconds: 40));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] chatDev failed: $e');
       return {'error': e.toString()};
     }
   }
@@ -94,7 +341,9 @@ class AiInsightsRepository {
       final rows = await sb
           .from('admin_dev_tasks')
           .select('id, instruction, status, pr_url, pr_number, run_url, '
-              'error, summary, created_at, updated_at')
+              'ci_status, ci_run_url, error, summary, image_urls, '
+              'await_review, plan, origin, merge_commit_sha, '
+              'created_at, updated_at')
           .order('created_at', ascending: false)
           .limit(40);
       return (rows as List)
@@ -103,6 +352,32 @@ class AiInsightsRepository {
     } catch (e) {
       debugPrint('[AiInsights] fetchDevTasks failed: $e');
       return const [];
+    }
+  }
+
+  /// Löscht einen einzelnen Entwicklungs-Auftrag (nur abgeschlossene).
+  static Future<Map<String, dynamic>> deleteDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht alle abgeschlossenen Aufträge (merged/failed/no_changes) auf einmal.
+  static Future<Map<String, dynamic>> clearDevTasks() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'clear'})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] clearDevTasks failed: $e');
+      return {'error': e.toString()};
     }
   }
 
@@ -163,6 +438,36 @@ class AiInsightsRepository {
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
     } catch (e) {
       debugPrint('[AiInsights] rejectSuggestion failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Nimmt mehrere Vorschläge auf einmal an (je ein Dev-Auftrag pro Vorschlag).
+  static Future<Map<String, dynamic>> acceptManySuggestions(
+      List<String> ids) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions',
+              body: {'action': 'accept_many', 'ids': ids})
+          .timeout(const Duration(seconds: 90));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] acceptManySuggestions failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Lehnt mehrere Vorschläge auf einmal ab.
+  static Future<Map<String, dynamic>> rejectManySuggestions(
+      List<String> ids) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions',
+              body: {'action': 'reject_many', 'ids': ids})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] rejectManySuggestions failed: $e');
       return {'error': e.toString()};
     }
   }

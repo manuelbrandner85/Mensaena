@@ -2,27 +2,22 @@ name: 🤖 Admin Dev Agent
 
 # ════════════════════════════════════════════════════════════════════════
 # Wird vom Admin-Dashboard via Edge Function `admin-dev-agent` getriggert
-# (workflow_dispatch). Führt den Auftrag mit der Claude Code CLI aus,
-# ändert den Code (i. d. R. flutter_app/**), erstellt einen PR und meldet
-# den Status zurück an Supabase (admin_dev_tasks).
+# (workflow_dispatch). Nutzt anthropics/claude-code-action@v1 — die
+# offizielle Action, die Branch, Commits, Push und PR-Erstellung intern
+# und zuverlässig übernimmt (kein manuelles npm/git/gh nötig).
 #
 # Auto-Merge übernimmt `agent_automerge.yml` – NUR wenn das Flutter-CI
 # ("Flutter Android Build") grün ist. Danach liefert shorebird_patch.yml
 # die Dart-Änderung als lautlosen OTA-Patch an die App aus.
 #
 # Benötigte GitHub Secrets:
-#   CLAUDE_CODE_OAUTH_TOKEN    — Claude-Abo-Token (`claude setup-token`,
-#                                empfohlen, nutzt dein Pro/Max-Abo) ODER
-#   ANTHROPIC_API_KEY          — Anthropic-API-Key (pay-per-use). Eines genügt.
+#   CLAUDE_CODE_OAUTH_TOKEN    — Claude-Abo-Token (empfohlen) ODER
+#   ANTHROPIC_API_KEY          — Anthropic-API-Key. Eines genügt.
 #   AGENT_PAT                  — fine-grained PAT (contents:write,
-#                                pull-requests:write). Push/PR MÜSSEN über
-#                                den PAT laufen, damit das pull_request-CI
-#                                (flutter.yml) überhaupt triggert.
+#                                pull-requests:write). Push/PR MÜSSEN
+#                                über den PAT laufen, damit das
+#                                pull_request-CI (flutter.yml) triggert.
 #   SUPABASE_SERVICE_ROLE_KEY  — Statusupdates in admin_dev_tasks
-#
-# Hinweis: Die Aufgabe (inputs.instruction) wird AUSSCHLIESSLICH über
-# Umgebungsvariablen in Bash genutzt — niemals via ${{ }}-Interpolation in
-# run-Blöcken (Script-Injection-Schutz).
 # ════════════════════════════════════════════════════════════════════════
 
 on:
@@ -34,21 +29,26 @@ on:
       task_id:
         description: 'admin_dev_tasks.id (UUID)'
         required: true
+      image_urls:
+        description: 'JSON-Array mit Screenshot-URLs (optional, für Vision)'
+        required: false
+        default: '[]'
 
 permissions:
   contents: write
   pull-requests: write
+  issues: write
+  id-token: write  # Pflicht für anthropics/claude-code-action (OIDC-Token)
 
 env:
   SUPABASE_REF: gyqujitkvymlmgroovch
-  AGENT_MODEL: claude-sonnet-4-6
   SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   TASK_ID: ${{ inputs.task_id }}
-  INSTRUCTION: ${{ inputs.instruction }}
 
 jobs:
   agent:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - name: Checkout (mit PAT, damit PR-CI triggert)
         uses: actions/checkout@v4
@@ -56,114 +56,128 @@ jobs:
           token: ${{ secrets.AGENT_PAT }}
           fetch-depth: 0
 
-      - name: Branch anlegen
-        id: branch
-        run: |
-          BR="agent/task-${TASK_ID}"
-          git config user.name "Mensaena Agent"
-          git config user.email "agent@mensaena.de"
-          git checkout -b "$BR"
-          echo "branch=$BR" >> "$GITHUB_OUTPUT"
-
       - name: Status -> running
         run: |
           curl -sS -X PATCH \
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
             -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-            -d "{\"status\":\"running\",\"branch\":\"${{ steps.branch.outputs.branch }}\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            -d "{\"status\":\"running\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Claude Code CLI installieren
-        run: npm install -g @anthropic-ai/claude-code
-
-      - name: Prompt schreiben (injection-sicher via env)
+      - name: Screenshots herunterladen (Vision)
+        env:
+          IMGS: ${{ inputs.image_urls }}
         run: |
-          {
-            echo "Du bist der Mensaena-Entwicklungs-Agent. Ein Admin hat aus dem"
-            echo "Admin-Dashboard folgende Aufgabe gestellt. Setze sie vollständig um."
-            echo ""
-            echo "=== AUFGABE ==="
-            printf '%s\n' "$INSTRUCTION"
-            echo "=== ENDE AUFGABE ==="
-            echo ""
-            echo "Verbindliche Regeln:"
-            echo "- Befolge STRIKT die Projektregeln in CLAUDE.md, besonders:"
-            echo "  * i18n-Pflicht: JEDER neue user-facing String via easy_localization"
-            echo "    .tr() mit Key in ALLEN 7 Dateien"
-            echo "    (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json)."
-            echo "  * Supabase-Stream-Regeln (immer .limit(), autoDispose)."
-            echo "  * Design-System (primary/teal, KEINE emerald-Farben)."
-            echo "- Die meisten Änderungen betreffen die Flutter-App unter flutter_app/."
-            echo "- Halte die Änderung minimal und fokussiert auf die Aufgabe."
-            echo "- Der Flutter-Code MUSS kompilieren (keine fehlenden Imports, keine"
-            echo "  erfundenen LucideIcons, korrekte Typen). Dieser Code geht live an"
-            echo "  echte Nutzer."
-            echo "- Schreibe NIEMALS Secrets, Tokens oder Keys in den Code."
-            echo "- Committe NICHT und pushe NICHT selbst — das übernimmt der Workflow."
-          } > /tmp/agent_prompt.txt
+          # Bilder in einen lokalen Ordner laden. Per .git/info/exclude vom
+          # Commit ausgeschlossen, damit der Agent sie NICHT versehentlich
+          # mit eincheckt — sie dienen nur als visueller Kontext.
+          mkdir -p .godmode_images
+          echo ".godmode_images/" >> .git/info/exclude
+          COUNT=$(node -e 'const a=JSON.parse(process.env.IMGS||"[]"); process.stdout.write(String(Array.isArray(a)?a.length:0))')
+          echo "Bilder: $COUNT"
+          [ "$COUNT" = "0" ] && exit 0
+          node -e 'const a=JSON.parse(process.env.IMGS||"[]"); a.forEach(u=>console.log(u))' > /tmp/img_urls.txt
+          i=0
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            ext=$(printf '%s' "$url" | sed -E 's/.*\.([a-zA-Z0-9]{1,4})($|\?).*/\1/')
+            case "$ext" in jpg|jpeg|png|gif|webp) ;; *) ext=jpg;; esac
+            curl -sSL "$url" -o ".godmode_images/screenshot_${i}.${ext}" || true
+            i=$((i+1))
+          done < /tmp/img_urls.txt
+          ls -la .godmode_images/ || true
 
       - name: Agent ausführen
-        env:
-          # Abo-Token bevorzugt (nutzt Claude Pro/Max, kein API-Key nötig).
-          # Fällt automatisch auf den API-Key zurück, falls nur der gesetzt ist.
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          set +e
-          claude -p "$(cat /tmp/agent_prompt.txt)" \
-            --model "$AGENT_MODEL" \
-            --dangerously-skip-permissions \
-            --max-turns 80 \
-            > /tmp/agent_output.log 2>&1
-          echo "Exit: $?"
-          echo "----- Agent-Ausgabe (letzte 60 Zeilen) -----"
-          tail -n 60 /tmp/agent_output.log || true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.AGENT_PAT }}
+          claude_args: "--max-turns 80"
+          prompt: |
+            Du bist der Mensaena-Entwicklungs-Agent. Ein Admin hat aus dem
+            Admin-Dashboard folgende Aufgabe gestellt. Setze sie vollständig um.
 
-      - name: Änderungen prüfen, committen, PR erstellen
-        id: pr
-        env:
-          GH_TOKEN: ${{ secrets.AGENT_PAT }}
-        run: |
-          if git diff --quiet && git diff --cached --quiet; then
-            echo "Keine Änderungen vom Agenten."
-            echo "no_changes=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          git add -A
-          TITLE="$(printf '%s' "$INSTRUCTION" | head -c 60 | tr '\n' ' ')"
-          git commit -m "agent: Admin-Auftrag #${TASK_ID}" -m "$INSTRUCTION"
-          git push -u origin "${{ steps.branch.outputs.branch }}"
+            === AUFGABE ===
+            ${{ inputs.instruction }}
+            === ENDE AUFGABE ===
 
-          PR_BODY="$(printf '🤖 Automatisch erstellt durch den Admin-Dev-Agenten.\n\n**Auftrag:**\n%s\n\nAuto-Merge erfolgt automatisch, sobald das Flutter-CI grün ist.' "$INSTRUCTION")"
-          PR_URL="$(gh pr create \
-            --base main \
-            --head "${{ steps.branch.outputs.branch }}" \
-            --title "🤖 Agent: $TITLE" \
-            --body "$PR_BODY" \
-            --label "agent-automerge")"
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
-          echo "pr_number=$(echo "$PR_URL" | grep -oE '[0-9]+$')" >> "$GITHUB_OUTPUT"
+            WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
+            liegen, sieh sie dir ZUERST mit dem Read-Tool an. Das sind
+            Screenshots, die der Admin zum Auftrag hochgeladen hat (z. B. um
+            ein Problem oder den gewünschten Zustand zu zeigen). Beziehe sie
+            in deine Umsetzung ein. Diese Bilder NIEMALS mit committen.
 
-      - name: Status -> pr_open / no_changes
+            Vorgehen (Schritt für Schritt):
+            1. Lies CLAUDE.md vollständig — halte ALLE Regeln ein.
+            2. Erstelle einen neuen Branch: agent/task-${{ inputs.task_id }}
+            3. Setze die Aufgabe um.
+            4. Stelle sicher: keine fehlenden Imports, keine erfundenen
+               LucideIcons, korrekte Dart-Typen.
+            5. Committe mit einer prägnanten Beschreibung der Änderung.
+            6. Pushe den Branch und erstelle einen PR gegen main mit:
+               - Der Aufgabe im Body
+               - "Auto-Merge erfolgt automatisch, sobald das Flutter-CI grün ist."
+
+            Verbindliche Regeln aus CLAUDE.md:
+            - i18n-Pflicht: JEDER neue user-facing String via .tr() in ALLEN
+              7 JSON-Dateien (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json).
+            - Supabase-Streams: IMMER .limit() + autoDispose.
+            - Design: primary/teal, KEINE emerald-Farben.
+            - Schreibe NIEMALS Secrets, Tokens oder Keys in den Code.
+
+      - name: Screenshots/Goldens als Artefakt sichern (best-effort)
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: godmode-screenshots-${{ inputs.task_id }}
+          path: |
+            flutter_app/test/golden/**/*.png
+            flutter_app/test/**/failures/*.png
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: PR ermitteln
+        id: findpr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.AGENT_PAT }}
+          script: |
+            const taskId = process.env.TASK_ID;
+            const branch = `agent/task-${taskId}`;
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const match = prs.find(p => p.head.ref === branch);
+            if (!match) {
+              core.setOutput('found', 'false');
+              return;
+            }
+            core.setOutput('found', 'true');
+            core.setOutput('number', String(match.number));
+            core.setOutput('url', match.html_url);
+
+      - name: Status -> pr_open
+        if: steps.findpr.outputs.found == 'true'
         run: |
-          if [ "${{ steps.pr.outputs.no_changes }}" = "true" ]; then
-            curl -sS -X PATCH \
-              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
-              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
-              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-              -d "{\"status\":\"no_changes\",\"summary\":\"Der Agent hat keine Änderungen vorgenommen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
-          else
-            curl -sS -X PATCH \
-              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
-              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
-              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-              -d "{\"status\":\"pr_open\",\"pr_url\":\"${{ steps.pr.outputs.pr_url }}\",\"pr_number\":${{ steps.pr.outputs.pr_number }},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
-          fi
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"pr_open\",\"pr_url\":\"${{ steps.findpr.outputs.url }}\",\"pr_number\":${{ steps.findpr.outputs.number }},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+      - name: Status -> no_changes
+        if: steps.findpr.outputs.found == 'false'
+        run: |
+          curl -sS -X PATCH \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"status\":\"no_changes\",\"summary\":\"Der Agent hat keine Änderungen vorgenommen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
       - name: Status -> failed (bei Fehler)
         if: failure()

@@ -52,7 +52,7 @@ jobs:
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_scan_runs?id=eq.${SCAN_ID}" \
             -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-            -d "{\"status\":\"running\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            -d "{\"status\":\"running\",\"phase\":\"scanning\",\"analyzed_files\":0,\"found_so_far\":0,\"heartbeat_at\":\"$(date -u +%FT%TZ)\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -86,6 +86,26 @@ jobs:
             echo "Supabase-Stream-Limits, Design-System teal/primary, KEINE"
             echo "emerald-Farben). Verstöße dagegen sind valide Vorschläge."
             echo ""
+            echo "WICHTIG — schlage AUSDRÜCKLICH auch NEUERUNGEN vor (komplett"
+            echo "neue Features/Module/Ideen, die die App besser machen), nicht"
+            echo "nur Korrekturen. Mische Bugs, Verbesserungen UND Neuerungen."
+            echo ""
+            echo "Markiere jeden Vorschlag mit 'kind':"
+            echo "  - bug          = ein Fehler/Bug, der behoben werden muss"
+            echo "  - improvement  = Verbesserung von etwas Vorhandenem"
+            echo "  - new          = Neuerung / komplett neues Feature"
+            echo ""
+            echo "Gib zu JEDEM Vorschlag eine 'reason' an — leicht verständlich,"
+            echo "WARUM das geändert/verbessert/neu gemacht werden soll (1-2 Sätze,"
+            echo "Deutsch, konkreter Nutzen für die Nutzer)."
+            echo ""
+            echo "Du DARFST eigene, treffendere Kategorien vergeben (selbstlernend),"
+            echo "wenn die Standardkategorien nicht passen. 'category' ist ein kurzer"
+            echo "Schlüssel (klein, ohne Leerzeichen, z. B. 'accessibility',"
+            echo "'onboarding', 'monetization'). 'category_label' ist der lesbare"
+            echo "deutsche Name dazu. Standardkategorien:"
+            echo "  ui, feature, bug, performance, i18n, database, security, config."
+            echo ""
             echo "Konzentriere dich auf die wirkungsvollsten 12-25 Vorschläge."
             echo "Jeder Vorschlag MUSS so formuliert sein, dass ein Entwickler-Agent"
             echo "ihn ohne Rückfragen umsetzen kann (instruction = klare Anweisung,"
@@ -94,10 +114,13 @@ jobs:
             echo "Schreibe das Ergebnis als reines JSON in die Datei"
             echo "/tmp/suggestions.json (NICHTS sonst dorthin). Format:"
             echo '{ "suggestions": [ {'
-            echo '  "category": "bug|ui|feature|performance|i18n|database|security|config",'
+            echo '  "category": "kurzer-schlüssel (Standard oder eigene Kategorie)",'
+            echo '  "category_label": "Lesbarer deutscher Name der Kategorie",'
+            echo '  "kind": "bug|improvement|new",'
             echo '  "severity": "low|medium|high|critical",'
             echo '  "title": "Kurzer Titel (Deutsch)",'
             echo '  "description": "Was ist das Problem / der Nutzen (1-3 Sätze, Deutsch)",'
+            echo '  "reason": "WARUM (leicht verständlich, 1-2 Sätze, Deutsch)",'
             echo '  "instruction": "Präzise Umsetzungs-Anweisung für den Dev-Agenten (Deutsch)",'
             echo '  "file_hint": "relativer Pfad zur betroffenen Datei"'
             echo '} ] }'
@@ -107,20 +130,132 @@ jobs:
             echo "des Codes ausgiebig — sei gründlich, geh in die Tiefe."
           } > /tmp/scan_prompt.txt
 
+          # ── Selbstlernend: bereits abgelehnte/angenommene Vorschläge laden ──
+          # Der Agent soll abgelehnte NIEMALS erneut vorschlagen und bereits
+          # angenommene/umgesetzte nicht duplizieren.
+          REJECTED=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_suggestions?select=title&status=eq.rejected&order=reviewed_at.desc&limit=80" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(a.map(x=>"- "+x.title).join("\n"))}catch{process.stdout.write("")}})' || true)
+          ACCEPTED=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_suggestions?select=title&status=eq.accepted&order=reviewed_at.desc&limit=80" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(a.map(x=>"- "+x.title).join("\n"))}catch{process.stdout.write("")}})' || true)
+          {
+            echo ""
+            echo "=== SELBSTLERNEND — NICHT WIEDERHOLEN ==="
+            if [ -n "$REJECTED" ]; then
+              echo "Diese Vorschläge wurden vom Admin ABGELEHNT. Schlage sie NIEMALS"
+              echo "erneut vor (auch nicht ähnlich formuliert):"
+              echo "$REJECTED"
+              echo ""
+            fi
+            if [ -n "$ACCEPTED" ]; then
+              echo "Diese Vorschläge wurden bereits ANGENOMMEN/umgesetzt. Dupliziere"
+              echo "sie nicht — schlage höchstens sinnvolle Folge-Verbesserungen vor:"
+              echo "$ACCEPTED"
+            fi
+          } >> /tmp/scan_prompt.txt
+
+      # Live-Fortschritt-Tailer: liest den stream-json-Output der Claude CLI,
+      # erkennt jede gelesene Datei (Read/Grep/Glob) und schreibt laufend
+      # current_file + analyzed_files + heartbeat nach admin_scan_runs. So sieht
+      # das Dashboard in Echtzeit, welche Datei gerade analysiert wird.
+      - name: Fortschritt-Tailer schreiben
+        run: |
+          cat > /tmp/progress_tailer.js <<'TAILER'
+          const https = require('https');
+          const readline = require('readline');
+          const REF = process.env.SUPABASE_REF;
+          const SRK = process.env.SRK;
+          const SCAN_ID = process.env.SCAN_ID;
+          let analyzed = 0;
+          let lastFile = '';
+          let lastSent = 0;
+
+          function patch(fields) {
+            const data = JSON.stringify({ ...fields, updated_at: new Date().toISOString() });
+            const req = https.request({
+              method: 'PATCH',
+              hostname: REF + '.supabase.co',
+              path: '/rest/v1/admin_scan_runs?id=eq.' + SCAN_ID,
+              headers: {
+                apikey: SRK,
+                Authorization: 'Bearer ' + SRK,
+                'Content-Type': 'application/json',
+                Prefer: 'return=minimal',
+                'Content-Length': Buffer.byteLength(data),
+              },
+            }, (res) => { res.resume(); });
+            req.on('error', () => {});
+            req.write(data);
+            req.end();
+          }
+
+          function send(force) {
+            const now = Date.now();
+            if (!force && now - lastSent < 2500) return;
+            lastSent = now;
+            patch({
+              phase: 'scanning',
+              current_file: lastFile.slice(0, 300),
+              analyzed_files: analyzed,
+              heartbeat_at: new Date().toISOString(),
+            });
+          }
+
+          function shorten(p) {
+            if (!p) return '';
+            const i = p.indexOf('flutter_app/');
+            return i >= 0 ? p.slice(i) : p;
+          }
+
+          // Heartbeat auch wenn die KI gerade nachdenkt (keine neue Datei).
+          const hb = setInterval(() => send(true), 5000);
+          hb.unref();
+
+          const rl = readline.createInterface({ input: process.stdin });
+          rl.on('line', (line) => {
+            process.stdout.write(line + '\n');
+            let ev;
+            try { ev = JSON.parse(line); } catch (_) { return; }
+            if (ev && ev.type === 'assistant' && ev.message && Array.isArray(ev.message.content)) {
+              for (const b of ev.message.content) {
+                if (b && b.type === 'tool_use') {
+                  const inp = b.input || {};
+                  const f = inp.file_path || inp.path || inp.pattern || '';
+                  if (['Read', 'Grep', 'Glob'].includes(b.name) && f) {
+                    analyzed++;
+                    lastFile = shorten(String(f));
+                    send(false);
+                  }
+                }
+              }
+            }
+          });
+          rl.on('close', () => send(true));
+          TAILER
+          echo "Tailer geschrieben."
+
       - name: Analyse ausführen
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set +e
+          # stream-json (+ --verbose Pflicht) liefert pro Schritt ein JSON-Event.
+          # Wir leiten es durch den Tailer, der den Live-Fortschritt nach Supabase
+          # schreibt. suggestions.json schreibt die CLI weiterhin via Write-Tool.
           claude -p "$(cat /tmp/scan_prompt.txt)" \
             --model "$AGENT_MODEL" \
+            --output-format stream-json --verbose \
             --dangerously-skip-permissions \
             --max-turns 120 \
-            > /tmp/scan_output.log 2>&1
-          echo "Exit: $?"
-          echo "----- Analyse-Ausgabe (letzte 40 Zeilen) -----"
-          tail -n 40 /tmp/scan_output.log || true
+            2> /tmp/scan_err.log \
+            | node /tmp/progress_tailer.js > /tmp/scan_output.log
+          echo "Exit (pipe): ${PIPESTATUS[0]}"
+          echo "----- Analyse-Fehlerausgabe (letzte 20 Zeilen) -----"
+          tail -n 20 /tmp/scan_err.log || true
 
       - name: Vorschläge nach Supabase schreiben
         run: |
@@ -136,7 +271,9 @@ jobs:
           fi
 
           # JSON in REST-Bulk-Insert-Rows umwandeln (scan_id anreichern, validieren).
-          ROWS="$(SCAN_ID="$SCAN_ID" node -e '
+          # Schreibt zwei Dateien: /tmp/rows.json (Vorschläge) + /tmp/cats.json
+          # (neu entdeckte Kategorien für admin_dev_categories).
+          SCAN_ID="$SCAN_ID" node -e '
             const fs = require("fs");
             const raw = fs.readFileSync("/tmp/suggestions.json", "utf8");
             let parsed;
@@ -145,25 +282,52 @@ jobs:
               const a = raw.indexOf("{"); const b = raw.lastIndexOf("}");
               parsed = JSON.parse(raw.slice(a, b + 1));
             }
-            const cats = ["ui","feature","bug","performance","i18n","database","security","config"];
+            const builtin = ["ui","feature","bug","performance","i18n","database","security","config"];
             const sevs = ["low","medium","high","critical"];
+            const kinds = ["bug","improvement","new"];
+            const slug = (s) => String(s || "").toLowerCase().trim()
+              .replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40);
+            const newCats = {};
             const out = (parsed.suggestions || [])
               .filter(s => s && s.title && s.instruction)
               .slice(0, 40)
-              .map(s => ({
-                scan_id: process.env.SCAN_ID,
-                category: cats.includes(s.category) ? s.category : "feature",
-                severity: sevs.includes(s.severity) ? s.severity : "medium",
-                title: String(s.title).slice(0, 200),
-                description: s.description ? String(s.description).slice(0, 1000) : null,
-                instruction: String(s.instruction).slice(0, 2000),
-                file_hint: s.file_hint ? String(s.file_hint).slice(0, 300) : null,
-              }));
-            process.stdout.write(JSON.stringify(out));
-          ')"
+              .map(s => {
+                let cat = slug(s.category) || "feature";
+                if (!builtin.includes(cat)) {
+                  const label = String(s.category_label || s.category || cat).slice(0, 60);
+                  newCats[cat] = { key: cat, label, source: "ai" };
+                }
+                return {
+                  scan_id: process.env.SCAN_ID,
+                  category: cat,
+                  kind: kinds.includes(s.kind) ? s.kind : "improvement",
+                  severity: sevs.includes(s.severity) ? s.severity : "medium",
+                  title: String(s.title).slice(0, 200),
+                  description: s.description ? String(s.description).slice(0, 1000) : null,
+                  reason: s.reason ? String(s.reason).slice(0, 600) : null,
+                  instruction: String(s.instruction).slice(0, 2000),
+                  file_hint: s.file_hint ? String(s.file_hint).slice(0, 300) : null,
+                };
+              });
+            fs.writeFileSync("/tmp/rows.json", JSON.stringify(out));
+            fs.writeFileSync("/tmp/cats.json", JSON.stringify(Object.values(newCats)));
+          '
+          ROWS="$(cat /tmp/rows.json)"
+          CATS="$(cat /tmp/cats.json)"
 
           COUNT="$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).length))' "$ROWS")"
-          echo "Erzeugte Vorschläge: $COUNT"
+          CATCOUNT="$(node -e 'process.stdout.write(String(JSON.parse(process.argv[1]).length))' "$CATS")"
+          echo "Erzeugte Vorschläge: $COUNT | Neue Kategorien: $CATCOUNT"
+
+          # Neu entdeckte Kategorien selbstlernend anlegen (Konflikt = ignorieren).
+          if [ "$CATCOUNT" -gt 0 ]; then
+            curl -sS -X POST \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_categories?on_conflict=key" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: return=minimal,resolution=ignore-duplicates" \
+              -d "$CATS" || true
+          fi
 
           if [ "$COUNT" -gt 0 ]; then
             curl -sS -X POST \
@@ -177,7 +341,7 @@ jobs:
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_scan_runs?id=eq.${SCAN_ID}" \
             -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-            -d "{\"status\":\"done\",\"found\":${COUNT},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            -d "{\"status\":\"done\",\"phase\":\"done\",\"found\":${COUNT},\"found_so_far\":${COUNT},\"current_file\":null,\"heartbeat_at\":\"$(date -u +%FT%TZ)\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
       - name: Status -> failed (bei Fehler)
         if: failure()

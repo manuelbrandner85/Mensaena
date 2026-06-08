@@ -36,6 +36,7 @@ jobs:
           BRANCH: ${{ github.event.workflow_run.head_branch }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          CI_RUN_URL: ${{ github.event.workflow_run.html_url }}
         run: |
           set -euo pipefail
           TASK_ID="${BRANCH#agent/task-}"
@@ -52,15 +53,32 @@ jobs:
           # 1) Flutter-CI muss grün sein
           if [ "$CONCLUSION" != "success" ]; then
             echo "Flutter-CI nicht grün ($CONCLUSION) — kein Merge."
-            patch_status "{\"summary\":\"Flutter-CI fehlgeschlagen ($CONCLUSION) — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            patch_status "{\"ci_status\":\"failure\",\"ci_run_url\":\"${CI_RUN_URL}\",\"summary\":\"Flutter-CI fehlgeschlagen ($CONCLUSION) — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
             exit 0
           fi
+
+          # CI grün — im Dashboard sofort sichtbar machen.
+          patch_status "{\"ci_status\":\"success\",\"ci_run_url\":\"${CI_RUN_URL}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
           # 2) PR zum Branch finden
           PR_NUM=$(gh pr list --repo "${{ github.repository }}" --head "$BRANCH" \
                      --state open --json number --jq '.[0].number // empty')
           if [ -z "$PR_NUM" ]; then
             echo "Kein offener PR für $BRANCH — evtl. bereits gemergt."
+            exit 0
+          fi
+
+          # 2b) Review-Gate: wenn der Admin "Vor Merge prüfen" gewählt hat
+          #     (await_review=true), NICHT automatisch mergen — stattdessen
+          #     auf 'awaiting_review' setzen. Der Admin gibt im Dashboard frei.
+          AWAIT=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=await_review" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(String(a[0]&&a[0].await_review===true))}catch{process.stdout.write("false")}})')
+          if [ "$AWAIT" = "true" ]; then
+            echo "Review-Gate aktiv — warte auf manuelle Freigabe."
+            patch_status "{\"status\":\"awaiting_review\",\"ci_status\":\"success\",\"ci_run_url\":\"${CI_RUN_URL}\",\"pr_number\":${PR_NUM},\"summary\":\"CI grün — wartet auf deine Freigabe (Diff prüfen, dann mergen).\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
             exit 0
           fi
 
@@ -78,4 +96,8 @@ jobs:
           gh pr merge "$PR_NUM" --repo "${{ github.repository }}" \
              --squash --delete-branch --admin
 
-          patch_status "{\"status\":\"merged\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          # Merge-Commit-SHA für späteren Ein-Tap-Rollback speichern.
+          MERGE_SHA=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
+                        --json mergeCommit --jq '.mergeCommit.oid // empty' || true)
+
+          patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
