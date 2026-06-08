@@ -1317,6 +1317,30 @@
       "merged": "Distribuito",
       "failed": "Fallito",
       "no_changes": "Nessuna modifica"
+    },
+    "scanAnalyzing": "Analisi di {file}",
+    "scanFilesRead": "{count} file analizzati",
+    "scanFoundSoFar": "{count} trovati",
+    "scanWorking": "L'agente sta lavorando …",
+    "lastScan": "Ultima scansione: {count} proposte",
+    "select": "Seleziona",
+    "selectAll": "Tutti",
+    "clearSelection": "Annulla",
+    "selectedCount": "{count} selezionati",
+    "acceptedMany": "{count} accettati — esecuzione in corso.",
+    "cancel": "Annulla",
+    "ci": {
+      "pending": "CI in attesa",
+      "running": "CI in corso",
+      "success": "CI superato",
+      "failure": "CI fallito"
+    },
+    "stage": {
+      "agent": "Agente",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
     }
   },
   "create": {

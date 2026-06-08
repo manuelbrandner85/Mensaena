@@ -1317,6 +1317,30 @@
       "merged": "Delivered",
       "failed": "Failed",
       "no_changes": "No change"
+    },
+    "scanAnalyzing": "Analyzing {file}",
+    "scanFilesRead": "{count} files analyzed",
+    "scanFoundSoFar": "{count} found",
+    "scanWorking": "The agent is working …",
+    "lastScan": "Last scan: {count} suggestions",
+    "select": "Select",
+    "selectAll": "All",
+    "clearSelection": "Clear",
+    "selectedCount": "{count} selected",
+    "acceptedMany": "{count} accepted — work in progress.",
+    "cancel": "Cancel",
+    "ci": {
+      "pending": "CI pending",
+      "running": "CI running",
+      "success": "CI passed",
+      "failure": "CI failed"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Merge",
+      "ota": "OTA"
     }
   },
   "create": {

@@ -36,6 +36,7 @@ jobs:
           BRANCH: ${{ github.event.workflow_run.head_branch }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          CI_RUN_URL: ${{ github.event.workflow_run.html_url }}
         run: |
           set -euo pipefail
           TASK_ID="${BRANCH#agent/task-}"
@@ -52,9 +53,12 @@ jobs:
           # 1) Flutter-CI muss grün sein
           if [ "$CONCLUSION" != "success" ]; then
             echo "Flutter-CI nicht grün ($CONCLUSION) — kein Merge."
-            patch_status "{\"summary\":\"Flutter-CI fehlgeschlagen ($CONCLUSION) — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            patch_status "{\"ci_status\":\"failure\",\"ci_run_url\":\"${CI_RUN_URL}\",\"summary\":\"Flutter-CI fehlgeschlagen ($CONCLUSION) — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
             exit 0
           fi
+
+          # CI grün — im Dashboard sofort sichtbar machen.
+          patch_status "{\"ci_status\":\"success\",\"ci_run_url\":\"${CI_RUN_URL}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
           # 2) PR zum Branch finden
           PR_NUM=$(gh pr list --repo "${{ github.repository }}" --head "$BRANCH" \
@@ -78,4 +82,4 @@ jobs:
           gh pr merge "$PR_NUM" --repo "${{ github.repository }}" \
              --squash --delete-branch --admin
 
-          patch_status "{\"status\":\"merged\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"

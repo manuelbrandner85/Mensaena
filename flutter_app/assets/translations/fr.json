@@ -1317,6 +1317,30 @@
       "merged": "Livré",
       "failed": "Échoué",
       "no_changes": "Aucun changement"
+    },
+    "scanAnalyzing": "Analyse de {file}",
+    "scanFilesRead": "{count} fichiers analysés",
+    "scanFoundSoFar": "{count} trouvés",
+    "scanWorking": "L'agent travaille …",
+    "lastScan": "Dernière analyse : {count} suggestions",
+    "select": "Sélectionner",
+    "selectAll": "Tout",
+    "clearSelection": "Effacer",
+    "selectedCount": "{count} sélectionnés",
+    "acceptedMany": "{count} acceptés — exécution en cours.",
+    "cancel": "Annuler",
+    "ci": {
+      "pending": "CI en attente",
+      "running": "CI en cours",
+      "success": "CI réussi",
+      "failure": "CI échoué"
+    },
+    "stage": {
+      "agent": "Agent",
+      "pr": "PR",
+      "ci": "CI",
+      "merge": "Fusion",
+      "ota": "OTA"
     }
   },
   "create": {

@@ -11,6 +11,8 @@
 //   • 'accept' { id }     — Vorschlag annehmen → erzeugt einen admin_dev_tasks
 //                           -Auftrag (triggert admin_agent.yml → PR → OTA).
 //   • 'reject' { id }     — Vorschlag ablehnen.
+//   • 'accept_many' {ids} — mehrere Vorschläge auf einmal annehmen.
+//   • 'reject_many' {ids} — mehrere Vorschläge auf einmal ablehnen.
 //
 // Nur role='admin'. Schreibzugriff ausschließlich serverseitig (service_role).
 //
@@ -50,6 +52,55 @@ async function dispatchWorkflow(
   return { ok: false, status: res.status, detail: detail.slice(0, 400) }
 }
 
+// Nimmt EINEN Vorschlag an: legt einen Dev-Task an, triggert admin_agent.yml
+// und markiert den Vorschlag als 'accepted'. Wird von 'accept' und
+// 'accept_many' geteilt. Gibt {ok, task_id?} oder {ok:false, error} zurück.
+// deno-lint-ignore no-explicit-any
+async function acceptOne(admin: any, token: string, userId: string, id: string) {
+  const { data: sug } = await admin
+    .from('admin_dev_suggestions')
+    .select('id, title, instruction, status')
+    .eq('id', id)
+    .maybeSingle()
+  if (!sug) return { ok: false, error: 'not_found' }
+  if (sug.status !== 'pending') return { ok: false, error: 'already_reviewed' }
+
+  const { data: task, error: tErr } = await admin
+    .from('admin_dev_tasks')
+    .insert({ created_by: userId, instruction: sug.instruction, status: 'queued' })
+    .select('id')
+    .single()
+  if (tErr || !task) return { ok: false, error: 'task_insert_failed' }
+
+  const r = await dispatchWorkflow(token, GH_AGENT_WORKFLOW, {
+    instruction: sug.instruction, task_id: task.id,
+  })
+  if (!r.ok) {
+    await admin.from('admin_dev_tasks')
+      .update({ status: 'failed', error: `dispatch ${r.status}: ${r.detail}`, updated_at: new Date().toISOString() })
+      .eq('id', task.id)
+    return { ok: false, error: 'dispatch_failed' }
+  }
+
+  await admin.from('admin_dev_suggestions')
+    .update({
+      status: 'accepted', task_id: task.id,
+      reviewed_by: userId, reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  try {
+    await admin.from('ai_admin_audit').insert({
+      feature: 'dev_agent', actor_id: userId, action: 'suggestion_accepted',
+      target_type: 'admin_dev_suggestions', target_id: id,
+      summary: String(sug.title ?? '').slice(0, 280),
+    })
+  } catch { /* best-effort */ }
+
+  return { ok: true, task_id: task.id }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
@@ -78,10 +129,11 @@ Deno.serve(async (req) => {
     const { data, error } = await q
     if (error) return json({ error: 'list_failed', detail: error.message }, 500)
 
-    // Aktueller Scan-Status (für „läuft gerade")
+    // Aktueller Scan-Status inkl. Live-Fortschritt (für „läuft gerade").
     const { data: scan } = await admin
       .from('admin_scan_runs')
-      .select('id, status, found, run_url, created_at')
+      .select('id, status, found, run_url, created_at, phase, current_file, ' +
+        'analyzed_files, found_so_far, heartbeat_at')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
@@ -137,49 +189,34 @@ Deno.serve(async (req) => {
     const token = Deno.env.get('GH_AGENT_TOKEN') ?? ''
     if (!token) return json({ error: 'not_configured' }, 503)
 
-    const { data: sug } = await admin
-      .from('admin_dev_suggestions')
-      .select('id, title, instruction, status')
-      .eq('id', id)
-      .maybeSingle()
-    if (!sug) return json({ error: 'not_found' }, 404)
-    if (sug.status !== 'pending') return json({ error: 'already_reviewed' }, 409)
-
-    // Dev-Task anlegen (wie admin-dev-agent).
-    const { data: task, error: tErr } = await admin
-      .from('admin_dev_tasks')
-      .insert({ created_by: user.id, instruction: sug.instruction, status: 'queued' })
-      .select('id')
-      .single()
-    if (tErr || !task) return json({ error: 'task_insert_failed', detail: tErr?.message }, 500)
-
-    const r = await dispatchWorkflow(token, GH_AGENT_WORKFLOW, {
-      instruction: sug.instruction, task_id: task.id,
-    })
+    const r = await acceptOne(admin, token, user.id, id)
     if (!r.ok) {
-      await admin.from('admin_dev_tasks')
-        .update({ status: 'failed', error: `dispatch ${r.status}: ${r.detail}`, updated_at: new Date().toISOString() })
-        .eq('id', task.id)
-      return json({ error: 'dispatch_failed', status: r.status, detail: r.detail }, 502)
+      const code = r.error === 'not_found' ? 404
+        : r.error === 'already_reviewed' ? 409
+        : r.error === 'dispatch_failed' ? 502 : 500
+      return json({ error: r.error }, code)
     }
+    return json({ ok: true, task_id: r.task_id, status: 'queued' })
+  }
 
-    await admin.from('admin_dev_suggestions')
-      .update({
-        status: 'accepted', task_id: task.id,
-        reviewed_by: user.id, reviewed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
+  // ── ACCEPT MANY ─────────────────────────────────────────────────────────────
+  if (action === 'accept_many') {
+    const ids = Array.isArray(body?.ids)
+      ? body.ids.map((x: unknown) => String(x)).filter(Boolean).slice(0, 25)
+      : []
+    if (ids.length === 0) return json({ error: 'ids_required' }, 400)
 
-    try {
-      await admin.from('ai_admin_audit').insert({
-        feature: 'dev_agent', actor_id: user.id, action: 'suggestion_accepted',
-        target_type: 'admin_dev_suggestions', target_id: id,
-        summary: String(sug.title ?? '').slice(0, 280),
-      })
-    } catch { /* best-effort */ }
+    const token = Deno.env.get('GH_AGENT_TOKEN') ?? ''
+    if (!token) return json({ error: 'not_configured' }, 503)
 
-    return json({ ok: true, task_id: task.id, status: 'queued' })
+    let accepted = 0
+    const failed: string[] = []
+    for (const id of ids) {
+      const r = await acceptOne(admin, token, user.id, id)
+      if (r.ok) accepted++
+      else failed.push(id)
+    }
+    return json({ ok: true, accepted, failed })
   }
 
   // ── REJECT ──────────────────────────────────────────────────────────────────
@@ -204,6 +241,25 @@ Deno.serve(async (req) => {
     } catch { /* best-effort */ }
 
     return json({ ok: true })
+  }
+
+  // ── REJECT MANY ─────────────────────────────────────────────────────────────
+  if (action === 'reject_many') {
+    const ids = Array.isArray(body?.ids)
+      ? body.ids.map((x: unknown) => String(x)).filter(Boolean).slice(0, 60)
+      : []
+    if (ids.length === 0) return json({ error: 'ids_required' }, 400)
+
+    const { error, count } = await admin.from('admin_dev_suggestions')
+      .update({
+        status: 'rejected',
+        reviewed_by: user.id, reviewed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { count: 'exact' })
+      .in('id', ids).eq('status', 'pending')
+    if (error) return json({ error: 'reject_failed', detail: error.message }, 500)
+
+    return json({ ok: true, rejected: count ?? 0 })
   }
 
   return json({ error: 'unknown_action' }, 400)
