@@ -2449,7 +2449,7 @@ class _InputBarState extends State<_InputBar> {
                   Expanded(
                     child: Text(
                       'adminDev.duplicateWarning'
-                          .tr(namedArgs: {'task': dupWarning!}),
+                          .tr(namedArgs: {'task': dupWarning}),
                       style: AppTypography.body(
                           size: 10, color: Colors.orange.shade800),
                       maxLines: 2,
