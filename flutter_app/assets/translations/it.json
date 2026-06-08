@@ -1139,6 +1139,9 @@
     "toggleFailed": "Modifica non riuscita. Solo gli amministratori possono cambiare le funzioni.",
     "auditTitle": "Attività IA",
     "auditEmpty": "Ancora nessuna attività IA.",
+    "auditClearAll": "Elimina tutto",
+    "auditAutoDeleteNote": "Le voci vengono eliminate automaticamente dopo 24 ore.",
+    "clearFailed": "Eliminazione non riuscita.",
     "cat": {
       "moderation": "Sicurezza e moderazione",
       "growth": "Crescita e community",

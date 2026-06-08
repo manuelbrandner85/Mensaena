@@ -1138,6 +1138,9 @@
     "toggleFailed": "Umschalten fehlgeschlagen. Nur Admins dürfen Features ändern.",
     "auditTitle": "KI-Aktivität",
     "auditEmpty": "Noch keine KI-Aktivität.",
+    "auditClearAll": "Alle löschen",
+    "auditAutoDeleteNote": "Einträge werden automatisch nach 24 Stunden gelöscht.",
+    "clearFailed": "Löschen fehlgeschlagen.",
     "cat": {
       "moderation": "Sicherheit & Moderation",
       "growth": "Wachstum & Community",

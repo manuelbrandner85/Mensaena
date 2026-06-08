@@ -1139,6 +1139,9 @@
     "toggleFailed": "Toggle failed. Only admins can change features.",
     "auditTitle": "AI Activity",
     "auditEmpty": "No AI activity yet.",
+    "auditClearAll": "Delete all",
+    "auditAutoDeleteNote": "Entries are automatically deleted after 24 hours.",
+    "clearFailed": "Delete failed.",
     "cat": {
       "moderation": "Safety & Moderation",
       "growth": "Growth & Community",

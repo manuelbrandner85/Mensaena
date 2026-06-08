@@ -110,7 +110,7 @@ class AiAdminRepository {
     try {
       final rows = await sb
           .from('ai_admin_audit')
-          .select('feature, action, summary, provider, created_at')
+          .select('id, feature, action, summary, provider, created_at')
           .order('created_at', ascending: false)
           .limit(limit);
       return (rows as List)
@@ -119,6 +119,31 @@ class AiAdminRepository {
     } catch (e) {
       debugPrint('[AiAdmin] recentAudit failed: $e');
       return const [];
+    }
+  }
+
+  /// Einzelnen Audit-Eintrag löschen. true bei Erfolg.
+  static Future<bool> deleteAuditEntry(String id) async {
+    try {
+      final res = await sb.rpc<dynamic>(
+        'delete_ai_audit_entry',
+        params: {'p_id': id},
+      );
+      return res == true;
+    } catch (e) {
+      debugPrint('[AiAdmin] deleteAuditEntry failed: $e');
+      return false;
+    }
+  }
+
+  /// Alle Audit-Einträge löschen. Gibt Anzahl gelöschter Zeilen zurück.
+  static Future<int> clearAudit() async {
+    try {
+      final res = await sb.rpc<dynamic>('clear_ai_audit');
+      return (res as num?)?.toInt() ?? 0;
+    } catch (e) {
+      debugPrint('[AiAdmin] clearAudit failed: $e');
+      return -1;
     }
   }
 }

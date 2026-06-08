@@ -1139,6 +1139,9 @@
     "toggleFailed": "Échec du basculement. Seuls les administrateurs peuvent modifier les fonctions.",
     "auditTitle": "Activité IA",
     "auditEmpty": "Pas encore d'activité IA.",
+    "auditClearAll": "Tout supprimer",
+    "auditAutoDeleteNote": "Les entrées sont automatiquement supprimées après 24 heures.",
+    "clearFailed": "Échec de la suppression.",
     "cat": {
       "moderation": "Sécurité et modération",
       "growth": "Croissance et communauté",
