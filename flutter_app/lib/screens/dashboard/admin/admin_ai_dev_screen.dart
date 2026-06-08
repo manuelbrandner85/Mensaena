@@ -1,6 +1,7 @@
 // ignore_for_file: lines_longer_than_80_chars
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' show Random;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -99,6 +100,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   final _ctrl = TextEditingController();
   List<Map<String, dynamic>> _tasks = const [];
   List<Map<String, dynamic>> _suggestions = const [];
+  List<Map<String, dynamic>> _notes = const [];
+  bool _notesExpanded = false;
   Map<String, dynamic>? _scan;
   final Set<String> _busySuggestions = {};
   final Set<String> _deletingTasks = {};
@@ -126,6 +129,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     super.initState();
     _refresh();
     _loadSuggestions();
+    _loadNotes();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
       if (_scanning) _loadSuggestions(silent: true);
       if (_hasActive) _refresh(silent: true);
@@ -458,6 +462,16 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     setState(() => _pendingImages.removeAt(index));
   }
 
+  // Fehlgeschlagenen Auftrag wiederholen — lädt Instruction ins Eingabefeld
+  // und öffnet den Chat-Bestätigungs-Flow wie bei einem neuen Auftrag.
+  Future<void> _retryTask(String instruction) async {
+    setState(() {
+      _ctrl.text = instruction;
+      _ctrl.selection = TextSelection.collapsed(offset: instruction.length);
+    });
+    await _send(instruction);
+  }
+
   // Laufenden Auftrag abbrechen.
   Future<void> _cancelTask(String id) async {
     setState(() => _deletingTasks.add(id));
@@ -495,6 +509,81 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _DiffSheet(taskId: id),
+    );
+  }
+
+  // ── Notizen / Backlog ──────────────────────────────────────────────────────
+  Future<void> _loadNotes() async {
+    final rows = await AiInsightsRepository.fetchDevNotes();
+    if (!mounted) return;
+    setState(() => _notes = rows);
+  }
+
+  // Notiz anlegen oder bearbeiten (Dialog mit Textfeld).
+  Future<void> _editNote({Map<String, dynamic>? existing}) async {
+    final ctrl = TextEditingController(
+        text: existing?['content'] as String? ?? '');
+    final content = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(existing == null
+            ? 'adminDev.notes.add'.tr()
+            : 'adminDev.notes.edit'.tr()),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: 6,
+          minLines: 3,
+          decoration: InputDecoration(
+            hintText: 'adminDev.notes.placeholder'.tr(),
+            border: const OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(ctrl.text.trim()),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
+            child: Text('common.save'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (content == null || content.isEmpty) return;
+    final res = await AiInsightsRepository.saveDevNote(
+        id: existing?['id'] as String?, content: content);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      await _loadNotes();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.notes.saveFailed'.tr())),
+      );
+    }
+  }
+
+  Future<void> _deleteNote(String id) async {
+    final res = await AiInsightsRepository.deleteDevNote(id);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      setState(() => _notes = _notes.where((n) => n['id'] != id).toList());
+    }
+  }
+
+  // Notiz „in den Auftrag übernehmen": Text ins Eingabefeld laden, damit der
+  // Admin ihn NOCH bearbeiten kann. Abgesendet wird erst über den normalen
+  // Senden-Button — und dort kommt dann die Bestätigung (Ja/Nein).
+  void _useNote(String content) {
+    setState(() {
+      _ctrl.text = content;
+      _ctrl.selection = TextSelection.collapsed(offset: content.length);
+      _notesExpanded = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('adminDev.notes.loadedIntoInput'.tr())),
     );
   }
 
@@ -551,6 +640,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                     : ListView(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         children: [
+                          _NotesCard(
+                            notes: _notes,
+                            expanded: _notesExpanded,
+                            onToggle: () => setState(
+                                () => _notesExpanded = !_notesExpanded),
+                            onAdd: () => _editNote(),
+                            onEdit: (n) => _editNote(existing: n),
+                            onDelete: (id) => _deleteNote(id),
+                            onUse: (c) => _useNote(c),
+                          ),
+                          const SizedBox(height: 10),
                           _LiveScanCard(
                             scanning: _scanning,
                             scan: _scan,
@@ -611,6 +711,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                     status == 'awaiting_review');
                             final isReview =
                                 status == 'awaiting_review' && id != null;
+                            final canRetry = id != null &&
+                                (status == 'failed' || status == 'no_changes');
                             return _TaskCard(
                               task: t,
                               busy: _deletingTasks.contains(id),
@@ -621,6 +723,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                               onMerge: isReview ? () => _mergeTask(id) : null,
                               onShowDiff: id != null && t['pr_number'] != null
                                   ? () => _showDiff(id)
+                                  : null,
+                              onRetry: canRetry
+                                  ? () => _retryTask(
+                                      t['instruction'] as String? ?? '')
                                   : null,
                             );
                           }),
@@ -650,6 +756,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                 _ctrl.text = t;
                 _ctrl.selection = TextSelection.collapsed(offset: t.length);
               },
+              existingInstructions: _tasks
+                  .map((t) => t['instruction'] as String? ?? '')
+                  .where((s) => s.isNotEmpty)
+                  .toList(),
             ),
           ],
         ),
@@ -869,6 +979,176 @@ class _SeverityRow extends StatelessWidget {
 
 // ── Live Scan Card ──────────────────────────────────────────────────────────
 
+// ── Notizen / Backlog (ausklappbar) ─────────────────────────────────────────
+
+class _NotesCard extends StatelessWidget {
+  const _NotesCard({
+    required this.notes,
+    required this.expanded,
+    required this.onToggle,
+    required this.onAdd,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onUse,
+  });
+  final List<Map<String, dynamic>> notes;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onAdd;
+  final void Function(Map<String, dynamic>) onEdit;
+  final void Function(String) onDelete;
+  final void Function(String) onUse;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.scrollText,
+                      size: 18, color: AppColors.trust),
+                  const SizedBox(width: 10),
+                  Text(
+                    'adminDev.notes.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text('${notes.length}',
+                        style: AppTypography.body(
+                            size: 10, color: AppColors.lightMute)),
+                  ),
+                  const Spacer(),
+                  Icon(
+                    expanded
+                        ? LucideIcons.chevronUp
+                        : LucideIcons.chevronDown,
+                    size: 18,
+                    color: AppColors.lightMute,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            if (notes.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+                child: Text('adminDev.notes.empty'.tr(),
+                    style: AppTypography.body(
+                        size: 12, color: AppColors.lightMute)),
+              )
+            else
+              ...notes.map((n) => _NoteTile(
+                    note: n,
+                    onEdit: () => onEdit(n),
+                    onDelete: () => onDelete(n['id'] as String),
+                    onUse: () => onUse(n['content'] as String? ?? ''),
+                  )),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 4, 10, 10),
+              child: TextButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text('adminDev.notes.add'.tr()),
+                style: TextButton.styleFrom(foregroundColor: AppColors.teal),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _NoteTile extends StatelessWidget {
+  const _NoteTile({
+    required this.note,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onUse,
+  });
+  final Map<String, dynamic> note;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onUse;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = note['content'] as String? ?? '';
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+      padding: const EdgeInsets.fromLTRB(12, 10, 8, 6),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            content,
+            style: AppTypography.body(size: 12, color: AppColors.lightInk),
+            maxLines: 4,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: onEdit,
+                icon: const Icon(LucideIcons.pencil, size: 15),
+                color: AppColors.lightMute,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'adminDev.notes.edit'.tr(),
+              ),
+              IconButton(
+                onPressed: onDelete,
+                icon: const Icon(LucideIcons.trash2, size: 15),
+                color: AppColors.lightMute,
+                visualDensity: VisualDensity.compact,
+                tooltip: 'common.delete'.tr(),
+              ),
+              TextButton.icon(
+                onPressed: onUse,
+                icon: const Icon(LucideIcons.send, size: 14),
+                label: Text('adminDev.notes.use'.tr()),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.teal,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LiveScanCard extends StatefulWidget {
   const _LiveScanCard({
     required this.scanning,
@@ -888,6 +1168,7 @@ class _LiveScanCard extends StatefulWidget {
 class _LiveScanCardState extends State<_LiveScanCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ac;
+  Timer? _tick; // sekündlicher Tick für die Laufzeit-Anzeige
 
   @override
   void initState() {
@@ -896,12 +1177,29 @@ class _LiveScanCardState extends State<_LiveScanCard>
       vsync: this,
       duration: const Duration(milliseconds: 1100),
     )..repeat(reverse: true);
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted && widget.scanning) setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _ac.dispose();
+    _tick?.cancel();
     super.dispose();
+  }
+
+  // Laufzeit seit Scan-Start als mm:ss (aus created_at).
+  String _elapsed(Map<String, dynamic>? scan) {
+    final raw = scan?['created_at'] as String?;
+    if (raw == null) return '';
+    final start = DateTime.tryParse(raw);
+    if (start == null) return '';
+    final secs = DateTime.now().toUtc().difference(start.toUtc()).inSeconds;
+    if (secs < 0) return '';
+    final m = (secs ~/ 60).toString().padLeft(2, '0');
+    final s = (secs % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   @override
@@ -909,10 +1207,12 @@ class _LiveScanCardState extends State<_LiveScanCard>
     final scan = widget.scan;
     final scanning = widget.scanning;
     final currentFile = scan?['current_file'] as String?;
+    final phase = scan?['phase'] as String?;
     final analyzed = (scan?['analyzed_files'] as num?)?.toInt() ?? 0;
     final foundSoFar = (scan?['found_so_far'] as num?)?.toInt() ?? 0;
     final found = (scan?['found'] as num?)?.toInt() ?? 0;
     final isDone = (scan?['status'] as String?) == 'done';
+    final elapsed = scanning ? _elapsed(scan) : '';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -1046,7 +1346,24 @@ class _LiveScanCardState extends State<_LiveScanCard>
                         AppTypography.body(size: 10, color: AppColors.teal),
                   ),
                 ],
+                const Spacer(),
+                if (elapsed.isNotEmpty) ...[
+                  const Icon(LucideIcons.clock,
+                      size: 12, color: AppColors.lightMute),
+                  const SizedBox(width: 4),
+                  Text(elapsed,
+                      style: AppTypography.body(
+                          size: 10, color: AppColors.lightMute)),
+                ],
               ],
+            ),
+            const SizedBox(height: 6),
+            // Aktuelle Phase + Beruhigungs-Hinweis (Audit dauert ein paar Min.).
+            Text(
+              (phase != null && phase.isNotEmpty)
+                  ? 'adminDev.scanPhase'.tr(namedArgs: {'phase': phase})
+                  : 'adminDev.scanLongHint'.tr(),
+              style: AppTypography.body(size: 10, color: AppColors.lightMute),
             ),
           ],
         ],
@@ -1607,6 +1924,7 @@ class _TaskCard extends StatelessWidget {
     this.onCancel,
     this.onMerge,
     this.onShowDiff,
+    this.onRetry,
     this.busy = false,
   });
   final Map<String, dynamic> task;
@@ -1614,6 +1932,7 @@ class _TaskCard extends StatelessWidget {
   final VoidCallback? onCancel;
   final VoidCallback? onMerge;
   final VoidCallback? onShowDiff;
+  final VoidCallback? onRetry;
   final bool busy;
 
   @override
@@ -1739,6 +2058,24 @@ class _TaskCard extends StatelessWidget {
                     url: runUrl,
                   ),
               ],
+            ),
+          ],
+          // Wiederholen-Button für fehlgeschlagene Aufträge.
+          if (onRetry != null) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: busy ? null : onRetry,
+                icon: const Icon(LucideIcons.refreshCw, size: 14),
+                label: Text('adminDev.retry'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.teal,
+                  side: BorderSide(color: AppColors.teal.withValues(alpha: 0.4)),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
             ),
           ],
           // Diff-Vorschau + (bei Review-Gate) manuelle Freigabe.
@@ -1981,10 +2318,15 @@ class _LinkButton extends StatelessWidget {
 
 // ── Input Bar ─────────────────────────────────────────────────────────────────
 
-// Häufige Auftrags-Vorlagen (Schnell-Buttons). Keys → übersetzte Texte.
-const _devTemplateKeys = ['i18nCheck', 'perfCheck', 'darkMode', 'a11y'];
+// Vollständiger Pool aller Auftrags-Vorlagen. Bei jedem Tap werden 4 zufällige
+// aus diesem Pool angezeigt — so erscheinen nie zweimal dieselben Chips.
+const _allTemplateKeys = [
+  'i18nCheck', 'perfCheck', 'darkMode', 'a11y',
+  'onboarding', 'security', 'animations', 'crashes',
+  'dependencies', 'notifications', 'offline', 'emptyStates',
+];
 
-class _InputBar extends StatelessWidget {
+class _InputBar extends StatefulWidget {
   const _InputBar({
     required this.ctrl,
     required this.sending,
@@ -1996,6 +2338,7 @@ class _InputBar extends StatelessWidget {
     required this.awaitReview,
     required this.onToggleReview,
     required this.onTemplate,
+    required this.existingInstructions,
   });
   final TextEditingController ctrl;
   final bool sending;
@@ -2007,9 +2350,55 @@ class _InputBar extends StatelessWidget {
   final bool awaitReview;
   final void Function(bool) onToggleReview;
   final void Function(String) onTemplate;
+  // Für Duplikat-Erkennung (simple Keyword-Überschneidung).
+  final List<String> existingInstructions;
+
+  @override
+  State<_InputBar> createState() => _InputBarState();
+}
+
+class _InputBarState extends State<_InputBar> {
+  late List<String> _visibleTemplates;
+
+  @override
+  void initState() {
+    super.initState();
+    _visibleTemplates = _pickTemplates();
+  }
+
+  // Wählt 4 zufällige Templates aus dem Pool.
+  List<String> _pickTemplates() {
+    final pool = List<String>.from(_allTemplateKeys)..shuffle(Random());
+    return pool.take(4).toList();
+  }
+
+  void _onTemplateTap(String key) {
+    widget.onTemplate('adminDev.templateTexts.$key'.tr());
+    // Nach jedem Tap neuen Mix anzeigen.
+    setState(() => _visibleTemplates = _pickTemplates());
+  }
+
+  // Einfache Duplikat-Warnung: prüft ob der Eingabe-Text signifikante
+  // Wortüberschneidung mit einem bestehenden Auftrag hat.
+  String? _duplicateWarning(String text) {
+    if (text.length < 10) return null;
+    final words = text.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
+    if (words.isEmpty) return null;
+    for (final instr in widget.existingInstructions) {
+      final existWords = instr.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
+      final overlap = words.intersection(existWords).length;
+      if (overlap >= 3 && overlap / words.length > 0.4) {
+        return instr.length > 60 ? '${instr.substring(0, 60)}…' : instr;
+      }
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final inputText = widget.ctrl.text;
+    final dupWarning = _duplicateWarning(inputText);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
@@ -2019,13 +2408,13 @@ class _InputBar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Vorlagen-Chips (Schnell-Aufträge).
+          // Vorlagen-Chips (rotierender Pool — ändert sich nach jedem Tap).
           SizedBox(
             height: 30,
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                for (final k in _devTemplateKeys)
+                for (final k in _visibleTemplates)
                   Padding(
                     padding: const EdgeInsets.only(right: 6),
                     child: ActionChip(
@@ -2036,35 +2425,62 @@ class _InputBar extends StatelessWidget {
                       side: BorderSide(
                           color: AppColors.teal.withValues(alpha: 0.25)),
                       visualDensity: VisualDensity.compact,
-                      onPressed: sending
-                          ? null
-                          : () => onTemplate('adminDev.templateTexts.$k'.tr()),
+                      onPressed: widget.sending ? null : () => _onTemplateTap(k),
                     ),
                   ),
               ],
             ),
           ),
+          // Duplikat-Warnung: nur wenn starke Überschneidung mit bestehendem Auftrag.
+          if (dupWarning != null) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(LucideIcons.alertTriangle,
+                      size: 13, color: Colors.orange.shade700),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'adminDev.duplicateWarning'
+                          .tr(namedArgs: {'task': dupWarning ?? ''}),
+                      style: AppTypography.body(
+                          size: 10, color: Colors.orange.shade800),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           // Angehängte Screenshots (Vorschau + Entfernen).
-          if (images.isNotEmpty) ...[
+          if (widget.images.isNotEmpty) ...[
             const SizedBox(height: 8),
             SizedBox(
               height: 60,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: images.length,
+                itemCount: widget.images.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (context, i) => Stack(
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.file(images[i],
+                      child: Image.file(widget.images[i],
                           width: 60, height: 60, fit: BoxFit.cover),
                     ),
                     Positioned(
                       top: 0,
                       right: 0,
                       child: GestureDetector(
-                        onTap: () => onRemoveImage(i),
+                        onTap: () => widget.onRemoveImage(i),
                         child: Container(
                           decoration: const BoxDecoration(
                             color: Colors.black54,
@@ -2093,8 +2509,8 @@ class _InputBar extends StatelessWidget {
                         size: 11, color: AppColors.lightMute)),
               ),
               Switch(
-                value: awaitReview,
-                onChanged: sending ? null : onToggleReview,
+                value: widget.awaitReview,
+                onChanged: widget.sending ? null : widget.onToggleReview,
                 activeColor: AppColors.teal,
               ),
             ],
@@ -2103,19 +2519,20 @@ class _InputBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               IconButton(
-                onPressed: sending || images.length >= 6 ? null : onAttach,
+                onPressed: widget.sending || widget.images.length >= 6 ? null : widget.onAttach,
                 icon: const Icon(LucideIcons.imagePlus, size: 20),
                 color: AppColors.teal,
                 tooltip: 'adminDev.attachImage'.tr(),
               ),
               Expanded(
                 child: TextField(
-                  controller: ctrl,
-                  enabled: !sending,
+                  controller: widget.ctrl,
+                  onChanged: (_) => setState(() {}),
+                  enabled: !widget.sending,
                   maxLines: 4,
                   minLines: 1,
                   decoration: InputDecoration(
-                    hintText: placeholder,
+                    hintText: widget.placeholder,
                     hintStyle: AppTypography.body(
                         size: 13, color: AppColors.lightMute),
                     filled: true,
@@ -2139,13 +2556,13 @@ class _InputBar extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               FilledButton(
-                onPressed: sending ? null : () => onSend(),
+                onPressed: widget.sending ? null : () => widget.onSend(),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.teal,
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(14),
                 ),
-                child: sending
+                child: widget.sending
                     ? const SizedBox(
                         width: 18,
                         height: 18,

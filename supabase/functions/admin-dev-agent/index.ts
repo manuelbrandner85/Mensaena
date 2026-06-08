@@ -82,6 +82,43 @@ Deno.serve(async (req) => {
     return json({ ok: true, deleted: (data?.length ?? 0) })
   }
 
+  // ── Notizen / Backlog ────────────────────────────────────────────────────
+  if (action === 'notes_list') {
+    const { data, error } = await admin
+      .from('admin_dev_notes')
+      .select('id, content, created_at, updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(100)
+    if (error) return json({ error: 'notes_failed', detail: error.message }, 500)
+    return json({ ok: true, notes: data ?? [] })
+  }
+
+  if (action === 'note_save') {
+    const content = String(body?.content ?? '').trim().slice(0, 4000)
+    if (content.length < 2) return json({ error: 'content_required' }, 400)
+    const id = body?.id ? String(body.id) : null
+    if (id) {
+      const { error } = await admin.from('admin_dev_notes')
+        .update({ content, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) return json({ error: 'note_update_failed', detail: error.message }, 500)
+      return json({ ok: true, id })
+    }
+    const { data, error } = await admin.from('admin_dev_notes')
+      .insert({ created_by: user.id, content })
+      .select('id').single()
+    if (error || !data) return json({ error: 'note_insert_failed', detail: error?.message }, 500)
+    return json({ ok: true, id: data.id })
+  }
+
+  if (action === 'note_delete') {
+    const id = String(body?.id ?? '')
+    if (!id) return json({ error: 'id_required' }, 400)
+    const { error } = await admin.from('admin_dev_notes').delete().eq('id', id)
+    if (error) return json({ error: 'note_delete_failed', detail: error.message }, 500)
+    return json({ ok: true, deleted: 1 })
+  }
+
   // ── Laufenden Auftrag abbrechen ──────────────────────────────────────────
   if (action === 'cancel') {
     const id = String(body?.id ?? '')

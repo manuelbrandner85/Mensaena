@@ -1372,14 +1372,44 @@
       "i18nCheck": "Çeviriler",
       "perfCheck": "Performans",
       "darkMode": "Karanlık mod",
-      "a11y": "Erişilebilirlik"
+      "a11y": "Erişilebilirlik",
+      "onboarding": "Onboarding",
+      "security": "Güvenlik",
+      "animations": "Animasyonlar",
+      "crashes": "Çökmeler",
+      "dependencies": "Bağımlılıklar",
+      "notifications": "Bildirimler",
+      "offline": "Çevrimdışı modu",
+      "emptyStates": "Boş durumlar"
     },
     "templateTexts": {
       "i18nCheck": "Tüm çevirileri 7 dilde eksik anahtarlar ve doğal olmayan ifadeler için kontrol et ve düzelt.",
       "perfCheck": "Uygulamayı performans sorunları (gereksiz yeniden oluşturmalar, eksik stream limitleri) için analiz et ve düzelt.",
       "darkMode": "Ayarlara bir karanlık mod düğmesi ekle ve tüm ekranların bunu desteklediğinden emin ol.",
-      "a11y": "Erişilebilirliği iyileştir: kontrastlar, dokunma hedefi boyutları ve ekran okuyucu etiketleri."
-    }
+      "a11y": "Erişilebilirliği iyileştir: kontrastlar, dokunma hedefi boyutları ve ekran okuyucu etiketleri.",
+      "onboarding": "Yeni kullanıcılar için katılım akışını iyileştir: daha net adımlar, daha iyi açıklamalar ve motive edici bir tamamlama sayfası.",
+      "security": "Tüm RLS kurallarını ve güvenlik yapılandırmalarını incele — güvenlik açıklarını tespit et ve kapat.",
+      "animations": "Ana ekranlara ince, zarif animasyonlar ekle: yumuşak geçişler, hero animasyonları ve geri bildirim efektleri.",
+      "crashes": "Uygulamadaki en yaygın çökmeleri ve hataları analiz et ve en kritik olanları düzelt.",
+      "dependencies": "Tüm güncel olmayan bağımlılıkları en son kararlı sürümlere güncelle ve uyumluluk sorunlarını düzelt.",
+      "notifications": "Anlık bildirim akışını iyileştir: daha iyi metinler, akıllı zamanlama ve gruplu bildirimler.",
+      "offline": "Çevrimdışı işlevselliği iyileştir: anlamlı hata mesajları, önemli verilerin yerel önbelleğe alınması ve yeniden bağlanma sonrası senkronizasyon.",
+      "emptyStates": "Tüm ekranlara illüstrasyonlar, motive edici metinler ve harekete geçirici mesajlarla çekici boş durumlar ekle."
+    },
+    "notes": {
+      "title": "Birikim / Notlar",
+      "add": "Yeni not",
+      "edit": "Notu düzenle",
+      "empty": "Henüz not yok. Fikir veya planlanan görevler ekleyin.",
+      "placeholder": "Bir fikir veya görev tanımlayın …",
+      "saveFailed": "Not kaydedilemedi.",
+      "loadedIntoInput": "Not girişe yüklendi — düzenleyip gönderin.",
+      "use": "Kullan"
+    },
+    "scanPhase": "Aşama: {phase}",
+    "scanLongHint": "Analiz birkaç dakika sürebilir — lütfen bekleyin.",
+    "retry": "Tekrar dene",
+    "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\""
   },
   "create": {
     "titleRequired": "Başlık gerekli.",

@@ -137,6 +137,55 @@ class AiInsightsRepository {
     }
   }
 
+  // ── Notizen / Backlog (Admin) ──────────────────────────────────────────────
+
+  /// Lädt die gespeicherten Godmode-Notizen (Ideen/Prompts).
+  static Future<List<Map<String, dynamic>>> fetchDevNotes() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'notes_list'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['notes'] as List?) ?? const [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchDevNotes failed: $e');
+      return const [];
+    }
+  }
+
+  /// Speichert eine Notiz (neu, wenn [id] null; sonst Update).
+  static Future<Map<String, dynamic>> saveDevNote(
+      {String? id, required String content}) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'note_save',
+            if (id != null) 'id': id,
+            'content': content,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] saveDevNote failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht eine Notiz.
+  static Future<Map<String, dynamic>> deleteDevNote(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'note_delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevNote failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   /// Chatbot-Modus: schickt den Gesprächsverlauf an die KI und bekommt eine
   /// Antwort zurück. Erst wenn `ready==true` ist, liegt ein bestätigungsreifer
   /// Auftrag (`instruction`) vor, den der Admin per createDevTask absenden kann.
