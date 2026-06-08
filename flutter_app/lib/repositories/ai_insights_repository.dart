@@ -122,6 +122,32 @@ class AiInsightsRepository {
     }
   }
 
+  /// Löscht einen einzelnen Entwicklungs-Auftrag (nur abgeschlossene).
+  static Future<Map<String, dynamic>> deleteDevTask(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'delete', 'id': id})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht alle abgeschlossenen Aufträge (merged/failed/no_changes) auf einmal.
+  static Future<Map<String, dynamic>> clearDevTasks() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'clear'})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] clearDevTasks failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   // ── KI-Tiefenanalyse / Vorschläge (Admin) ──────────────────────────────────
 
   /// Lädt offene KI-Vorschläge (optional nach Kategorie gefiltert) plus den

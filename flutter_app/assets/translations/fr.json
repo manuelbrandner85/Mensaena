@@ -1272,6 +1272,8 @@
     "openPr": "Voir la PR",
     "openRun": "Voir le journal",
     "tasksLabel": "Tâches",
+    "clearDone": "Effacer les terminées",
+    "deleteFailed": "Échec de la suppression.",
     "suggestions": "Suggestions IA",
     "implement": "Réaliser",
     "accept": "Accepter",

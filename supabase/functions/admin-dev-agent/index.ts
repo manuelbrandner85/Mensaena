@@ -34,6 +34,33 @@ Deno.serve(async (req) => {
   if (!prof || prof.role !== 'admin') return json({ error: 'forbidden' }, 403)
 
   const body = await req.json().catch(() => ({}))
+  const action = String(body?.action ?? 'create')
+
+  // ── Auftrag(e) löschen ─────────────────────────────────────────────────────
+  // Damit sich die Liste im Dashboard nicht endlos füllt, kann der Admin
+  // einzelne Aufträge ('delete' { id }) oder alle abgeschlossenen Aufträge
+  // ('clear') entfernen. Nur abgeschlossene Zustände dürfen gelöscht werden,
+  // damit laufende Aufträge nicht versehentlich verschwinden.
+  const DONE_STATES = ['merged', 'failed', 'no_changes']
+
+  if (action === 'delete') {
+    const id = String(body?.id ?? '')
+    if (!id) return json({ error: 'id_required' }, 400)
+    const { error } = await admin.from('admin_dev_tasks').delete().eq('id', id)
+    if (error) return json({ error: 'delete_failed', detail: error.message }, 500)
+    return json({ ok: true, deleted: 1 })
+  }
+
+  if (action === 'clear') {
+    const { data, error } = await admin
+      .from('admin_dev_tasks')
+      .delete()
+      .in('status', DONE_STATES)
+      .select('id')
+    if (error) return json({ error: 'clear_failed', detail: error.message }, 500)
+    return json({ ok: true, deleted: (data?.length ?? 0) })
+  }
+
   const instruction = String(body?.instruction ?? '').trim().slice(0, 4000)
   if (instruction.length < 5) return json({ error: 'instruction_required' }, 400)
 

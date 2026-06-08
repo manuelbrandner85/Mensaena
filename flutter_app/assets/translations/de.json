@@ -1271,6 +1271,8 @@
     "openPr": "PR ansehen",
     "openRun": "Log ansehen",
     "tasksLabel": "Aufträge",
+    "clearDone": "Abgeschlossene löschen",
+    "deleteFailed": "Löschen fehlgeschlagen.",
     "suggestions": "KI-Vorschläge",
     "implement": "Umsetzen",
     "accept": "Annehmen",

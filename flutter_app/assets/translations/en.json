@@ -1272,6 +1272,8 @@
     "openPr": "View PR",
     "openRun": "View log",
     "tasksLabel": "Tasks",
+    "clearDone": "Clear completed",
+    "deleteFailed": "Could not delete.",
     "suggestions": "AI suggestions",
     "implement": "Implement",
     "accept": "Accept",

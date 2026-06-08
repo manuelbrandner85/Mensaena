@@ -1271,6 +1271,8 @@
     "openPr": "PR'ı gör",
     "openRun": "Günlüğü gör",
     "tasksLabel": "Görevler",
+    "clearDone": "Tamamlananları sil",
+    "deleteFailed": "Silinemedi.",
     "suggestions": "Yapay zekâ önerileri",
     "implement": "Uygula",
     "accept": "Kabul et",

@@ -1272,6 +1272,8 @@
     "openPr": "Ver PR",
     "openRun": "Ver registro",
     "tasksLabel": "Tareas",
+    "clearDone": "Borrar completadas",
+    "deleteFailed": "No se pudo eliminar.",
     "suggestions": "Sugerencias IA",
     "implement": "Implementar",
     "accept": "Aceptar",

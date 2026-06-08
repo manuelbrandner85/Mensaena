@@ -1272,6 +1272,8 @@
     "openPr": "Vedi PR",
     "openRun": "Vedi log",
     "tasksLabel": "Attività",
+    "clearDone": "Elimina completate",
+    "deleteFailed": "Eliminazione non riuscita.",
     "suggestions": "Suggerimenti IA",
     "implement": "Realizza",
     "accept": "Accetta",

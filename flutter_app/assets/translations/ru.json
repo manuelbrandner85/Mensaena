@@ -1271,6 +1271,8 @@
     "openPr": "Открыть PR",
     "openRun": "Открыть лог",
     "tasksLabel": "Задачи",
+    "clearDone": "Удалить завершённые",
+    "deleteFailed": "Не удалось удалить.",
     "suggestions": "Предложения ИИ",
     "implement": "Внедрить",
     "accept": "Принять",

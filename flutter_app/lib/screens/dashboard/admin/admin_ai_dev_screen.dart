@@ -98,6 +98,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   List<Map<String, dynamic>> _suggestions = const [];
   Map<String, dynamic>? _scan;
   final Set<String> _busySuggestions = {};
+  final Set<String> _deletingTasks = {};
+  bool _clearingTasks = false;
   bool _loading = true;
   bool _sending = false;
   bool _suggestionsLoading = false;
@@ -164,6 +166,46 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       _tasks = rows;
       _loading = false;
     });
+  }
+
+  // Ein abgeschlossener Auftrag ist löschbar (merged/failed/no_changes).
+  bool _deletable(String? status) =>
+      status == 'merged' || status == 'failed' || status == 'no_changes';
+
+  // Anzahl löschbarer (abgeschlossener) Aufträge.
+  int get _doneCount =>
+      _tasks.where((t) => _deletable(t['status'] as String?)).length;
+
+  Future<void> _deleteTask(String id) async {
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.deleteDevTask(id);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      setState(() {
+        _tasks = _tasks.where((t) => t['id'] != id).toList();
+        _deletingTasks.remove(id);
+      });
+    } else {
+      setState(() => _deletingTasks.remove(id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.deleteFailed'.tr())),
+      );
+    }
+  }
+
+  Future<void> _clearTasks() async {
+    setState(() => _clearingTasks = true);
+    final res = await AiInsightsRepository.clearDevTasks();
+    if (!mounted) return;
+    setState(() => _clearingTasks = false);
+    if (res['ok'] == true) {
+      setState(() => _tasks =
+          _tasks.where((t) => !_deletable(t['status'] as String?)).toList());
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.deleteFailed'.tr())),
+      );
+    }
   }
 
   // Built-in-Kategorie zum aktuellen Key (null wenn dynamische/eigene Kategorie).
@@ -464,10 +506,28 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                               icon: LucideIcons.gitPullRequest,
                               label: 'adminDev.tasksLabel'.tr(),
                               count: _tasks.length,
+                              trailing: _doneCount > 0
+                                  ? _ClearTasksButton(
+                                      busy: _clearingTasks,
+                                      onTap: _clearTasks,
+                                    )
+                                  : null,
                             ),
                           if (_tasks.isEmpty && _suggestions.isEmpty)
                             _EmptyHint(),
-                          ..._tasks.map((t) => _TaskCard(task: t)),
+                          ..._tasks.map((t) {
+                            final id = t['id'] as String?;
+                            final canDelete =
+                                _deletable(t['status'] as String?) &&
+                                    id != null;
+                            return _TaskCard(
+                              task: t,
+                              onDelete: canDelete
+                                  ? () => _deleteTask(id)
+                                  : null,
+                              deleting: _deletingTasks.contains(id),
+                            );
+                          }),
                           const SizedBox(height: 12),
                         ],
                       ),
@@ -968,10 +1028,14 @@ class _SuggestionsHeader extends StatelessWidget {
 
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel(
-      {required this.icon, required this.label, required this.count});
+      {required this.icon,
+      required this.label,
+      required this.count,
+      this.trailing});
   final IconData icon;
   final String label;
   final int count;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -997,7 +1061,44 @@ class _SectionLabel extends StatelessWidget {
                 style:
                     AppTypography.body(size: 10, color: AppColors.lightMute)),
           ),
+          if (trailing != null) ...[const Spacer(), trailing!],
         ],
+      ),
+    );
+  }
+}
+
+// Kleiner „Abgeschlossene löschen"-Button im Aufträge-Header.
+class _ClearTasksButton extends StatelessWidget {
+  const _ClearTasksButton({required this.busy, required this.onTap});
+  final bool busy;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: busy ? null : onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (busy)
+              const SizedBox(
+                width: 11,
+                height: 11,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: AppColors.lightMute),
+              )
+            else
+              Icon(LucideIcons.trash2, size: 12, color: AppColors.lightMute),
+            const SizedBox(width: 4),
+            Text('adminDev.clearDone'.tr(),
+                style:
+                    AppTypography.body(size: 11, color: AppColors.lightMute)),
+          ],
+        ),
       ),
     );
   }
@@ -1395,8 +1496,10 @@ class _EmptyHint extends StatelessWidget {
 // ── Task Card (mit Live-Pipeline) ───────────────────────────────────────────
 
 class _TaskCard extends StatelessWidget {
-  const _TaskCard({required this.task});
+  const _TaskCard({required this.task, this.onDelete, this.deleting = false});
   final Map<String, dynamic> task;
+  final VoidCallback? onDelete;
+  final bool deleting;
 
   @override
   Widget build(BuildContext context) {
@@ -1445,7 +1548,24 @@ class _TaskCard extends StatelessWidget {
                   height: 13,
                   child: CircularProgressIndicator(
                       strokeWidth: 2, color: AppColors.teal),
-                ),
+                )
+              else if (onDelete != null)
+                deleting
+                    ? const SizedBox(
+                        width: 13,
+                        height: 13,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: AppColors.lightMute),
+                      )
+                    : InkWell(
+                        onTap: onDelete,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Icon(LucideIcons.trash2,
+                              size: 15, color: AppColors.lightMute),
+                        ),
+                      ),
             ],
           ),
           const SizedBox(height: 10),
