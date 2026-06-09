@@ -561,7 +561,15 @@
     "permissions": "Autorizzazioni",
     "permissionsDesc": "Panoramica di fotocamera, microfono, posizione e altro — in un solo posto.",
     "clearCache": "Svuota cache",
-    "clearCacheDone": "Liberati {mb} MB di cache immagini"
+    "clearCacheDone": "Liberati {mb} MB di cache immagini",
+    "notifPush": {
+      "sectionTitle": "NOTIFICHE PUSH",
+      "messages": "💬 Messaggi",
+      "interactions": "👥 Interazioni",
+      "zeitbank": "⏱ Banca del Tempo",
+      "crisis": "🚨 Crisi ed Emergenze",
+      "marketing": "📢 Marketing e Consigli"
+    }
   },
   "chat": {
     "writeMessage": "Scrivi un messaggio …",

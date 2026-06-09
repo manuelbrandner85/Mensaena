@@ -561,7 +561,15 @@
     "permissions": "Berechtigungen",
     "permissionsDesc": "Übersicht über Kamera, Mikrofon, Standort und Co. — alles an einem Ort.",
     "clearCache": "Cache leeren",
-    "clearCacheDone": "{mb} MB Bild-Cache geleert"
+    "clearCacheDone": "{mb} MB Bild-Cache geleert",
+    "notifPush": {
+      "sectionTitle": "PUSH-BENACHRICHTIGUNGEN",
+      "messages": "💬 Nachrichten",
+      "interactions": "👥 Interaktionen",
+      "zeitbank": "⏱ Zeitbank",
+      "crisis": "🚨 Krisen & Notfälle",
+      "marketing": "📢 Marketing & Tipps"
+    }
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",

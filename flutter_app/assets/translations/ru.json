@@ -561,7 +561,15 @@
     "permissions": "Разрешения",
     "permissionsDesc": "Обзор камеры, микрофона, геолокации и других в одном месте.",
     "clearCache": "Очистить кэш",
-    "clearCacheDone": "Очищено {mb} МБ кэша изображений"
+    "clearCacheDone": "Очищено {mb} МБ кэша изображений",
+    "notifPush": {
+      "sectionTitle": "PUSH-УВЕДОМЛЕНИЯ",
+      "messages": "💬 Сообщения",
+      "interactions": "👥 Взаимодействия",
+      "zeitbank": "⏱ Банк Времени",
+      "crisis": "🚨 Кризисы и Чрезвычайные Ситуации",
+      "marketing": "📢 Маркетинг и Советы"
+    }
   },
   "chat": {
     "writeMessage": "Написать сообщение …",

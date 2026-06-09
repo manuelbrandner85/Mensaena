@@ -22,6 +22,7 @@ import '../../providers/locale_provider.dart';
 import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
+import '../../repositories/settings_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../providers/role_provider.dart';
 import '../../services/biometric_service.dart';
@@ -573,6 +574,8 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
                 onChanged: (h) =>
                     _update(prefs.copyWith(dailyDigestHour: h)),
               ),
+            const SizedBox(height: 18),
+            const _NotifPushPrefsSection(),
             const SizedBox(height: 18),
             // F44: Benachrichtigungs-Radius für nearby-Posts.
             Text('notif.radiusSection'.tr().toUpperCase(),
@@ -2908,6 +2911,85 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
               style: AppTypography.caption()),
         ),
       ],
+    );
+  }
+}
+
+// ── Push-Benachrichtigungen Kategorien (JSONB in profiles) ───────────────
+/// 5 Feature-Kategorien-Toggles, gespeichert als notification_preferences
+/// JSONB im profiles-Datensatz via SettingsRepository.
+class _NotifPushPrefsSection extends ConsumerStatefulWidget {
+  const _NotifPushPrefsSection();
+
+  @override
+  ConsumerState<_NotifPushPrefsSection> createState() =>
+      _NotifPushPrefsSectionState();
+}
+
+class _NotifPushPrefsSectionState
+    extends ConsumerState<_NotifPushPrefsSection> {
+  NotificationPreferences? _local;
+
+  Future<void> _update(NotificationPreferences next) async {
+    setState(() => _local = next);
+    await SettingsRepository.saveNotificationPreferences(next);
+    ref.invalidate(notificationPreferencesProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final async = ref.watch(notificationPreferencesProvider);
+    return async.when(
+      loading: () => const SizedBox(
+        height: 40,
+        child: Center(
+          child: SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+                strokeWidth: 2, color: AppColors.amber),
+          ),
+        ),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (p) {
+        _local ??= p;
+        final prefs = _local!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('settings.notifPush.sectionTitle'.tr(),
+                style:
+                    AppTypography.label(size: 10, color: AppColors.mute)),
+            const SizedBox(height: 8),
+            _BoolTile(
+              label: 'settings.notifPush.messages'.tr(),
+              value: prefs.messages,
+              onChanged: (v) => _update(prefs.copyWith(messages: v)),
+            ),
+            _BoolTile(
+              label: 'settings.notifPush.interactions'.tr(),
+              value: prefs.interactions,
+              onChanged: (v) => _update(prefs.copyWith(interactions: v)),
+            ),
+            _BoolTile(
+              label: 'settings.notifPush.zeitbank'.tr(),
+              value: prefs.zeitbank,
+              onChanged: (v) => _update(prefs.copyWith(zeitbank: v)),
+            ),
+            _BoolTile(
+              label: 'settings.notifPush.crisis'.tr(),
+              value: prefs.crisis,
+              onChanged: (v) => _update(prefs.copyWith(crisis: v)),
+            ),
+            _BoolTile(
+              label: 'settings.notifPush.marketing'.tr(),
+              value: prefs.marketing,
+              onChanged: (v) => _update(prefs.copyWith(marketing: v)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

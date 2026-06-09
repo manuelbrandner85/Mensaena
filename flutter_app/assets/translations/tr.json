@@ -561,7 +561,15 @@
     "permissions": "İzinler",
     "permissionsDesc": "Kamera, mikrofon, konum ve daha fazlasının tek bir yerde genel bakışı.",
     "clearCache": "Önbelleği temizle",
-    "clearCacheDone": "{mb} MB görsel önbelleği temizlendi"
+    "clearCacheDone": "{mb} MB görsel önbelleği temizlendi",
+    "notifPush": {
+      "sectionTitle": "PUSH BİLDİRİMLERİ",
+      "messages": "💬 Mesajlar",
+      "interactions": "👥 Etkileşimler",
+      "zeitbank": "⏱ Zaman Bankası",
+      "crisis": "🚨 Krizler ve Acil Durumlar",
+      "marketing": "📢 Pazarlama ve İpuçları"
+    }
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",

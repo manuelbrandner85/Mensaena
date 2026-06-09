@@ -561,7 +561,15 @@
     "permissions": "Autorisations",
     "permissionsDesc": "Aperçu de la caméra, du micro, de la localisation et plus — au même endroit.",
     "clearCache": "Vider le cache",
-    "clearCacheDone": "{mb} Mo de cache d’images libérés"
+    "clearCacheDone": "{mb} Mo de cache d’images libérés",
+    "notifPush": {
+      "sectionTitle": "NOTIFICATIONS PUSH",
+      "messages": "💬 Messages",
+      "interactions": "👥 Interactions",
+      "zeitbank": "⏱ Banque de Temps",
+      "crisis": "🚨 Crises et Urgences",
+      "marketing": "📢 Marketing et Conseils"
+    }
   },
   "chat": {
     "writeMessage": "Écrire un message …",
