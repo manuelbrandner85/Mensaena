@@ -137,6 +137,65 @@ jobs:
             - Design: primary/teal, KEINE emerald-Farben.
             - NIEMALS Secrets/Tokens/Keys in den Code.
 
+      # ── Fallback: Commit + Push + PR garantieren ────────────────────────────
+      # Der Agent SOLL selbst pushen + PR erstellen — tut es aber nicht immer
+      # zuverlässig (er meldet sich als "success", ohne den finalen git-Schritt
+      # gemacht zu haben → Datei-Änderungen, aber kein PR → Auftrag "verpufft").
+      # Dieser Schritt macht die Pipeline deterministisch: Wenn der Agent
+      # IRGENDEINE Änderung hinterlassen hat (Working-Tree ODER lokale Commits)
+      # und noch kein PR existiert, wird hier committet, gepusht und der PR
+      # erstellt. Läuft immer, ist aber idempotent (No-Op wenn nichts da ist).
+      - name: Fallback — Commit + Push + PR sicherstellen
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          BRANCH: agent/task-${{ inputs.task_id }}
+          REPO: ${{ github.repository }}
+          INSTR: ${{ inputs.instruction }}
+        run: |
+          set +e
+          # 1) Existiert bereits ein PR für den Branch? Dann hat der Agent alles
+          #    erledigt — nichts zu tun.
+          EXISTING=$(gh pr list --repo "$REPO" --head "$BRANCH" --state open \
+                       --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            echo "PR #$EXISTING existiert bereits — kein Fallback nötig."
+            exit 0
+          fi
+
+          # 2) Branch aus aktuellem Stand bilden (übernimmt evtl. lokale Commits
+          #    des Agents UND uncommittete Working-Tree-Änderungen).
+          git checkout -B "$BRANCH" || exit 0
+
+          # 3) Alles stagen; wenn es uncommittete Änderungen gibt → committen.
+          CHANGED=0
+          git add -A
+          if ! git diff --cached --quiet; then
+            TITLE=$(printf '%s' "$INSTR" | head -c 80 | tr '\n' ' ')
+            git -c user.name="claude[bot]" \
+                -c user.email="claude[bot]@users.noreply.github.com" \
+                commit -m "feat(godmode): ${TITLE}" && CHANGED=1
+          fi
+
+          # 4) Gibt es überhaupt etwas auszuliefern? Entweder haben wir gerade
+          #    committet (CHANGED=1) ODER der Agent hat selbst schon Commits auf
+          #    dem Branch erzeugt (AHEAD>0). Sonst echtes no_changes.
+          git fetch origin main -q
+          AHEAD=$(git rev-list --count origin/main..HEAD 2>/dev/null || echo 0)
+          if [ "$CHANGED" -eq 0 ] && [ "${AHEAD:-0}" -eq 0 ]; then
+            echo "Keine Änderungen gegenüber origin/main — echtes no_changes."
+            exit 0
+          fi
+
+          # 5) Push + PR. Force-with-lease falls der Agent den Branch schon
+          #    teilweise gepusht hatte.
+          git push -u origin "$BRANCH" --force-with-lease || git push -u origin "$BRANCH" --force
+          PR_TITLE=$(printf '%s' "$INSTR" | head -c 70 | tr '\n' ' ')
+          gh pr create --repo "$REPO" --base main --head "$BRANCH" \
+            --title "godmode: ${PR_TITLE}" \
+            --body "Automatisch erstellter Godmode-Auftrag (task ${{ inputs.task_id }}). Vom Fallback-Schritt erzeugt, da der Agent den PR nicht selbst angelegt hat." \
+            && echo "✅ Fallback-PR erstellt." || echo "PR-Erstellung fehlgeschlagen (evtl. existiert er doch schon)."
+
       - name: Screenshots/Goldens als Artefakt sichern (best-effort)
         if: always()
         continue-on-error: true
