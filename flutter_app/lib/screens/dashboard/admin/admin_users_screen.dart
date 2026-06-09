@@ -915,12 +915,12 @@ class _UserRow extends StatelessWidget {
         (user['created_at'] ?? user['profile_created_at'])?.toString();
     DateTime? created;
     if (createdAt != null) {
-      created = DateTime.tryParse(createdAt);
+      created = DateTime.tryParse(createdAt)?.toUtc();
     }
     // A1: letzter Login. admin_users_view liefert last_sign_in_at.
     final lastLoginRaw = user['last_sign_in_at']?.toString();
     final lastLogin =
-        lastLoginRaw != null ? DateTime.tryParse(lastLoginRaw) : null;
+        lastLoginRaw != null ? DateTime.tryParse(lastLoginRaw)?.toUtc() : null;
 
     final initial = (name.isNotEmpty ? name : '?').substring(0, 1).toUpperCase();
 

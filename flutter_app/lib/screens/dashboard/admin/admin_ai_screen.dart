@@ -590,7 +590,7 @@ class _AuditCardState extends ConsumerState<_AuditCard> {
     final feature = (e['feature'] ?? '').toString();
     final summary = (e['summary'] ?? '').toString();
     final createdRaw = e['created_at']?.toString();
-    final created = createdRaw != null ? DateTime.tryParse(createdRaw) : null;
+    final created = createdRaw != null ? DateTime.tryParse(createdRaw)?.toUtc() : null;
     final isBusy = _deleting.contains(id);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

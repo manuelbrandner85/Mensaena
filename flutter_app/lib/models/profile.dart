@@ -236,9 +236,9 @@ class Profile {
     return Profile(
       id: j['id'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime(2000),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime(2000),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime(2000),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime(2000),
       role: (j['role'] as String?) ?? 'user',
       donorTier: ni(j['donor_tier']),
       donationCount: ni(j['donation_count']),
@@ -280,7 +280,7 @@ class Profile {
       verifiedCommunity: (j['verified_community'] as bool?) ?? false,
       isVerified: j['is_verified'] as bool?,
       verifiedAt: j['verified_at'] != null
-          ? DateTime.tryParse(j['verified_at'] as String)
+          ? DateTime.tryParse(j['verified_at'] as String)?.toUtc()
           : null,
       emergencyContact1Name: j['emergency_contact_1_name'] as String?,
       emergencyContact1Phone: j['emergency_contact_1_phone'] as String?,
@@ -288,17 +288,17 @@ class Profile {
       emergencyContact2Phone: j['emergency_contact_2_phone'] as String?,
       onboardingCompleted: (j['onboarding_completed'] as bool?) ?? false,
       lastLoginAt: j['last_login_at'] != null
-          ? DateTime.tryParse(j['last_login_at'] as String)
+          ? DateTime.tryParse(j['last_login_at'] as String)?.toUtc()
           : null,
       inactiveReminderCount:
           ni(j['inactive_reminder_count']),
       trustScoreCount: ni(j['trust_score_count']),
       trustLevel: ni(j['trust_level']),
       trustUpdatedAt: j['trust_updated_at'] != null
-          ? DateTime.tryParse(j['trust_updated_at'] as String)
+          ? DateTime.tryParse(j['trust_updated_at'] as String)?.toUtc()
           : null,
       crisisBannedUntil: j['crisis_banned_until'] != null
-          ? DateTime.tryParse(j['crisis_banned_until'] as String)
+          ? DateTime.tryParse(j['crisis_banned_until'] as String)?.toUtc()
           : null,
       isCrisisVolunteer: (j['is_crisis_volunteer'] as bool?) ?? false,
       crisisSkills: (j['crisis_skills'] is List)
@@ -306,7 +306,7 @@ class Profile {
           : const [],
       isBanned: (j['is_banned'] as bool?) ?? false,
       bannedAt: j['banned_at'] != null
-          ? DateTime.tryParse(j['banned_at'] as String)
+          ? DateTime.tryParse(j['banned_at'] as String)?.toUtc()
           : null,
       bannedBy: j['banned_by'] as String?,
       banReason: j['ban_reason'] as String?,
@@ -344,7 +344,7 @@ class Profile {
           ? Map<String, dynamic>.from(j['emergency_contacts'] as Map)
           : const {},
       deletionRequestedAt: j['deletion_requested_at'] != null
-          ? DateTime.tryParse(j['deletion_requested_at'] as String)
+          ? DateTime.tryParse(j['deletion_requested_at'] as String)?.toUtc()
           : null,
       deletionConfirmed: (j['deletion_confirmed'] as bool?) ?? false,
       quietHoursEnabled: (j['quiet_hours_enabled'] as bool?) ?? false,
@@ -360,7 +360,7 @@ class Profile {
       statusText: j['status_text'] as String?,
       statusEmoji: j['status_emoji'] as String?,
       statusUntil: j['status_until'] != null
-          ? DateTime.tryParse(j['status_until'] as String)
+          ? DateTime.tryParse(j['status_until'] as String)?.toUtc()
           : null,
     );
   }

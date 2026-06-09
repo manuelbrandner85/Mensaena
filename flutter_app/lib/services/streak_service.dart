@@ -91,7 +91,7 @@ class StreakService {
       final lastRaw = await _storage.read(key: _lastDateKey);
       DateTime? last;
       if (lastRaw != null && lastRaw.isNotEmpty) {
-        last = DateTime.tryParse(lastRaw);
+        last = DateTime.tryParse(lastRaw)?.toUtc();
       }
       return StreakData(current: current, best: best, lastOpenDate: last);
     } catch (_) {

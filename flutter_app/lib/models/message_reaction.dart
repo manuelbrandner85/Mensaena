@@ -22,7 +22,7 @@ class MessageReaction {
       userId: j['user_id'] as String,
       emoji: j['emoji'] as String,
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

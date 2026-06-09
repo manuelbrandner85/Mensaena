@@ -333,10 +333,10 @@ class LiveStreamService {
           final active = rows.where((r) => r['status'] == 'live').toList()
             ..sort((a, b) {
               final ta = DateTime.tryParse(
-                      a['started_at'] as String? ?? '') ??
+                      a['started_at'] as String? ?? '')?.toUtc() ??
                   DateTime(2000);
               final tb = DateTime.tryParse(
-                      b['started_at'] as String? ?? '') ??
+                      b['started_at'] as String? ?? '')?.toUtc() ??
                   DateTime(2000);
               return tb.compareTo(ta);
             });

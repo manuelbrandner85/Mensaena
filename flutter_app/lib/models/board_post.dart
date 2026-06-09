@@ -53,13 +53,13 @@ class BoardPost {
       commentCount: (j['comment_count'] as num?)?.toInt() ?? 0,
       status: (j['status'] as String?) ?? 'active',
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       imageUrl: j['image_url'] as String?,
       contactInfo: j['contact_info'] as String?,
       expiresAt: j['expires_at'] != null
-          ? DateTime.tryParse(j['expires_at'] as String)
+          ? DateTime.tryParse(j['expires_at'] as String)?.toUtc()
           : null,
       latitude: (j['latitude'] as num?)?.toDouble(),
       longitude: (j['longitude'] as num?)?.toDouble(),

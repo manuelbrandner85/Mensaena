@@ -34,17 +34,17 @@ class Message {
       senderId: j['sender_id'] as String,
       content: j['content'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       receiverId: j['receiver_id'] as String?,
       readAt: j['read_at'] != null
-          ? DateTime.tryParse(j['read_at'] as String)
+          ? DateTime.tryParse(j['read_at'] as String)?.toUtc()
           : null,
       deletedAt: j['deleted_at'] != null
-          ? DateTime.tryParse(j['deleted_at'] as String)
+          ? DateTime.tryParse(j['deleted_at'] as String)?.toUtc()
           : null,
       replyToId: j['reply_to_id'] as String?,
       editedAt: j['edited_at'] != null
-          ? DateTime.tryParse(j['edited_at'] as String)
+          ? DateTime.tryParse(j['edited_at'] as String)?.toUtc()
           : null,
       isPinned: (j['is_pinned'] as bool?) ?? false,
     );

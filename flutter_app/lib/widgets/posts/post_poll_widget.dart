@@ -67,7 +67,7 @@ final postPollProvider =
       votesByOption: counts,
       myVote: mine,
       closesAt: pollRow['closes_at'] != null
-          ? DateTime.tryParse(pollRow['closes_at'] as String)
+          ? DateTime.tryParse(pollRow['closes_at'] as String)?.toUtc()
           : null,
     );
   } catch (_) {

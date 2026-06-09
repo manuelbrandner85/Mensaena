@@ -76,7 +76,7 @@ class PersonalBestService {
 
     void bump(String? ts) {
       if (ts == null) return;
-      final dt = DateTime.tryParse(ts)?.toLocal();
+      final dt = DateTime.tryParse(ts)?.toUtc();
       if (dt == null) return;
       final key =
           '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';

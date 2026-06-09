@@ -61,9 +61,9 @@ class ProfilesRepository {
   static Profile _safeMinimal(Map<String, dynamic> row, String userId) {
     return Profile(
       id: userId,
-      createdAt: DateTime.tryParse(row['created_at'] as String? ?? '') ??
+      createdAt: DateTime.tryParse(row['created_at'] as String? ?? '')?.toUtc() ??
           DateTime(2000),
-      updatedAt: DateTime.tryParse(row['updated_at'] as String? ?? '') ??
+      updatedAt: DateTime.tryParse(row['updated_at'] as String? ?? '')?.toUtc() ??
           DateTime(2000),
       role: (row['role'] as String?) ?? 'user',
       donorTier: 0,

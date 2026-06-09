@@ -66,13 +66,13 @@ class SunriseSunsetService {
       if (j['status'] != 'OK') return null;
       final results = j['results'] as Map<String, dynamic>;
       final times = SunTimes(
-        sunrise: DateTime.parse(results['sunrise'] as String).toLocal(),
-        sunset: DateTime.parse(results['sunset'] as String).toLocal(),
-        solarNoon: DateTime.parse(results['solar_noon'] as String).toLocal(),
+        sunrise: DateTime.parse(results['sunrise'] as String).toUtc(),
+        sunset: DateTime.parse(results['sunset'] as String).toUtc(),
+        solarNoon: DateTime.parse(results['solar_noon'] as String).toUtc(),
         civilTwilightBegin:
-            DateTime.parse(results['civil_twilight_begin'] as String).toLocal(),
+            DateTime.parse(results['civil_twilight_begin'] as String).toUtc(),
         civilTwilightEnd:
-            DateTime.parse(results['civil_twilight_end'] as String).toLocal(),
+            DateTime.parse(results['civil_twilight_end'] as String).toUtc(),
         dayLengthSeconds: (results['day_length'] as num).toInt(),
       );
       // Cache trimmen — max 30 Eintraege (geo-buckets × Datum).

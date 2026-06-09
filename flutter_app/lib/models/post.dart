@@ -97,7 +97,7 @@ class Post {
       title: j['title'] as String,
       userId: j['user_id'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       status: (j['status'] as String?) ?? 'open',
       category: j['category'] as String?,
       description: j['description'] as String?,
@@ -111,7 +111,7 @@ class Post {
       // Spalte ist TEXT in der DB — frueherer Code crashte mit TypeError.
       urgency: j['urgency']?.toString(),
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
       isAnonymous: (j['is_anonymous'] as bool?) ?? false,
       isRecurring: (j['is_recurring'] as bool?) ?? false,
@@ -137,10 +137,10 @@ class Post {
       privacyPhone: (j['privacy_phone'] as bool?) ?? false,
       privacyEmail: (j['privacy_email'] as bool?) ?? false,
       scheduledAt: j['scheduled_at'] != null
-          ? DateTime.tryParse(j['scheduled_at'] as String)
+          ? DateTime.tryParse(j['scheduled_at'] as String)?.toUtc()
           : null,
       expiresAt: j['expires_at'] != null
-          ? DateTime.tryParse(j['expires_at'] as String)
+          ? DateTime.tryParse(j['expires_at'] as String)?.toUtc()
           : null,
     );
   }

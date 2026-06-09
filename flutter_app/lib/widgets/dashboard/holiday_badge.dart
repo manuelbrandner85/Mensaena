@@ -46,7 +46,7 @@ class _HolidayBadgeState extends State<HolidayBadge> {
         if (raw is! Map<String, dynamic>) continue;
         final dateStr = raw['date'] as String?;
         if (dateStr == null) continue;
-        final d = DateTime.tryParse(dateStr);
+        final d = DateTime.tryParse(dateStr)?.toUtc();
         if (d == null) continue;
         final daysDiff = d.difference(todayStart).inDays;
         if (daysDiff < 0) continue;

@@ -294,7 +294,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               if (req != null) {
                 final scheduledStr = req['scheduled_for'] as String?;
                 final scheduled =
-                    scheduledStr != null ? DateTime.tryParse(scheduledStr) : null;
+                    scheduledStr != null ? DateTime.tryParse(scheduledStr)?.toUtc() : null;
                 return GlassCard(
                   padding: const EdgeInsets.all(16),
                   child: Column(

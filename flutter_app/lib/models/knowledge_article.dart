@@ -45,9 +45,9 @@ class KnowledgeArticle {
       slug: j['slug'] as String,
       content: j['content'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       summary: j['summary'] as String?,
       category: j['category'] as String?,
       tags: (j['tags'] is List)
@@ -59,7 +59,7 @@ class KnowledgeArticle {
       isFeatured: (j['is_featured'] as bool?) ?? false,
       status: j['status'] as String?,
       publishedAt: j['published_at'] != null
-          ? DateTime.tryParse(j['published_at'] as String)
+          ? DateTime.tryParse(j['published_at'] as String)?.toUtc()
           : null,
     );
   }

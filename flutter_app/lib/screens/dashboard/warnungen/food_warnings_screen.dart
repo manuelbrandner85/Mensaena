@@ -134,7 +134,7 @@ class _Tile extends StatelessWidget {
     final product = (warning['produktbezeichnung'] ?? '').toString();
     final company = (warning['inverkehrbringer'] ?? '').toString();
     final published =
-        DateTime.tryParse((warning['veroeffentlichungsdatum'] ?? '').toString());
+        DateTime.tryParse((warning['veroeffentlichungsdatum'] ?? '').toString())?.toUtc();
     final link =
         (warning['link'] ?? warning['detailLink'] ?? '').toString();
 

@@ -77,7 +77,7 @@ class MatchSummary {
         name: r['request_user_name'] as String?,
         avatarUrl: r['request_user_avatar'] as String?,
       ),
-      createdAt: DateTime.tryParse(r['created_at'] as String? ?? '') ??
+      createdAt: DateTime.tryParse(r['created_at'] as String? ?? '')?.toUtc() ??
           DateTime.now(),
       distanceKm: (r['distance_km'] as num?)?.toDouble(),
       conversationId: r['conversation_id'] as String?,

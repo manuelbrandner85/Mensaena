@@ -22,7 +22,7 @@ class UserBlock {
       blockedId: j['blocked_id'] as String,
       type: j['type'] as String,
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

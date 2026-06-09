@@ -31,7 +31,7 @@ class ZeitbankNotification {
       message: j['message'] as String? ?? '',
       seen: (j['seen'] as bool?) ?? false,
       clicked: (j['clicked'] as bool?) ?? false,
-      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ??
           DateTime.now(),
     );
   }

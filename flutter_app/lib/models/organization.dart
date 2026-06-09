@@ -108,9 +108,9 @@ class Organization {
       city: (j['city'] as String?) ?? '',
       country: (j['country'] as String?) ?? '',
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       description: j['description'] as String?,
       address: j['address'] as String?,
       zipCode: j['zip_code'] as String?,

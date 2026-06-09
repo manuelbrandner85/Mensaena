@@ -48,12 +48,12 @@ class ChatChannel {
       isLocked: j['is_locked'] as bool?,
       lockedBy: j['locked_by'] as String?,
       lockedAt: j['locked_at'] != null
-          ? DateTime.tryParse(j['locked_at'] as String)
+          ? DateTime.tryParse(j['locked_at'] as String)?.toUtc()
           : null,
       lockedReason: j['locked_reason'] as String?,
       sortOrder: (j['sort_order'] as num?)?.toInt(),
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
       conversationId: j['conversation_id'] as String?,
       category: j['category'] as String? ?? '',

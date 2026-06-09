@@ -132,7 +132,7 @@ class MeteoAlarmService {
       final id = _text(entry, 'id');
       final title = _text(entry, 'title');
       final summary = _text(entry, 'summary');
-      final updated = DateTime.tryParse(_text(entry, 'updated'));
+      final updated = DateTime.tryParse(_text(entry, 'updated'))?.toUtc();
       String web = '';
       for (final link in entry.findElements('link')) {
         final href = link.getAttribute('href');
@@ -179,10 +179,10 @@ class MeteoAlarmService {
             break;
           case 'effective':
           case 'onset':
-            effective ??= DateTime.tryParse(value);
+            effective ??= DateTime.tryParse(value)?.toUtc();
             break;
           case 'expires':
-            expires ??= DateTime.tryParse(value);
+            expires ??= DateTime.tryParse(value)?.toUtc();
             break;
           case 'description':
             if (description.isEmpty) description = value;

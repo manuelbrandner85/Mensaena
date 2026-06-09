@@ -28,7 +28,7 @@ class InteractionUpdate {
       authorId: j['author_id'] as String,
       updateType: j['update_type'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       content: j['content'] as String?,
       oldStatus: j['old_status'] as String?,
       newStatus: j['new_status'] as String?,

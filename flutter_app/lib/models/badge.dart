@@ -38,9 +38,9 @@ class BadgeModel {
       points: (j['points'] as num?)?.toInt() ?? 0,
       rarity: j['rarity'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       description: j['description'] as String?,
       icon: j['icon'] as String?,
     );

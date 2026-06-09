@@ -64,7 +64,7 @@ class BooksService {
     final lang = (locale ?? 'de').substring(0, 2);
     try {
       final atRaw = await _storage.read(key: _cacheAtKey);
-      final at = atRaw == null ? null : DateTime.tryParse(atRaw);
+      final at = atRaw == null ? null : DateTime.tryParse(atRaw)?.toUtc();
       if (at != null && DateTime.now().difference(at) < _ttl) {
         final raw = await _storage.read(key: _cacheKey);
         if (raw != null && raw.isNotEmpty) {

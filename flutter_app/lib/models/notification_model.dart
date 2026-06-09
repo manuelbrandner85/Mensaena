@@ -46,13 +46,13 @@ class AppNotification {
       title: j['title'] as String,
       body: j['body'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       link: j['link'] as String?,
       readAt: j['read_at'] != null
-          ? DateTime.tryParse(j['read_at'] as String)
+          ? DateTime.tryParse(j['read_at'] as String)?.toUtc()
           : null,
       scheduledFor: j['scheduled_for'] != null
-          ? DateTime.tryParse(j['scheduled_for'] as String)
+          ? DateTime.tryParse(j['scheduled_for'] as String)?.toUtc()
           : null,
       category: j['category'] as String?,
       content: j['content'] as String?,
@@ -63,7 +63,7 @@ class AppNotification {
       read: (j['read'] as bool?) ?? false,
       priority: j['priority'] as String?,
       deletedAt: j['deleted_at'] != null
-          ? DateTime.tryParse(j['deleted_at'] as String)
+          ? DateTime.tryParse(j['deleted_at'] as String)?.toUtc()
           : null,
     );
   }

@@ -676,7 +676,7 @@ class _ActivityRow extends StatelessWidget {
         ? profile['name'] as String
         : (entry['actor_id']?.toString() ?? '—');
     final createdRaw = entry['created_at']?.toString();
-    final created = createdRaw != null ? DateTime.tryParse(createdRaw) : null;
+    final created = createdRaw != null ? DateTime.tryParse(createdRaw)?.toUtc() : null;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -948,7 +948,7 @@ class _ScheduledBroadcastsList extends ConsumerWidget {
     final status = (b['status'] ?? 'pending').toString();
     final isPending = status == 'pending';
     final when =
-        DateTime.tryParse(b['scheduled_at']?.toString() ?? '')?.toLocal();
+        DateTime.tryParse(b['scheduled_at']?.toString() ?? '')?.toUtc();
     final recipients = b['recipients_count'];
     return Container(
       margin: const EdgeInsets.only(bottom: 6),

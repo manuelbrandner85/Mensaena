@@ -968,7 +968,7 @@ class _CommentTile extends StatelessWidget {
         .toString();
     final content = (comment['content'] ?? '').toString();
     final createdRaw = comment['created_at']?.toString();
-    final created = createdRaw != null ? DateTime.tryParse(createdRaw) : null;
+    final created = createdRaw != null ? DateTime.tryParse(createdRaw)?.toUtc() : null;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),

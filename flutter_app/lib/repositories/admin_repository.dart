@@ -935,7 +935,7 @@ class AdminRepository {
       for (final r in res.whereType<Map<String, dynamic>>()) {
         final dayRaw = r['day']?.toString();
         if (dayRaw == null) continue;
-        final day = DateTime.tryParse(dayRaw);
+        final day = DateTime.tryParse(dayRaw)?.toUtc();
         if (day == null) continue;
         out.add(UserGrowthPoint(
           day: day,

@@ -19,7 +19,7 @@ class BoardPin {
       userId: j['user_id'] as String,
       boardPostId: j['board_post_id'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
     );
   }
 

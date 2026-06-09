@@ -36,7 +36,7 @@ class SavedPin {
         label: j['label'] as String? ?? '',
         lat: (j['lat'] as num).toDouble(),
         lng: (j['lng'] as num).toDouble(),
-        createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+        createdAt: DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ??
             DateTime.now(),
       );
 }

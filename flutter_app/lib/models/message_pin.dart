@@ -22,7 +22,7 @@ class MessagePin {
       conversationId: j['conversation_id'] as String,
       pinnedBy: j['pinned_by'] as String,
       pinnedAt: j['pinned_at'] != null
-          ? DateTime.tryParse(j['pinned_at'] as String)
+          ? DateTime.tryParse(j['pinned_at'] as String)?.toUtc()
           : null,
     );
   }

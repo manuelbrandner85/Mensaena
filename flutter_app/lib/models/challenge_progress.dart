@@ -43,10 +43,10 @@ class ChallengeProgress {
       status: (j['status'] as String?) ?? 'active',
       progressPct: (j['progress_pct'] as num?)?.toInt() ?? 0,
       completedAt: j['completed_at'] != null
-          ? DateTime.tryParse(j['completed_at'] as String)
+          ? DateTime.tryParse(j['completed_at'] as String)?.toUtc()
           : null,
       joinedAt: j['joined_at'] != null
-          ? DateTime.tryParse(j['joined_at'] as String)
+          ? DateTime.tryParse(j['joined_at'] as String)?.toUtc()
           : null,
       checkedIn: (j['checked_in'] as bool?) ?? false,
     );

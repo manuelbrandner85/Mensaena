@@ -779,7 +779,7 @@ class _AuditRow extends StatelessWidget {
     DateTime? created;
     final raw = row['created_at'];
     if (raw is String) {
-      created = DateTime.tryParse(raw);
+      created = DateTime.tryParse(raw)?.toUtc();
     }
     final stamp = created != null
         ? DateFormat('dd.MM. HH:mm').format(created.toLocal())

@@ -46,7 +46,7 @@ class WeatherService {
       final out = <WeatherDay>[];
       for (var i = 0; i < dates.length; i++) {
         out.add(WeatherDay(
-          date: DateTime.parse(dates[i]),
+          date: DateTime.parse(dates[i]).toUtc(),
           tempMin: tmin[i],
           tempMax: tmax[i],
           code: codes[i],

@@ -52,7 +52,7 @@ class HolidaysService {
       return list
           .whereType<Map<String, dynamic>>()
           .map((m) => Holiday(
-                date: DateTime.parse(m['date'] as String),
+                date: DateTime.parse(m['date'] as String).toUtc(),
                 localName: m['localName'] as String? ?? '',
                 name: m['name'] as String? ?? '',
                 countryCode: m['countryCode'] as String?,

@@ -54,16 +54,16 @@ class Challenge {
       participantCount:
           (j['participant_count'] as num?)?.toInt() ?? 0,
       startDate: j['start_date'] != null
-          ? DateTime.tryParse(j['start_date'] as String)
+          ? DateTime.tryParse(j['start_date'] as String)?.toUtc()
           : null,
       endDate: j['end_date'] != null
-          ? DateTime.tryParse(j['end_date'] as String)
+          ? DateTime.tryParse(j['end_date'] as String)?.toUtc()
           : null,
       status: j['status'] as String? ?? 'active',
       creatorId: j['creator_id'] as String?,
       isWeekly: j['is_weekly'] as bool? ?? false,
       weekOf: j['week_of'] != null
-          ? DateTime.tryParse(j['week_of'] as String)
+          ? DateTime.tryParse(j['week_of'] as String)?.toUtc()
           : null,
     );
   }

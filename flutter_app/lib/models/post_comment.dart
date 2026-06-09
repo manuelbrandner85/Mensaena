@@ -30,14 +30,14 @@ class PostComment {
       userId: j['user_id'] as String,
       content: j['content'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
       parentId: j['parent_id'] as String?,
       isEdited: (j['is_edited'] as bool?) ?? false,
       deletedAt: j['deleted_at'] != null
-          ? DateTime.tryParse(j['deleted_at'] as String)
+          ? DateTime.tryParse(j['deleted_at'] as String)?.toUtc()
           : null,
     );
   }

@@ -132,11 +132,11 @@ class ConversationsRepository {
         // Explizit UTC normalisieren — DB liefert ISO mit "Z", aber
         // bei fehlendem Z parst Dart als local. .toUtc() fixt das.
         final ta = (DateTime.tryParse(
-                    (a['updated_at'] ?? a['created_at']) as String? ?? '') ??
+                    (a['updated_at'] ?? a['created_at']) as String? ?? '')?.toUtc() ??
                 DateTime.utc(2000))
             .toUtc();
         final tb = (DateTime.tryParse(
-                    (b['updated_at'] ?? b['created_at']) as String? ?? '') ??
+                    (b['updated_at'] ?? b['created_at']) as String? ?? '')?.toUtc() ??
                 DateTime.utc(2000))
             .toUtc();
         return tb.compareTo(ta);
@@ -214,9 +214,9 @@ class MessagesRepository {
         .map((rows) {
           final list = rows.where((r) => r['deleted_at'] == null).toList()
             ..sort((a, b) {
-              final ta = DateTime.tryParse(a['created_at'] as String? ?? '') ??
+              final ta = DateTime.tryParse(a['created_at'] as String? ?? '')?.toUtc() ??
                   DateTime(2000);
-              final tb = DateTime.tryParse(b['created_at'] as String? ?? '') ??
+              final tb = DateTime.tryParse(b['created_at'] as String? ?? '')?.toUtc() ??
                   DateTime(2000);
               return ta.compareTo(tb);
             });
@@ -451,7 +451,7 @@ class MessagesRepository {
           DateTime? latest;
           for (final p in peers) {
             final ts =
-                DateTime.tryParse(p['last_read_at'] as String? ?? '');
+                DateTime.tryParse(p['last_read_at'] as String? ?? '')?.toUtc();
             if (ts != null && (latest == null || ts.isAfter(latest))) {
               latest = ts;
             }

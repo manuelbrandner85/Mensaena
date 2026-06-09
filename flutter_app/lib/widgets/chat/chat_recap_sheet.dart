@@ -70,7 +70,7 @@ class _RecapBody extends StatelessWidget {
           if (_stopWords.contains(wl)) continue;
           words[wl] = (words[wl] ?? 0) + 1;
         }
-        final t = DateTime.tryParse(m['created_at'] as String? ?? '');
+        final t = DateTime.tryParse(m['created_at'] as String? ?? '')?.toUtc();
         if (t != null) {
           newest ??= t;
           oldest = t;

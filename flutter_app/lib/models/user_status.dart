@@ -19,7 +19,7 @@ class UserStatus {
       status: j['status'] as String?,
       statusText: j['status_text'] as String?,
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
     );
   }

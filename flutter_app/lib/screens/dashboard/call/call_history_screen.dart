@@ -246,9 +246,9 @@ class _CallRow extends StatelessWidget {
     final avatarUrl = peer?['avatar_url'] as String?;
     final status = (row['status'] as String?) ?? 'ended';
     final callType = (row['call_type'] as String?) ?? 'audio';
-    final created = DateTime.tryParse(row['created_at'] as String? ?? '');
-    final answered = DateTime.tryParse(row['answered_at'] as String? ?? '');
-    final ended = DateTime.tryParse(row['ended_at'] as String? ?? '');
+    final created = DateTime.tryParse(row['created_at'] as String? ?? '')?.toUtc();
+    final answered = DateTime.tryParse(row['answered_at'] as String? ?? '')?.toUtc();
+    final ended = DateTime.tryParse(row['ended_at'] as String? ?? '')?.toUtc();
 
     final dirInfo = _directionInfo(isOutgoing, status);
     final durationText = _durationText(status, answered, ended);

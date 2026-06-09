@@ -210,7 +210,7 @@ class _ReportTile extends StatelessWidget {
     final reason = row['reason'] as String? ?? '—';
     final type = row['content_type'] as String? ?? '—';
     final status = row['status'] as String? ?? 'pending';
-    final createdAt = DateTime.tryParse(row['created_at'] as String? ?? '');
+    final createdAt = DateTime.tryParse(row['created_at'] as String? ?? '')?.toUtc();
     final color = _statusColor(status);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

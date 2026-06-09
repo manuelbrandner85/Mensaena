@@ -22,7 +22,7 @@ class ConversationMuteService {
       if (!muted) return false;
       final untilStr = row['muted_until'] as String?;
       if (untilStr == null) return true;
-      final until = DateTime.tryParse(untilStr);
+      final until = DateTime.tryParse(untilStr)?.toUtc();
       if (until == null) return true;
       return until.isAfter(DateTime.now());
     } catch (_) {

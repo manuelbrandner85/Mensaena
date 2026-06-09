@@ -687,7 +687,7 @@ class _MessageModRow extends StatelessWidget {
     final content = (msg['content'] as String?) ?? '';
     final profile = msg['profiles'] as Map<String, dynamic>?;
     final senderName = (profile?['name'] as String?)?.trim();
-    final createdAt = DateTime.tryParse(msg['created_at'] as String? ?? '');
+    final createdAt = DateTime.tryParse(msg['created_at'] as String? ?? '')?.toUtc();
     return Opacity(
       opacity: isDeleted ? 0.5 : 1.0,
       child: Container(

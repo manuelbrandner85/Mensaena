@@ -48,9 +48,9 @@ class Interaction {
       helperId: j['helper_id'] as String,
       status: j['status'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       message: j['message'] as String?,
       helpedId: j['helped_id'] as String?,
       matchId: j['match_id'] as String?,
@@ -60,7 +60,7 @@ class Interaction {
       completionNotes: j['completion_notes'] as String?,
       conversationId: j['conversation_id'] as String?,
       completedAt: j['completed_at'] != null
-          ? DateTime.tryParse(j['completed_at'] as String)
+          ? DateTime.tryParse(j['completed_at'] as String)?.toUtc()
           : null,
       ratingRequested: (j['rating_requested'] as bool?) ?? false,
       helperRated: (j['helper_rated'] as bool?) ?? false,

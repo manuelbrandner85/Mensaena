@@ -386,7 +386,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(LucideIcons.shieldCheck,
+          const Icon(LucideIcons.shieldCheck,
               size: 48, color: AppColors.lebenSoft),
           const SizedBox(height: 12),
           Text('adminCrisis.empty'.tr(),

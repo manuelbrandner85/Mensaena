@@ -22,7 +22,7 @@ class GroupMember {
       userId: j['user_id'] as String,
       role: (j['role'] as String?) ?? 'member',
       joinedAt: j['joined_at'] != null
-          ? DateTime.tryParse(j['joined_at'] as String)
+          ? DateTime.tryParse(j['joined_at'] as String)?.toUtc()
           : null,
     );
   }

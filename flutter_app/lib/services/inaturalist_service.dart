@@ -85,7 +85,7 @@ class INaturalistService {
           observedAt: DateTime.tryParse(
               raw['observed_on_string'] as String? ??
                   raw['observed_on'] as String? ??
-                  ''),
+                  '')?.toUtc(),
           lat: coords != null && coords.length > 1
               ? (coords[1] as num).toDouble()
               : null,

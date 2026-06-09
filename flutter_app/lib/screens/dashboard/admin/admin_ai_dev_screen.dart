@@ -1496,7 +1496,7 @@ class _LiveScanCardState extends State<_LiveScanCard>
   String _elapsed(Map<String, dynamic>? scan) {
     final raw = scan?['created_at'] as String?;
     if (raw == null) return '';
-    final start = DateTime.tryParse(raw);
+    final start = DateTime.tryParse(raw)?.toUtc();
     if (start == null) return '';
     final secs = DateTime.now().toUtc().difference(start.toUtc()).inSeconds;
     if (secs < 0) return '';
@@ -2395,11 +2395,10 @@ class _TaskCard extends StatelessWidget {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                'adminDev.phaseOf'.tr(namedArgs: {
+                                '${'adminDev.phaseOf'.tr(namedArgs: {
                                       'n': '${i + 1}',
                                       'total': '$total',
-                                    }) +
-                                    ' · $title',
+                                    })} · $title',
                                 style: AppTypography.body(
                                     size: 11,
                                     color: active
@@ -2832,6 +2831,7 @@ class _InputBarState extends State<_InputBar> {
   // Mikrofon: Diktat starten/stoppen. Erkannter Text wird ans Eingabefeld
   // angehängt (an das, was vor dem Start drinstand).
   Future<void> _toggleListening() async {
+    final localeId = context.locale.toString().replaceAll('_', '-');
     if (_listening) {
       await _speech.stop();
       if (mounted) setState(() => _listening = false);
@@ -2860,7 +2860,7 @@ class _InputBarState extends State<_InputBar> {
     _baseTextBeforeListen = widget.ctrl.text;
     setState(() => _listening = true);
     await _speech.listen(
-      localeId: context.locale.toString().replaceAll('_', '-'),
+      listenOptions: stt.SpeechListenOptions(localeId: localeId),
       onResult: (r) {
         final spoken = r.recognizedWords;
         final sep = _baseTextBeforeListen.isEmpty ||
@@ -2954,8 +2954,8 @@ class _InputBarState extends State<_InputBar> {
                   setState(() => _expanded = false);
                 },
                 borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(
                       horizontal: 24, vertical: 2),
                   child: Icon(LucideIcons.chevronDown,
                       size: 20, color: AppColors.lightMute),

@@ -545,8 +545,8 @@ class _AlertTile extends StatelessWidget {
     final p = alert['sender'] as Map<String, dynamic>?;
     final name = _displayName(p);
     final msg = (alert['message'] ?? '').toString();
-    final created = DateTime.tryParse(alert['created_at']?.toString() ?? '')
-        ?.toLocal();
+    final created = DateTime.tryParse(alert['created_at']?.toString() ?? '')?.toUtc()
+        .toLocal();
     final color = isSos ? AppColors.herzrot : AppColors.leben;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),

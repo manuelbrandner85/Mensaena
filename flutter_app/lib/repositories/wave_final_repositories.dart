@@ -75,7 +75,7 @@ class UserStreaksRepository {
       }
       final lastStr = existing['last_active_date'] as String?;
       if (lastStr == todayDate) return;
-      final last = lastStr != null ? DateTime.tryParse(lastStr) : null;
+      final last = lastStr != null ? DateTime.tryParse(lastStr)?.toUtc() : null;
       final yesterday = DateTime.utc(today.year, today.month, today.day)
           .subtract(const Duration(days: 1));
       final cur = (existing['current_streak'] as int?) ?? 0;
