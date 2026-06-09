@@ -808,7 +808,8 @@
     "dashboardTitle": "Overview",
     "configureWidgets": "Configure widgets",
     "tooltipRemindLater": "Remind later",
-    "tooltipOtherStory": "Other story"
+    "tooltipOtherStory": "Other story",
+    "mapEmptyBody": "Nothing happening nearby yet — check the map to see what's going on further out."
   },
   "matching": {
     "disabled": "Matching is disabled",

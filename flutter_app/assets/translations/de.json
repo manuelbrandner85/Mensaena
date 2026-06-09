@@ -807,7 +807,8 @@
     "dashboardTitle": "Übersicht",
     "configureWidgets": "Widgets konfigurieren",
     "tooltipRemindLater": "Später erinnern",
-    "tooltipOtherStory": "Andere Geschichte"
+    "tooltipOtherStory": "Andere Geschichte",
+    "mapEmptyBody": "In deiner Nähe ist noch nichts los — schaue auf der Karte, was es weiter draußen gibt."
   },
   "matching": {
     "disabled": "Matching ist deaktiviert",

@@ -808,7 +808,8 @@
     "dashboardTitle": "Panoramica",
     "configureWidgets": "Configura widget",
     "tooltipRemindLater": "Ricorda più tardi",
-    "tooltipOtherStory": "Altra storia"
+    "tooltipOtherStory": "Altra storia",
+    "mapEmptyBody": "Ancora niente nelle vicinanze — controlla la mappa per vedere cosa succede più lontano."
   },
   "matching": {
     "disabled": "Matching disattivato",

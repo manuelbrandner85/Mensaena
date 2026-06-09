@@ -423,13 +423,17 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             )
           : null,
       body: SafeArea(
-        child: _loading
-            ? const Center(
-                child: CircularProgressIndicator(color: AppColors.amber),
-              )
-            : _post == null
-                ? _NotFound()
-                : Column(
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 320),
+          child: _loading
+              ? const Center(
+                  key: ValueKey('loading'),
+                  child: CircularProgressIndicator(color: AppColors.amber),
+                )
+              : _post == null
+                  ? _NotFound()
+                  : Column(
+                  key: const ValueKey('content'),
                     children: [
                       Expanded(
                         child: RefreshIndicator(
@@ -543,6 +547,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                       ),
                     ],
                   ),
+        ),
       ),
     );
   }
@@ -995,22 +1000,29 @@ class _ActionIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = active ? AppColors.amber : AppColors.inkSoft;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: color),
-            if (label.isNotEmpty) ...[
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: AppTypography.mono(size: 12, color: color),
-              ),
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.0, end: active ? 1.1 : 1.0),
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.elasticOut,
+      builder: (_, scale, child) =>
+          Transform.scale(scale: scale, child: child),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: color),
+              if (label.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: AppTypography.mono(size: 12, color: color),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

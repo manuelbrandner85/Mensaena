@@ -807,7 +807,8 @@
     "dashboardTitle": "Genel bakış",
     "configureWidgets": "Widget'ları yapılandır",
     "tooltipRemindLater": "Sonra hatırlat",
-    "tooltipOtherStory": "Başka hikaye"
+    "tooltipOtherStory": "Başka hikaye",
+    "mapEmptyBody": "Yakınında henüz bir şey yok — daha uzaktaki gelişmeleri görmek için haritaya bak."
   },
   "matching": {
     "disabled": "Eşleşme devre dışı",
