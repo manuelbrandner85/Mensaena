@@ -8,6 +8,13 @@ name: ✅ Agent Auto-Merge
 #
 # Der Merge läuft über AGENT_PAT, damit der Push auf main anschließend
 # shorebird_patch.yml triggert → OTA-Patch an die App.
+#
+# Rate-Limit-Härtung: ALLE Lese-Calls (pr list, check-runs, pr view) laufen
+# über das GITHUB_TOKEN — das hat einen eigenen, hohen Pro-Repo-Bucket und
+# belastet NICHT das User-Limit des PAT-Inhabers. Nur der Merge + der
+# Shorebird-Dispatch nutzen AGENT_PAT (Pflicht für die OTA-Kette). Dadurch
+# sinkt die PAT-Last auf 2 Calls; zusätzlich greift beim Merge ein Retry mit
+# Backoff, falls doch ein kurzzeitiges Secondary-Limit auftritt.
 # ════════════════════════════════════════════════════════════════════════
 
 on:
@@ -32,7 +39,11 @@ jobs:
     steps:
       - name: Auswerten & mergen
         env:
-          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          # Default-Token für gh = GITHUB_TOKEN (hoher Pro-Repo-Bucket, schont
+          # das User-Limit). Der PAT wird nur gezielt für Merge + Dispatch
+          # per Inline-Override (GH_TOKEN="$PAT" gh …) verwendet.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT: ${{ secrets.AGENT_PAT }}
           BRANCH: ${{ github.event.workflow_run.head_branch }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           CONCLUSION: ${{ github.event.workflow_run.conclusion }}
@@ -91,21 +102,43 @@ jobs:
             exit 0
           fi
 
-          # 4) Squash-Merge via PAT (triggert shorebird_patch.yml auf main)
+          # 4) Squash-Merge via PAT (triggert shorebird_patch.yml auf main).
+          #    Retry mit Backoff gegen kurzzeitige Secondary-Rate-Limits.
           echo "Alles grün — merge PR #$PR_NUM"
-          gh pr merge "$PR_NUM" --repo "${{ github.repository }}" \
-             --squash --delete-branch --admin
+          MERGED=0
+          for attempt in 1 2 3 4; do
+            if GH_TOKEN="$PAT" gh pr merge "$PR_NUM" --repo "${{ github.repository }}" \
+                 --squash --delete-branch --admin; then
+              MERGED=1
+              break
+            fi
+            # Schon gemergt? (z.B. paralleler Lauf) → als Erfolg werten.
+            STATE=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
+                      --json state --jq '.state' 2>/dev/null || echo "")
+            if [ "$STATE" = "MERGED" ]; then
+              MERGED=1
+              break
+            fi
+            WAIT=$((2 ** attempt))
+            echo "Merge-Versuch $attempt fehlgeschlagen (evtl. Rate-Limit) — warte ${WAIT}s…"
+            sleep "$WAIT"
+          done
+          if [ "$MERGED" -ne 1 ]; then
+            echo "Merge nach 4 Versuchen nicht möglich — PR bleibt offen."
+            patch_status "{\"ci_status\":\"success\",\"ci_run_url\":\"${CI_RUN_URL}\",\"pr_number\":${PR_NUM},\"summary\":\"CI grün, aber Auto-Merge scheiterte (Rate-Limit). PR #$PR_NUM bleibt offen — bitte manuell mergen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 0
+          fi
 
-          # Merge-Commit-SHA für späteren Ein-Tap-Rollback speichern.
+          # Merge-Commit-SHA für späteren Ein-Tap-Rollback speichern (Read via GITHUB_TOKEN).
           MERGE_SHA=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
                         --json mergeCommit --jq '.mergeCommit.oid // empty' || true)
 
-          # 5) OTA sicherstellen: shorebird_patch.yml explizit dispatchen.
+          # 5) OTA sicherstellen: shorebird_patch.yml explizit dispatchen (via PAT).
           # Die push-Pfadfilter greifen nur bei flutter_app/**-Änderungen —
           # dieser Dispatch ist der Safety-Net für alle anderen Fälle.
           # Falls der Token keine actions:write-Berechtigung hat, schlägt das
           # fehl (||true), der normale Push-Trigger ist dann das Backup.
-          gh workflow run shorebird_patch.yml \
+          GH_TOKEN="$PAT" gh workflow run shorebird_patch.yml \
             --repo "${{ github.repository }}" \
             --ref main \
             --field source_branch=main 2>/dev/null || true
