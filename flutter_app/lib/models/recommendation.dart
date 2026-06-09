@@ -97,13 +97,11 @@ class Recommendation {
       authorName:        authorProfiles?['name']         as String?,
       authorAvatarUrl:   authorProfiles?['avatar_url']   as String?,
       authorDisplayName: authorProfiles?['display_name'] as String?,
-      targetDisplayName: targetProfiles?['display_name']
+      targetDisplayName: (targetProfiles?['display_name']
           ?? targetProfiles?['name']
-          ?? targetOrg?['name']
-          as String?,
-      targetAvatarUrl: targetProfiles?['avatar_url']
-          ?? targetOrg?['logo_url']
-          as String?,
+          ?? targetOrg?['name']) as String?,
+      targetAvatarUrl: (targetProfiles?['avatar_url']
+          ?? targetOrg?['logo_url']) as String?,
     );
   }
 
