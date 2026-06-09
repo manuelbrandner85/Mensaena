@@ -2341,7 +2341,7 @@ class _TaskCard extends StatelessWidget {
                     Icon(
                       done ? LucideIcons.checkCircle2 : LucideIcons.circle,
                       size: 13,
-                      color: done ? Colors.green.shade600 : AppColors.lightMute,
+                      color: done ? AppColors.leben : AppColors.lightMute,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -2387,7 +2387,7 @@ class _TaskCard extends StatelessWidget {
                                       : LucideIcons.circle,
                               size: 13,
                               color: done
-                                  ? Colors.green.shade600
+                                  ? AppColors.leben
                                   : active
                                       ? AppColors.teal
                                       : AppColors.lightMute,
@@ -2564,7 +2564,7 @@ class _TaskCard extends StatelessWidget {
   _StatusMeta _statusMeta(String status) {
     switch (status) {
       case 'merged':
-        return const _StatusMeta(LucideIcons.checkCircle2, Colors.green);
+        return const _StatusMeta(LucideIcons.checkCircle2, AppColors.leben);
       case 'phased':
         return const _StatusMeta(LucideIcons.layers, AppColors.teal);
       case 'pr_open':
@@ -3612,7 +3612,7 @@ class _DiffFileTile extends StatelessWidget {
             children: [
               Text('+$additions',
                   style: AppTypography.body(
-                      size: 11, color: Colors.green.shade600)),
+                      size: 11, color: AppColors.leben)),
               const SizedBox(width: 8),
               Text('-$deletions',
                   style: AppTypography.body(
@@ -3763,7 +3763,7 @@ class _HealthCard extends StatelessWidget {
                   _stat('adminDev.health.total'.tr(), '$total',
                       LucideIcons.gitPullRequest),
                   _stat('adminDev.health.merged'.tr(), '$merged',
-                      LucideIcons.checkCircle2, color: Colors.green.shade600),
+                      LucideIcons.checkCircle2, color: AppColors.leben),
                   _stat('adminDev.health.active'.tr(), '$active',
                       LucideIcons.loader, color: AppColors.amber),
                   _stat('adminDev.health.failed'.tr(), '$failed',
@@ -3773,7 +3773,7 @@ class _HealthCard extends StatelessWidget {
                   _stat('adminDev.health.avgMerge'.tr(),
                       avgMin > 0 ? '$avgMin min' : '—', LucideIcons.clock),
                   _stat('adminDev.health.accepted'.tr(), '$accepted',
-                      LucideIcons.checkCheck, color: Colors.green.shade600),
+                      LucideIcons.checkCheck, color: AppColors.leben),
                   _stat('adminDev.health.rejected'.tr(), '$rejected',
                       LucideIcons.x, color: AppColors.lightMute),
                 ],
@@ -4255,7 +4255,7 @@ class _ModuleIntelligenceCard extends StatelessWidget {
       case 'medium':
         return Colors.amber.shade700;
       default:
-        return Colors.green.shade600;
+        return AppColors.leben;
     }
   }
 

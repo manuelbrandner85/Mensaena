@@ -173,7 +173,7 @@ class _ReportCard extends StatelessWidget {
     switch (report['ai_recommendation']) {
       case 'remove': return Colors.red.shade400;
       case 'escalate': return Colors.orange.shade400;
-      case 'keep': return Colors.green.shade400;
+      case 'keep': return AppColors.leben;
       default: return Colors.grey.shade300;
     }
   }
@@ -255,7 +255,7 @@ class _ReportCard extends StatelessWidget {
               children: [
                 _ActionBtn(
                   label: 'adminModeration.actionKeep'.tr(),
-                  color: Colors.green,
+                  color: AppColors.leben,
                   icon: LucideIcons.check,
                   onTap: () => onAction(report['id'] as String, 'keep'),
                 ),
@@ -312,7 +312,7 @@ class _RecBadge extends StatelessWidget {
     switch (rec) {
       case 'remove': return Colors.red.shade50;
       case 'escalate': return Colors.orange.shade50;
-      case 'keep': return Colors.green.shade50;
+      case 'keep': return AppColors.leben.withValues(alpha: 0.08);
       default: return Colors.grey.shade100;
     }
   }
@@ -321,7 +321,7 @@ class _RecBadge extends StatelessWidget {
     switch (rec) {
       case 'remove': return Colors.red.shade700;
       case 'escalate': return Colors.orange.shade700;
-      case 'keep': return Colors.green.shade700;
+      case 'keep': return AppColors.leben;
       default: return Colors.grey.shade600;
     }
   }
@@ -381,7 +381,7 @@ class _EmptyState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(LucideIcons.shieldCheck,
-              size: 48, color: Colors.green.shade300),
+              size: 48, color: AppColors.lebenSoft),
           const SizedBox(height: 12),
           Text('adminModeration.empty'.tr(),
               style: AppTypography.body(size: 13, color: AppColors.lightMute)),
