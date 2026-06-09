@@ -23,7 +23,7 @@ final _recapProvider = FutureProvider<WeeklyRecap>((ref) async {
 final _aiRecapProvider = FutureProvider<String?>((ref) async {
   final row = await AiFeaturesRepository().latestRecap();
   final c = row?['content'];
-  return c == null ? null : c.toString();
+  return c?.toString();
 });
 
 class WeeklyRecapWidget extends ConsumerWidget {
