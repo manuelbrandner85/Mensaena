@@ -200,7 +200,7 @@ class _RatingTile extends StatelessWidget {
     final score = (row['score'] as num?)?.toInt() ?? 0;
     final comment = (row['comment'] as String?)?.trim();
     final createdAt = DateTime.tryParse(
-            (row['created_at'] as String?) ?? '') ??
+            (row['created_at'] as String?) ?? '')?.toUtc() ??
         DateTime.now();
     final profile = row['profiles'] as Map<String, dynamic>?;
     final name = (profile?['display_name'] as String?) ??

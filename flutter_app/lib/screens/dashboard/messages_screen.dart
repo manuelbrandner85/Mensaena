@@ -537,7 +537,7 @@ class _DmTile extends ConsumerWidget {
     final avatarUrl = conv['peer_avatar_url'] as String?;
     final isDm = conv['is_dm'] == true;
     final updatedAt = DateTime.tryParse(
-            (conv['updated_at'] ?? conv['created_at']) as String? ?? '') ??
+            (conv['updated_at'] ?? conv['created_at']) as String? ?? '')?.toUtc() ??
         DateTime.now();
     final peerId = conv['peer_user_id'] as String?;
     final online = peerId != null && onlineUserIds.contains(peerId);

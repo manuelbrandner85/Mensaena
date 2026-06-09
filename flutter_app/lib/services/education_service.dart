@@ -44,7 +44,7 @@ class EducationContent {
       title: j['title']?.toString() ?? '',
       body: j['content']?.toString() ?? '',
       createdAt:
-          DateTime.tryParse(j['created_at']?.toString() ?? '') ??
+          DateTime.tryParse(j['created_at']?.toString() ?? '')?.toUtc() ??
               DateTime.now(),
       category: j['category']?.toString(),
       sourceUrl: j['source_url']?.toString() ??

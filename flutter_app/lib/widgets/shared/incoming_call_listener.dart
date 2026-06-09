@@ -242,7 +242,7 @@ class _IncomingCallListenerState
       final endedAt = r['ended_at'] as String?;
       if (endedAt != null && endedAt.isNotEmpty) continue;
       final createdAt =
-          DateTime.tryParse(r['created_at'] as String? ?? '') ?? now;
+          DateTime.tryParse(r['created_at'] as String? ?? '')?.toUtc() ?? now;
       // 50 s = 45 s Klingelfrist + Puffer; danach hat der Caller eh aufgegeben.
       if (now.difference(createdAt).inSeconds > 50) continue;
       _handledCallIds.add(id);

@@ -53,7 +53,7 @@ class KarmaHistoryScreen extends ConsumerWidget {
               final delta = (r['delta'] as num?)?.toInt() ?? 0;
               final reason = r['reason'] as String? ?? '';
               final ts =
-                  DateTime.tryParse(r['created_at'] as String? ?? '') ??
+                  DateTime.tryParse(r['created_at'] as String? ?? '')?.toUtc() ??
                       DateTime.now();
               final positive = delta >= 0;
               return Padding(

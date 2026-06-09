@@ -36,13 +36,13 @@ class PushSubscription {
       auth: j['auth'] as String,
       active: (j['active'] as bool?) ?? true,
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       userAgent: j['user_agent'] as String?,
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
       lastUsed: j['last_used'] != null
-          ? DateTime.tryParse(j['last_used'] as String)
+          ? DateTime.tryParse(j['last_used'] as String)?.toUtc()
           : null,
       deviceType: j['device_type'] as String?,
     );

@@ -34,10 +34,10 @@ class NinaWarning {
       areaText: j['area_text'] as String?,
       ags: j['ags'] as String?,
       startDate: j['start_date'] != null
-          ? DateTime.tryParse(j['start_date'] as String)
+          ? DateTime.tryParse(j['start_date'] as String)?.toUtc()
           : null,
       endDate: j['end_date'] != null
-          ? DateTime.tryParse(j['end_date'] as String)
+          ? DateTime.tryParse(j['end_date'] as String)?.toUtc()
           : null,
       senderName: j['sender_name'] as String?,
       msgType: j['msg_type'] as String?,

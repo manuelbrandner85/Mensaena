@@ -86,10 +86,10 @@ class Crisis {
       isVerified: j['is_verified'] as bool?,
       verifiedBy: j['verified_by'] as String?,
       verifiedAt: j['verified_at'] != null
-          ? DateTime.tryParse(j['verified_at'] as String)
+          ? DateTime.tryParse(j['verified_at'] as String)?.toUtc()
           : null,
       resolvedAt: j['resolved_at'] != null
-          ? DateTime.tryParse(j['resolved_at'] as String)
+          ? DateTime.tryParse(j['resolved_at'] as String)?.toUtc()
           : null,
       resolvedBy: j['resolved_by'] as String?,
       falseAlarmBy: j['false_alarm_by'] as String?,
@@ -102,10 +102,10 @@ class Crisis {
           ? (j['needed_resources'] as List).whereType<String>().toList()
           : const [],
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
       resolvedImageUrl: j['resolved_image_url'] as String?,
     );

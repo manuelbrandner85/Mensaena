@@ -37,7 +37,7 @@ class EmergencyNumber {
       isFree: j['is_free'] as bool?,
       sortOrder: (j['sort_order'] as num?)?.toInt(),
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

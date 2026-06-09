@@ -42,7 +42,7 @@ class TrustRating {
       ratedId: j['rated_id'] as String,
       score: (j['score'] as num?)?.toInt() ?? 0,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       comment: j['comment'] as String?,
       rating: (j['rating'] as num?)?.toInt(),
       interactionId: j['interaction_id'] as String?,
@@ -53,10 +53,10 @@ class TrustRating {
       wouldRecommend: j['would_recommend'] as bool?,
       response: j['response'] as String?,
       responseAt: j['response_at'] != null
-          ? DateTime.tryParse(j['response_at'] as String)
+          ? DateTime.tryParse(j['response_at'] as String)?.toUtc()
           : null,
       editedAt: j['edited_at'] != null
-          ? DateTime.tryParse(j['edited_at'] as String)
+          ? DateTime.tryParse(j['edited_at'] as String)?.toUtc()
           : null,
       reported: (j['reported'] as bool?) ?? false,
     );

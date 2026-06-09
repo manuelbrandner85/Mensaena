@@ -150,7 +150,7 @@ class WaterLevelService {
     final value = (measurement['value'] as num?)?.toDouble();
     if (value == null) return null;
 
-    final ts = DateTime.tryParse(measurement['timestamp']?.toString() ?? '') ??
+    final ts = DateTime.tryParse(measurement['timestamp']?.toString() ?? '')?.toUtc() ??
         DateTime.now();
     final trend = _mapTrend(measurement['trend']);
     final warning = _isWarning(waterSeries, value);

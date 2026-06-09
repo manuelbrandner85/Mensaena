@@ -68,7 +68,7 @@ class PostDraft {
         location: (j['location'] as String?) ?? '',
         tags: (j['tags'] as String?) ?? '',
         savedAt: j['saved_at'] != null
-            ? DateTime.tryParse(j['saved_at'] as String)
+            ? DateTime.tryParse(j['saved_at'] as String)?.toUtc()
             : null,
       );
 

@@ -60,9 +60,9 @@ class OrganizationReview {
       reportReason: j['report_reason'] as String?,
       adminResponse: j['admin_response'] as String?,
       adminResponseAt: DateTime.tryParse(
-          (j['admin_responded_at'] ?? j['admin_response_at'] ?? '') as String),
+          (j['admin_responded_at'] ?? j['admin_response_at'] ?? '') as String)?.toUtc(),
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       userName: profiles?['name'] as String?,
       userAvatarUrl: profiles?['avatar_url'] as String?,
       userDisplayName: profiles?['display_name'] as String?,

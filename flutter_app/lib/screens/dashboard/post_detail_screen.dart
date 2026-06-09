@@ -1105,7 +1105,7 @@ class _CommentTile extends StatelessWidget {
         'common.neighbour'.tr()) as String;
     final avatar = profile?['avatar_url'] as String?;
     final content = json['content'] as String? ?? '';
-    final createdAt = DateTime.tryParse(json['created_at'] as String? ?? '') ??
+    final createdAt = DateTime.tryParse(json['created_at'] as String? ?? '')?.toUtc() ??
         DateTime.now();
     return GestureDetector(
       onLongPress: isOwn ? () => _showActionSheet(context) : null,

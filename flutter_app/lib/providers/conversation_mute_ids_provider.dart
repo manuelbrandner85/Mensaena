@@ -22,7 +22,7 @@ final mutedConversationIdsProvider =
         .where((r) {
           final until = r['muted_until'] as String?;
           if (until == null) return true;
-          return (DateTime.tryParse(until)?.isAfter(DateTime.now())) ?? true;
+          return (DateTime.tryParse(until)?.toUtc()?.isAfter(DateTime.now())) ?? true;
         })
         .map((r) => r['conversation_id'] as String)
         .toSet();

@@ -62,7 +62,7 @@ class EventItem {
 
   factory EventItem.fromJson(Map<String, dynamic> j) {
     DateTime? parseDt(Object? v) =>
-        v is String && v.isNotEmpty ? DateTime.tryParse(v) : null;
+        v is String && v.isNotEmpty ? DateTime.tryParse(v)?.toUtc() : null;
     return EventItem(
       id: j['id'] as String,
       authorId: (j['author_id'] ?? j['user_id']) as String? ?? '',

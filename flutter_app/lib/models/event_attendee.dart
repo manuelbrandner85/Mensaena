@@ -28,7 +28,7 @@ class EventAttendee {
       reminderSet: j['reminder_set'] as bool?,
       reminderMinutes: (j['reminder_minutes'] as num?)?.toInt(),
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

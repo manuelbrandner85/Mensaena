@@ -110,7 +110,7 @@ class _VoicemailScreenState extends ConsumerState<VoicemailScreen> {
               final name =
                   (caller?['display_name'] as String?) ?? 'mensaena';
               final avatar = caller?['avatar_url'] as String?;
-              final ts = DateTime.tryParse(v['created_at'] as String? ?? '') ??
+              final ts = DateTime.tryParse(v['created_at'] as String? ?? '')?.toUtc() ??
                   DateTime.now();
               final dur = (v['duration_seconds'] as num?)?.toInt() ?? 0;
               final isListened = v['is_listened'] as bool? ?? false;

@@ -58,7 +58,7 @@ class HelpStreakService {
       for (final r in list) {
         final raw = r['completed_at'] as String?;
         if (raw == null) continue;
-        final dt = DateTime.tryParse(raw)?.toLocal();
+        final dt = DateTime.tryParse(raw)?.toUtc();
         if (dt == null) continue;
         final key =
             '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
@@ -75,7 +75,7 @@ class HelpStreakService {
       final helpsToday = list.where((r) {
         final raw = r['completed_at'] as String?;
         if (raw == null) return false;
-        final dt = DateTime.tryParse(raw)?.toLocal();
+        final dt = DateTime.tryParse(raw)?.toUtc();
         if (dt == null) return false;
         return DateTime(dt.year, dt.month, dt.day) == today0;
       }).length;

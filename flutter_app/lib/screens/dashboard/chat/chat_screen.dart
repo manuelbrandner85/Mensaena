@@ -734,7 +734,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       final m = msgs[i];
                       if (m['sender_id'] == myUid) continue;
                       final ts = DateTime.tryParse(
-                          m['created_at'] as String? ?? '');
+                          m['created_at'] as String? ?? '')?.toUtc();
                       if (ts != null && ts.isAfter(myLastRead)) {
                         firstUnreadIdx = i;
                         break;
@@ -752,7 +752,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       bool readByPeer = false;
                       if (mine && peerLastRead != null) {
                         final ts = DateTime.tryParse(
-                            m['created_at'] as String? ?? '');
+                            m['created_at'] as String? ?? '')?.toUtc();
                         readByPeer =
                             ts != null && !ts.isAfter(peerLastRead);
                       }
@@ -760,14 +760,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       // - erste Nachricht ODER
                       // - vorherige Nachricht an einem anderen Tag war.
                       final mAt = (DateTime.tryParse(
-                                  m['created_at'] as String? ?? '') ??
+                                  m['created_at'] as String? ?? '')?.toUtc() ??
                               DateTime.now())
                           .toLocal();
                       final prevDay = i == 0
                           ? null
                           : (DateTime.tryParse(
                                       msgs[i - 1]['created_at'] as String? ??
-                                          '') ??
+                                          '')?.toUtc() ??
                                   DateTime.now())
                               .toLocal();
                       final showDayHeader = prevDay == null ||
@@ -783,7 +783,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         final prev = msgs[i - 1];
                         if (prev['sender_id'] == m['sender_id']) {
                           final prevAt = DateTime.tryParse(
-                              prev['created_at'] as String? ?? '');
+                              prev['created_at'] as String? ?? '')?.toUtc();
                           if (prevAt != null) {
                             clustered =
                                 mAt.difference(prevAt.toLocal()).inSeconds < 60;

@@ -45,10 +45,10 @@ class Story {
       mediaType: j['media_type'] as String? ?? 'image',
       textOverlay: j['text_overlay'] as String?,
       expiresAt:
-          DateTime.tryParse(j['expires_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['expires_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       viewCount: (j['view_count'] as num?)?.toInt() ?? 0,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       authorName: name,
       authorAvatar: avatar,
     );
@@ -69,7 +69,7 @@ class UserFollow {
         followerId: j['follower_id'] as String,
         followingId: j['following_id'] as String,
         createdAt:
-            DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+            DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       );
 }
 
@@ -102,9 +102,9 @@ class DailyChallenge {
         karmaReward: (j['karma_reward'] as num?)?.toInt() ?? 5,
         isCompleted: (j['is_completed'] as bool?) ?? false,
         completedAt: j['completed_at'] != null
-            ? DateTime.tryParse(j['completed_at'] as String)
+            ? DateTime.tryParse(j['completed_at'] as String)?.toUtc()
             : null,
-        date: DateTime.tryParse(j['date'] as String? ?? '') ?? DateTime.now(),
+        date: DateTime.tryParse(j['date'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       );
 }
 
@@ -147,7 +147,7 @@ class ThankYouCard {
       designId: (j['design_id'] as num?)?.toInt() ?? 1,
       message: j['message'] as String?,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       senderName: name,
       senderAvatar: avatar,
     );
@@ -198,11 +198,11 @@ class CommunityPoll {
       options: list,
       isAnonymous: (j['is_anonymous'] as bool?) ?? false,
       closesAt: j['closes_at'] != null
-          ? DateTime.tryParse(j['closes_at'] as String)
+          ? DateTime.tryParse(j['closes_at'] as String)?.toUtc()
           : null,
       status: j['status'] as String? ?? 'active',
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       creatorName: name,
     );
   }
@@ -231,9 +231,9 @@ class Mentorship {
         menteeId: j['mentee_id'] as String,
         status: j['status'] as String? ?? 'active',
         startedAt:
-            DateTime.tryParse(j['started_at'] as String? ?? '') ?? DateTime.now(),
+            DateTime.tryParse(j['started_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
         endedAt: j['ended_at'] != null
-            ? DateTime.tryParse(j['ended_at'] as String)
+            ? DateTime.tryParse(j['ended_at'] as String)?.toUtc()
             : null,
       );
 }
@@ -273,7 +273,7 @@ class LivestreamMessage {
       content: j['content'] as String? ?? '',
       type: j['type'] as String? ?? 'text',
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       userName: name,
       userAvatar: avatar,
     );

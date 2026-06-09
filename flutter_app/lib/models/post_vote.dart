@@ -22,7 +22,7 @@ class PostVote {
       userId: j['user_id'] as String,
       vote: (j['vote'] as num?)?.toInt() ?? 0,
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

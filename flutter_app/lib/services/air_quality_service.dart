@@ -120,7 +120,7 @@ class AirQualityService {
       final units = j['current_units'] as Map<String, dynamic>? ?? const {};
       final timeIso = current['time'] as String?;
       final measuredAt =
-          DateTime.tryParse(timeIso ?? '') ?? DateTime.now();
+          DateTime.tryParse(timeIso ?? '')?.toUtc() ?? DateTime.now();
       final stationLat = (j['latitude'] as num?)?.toDouble() ?? lat;
       final stationLng = (j['longitude'] as num?)?.toDouble() ?? lng;
 

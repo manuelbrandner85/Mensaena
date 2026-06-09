@@ -69,9 +69,9 @@ class MarketplaceListing {
       listingType: j['listing_type'] as String,
       status: j['status'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       condition: j['condition'] as String?,
       images: (j['images'] is List)
           ? (j['images'] as List).whereType<String>().toList()
@@ -88,7 +88,7 @@ class MarketplaceListing {
       viewCount: (j['view_count'] as num?)?.toInt() ?? 0,
       favoriteCount: (j['favorite_count'] as num?)?.toInt() ?? 0,
       expiresAt: j['expires_at'] != null
-          ? DateTime.tryParse(j['expires_at'] as String)
+          ? DateTime.tryParse(j['expires_at'] as String)?.toUtc()
           : null,
       price: (j['price'] as num?)?.toDouble(),
       priceType: j['price_type'] as String?,
@@ -98,7 +98,7 @@ class MarketplaceListing {
           ? (j['image_urls'] as List).whereType<String>().toList()
           : const [],
       reservedUntil: j['reserved_until'] != null
-          ? DateTime.tryParse(j['reserved_until'] as String)
+          ? DateTime.tryParse(j['reserved_until'] as String)?.toUtc()
           : null,
     );
   }

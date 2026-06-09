@@ -90,9 +90,9 @@ class Recommendation {
           const [],
       isPublic:   (j['is_public']  as bool?) ?? true,
       isFlagged:  (j['is_flagged'] as bool?) ?? false,
-      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
       authorName:        authorProfiles?['name']         as String?,
       authorAvatarUrl:   authorProfiles?['avatar_url']   as String?,

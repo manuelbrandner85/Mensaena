@@ -759,7 +759,7 @@ class _GroupEventsSection extends ConsumerWidget {
               final desc = (e['description'] ?? '').toString();
               final startStr = e['start_at']?.toString();
               final start = startStr != null
-                  ? DateTime.tryParse(startStr)?.toLocal()
+                  ? DateTime.tryParse(startStr)?.toUtc()
                   : null;
               final canDelete =
                   canModerate || e['created_by'] == myUid;

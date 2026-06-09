@@ -58,7 +58,7 @@ class ActivityHeatmapService {
         for (final r in rows as List) {
           final ts = (r as Map)[tsCol] as String?;
           if (ts == null) continue;
-          final dt = DateTime.tryParse(ts)?.toLocal();
+          final dt = DateTime.tryParse(ts)?.toUtc();
           if (dt == null) continue;
           final key =
               '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';

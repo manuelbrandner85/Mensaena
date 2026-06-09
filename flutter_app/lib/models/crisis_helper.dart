@@ -42,10 +42,10 @@ class CrisisHelper {
       latitude: (j['latitude'] as num?)?.toDouble(),
       longitude: (j['longitude'] as num?)?.toDouble(),
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
     );
   }

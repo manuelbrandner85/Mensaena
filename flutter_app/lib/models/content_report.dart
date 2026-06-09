@@ -43,10 +43,10 @@ class ContentReport {
       resolvedBy: (j['reviewed_by'] ?? j['resolved_by']) as String?,
       resolvedAt: (j['reviewed_at'] ?? j['resolved_at']) != null
           ? DateTime.tryParse(
-              (j['reviewed_at'] ?? j['resolved_at']) as String)
+              (j['reviewed_at'] ?? j['resolved_at']) as String)?.toUtc()
           : null,
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

@@ -32,7 +32,7 @@ class AppRelease {
       mandatory: (j['mandatory'] as bool?) ?? false,
       isPatch: (j['is_patch'] as bool?) ?? false,
       platform: j['platform'] as String? ?? 'android',
-      releasedAt: DateTime.tryParse(j['released_at'] as String? ?? '') ??
+      releasedAt: DateTime.tryParse(j['released_at'] as String? ?? '')?.toUtc() ??
           DateTime.now(),
       changelog: (j['changelog'] is Map)
           ? Map<String, dynamic>.from(j['changelog'] as Map)

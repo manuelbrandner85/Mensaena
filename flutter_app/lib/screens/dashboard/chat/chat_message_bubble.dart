@@ -70,7 +70,7 @@ class ChatMessageBubble extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final content = json['content'] as String? ?? '';
-    final at = DateTime.tryParse(json['created_at'] as String? ?? '') ??
+    final at = DateTime.tryParse(json['created_at'] as String? ?? '')?.toUtc() ??
         DateTime.now();
     final editedAt = json['edited_at'] as String?;
     final replyToId = json['reply_to_id'] as String?;

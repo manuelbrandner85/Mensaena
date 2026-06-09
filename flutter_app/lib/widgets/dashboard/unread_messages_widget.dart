@@ -45,7 +45,7 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
         final convId = m['conversation_id'] as String?;
         if (convId == null) continue;
         final lastRead = m['last_read_at'] != null
-            ? DateTime.tryParse(m['last_read_at'] as String)
+            ? DateTime.tryParse(m['last_read_at'] as String)?.toUtc()
             : null;
 
         final msgs = await sb
@@ -60,7 +60,7 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
 
         final unread = msgList.where((row) {
           final createdAt =
-              DateTime.tryParse(row['created_at'] as String? ?? '');
+              DateTime.tryParse(row['created_at'] as String? ?? '')?.toUtc();
           if (createdAt == null) return false;
           return lastRead == null || createdAt.isAfter(lastRead);
         }).toList();
@@ -91,7 +91,7 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
           senderAvatar: senderAvatar,
           lastText: (newest['content'] as String?) ?? '',
           timestamp:
-              DateTime.tryParse(newest['created_at'] as String? ?? '') ??
+              DateTime.tryParse(newest['created_at'] as String? ?? '')?.toUtc() ??
                   DateTime.now(),
           unreadCount: unread.length,
         ));

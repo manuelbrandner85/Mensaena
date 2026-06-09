@@ -81,10 +81,10 @@ class NinaWarning {
         event: j['event'] as String?,
         areaDesc: j['area_desc'] as String?,
         onset: j['onset'] != null
-            ? DateTime.tryParse(j['onset'] as String)
+            ? DateTime.tryParse(j['onset'] as String)?.toUtc()
             : null,
         expires: j['expires'] != null
-            ? DateTime.tryParse(j['expires'] as String)
+            ? DateTime.tryParse(j['expires'] as String)?.toUtc()
             : null,
       );
 
@@ -318,7 +318,7 @@ class FoodWarning {
         id: j['id']?.toString() ?? '',
         title: j['title'] as String? ?? j['product_name'] as String? ?? '',
         publishedAt:
-            DateTime.tryParse(j['published_at'] as String? ?? '') ??
+            DateTime.tryParse(j['published_at'] as String? ?? '')?.toUtc() ??
                 DateTime.now(),
         brand: j['brand'] as String?,
         product: j['product_name'] as String?,

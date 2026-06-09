@@ -221,7 +221,7 @@ class ScheduledStreamsScreen extends ConsumerWidget {
             itemBuilder: (_, i) {
               final s = streams[i];
               final id = s['id'] as String;
-              final when = DateTime.tryParse(s['scheduled_at'] as String? ?? '');
+              final when = DateTime.tryParse(s['scheduled_at'] as String? ?? '')?.toUtc();
               final reminded = reminders.contains(id);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),

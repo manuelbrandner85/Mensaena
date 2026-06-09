@@ -33,15 +33,15 @@ class Conversation {
       type: j['type'] as String? ?? '',
       title: j['title'] as String?,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       postId: j['post_id'] as String?,
       updatedAt: j['updated_at'] != null
-          ? DateTime.tryParse(j['updated_at'] as String)
+          ? DateTime.tryParse(j['updated_at'] as String)?.toUtc()
           : null,
       isLocked: j['is_locked'] as bool?,
       lockedBy: j['locked_by'] as String?,
       lockedAt: j['locked_at'] != null
-          ? DateTime.tryParse(j['locked_at'] as String)
+          ? DateTime.tryParse(j['locked_at'] as String)?.toUtc()
           : null,
       lockedReason: j['locked_reason'] as String?,
       groupId: j['group_id'] as String?,

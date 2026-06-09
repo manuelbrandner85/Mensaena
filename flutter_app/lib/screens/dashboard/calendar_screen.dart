@@ -167,7 +167,7 @@ class _ListView extends StatelessWidget {
         children: [
           for (final key in sortedKeys)
             _DaySection(
-              date: DateTime.parse(key),
+              date: DateTime.parse(key).toUtc(),
               events: groups[key]!,
             ),
         ],

@@ -24,9 +24,9 @@ class BoardComment {
       authorId: j['author_id'] as String,
       content: j['content'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
     );
   }
 

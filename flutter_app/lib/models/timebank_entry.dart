@@ -33,12 +33,12 @@ class TimebankEntry {
       hours: (j['hours'] as num?)?.toDouble() ?? 0.0,
       description: j['description'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       postId: j['post_id'] as String?,
       category: j['category'] as String?,
       status: j['status'] as String?,
       confirmedAt: j['confirmed_at'] != null
-          ? DateTime.tryParse(j['confirmed_at'] as String)
+          ? DateTime.tryParse(j['confirmed_at'] as String)?.toUtc()
           : null,
     );
   }

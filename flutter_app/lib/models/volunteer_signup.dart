@@ -25,11 +25,11 @@ class VolunteerSignup {
       postId: j['post_id'] as String,
       userId: j['user_id'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       message: j['message'] as String?,
       status: j['status'] as String?,
       respondedAt: j['responded_at'] != null
-          ? DateTime.tryParse(j['responded_at'] as String)
+          ? DateTime.tryParse(j['responded_at'] as String)?.toUtc()
           : null,
     );
   }

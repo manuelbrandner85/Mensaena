@@ -48,7 +48,7 @@ class Group {
       category: j['category'] as String? ?? 'sonstiges',
       memberCount: (j['member_count'] as num?)?.toInt() ?? 0,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       description: j['description'] as String?,
       avatarUrl: (j['avatar_url'] ?? j['image_url']) as String?,
       bannerUrl: (j['banner_url'] ?? j['cover_image_url']) as String?,

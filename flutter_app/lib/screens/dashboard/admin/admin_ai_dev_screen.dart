@@ -1496,7 +1496,7 @@ class _LiveScanCardState extends State<_LiveScanCard>
   String _elapsed(Map<String, dynamic>? scan) {
     final raw = scan?['created_at'] as String?;
     if (raw == null) return '';
-    final start = DateTime.tryParse(raw);
+    final start = DateTime.tryParse(raw)?.toUtc();
     if (start == null) return '';
     final secs = DateTime.now().toUtc().difference(start.toUtc()).inSeconds;
     if (secs < 0) return '';

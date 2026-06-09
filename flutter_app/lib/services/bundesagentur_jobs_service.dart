@@ -91,7 +91,7 @@ class BundesagenturJobsService {
           company: (a['arbeitgeber'] as String?) ?? '',
           location: location.trim(),
           publicationDate:
-              DateTime.tryParse(pubStr ?? '') ?? DateTime.now(),
+              DateTime.tryParse(pubStr ?? '')?.toUtc() ?? DateTime.now(),
           refNr: a['refnr'] as String?,
           externalUrl: a['externeUrl'] as String?,
         );

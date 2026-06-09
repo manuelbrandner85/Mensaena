@@ -25,7 +25,7 @@ class Region {
       name: j['name'] as String,
       slug: j['slug'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       lat: (j['lat'] as num?)?.toDouble(),
       lng: (j['lng'] as num?)?.toDouble(),
       radiusKm: (j['radius_km'] as num?)?.toInt(),

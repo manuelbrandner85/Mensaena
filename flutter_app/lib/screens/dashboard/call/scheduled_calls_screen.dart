@@ -106,7 +106,7 @@ class ScheduledCallsScreen extends ConsumerWidget {
               final name =
                   (partner?['display_name'] as String?) ?? 'mensaena';
               final avatar = partner?['avatar_url'] as String?;
-              final when = DateTime.tryParse(r['scheduled_at'] as String);
+              final when = DateTime.tryParse(r['scheduled_at'] as String)?.toUtc();
               final type = r['call_type'] as String? ?? 'audio';
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),

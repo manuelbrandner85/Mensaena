@@ -78,8 +78,8 @@ class SunService {
           sunsetList.isEmpty) {
         return null;
       }
-      final sunrise = DateTime.parse(sunriseList.first);
-      final sunset = DateTime.parse(sunsetList.first);
+      final sunrise = DateTime.parse(sunriseList.first).toUtc();
+      final sunset = DateTime.parse(sunsetList.first).toUtc();
       final solarNoon = sunrise.add(sunset.difference(sunrise) ~/ 2);
       final data = SunData(
         sunrise: sunrise,

@@ -226,7 +226,7 @@ class CivilProtectionService {
       }
       if (bestMag == null || bestMag < 3.0) continue;
       final location = m.group(9)?.trim() ?? '';
-      final dt = DateTime.tryParse('${date}T${time}Z');
+      final dt = DateTime.tryParse('${date}T${time}Z')?.toUtc();
       out.add(CivilProtectionAlert(
         id: 'TR_kandilli_${date}_$time',
         country: 'TR',
@@ -356,7 +356,7 @@ class CivilProtectionService {
 
   static DateTime? _parseDate(String raw) {
     if (raw.isEmpty) return null;
-    final iso = DateTime.tryParse(raw);
+    final iso = DateTime.tryParse(raw)?.toUtc();
     if (iso != null) return iso;
     // RFC 822 (z.B. "Mon, 04 Mar 2026 15:30:00 +0100") — defensiv.
     try {

@@ -46,8 +46,8 @@ final _crashLogsProvider =
       ...results[1],
     ];
     merged.sort((a, b) {
-      final aT = DateTime.tryParse(a['created_at'] as String? ?? '');
-      final bT = DateTime.tryParse(b['created_at'] as String? ?? '');
+      final aT = DateTime.tryParse(a['created_at'] as String? ?? '')?.toUtc();
+      final bT = DateTime.tryParse(b['created_at'] as String? ?? '')?.toUtc();
       if (aT == null || bT == null) return 0;
       return bT.compareTo(aT);
     });
@@ -122,7 +122,7 @@ class AdminCrashLogsScreen extends ConsumerWidget {
               final msg = parts.skip(1).join('|');
               final last = group.first;
               final ts = DateTime.tryParse(
-                      last['created_at'] as String? ?? '') ??
+                      last['created_at'] as String? ?? '')?.toUtc() ??
                   DateTime.now();
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),

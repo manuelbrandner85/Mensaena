@@ -19,7 +19,7 @@ class RateLimit {
       userId: j['user_id'] as String,
       action: j['action'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
     );
   }
 

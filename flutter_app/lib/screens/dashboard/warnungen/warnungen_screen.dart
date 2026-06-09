@@ -419,7 +419,7 @@ class _WarningTile extends StatelessWidget {
             ?.toString() ??
         'civil.fallbackTitle'.tr();
     final sentRaw = warning['sent'] ?? data['sent'];
-    final sent = sentRaw is String ? DateTime.tryParse(sentRaw) : null;
+    final sent = sentRaw is String ? DateTime.tryParse(sentRaw)?.toUtc() : null;
 
     return InkWell(
       onTap: onTap,

@@ -93,10 +93,10 @@ class JobsService {
               profession: m['beruf'] as String?,
               publishedAt: m['aktuelleVeroeffentlichungsdatum'] != null
                   ? DateTime.tryParse(
-                      m['aktuelleVeroeffentlichungsdatum'] as String)
+                      m['aktuelleVeroeffentlichungsdatum'] as String)?.toUtc()
                   : null,
               modifiedAt: m['modifikationsTimestamp'] != null
-                  ? DateTime.tryParse(m['modifikationsTimestamp'] as String)
+                  ? DateTime.tryParse(m['modifikationsTimestamp'] as String)?.toUtc()
                   : null,
             );
           })

@@ -31,7 +31,7 @@ class CrisisUpdate {
       imageUrl: j['image_url'] as String?,
       isPinned: (j['is_pinned'] as bool?) ?? false,
       createdAt: j['created_at'] != null
-          ? DateTime.tryParse(j['created_at'] as String)
+          ? DateTime.tryParse(j['created_at'] as String)?.toUtc()
           : null,
     );
   }

@@ -66,10 +66,10 @@ class PostContactRequest {
       status: j['status'] as String? ?? 'pending',
       message: j['message'] as String?,
       respondedAt: j['responded_at'] != null
-          ? DateTime.tryParse(j['responded_at'] as String)
+          ? DateTime.tryParse(j['responded_at'] as String)?.toUtc()
           : null,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ??
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ??
               DateTime.now(),
       requesterName: rName,
       requesterAvatar: rAvatar,

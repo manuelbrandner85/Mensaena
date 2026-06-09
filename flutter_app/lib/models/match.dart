@@ -56,9 +56,9 @@ class MatchModel {
       seenByOffer: (j['seen_by_offer'] as bool?) ?? false,
       seenByRequest: (j['seen_by_request'] as bool?) ?? false,
       expiresAt:
-          DateTime.tryParse(j['expires_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['expires_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       scoreBreakdown: (j['score_breakdown'] is Map)
           ? Map<String, dynamic>.from(j['score_breakdown'] as Map)
           : const {},

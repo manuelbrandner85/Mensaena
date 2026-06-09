@@ -50,19 +50,19 @@ class SkillOffer {
       title: j['title'] as String,
       description: j['description'] as String,
       createdAt:
-          DateTime.tryParse(j['created_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       updatedAt:
-          DateTime.tryParse(j['updated_at'] as String? ?? '') ?? DateTime.now(),
+          DateTime.tryParse(j['updated_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
       skillCategory: j['skill_category'] as String?,
       level: j['level'] as String?,
       isFree: (j['is_free'] as bool?) ?? true,
       hourlyRate: (j['hourly_rate'] as num?)?.toDouble(),
       currency: j['currency'] as String?,
       availableFrom: j['available_from'] != null
-          ? DateTime.tryParse(j['available_from'] as String)
+          ? DateTime.tryParse(j['available_from'] as String)?.toUtc()
           : null,
       availableUntil: j['available_until'] != null
-          ? DateTime.tryParse(j['available_until'] as String)
+          ? DateTime.tryParse(j['available_until'] as String)?.toUtc()
           : null,
       locationLat: (j['location_lat'] as num?)?.toDouble(),
       locationLng: (j['location_lng'] as num?)?.toDouble(),

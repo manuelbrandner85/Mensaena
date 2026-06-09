@@ -19,7 +19,7 @@ class UserBadge {
       userId: j['user_id'] as String,
       badgeId: j['badge_id'] as String,
       earnedAt: j['earned_at'] != null
-          ? DateTime.tryParse(j['earned_at'] as String)
+          ? DateTime.tryParse(j['earned_at'] as String)?.toUtc()
           : null,
     );
   }
