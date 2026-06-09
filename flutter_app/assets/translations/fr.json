@@ -4287,5 +4287,37 @@
     "apkButton": "Télécharger l'APK",
     "whyTitle": "Pourquoi pas le Play Store ?",
     "whyDesc": "Mensaena est open source et sans pub. Nous ne partageons aucune donnée avec Google, donc pas de Play Store. F-Droid vérifie chaque version indépendamment — pas besoin de nous faire une confiance aveugle."
+  },
+  "recommendations": {
+    "screenTitle": "Recommandations",
+    "tab": "Recommandations",
+    "create": "Ajouter une recommandation",
+    "typePerson": "Personne",
+    "typeBusiness": "Entreprise",
+    "category": "Catégorie",
+    "categories": {
+      "all": "Toutes",
+      "craft": "Artisanat",
+      "care": "Soins",
+      "education": "Éducation",
+      "health": "Santé",
+      "auto": "Auto",
+      "garden": "Jardin"
+    },
+    "stars": "Étoiles",
+    "textHint": "Décrivez votre expérience …",
+    "photoOptional": "Ajouter une photo (facultatif)",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Personne ou entreprise …",
+    "postalCodeLabel": "Code postal",
+    "postalCodePlaceholder": "ex. 12345",
+    "trustScore": "Score de confiance",
+    "trustNeighborhood": "{count}× du quartier",
+    "noResults": "Aucune recommandation trouvée.",
+    "submitSuccess": "Recommandation enregistrée !",
+    "submitError": "Erreur lors de l'enregistrement.",
+    "submitting": "Enregistrement …",
+    "submit": "Envoyer la recommandation",
+    "cancel": "Annuler"
   }
 }

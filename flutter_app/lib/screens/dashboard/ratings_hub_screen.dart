@@ -1,5 +1,5 @@
 /// SKILL: mensaena-features
-/// Ratings-Hub — Bewertungs-Übersicht (Gegeben + Erhalten).
+/// Ratings-Hub — Bewertungs-Übersicht (Gegeben + Erhalten + Empfehlungen).
 /// 1:1 zu Web /ratings (lebt dort als Tab in Profile, hier als eigener Screen).
 library;
 
@@ -14,6 +14,7 @@ import '../../config/theme/app_typography.dart';
 import '../../repositories/trust_ratings_repository.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/skeleton_card.dart';
+import 'recommendations/recommendations_screen.dart';
 
 class RatingsHubScreen extends ConsumerStatefulWidget {
   const RatingsHubScreen({super.key});
@@ -31,7 +32,7 @@ class _RatingsHubScreenState extends ConsumerState<RatingsHubScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 2, vsync: this);
+    _tab = TabController(length: 3, vsync: this);
     _load();
   }
 
@@ -105,6 +106,17 @@ class _RatingsHubScreenState extends ConsumerState<RatingsHubScreen>
                       ],
                     ),
                   ),
+                  Tab(
+                    height: 36,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(LucideIcons.thumbsUp, size: 14),
+                        const SizedBox(width: 6),
+                        Text('recommendations.tab'.tr()),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -130,6 +142,7 @@ class _RatingsHubScreenState extends ConsumerState<RatingsHubScreen>
                       mode: _Mode.given,
                     ),
                   ),
+                  const RecommendationsScreen(),
                 ],
               ),
             ),

@@ -4286,5 +4286,37 @@
     "apkButton": "Скачать APK",
     "whyTitle": "Почему не Play Store?",
     "whyDesc": "Mensaena — открытый код и без рекламы. Мы не передаём данные Google, поэтому без Play Store. F-Droid проверяет каждую версию независимо — не нужно слепо нам доверять."
+  },
+  "recommendations": {
+    "screenTitle": "Рекомендации",
+    "tab": "Рекомендации",
+    "create": "Добавить рекомендацию",
+    "typePerson": "Человек",
+    "typeBusiness": "Компания",
+    "category": "Категория",
+    "categories": {
+      "all": "Все",
+      "craft": "Ремесло",
+      "care": "Уход",
+      "education": "Образование",
+      "health": "Здоровье",
+      "auto": "Авто",
+      "garden": "Сад"
+    },
+    "stars": "Звёзды",
+    "textHint": "Опишите ваш опыт …",
+    "photoOptional": "Добавить фото (необязательно)",
+    "nameLabel": "Имя",
+    "namePlaceholder": "Человек или компания …",
+    "postalCodeLabel": "Почтовый индекс",
+    "postalCodePlaceholder": "напр. 12345",
+    "trustScore": "Оценка доверия",
+    "trustNeighborhood": "{count}× из района",
+    "noResults": "Рекомендации не найдены.",
+    "submitSuccess": "Рекомендация сохранена!",
+    "submitError": "Ошибка при сохранении.",
+    "submitting": "Сохранение …",
+    "submit": "Отправить рекомендацию",
+    "cancel": "Отмена"
   }
 }

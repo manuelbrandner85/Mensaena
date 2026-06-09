@@ -4286,5 +4286,37 @@
     "apkButton": "APK'yı indir",
     "whyTitle": "Neden Play Store değil?",
     "whyDesc": "Mensaena açık kaynak ve reklamsızdır. Google ile veri paylaşmayız, bu yüzden Play Store yok. F-Droid her sürümü bağımsız doğrular — bize körü körüne güvenmek zorunda değilsin."
+  },
+  "recommendations": {
+    "screenTitle": "Tavsiyeler",
+    "tab": "Tavsiyeler",
+    "create": "Tavsiye ekle",
+    "typePerson": "Kişi",
+    "typeBusiness": "İşletme",
+    "category": "Kategori",
+    "categories": {
+      "all": "Tümü",
+      "craft": "El Sanatları",
+      "care": "Bakım",
+      "education": "Eğitim",
+      "health": "Sağlık",
+      "auto": "Otomotiv",
+      "garden": "Bahçe"
+    },
+    "stars": "Yıldız",
+    "textHint": "Deneyiminizi anlatın …",
+    "photoOptional": "Fotoğraf ekle (isteğe bağlı)",
+    "nameLabel": "İsim",
+    "namePlaceholder": "Kişi veya işletme …",
+    "postalCodeLabel": "Posta kodu",
+    "postalCodePlaceholder": "ör. 12345",
+    "trustScore": "Güven puanı",
+    "trustNeighborhood": "Mahalleden {count}×",
+    "noResults": "Tavsiye bulunamadı.",
+    "submitSuccess": "Tavsiye kaydedildi!",
+    "submitError": "Kaydetme hatası.",
+    "submitting": "Kaydediliyor …",
+    "submit": "Tavsiye gönder",
+    "cancel": "İptal"
   }
 }

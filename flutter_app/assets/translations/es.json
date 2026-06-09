@@ -4287,5 +4287,37 @@
     "apkButton": "Descargar APK",
     "whyTitle": "¿Por qué no la Play Store?",
     "whyDesc": "Mensaena es de código abierto y sin anuncios. No compartimos datos con Google, así que nada de Play Store. F-Droid verifica cada versión de forma independiente — no tienes que confiar a ciegas."
+  },
+  "recommendations": {
+    "screenTitle": "Recomendaciones",
+    "tab": "Recomendaciones",
+    "create": "Añadir recomendación",
+    "typePerson": "Persona",
+    "typeBusiness": "Negocio",
+    "category": "Categoría",
+    "categories": {
+      "all": "Todas",
+      "craft": "Oficios",
+      "care": "Cuidados",
+      "education": "Educación",
+      "health": "Salud",
+      "auto": "Automoción",
+      "garden": "Jardín"
+    },
+    "stars": "Estrellas",
+    "textHint": "Describe tu experiencia …",
+    "photoOptional": "Añadir foto (opcional)",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Persona o negocio …",
+    "postalCodeLabel": "Código postal",
+    "postalCodePlaceholder": "p. ej. 12345",
+    "trustScore": "Puntuación de confianza",
+    "trustNeighborhood": "{count}× del barrio",
+    "noResults": "No se encontraron recomendaciones.",
+    "submitSuccess": "¡Recomendación guardada!",
+    "submitError": "Error al guardar.",
+    "submitting": "Guardando …",
+    "submit": "Enviar recomendación",
+    "cancel": "Cancelar"
   }
 }
