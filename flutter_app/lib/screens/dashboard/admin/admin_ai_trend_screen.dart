@@ -202,7 +202,7 @@ class _TrendCard extends StatelessWidget {
 
   Color _dirColor(String? dir) {
     switch (dir) {
-      case 'up': return Colors.green.shade600;
+      case 'up': return AppColors.leben;
       case 'down': return Colors.red.shade500;
       default: return AppColors.lightMute;
     }
@@ -210,7 +210,7 @@ class _TrendCard extends StatelessWidget {
 
   Color _sentimentColor(String? s) {
     switch (s) {
-      case 'positiv': return Colors.green.shade600;
+      case 'positiv': return AppColors.leben;
       case 'negativ': return Colors.red.shade500;
       default: return AppColors.lightMute;
     }

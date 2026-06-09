@@ -169,7 +169,7 @@ class _CrisisCard extends StatelessWidget {
       case 'critical': return Colors.red.shade700;
       case 'high':     return Colors.orange.shade700;
       case 'medium':   return Colors.amber.shade700;
-      default:         return Colors.green.shade700;
+      default:         return AppColors.leben;
     }
   }
 
@@ -178,7 +178,7 @@ class _CrisisCard extends StatelessWidget {
       case 'critical': return Colors.red.shade50;
       case 'high':     return Colors.orange.shade50;
       case 'medium':   return Colors.amber.shade50;
-      default:         return Colors.green.shade50;
+      default:         return AppColors.leben.withValues(alpha: 0.08);
     }
   }
 
@@ -387,7 +387,7 @@ class _EmptyState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(LucideIcons.shieldCheck,
-              size: 48, color: Colors.green.shade300),
+              size: 48, color: AppColors.lebenSoft),
           const SizedBox(height: 12),
           Text('adminCrisis.empty'.tr(),
               style: AppTypography.body(size: 13, color: AppColors.lightMute)),
