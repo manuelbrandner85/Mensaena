@@ -1,0 +1,143 @@
+name: 🧹 Agent Auto-Merge Sweeper
+
+# ════════════════════════════════════════════════════════════════════════
+# Sicherheitsnetz für agent_automerge.yml.
+#
+# agent_automerge läuft NUR beim Abschluss von "Flutter Android Build" und
+# kann in seltenen Fällen einen Merge überspringen (z.B. PAT-Primär-Rate-
+# Limit erschöpft, transienter Fehler). Dann bleibt ein agent/*-PR mit
+# grünem CI offen — und nichts re-triggert den Merge bis zum nächsten Lauf.
+#
+# Dieser Cron schließt die Lücke: alle 15 Minuten sucht er agent/task-*-PRs
+# mit grünem Flutter-CI, die noch offen sind, und mergt sie — mit exakt der
+# gleichen Gating-Logik wie agent_automerge (CI grün, kein anderer Check rot,
+# Review-Gate respektiert). Findet er nichts, ist es ein No-Op.
+#
+# Token-Strategie wie im Automerge: Lese-Calls über GITHUB_TOKEN (eigener
+# Bucket), nur Merge + Shorebird-Dispatch über AGENT_PAT (Pflicht für die
+# OTA-Kette).
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # alle 15 Minuten
+  workflow_dispatch:          # manuell auslösbar (Actions-Tab)
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+
+concurrency:
+  group: agent-automerge-sweeper
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Offene Agent-PRs mit grünem CI mergen
+        env:
+          # Default-Token für gh = GITHUB_TOKEN (hoher Pro-Repo-Bucket).
+          # PAT nur für Merge + Dispatch (Inline-Override).
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT: ${{ secrets.AGENT_PAT }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          patch_status() {
+            local task_id="$1"; local body="$2"
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${task_id}" \
+              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "$body" || true
+          }
+
+          # 1) Alle offenen, nicht-Draft agent/task-* PRs holen (Read via GITHUB_TOKEN).
+          PRS=$(gh pr list --repo "$REPO" --state open --limit 50 \
+                  --json number,headRefName,headRefOid,isDraft \
+                  --jq '.[] | select(.isDraft==false)
+                            | select(.headRefName | startswith("agent/task-"))
+                            | [.number, .headRefName, .headRefOid] | @tsv')
+
+          if [ -z "$PRS" ]; then
+            echo "Keine offenen agent/task-* PRs — nichts zu tun."
+            exit 0
+          fi
+
+          echo "$PRS" | while IFS=$'\t' read -r PR_NUM BRANCH HEAD_SHA; do
+            [ -z "${PR_NUM:-}" ] && continue
+            TASK_ID="${BRANCH#agent/task-}"
+            echo "── Prüfe PR #$PR_NUM ($BRANCH @ ${HEAD_SHA:0:7})"
+
+            # 2) Flutter-CI ("build" aus "Flutter Android Build") muss grün sein.
+            #    Wir lesen die check-runs des Head-Commits.
+            CHECKS=$(gh api "repos/${REPO}/commits/${HEAD_SHA}/check-runs" \
+                       --jq '.check_runs' 2>/dev/null || echo '[]')
+
+            BUILD_OK=$(echo "$CHECKS" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);const b=a.filter(c=>c.name==="build");const ok=b.length>0&&b.every(c=>c.status==="completed")&&b.some(c=>c.conclusion==="success");process.stdout.write(ok?"true":"false")}catch{process.stdout.write("false")}})')
+            if [ "$BUILD_OK" != "true" ]; then
+              echo "  Flutter-CI noch nicht grün/abgeschlossen — überspringe (nächster Sweep)."
+              continue
+            fi
+
+            # 3) Kein anderer abgeschlossener Check darf fehlgeschlagen sein.
+            FAILED=$(echo "$CHECKS" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);const n=a.filter(c=>c.status==="completed"&&["failure","cancelled","timed_out","action_required"].includes(c.conclusion)).length;process.stdout.write(String(n))}catch{process.stdout.write("0")}})')
+            if [ "${FAILED:-0}" -gt 0 ]; then
+              echo "  $FAILED fehlgeschlagene Checks — kein Merge."
+              continue
+            fi
+
+            # 4) Review-Gate respektieren: await_review=true → nicht mergen.
+            AWAIT=$(curl -sS \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=await_review,status" \
+              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(String(a[0]&&a[0].await_review===true))}catch{process.stdout.write("false")}})')
+            if [ "$AWAIT" = "true" ]; then
+              echo "  Review-Gate aktiv — überspringe (wartet auf manuelle Freigabe)."
+              continue
+            fi
+
+            # 5) Squash-Merge via PAT (triggert shorebird_patch.yml auf main).
+            #    Retry mit Backoff gegen kurzzeitige Secondary-Limits.
+            echo "  Alles grün — merge PR #$PR_NUM"
+            MERGED=0
+            for attempt in 1 2 3 4; do
+              if GH_TOKEN="$PAT" gh pr merge "$PR_NUM" --repo "$REPO" \
+                   --squash --delete-branch --admin; then
+                MERGED=1; break
+              fi
+              STATE=$(gh pr view "$PR_NUM" --repo "$REPO" --json state --jq '.state' 2>/dev/null || echo "")
+              if [ "$STATE" = "MERGED" ]; then MERGED=1; break; fi
+              WAIT=$((2 ** attempt))
+              echo "  Merge-Versuch $attempt fehlgeschlagen — warte ${WAIT}s…"
+              sleep "$WAIT"
+            done
+            if [ "$MERGED" -ne 1 ]; then
+              echo "  Merge nach 4 Versuchen nicht möglich — bleibt für nächsten Sweep offen."
+              continue
+            fi
+
+            MERGE_SHA=$(gh pr view "$PR_NUM" --repo "$REPO" \
+                          --json mergeCommit --jq '.mergeCommit.oid // empty' || true)
+
+            # 6) OTA sicherstellen + Status + Phasen-Verkettung (via PAT bzw. service_role).
+            GH_TOKEN="$PAT" gh workflow run shorebird_patch.yml \
+              --repo "$REPO" --ref main --field source_branch=main 2>/dev/null || true
+
+            patch_status "$TASK_ID" "{\"status\":\"merged\",\"ci_status\":\"success\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"summary\":\"PR #$PR_NUM via Sweeper gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+            curl -sS -X POST \
+              "https://${SUPABASE_REF}.supabase.co/functions/v1/admin-dev-agent" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Content-Type: application/json" \
+              -d "{\"action\":\"next_phase\",\"task_id\":\"${TASK_ID}\"}" \
+              && echo "  next_phase angestoßen für ${TASK_ID}" || true
+          done
