@@ -123,22 +123,17 @@ class MatchingRepository {
   }
 
   /// Realtime-Stream: alle Matches des aktuellen Users (offer ODER request).
-  /// Sortiert nach created_at desc.
+  /// Nutzt v_my_matches-View mit user_id-Spalte für serverseitigen .eq()-Filter,
+  /// da Supabase .stream() kein .or() unterstützt.
   static Stream<List<MatchSummary>> watchMine() {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return Stream.value(const []);
-    // MEMORY-FIX: .limit(200) — ohne Limit werden ALLE Matches geladen,
-    // dann client-seitig gefiltert. Bei vielen historischen Matches: OOM.
     return sb
-        .from('matches')
+        .from('v_my_matches')
         .stream(primaryKey: ['id'])
-        .order('created_at', ascending: false)
-        .limit(200)
-        .map((rows) => rows
-            .where((r) =>
-                r['offer_user_id'] == uid || r['request_user_id'] == uid)
-            .map(MatchSummary.fromRpcRow)
-            .toList());
+        .eq('user_id', uid)
+        .limit(100)
+        .map((rows) => rows.map(MatchSummary.fromRpcRow).toList());
   }
 
   static Future<void> markSeen(String matchId) async {
