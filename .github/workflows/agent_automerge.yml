@@ -111,3 +111,15 @@ jobs:
             --field source_branch=main 2>/dev/null || true
 
           patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+          # ── Phasen-Verkettung ──────────────────────────────────────────────
+          # War dieser Task eine Phase eines größeren Auftrags, dispatcht
+          # next_phase die nächste Phase (eigener PR/CI/OTA). Bei Einzel-
+          # Aufträgen ist das ein harmloser No-Op (chained:false). Service-to-
+          # Service über den Service-Role-Key (kein User-JWT im Workflow).
+          curl -sS -X POST \
+            "https://${SUPABASE_REF}.supabase.co/functions/v1/admin-dev-agent" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"action\":\"next_phase\",\"task_id\":\"${TASK_ID}\"}" \
+            && echo "next_phase angestoßen für ${TASK_ID}" || true

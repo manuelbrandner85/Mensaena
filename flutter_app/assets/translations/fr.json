@@ -1323,7 +1323,8 @@
       "failed": "Échoué",
       "no_changes": "Aucun changement",
       "awaiting_review": "En attente d’approbation",
-      "cancelled": "Annulé"
+      "cancelled": "Annulé",
+      "phased": "En phases"
     },
     "scanAnalyzing": "Analyse de {file}",
     "scanFilesRead": "{count} fichiers analysés",
@@ -1496,7 +1497,8 @@
       "acceptedOk": "Tâche créée — implémentation en cours.",
       "dismissedOk": "Ignoré.",
       "actionFailed": "Action échouée."
-    }
+    },
+    "phaseOf": "Phase {n}/{total}"
   },
   "create": {
     "titleRequired": "Le titre est obligatoire.",
