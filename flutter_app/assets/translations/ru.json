@@ -1322,7 +1322,8 @@
       "failed": "Ошибка",
       "no_changes": "Без изменений",
       "awaiting_review": "Ожидает одобрения",
-      "cancelled": "Отменено"
+      "cancelled": "Отменено",
+      "phased": "По этапам"
     },
     "scanAnalyzing": "Анализ {file}",
     "scanFilesRead": "Проанализировано файлов: {count}",
@@ -1495,7 +1496,8 @@
       "acceptedOk": "Задача создана — реализация запущена.",
       "dismissedOk": "Отклонено.",
       "actionFailed": "Действие не выполнено."
-    }
+    },
+    "phaseOf": "Этап {n}/{total}"
   },
   "create": {
     "titleRequired": "Заголовок обязателен.",

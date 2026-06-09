@@ -1322,7 +1322,8 @@
       "failed": "Başarısız",
       "no_changes": "Değişiklik yok",
       "awaiting_review": "Onay bekliyor",
-      "cancelled": "İptal edildi"
+      "cancelled": "İptal edildi",
+      "phased": "Aşamalı"
     },
     "scanAnalyzing": "{file} analiz ediliyor",
     "scanFilesRead": "{count} dosya analiz edildi",
@@ -1495,7 +1496,8 @@
       "acceptedOk": "Görev oluşturuldu — uygulama başladı.",
       "dismissedOk": "Yok sayıldı.",
       "actionFailed": "İşlem başarısız."
-    }
+    },
+    "phaseOf": "Aşama {n}/{total}"
   },
   "create": {
     "titleRequired": "Başlık gerekli.",

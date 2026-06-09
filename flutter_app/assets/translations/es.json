@@ -1323,7 +1323,8 @@
       "failed": "Fallido",
       "no_changes": "Sin cambios",
       "awaiting_review": "Esperando aprobación",
-      "cancelled": "Cancelado"
+      "cancelled": "Cancelado",
+      "phased": "En fases"
     },
     "scanAnalyzing": "Analizando {file}",
     "scanFilesRead": "{count} archivos analizados",
@@ -1496,7 +1497,8 @@
       "acceptedOk": "Tarea creada — implementación en marcha.",
       "dismissedOk": "Descartado.",
       "actionFailed": "Acción fallida."
-    }
+    },
+    "phaseOf": "Fase {n}/{total}"
   },
   "create": {
     "titleRequired": "El título es obligatorio.",

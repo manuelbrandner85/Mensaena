@@ -2354,6 +2354,91 @@ class _TaskCard extends StatelessWidget {
               );
             }),
           ],
+          // Auto-Phasen: Parent zeigt Phasen-Fortschritt, Child zeigt sein
+          // Phasen-Badge. (plan ist hier eine Map, nicht die Legacy-List.)
+          if (task['plan'] is Map) ...[
+            Builder(builder: (_) {
+              final p = task['plan'] as Map;
+              final phases = p['phases'];
+              if (phases is List && phases.isNotEmpty) {
+                final total = phases.length;
+                final current = (p['current'] as num?)?.toInt() ?? 0;
+                final allDone = status == 'merged';
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(total, (i) {
+                      final ph = phases[i];
+                      final title = (ph is Map ? ph['title'] : null)?.toString() ??
+                          'Phase ${i + 1}';
+                      final done = allDone || i < current;
+                      final active = !allDone && i == current;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              done
+                                  ? LucideIcons.checkCircle2
+                                  : active
+                                      ? LucideIcons.loader
+                                      : LucideIcons.circle,
+                              size: 13,
+                              color: done
+                                  ? Colors.green.shade600
+                                  : active
+                                      ? AppColors.teal
+                                      : AppColors.lightMute,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'adminDev.phaseOf'.tr(namedArgs: {
+                                      'n': '${i + 1}',
+                                      'total': '$total',
+                                    }) +
+                                    ' · $title',
+                                style: AppTypography.body(
+                                    size: 11,
+                                    color: active
+                                        ? AppColors.lightInk
+                                        : AppColors.lightMute),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              }
+              final idx = (p['phase_index'] as num?)?.toInt();
+              final ptot = (p['phase_total'] as num?)?.toInt();
+              if (idx != null && ptot != null) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.layers,
+                          size: 12, color: AppColors.teal),
+                      const SizedBox(width: 5),
+                      Text(
+                        'adminDev.phaseOf'.tr(
+                            namedArgs: {'n': '${idx + 1}', 'total': '$ptot'}),
+                        style: AppTypography.body(
+                            size: 11,
+                            color: AppColors.teal,
+                            weight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }),
+          ],
           if (summary != null && summary.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(summary,
@@ -2480,6 +2565,8 @@ class _TaskCard extends StatelessWidget {
     switch (status) {
       case 'merged':
         return const _StatusMeta(LucideIcons.checkCircle2, Colors.green);
+      case 'phased':
+        return const _StatusMeta(LucideIcons.layers, AppColors.teal);
       case 'pr_open':
         return const _StatusMeta(LucideIcons.gitPullRequest, AppColors.teal);
       case 'awaiting_review':

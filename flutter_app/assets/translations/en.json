@@ -1323,7 +1323,8 @@
       "failed": "Failed",
       "no_changes": "No change",
       "awaiting_review": "Awaiting approval",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "phased": "In phases"
     },
     "scanAnalyzing": "Analyzing {file}",
     "scanFilesRead": "{count} files analyzed",
@@ -1496,7 +1497,8 @@
       "acceptedOk": "Task created — implementation running.",
       "dismissedOk": "Dismissed.",
       "actionFailed": "Action failed."
-    }
+    },
+    "phaseOf": "Phase {n}/{total}"
   },
   "create": {
     "titleRequired": "Title is required.",

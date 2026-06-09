@@ -69,22 +69,195 @@ function runIdFromUrl(url: string | null | undefined): string | null {
   return m ? m[1] : null
 }
 
+type Phase = { title: string; instruction: string }
+
+// ── Auto-Phasen: zerlegt einen zu großen Auftrag in unabhängige Phasen ──
+// Liefert {single:true} wenn ein PR reicht, sonst {single:false, phases:[…]}.
+// Jede Phase MUSS für sich kompilieren + CI grün bekommen (sonst merged Phase 1
+// kaputten Code). Bei Planner-Fehler → sicherer Fallback auf ein PR.
+async function planPhases(
+  instruction: string,
+): Promise<{ single: true } | { single: false; phases: Phase[] }> {
+  const sys = `Du bist ein Senior-Softwarearchitekt für die Flutter-App Mensaena.
+Beurteile, ob die Aufgabe des Admins in EINEM Pull Request umsetzbar ist oder
+ob sie zu groß ist und in mehrere Phasen zerlegt werden sollte.
+
+REGELN:
+- Zerlege NUR, wenn die Aufgabe wirklich groß ist (mehrere Screens/Module,
+  Datenmodell + UI + Übersetzungen + Logik zusammen). Kleine und mittlere
+  Aufgaben bleiben EIN PR.
+- Wenn du zerlegst: 2 bis 5 Phasen. JEDE Phase MUSS für sich allein
+  kompilieren und das CI grün bekommen — die App bleibt nach jeder Phase
+  lauffähig. NIEMALS eine Phase, die ohne die nächste kaputten Code merged.
+- Jede Phase ist eine eigenständige, vollständige Handlungsanweisung in
+  natürlicher deutscher Sprache (so wie der Admin sie formuliert hätte).
+- Reihenfolge logisch aufbauend (z. B. erst Datenmodell+Migration, dann
+  Repository/Provider, dann UI, dann Feinschliff/Übersetzungen).
+
+Antworte AUSSCHLIESSLICH als JSON:
+- Wenn ein PR reicht:  {"single": true}
+- Wenn Phasen nötig:   {"single": false, "phases": [{"title": "...", "instruction": "..."}, ...]}`
+  try {
+    const { text } = await callAiChain(sys, instruction, {
+      jsonMode: true, timeoutMs: 22_000,
+    })
+    const parsed = parseAiJson<{ single?: boolean; phases?: Phase[] }>(text ?? '')
+    if (!parsed || parsed.single === true || !Array.isArray(parsed.phases)) {
+      return { single: true }
+    }
+    const phases = parsed.phases
+      .map((p) => ({
+        title: String(p?.title ?? '').slice(0, 120).trim(),
+        instruction: String(p?.instruction ?? '').slice(0, 2000).trim(),
+      }))
+      .filter((p) => p.instruction.length > 4)
+      .slice(0, 5)
+    if (phases.length < 2) return { single: true }
+    return { single: false, phases }
+  } catch {
+    return { single: true }
+  }
+}
+
+// Baut die finale Instruction für eine einzelne Phase (mit Kontext zu den
+// bereits gemergten Vorphasen, damit der Agent nicht doppelt arbeitet).
+function buildPhaseInstruction(baseTitle: string, phases: Phase[], idx: number): string {
+  const total = phases.length
+  const prior = phases.slice(0, idx)
+    .map((x, i) => `  ${i + 1}. ${x.title} (bereits erledigt & in main gemergt)`)
+    .join('\n')
+  const priorBlock = idx > 0
+    ? `\n\nBereits abgeschlossene Phasen (Code ist schon im main):\n${prior}`
+    : ''
+  return `Dies ist Phase ${idx + 1} von ${total} eines größeren Auftrags („${baseTitle}").` +
+    priorBlock +
+    `\n\nSetze JETZT NUR diese Phase um — nicht mehr, nicht weniger:\n${phases[idx].instruction}` +
+    `\n\nWICHTIG: Die App MUSS nach dieser Phase kompilieren und das CI grün sein. ` +
+    `Liefere ausschließlich den Code für genau diese Phase.`
+}
+
+// Legt einen Phase-Child-Task an und dispatcht admin_agent.yml dafür.
+// deno-lint-ignore no-explicit-any
+async function dispatchPhase(
+  admin: any, token: string, parentId: string, createdBy: string,
+  baseTitle: string, phases: Phase[], idx: number,
+  imageUrls: string[], awaitReview: boolean,
+): Promise<{ ok: boolean; childId?: string; error?: string }> {
+  const instr = buildPhaseInstruction(baseTitle, phases, idx)
+  const imgs = idx === 0 ? imageUrls : []
+  const { data: child, error } = await admin
+    .from('admin_dev_tasks')
+    .insert({
+      created_by: createdBy,
+      instruction: instr,
+      status: 'queued',
+      image_urls: imgs,
+      await_review: awaitReview,
+      origin: 'phase',
+      parent_task_id: parentId,
+      plan: { phase_index: idx, phase_total: phases.length, phase_title: phases[idx].title },
+    })
+    .select('id').single()
+  if (error || !child) return { ok: false, error: error?.message }
+
+  const res = await fetch(
+    `${GH_API}/actions/workflows/${GH_WORKFLOW}/dispatches`,
+    {
+      method: 'POST', headers: ghHeaders(token),
+      body: JSON.stringify({
+        ref: GH_REF,
+        inputs: { instruction: instr, task_id: child.id, image_urls: JSON.stringify(imgs) },
+      }),
+    },
+  )
+  if (res.status !== 204) {
+    const detail = await res.text().catch(() => '')
+    await admin.from('admin_dev_tasks').update({
+      status: 'failed', error: `dispatch ${res.status}: ${detail.slice(0, 300)}`,
+      updated_at: new Date().toISOString(),
+    }).eq('id', child.id)
+    return { ok: false, childId: child.id, error: `dispatch_${res.status}` }
+  }
+  return { ok: true, childId: child.id }
+}
+
+// next_phase: wird von agent_automerge.yml nach dem Merge eines Tasks gerufen.
+// Ist der gemergte Task ein Phase-Child → nächste Phase dispatchen (oder den
+// Parent finalisieren). Bei Einzel-Aufträgen passiert nichts (chained:false).
+// deno-lint-ignore no-explicit-any
+async function handleNextPhase(admin: any, token: string, body: any): Promise<Response> {
+  const mergedId = String(body?.task_id ?? '')
+  if (!mergedId) return json({ error: 'task_id_required' }, 400)
+  if (!token) return json({ error: 'agent_not_configured' }, 503)
+
+  const { data: merged } = await admin.from('admin_dev_tasks')
+    .select('id, parent_task_id, plan, created_by').eq('id', mergedId).maybeSingle()
+  if (!merged || !merged.parent_task_id) return json({ ok: true, chained: false })
+
+  const { data: parent } = await admin.from('admin_dev_tasks')
+    .select('id, instruction, plan, created_by, image_urls, await_review')
+    .eq('id', merged.parent_task_id).maybeSingle()
+  if (!parent || !parent.plan?.phases) return json({ ok: true, chained: false })
+
+  const phases = (parent.plan.phases as Phase[]) ?? []
+  const doneIdx = Number(merged.plan?.phase_index ?? -1)
+  const nextIdx = doneIdx + 1
+
+  if (nextIdx >= phases.length) {
+    await admin.from('admin_dev_tasks').update({
+      status: 'merged',
+      summary: `Alle ${phases.length} Phasen ausgeliefert.`,
+      plan: { ...parent.plan, current: phases.length },
+      updated_at: new Date().toISOString(),
+    }).eq('id', parent.id)
+    return json({ ok: true, chained: false, completed: true })
+  }
+
+  const baseTitle = String(parent.instruction ?? '').slice(0, 120)
+  const r = await dispatchPhase(
+    admin, token, parent.id, String(parent.created_by ?? merged.created_by),
+    baseTitle, phases, nextIdx,
+    Array.isArray(parent.image_urls) ? parent.image_urls : [],
+    parent.await_review === true,
+  )
+  if (!r.ok) return json({ error: 'phase_dispatch_failed', detail: r.error }, 502)
+
+  await admin.from('admin_dev_tasks').update({
+    status: 'phased',
+    summary: `Phase ${nextIdx + 1}/${phases.length} gestartet: ${phases[nextIdx].title}`,
+    plan: { ...parent.plan, current: nextIdx },
+    updated_at: new Date().toISOString(),
+  }).eq('id', parent.id)
+
+  return json({ ok: true, chained: true, phase: nextIdx + 1, total: phases.length })
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
+  const body = await req.json().catch(() => ({}))
+  const action = String(body?.action ?? 'create')
+  const token = Deno.env.get('GH_AGENT_TOKEN') ?? ''
+  const admin = adminClient()
+
+  // ── Service-to-Service: Phasen-Verkettung (von agent_automerge.yml) ───────
+  // Authentifiziert via Service-Role-Key statt User-JWT, weil ein GitHub-
+  // Workflow kein Admin-User ist. NUR 'next_phase' ist so erreichbar.
+  if (action === 'next_phase') {
+    const authHeader = req.headers.get('Authorization') ?? ''
+    const srk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    if (!srk || authHeader !== `Bearer ${srk}`) return json({ error: 'forbidden' }, 403)
+    return await handleNextPhase(admin, token, body)
+  }
+
+  // ── Ab hier: User-authentifizierte Admin-Aktionen ─────────────────────────
   const user = await getUser(req)
   if (!user) return json({ error: 'unauthorized' }, 401)
-
-  const admin = adminClient()
 
   // ── Nur Admins (kein moderator) ──────────────────────────────────────────
   const { data: prof } = await admin
     .from('profiles').select('role').eq('id', user.id).maybeSingle()
   if (!prof || prof.role !== 'admin') return json({ error: 'forbidden' }, 403)
-
-  const body = await req.json().catch(() => ({}))
-  const action = String(body?.action ?? 'create')
-  const token = Deno.env.get('GH_AGENT_TOKEN') ?? ''
 
   // Abgeschlossene Zustände — nur diese dürfen gelöscht werden.
   const DONE_STATES = ['merged', 'failed', 'no_changes', 'cancelled']
@@ -420,6 +593,9 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
       summary: `Manuell freigegeben & gemergt (PR #${t.pr_number}). OTA-Auslieferung läuft.`,
       updated_at: new Date().toISOString(),
     }).eq('id', id)
+    // War das eine Phase eines größeren Auftrags? Dann nächste Phase anstoßen.
+    // (Der manuelle Merge läuft nicht über agent_automerge.yml, daher hier.)
+    try { await handleNextPhase(admin, token, { task_id: id }) } catch { /* best-effort */ }
     return json({ ok: true, status: 'merged' })
   }
 
@@ -437,6 +613,56 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
   const planSteps: string[] = Array.isArray(body?.plan)
     ? body.plan.map((x: unknown) => String(x).slice(0, 200)).filter(Boolean).slice(0, 6)
     : []
+
+  // ── Auto-Phasen: zu große Aufträge automatisch zerlegen ───────────────────
+  // Übersprungen, wenn der Aufrufer explizit Schritte vorgibt (Legacy-Plan)
+  // oder no_split:true setzt. Sonst klassifiziert der Planner; bei „zu groß"
+  // wird ein Parent-Container angelegt und nur Phase 1 dispatcht. Die weiteren
+  // Phasen kettet agent_automerge.yml nach jedem Merge via next_phase nach.
+  if (planSteps.length === 0 && body?.no_split !== true) {
+    const decision = await planPhases(instruction)
+    if (!decision.single) {
+      const { data: parent, error: pErr } = await admin
+        .from('admin_dev_tasks')
+        .insert({
+          created_by: user.id,
+          instruction,
+          status: 'phased',
+          image_urls: imageUrls,
+          await_review: awaitReview,
+          origin: ['manual', 'suggestion', 'schedule', 'rollback'].includes(String(body?.origin))
+            ? String(body.origin) : 'manual',
+          plan: { phases: decision.phases, total: decision.phases.length, current: 0 },
+        })
+        .select('id').single()
+      if (pErr || !parent) return json({ error: 'insert_failed', detail: pErr?.message }, 500)
+
+      const r = await dispatchPhase(
+        admin, token, parent.id, user.id, instruction.slice(0, 120),
+        decision.phases, 0, imageUrls, awaitReview,
+      )
+      if (!r.ok) {
+        await admin.from('admin_dev_tasks').update({
+          status: 'failed', error: `phase1 dispatch: ${r.error}`,
+          updated_at: new Date().toISOString(),
+        }).eq('id', parent.id)
+        return json({ error: 'phase_dispatch_failed', detail: r.error }, 502)
+      }
+
+      try {
+        await admin.from('ai_admin_audit').insert({
+          feature: 'dev_agent', actor_id: user.id, action: 'task_phased',
+          target_type: 'admin_dev_tasks', target_id: parent.id,
+          summary: `${decision.phases.length} Phasen: ${instruction.slice(0, 240)}`,
+        })
+      } catch { /* best-effort */ }
+
+      return json({
+        ok: true, task_id: parent.id, status: 'phased',
+        phases: decision.phases.length,
+      })
+    }
+  }
 
   // Wenn ein Plan vorliegt: hänge ihn an die Instruction (Agent arbeitet ihn ab).
   let finalInstruction = instruction

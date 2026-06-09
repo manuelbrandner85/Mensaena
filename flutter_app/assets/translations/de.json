@@ -1322,7 +1322,8 @@
       "failed": "Fehlgeschlagen",
       "no_changes": "Keine Änderung",
       "awaiting_review": "Wartet auf Freigabe",
-      "cancelled": "Abgebrochen"
+      "cancelled": "Abgebrochen",
+      "phased": "In Phasen"
     },
     "scanAnalyzing": "Analysiere {file}",
     "scanFilesRead": "{count} Dateien analysiert",
@@ -1495,7 +1496,8 @@
       "acceptedOk": "Auftrag erstellt — Umsetzung läuft.",
       "dismissedOk": "Verworfen.",
       "actionFailed": "Aktion fehlgeschlagen."
-    }
+    },
+    "phaseOf": "Phase {n}/{total}"
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",
