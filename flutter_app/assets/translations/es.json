@@ -808,7 +808,8 @@
     "dashboardTitle": "Resumen",
     "configureWidgets": "Configurar widgets",
     "tooltipRemindLater": "Recordar más tarde",
-    "tooltipOtherStory": "Otra historia"
+    "tooltipOtherStory": "Otra historia",
+    "mapEmptyBody": "Nada por aquí todavía — mira el mapa para ver qué pasa más lejos."
   },
   "matching": {
     "disabled": "Matching desactivado",

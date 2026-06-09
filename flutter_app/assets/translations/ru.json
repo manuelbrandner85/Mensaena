@@ -807,7 +807,8 @@
     "dashboardTitle": "Обзор",
     "configureWidgets": "Настроить виджеты",
     "tooltipRemindLater": "Напомнить позже",
-    "tooltipOtherStory": "Другая история"
+    "tooltipOtherStory": "Другая история",
+    "mapEmptyBody": "Пока ничего нет рядом — посмотри на карте, что происходит дальше."
   },
   "matching": {
     "disabled": "Подбор отключён",

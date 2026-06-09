@@ -99,17 +99,36 @@ class DashboardHomeScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardHomeScreenState
-    extends ConsumerState<DashboardHomeScreen> {
+    extends ConsumerState<DashboardHomeScreen>
+    with SingleTickerProviderStateMixin {
   Future<_DashboardData>? _data;
   bool _locationCheckDone = false;
   // L16: Doppel-Back-Tap-to-Exit-Schutz auf Dashboard-Home.
   DateTime? _lastBackPress;
 
+  late final AnimationController _fadeCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 520),
+  );
+  late final Animation<double> _fadeAnim =
+      CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
+  late final Animation<Offset> _slideAnim = Tween<Offset>(
+    begin: const Offset(0, 0.035),
+    end: Offset.zero,
+  ).animate(CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut));
+
   @override
   void initState() {
     super.initState();
     _data = _loadAll();
+    _fadeCtrl.forward();
     WidgetsBinding.instance.addPostFrameCallback((_) => _runFirstRunFlow());
+  }
+
+  @override
+  void dispose() {
+    _fadeCtrl.dispose();
+    super.dispose();
   }
 
   /// Erststart-Reihenfolge OHNE Stapeln (Release-UX 2026-06).
@@ -234,7 +253,11 @@ class _DashboardHomeScreenState
         tooltip: 'home.configureWidgets'.tr(),
         child: const Icon(LucideIcons.settings, size: 16),
       ),
-      body: RefreshIndicator(
+      body: FadeTransition(
+        opacity: _fadeAnim,
+        child: SlideTransition(
+          position: _slideAnim,
+          child: RefreshIndicator(
         color: AppColors.amber,
         backgroundColor: AppColors.surface,
         onRefresh: _refresh,
@@ -275,6 +298,8 @@ class _DashboardHomeScreenState
               ),
             );
           },
+        ),
+          ),
         ),
       ),
       ),
@@ -997,7 +1022,7 @@ class _MapEmptyTile extends StatelessWidget {
                       )),
                   const SizedBox(height: 2),
                   Text(
-                    'In deiner Nähe ist noch nichts los — schaue auf der Karte, was es weiter draußen gibt.',
+                    'home.mapEmptyBody'.tr(),
                     style: AppTypography.body(
                         size: 12, color: AppColors.inkSoft, height: 1.4),
                   ),

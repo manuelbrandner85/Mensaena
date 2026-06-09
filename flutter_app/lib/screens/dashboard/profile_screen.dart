@@ -155,7 +155,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 ),
               );
             }
-            return Column(
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 380),
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.025),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                ),
+              ),
+              child: Column(
+              key: ValueKey('profile-${p.id}'),
               children: [
                 // Cinema-Cover: dezenter Bronze-Spotlight hinter dem Header
                 // (der Header scrollt nicht → kein Parallax, dafür ein
@@ -206,6 +219,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                   ),
                 ),
               ],
+              ),
             );
           },
         ),
@@ -760,7 +774,9 @@ class _Header extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Bloom(
+                  Hero(
+                    tag: 'profile-avatar-${profile.id}',
+                    child: Bloom(
                     color: AppColors.bronze,
                     intensity: 0.5,
                     radius: 22,
@@ -803,6 +819,7 @@ class _Header extends StatelessWidget {
                               ),
                             ),
                           ),
+                  ),
                   ),
                   ),
                   if (isMe)
