@@ -182,6 +182,6 @@ final timebankBalanceProvider = FutureProvider<TimebankBalance>((ref) async {
 });
 
 final zeitbankNotificationsStreamProvider =
-    StreamProvider<List<ZeitbankNotification>>((ref) {
+    StreamProvider.autoDispose<List<ZeitbankNotification>>((ref) {
   return TimebankRepository.watchUnseenNotifications();
 });
