@@ -546,7 +546,8 @@ class _Tile extends ConsumerWidget {
     final savedAsync = ref.watch(savedListingIdsProvider);
     final isSaved = savedAsync.value?.contains(item.id) ?? false;
     final isClaimed = item.status == 'claimed' || item.status == 'sold';
-    final isReserved = item.status == 'reserved';
+    final isReserved = item.reservedUntil != null &&
+        item.reservedUntil!.isAfter(DateTime.now());
     return InkWell(
       onTap: () => context.push('/dashboard/marketplace/${item.id}'),
       borderRadius: BorderRadius.circular(12),
@@ -649,7 +650,7 @@ class _Tile extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  // Reserved-Badge (amber oben rechts auf dem Bild).
+                  // Reserved-Badge (amber oben links auf dem Bild).
                   if (isReserved)
                     Positioned(
                       top: 6,
@@ -658,11 +659,11 @@ class _Tile extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.amber.withValues(alpha: 0.9),
+                          color: AppColors.amber.withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
-                          'marketplace.reservedBadge'.tr(),
+                          'marketplace.reserved'.tr(),
                           style: AppTypography.label(
                             size: 9,
                             color: AppColors.voidColor,

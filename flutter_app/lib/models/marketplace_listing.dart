@@ -28,6 +28,7 @@ class MarketplaceListing {
     this.conditionState,
     this.sellerId,
     this.imageUrls = const [],
+    this.reservedUntil,
   });
 
   final String id;
@@ -56,6 +57,7 @@ class MarketplaceListing {
   final String? conditionState;
   final String? sellerId;
   final List<String> imageUrls;
+  final DateTime? reservedUntil;
 
   factory MarketplaceListing.fromJson(Map<String, dynamic> j) {
     return MarketplaceListing(
@@ -95,6 +97,9 @@ class MarketplaceListing {
       imageUrls: (j['image_urls'] is List)
           ? (j['image_urls'] as List).whereType<String>().toList()
           : const [],
+      reservedUntil: j['reserved_until'] != null
+          ? DateTime.tryParse(j['reserved_until'] as String)
+          : null,
     );
   }
 
@@ -125,5 +130,6 @@ class MarketplaceListing {
         'condition_state': conditionState,
         'seller_id': sellerId,
         'image_urls': imageUrls,
+        'reserved_until': reservedUntil?.toIso8601String(),
       };
 }
