@@ -217,19 +217,25 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
             Row(
               children: _colors.entries.map((e) {
                 final active = e.key == _color;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
-                    onTap: () => setState(() => _color = e.key),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: e.value,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: active ? AppColors.amber : AppColors.line,
-                          width: active ? 3 : 1,
+                // 36dp-Kreis bleibt das Visual, die Tap-Fläche ist 48dp
+                // (A11y-Minimum für Touch-Targets).
+                return GestureDetector(
+                  onTap: () => setState(() => _color = e.key),
+                  behavior: HitTestBehavior.opaque,
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Center(
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: e.value,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: active ? AppColors.amber : AppColors.line,
+                            width: active ? 3 : 1,
+                          ),
                         ),
                       ),
                     ),

@@ -817,7 +817,10 @@
     "configureWidgets": "Configure widgets",
     "tooltipRemindLater": "Remind later",
     "tooltipOtherStory": "Other story",
-    "mapEmptyBody": "Nothing happening nearby yet — check the map to see what's going on further out."
+    "mapEmptyBody": "Nothing happening nearby yet — check the map to see what's going on further out.",
+    "locationDenied": "Location access denied.",
+    "locationSetPrompt": "Please set your location via GPS or address.",
+    "saveFailed": "Saving failed."
   },
   "matching": {
     "disabled": "Matching is disabled",
@@ -1655,7 +1658,8 @@
     },
     "imageUploadFailed": "Image could not be uploaded. Please try again.",
     "imagePartialFailed": "Some images could not be uploaded.",
-    "saveFailed": "Couldn't save the post. Your draft is kept — try again."
+    "saveFailed": "Couldn't save the post. Your draft is kept — try again.",
+    "urgencyCritical": "Critical"
   },
   "crisis": {
     "error": "Error: {error}",
@@ -1879,7 +1883,9 @@
     "boosted": "Boosted",
     "boostedCount": "Boosted {n}×",
     "loadingAll": "Loading all posts…",
-    "activeAll": "{count}{more} active posts"
+    "activeAll": "{count}{more} active posts",
+    "saveTooltip": "Save post",
+    "voteDownTooltip": "Thumbs down"
   },
   "marketplace": {
     "listing": "Listing",
@@ -2266,7 +2272,9 @@
     "eventTitle": "Event title",
     "eventWhere": "Location (optional)",
     "eventDescription": "Description (optional)",
-    "eventSave": "Create event"
+    "eventSave": "Create event",
+    "empty": "No groups yet.",
+    "emptyHint": "Start the first group!"
   },
   "board": {
     "title": "Note",
@@ -2452,7 +2460,9 @@
     "validationTitle": "Title must be at least 5 characters.",
     "validationContent": "Content must be at least 50 characters.",
     "publishFailed": "Publishing failed.",
-    "publishedNoCover": "Article published — but the cover image could not be uploaded."
+    "publishedNoCover": "Article published — but the cover image could not be uploaded.",
+    "emptyAll": "No articles yet.",
+    "emptyFiltered": "No articles found."
   },
   "air": {
     "title": "Air quality",
@@ -2719,7 +2729,8 @@
     "errReceiverMissing": "Please choose a recipient.",
     "errHoursInvalid": "Please enter valid hours (0–24).",
     "errDescTooShort": "Please enter at least 3 characters.",
-    "receiverChosen": "Recipient chosen: {name}"
+    "receiverChosen": "Recipient chosen: {name}",
+    "emptyHint": "No entries yet. As soon as you help neighbours, you can log your hours here."
   },
   "search": {
     "minChars": "Type at least 2 characters",
@@ -2749,7 +2760,8 @@
   "skills": {
     "offerSkill": "Offer skill",
     "free": "Free",
-    "screenTitle": "Skills"
+    "screenTitle": "Skills",
+    "empty": "No skill offers yet."
   },
   "wissen": {
     "shareTitle": "Share knowledge",
@@ -3073,7 +3085,9 @@
     "yesterday": "Yesterday"
   },
   "voice": {
-    "micDenied": "Microphone permission denied."
+    "micDenied": "Microphone permission denied.",
+    "dictStart": "Speech to text",
+    "dictStop": "Stop recording"
   },
   "widgets": {
     "config": "Widget configuration",
@@ -3182,7 +3196,9 @@
   "ratings": {
     "given": "Given",
     "received": "Received",
-    "screenTitle": "Ratings"
+    "screenTitle": "Ratings",
+    "emptyReceived": "No ratings received yet.",
+    "emptyGiven": "You haven't rated anyone yet."
   },
   "modules": {
     "post": "Post",
@@ -3245,7 +3261,10 @@
     "crisisDetail": "Crisis",
     "organization": "Organisation",
     "farm": "Farm",
-    "mentalSupport": "Mental support"
+    "mentalSupport": "Mental support",
+    "emptyPosts": "No {title} posts yet.",
+    "emptyPostsHint": "Be the first — tap the plus button.",
+    "tryOtherFilters": "Try different filters."
   },
   "push": {
     "channels": {
@@ -3274,7 +3293,8 @@
   "badges": {
     "shareBtn": "Share achievement",
     "shareCaption": "I just unlocked the ‹{name}› badge on Mensaena 🏅",
-    "newlyEarned": "{n} new badge earned!"
+    "newlyEarned": "{n} new badge earned!",
+    "empty": "No badges defined yet."
   },
   "streak": {
     "title": "Keep it going",

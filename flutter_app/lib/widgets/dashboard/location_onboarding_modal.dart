@@ -56,7 +56,7 @@ class _LocationOnboardingModalState
           perm == LocationPermission.deniedForever) {
         if (!mounted) return;
         setState(() {
-          _err = 'Standort-Zugriff verweigert.';
+          _err = 'home.locationDenied'.tr();
           _gpsLoading = false;
         });
         return;
@@ -70,7 +70,7 @@ class _LocationOnboardingModalState
       _ctrl.text =
           'GPS: ${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}';
     } catch (_) {
-      if (mounted) setState(() => _err = 'Standort nicht verfügbar.');
+      if (mounted) setState(() => _err = 'create.locationUnavailable'.tr());
     } finally {
       if (mounted) setState(() => _gpsLoading = false);
     }
@@ -79,7 +79,7 @@ class _LocationOnboardingModalState
   Future<void> _save() async {
     if (_lat == null || _lng == null) {
       setState(() =>
-          _err = 'Bitte Standort per GPS oder Adresse setzen.');
+          _err = 'home.locationSetPrompt'.tr());
       return;
     }
     setState(() {
@@ -99,7 +99,7 @@ class _LocationOnboardingModalState
       if (!mounted) return;
       setState(() {
         _saving = false;
-        _err = 'Speichern fehlgeschlagen.';
+        _err = 'home.saveFailed'.tr();
       });
     }
   }

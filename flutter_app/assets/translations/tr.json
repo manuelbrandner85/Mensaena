@@ -816,7 +816,10 @@
     "configureWidgets": "Widget'ları yapılandır",
     "tooltipRemindLater": "Sonra hatırlat",
     "tooltipOtherStory": "Başka hikaye",
-    "mapEmptyBody": "Yakınında henüz bir şey yok — daha uzaktaki gelişmeleri görmek için haritaya bak."
+    "mapEmptyBody": "Yakınında henüz bir şey yok — daha uzaktaki gelişmeleri görmek için haritaya bak.",
+    "locationDenied": "Konum erişimi reddedildi.",
+    "locationSetPrompt": "Lütfen konumunu GPS veya adresle ayarla.",
+    "saveFailed": "Kaydetme başarısız oldu."
   },
   "matching": {
     "disabled": "Eşleşme devre dışı",
@@ -1654,7 +1657,8 @@
     },
     "imageUploadFailed": "Görsel yüklenemedi. Lütfen tekrar deneyin.",
     "imagePartialFailed": "Bazı görseller yüklenemedi.",
-    "saveFailed": "Gönderi kaydedilemedi. Taslağın korunuyor — tekrar dene."
+    "saveFailed": "Gönderi kaydedilemedi. Taslağın korunuyor — tekrar dene.",
+    "urgencyCritical": "Kritik"
   },
   "crisis": {
     "error": "Hata: {error}",
@@ -1878,7 +1882,9 @@
     "boosted": "Öne çıkarıldı",
     "boostedCount": "{n}× öne çıkarıldı",
     "loadingAll": "Tüm gönderiler yükleniyor…",
-    "activeAll": "{count}{more} aktif gönderi"
+    "activeAll": "{count}{more} aktif gönderi",
+    "saveTooltip": "Gönderiyi kaydet",
+    "voteDownTooltip": "Beğenme"
   },
   "marketplace": {
     "listing": "İlan",
@@ -2265,7 +2271,9 @@
     "eventTitle": "Etkinlik başlığı",
     "eventWhere": "Konum (isteğe bağlı)",
     "eventDescription": "Açıklama (isteğe bağlı)",
-    "eventSave": "Etkinlik oluştur"
+    "eventSave": "Etkinlik oluştur",
+    "empty": "Henüz grup yok.",
+    "emptyHint": "İlk grubu sen kur!"
   },
   "board": {
     "title": "Not",
@@ -2451,7 +2459,9 @@
     "validationTitle": "Başlık en az 5 karakter olmalı.",
     "validationContent": "İçerik en az 50 karakter olmalı.",
     "publishFailed": "Yayınlama başarısız oldu.",
-    "publishedNoCover": "Makale yayınlandı — ancak kapak görseli yüklenemedi."
+    "publishedNoCover": "Makale yayınlandı — ancak kapak görseli yüklenemedi.",
+    "emptyAll": "Henüz makale yok.",
+    "emptyFiltered": "Makale bulunamadı."
   },
   "air": {
     "title": "Hava kalitesi",
@@ -2718,7 +2728,8 @@
     "errReceiverMissing": "Bir alıcı seç.",
     "errHoursInvalid": "Geçerli saat gir (0–24).",
     "errDescTooShort": "En az 3 karakter.",
-    "receiverChosen": "Alıcı seçildi: {name}"
+    "receiverChosen": "Alıcı seçildi: {name}",
+    "emptyHint": "Henüz kayıt yok. Komşularına yardım ettiğinde saatlerini buraya girebilirsin."
   },
   "search": {
     "minChars": "En az 2 karakter girin",
@@ -2748,7 +2759,8 @@
   "skills": {
     "offerSkill": "Beceri öner",
     "free": "Ücretsiz",
-    "screenTitle": "Beceriler"
+    "screenTitle": "Beceriler",
+    "empty": "Henüz yetenek teklifi yok."
   },
   "wissen": {
     "shareTitle": "Bilgiyi paylaş",
@@ -3072,7 +3084,9 @@
     "yesterday": "Dün"
   },
   "voice": {
-    "micDenied": "Mikrofon izni reddedildi."
+    "micDenied": "Mikrofon izni reddedildi.",
+    "dictStart": "Konuşmayı yazıya çevir",
+    "dictStop": "Kaydı durdur"
   },
   "widgets": {
     "config": "Widget yapılandırması",
@@ -3181,7 +3195,9 @@
   "ratings": {
     "given": "Verilen",
     "received": "Alınan",
-    "screenTitle": "Değerlendirmeler"
+    "screenTitle": "Değerlendirmeler",
+    "emptyReceived": "Henüz değerlendirme almadın.",
+    "emptyGiven": "Henüz kimseyi değerlendirmedin."
   },
   "modules": {
     "post": "Gönderi",
@@ -3244,7 +3260,10 @@
     "crisisDetail": "Kriz",
     "organization": "Kuruluş",
     "farm": "Çiftlik",
-    "mentalSupport": "Ruhsal destek"
+    "mentalSupport": "Ruhsal destek",
+    "emptyPosts": "Henüz {title} gönderisi yok.",
+    "emptyPostsHint": "İlk sen ol — artı düğmesine dokun.",
+    "tryOtherFilters": "Farklı filtreler dene."
   },
   "push": {
     "channels": {
@@ -3276,7 +3295,8 @@
   "badges": {
     "shareBtn": "Başarıyı paylaş",
     "shareCaption": "Mensaena'da ‹{name}› rozetini açtım 🏅",
-    "newlyEarned": "{n} yeni rozet kazanıldı!"
+    "newlyEarned": "{n} yeni rozet kazanıldı!",
+    "empty": "Henüz rozet tanımlanmamış."
   },
   "streak": {
     "title": "Devam et",

@@ -251,13 +251,14 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
                           EmptyStateCard(
                             icon: LucideIcons.inbox,
                             title: _hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Noch keine ${widget.title}-Beiträge.',
+                                ? 'search.noResultsShort'.tr()
+                                : 'modules.emptyPosts'.tr(
+                                    namedArgs: {'title': widget.title}),
                             description: _hasFilters
-                                ? 'Andere Filter probieren.'
-                                : 'Sei der/die Erste:r — Plus-Button.',
+                                ? 'modules.tryOtherFilters'.tr()
+                                : 'modules.emptyPostsHint'.tr(),
                             actionLabel:
-                                _hasFilters ? 'Filter zurücksetzen' : null,
+                                _hasFilters ? 'posts.resetFilter'.tr() : null,
                             onAction: _hasFilters
                                 ? () => setState(() {
                                       _search = '';

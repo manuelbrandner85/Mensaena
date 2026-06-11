@@ -294,8 +294,8 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
                             const SizedBox(height: 10),
                             Text(
                               all.isEmpty
-                                  ? 'Noch keine Artikel.'
-                                  : 'Keine Artikel gefunden.',
+                                  ? 'knowledge.emptyAll'.tr()
+                                  : 'knowledge.emptyFiltered'.tr(),
                               style: AppTypography.body(
                                 size: 14,
                                 color: AppColors.ink,

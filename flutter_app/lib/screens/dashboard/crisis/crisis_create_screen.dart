@@ -742,21 +742,31 @@ class _StepBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
+    // Sichtbarer Kreis bleibt 34dp, die Tap-Fläche ist 48dp (A11y-Minimum —
+    // im Krisen-Kontext besonders wichtig, zitternde Hände treffen sonst
+    // daneben).
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: 34,
-        height: 34,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: enabled
-              ? AppColors.bronze.withValues(alpha: 0.16)
-              : AppColors.surface.withValues(alpha: 0.3),
-          shape: BoxShape.circle,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(
+          child: Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: enabled
+                  ? AppColors.bronze.withValues(alpha: 0.16)
+                  : AppColors.surface.withValues(alpha: 0.3),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon,
+                size: 16,
+                color: enabled ? AppColors.bronze : AppColors.mute),
+          ),
         ),
-        child: Icon(icon,
-            size: 16,
-            color: enabled ? AppColors.bronze : AppColors.mute),
       ),
     );
   }

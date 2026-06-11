@@ -945,6 +945,7 @@ class _ActionsBar extends StatelessWidget {
                 label: '',
                 active: myVote == -1,
                 onTap: onVoteDown,
+                tooltip: 'posts.voteDownTooltip'.tr(),
               ),
               const SizedBox(width: 8),
               // F38: Emoji-Reactions neben dem Vote-Up/Down.
@@ -958,24 +959,28 @@ class _ActionsBar extends StatelessWidget {
                 label: '',
                 active: saved,
                 onTap: onSave,
+                tooltip: 'posts.saveTooltip'.tr(),
               ),
               _ActionIcon(
                 icon: LucideIcons.share2,
                 label: '',
                 active: false,
                 onTap: onShare,
+                tooltip: 'common.share'.tr(),
               ),
               _ActionIcon(
                 icon: LucideIcons.link,
                 label: '',
                 active: false,
                 onTap: onCopyLink,
+                tooltip: 'events.shareLink'.tr(),
               ),
               _ActionIcon(
                 icon: LucideIcons.flag,
                 label: '',
                 active: false,
                 onTap: onReport,
+                tooltip: 'profile.report'.tr(),
               ),
             ],
           ),
@@ -991,6 +996,7 @@ class _ActionIcon extends StatelessWidget {
     required this.label,
     required this.active,
     required this.onTap,
+    this.tooltip,
   });
 
   final IconData icon;
@@ -998,10 +1004,13 @@ class _ActionIcon extends StatelessWidget {
   final bool active;
   final VoidCallback onTap;
 
+  /// Pflicht bei label == '' (Icon-only): Screen-Reader-Label + Tooltip.
+  final String? tooltip;
+
   @override
   Widget build(BuildContext context) {
     final color = active ? AppColors.amber : AppColors.inkSoft;
-    return TweenAnimationBuilder<double>(
+    final child = TweenAnimationBuilder<double>(
       tween: Tween(begin: 1.0, end: active ? 1.1 : 1.0),
       duration: const Duration(milliseconds: 240),
       curve: Curves.elasticOut,
@@ -1026,6 +1035,11 @@ class _ActionIcon extends StatelessWidget {
           ),
         ),
       ),
+    );
+    if (tooltip == null || tooltip!.isEmpty) return child;
+    return Tooltip(
+      message: tooltip!,
+      child: Semantics(button: true, label: tooltip, child: child),
     );
   }
 }

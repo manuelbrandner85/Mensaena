@@ -108,7 +108,7 @@ class _VoiceDictationButtonState extends State<VoiceDictationButton> {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: _listening ? 'Aufnahme stoppen' : 'Sprache → Text',
+      message: _listening ? 'voice.dictStop'.tr() : 'voice.dictStart'.tr(),
       child: InkWell(
         onTap: _toggle,
         borderRadius: BorderRadius.circular(20),

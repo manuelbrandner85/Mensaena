@@ -817,7 +817,10 @@
     "configureWidgets": "Configurar widgets",
     "tooltipRemindLater": "Recordar más tarde",
     "tooltipOtherStory": "Otra historia",
-    "mapEmptyBody": "Nada por aquí todavía — mira el mapa para ver qué pasa más lejos."
+    "mapEmptyBody": "Nada por aquí todavía — mira el mapa para ver qué pasa más lejos.",
+    "locationDenied": "Acceso a la ubicación denegado.",
+    "locationSetPrompt": "Establece tu ubicación por GPS o dirección.",
+    "saveFailed": "Error al guardar."
   },
   "matching": {
     "disabled": "Matching desactivado",
@@ -1655,7 +1658,8 @@
     },
     "imageUploadFailed": "No se pudo subir la imagen. Inténtalo de nuevo.",
     "imagePartialFailed": "Algunas imágenes no se pudieron subir.",
-    "saveFailed": "No se pudo guardar la publicación. Tu borrador se conserva — inténtalo de nuevo."
+    "saveFailed": "No se pudo guardar la publicación. Tu borrador se conserva — inténtalo de nuevo.",
+    "urgencyCritical": "Crítica"
   },
   "crisis": {
     "error": "Error: {error}",
@@ -1879,7 +1883,9 @@
     "boosted": "Impulsado",
     "boostedCount": "Impulsado {n}×",
     "loadingAll": "Cargando todas las publicaciones…",
-    "activeAll": "{count}{more} publicaciones activas"
+    "activeAll": "{count}{more} publicaciones activas",
+    "saveTooltip": "Guardar publicación",
+    "voteDownTooltip": "Pulgar abajo"
   },
   "marketplace": {
     "listing": "Anuncio",
@@ -2266,7 +2272,9 @@
     "eventTitle": "Título del evento",
     "eventWhere": "Lugar (opcional)",
     "eventDescription": "Descripción (opcional)",
-    "eventSave": "Crear evento"
+    "eventSave": "Crear evento",
+    "empty": "Aún no hay grupos.",
+    "emptyHint": "¡Crea el primer grupo!"
   },
   "board": {
     "title": "Nota",
@@ -2452,7 +2460,9 @@
     "validationTitle": "El título debe tener al menos 5 caracteres.",
     "validationContent": "El contenido debe tener al menos 50 caracteres.",
     "publishFailed": "Error al publicar.",
-    "publishedNoCover": "Artículo publicado — pero no se pudo subir la imagen de portada."
+    "publishedNoCover": "Artículo publicado — pero no se pudo subir la imagen de portada.",
+    "emptyAll": "Aún no hay artículos.",
+    "emptyFiltered": "No se encontraron artículos."
   },
   "air": {
     "title": "Calidad del aire",
@@ -2719,7 +2729,8 @@
     "errReceiverMissing": "Elige un destinatario.",
     "errHoursInvalid": "Ingresa horas válidas (0–24).",
     "errDescTooShort": "Al menos 3 caracteres.",
-    "receiverChosen": "Destinatario elegido: {name}"
+    "receiverChosen": "Destinatario elegido: {name}",
+    "emptyHint": "Aún no hay registros. En cuanto ayudes a tus vecinos, podrás anotar aquí las horas."
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",
@@ -2749,7 +2760,8 @@
   "skills": {
     "offerSkill": "Ofrecer habilidad",
     "free": "Gratis",
-    "screenTitle": "Habilidades"
+    "screenTitle": "Habilidades",
+    "empty": "Aún no hay ofertas de habilidades."
   },
   "wissen": {
     "shareTitle": "Comparte conocimiento",
@@ -3073,7 +3085,9 @@
     "yesterday": "Ayer"
   },
   "voice": {
-    "micDenied": "Permiso de micrófono denegado."
+    "micDenied": "Permiso de micrófono denegado.",
+    "dictStart": "Voz a texto",
+    "dictStop": "Detener grabación"
   },
   "widgets": {
     "config": "Configuración de widgets",
@@ -3182,7 +3196,9 @@
   "ratings": {
     "given": "Dadas",
     "received": "Recibidas",
-    "screenTitle": "Valoraciones"
+    "screenTitle": "Valoraciones",
+    "emptyReceived": "Aún no has recibido valoraciones.",
+    "emptyGiven": "Todavía no has valorado a nadie."
   },
   "modules": {
     "post": "Publicación",
@@ -3245,7 +3261,10 @@
     "crisisDetail": "Crisis",
     "organization": "Organización",
     "farm": "Granja",
-    "mentalSupport": "Apoyo mental"
+    "mentalSupport": "Apoyo mental",
+    "emptyPosts": "Aún no hay publicaciones en {title}.",
+    "emptyPostsHint": "Sé el/la primero/a — pulsa el botón más.",
+    "tryOtherFilters": "Prueba con otros filtros."
   },
   "push": {
     "channels": {
@@ -3277,7 +3296,8 @@
   "badges": {
     "shareBtn": "Compartir logro",
     "shareCaption": "¡Acabo de desbloquear la insignia ‹{name}› en Mensaena 🏅",
-    "newlyEarned": "¡{n} nueva insignia obtenida!"
+    "newlyEarned": "¡{n} nueva insignia obtenida!",
+    "empty": "Aún no hay insignias definidas."
   },
   "streak": {
     "title": "Sigue así",

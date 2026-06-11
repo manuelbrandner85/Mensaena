@@ -792,7 +792,13 @@ class _ModuleCreatePostScreenState
                 for (var i = 1; i <= 5; i++)
                   ChoiceChip(
                     label: Text(
-                      ['Niedrig', 'Normal', 'Mittel', 'Hoch', 'Kritisch'][i - 1],
+                      [
+                        'create.urgencyLow'.tr(),
+                        'create.urgencyNormal'.tr(),
+                        'create.urgencyMedium'.tr(),
+                        'create.urgencyHigh'.tr(),
+                        'create.urgencyCritical'.tr(),
+                      ][i - 1],
                       style: AppTypography.label(size: 9),
                     ),
                     selected: _urgency == i,
