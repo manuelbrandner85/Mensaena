@@ -31,6 +31,9 @@ class IncomingCallOverlay {
     try {
       _sub = FlutterOverlayWindow.overlayListener.listen(_handleAction);
     } catch (e) {
+      // Flag zurücksetzen, sonst blockiert ein einmaliger Fehler jeden
+      // späteren Attach-Versuch dauerhaft.
+      _listenerAttached = false;
       debugPrint('[IncomingCallOverlay] listener attach failed: $e');
     }
   }

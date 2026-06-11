@@ -213,6 +213,10 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   }
 
   void _watchCallStatus() {
+    // _bootstrap() kann mehrfach laufen (Reattach via Mini-Player) — alte
+    // Subscription MUSS vor einer neuen weg, sonst stapeln sich Listener
+    // und Status-Events feuern doppelt.
+    _callStatusSub?.cancel();
     try {
       _callStatusSub = sb
           .from('dm_calls')
@@ -650,6 +654,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     if (lp == null) return;
     final next = !_micEnabled;
     await lp.setMicrophoneEnabled(next);
+    if (!mounted) return;
     setState(() => _micEnabled = next);
   }
 
@@ -754,6 +759,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     final next = !_speakerOn;
     try {
       await lk.Hardware.instance.setSpeakerphoneOn(next);
+      if (!mounted) return;
       setState(() => _speakerOn = next);
     } catch (_) {/* Hardware-Plattform-Bridge fehlt evtl. */}
   }

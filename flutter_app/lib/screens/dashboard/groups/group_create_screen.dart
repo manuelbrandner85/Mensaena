@@ -102,6 +102,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
         [_cover!],
         onError: (_, e) => uploadErr = e,
       );
+      if (!mounted) return;
       if (urls.isEmpty) {
         Haptics.error();
         setState(() {

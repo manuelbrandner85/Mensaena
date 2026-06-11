@@ -40,10 +40,22 @@ class _VoiceDictationButtonState extends State<VoiceDictationButton> {
     _init();
   }
 
+  @override
+  void dispose() {
+    // Verlässt der User den Screen mitten im Diktat, läuft die native
+    // STT-Session sonst weiter und onStatus/onError feuern auf disposed
+    // State ("setState after dispose").
+    _stt.cancel();
+    super.dispose();
+  }
+
   Future<void> _init() async {
     final ok = await _stt.initialize(
-      onError: (_) => setState(() => _listening = false),
+      onError: (_) {
+        if (mounted) setState(() => _listening = false);
+      },
       onStatus: (status) {
+        if (!mounted) return;
         if (status == 'notListening' || status == 'done') {
           setState(() => _listening = false);
         }
@@ -55,6 +67,7 @@ class _VoiceDictationButtonState extends State<VoiceDictationButton> {
   Future<void> _toggle() async {
     if (_listening) {
       await _stt.stop();
+      if (!mounted) return;
       setState(() => _listening = false);
       return;
     }
@@ -72,6 +85,7 @@ class _VoiceDictationButtonState extends State<VoiceDictationButton> {
       await _init();
       if (!_available) return;
     }
+    if (!mounted) return;
     HapticFeedback.lightImpact();
     setState(() => _listening = true);
     final startLen = widget.controller.text.length;
