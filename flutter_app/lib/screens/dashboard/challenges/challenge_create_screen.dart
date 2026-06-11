@@ -95,6 +95,7 @@ class _ChallengeCreateScreenState
       body: SafeArea(
         child: Form(
           key: _form,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
             children: [

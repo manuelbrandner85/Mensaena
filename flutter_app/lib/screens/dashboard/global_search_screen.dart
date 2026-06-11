@@ -76,7 +76,9 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
     Future<List<Map<String, dynamic>>> safe(
         Future<dynamic> Function() run) async {
       try {
-        final res = await run();
+        // Timeout pro Quelle: ohne ihn blockiert EINE haengende Query das
+        // gesamte Future.wait -> ewiger Spinner statt Teilergebnissen.
+        final res = await run().timeout(const Duration(seconds: 8));
         if (res is List) {
           return res.whereType<Map<String, dynamic>>().toList();
         }

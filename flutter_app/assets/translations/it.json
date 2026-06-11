@@ -1659,7 +1659,10 @@
     "imageUploadFailed": "Impossibile caricare l’immagine. Riprova.",
     "imagePartialFailed": "Alcune immagini non sono state caricate.",
     "saveFailed": "Impossibile salvare il post. La bozza è conservata — riprova.",
-    "urgencyCritical": "Critica"
+    "urgencyCritical": "Critica",
+    "meetingPoint": "Punto d'incontro (es. stazione, bar …)",
+    "timebankHours": "Ore banca del tempo (opzionale)",
+    "timebankHoursHint": "es. 2.5"
   },
   "crisis": {
     "error": "Errore: {error}",

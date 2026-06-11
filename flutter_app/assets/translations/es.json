@@ -1659,7 +1659,10 @@
     "imageUploadFailed": "No se pudo subir la imagen. Inténtalo de nuevo.",
     "imagePartialFailed": "Algunas imágenes no se pudieron subir.",
     "saveFailed": "No se pudo guardar la publicación. Tu borrador se conserva — inténtalo de nuevo.",
-    "urgencyCritical": "Crítica"
+    "urgencyCritical": "Crítica",
+    "meetingPoint": "Punto de encuentro (p. ej. estación, café …)",
+    "timebankHours": "Horas del banco de tiempo (opcional)",
+    "timebankHoursHint": "p. ej. 2.5"
   },
   "crisis": {
     "error": "Error: {error}",

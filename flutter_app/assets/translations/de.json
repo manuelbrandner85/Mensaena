@@ -1658,7 +1658,10 @@
     "imageUploadFailed": "Bild konnte nicht hochgeladen werden. Bitte erneut versuchen.",
     "imagePartialFailed": "Einige Bilder konnten nicht hochgeladen werden.",
     "saveFailed": "Beitrag konnte nicht gespeichert werden. Dein Entwurf bleibt erhalten — versuch es erneut.",
-    "urgencyCritical": "Kritisch"
+    "urgencyCritical": "Kritisch",
+    "meetingPoint": "Treffpunkt (z. B. Bahnhof, Café …)",
+    "timebankHours": "Zeitbank-Stunden (optional)",
+    "timebankHoursHint": "z. B. 2.5"
   },
   "crisis": {
     "error": "Fehler: {error}",
