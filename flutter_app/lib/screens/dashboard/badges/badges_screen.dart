@@ -65,10 +65,10 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
           },
           child: allAsync.when(
             loading: () => const SkeletonList(count: 5, itemHeight: 96),
-            error: (_, __) => _empty('Fehler beim Laden.'),
+            error: (_, __) => _empty('errors.loadFailed'.tr()),
             data: (badges) {
               if (badges.isEmpty) {
-                return _empty('Noch keine Badges definiert.');
+                return _empty('badges.empty'.tr());
               }
               final earnedIds = <String>{
                 for (final ub in mineAsync.value ?? const <UserBadge>[])

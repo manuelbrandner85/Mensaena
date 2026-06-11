@@ -138,14 +138,14 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                           EmptyStateCard(
                             icon: LucideIcons.users2,
                             title: _hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Noch keine Gruppen.',
+                                ? 'search.noResultsShort'.tr()
+                                : 'groups.empty'.tr(),
                             description: _hasFilters
-                                ? 'Andere Filter probieren.'
-                                : 'Gründe die erste Gruppe!',
+                                ? 'modules.tryOtherFilters'.tr()
+                                : 'groups.emptyHint'.tr(),
                             actionLabel: _hasFilters
-                                ? 'Filter zurücksetzen'
-                                : 'Gruppe erstellen',
+                                ? 'posts.resetFilter'.tr()
+                                : 'groups.create'.tr(),
                             onAction: _hasFilters
                                 ? () => setState(() {
                                       _filter = 'all';

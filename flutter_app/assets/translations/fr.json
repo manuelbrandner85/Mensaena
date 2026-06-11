@@ -817,7 +817,10 @@
     "configureWidgets": "Configurer les widgets",
     "tooltipRemindLater": "Me rappeler plus tard",
     "tooltipOtherStory": "Autre histoire",
-    "mapEmptyBody": "Rien à proximité pour l'instant — consultez la carte pour voir ce qui se passe plus loin."
+    "mapEmptyBody": "Rien à proximité pour l'instant — consultez la carte pour voir ce qui se passe plus loin.",
+    "locationDenied": "Accès à la position refusé.",
+    "locationSetPrompt": "Définis ta position par GPS ou adresse.",
+    "saveFailed": "Échec de l’enregistrement."
   },
   "matching": {
     "disabled": "Matching désactivé",
@@ -1655,7 +1658,8 @@
     },
     "imageUploadFailed": "Impossible d’envoyer l’image. Réessaie.",
     "imagePartialFailed": "Certaines images n’ont pas pu être envoyées.",
-    "saveFailed": "Impossible d'enregistrer la publication. Ton brouillon est conservé — réessaie."
+    "saveFailed": "Impossible d'enregistrer la publication. Ton brouillon est conservé — réessaie.",
+    "urgencyCritical": "Critique"
   },
   "crisis": {
     "error": "Erreur : {error}",
@@ -1879,7 +1883,9 @@
     "boosted": "Amplifié",
     "boostedCount": "Amplifié {n}×",
     "loadingAll": "Chargement de toutes les publications…",
-    "activeAll": "{count}{more} publications actives"
+    "activeAll": "{count}{more} publications actives",
+    "saveTooltip": "Enregistrer le post",
+    "voteDownTooltip": "Pouce vers le bas"
   },
   "marketplace": {
     "listing": "Annonce",
@@ -2266,7 +2272,9 @@
     "eventTitle": "Titre de l’événement",
     "eventWhere": "Lieu (facultatif)",
     "eventDescription": "Description (facultatif)",
-    "eventSave": "Créer l’événement"
+    "eventSave": "Créer l’événement",
+    "empty": "Pas encore de groupes.",
+    "emptyHint": "Crée le premier groupe !"
   },
   "board": {
     "title": "Note",
@@ -2452,7 +2460,9 @@
     "validationTitle": "Le titre doit contenir au moins 5 caractères.",
     "validationContent": "Le contenu doit contenir au moins 50 caractères.",
     "publishFailed": "Échec de la publication.",
-    "publishedNoCover": "Article publié — mais l’image de couverture n’a pas pu être envoyée."
+    "publishedNoCover": "Article publié — mais l’image de couverture n’a pas pu être envoyée.",
+    "emptyAll": "Pas encore d’articles.",
+    "emptyFiltered": "Aucun article trouvé."
   },
   "air": {
     "title": "Qualité de l'air",
@@ -2719,7 +2729,8 @@
     "errReceiverMissing": "Choisis un destinataire.",
     "errHoursInvalid": "Saisis des heures valides (0–24).",
     "errDescTooShort": "3 caractères minimum.",
-    "receiverChosen": "Destinataire choisi : {name}"
+    "receiverChosen": "Destinataire choisi : {name}",
+    "emptyHint": "Pas encore d’entrées. Dès que tu aides tes voisins, tu peux enregistrer tes heures ici."
   },
   "search": {
     "minChars": "Saisissez au moins 2 caractères",
@@ -2749,7 +2760,8 @@
   "skills": {
     "offerSkill": "Proposer une compétence",
     "free": "Gratuit",
-    "screenTitle": "Compétences"
+    "screenTitle": "Compétences",
+    "empty": "Aucune offre de compétence pour l’instant."
   },
   "wissen": {
     "shareTitle": "Partager le savoir",
@@ -3073,7 +3085,9 @@
     "yesterday": "Hier"
   },
   "voice": {
-    "micDenied": "Autorisation du micro refusée."
+    "micDenied": "Autorisation du micro refusée.",
+    "dictStart": "Dictée vocale",
+    "dictStop": "Arrêter l’enregistrement"
   },
   "widgets": {
     "config": "Configuration des widgets",
@@ -3182,7 +3196,9 @@
   "ratings": {
     "given": "Données",
     "received": "Reçues",
-    "screenTitle": "Évaluations"
+    "screenTitle": "Évaluations",
+    "emptyReceived": "Aucune évaluation reçue pour l’instant.",
+    "emptyGiven": "Tu n’as encore évalué personne."
   },
   "modules": {
     "post": "Publication",
@@ -3245,7 +3261,10 @@
     "crisisDetail": "Crise",
     "organization": "Organisation",
     "farm": "Ferme",
-    "mentalSupport": "Soutien mental"
+    "mentalSupport": "Soutien mental",
+    "emptyPosts": "Pas encore de publications dans {title}.",
+    "emptyPostsHint": "Sois le premier — appuie sur le bouton plus.",
+    "tryOtherFilters": "Essaie d’autres filtres."
   },
   "push": {
     "channels": {
@@ -3277,7 +3296,8 @@
   "badges": {
     "shareBtn": "Partager la réussite",
     "shareCaption": "Je viens de débloquer le badge ‹{name}› sur Mensaena 🏅",
-    "newlyEarned": "{n} nouveau badge obtenu !"
+    "newlyEarned": "{n} nouveau badge obtenu !",
+    "empty": "Aucun badge défini pour l’instant."
   },
   "streak": {
     "title": "Continue",

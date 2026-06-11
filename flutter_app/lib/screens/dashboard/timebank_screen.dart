@@ -82,8 +82,7 @@ class _TimebankScreenState extends ConsumerState<TimebankScreen> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Noch keine Eintraege. Sobald du Nachbar:innen '
-                            'hilfst, kannst du die Stunden hier eintragen.',
+                            'timebank.emptyHint'.tr(),
                             textAlign: TextAlign.center,
                             style: AppTypography.body(
                               size: 13,

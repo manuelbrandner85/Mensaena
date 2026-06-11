@@ -102,7 +102,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                               size: 32, color: AppColors.mute),
                           const SizedBox(height: 10),
                           Text(
-                            'Noch keine Skill-Angebote.',
+                            'skills.empty'.tr(),
                             style: AppTypography.body(
                               size: 14,
                               color: AppColors.mute,

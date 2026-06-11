@@ -169,8 +169,8 @@ class _RatingList extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       mode == _Mode.received
-                          ? 'Noch keine Bewertungen erhalten.'
-                          : 'Du hast noch niemanden bewertet.',
+                          ? 'ratings.emptyReceived'.tr()
+                          : 'ratings.emptyGiven'.tr(),
                       style: AppTypography.body(
                           size: 14, color: AppColors.mute),
                     ),

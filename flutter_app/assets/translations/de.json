@@ -816,7 +816,10 @@
     "configureWidgets": "Widgets konfigurieren",
     "tooltipRemindLater": "Später erinnern",
     "tooltipOtherStory": "Andere Geschichte",
-    "mapEmptyBody": "In deiner Nähe ist noch nichts los — schaue auf der Karte, was es weiter draußen gibt."
+    "mapEmptyBody": "In deiner Nähe ist noch nichts los — schaue auf der Karte, was es weiter draußen gibt.",
+    "locationDenied": "Standort-Zugriff verweigert.",
+    "locationSetPrompt": "Bitte Standort per GPS oder Adresse setzen.",
+    "saveFailed": "Speichern fehlgeschlagen."
   },
   "matching": {
     "disabled": "Matching ist deaktiviert",
@@ -1654,7 +1657,8 @@
     },
     "imageUploadFailed": "Bild konnte nicht hochgeladen werden. Bitte erneut versuchen.",
     "imagePartialFailed": "Einige Bilder konnten nicht hochgeladen werden.",
-    "saveFailed": "Beitrag konnte nicht gespeichert werden. Dein Entwurf bleibt erhalten — versuch es erneut."
+    "saveFailed": "Beitrag konnte nicht gespeichert werden. Dein Entwurf bleibt erhalten — versuch es erneut.",
+    "urgencyCritical": "Kritisch"
   },
   "crisis": {
     "error": "Fehler: {error}",
@@ -1878,7 +1882,9 @@
     "boosted": "Verstärkt",
     "boostedCount": "{n}× verstärkt",
     "loadingAll": "Lade alle Beiträge…",
-    "activeAll": "{count}{more} aktive Beiträge"
+    "activeAll": "{count}{more} aktive Beiträge",
+    "saveTooltip": "Beitrag merken",
+    "voteDownTooltip": "Daumen runter"
   },
   "marketplace": {
     "listing": "Inserat",
@@ -2265,7 +2271,9 @@
     "eventTitle": "Titel des Termins",
     "eventWhere": "Ort (optional)",
     "eventDescription": "Beschreibung (optional)",
-    "eventSave": "Termin anlegen"
+    "eventSave": "Termin anlegen",
+    "empty": "Noch keine Gruppen.",
+    "emptyHint": "Gründe die erste Gruppe!"
   },
   "board": {
     "title": "Notiz",
@@ -2451,7 +2459,9 @@
     "validationTitle": "Titel min. 5 Zeichen.",
     "validationContent": "Inhalt min. 50 Zeichen.",
     "publishFailed": "Veröffentlichung fehlgeschlagen.",
-    "publishedNoCover": "Artikel veröffentlicht — das Titelbild konnte aber nicht hochgeladen werden."
+    "publishedNoCover": "Artikel veröffentlicht — das Titelbild konnte aber nicht hochgeladen werden.",
+    "emptyAll": "Noch keine Artikel.",
+    "emptyFiltered": "Keine Artikel gefunden."
   },
   "air": {
     "title": "Luftqualität",
@@ -2718,7 +2728,8 @@
     "errReceiverMissing": "Bitte Empfänger:in wählen.",
     "errHoursInvalid": "Bitte gültige Stundenzahl angeben (0–24).",
     "errDescTooShort": "Bitte mindestens 3 Zeichen Beschreibung.",
-    "receiverChosen": "Empfänger:in gewählt: {name}"
+    "receiverChosen": "Empfänger:in gewählt: {name}",
+    "emptyHint": "Noch keine Einträge. Sobald du Nachbar:innen hilfst, kannst du die Stunden hier eintragen."
   },
   "search": {
     "minChars": "Mindestens 2 Zeichen eingeben",
@@ -2748,7 +2759,8 @@
   "skills": {
     "offerSkill": "Skill anbieten",
     "free": "Gratis",
-    "screenTitle": "Skills"
+    "screenTitle": "Skills",
+    "empty": "Noch keine Skill-Angebote."
   },
   "wissen": {
     "shareTitle": "Wissen teilen",
@@ -3072,7 +3084,9 @@
     "yesterday": "Gestern"
   },
   "voice": {
-    "micDenied": "Mikrofon-Berechtigung verweigert."
+    "micDenied": "Mikrofon-Berechtigung verweigert.",
+    "dictStart": "Sprache → Text",
+    "dictStop": "Aufnahme stoppen"
   },
   "widgets": {
     "config": "Widget-Konfiguration",
@@ -3181,7 +3195,9 @@
   "ratings": {
     "given": "Gegeben",
     "received": "Erhalten",
-    "screenTitle": "Bewertungen"
+    "screenTitle": "Bewertungen",
+    "emptyReceived": "Noch keine Bewertungen erhalten.",
+    "emptyGiven": "Du hast noch niemanden bewertet."
   },
   "modules": {
     "post": "Beitrag",
@@ -3244,7 +3260,10 @@
     "crisisDetail": "Krise",
     "organization": "Organisation",
     "farm": "Hof",
-    "mentalSupport": "Mentale Unterstützung"
+    "mentalSupport": "Mentale Unterstützung",
+    "emptyPosts": "Noch keine {title}-Beiträge.",
+    "emptyPostsHint": "Sei der/die Erste:r — Plus-Button.",
+    "tryOtherFilters": "Andere Filter probieren."
   },
   "push": {
     "channels": {
@@ -3273,7 +3292,8 @@
   "badges": {
     "shareBtn": "Erfolg teilen",
     "shareCaption": "Ich habe gerade das Badge ‹{name}› auf Mensaena freigeschaltet 🏅",
-    "newlyEarned": "{n} neues Badge erhalten!"
+    "newlyEarned": "{n} neues Badge erhalten!",
+    "empty": "Noch keine Badges definiert."
   },
   "streak": {
     "title": "Dranbleiben",
