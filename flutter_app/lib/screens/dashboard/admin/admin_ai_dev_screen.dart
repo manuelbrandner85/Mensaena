@@ -885,6 +885,16 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                 _loadSuggestions();
               },
             ),
+            // Immer sichtbare Pipeline-Leiste (kein Scrollen nötig).
+            if (_tasks.isNotEmpty)
+              _LiveTasksBar(
+                tasks: _tasks,
+                busyIds: _deletingTasks,
+                onCancel: _cancelTask,
+                onRetry: (instruction) => _retryTask(instruction),
+                onDelete: _deleteTask,
+                onMerge: _mergeTask,
+              ),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.teal,
@@ -939,6 +949,57 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             onUse: (id, c) => _sendNote(id, c),
                           ),
                           const SizedBox(height: 10),
+                          // Auftragshistorie direkt oben in der ScrollListe
+                          // (aktive Aufträge auch in _LiveTasksBar sichtbar).
+                          if (_tasks.isNotEmpty)
+                            _SectionLabel(
+                              icon: LucideIcons.gitPullRequest,
+                              label: 'adminDev.tasksLabel'.tr(),
+                              count: _tasks.length,
+                              trailing: _doneCount > 0
+                                  ? _ClearTasksButton(
+                                      busy: _clearingTasks,
+                                      onTap: _clearTasks,
+                                    )
+                                  : null,
+                            ),
+                          ..._tasks.map((t) {
+                            final id = t['id'] as String?;
+                            final status = t['status'] as String?;
+                            final canDelete = _deletable(status) && id != null;
+                            final canCancel = id != null &&
+                                (status == 'queued' ||
+                                    status == 'running' ||
+                                    status == 'pr_open' ||
+                                    status == 'awaiting_review');
+                            final isReview =
+                                status == 'awaiting_review' && id != null;
+                            final canRetry = id != null &&
+                                (status == 'failed' || status == 'no_changes');
+                            final canRollback = id != null &&
+                                status == 'merged' &&
+                                (t['merge_commit_sha'] as String?) != null &&
+                                (t['origin'] as String?) != 'rollback';
+                            return _TaskCard(
+                              task: t,
+                              busy: _deletingTasks.contains(id),
+                              onDelete:
+                                  canDelete ? () => _deleteTask(id) : null,
+                              onCancel:
+                                  canCancel ? () => _cancelTask(id) : null,
+                              onMerge: isReview ? () => _mergeTask(id) : null,
+                              onShowDiff: id != null && t['pr_number'] != null
+                                  ? () => _showDiff(id)
+                                  : null,
+                              onRetry: canRetry
+                                  ? () => _retryTask(
+                                      t['instruction'] as String? ?? '')
+                                  : null,
+                              onRollback:
+                                  canRollback ? () => _rollbackTask(id) : null,
+                            );
+                          }),
+                          if (_tasks.isNotEmpty) const SizedBox(height: 10),
                           _LiveScanCard(
                             scanning: _scanning,
                             scan: _scan,
@@ -974,58 +1035,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                 )),
                             const SizedBox(height: 14),
                           ],
-                          if (_tasks.isNotEmpty)
-                            _SectionLabel(
-                              icon: LucideIcons.gitPullRequest,
-                              label: 'adminDev.tasksLabel'.tr(),
-                              count: _tasks.length,
-                              trailing: _doneCount > 0
-                                  ? _ClearTasksButton(
-                                      busy: _clearingTasks,
-                                      onTap: _clearTasks,
-                                    )
-                                  : null,
-                            ),
                           if (_tasks.isEmpty && _suggestions.isEmpty)
                             _EmptyHint(),
-                          ..._tasks.map((t) {
-                            final id = t['id'] as String?;
-                            final status = t['status'] as String?;
-                            final canDelete = _deletable(status) && id != null;
-                            final canCancel = id != null &&
-                                (status == 'queued' ||
-                                    status == 'running' ||
-                                    status == 'pr_open' ||
-                                    status == 'awaiting_review');
-                            final isReview =
-                                status == 'awaiting_review' && id != null;
-                            final canRetry = id != null &&
-                                (status == 'failed' || status == 'no_changes');
-                            // Rollback nur bei gemergten Aufträgen mit Commit
-                            // (kein Rollback eines Rollbacks).
-                            final canRollback = id != null &&
-                                status == 'merged' &&
-                                (t['merge_commit_sha'] as String?) != null &&
-                                (t['origin'] as String?) != 'rollback';
-                            return _TaskCard(
-                              task: t,
-                              busy: _deletingTasks.contains(id),
-                              onDelete:
-                                  canDelete ? () => _deleteTask(id) : null,
-                              onCancel:
-                                  canCancel ? () => _cancelTask(id) : null,
-                              onMerge: isReview ? () => _mergeTask(id) : null,
-                              onShowDiff: id != null && t['pr_number'] != null
-                                  ? () => _showDiff(id)
-                                  : null,
-                              onRetry: canRetry
-                                  ? () => _retryTask(
-                                      t['instruction'] as String? ?? '')
-                                  : null,
-                              onRollback:
-                                  canRollback ? () => _rollbackTask(id) : null,
-                            );
-                          }),
                           const SizedBox(height: 12),
                         ],
                       ),
@@ -1062,6 +1073,234 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                   .toList(),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Live Tasks Bar ────────────────────────────────────────────────────────────
+// Immer sichtbare Leiste direkt unter der Category-Row.
+// Zeigt alle Aufträge kompakt — aktive zuerst, danach abgeschlossene/fehler.
+// Kein Scrollen nötig: Retry, Löschen, Abbrechen direkt hier erreichbar.
+
+class _LiveTasksBar extends StatelessWidget {
+  const _LiveTasksBar({
+    required this.tasks,
+    required this.busyIds,
+    required this.onCancel,
+    required this.onRetry,
+    required this.onDelete,
+    required this.onMerge,
+  });
+
+  final List<Map<String, dynamic>> tasks;
+  final Set<String> busyIds;
+  final void Function(String id) onCancel;
+  final void Function(String instruction) onRetry;
+  final void Function(String id) onDelete;
+  final void Function(String id) onMerge;
+
+  static const _activeOrder = [
+    'running', 'queued', 'pr_open', 'awaiting_review',
+    'failed', 'no_changes', 'cancelled', 'merged',
+  ];
+
+  static Color _statusColor(String? s) {
+    switch (s) {
+      case 'running':    return AppColors.teal;
+      case 'queued':     return AppColors.mute;
+      case 'pr_open':    return AppColors.amber;
+      case 'awaiting_review': return AppColors.trust;
+      case 'failed':     return AppColors.herzrot;
+      case 'no_changes': return AppColors.mute;
+      case 'merged':     return AppColors.leben;
+      case 'cancelled':  return AppColors.mute;
+      default:           return AppColors.mute;
+    }
+  }
+
+  static IconData _statusIcon(String? s) {
+    switch (s) {
+      case 'running':    return LucideIcons.loader2;
+      case 'queued':     return LucideIcons.clock;
+      case 'pr_open':    return LucideIcons.gitPullRequest;
+      case 'awaiting_review': return LucideIcons.eye;
+      case 'failed':     return LucideIcons.alertCircle;
+      case 'no_changes': return LucideIcons.minus;
+      case 'merged':     return LucideIcons.checkCircle;
+      case 'cancelled':  return LucideIcons.xCircle;
+      default:           return LucideIcons.circle;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = [...tasks]..sort((a, b) {
+        final ra = _activeOrder.indexOf(a['status'] as String? ?? '');
+        final rb = _activeOrder.indexOf(b['status'] as String? ?? '');
+        return (ra == -1 ? 99 : ra).compareTo(rb == -1 ? 99 : rb);
+      });
+
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          bottom: BorderSide(color: AppColors.teal.withValues(alpha: 0.12)),
+        ),
+      ),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        itemCount: sorted.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, i) {
+          final t = sorted[i];
+          final id = t['id'] as String?;
+          final status = t['status'] as String?;
+          final instruction = (t['instruction'] as String? ?? '').trim();
+          final short = instruction.length > 38
+              ? '${instruction.substring(0, 35)}…'
+              : instruction;
+          final color = _statusColor(status);
+          final icon = _statusIcon(status);
+          final busy = id != null && busyIds.contains(id);
+
+          final canRetry =
+              id != null && (status == 'failed' || status == 'no_changes');
+          final canCancel = id != null &&
+              (status == 'queued' ||
+                  status == 'running' ||
+                  status == 'pr_open' ||
+                  status == 'awaiting_review');
+          final canDelete = id != null &&
+              (status == 'merged' ||
+                  status == 'failed' ||
+                  status == 'no_changes' ||
+                  status == 'cancelled');
+          final canMerge = id != null && status == 'awaiting_review';
+
+          return Container(
+            width: 220,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.elevated,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: color.withValues(alpha: 0.30)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 12, color: color),
+                    const SizedBox(width: 5),
+                    Text(
+                      'adminDev.status.$status'.tr(),
+                      style: AppTypography.body(
+                          size: 10, color: color, weight: FontWeight.w600),
+                    ),
+                    const Spacer(),
+                    if (busy)
+                      SizedBox(
+                        width: 10,
+                        height: 10,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1.5,
+                          color: color,
+                        ),
+                      ),
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: Text(
+                      short.isEmpty ? '—' : short,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body(
+                          size: 11, color: AppColors.inkSoft),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (canRetry)
+                      _MiniAction(
+                        icon: LucideIcons.refreshCw,
+                        color: AppColors.teal,
+                        tooltip: 'adminDev.retry'.tr(),
+                        onTap: busy
+                            ? null
+                            : () => onRetry(instruction),
+                      ),
+                    if (canMerge)
+                      _MiniAction(
+                        icon: LucideIcons.gitMerge,
+                        color: AppColors.leben,
+                        tooltip: 'adminDev.approveMerge'.tr(),
+                        onTap: busy ? null : () => onMerge(id),
+                      ),
+                    if (canCancel)
+                      _MiniAction(
+                        icon: LucideIcons.x,
+                        color: AppColors.herzrot,
+                        tooltip: 'adminDev.cancel'.tr(),
+                        onTap: busy ? null : () => onCancel(id),
+                      ),
+                    if (canDelete)
+                      _MiniAction(
+                        icon: LucideIcons.trash2,
+                        color: AppColors.ghost,
+                        tooltip: 'common.delete'.tr(),
+                        onTap: busy ? null : () => onDelete(id),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _MiniAction extends StatelessWidget {
+  const _MiniAction({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.only(left: 4),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: onTap != null ? 0.12 : 0.05),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(
+            icon,
+            size: 13,
+            color: onTap != null ? color : AppColors.ghost,
+          ),
         ),
       ),
     );
