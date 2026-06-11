@@ -272,6 +272,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
         ],
       ),
     );
+    ctrl.dispose();
     if (newText == null || newText.isEmpty || !mounted) return;
     final ok = await PostCommentsRepository.edit(
       commentId: id,

@@ -98,6 +98,59 @@ class SettingsRepository {
       return false;
     }
   }
+
+  /// DSGVO-Art.-20-Export: alle Rows einer Tabelle, in denen der User in
+  /// EINER Spalte steht. Fehler → leere Liste (Export bleibt vollständig
+  /// lauffähig, auch wenn einzelne Tabellen/RLS-Policies fehlen).
+  static Future<List<dynamic>> gdprRowsSingle(
+      String table, String column, String uid) async {
+    try {
+      return await sb.from(table).select().eq(column, uid).limit(10000);
+    } catch (_) {
+      return const <dynamic>[];
+    }
+  }
+
+  /// DSGVO-Export für Tabellen mit ZWEI beteiligten Spalten
+  /// (beide Richtungen, z. B. interactions helper_id/helped_id).
+  static Future<List<dynamic>> gdprRowsDual(
+      String table, String columnA, String columnB, String uid) async {
+    try {
+      return await sb
+          .from(table)
+          .select()
+          .or('$columnA.eq.$uid,$columnB.eq.$uid')
+          .limit(10000);
+    } catch (_) {
+      return const <dynamic>[];
+    }
+  }
+
+  /// Liest die drei DSGVO-Opt-in-Flags. null-Werte → false
+  /// (Privacy by default: fehlender Wert = NICHT eingewilligt).
+  static Future<({bool marketing, bool reactivation, bool email})>
+      getConsentFlags(String uid) async {
+    final row = await sb
+        .from('profiles')
+        .select('marketing_opt_in, reactivation_opt_in, email_opt_in')
+        .eq('id', uid)
+        .maybeSingle();
+    return (
+      marketing: (row?['marketing_opt_in'] as bool?) ?? false,
+      reactivation: (row?['reactivation_opt_in'] as bool?) ?? false,
+      email: (row?['email_opt_in'] as bool?) ?? false,
+    );
+  }
+
+  /// E-Mail-Abmeldung (Opt-out): markiert die email_subscriptions-Zeile
+  /// als abgemeldet. Das profiles-Flag setzt der Aufrufer via
+  /// ProfilesRepository.update (eine Zuständigkeit pro Repo).
+  static Future<void> unsubscribeEmail(String uid) async {
+    await sb.from('email_subscriptions').update({
+      'subscribed': false,
+      'unsubscribed_at': DateTime.now().toUtc().toIso8601String(),
+    }).eq('user_id', uid);
+  }
 }
 
 final notificationPreferencesProvider =

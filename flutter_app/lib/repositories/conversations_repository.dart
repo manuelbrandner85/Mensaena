@@ -249,6 +249,22 @@ class MessagesRepository {
     }
   }
 
+  /// System-Notiz in eine Konversation einfügen (z. B. [SYSTEM_NOTE:...]
+  /// nach einem Call). Bewusst OHNE conversations.updated_at-Touch —
+  /// System-Notizen sollen die Sortierung nicht nach oben spülen.
+  static Future<void> insertSystemNote({
+    required String conversationId,
+    required String content,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    await sb.from('messages').insert({
+      'conversation_id': conversationId,
+      'sender_id': uid,
+      'content': content,
+    });
+  }
+
   /// Eigene Nachricht editieren (nur eigene erlaubt — RLS).
   static Future<bool> edit({
     required String messageId,

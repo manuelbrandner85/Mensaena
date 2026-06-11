@@ -173,7 +173,13 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
       );
       // Mikro an, Kamera aus (User entscheidet via Toggle).
       await room.localParticipant?.setMicrophoneEnabled(_micEnabled);
-      if (!mounted) return;
+      if (!mounted) {
+        // User hat den Screen während des Connects verlassen — der Room
+        // wurde nie im Holder abgelegt, also hier komplett aufräumen,
+        // sonst bleiben Besetzt-Status + Foreground-Service hängen.
+        await _abortConnect(room);
+        return;
+      }
       // Prefetch profile data für alle Remote-Participants
       for (final p in room.remoteParticipants.values) {
         _fetchProfileFor(p.identity);
@@ -200,12 +206,34 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
       );
       _attachEventsBus(room);
     } catch (e) {
+      // Connect fehlgeschlagen (z. B. 25s-Timeout): Besetzt-Status,
+      // Foreground-Service und Room IMMER zurücksetzen. Vorher blieb
+      // CallBusyState.inStream=true hängen (alle eingehenden Anrufe
+      // wurden dauerhaft als besetzt abgelehnt) und der Audio-Service
+      // lief weiter (Akku), weil dispose() nur bei _left aufräumt.
+      await _abortConnect(room);
       if (!mounted) return;
       setState(() {
         _state = _RoomState.failed;
         _error = e.toString();
       });
     }
+  }
+
+  /// Räumt einen fehlgeschlagenen/abgebrochenen Connect vollständig auf —
+  /// Gegenstück zu dem, was VOR room.connect() aktiviert wurde.
+  Future<void> _abortConnect(lk.Room room) async {
+    CallBusyState.inStream = false;
+    LiveAudioService.stop();
+    _listener?.dispose();
+    _listener = null;
+    _room = null;
+    try {
+      await room.disconnect();
+    } catch (_) {}
+    try {
+      await room.dispose();
+    } catch (_) {}
   }
 
   /// Nach transientem Abbruch (Netzwerk-Blip beim Minimieren/Backgrounding):

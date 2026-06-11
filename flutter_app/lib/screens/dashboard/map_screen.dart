@@ -195,6 +195,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ],
       ),
     );
+    ctrl.dispose();
     if (label == null || label.isEmpty) return;
     final pin = SavedPin(
       id: DateTime.now().millisecondsSinceEpoch.toString(),

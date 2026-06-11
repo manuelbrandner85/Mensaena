@@ -283,7 +283,8 @@ class _MarketplaceCreateScreenState
           // skip failed individual uploads; continue with the rest.
         }
       }
-      if (mounted) setState(() => _uploading = false);
+      if (!mounted) return;
+      setState(() => _uploading = false);
     }
 
     // Create listing.

@@ -15,6 +15,7 @@ import '../../../repositories/challenges_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
   const ChallengeCreateScreen({super.key});
@@ -77,20 +78,12 @@ class _ChallengeCreateScreenState
     setState(() => _busy = false);
     if (id == null) {
       Haptics.error();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('challenges.createFailed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'challenges.createFailed'.tr());
       return;
     }
     Haptics.success();
     MiniConfetti.show(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text('challenges.createSuccess'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.leben)),
-    ));
+    AppSnackBar.success(context, 'challenges.createSuccess'.tr());
     context.go('/dashboard/challenges');
   }
 

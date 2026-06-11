@@ -197,6 +197,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void _setupPresence() {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
+    // Guard gegen Re-Init (z. B. schneller Konversations-Wechsel): den
+    // alten Channel IMMER erst abmelden, sonst bleiben mehrere Realtime-
+    // Channels parallel offen (die Leak-Klasse hinter dem 4.1.x-OOM).
+    final old = _typingChannel;
+    if (old != null) {
+      _typingChannel = null;
+      sb.removeChannel(old);
+    }
     _typingChannel = sb.channel('chat:${widget.conversationId}');
     _typingChannel!
       ..onBroadcast(
@@ -666,7 +674,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   // Nachrichten ("ok","ok") wurden zu EINER kollabiert,
                   // solange erst ein Echo angekommen war. Cleanup post-frame.
                   String keyOf(Map<String, dynamic> m) =>
-                      '${m['sender_id']} ${m['content']}';
+                      '${m['sender_id']}\u0000${m['content']}';
                   final realCounts = <String, int>{};
                   for (final m in msgsRaw) {
                     realCounts.update(keyOf(m), (v) => v + 1,

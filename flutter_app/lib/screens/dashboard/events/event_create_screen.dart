@@ -277,9 +277,9 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       } catch (_) {
         imageUrl = null;
       }
-      if (mounted) setState(() => _uploading = false);
+      if (!mounted) return;
+      setState(() => _uploading = false);
       if (imageUrl == null) {
-        if (!mounted) return;
         setState(() {
           _error = 'events.imageUploadFailed'.tr();
           _submitting = false;

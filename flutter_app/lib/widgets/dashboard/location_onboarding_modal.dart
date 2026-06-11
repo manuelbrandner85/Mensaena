@@ -36,6 +36,12 @@ class _LocationOnboardingModalState
   bool _gpsLoading = false;
   String? _err;
 
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _useGps() async {
     setState(() {
       _gpsLoading = true;
@@ -48,6 +54,7 @@ class _LocationOnboardingModalState
       }
       if (perm == LocationPermission.denied ||
           perm == LocationPermission.deniedForever) {
+        if (!mounted) return;
         setState(() {
           _err = 'Standort-Zugriff verweigert.';
           _gpsLoading = false;
@@ -57,12 +64,13 @@ class _LocationOnboardingModalState
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+      if (!mounted) return;
       _lat = pos.latitude;
       _lng = pos.longitude;
       _ctrl.text =
           'GPS: ${pos.latitude.toStringAsFixed(4)}, ${pos.longitude.toStringAsFixed(4)}';
     } catch (_) {
-      setState(() => _err = 'Standort nicht verfügbar.');
+      if (mounted) setState(() => _err = 'Standort nicht verfügbar.');
     } finally {
       if (mounted) setState(() => _gpsLoading = false);
     }
@@ -88,6 +96,7 @@ class _LocationOnboardingModalState
       widget.onSaved(_lat!, _lng!, _ctrl.text.trim());
       Navigator.pop(context);
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _saving = false;
         _err = 'Speichern fehlgeschlagen.';
