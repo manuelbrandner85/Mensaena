@@ -407,7 +407,7 @@ class ChatMessageBubble extends ConsumerWidget {
                       const SizedBox(width: 4),
                       Text('chat.editedTag'.tr(),
                           style: AppTypography.label(
-                              size: 8, color: AppColors.mute)),
+                              size: 8, color: AppColors.inkSoft)),
                     ],
                     if (mine) ...[
                       const SizedBox(width: 4),

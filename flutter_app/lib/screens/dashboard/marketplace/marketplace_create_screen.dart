@@ -15,6 +15,7 @@ import '../../../repositories/marketplace_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -137,11 +138,7 @@ class _MarketplaceCreateScreenState
     );
     if (!mounted) return;
     if (p == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.productNotFound'.tr(namedArgs: {'code': code}),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'marketplace.productNotFound'.tr(namedArgs: {'code': code}));
       return;
     }
     setState(() {
@@ -175,12 +172,7 @@ class _MarketplaceCreateScreenState
     }
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-          '✓ ${'marketplace.inserted'.tr(namedArgs: {'name': p.name})}',
-          style: AppTypography.body(size: 13, color: AppColors.leben)),
-    ));
+    AppSnackBar.success(context, '✓ ${'marketplace.inserted'.tr(namedArgs: {'name': p.name})}');
   }
 
   /// Bottom-Sheet mit Gallery/Camera-Optionen. Picked Image → _images.
@@ -240,11 +232,7 @@ class _MarketplaceCreateScreenState
       setState(() => _images.add(File(picked.path)));
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.create.uploadFailed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'marketplace.create.uploadFailed'.tr());
     }
   }
 
