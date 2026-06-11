@@ -338,6 +338,13 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: python3 scripts/check_stream_limits.py
 
+      # UI-Schicht-Guard (Ratchet): keine NEUEN direkten sb.from(...)-Zugriffe
+      # in screens/widgets — Datenzugriff gehört in repositories/services.
+      # Altbestand ist als Baseline eingefroren und darf nur sinken.
+      - name: UI-Supabase Guard
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/check_ui_supabase.py
+
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"
 

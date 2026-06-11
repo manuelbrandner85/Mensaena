@@ -22,6 +22,7 @@ import '../../providers/locale_provider.dart';
 import '../../providers/shorebird_patch_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../repositories/notification_prefs_repository.dart';
+import '../../repositories/notifications_repository.dart';
 import '../../repositories/settings_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../providers/role_provider.dart';
@@ -620,14 +621,10 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
     final uid = sb.auth.currentUser?.id;
     if (uid == null) return;
     try {
-      await sb.from('notifications').insert({
-        'user_id': uid,
-        'type': 'system',
-        'title': 'notif.test_title'.tr(),
-        'message': 'notif.test_body'.tr(),
-        'data': {'kind': 'test'},
-        'is_read': false,
-      });
+      await NotificationsRepository.insertSelfTest(
+        title: 'notif.test_title'.tr(),
+        message: 'notif.test_body'.tr(),
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
@@ -787,25 +784,14 @@ class _DangerTabState extends State<_DangerTab> {
       await Future.wait([
         for (final e in single.entries)
           () async {
-            try {
-              collected[e.key] =
-                  await sb.from(e.key).select().eq(e.value, uid).limit(10000);
-            } catch (_) {
-              collected[e.key] = const <dynamic>[];
-            }
+            collected[e.key] =
+                await SettingsRepository.gdprRowsSingle(e.key, e.value, uid);
           }(),
         for (final e in dual.entries)
           () async {
-            try {
-              final cols = e.value.split(',');
-              collected[e.key] = await sb
-                  .from(e.key)
-                  .select()
-                  .or('${cols[0]}.eq.$uid,${cols[1]}.eq.$uid')
-                  .limit(10000);
-            } catch (_) {
-              collected[e.key] = const <dynamic>[];
-            }
+            final cols = e.value.split(',');
+            collected[e.key] = await SettingsRepository.gdprRowsDual(
+                e.key, cols[0], cols[1], uid);
           }(),
       ]);
       final profileRows = collected['profiles'] as List? ?? const [];
@@ -2797,17 +2783,12 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
       return;
     }
     try {
-      final row = await sb
-          .from('profiles')
-          .select('marketing_opt_in, reactivation_opt_in, email_opt_in')
-          .eq('id', uid)
-          .maybeSingle();
+      final flags = await SettingsRepository.getConsentFlags(uid);
       if (!mounted) return;
       setState(() {
-        // Privacy by default: fehlender/null Wert = NICHT eingewilligt.
-        _marketing = (row?['marketing_opt_in'] as bool?) ?? false;
-        _reactivation = (row?['reactivation_opt_in'] as bool?) ?? false;
-        _email = (row?['email_opt_in'] as bool?) ?? false;
+        _marketing = flags.marketing;
+        _reactivation = flags.reactivation;
+        _email = flags.email;
         _loading = false;
       });
     } catch (_) {
@@ -2832,11 +2813,8 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
         // Bleibt aus, bis im Postfach bestätigt wurde.
         setState(() => _email = false);
       } else {
-        await sb.from('profiles').update({'email_opt_in': false}).eq('id', uid);
-        await sb.from('email_subscriptions').update({
-          'subscribed': false,
-          'unsubscribed_at': DateTime.now().toUtc().toIso8601String(),
-        }).eq('user_id', uid);
+        await ProfilesRepository.update(uid, {'email_opt_in': false});
+        await SettingsRepository.unsubscribeEmail(uid);
         await sb.rpc<dynamic>('record_consent', params: {
           'p_type': 'email',
           'p_granted': false,
@@ -2859,7 +2837,7 @@ class _MarketingPrefsSectionState extends State<_MarketingPrefsSection> {
       if (col == 'reactivation_opt_in') _reactivation = v;
     });
     try {
-      await sb.from('profiles').update({col: v}).eq('id', uid);
+      await ProfilesRepository.update(uid, {col: v});
       // DSGVO Art. 7(1): Einwilligung/Widerruf revisionssicher protokollieren.
       final type = col == 'marketing_opt_in' ? 'marketing' : 'reactivation';
       await sb.rpc<dynamic>('record_consent', params: {

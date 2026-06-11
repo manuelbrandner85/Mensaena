@@ -51,6 +51,24 @@ class NotificationsRepository {
     }
   }
 
+  /// Test-Notification an den eigenen User (Settings → "Test senden").
+  /// Wirft bei Fehler — der Aufrufer zeigt das Feedback.
+  static Future<void> insertSelfTest({
+    required String title,
+    required String message,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    await sb.from('notifications').insert({
+      'user_id': uid,
+      'type': 'system',
+      'title': title,
+      'message': message,
+      'data': {'kind': 'test'},
+      'is_read': false,
+    });
+  }
+
   /// Eine Notification als gelesen markieren.
   static Future<void> markRead(String id) async {
     try {

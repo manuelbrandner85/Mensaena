@@ -181,6 +181,63 @@ class DmCallService {
     } catch (_) {}
   }
 
+  /// Liefert die Kern-Metadaten eines Calls (oder null):
+  /// caller_id, callee_id, status, conversation_id, call_type.
+  static Future<Map<String, dynamic>?> fetchCall(String callId) async {
+    try {
+      return await sb
+          .from('dm_calls')
+          .select('caller_id, callee_id, status, conversation_id, call_type')
+          .eq('id', callId)
+          .maybeSingle();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Realtime-Stream auf genau einen Call (Status-Übergänge ringing →
+  /// active/cancelled/missed/ended). limit(1) Pflicht (Stream-Regeln).
+  static Stream<List<Map<String, dynamic>>> watchCall(String callId) {
+    return sb
+        .from('dm_calls')
+        .stream(primaryKey: ['id'])
+        .eq('id', callId)
+        .limit(1);
+  }
+
+  /// Liefert die Konversations-ID zu einem Call (oder null).
+  static Future<String?> conversationIdOf(String callId) async {
+    try {
+      final call = await sb
+          .from('dm_calls')
+          .select('conversation_id')
+          .eq('id', callId)
+          .maybeSingle();
+      return call?['conversation_id'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Markiert den Call als aktiv (Peer-Connection steht).
+  static Future<void> markActive(String callId) async {
+    try {
+      await sb
+          .from('dm_calls')
+          .update({'status': 'active'}).eq('id', callId);
+    } catch (_) {}
+  }
+
+  /// Markiert den Call als verpasst (Ringing-Timeout).
+  static Future<void> markMissed(String callId) async {
+    try {
+      await sb.from('dm_calls').update({
+        'status': 'missed',
+        'ended_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', callId);
+    } catch (_) {}
+  }
+
   /// Bricht eigenen Anruf ab.
   static Future<void> cancel(String callId) async {
     try {

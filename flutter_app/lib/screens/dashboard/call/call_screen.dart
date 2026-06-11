@@ -18,6 +18,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../providers/active_call_provider.dart';
+import '../../../repositories/conversations_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/call_room_holder.dart';
 import '../../../services/dm_call_service.dart';
@@ -151,11 +153,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     }
     try {
       final me = SupabaseService.currentUser?.id;
-      final call = await sb
-          .from('dm_calls')
-          .select('caller_id, callee_id, status')
-          .eq('id', widget.callId)
-          .maybeSingle();
+      final call = await DmCallService.fetchCall(widget.callId);
       if (call == null) {
         await _connect();
         return;
@@ -203,14 +201,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
 
   /// Setzt den Call auf 'active' (fire-and-forget) — beim direkten Beitritt
   /// nach CallKit-Accept, damit der Caller-Status sofort umspringt.
-  Future<void> _markActive() async {
-    try {
-      await sb.from('dm_calls').update({'status': 'active'}).eq(
-            'id',
-            widget.callId,
-          );
-    } catch (_) {}
-  }
+  Future<void> _markActive() => DmCallService.markActive(widget.callId);
 
   void _watchCallStatus() {
     // _bootstrap() kann mehrfach laufen (Reattach via Mini-Player) — alte
@@ -218,12 +209,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     // und Status-Events feuern doppelt.
     _callStatusSub?.cancel();
     try {
-      _callStatusSub = sb
-          .from('dm_calls')
-          .stream(primaryKey: ['id'])
-          .eq('id', widget.callId)
-          .limit(1)
-          .listen((rows) async {
+      _callStatusSub =
+          DmCallService.watchCall(widget.callId).listen((rows) async {
             if (rows.isEmpty) return;
             final r = rows.first;
             final s = r['status'] as String?;
@@ -290,12 +277,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       ref.read(activeCallProvider.notifier).state = null;
     }
     if (status == 'missed') {
-      try {
-        await sb.from('dm_calls').update({
-          'status': 'missed',
-          'ended_at': DateTime.now().toUtc().toIso8601String(),
-        }).eq('id', widget.callId);
-      } catch (_) {}
+      await DmCallService.markMissed(widget.callId);
     }
     if (!mounted) return;
     final msg = status == 'cancelled'
@@ -335,23 +317,15 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     try {
       final me = SupabaseService.currentUser?.id;
       if (me == null) return;
-      final call = await sb
-          .from('dm_calls')
-          .select('caller_id, callee_id')
-          .eq('id', widget.callId)
-          .maybeSingle();
+      final call = await DmCallService.fetchCall(widget.callId);
       if (call == null) return;
       final peerId = call['caller_id'] == me
           ? call['callee_id'] as String?
           : call['caller_id'] as String?;
       if (peerId == null) return;
-      final p = await sb
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', peerId)
-          .maybeSingle();
+      final p = await ProfilesRepository.getById(peerId);
       if (mounted) {
-        setState(() => _peerAvatarUrl = p?['avatar_url'] as String?);
+        setState(() => _peerAvatarUrl = p?.avatarUrl);
       }
     } catch (_) {}
   }
@@ -372,14 +346,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     final myId = SupabaseService.currentUser?.id ?? 'guest';
     String myName = 'Mitglied';
     try {
-      final p = await sb
-          .from('profiles')
-          .select('display_name, name')
-          .eq('id', myId)
-          .maybeSingle();
-      myName = (p?['display_name'] as String?) ??
-          (p?['name'] as String?) ??
-          'Mitglied';
+      final p = await ProfilesRepository.getById(myId);
+      myName = p?.displayName ?? p?.name ?? 'Mitglied';
     } catch (_) {}
 
     // Token holen
@@ -907,20 +875,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     if (note == null || note.isEmpty) return;
     // Notiz als SYSTEM-Chat-Message speichern. Conv-ID per Call-Lookup.
     try {
-      final call = await sb
-          .from('dm_calls')
-          .select('conversation_id')
-          .eq('id', widget.callId)
-          .maybeSingle();
-      final convId = call?['conversation_id'] as String?;
+      final convId = await DmCallService.conversationIdOf(widget.callId);
       if (convId == null) return;
-      final me = SupabaseService.currentUser?.id;
-      if (me == null) return;
-      await sb.from('messages').insert({
-        'conversation_id': convId,
-        'sender_id': me,
-        'content': '[SYSTEM_NOTE:$note]',
-      });
+      await MessagesRepository.insertSystemNote(
+        conversationId: convId,
+        content: '[SYSTEM_NOTE:$note]',
+      );
     } catch (_) {/* fail-silent */}
   }
 
@@ -1206,11 +1166,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     String? convId;
     String callType = 'video';
     try {
-      final row = await sb
-          .from('dm_calls')
-          .select('conversation_id, call_type')
-          .eq('id', widget.callId)
-          .maybeSingle();
+      final row = await DmCallService.fetchCall(widget.callId);
       convId = row?['conversation_id'] as String?;
       callType = (row?['call_type'] as String?) ?? 'video';
     } catch (_) {}
