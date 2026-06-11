@@ -1658,7 +1658,10 @@
     "imageUploadFailed": "Görsel yüklenemedi. Lütfen tekrar deneyin.",
     "imagePartialFailed": "Bazı görseller yüklenemedi.",
     "saveFailed": "Gönderi kaydedilemedi. Taslağın korunuyor — tekrar dene.",
-    "urgencyCritical": "Kritik"
+    "urgencyCritical": "Kritik",
+    "meetingPoint": "Buluşma noktası (örn. istasyon, kafe …)",
+    "timebankHours": "Zaman bankası saatleri (isteğe bağlı)",
+    "timebankHoursHint": "örn. 2.5"
   },
   "crisis": {
     "error": "Hata: {error}",

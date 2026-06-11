@@ -1659,7 +1659,10 @@
     "imageUploadFailed": "Impossible d’envoyer l’image. Réessaie.",
     "imagePartialFailed": "Certaines images n’ont pas pu être envoyées.",
     "saveFailed": "Impossible d'enregistrer la publication. Ton brouillon est conservé — réessaie.",
-    "urgencyCritical": "Critique"
+    "urgencyCritical": "Critique",
+    "meetingPoint": "Point de rencontre (p. ex. gare, café …)",
+    "timebankHours": "Heures de banque de temps (optionnel)",
+    "timebankHoursHint": "p. ex. 2.5"
   },
   "crisis": {
     "error": "Erreur : {error}",

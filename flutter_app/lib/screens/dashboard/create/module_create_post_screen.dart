@@ -532,6 +532,7 @@ class _ModuleCreatePostScreenState
               controller: _descCtrl,
               maxLines: 6,
               minLines: 3,
+              maxLength: 2000,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: InputDecoration(
                 labelText: 'create.descriptionOptional'.tr(),
@@ -695,6 +696,7 @@ class _ModuleCreatePostScreenState
             TextField(
               controller: _phoneCtrl,
               keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.next,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: InputDecoration(
                 labelText: 'create.phone'.tr(),
@@ -713,9 +715,10 @@ class _ModuleCreatePostScreenState
             TextField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'E-Mail',
+              decoration: InputDecoration(
+                labelText: 'create.emailOptional'.tr(),
                 isDense: true,
               ),
             ),
@@ -733,6 +736,7 @@ class _ModuleCreatePostScreenState
             TextField(
               controller: _whatsappCtrl,
               keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.next,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: const InputDecoration(
                 labelText: 'WhatsApp',
@@ -743,9 +747,10 @@ class _ModuleCreatePostScreenState
             const SizedBox(height: 6),
             TextField(
               controller: _meetingCtrl,
+              textInputAction: TextInputAction.next,
               style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'Treffpunkt (z. B. Bahnhof, Café …)',
+              decoration: InputDecoration(
+                labelText: 'create.meetingPoint'.tr(),
                 isDense: true,
               ),
             ),
@@ -758,10 +763,11 @@ class _ModuleCreatePostScreenState
                 controller: _timeHoursCtrl,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
+                textInputAction: TextInputAction.done,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: const InputDecoration(
-                  labelText: 'Zeitbank-Stunden (optional)',
-                  hintText: 'z. B. 2.5',
+                decoration: InputDecoration(
+                  labelText: 'create.timebankHours'.tr(),
+                  hintText: 'create.timebankHoursHint'.tr(),
                   isDense: true,
                 ),
               ),

@@ -1659,7 +1659,10 @@
     "imageUploadFailed": "Image could not be uploaded. Please try again.",
     "imagePartialFailed": "Some images could not be uploaded.",
     "saveFailed": "Couldn't save the post. Your draft is kept — try again.",
-    "urgencyCritical": "Critical"
+    "urgencyCritical": "Critical",
+    "meetingPoint": "Meeting point (e.g. station, café …)",
+    "timebankHours": "Timebank hours (optional)",
+    "timebankHoursHint": "e.g. 2.5"
   },
   "crisis": {
     "error": "Error: {error}",
