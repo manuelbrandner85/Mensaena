@@ -356,7 +356,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/map',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.immersive<void>(
           key: state.pageKey,
           child: const MapScreen(),
         ),
@@ -472,7 +472,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       //    /dashboard/<module>/create) ───────────────────────
       GoRoute(
         path: '/dashboard/animals/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.animals),
@@ -480,7 +480,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/housing/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.housing),
@@ -488,7 +488,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/mobility/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.mobility),
@@ -496,7 +496,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/sharing/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.sharing),
@@ -504,7 +504,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/harvest/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.harvest),
@@ -512,7 +512,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/community/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.community),
@@ -534,7 +534,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/wiki/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const KnowledgeCreateScreen(
             routePath: '/dashboard/wiki'),
@@ -542,7 +542,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/skills/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.skills),
@@ -550,7 +550,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/jobs/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.jobs),
@@ -558,7 +558,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/rescuer/create',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.rescuer),
@@ -717,7 +717,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.sheet<void>(
               key: state.pageKey,
               child: const GroupCreateScreen(),
             ),
@@ -742,7 +742,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.sheet<void>(
               key: state.pageKey,
               child: const MarketplaceCreateScreen(),
             ),
@@ -767,7 +767,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.sheet<void>(
               key: state.pageKey,
               child: const EventCreateScreen(),
             ),
@@ -799,7 +799,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.sheet<void>(
               key: state.pageKey,
               child: const ChallengeCreateScreen(),
             ),
@@ -876,7 +876,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'farm/add',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.sheet<void>(
               key: state.pageKey,
               child: const FarmCreateScreen(),
             ),
@@ -901,35 +901,35 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/crisis',
-        pageBuilder: (_, state) => mensaenaTransition<void>(
+        pageBuilder: (_, state) => AppTransitions.calm<void>(
           key: state.pageKey,
           child: const CrisisDashboardScreen(),
         ),
         routes: [
           GoRoute(
             path: 'first-aid',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.calm<void>(
               key: state.pageKey,
               child: const CrisisFirstAidScreen(),
             ),
           ),
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.calm<void>(
               key: state.pageKey,
               child: const CrisisCreateScreen(),
             ),
           ),
           GoRoute(
             path: 'resources',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.calm<void>(
               key: state.pageKey,
               child: const CrisisResourcesScreen(),
             ),
           ),
           GoRoute(
             path: 'circle',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.calm<void>(
               key: state.pageKey,
               child: const FamilyCircleScreen(),
             ),
@@ -991,7 +991,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => mensaenaTransition<void>(
+            pageBuilder: (_, state) => AppTransitions.sheet<void>(
               key: state.pageKey,
               child: const BoardCreateScreen(),
             ),
@@ -1478,7 +1478,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/call/:callId',
-        pageBuilder: (ctx, st) => mensaenaTransition<void>(
+        pageBuilder: (ctx, st) => AppTransitions.immersive<void>(
           key: st.pageKey,
           child: CallScreen(
           callId: st.pathParameters['callId']!,
@@ -1492,7 +1492,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/dashboard/live/:roomName',
-        pageBuilder: (ctx, st) => mensaenaTransition<void>(
+        pageBuilder: (ctx, st) => AppTransitions.immersive<void>(
           key: st.pageKey,
           child: LiveRoomScreen(
           roomName: st.pathParameters['roomName']!,
