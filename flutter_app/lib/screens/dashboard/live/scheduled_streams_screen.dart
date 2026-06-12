@@ -13,18 +13,12 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../repositories/scheduled_streams_repository.dart';
 
 final scheduledStreamsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   try {
-    final rows = await sb
-        .from('scheduled_streams')
-        .select()
-        .eq('is_cancelled', false)
-        .gte('scheduled_at', DateTime.now().toIso8601String())
-        .order('scheduled_at', ascending: true)
-        .limit(100);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
+    return ScheduledStreamsRepository.listUpcoming();
   } catch (_) {
     return const [];
   }
@@ -35,14 +29,7 @@ final myStreamRemindersProvider =
   final uid = SupabaseService.currentUser?.id;
   if (uid == null) return const {};
   try {
-    final rows = await sb
-        .from('scheduled_stream_reminders')
-        .select('stream_id')
-        .eq('user_id', uid);
-    return (rows as List)
-        .whereType<Map<String, dynamic>>()
-        .map((r) => r['stream_id'] as String)
-        .toSet();
+    return ScheduledStreamsRepository.myReminderIds(uid);
   } catch (_) {
     return const {};
   }
@@ -56,16 +43,11 @@ class ScheduledStreamsScreen extends ConsumerWidget {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
     if (current.contains(streamId)) {
-      await sb
-          .from('scheduled_stream_reminders')
-          .delete()
-          .eq('stream_id', streamId)
-          .eq('user_id', uid);
+      await ScheduledStreamsRepository.removeReminder(
+          streamId: streamId, userId: uid);
     } else {
-      await sb.from('scheduled_stream_reminders').insert({
-        'stream_id': streamId,
-        'user_id': uid,
-      });
+      await ScheduledStreamsRepository.addReminder(
+          streamId: streamId, userId: uid);
     }
     ref.invalidate(myStreamRemindersProvider);
   }
@@ -160,13 +142,13 @@ class ScheduledStreamsScreen extends ConsumerWidget {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
     try {
-      await sb.from('scheduled_streams').insert({
-        'host_id': uid,
-        'title': titleCtrl.text.trim(),
-        'description':
+      await ScheduledStreamsRepository.create(
+        hostId: uid,
+        title: titleCtrl.text.trim(),
+        description:
             descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
-        'scheduled_at': when!.toIso8601String(),
-      });
+        scheduledAt: when!,
+      );
       ref.invalidate(scheduledStreamsProvider);
     } catch (_) {}
   }

@@ -43,7 +43,6 @@ BASELINE: dict[str, int] = {
     "lib/screens/dashboard/knowledge/knowledge_create_screen.dart": 1,
     "lib/screens/dashboard/knowledge/knowledge_screen.dart": 2,
     "lib/screens/dashboard/live/live_room_screen.dart": 2,
-    "lib/screens/dashboard/live/scheduled_streams_screen.dart": 5,
     "lib/screens/dashboard/marketplace/marketplace_create_screen.dart": 1,
     "lib/screens/dashboard/marketplace/marketplace_detail_screen.dart": 1,
     "lib/screens/dashboard/mentorship_match_screen.dart": 2,
