@@ -214,6 +214,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-06-12 | refactor(sb-abbau-1): NEU repositories/search_repository.dart (8 Such-Quellen + Posts-Fallback, je 8s-Timeout+Fail-Safe); global_search_screen Supabase-frei, Guard-Baseline gesenkt | flutter_app/lib/repositories/search_repository.dart, flutter_app/lib/screens/dashboard/global_search_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sweep): AppSnackBar-Restmigration — 67 Standard-Bloecke in 29 Dateien (−~400 Zeilen Boilerplate); Sonderformen (Icons/Actions/Custom-Styling) bleiben manuell | flutter_app/lib/screens/dashboard/** (29 Dateien) |
 | 2026-06-12 | feat(phase6-batch5): _SideRail im dashboard_scaffold — ab medium seitliche Navigation (4 Ziele + Badges, _BottomItem-Reuse), BottomNav nur noch compact; Cinema-Layer vollflaechig | flutter_app/lib/widgets/layouts/dashboard_scaffold.dart |
 | 2026-06-12 | feat(phase6-batch4): ReadableWidth Runde 2 — marketplace/knowledge/crisis/event_create (alle 9 Create-Screens jetzt Tablet-Lesebreite) | flutter_app/lib/screens/dashboard/{marketplace/marketplace_create_screen,knowledge/knowledge_create_screen,crisis/crisis_create_screen,events/event_create_screen}.dart |
