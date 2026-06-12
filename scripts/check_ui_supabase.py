@@ -73,8 +73,6 @@ BASELINE: dict[str, int] = {
     "lib/widgets/marketplace/barter_matches_carousel.dart": 1,
     "lib/widgets/marketplace/price_indicator.dart": 1,
     "lib/widgets/post/contact_requests_manager.dart": 2,
-    "lib/widgets/posts/poll_create_sheet.dart": 1,
-    "lib/widgets/posts/post_poll_widget.dart": 4,
     "lib/widgets/posts/save_collection_picker.dart": 2,
     "lib/widgets/posts/similar_posts_carousel.dart": 1,
     "lib/widgets/profile/send_voicemail_sheet.dart": 1,
