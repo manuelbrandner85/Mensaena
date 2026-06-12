@@ -147,8 +147,8 @@ class _MediaGridState extends State<_MediaGrid> {
                 controller: widget.scrollController,
                 padding: const EdgeInsets.all(12),
                 gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 130,
                   mainAxisSpacing: 6,
                   crossAxisSpacing: 6,
                 ),

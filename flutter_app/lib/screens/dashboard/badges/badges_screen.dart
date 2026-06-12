@@ -76,9 +76,11 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
               };
               return GridView.builder(
                 padding: const EdgeInsets.all(16),
+                // Max-Extent statt fixer Spaltenzahl: Phone bleibt 2-spaltig,
+                // Tablets bekommen automatisch 3-4 Spalten (Phase 6).
                 gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                   childAspectRatio: 0.95,

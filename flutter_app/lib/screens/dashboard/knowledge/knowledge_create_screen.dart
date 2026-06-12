@@ -163,8 +163,8 @@ class _KnowledgeCreateScreenState
                 style: AppTypography.display(size: 18, color: AppColors.ink),
               ),
               const SizedBox(height: 14),
-              GridView.count(
-                crossAxisCount: 3,
+              GridView.extent(
+                maxCrossAxisExtent: 130,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 mainAxisSpacing: 8,

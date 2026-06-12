@@ -215,8 +215,8 @@ class _OverviewGrid extends StatelessWidget {
         ),
     ];
 
-    return GridView.count(
-      crossAxisCount: 2,
+    return GridView.extent(
+      maxCrossAxisExtent: 240,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 10,
