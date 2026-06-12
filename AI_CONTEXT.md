@@ -214,6 +214,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-06-12 | refactor(sb-abbau-5): NEU repositories/referrals_repository.dart; invite_screen Supabase-frei (4->0); Baseline 85/54 | flutter_app/lib/repositories/referrals_repository.dart, flutter_app/lib/screens/dashboard/invite/invite_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-4): NEU repositories/scheduled_streams_repository.dart; scheduled_streams_screen Supabase-frei (5->0); Baseline 89/55 | flutter_app/lib/repositories/scheduled_streams_repository.dart, flutter_app/lib/screens/dashboard/live/scheduled_streams_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-3): NEU repositories/polls_repository.dart; post_poll_widget + poll_create_sheet Supabase-frei; Baseline 94/56 | flutter_app/lib/repositories/polls_repository.dart, flutter_app/lib/widgets/posts/{post_poll_widget,poll_create_sheet}.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | feat(bump-4.4.0): video_player + CinematicVideoBackdrop (Loop-Video nur full-Profil, Standbild-Fallback, Scrim geteilt) auf Landing; erster GPU-Shader shaders/grain.frag (film_grain GPU-Pfad + CPU-Fallback); pubspec: version 4.4.0+40400, assets/videos, shaders-Sektion. 3D-Viewer/animations bewusst vertagt (keine Assets/Routen) | flutter_app/pubspec.yaml, flutter_app/shaders/grain.frag, flutter_app/lib/widgets/effects/{cinematic_video_backdrop,cinematic_backdrop,film_grain}.dart, flutter_app/lib/screens/public/landing_screen.dart |
