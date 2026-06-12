@@ -222,6 +222,25 @@ class ConversationsRepository {
     }
   }
 
+  /// Mein `last_read_at` in dieser Konversation (für die „bis hier gelesen"-
+  /// Markierung beim Öffnen). Null wenn keine Membership/kein Wert.
+  static Future<DateTime?> myLastReadAt(String conversationId) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final row = await sb
+          .from('conversation_members')
+          .select('last_read_at')
+          .eq('conversation_id', conversationId)
+          .eq('user_id', uid)
+          .maybeSingle();
+      final raw = row?['last_read_at'] as String?;
+      return raw == null ? null : DateTime.tryParse(raw)?.toUtc();
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Mitglieder einer Konversation inkl. Profil (fuer @-Mention-Autocomplete).
   static Future<List<Map<String, dynamic>>> members(
       String conversationId) async {
@@ -339,6 +358,27 @@ class MessagesRepository {
       'sender_id': uid,
       'content': content,
     });
+  }
+
+  /// Letzte [limit] Nachrichten-Contents einer Konversation (neueste
+  /// zuerst), für die Medien-Galerie. Nur content+created_at, nicht
+  /// gelöschte. Best-effort, leere Liste bei Fehler.
+  static Future<List<Map<String, dynamic>>> recentContents(
+    String conversationId, {
+    int limit = 500,
+  }) async {
+    try {
+      final rows = await sb
+          .from('messages')
+          .select('content, created_at')
+          .eq('conversation_id', conversationId)
+          .filter('deleted_at', 'is', null)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
   }
 
   /// Letzte Nachrichten EINER Konversation von ANDEREN (fuer Unread).

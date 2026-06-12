@@ -216,6 +216,28 @@ class DmCallService {
         .limit(20);
   }
 
+  /// Peer-ID + Call-Typ zu einem Call aus meiner Sicht (für „Zurückrufen"):
+  /// liefert die jeweils ANDERE Partei. peerId null = nicht auflösbar.
+  static Future<({String? peerId, String callType})> peerOf(
+      String callId) async {
+    final me = SupabaseService.currentUser?.id;
+    try {
+      final row = await sb
+          .from('dm_calls')
+          .select('caller_id, callee_id, call_type')
+          .eq('id', callId)
+          .maybeSingle();
+      final callType = (row?['call_type'] as String?) ?? 'audio';
+      if (row == null || me == null) return (peerId: null, callType: callType);
+      final peer = (row['caller_id'] == me)
+          ? row['callee_id'] as String?
+          : row['caller_id'] as String?;
+      return (peerId: peer, callType: callType);
+    } catch (_) {
+      return (peerId: null, callType: 'audio');
+    }
+  }
+
   /// Liefert die Konversations-ID zu einem Call (oder null).
   static Future<String?> conversationIdOf(String callId) async {
     try {

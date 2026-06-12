@@ -10,7 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/conversations_repository.dart';
 import '../../../widgets/shared/image_lightbox.dart';
 import '../../../widgets/shared/premium_image.dart';
 
@@ -46,26 +46,17 @@ class ChatMediaSheet {
   /// Lädt die letzten 500 Nachrichten der Konversation und extrahiert alle
   /// Bild-URLs (neueste zuerst). Best-effort, leere Liste bei Fehler.
   static Future<List<String>> loadImages(String conversationId) async {
-    try {
-      final rows = await sb
-          .from('messages')
-          .select('content, created_at')
-          .eq('conversation_id', conversationId)
-          .filter('deleted_at', 'is', null)
-          .order('created_at', ascending: false)
-          .limit(500);
-      final urls = <String>[];
-      for (final r in (rows as List).whereType<Map<String, dynamic>>()) {
-        final content = r['content'] as String? ?? '';
-        for (final m in _imgRegex.allMatches(content)) {
-          final u = m.group(1);
-          if (u != null) urls.add(u);
-        }
+    final rows =
+        await MessagesRepository.recentContents(conversationId);
+    final urls = <String>[];
+    for (final r in rows) {
+      final content = r['content'] as String? ?? '';
+      for (final m in _imgRegex.allMatches(content)) {
+        final u = m.group(1);
+        if (u != null) urls.add(u);
       }
-      return urls;
-    } catch (_) {
-      return const [];
     }
+    return urls;
   }
 }
 
