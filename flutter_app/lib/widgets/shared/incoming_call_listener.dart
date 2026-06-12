@@ -146,10 +146,12 @@ class _IncomingCallListenerState
       },
     );
     if (picked == null) return;
+    final convId = ctx.conversationId;
+    if (convId == null) return;
     // Quick-Reply ist eine echte Nachricht → MessagesRepository.send
     // (inkl. conversations.updated_at-Touch für die Sortierung).
     await MessagesRepository.send(
-      conversationId: ctx.conversationId,
+      conversationId: convId,
       content: picked,
     );
   }
