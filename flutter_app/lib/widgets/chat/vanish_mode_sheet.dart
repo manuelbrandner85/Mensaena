@@ -19,7 +19,7 @@ class VanishModeSheet extends ConsumerStatefulWidget {
       {required String conversationId}) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

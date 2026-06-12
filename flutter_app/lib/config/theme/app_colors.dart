@@ -59,6 +59,11 @@ class AppColors {
   static const Color mute = Color(0xFF8B8576);
   static const Color ghost = Color(0xFF5E5A50);
 
+  // ── Sheets & Modals ───────────────────────────────────────────────
+  /// Standard-Hintergrund fuer BottomSheets/Modals (94% deckendes,
+  /// tiefes Navy). Vorher 58x als rohes Color(0xF0121A28) kopiert.
+  static const Color sheetBackground = Color(0xF0121A28);
+
   // ── Linien & Trenner (warmer Papier-Tint statt Weiß) ──────────────
   static const Color line = Color(0x1FECE5D6);
   static const Color lineActive = Color(0x4DC79363);

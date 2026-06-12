@@ -94,7 +94,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   Future<void> _pickCover() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),

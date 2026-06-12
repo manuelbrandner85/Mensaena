@@ -213,7 +213,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void _openSavedPinSheet(SavedPin pin) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -510,7 +510,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final center = _mapController.camera.center;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -540,7 +540,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void _openPostSheet(Post post) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -1829,7 +1829,7 @@ extension _A11ySheet on _MapScreenState {
   void _openA11ySheet(_AccessiblePlace p) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

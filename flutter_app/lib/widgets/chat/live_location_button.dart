@@ -26,7 +26,7 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
   Future<void> _openSheet() async {
     final selected = await showModalBottomSheet<Duration>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
