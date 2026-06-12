@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../../config/theme/app_layout.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/active_call_provider.dart';
 import '../../providers/active_stream_provider.dart';
@@ -243,7 +244,11 @@ class DashboardScaffold extends ConsumerWidget {
         ],
       ),
       drawer: const AppDrawer(),
-      bottomNavigationBar: _BottomNav(activeRoute: activeRoute),
+      // Phase 6: BottomNav nur auf Phones — ab medium uebernimmt die
+      // _SideRail links (Tablet/Foldable-Konvention).
+      bottomNavigationBar: context.layout.isCompact
+          ? _BottomNav(activeRoute: activeRoute)
+          : null,
       // Zentraler '+'-FAB entfernt (User-Wunsch 2026-05): jedes Modul hat
       // einen eigenen, zielgerichteten Create-Pfad — ein globaler Picker
       // ist redundant. fab-Parameter wird durchgereicht für Module die
@@ -268,7 +273,11 @@ class DashboardScaffold extends ConsumerWidget {
           // Jeder Screen instanziiert seinen eigenen DashboardScaffold, d.h.
           // ein Wrap hier würde bei jeder Navigation Realtime-/FCM-Subs
           // disposen + neu öffnen → Socket-Churn → Crash nach 2. Tap.
-          Stack(
+          Row(children: [
+            if (context.layout.isAtLeastMedium)
+              _SideRail(activeRoute: activeRoute),
+            Expanded(
+                child: Stack(
             children: [
               Column(
                 children: [
@@ -288,7 +297,8 @@ class DashboardScaffold extends ConsumerWidget {
                   !activeRoute.startsWith('/dashboard/live/'))
                 ActiveStreamMiniPlayer(info: activeStream),
             ],
-          ),
+          )),
+          ]),
         ],
       ),
     );
@@ -297,6 +307,87 @@ class DashboardScaffold extends ConsumerWidget {
 
 // _PlusFab entfernt (User-Wunsch 2026-05): zentraler '+'-Create-Picker
 // raus — jedes Modul hat seinen eigenen zielgerichteten Create-Pfad.
+
+/// Phase 6: Seitliche Navigation ab medium (Tablets/Foldables) — gleiche
+/// 4 Ziele + Badges wie die _BottomNav, als schmale Spalte links.
+class _SideRail extends ConsumerWidget {
+  const _SideRail({required this.activeRoute});
+  final String activeRoute;
+
+  bool _matches(String route, List<String> prefixes) {
+    for (final p in prefixes) {
+      if (activeRoute == p) return true;
+      if (activeRoute.startsWith('$p/')) return true;
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pendingActions =
+        ref.watch(pendingActionsCountProvider).value ?? 0;
+    final unreadDm = ref.watch(unreadDmCountProvider).value ?? 0;
+    return Container(
+      width: 84,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppColors.elevated, AppColors.surface],
+        ),
+        border: Border(right: BorderSide(color: AppColors.line)),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 64,
+              child: _BottomItem(
+                icon: LucideIcons.home,
+                label: 'nav.home'.tr(),
+                route: '/dashboard',
+                active: activeRoute == '/dashboard',
+              ),
+            ),
+            SizedBox(
+              height: 64,
+              child: _BottomItem(
+                icon: LucideIcons.map,
+                label: 'nav.map'.tr(),
+                route: '/dashboard/map',
+                active: _matches(activeRoute, ['/dashboard/map']),
+              ),
+            ),
+            SizedBox(
+              height: 64,
+              child: _BottomItem(
+                icon: LucideIcons.messageSquare,
+                label: 'nav.chat'.tr(),
+                route: '/dashboard/messages',
+                active: _matches(activeRoute, [
+                  '/dashboard/messages',
+                  '/dashboard/chat',
+                ]),
+                badgeCount: unreadDm,
+              ),
+            ),
+            SizedBox(
+              height: 64,
+              child: _BottomItem(
+                icon: LucideIcons.user,
+                label: 'nav.profile'.tr(),
+                route: '/dashboard/profile',
+                active: _matches(activeRoute, ['/dashboard/profile']),
+                badgeCount: pendingActions,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /// V20: BottomNav — BackdropFilter BLEIBT aber sigma von 3 auf 2 reduziert.
 /// Visuell kaum Unterschied (3→2), spart ~25% GPU-Last pro Frame.
