@@ -123,6 +123,22 @@ class TrustRatingsRepository {
     }
   }
 
+  /// Erhaltene Bewertungen eines BELIEBIGEN Users (Profil-Ansicht).
+  static Future<List<Map<String, dynamic>>> getReceivedFor(String userId,
+      {int limit = 50}) async {
+    try {
+      final res = await sb
+          .from('trust_ratings')
+          .select()
+          .eq('rated_id', userId)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (res as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// V4: Trust-Score-Verlauf. Holt alle Bewertungen für [userId] sortiert
   /// nach Zeit und berechnet den LAUFENDEN Durchschnitt nach jeder
   /// Bewertung → eine Punktreihe für die Verlaufs-Sparkline. Liefert max

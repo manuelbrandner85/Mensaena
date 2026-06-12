@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-11)
+- [x] sb.from-Abbau Batch 2: profile_screen Supabase-frei (6 -> 0) — NEU ProfilesRepository.publicStats (4 Count-/Timebank-Queries gebuendelt, PERF-Kommentare uebernommen), PostsRepository.listByUser, TrustRatingsRepository.getReceivedFor (beliebiger User, getReceived blieb self-only). Baseline: 99 Zugriffe / 58 Dateien.
 - [x] sb.from-Abbau Batch 1: NEU repositories/search_repository.dart — alle 8 Quellen der globalen Suche (profiles/events/orgs/groups/marketplace/board/knowledge + Posts-ilike-Fallback) mit 8s-Timeout + Fail-Safe pro Quelle; global_search_screen ist Supabase-frei (8 -> 0), Baseline gesenkt (105 Zugriffe / 59 Dateien verbleiben).
 - [x] Phase-2-Sweep — AppSnackBar-Restmigration (Standard-Pattern): 67 weitere handgebaute SnackBar-Bloecke in 29 Dateien auf AppSnackBar.success/error/info (Semantik aus Key+Farbe abgeleitet, Ternaries bewusst info). messages_screen ausgenommen (Sonderform ohne style-Zeile — Migrator-Over-Match erkannt + revertiert, Stelle bleibt manuell). Verbleibende Nicht-Standard-Formen (custom Icons/Rows/Actions/Durations) bewusst manuell.
 - [x] Phase-6 Batch 5 — NavigationRail: dashboard_scaffold zeigt ab medium (>=600dp) eine _SideRail links (gleiche 4 Ziele + Unread-/Pending-Badges wie _BottomNav, wiederverwendete _BottomItem-Widgets) und blendet die BottomNav aus; Cinema-Layer bleibt vollflaechig dahinter. Phones unveraendert.

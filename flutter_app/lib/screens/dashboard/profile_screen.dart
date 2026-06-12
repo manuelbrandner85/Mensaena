@@ -21,10 +21,9 @@ import '../../models/profile.dart';
 import '../../repositories/challenges_repository.dart';
 import '../../repositories/content_reports_repository.dart';
 import '../../repositories/profiles_repository.dart';
+import '../../repositories/posts_repository.dart';
 import '../../repositories/trust_ratings_repository.dart';
 import '../../repositories/user_blocks_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'
-    show CountOption, PostgrestResponse;
 
 import '../../services/supabase_service.dart';
 import '../../repositories/mega_repositories.dart';
@@ -327,50 +326,13 @@ class _ProfileStatsBarState extends State<_ProfileStatsBar> {
       //   - Timebank-Hours: hours + giver_id genügt (status='confirmed'
       //     filtert serverseitig; receiver_id ist redundant weil die
       //     OR-Bedingung garantiert dass userId einer der beiden ist).
-      final results = await Future.wait<dynamic>([
-        sb
-            .from('posts')
-            .select('id')
-            .eq('user_id', widget.userId)
-            .eq('status', 'active')
-            .count(CountOption.exact),
-        sb
-            .from('group_members')
-            .select('id')
-            .eq('user_id', widget.userId)
-            .count(CountOption.exact),
-        // Aktive Challenges: completed_at IS NULL + status != 'completed'.
-        sb
-            .from('challenge_progress')
-            .select('id')
-            .eq('user_id', widget.userId)
-            .filter('completed_at', 'is', null)
-            .neq('status', 'completed')
-            .count(CountOption.exact),
-        // Timebank: hours + giver_id genügt, status='confirmed' filtert
-        // serverseitig.
-        sb
-            .from('timebank_entries')
-            .select('hours, giver_id')
-            .or('giver_id.eq.${widget.userId},receiver_id.eq.${widget.userId}')
-            .eq('status', 'confirmed'),
-      ]);
-      double given = 0;
-      double received = 0;
-      for (final r in (results[3] as List).whereType<Map<String, dynamic>>()) {
-        final h = (r['hours'] as num?)?.toDouble() ?? 0;
-        if (r['giver_id'] == widget.userId) {
-          given += h;
-        } else {
-          received += h;
-        }
-      }
+      final stats = await ProfilesRepository.publicStats(widget.userId);
       return _StatsData(
-        postsCount: (results[0] as PostgrestResponse).count,
-        groupsCount: (results[1] as PostgrestResponse).count,
-        activeChallenges: (results[2] as PostgrestResponse).count,
-        hoursGiven: given,
-        hoursReceived: received,
+        postsCount: stats.posts,
+        groupsCount: stats.groups,
+        activeChallenges: stats.activeChallenges,
+        hoursGiven: stats.hoursGiven,
+        hoursReceived: stats.hoursReceived,
       );
     } catch (_) {
       return const _StatsData(
@@ -537,17 +499,7 @@ class _PostsTabState extends State<_PostsTab> {
 
   Future<List<Post>> _load() async {
     try {
-      final rows = await sb
-          .from('posts')
-          .select()
-          .eq('user_id', widget.userId)
-          .eq('status', 'active')
-          .order('created_at', ascending: false)
-          .limit(50);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map(Post.fromJson)
-          .toList();
+      return PostsRepository.listByUser(widget.userId);
     } catch (_) {
       return const [];
     }
@@ -604,17 +556,7 @@ class _RatingsTabState extends State<_RatingsTab> {
 
   Future<List<Map<String, dynamic>>> _load() async {
     try {
-      // BUGFIX: DB-Spalte heisst rated_id, nicht rated_user_id —
-      // vorher silent catch → leerer Ratings-Tab.
-      final rows = await sb
-          .from('trust_ratings')
-          .select()
-          .eq('rated_id', widget.userId)
-          .order('created_at', ascending: false)
-          .limit(50);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .toList();
+      return TrustRatingsRepository.getReceivedFor(widget.userId);
     } catch (_) {
       return const [];
     }

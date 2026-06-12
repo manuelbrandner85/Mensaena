@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/profile.dart';
 import '../services/supabase_service.dart';
 
@@ -95,6 +97,61 @@ class ProfilesRepository {
   /// Profile patchen.
   /// L23: avatar_url + cover_url müssen aus dem Supabase-Storage stammen.
   /// Falls jemand versucht externe URLs einzukippen — werden sie ignoriert.
+  /// Oeffentliche Profil-Statistiken (Posts/Gruppen/Challenges/Zeitbank).
+  /// PERF: head-only counts statt Row-Listen (siehe Audit 2026-06);
+  /// Timebank: hours+giver_id genuegt, status='confirmed' serverseitig.
+  static Future<
+      ({
+        int posts,
+        int groups,
+        int activeChallenges,
+        double hoursGiven,
+        double hoursReceived
+      })> publicStats(String userId) async {
+    final results = await Future.wait<dynamic>([
+      sb
+          .from('posts')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .count(CountOption.exact),
+      sb
+          .from('group_members')
+          .select('id')
+          .eq('user_id', userId)
+          .count(CountOption.exact),
+      sb
+          .from('challenge_progress')
+          .select('id')
+          .eq('user_id', userId)
+          .filter('completed_at', 'is', null)
+          .neq('status', 'completed')
+          .count(CountOption.exact),
+      sb
+          .from('timebank_entries')
+          .select('hours, giver_id')
+          .or('giver_id.eq.$userId,receiver_id.eq.$userId')
+          .eq('status', 'confirmed'),
+    ]);
+    double given = 0;
+    double received = 0;
+    for (final r in (results[3] as List).whereType<Map<String, dynamic>>()) {
+      final h = (r['hours'] as num?)?.toDouble() ?? 0;
+      if (r['giver_id'] == userId) {
+        given += h;
+      } else {
+        received += h;
+      }
+    }
+    return (
+      posts: (results[0] as PostgrestResponse).count,
+      groups: (results[1] as PostgrestResponse).count,
+      activeChallenges: (results[2] as PostgrestResponse).count,
+      hoursGiven: given,
+      hoursReceived: received,
+    );
+  }
+
   static Future<void> update(String userId, Map<String, dynamic> patch) async {
     if (patch.containsKey('avatar_url')) {
       final v = patch['avatar_url'];
