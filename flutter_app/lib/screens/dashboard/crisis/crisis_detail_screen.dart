@@ -189,21 +189,26 @@ class CrisisDetailScreen extends ConsumerWidget {
                     ? null
                     : () async {
                         final text = ctrl.text.trim();
-                        final uid = SupabaseService.currentUser?.id;
-                        if (text.isEmpty || uid == null) return;
+                        if (text.isEmpty) return;
                         setLocal(() => sending = true);
-                        try {
-                          await sb.from('crisis_updates').insert({
-                            'crisis_id': c.id,
-                            'user_id': uid,
-                            'content': text,
-                            'severity': severity,
-                          });
-                          if (!sheetCtx.mounted) return;
+                        // BUGFIX: roher Insert nutzte user_id/severity —
+                        // crisis_updates hat author_id/update_type (siehe
+                        // CrisisUpdate-Modell). Chip-Werte mappen.
+                        final ok = await CrisisRepository.addUpdate(
+                          crisisId: c.id,
+                          content: text,
+                          updateType: switch (severity) {
+                            'progress' => 'status_change',
+                            'resolved' => 'resolution',
+                            _ => 'info',
+                          },
+                        );
+                        if (!sheetCtx.mounted) return;
+                        if (ok) {
                           Navigator.pop(sheetCtx);
                           ref.invalidate(
                               crisisUpdatesStreamProvider(c.id));
-                        } catch (_) {
+                        } else {
                           setLocal(() => sending = false);
                         }
                       },
