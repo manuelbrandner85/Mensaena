@@ -20,6 +20,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/cinema_accents.dart';
 import '../../providers/cinema_provider.dart';
+import '../../providers/effects_gate_provider.dart';
 
 class GlassCard extends ConsumerWidget {
   const GlassCard({
@@ -97,6 +98,30 @@ class GlassCard extends ConsumerWidget {
             : Colors.white.withValues(alpha: 0.12));
 
     final radius = BorderRadius.circular(borderRadius);
+
+    // EffectsGate: BackdropFilter ist der teuerste Standard-Effekt.
+    // Auf reduced/none (Lite-Tier, reduceMotion, Intensity) ersetzt eine
+    // staerker getoente Flaeche den Blur — visuell nah, GPU-Kosten ~0.
+    final glassProfile = ref.watch(effectsProfileProvider);
+    if (!glassProfile.isFull) {
+      return RepaintBoundary(
+        child: ClipRRect(
+          borderRadius: radius,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Color.alphaBlend(
+                  effectiveTint, AppColors.surface.withValues(alpha: 0.85)),
+              borderRadius: radius,
+              border: Border.all(color: effectiveBorder, width: 1),
+            ),
+            child: Padding(
+              padding: padding,
+              child: child,
+            ),
+          ),
+        ),
+      );
+    }
 
     // V4: RepaintBoundary cached das Blur-Ergebnis → wird nur bei
     // echten Content-Aenderungen neu berechnet, nicht bei jedem Frame.

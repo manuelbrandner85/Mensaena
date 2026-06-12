@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/app_colors.dart';
-import '../../providers/accessibility_provider.dart';
+import '../../providers/effects_gate_provider.dart';
 import '../../services/haptics.dart';
 
 class CelebrateBurst {
@@ -35,7 +35,10 @@ class CelebrateBurst {
     final overlay = Overlay.maybeOf(context);
     if (overlay == null) return;
     unawaited(Haptics.success());
-    if (ref != null && ref.read(a11yProvider).effectiveReduceMotion) {
+    // EffectsGate statt Einzel-Signal: deckt reduceMotion/seniorMode,
+    // Lite-Tier UND CinemaIntensity.minimal in einem Check ab.
+    if (ref != null &&
+        ref.read(effectsProfileProvider) == EffectsProfile.none) {
       return;
     }
 

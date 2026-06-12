@@ -11,9 +11,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/haptics.dart';
 import '../../widgets/effects/tilt_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/pressable.dart';
 
 class ModuleTile {
   const ModuleTile({
@@ -257,12 +257,10 @@ class _ModuleCard extends StatelessWidget {
     return TiltCard(
       intensity: 0.5,
       borderRadius: 16,
-      child: InkWell(
+      child: Pressable(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          Haptics.tap();
-          context.push(tile.route);
-        },
+        // Haptik liefert Pressable selbst — kein doppeltes Haptics.tap().
+        onTap: () => context.push(tile.route),
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(

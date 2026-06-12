@@ -19,8 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
-import '../../config/theme/cinema_theme.dart';
-import '../../providers/cinema_provider.dart';
+import '../../providers/effects_gate_provider.dart';
 
 const _maxTiltRad = 0.105;
 const _sensitivity = 0.08;
@@ -147,11 +146,13 @@ class _TiltCardState extends ConsumerState<TiltCard> {
 
   @override
   Widget build(BuildContext context) {
-    final intensity = ref.watch(cinemaIntensityProvider);
-    if (intensity == CinemaIntensity.minimal) {
+    // EffectsGate statt Einzel-Signal: respektiert jetzt auch
+    // reduceMotion/seniorMode und Lite-Tier (vorher nur CinemaIntensity).
+    final profile = ref.watch(effectsProfileProvider);
+    if (profile.isOff) {
       return widget.child;
     }
-    final mult = widget.intensity * intensity.multiplier;
+    final mult = widget.intensity * profile.intensityFactor;
     final rx = _tiltX * mult;
     final ry = _tiltY * mult;
     return Transform(

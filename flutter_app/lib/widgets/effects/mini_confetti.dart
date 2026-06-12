@@ -16,7 +16,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/app_colors.dart';
-import '../../services/device_tier_service.dart';
+import '../../providers/effects_gate_provider.dart';
 
 class MiniConfetti {
   const MiniConfetti._();
@@ -30,7 +30,11 @@ class MiniConfetti {
     // unnötiger Listener aufgebaut wird.
     try {
       final container = ProviderScope.containerOf(context, listen: false);
-      if (container.read(liteModeActiveProvider)) return;
+      // EffectsGate: deckt Lite-Tier, reduceMotion/seniorMode und
+      // CinemaIntensity.minimal in einem Check ab.
+      if (container.read(effectsProfileProvider) == EffectsProfile.none) {
+        return;
+      }
     } catch (_) {
       // Falls aus irgendeinem Grund kein ProviderScope da ist (Tests):
       // einfach den Effekt zeigen — kein Showstopper.
