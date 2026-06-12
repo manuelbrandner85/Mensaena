@@ -496,7 +496,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
                       size: 14, color: AppColors.mute),
                   hintText: 'posts.locationExample'.tr(),
                   hintStyle: AppTypography.body(
-                      size: 13, color: AppColors.mute),
+                      size: 13, color: AppColors.inkSoft),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,

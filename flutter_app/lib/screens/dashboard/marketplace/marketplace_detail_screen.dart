@@ -26,6 +26,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/marketplace/barter_matches_carousel.dart';
 import '../../../widgets/marketplace_reservation.dart';
 import '../../../widgets/shared/image_carousel.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 // Stabile DB-Werte → Anzeige-i18n-Keys (Spiegel des Create-Screens).
 const Map<String, String> _kTypeLabels = {
@@ -447,22 +448,13 @@ class _MarketplaceDetailScreenState
       final convId = await ConversationsRepository.getOrCreateDm(l.userId);
       if (!context.mounted) return;
       if (convId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: AppColors.surface,
-          content: Text('marketplace.contactFailed'.tr(),
-              style: AppTypography.body(size: 13, color: AppColors.ink)),
-        ));
+        AppSnackBar.error(context, 'marketplace.contactFailed'.tr());
         return;
       }
       context.go('/dashboard/chat?conv=$convId');
     } catch (_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.contactFailed'.tr(),
-            style: AppTypography.body(
-                size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'marketplace.contactFailed'.tr());
     } finally {
       _contactInFlight.remove(l.id);
     }
@@ -515,13 +507,11 @@ class _MarketplaceDetailScreenState
       reason: reason,
     );
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        ok ? 'report.thanks'.tr() : 'marketplace.contactFailed'.tr(),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    if (ok) {
+      AppSnackBar.success(context, 'report.thanks'.tr());
+    } else {
+      AppSnackBar.error(context, 'marketplace.contactFailed'.tr());
+    }
   }
 
   Future<void> _share(MarketplaceListing l) async {
@@ -604,18 +594,10 @@ class _MarketplaceDetailScreenState
         'message': msgCtrl.text.trim().isEmpty ? null : msgCtrl.text.trim(),
       });
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.reserve_sent'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.success(context, 'marketplace.reserve_sent'.tr());
     } catch (_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.reserve_failed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'marketplace.reserve_failed'.tr());
     }
   }
 
@@ -635,12 +617,7 @@ class _MarketplaceDetailScreenState
     if (success) {
       ref.invalidate(marketplaceDetailProvider(l.id));
       ref.invalidate(marketplaceStatsProvider);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.markedReserved'.tr(),
-            style:
-                AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.success(context, 'marketplace.markedReserved'.tr());
     }
   }
 
@@ -661,12 +638,7 @@ class _MarketplaceDetailScreenState
     if (success) {
       ref.invalidate(marketplaceDetailProvider(l.id));
       ref.invalidate(marketplaceStatsProvider);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('marketplace.sold'.tr(),
-            style:
-                AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.success(context, 'marketplace.sold'.tr());
     }
   }
 }
