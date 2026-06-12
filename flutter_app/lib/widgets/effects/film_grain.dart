@@ -30,12 +30,12 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
   static ui.FragmentProgram? _program;
   static bool _programRequested = false;
 
-  static void _loadProgram() {
+  static Future<void> _loadProgram() async {
     if (_programRequested) return;
     _programRequested = true;
-    ui.FragmentProgram.fromAsset('shaders/grain.frag')
-        .then((p) => _program = p)
-        .catchError((_) {/* Fallback: CPU-Painter bleibt aktiv */});
+    try {
+      _program = await ui.FragmentProgram.fromAsset('shaders/grain.frag');
+    } catch (_) {/* Fallback: CPU-Painter bleibt aktiv */}
   }
 
   @override
