@@ -7,6 +7,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../../config/motion/app_motion.dart';
 import '../../services/haptics.dart';
 
 class Pressable extends StatefulWidget {
@@ -35,11 +36,28 @@ class Pressable extends StatefulWidget {
   State<Pressable> createState() => _PressableState();
 }
 
-class _PressableState extends State<Pressable> {
+class _PressableState extends State<Pressable>
+    with SingleTickerProviderStateMixin {
   bool _down = false;
+  late final AnimationController _scaleCtrl =
+      AnimationController.unbounded(vsync: this, value: 1.0);
+
+  @override
+  void dispose() {
+    _scaleCtrl.dispose();
+    super.dispose();
+  }
 
   void _set(bool v) {
-    if (mounted && _down != v) setState(() => _down = v);
+    if (!mounted || _down == v) return;
+    setState(() => _down = v);
+    // Physik statt fixer Duration: Druecken schnappt straff zu (snappy),
+    // Loslassen federt mit minimalem Overshoot zurueck (bouncy) — das
+    // "lebendige" Release ist der Kern des Engine-Feels.
+    _scaleCtrl.springTo(
+      v ? widget.scale : 1.0,
+      spring: v ? AppMotion.snappy : AppMotion.bouncy,
+    );
   }
 
   @override
@@ -55,10 +73,8 @@ class _PressableState extends State<Pressable> {
               widget.onTap!();
             },
       onLongPress: widget.onLongPress,
-      child: AnimatedScale(
-        scale: _down ? widget.scale : 1.0,
-        duration: const Duration(milliseconds: 110),
-        curve: Curves.easeOut,
+      child: ScaleTransition(
+        scale: _scaleCtrl,
         child: widget.glow == null
             ? widget.child
             : AnimatedContainer(
