@@ -16,6 +16,7 @@ import '../../config/theme/app_typography.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../effects/glass_card.dart';
+import '../../repositories/dashboard_widgets_repository.dart';
 
 final _nearbyNeighborsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -26,22 +27,8 @@ final _nearbyNeighborsProvider =
     final lat = profile?.latitude ?? profile?.homeLat;
     final lng = profile?.longitude ?? profile?.homeLng;
     if (lat == null || lng == null) return const [];
-    // Letzte 14 Tage neu — Ring 50 km Radius (~0.7° in BBox approx).
-    final since =
-        DateTime.now().subtract(const Duration(days: 14)).toIso8601String();
-    final rows = await sb
-        .from('profiles')
-        .select('id, display_name, avatar_url, location, latitude, longitude, created_at')
-        .neq('id', me)
-        .gte('created_at', since)
-        .not('avatar_url', 'is', null)
-        .gte('latitude', lat - 0.7)
-        .lte('latitude', lat + 0.7)
-        .gte('longitude', lng - 0.7)
-        .lte('longitude', lng + 0.7)
-        .order('created_at', ascending: false)
-        .limit(10);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
+    return DashboardWidgetsRepository.nearbyNewNeighbors(
+      meId: me, lat: lat, lng: lng);
   } catch (_) {
     return const [];
   }

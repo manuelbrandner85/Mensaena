@@ -9,8 +9,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
 import '../effects/shimmer_skeleton.dart';
+import '../../repositories/dashboard_widgets_repository.dart';
 
 class SuccessStoryCard extends StatefulWidget {
   const SuccessStoryCard({super.key});
@@ -31,26 +31,7 @@ class _SuccessStoryCardState extends State<SuccessStoryCard> {
 
   Future<Map<String, dynamic>?> _load() async {
     try {
-      List<Map<String, dynamic>> data;
-      try {
-        final rows = await sb
-            .from('success_stories')
-            .select(
-                'id, title, body, image_url, profiles!success_stories_author_id_fkey(name, location)')
-            .eq('is_approved', true)
-            .order('created_at', ascending: false)
-            .limit(20);
-        data = (rows as List).whereType<Map<String, dynamic>>().toList();
-      } catch (_) {
-        final rows = await sb
-            .from('success_stories')
-            .select(
-                'id, title, body, profiles!success_stories_author_id_fkey(name, location)')
-            .eq('is_approved', true)
-            .order('created_at', ascending: false)
-            .limit(20);
-        data = (rows as List).whereType<Map<String, dynamic>>().toList();
-      }
+      final data = await DashboardWidgetsRepository.successStories();
       if (data.isEmpty) return null;
       data.shuffle();
       return data.first;
