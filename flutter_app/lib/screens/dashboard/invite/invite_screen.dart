@@ -10,6 +10,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../repositories/referrals_repository.dart';
 
 const _baseUrl = 'https://www.mensaena.de';
 
@@ -39,40 +40,12 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       return;
     }
     try {
-      final pending = await sb
-          .from('referrals')
-          .select('invite_code')
-          .eq('inviter_id', uid)
-          .eq('status', 'pending')
-          .limit(1)
-          .maybeSingle();
-      String? code = pending?['invite_code'] as String?;
-      if (code == null) {
-        final inserted = await sb
-            .from('referrals')
-            .insert({
-              'inviter_id': uid,
-              'status': 'pending',
-            })
-            .select('invite_code')
-            .maybeSingle();
-        code = inserted?['invite_code'] as String?;
-      }
-      final acceptedRes = await sb
-          .from('referrals')
-          .select('id')
-          .eq('inviter_id', uid)
-          .eq('status', 'accepted');
-      final pendingRes = await sb
-          .from('referrals')
-          .select('id')
-          .eq('inviter_id', uid)
-          .eq('status', 'pending');
+      final state = await ReferralsRepository.myInviteState(uid);
       if (!mounted) return;
       setState(() {
-        _code = code;
-        _accepted = (acceptedRes as List).length;
-        _pending = (pendingRes as List).length;
+        _code = state.code;
+        _accepted = state.accepted;
+        _pending = state.pending;
         _loading = false;
       });
     } catch (_) {
