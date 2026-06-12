@@ -18,6 +18,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
+import '../../../repositories/calls_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/empty_state_card.dart';
@@ -50,34 +51,8 @@ class _CallHistoryScreenState extends ConsumerState<CallHistoryScreen> {
     _future = _fetch(myId);
   }
 
-  Future<List<Map<String, dynamic>>> _fetch(String myId) async {
-    try {
-      final rows = await sb
-          .from('dm_calls')
-          .select('id, caller_id, callee_id, call_type, status, '
-              'created_at, answered_at, ended_at, conversation_id, room_name, '
-              'caller_hidden_at, callee_hidden_at, '
-              'caller:profiles!dm_calls_caller_id_fkey(id,display_name,name,avatar_url),'
-              'callee:profiles!dm_calls_callee_id_fkey(id,display_name,name,avatar_url)')
-          .or('and(caller_id.eq.$myId,caller_hidden_at.is.null),and(callee_id.eq.$myId,callee_hidden_at.is.null)')
-          .order('created_at', ascending: false)
-          .limit(30);
-      return List<Map<String, dynamic>>.from(rows as List);
-    } catch (_) {
-      // Fallback ohne Joins — manche Supabase-Setups erlauben den Embed nicht.
-      try {
-        final rows = await sb
-            .from('dm_calls')
-            .select()
-            .or('and(caller_id.eq.$myId,caller_hidden_at.is.null),and(callee_id.eq.$myId,callee_hidden_at.is.null)')
-            .order('created_at', ascending: false)
-            .limit(30);
-        return List<Map<String, dynamic>>.from(rows as List);
-      } catch (_) {
-        return const <Map<String, dynamic>>[];
-      }
-    }
-  }
+  Future<List<Map<String, dynamic>>> _fetch(String myId) =>
+      CallsRepository.history(myId);
 
   Future<void> _hideOne(String callId) async {
     final ok = await DmCallService.hideCallForMe(callId);

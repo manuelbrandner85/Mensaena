@@ -11,40 +11,22 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../repositories/calls_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 final scheduledCallsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  final uid = SupabaseService.currentUser?.id;
-  if (uid == null) return const [];
-  try {
-    final rows = await sb
-        .from('scheduled_calls')
-        .select(
-            '*, caller:caller_id(id, display_name, avatar_url), callee:callee_id(id, display_name, avatar_url)')
-        .or('caller_id.eq.$uid,callee_id.eq.$uid')
-        .eq('is_cancelled', false)
-        .gte('scheduled_at', DateTime.now().toIso8601String())
-        .order('scheduled_at', ascending: true)
-        .limit(50);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
-  } catch (_) {
-    return const [];
-  }
+  return CallsRepository.scheduledUpcoming();
 });
 
 class ScheduledCallsScreen extends ConsumerWidget {
   const ScheduledCallsScreen({super.key});
 
   Future<void> _cancel(WidgetRef ref, String id) async {
-    try {
-      await sb
-          .from('scheduled_calls')
-          .update({'is_cancelled': true}).eq('id', id);
-      ref.invalidate(scheduledCallsProvider);
-    } catch (_) {}
+    final ok = await CallsRepository.scheduleCancel(id);
+    if (ok) ref.invalidate(scheduledCallsProvider);
   }
 
   /// Öffnet das System-„Termin hinzufügen"-Dialog mit vorausgefüllten Daten.
@@ -245,20 +227,19 @@ class _ScheduleCallSheetState extends ConsumerState<ScheduleCallSheet> {
   }
 
   Future<void> _save() async {
-    final uid = SupabaseService.currentUser?.id;
-    if (uid == null || _when == null) return;
+    if (_when == null) return;
     setState(() => _saving = true);
-    try {
-      await sb.from('scheduled_calls').insert({
-        'caller_id': uid,
-        'callee_id': widget.calleeId,
-        'scheduled_at': _when!.toIso8601String(),
-        'call_type': _type,
-      });
+    final ok = await CallsRepository.scheduleCreate(
+      calleeId: widget.calleeId,
+      scheduledAt: _when!,
+      callType: _type,
+    );
+    if (!mounted) return;
+    if (ok) {
       ref.invalidate(scheduledCallsProvider);
-      if (mounted) Navigator.pop(context, true);
-    } catch (_) {
-      if (mounted) setState(() => _saving = false);
+      Navigator.pop(context, true);
+    } else {
+      setState(() => _saving = false);
     }
   }
 

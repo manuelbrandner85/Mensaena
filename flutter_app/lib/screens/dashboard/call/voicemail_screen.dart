@@ -11,26 +11,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/calls_repository.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 final voicemailsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  final uid = SupabaseService.currentUser?.id;
-  if (uid == null) return const [];
-  try {
-    final rows = await sb
-        .from('call_voicemails')
-        .select(
-            '*, caller:caller_id (id, display_name, avatar_url)')
-        .eq('callee_id', uid)
-        .order('created_at', ascending: false)
-        .limit(100);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
-  } catch (_) {
-    return const [];
-  }
+  return CallsRepository.voicemailsForMe();
 });
 
 class VoicemailScreen extends ConsumerStatefulWidget {
@@ -61,9 +48,7 @@ class _VoicemailScreenState extends ConsumerState<VoicemailScreen> {
     try {
       await _player.play(UrlSource(url));
       if (!(v['is_listened'] as bool? ?? false)) {
-        await sb
-            .from('call_voicemails')
-            .update({'is_listened': true}).eq('id', id);
+        await CallsRepository.voicemailMarkListened(id);
         ref.invalidate(voicemailsProvider);
       }
     } catch (_) {

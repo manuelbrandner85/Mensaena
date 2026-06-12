@@ -205,6 +205,17 @@ class DmCallService {
         .limit(1);
   }
 
+  /// Realtime-Stream der letzten 20 an [uid] gerichteten Calls — Quelle
+  /// des IncomingCallListener (Dedupe/Popup-Logik bleibt im Widget).
+  static Stream<List<Map<String, dynamic>>> watchIncomingFor(String uid) {
+    return sb
+        .from('dm_calls')
+        .stream(primaryKey: ['id'])
+        .eq('callee_id', uid)
+        .order('created_at', ascending: false)
+        .limit(20);
+  }
+
   /// Liefert die Konversations-ID zu einem Call (oder null).
   static Future<String?> conversationIdOf(String callId) async {
     try {
