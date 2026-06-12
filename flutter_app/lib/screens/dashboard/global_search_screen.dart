@@ -13,6 +13,7 @@ import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/skeleton_card.dart';
+import '../../repositories/search_repository.dart';
 import 'modules_hub_screen.dart' show ModuleTile, kModulesCatalog;
 
 /// SKILL: mensaena-features
@@ -73,70 +74,19 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
     final query = q.trim();
     if (query.length < 2) return const _SearchResults.empty();
     final pattern = '%$query%';
-    Future<List<Map<String, dynamic>>> safe(
-        Future<dynamic> Function() run) async {
-      try {
-        // Timeout pro Quelle: ohne ihn blockiert EINE haengende Query das
-        // gesamte Future.wait -> ewiger Spinner statt Teilergebnissen.
-        final res = await run().timeout(const Duration(seconds: 8));
-        if (res is List) {
-          return res.whereType<Map<String, dynamic>>().toList();
-        }
-      } catch (_) {}
-      return const [];
-    }
-
     try {
-      // 8 Parallel-Quellen für die globale Suche (1M€-App-Niveau):
-      // Posts/Profile/Events/Orgs (bestehend) + Gruppen/Marktplatz/Brett/
-      // Wissen (neu). Jede Quelle in safe() gewrappt, damit eine fehlende
-      // Tabelle/RLS nicht die anderen 7 Ergebnisse killt.
+      // 8 Parallel-Quellen für die globale Suche — alle im
+      // SearchRepository (8s-Timeout + Fail-Safe pro Quelle, damit eine
+      // fehlende Tabelle/RLS nicht die anderen 7 Ergebnisse killt).
       final results = await Future.wait<List<Map<String, dynamic>>>([
         _searchPosts(query),
-        safe(() => sb
-            .from('profiles')
-            .select('id, name, display_name, nickname, avatar_url, location')
-            .or('name.ilike.$pattern,nickname.ilike.$pattern,display_name.ilike.$pattern')
-            .limit(10)),
-        safe(() => sb
-            .from('events')
-            .select('id, title, description, start_date, location_name')
-            .ilike('title', pattern)
-            .eq('status', 'active')
-            .order('start_date')
-            .limit(10)),
-        safe(() => sb
-            .from('organizations')
-            .select('id, name, category, city, is_verified')
-            .or('name.ilike.$pattern,description.ilike.$pattern')
-            .limit(10)),
-        safe(() => sb
-            .from('groups')
-            .select('id, name, slug, category, description, member_count')
-            .or('name.ilike.$pattern,description.ilike.$pattern')
-            .neq('is_archived', true)
-            .order('member_count', ascending: false)
-            .limit(10)),
-        safe(() => sb
-            .from('marketplace_listings')
-            .select('id, title, listing_type, category, price, location_text')
-            .or('title.ilike.$pattern,description.ilike.$pattern')
-            .eq('status', 'active')
-            .order('created_at', ascending: false)
-            .limit(10)),
-        safe(() => sb
-            .from('board_posts')
-            .select('id, content, category, color, created_at')
-            .ilike('content', pattern)
-            .eq('status', 'active')
-            .order('created_at', ascending: false)
-            .limit(10)),
-        safe(() => sb
-            .from('knowledge_articles')
-            .select('id, slug, title, summary, category')
-            .or('title.ilike.$pattern,summary.ilike.$pattern,content.ilike.$pattern')
-            .eq('is_public', true)
-            .limit(10)),
+        SearchRepository.profiles(pattern),
+        SearchRepository.events(pattern),
+        SearchRepository.organizations(pattern),
+        SearchRepository.groups(pattern),
+        SearchRepository.marketplace(pattern),
+        SearchRepository.boardPosts(pattern),
+        SearchRepository.knowledge(pattern),
       ]);
       return _SearchResults(
         modules: _matchModules(query),
@@ -212,18 +162,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
       }
     } catch (_) {}
     // Fallback: direct ilike
-    try {
-      final res = await sb
-          .from('posts')
-          .select('id, title, type, description, created_at')
-          .or('title.ilike.%$q%,description.ilike.%$q%')
-          .eq('status', 'active')
-          .order('created_at', ascending: false)
-          .limit(10);
-      return (res as List).whereType<Map<String, dynamic>>().toList();
-    } catch (_) {
-      return const [];
-    }
+    return SearchRepository.postsFallback(q);
   }
 
   void _onChanged(String v) {
