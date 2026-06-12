@@ -194,6 +194,20 @@ class ConversationsRepository {
     }
   }
 
+  /// True wenn die Konversation mindestens eine Nachricht hat.
+  static Future<bool> hasMessages(String conversationId) async {
+    try {
+      final rows = await sb
+          .from('messages')
+          .select('id')
+          .eq('conversation_id', conversationId)
+          .limit(1);
+      return (rows as List).isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Eigene Memberships mit last_read_at (fuer Unread-Aggregation).
   static Future<List<Map<String, dynamic>>> myMembershipsRead(
       String userId) async {

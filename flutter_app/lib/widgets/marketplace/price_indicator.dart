@@ -10,29 +10,12 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/marketplace_repository.dart';
 
 final _avgPriceProvider =
     FutureProvider.family.autoDispose<double?, String>((ref, category) async {
   try {
-    final since = DateTime.now()
-        .toUtc()
-        .subtract(const Duration(days: 90))
-        .toIso8601String();
-    final rows = await sb
-        .from('marketplace_listings')
-        .select('price')
-        .eq('category', category)
-        .gte('created_at', since)
-        .gt('price', 0);
-    if ((rows as List).isEmpty) return null;
-    final prices = rows
-        .cast<Map<String, dynamic>>()
-        .map((r) => (r['price'] as num?)?.toDouble())
-        .whereType<double>()
-        .toList();
-    if (prices.isEmpty) return null;
-    return prices.reduce((a, b) => a + b) / prices.length;
+    return MarketplaceRepository.averagePrice(category);
   } catch (_) {
     return null;
   }

@@ -13,23 +13,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/posts_repository.dart';
 
 final _similarPostsProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, _SimilarKey>((ref, key) async {
   try {
-    var q = sb
-        .from('posts')
-        .select('id, title, type, media_urls, image_url, created_at')
-        .neq('id', key.postId)
-        .eq('status', 'active')
-        .eq('type', key.type);
-    if (key.tags.isNotEmpty) {
-      // Postgres array overlap operator via Supabase
-      q = q.overlaps('tags', key.tags);
-    }
-    final rows = await q.order('created_at', ascending: false).limit(5);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
+    return PostsRepository.similar(
+        postId: key.postId, type: key.type, tags: key.tags);
   } catch (_) {
     return const [];
   }
