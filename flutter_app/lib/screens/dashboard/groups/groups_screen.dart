@@ -137,6 +137,9 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                           const SizedBox(height: 60),
                           EmptyStateCard(
                             icon: LucideIcons.users2,
+                            moodAsset: _hasFilters
+                                ? null
+                                : 'assets/images/empty_community.webp',
                             title: _hasFilters
                                 ? 'search.noResultsShort'.tr()
                                 : 'groups.empty'.tr(),

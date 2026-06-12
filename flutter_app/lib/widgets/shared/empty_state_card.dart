@@ -15,6 +15,7 @@ class EmptyStateCard extends StatefulWidget {
     this.actionLabel,
     this.onAction,
     this.color,
+    this.moodAsset,
     super.key,
   });
 
@@ -24,6 +25,10 @@ class EmptyStateCard extends StatefulWidget {
   final String? actionLabel;
   final VoidCallback? onAction;
   final Color? color;
+
+  /// Optionales Higgsfield-Stimmungsbild (assets/images/empty_*.webp) —
+  /// macht aus dem leeren Zustand einen Moment statt einer Luecke.
+  final String? moodAsset;
 
   @override
   State<EmptyStateCard> createState() => _EmptyStateCardState();
@@ -69,6 +74,20 @@ class _EmptyStateCardState extends State<EmptyStateCard>
       ),
       child: Column(
         children: [
+          if (widget.moodAsset != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                widget.moodAsset!,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                // Fehler -> Bild faellt einfach weg, Layout bleibt intakt.
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           AnimatedBuilder(
             animation: _pulse,
             builder: (_, child) {
