@@ -14,6 +14,8 @@ import 'repositories/extra_repositories.dart';
 import 'repositories/notification_prefs_repository.dart';
 import 'services/deep_link_service.dart';
 import 'services/memory_watchdog_service.dart';
+import 'providers/effects_gate_provider.dart';
+import 'services/frame_watchdog_service.dart';
 import 'services/push_notification_service.dart';
 import 'services/supabase_service.dart';
 import 'widgets/shared/biometric_lock_gate.dart';
@@ -49,12 +51,19 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
     // Image-Cache proaktiv, bevor er das harte Limit reißt (→ kein OOM-Crash
     // / kein Langsamer-Werden über Stunden). Siehe MemoryWatchdogService.
     MemoryWatchdogService.instance.start();
+    // Frame-Watchdog (Phase 6): misst echte Frame-Zeiten und deckelt das
+    // EffectsGate auf reduced, wenn >10% der Frames das Budget reissen.
+    FrameWatchdogService.instance.start(onCapChanged: (capped) {
+      if (!mounted) return;
+      ref.read(runtimeEffectsCapProvider.notifier).state = capped;
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     MemoryWatchdogService.instance.stop();
+    FrameWatchdogService.instance.stop();
     super.dispose();
   }
 

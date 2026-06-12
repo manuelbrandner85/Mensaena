@@ -46,6 +46,11 @@ extension EffectsProfileX on EffectsProfile {
       };
 }
 
+/// Laufzeit-Deckel vom FrameWatchdog (Phase 6): true = das Gerät kommt
+/// aktuell nicht hinterher → full wird auf reduced gedeckelt. Der Watchdog
+/// nimmt nur Schmuck weg, nie Funktion (deshalb kein Deckel auf none).
+final runtimeEffectsCapProvider = StateProvider<bool>((_) => false);
+
 final effectsProfileProvider = Provider<EffectsProfile>((ref) {
   // effectiveReduceMotion: schließt seniorMode mit ein.
   final reduceMotion = ref.watch(a11yProvider).effectiveReduceMotion;
@@ -59,9 +64,15 @@ final effectsProfileProvider = Provider<EffectsProfile>((ref) {
         ? EffectsProfile.none
         : EffectsProfile.reduced;
   }
-  return switch (intensity) {
+  final base = switch (intensity) {
     CinemaIntensity.full => EffectsProfile.full,
     CinemaIntensity.reduced => EffectsProfile.reduced,
     CinemaIntensity.minimal => EffectsProfile.none,
   };
+  // Frame-Watchdog-Deckel: full -> reduced solange das Gerät janked.
+  if (base == EffectsProfile.full &&
+      ref.watch(runtimeEffectsCapProvider)) {
+    return EffectsProfile.reduced;
+  }
+  return base;
 });
