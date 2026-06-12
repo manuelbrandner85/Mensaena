@@ -15,6 +15,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 /// SKILL: mensaena-features
 /// Knowledge-Create-Screen — Markdown-Editor mit Live-Vorschau,
@@ -367,7 +368,8 @@ class _KnowledgeCreateScreenState
       title: 'knowledge.createArticle'.tr(),
       currentRoute: widget.routePath,
       body: SafeArea(
-        child: ListView(
+        child: ReadableWidth(
+            child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
           children: [
             EditorialModuleHeader(
@@ -614,7 +616,7 @@ class _KnowledgeCreateScreenState
               child: Text('common.cancel'.tr()),
             ),
           ],
-        ),
+        )),
       ),
     );
   }

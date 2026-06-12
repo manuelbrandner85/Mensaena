@@ -16,6 +16,7 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 /// SKILL: mensaena-features
 /// Komplette Event-Erstellungs-Maske: Cover, 10 Kategorien, Datum+Zeit,
@@ -337,7 +338,8 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            ListView(
+            ReadableWidth(
+                child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               children: [
                 _sectionCover(),
@@ -358,7 +360,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
                 _submitButton(),
                 const SizedBox(height: 16),
               ],
-            ),
+            )),
             if (_submitting || _uploading) _loadingOverlay(),
           ],
         ),

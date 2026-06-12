@@ -16,6 +16,7 @@ import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 /// SKILL: mensaena-features
 /// Crisis-Create — Schnellformular fuer Notfallmeldung.
@@ -263,7 +264,8 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       title: 'crisis.createTitle'.tr(),
       currentRoute: '/dashboard/crisis',
       body: SafeArea(
-        child: ListView(
+        child: ReadableWidth(
+            child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
             // Pulsierender Lebensgefahr-Banner (auf dieser Seite sehr prominent)
@@ -665,7 +667,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
               ),
             ),
           ],
-        ),
+        )),
       ),
     );
   }
