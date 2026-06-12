@@ -20,6 +20,7 @@ import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../shared/barcode_scanner_screen.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 class MarketplaceCreateScreen extends ConsumerStatefulWidget {
   const MarketplaceCreateScreen({super.key});
@@ -326,7 +327,8 @@ class _MarketplaceCreateScreenState
       title: 'create.marketplaceTitle'.tr(),
       currentRoute: '/dashboard/marketplace',
       body: SafeArea(
-        child: ListView(
+        child: ReadableWidth(
+            child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Text('marketplace.type'.tr(), style: AppTypography.label(size: 10)),
@@ -612,7 +614,7 @@ class _MarketplaceCreateScreenState
                   : 'marketplace.createButton'.tr()),
             ),
           ],
-        ),
+        )),
       ),
     );
   }
