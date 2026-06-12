@@ -107,6 +107,33 @@ class DashboardWidgetsRepository {
     }
   }
 
+  /// Wochen-Digest-Zaehler (Posts/Interactions/Messages der letzten 7 Tage).
+  static Future<({int posts, int interactions, int messages})>
+      weeklyDigestCounts(String userId) async {
+    final since = DateTime.now()
+        .toUtc()
+        .subtract(const Duration(days: 7))
+        .toIso8601String();
+    try {
+      final results = await Future.wait([
+        sb.from('posts').select('id').eq('user_id', userId).gte('created_at', since),
+        sb
+            .from('interactions')
+            .select('id')
+            .or('helper_id.eq.$userId,helped_id.eq.$userId')
+            .gte('created_at', since),
+        sb.from('messages').select('id').eq('sender_id', userId).gte('created_at', since),
+      ]);
+      return (
+        posts: (results[0] as List).length,
+        interactions: (results[1] as List).length,
+        messages: (results[2] as List).length,
+      );
+    } catch (_) {
+      return (posts: 0, interactions: 0, messages: 0);
+    }
+  }
+
   /// Top-Weekly-Challenges der angegebenen Woche.
   static Future<List<Map<String, dynamic>>> weeklyChallenges(
       String weekOf) async {

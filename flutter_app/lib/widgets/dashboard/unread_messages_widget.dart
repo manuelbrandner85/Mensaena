@@ -11,6 +11,8 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../shared/sized_avatar_image.dart';
+import '../../repositories/conversations_repository.dart';
+import '../../repositories/profiles_repository.dart';
 
 class UnreadMessagesWidget extends StatefulWidget {
   const UnreadMessagesWidget({super.key});
@@ -32,12 +34,8 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return const [];
     try {
-      final memberships = await sb
-          .from('conversation_members')
-          .select('conversation_id, last_read_at')
-          .eq('user_id', uid);
       final memList =
-          (memberships as List).whereType<Map<String, dynamic>>();
+          await ConversationsRepository.myMembershipsRead(uid);
       if (memList.isEmpty) return const [];
 
       final result = <_UnreadMessage>[];
@@ -48,14 +46,8 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
             ? DateTime.tryParse(m['last_read_at'] as String)?.toUtc()
             : null;
 
-        final msgs = await sb
-            .from('messages')
-            .select('id, content, sender_id, created_at')
-            .eq('conversation_id', convId)
-            .neq('sender_id', uid)
-            .order('created_at', ascending: false)
-            .limit(20);
-        final msgList = (msgs as List).whereType<Map<String, dynamic>>();
+        final msgList = await MessagesRepository.recentFromOthers(
+            conversationId: convId, excludeSenderId: uid);
         if (msgList.isEmpty) continue;
 
         final unread = msgList.where((row) {
@@ -71,19 +63,11 @@ class _UnreadMessagesWidgetState extends State<UnreadMessagesWidget> {
         String senderName = 'Nachbar:in';
         String? senderAvatar;
         if (senderId != null) {
-          try {
-            final p = await sb
-                .from('profiles')
-                .select('name, display_name, avatar_url')
-                .eq('id', senderId)
-                .maybeSingle();
-            if (p != null) {
-              senderName = (p['display_name'] as String?) ??
-                  (p['name'] as String?) ??
-                  senderName;
-              senderAvatar = p['avatar_url'] as String?;
-            }
-          } catch (_) {}
+          final p = await ProfilesRepository.getById(senderId);
+          if (p != null) {
+            senderName = p.displayName ?? p.name ?? senderName;
+            senderAvatar = p.avatarUrl;
+          }
         }
         result.add(_UnreadMessage(
           conversationId: convId,

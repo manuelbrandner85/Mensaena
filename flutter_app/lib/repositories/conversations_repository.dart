@@ -194,6 +194,20 @@ class ConversationsRepository {
     }
   }
 
+  /// Eigene Memberships mit last_read_at (fuer Unread-Aggregation).
+  static Future<List<Map<String, dynamic>>> myMembershipsRead(
+      String userId) async {
+    try {
+      final rows = await sb
+          .from('conversation_members')
+          .select('conversation_id, last_read_at')
+          .eq('user_id', userId);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   /// Mitglieder einer Konversation inkl. Profil (fuer @-Mention-Autocomplete).
   static Future<List<Map<String, dynamic>>> members(
       String conversationId) async {
@@ -311,6 +325,26 @@ class MessagesRepository {
       'sender_id': uid,
       'content': content,
     });
+  }
+
+  /// Letzte Nachrichten EINER Konversation von ANDEREN (fuer Unread).
+  static Future<List<Map<String, dynamic>>> recentFromOthers({
+    required String conversationId,
+    required String excludeSenderId,
+    int limit = 20,
+  }) async {
+    try {
+      final rows = await sb
+          .from('messages')
+          .select('id, content, sender_id, created_at')
+          .eq('conversation_id', conversationId)
+          .neq('sender_id', excludeSenderId)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
   }
 
   /// Weitergeleitete Nachricht in eine Konversation einfuegen.

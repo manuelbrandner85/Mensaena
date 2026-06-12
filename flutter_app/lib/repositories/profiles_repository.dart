@@ -152,6 +152,21 @@ class ProfilesRepository {
     );
   }
 
+  /// Liest die rohe dashboard_config (JSONB) eines Users (oder null).
+  static Future<Map<String, dynamic>?> dashboardConfig(String userId) async {
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('dashboard_config')
+          .eq('id', userId)
+          .maybeSingle();
+      final raw = row?['dashboard_config'];
+      return raw is Map ? Map<String, dynamic>.from(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<void> update(String userId, Map<String, dynamic> patch) async {
     if (patch.containsKey('avatar_url')) {
       final v = patch['avatar_url'];
