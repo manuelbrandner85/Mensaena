@@ -13,18 +13,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/posts_repository.dart';
 
 final _postPreviewProvider =
     FutureProvider.autoDispose.family<Map<String, dynamic>?, String>(
   (ref, postId) async {
     try {
-      final row = await sb
-          .from('posts')
-          .select('id, title, type, image_url, images, user_id')
-          .eq('id', postId)
-          .maybeSingle();
-      return row;
+      return PostsRepository.cardPreview(postId);
     } catch (_) {
       return null;
     }

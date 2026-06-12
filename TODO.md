@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-11)
+- [x] sb.from-Abbau Batch 7 (Sammel-PR Chat-Widgets): 6 Widgets Supabase-frei (7 Zugriffe -> 0) via bestehende Repos: forward_message_sheet+chat_recap_sheet -> MessagesRepository.forward/recentForRecap; mentions_autocomplete+vanish_mode_banner+vanish_mode_sheet (2) -> ConversationsRepository.members/vanishSettings/setVanish; post_card_chat_bubble -> PostsRepository.cardPreview. Unused supabase_service-Importe entfernt. Baseline: 75 Zugriffe / 47 Dateien (-34% seit Start 113/61). Ab jetzt Sammel-PRs pro Domaene statt eins-pro-Datei.
 - [x] sb.from-Abbau Batch 6 (Account): account_screen Supabase-frei bzgl. sb.from (3 -> 0) — GDPR-Export nutzt jetzt die bestehenden SettingsRepository.gdprRowsSingle/gdprRowsDual (kein Dup), verified_email-Update via ProfilesRepository.update. sb.auth.resend bleibt (Auth, vom Guard nicht erfasst). Baseline: 82 Zugriffe / 53 Dateien.
 - [x] sb.from-Abbau Batch 5 (Einladungen): NEU repositories/referrals_repository.dart (myInviteState: pending-Code holen/erzeugen + accepted/pending-Zaehler); invite_screen Supabase-frei (4 -> 0). Baseline: 85 Zugriffe / 54 Dateien.
 - [x] sb.from-Abbau Batch 4 (Geplante Streams): NEU repositories/scheduled_streams_repository.dart (listUpcoming/myReminderIds/addReminder/removeReminder/create); scheduled_streams_screen Supabase-frei (5 -> 0). Baseline: 89 Zugriffe / 55 Dateien (Start: 113/61, -21%).

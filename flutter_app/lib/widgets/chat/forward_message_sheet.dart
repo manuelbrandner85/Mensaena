@@ -82,11 +82,10 @@ class _ForwardMessageSheetState extends ConsumerState<ForwardMessageSheet> {
     try {
       final me = SupabaseService.currentUser?.id;
       if (me == null) return;
-      await sb.from('messages').insert({
-        'conversation_id': convId,
-        'sender_id': me,
-        'content': '[FORWARDED]\n${widget.originalContent}',
-      });
+      await MessagesRepository.forward(
+        conversationId: convId,
+        content: '[FORWARDED]\n${widget.originalContent}',
+      );
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

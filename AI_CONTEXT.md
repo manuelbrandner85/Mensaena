@@ -214,6 +214,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-06-12 | refactor(sb-abbau-7): Chat-Widgets Sammel-PR — 6 Dateien Supabase-frei via +6 Repo-Methoden (ConversationsRepository.members/vanishSettings/setVanish, MessagesRepository.forward/recentForRecap, PostsRepository.cardPreview); Baseline 75/47 | flutter_app/lib/repositories/{conversations,posts}_repository.dart, flutter_app/lib/widgets/chat/{chat_recap_sheet,forward_message_sheet,mentions_autocomplete,post_card_chat_bubble,vanish_mode_banner,vanish_mode_sheet}.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-6): account_screen sb.from 3->0 (GDPR-Export -> SettingsRepository.gdprRows*, verified_email -> ProfilesRepository.update); Baseline 82/53 | flutter_app/lib/screens/dashboard/account_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-5): NEU repositories/referrals_repository.dart; invite_screen Supabase-frei (4->0); Baseline 85/54 | flutter_app/lib/repositories/referrals_repository.dart, flutter_app/lib/screens/dashboard/invite/invite_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-4): NEU repositories/scheduled_streams_repository.dart; scheduled_streams_screen Supabase-frei (5->0); Baseline 89/55 | flutter_app/lib/repositories/scheduled_streams_repository.dart, flutter_app/lib/screens/dashboard/live/scheduled_streams_screen.dart, scripts/check_ui_supabase.py |

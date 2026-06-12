@@ -9,7 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/conversations_repository.dart';
 
 class VanishModeSheet extends ConsumerStatefulWidget {
   const VanishModeSheet({required this.conversationId, super.key});
@@ -49,15 +49,12 @@ class _VanishModeSheetState extends ConsumerState<VanishModeSheet> {
 
   Future<void> _load() async {
     try {
-      final row = await sb
-          .from('conversations')
-          .select('vanish_mode_enabled, vanish_seconds')
-          .eq('id', widget.conversationId)
-          .maybeSingle();
+      final v = await ConversationsRepository.vanishSettings(
+          widget.conversationId);
       if (!mounted) return;
       setState(() {
-        _enabled = row?['vanish_mode_enabled'] as bool? ?? false;
-        _seconds = (row?['vanish_seconds'] as num?)?.toInt() ?? 3600;
+        _enabled = v.enabled;
+        _seconds = v.seconds;
         _loading = false;
       });
     } catch (_) {
@@ -67,10 +64,11 @@ class _VanishModeSheetState extends ConsumerState<VanishModeSheet> {
 
   Future<void> _save() async {
     try {
-      await sb.from('conversations').update({
-        'vanish_mode_enabled': _enabled,
-        'vanish_seconds': _seconds,
-      }).eq('id', widget.conversationId);
+      await ConversationsRepository.setVanish(
+        conversationId: widget.conversationId,
+        enabled: _enabled,
+        seconds: _seconds,
+      );
       if (mounted) Navigator.pop(context);
     } catch (_) {}
   }

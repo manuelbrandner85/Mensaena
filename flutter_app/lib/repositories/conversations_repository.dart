@@ -193,6 +193,54 @@ class ConversationsRepository {
       return null;
     }
   }
+
+  /// Mitglieder einer Konversation inkl. Profil (fuer @-Mention-Autocomplete).
+  static Future<List<Map<String, dynamic>>> members(
+      String conversationId) async {
+    try {
+      final rows = await sb
+          .from('conversation_members')
+          .select('user_id, profiles!inner(id, display_name, avatar_url)')
+          .eq('conversation_id', conversationId)
+          .limit(100);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map((r) => Map<String, dynamic>.from(r['profiles'] as Map))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Vanish-Mode-Einstellungen einer Konversation.
+  static Future<({bool enabled, int seconds})> vanishSettings(
+      String conversationId) async {
+    try {
+      final row = await sb
+          .from('conversations')
+          .select('vanish_mode_enabled, vanish_seconds')
+          .eq('id', conversationId)
+          .maybeSingle();
+      return (
+        enabled: row?['vanish_mode_enabled'] as bool? ?? false,
+        seconds: (row?['vanish_seconds'] as num?)?.toInt() ?? 3600,
+      );
+    } catch (_) {
+      return (enabled: false, seconds: 3600);
+    }
+  }
+
+  /// Vanish-Mode setzen.
+  static Future<void> setVanish({
+    required String conversationId,
+    required bool enabled,
+    required int seconds,
+  }) async {
+    await sb.from('conversations').update({
+      'vanish_mode_enabled': enabled,
+      'vanish_seconds': seconds,
+    }).eq('id', conversationId);
+  }
 }
 
 class MessagesRepository {
@@ -263,6 +311,37 @@ class MessagesRepository {
       'sender_id': uid,
       'content': content,
     });
+  }
+
+  /// Weitergeleitete Nachricht in eine Konversation einfuegen.
+  static Future<void> forward({
+    required String conversationId,
+    required String content,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    await sb.from('messages').insert({
+      'conversation_id': conversationId,
+      'sender_id': uid,
+      'content': content,
+    });
+  }
+
+  /// Letzte 100 nicht-geloeschte Nachrichten fuer den Chat-Recap.
+  static Future<List<Map<String, dynamic>>> recentForRecap(
+      String conversationId) async {
+    try {
+      final rows = await sb
+          .from('messages')
+          .select('content, sender_id, created_at')
+          .eq('conversation_id', conversationId)
+          .isFilter('deleted_at', null)
+          .order('created_at', ascending: false)
+          .limit(100);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
   }
 
   /// Eigene Nachricht editieren (nur eigene erlaubt — RLS).
