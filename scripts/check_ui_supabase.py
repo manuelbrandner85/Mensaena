@@ -54,9 +54,6 @@ BASELINE: dict[str, int] = {
     "lib/widgets/livestream/livestream_chat_resolver.dart": 1,
     "lib/widgets/profile/send_voicemail_sheet.dart": 1,
     "lib/widgets/profile/status_editor_sheet.dart": 3,
-    "lib/widgets/shared/critical_crisis_alert_listener.dart": 1,
-    "lib/widgets/shared/incoming_call_listener.dart": 3,
-    "lib/widgets/shared/sos_button.dart": 2,
 }
 
 

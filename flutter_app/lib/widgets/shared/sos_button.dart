@@ -15,9 +15,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../models/emergency_number.dart';
+import '../../repositories/crisis_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/locale_country_service.dart';
-import '../../services/supabase_service.dart';
 
 class SOSButton extends StatefulWidget {
   const SOSButton({super.key});
@@ -119,7 +120,7 @@ class _SOSSheet extends StatefulWidget {
 }
 
 class _SOSSheetState extends State<_SOSSheet> {
-  Future<List<Map<String, dynamic>>>? _future;
+  Future<List<EmergencyNumber>>? _future;
 
   @override
   void didChangeDependencies() {
@@ -127,27 +128,11 @@ class _SOSSheetState extends State<_SOSSheet> {
     _future ??= _load(LocaleCountryService.forContext(context));
   }
 
-  Future<List<Map<String, dynamic>>> _load(String country) async {
-    try {
-      final rows = await sb
-          .from('emergency_numbers')
-          .select()
-          .eq('country', country)
-          .order('sort_order');
-      return List<Map<String, dynamic>>.from(rows as List);
-    } catch (_) {
-      // Fallback DE wenn das User-Land nicht gepflegt ist.
-      try {
-        final rows = await sb
-            .from('emergency_numbers')
-            .select()
-            .eq('country', 'DE')
-            .order('sort_order');
-        return List<Map<String, dynamic>>.from(rows as List);
-      } catch (_) {
-        return const <Map<String, dynamic>>[];
-      }
-    }
+  Future<List<EmergencyNumber>> _load(String country) async {
+    final rows = await EmergencyNumbersRepository.listForCountry(country);
+    if (rows.isNotEmpty) return rows;
+    // Fallback DE wenn das User-Land nicht gepflegt ist.
+    return EmergencyNumbersRepository.listForCountry('DE');
   }
 
   @override
@@ -206,7 +191,7 @@ class _SOSSheetState extends State<_SOSSheet> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
+              child: FutureBuilder<List<EmergencyNumber>>(
                 future: _future,
                 builder: (context, snap) {
                   if (snap.connectionState != ConnectionState.done) {
@@ -215,7 +200,7 @@ class _SOSSheetState extends State<_SOSSheet> {
                           color: AppColors.herzrot),
                     );
                   }
-                  final rows = snap.data ?? const <Map<String, dynamic>>[];
+                  final rows = snap.data ?? const <EmergencyNumber>[];
                   if (rows.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.all(24),
@@ -226,9 +211,9 @@ class _SOSSheetState extends State<_SOSSheet> {
                       ),
                     );
                   }
-                  final grouped = <String, List<Map<String, dynamic>>>{};
+                  final grouped = <String, List<EmergencyNumber>>{};
                   for (final r in rows) {
-                    final cat = (r['category'] as String?) ?? 'general';
+                    final cat = r.category.isEmpty ? 'general' : r.category;
                     grouped.putIfAbsent(cat, () => []).add(r);
                   }
                   return ListView(
@@ -275,15 +260,15 @@ class _SOSSheetState extends State<_SOSSheet> {
 
 class _SOSRow extends StatelessWidget {
   const _SOSRow({required this.row});
-  final Map<String, dynamic> row;
+  final EmergencyNumber row;
 
   @override
   Widget build(BuildContext context) {
-    final label = (row['label'] as String?) ?? '';
-    final number = (row['number'] as String?) ?? '';
-    final description = (row['description'] as String?) ?? '';
-    final is24h = row['is_24h'] == true;
-    final isFree = row['is_free'] == true;
+    final label = row.label;
+    final number = row.number;
+    final description = row.description ?? '';
+    final is24h = row.is24h == true;
+    final isFree = row.isFree == true;
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(

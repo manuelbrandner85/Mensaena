@@ -205,6 +205,18 @@ class DmCallService {
         .limit(1);
   }
 
+  /// Realtime-Stream aller eingehenden Calls eines Users (neueste zuerst).
+  /// limit(20) Pflicht (Stream-Regeln) — Konsument: IncomingCallListener.
+  static Stream<List<Map<String, dynamic>>> watchIncomingFor(
+      String calleeId) {
+    return sb
+        .from('dm_calls')
+        .stream(primaryKey: ['id'])
+        .eq('callee_id', calleeId)
+        .order('created_at', ascending: false)
+        .limit(20);
+  }
+
   /// Liefert die Konversations-ID zu einem Call (oder null).
   static Future<String?> conversationIdOf(String callId) async {
     try {

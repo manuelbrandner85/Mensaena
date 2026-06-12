@@ -10,9 +10,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../repositories/crisis_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/sound_service.dart';
-import '../../services/supabase_service.dart';
 
 const _lastSeenKey = 'last_seen_critical_crisis_v1';
 const _storage = FlutterSecureStorage();
@@ -84,16 +84,7 @@ class _CriticalCrisisAlertListenerState
     if (!_bootstrapped) return;
     if (_lifecycle != AppLifecycleState.resumed) return;
     try {
-      final rows = await sb
-          .from('crises')
-          .select('id, created_at')
-          .eq('status', 'active')
-          .eq('urgency', 'critical')
-          .order('created_at', ascending: false)
-          .limit(1);
-      final list = (rows as List).whereType<Map<String, dynamic>>().toList();
-      if (list.isEmpty) return;
-      final newestId = list.first['id'] as String?;
+      final newestId = await CrisisRepository.latestCriticalActiveId();
       if (newestId == null || newestId == _lastSeenId) return;
 
       final isFirstRun = _lastSeenId == null;

@@ -45,6 +45,24 @@ class CrisisRepository {
     }
   }
 
+  /// ID der neuesten aktiven KRITISCHEN Krise (oder null) — fuer den
+  /// CriticalCrisisAlertListener (Dedupe via SecureStorage).
+  static Future<String?> latestCriticalActiveId() async {
+    try {
+      final rows = await sb
+          .from('crises')
+          .select('id, created_at')
+          .eq('status', 'active')
+          .eq('urgency', 'critical')
+          .order('created_at', ascending: false)
+          .limit(1);
+      final list = (rows as List).whereType<Map<String, dynamic>>().toList();
+      return list.isEmpty ? null : list.first['id'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<Crisis?> getById(String id) async {
     try {
       final row =

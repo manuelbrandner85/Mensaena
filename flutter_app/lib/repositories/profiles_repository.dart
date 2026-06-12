@@ -11,6 +11,27 @@ import '../services/supabase_service.dart';
 class ProfilesRepository {
   const ProfilesRepository._();
 
+  /// Leichtgewichtiger Name+Avatar-Lookup (z. B. Incoming-Call-UI).
+  /// Bewusst KEIN Minimal-Fallback: null heisst "nicht aufloesbar".
+  static Future<({String? displayName, String? avatarUrl})?> nameAndAvatar(
+      String userId) async {
+    try {
+      final p = await sb
+          .from('profiles')
+          .select('display_name, name, avatar_url')
+          .eq('id', userId)
+          .maybeSingle();
+      if (p == null) return null;
+      return (
+        displayName:
+            (p['display_name'] as String?) ?? (p['name'] as String?),
+        avatarUrl: p['avatar_url'] as String?,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Profil per User-ID. NIEMALS null wenn userId vorhanden ist —
   /// fallback auf Minimal-Profile damit UI nie "Fehler beim Laden" zeigt.
   static Future<Profile?> getById(String userId) async {

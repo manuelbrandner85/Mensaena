@@ -1,7 +1,10 @@
 # MENSAENA – TODO
-> Aktualisiert: 2026-06-11 (Phase-1-Bug-Audit-Fixes: Call/Live-Lifecycle, mounted-Sweep, Controller-Leaks)
+> Aktualisiert: 2026-06-12 (sb-Abbau Batch 11: widgets/shared Supabase-frei, Baseline 47/30)
 > JEDER Prompt = diese Datei updaten. KEINE AUSNAHME.
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
+
+## Ad-hoc (2026-06-12)
+- [x] sb.from-Abbau Batch 11 (widgets/shared Sammel-PR): sos_button (2 -> 0, nutzt bestehendes EmergencyNumbersRepository.listForCountry + DE-Fallback, _SOSSheet jetzt typisiert auf EmergencyNumber), critical_crisis_alert_listener (1 -> 0, NEU CrisisRepository.latestCriticalActiveId), incoming_call_listener (3 -> 0: Quick-Reply via MessagesRepository.send [touch updated_at jetzt korrekt — echte Nachricht], dm_calls-Stream NEU DmCallService.watchIncomingFor [limit 20], Caller-Lookup NEU ProfilesRepository.nameAndAvatar [bewusst ohne Minimal-Fallback]). sb.auth.onAuthStateChange bleibt (Auth, vom Guard nicht erfasst). Baseline: 47 Zugriffe / 30 Dateien (-58% seit Start 113/61).
 
 ## Ad-hoc (2026-06-11)
 - [x] Phase 4 Stufe 1 (Engineering): NEU widgets/effects/orbit_viewer.dart — interaktiver 360°-Dreh-Viewer aus Frame-Sequenz (drag-to-rotate + Fling-Momentum via FrictionSimulation; EffectsGate: full=interaktiv+Momentum+Hinweis, reduced=Drag-only, none=statischer Referenz-Frame; precacheImage nur bei Interaktion; gaplessPlayback gegen Flackern; errorBuilder). OHNE Game-Engine, OTA-faehig (Frames=Assets), schwach-Geraet-tauglich (nur Bildwechsel). BLOCKIERT: 360°-Frame-Assets brauchen Higgsfield-Generierung (Turntable-Video -> ffmpeg-Frames) — MCP-Aufrufe erfordern aktuell User-Freigabe. Einbau-Plan: in badge_detail_sheet ein drehbares Bronze-Abzeichen (2-Zeilen-Integration sobald Frames in assets/orbit/ liegen). Unity-Welt bleibt vertagt bis Web-Prototyp-Validierung.
