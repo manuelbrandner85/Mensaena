@@ -4,6 +4,41 @@
 Mensaena – Nachbarschaftshilfe-Plattform, live unter www.mensaena.de
 Version 1.0.0-beta | Sprache: Deutsch (Standard) + EN/IT/ES/FR/TR/RU
 
+## Design- & Motion-Skills (global installiert, Pflicht-Nutzung)
+13 Design-Skills liegen versioniert in `.agents/skills/` (SessionStart-Hook
+symlinkt sie nach `.claude/skills/` → in jeder Session via Skill-Tool aufrufbar).
+Quellen in `skills-lock.json`: `leonxlnx/taste-skill`, `emilkowalski/skill`,
+`pbakaus/impeccable` (impeccable.style).
+
+**Wann welcher Skill (VOR der Arbeit aufrufen, nicht danach):**
+- **`emil-design-eng`** — IMMER bei Animationen/Micro-Interactions/Transitions
+  (Flutter wie Web). Emil Kowalskis Prinzipien: Easing/Dauer-Entscheidungen,
+  wann NICHT animiert wird, unsichtbare Details. Leitlinie für AppMotion-Springs.
+- **`impeccable`** — Default für jede UI-Arbeit (Design, Redesign, Polish,
+  Critique, A11y, Spacing, Typo, Farbe, Motion). Modi als Argument:
+  `audit`, `polish`, `animate`, `typeset`, `colorize`, `quieter`, `bolder`.
+  Respektiert vorhandene Tokens (AppColors/AppSpacing/AppMotion) — nie überschreiben.
+- **`taste-skill`** — Landing pages, Portfolio-/Marketing-Seiten (Next.js-Web,
+  Landing `src/app/landing/`): Anti-Slop-Richtung, keine Template-Optik.
+- **`redesign-skill`** — bestehende Screens/Seiten hochwertiger machen ohne
+  Funktionalität zu brechen (Audit-first).
+- **`soft-skill`** — High-End-Agentur-Detailgrad (Schatten, Karten, Motion-
+  Choreografie) für Premium-Flächen (Onboarding, Profil, Detail-Screens).
+- **`minimalist-skill` / `brutalist-skill`** — alternative Stilrichtungen;
+  bei Mensaena nur nach explizitem Auftrag (Design-Prinzip: elegant, subtil).
+- **`imagegen-frontend-mobile` / `imagegen-frontend-web` / `brandkit`** —
+  Bild-Generierungs-Briefings (z. B. via Higgsfield) für Screen-Konzepte,
+  Referenz-Boards, Brand-Assets. Generieren NUR Bilder, keinen Code.
+- **`image-to-code-skill`** — Referenzbild → Implementierung (Web).
+- **`stitch-skill`** — DESIGN.md-Generierung im Stitch-Format.
+- **`output-skill`** — bei großen Generierungsaufgaben gegen Truncation/Platzhalter.
+
+**Regeln:** (1) Flutter-Motion-Arbeit = `emil-design-eng` + `impeccable animate`
+zuerst lesen, dann mit AppMotion/EffectsGate umsetzen (Stream-/Perf-Regeln unten
+gelten weiter). (2) Web-UI-Arbeit = `impeccable` (+ `taste-skill` für Landing).
+(3) Skills liefern Geschmack/Prinzipien — Mensaena-Design-System (Farben,
+Spacing, "elegant, professionell, subtil") hat immer Vorrang bei Konflikten.
+
 ## i18n-Pflicht (Flutter-App)
 **JEDER neue user-facing String MUSS via `easy_localization` übersetzt werden.**
 
