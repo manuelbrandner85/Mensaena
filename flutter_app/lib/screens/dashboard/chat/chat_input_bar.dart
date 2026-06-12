@@ -11,6 +11,7 @@ import '../../../services/haptics.dart';
 import '../../../services/voice_recorder_service.dart';
 import '../../../widgets/chat/live_location_button.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Input-Bar — Textfeld + Voice-Diktat + Voice-Recorder + Send-Button.
@@ -215,13 +216,7 @@ class _ChatVoiceRecorderButtonState extends State<ChatVoiceRecorderButton> {
     if (!ok) {
       if (!mounted) return;
       unawaited(Haptics.error());
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'Mikrofon-Berechtigung erforderlich.',
-          style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
-        ),
-      ));
+      AppSnackBar.error(context, 'Mikrofon-Berechtigung erforderlich.');
       return;
     }
     Haptics.tap();
@@ -243,13 +238,7 @@ class _ChatVoiceRecorderButtonState extends State<ChatVoiceRecorderButton> {
     if (!mounted) return;
     setState(() => _recording = false);
     if (result == null || result.durationSeconds < 1) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'chat.recordingTooShort'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.mute),
-        ),
-      ));
+      AppSnackBar.info(context, 'chat.recordingTooShort'.tr());
       return;
     }
     setState(() => _uploading = true);
@@ -258,14 +247,7 @@ class _ChatVoiceRecorderButtonState extends State<ChatVoiceRecorderButton> {
     setState(() => _uploading = false);
     if (url == null) {
       unawaited(Haptics.error());
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'Upload fehlgeschlagen.',
-          style: AppTypography.body(
-              size: 13, color: AppColors.herzrotWarm),
-        ),
-      ));
+      AppSnackBar.error(context, 'Upload fehlgeschlagen.');
       return;
     }
     unawaited(Haptics.success());

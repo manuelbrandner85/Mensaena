@@ -9,6 +9,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 const _baseUrl = 'https://www.mensaena.de';
 
@@ -85,11 +86,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   Future<void> _copy() async {
     await Clipboard.setData(ClipboardData(text: _inviteUrl));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text('invite.linkCopied'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink)),
-    ));
+    AppSnackBar.success(context, 'invite.linkCopied'.tr());
   }
 
   Future<void> _share() async {

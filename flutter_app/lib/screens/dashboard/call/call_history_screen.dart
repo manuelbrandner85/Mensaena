@@ -23,6 +23,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/sized_avatar_image.dart';
 import '../../../widgets/shared/skeleton_card.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class CallHistoryScreen extends ConsumerStatefulWidget {
   const CallHistoryScreen({super.key});
@@ -84,11 +85,7 @@ class _CallHistoryScreenState extends ConsumerState<CallHistoryScreen> {
     if (ok) {
       setState(_load);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('common.failed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
-      ));
+      AppSnackBar.error(context, 'common.failed'.tr());
     }
   }
 
@@ -120,17 +117,9 @@ class _CallHistoryScreenState extends ConsumerState<CallHistoryScreen> {
     if (!mounted) return;
     if (count != null) {
       setState(_load);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('callHistory.cleared'.tr(namedArgs: {'n': '$count'}),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'callHistory.cleared'.tr(namedArgs: {'n': '$count'}));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('common.failed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
-      ));
+      AppSnackBar.error(context, 'common.failed'.tr());
     }
   }
 
@@ -394,11 +383,7 @@ class _CallRow extends StatelessWidget {
   }) async {
     Haptics.tap();
     if (conversationId == null || conversationId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('callHistory.callbackNoConv'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'callHistory.callbackNoConv'.tr());
       return;
     }
     final result = await DmCallService.start(
@@ -408,12 +393,7 @@ class _CallRow extends StatelessWidget {
     );
     if (!context.mounted) return;
     if (!result.success || result.callId == null || result.roomName == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-            result.errorReason ?? 'callHistory.callbackFailed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, result.errorReason ?? 'callHistory.callbackFailed'.tr());
       return;
     }
     final encPeer = Uri.encodeComponent(peerName);

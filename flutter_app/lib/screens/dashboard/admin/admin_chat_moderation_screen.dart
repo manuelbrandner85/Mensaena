@@ -12,6 +12,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/module_search_bar.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features (Admin chat moderation)
 /// Chat-Moderation: lock/unlock community chat, ban/unban senders,
@@ -140,24 +141,10 @@ class _AdminChatModerationScreenState
     if (!mounted) return;
     setState(() => _lockBusy = false);
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          isLocked
-              ? 'admin.chatMod.unlockSuccess'.tr()
-              : 'admin.chatMod.lockSuccess'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.info(context, isLocked ? 'admin.chatMod.unlockSuccess'.tr() : 'admin.chatMod.lockSuccess'.tr());
       _loadAll();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'admin.chatMod.actionFailed'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.error(context, 'admin.chatMod.actionFailed'.tr());
     }
   }
 
@@ -167,24 +154,10 @@ class _AdminChatModerationScreenState
     final ok = await AdminRepository.toggleChatBan(uid, wasBanned);
     if (!mounted) return;
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          wasBanned
-              ? 'admin.chatMod.unbanSuccess'.tr()
-              : 'admin.chatMod.banSuccess'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.info(context, wasBanned ? 'admin.chatMod.unbanSuccess'.tr() : 'admin.chatMod.banSuccess'.tr());
       _loadAll();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'admin.chatMod.actionFailed'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.error(context, 'admin.chatMod.actionFailed'.tr());
     }
   }
 
@@ -193,22 +166,10 @@ class _AdminChatModerationScreenState
     final ok = await AdminRepository.softDeleteMessage(mid);
     if (!mounted) return;
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'admin.chatMod.deletedMsg'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.info(context, 'admin.chatMod.deletedMsg'.tr());
       _loadAll();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'admin.chatMod.actionFailed'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.error(context, 'admin.chatMod.actionFailed'.tr());
     }
   }
 

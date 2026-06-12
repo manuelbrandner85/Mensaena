@@ -21,6 +21,7 @@ import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/view_toggle.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Krisen-Dashboard — 1:1-Spiegel von `src/app/dashboard/crisis/page.tsx`.
@@ -1565,18 +1566,10 @@ class _SosTopBanner extends StatelessWidget {
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       });
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('crisis.safeCheckSent'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.leben)),
-      ));
+      AppSnackBar.success(context, 'crisis.safeCheckSent'.tr());
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('crisis.error'.tr(namedArgs: {'error': '$e'}),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'crisis.error'.tr(namedArgs: {'error': '$e'}));
     }
   }
 }

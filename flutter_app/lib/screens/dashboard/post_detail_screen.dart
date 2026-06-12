@@ -28,6 +28,7 @@ import '../../widgets/shared/post_reactions_button.dart';
 import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/post_status_badge.dart';
 import '../../widgets/shared/wikipedia_box.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
 /// Post-Detail: Hero (Typ-Badge, Bilder, Titel, Beschreibung), Author,
@@ -285,11 +286,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       final fresh = await PostCommentsRepository.listFor(widget.postId);
       if (mounted) setState(() => _comments = fresh);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('common.error'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'common.error'.tr());
     }
   }
 
@@ -395,12 +392,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       return;
     }
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('posts.deleteFailed'.tr(),
-            style:
-                AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'posts.deleteFailed'.tr());
     }
   }
 

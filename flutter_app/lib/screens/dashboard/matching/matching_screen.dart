@@ -15,6 +15,7 @@ import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/matching_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 const _filters = <(String, String)>[
   ('all', 'Alle'),
@@ -362,21 +363,7 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
       accept: accept,
     );
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        result.success
-            ? (accept
-                ? (result.conversationId != null
-                    ? 'matching.accepted'.tr()
-                    : 'matching.acceptedWaiting'.tr())
-                : 'matching.rejected'.tr())
-            : 'matching.errorPrefix'.tr(namedArgs: {
-                'error': result.error ?? 'matching.errorUnknown'.tr()
-              }),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, result.success ? (accept ? (result.conversationId != null ? 'matching.accepted'.tr() : 'matching.acceptedWaiting'.tr()) : 'matching.rejected'.tr()) : 'matching.errorPrefix'.tr(namedArgs: { 'error': result.error ?? 'matching.errorUnknown'.tr() }));
     if (result.success) {
       ref.invalidate(matchingListProvider);
       ref.invalidate(matchingCountsProvider);
@@ -959,13 +946,7 @@ class _PreferencesSheetState extends ConsumerState<_PreferencesSheet> {
     final ok = await MatchingRepository.savePreferences(_prefs!);
     if (!mounted) return;
     setState(() => _saving = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        ok ? 'Gespeichert.' : 'Speichern fehlgeschlagen.',
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, ok ? 'Gespeichert.' : 'Speichern fehlgeschlagen.');
     if (ok) {
       widget.onSaved();
       Navigator.pop(context);

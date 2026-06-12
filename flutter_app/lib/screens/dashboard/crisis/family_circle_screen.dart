@@ -10,6 +10,7 @@ import '../../../repositories/family_circle_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// R3: Familien-Kreis — vertrauenswürdiger Kreis aus nahen Kontakten, die im
 /// Notfall sofort einen Sicherheits-Alarm bekommen. Mitglieder können
@@ -290,12 +291,7 @@ class FamilyCircleScreen extends ConsumerWidget {
                         'self' => 'circle.selfError'.tr(),
                         _ => 'circle.requestFailed'.tr(),
                       };
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        backgroundColor: AppColors.surface,
-                        content: Text(msg,
-                            style: AppTypography.body(
-                                size: 13, color: AppColors.ink)),
-                      ));
+                      AppSnackBar.info(context, msg);
                     },
               child: sending
                   ? const SizedBox(

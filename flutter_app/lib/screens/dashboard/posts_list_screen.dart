@@ -20,6 +20,7 @@ import '../../widgets/shared/module_search_bar.dart';
 import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/shared/post_card.dart';
 import '../../widgets/shared/skeleton_card.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Posts-Feed — 1:1-Spiegel von `src/app/dashboard/posts/page.tsx`.
@@ -112,12 +113,7 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       if (p == LocationPermission.denied ||
           p == LocationPermission.deniedForever) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: AppColors.surface,
-          content: Text('posts.locationDenied'.tr(),
-              style: AppTypography.body(
-                  size: 13, color: AppColors.ink)),
-        ));
+        AppSnackBar.error(context, 'posts.locationDenied'.tr());
         return;
       }
       final pos = await Geolocator.getCurrentPosition();

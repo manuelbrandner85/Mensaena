@@ -16,6 +16,7 @@ import '../../repositories/mega_repositories.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 class _MentorMatch {
   const _MentorMatch({
@@ -83,15 +84,7 @@ class MentorshipMatchScreen extends ConsumerWidget {
     try {
       final ok = await MentorshipsRepository.request(mentorId);
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          ok
-              ? 'mentorship.request_sent'.tr()
-              : 'mentorship.request_failed'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.info(context, ok ? 'mentorship.request_sent'.tr() : 'mentorship.request_failed'.tr());
     } finally {
       _requesting.remove(mentorId);
     }

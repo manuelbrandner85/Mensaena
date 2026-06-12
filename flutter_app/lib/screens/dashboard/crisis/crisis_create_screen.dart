@@ -17,6 +17,7 @@ import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Crisis-Create — Schnellformular fuer Notfallmeldung.
@@ -249,11 +250,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       return;
     }
     if (imageFailures > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('create.imagePartialFailed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'create.imagePartialFailed'.tr());
     }
     context.go('/dashboard/crisis/$id');
   }

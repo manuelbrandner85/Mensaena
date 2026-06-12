@@ -36,6 +36,7 @@ import '../../widgets/shared/empty_state_card.dart';
 import '../../widgets/shared/verified_badge.dart';
 import '../../widgets/shared/post_card.dart';
 import '../../widgets/shared/sparkline.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// V4: Trust-Score-Verlauf (laufender Durchschnitt aus trust_ratings).
 final _trustHistoryProvider =
@@ -1097,11 +1098,7 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
         : (action == 'mute'
             ? 'profile.userMuted24h'.tr()
             : 'profile.userBlocked'.tr());
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(msg,
-          style: AppTypography.body(size: 13, color: AppColors.ink)),
-    ));
+    AppSnackBar.info(context, msg);
   }
 
   Future<void> _showReportDialog() async {
@@ -1156,13 +1153,7 @@ class _OtherUserActionsState extends State<_OtherUserActions> {
     );
     if (!mounted) return;
     setState(() => _busy = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        ok ? 'posts.reportSubmitted'.tr() : 'posts.reportFailed'.tr(),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, ok ? 'posts.reportSubmitted'.tr() : 'posts.reportFailed'.tr());
   }
 
   @override

@@ -40,6 +40,7 @@ import '../../../widgets/event_reminder_widget.dart';
 import '../../../widgets/event_share_sheet.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 // Akzent-Farben fuer Event-Kategorien (Hero-Border + Badge).
 const Map<String, Color> _categoryAccent = {
@@ -435,14 +436,7 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
                   OutlinedButton.icon(
                     onPressed: () {
                       // Placeholder: Edit-Screen
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        backgroundColor: AppColors.surface,
-                        content: Text(
-                          'events.authorActions.editComingSoon'.tr(),
-                          style: AppTypography.body(
-                              size: 13, color: AppColors.ink),
-                        ),
-                      ));
+                      AppSnackBar.info(context, 'events.authorActions.editComingSoon'.tr());
                     },
                     icon: const Icon(LucideIcons.edit3, size: 14),
                     label: Text('events.authorActions.edit'.tr()),
@@ -610,15 +604,7 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
     if (!ok || !context.mounted) return;
     final success = await EventsRepository.cancelEvent(e.id);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        success
-            ? 'events.authorActions.cancelled'.tr()
-            : 'events.error'.tr(namedArgs: {'error': '500'}),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, success ? 'events.authorActions.cancelled'.tr() : 'events.error'.tr(namedArgs: {'error': '500'}));
     if (success) {
       ref.invalidate(eventDetailProvider(e.id));
       if (context.mounted) context.pop();
@@ -639,15 +625,7 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
     if (!ok || !context.mounted) return;
     final success = await EventsRepository.deleteEvent(e.id);
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        success
-            ? 'events.authorActions.deleted'.tr()
-            : 'events.error'.tr(namedArgs: {'error': '500'}),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, success ? 'events.authorActions.deleted'.tr() : 'events.error'.tr(namedArgs: {'error': '500'}));
     if (success && context.mounted) {
       context.pop();
     }
@@ -672,24 +650,10 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
       );
       final ok = await a2c.Add2Calendar.addEvent2Cal(entry);
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          ok
-              ? 'events.openedInCalendar'.tr()
-              : 'events.calendarNotOpened'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.info(context, ok ? 'events.openedInCalendar'.tr() : 'events.calendarNotOpened'.tr());
     } catch (err) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'events.error'.tr(namedArgs: {'error': '$err'}),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.error(context, 'events.error'.tr(namedArgs: {'error': '$err'}));
     }
   }
 
@@ -751,13 +715,7 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
       );
     } catch (_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          'events.exportFailed'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.error(context, 'events.exportFailed'.tr());
     }
   }
 }
@@ -1336,15 +1294,7 @@ class _SavedToggleButtonState extends ConsumerState<_SavedToggleButton> {
       await EventReminderService.cancel(widget.event.id);
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        now
-            ? 'events.saved'.tr()
-            : 'events.unsaved'.tr(),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, now ? 'events.saved'.tr() : 'events.unsaved'.tr());
   }
 
   Future<void> _longPress() async {
@@ -1423,16 +1373,7 @@ class _SavedToggleButtonState extends ConsumerState<_SavedToggleButton> {
       );
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        mins == 0
-            ? 'events.reminderRemoved'.tr()
-            : 'events.reminderSet'
-                .tr(namedArgs: {'label': _reminderLabel(mins)}),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, mins == 0 ? 'events.reminderRemoved'.tr() : 'events.reminderSet' .tr(namedArgs: {'label': _reminderLabel(mins)}));
   }
 
   String _reminderLabel(int minutes) {

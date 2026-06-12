@@ -38,6 +38,7 @@ import '../../widgets/confirm_dialog.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/battery_optimization_prompt.dart';
 import '../../widgets/shared/release_notes_sheet.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Settings-Screen mit 5 Tabs (Account/Privacy/Notifications/Region/Danger).
@@ -89,12 +90,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       // gesetzt, war aber nicht persistiert. Jetzt Hinweis + Re-Fetch (zeigt
       // den echten DB-Wert).
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: AppColors.surface,
-          content: Text('settings.saveFailed'.tr(),
-              style: AppTypography.body(
-                  size: 13, color: AppColors.herzrotWarm)),
-        ));
+        AppSnackBar.error(context, 'settings.saveFailed'.tr());
       }
     }
     if (mounted) setState(() => _future = ProfilesRepository.getMine());
@@ -626,11 +622,7 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
         message: 'notif.test_body'.tr(),
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('notif.test_sent'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.success(context, 'notif.test_sent'.tr());
     } catch (_) {}
   }
 }
@@ -816,19 +808,10 @@ class _DangerTabState extends State<_DangerTab> {
         text: 'Dein Mensaena-Daten-Export (DSGVO Art. 20).',
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('settings.exportCreated'.tr(namedArgs: {'size': (json.length / 1024).toStringAsFixed(1)}),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'settings.exportCreated'.tr(namedArgs: {'size': (json.length / 1024).toStringAsFixed(1)}));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('settings.exportFailed'.tr(namedArgs: {'error': e.toString()}),
-            style: AppTypography.body(
-                size: 13, color: AppColors.herzrotWarm)),
-      ));
+      AppSnackBar.error(context, 'settings.exportFailed'.tr(namedArgs: {'error': e.toString()}));
     } finally {
       if (mounted) setState(() => _exporting = false);
     }
@@ -885,12 +868,7 @@ class _DangerTabState extends State<_DangerTab> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _deleting = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('settings.deleteFailed'.tr(namedArgs: {'error': e.toString()}),
-            style: AppTypography.body(
-                size: 13, color: AppColors.herzrotWarm)),
-      ));
+      AppSnackBar.error(context, 'settings.deleteFailed'.tr(namedArgs: {'error': e.toString()}));
     }
   }
 
@@ -1815,11 +1793,7 @@ class _SecurityTabState extends State<_SecurityTab> {
 
   void _toast(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(msg,
-          style: AppTypography.body(size: 13, color: AppColors.ink)),
-    ));
+    AppSnackBar.info(context, msg);
   }
 
   @override

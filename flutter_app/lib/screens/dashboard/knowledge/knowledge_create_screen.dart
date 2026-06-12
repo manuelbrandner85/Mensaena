@@ -16,6 +16,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Knowledge-Create-Screen — Markdown-Editor mit Live-Vorschau,
@@ -306,15 +307,7 @@ class _KnowledgeCreateScreenState
         'published_at': DateTime.now().toUtc().toIso8601String(),
       });
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          coverFailed
-              ? 'knowledge.publishedNoCover'.tr()
-              : 'knowledge.publishArticle'.tr(),
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
+      AppSnackBar.info(context, coverFailed ? 'knowledge.publishedNoCover'.tr() : 'knowledge.publishArticle'.tr());
       context.go(widget.routePath);
     } catch (_) {
       if (!mounted) return;
