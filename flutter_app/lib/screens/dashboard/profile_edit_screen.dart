@@ -20,7 +20,6 @@ import '../../services/locale_country_service.dart';
 import '../../services/location_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
-import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Profile-Edit — vollständiger Profil-Builder mit 8 Sektionen:
@@ -292,7 +291,11 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       _newAvatar = null;
     });
     if (!mounted) return;
-    AppSnackBar.info(context, 'profile.avatarChosen'.tr());
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text('profile.avatarChosen'.tr(),
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
   }
 
   Future<void> _pickAvatar() async {
@@ -353,10 +356,38 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     } catch (e) {
       // Fehler NICHT mehr silent — User sieht Snackbar mit Fail-Reason.
       if (mounted) {
-        AppSnackBar.error(context, 'uploads.failed'.tr(namedArgs: {'e': '$e'}), style: AppTypography.body(size: 12, color: AppColors.ink)), )); } return null; } } Future<void> _useGPS() async { try { final pos = await LocationService.getCurrentPosition( accuracy: LocationAccuracy.medium); if (!mounted) return; setState(() { _lat = pos.latitude; _lng = pos.longitude; }); ScaffoldMessenger.of(context).showSnackBar(SnackBar( backgroundColor: AppColors.surface, content: Text('profile.gpsCaptured'.tr());
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('uploads.failed'.tr(namedArgs: {'e': '$e'}),
+              style: AppTypography.body(size: 12, color: AppColors.ink)),
+        ));
+      }
+      return null;
+    }
+  }
+
+  Future<void> _useGPS() async {
+    try {
+      final pos = await LocationService.getCurrentPosition(
+          accuracy: LocationAccuracy.medium);
+      if (!mounted) return;
+      setState(() {
+        _lat = pos.latitude;
+        _lng = pos.longitude;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('profile.gpsCaptured'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
     } catch (e) {
       if (!mounted) return;
-      AppSnackBar.error(context, '$e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('$e',
+            style:
+                AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
     }
   }
 
@@ -429,7 +460,13 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       if (!mounted) return;
       if (url == null) {
         setState(() => _saving = false);
-        AppSnackBar.error(context, 'profile.avatarUploadFailed'.tr());
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(
+            'profile.avatarUploadFailed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+          ),
+        ));
         return;
       }
       patch['avatar_url'] = url;
@@ -448,11 +485,20 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       await ProfilesRepository.update(uid, patch);
       if (!mounted) return;
       ref.invalidate(myProfileProvider);
-      AppSnackBar.success(context, 'profile.profileSaved'.tr());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('profile.profileSaved'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
       context.pop();
     } catch (e) {
       if (!mounted) return;
-      AppSnackBar.error(context, 'profile.saveFailed'.tr(namedArgs: {'error': '$e'}));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('profile.saveFailed'.tr(namedArgs: {'error': '$e'}),
+            style:
+                AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

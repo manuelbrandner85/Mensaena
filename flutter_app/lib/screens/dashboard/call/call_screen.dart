@@ -37,7 +37,6 @@ import '../../../widgets/effects/light_leaks.dart';
 import '../../../widgets/effects/vignette.dart';
 import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/shared/user_picker_sheet.dart';
-import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-DM-Anruf (Audio + optional Video) via LiveKit.
@@ -284,7 +283,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     final msg = status == 'cancelled'
         ? 'call.callDeclined'.tr()
         : 'call.notReachable'.tr();
-    AppSnackBar.info(context, msg);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(msg,
+          style: AppTypography.body(size: 13, color: AppColors.ink)),
+    ));
     if (context.canPop()) {
       context.pop();
     } else {
@@ -659,7 +662,12 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       setState(() => _screenShareEnabled = next);
     } catch (e) {
       if (!mounted) return;
-      AppSnackBar.error(context, 'call.screenShareFailed'.tr());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('call.screenShareFailed'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm)),
+      ));
     }
   }
 
@@ -671,7 +679,29 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       if (cam.isPermanentlyDenied) {
         if (!mounted) return;
         // User-Fix: zeigt klare Aufforderung statt stillem Fail.
-        AppSnackBar.error(context, 'call.cameraDeniedPermanent'.tr(), style: AppTypography.body( size: 13, color: AppColors.herzrotWarm), ), action: SnackBarAction( label: 'call.openSettings'.tr(), onPressed: openAppSettings, ), duration: const Duration(seconds: 6), )); return; } if (cam.isDenied) { if (!mounted) return; ScaffoldMessenger.of(context).showSnackBar(SnackBar( backgroundColor: AppColors.surface, content: Text('call.cameraDenied'.tr());
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(
+            'call.cameraDeniedPermanent'.tr(),
+            style: AppTypography.body(
+                size: 13, color: AppColors.herzrotWarm),
+          ),
+          action: SnackBarAction(
+            label: 'call.openSettings'.tr(),
+            onPressed: openAppSettings,
+          ),
+          duration: const Duration(seconds: 6),
+        ));
+        return;
+      }
+      if (cam.isDenied) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('call.cameraDenied'.tr(),
+              style: AppTypography.body(
+                  size: 13, color: AppColors.herzrotWarm)),
+        ));
         return;
       }
     }
@@ -682,7 +712,14 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       setState(() => _camEnabled = next);
     } catch (e) {
       if (!mounted) return;
-      AppSnackBar.error(context, 'call.cameraFailed'.tr());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text(
+          'call.cameraFailed'.tr(),
+          style: AppTypography.body(
+              size: 13, color: AppColors.herzrotWarm),
+        ),
+      ));
     }
   }
 
