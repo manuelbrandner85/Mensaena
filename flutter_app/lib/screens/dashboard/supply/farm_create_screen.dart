@@ -24,6 +24,7 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 class FarmCreateScreen extends ConsumerStatefulWidget {
   const FarmCreateScreen({super.key});
@@ -231,7 +232,8 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       title: 'create.farmCreateTitle'.tr(),
       currentRoute: '/dashboard/supply/farm/add',
       body: SafeArea(
-        child: Form(
+        child: ReadableWidth(
+            child: Form(
           key: _form,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: ListView(
@@ -409,7 +411,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }

@@ -26,6 +26,7 @@ import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import 'module_create_config.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-Pendant zu Web `src/components/shared/CreatePostPage.tsx`.
@@ -424,7 +425,8 @@ class _ModuleCreatePostScreenState
       title: c.title.tr(),
       currentRoute: c.returnRoute,
       body: SafeArea(
-        child: ListView(
+        child: ReadableWidth(
+            child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             // Editorial-Header mit Modul-Akzent
@@ -863,7 +865,7 @@ class _ModuleCreatePostScreenState
               child: Text('common.cancel'.tr()),
             ),
           ],
-        ),
+        )),
       ),
     );
   }
