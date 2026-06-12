@@ -12,6 +12,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../effects/glass_card.dart';
+import '../../repositories/dashboard_widgets_repository.dart';
 
 /// Phase 10 E10: Mentor-CTA nur wenn karma≥100 UND trust_score≥4.0
 /// UND mind. 3 Skills hinterlegt sind. Verhindert dass Anfänger-User
@@ -21,11 +22,8 @@ final _myMentorEligibilityProvider =
   final uid = SupabaseService.currentUser?.id;
   if (uid == null) return false;
   try {
-    final row = await sb
-        .from('profiles')
-        .select('is_mentor, skills, offer_tags, karma_points, trust_score')
-        .eq('id', uid)
-        .maybeSingle();
+    final row =
+        await DashboardWidgetsRepository.mentorEligibilityRow(uid);
     if (row == null) return false;
     final isMentor = row['is_mentor'] as bool? ?? false;
     if (isMentor) return false;

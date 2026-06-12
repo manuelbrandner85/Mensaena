@@ -9,8 +9,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
 import '../effects/tilt_card.dart';
+import '../../repositories/trust_ratings_repository.dart';
 
 class ThanksReceived extends ConsumerWidget {
   const ThanksReceived({super.key, required this.userId});
@@ -90,13 +90,7 @@ class ThanksReceived extends ConsumerWidget {
 
   Future<List<Map<String, dynamic>>> _loadRatings() async {
     try {
-      final rows = await sb
-          .from('trust_ratings')
-          .select()
-          .eq('rated_id', userId)
-          .order('created_at', ascending: false)
-          .limit(5);
-      return (rows as List).whereType<Map<String, dynamic>>().toList();
+      return TrustRatingsRepository.getReceivedFor(userId, limit: 5);
     } catch (_) {
       return const [];
     }

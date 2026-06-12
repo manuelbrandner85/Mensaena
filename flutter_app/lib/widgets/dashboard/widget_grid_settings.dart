@@ -12,6 +12,7 @@ import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../effects/glass_card.dart';
 import '../effects/tilt_card.dart';
+import '../../repositories/profiles_repository.dart';
 
 /// SKILL: mensaena-features
 /// Pendant zu Web `dashboardWidgetStore`. Erlaubt Sichtbarkeit + Reihenfolge
@@ -381,15 +382,9 @@ class DashboardWidgetConfig {
     try {
       final uid = SupabaseService.currentUser?.id;
       if (uid == null) return local;
-      final row = await sb
-          .from('profiles')
-          .select('dashboard_config')
-          .eq('id', uid)
-          .maybeSingle();
-      final raw = row?['dashboard_config'];
-      if (raw is! Map || raw.isEmpty) return local;
-      final remote = DashboardWidgetConfig.fromJson(
-          Map<String, dynamic>.from(raw));
+      final raw = await ProfilesRepository.dashboardConfig(uid);
+      if (raw == null || raw.isEmpty) return local;
+      final remote = DashboardWidgetConfig.fromJson(raw);
       // Conflict-Resolution: höhere version gewinnt.
       if (remote.version > local.version) {
         await remote._writeLocal();
@@ -417,9 +412,7 @@ class DashboardWidgetConfig {
     try {
       final uid = SupabaseService.currentUser?.id;
       if (uid == null) return;
-      await sb
-          .from('profiles')
-          .update({'dashboard_config': toJson()}).eq('id', uid);
+      await ProfilesRepository.update(uid, {'dashboard_config': toJson()});
     } catch (_) {}
   }
 

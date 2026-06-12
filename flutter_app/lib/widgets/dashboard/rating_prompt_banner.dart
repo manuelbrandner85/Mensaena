@@ -9,7 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/dashboard_widgets_repository.dart';
 
 class RatingPromptBanner extends StatefulWidget {
   const RatingPromptBanner({super.key, required this.userId});
@@ -31,23 +31,7 @@ class _RatingPromptBannerState extends State<RatingPromptBanner> {
 
   Future<List<Map<String, dynamic>>> _load() async {
     try {
-      try {
-        final res = await sb
-            .rpc<dynamic>('get_pending_ratings',
-                params: {'p_user_id': widget.userId});
-        if (res is List) {
-          return res.whereType<Map<String, dynamic>>().toList();
-        }
-      } catch (_) {}
-      final rows = await sb
-          .from('interactions')
-          .select(
-              'id, helper_id, helped_id, post_id, status, completed_at')
-          .or('helper_id.eq.${widget.userId},helped_id.eq.${widget.userId}')
-          .eq('status', 'completed')
-          .order('completed_at', ascending: false)
-          .limit(5);
-      return (rows as List).whereType<Map<String, dynamic>>().toList();
+      return await DashboardWidgetsRepository.pendingRatings(widget.userId);
     } catch (_) {
       return const [];
     }

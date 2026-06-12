@@ -9,7 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/dashboard_widgets_repository.dart';
 
 class WeeklyChallengeHighlight extends StatefulWidget {
   const WeeklyChallengeHighlight({super.key});
@@ -35,15 +35,7 @@ class _WeeklyChallengeHighlightState extends State<WeeklyChallengeHighlight> {
       final monday = now.subtract(Duration(days: weekday - 1));
       final weekOf =
           '${monday.year.toString().padLeft(4, '0')}-${monday.month.toString().padLeft(2, '0')}-${monday.day.toString().padLeft(2, '0')}';
-      final rows = await sb
-          .from('challenges')
-          .select(
-              'id, title, description, category, difficulty, points, participant_count')
-          .eq('is_weekly', true)
-          .eq('week_of', weekOf)
-          .order('points', ascending: false)
-          .limit(3);
-      return (rows as List).whereType<Map<String, dynamic>>().toList();
+      return DashboardWidgetsRepository.weeklyChallenges(weekOf);
     } catch (_) {
       return const [];
     }

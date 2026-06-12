@@ -9,7 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/profile.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/dashboard_widgets_repository.dart';
 
 class WeeklyDigest extends StatefulWidget {
   const WeeklyDigest({super.key, required this.profile});
@@ -29,32 +29,13 @@ class _WeeklyDigestState extends State<WeeklyDigest> {
   }
 
   Future<_DigestData> _load() async {
-    final since = DateTime.now()
-        .toUtc()
-        .subtract(const Duration(days: 7))
-        .toIso8601String();
     try {
-      final results = await Future.wait([
-        sb
-            .from('posts')
-            .select('id')
-            .eq('user_id', widget.profile.id)
-            .gte('created_at', since),
-        sb
-            .from('interactions')
-            .select('id')
-            .or('helper_id.eq.${widget.profile.id},helped_id.eq.${widget.profile.id}')
-            .gte('created_at', since),
-        sb
-            .from('messages')
-            .select('id')
-            .eq('sender_id', widget.profile.id)
-            .gte('created_at', since),
-      ]);
+      final c =
+          await DashboardWidgetsRepository.weeklyDigestCounts(widget.profile.id);
       return _DigestData(
-        posts: (results[0] as List).length,
-        interactions: (results[1] as List).length,
-        messages: (results[2] as List).length,
+        posts: c.posts,
+        interactions: c.interactions,
+        messages: c.messages,
       );
     } catch (_) {
       return const _DigestData(posts: 0, interactions: 0, messages: 0);
