@@ -17,6 +17,8 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/wave_final_providers.dart';
 import '../../services/supabase_service.dart';
+import '../../repositories/profiles_repository.dart';
+import '../../repositories/settings_repository.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -66,9 +68,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     final confirmed = user.emailConfirmedAt != null;
     if (!confirmed) return;
     try {
-      await sb
-          .from('profiles')
-          .update({'verified_email': true}).eq('id', user.id);
+      await ProfilesRepository.update(user.id, {'verified_email': true});
     } catch (_) {/* best-effort */}
   }
 
@@ -115,19 +115,11 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       };
       final names = [...single.keys, ...dual.keys];
       final results = await Future.wait(names.map((t) async {
-        try {
-          if (single.containsKey(t)) {
-            return await sb.from(t).select().eq(single[t]!, uid).limit(10000);
-          }
-          final cols = dual[t]!;
-          return await sb
-              .from(t)
-              .select()
-              .or('${cols[0]}.eq.$uid,${cols[1]}.eq.$uid')
-              .limit(10000);
-        } catch (_) {
-          return <Map<String, dynamic>>[];
+        if (single.containsKey(t)) {
+          return SettingsRepository.gdprRowsSingle(t, single[t]!, uid);
         }
+        final cols = dual[t]!;
+        return SettingsRepository.gdprRowsDual(t, cols[0], cols[1], uid);
       }));
       for (var i = 0; i < names.length; i++) {
         dump[names[i]] = results[i];

@@ -23,7 +23,6 @@ PATTERN = re.compile(r"\bsb\s*\.\s*from\s*\(|Supabase\.instance")
 
 # Eingefrorener Altbestand — NICHT erhöhen. Abbau erwünscht.
 BASELINE: dict[str, int] = {
-    "lib/screens/dashboard/account_screen.dart": 3,
     "lib/screens/dashboard/admin/admin_chat_moderation_screen.dart": 1,
     "lib/screens/dashboard/admin/admin_crash_logs_screen.dart": 2,
     "lib/screens/dashboard/admin/admin_users_screen.dart": 1,

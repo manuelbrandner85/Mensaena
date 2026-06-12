@@ -214,6 +214,7 @@ BoardCat:general|gesucht|biete|event|info|warnung|verloren|fundbuero
 ## §7 Log
 | Datum | Was | Dateien |
 |---|---|---|
+| 2026-06-12 | refactor(sb-abbau-6): account_screen sb.from 3->0 (GDPR-Export -> SettingsRepository.gdprRows*, verified_email -> ProfilesRepository.update); Baseline 82/53 | flutter_app/lib/screens/dashboard/account_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-5): NEU repositories/referrals_repository.dart; invite_screen Supabase-frei (4->0); Baseline 85/54 | flutter_app/lib/repositories/referrals_repository.dart, flutter_app/lib/screens/dashboard/invite/invite_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-4): NEU repositories/scheduled_streams_repository.dart; scheduled_streams_screen Supabase-frei (5->0); Baseline 89/55 | flutter_app/lib/repositories/scheduled_streams_repository.dart, flutter_app/lib/screens/dashboard/live/scheduled_streams_screen.dart, scripts/check_ui_supabase.py |
 | 2026-06-12 | refactor(sb-abbau-3): NEU repositories/polls_repository.dart; post_poll_widget + poll_create_sheet Supabase-frei; Baseline 94/56 | flutter_app/lib/repositories/polls_repository.dart, flutter_app/lib/widgets/posts/{post_poll_widget,poll_create_sheet}.dart, scripts/check_ui_supabase.py |
