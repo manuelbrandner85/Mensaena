@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
+import '../../repositories/polls_repository.dart';
 
 class PollData {
   const PollData({
@@ -35,21 +36,15 @@ class PollData {
 final postPollProvider =
     FutureProvider.autoDispose.family<PollData?, String>((ref, postId) async {
   try {
-    final pollRow = await sb
-        .from('post_polls')
-        .select()
-        .eq('post_id', postId)
-        .maybeSingle();
-    if (pollRow == null) return null;
+    final data = await PollsRepository.fetch(postId);
+    if (data == null) return null;
+    final pollRow = data.poll;
     final pollId = pollRow['id'] as String;
     final opts = (pollRow['options'] as List?)
             ?.whereType<String>()
             .toList() ??
         const [];
-    final votes = await sb
-        .from('post_poll_votes')
-        .select('user_id, option_index')
-        .eq('poll_id', pollId);
+    final votes = data.votes;
     final counts = List<int>.filled(opts.length, 0);
     int? mine;
     final myId = SupabaseService.currentUser?.id;
@@ -84,17 +79,11 @@ class PostPollWidget extends ConsumerWidget {
     if (uid == null || poll.isClosed) return;
     try {
       if (poll.myVote == null) {
-        await sb.from('post_poll_votes').insert({
-          'poll_id': poll.pollId,
-          'user_id': uid,
-          'option_index': idx,
-        });
+        await PollsRepository.vote(
+            pollId: poll.pollId, userId: uid, optionIndex: idx);
       } else {
-        await sb
-            .from('post_poll_votes')
-            .update({'option_index': idx})
-            .eq('poll_id', poll.pollId)
-            .eq('user_id', uid);
+        await PollsRepository.changeVote(
+            pollId: poll.pollId, userId: uid, optionIndex: idx);
       }
       ref.invalidate(postPollProvider(postId));
     } catch (_) {}

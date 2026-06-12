@@ -10,7 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/polls_repository.dart';
 
 class PollCreateSheet extends ConsumerStatefulWidget {
   const PollCreateSheet({required this.postId, super.key});
@@ -70,14 +70,12 @@ class _PollCreateSheetState extends ConsumerState<PollCreateSheet> {
     if (q.isEmpty || options.length < 2) return;
     setState(() => _saving = true);
     try {
-      await sb.from('post_polls').insert({
-        'post_id': widget.postId,
-        'question': q,
-        'options': options,
-        'closes_at': _closesIn == null
-            ? null
-            : DateTime.now().add(_closesIn!).toIso8601String(),
-      });
+      await PollsRepository.create(
+        postId: widget.postId,
+        question: q,
+        options: options,
+        closesIn: _closesIn,
+      );
       if (mounted) Navigator.pop(context, true);
     } catch (_) {
       if (mounted) setState(() => _saving = false);
