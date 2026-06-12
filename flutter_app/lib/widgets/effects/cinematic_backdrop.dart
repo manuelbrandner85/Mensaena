@@ -87,22 +87,44 @@ class _CinematicBackdropState extends ConsumerState<CinematicBackdrop>
           else
             image,
           // Lesbarkeits-Scrim: oben sanft, unten kraeftig (Text-Zone).
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.voidColor.withValues(alpha: widget.topScrim),
-                  AppColors.voidColor.withValues(alpha: 0.15),
-                  AppColors.voidColor.withValues(alpha: widget.bottomScrim),
-                ],
-                stops: const [0.0, 0.45, 1.0],
-              ),
-            ),
+          CinematicBackdropScrim(
+            topScrim: widget.topScrim,
+            bottomScrim: widget.bottomScrim,
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Wiederverwendbarer Lesbarkeits-Scrim (auch vom Video-Backdrop genutzt,
+/// damit Standbild und Video exakt gleich abdunkeln → nahtloser Wechsel).
+class CinematicBackdropScrim extends StatelessWidget {
+  const CinematicBackdropScrim({
+    required this.topScrim,
+    required this.bottomScrim,
+    super.key,
+  });
+
+  final double topScrim;
+  final double bottomScrim;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.voidColor.withValues(alpha: topScrim),
+            AppColors.voidColor.withValues(alpha: 0.15),
+            AppColors.voidColor.withValues(alpha: bottomScrim),
+          ],
+          stops: const [0.0, 0.45, 1.0],
+        ),
+      ),
+      child: const SizedBox.expand(),
     );
   }
 }

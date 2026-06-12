@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.3.2+40302
+version: 4.4.0+40400
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -104,6 +104,11 @@ dependencies:
   # Shake-to-Report: User schüttelt Phone → Screenshot + Annotation → error_logs.
   feedback: ^3.1.0
 
+  # Splash-/Backdrop-Loop-Videos (Higgsfield-Assets, stumm, lokal
+  # gebuendelt). Nur auf EffectsProfile.full aktiv — reduced/none nutzt
+  # das frame-identische Standbild via CinematicBackdrop.
+  video_player: ^2.9.2
+
   # Shorebird OTA: liest die Patch-Nummer + meldet sich beim Server.
   # Patches selber werden automatisch beim Launch installiert.
   shorebird_code_push: ^2.0.6
@@ -183,7 +188,10 @@ flutter:
     - assets/translations/
     - assets/data/
     - assets/sounds/
+    - assets/videos/
     # WICHTIG: shorebird.yaml MUSS als Asset gebündelt sein — sonst schlägt
     # `shorebird release`/`patch` mit "pubspec.yaml does not have shorebird.yaml
     # as a flutter asset" fehl.
     - shorebird.yaml
+  shaders:
+    - shaders/grain.frag

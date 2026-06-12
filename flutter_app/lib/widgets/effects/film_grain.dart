@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -24,9 +25,23 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
 
+  /// GPU-Shader (shaders/grain.frag), einmal pro App-Lauf geladen.
+  /// null = (noch) nicht verfuegbar -> CPU-Painter-Fallback.
+  static ui.FragmentProgram? _program;
+  static bool _programRequested = false;
+
+  static void _loadProgram() {
+    if (_programRequested) return;
+    _programRequested = true;
+    ui.FragmentProgram.fromAsset('shaders/grain.frag')
+        .then((p) => _program = p)
+        .catchError((_) {/* Fallback: CPU-Painter bleibt aktiv */});
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadProgram();
     _ctrl = AnimationController(
       vsync: this,
       // 80ms-Cycle wie vorher → 12.5fps Grain (sieht weicher aus als 60fps).
@@ -62,15 +77,27 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
       child: RepaintBoundary(
         child: AnimatedBuilder(
           animation: _ctrl,
-          builder: (_, __) => CustomPaint(
-            painter: _FilmGrainPainter(
-              opacity: widget.opacity,
-              // value [0..1) → diskreter Seed alle 80ms wenn das
-              // controller-cycle endet und neu startet.
-              seed: (_ctrl.value * 1000).floor(),
-            ),
-            size: Size.infinite,
-          ),
+          builder: (_, __) {
+            // value [0..1) → diskreter Seed alle 80ms wenn das
+            // controller-cycle endet und neu startet.
+            final seed = (_ctrl.value * 1000).floor();
+            final program = _program;
+            return CustomPaint(
+              painter: program != null
+                  // GPU-Pfad: 0 Dart-Arbeit pro Frame (Impeller/Skia).
+                  ? _ShaderGrainPainter(
+                      shader: program.fragmentShader(),
+                      opacity: widget.opacity,
+                      seed: seed,
+                    )
+                  // Fallback solange der Shader laedt/fehlt.
+                  : _FilmGrainPainter(
+                      opacity: widget.opacity,
+                      seed: seed,
+                    ),
+              size: Size.infinite,
+            );
+          },
         ),
       ),
     );
@@ -106,5 +133,35 @@ class _FilmGrainPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_FilmGrainPainter old) =>
+      old.seed != seed || old.opacity != opacity;
+}
+
+
+class _ShaderGrainPainter extends CustomPainter {
+  _ShaderGrainPainter({
+    required this.shader,
+    required this.opacity,
+    required this.seed,
+  });
+
+  final ui.FragmentShader shader;
+  final double opacity;
+  final int seed;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Uniform-Reihenfolge MUSS der Deklaration in grain.frag entsprechen:
+    // 0: uTime, 1: uOpacity.
+    shader
+      ..setFloat(0, seed.toDouble())
+      ..setFloat(1, opacity);
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..shader = shader,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ShaderGrainPainter old) =>
       old.seed != seed || old.opacity != opacity;
 }
