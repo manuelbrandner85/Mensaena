@@ -7,25 +7,91 @@ library;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../providers/chat_ai_provider.dart';
+import '../../providers/effects_gate_provider.dart';
 import '../../repositories/chat_ai_repository.dart';
 import '../../services/haptics.dart';
 import '../effects/bloom.dart';
 
-class MensaenaAssistantFab extends ConsumerWidget {
+class MensaenaAssistantFab extends ConsumerStatefulWidget {
   const MensaenaAssistantFab({required this.screenLabel, super.key});
 
   /// Lesbares Label des aktuellen Screens (Kontext für Mensa).
   final String screenLabel;
 
-  void _open(BuildContext context, WidgetRef ref) {
+  @override
+  ConsumerState<MensaenaAssistantFab> createState() =>
+      _MensaenaAssistantFabState();
+}
+
+class _MensaenaAssistantFabState extends ConsumerState<MensaenaAssistantFab>
+    with SingleTickerProviderStateMixin {
+  static const _pulseKey = 'mensaena_assistant_pulse_v1';
+
+  /// E1 Mensa-Pulse: einmaliger Doppel-Puls beim allerersten Erscheinen
+  /// des FABs — lenkt EINMAL den Blick auf Mensa, danach nie wieder
+  /// (Guard via SecureStorage). Läuft nur auf EffectsProfile.full.
+  late final AnimationController _pulseCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  );
+  late final Animation<double> _pulseScale = TweenSequence<double>([
+    TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.12)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 16),
+    TweenSequenceItem(
+        tween: Tween(begin: 1.12, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 16),
+    TweenSequenceItem(tween: ConstantTween(1.0), weight: 18),
+    TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.12)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 16),
+    TweenSequenceItem(
+        tween: Tween(begin: 1.12, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 16),
+    TweenSequenceItem(tween: ConstantTween(1.0), weight: 18),
+  ]).animate(_pulseCtrl);
+
+  @override
+  void initState() {
+    super.initState();
+    _maybePulse();
+  }
+
+  Future<void> _maybePulse() async {
+    const storage = FlutterSecureStorage();
+    try {
+      if (await storage.read(key: _pulseKey) != null) return;
+      await storage.write(key: _pulseKey, value: '1');
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
+    // Nur auf `full` — der Hinweis ist Schmuck, keine Funktion.
+    if (!ref.read(effectsProfileProvider).isFull) return;
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    if (mounted) _pulseCtrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  void _open(BuildContext context) {
     Haptics.tap();
     ref.read(chatAiProvider.notifier).setContext(
-          screen: screenLabel,
+          screen: widget.screenLabel,
           language: context.locale.languageCode,
         );
     // Begrüßung sicherstellen (lädt Vorname + Tageszeit, einmalig).
@@ -40,44 +106,47 @@ class MensaenaAssistantFab extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Bloom(
-      color: AppColors.bronze,
-      radius: 18,
-      intensity: 0.5,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: () => _open(context, ref),
-          child: Container(
-            width: 54,
-            height: 54,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              // Halbtransparent (überlagert nichts dauerhaft).
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.bronze.withValues(alpha: 0.92),
-                  AppColors.bronzeSoft.withValues(alpha: 0.85),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(
-                color: AppColors.bronze.withValues(alpha: 0.55),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.bronze.withValues(alpha: 0.40),
-                  blurRadius: 18,
-                  offset: const Offset(0, 4),
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _pulseScale,
+      child: Bloom(
+        color: AppColors.bronze,
+        radius: 18,
+        intensity: 0.5,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () => _open(context),
+            child: Container(
+              width: 54,
+              height: 54,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                // Halbtransparent (überlagert nichts dauerhaft).
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.bronze.withValues(alpha: 0.92),
+                    AppColors.bronzeSoft.withValues(alpha: 0.85),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ],
+                border: Border.all(
+                  color: AppColors.bronze.withValues(alpha: 0.55),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.bronze.withValues(alpha: 0.40),
+                    blurRadius: 18,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.auto_awesome,
+                  color: AppColors.voidColor, size: 24),
             ),
-            child: const Icon(Icons.auto_awesome,
-                color: AppColors.voidColor, size: 24),
           ),
         ),
       ),

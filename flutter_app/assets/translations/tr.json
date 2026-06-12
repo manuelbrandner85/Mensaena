@@ -3428,6 +3428,11 @@
       "pillar": "Direk",
       "anchor": "Çapa",
       "beacon": "Fener"
+    },
+    "levelUp": {
+      "title": "Yeni seviyeye ulaştın",
+      "subtitle": "Mahallen sana teşekkür ediyor.",
+      "cta": "Devam"
     }
   },
   "mentorship": {
@@ -4366,5 +4371,12 @@
     "targetTypeUser": "Komşu",
     "targetTypeOrg": "Kuruluş",
     "targetTypeName": "Serbest isim"
+  },
+  "firstHelp": {
+    "title": "İlk yardımın!",
+    "message": "İlk kez mahallenden birine yardım ettin. Mensaena tam da bunun için var — burada olduğun için teşekkürler.",
+    "share": "Bu anı paylaş",
+    "shareText": "Az önce Mensaena üzerinden mahallemden birine yardım ettim. 💚 www.mensaena.de",
+    "close": "Devam"
   }
 }

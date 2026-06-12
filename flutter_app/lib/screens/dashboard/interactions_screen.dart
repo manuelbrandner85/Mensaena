@@ -14,6 +14,7 @@ import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/shared/trust_rating_modal.dart';
 import '../../widgets/shared/app_snackbar.dart';
+import '../../widgets/shared/first_help_moment.dart';
 
 /// SKILL: mensaena-features
 /// Interactions-Screen: alle aktiven Hilfeanfragen des Users.
@@ -264,6 +265,11 @@ class _StatusActions extends ConsumerWidget {
               if (!context.mounted) return;
               AppSnackBar.info(context, ok ? 'Status: ${step.label}' : 'Fehler.');
               if (ok) onChanged();
+              // D2 Stolz-Momente: erste abgeschlossene Hilfe als
+              // Helfer:in → einmalige Dankes-Sequenz (Guard im Widget).
+              if (ok && step.value == 'completed' && isHelper) {
+                FirstHelpMoment.maybeShow(context, ref);
+              }
             },
           ),
       ],

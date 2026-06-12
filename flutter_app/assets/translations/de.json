@@ -3425,6 +3425,11 @@
       "pillar": "Stütze",
       "anchor": "Anker",
       "beacon": "Leuchtturm"
+    },
+    "levelUp": {
+      "title": "Neues Level erreicht",
+      "subtitle": "Deine Nachbarschaft dankt dir.",
+      "cta": "Weiter"
     }
   },
   "mentorship": {
@@ -4363,5 +4368,12 @@
     "targetTypeUser": "Nachbar/in",
     "targetTypeOrg": "Organisation",
     "targetTypeName": "Freier Name"
+  },
+  "firstHelp": {
+    "title": "Deine erste Hilfe!",
+    "message": "Du hast zum ersten Mal jemandem in deiner Nachbarschaft geholfen. Genau dafür gibt es Mensaena — danke, dass du da bist.",
+    "share": "Moment teilen",
+    "shareText": "Ich habe gerade jemandem in meiner Nachbarschaft über Mensaena geholfen. 💚 www.mensaena.de",
+    "close": "Weiter"
   }
 }

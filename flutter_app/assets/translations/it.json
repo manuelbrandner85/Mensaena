@@ -3429,6 +3429,11 @@
       "pillar": "Pilastro",
       "anchor": "Àncora",
       "beacon": "Faro"
+    },
+    "levelUp": {
+      "title": "Nuovo livello raggiunto",
+      "subtitle": "Il tuo vicinato ti ringrazia.",
+      "cta": "Avanti"
     }
   },
   "mentorship": {
@@ -4367,5 +4372,12 @@
     "targetTypeUser": "Vicino/a",
     "targetTypeOrg": "Organizzazione",
     "targetTypeName": "Nome libero"
+  },
+  "firstHelp": {
+    "title": "Il tuo primo aiuto!",
+    "message": "Hai aiutato per la prima volta qualcuno del tuo vicinato. Mensaena esiste proprio per questo — grazie di esserci.",
+    "share": "Condividi il momento",
+    "shareText": "Ho appena aiutato una persona del mio vicinato tramite Mensaena. 💚 www.mensaena.de",
+    "close": "Avanti"
   }
 }

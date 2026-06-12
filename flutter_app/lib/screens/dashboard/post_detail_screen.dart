@@ -29,6 +29,7 @@ import '../../widgets/shared/image_carousel.dart';
 import '../../widgets/shared/post_status_badge.dart';
 import '../../widgets/shared/wikipedia_box.dart';
 import '../../widgets/shared/app_snackbar.dart';
+import '../../widgets/shared/morphing_action_button.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
 /// Post-Detail: Hero (Typ-Badge, Bilder, Titel, Beschreibung), Author,
@@ -179,23 +180,22 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  Future<void> _offerHelp() async {
+  /// B5 Mikro-Physik: Erfolg wird vom MorphingActionButton AM Button
+  /// angezeigt (Spinner → Häkchen) — SnackBar nur noch im Fehlerfall.
+  Future<bool> _offerHelp() async {
     final ok = await InteractionsCreateRepository.offerHelp(
       postId: widget.postId,
     );
-    if (!mounted) return;
+    if (!mounted) return ok;
     if (ok) {
       unawaited(Haptics.success());
     } else {
       unawaited(Haptics.error());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('posts.helpFailed'.tr())),
+      );
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          ok ? 'posts.helpOffered'.tr() : 'posts.helpFailed'.tr(),
-        ),
-      ),
-    );
+    return ok;
   }
 
   /// Builds depth-1 nested comment tree (1:1 to Web PostDetailPage).
@@ -900,7 +900,7 @@ class _ActionsBar extends StatelessWidget {
   final VoidCallback onShare;
   final VoidCallback onCopyLink;
   final VoidCallback onReport;
-  final VoidCallback? onHelp;
+  final Future<bool> Function()? onHelp;
 
   @override
   Widget build(BuildContext context) {
@@ -916,10 +916,12 @@ class _ActionsBar extends StatelessWidget {
           if (onHelp != null) ...[
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: onHelp,
-                icon: const Icon(LucideIcons.helpingHand, size: 18),
-                label: Text('posts.ihelp'.tr()),
+              // B5: morpht Idle → Spinner → Häkchen am Ort der Aktion.
+              child: MorphingActionButton(
+                icon: LucideIcons.helpingHand,
+                label: 'posts.ihelp'.tr(),
+                successLabel: 'posts.helpOffered'.tr(),
+                action: onHelp!,
               ),
             ),
             const SizedBox(height: 12),
