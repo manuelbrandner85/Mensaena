@@ -183,6 +183,26 @@ class PostsRepository {
   }
 
   /// Einzelnen Post per ID holen.
+  /// Aktive Posts eines Users, neueste zuerst (Profil-Tab).
+  static Future<List<Post>> listByUser(String userId,
+      {int limit = 50}) async {
+    try {
+      final rows = await sb
+          .from('posts')
+          .select()
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(Post.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   static Future<Post?> getById(String id) async {
     try {
       final row =

@@ -50,7 +50,6 @@ BASELINE: dict[str, int] = {
     "lib/screens/dashboard/mentorship_screen.dart": 1,
     "lib/screens/dashboard/messages_screen.dart": 1,
     "lib/screens/dashboard/module/module_posts_screen.dart": 1,
-    "lib/screens/dashboard/profile_screen.dart": 6,
     "lib/screens/dashboard/skills/skills_screen.dart": 1,
     "lib/widgets/chat/chat_recap_sheet.dart": 1,
     "lib/widgets/chat/forward_message_sheet.dart": 1,
