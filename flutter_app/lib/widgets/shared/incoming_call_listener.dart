@@ -20,6 +20,8 @@ import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/conversations_repository.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/call_busy_state.dart';
 import '../../services/call_event_bus.dart';
 import '../../services/callkit_service.dart';
@@ -144,15 +146,14 @@ class _IncomingCallListenerState
       },
     );
     if (picked == null) return;
-    final me = SupabaseService.currentUser?.id;
-    if (me == null) return;
-    try {
-      await sb.from('messages').insert({
-        'conversation_id': ctx.conversationId,
-        'sender_id': me,
-        'content': picked,
-      });
-    } catch (_) {}
+    final convId = ctx.conversationId;
+    if (convId == null) return;
+    // Quick-Reply ist eine echte Nachricht → MessagesRepository.send
+    // (inkl. conversations.updated_at-Touch für die Sortierung).
+    await MessagesRepository.send(
+      conversationId: convId,
+      content: picked,
+    );
   }
 
   void _setupListeners() {
@@ -168,13 +169,7 @@ class _IncomingCallListenerState
     unawaited(_seedHandledFromActiveCalls().then((_) {
       if (!mounted) return;
       try {
-        _realtimeSub = sb
-            .from('dm_calls')
-            .stream(primaryKey: ['id'])
-            .eq('callee_id', uid)
-            .order('created_at', ascending: false)
-            .limit(20)
-            .listen(
+        _realtimeSub = DmCallService.watchIncomingFor(uid).listen(
               _handleRealtimeBatch,
               onError: (_) {/* swallow timeouts / network drops */},
               cancelOnError: false,
@@ -296,19 +291,11 @@ class _IncomingCallListenerState
     String resolvedName = callerName ?? 'Nachbar:in';
     String? avatarUrl = callerAvatar;
     if (callerId != null && (callerName == null || avatarUrl == null)) {
-      try {
-        final p = await sb
-            .from('profiles')
-            .select('display_name, name, avatar_url')
-            .eq('id', callerId)
-            .maybeSingle();
-        if (p != null) {
-          resolvedName = (p['display_name'] as String?) ??
-              (p['name'] as String?) ??
-              resolvedName;
-          avatarUrl ??= p['avatar_url'] as String?;
-        }
-      } catch (_) {}
+      final p = await ProfilesRepository.getById(callerId);
+      if (p != null) {
+        resolvedName = p.displayName ?? p.name ?? resolvedName;
+        avatarUrl ??= p.avatarUrl;
+      }
     }
 
     // Metadata an CallEventBus geben fuer Accept-Navigation.

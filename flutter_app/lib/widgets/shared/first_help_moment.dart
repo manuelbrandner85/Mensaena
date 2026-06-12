@@ -58,12 +58,12 @@ class _FirstHelpContent extends StatelessWidget {
         children: [
           // Stimmungs-Header: Higgsfield-Still mit Ken-Burns-Drift (full)
           // bzw. statisch (reduced/none) — CinematicBackdrop regelt das.
-          SizedBox(
+          const SizedBox(
             height: 150,
             child: ClipRRect(
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(22)),
-              child: const CinematicBackdrop(
+                  BorderRadius.vertical(top: Radius.circular(22)),
+              child: CinematicBackdrop(
                 asset: 'assets/images/onboarding_connect.webp',
                 topScrim: 0.15,
                 bottomScrim: 0.7,
