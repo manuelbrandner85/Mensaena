@@ -197,8 +197,8 @@ class AppTheme {
       // dunklen Glass-Strong-Ton + rounded-22-Oberkante. Sheets die ihren
       // eigenen Container malen überschreiben das ggf. weiterhin.
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Color(0xF0121A28),
-        modalBackgroundColor: Color(0xF0121A28),
+        backgroundColor: AppColors.sheetBackground,
+        modalBackgroundColor: AppColors.sheetBackground,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         modalElevation: 0,

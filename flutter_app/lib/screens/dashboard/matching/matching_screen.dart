@@ -213,7 +213,7 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -242,7 +242,7 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

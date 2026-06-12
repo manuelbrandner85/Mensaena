@@ -19,7 +19,7 @@ class BadgeDetailSheet {
       {bool earned = false}) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

@@ -29,7 +29,7 @@ class UserPickerSheet {
   }) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       isScrollControlled: true,
       builder: (sheetCtx) => _UserPickerBody(
         title: title,

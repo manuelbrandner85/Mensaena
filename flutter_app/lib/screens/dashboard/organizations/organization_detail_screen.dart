@@ -1242,7 +1242,7 @@ class _OrganizationDetailScreenState
   Future<void> _openReportSheet(String reviewId) async {
     final reason = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),

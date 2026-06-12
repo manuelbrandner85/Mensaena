@@ -157,7 +157,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   Future<void> _report() async {
     final reason = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -1055,7 +1055,7 @@ class _CommentTile extends StatelessWidget {
     if (!isOwn) return;
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

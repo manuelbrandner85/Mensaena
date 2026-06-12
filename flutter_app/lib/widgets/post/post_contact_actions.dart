@@ -224,7 +224,7 @@ class PostContactActions extends ConsumerWidget {
     final result = await showModalBottomSheet<String?>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xF0121A28),
+      backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -486,7 +486,7 @@ class _SecondaryMethodsRow extends ConsumerWidget {
         if (note == null) return;
         showModalBottomSheet<void>(
           context: context,
-          backgroundColor: const Color(0xF0121A28),
+          backgroundColor: AppColors.sheetBackground,
           builder: (_) => Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
