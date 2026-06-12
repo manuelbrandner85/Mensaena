@@ -250,6 +250,9 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
                           const SizedBox(height: 40),
                           EmptyStateCard(
                             icon: LucideIcons.inbox,
+                            moodAsset: _hasFilters
+                                ? null
+                                : 'assets/images/empty_nearby.webp',
                             title: _hasFilters
                                 ? 'search.noResultsShort'.tr()
                                 : 'modules.emptyPosts'.tr(

@@ -17,6 +17,7 @@ import '../../config/theme/app_typography.dart';
 import '../../services/haptics.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/navigation/language_picker.dart';
+import '../../widgets/effects/cinematic_backdrop.dart';
 
 const _onboardingShownKey = 'onboarding_tour_v1_shown';
 const _storage = FlutterSecureStorage();
@@ -126,23 +127,33 @@ class _OnboardingTourScreenState
       body: SafeArea(
         child: Stack(
           children: [
-            // Cinematic Hintergrund — radial-gradient pro Step
+            // Cinematic Hintergrund — Higgsfield-Dusk-Still pro Tour-Haelfte
+            // (Crossfade beim Wechsel), darueber der Step-Farb-Glow wie zuvor.
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 700),
-              child: Container(
-                key: ValueKey('bg_$_index'),
+              child: CinematicBackdrop(
+                key: ValueKey(
+                    _index < 3 ? 'bg_arrive' : 'bg_connect'),
+                asset: _index < 3
+                    ? 'assets/images/onboarding_arrive.webp'
+                    : 'assets/images/onboarding_connect.webp',
+                topScrim: 0.45,
+                bottomScrim: 0.92,
+              ),
+            ),
+            IgnorePointer(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     center: const Alignment(0.0, -0.4),
                     radius: 1.3,
                     colors: [
-                      _steps[_index].color.withValues(alpha: 0.18),
-                      AppColors.voidColor,
-                      AppColors.voidColor,
+                      _steps[_index].color.withValues(alpha: 0.12),
+                      Colors.transparent,
                     ],
-                    stops: const [0.0, 0.6, 1.0],
                   ),
                 ),
+                child: const SizedBox.expand(),
               ),
             ),
             // PageView

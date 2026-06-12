@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/app_config.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../widgets/effects/cinematic_backdrop.dart';
 
 /// SKILL: mensaena-design + flutter-build-responsive-layout
 /// Landing — minimaler Cinema-Hero. Volle 9-Section-Variante kommt in
@@ -17,8 +18,16 @@ class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const CinematicBackdrop(
+            asset: 'assets/images/splash_dusk.webp',
+            topScrim: 0.55,
+            bottomScrim: 0.9,
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 64),
           child: Center(
             child: ConstrainedBox(
@@ -91,7 +100,9 @@ class LandingScreen extends StatelessWidget {
               ),
             ),
           ),
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
