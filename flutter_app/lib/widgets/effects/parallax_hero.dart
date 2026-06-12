@@ -40,6 +40,17 @@ class _ParallaxHeroState extends State<ParallaxHero> {
   }
 
   @override
+  void didUpdateWidget(covariant ParallaxHero oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Tauscht der Parent den ScrollController, MUSS der Listener umziehen
+    // — sonst feuert _onScroll doppelt bzw. auf einem toten Controller.
+    if (oldWidget.scrollController != widget.scrollController) {
+      oldWidget.scrollController.removeListener(_onScroll);
+      widget.scrollController.addListener(_onScroll);
+    }
+  }
+
+  @override
   void dispose() {
     widget.scrollController.removeListener(_onScroll);
     super.dispose();

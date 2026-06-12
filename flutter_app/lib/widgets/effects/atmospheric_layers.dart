@@ -102,13 +102,14 @@ class _StarfieldState extends State<Starfield>
     return IgnorePointer(
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, __) => CustomPaint(
+        builder: (_, __) => RepaintBoundary(
+            child: CustomPaint(
           painter: _StarfieldPainter(
               stars: _stars,
               intensity: widget.intensity,
               t: _ctrl.value * math.pi * 2),
           size: Size.infinite,
-        ),
+        )),
       ),
     );
   }
@@ -250,7 +251,8 @@ class _GodRaysState extends State<GodRays>
     return IgnorePointer(
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, __) => CustomPaint(
+        builder: (_, __) => RepaintBoundary(
+            child: CustomPaint(
           painter: _GodRaysPainter(
             source: widget.source,
             color: widget.color,
@@ -258,7 +260,7 @@ class _GodRaysState extends State<GodRays>
             t: _ctrl.value,
           ),
           size: Size.infinite,
-        ),
+        )),
       ),
     );
   }
@@ -365,7 +367,8 @@ class _DustParticlesState extends State<DustParticles>
     return IgnorePointer(
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, __) => CustomPaint(
+        builder: (_, __) => RepaintBoundary(
+            child: CustomPaint(
           painter: _DustPainter(
             particles: _particles,
             color: widget.color,
@@ -373,7 +376,7 @@ class _DustParticlesState extends State<DustParticles>
             t: _ctrl.value,
           ),
           size: Size.infinite,
-        ),
+        )),
       ),
     );
   }
@@ -405,13 +408,13 @@ class _DustPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Paint einmal pro Frame statt pro Partikel (Allokations-Hotpath).
+    final paint = Paint()..color = color.withValues(alpha: 0.35 * intensity);
     for (final p in particles) {
       final drift = t * p.driftSpeed;
       final wx = (p.x + math.cos(p.driftAngle) * drift * 0.10) % 1.0;
       final wy = (p.y + math.sin(p.driftAngle) * drift * 0.06) % 1.0;
-      final paint = Paint()
-        ..color = color.withValues(alpha: 0.35 * intensity)
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, p.size * 1.5);
+      paint.maskFilter = MaskFilter.blur(BlurStyle.normal, p.size * 1.5);
       canvas.drawCircle(
         Offset(wx * size.width, wy * size.height),
         p.size,

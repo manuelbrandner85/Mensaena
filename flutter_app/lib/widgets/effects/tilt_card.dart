@@ -60,7 +60,10 @@ class _SharedAccelerometer {
   }
 
   static void _maybeDetach() {
-    _listenerCount--;
+    // Guard gegen Unterlauf: doppeltes Detach (schnelle Navigation) darf den
+    // Zaehler nicht negativ machen, sonst haelt die naechste TiltCard den
+    // Sensor-Stream faelschlich fuer aktiv.
+    if (_listenerCount > 0) _listenerCount--;
     if (_listenerCount > 0) return;
     final s = _nativeSub;
     _nativeSub = null;
