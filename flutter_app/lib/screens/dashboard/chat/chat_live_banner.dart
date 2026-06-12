@@ -51,6 +51,9 @@ class _ChatLiveRoomBannerState extends State<ChatLiveRoomBanner>
     return StreamBuilder<Map<String, dynamic>?>(
       stream: LiveStreamService.watchActiveRoom(widget.conversationId),
       builder: (context, snap) {
+        // M5: Banner ist Schmuck — bei Stream-Fehler bewusst ausblenden
+        // statt Fehlfläche im Chat (explizit dokumentierter Pfad).
+        if (snap.hasError) return const SizedBox.shrink();
         final room = snap.data;
         if (room == null) return const SizedBox.shrink();
         final roomName = (room['room_name'] as String?) ?? '';
@@ -156,6 +159,8 @@ class ChatPinnedMessagesPanel extends StatelessWidget {
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: MessagesRepository.watchPinnedMessages(conversationId),
       builder: (context, snap) {
+        // M5: dito — Pin-Panel verschwindet bei Fehler, blockiert nie.
+        if (snap.hasError) return const SizedBox.shrink();
         final pins = snap.data ?? const <Map<String, dynamic>>[];
         if (pins.isEmpty) return const SizedBox.shrink();
         return Container(

@@ -13,6 +13,7 @@ import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/skeleton_card.dart';
+import '../../widgets/shared/error_retry_card.dart';
 import '../../repositories/search_repository.dart';
 import 'modules_hub_screen.dart' show ModuleTile, kModulesCatalog;
 
@@ -238,6 +239,14 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                         if (snap.connectionState != ConnectionState.done) {
                           return const SkeletonList(
                               count: 5, itemHeight: 70);
+                        }
+                        // M5: Fehler nicht als "keine Ergebnisse" tarnen —
+                        // ehrlicher Zustand mit Retry.
+                        if (snap.hasError) {
+                          return ErrorRetryCard(
+                            onRetry: () => setState(
+                                () => _future = _runSearch(_query)),
+                          );
                         }
                         final r = snap.data ?? const _SearchResults.empty();
                         if (r.isEmpty) return _NoResults(query: _query);
