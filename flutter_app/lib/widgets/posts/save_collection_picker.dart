@@ -10,19 +10,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/supabase_service.dart';
+import '../../repositories/posts_repository.dart';
 
 final saveCollectionsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final uid = SupabaseService.currentUser?.id;
   if (uid == null) return const [];
   try {
-    final rows = await sb
-        .from('save_collections')
-        .select()
-        .eq('user_id', uid)
-        .order('created_at', ascending: false)
-        .limit(100);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
+    return PostsRepository.listSaveCollections(uid);
   } catch (_) {
     return const [];
   }
@@ -94,11 +89,11 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
     try {
-      await sb.from('save_collections').insert({
-        'user_id': uid,
-        'name': nameCtrl.text.trim(),
-        'emoji': emojiCtrl.text.trim().isEmpty ? null : emojiCtrl.text.trim(),
-      });
+      await PostsRepository.createSaveCollection(
+        userId: uid,
+        name: nameCtrl.text.trim(),
+        emoji: emojiCtrl.text.trim().isEmpty ? null : emojiCtrl.text.trim(),
+      );
       ref.invalidate(saveCollectionsProvider);
     } catch (_) {}
   }

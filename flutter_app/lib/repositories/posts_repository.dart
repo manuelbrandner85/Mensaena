@@ -217,6 +217,58 @@ class PostsRepository {
     }
   }
 
+  /// Aehnliche aktive Posts (gleicher Typ, optional Tag-Overlap), max 5.
+  static Future<List<Map<String, dynamic>>> similar({
+    required String postId,
+    required String type,
+    List<String> tags = const [],
+  }) async {
+    try {
+      var q = sb
+          .from('posts')
+          .select('id, title, type, media_urls, image_url, created_at')
+          .neq('id', postId)
+          .eq('status', 'active')
+          .eq('type', type);
+      if (tags.isNotEmpty) {
+        q = q.overlaps('tags', tags);
+      }
+      final rows = await q.order('created_at', ascending: false).limit(5);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Save-Collections des Users (Lesezeichen-Ordner).
+  static Future<List<Map<String, dynamic>>> listSaveCollections(
+      String userId) async {
+    try {
+      final rows = await sb
+          .from('save_collections')
+          .select()
+          .eq('user_id', userId)
+          .order('created_at', ascending: false)
+          .limit(100);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Neue Save-Collection anlegen.
+  static Future<void> createSaveCollection({
+    required String userId,
+    required String name,
+    String? emoji,
+  }) async {
+    await sb.from('save_collections').insert({
+      'user_id': userId,
+      'name': name,
+      'emoji': emoji,
+    });
+  }
+
   static Future<Post?> getById(String id) async {
     try {
       final row =

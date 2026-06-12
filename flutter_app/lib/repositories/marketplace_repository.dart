@@ -37,6 +37,52 @@ class MarketplaceRepository {
     }
   }
 
+  /// Tausch-Angebote derselben Kategorie (Barter-Matches), max 5.
+  static Future<List<Map<String, dynamic>>> barterMatches({
+    required String listingId,
+    required String category,
+  }) async {
+    try {
+      final rows = await sb
+          .from('marketplace_listings')
+          .select('id, title, category, images, image_urls, user_id')
+          .neq('id', listingId)
+          .eq('listing_type', 'tauschen')
+          .eq('category', category)
+          .isFilter('deleted_at', null)
+          .order('created_at', ascending: false)
+          .limit(5);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Durchschnittspreis einer Kategorie (letzte 90 Tage, price>0) oder null.
+  static Future<double?> averagePrice(String category) async {
+    try {
+      final since = DateTime.now()
+          .toUtc()
+          .subtract(const Duration(days: 90))
+          .toIso8601String();
+      final rows = await sb
+          .from('marketplace_listings')
+          .select('price')
+          .eq('category', category)
+          .gte('created_at', since)
+          .gt('price', 0);
+      final prices = (rows as List)
+          .cast<Map<String, dynamic>>()
+          .map((r) => (r['price'] as num?)?.toDouble())
+          .whereType<double>()
+          .toList();
+      if (prices.isEmpty) return null;
+      return prices.reduce((a, b) => a + b) / prices.length;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<MarketplaceListing?> getById(String id) async {
     try {
       final row = await sb

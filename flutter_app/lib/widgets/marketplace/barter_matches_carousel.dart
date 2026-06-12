@@ -13,24 +13,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/marketplace_repository.dart';
 
 final _barterMatchesProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, _BarterKey>((ref, key) async {
   try {
-    final rows = await sb
-        .from('marketplace_listings')
-        // BUGFIX: media_urls/image_url existieren NICHT in der Tabelle →
-        // PostgREST-Fehler → Carousel zeigte nie Bilder. Echte Spalten sind
-        // images + image_urls (beide Arrays).
-        .select('id, title, category, images, image_urls, user_id')
-        .neq('id', key.listingId)
-        .eq('listing_type', 'tauschen')
-        .eq('category', key.category)
-        .isFilter('deleted_at', null)
-        .order('created_at', ascending: false)
-        .limit(5);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
+    return MarketplaceRepository.barterMatches(
+        listingId: key.listingId, category: key.category);
   } catch (_) {
     return const [];
   }
