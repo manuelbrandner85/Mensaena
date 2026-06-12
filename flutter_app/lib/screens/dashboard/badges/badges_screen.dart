@@ -12,6 +12,7 @@ import '../../../models/user_badge.dart';
 import '../../../repositories/challenges_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/skeleton_card.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Badges-Gallery — alle Badges der Plattform, eigene markiert.
@@ -37,11 +38,7 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
     if (!mounted) return;
     if (newCount > 0) {
       ref.invalidate(myBadgesProvider);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('badges.newlyEarned'.tr(namedArgs: {'n': '$newCount'}),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'badges.newlyEarned'.tr(namedArgs: {'n': '$newCount'}));
     }
   }
 

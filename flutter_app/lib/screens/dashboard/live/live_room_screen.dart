@@ -45,6 +45,7 @@ import '../../../widgets/shared/floating_reactions_layer.dart';
 import '../../../widgets/livestream/livestream_chat_resolver.dart';
 import '../../../widgets/shared/user_picker_sheet.dart';
 import '../../../widgets/shared/watcher_panel.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class LiveRoomScreen extends ConsumerStatefulWidget {
   const LiveRoomScreen({
@@ -428,11 +429,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   void _toast(String msg) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(msg,
-          style: AppTypography.body(size: 13, color: AppColors.ink)),
-    ));
+    AppSnackBar.info(context, msg);
   }
 
   // Auto-Close-Guard: verhindert doppeltes Beenden, falls mehrere

@@ -21,6 +21,7 @@ import '../../../widgets/shared/image_lightbox.dart';
 import '../../../widgets/shared/translate_button.dart';
 import '../../../widgets/shared/voice_message_bubble.dart';
 import 'chat_action_sheet.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Message-Bubble — Text/Image/Voice + Reactions + Reply-Quote
@@ -683,11 +684,7 @@ class _SystemCallCard extends StatelessWidget {
       if (!result.success ||
           result.callId == null ||
           result.roomName == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: AppColors.surface,
-          content: Text(result.errorReason ?? 'systemCall.callbackFailed'.tr(),
-              style: AppTypography.body(size: 13, color: AppColors.ink)),
-        ));
+        AppSnackBar.info(context, result.errorReason ?? 'systemCall.callbackFailed'.tr());
         return;
       }
       final encPeer = Uri.encodeComponent(peerName);

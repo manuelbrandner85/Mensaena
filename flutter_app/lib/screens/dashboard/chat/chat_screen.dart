@@ -35,6 +35,7 @@ import 'chat_live_banner.dart';
 import 'chat_media_sheet.dart';
 import 'chat_message_bubble.dart';
 import 'chat_typing_indicator.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Chat-Screen mit Realtime-Messages via Supabase Stream.
@@ -181,11 +182,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
     if (!mounted) return;
     if (room == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('chat.livestreamFailed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.error(context, 'chat.livestreamFailed'.tr());
       return;
     }
     setState(() => _activeStreamRoom = room);
@@ -417,15 +414,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ref.invalidate(messagesStreamProvider(widget.conversationId));
       ref.invalidate(peerLastReadProvider(widget.conversationId));
     }
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        count != null
-            ? 'chat.clearHistoryOk'.tr(namedArgs: {'count': '$count'})
-            : 'chat.clearHistoryFailed'.tr(),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, count != null ? 'chat.clearHistoryOk'.tr(namedArgs: {'count': '$count'}) : 'chat.clearHistoryFailed'.tr());
   }
 
   Future<void> _sendVoice(String url, int durationSeconds) async {

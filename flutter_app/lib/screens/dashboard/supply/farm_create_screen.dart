@@ -25,6 +25,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class FarmCreateScreen extends ConsumerStatefulWidget {
   const FarmCreateScreen({super.key});
@@ -219,11 +220,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
   }
 
   void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(msg,
-          style: AppTypography.body(size: 13, color: AppColors.ink)),
-    ));
+    AppSnackBar.info(context, msg);
   }
 
   @override

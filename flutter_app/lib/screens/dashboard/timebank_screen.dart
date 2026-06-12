@@ -12,6 +12,7 @@ import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/user_picker_sheet.dart';
 import '../../widgets/shared/skeleton_card.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Zeitbank-Screen: Stundenkonto + Eintraege-Historie + Bestaetigungs-System.
@@ -210,12 +211,7 @@ class _CreateEntrySheetState extends State<_CreateEntrySheet> {
       Haptics.confirm();
       widget.onCreated();
       Navigator.of(context).maybePop();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('timebank.createdPendingSnack'.tr(),
-            style:
-                AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'timebank.createdPendingSnack'.tr());
     } else {
       setState(() {
         _submitting = false;

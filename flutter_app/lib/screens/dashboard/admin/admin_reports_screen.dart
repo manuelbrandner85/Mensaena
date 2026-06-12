@@ -11,6 +11,7 @@ import '../../../widgets/shared/skeleton_card.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features (Admin Phase 5)
 /// 1:1 zu `src/app/dashboard/admin/components/ReportsTab.tsx`.
@@ -58,13 +59,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
       status: status,
     );
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        ok ? 'Status: $status' : 'Fehler beim Update.',
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, ok ? 'Status: $status' : 'Fehler beim Update.');
     if (ok) _load();
   }
 

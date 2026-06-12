@@ -13,6 +13,7 @@ import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/shared/trust_rating_modal.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// Interactions-Screen: alle aktiven Hilfeanfragen des Users.
@@ -261,14 +262,7 @@ class _StatusActions extends ConsumerWidget {
               final ok = await InteractionsRepository.setStatus(
                   interactionId, step.value);
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: AppColors.surface,
-                content: Text(
-                  ok ? 'Status: ${step.label}' : 'Fehler.',
-                  style:
-                      AppTypography.body(size: 13, color: AppColors.ink),
-                ),
-              ));
+              AppSnackBar.info(context, ok ? 'Status: ${step.label}' : 'Fehler.');
               if (ok) onChanged();
             },
           ),

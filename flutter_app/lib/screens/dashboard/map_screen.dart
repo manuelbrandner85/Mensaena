@@ -31,6 +31,7 @@ import '../../services/saved_pins_service.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-features
 /// Karten-Screen V2 — Pendant zur Web /dashboard/map mit Leaflet.
@@ -391,11 +392,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         _mapController.move(_center, _zoom);
       } else if (mounted) {
         // 3) Wirklich nichts da → sichtbarer Hinweis statt stiller Leere.
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: AppColors.surface,
-          content: Text('map.locationUnavailable'.tr(),
-              style: AppTypography.body(size: 13, color: AppColors.ink)),
-        ));
+        AppSnackBar.info(context, 'map.locationUnavailable'.tr());
       }
     }
     await _loadPosts();
@@ -527,11 +524,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
     if (!mounted) return;
     if (pos == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('map.locationUnavailable'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
+      AppSnackBar.info(context, 'map.locationUnavailable'.tr());
       return;
     }
     final loc = LatLng(pos.latitude, pos.longitude);

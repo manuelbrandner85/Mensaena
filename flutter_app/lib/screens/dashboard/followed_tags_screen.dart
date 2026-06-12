@@ -15,6 +15,7 @@ import '../../repositories/extra_repositories.dart';
 import '../../services/haptics.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 final _myFollowedTagsProvider =
     FutureProvider.autoDispose<List<String>>((ref) async {
@@ -71,15 +72,7 @@ class _FollowedTagsScreenState extends ConsumerState<FollowedTagsScreen> {
     if (!mounted) return;
     if (added) _input.clear();
     ref.invalidate(_myFollowedTagsProvider);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        added
-            ? 'followed_tags.added'.tr(namedArgs: {'tag': t})
-            : 'followed_tags.removed'.tr(namedArgs: {'tag': t}),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, added ? 'followed_tags.added'.tr(namedArgs: {'tag': t}) : 'followed_tags.removed'.tr(namedArgs: {'tag': t}));
   }
 
   @override

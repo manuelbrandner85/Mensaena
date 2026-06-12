@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-11)
+- [x] Phase-2-Sweep — AppSnackBar-Restmigration (Standard-Pattern): 67 weitere handgebaute SnackBar-Bloecke in 29 Dateien auf AppSnackBar.success/error/info (Semantik aus Key+Farbe abgeleitet, Ternaries bewusst info). messages_screen ausgenommen (Sonderform ohne style-Zeile — Migrator-Over-Match erkannt + revertiert, Stelle bleibt manuell). Verbleibende Nicht-Standard-Formen (custom Icons/Rows/Actions/Durations) bewusst manuell.
 - [x] Phase-6 Batch 5 — NavigationRail: dashboard_scaffold zeigt ab medium (>=600dp) eine _SideRail links (gleiche 4 Ziele + Unread-/Pending-Badges wie _BottomNav, wiederverwendete _BottomItem-Widgets) und blendet die BottomNav aus; Cinema-Layer bleibt vollflaechig dahinter. Phones unveraendert.
 - [x] Phase-6 Batch 4 — Lesebreite Runde 2: ReadableWidth auf die restlichen 4 Create-Screens (marketplace_create, knowledge_create, crisis_create, event_create [ListView im Loading-Stack gezielt gewrappt]). Damit haben ALLE 9 Beitragserstellungs-Screens Tablet-Lesebreite.
 - [x] Phase-6 Batch 3 — Lesebreite: NEU widgets/shared/readable_width.dart (Center+ConstrainedBox auf AppLayout.readableWidth=640; auf Phones wirkungslos, auf Tablets/Foldables laufen Formulare nicht mehr ueber die volle Breite). Angewandt auf 5 Create-Screens: module_create_post (zentraler Flow), group_create, board_create, challenge_create, farm_create. Restliche Create-/Settings-/Artikel-Screens folgen im naechsten Sweep.

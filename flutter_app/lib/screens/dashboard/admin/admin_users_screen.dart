@@ -18,6 +18,7 @@ import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/module_search_bar.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features (Admin Phase 5)
 /// Nutzerverwaltung — Pagination, Rollen-Filter, Edit-Sheet, Ban-Dialog,
@@ -519,11 +520,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   void _openBan(Map<String, dynamic> user) {
     // Self-Guard: Admin darf sich nicht selbst bannen.
     if (user['id'] == SupabaseService.currentUser?.id) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('admin.cannotActOnSelf'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
-      ));
+      AppSnackBar.error(context, 'admin.cannotActOnSelf'.tr());
       return;
     }
     final reasonCtrl = TextEditingController();
@@ -647,11 +644,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     final uid = user['id'] as String?;
     if (uid == null) return;
     if (uid == SupabaseService.currentUser?.id) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('admin.cannotActOnSelf'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
-      ));
+      AppSnackBar.error(context, 'admin.cannotActOnSelf'.tr());
       return;
     }
     final ok = await ConfirmDialog.show(

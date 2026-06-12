@@ -14,6 +14,7 @@ import '../../../services/share_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class BoardDetailScreen extends ConsumerStatefulWidget {
   const BoardDetailScreen({required this.boardPostId, super.key});
@@ -511,13 +512,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
       reason: reason,
     );
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AppColors.surface,
-      content: Text(
-        ok ? 'report.thanks'.tr() : 'common.errorGeneric'.tr(),
-        style: AppTypography.body(size: 13, color: AppColors.ink),
-      ),
-    ));
+    AppSnackBar.info(context, ok ? 'report.thanks'.tr() : 'common.errorGeneric'.tr());
   }
 }
 
