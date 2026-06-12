@@ -1,5 +1,5 @@
 /// SKILL: mensaena-design (Phase 6 — Responsiveness)
-/// AppLayout — Breakpoint-Tokens nach Material-3-Fensterklassen.
+/// AppLayout — Breakpoint-Tokens nach Material-3-Fensterklassen (V1).
 ///
 ///   compact   < 600 dp   Phones, Foldable zugeklappt  → heutiges Layout
 ///   medium    600–839 dp Kleine Tablets, Foldable auf, Phone quer

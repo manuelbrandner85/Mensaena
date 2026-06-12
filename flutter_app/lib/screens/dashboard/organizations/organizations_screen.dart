@@ -896,8 +896,8 @@ class _CategorySheet extends StatelessWidget {
               child: GridView.builder(
                 shrinkWrap: true,
                 gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 130,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   childAspectRatio: 1.0,

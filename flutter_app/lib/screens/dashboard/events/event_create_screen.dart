@@ -490,10 +490,12 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
         children: [
           Text('events.category'.tr(), style: AppTypography.label(size: 10)),
           const SizedBox(height: 10),
-          GridView.count(
+          GridView.extent(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 5,
+            // 4 Spalten auf Phones (vorher 5 — Labels wurden abgeschnitten,
+            // Phase-3-Befund), Tablets skalieren automatisch.
+            maxCrossAxisExtent: 96,
             childAspectRatio: 1,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,

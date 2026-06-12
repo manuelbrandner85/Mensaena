@@ -709,8 +709,8 @@ class _BadgesTab extends ConsumerWidget {
         final earned = allBadges.where((b) => earnedIds.contains(b.id));
         return GridView(
           padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 130,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
             childAspectRatio: 0.95,
