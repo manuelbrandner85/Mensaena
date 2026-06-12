@@ -10,7 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/conversations_repository.dart';
 
 class ChatRecapSheet {
   static Future<void> show(
@@ -43,15 +43,8 @@ class _RecapBody extends StatelessWidget {
 
   Future<_Recap> _compute() async {
     try {
-      final rows = await sb
-          .from('messages')
-          .select('content, sender_id, created_at')
-          .eq('conversation_id', conversationId)
-          .isFilter('deleted_at', null)
-          .order('created_at', ascending: false)
-          .limit(100);
       final list =
-          (rows as List).whereType<Map<String, dynamic>>().toList();
+          await MessagesRepository.recentForRecap(conversationId);
       if (list.isEmpty) return _Recap.empty();
       final total = list.length;
       final senders = <String, int>{};

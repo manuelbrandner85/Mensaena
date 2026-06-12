@@ -203,6 +203,20 @@ class PostsRepository {
     }
   }
 
+  /// Schlanke Vorschau-Daten fuer die Post-Karte in einer Chat-Bubble
+  /// (Roh-Map, keine vollstaendige Post-Hydration noetig).
+  static Future<Map<String, dynamic>?> cardPreview(String postId) async {
+    try {
+      return await sb
+          .from('posts')
+          .select('id, title, type, image_url, images, user_id')
+          .eq('id', postId)
+          .maybeSingle();
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<Post?> getById(String id) async {
     try {
       final row =

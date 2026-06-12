@@ -8,20 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/conversations_repository.dart';
 
 final _membersProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, String>((ref, conversationId) async {
   try {
-    final rows = await sb
-        .from('conversation_members')
-        .select('user_id, profiles!inner(id, display_name, avatar_url)')
-        .eq('conversation_id', conversationId)
-        .limit(100);
-    return (rows as List)
-        .whereType<Map<String, dynamic>>()
-        .map((r) => Map<String, dynamic>.from(r['profiles'] as Map))
-        .toList();
+    return ConversationsRepository.members(conversationId);
   } catch (_) {
     return const [];
   }

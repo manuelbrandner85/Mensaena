@@ -8,21 +8,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/conversations_repository.dart';
 
 final _vanishStateProvider =
     FutureProvider.autoDispose.family<({bool enabled, int seconds}), String>(
         (ref, conversationId) async {
   try {
-    final row = await sb
-        .from('conversations')
-        .select('vanish_mode_enabled, vanish_seconds')
-        .eq('id', conversationId)
-        .maybeSingle();
-    return (
-      enabled: row?['vanish_mode_enabled'] as bool? ?? false,
-      seconds: (row?['vanish_seconds'] as num?)?.toInt() ?? 3600,
-    );
+    return ConversationsRepository.vanishSettings(conversationId);
   } catch (_) {
     return (enabled: false, seconds: 3600);
   }

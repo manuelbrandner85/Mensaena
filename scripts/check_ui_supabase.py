@@ -23,7 +23,6 @@ PATTERN = re.compile(r"\bsb\s*\.\s*from\s*\(|Supabase\.instance")
 
 # Eingefrorener Altbestand — NICHT erhöhen. Abbau erwünscht.
 BASELINE: dict[str, int] = {
-    "lib/screens/dashboard/account_screen.dart": 3,
     "lib/screens/dashboard/admin/admin_chat_moderation_screen.dart": 1,
     "lib/screens/dashboard/admin/admin_crash_logs_screen.dart": 2,
     "lib/screens/dashboard/admin/admin_users_screen.dart": 1,
@@ -49,12 +48,6 @@ BASELINE: dict[str, int] = {
     "lib/screens/dashboard/messages_screen.dart": 1,
     "lib/screens/dashboard/module/module_posts_screen.dart": 1,
     "lib/screens/dashboard/skills/skills_screen.dart": 1,
-    "lib/widgets/chat/chat_recap_sheet.dart": 1,
-    "lib/widgets/chat/forward_message_sheet.dart": 1,
-    "lib/widgets/chat/mentions_autocomplete.dart": 1,
-    "lib/widgets/chat/post_card_chat_bubble.dart": 1,
-    "lib/widgets/chat/vanish_mode_banner.dart": 1,
-    "lib/widgets/chat/vanish_mode_sheet.dart": 2,
     "lib/widgets/crisis/safe_checkin_button.dart": 3,
     "lib/widgets/dashboard/become_mentor_cta.dart": 1,
     "lib/widgets/dashboard/location_onboarding_modal.dart": 1,
