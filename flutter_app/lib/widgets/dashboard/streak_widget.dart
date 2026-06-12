@@ -16,6 +16,7 @@ import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/celebrate_burst.dart';
 import '../effects/glass_card.dart';
+import '../effects/living_flame.dart';
 
 final _streakProvider = FutureProvider<StreakData>((ref) async {
   return StreakService.read();
@@ -81,7 +82,9 @@ class _StreakWidgetState extends ConsumerState<StreakWidget> {
                     border:
                         Border.all(color: AppColors.amber, width: 1.5),
                   ),
-                  child: const Icon(LucideIcons.flame,
+                  // D3 Stolz-Momente: lebendige Flamme auf `full`,
+                  // statisches Icon auf reduced/none (Gate im Widget).
+                  child: const LivingFlame(
                       size: 22, color: AppColors.amber),
                 ),
               ),

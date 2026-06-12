@@ -26,8 +26,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/cinema_theme.dart';
-import '../../providers/accessibility_provider.dart';
 import '../../providers/cinema_provider.dart';
+import '../../providers/effects_gate_provider.dart';
 import '../../providers/theme_mode_provider.dart';
 import '../../services/device_tier_service.dart';
 import 'atmospheric_layers.dart';
@@ -46,17 +46,17 @@ class CinemaOverlay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final phase = ref.watch(effectiveCinemaPhaseProvider);
-    final baseIntensity = ref.watch(cinemaIntensityProvider).multiplier;
+    // EffectsGate statt Einzel-Signale: deckt reduceMotion/seniorMode (none),
+    // CinemaIntensity (full/reduced/minimal) UND den Phase-6-Frame-Watchdog
+    // ab (full -> reduced bei Jank). intensityFactor (1.0/0.5/0.0) entspricht
+    // exakt dem frueheren CinemaIntensity.multiplier — bei reduced fallen die
+    // teuren Layer (God-Rays/Flare/Fog/Dust/Grain, Schwelle >= 0.6) weg.
+    final profile = ref.watch(effectsProfileProvider);
     final isLight = ref.watch(isLightModeProvider);
-    // P21: reduceMotion (oder seniorMode) → Cinema-Effects komplett aus.
-    // Statisches Theme reicht für Lesbarkeit, animierte Layer würden
-    // bei A11y-Bedarf eher stören.
-    final reduceMotion =
-        ref.watch(a11yProvider.select((p) => p.effectiveReduceMotion));
-    // PERF: Lite-Mode (ARM32 / Android < 9) → Effekte komplett aus, sonst
-    // crasht die App auf alten Geräten unter dem Gewicht der 9+
-    // AnimationControllers.
+    // PERF: Lite-Mode bleibt STRENGER als das Gate (komplett aus statt
+    // reduced) — die 9+ AnimationControllers crashten ARM32/Android<9.
     final liteMode = ref.watch(liteModeActiveProvider);
+    final baseIntensity = profile.intensityFactor;
 
     // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
     // ergeben strukturell SEHR unterschiedliche Widget-Trees (SizedBox vs
@@ -64,10 +64,7 @@ class CinemaOverlay extends ConsumerWidget {
     // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
     // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
     // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
-    if (phase == null ||
-        baseIntensity <= 0.01 ||
-        reduceMotion ||
-        liteMode) {
+    if (phase == null || profile.isOff || liteMode) {
       return KeyedSubtree(
         key: const ValueKey('cinema_overlay_off'),
         child: child,

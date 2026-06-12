@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/dashboard_widgets_repository.dart';
+import '../shared/pressable.dart';
 
 class WeeklyChallengeHighlight extends StatefulWidget {
   const WeeklyChallengeHighlight({super.key});
@@ -51,7 +52,8 @@ class _WeeklyChallengeHighlightState extends State<WeeklyChallengeHighlight> {
         }
         final list = snap.data ?? const <Map<String, dynamic>>[];
         if (list.isEmpty) return const SizedBox.shrink();
-        return InkWell(
+        // B1 Mikro-Physik: Karte = Pressable statt InkWell.
+        return Pressable(
           onTap: () => context.go('/dashboard/challenges'),
           borderRadius: BorderRadius.circular(12),
           child: Container(

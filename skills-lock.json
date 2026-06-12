@@ -97,6 +97,18 @@
       "skillPath": "skills/brainstorming/SKILL.md",
       "computedHash": "8df9b47092524833138b58682d03f2e153a242e550d1693657afdbee0cc9cdb0"
     },
+    "brandkit": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/brandkit/SKILL.md",
+      "computedHash": "b0c4837e1bd140ca816ae54948754ddd2ac1e2a4d3619363777a80caf00b2ede"
+    },
+    "brutalist-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/brutalist-skill/SKILL.md",
+      "computedHash": "fffbaac8597f07679e9d87145533567658aedba3b5eca6f16a7075a333048caa"
+    },
     "burpsuite-project-parser": {
       "source": "trailofbits/skills",
       "sourceType": "github",
@@ -301,6 +313,12 @@
       "skillPath": "skills/emails/SKILL.md",
       "computedHash": "261d986c2a1f1f5f823f8c889e16db723edb8a9d0fa5ede8412f981594715c49"
     },
+    "emil-design-eng": {
+      "source": "emilkowalski/skill",
+      "sourceType": "github",
+      "skillPath": "skills/emil-design-eng/SKILL.md",
+      "computedHash": "433b5a239cda18e0576e4e558532e7e53512e21fafe5b85db4894c28ec399b72"
+    },
     "entry-point-analyzer": {
       "source": "trailofbits/skills",
       "sourceType": "github",
@@ -403,6 +421,30 @@
       "skillPath": "skills/image/SKILL.md",
       "computedHash": "5fb3522650b369f0ab44ab5405ab48af327ac3deaa81391643aa3b9aad06601b"
     },
+    "image-to-code-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/image-to-code-skill/SKILL.md",
+      "computedHash": "4c060a8064a8b13380bc2ef3d6e6a1d0b1e316aa093cd9807d0ce9e4eeb037fa"
+    },
+    "imagegen-frontend-mobile": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/imagegen-frontend-mobile/SKILL.md",
+      "computedHash": "8a33389979f3074fa0926678e266ad2eb9234624472254469fc1ad916b9caa24"
+    },
+    "imagegen-frontend-web": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/imagegen-frontend-web/SKILL.md",
+      "computedHash": "6b5c2256522fdba1e3313eafa3d743b960a7b13ec029d3e6586e04b23327c1f8"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": "plugin/skills/impeccable/SKILL.md",
+      "computedHash": "4128333148c9a927754162e2283f31016380bdf79e374d260de0879270e73da8"
+    },
     "insecure-defaults": {
       "source": "trailofbits/skills",
       "sourceType": "github",
@@ -463,6 +505,12 @@
       "skillPath": "plugins/trailmark/skills/mermaid-to-proverif/SKILL.md",
       "computedHash": "1d3f71750e574e1d0d089ca740c425440f39678b88d09bfcd3cde11731017519"
     },
+    "minimalist-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/minimalist-skill/SKILL.md",
+      "computedHash": "36bc7328f085405f43b476938e62460fa573bf7e984e949e072bcf014831a44c"
+    },
     "modern-python": {
       "source": "trailofbits/skills",
       "sourceType": "github",
@@ -486,6 +534,12 @@
       "sourceType": "github",
       "skillPath": "plugins/testing-handbook-skills/skills/ossfuzz/SKILL.md",
       "computedHash": "8d34900449132fd07f45429b918d9e7ebe78551d090e159ab8ad469e43430082"
+    },
+    "output-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/output-skill/SKILL.md",
+      "computedHash": "e5bf48b1ae561511439cf71672209a10a88cee0968cc925909ff861dfa0a96a7"
     },
     "paywalls": {
       "source": "coreyhaines31/marketingskills",
@@ -540,6 +594,12 @@
       "sourceType": "github",
       "skillPath": "skills/receiving-code-review/SKILL.md",
       "computedHash": "2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30"
+    },
+    "redesign-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/redesign-skill/SKILL.md",
+      "computedHash": "98ad3e5b051bfb71b2795f7e8a6aa0d32b51ee095606c098a4b2822ac07926c9"
     },
     "referrals": {
       "source": "coreyhaines31/marketingskills",
@@ -667,6 +727,12 @@
       "skillPath": "skills/social/SKILL.md",
       "computedHash": "45f19eb1da07de3505f4db57ea0a83906c73bc30bc6af1fdb4d576d5d2dee310"
     },
+    "soft-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/soft-skill/SKILL.md",
+      "computedHash": "e1e32f5e2d420872c6c7332b53d5ff7721946766b78c4822b424c2d512c8fdbc"
+    },
     "solana-vulnerability-scanner": {
       "source": "trailofbits/skills",
       "sourceType": "github",
@@ -678,6 +744,12 @@
       "sourceType": "github",
       "skillPath": "plugins/spec-to-code-compliance/skills/spec-to-code-compliance/SKILL.md",
       "computedHash": "33d4d2203e13ffc2a51d821433d6c1029f58f5ddf8c88715403844da5adca798"
+    },
+    "stitch-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/stitch-skill/SKILL.md",
+      "computedHash": "46bdb08fee2dded38b6ba0a051230a502d6ac6e4044afd47592cb40c256028b5"
     },
     "subagent-driven-development": {
       "source": "obra/superpowers",
@@ -702,6 +774,12 @@
       "sourceType": "github",
       "skillPath": "skills/systematic-debugging/SKILL.md",
       "computedHash": "7246fdd3a795fc3daff0af72044ca99bf836e4e6a46844742858786fdfb86488"
+    },
+    "taste-skill": {
+      "source": "leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/taste-skill/SKILL.md",
+      "computedHash": "aa194351b246b8b4799099d4ed7b033d29eab6e6e3d58d8d2172978be7b3ec89"
     },
     "test-driven-development": {
       "source": "obra/superpowers",

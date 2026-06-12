@@ -14,6 +14,8 @@ import '../../services/karma_service.dart';
 import 'tile_error.dart';
 import '../effects/bloom.dart';
 import '../effects/glass_card.dart';
+import '../effects/level_up_ceremony.dart';
+import '../shared/count_up_text.dart';
 
 final _karmaProvider = FutureProvider<KarmaSnapshot>((ref) async {
   return KarmaService.compute();
@@ -31,6 +33,13 @@ class KarmaWidget extends ConsumerWidget {
       data: (k) {
         if (k.points == 0) return const SizedBox.shrink();
         final level = k.level;
+        // D1 Stolz-Momente: Levelwechsel feiern (idempotent via Storage,
+        // erste Beobachtung setzt nur die Basis — kein Rückwirkend-Fest).
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            LevelUpCeremony.maybeShow(context, ref, level);
+          }
+        });
         final progress = k.progressInLevel;
         final toNext = k.pointsToNext;
         return GlassCard(
@@ -64,7 +73,8 @@ class KarmaWidget extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  Text('${k.points}',
+                  // B4 Mikro-Physik: Punkte zählen beim Erscheinen hoch.
+                  CountUpText('${k.points}',
                       style: AppTypography.display(
                           size: 22, color: AppColors.ink)),
                 ],

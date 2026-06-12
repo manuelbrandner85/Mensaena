@@ -21,6 +21,7 @@ class AnimatedEntrance extends StatelessWidget {
     this.offsetY = 18,
     this.maxStagger = 10,
     this.enabled = true,
+    this.spring = false,
     super.key,
   });
 
@@ -36,6 +37,12 @@ class AnimatedEntrance extends StatelessWidget {
   /// Aufrufer kann global abschalten (z. B. reduceMotion / Lite-Tier).
   final bool enabled;
 
+  /// Spring-Option: leichter Overshoot beim Einschweben (Näherung der
+  /// AppMotion.bouncy-Feder via easeOutBack). Bewusst OHNE Controller
+  /// (V23-Crash-Historie) — Kurven-Näherung statt echter Physik. Für
+  /// Hero-Karten/Highlights, nicht für lange Standard-Listen.
+  final bool spring;
+
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
@@ -47,7 +54,13 @@ class AnimatedEntrance extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
       duration: duration + Duration(milliseconds: stagger * 55),
-      curve: Interval(start, 1.0, curve: Curves.easeOutCubic),
+      curve: Interval(
+        start,
+        1.0,
+        // easeOutBack schießt minimal über 1.0 hinaus → Item „landet" mit
+        // Mini-Overshoot; Opacity ist geclamped, Translate darf überschwingen.
+        curve: spring ? Curves.easeOutBack : Curves.easeOutCubic,
+      ),
       builder: (context, t, child) {
         return Opacity(
           opacity: t.clamp(0.0, 1.0),

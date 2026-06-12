@@ -21,6 +21,7 @@ import '../../config/theme/app_typography.dart';
 import '../../models/crisis.dart';
 import '../../models/event.dart';
 import '../../models/post.dart';
+import '../../providers/effects_gate_provider.dart';
 import '../../repositories/crisis_repository.dart';
 import '../../repositories/events_repository.dart';
 import '../../repositories/posts_repository.dart';
@@ -70,6 +71,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _loading = true;
   String? _error;
   bool _hasGps = false;
+  // C1: Post-Sheet offen → Karte tritt minimal zurück (AnimatedScale).
+  bool _postSheetOpen = false;
 
   // V1 — Kategorie-Filter: standardmaessig alle 9 Typen aktiv (User-Wunsch).
   // Wird beim ersten Tap auf einen Chip auf Single-Select-Style umgeschaltet.
@@ -538,6 +541,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   void _openPostSheet(Post post) {
+    // C1: Karte tritt zurück solange das Sheet offen ist.
+    setState(() => _postSheetOpen = true);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.sheetBackground,
@@ -558,7 +563,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               )
             : null,
       ),
-    );
+    ).whenComplete(() {
+      if (mounted) setState(() => _postSheetOpen = false);
+    });
   }
 
   String _tileUrl(BuildContext context) {
@@ -726,7 +733,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
         ],
       ),
-      body: Stack(
+      body: AnimatedScale(
+        // C1 Atmosphäre: Sheet offen → Karte tritt minimal zurück
+        // (iOS-Modal-Tiefe). Nur auf `full`, Transform-only, 220 ms
+        // ease-out — Barrier-Dim kommt vom Sheet selbst.
+        scale: _postSheetOpen &&
+                ref.watch(effectsProfileProvider).isFull
+            ? 0.985
+            : 1.0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        child: Stack(
         children: [
           FlutterMap(
             mapController: _mapController,
@@ -1048,6 +1065,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               }),
             ),
         ],
+        ),
       ),
     );
   }

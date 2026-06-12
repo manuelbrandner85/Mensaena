@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/device_tier_service.dart';
+import 'count_up_text.dart';
 
 /// SKILL: mensaena-design
 /// Statistik-Kachel fuer Dashboard-Home. Icon + Label + Wert.
@@ -138,23 +139,30 @@ class StatCard extends ConsumerWidget {
                 style: AppTypography.label(size: 10),
               ),
               const SizedBox(height: 6),
-              if (loading)
-                Container(
-                  width: 40,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: AppColors.elevated,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                )
-              else
-                Text(
-                  value,
-                  style: AppTypography.mono(
-                    size: 24,
-                    weight: FontWeight.w700,
-                  ).copyWith(color: AppColors.ink),
-                ),
+              // E2: Skeleton -> Wert nicht hart tauschen, sondern kurzer
+              // Crossfade (150 ms, ease-out). B4: Wert zählt hoch.
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 150),
+                switchInCurve: Curves.easeOut,
+                child: loading
+                    ? Container(
+                        key: const ValueKey('skeleton'),
+                        width: 40,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: AppColors.elevated,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      )
+                    : CountUpText(
+                        value,
+                        key: const ValueKey('value'),
+                        style: AppTypography.mono(
+                          size: 24,
+                          weight: FontWeight.w700,
+                        ).copyWith(color: AppColors.ink),
+                      ),
+              ),
             ],
           ),
         ],

@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/profile.dart';
+import '../shared/pressable.dart';
 
 class TrustScoreCard extends StatelessWidget {
   const TrustScoreCard({super.key, required this.profile});
@@ -30,7 +31,9 @@ class TrustScoreCard extends StatelessWidget {
     final count = profile.trustScoreCount;
     final level = _levelLabel(score);
     final ratio = (score / 5).clamp(0.0, 1.0);
-    return InkWell(
+    // B1 Mikro-Physik: Karte = Pressable (Spring-Scale + Haptik),
+    // InkWell bleibt Listen-Rows vorbehalten.
+    return Pressable(
       onTap: () => context.go('/dashboard/profile'),
       borderRadius: BorderRadius.circular(14),
       child: Container(

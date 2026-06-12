@@ -77,13 +77,23 @@ class _EmptyStateCardState extends State<EmptyStateCard>
           if (widget.moodAsset != null) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                widget.moodAsset!,
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                // Fehler -> Bild faellt einfach weg, Layout bleibt intakt.
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              // E3: Ken-Burns-Mini-Drift auf dem Stimmungsbild — teilt
+              // sich den vorhandenen Puls-Controller (kein 2. Ticker),
+              // Transform-only, der Clip frisst den Überstand.
+              child: AnimatedBuilder(
+                animation: _pulse,
+                builder: (_, child) => Transform.scale(
+                  scale: 1.0 + _pulse.value * 0.03,
+                  child: child,
+                ),
+                child: Image.asset(
+                  widget.moodAsset!,
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  // Fehler -> Bild faellt einfach weg, Layout bleibt intakt.
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
               ),
             ),
             const SizedBox(height: 16),

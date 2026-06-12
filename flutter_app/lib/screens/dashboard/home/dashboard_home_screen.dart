@@ -86,6 +86,7 @@ import '../../../widgets/dashboard/dashboard_onboarding_tooltip.dart';
 import '../../../widgets/dashboard/dashboard_widget_wrapper.dart';
 import '../../../widgets/dashboard/disabled_widgets_bar.dart';
 import '../../../widgets/dashboard/widget_grid_settings.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/post_card.dart';
@@ -419,11 +420,16 @@ class _DashboardHomeScreenState
 
       switch (id) {
         case 'hero':
-          out.add(DashboardHeroCard(
-            profile: profile,
-            memberSinceDays: profile == null
-                ? 0
-                : DateTime.now().difference(profile.createdAt).inDays,
+          // B2 Mikro-Physik: der EINE Hero-Moment des Dashboards bekommt
+          // den Spring-Entrance (Overshoot) — Listen bleiben easeOut.
+          out.add(AnimatedEntrance(
+            spring: true,
+            child: DashboardHeroCard(
+              profile: profile,
+              memberSinceDays: profile == null
+                  ? 0
+                  : DateTime.now().difference(profile.createdAt).inDays,
+            ),
           ));
           // F59 Stories-Ring direkt unter dem Hero.
           out.add(const StoriesRing());
