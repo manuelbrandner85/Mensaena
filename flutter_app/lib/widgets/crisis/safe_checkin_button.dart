@@ -11,45 +11,19 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/crisis_repository.dart';
 import '../../services/location_service.dart';
-import '../../services/supabase_service.dart';
 
 final _hasCriticalNearbyProvider =
     FutureProvider.autoDispose<({bool active, String? crisisId})>((ref) async {
-  try {
-    final rows = await sb
-        .from('crises')
-        .select('id, urgency, status, latitude, longitude')
-        .eq('status', 'active')
-        .eq('urgency', 'critical')
-        .limit(10);
-    final list =
-        (rows as List).whereType<Map<String, dynamic>>().toList();
-    if (list.isEmpty) return (active: false, crisisId: null);
-    return (active: true, crisisId: list.first['id'] as String?);
-  } catch (_) {
-    return (active: false, crisisId: null);
-  }
+  final latest = await CrisisRepository.latestCriticalActive();
+  if (latest == null) return (active: false, crisisId: null);
+  return (active: true, crisisId: latest['id'] as String?);
 });
 
 final _myCheckinTodayProvider =
     FutureProvider.autoDispose<bool>((ref) async {
-  final uid = SupabaseService.currentUser?.id;
-  if (uid == null) return false;
-  try {
-    final since =
-        DateTime.now().subtract(const Duration(hours: 12)).toIso8601String();
-    final rows = await sb
-        .from('user_safety_checkins')
-        .select('id')
-        .eq('user_id', uid)
-        .eq('status', 'safe')
-        .gte('created_at', since)
-        .limit(1);
-    return (rows as List).isNotEmpty;
-  } catch (_) {
-    return false;
-  }
+  return CrisisRepository.myRecentSafeCheckin();
 });
 
 class SafeCheckinButton extends ConsumerWidget {
@@ -58,8 +32,6 @@ class SafeCheckinButton extends ConsumerWidget {
   Future<void> _checkIn(BuildContext context, WidgetRef ref,
       String? crisisId) async {
     HapticFeedback.mediumImpact();
-    final uid = SupabaseService.currentUser?.id;
-    if (uid == null) return;
     double? lat;
     double? lng;
     try {
@@ -68,29 +40,19 @@ class SafeCheckinButton extends ConsumerWidget {
       lat = pos.latitude;
       lng = pos.longitude;
     } catch (_) {/* checkin works without GPS too */}
-    try {
-      await sb.from('user_safety_checkins').insert({
-        'user_id': uid,
-        'crisis_id': crisisId,
-        'status': 'safe',
-        'latitude': lat,
-        'longitude': lng,
-      });
-      ref.invalidate(_myCheckinTodayProvider);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('safe.confirmed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.leben)),
-      ));
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('common.failed'.tr(),
-            style: AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
-    }
+    final ok = await CrisisRepository.insertSafeCheckin(
+      crisisId: crisisId,
+      latitude: lat,
+      longitude: lng,
+    );
+    if (ok) ref.invalidate(_myCheckinTodayProvider);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AppColors.surface,
+      content: Text(ok ? 'safe.confirmed'.tr() : 'common.failed'.tr(),
+          style: AppTypography.body(
+              size: 13, color: ok ? AppColors.leben : AppColors.ink)),
+    ));
   }
 
   @override

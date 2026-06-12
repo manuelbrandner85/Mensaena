@@ -267,6 +267,85 @@ class CrisisRepository {
   }
 
   /// Status-Update an Krise anhaengen.
+  /// Neueste aktive KRITISCHE Krise (oder null) — Quelle für den
+  /// Safe-Check-in-Button und den Critical-Alert-Listener.
+  static Future<Map<String, dynamic>?> latestCriticalActive() async {
+    try {
+      final rows = await sb
+          .from('crises')
+          .select('id, created_at, latitude, longitude')
+          .eq('status', 'active')
+          .eq('urgency', 'critical')
+          .order('created_at', ascending: false)
+          .limit(1);
+      final list = (rows as List).whereType<Map<String, dynamic>>().toList();
+      return list.isEmpty ? null : list.first;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Habe ich mich innerhalb von [window] bereits als „sicher" gemeldet?
+  static Future<bool> myRecentSafeCheckin(
+      {Duration window = const Duration(hours: 12)}) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final since = DateTime.now().subtract(window).toIso8601String();
+      final rows = await sb
+          .from('user_safety_checkins')
+          .select('id')
+          .eq('user_id', uid)
+          .eq('status', 'safe')
+          .gte('created_at', since)
+          .limit(1);
+      return (rows as List).isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> insertSafeCheckin({
+    String? crisisId,
+    double? latitude,
+    double? longitude,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('user_safety_checkins').insert({
+        'user_id': uid,
+        'crisis_id': crisisId,
+        'status': 'safe',
+        'latitude': latitude,
+        'longitude': longitude,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Status-Broadcast (user_status-Upsert), z. B. „safe" im Krisenfall.
+  static Future<bool> setMyUserStatus({
+    required String status,
+    String? statusText,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('user_status').upsert({
+        'user_id': uid,
+        'status': status,
+        if (statusText != null) 'status_text': statusText,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> addUpdate({
     required String crisisId,
     required String content,

@@ -11,7 +11,6 @@ import '../../../models/crisis.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/locale_country_service.dart';
-import '../../../services/supabase_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/crisis/safe_checkin_button.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -1553,23 +1552,18 @@ class _SosTopBanner extends StatelessWidget {
   }
 
   Future<void> _sendSafeCheckIn(BuildContext context) async {
-    final uid = SupabaseService.currentUser?.id;
-    if (uid == null) return;
-    try {
-      // Status broadcast via user_status + thanks an Profil-Kontakte.
-      await sb.from('user_status').upsert({
-        'user_id': uid,
-        'status': 'safe',
-        'status_text': 'crisis.safeStatusText'.tr(namedArgs: {
-          'time': DateTime.now().toLocal().toIso8601String().substring(11, 16),
-        }),
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
-      });
-      if (!context.mounted) return;
+    // Status broadcast via user_status + thanks an Profil-Kontakte.
+    final ok = await CrisisRepository.setMyUserStatus(
+      status: 'safe',
+      statusText: 'crisis.safeStatusText'.tr(namedArgs: {
+        'time': DateTime.now().toLocal().toIso8601String().substring(11, 16),
+      }),
+    );
+    if (!context.mounted) return;
+    if (ok) {
       AppSnackBar.success(context, 'crisis.safeCheckSent'.tr());
-    } catch (e) {
-      if (!context.mounted) return;
-      AppSnackBar.error(context, 'crisis.error'.tr(namedArgs: {'error': '$e'}));
+    } else {
+      AppSnackBar.error(context, 'crisis.error'.tr(namedArgs: {'error': ''}));
     }
   }
 }
