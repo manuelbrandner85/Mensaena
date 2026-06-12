@@ -15,6 +15,7 @@ import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 class BoardCreateScreen extends ConsumerStatefulWidget {
   const BoardCreateScreen({super.key});
@@ -167,7 +168,8 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       title: 'create.pinTitle'.tr(),
       currentRoute: '/dashboard/board',
       body: SafeArea(
-        child: ListView(
+        child: ReadableWidth(
+            child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Text('board.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
@@ -410,7 +412,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                   : 'board.createButton'.tr()),
             ),
           ],
-        ),
+        )),
       ),
     );
   }

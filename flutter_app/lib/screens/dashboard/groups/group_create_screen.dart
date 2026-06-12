@@ -15,6 +15,7 @@ import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 class GroupCreateScreen extends ConsumerStatefulWidget {
   const GroupCreateScreen({super.key});
@@ -146,7 +147,8 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
       title: 'create.groupCreateTitle'.tr(),
       currentRoute: '/dashboard/groups',
       body: SafeArea(
-        child: ListView(
+        child: ReadableWidth(
+            child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             // Titelbild — gibt der Gruppe sofort Charakter.
@@ -352,7 +354,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                   : 'groups.createButton'.tr()),
             ),
           ],
-        ),
+        )),
       ),
     );
   }

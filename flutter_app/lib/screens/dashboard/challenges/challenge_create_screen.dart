@@ -16,6 +16,7 @@ import '../../../services/haptics.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/shared/readable_width.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
   const ChallengeCreateScreen({super.key});
@@ -93,7 +94,8 @@ class _ChallengeCreateScreenState
       title: 'challenges.create'.tr(),
       currentRoute: '/dashboard/challenges/create',
       body: SafeArea(
-        child: Form(
+        child: ReadableWidth(
+            child: Form(
           key: _form,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           child: ListView(
@@ -246,7 +248,7 @@ class _ChallengeCreateScreenState
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }
