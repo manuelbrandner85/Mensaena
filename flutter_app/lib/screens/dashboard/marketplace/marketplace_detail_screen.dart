@@ -528,8 +528,6 @@ class _MarketplaceDetailScreenState
   /// Käufer-Aktion: Reservierungs-Anfrage mit optionaler Nachricht.
   Future<void> _reserveAsBuyer(
       BuildContext context, WidgetRef ref, MarketplaceListing l) async {
-    final uid = SupabaseService.currentUser?.id;
-    if (uid == null) return;
     final msgCtrl = TextEditingController();
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
@@ -587,16 +585,14 @@ class _MarketplaceDetailScreenState
       ),
     );
     if (confirmed != true || !context.mounted) return;
-    try {
-      await sb.from('marketplace_reservations').insert({
-        'listing_id': l.id,
-        'user_id': uid,
-        'message': msgCtrl.text.trim().isEmpty ? null : msgCtrl.text.trim(),
-      });
-      if (!context.mounted) return;
+    final ok = await MarketplaceRepository.requestReservation(
+      listingId: l.id,
+      message: msgCtrl.text,
+    );
+    if (!context.mounted) return;
+    if (ok) {
       AppSnackBar.success(context, 'marketplace.reserve_sent'.tr());
-    } catch (_) {
-      if (!context.mounted) return;
+    } else {
       AppSnackBar.error(context, 'marketplace.reserve_failed'.tr());
     }
   }

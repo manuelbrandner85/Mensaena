@@ -308,11 +308,7 @@ class _MarketplaceCreateScreenState
     // Patch images into the row (separated from create() to keep its API
     // stable). Failure here is non-fatal — the listing exists either way.
     if (imageUrls.isNotEmpty) {
-      try {
-        await sb.from('marketplace_listings').update({
-          'images': imageUrls,
-        }).eq('id', id);
-      } catch (_) {/* ignore */}
+      await MarketplaceRepository.updateImages(id, imageUrls);
     }
 
     if (!mounted) return;

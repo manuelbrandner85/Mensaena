@@ -12,7 +12,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/knowledge_article.dart';
 import '../../../providers/role_provider.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/knowledge_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/wiki/ai_wiki_generator_sheet.dart';
 
@@ -75,34 +75,11 @@ class _KnowledgeScreenState extends ConsumerState<KnowledgeScreen> {
     _future = _load();
   }
 
-  Future<List<KnowledgeArticle>> _load() async {
-    try {
-      // FIX (User-Wunsch): "/dashboard/wiki" und "/dashboard/knowledge"
-      // zeigten dieselben Artikel. Jetzt:
-      // - knowledge (= Bildung) → category IN ('kurs','workshop',
-      //   'tutorial','lernmaterial','webinar','anleitung')
-      // - wiki → der Rest
-      const eduCats = ['kurs', 'workshop', 'tutorial', 'lernmaterial',
-          'webinar', 'anleitung'];
-      var q = sb.from('knowledge_articles').select().eq('is_public', true);
-      final isBildung = widget.routePath == '/dashboard/knowledge';
-      if (isBildung) {
-        q = q.inFilter('category', eduCats);
-      } else {
-        q = q.not('category', 'in',
-            '(${eduCats.map((c) => '"$c"').join(',')})');
-      }
-      final rows = await q
-          .order('is_featured', ascending: false)
-          .order('created_at', ascending: false)
-          .limit(200);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map(KnowledgeArticle.fromJson)
-          .toList();
-    } catch (_) {
-      return const [];
-    }
+  Future<List<KnowledgeArticle>> _load() {
+    // FIX (User-Wunsch): "/dashboard/wiki" und "/dashboard/knowledge"
+    // zeigten dieselben Artikel. Bildung = Edu-Kategorien, Wiki = Rest.
+    final isBildung = widget.routePath == '/dashboard/knowledge';
+    return KnowledgeRepository.listPublic(edu: isBildung);
   }
 
   Future<void> _refresh() async {
@@ -595,16 +572,8 @@ class _ArticleTile extends StatelessWidget {
           ),
           builder: (_) => _ArticleSheet(article: article),
         );
-        // P11: Reading-Tracker — fire-and-forget upsert, ignoriert Fehler.
-        final uid = SupabaseService.currentUser?.id;
-        if (uid != null) {
-          unawaited(sb.from('knowledge_article_reads').upsert({
-            'article_id': article.id,
-            'user_id': uid,
-            'scroll_pct': 0,
-            'last_read_at': DateTime.now().toIso8601String(),
-          }, onConflict: 'article_id,user_id').then((_) {}).catchError((_) {}));
-        }
+        // P11: Reading-Tracker — fire-and-forget, ignoriert Fehler.
+        unawaited(KnowledgeRepository.recordRead(article.id));
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

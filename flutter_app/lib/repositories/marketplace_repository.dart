@@ -140,6 +140,39 @@ class MarketplaceRepository {
     }
   }
 
+  /// Hängt die hochgeladenen Bild-URLs an ein bestehendes Listing
+  /// (nach dem Bild-Upload im Create-Flow).
+  static Future<void> updateImages(
+      String listingId, List<String> imageUrls) async {
+    try {
+      await sb
+          .from('marketplace_listings')
+          .update({'images': imageUrls}).eq('id', listingId);
+    } catch (_) {/* Bilder optional — Listing existiert bereits */}
+  }
+
+  /// Interessent fragt ein Listing an (Reservierungs-WUNSCH in
+  /// marketplace_reservations — nicht der Status-Flip des Listings).
+  static Future<bool> requestReservation({
+    required String listingId,
+    String? message,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('marketplace_reservations').insert({
+        'listing_id': listingId,
+        'user_id': uid,
+        'message': (message != null && message.trim().isNotEmpty)
+            ? message.trim()
+            : null,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Mark a listing as 'claimed' (given away). Owner only.
   static Future<bool> markAsClaimed(String listingId) async {
     try {
