@@ -18,6 +18,8 @@ import '../../providers/unread_counts_provider.dart';
 import '../../repositories/notifications_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/recent_pages_service.dart';
+import '../../config/module_banners.dart';
+import '../shared/module_banner.dart';
 import '../shared/my_avatar_top_button.dart';
 import '../shared/sos_button.dart';
 import '../effects/cinema_overlay.dart';
@@ -86,6 +88,7 @@ class DashboardScaffold extends ConsumerWidget {
     this.currentRoute = '/dashboard',
     this.fab,
     this.onRefresh,
+    this.headerImage,
     super.key,
   });
 
@@ -94,6 +97,10 @@ class DashboardScaffold extends ConsumerWidget {
   final String currentRoute;
   final Widget? fab;
   final Future<void> Function()? onRefresh;
+
+  /// Optionales Higgsfield-Modul-Banner (Asset-Pfad) — fixer Bildstreifen
+  /// über dem Body. null = kein Banner.
+  final String? headerImage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -282,6 +289,15 @@ class DashboardScaffold extends ConsumerWidget {
               Column(
                 children: [
                   const ZeitbankConfirmationBanner(),
+                  // Auto-Banner: explizit gesetztes headerImage, sonst aus
+                  // der aktiven Route (nur exakte Modul-Landing-Routen —
+                  // Detail-Screens mit eigenem Hero bleiben bannerlos).
+                  if ((headerImage ??
+                          moduleBanner(activeRoute, prefix: false)) !=
+                      null)
+                    ModuleBanner(
+                        asset: headerImage ??
+                            moduleBanner(activeRoute, prefix: false)!),
                   Expanded(child: refreshed),
                 ],
               ),
