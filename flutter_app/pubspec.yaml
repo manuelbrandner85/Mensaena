@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.4.2+40402
+version: 4.4.3+40403
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -184,6 +184,9 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    # Unterverzeichnis MUSS explizit deklariert werden — `assets/images/`
+    # bündelt KEINE Unterordner. Sonst fehlen die Modul-Header-Banner.
+    - assets/images/modules/
     - assets/launcher/
     - assets/translations/
     - assets/data/
