@@ -6,6 +6,7 @@
 /// UI flexibel auf die Felder zugreifen kann ohne Boilerplate-Modelle.
 library;
 
+import '../services/location_anonymizer.dart';
 import '../services/supabase_service.dart';
 
 // ─── Post-Features ────────────────────────────────────────────────────
@@ -915,8 +916,8 @@ class CrisisReportsRepository {
         'description': description.trim(),
         'type': type,
         'severity': severity,
-        if (latitude != null) 'latitude': latitude,
-        if (longitude != null) 'longitude': longitude,
+        if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
+        if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),
         if (city != null) 'city': city,
         if (country != null) 'country': country,
         if (contactPhone != null) 'contact_phone': contactPhone,
@@ -970,8 +971,8 @@ class CrisisResourcesRepository {
         if (description != null) 'description': description,
         if (quantity != null) 'quantity': quantity,
         if (locationText != null) 'location_text': locationText,
-        if (latitude != null) 'latitude': latitude,
-        if (longitude != null) 'longitude': longitude,
+        if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
+        if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),
         'status': 'available',
       });
       return true;

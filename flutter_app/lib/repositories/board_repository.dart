@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/board_comment.dart';
 import '../models/board_post.dart';
+import '../services/location_anonymizer.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
@@ -69,8 +70,8 @@ class BoardRepository {
             'contact_info': contactInfo,
             'expires_at': expiresAt?.toUtc().toIso8601String(),
             if (imageUrl != null) 'image_url': imageUrl,
-            if (latitude != null) 'latitude': latitude,
-            if (longitude != null) 'longitude': longitude,
+            if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
+            if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),
             'status': 'active',
             'pinned': false,
             'pin_count': 0,

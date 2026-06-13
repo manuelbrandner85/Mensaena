@@ -252,8 +252,8 @@ class _CrisisDashboardScreenState
                           for (final c in list)
                             MapMarkerData(
                               id: c.id,
-                              lat: c.latitude,
-                              lng: c.longitude,
+                              lat: c.displayLat,
+                              lng: c.displayLng,
                               color: _urgencyColor(c.urgency),
                               title: c.title,
                               subtitle: c.locationText,

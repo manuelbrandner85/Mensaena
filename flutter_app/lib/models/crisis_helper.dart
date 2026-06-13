@@ -1,6 +1,8 @@
 /// SKILL: mensaena-architektur
 /// Spiegel der Supabase-Tabelle `crisis_helpers`. Realtime-relevant fuer
 /// CrisisDetail-Screen (Live-Helfer-Count).
+import '../services/location_anonymizer.dart';
+
 class CrisisHelper {
   const CrisisHelper({
     required this.id,
@@ -27,6 +29,12 @@ class CrisisHelper {
   final double? longitude;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+
+  /// Anonymisierte Anzeigekoordinaten (≈1 km Genauigkeit).
+  double? get displayLat =>
+      latitude != null ? LocationAnonymizer.lat(latitude!) : null;
+  double? get displayLng =>
+      longitude != null ? LocationAnonymizer.lng(longitude!) : null;
 
   factory CrisisHelper.fromJson(Map<String, dynamic> j) {
     return CrisisHelper(

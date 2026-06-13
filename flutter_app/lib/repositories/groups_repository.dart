@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/group.dart';
 import '../models/group_member.dart';
 import '../models/group_post.dart';
+import '../services/location_anonymizer.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
@@ -401,8 +402,8 @@ class GroupsRepository {
             'post_count': 0,
             if (coverImageUrl != null) 'cover_image_url': coverImageUrl,
             if (maxMembers != null) 'max_members': maxMembers,
-            if (latitude != null) 'latitude': latitude,
-            if (longitude != null) 'longitude': longitude,
+            if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
+            if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),
             if (radiusKm != null) 'radius_km': radiusKm,
           })
           .select()

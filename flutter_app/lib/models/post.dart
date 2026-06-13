@@ -1,6 +1,7 @@
 // SKILL: mensaena-architektur + flutter-implement-json-serialization
 // Spiegel der Supabase-Tabelle `posts` (gyqujitkvymlmgroovch).
 import 'post_intent.dart';
+import '../services/location_anonymizer.dart';
 
 class Post {
   const Post({
@@ -88,6 +89,12 @@ class Post {
       scheduledAt != null && scheduledAt!.isAfter(DateTime.now());
   bool get isExpired =>
       expiresAt != null && expiresAt!.isBefore(DateTime.now());
+
+  /// Anonymisierte Anzeigekoordinaten (≈1 km Genauigkeit).
+  double? get displayLat =>
+      latitude != null ? LocationAnonymizer.lat(latitude!) : null;
+  double? get displayLng =>
+      longitude != null ? LocationAnonymizer.lng(longitude!) : null;
 
   factory Post.fromJson(Map<String, dynamic> j) {
     return Post(

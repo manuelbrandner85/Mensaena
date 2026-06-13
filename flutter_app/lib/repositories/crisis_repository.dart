@@ -4,6 +4,7 @@ import '../models/crisis.dart';
 import '../models/crisis_helper.dart';
 import '../models/crisis_update.dart';
 import '../models/emergency_number.dart';
+import '../services/location_anonymizer.dart';
 import '../services/location_service.dart';
 import '../services/supabase_service.dart';
 import 'profiles_repository.dart';
@@ -143,6 +144,8 @@ class CrisisRepository {
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
+    final anonLat = latitude != null ? LocationAnonymizer.lat(latitude) : null;
+    final anonLng = longitude != null ? LocationAnonymizer.lng(longitude) : null;
     try {
       final row = await sb
           .from('crises')
@@ -154,8 +157,8 @@ class CrisisRepository {
             'urgency': urgency,
             'status': 'active',
             'location_text': locationText,
-            'latitude': latitude,
-            'longitude': longitude,
+            'latitude': anonLat,
+            'longitude': anonLng,
             'radius_km': radiusKm,
             'is_anonymous': isAnonymous,
             if (affectedCount != null) 'affected_count': affectedCount,
@@ -312,13 +315,15 @@ class CrisisRepository {
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
+    final anonLat = latitude != null ? LocationAnonymizer.lat(latitude) : null;
+    final anonLng = longitude != null ? LocationAnonymizer.lng(longitude) : null;
     try {
       await sb.from('user_safety_checkins').insert({
         'user_id': uid,
         'crisis_id': crisisId,
         'status': 'safe',
-        'latitude': latitude,
-        'longitude': longitude,
+        'latitude': anonLat,
+        'longitude': anonLng,
       });
       return true;
     } catch (_) {

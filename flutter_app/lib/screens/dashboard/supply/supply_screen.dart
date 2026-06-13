@@ -261,8 +261,8 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                           for (final f in list)
                             MapMarkerData(
                               id: f.slug,
-                              lat: f.latitude,
-                              lng: f.longitude,
+                              lat: f.displayLat,
+                              lng: f.displayLng,
                               color: f.isBio == true
                                   ? AppColors.leben
                                   : AppColors.amber,

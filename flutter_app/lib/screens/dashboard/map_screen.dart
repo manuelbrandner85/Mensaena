@@ -501,7 +501,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  bool _hasGeo(Post p) => p.latitude != null && p.longitude != null;
+  bool _hasGeo(Post p) => p.displayLat != null && p.displayLng != null;
 
   /// V1 — client-seitiges Kategorie-Filtern.
   List<Post> get _filteredPosts => _activeTypes.isEmpty
@@ -616,9 +616,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         : const <EventItem>[];
     final crisisMarkers = [
       for (final c in crises)
-        if (c.latitude != null && c.longitude != null)
+        if (c.displayLat != null && c.displayLng != null)
           Marker(
-            point: LatLng(c.latitude!, c.longitude!),
+            point: LatLng(c.displayLat!, c.displayLng!),
             width: 40,
             height: 40,
             child: GestureDetector(
@@ -859,14 +859,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 CircleLayer(
                   circles: [
                     for (final p in _filteredPosts)
-                      CircleMarker(
-                        point: LatLng(p.latitude!, p.longitude!),
-                        radius: 30,
-                        color: _markerColor(p.type)
-                            .withValues(alpha: 0.3),
-                        borderStrokeWidth: 0,
-                        borderColor: Colors.transparent,
-                      ),
+                      if (p.displayLat != null && p.displayLng != null)
+                        CircleMarker(
+                          point: LatLng(p.displayLat!, p.displayLng!),
+                          radius: 30,
+                          color: _markerColor(p.type)
+                              .withValues(alpha: 0.3),
+                          borderStrokeWidth: 0,
+                          borderColor: Colors.transparent,
+                        ),
                   ],
                 )
               else
@@ -1098,7 +1099,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
     );
     return Marker(
-      point: LatLng(p.latitude!, p.longitude!),
+      point: LatLng(p.displayLat!, p.displayLng!),
       width: 44,
       height: 44,
       alignment: Alignment.topCenter,
