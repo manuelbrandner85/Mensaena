@@ -52,7 +52,7 @@ class _SosScreenState extends ConsumerState<SosScreen>
   Future<void> _sendSos() async {
     if (_sending) return;
     setState(() => _sending = true);
-    HapticService.heavy();
+    Haptics.heavy();
 
     try {
       final pos = await LocationService.getCurrentPosition();
@@ -66,13 +66,13 @@ class _SosScreenState extends ConsumerState<SosScreen>
       if (!mounted) return;
       if (alert != null) {
         setState(() => _myAlert = alert);
-        AppSnackbar.success(context, 'sos.alertSent'.tr());
+        AppSnackBar.success(context, 'sos.alertSent'.tr());
       } else {
-        AppSnackbar.error(context, 'sos.alertError'.tr());
+        AppSnackBar.error(context, 'sos.alertError'.tr());
       }
     } catch (_) {
       if (!mounted) return;
-      AppSnackbar.error(context, 'sos.locationError'.tr());
+      AppSnackBar.error(context, 'sos.locationError'.tr());
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -84,7 +84,7 @@ class _SosScreenState extends ConsumerState<SosScreen>
     if (!mounted) return;
     if (ok) {
       setState(() => _myAlert = null);
-      AppSnackbar.success(context, 'sos.alertResolved'.tr());
+      AppSnackBar.success(context, 'sos.alertResolved'.tr());
     }
   }
 
@@ -93,7 +93,7 @@ class _SosScreenState extends ConsumerState<SosScreen>
     if (userId.isEmpty) return;
     await EmergencyRepository.respondToAlert(alert.id, userId);
     if (!mounted) return;
-    AppSnackbar.success(context, 'sos.respondConfirm'.tr());
+    AppSnackBar.success(context, 'sos.respondConfirm'.tr());
   }
 
   @override
