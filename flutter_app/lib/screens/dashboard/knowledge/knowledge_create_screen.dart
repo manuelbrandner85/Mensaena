@@ -290,23 +290,25 @@ class _KnowledgeCreateScreenState
           .where((t) => t.isNotEmpty)
           .toList();
 
-      await sb.from('knowledge_articles').insert({
-        'author_id': uid,
-        'title': _titleCtrl.text.trim(),
-        'slug': _slugify(_titleCtrl.text.trim()),
-        'content': _contentCtrl.text.trim(),
-        'summary': _summaryCtrl.text.trim().isEmpty
-            ? null
-            : _summaryCtrl.text.trim(),
-        'category': _category,
-        'tags': tags,
-        if (imageUrl != null) 'image_url': imageUrl,
-        'is_public': _isPublic,
-        'is_featured': _isFeatured,
-        'status': 'published',
-        'published_at': DateTime.now().toUtc().toIso8601String(),
-      });
+      final ok = await KnowledgeRepository.publish(
+        title: _titleCtrl.text.trim(),
+        slug: _slugify(_titleCtrl.text.trim()),
+        content: _contentCtrl.text.trim(),
+        summary: _summaryCtrl.text.trim(),
+        category: _category,
+        tags: tags,
+        imageUrl: imageUrl,
+        isPublic: _isPublic,
+        isFeatured: _isFeatured,
+      );
       if (!mounted) return;
+      if (!ok) {
+        setState(() {
+          _submitting = false;
+          _error = 'knowledge.publishFailed'.tr();
+        });
+        return;
+      }
       AppSnackBar.info(context, coverFailed ? 'knowledge.publishedNoCover'.tr() : 'knowledge.publishArticle'.tr());
       context.go(widget.routePath);
     } catch (_) {
