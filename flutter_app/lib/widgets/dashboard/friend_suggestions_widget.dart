@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../shared/pressable.dart';
 import '../../repositories/friendships_repository.dart';
 import '../profile/friend_request_button.dart';
 import '../shared/sized_avatar_image.dart';
@@ -76,7 +77,8 @@ class _SuggestionTile extends StatelessWidget {
         (p['name'] as String?) ??
         'common.neighbour'.tr();
     final avatar = p['avatar_url'] as String?;
-    return InkWell(
+    // B1: Vorschlags-Karte = Pressable (Spring + Haptik).
+    return Pressable(
       onTap: () => context.push('/dashboard/profile/$id'),
       borderRadius: BorderRadius.circular(12),
       child: Container(

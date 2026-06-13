@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../shared/pressable.dart';
 import '../../services/on_this_day_service.dart';
 import '../effects/glass_card.dart';
 import '../../utils/safe_launch.dart';
@@ -106,7 +107,8 @@ class _EventCard extends StatelessWidget {
     final yearsAgo = DateTime.now().year - event.year;
     return SizedBox(
       width: 220,
-      child: InkWell(
+      // B1 Mikro-Physik: Karte = Pressable (Spring + Haptik).
+      child: Pressable(
         onTap: _open,
         borderRadius: BorderRadius.circular(12),
         child: Column(
