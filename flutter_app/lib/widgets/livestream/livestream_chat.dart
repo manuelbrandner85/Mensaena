@@ -16,6 +16,7 @@ import '../../providers/mega_providers.dart';
 import '../../repositories/mega_repositories.dart';
 import '../../services/chat_word_filter_service.dart';
 import '../../services/haptics.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 class LivestreamChat extends ConsumerStatefulWidget {
   const LivestreamChat({required this.roomId, super.key});
@@ -82,8 +83,7 @@ class _LivestreamChatState extends ConsumerState<LivestreamChat> {
     _sendingGift = false;
     if (!mounted) return;
     if (remaining < 0) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('livestream.not_enough_karma'.tr())));
+      AppSnackBar.info(context, 'livestream.not_enough_karma'.tr());
     }
   }
 

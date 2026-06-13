@@ -191,9 +191,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       unawaited(Haptics.success());
     } else {
       unawaited(Haptics.error());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('posts.helpFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'posts.helpFailed'.tr());
     }
     return ok;
   }
@@ -351,9 +349,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       // Post hat kein copyWith → lokalen Override halten, damit das Badge
       // sofort den neuen Status zeigt ohne Voll-Reload.
       setState(() => _statusOverride = status);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('posts.statusChanged'.tr())),
-      );
+      AppSnackBar.info(context, 'posts.statusChanged'.tr());
     }
   }
 

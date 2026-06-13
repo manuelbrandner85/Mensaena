@@ -15,6 +15,7 @@ import '../../config/theme/app_typography.dart';
 import '../../repositories/events_repository.dart';
 import '../../services/supabase_service.dart';
 import '../shared/image_lightbox.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 final eventPhotosProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, String>((ref, eventId) async {
@@ -66,8 +67,7 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
     } catch (e) {
       debugPrint('event photo upload failed: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('events.photo_upload_failed'.tr())));
+        AppSnackBar.error(context, 'events.photo_upload_failed'.tr());
       }
     } finally {
       if (mounted) setState(() => _uploading = false);

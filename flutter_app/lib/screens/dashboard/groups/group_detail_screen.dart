@@ -12,6 +12,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/parallax_image_header.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/premium_image.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class GroupDetailScreen extends ConsumerStatefulWidget {
   const GroupDetailScreen({required this.groupId, super.key});
@@ -87,9 +88,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     if (!mounted) return;
     if (ok) {
       ref.invalidate(groupMyJoinStatusProvider(groupId));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('groups.requestSent'.tr())),
-      );
+      AppSnackBar.success(context, 'groups.requestSent'.tr());
     }
   }
 

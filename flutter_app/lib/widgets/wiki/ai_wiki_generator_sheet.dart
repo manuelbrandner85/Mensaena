@@ -12,6 +12,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/ai_features_repository.dart';
 import '../../services/haptics.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 /// Öffnet den Generator. Liefert true, wenn ein Artikel erstellt/veröffentlicht
 /// wurde (Aufrufer kann dann die Liste neu laden).
@@ -64,8 +65,7 @@ class _AiWikiGeneratorSheetState extends State<_AiWikiGeneratorSheet> {
       _created = d != null;
     });
     if (d == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('assistant.error'.tr())));
+      AppSnackBar.error(context, 'assistant.error'.tr());
     }
   }
 
@@ -77,10 +77,9 @@ class _AiWikiGeneratorSheetState extends State<_AiWikiGeneratorSheet> {
     final ok = await AiFeaturesRepository().publishWikiArticle(id);
     if (!mounted) return;
     setState(() => _publishing = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(ok
+    AppSnackBar.error(context, ok
             ? 'assistant.wiki_published'.tr()
-            : 'assistant.error'.tr())));
+            : 'assistant.error'.tr());
     if (ok) Navigator.pop(context, true);
   }
 

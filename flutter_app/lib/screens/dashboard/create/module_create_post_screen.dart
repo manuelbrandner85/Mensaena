@@ -28,6 +28,7 @@ import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import 'module_create_config.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-Pendant zu Web `src/components/shared/CreatePostPage.tsx`.
@@ -191,17 +192,13 @@ class _ModuleCreatePostScreenState
       });
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('create.locationUnavailable'.tr())),
-      );
+      AppSnackBar.error(context, 'create.locationUnavailable'.tr());
     }
   }
 
   Future<void> _pickImage() async {
     if (_images.length >= 5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('create.maxImages'.tr())),
-      );
+      AppSnackBar.info(context, 'create.maxImages'.tr());
       return;
     }
     final picker = ImagePicker();
@@ -258,8 +255,7 @@ class _ModuleCreatePostScreenState
         ? _descCtrl.text.trim()
         : _titleCtrl.text.trim();
     if (raw.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('assistant.improve_empty'.tr())));
+      AppSnackBar.info(context, 'assistant.improve_empty'.tr());
       return;
     }
     setState(() => _aiImproving = true);
@@ -271,8 +267,7 @@ class _ModuleCreatePostScreenState
     if (!mounted) return;
     setState(() => _aiImproving = false);
     if (improved == null || improved.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('assistant.error'.tr())));
+      AppSnackBar.error(context, 'assistant.error'.tr());
       return;
     }
     final suggestion = improved;

@@ -145,9 +145,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       });
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('crisis.locationUnavailable'.tr())),
-      );
+      AppSnackBar.error(context, 'crisis.locationUnavailable'.tr());
     }
   }
 
