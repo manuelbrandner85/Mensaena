@@ -7,7 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/skill_offer.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/skills_repository.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
@@ -31,22 +31,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
     _future = _load();
   }
 
-  Future<List<SkillOffer>> _load() async {
-    try {
-      final rows = await sb
-          .from('skill_offers')
-          .select()
-          .eq('is_active', true)
-          .order('created_at', ascending: false)
-          .limit(50);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map(SkillOffer.fromJson)
-          .toList();
-    } catch (_) {
-      return const [];
-    }
-  }
+  Future<List<SkillOffer>> _load() => SkillsRepository.listActive();
 
   Future<void> _refresh() async {
     final fresh = _load();

@@ -8,6 +8,7 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/interaction.dart';
 import '../../repositories/interactions_repository.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -418,19 +419,10 @@ class _RateButtonState extends State<_RateButton> {
   }
 
   Future<void> _loadPartner() async {
-    try {
-      final p = await sb
-          .from('profiles')
-          .select('name, display_name')
-          .eq('id', widget.partnerId)
-          .maybeSingle();
-      if (!mounted) return;
-      setState(() => _partnerName = (p?['display_name'] as String?) ??
-          (p?['name'] as String?) ??
-          'Nachbar:in');
-    } catch (_) {
-      if (mounted) setState(() => _partnerName = 'Nachbar:in');
-    }
+    final p = await ProfilesRepository.getById(widget.partnerId);
+    if (!mounted) return;
+    setState(() =>
+        _partnerName = p?.displayName ?? p?.name ?? 'Nachbar:in');
   }
 
   Future<void> _openRatingModal() async {
