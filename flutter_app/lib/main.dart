@@ -17,7 +17,6 @@ import 'providers/locale_provider.dart';
 import 'providers/role_provider.dart';
 import 'repositories/challenges_repository.dart';
 import 'repositories/extra_repositories.dart';
-import 'services/audio_feedback_service.dart';
 import 'services/call_event_bus.dart';
 import 'services/callkit_service.dart';
 import 'services/device_tier_service.dart';
@@ -250,9 +249,8 @@ Future<void> _initBackgroundServices() async {
     unawaited(PushNotificationService.registerToken());
   });
 
-  // Startup-Sound: einmal pro Kalendertag, leise. Respektiert die
-  // bestehende notify-Sound-Praeferenz des Users (kSoundEnabledKey).
-  unawaited(_playStartupSound());
+  // Startup-Sound wird jetzt direkt im SplashScreen ausgelöst (zuverlässiges
+  // Timing) — nicht mehr hier nach den Background-Init-awaits (kam zu spät).
 
   // Shorebird OTA-Patch: Check + Download im Background. Wenn ein neuer
   // Patch verfuegbar ist, laedt Shorebird ihn jetzt aktiv herunter
@@ -276,14 +274,6 @@ Future<void> _initBackgroundServices() async {
   unawaited(
     SleepReminderService.instance.ensureScheduled().catchError((_) {}),
   );
-}
-
-/// Spielt assets/sounds/startup.mp3 bei JEDEM App-Start.
-/// (User-Wunsch — kein Throttle, kein once-per-day.)
-Future<void> _playStartupSound() async {
-  try {
-    await AudioFeedbackService.instance.playStartupMelody();
-  } catch (_) {/* fail-silent */}
 }
 
 /// Fire-and-forget helper.
