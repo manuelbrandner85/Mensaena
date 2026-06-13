@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../services/supabase_service.dart';
@@ -40,6 +41,12 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _ambientCtrl; // Partikel + Glow-Atmen
   Timer? _navTimer;
 
+  // Lebendiger Higgsfield-Loop hinter dem Logo. Frame 1 == splash_cosmos.webp
+  // (image-to-video mit Start=End-Frame), darum ist das Standbild ein
+  // nahtloser Fallback bis Init fertig / bei Decoder-Fehler.
+  VideoPlayerController? _video;
+  bool _videoReady = false;
+
   static const _totalDurationMs = 4400;
 
   @override
@@ -53,10 +60,33 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+    _initVideo();
     _navTimer = Timer(
       const Duration(milliseconds: _totalDurationMs + 200),
       _navigate,
     );
+  }
+
+  Future<void> _initVideo() async {
+    final v = VideoPlayerController.asset('assets/videos/splash_cosmos.mp4');
+    _video = v;
+    try {
+      await v.initialize();
+      await v.setLooping(true);
+      await v.setVolume(0);
+      if (!mounted) {
+        await v.dispose();
+        return;
+      }
+      await v.play();
+      setState(() => _videoReady = true);
+    } catch (_) {
+      // Decoder/Asset-Fehler → Standbild bleibt (kein Bruch).
+      _video = null;
+      try {
+        await v.dispose();
+      } catch (_) {}
+    }
   }
 
   Future<void> _navigate() async {
@@ -75,6 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
     _navTimer?.cancel();
     _ctrl.dispose();
     _ambientCtrl.dispose();
+    _video?.dispose();
     super.dispose();
   }
 
@@ -113,21 +144,33 @@ class _SplashScreenState extends State<SplashScreen>
           return Stack(
             fit: StackFit.expand,
             children: [
-              // ── Higgsfield-Keyart-Hintergrund (Ken-Burns) ──────────
+              // ── Higgsfield-Hintergrund: lebendiger Video-Loop (sobald
+              // bereit), sonst das frame-identische Standbild. Ken-Burns
+              // auf beidem für zusätzliche Tiefe.
               Transform.translate(
                 offset: Offset(0, bgDriftY),
                 child: Transform.scale(
                   scale: bgScale,
                   child: Opacity(
                     opacity: bgT,
-                    child: Image.asset(
-                      'assets/images/splash_cosmos.webp',
-                      fit: BoxFit.cover,
-                      width: size.width,
-                      height: size.height,
-                      errorBuilder: (_, __, ___) => const ColoredBox(
-                          color: AppColors.voidColor),
-                    ),
+                    child: (_videoReady && _video != null)
+                        ? FittedBox(
+                            fit: BoxFit.cover,
+                            clipBehavior: Clip.hardEdge,
+                            child: SizedBox(
+                              width: _video!.value.size.width,
+                              height: _video!.value.size.height,
+                              child: VideoPlayer(_video!),
+                            ),
+                          )
+                        : Image.asset(
+                            'assets/images/splash_cosmos.webp',
+                            fit: BoxFit.cover,
+                            width: size.width,
+                            height: size.height,
+                            errorBuilder: (_, __, ___) => const ColoredBox(
+                                color: AppColors.voidColor),
+                          ),
                   ),
                 ),
               ),
