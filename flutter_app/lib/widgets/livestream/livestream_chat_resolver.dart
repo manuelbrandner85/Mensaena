@@ -10,22 +10,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/mega_repositories.dart';
 import 'livestream_chat.dart';
 
 final _roomIdByNameProvider =
     FutureProvider.autoDispose.family<String?, String>(
         (ref, roomName) async {
-  try {
-    final row = await sb
-        .from('live_rooms')
-        .select('id')
-        .eq('room_name', roomName)
-        .maybeSingle();
-    return row?['id'] as String?;
-  } catch (_) {
-    return null;
-  }
+  return LivestreamMessagesRepository.roomIdByName(roomName);
 });
 
 class LivestreamChatByRoomName extends ConsumerWidget {

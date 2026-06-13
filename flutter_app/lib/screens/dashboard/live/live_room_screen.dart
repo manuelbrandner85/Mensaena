@@ -34,6 +34,7 @@ import '../../../services/live_audio_service.dart';
 import '../../../services/livekit_token_service.dart';
 import '../../../services/stream_room_holder.dart';
 import '../../../services/room_events_service.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../config/theme/cinema_theme.dart' show LightLeakSpot;
 import '../../../widgets/effects/atmospheric_layers.dart';
@@ -120,19 +121,13 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     final myId = SupabaseService.currentUser?.id ?? 'guest';
     String myName = 'Mitglied';
     String? myAvatarUrl;
-    try {
-      final p = await sb
-          .from('profiles')
-          .select('display_name, name, avatar_url')
-          .eq('id', myId)
-          .maybeSingle();
-      myName = (p?['display_name'] as String?) ??
-          (p?['name'] as String?) ??
-          'Mitglied';
-      myAvatarUrl = p?['avatar_url'] as String?;
+    final p = await ProfilesRepository.getById(myId);
+    if (p != null) {
+      myName = p.displayName ?? p.name ?? 'Mitglied';
+      myAvatarUrl = p.avatarUrl;
       _profiles[myId] =
           _ParticipantProfile(name: myName, avatarUrl: myAvatarUrl);
-    } catch (_) {}
+    }
 
     final ({String token, String url}) tok;
     try {
@@ -370,21 +365,13 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
 
   Future<void> _fetchProfileFor(String identity) async {
     if (_profiles.containsKey(identity)) return;
-    try {
-      final p = await sb
-          .from('profiles')
-          .select('display_name, name, avatar_url')
-          .eq('id', identity)
-          .maybeSingle();
-      if (p == null) return;
-      final name = (p['display_name'] as String?) ??
-          (p['name'] as String?) ??
-          'Mitglied';
-      final avatarUrl = p['avatar_url'] as String?;
-      _profiles[identity] =
-          _ParticipantProfile(name: name, avatarUrl: avatarUrl);
-      if (mounted) setState(() {});
-    } catch (_) {}
+    final p = await ProfilesRepository.getById(identity);
+    if (p == null) return;
+    _profiles[identity] = _ParticipantProfile(
+      name: p.displayName ?? p.name ?? 'Mitglied',
+      avatarUrl: p.avatarUrl,
+    );
+    if (mounted) setState(() {});
   }
 
   Future<void> _toggleMic() async {

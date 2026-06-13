@@ -13,6 +13,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/calls_repository.dart';
 import '../../services/supabase_service.dart';
 import '../../services/voice_recorder_service.dart';
 
@@ -95,12 +96,11 @@ class _SendVoicemailSheetState extends ConsumerState<SendVoicemailSheet> {
                 const FileOptions(contentType: 'audio/mp4', upsert: false),
           );
       final url = sb.storage.from('voicemails').getPublicUrl(remote);
-      await sb.from('call_voicemails').insert({
-        'caller_id': uid,
-        'callee_id': widget.calleeId,
-        'audio_url': url,
-        'duration_seconds': seconds,
-      });
+      await CallsRepository.sendVoicemail(
+        calleeId: widget.calleeId,
+        audioUrl: url,
+        seconds: seconds,
+      );
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

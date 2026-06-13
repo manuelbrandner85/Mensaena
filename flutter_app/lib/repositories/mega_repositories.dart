@@ -510,6 +510,21 @@ class MentorshipsRepository {
 class LivestreamMessagesRepository {
   const LivestreamMessagesRepository._();
 
+  /// live_rooms.id zu einem room_name (für den Chat-Resolver). Null wenn
+  /// kein Raum existiert.
+  static Future<String?> roomIdByName(String roomName) async {
+    try {
+      final row = await sb
+          .from('live_rooms')
+          .select('id')
+          .eq('room_name', roomName)
+          .maybeSingle();
+      return row?['id'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Stream<List<LivestreamMessage>> watch(String roomId) {
     return sb
         .from('livestream_messages')
