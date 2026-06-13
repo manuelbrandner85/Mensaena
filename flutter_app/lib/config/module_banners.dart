@@ -12,8 +12,8 @@ library;
 /// Route (oder Route-Präfix) → Banner-Asset. Reihenfolge: erst exakte
 /// Treffer, dann Präfix-Fallback für Detail-Routen desselben Moduls.
 // Es werden NUR Routen gelistet, für die das Banner-Asset wirklich
-// existiert (sonst zeigte ModuleBanner ein leeres Band). Weitere Module
-// kommen batchweise dazu, sobald ihr Higgsfield-Keyart generiert ist.
+// existiert (sonst zeigte ModuleBanner ein leeres Band). Alle 22 Module
+// haben jetzt ein eigenes, themenpassendes Higgsfield-Keyart.
 const Map<String, String> _kModuleBanners = {
   '/dashboard/posts': 'assets/images/modules/posts.webp',
   '/dashboard/marketplace': 'assets/images/modules/marketplace.webp',
@@ -21,6 +21,22 @@ const Map<String, String> _kModuleBanners = {
   '/dashboard/groups': 'assets/images/modules/groups.webp',
   '/dashboard/crisis': 'assets/images/modules/crisis.webp',
   '/dashboard/knowledge': 'assets/images/modules/knowledge.webp',
+  '/dashboard/map': 'assets/images/modules/map.webp',
+  '/dashboard/organizations': 'assets/images/modules/organizations.webp',
+  '/dashboard/animals': 'assets/images/modules/animals.webp',
+  '/dashboard/mental-support': 'assets/images/modules/mental_support.webp',
+  '/dashboard/board': 'assets/images/modules/board.webp',
+  '/dashboard/challenges': 'assets/images/modules/challenges.webp',
+  '/dashboard/supply': 'assets/images/modules/supply.webp',
+  '/dashboard/harvest': 'assets/images/modules/harvest.webp',
+  '/dashboard/rescuer': 'assets/images/modules/rescuer.webp',
+  '/dashboard/housing': 'assets/images/modules/housing.webp',
+  '/dashboard/mobility': 'assets/images/modules/mobility.webp',
+  '/dashboard/jobs': 'assets/images/modules/jobs.webp',
+  '/dashboard/timebank': 'assets/images/modules/timebank.webp',
+  '/dashboard/wiki': 'assets/images/modules/wiki.webp',
+  '/dashboard/skills': 'assets/images/modules/skills.webp',
+  '/dashboard/interactions': 'assets/images/modules/interactions.webp',
 };
 
 /// Liefert das Banner-Asset für [route]. [prefix]=false → nur exakter
