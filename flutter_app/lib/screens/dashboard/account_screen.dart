@@ -240,9 +240,13 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                   const Icon(LucideIcons.download,
                       size: 18, color: AppColors.bronze),
                   const SizedBox(width: 8),
-                  Text('account.export_title'.tr(),
-                      style: AppTypography.display(
-                          size: 16, color: AppColors.ink)),
+                  Expanded(
+                    child: Text('account.export_title'.tr(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.display(
+                            size: 16, color: AppColors.ink)),
+                  ),
                 ]),
                 const SizedBox(height: 8),
                 Text('account.export_body'.tr(),

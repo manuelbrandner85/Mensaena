@@ -71,11 +71,15 @@ class BecomeMentorCta extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('mentorship.become_title'.tr(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: AppTypography.body(
                                 size: 14,
                                 color: AppColors.ink,
                                 weight: FontWeight.w700)),
                         Text('mentorship.become_body'.tr(),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
                             style: AppTypography.body(
                                 size: 12,
                                 color: AppColors.inkSoft,

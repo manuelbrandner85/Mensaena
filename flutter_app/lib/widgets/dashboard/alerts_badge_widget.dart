@@ -56,6 +56,8 @@ class _IdlePill extends StatelessWidget {
         Expanded(
           child: Text(
             'dashboard.alerts.allClear'.tr(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: AppTypography.body(
                 size: 12,
                 color: AppColors.lebenSoft,

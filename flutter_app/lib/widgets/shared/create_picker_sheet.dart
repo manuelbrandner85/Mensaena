@@ -35,9 +35,13 @@ class CreatePickerSheet {
                 const Icon(LucideIcons.plus,
                     size: 18, color: AppColors.bronze),
                 const SizedBox(width: 8),
-                Text('create.picker_title'.tr(),
-                    style: AppTypography.display(
-                        size: 18, color: AppColors.ink)),
+                Expanded(
+                  child: Text('create.picker_title'.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.display(
+                          size: 18, color: AppColors.ink)),
+                ),
               ]),
               const SizedBox(height: 4),
               Text('create.picker_subtitle'.tr(),

@@ -102,8 +102,13 @@ class WeatherWidget extends ConsumerWidget {
                     ],
                   ),
                 ),
-                Text('home.weatherSource'.tr(),
-                    style: AppTypography.caption()),
+                Flexible(
+                  child: Text('home.weatherSource'.tr(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: AppTypography.caption()),
+                ),
               ]),
               if (tip.isNotEmpty) ...[
                 const SizedBox(height: 10),
