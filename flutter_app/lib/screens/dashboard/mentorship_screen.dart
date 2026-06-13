@@ -36,19 +36,8 @@ final _mentorshipWithPartnersProvider =
       .map((m) => m.mentorId == me ? m.menteeId : m.mentorId)
       .toSet()
       .toList();
-  try {
-    final rows = await sb
-        .from('profiles')
-        .select('id, display_name, avatar_url')
-        .inFilter('id', ids);
-    final map = {
-      for (final r in (rows as List).whereType<Map<String, dynamic>>())
-        r['id'] as String: r,
-    };
-    return _MentorshipsWithPartners(mentorships: list, partners: map);
-  } catch (_) {
-    return _MentorshipsWithPartners(mentorships: list, partners: const {});
-  }
+  final map = await MentorshipsRepository.partnersByIds(ids);
+  return _MentorshipsWithPartners(mentorships: list, partners: map);
 });
 
 class _MentorshipsWithPartners {
