@@ -21,6 +21,7 @@ import '../../repositories/mega_repositories.dart';
 import '../../services/haptics.dart';
 import '../../services/supabase_service.dart';
 import 'story_viewer.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 class StoriesRing extends ConsumerWidget {
   const StoriesRing({super.key});
@@ -115,9 +116,7 @@ class _AddStoryBtn extends StatelessWidget {
       if (ok) onUploaded();
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('stories.upload_failed'.tr())),
-      );
+      AppSnackBar.error(context, 'stories.upload_failed'.tr());
     }
   }
 

@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../services/live_location_service.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 class LiveLocationButton extends StatefulWidget {
   const LiveLocationButton({required this.conversationId, super.key});
@@ -83,8 +84,7 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
         duration: selected,
       );
       if (!ok && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('chat.share_no_permission'.tr())));
+        AppSnackBar.info(context, 'chat.share_no_permission'.tr());
       }
     }
     if (mounted) setState(() {});

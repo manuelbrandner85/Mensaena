@@ -21,6 +21,7 @@ import '../../repositories/profiles_repository.dart';
 import '../../repositories/settings_repository.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/app_snackbar.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
   const AccountScreen({super.key});
@@ -45,15 +46,11 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
     try {
       await sb.auth.resend(type: OtpType.signup, email: email);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('account.verifySent'.tr())),
-        );
+        AppSnackBar.success(context, 'account.verifySent'.tr());
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('account.verifyFailed'.tr())),
-        );
+        AppSnackBar.error(context, 'account.verifyFailed'.tr());
       }
     } finally {
       if (mounted) setState(() => _resending = false);
@@ -133,8 +130,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
           text: 'account.export_subject'.tr());
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('account.export_failed'.tr())));
+        AppSnackBar.error(context, 'account.export_failed'.tr());
       }
     } finally {
       if (mounted) setState(() => _exporting = false);

@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../config/theme/app_colors.dart';
 import '../config/theme/app_typography.dart';
+import '../widgets/shared/app_snackbar.dart';
 
 class EventShareSheet {
   const EventShareSheet._();
@@ -85,9 +86,7 @@ class _ShareBody extends StatelessWidget {
                 await Clipboard.setData(ClipboardData(text: _url));
                 if (!context.mounted) return;
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('events.linkCopied'.tr())),
-                );
+                AppSnackBar.success(context, 'events.linkCopied'.tr());
               },
             ),
             _buildTile(
@@ -98,9 +97,7 @@ class _ShareBody extends StatelessWidget {
                 await Clipboard.setData(ClipboardData(text: _text));
                 if (!context.mounted) return;
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('events.textCopied'.tr())),
-                );
+                AppSnackBar.success(context, 'events.textCopied'.tr());
               },
             ),
             _buildTile(

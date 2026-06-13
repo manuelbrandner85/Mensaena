@@ -1529,9 +1529,7 @@ Future<void> _openDirections(
     await launchUrl(web, mode: LaunchMode.externalApplication);
   } catch (_) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('map.routeFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'map.routeFailed'.tr());
     }
   }
 }
