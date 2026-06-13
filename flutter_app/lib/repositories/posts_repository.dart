@@ -443,6 +443,96 @@ class PostsRepository {
       return false;
     }
   }
+
+  /// Aktive Posts eines Moduls. Backwards-compat: alte Posts ohne
+  /// module_key werden über type + module_key IS NULL mitgenommen.
+  static Future<List<Post>> listByModule({
+    String? moduleKey,
+    required String postType,
+    int limit = 100,
+  }) async {
+    try {
+      var q = sb.from('posts').select().eq('status', 'active');
+      if (moduleKey != null) {
+        q = q.or(
+            'module_key.eq.$moduleKey,and(type.eq.$postType,module_key.is.null)');
+      } else {
+        q = q.eq('type', postType);
+      }
+      final rows =
+          await q.order('created_at', ascending: false).limit(limit);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(Post.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Eigene Entwürfe (status='draft'), neueste zuerst.
+  static Future<List<Post>> listMyDrafts({int limit = 100}) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final rows = await sb
+          .from('posts')
+          .select()
+          .eq('user_id', uid)
+          .eq('status', 'draft')
+          .order('updated_at', ascending: false)
+          .limit(limit);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(Post.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Top-Tags aus post_tags (aggregiert, häufigste zuerst).
+  static Future<List<({String tag, int count})>> suggestedTags({
+    int scan = 500,
+    int take = 20,
+  }) async {
+    try {
+      final rows =
+          await sb.from('post_tags').select('tag').limit(scan);
+      final counts = <String, int>{};
+      for (final r in (rows as List).whereType<Map<String, dynamic>>()) {
+        final t = (r['tag'] as String?)?.trim().toLowerCase();
+        if (t == null || t.isEmpty) continue;
+        counts[t] = (counts[t] ?? 0) + 1;
+      }
+      final entries = counts.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      return entries
+          .take(take)
+          .map((e) => (tag: e.key, count: e.value))
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Beitrag erstellen. [fields] ist die vollständige Insert-Map (der
+  /// Create-Screen baut sie modulspezifisch). Gibt die neue Post-ID
+  /// zurück — null bei Block (RLS/Rate-Limit) oder Fehler.
+  static Future<String?> create(Map<String, dynamic> fields) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final inserted = await sb
+          .from('posts')
+          .insert({'user_id': uid, ...fields})
+          .select()
+          .maybeSingle();
+      return inserted?['id'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 /// Populaere Tags — 1:1 aus `src/app/dashboard/posts/page.tsx` Z. 12.
