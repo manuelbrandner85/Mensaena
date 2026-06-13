@@ -10,22 +10,12 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 
 final myStatusProvider =
     FutureProvider.autoDispose<Map<String, dynamic>?>((ref) async {
-  final uid = SupabaseService.currentUser?.id;
-  if (uid == null) return null;
-  try {
-    final row = await sb
-        .from('profiles')
-        .select('status_text, status_emoji, status_until')
-        .eq('id', uid)
-        .maybeSingle();
-    return row;
-  } catch (_) {
-    return null;
-  }
+  return ProfilesRepository.myStatus();
 });
 
 class StatusEditorSheet extends ConsumerStatefulWidget {
@@ -81,12 +71,13 @@ class _StatusEditorSheetState extends ConsumerState<StatusEditorSheet> {
     final until = _duration == null
         ? null
         : DateTime.now().add(_duration!).toIso8601String();
+    final empty = _ctrl.text.trim().isEmpty;
     try {
-      await sb.from('profiles').update({
-        'status_text': _ctrl.text.trim().isEmpty ? null : _ctrl.text.trim(),
-        'status_emoji': _ctrl.text.trim().isEmpty ? null : _emoji,
+      await ProfilesRepository.update(uid, {
+        'status_text': empty ? null : _ctrl.text.trim(),
+        'status_emoji': empty ? null : _emoji,
         'status_until': until,
-      }).eq('id', uid);
+      });
       ref.invalidate(myStatusProvider);
       if (mounted) Navigator.pop(context);
     } catch (_) {
@@ -99,11 +90,11 @@ class _StatusEditorSheetState extends ConsumerState<StatusEditorSheet> {
     if (uid == null) return;
     setState(() => _saving = true);
     try {
-      await sb.from('profiles').update({
+      await ProfilesRepository.update(uid, {
         'status_text': null,
         'status_emoji': null,
         'status_until': null,
-      }).eq('id', uid);
+      });
       ref.invalidate(myStatusProvider);
       if (mounted) Navigator.pop(context);
     } catch (_) {
