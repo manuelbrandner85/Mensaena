@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../shared/pressable.dart';
 import '../../repositories/matching_repository.dart';
 import 'tile_error.dart';
 
@@ -26,7 +27,8 @@ class SmartMatchWidget extends ConsumerWidget {
         final pending =
             matches.where((m) => m.status == 'pending').take(3).toList();
         if (pending.isEmpty) return const SizedBox.shrink();
-        return InkWell(
+        // B1 Mikro-Physik: ganze Karte = Pressable (Spring + Haptik).
+        return Pressable(
           onTap: () => context.go('/dashboard/matching'),
           borderRadius: BorderRadius.circular(12),
           child: Container(

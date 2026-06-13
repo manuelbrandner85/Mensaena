@@ -13,6 +13,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../shared/pressable.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/supabase_service.dart';
 import '../effects/glass_card.dart';
@@ -83,7 +84,8 @@ class NearbyNeighborsWidget extends ConsumerWidget {
                           final name =
                               (p['display_name'] as String?) ?? 'mensaena';
                           final avatar = p['avatar_url'] as String?;
-                          return InkWell(
+                          // B1: Karussell-Karte = Pressable (Spring).
+                          return Pressable(
                             onTap: () =>
                                 context.push('/dashboard/profile/$id'),
                             borderRadius: BorderRadius.circular(12),

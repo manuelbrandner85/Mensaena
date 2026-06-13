@@ -106,15 +106,16 @@ class CinemaOverlay extends ConsumerWidget {
         if (spec.hasStarfield)
           RepaintBoundary(child: Starfield(intensity: intensity)),
 
-        // 4. Sky-Body (Sonne/Mond)
+        // 4. Sky-Body (Sonne/Mond). C3: KEIN AnimatedSwitcher mehr — die
+        // SkyBody bleibt persistent (stabiler Key) und animiert den
+        // Phasenwechsel selbst als Bogen über den Himmel (Sonne/Mond
+        // „wandert" beim Übergang) statt an zwei festen Positionen zu
+        // crossfaden. Nur auf full (intensity >= 0.6).
         RepaintBoundary(
-          child: AnimatedSwitcher(
-            duration: const Duration(seconds: 8),
-            child: SkyBody(
-              key: ValueKey('sky_${phase.name}'),
-              spec: spec.skyBody,
-              intensity: intensity,
-            ),
+          child: SkyBody(
+            key: const ValueKey('sky_persistent'),
+            spec: spec.skyBody,
+            intensity: intensity,
           ),
         ),
 
