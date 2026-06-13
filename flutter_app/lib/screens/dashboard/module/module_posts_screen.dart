@@ -7,7 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/post.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/posts_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/empty_state_card.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
@@ -74,33 +74,14 @@ class _ModulePostsScreenState extends ConsumerState<ModulePostsScreen> {
     _future = _load();
   }
 
-  Future<List<Post>> _load() async {
-    try {
-      // BUG-FIX (User-Report: "in rettung sind falsche Postings"):
-      // Vorher: OR-Filter (type=X ODER module_key=Y) → matched ALLE
-      // type=sharing-Posts global, also auch nicht für harvest gemeinte
-      // → harvest-Modul zeigte fremde Posts.
-      //
-      // Jetzt: moduleKey gesetzt → STRIKT module_key=Y (Module-Wizard
-      // setzt das immer). Backwards-compat für alte Posts ohne module_key:
-      // type=X UND module_key IS NULL erlaubt.
-      var q = sb.from('posts').select().eq('status', 'active');
-      if (widget.moduleKey != null) {
-        q = q.or(
-            'module_key.eq.${widget.moduleKey},and(type.eq.${widget.postType},module_key.is.null)');
-      } else {
-        q = q.eq('type', widget.postType);
-      }
-      final rows = await q
-          .order('created_at', ascending: false)
-          .limit(100);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map(Post.fromJson)
-          .toList();
-    } catch (_) {
-      return const [];
-    }
+  Future<List<Post>> _load() {
+    // moduleKey gesetzt → STRIKT module_key (Backwards-compat für alte
+    // Posts ohne module_key via type + module_key IS NULL); siehe
+    // PostsRepository.listByModule.
+    return PostsRepository.listByModule(
+      moduleKey: widget.moduleKey,
+      postType: widget.postType,
+    );
   }
 
   Future<void> _refresh() async {

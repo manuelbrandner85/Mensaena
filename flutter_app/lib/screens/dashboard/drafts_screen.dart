@@ -11,29 +11,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/post.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/posts_repository.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 
 final _draftsProvider = FutureProvider.autoDispose<List<Post>>((ref) async {
-  final uid = SupabaseService.currentUser?.id;
-  if (uid == null) return const [];
-  try {
-    final rows = await sb
-        .from('posts')
-        .select()
-        .eq('user_id', uid)
-        .eq('status', 'draft')
-        .order('updated_at', ascending: false)
-        .limit(100);
-    return (rows as List)
-        .whereType<Map<String, dynamic>>()
-        .map(Post.fromJson)
-        .toList();
-  } catch (_) {
-    return const [];
-  }
+  return PostsRepository.listMyDrafts();
 });
 
 class DraftsScreen extends ConsumerWidget {
@@ -127,10 +111,7 @@ class DraftsScreen extends ConsumerWidget {
                             danger: true,
                           );
                           if (!ok) return;
-                          await sb
-                              .from('posts')
-                              .delete()
-                              .eq('id', d.id);
+                          await PostsRepository.delete(d.id);
                           ref.invalidate(_draftsProvider);
                         },
                         icon: const Icon(LucideIcons.trash2,

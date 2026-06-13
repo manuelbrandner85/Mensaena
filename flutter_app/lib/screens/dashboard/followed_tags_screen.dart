@@ -12,8 +12,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/extra_repositories.dart';
+import '../../repositories/posts_repository.dart';
 import '../../services/haptics.dart';
-import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/app_snackbar.dart';
 
@@ -25,26 +25,7 @@ final _myFollowedTagsProvider =
 final _suggestedTagsProvider =
     FutureProvider.autoDispose<List<({String tag, int count})>>(
         (ref) async {
-  try {
-    final rows = await sb
-        .from('post_tags')
-        .select('tag')
-        .limit(500);
-    final counts = <String, int>{};
-    for (final r in (rows as List).whereType<Map<String, dynamic>>()) {
-      final t = (r['tag'] as String?)?.trim().toLowerCase();
-      if (t == null || t.isEmpty) continue;
-      counts[t] = (counts[t] ?? 0) + 1;
-    }
-    final entries = counts.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    return entries
-        .take(20)
-        .map((e) => (tag: e.key, count: e.value))
-        .toList();
-  } catch (_) {
-    return const [];
-  }
+  return PostsRepository.suggestedTags();
 });
 
 class FollowedTagsScreen extends ConsumerStatefulWidget {

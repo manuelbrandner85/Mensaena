@@ -12,6 +12,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_features_repository.dart';
+import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/geocoding_service.dart';
 import '../../../services/location_service.dart';
@@ -352,10 +353,7 @@ class _ModuleCreatePostScreenState
         .toList();
 
     try {
-      final inserted = await sb
-          .from('posts')
-          .insert({
-            'user_id': uid,
+      final newId = await PostsRepository.create({
             'type': _type,
             'category': _category,
             'title': _titleCtrl.text.trim(),
@@ -396,19 +394,16 @@ class _ModuleCreatePostScreenState
             'tags': tags,
             'status': 'active',
             'module_key': widget.config.moduleKey,
-          })
-          .select()
-          .maybeSingle();
-      if (inserted == null) throw StateError('insert_blocked');
+          });
+      if (newId == null) throw StateError('insert_blocked');
 
       await PostDraftService.clear();
       if (!mounted) return;
-      final id = inserted['id'] as String;
       // Premium: kleiner Feier-Moment beim erfolgreichen Erstellen.
       CelebrateBurst.fire(context, ref: ref);
       // 1:1 Web: navigiere zur Modul-Detail-Page, nicht zum Post-Detail
       // (Web macht beides — wir nehmen Modul-Route für bessere UX-Continuity).
-      context.go('${widget.config.returnRoute}/$id');
+      context.go('${widget.config.returnRoute}/$newId');
     } catch (e) {
       if (!mounted) return;
       setState(() {
