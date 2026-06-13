@@ -371,7 +371,10 @@ class _DashboardHomeScreenState
       final idx = pinnedFixedOrder.indexOf(id);
       return idx < 0 ? 999 : idx;
     }
-    final sortedOrder = [...order];
+    // Dedupe: eine korrupt gespeicherte/gesyncte Config (alter Bug) konnte
+    // IDs doppelt enthalten → Widget rendert doppelt. toSet() hält die
+    // Einfüge-Reihenfolge (LinkedHashSet) und entfernt Duplikate.
+    final sortedOrder = order.toSet().toList();
     sortedOrder.sort((a, b) {
       final pinnedA = pinnedTop.contains(a);
       final pinnedB = pinnedTop.contains(b);
@@ -395,6 +398,30 @@ class _DashboardHomeScreenState
     if (!sortedOrder.contains('hero')) {
       sortedOrder.insert(0, 'hero');
     }
+
+    // Vorab-Konsum (reihenfolge-UNABHÄNGIG): Gruppen-Widgets fassen mehrere
+    // Einzel-Widgets zusammen und „konsumieren" sie. Vorher geschah das erst
+    // im jeweiligen case — stand ein Mitglied VOR seiner Gruppe in der
+    // (user-sortierbaren) order, rendete es doppelt (z. B. streak + erneut
+    // in progress_trio). Jetzt werden die Mitglieder schon vor dem Loop
+    // markiert, sobald ihre Gruppe aktiv ist (mit identischen Bedingungen
+    // wie im case), egal wie die Reihenfolge ist.
+    bool groupActive(String id) => id == 'hero' || visible.contains(id);
+    if (groupActive('progress_trio')) {
+      consumed.addAll(const ['karma', 'streak', 'helpStreak']);
+    }
+    if (groupActive('sky') &&
+        profile?.latitude != null &&
+        profile?.longitude != null) {
+      consumed.addAll(const ['weather', 'sun', 'moon']);
+    }
+    if (groupActive('weekly_summary') && profile != null) {
+      consumed.addAll(const ['recap', 'digest']);
+    }
+    if (groupActive('alerts_badge')) {
+      consumed.addAll(const ['safety', 'traffic', 'water_level']);
+    }
+
     for (final id in sortedOrder) {
       // Hero ist nicht-verbergbar (User-Wunsch). Auch wenn visible-Set
       // hero nicht enthält, rendern wir es trotzdem.
