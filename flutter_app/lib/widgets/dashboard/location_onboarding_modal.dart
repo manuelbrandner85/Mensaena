@@ -5,7 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../services/supabase_service.dart';
+import '../../repositories/profiles_repository.dart';
 import '../shared/address_autocomplete_field.dart';
 
 /// SKILL: mensaena-design + mensaena-features
@@ -87,11 +87,11 @@ class _LocationOnboardingModalState
       _err = null;
     });
     try {
-      await sb.from('profiles').update({
+      await ProfilesRepository.update(widget.userId, {
         'latitude': _lat,
         'longitude': _lng,
         'location': _ctrl.text.trim(),
-      }).eq('id', widget.userId);
+      });
       if (!mounted) return;
       widget.onSaved(_lat!, _lng!, _ctrl.text.trim());
       Navigator.pop(context);

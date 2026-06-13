@@ -22,42 +22,12 @@ SCAN_DIRS = ["lib/screens", "lib/widgets"]
 PATTERN = re.compile(r"\bsb\s*\.\s*from\s*\(|Supabase\.instance")
 
 # Eingefrorener Altbestand — NICHT erhöhen. Abbau erwünscht.
-BASELINE: dict[str, int] = {
-    "lib/screens/dashboard/admin/admin_chat_moderation_screen.dart": 1,
-    "lib/screens/dashboard/admin/admin_crash_logs_screen.dart": 2,
-    "lib/screens/dashboard/admin/admin_users_screen.dart": 1,
-    "lib/screens/dashboard/call/call_history_screen.dart": 2,
-    "lib/screens/dashboard/call/scheduled_calls_screen.dart": 3,
-    "lib/screens/dashboard/call/voicemail_screen.dart": 2,
-    "lib/screens/dashboard/chat/chat_media_sheet.dart": 1,
-    "lib/screens/dashboard/chat/chat_message_bubble.dart": 2,
-    "lib/screens/dashboard/chat/chat_screen.dart": 2,
-    "lib/screens/dashboard/create/module_create_post_screen.dart": 1,
-    "lib/screens/dashboard/crisis/crisis_dashboard_screen.dart": 1,
-    "lib/screens/dashboard/crisis/crisis_detail_screen.dart": 1,
-    "lib/screens/dashboard/drafts_screen.dart": 2,
-    "lib/screens/dashboard/followed_tags_screen.dart": 1,
-    "lib/screens/dashboard/interactions_screen.dart": 1,
-    "lib/screens/dashboard/knowledge/knowledge_create_screen.dart": 1,
-    "lib/screens/dashboard/knowledge/knowledge_screen.dart": 2,
-    "lib/screens/dashboard/live/live_room_screen.dart": 2,
-    "lib/screens/dashboard/marketplace/marketplace_create_screen.dart": 1,
-    "lib/screens/dashboard/marketplace/marketplace_detail_screen.dart": 1,
-    "lib/screens/dashboard/mentorship_match_screen.dart": 2,
-    "lib/screens/dashboard/mentorship_screen.dart": 1,
-    "lib/screens/dashboard/messages_screen.dart": 1,
-    "lib/screens/dashboard/module/module_posts_screen.dart": 1,
-    "lib/screens/dashboard/skills/skills_screen.dart": 1,
-    "lib/widgets/crisis/safe_checkin_button.dart": 3,
-    "lib/widgets/dashboard/location_onboarding_modal.dart": 1,
-    "lib/widgets/events/event_photos_gallery.dart": 2,
-    "lib/widgets/livestream/livestream_chat_resolver.dart": 1,
-    "lib/widgets/profile/send_voicemail_sheet.dart": 1,
-    "lib/widgets/profile/status_editor_sheet.dart": 3,
-    "lib/widgets/shared/critical_crisis_alert_listener.dart": 1,
-    "lib/widgets/shared/incoming_call_listener.dart": 3,
-    "lib/widgets/shared/sos_button.dart": 2,
-}
+# 2026-06-13: Altbestand vollständig abgebaut (Start 113/61 → 0/0). Die
+# BASELINE ist jetzt LEER = harte Null-Toleranz: JEDER neue direkte
+# sb.from()-Zugriff in screens/ oder widgets/ lässt den CI scheitern.
+# Datenzugriffe gehören in lib/repositories/ (oder lib/services/).
+# Ausnahme bleibt sb.storage (Datei-Upload) — vom PATTERN nicht erfasst.
+BASELINE: dict[str, int] = {}
 
 
 def main() -> int:

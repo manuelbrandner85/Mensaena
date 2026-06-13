@@ -88,6 +88,27 @@ class CallsRepository {
         .update({'is_listened': true}).eq('id', id);
   }
 
+  /// Voicemail senden (Audio bereits in Storage). true bei Erfolg.
+  static Future<bool> sendVoicemail({
+    required String calleeId,
+    required String audioUrl,
+    required int seconds,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('call_voicemails').insert({
+        'caller_id': uid,
+        'callee_id': calleeId,
+        'audio_url': audioUrl,
+        'duration_seconds': seconds,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // ── Anruf-Historie ──────────────────────────────────────────────────
 
   /// Letzte 30 Calls, an denen ich beteiligt und die ich nicht
