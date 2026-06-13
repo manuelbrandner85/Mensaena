@@ -334,6 +334,43 @@ class EventsRepository {
       return null;
     }
   }
+
+  /// Event-Fotos (neueste zuerst). Best-effort, leere Liste bei Fehler.
+  static Future<List<Map<String, dynamic>>> listPhotos(
+    String eventId, {
+    int limit = 100,
+  }) async {
+    try {
+      final rows = await sb
+          .from('event_photos')
+          .select()
+          .eq('event_id', eventId)
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Hängt ein hochgeladenes Foto (bereits in Storage) an ein Event.
+  static Future<bool> addPhoto({
+    required String eventId,
+    required String imageUrl,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      await sb.from('event_photos').insert({
+        'event_id': eventId,
+        'user_id': uid,
+        'image_url': imageUrl,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 final upcomingEventsProvider =

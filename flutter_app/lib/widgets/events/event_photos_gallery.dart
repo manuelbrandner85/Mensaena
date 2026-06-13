@@ -12,22 +12,13 @@ import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/events_repository.dart';
 import '../../services/supabase_service.dart';
 import '../shared/image_lightbox.dart';
 
 final eventPhotosProvider = FutureProvider.autoDispose
     .family<List<Map<String, dynamic>>, String>((ref, eventId) async {
-  try {
-    final rows = await sb
-        .from('event_photos')
-        .select()
-        .eq('event_id', eventId)
-        .order('created_at', ascending: false)
-        .limit(100);
-    return (rows as List).whereType<Map<String, dynamic>>().toList();
-  } catch (_) {
-    return const [];
-  }
+  return EventsRepository.listPhotos(eventId);
 });
 
 class EventPhotosGallery extends ConsumerStatefulWidget {
@@ -69,11 +60,8 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
             fileOptions: FileOptions(contentType: mime, upsert: false),
           );
       final url = sb.storage.from('event-photos').getPublicUrl(path);
-      await sb.from('event_photos').insert({
-        'event_id': widget.eventId,
-        'user_id': uid,
-        'image_url': url,
-      });
+      await EventsRepository.addPhoto(
+          eventId: widget.eventId, imageUrl: url);
       ref.invalidate(eventPhotosProvider(widget.eventId));
     } catch (e) {
       debugPrint('event photo upload failed: $e');
