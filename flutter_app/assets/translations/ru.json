@@ -4378,5 +4378,9 @@
     "share": "Поделиться моментом",
     "shareText": "Я только что помог(ла) соседу через Mensaena. 💚 www.mensaena.de",
     "close": "Далее"
+  },
+  "waterLevel": {
+    "title": "Уровень воды",
+    "flood": "Паводок"
   }
 }

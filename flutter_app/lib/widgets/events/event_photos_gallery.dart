@@ -117,9 +117,12 @@ class _EventPhotosGalleryState extends ConsumerState<EventPhotosGallery> {
             return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
+              // Phase-6 Grid-Sweep: maxCrossAxisExtent statt fester Spalten —
+              // auf Phones bleiben es 3 Spalten (ceil(360/(130+6))=3), auf
+              // Tablets/Foldables gibt es automatisch mehr.
               gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+                  const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 130,
                 mainAxisSpacing: 6,
                 crossAxisSpacing: 6,
               ),

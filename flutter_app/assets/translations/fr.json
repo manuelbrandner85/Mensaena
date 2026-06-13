@@ -4379,5 +4379,9 @@
     "share": "Partager ce moment",
     "shareText": "Je viens d'aider quelqu'un de mon voisinage grâce à Mensaena. 💚 www.mensaena.de",
     "close": "Continuer"
+  },
+  "waterLevel": {
+    "title": "Niveau d'eau",
+    "flood": "Crue"
   }
 }

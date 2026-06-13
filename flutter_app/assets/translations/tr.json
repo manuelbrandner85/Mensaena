@@ -4378,5 +4378,9 @@
     "share": "Bu anı paylaş",
     "shareText": "Az önce Mensaena üzerinden mahallemden birine yardım ettim. 💚 www.mensaena.de",
     "close": "Devam"
+  },
+  "waterLevel": {
+    "title": "Su seviyesi",
+    "flood": "Taşkın"
   }
 }

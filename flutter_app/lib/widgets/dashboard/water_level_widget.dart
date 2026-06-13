@@ -2,6 +2,7 @@
 /// Cached via Riverpod + WaterLevelService hat 15-Min-Cache.
 library;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -96,7 +97,7 @@ class WaterLevelWidget extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Pegel',
+                      Text('waterLevel.title'.tr(),
                           style: AppTypography.label(
                               size: 9, color: AppColors.tealSoft)),
                       Text(
@@ -119,7 +120,7 @@ class WaterLevelWidget extends ConsumerWidget {
                       color: AppColors.herzrot.withValues(alpha: 0.22),
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: Text('Hochwasser',
+                    child: Text('waterLevel.flood'.tr(),
                         style: AppTypography.label(
                             size: 8, color: AppColors.herzrot)),
                   ),
