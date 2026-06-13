@@ -223,6 +223,21 @@ class ProfilesRepository {
     }
   }
 
+  /// Eigener Status (status_text/emoji/until) — für den Status-Editor.
+  static Future<Map<String, dynamic>?> myStatus() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      return await sb
+          .from('profiles')
+          .select('status_text, status_emoji, status_until')
+          .eq('id', uid)
+          .maybeSingle();
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<void> update(String userId, Map<String, dynamic> patch) async {
     if (patch.containsKey('avatar_url')) {
       final v = patch['avatar_url'];

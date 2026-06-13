@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-13)
+- [x] sb.from-Abbau Batch 19 (Profil-Status): NEU ProfilesRepository.myStatus; status_editor_sheet nutzt myStatus (Lesen) + ProfilesRepository.update (Speichern/Löschen, existierte bereits). status_editor_sheet (3->0) Supabase-frei. Baseline: 9 Zugriffe / 7 Dateien (-92% seit Start 113/61).
 - [x] sb.from-Abbau Batch 18 (Misc): NEU repositories/skills_repository.dart (listActive für skill_offers); interactions_screen Partner-Lookup via ProfilesRepository.getById. 2 Dateien Supabase-frei: skills_screen (1->0), interactions_screen (1->0). Baseline: 12 Zugriffe / 8 Dateien (-89% seit Start 113/61).
 - [x] sb.from-Abbau Batch 17 (Events-Fotos): +2 EventsRepository-Methoden — listPhotos (Event-Galerie), addPhoto (Foto nach Storage-Upload anhängen). event_photos_gallery (2->0) Supabase-frei; sb.storage (Bild-Upload) + SupabaseService (uid-Prefix) bleiben. Baseline: 14 Zugriffe / 10 Dateien (-88% seit Start 113/61).
 - [x] sb.from-Abbau Batch 16 (Mentorship-Domäne): +3 MentorshipsRepository-Methoden (mega_repositories) — partnersByIds (Partner-Kurzprofile id→Row), myMatchTags (eigene skills/module/offer/seek-Tags lowercased), listMentors (is_mentor-Profile fürs Matching). 2 Dateien Supabase-frei: mentorship_screen (1->0 Partner-Lookup), mentorship_match_screen (2->0 eigene Tags + Mentor-Liste, supabase_service-Import entfernt). Baseline: 16 Zugriffe / 11 Dateien (-86% seit Start 113/61).
