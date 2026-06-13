@@ -459,8 +459,8 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
                         for (final o in list)
                           MapMarkerData(
                             id: o.id,
-                            lat: o.latitude,
-                            lng: o.longitude,
+                            lat: o.displayLat,
+                            lng: o.displayLng,
                             color: _hexToColor(
                                 getCategoryConfig(o.category).markerColor),
                             title: o.name,
@@ -1205,12 +1205,12 @@ class _OrgCard extends StatelessWidget {
                             label: 'organizations.actions.mail'.tr(),
                             onTap: () => _open('mailto:${org.email}'),
                           ),
-                        if (org.latitude != null && org.longitude != null)
+                        if (org.displayLat != null && org.displayLng != null)
                           _ActionChip(
                             icon: LucideIcons.mapPin,
                             label: 'organizations.actions.map'.tr(),
                             onTap: () => _open(
-                                'https://www.openstreetmap.org/?mlat=${org.latitude}&mlon=${org.longitude}#map=17/${org.latitude}/${org.longitude}'),
+                                'https://www.openstreetmap.org/?mlat=${org.displayLat}&mlon=${org.displayLng}#map=15/${org.displayLat}/${org.displayLng}'),
                           ),
                         _ActionChip(
                           icon: LucideIcons.arrowRight,

@@ -1,5 +1,7 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
 /// Spiegel der Supabase-Tabelle `farm_listings` (gyqujitkvymlmgroovch).
+import '../services/location_anonymizer.dart';
+
 class FarmListing {
   const FarmListing({
     required this.id,
@@ -70,6 +72,12 @@ class FarmListing {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<String> mediaUrls;
+
+  /// Anonymisierte Anzeigekoordinaten (≈1 km Genauigkeit).
+  double? get displayLat =>
+      latitude != null ? LocationAnonymizer.lat(latitude!) : null;
+  double? get displayLng =>
+      longitude != null ? LocationAnonymizer.lng(longitude!) : null;
 
   factory FarmListing.fromJson(Map<String, dynamic> j) {
     return FarmListing(

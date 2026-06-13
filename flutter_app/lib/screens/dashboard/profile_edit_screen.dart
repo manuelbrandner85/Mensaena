@@ -17,6 +17,7 @@ import '../../models/profile.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/avatar_generator_service.dart';
 import '../../services/locale_country_service.dart';
+import '../../services/location_anonymizer.dart';
 import '../../services/location_service.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
@@ -371,9 +372,10 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       final pos = await LocationService.getCurrentPosition(
           accuracy: LocationAccuracy.medium);
       if (!mounted) return;
+      final anon = LocationAnonymizer.fuzzy(pos.latitude, pos.longitude);
       setState(() {
-        _lat = pos.latitude;
-        _lng = pos.longitude;
+        _lat = anon.lat;
+        _lng = anon.lng;
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,

@@ -181,9 +181,9 @@ class _MarketplaceDetailScreenState
                   ),
                 ],
                 // M4: Inline-Karten-Vorschau wenn Koordinaten vorhanden.
-                if (l.latitude != null && l.longitude != null) ...[
+                if (l.displayLat != null && l.displayLng != null) ...[
                   const SizedBox(height: 10),
-                  _MapPreview(lat: l.latitude!, lng: l.longitude!),
+                  _MapPreview(lat: l.displayLat!, lng: l.displayLng!),
                 ],
                 if (l.tags.isNotEmpty) ...[
                   const SizedBox(height: 12),

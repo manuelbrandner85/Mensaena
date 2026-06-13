@@ -3,6 +3,8 @@
 ///
 /// Hinweis: `openingHours` (String) bleibt fuer Legacy-Daten/Anzeige,
 /// `openingHoursJson` (Map<String, dynamic>) ist die neue JSONB-Quelle.
+import '../services/location_anonymizer.dart';
+
 class Organization {
   const Organization({
     required this.id,
@@ -84,6 +86,12 @@ class Organization {
   final Map<String, dynamic> accessibility;
   final String? slug;
   final double? distanceKm;
+
+  /// Anonymisierte Anzeigekoordinaten (≈1 km Genauigkeit).
+  double? get displayLat =>
+      latitude != null ? LocationAnonymizer.lat(latitude!) : null;
+  double? get displayLng =>
+      longitude != null ? LocationAnonymizer.lng(longitude!) : null;
 
   factory Organization.fromJson(Map<String, dynamic> j) {
     // opening_hours kann Map (JSONB) ODER String (legacy) sein.

@@ -4,6 +4,7 @@ import '../models/farm_listing.dart';
 import '../models/organization.dart';
 import '../models/organization_review.dart';
 import '../models/organization_stats.dart';
+import '../services/location_anonymizer.dart';
 import '../services/location_service.dart';
 import '../services/supabase_service.dart';
 
@@ -406,8 +407,8 @@ class FarmsRepository {
         'category': category,
         if (region != null && region.trim().isNotEmpty)
           'region': region.trim(),
-        if (latitude != null) 'latitude': latitude,
-        if (longitude != null) 'longitude': longitude,
+        if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
+        if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),
         if (description != null && description.trim().isNotEmpty)
           'description': description.trim(),
         if (address != null && address.trim().isNotEmpty)

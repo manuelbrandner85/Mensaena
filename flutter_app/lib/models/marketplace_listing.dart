@@ -1,5 +1,7 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
 /// Spiegel der Supabase-Tabelle `marketplace_listings` (gyqujitkvymlmgroovch).
+import '../services/location_anonymizer.dart';
+
 class MarketplaceListing {
   const MarketplaceListing({
     required this.id,
@@ -58,6 +60,12 @@ class MarketplaceListing {
   final String? sellerId;
   final List<String> imageUrls;
   final DateTime? reservedUntil;
+
+  /// Anonymisierte Anzeigekoordinaten (≈1 km Genauigkeit).
+  double? get displayLat =>
+      latitude != null ? LocationAnonymizer.lat(latitude!) : null;
+  double? get displayLng =>
+      longitude != null ? LocationAnonymizer.lng(longitude!) : null;
 
   factory MarketplaceListing.fromJson(Map<String, dynamic> j) {
     return MarketplaceListing(

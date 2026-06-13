@@ -1,5 +1,7 @@
 /// SKILL: mensaena-architektur + flutter-implement-json-serialization
 /// Spiegel der Supabase-Tabelle `profiles` (gyqujitkvymlmgroovch).
+import '../services/location_anonymizer.dart';
+
 class Profile {
   const Profile({
     required this.id,
@@ -198,6 +200,16 @@ class Profile {
   final String? statusText;
   final String? statusEmoji;
   final DateTime? statusUntil;
+
+  /// Anonymisierte Anzeigekoordinaten (≈1 km Genauigkeit).
+  double? get displayLat =>
+      latitude != null ? LocationAnonymizer.lat(latitude!) : null;
+  double? get displayLng =>
+      longitude != null ? LocationAnonymizer.lng(longitude!) : null;
+  double? get displayHomeLat =>
+      homeLat != null ? LocationAnonymizer.lat(homeLat!) : null;
+  double? get displayHomeLng =>
+      homeLng != null ? LocationAnonymizer.lng(homeLng!) : null;
 
   bool get hasActiveStatus {
     if (statusText == null || statusText!.isEmpty) return false;

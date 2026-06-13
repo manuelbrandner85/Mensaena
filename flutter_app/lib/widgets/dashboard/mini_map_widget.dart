@@ -122,8 +122,8 @@ class MiniMapWidget extends StatelessWidget {
                   for (final p in posts)
                     MapMarkerData(
                       id: p.id,
-                      lat: p.latitude,
-                      lng: p.longitude,
+                      lat: p.displayLat,
+                      lng: p.displayLng,
                       color: _markerColor(p.type),
                       emoji: _markerEmoji(p.type),
                       type: p.type,

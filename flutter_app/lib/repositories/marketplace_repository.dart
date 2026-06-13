@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../models/marketplace_listing.dart';
+import '../services/location_anonymizer.dart';
 import '../services/supabase_service.dart';
 
 /// SKILL: supabase + mensaena-features
@@ -126,8 +127,8 @@ class MarketplaceRepository {
             'price': price,
             'price_type': priceType,
             'location_text': locationText,
-            'latitude': latitude,
-            'longitude': longitude,
+            'latitude': latitude != null ? LocationAnonymizer.lat(latitude) : null,
+            'longitude': longitude != null ? LocationAnonymizer.lng(longitude) : null,
             if (tags.isNotEmpty) 'tags': tags,
             'status': 'active',
           })
