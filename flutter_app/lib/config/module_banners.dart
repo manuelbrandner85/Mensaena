@@ -38,6 +38,25 @@ const Map<String, String> _kModuleBanners = {
   '/dashboard/wiki': 'assets/images/modules/wiki.webp',
   '/dashboard/skills': 'assets/images/modules/skills.webp',
   '/dashboard/interactions': 'assets/images/modules/interactions.webp',
+  // Zweite Welle: weitere user-facing Bereiche, die bisher ohne Header-Bild
+  // waren. Admin-/Settings-/Detail-/Create-Screens bleiben bewusst bannerlos.
+  '/dashboard/badges': 'assets/images/modules/badges.webp',
+  '/dashboard/matching': 'assets/images/modules/matching.webp',
+  '/dashboard/friends': 'assets/images/modules/friends.webp',
+  '/dashboard/leaderboard': 'assets/images/modules/leaderboard.webp',
+  '/dashboard/calendar': 'assets/images/modules/calendar.webp',
+  '/dashboard/community-polls': 'assets/images/modules/community_polls.webp',
+  '/dashboard/mentorship': 'assets/images/modules/mentorship.webp',
+  // Discovery-Variante teilt sich das Mentorship-Keyart (prefix:false → der
+  // exakte Sub-Pfad braucht einen eigenen Eintrag).
+  '/dashboard/mentorship/find': 'assets/images/modules/mentorship.webp',
+  '/dashboard/identify': 'assets/images/modules/identify.webp',
+  '/dashboard/harvest-wild': 'assets/images/modules/harvest_wild.webp',
+  '/dashboard/charge-stations': 'assets/images/modules/charge_stations.webp',
+  '/dashboard/voicemail': 'assets/images/modules/voicemail.webp',
+  '/dashboard/wissen': 'assets/images/modules/wissen.webp',
+  '/dashboard/teilen': 'assets/images/modules/teilen.webp',
+  '/dashboard/warnungen': 'assets/images/modules/warnungen.webp',
 };
 
 /// Liefert das Banner-Asset für [route]. [prefix]=false → nur exakter
