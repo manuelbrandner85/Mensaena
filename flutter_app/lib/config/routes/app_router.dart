@@ -77,6 +77,7 @@ import '../../screens/dashboard/crisis/family_circle_screen.dart';
 import '../../screens/dashboard/crisis/crisis_dashboard_screen.dart';
 import '../../screens/dashboard/crisis/crisis_detail_screen.dart';
 import '../../screens/dashboard/crisis/crisis_resources_screen.dart';
+import '../../screens/dashboard/crisis/sos_screen.dart';
 import '../../screens/dashboard/home/dashboard_home_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_create_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_screen.dart';
@@ -932,6 +933,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             pageBuilder: (_, state) => AppTransitions.calm<void>(
               key: state.pageKey,
               child: const FamilyCircleScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'sos',
+            pageBuilder: (_, state) => AppTransitions.calm<void>(
+              key: state.pageKey,
+              child: const SosScreen(),
             ),
           ),
           GoRoute(

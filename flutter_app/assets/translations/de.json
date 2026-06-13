@@ -3052,7 +3052,25 @@
     "reportCrisis": "Krise melden",
     "is24h": "24/7",
     "isFree": "Kostenlos",
-    "empty": "Keine Notrufnummern für dein Land hinterlegt."
+    "empty": "Keine Notrufnummern für dein Land hinterlegt.",
+    "screenTitle": "SOS-Notfall",
+    "type": {
+      "medical": "Medizinisch",
+      "fire": "Feuer",
+      "accident": "Unfall",
+      "other": "Sonstiges"
+    },
+    "alertSent": "Notruf wurde gesendet – Hilfe ist unterwegs.",
+    "alertError": "Fehler beim Senden des Notrufs.",
+    "locationError": "Standort konnte nicht ermittelt werden.",
+    "alertActive": "Dein Notruf ist aktiv.",
+    "resolveAlert": "Notruf beenden",
+    "nearbyAlerts": "{count} Notfälle in deiner Nähe",
+    "noNearbyAlerts": "Keine aktiven Notfälle in deiner Nähe.",
+    "responders": "{count} Helfer",
+    "respond": "Helfen",
+    "respondConfirm": "Du wirst als Helfer eingetragen.",
+    "alertResolved": "Notruf wurde beendet."
   },
   "drawer": {
     "pinned": "Angeheftet",

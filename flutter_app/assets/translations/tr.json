@@ -3052,7 +3052,25 @@
     "reportCrisis": "Kriz bildir",
     "is24h": "7/24",
     "isFree": "Ücretsiz",
-    "empty": "Ülken için yapılandırılmış acil durum numarası yok."
+    "empty": "Ülken için yapılandırılmış acil durum numarası yok.",
+    "screenTitle": "SOS Acil Durum",
+    "type": {
+      "medical": "Tıbbi",
+      "fire": "Yangın",
+      "accident": "Kaza",
+      "other": "Diğer"
+    },
+    "alertSent": "Acil durum uyarısı gönderildi – yardım yolda.",
+    "alertError": "Acil durum uyarısı gönderilemedi.",
+    "locationError": "Konumunuz belirlenemedi.",
+    "alertActive": "SOS uyarınız aktif.",
+    "resolveAlert": "Uyarıyı sonlandır",
+    "nearbyAlerts": "Yakınında {count} acil durum",
+    "noNearbyAlerts": "Yakında aktif acil durum yok.",
+    "responders": "{count} yardımcı",
+    "respond": "Yardım et",
+    "respondConfirm": "Yardımcı olarak kaydedildiniz.",
+    "alertResolved": "Acil durum uyarısı sonlandırıldı."
   },
   "drawer": {
     "pinned": "Sabitlendi",

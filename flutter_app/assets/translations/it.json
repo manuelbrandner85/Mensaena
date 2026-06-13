@@ -3053,7 +3053,25 @@
     "reportCrisis": "Segnala emergenza",
     "is24h": "24/7",
     "isFree": "Gratuito",
-    "empty": "Nessun numero di emergenza configurato per il tuo Paese."
+    "empty": "Nessun numero di emergenza configurato per il tuo Paese.",
+    "screenTitle": "SOS Emergenza",
+    "type": {
+      "medical": "Medico",
+      "fire": "Incendio",
+      "accident": "Incidente",
+      "other": "Altro"
+    },
+    "alertSent": "Allarme inviato – i soccorsi sono in arrivo.",
+    "alertError": "Errore nell'invio dell'allarme.",
+    "locationError": "Impossibile rilevare la posizione.",
+    "alertActive": "Il tuo allarme SOS è attivo.",
+    "resolveAlert": "Termina allarme",
+    "nearbyAlerts": "{count} emergenze nelle vicinanze",
+    "noNearbyAlerts": "Nessuna emergenza attiva nelle vicinanze.",
+    "responders": "{count} soccorritori",
+    "respond": "Aiuta",
+    "respondConfirm": "Sei registrato come soccorritore.",
+    "alertResolved": "Allarme terminato."
   },
   "drawer": {
     "pinned": "In evidenza",
