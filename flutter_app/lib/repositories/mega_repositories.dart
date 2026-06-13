@@ -440,6 +440,69 @@ class MentorshipsRepository {
       return false;
     }
   }
+
+  /// Partner-Kurzprofile (id/display_name/avatar_url) zu einer ID-Liste,
+  /// als Map id→Row. Für die Mentorship-Liste (Anzeige des Gegenübers).
+  static Future<Map<String, Map<String, dynamic>>> partnersByIds(
+      List<String> ids) async {
+    if (ids.isEmpty) return const {};
+    try {
+      final rows = await sb
+          .from('profiles')
+          .select('id, display_name, avatar_url')
+          .inFilter('id', ids);
+      return {
+        for (final r in (rows as List).whereType<Map<String, dynamic>>())
+          r['id'] as String: r,
+      };
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  /// Meine Match-Tags (skills + preferred_modules + offer_tags + seek_tags),
+  /// lowercased & dedupliziert — Basis für die Mentor-Überschneidung.
+  static Future<Set<String>> myMatchTags() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const {};
+    try {
+      final me = await sb
+          .from('profiles')
+          .select('skills, preferred_modules, offer_tags, seek_tags')
+          .eq('id', uid)
+          .maybeSingle();
+      return <String>{
+        ...((me?['skills'] as List?)?.whereType<String>() ?? const []),
+        ...((me?['preferred_modules'] as List?)?.whereType<String>() ??
+            const []),
+        ...((me?['offer_tags'] as List?)?.whereType<String>() ?? const []),
+        ...((me?['seek_tags'] as List?)?.whereType<String>() ?? const []),
+      }.map((s) => s.toLowerCase()).toSet();
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  /// Verfügbare Mentor:innen (is_mentor=true, ohne mich), Kurzprofil +
+  /// Topics/Skills für das Matching. Roh-Maps — das Scoring macht der Screen.
+  static Future<List<Map<String, dynamic>>> listMentors({
+    int limit = 200,
+  }) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return const [];
+    try {
+      final rows = await sb
+          .from('profiles')
+          .select(
+              'id, display_name, avatar_url, bio, mentor_topics, skills, location')
+          .eq('is_mentor', true)
+          .neq('id', uid)
+          .limit(limit);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
 }
 
 // ── F16 Livestream-Messages ────────────────────────────────────────────

@@ -13,7 +13,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../repositories/mega_repositories.dart';
-import '../../services/supabase_service.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/app_snackbar.dart';
@@ -31,45 +30,20 @@ class _MentorMatch {
 
 final _mentorMatchesProvider =
     FutureProvider.autoDispose<List<_MentorMatch>>((ref) async {
-  final uid = SupabaseService.currentUser?.id;
-  if (uid == null) return const [];
-  try {
-    final me = await sb
-        .from('profiles')
-        .select('skills, preferred_modules, offer_tags, seek_tags')
-        .eq('id', uid)
-        .maybeSingle();
-    final mine = <String>{
-      ...((me?['skills'] as List?)?.whereType<String>() ?? const []),
-      ...((me?['preferred_modules'] as List?)?.whereType<String>() ?? const []),
-      ...((me?['offer_tags'] as List?)?.whereType<String>() ?? const []),
-      ...((me?['seek_tags'] as List?)?.whereType<String>() ?? const []),
-    }.map((s) => s.toLowerCase()).toSet();
-
-    final rows = await sb
-        .from('profiles')
-        .select(
-            'id, display_name, avatar_url, bio, mentor_topics, skills, location')
-        .eq('is_mentor', true)
-        .neq('id', uid)
-        .limit(200);
-    final matches = <_MentorMatch>[];
-    for (final p in (rows as List).whereType<Map<String, dynamic>>()) {
-      final topics = <String>{
-        ...((p['mentor_topics'] as List?)?.whereType<String>() ?? const []),
-        ...((p['skills'] as List?)?.whereType<String>() ?? const []),
-      }.toList();
-      final overlap = topics
-          .where((t) => mine.contains(t.toLowerCase()))
-          .length;
-      matches.add(_MentorMatch(
-          profile: p, overlap: overlap, topics: topics));
-    }
-    matches.sort((a, b) => b.overlap.compareTo(a.overlap));
-    return matches.take(50).toList();
-  } catch (_) {
-    return const [];
+  final mine = await MentorshipsRepository.myMatchTags();
+  final rows = await MentorshipsRepository.listMentors();
+  final matches = <_MentorMatch>[];
+  for (final p in rows) {
+    final topics = <String>{
+      ...((p['mentor_topics'] as List?)?.whereType<String>() ?? const []),
+      ...((p['skills'] as List?)?.whereType<String>() ?? const []),
+    }.toList();
+    final overlap =
+        topics.where((t) => mine.contains(t.toLowerCase())).length;
+    matches.add(_MentorMatch(profile: p, overlap: overlap, topics: topics));
   }
+  matches.sort((a, b) => b.overlap.compareTo(a.overlap));
+  return matches.take(50).toList();
 });
 
 class MentorshipMatchScreen extends ConsumerWidget {
