@@ -8,7 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -54,16 +54,9 @@ class _AdminChatModerationScreenState
   }
 
   Future<void> _loadMyRole() async {
-    try {
-      final uid = SupabaseService.currentUser?.id;
-      if (uid == null) return;
-      final row =
-          await sb.from('profiles').select('role').eq('id', uid).maybeSingle();
-      if (!mounted) return;
-      setState(() => _isAdmin = row?['role'] == 'admin');
-    } catch (_) {
-      // ignore role lookup errors; default = not admin
-    }
+    final role = await ProfilesRepository.myRole();
+    if (!mounted) return;
+    setState(() => _isAdmin = role == 'admin');
   }
 
   Future<void> _loadAll() async {

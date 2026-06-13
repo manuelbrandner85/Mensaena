@@ -10,51 +10,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../providers/role_provider.dart';
-import '../../../services/supabase_service.dart';
+import '../../../repositories/admin_repository.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 final _crashLogsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
-  try {
-    final since =
-        DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
-    // Liest aus error_logs (Live-Source aus main.dart) UND crash_logs.
-    final results = await Future.wait([
-      sb
-          .from('error_logs')
-          .select()
-          .gte('created_at', since)
-          .order('created_at', ascending: false)
-          .limit(300)
-          .then((r) => (r as List).whereType<Map<String, dynamic>>().toList()),
-      sb
-          .from('crash_logs')
-          .select()
-          .gte('created_at', since)
-          .order('created_at', ascending: false)
-          .limit(200)
-          .then((r) => (r as List).whereType<Map<String, dynamic>>().toList()),
-    ]);
-    final merged = <Map<String, dynamic>>[
-      ...results[0].map((r) => {
-            ...r,
-            'error_message': r['message'] ?? r['error_message'],
-            'stack_trace': r['stack'] ?? r['stack_trace'],
-            'build_number': r['build_number'] ?? 0,
-          }),
-      ...results[1],
-    ];
-    merged.sort((a, b) {
-      final aT = DateTime.tryParse(a['created_at'] as String? ?? '')?.toUtc();
-      final bT = DateTime.tryParse(b['created_at'] as String? ?? '')?.toUtc();
-      if (aT == null || bT == null) return 0;
-      return bT.compareTo(aT);
-    });
-    return merged.take(500).toList();
-  } catch (_) {
-    return const [];
-  }
+  return AdminRepository.recentIncidents();
 });
 
 class AdminCrashLogsScreen extends ConsumerWidget {

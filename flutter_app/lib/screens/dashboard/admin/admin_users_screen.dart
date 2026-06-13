@@ -13,6 +13,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
@@ -204,19 +205,9 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   }
 
   Future<void> _loadMyRole() async {
-    try {
-      final uid = SupabaseService.currentUser?.id;
-      if (uid == null) return;
-      final row = await sb
-          .from('profiles')
-          .select('role')
-          .eq('id', uid)
-          .maybeSingle();
-      if (!mounted) return;
-      setState(() => _myRole = row?['role'] as String?);
-    } catch (_) {
-      // ignore; default guard = restrictive
-    }
+    final role = await ProfilesRepository.myRole();
+    if (!mounted) return;
+    setState(() => _myRole = role);
   }
 
   bool get _isAdmin => _myRole == 'admin';
