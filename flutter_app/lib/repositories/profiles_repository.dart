@@ -167,6 +167,62 @@ class ProfilesRepository {
     }
   }
 
+  /// @-Mention-Autocomplete: bis zu 6 Profile, deren nickname/name/
+  /// display_name mit [query] beginnen. Leere Query → leere Liste.
+  static Future<List<Map<String, dynamic>>> searchMentions(
+      String query) async {
+    if (query.isEmpty) return const [];
+    try {
+      final rows = await sb
+          .from('profiles')
+          .select('id, name, display_name, nickname, avatar_url')
+          .or('nickname.ilike.$query%,name.ilike.$query%,display_name.ilike.$query%')
+          .limit(6);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Personensuche für „Neuen Chat starten" — alle außer mir, nicht
+  /// gebannt; [query] (optional) filtert display_name/name/nickname.
+  static Future<List<Map<String, dynamic>>> searchForNewChat(
+      String query) async {
+    final myId = SupabaseService.currentUser?.id;
+    try {
+      var q = sb
+          .from('profiles')
+          .select('id, display_name, name, nickname, avatar_url, location')
+          .neq('id', myId ?? '00000000-0000-0000-0000-000000000000')
+          .filter('is_banned', 'eq', false);
+      final trimmed = query.trim();
+      if (trimmed.isNotEmpty) {
+        final esc = trimmed.replaceAll('%', r'\%');
+        q = q.or(
+            'display_name.ilike.%$esc%,name.ilike.%$esc%,nickname.ilike.%$esc%');
+      }
+      final rows = await q.order('display_name').limit(50);
+      return (rows as List).whereType<Map<String, dynamic>>().toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Profil-ID zu einem exakten display_name (für @-Mention-Tap-Navigation).
+  static Future<String?> idByDisplayName(String name) async {
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('id')
+          .eq('display_name', name)
+          .limit(1)
+          .maybeSingle();
+      return row?['id'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<void> update(String userId, Map<String, dynamic> patch) async {
     if (patch.containsKey('avatar_url')) {
       final v = patch['avatar_url'];

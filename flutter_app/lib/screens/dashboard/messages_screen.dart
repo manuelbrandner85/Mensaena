@@ -13,9 +13,9 @@ import '../../providers/unread_counts_provider.dart';
 import '../../widgets/chat/chat_recap_sheet.dart';
 import '../../config/routes/app_router.dart' show rootNavigatorKey;
 import '../../repositories/conversations_repository.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
-import '../../services/supabase_service.dart';
 import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
@@ -900,25 +900,8 @@ class _NewDmPickerSheetState extends State<_NewDmPickerSheet> {
     _future = _fetch(_q);
   }
 
-  Future<List<Map<String, dynamic>>> _fetch(String q) async {
-    try {
-      final myId = SupabaseService.currentUser?.id;
-      var query = sb
-          .from('profiles')
-          .select('id, display_name, name, nickname, avatar_url, location')
-          .neq('id', myId ?? '00000000-0000-0000-0000-000000000000')
-          .filter('is_banned', 'eq', false);
-      if (q.trim().isNotEmpty) {
-        final esc = q.trim().replaceAll('%', r'\%');
-        query = query.or(
-            'display_name.ilike.%$esc%,name.ilike.%$esc%,nickname.ilike.%$esc%');
-      }
-      final rows = await query.order('display_name').limit(50);
-      return (rows as List).whereType<Map<String, dynamic>>().toList();
-    } catch (_) {
-      return const [];
-    }
-  }
+  Future<List<Map<String, dynamic>>> _fetch(String q) =>
+      ProfilesRepository.searchForNewChat(q);
 
   Future<void> _startChat(String otherId, String name) async {
     if (_creating) return;

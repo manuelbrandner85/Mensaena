@@ -14,6 +14,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../config/theme/cinema_accents.dart';
 import '../../../providers/cinema_provider.dart';
 import '../../../repositories/conversations_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/chat_context_service.dart';
 import '../../../services/chat_draft_service.dart';
 import '../../../services/chat_word_filter_service.dart';
@@ -284,15 +285,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         if (mounted) setState(() => _mentionSuggestions = const []);
         return;
       }
-      final rows = await sb
-          .from('profiles')
-          .select('id, name, display_name, nickname, avatar_url')
-          .or('nickname.ilike.$query%,name.ilike.$query%,display_name.ilike.$query%')
-          .limit(6);
+      final rows = await ProfilesRepository.searchMentions(query);
       // Out-of-order-Guard: nur uebernehmen wenn query immer noch aktuell.
       if (!mounted || query != _activeMentionQuery) return;
-      setState(() => _mentionSuggestions =
-          (rows as List).whereType<Map<String, dynamic>>().toList());
+      setState(() => _mentionSuggestions = rows);
     } catch (_) {
       if (mounted) setState(() => _mentionSuggestions = const []);
     }
@@ -360,20 +356,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   /// korrekte Stelle anzeigt (sonst waere die Markierung schon vor dem
   /// ersten Frame ueberschrieben).
   Future<void> _captureLastReadAtOpen() async {
-    try {
-      final uid = SupabaseService.currentUser?.id;
-      if (uid == null) return;
-      final row = await sb
-          .from('conversation_members')
-          .select('last_read_at')
-          .eq('conversation_id', widget.conversationId)
-          .eq('user_id', uid)
-          .maybeSingle();
-      final raw = row?['last_read_at'] as String?;
-      if (raw != null && mounted) {
-        setState(() => _myLastReadAtOpen = DateTime.tryParse(raw)?.toUtc());
-      }
-    } catch (_) {/* fail-silent */}
+    final at =
+        await ConversationsRepository.myLastReadAt(widget.conversationId);
+    if (at != null && mounted) {
+      setState(() => _myLastReadAtOpen = at);
+    }
   }
 
   /// DM-Chat-History komplett aus DB loeschen. Wirkt fuer BEIDE Teilnehmer

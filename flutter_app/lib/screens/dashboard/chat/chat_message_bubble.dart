@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/conversations_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/link_preview_service.dart';
@@ -660,25 +661,14 @@ class _SystemCallCard extends StatelessWidget {
   Future<void> _callBack(BuildContext context) async {
     Haptics.tap();
     // Peer-ID via dm_calls lookup — sicherer als den Namen zu nutzen.
-    String? peerId;
     try {
-      final me = SupabaseService.currentUser?.id;
-      final row = await sb
-          .from('dm_calls')
-          .select('caller_id, callee_id, call_type')
-          .eq('id', callId)
-          .maybeSingle();
-      if (row != null && me != null) {
-        peerId = (row['caller_id'] == me)
-            ? row['callee_id'] as String?
-            : row['caller_id'] as String?;
-      }
-      final callType = (row?['call_type'] as String?) ?? 'audio';
+      final peer = await DmCallService.peerOf(callId);
+      final peerId = peer.peerId;
       if (peerId == null || peerId.isEmpty) return;
       final result = await DmCallService.start(
         conversationId: conversationId,
         calleeId: peerId,
-        callType: callType,
+        callType: peer.callType,
       );
       if (!context.mounted) return;
       if (!result.success ||
@@ -838,16 +828,9 @@ class _MentionAwareTextState extends State<_MentionAwareText> {
   }
 
   Future<void> _openMention(String name) async {
-    try {
-      final row = await sb
-          .from('profiles')
-          .select('id')
-          .eq('display_name', name)
-          .limit(1)
-          .maybeSingle();
-      if (row == null || !mounted) return;
-      GoRouter.of(context).go('/dashboard/profile/${row['id']}');
-    } catch (_) {/* silently no-op */}
+    final id = await ProfilesRepository.idByDisplayName(name);
+    if (id == null || !mounted) return;
+    GoRouter.of(context).go('/dashboard/profile/$id');
   }
 
   void _buildSpans() {
