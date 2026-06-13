@@ -8,6 +8,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_admin_repository.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Zentrales KI-Steuerungs-Panel fürs Admin-Dashboard (Fundament).
@@ -381,9 +382,7 @@ class _FlagTileState extends ConsumerState<_FlagTile> {
     setState(() => _busy = false);
     if (!ok) {
       setState(() => _enabled = !v); // revert
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminAi.toggleFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminAi.toggleFailed'.tr());
       return;
     }
     ref.invalidate(aiFlagsProvider);
@@ -473,9 +472,7 @@ class _AuditCardState extends ConsumerState<_AuditCard> {
       });
     } else {
       setState(() => _deleting.remove(id));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminAi.clearFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminAi.clearFailed'.tr());
     }
   }
 
@@ -487,9 +484,7 @@ class _AuditCardState extends ConsumerState<_AuditCard> {
     if (deleted >= 0) {
       setState(() => _localRows = []);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminAi.clearFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminAi.clearFailed'.tr());
     }
   }
 

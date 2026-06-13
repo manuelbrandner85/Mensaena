@@ -18,6 +18,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/admin/marketing_preview.dart';
 import '../../../widgets/shared/error_state_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 class AdminMarketingScreen extends ConsumerStatefulWidget {
   const AdminMarketingScreen({super.key});
@@ -453,9 +454,7 @@ class _EmailTabState extends State<_EmailTab> {
     final email = SupabaseService.currentUser?.email;
     if (email == null || email.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('marketing.test_no_email'.tr())),
-      );
+      AppSnackBar.info(context, 'marketing.test_no_email'.tr());
       return;
     }
     Haptics.tap();

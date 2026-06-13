@@ -180,9 +180,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           text: 'admin.exportCsvSubject'.tr());
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('admin.exportCsvFailed'.tr())),
-        );
+        AppSnackBar.error(context, 'admin.exportCsvFailed'.tr());
       }
     } finally {
       if (mounted) setState(() => _exporting = false);

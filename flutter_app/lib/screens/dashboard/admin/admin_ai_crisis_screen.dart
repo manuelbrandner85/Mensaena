@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_moderation_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Krisen-Triage — zeigt aktive Krisen mit KI-Dringlichkeitsbewertung.
@@ -63,14 +64,12 @@ class _AdminAiCrisisScreenState extends ConsumerState<AdminAiCrisisScreen> {
         if (mounted) setState(() => _crises = _sorted(list));
       } else if (res['disabled'] == true) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('adminCrisis.disabled'.tr())));
+          AppSnackBar.success(context, 'adminCrisis.disabled'.tr());
         }
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('adminCrisis.analyzeFailed'.tr())));
+        AppSnackBar.error(context, 'adminCrisis.analyzeFailed'.tr());
       }
     }
     if (mounted) setState(() => _analyzing = false);

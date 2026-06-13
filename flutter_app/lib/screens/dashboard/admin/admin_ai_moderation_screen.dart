@@ -7,6 +7,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_moderation_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// KI-Moderations-Queue — zeigt offene Meldungen mit KI-Empfehlung.
@@ -49,14 +50,12 @@ class _AdminAiModerationScreenState
         if (mounted) setState(() => _reports = list);
       } else if (res['disabled'] == true) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('adminModeration.disabled'.tr())));
+          AppSnackBar.success(context, 'adminModeration.disabled'.tr());
         }
       }
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('adminModeration.analyzeFailed'.tr())));
+        AppSnackBar.error(context, 'adminModeration.analyzeFailed'.tr());
       }
     }
     if (mounted) setState(() => _analyzing = false);
@@ -67,11 +66,9 @@ class _AdminAiModerationScreenState
     if (!mounted) return;
     if (ok) {
       setState(() => _reports.removeWhere((r) => r['id'] == reportId));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminModeration.actionDone'.tr())));
+      AppSnackBar.success(context, 'adminModeration.actionDone'.tr());
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminModeration.actionFailed'.tr())));
+      AppSnackBar.error(context, 'adminModeration.actionFailed'.tr());
     }
   }
 

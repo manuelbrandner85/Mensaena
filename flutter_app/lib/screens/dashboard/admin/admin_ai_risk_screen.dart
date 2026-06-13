@@ -8,6 +8,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_insights_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// KI-Risikoprofil — zeigt Nutzer mit erhöhtem Risiko-Score.
@@ -55,7 +56,7 @@ class _AdminAiRiskScreenState extends ConsumerState<AdminAiRiskScreen> {
   }
 
   void _snack(String msg) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      AppSnackBar.info(context, msg);
 
   @override
   Widget build(BuildContext context) {
