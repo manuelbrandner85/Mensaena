@@ -307,7 +307,7 @@ class DashboardScaffold extends ConsumerWidget {
                             floatHeaderSlivers: true,
                             headerSliverBuilder: (_, __) => [
                               SliverToBoxAdapter(
-                                  child: ModuleBanner(asset: bannerAsset!)),
+                                  child: ModuleBanner(asset: bannerAsset)),
                             ],
                             body: refreshed,
                           ),
