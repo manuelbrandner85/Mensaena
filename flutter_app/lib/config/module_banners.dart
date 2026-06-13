@@ -21,7 +21,8 @@ const Map<String, String> _kModuleBanners = {
   '/dashboard/groups': 'assets/images/modules/groups.webp',
   '/dashboard/crisis': 'assets/images/modules/crisis.webp',
   '/dashboard/knowledge': 'assets/images/modules/knowledge.webp',
-  '/dashboard/map': 'assets/images/modules/map.webp',
+  // map bewusst OHNE Banner: die Karte ist vollflächig + nicht scrollbar,
+  // ein Header-Streifen würde nur Kartenfläche kosten.
   '/dashboard/organizations': 'assets/images/modules/organizations.webp',
   '/dashboard/animals': 'assets/images/modules/animals.webp',
   '/dashboard/mental-support': 'assets/images/modules/mental_support.webp',

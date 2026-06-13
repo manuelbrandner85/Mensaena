@@ -115,6 +115,11 @@ class DashboardScaffold extends ConsumerWidget {
       activeRoute = currentRoute;
     }
 
+    // Modul-Banner: explizit gesetzt, sonst aus der aktiven Route (nur
+    // exakte Modul-Landings; Detail-Screens bleiben bannerlos).
+    final bannerAsset =
+        headerImage ?? moduleBanner(activeRoute, prefix: false);
+
     // Listener auf konsolidierten Record-Provider. Snackbar nur wenn die
     // ungelesene ID sich aendert (nicht bei jedem read-status-toggle).
     ref.listen(_newestUnreadProvider, (prev, next) {
@@ -292,13 +297,21 @@ class DashboardScaffold extends ConsumerWidget {
                   // Auto-Banner: explizit gesetztes headerImage, sonst aus
                   // der aktiven Route (nur exakte Modul-Landing-Routen —
                   // Detail-Screens mit eigenem Hero bleiben bannerlos).
-                  if ((headerImage ??
-                          moduleBanner(activeRoute, prefix: false)) !=
-                      null)
-                    ModuleBanner(
-                        asset: headerImage ??
-                            moduleBanner(activeRoute, prefix: false)!),
-                  Expanded(child: refreshed),
+                  // Das Banner liegt als kollabierender Header im
+                  // NestedScrollView → es SCROLLT mit dem Content nach oben
+                  // weg und gibt vollen Platz frei, statt fix zu bleiben.
+                  Expanded(
+                    child: bannerAsset == null
+                        ? refreshed
+                        : NestedScrollView(
+                            floatHeaderSlivers: true,
+                            headerSliverBuilder: (_, __) => [
+                              SliverToBoxAdapter(
+                                  child: ModuleBanner(asset: bannerAsset)),
+                            ],
+                            body: refreshed,
+                          ),
+                  ),
                 ],
               ),
               // "Mensa"-Assistent: schwebt über der BottomNav, verschiebbar.
