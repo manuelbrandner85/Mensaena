@@ -16,6 +16,7 @@ import '../../../repositories/ai_insights_repository.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Admin Dev Godmode — vollständige App-Entwicklung direkt aus dem Dashboard.
@@ -224,9 +225,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       });
     } else {
       setState(() => _deletingTasks.remove(id));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.deleteFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.deleteFailed'.tr());
     }
   }
 
@@ -239,9 +238,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       setState(() => _tasks =
           _tasks.where((t) => !_deletable(t['status'] as String?)).toList());
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.deleteFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.deleteFailed'.tr());
     }
   }
 
@@ -289,9 +286,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     final res = await AiInsightsRepository.scanApp();
     if (!mounted) return;
     if (res['ok'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.scanStarted'.tr())),
-      );
+      AppSnackBar.info(context, 'adminDev.scanStarted'.tr());
       await _loadSuggestions(silent: true);
     } else {
       final notConfigured =
@@ -313,9 +308,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (!mounted) return;
     setState(() => _busySuggestions.remove(id));
     if (res['ok'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.accepted'.tr())),
-      );
+      AppSnackBar.info(context, 'adminDev.accepted'.tr());
       await _loadSuggestions(silent: true);
       await _refresh(silent: true);
     } else {
@@ -373,11 +366,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     });
     if (res['ok'] == true) {
       final n = (res['accepted'] as num?)?.toInt() ?? ids.length;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('adminDev.acceptedMany'
-                .tr(namedArgs: {'count': '$n'}))),
-      );
+      AppSnackBar.info(context, 'adminDev.acceptedMany'
+                .tr(namedArgs: {'count': '$n'}));
       await _loadSuggestions(silent: true);
       await _refresh(silent: true);
     } else {
@@ -598,9 +588,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (res['ok'] == true) {
       await _refresh(silent: true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.cancelFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.cancelFailed'.tr());
     }
   }
 
@@ -613,9 +601,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (res['ok'] == true) {
       await _refresh(silent: true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.mergeFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.mergeFailed'.tr());
     }
   }
 
@@ -673,14 +659,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     final res = await AiInsightsRepository.startModuleScan();
     if (!mounted) return;
     if (res['ok'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.modules.scanStarted'.tr())),
-      );
+      AppSnackBar.info(context, 'adminDev.modules.scanStarted'.tr());
       await _loadModuleInsights(silent: true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.modules.scanFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.modules.scanFailed'.tr());
     }
   }
 
@@ -692,14 +674,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (res['ok'] == true) {
       setState(() => _moduleInsights =
           _moduleInsights.where((i) => i['id'] != id).toList());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.modules.acceptedOk'.tr())),
-      );
+      AppSnackBar.success(context, 'adminDev.modules.acceptedOk'.tr());
       await _refresh(silent: true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.modules.actionFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.modules.actionFailed'.tr());
     }
   }
 
@@ -714,9 +692,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       }
     });
     if (res['ok'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.modules.dismissedOk'.tr())),
-      );
+      AppSnackBar.success(context, 'adminDev.modules.dismissedOk'.tr());
     }
   }
 
@@ -773,9 +749,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (res['ok'] == true) {
       await _refresh(silent: true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.rollback.failed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.rollback.failed'.tr());
     }
   }
 
@@ -819,9 +793,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     if (res['ok'] == true) {
       await _loadNotes();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.notes.saveFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.notes.saveFailed'.tr());
     }
   }
 
@@ -3090,9 +3062,7 @@ class _InputBarState extends State<_InputBar> {
     }
     if (!_speechAvailable) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('adminDev.voice.unavailable'.tr())),
-        );
+        AppSnackBar.info(context, 'adminDev.voice.unavailable'.tr());
       }
       return;
     }
@@ -3470,9 +3440,7 @@ class _DevChatSheetState extends State<_DevChatSheet> {
     setState(() => _confirming = false);
     if (ok) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.queued'.tr())),
-      );
+      AppSnackBar.info(context, 'adminDev.queued'.tr());
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -4301,9 +4269,7 @@ class _ScheduleSheetState extends State<_ScheduleSheet> {
     if (res['ok'] == true) {
       Navigator.of(context).pop(true);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('adminDev.schedules.saveFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'adminDev.schedules.saveFailed'.tr());
     }
   }
 

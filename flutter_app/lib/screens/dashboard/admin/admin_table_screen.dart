@@ -13,6 +13,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/admin_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features (Admin Phase 5)
 /// Generischer Tabellen-Browser: 100 letzte Rows der Supabase-Tabelle,
@@ -114,11 +115,9 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
       }
     }
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('admin.bulk.deleteResult'.tr(
+    AppSnackBar.error(context, 'admin.bulk.deleteResult'.tr(
         namedArgs: {'ok': '$okCount', 'fail': '$failCount'},
-      ))),
-    );
+      ));
     _exitSelectionMode();
     await _refresh();
   }
@@ -187,9 +186,7 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
   /// Row vorhandenen Keys + alle in nachfolgenden Rows neu auftauchenden.
   Future<void> _exportCsv(List<Map<String, dynamic>> rows) async {
     if (rows.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.export.empty'.tr())),
-      );
+      AppSnackBar.info(context, 'admin.export.empty'.tr());
       return;
     }
     // Spalten-Set sammeln
@@ -221,9 +218,7 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
       );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.export.failed'.tr())),
-      );
+      AppSnackBar.error(context, 'admin.export.failed'.tr());
     }
   }
 
@@ -231,9 +226,7 @@ class _AdminTableScreenState extends ConsumerState<AdminTableScreen> {
     final cols = await AdminRepository.getTableColumns(widget.tableName);
     if (!mounted) return;
     if (cols.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.createUnavailable'.tr())),
-      );
+      AppSnackBar.info(context, 'admin.createUnavailable'.tr());
       return;
     }
     await showModalBottomSheet<void>(
@@ -686,24 +679,18 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (allOk && changed > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.editSaved'.tr(
+      AppSnackBar.success(context, 'admin.editSaved'.tr(
           namedArgs: {'n': '$changed'},
-        ))),
-      );
+        ));
       widget.onChanged();
       Navigator.of(context).pop();
     } else if (changed == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.editNoChanges'.tr())),
-      );
+      AppSnackBar.info(context, 'admin.editNoChanges'.tr());
       _cancelEdit();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.editPartialFail'.tr(
+      AppSnackBar.error(context, 'admin.editPartialFail'.tr(
           namedArgs: {'n': '$changed'},
-        ))),
-      );
+        ));
       widget.onChanged();
     }
   }
@@ -745,15 +732,11 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.statusSetTo'.tr(namedArgs: {'s': s}))),
-      );
+      AppSnackBar.info(context, 'admin.statusSetTo'.tr(namedArgs: {'s': s}));
       widget.onChanged();
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.statusUpdateFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'admin.statusUpdateFailed'.tr());
     }
   }
 
@@ -769,15 +752,11 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$label gesetzt.')),
-      );
+      AppSnackBar.info(context, '$label gesetzt.');
       widget.onChanged();
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.actionFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'admin.actionFailed'.tr());
     }
   }
 
@@ -817,15 +796,11 @@ class _AdminDetailSheetState extends State<_AdminDetailSheet> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.entryDeleted'.tr())),
-      );
+      AppSnackBar.success(context, 'admin.entryDeleted'.tr());
       widget.onChanged();
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.deleteFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'admin.deleteFailed'.tr());
     }
   }
 
@@ -1169,11 +1144,9 @@ class _AdminCreateSheetState extends State<_AdminCreateSheet> {
       }
     }
     if (missing.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.createMissingFields'.tr(
+      AppSnackBar.info(context, 'admin.createMissingFields'.tr(
           namedArgs: {'fields': missing.join(', ')},
-        ))),
-      );
+        ));
       return;
     }
     setState(() => _busy = true);
@@ -1202,15 +1175,11 @@ class _AdminCreateSheetState extends State<_AdminCreateSheet> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (created != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.createSuccess'.tr())),
-      );
+      AppSnackBar.success(context, 'admin.createSuccess'.tr());
       widget.onCreated();
       Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.createFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'admin.createFailed'.tr());
     }
   }
 

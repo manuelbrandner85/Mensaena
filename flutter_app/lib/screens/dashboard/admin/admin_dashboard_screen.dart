@@ -13,6 +13,7 @@ import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/animated_stat_number.dart';
 import '../../../widgets/wiki/ai_wiki_generator_sheet.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features (Admin Phase 6)
 /// Web-parity admin dashboard: open-reports alert, stat-cards strip,
@@ -1044,9 +1045,7 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
     final title = _title.text.trim();
     final body = _body.text.trim();
     if (title.isEmpty || body.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.broadcastEmpty'.tr())),
-      );
+      AppSnackBar.info(context, 'admin.broadcastEmpty'.tr());
       return;
     }
     final scheduled = _scheduledAt;
@@ -1097,16 +1096,12 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
       if (!mounted) return;
       setState(() => _sending = false);
       if (id == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('admin.broadcastFailed'.tr())),
-        );
+        AppSnackBar.error(context, 'admin.broadcastFailed'.tr());
         return;
       }
       ref.invalidate(adminScheduledBroadcastsProvider);
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.broadcastScheduled'.tr())),
-      );
+      AppSnackBar.info(context, 'admin.broadcastScheduled'.tr());
       return;
     }
 
@@ -1119,9 +1114,7 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
     if (!mounted) return;
     setState(() => _sending = false);
     if (count == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('admin.broadcastFailed'.tr())),
-      );
+      AppSnackBar.error(context, 'admin.broadcastFailed'.tr());
       return;
     }
     // Notification-Count im Dashboard auffrischen.

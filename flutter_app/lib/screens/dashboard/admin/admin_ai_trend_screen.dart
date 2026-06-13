@@ -7,6 +7,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/ai_insights_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Trend-Erkennung — KI analysiert Themen-Spikes der letzten 24h.
@@ -34,8 +35,7 @@ class _AdminAiTrendScreenState extends ConsumerState<AdminAiTrendScreen> {
       if (mounted) setState(() => _result = res);
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('adminTrend.analyzeFailed'.tr())));
+        AppSnackBar.error(context, 'adminTrend.analyzeFailed'.tr());
       }
     }
     if (mounted) setState(() => _loading = false);
