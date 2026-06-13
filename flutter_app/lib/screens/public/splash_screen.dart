@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../../services/audio_feedback_service.dart';
 import '../../services/supabase_service.dart';
 import 'onboarding_tour_screen.dart';
 
@@ -60,6 +61,10 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+    // Startup-Sound DIREKT beim Splash (zuverlässiges Timing): vorher lief
+    // er erst nach den Background-Init-awaits in main.dart und kam oft zu
+    // spät, wenn der Splash schon weg war. Fire-and-forget, fail-silent.
+    AudioFeedbackService.instance.playStartupMelody();
     _initVideo();
     _navTimer = Timer(
       const Duration(milliseconds: _totalDurationMs + 200),
@@ -68,7 +73,12 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _initVideo() async {
-    final v = VideoPlayerController.asset('assets/videos/splash_cosmos.mp4');
+    // mixWithOthers: true → der stumme Loop greift NICHT den Audio-Fokus
+    // (sonst würde ExoPlayer den Startup-Sound ducken/abwürgen).
+    final v = VideoPlayerController.asset(
+      'assets/videos/splash_cosmos.mp4',
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+    );
     _video = v;
     try {
       await v.initialize();
