@@ -223,6 +223,22 @@ class ProfilesRepository {
     }
   }
 
+  /// Eigene Rolle (admin/moderator/null) — für Admin-Guards.
+  static Future<String?> myRole() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('role')
+          .eq('id', uid)
+          .maybeSingle();
+      return row?['role'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Eigener Status (status_text/emoji/until) — für den Status-Editor.
   static Future<Map<String, dynamic>?> myStatus() async {
     final uid = SupabaseService.currentUser?.id;

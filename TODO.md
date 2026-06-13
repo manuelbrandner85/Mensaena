@@ -4,6 +4,7 @@
 > [x]=done []=open [SQL]=User führt SQL aus [!]=kritisch
 
 ## Ad-hoc (2026-06-13)
+- [x] sb.from-Abbau Batch 20 (Admin): +ProfilesRepository.myRole (Rollen-Lookup, 2x dedupliziert) + AdminRepository.recentIncidents (error_logs+crash_logs zusammengeführt, Feld-Normalisierung). 3 Dateien Supabase-frei: admin_crash_logs (2->0), admin_users (1->0), admin_chat_moderation (1->0). Baseline: 5 Zugriffe / 4 Dateien (-96% seit Start 113/61).
 - [x] sb.from-Abbau Batch 19 (Profil-Status): NEU ProfilesRepository.myStatus; status_editor_sheet nutzt myStatus (Lesen) + ProfilesRepository.update (Speichern/Löschen, existierte bereits). status_editor_sheet (3->0) Supabase-frei. Baseline: 9 Zugriffe / 7 Dateien (-92% seit Start 113/61).
 - [x] sb.from-Abbau Batch 18 (Misc): NEU repositories/skills_repository.dart (listActive für skill_offers); interactions_screen Partner-Lookup via ProfilesRepository.getById. 2 Dateien Supabase-frei: skills_screen (1->0), interactions_screen (1->0). Baseline: 12 Zugriffe / 8 Dateien (-89% seit Start 113/61).
 - [x] sb.from-Abbau Batch 17 (Events-Fotos): +2 EventsRepository-Methoden — listPhotos (Event-Galerie), addPhoto (Foto nach Storage-Upload anhängen). event_photos_gallery (2->0) Supabase-frei; sb.storage (Bild-Upload) + SupabaseService (uid-Prefix) bleiben. Baseline: 14 Zugriffe / 10 Dateien (-88% seit Start 113/61).
