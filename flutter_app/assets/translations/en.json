@@ -3053,7 +3053,25 @@
     "reportCrisis": "Report crisis",
     "is24h": "24/7",
     "isFree": "Free",
-    "empty": "No emergency numbers configured for your country."
+    "empty": "No emergency numbers configured for your country.",
+    "screenTitle": "SOS Emergency",
+    "type": {
+      "medical": "Medical",
+      "fire": "Fire",
+      "accident": "Accident",
+      "other": "Other"
+    },
+    "alertSent": "Emergency alert sent – help is on the way.",
+    "alertError": "Failed to send emergency alert.",
+    "locationError": "Could not determine your location.",
+    "alertActive": "Your emergency alert is active.",
+    "resolveAlert": "End alert",
+    "nearbyAlerts": "{count} emergencies near you",
+    "noNearbyAlerts": "No active emergencies nearby.",
+    "responders": "{count} responders",
+    "respond": "Help",
+    "respondConfirm": "You are registered as a responder.",
+    "alertResolved": "Emergency alert ended."
   },
   "drawer": {
     "pinned": "Pinned",
