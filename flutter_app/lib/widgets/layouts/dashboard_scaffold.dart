@@ -225,6 +225,31 @@ class DashboardScaffold extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       appBar: AppBar(
+        // Header IMMER im Cinema-Dark-Look — identisch zur Bottom-Nav, egal
+        // welches Theme aktiv ist. Sonst war im Light-Mode der Header hell,
+        // während Body (CinemaOverlay) + Bottom-Nav dunkel blieben → Bruch.
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: AppColors.ink,
+        iconTheme: const IconThemeData(color: AppColors.ink),
+        actionsIconTheme: const IconThemeData(color: AppColors.ink),
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light, // Android: helle Icons
+          statusBarBrightness: Brightness.dark, // iOS: helle Icons
+        ),
+        // Gleicher Verlauf + Hairline wie die Bottom-Nav (gespiegelt: Linie
+        // unten statt oben), damit oben und unten visuell zusammengehören.
+        flexibleSpace: const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [AppColors.elevated, AppColors.surface],
+            ),
+            border: Border(bottom: BorderSide(color: AppColors.line)),
+          ),
+        ),
         leading: showBack
             ? IconButton(
                 tooltip: 'common.back'.tr(),
