@@ -96,7 +96,6 @@ class _SplashScreenState extends State<SplashScreen>
           final climaxT = _bump((t - 0.78) / 0.10);
           final ringT = ((t - 0.78) / 0.18).clamp(0.0, 1.0);
           final ringEased = 1.0 - math.pow(1.0 - ringT, 2).toDouble();
-          final sweepT = ((t - 0.78) / 0.14).clamp(0.0, 1.0);
           final flashT = _bump((t - 0.96) / 0.03);
           final exitT = ((t - 0.97) / 0.03).clamp(0.0, 1.0);
 
