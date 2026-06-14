@@ -172,12 +172,27 @@ class BoardRepository {
     String? content,
     String? category,
     String? color,
+    String? contactInfo,
+    DateTime? expiresAt,
+    bool clearExpiresAt = false,
+    String? imageUrl,
+    bool clearImageUrl = false,
   }) async {
     try {
       final patch = <String, dynamic>{
         if (content != null) 'content': content,
         if (category != null) 'category': category,
         if (color != null) 'color': color,
+        if (contactInfo != null)
+          'contact_info': contactInfo.isEmpty ? null : contactInfo,
+        if (clearExpiresAt)
+          'expires_at': null
+        else if (expiresAt != null)
+          'expires_at': expiresAt.toUtc().toIso8601String(),
+        if (clearImageUrl)
+          'image_url': null
+        else if (imageUrl != null)
+          'image_url': imageUrl,
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       };
       await sb.from('board_posts').update(patch).eq('id', id);

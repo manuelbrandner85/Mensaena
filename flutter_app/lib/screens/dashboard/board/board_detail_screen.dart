@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -10,6 +13,7 @@ import '../../../config/theme/app_typography.dart';
 import '../../../models/board_post.dart';
 import '../../../repositories/board_repository.dart';
 import '../../../repositories/content_reports_repository.dart';
+import '../../../services/image_upload_service.dart';
 import '../../../services/share_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../utils/safe_launch.dart';
@@ -312,9 +316,41 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
 
   Future<void> _openEditModal(BuildContext ctx, BoardPost post) async {
     final contentCtrl = TextEditingController(text: post.content);
+    final contactInfoCtrl =
+        TextEditingController(text: post.contactInfo ?? '');
     String category = post.category;
     String color = post.color;
+    DateTime? modalExpiresAt = post.expiresAt;
+    File? newImage;
+    String? existingImageUrl = post.imageUrl;
     bool saving = false;
+
+    Future<void> pickImage(StateSetter setLocal) async {
+      final picker = ImagePicker();
+      final result = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1400,
+        maxHeight: 1400,
+        imageQuality: 80,
+      );
+      if (result == null) return;
+      setLocal(() {
+        newImage = File(result.path);
+        existingImageUrl = null;
+      });
+    }
+
+    Future<void> pickExpiry(StateSetter setLocal) async {
+      final now = DateTime.now();
+      final picked = await showDatePicker(
+        context: ctx,
+        initialDate: modalExpiresAt ?? now.add(const Duration(days: 7)),
+        firstDate: now,
+        lastDate: now.add(const Duration(days: 365)),
+      );
+      if (picked != null) setLocal(() => modalExpiresAt = picked);
+    }
+
     await showModalBottomSheet<void>(
       context: ctx,
       isScrollControlled: true,
@@ -323,7 +359,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetCtx) => StatefulBuilder(
-        builder: (sheetCtx, setLocal) => Padding(
+        builder: (sheetCtx, setLocal) => SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
             20, 16, 20,
             16 + MediaQuery.of(sheetCtx).viewInsets.bottom,
@@ -357,6 +393,23 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                   filled: true,
                   fillColor: AppColors.elevated,
                   hintText: 'board.contentHint'.tr(),
+                  hintStyle: AppTypography.body(
+                      size: 13, color: AppColors.mute),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: contactInfoCtrl,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.elevated,
+                  labelText: 'create.contactOptional'.tr(),
+                  hintText: 'create.pinContactHint'.tr(),
                   hintStyle: AppTypography.body(
                       size: 13, color: AppColors.mute),
                   border: OutlineInputBorder(
@@ -413,6 +466,131 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                     ),
                 ],
               ),
+              const SizedBox(height: 12),
+              // Bild
+              Text('board.image'.tr(), style: AppTypography.label(size: 10)),
+              const SizedBox(height: 8),
+              if (newImage != null)
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(newImage!,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover),
+                    ),
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: GestureDetector(
+                        onTap: () => setLocal(() => newImage = null),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xCC000000),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.x,
+                              size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else if (existingImageUrl != null &&
+                  existingImageUrl!.isNotEmpty)
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        existingImageUrl!,
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const SizedBox.shrink(),
+                      ),
+                    ),
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: GestureDetector(
+                        onTap: () =>
+                            setLocal(() => existingImageUrl = null),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0xCC000000),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.x,
+                              size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                GestureDetector(
+                  onTap: () => pickImage(setLocal),
+                  child: Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      border: Border.all(color: AppColors.line),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(LucideIcons.camera,
+                            color: AppColors.bronze, size: 18),
+                        const SizedBox(width: 8),
+                        Text('board.addImage'.tr(),
+                            style: AppTypography.caption()),
+                      ],
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              // Ablaufdatum
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => pickExpiry(setLocal),
+                      icon: const Icon(LucideIcons.calendarClock,
+                          size: 16),
+                      label: Text(
+                        modalExpiresAt == null
+                            ? 'board.setExpiry'.tr()
+                            : 'board.expiresOn'.tr(namedArgs: {
+                                'date':
+                                    '${modalExpiresAt!.day}.${modalExpiresAt!.month}.${modalExpiresAt!.year}'
+                              }),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.inkSoft,
+                        side: const BorderSide(color: AppColors.line),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  if (modalExpiresAt != null)
+                    IconButton(
+                      onPressed: () =>
+                          setLocal(() => modalExpiresAt = null),
+                      icon: const Icon(LucideIcons.x, size: 16),
+                      color: AppColors.mute,
+                      tooltip: 'board.noExpiry'.tr(),
+                    ),
+                ],
+              ),
               const SizedBox(height: 18),
               FilledButton(
                 style: FilledButton.styleFrom(
@@ -424,11 +602,32 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
                     ? null
                     : () async {
                         setLocal(() => saving = true);
+                        String? uploadedUrl;
+                        if (newImage != null) {
+                          final urls = await ImageUploadService.upload(
+                              [newImage!]);
+                          if (urls.isEmpty) {
+                            setLocal(() => saving = false);
+                            return;
+                          }
+                          uploadedUrl = urls.first;
+                        }
+                        final hadImage = post.imageUrl != null &&
+                            post.imageUrl!.isNotEmpty;
+                        final imageRemoved =
+                            hadImage && existingImageUrl == null &&
+                                newImage == null;
                         final ok = await BoardRepository.update(
                           id: post.id,
                           content: contentCtrl.text.trim(),
                           category: category,
                           color: color,
+                          contactInfo: contactInfoCtrl.text.trim(),
+                          expiresAt: modalExpiresAt,
+                          clearExpiresAt: post.expiresAt != null &&
+                              modalExpiresAt == null,
+                          imageUrl: uploadedUrl,
+                          clearImageUrl: imageRemoved,
                         );
                         if (!sheetCtx.mounted) return;
                         Navigator.pop(sheetCtx);
@@ -453,6 +652,8 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
         ),
       ),
     );
+    contentCtrl.dispose();
+    contactInfoCtrl.dispose();
   }
 
   Color _colorFor(String c) {
