@@ -137,6 +137,18 @@ jobs:
             - Design: primary/teal, KEINE emerald-Farben.
             - NIEMALS Secrets/Tokens/Keys in den Code.
 
+            Ressourcen-Katalog (High-End):
+            - Lies docs/godmode/resources.md. BEVORZUGE die dort gelisteten
+              KOSTENLOSEN APIs (möglichst ohne Key) und bewährten Open-Source-
+              Pakete, statt Funktionen von Grund auf neu zu erfinden. API-Keys
+              nur via Secrets, niemals im Code.
+            - Bei unbekannten Paketen/APIs ZUERST die AKTUELLE Doku recherchieren
+              (WebFetch/WebSearch, pub.dev), dann integrieren — keine veralteten
+              Annahmen.
+            - Neue NATIVE Dependencies brauchen einen Versions-Bump (kein OTA);
+              reine Dart-Pakete sind unkritisch. Im Zweifel ohne neue Dependency
+              lösen.
+
       # ── Fallback: Commit + Push + PR garantieren ────────────────────────────
       # Der Agent (claude-code-action) committet seine Änderungen per GitHub-API
       # (github-actions[bot], Commit-Signing) DIREKT auf den Branch
