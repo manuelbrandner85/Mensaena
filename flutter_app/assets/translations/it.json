@@ -1383,6 +1383,8 @@
     "approveMerge": "Approva e unisci",
     "attachImage": "Allega screenshot",
     "reviewBeforeMerge": "Rivedi prima del merge (approvazione manuale)",
+    "quickWin": "Soluzione rapida",
+    "impactEffort": "Impatto {impact} · Sforzo {effort}",
     "edit": {
       "title": "Modifica proposta e accetta",
       "retryTitle": "Adatta l'incarico e riavvia",

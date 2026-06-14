@@ -1383,6 +1383,8 @@
     "approveMerge": "Approve & merge",
     "attachImage": "Attach screenshot",
     "reviewBeforeMerge": "Review before merge (manual approval)",
+    "quickWin": "Quick win",
+    "impactEffort": "Impact {impact} · Effort {effort}",
     "edit": {
       "title": "Edit suggestion & accept",
       "retryTitle": "Adjust task & restart",
