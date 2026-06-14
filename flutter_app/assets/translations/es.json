@@ -2157,7 +2157,9 @@
       "other": "Otros"
     },
     "attendeesCount": "{count} asistentes",
-    "linkOpenFailed": "No se pudo abrir el enlace."
+    "linkOpenFailed": "No se pudo abrir el enlace.",
+    "empty": "No hay eventos próximos.",
+    "emptyHint": "Sé la primera persona — usa el botón +."
   },
   "challenges": {
     "create": "Crear reto",
@@ -2733,7 +2735,8 @@
     "errHoursInvalid": "Ingresa horas válidas (0–24).",
     "errDescTooShort": "Al menos 3 caracteres.",
     "receiverChosen": "Destinatario elegido: {name}",
-    "emptyHint": "Aún no hay registros. En cuanto ayudes a tus vecinos, podrás anotar aquí las horas."
+    "emptyHint": "Aún no hay registros. En cuanto ayudes a tus vecinos, podrás anotar aquí las horas.",
+    "empty": "Aún no hay entradas."
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",
@@ -2764,7 +2767,8 @@
     "offerSkill": "Ofrecer habilidad",
     "free": "Gratis",
     "screenTitle": "Habilidades",
-    "empty": "Aún no hay ofertas de habilidades."
+    "empty": "Aún no hay ofertas de habilidades.",
+    "emptyHint": "¡Ofrece tu primera habilidad!"
   },
   "wissen": {
     "shareTitle": "Comparte conocimiento",

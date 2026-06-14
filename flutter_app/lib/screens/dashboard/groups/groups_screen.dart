@@ -13,7 +13,7 @@ import '../../../repositories/groups_repository.dart';
 import '../../../widgets/groups/nearby_groups_carousel.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
-import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/empty_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/skeleton_card.dart';
@@ -135,15 +135,12 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                         padding: const EdgeInsets.all(16),
                         children: [
                           const SizedBox(height: 60),
-                          EmptyStateCard(
+                          EmptyStateWidget(
                             icon: LucideIcons.users2,
-                            moodAsset: _hasFilters
-                                ? null
-                                : 'assets/images/empty_community.webp',
                             title: _hasFilters
                                 ? 'search.noResultsShort'.tr()
                                 : 'groups.empty'.tr(),
-                            description: _hasFilters
+                            subtitle: _hasFilters
                                 ? 'modules.tryOtherFilters'.tr()
                                 : 'groups.emptyHint'.tr(),
                             actionLabel: _hasFilters

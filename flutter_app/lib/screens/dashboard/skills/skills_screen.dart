@@ -11,6 +11,7 @@ import '../../../repositories/skills_repository.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
+import '../../../widgets/shared/empty_state_widget.dart';
 import '../../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
@@ -79,22 +80,11 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                 return ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    const SizedBox(height: 120),
-                    Center(
-                      child: Column(
-                        children: [
-                          const Icon(LucideIcons.wrench,
-                              size: 32, color: AppColors.mute),
-                          const SizedBox(height: 10),
-                          Text(
-                            'skills.empty'.tr(),
-                            style: AppTypography.body(
-                              size: 14,
-                              color: AppColors.mute,
-                            ),
-                          ),
-                        ],
-                      ),
+                    const SizedBox(height: 80),
+                    EmptyStateWidget(
+                      icon: LucideIcons.wrench,
+                      title: 'skills.empty'.tr(),
+                      subtitle: 'skills.emptyHint'.tr(),
                     ),
                   ],
                 );

@@ -25,6 +25,9 @@ class AppColors {
   static const Color amberDeep = Color(0xFF92400E);
   static const Color amberGlow = Color(0x4DF59E0B);
 
+  // ── Brand-Primary (Teal #1EAAA6, Design-System primary-500) ─────────
+  static const Color primary500 = Color(0xFF1EAAA6);
+
   // ── Abendluft (Sekundaer: gedämpftes Film-Teal) ───────────────────
   // Design-Brand-Teal #2B5663 (tief). Vordergrund-Varianten heller damit
   // Text/Icons auf dunklem Grund lesbar bleiben.

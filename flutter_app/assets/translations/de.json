@@ -2156,7 +2156,9 @@
       "other": "Sonstiges"
     },
     "attendeesCount": "{count} Zusagen",
-    "linkOpenFailed": "Link konnte nicht geöffnet werden."
+    "linkOpenFailed": "Link konnte nicht geöffnet werden.",
+    "empty": "Keine kommenden Events.",
+    "emptyHint": "Sei der/die Erste:r – Plus-Button nutzen."
   },
   "challenges": {
     "create": "Challenge erstellen",
@@ -2732,7 +2734,8 @@
     "errHoursInvalid": "Bitte gültige Stundenzahl angeben (0–24).",
     "errDescTooShort": "Bitte mindestens 3 Zeichen Beschreibung.",
     "receiverChosen": "Empfänger:in gewählt: {name}",
-    "emptyHint": "Noch keine Einträge. Sobald du Nachbar:innen hilfst, kannst du die Stunden hier eintragen."
+    "emptyHint": "Noch keine Einträge. Sobald du Nachbar:innen hilfst, kannst du die Stunden hier eintragen.",
+    "empty": "Noch keine Einträge."
   },
   "search": {
     "minChars": "Mindestens 2 Zeichen eingeben",
@@ -2763,7 +2766,8 @@
     "offerSkill": "Skill anbieten",
     "free": "Gratis",
     "screenTitle": "Skills",
-    "empty": "Noch keine Skill-Angebote."
+    "empty": "Noch keine Skill-Angebote.",
+    "emptyHint": "Biete dein erstes Skill an!"
   },
   "wissen": {
     "shareTitle": "Wissen teilen",

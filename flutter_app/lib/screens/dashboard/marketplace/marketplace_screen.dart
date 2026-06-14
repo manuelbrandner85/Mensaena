@@ -16,7 +16,7 @@ import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
-import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/empty_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/image_carousel.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -337,12 +337,12 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         padding: const EdgeInsets.all(16),
                         children: [
                           const SizedBox(height: 40),
-                          EmptyStateCard(
+                          EmptyStateWidget(
                             icon: LucideIcons.store,
                             title: _hasFilters
                                 ? 'marketplace.noMatches'.tr()
                                 : 'marketplace.noListings'.tr(),
-                            description: _hasFilters
+                            subtitle: _hasFilters
                                 ? 'marketplace.noMatchesHint'.tr()
                                 : 'marketplace.beFirstHint'.tr(),
                             actionLabel: _hasFilters

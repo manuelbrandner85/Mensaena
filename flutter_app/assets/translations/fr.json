@@ -2157,7 +2157,9 @@
       "other": "Autres"
     },
     "attendeesCount": "{count} participants",
-    "linkOpenFailed": "Impossible d’ouvrir le lien."
+    "linkOpenFailed": "Impossible d’ouvrir le lien.",
+    "empty": "Aucun événement à venir.",
+    "emptyHint": "Sois la première personne — utilise le bouton +."
   },
   "challenges": {
     "create": "Créer un défi",
@@ -2733,7 +2735,8 @@
     "errHoursInvalid": "Saisis des heures valides (0–24).",
     "errDescTooShort": "3 caractères minimum.",
     "receiverChosen": "Destinataire choisi : {name}",
-    "emptyHint": "Pas encore d’entrées. Dès que tu aides tes voisins, tu peux enregistrer tes heures ici."
+    "emptyHint": "Pas encore d’entrées. Dès que tu aides tes voisins, tu peux enregistrer tes heures ici.",
+    "empty": "Pas encore d'entrées."
   },
   "search": {
     "minChars": "Saisissez au moins 2 caractères",
@@ -2764,7 +2767,8 @@
     "offerSkill": "Proposer une compétence",
     "free": "Gratuit",
     "screenTitle": "Compétences",
-    "empty": "Aucune offre de compétence pour l’instant."
+    "empty": "Aucune offre de compétence pour l’instant.",
+    "emptyHint": "Propose ta première compétence !"
   },
   "wissen": {
     "shareTitle": "Partager le savoir",

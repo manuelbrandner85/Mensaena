@@ -12,7 +12,7 @@ import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
-import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/empty_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -274,16 +274,16 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                         padding: const EdgeInsets.all(16),
                         children: [
                           const SizedBox(height: 60),
-                          EmptyStateCard(
+                          EmptyStateWidget(
                             icon: LucideIcons.calendar,
                             title: _hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Keine kommenden Events.',
-                            description: _hasFilters
-                                ? 'Andere Filter probieren.'
-                                : 'Sei der/die Erste:r — Plus-Button.',
+                                ? 'search.noResultsShort'.tr()
+                                : 'events.empty'.tr(),
+                            subtitle: _hasFilters
+                                ? 'modules.tryOtherFilters'.tr()
+                                : 'events.emptyHint'.tr(),
                             actionLabel: _hasFilters
-                                ? 'Filter zurücksetzen'
+                                ? 'posts.resetFilter'.tr()
                                 : null,
                             onAction: _hasFilters
                                 ? () => setState(() {

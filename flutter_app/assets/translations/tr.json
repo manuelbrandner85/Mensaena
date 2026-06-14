@@ -2156,7 +2156,9 @@
       "other": "Diğer"
     },
     "attendeesCount": "{count} katılıyor",
-    "linkOpenFailed": "Bağlantı açılamadı."
+    "linkOpenFailed": "Bağlantı açılamadı.",
+    "empty": "Yaklaşan etkinlik yok.",
+    "emptyHint": "İlk sen ol — artı düğmesini kullan."
   },
   "challenges": {
     "create": "Meydan okuma oluştur",
@@ -2732,7 +2734,8 @@
     "errHoursInvalid": "Geçerli saat gir (0–24).",
     "errDescTooShort": "En az 3 karakter.",
     "receiverChosen": "Alıcı seçildi: {name}",
-    "emptyHint": "Henüz kayıt yok. Komşularına yardım ettiğinde saatlerini buraya girebilirsin."
+    "emptyHint": "Henüz kayıt yok. Komşularına yardım ettiğinde saatlerini buraya girebilirsin.",
+    "empty": "Henüz kayıt yok."
   },
   "search": {
     "minChars": "En az 2 karakter girin",
@@ -2763,7 +2766,8 @@
     "offerSkill": "Beceri öner",
     "free": "Ücretsiz",
     "screenTitle": "Beceriler",
-    "empty": "Henüz yetenek teklifi yok."
+    "empty": "Henüz yetenek teklifi yok.",
+    "emptyHint": "İlk yeteneğini sun!"
   },
   "wissen": {
     "shareTitle": "Bilgiyi paylaş",

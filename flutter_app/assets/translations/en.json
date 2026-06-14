@@ -2157,7 +2157,9 @@
       "other": "Other"
     },
     "attendeesCount": "{count} attending",
-    "linkOpenFailed": "Could not open the link."
+    "linkOpenFailed": "Could not open the link.",
+    "empty": "No upcoming events.",
+    "emptyHint": "Be the first — use the plus button."
   },
   "challenges": {
     "create": "Create challenge",
@@ -2733,7 +2735,8 @@
     "errHoursInvalid": "Please enter valid hours (0–24).",
     "errDescTooShort": "Please enter at least 3 characters.",
     "receiverChosen": "Recipient chosen: {name}",
-    "emptyHint": "No entries yet. As soon as you help neighbours, you can log your hours here."
+    "emptyHint": "No entries yet. As soon as you help neighbours, you can log your hours here.",
+    "empty": "No entries yet."
   },
   "search": {
     "minChars": "Type at least 2 characters",
@@ -2764,7 +2767,8 @@
     "offerSkill": "Offer skill",
     "free": "Free",
     "screenTitle": "Skills",
-    "empty": "No skill offers yet."
+    "empty": "No skill offers yet.",
+    "emptyHint": "Offer your first skill!"
   },
   "wissen": {
     "shareTitle": "Share knowledge",
