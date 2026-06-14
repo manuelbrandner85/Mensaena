@@ -1382,6 +1382,8 @@
     "approveMerge": "Onayla ve birleştir",
     "attachImage": "Ekran görüntüsü ekle",
     "reviewBeforeMerge": "Birleştirmeden önce incele (manuel onay)",
+    "quickWin": "Hızlı kazanım",
+    "impactEffort": "Etki {impact} · Çaba {effort}",
     "edit": {
       "title": "Öneriyi düzenle ve kabul et",
       "retryTitle": "Görevi düzenle ve yeniden başlat",

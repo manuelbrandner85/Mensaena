@@ -1382,6 +1382,8 @@
     "approveMerge": "Freigeben & mergen",
     "attachImage": "Screenshot anhängen",
     "reviewBeforeMerge": "Vor Merge prüfen (manuelle Freigabe)",
+    "quickWin": "Quick-Win",
+    "impactEffort": "Nutzen {impact} · Aufwand {effort}",
     "edit": {
       "title": "Vorschlag bearbeiten & annehmen",
       "retryTitle": "Auftrag anpassen & neu starten",

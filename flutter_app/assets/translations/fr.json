@@ -1383,6 +1383,8 @@
     "approveMerge": "Approuver et fusionner",
     "attachImage": "Joindre une capture",
     "reviewBeforeMerge": "Vérifier avant la fusion (approbation manuelle)",
+    "quickWin": "Gain rapide",
+    "impactEffort": "Impact {impact} · Effort {effort}",
     "edit": {
       "title": "Modifier la suggestion et accepter",
       "retryTitle": "Ajuster la tâche et relancer",

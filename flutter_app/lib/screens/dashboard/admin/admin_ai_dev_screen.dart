@@ -185,7 +185,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
           .where((s) => (s['severity'] as String? ?? 'medium') == _severity)
           .toList();
     }
+    // Quick-Win-Priorisierung: hoher Nutzen (impact) + wenig Aufwand (effort)
+    // zuerst. Fehlt der Score (Altbestand), neutral mit 3 werten.
+    int qwScore(Map<String, dynamic> s) {
+      final imp = (s['impact'] as num?)?.toInt() ?? 3;
+      final eff = (s['effort'] as num?)?.toInt() ?? 3;
+      return imp * 2 - eff;
+    }
+
     final sorted = [...list]..sort((a, b) {
+        final sc = qwScore(b).compareTo(qwScore(a)); // höchster Score zuerst
+        if (sc != 0) return sc;
         final ra = _severityRank[a['severity'] as String? ?? 'medium'] ?? 2;
         final rb = _severityRank[b['severity'] as String? ?? 'medium'] ?? 2;
         return ra.compareTo(rb);
@@ -2200,6 +2210,10 @@ class _SuggestionCard extends StatelessWidget {
     final sevColor = _severityColor(severity);
     final kindColor = _kindColor(kind);
     final kindIcon = _kindIcon(kind);
+    final impact = (suggestion['impact'] as num?)?.toInt();
+    final effort = (suggestion['effort'] as num?)?.toInt();
+    final quickWin =
+        impact != null && effort != null && impact >= 4 && effort <= 2;
 
     final card = Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -2252,6 +2266,18 @@ class _SuggestionCard extends StatelessWidget {
                     _Badge(
                         text: 'adminDev.severity.$severity'.tr(),
                         color: sevColor),
+                    if (quickWin)
+                      _Badge(
+                          text: 'adminDev.quickWin'.tr(),
+                          color: AppColors.leben),
+                    if (impact != null && effort != null)
+                      _Badge(
+                        text: 'adminDev.impactEffort'.tr(namedArgs: {
+                          'impact': '$impact',
+                          'effort': '$effort',
+                        }),
+                        color: AppColors.bronze,
+                      ),
                   ],
                 ),
               ),
