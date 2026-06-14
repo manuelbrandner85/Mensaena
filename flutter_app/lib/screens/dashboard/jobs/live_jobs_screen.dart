@@ -19,6 +19,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/error_state_card.dart';
 
 class LiveJobsScreen extends ConsumerStatefulWidget {
   const LiveJobsScreen({super.key});
@@ -187,6 +188,16 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
                           return const Center(
                             child: CircularProgressIndicator(
                                 color: AppColors.bronze),
+                          );
+                        }
+                        if (snap.hasError) {
+                          return ListView(
+                            physics:
+                                const AlwaysScrollableScrollPhysics(),
+                            children: [
+                              const SizedBox(height: 40),
+                              ErrorStateCard(onRetry: _search),
+                            ],
                           );
                         }
                         final list = snap.data ?? const <JobOffer>[];
