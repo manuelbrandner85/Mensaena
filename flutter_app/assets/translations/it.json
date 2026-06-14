@@ -2157,7 +2157,9 @@
       "other": "Altro"
     },
     "attendeesCount": "{count} partecipanti",
-    "linkOpenFailed": "Impossibile aprire il link."
+    "linkOpenFailed": "Impossibile aprire il link.",
+    "empty": "Nessun evento imminente.",
+    "emptyHint": "Sii il/la primo/a — usa il pulsante +."
   },
   "challenges": {
     "create": "Crea sfida",
@@ -2733,7 +2735,8 @@
     "errHoursInvalid": "Inserisci ore valide (0–24).",
     "errDescTooShort": "Almeno 3 caratteri.",
     "receiverChosen": "Destinatario scelto: {name}",
-    "emptyHint": "Ancora nessuna voce. Appena aiuti i tuoi vicini, puoi registrare qui le ore."
+    "emptyHint": "Ancora nessuna voce. Appena aiuti i tuoi vicini, puoi registrare qui le ore.",
+    "empty": "Ancora nessuna voce."
   },
   "search": {
     "minChars": "Inserisci almeno 2 caratteri",
@@ -2764,7 +2767,8 @@
     "offerSkill": "Offri un'abilità",
     "free": "Gratis",
     "screenTitle": "Competenze",
-    "empty": "Ancora nessuna offerta di competenze."
+    "empty": "Ancora nessuna offerta di competenze.",
+    "emptyHint": "Offri la tua prima competenza!"
   },
   "wissen": {
     "shareTitle": "Condividi sapere",

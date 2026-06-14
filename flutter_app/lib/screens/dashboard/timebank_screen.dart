@@ -11,6 +11,7 @@ import '../../services/haptics.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/user_picker_sheet.dart';
+import '../../widgets/shared/empty_state_widget.dart';
 import '../../widgets/shared/skeleton_card.dart';
 import '../../widgets/shared/app_snackbar.dart';
 
@@ -67,32 +68,10 @@ class _TimebankScreenState extends ConsumerState<TimebankScreen> {
                 ),
                 data: (list) {
                   if (list.isEmpty) {
-                    return Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface.withValues(alpha: 0.4),
-                        border: Border.all(color: AppColors.line),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(
-                            LucideIcons.clock,
-                            size: 28,
-                            color: AppColors.mute,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'timebank.emptyHint'.tr(),
-                            textAlign: TextAlign.center,
-                            style: AppTypography.body(
-                              size: 13,
-                              color: AppColors.inkSoft,
-                              height: 1.55,
-                            ),
-                          ),
-                        ],
-                      ),
+                    return EmptyStateWidget(
+                      icon: LucideIcons.clock,
+                      title: 'timebank.empty'.tr(),
+                      subtitle: 'timebank.emptyHint'.tr(),
                     );
                   }
                   return Column(
