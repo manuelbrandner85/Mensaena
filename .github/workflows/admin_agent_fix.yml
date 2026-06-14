@@ -1,0 +1,100 @@
+name: 🔧 Admin Dev Agent — CI-Selbstheilung
+
+# ════════════════════════════════════════════════════════════════════════
+# Wird von agent_automerge.yml getriggert (workflow_dispatch), wenn das
+# Flutter-CI eines Agent-PRs ROT ist und noch Selbstheilungs-Versuche übrig
+# sind (ci_attempts < MAX). Der Agent checkt den BESTEHENDEN Branch
+# agent/task-<id> aus, liest die CI-Fehler (in .godmode_cierror.txt) + die
+# ursprüngliche Aufgabe und behebt NUR die Fehler auf DEMSELBEN Branch.
+# Der Push (via AGENT_PAT) triggert flutter.yml erneut → agent_automerge.yml
+# wertet erneut aus (Merge bei grün, sonst nächster Heilungs-Versuch bis MAX).
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: 'admin_dev_tasks.id (UUID) des fehlgeschlagenen Auftrags'
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+  SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  TASK_ID: ${{ inputs.task_id }}
+  BRANCH: agent/task-${{ inputs.task_id }}
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout des Agent-Branches (mit PAT, damit der Re-Push CI triggert)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AGENT_PAT }}
+          ref: agent/task-${{ inputs.task_id }}
+          fetch-depth: 0
+
+      - name: Aufgabe + CI-Fehler aus Supabase laden
+        run: |
+          # Ursprüngliche Anweisung + gespeicherten CI-Fehler-Log holen.
+          ROW=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=instruction,error" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}")
+          # CI-Fehler in eine gitignorierte Datei schreiben (nie committen!).
+          echo ".godmode_cierror.txt" >> .git/info/exclude
+          printf '%s' "$ROW" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);require("fs").writeFileSync(".godmode_cierror.txt",String((a[0]&&a[0].error)||"(kein Log gespeichert)"));process.stdout.write(String((a[0]&&a[0].instruction)||""))}catch{process.stdout.write("")}})' > /tmp/instr.txt
+          echo "INSTRUCTION<<__EOF__" >> "$GITHUB_ENV"
+          cat /tmp/instr.txt >> "$GITHUB_ENV"
+          echo "" >> "$GITHUB_ENV"
+          echo "__EOF__" >> "$GITHUB_ENV"
+
+      - name: Agent — CI-Fehler beheben
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.AGENT_PAT }}
+          claude_args: "--max-turns 120 --permission-mode bypassPermissions"
+          prompt: |
+            Du bist der Mensaena CI-Selbstheilungs-Agent. Du arbeitest auf dem
+            BESTEHENDEN Branch agent/task-${{ inputs.task_id }} (bereits ausgecheckt).
+            Das Flutter-CI dieses Branches ist ROT.
+
+            1. Lies ZUERST die Datei .godmode_cierror.txt — das sind die echten
+               CI-Fehler (flutter analyze / Build). NIEMALS diese Datei committen.
+            2. Ursprüngliche Aufgabe (Kontext, NICHT neu umsetzen):
+               === AUFGABE ===
+               ${{ env.INSTRUCTION }}
+               === ENDE ===
+            3. Behebe AUSSCHLIESSLICH die Fehler, sodass `flutter analyze` sauber
+               ist und der Build durchläuft. Minimale, gezielte Änderungen.
+            4. Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
+               KEINEN neuen PR (der PR existiert bereits).
+
+            Regeln (CLAUDE.md): i18n in allen 7 JSON-Dateien; Supabase-Streams
+            mit .limit() + autoDispose; Design primary/teal (kein emerald); keine
+            Secrets im Code; pubspec-Version NICHT ändern.
+
+      - name: Fallback — Fixes committen + pushen (falls der Agent es nicht tat)
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+        run: |
+          set +e
+          rm -f .godmode_cierror.txt
+          git add -A
+          if ! git diff --cached --quiet; then
+            git -c user.name="claude[bot]" \
+                -c user.email="claude[bot]@users.noreply.github.com" \
+                commit -m "fix(godmode): CI-Selbstheilung (task ${TASK_ID})"
+            git push origin "HEAD:${BRANCH}" --force-with-lease || git push origin "HEAD:${BRANCH}"
+          else
+            echo "Keine lokalen Änderungen — Agent hat vermutlich selbst gepusht."
+          fi
