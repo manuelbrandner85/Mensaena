@@ -202,6 +202,10 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       });
       return;
     }
+    if (_anonymous && _contactPhone.text.trim().isEmpty) {
+      setState(() => _error = 'crisis.anonymousNeedsPhone'.tr());
+      return;
+    }
     // K1: GPS-Bestätigung
     final confirmed = await _confirmLocation();
     if (!confirmed) return;
@@ -587,6 +591,11 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
               decoration: InputDecoration(
                 labelText: 'crisisCreate.contactPhone'.tr(),
                 prefixIcon: const Icon(LucideIcons.phone, size: 18),
+                helperText: _anonymous
+                    ? 'crisisCreate.anonymousPhoneHint'.tr()
+                    : null,
+                helperMaxLines: 3,
+                helperStyle: AppTypography.caption(),
               ),
             ),
             const SizedBox(height: 6),

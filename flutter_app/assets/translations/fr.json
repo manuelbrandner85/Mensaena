@@ -1812,7 +1812,8 @@
     "taskRelease": "Libérer",
     "taskTitleHint": "Que faut-il faire ?",
     "taskDescHint": "Détails (facultatif)",
-    "taskSave": "Ajouter une tâche"
+    "taskSave": "Ajouter une tâche",
+    "anonymousNeedsPhone": "Veuillez saisir un numéro de téléphone — il ne sera visible que pour les modérateurs."
   },
   "posts": {
     "title": "Publications",
@@ -3935,7 +3936,8 @@
     "resMedicine": "Médicaments",
     "resPower": "Électricité",
     "resTools": "Outils",
-    "resVehicle": "Véhicule"
+    "resVehicle": "Véhicule",
+    "anonymousPhoneHint": "Même anonyme : ton numéro n'est visible que pour les modérateurs, pas pour les autres voisins."
   },
   "safety": {
     "foodRecall": "RAPPEL ALIMENTAIRE",
