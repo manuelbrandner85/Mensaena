@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
     "duplicateTitle": "Posible tarea duplicada",
     "duplicateProceed": "Hacerlo igualmente",
+    "refine": {
+      "title": "Refinar tarea",
+      "hint": "¿Qué cambiar adicionalmente?",
+      "started": "Refinamiento en curso …",
+      "button": "Refinar"
+    },
     "changelog": {
       "title": "Historial de cambios",
       "empty": "Aún no hay cambios publicados."

@@ -1440,6 +1440,12 @@
     "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
     "duplicateTitle": "Möglicher Doppel-Auftrag",
     "duplicateProceed": "Trotzdem umsetzen",
+    "refine": {
+      "title": "Auftrag nachbessern",
+      "hint": "Was soll zusätzlich geändert werden?",
+      "started": "Nachbesserung läuft …",
+      "button": "Nachbessern"
+    },
     "changelog": {
       "title": "Änderungsverlauf",
       "empty": "Noch keine ausgelieferten Änderungen."

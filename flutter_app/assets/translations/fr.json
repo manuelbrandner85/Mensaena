@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Tâche similaire déjà présente : « {task} »",
     "duplicateTitle": "Tâche en double possible",
     "duplicateProceed": "Lancer quand même",
+    "refine": {
+      "title": "Affiner la tâche",
+      "hint": "Que modifier en plus ?",
+      "started": "Affinage en cours …",
+      "button": "Affiner"
+    },
     "changelog": {
       "title": "Journal des modifications",
       "empty": "Aucune modification livrée pour l'instant."
