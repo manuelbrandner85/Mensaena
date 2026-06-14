@@ -1441,6 +1441,10 @@
     "duplicateWarning": "Similar task already exists: \"{task}\"",
     "duplicateTitle": "Possible duplicate task",
     "duplicateProceed": "Do it anyway",
+    "changelog": {
+      "title": "Changelog",
+      "empty": "No shipped changes yet."
+    },
     "health": {
       "title": "System Health",
       "total": "Tasks",

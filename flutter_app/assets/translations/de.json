@@ -1440,6 +1440,10 @@
     "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
     "duplicateTitle": "Möglicher Doppel-Auftrag",
     "duplicateProceed": "Trotzdem umsetzen",
+    "changelog": {
+      "title": "Änderungsverlauf",
+      "empty": "Noch keine ausgelieferten Änderungen."
+    },
     "health": {
       "title": "System-Health",
       "total": "Aufträge",

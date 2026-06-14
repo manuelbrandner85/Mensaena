@@ -1441,6 +1441,10 @@
     "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
     "duplicateTitle": "Posible tarea duplicada",
     "duplicateProceed": "Hacerlo igualmente",
+    "changelog": {
+      "title": "Historial de cambios",
+      "empty": "Aún no hay cambios publicados."
+    },
     "health": {
       "title": "Estado del sistema",
       "total": "Tareas",

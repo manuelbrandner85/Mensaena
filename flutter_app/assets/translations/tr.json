@@ -1440,6 +1440,10 @@
     "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
     "duplicateTitle": "Olası mükerrer görev",
     "duplicateProceed": "Yine de yap",
+    "changelog": {
+      "title": "Değişiklik günlüğü",
+      "empty": "Henüz yayınlanan değişiklik yok."
+    },
     "health": {
       "title": "Sistem Sağlığı",
       "total": "Görevler",
