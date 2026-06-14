@@ -1812,7 +1812,8 @@
     "taskRelease": "Rilascia",
     "taskTitleHint": "Cosa c’è da fare?",
     "taskDescHint": "Dettagli (facoltativo)",
-    "taskSave": "Aggiungi attività"
+    "taskSave": "Aggiungi attività",
+    "anonymousNeedsPhone": "Inserisci un numero di telefono — sarà visibile solo ai moderatori."
   },
   "posts": {
     "title": "Post",
@@ -3935,7 +3936,8 @@
     "resMedicine": "Medicine",
     "resPower": "Elettricità",
     "resTools": "Attrezzi",
-    "resVehicle": "Veicolo"
+    "resVehicle": "Veicolo",
+    "anonymousPhoneHint": "Anche in forma anonima: il tuo numero è visibile solo ai moderatori, non agli altri vicini."
   },
   "safety": {
     "foodRecall": "RICHIAMO ALIMENTARE",

@@ -1812,7 +1812,8 @@
     "taskRelease": "Release",
     "taskTitleHint": "What needs doing?",
     "taskDescHint": "Details (optional)",
-    "taskSave": "Add task"
+    "taskSave": "Add task",
+    "anonymousNeedsPhone": "Please enter a phone number — it will only be visible to moderators."
   },
   "posts": {
     "title": "Posts",
@@ -3932,7 +3933,8 @@
     "resMedicine": "Medicine",
     "resPower": "Power",
     "resTools": "Tools",
-    "resVehicle": "Vehicle"
+    "resVehicle": "Vehicle",
+    "anonymousPhoneHint": "Even anonymous: your number is only visible to moderators, not to other neighbours."
   },
   "safety": {
     "foodRecall": "FOOD RECALL",
