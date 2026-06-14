@@ -1439,6 +1439,8 @@
     "scanLongHint": "Analysis may take a few minutes — please wait.",
     "retry": "Retry",
     "duplicateWarning": "Similar task already exists: \"{task}\"",
+    "duplicateTitle": "Possible duplicate task",
+    "duplicateProceed": "Do it anyway",
     "health": {
       "title": "System Health",
       "total": "Tasks",
