@@ -121,7 +121,12 @@ jobs:
                nicht den ganzen Codebase).
             2. Branch erstellen: agent/task-${{ inputs.task_id }}
             3. Änderungen umsetzen.
-            4. flutter analyze prüfen (nur wenn Dart-Dateien geändert).
+            4. Vor dem PR prüfen (nur wenn Dart-Dateien geändert): `flutter
+               analyze` UND die Projekt-Guards
+               `python3 scripts/check_stream_limits.py` +
+               `python3 scripts/check_ui_supabase.py` ausführen und ALLE
+               gemeldeten Verstöße beheben. Für jeden neuen `.tr()`-Key
+               sicherstellen, dass er in ALLEN 7 Übersetzungs-Dateien existiert.
             5. Commit + Push + PR gegen main erstellen.
 
             Effizienz-Regeln:
@@ -148,6 +153,10 @@ jobs:
             - Neue NATIVE Dependencies brauchen einen Versions-Bump (kein OTA);
               reine Dart-Pakete sind unkritisch. Im Zweifel ohne neue Dependency
               lösen.
+            - Du darfst GitHub nach Referenz-Implementierungen/Snippets suchen
+              (WebSearch + Code-Suche). Bevorzuge permissive Lizenzen
+              (MIT/Apache/BSD); übernimm KEINEN GPL/AGPL-Code 1:1. Nenne genutzte
+              Quellen kurz im PR-Text.
 
       # ── Fallback: Commit + Push + PR garantieren ────────────────────────────
       # Der Agent (claude-code-action) committet seine Änderungen per GitHub-API

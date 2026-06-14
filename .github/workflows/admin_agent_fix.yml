@@ -75,6 +75,8 @@ jobs:
                === ENDE ===
             3. Behebe AUSSCHLIESSLICH die Fehler, sodass `flutter analyze` sauber
                ist und der Build durchläuft. Minimale, gezielte Änderungen.
+               Prüfe vor dem Push auch `python3 scripts/check_stream_limits.py`
+               und `python3 scripts/check_ui_supabase.py` (keine Verstöße).
             4. Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
                KEINEN neuen PR (der PR existiert bereits).
 
