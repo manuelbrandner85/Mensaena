@@ -169,6 +169,17 @@ jobs:
 
           patch_status "{\"status\":\"merged\",\"ci_status\":\"success\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"summary\":\"PR #$PR_NUM gemergt (CI grün). OTA-Auslieferung läuft.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
+          # ── Auto-Changelog: gemergte Änderung festhalten (für Dashboard) ────
+          PR_TITLE=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
+                       --json title --jq '.title' 2>/dev/null || echo "Godmode-Änderung")
+          CL_BODY=$(TASK_ID="$TASK_ID" PR_TITLE="$PR_TITLE" PR_NUM="$PR_NUM" node -e 'console.log(JSON.stringify({task_id:process.env.TASK_ID,title:String(process.env.PR_TITLE||"Godmode-Änderung").slice(0,300),pr_number:Number(process.env.PR_NUM)||null}))')
+          curl -sS -X POST \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/godmode_changelog" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "$CL_BODY" || true
+
           # ── Phasen-Verkettung ──────────────────────────────────────────────
           # War dieser Task eine Phase eines größeren Auftrags, dispatcht
           # next_phase die nächste Phase (eigener PR/CI/OTA). Bei Einzel-

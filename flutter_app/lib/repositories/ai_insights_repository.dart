@@ -406,6 +406,23 @@ class AiInsightsRepository {
     }
   }
 
+  /// Lädt den Godmode-Änderungsverlauf (gemergte Aufträge, Admin-only via RLS).
+  static Future<List<Map<String, dynamic>>> fetchGodmodeChangelog() async {
+    try {
+      final rows = await sb
+          .from('godmode_changelog')
+          .select('id, title, pr_number, created_at')
+          .order('created_at', ascending: false)
+          .limit(50);
+      return (rows as List)
+          .map((r) => Map<String, dynamic>.from(r as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchGodmodeChangelog failed: $e');
+      return const [];
+    }
+  }
+
   /// Lädt die letzten Entwicklungs-Aufträge (Admin-only via RLS).
   static Future<List<Map<String, dynamic>>> fetchDevTasks() async {
     try {

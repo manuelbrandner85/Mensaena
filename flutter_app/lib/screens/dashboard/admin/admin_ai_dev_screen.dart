@@ -104,6 +104,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   List<Map<String, dynamic>> _suggestions = const [];
   List<Map<String, dynamic>> _notes = const [];
   bool _notesExpanded = false;
+  List<Map<String, dynamic>> _changelog = const [];
+  bool _changelogExpanded = false;
   // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
   // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
   String? _pendingNoteId;
@@ -151,6 +153,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     _loadSuggestions();
     _loadNotes();
     _loadMetrics();
+    _loadChangelog();
     _loadSchedules();
     _loadModuleInsights();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
@@ -813,6 +816,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     setState(() => _metrics = m);
   }
 
+  Future<void> _loadChangelog() async {
+    final c = await AiInsightsRepository.fetchGodmodeChangelog();
+    if (!mounted) return;
+    setState(() => _changelog = c);
+  }
+
   Future<void> _loadSchedules() async {
     final rows = await AiInsightsRepository.fetchDevSchedules();
     if (!mounted) return;
@@ -1104,6 +1113,13 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             onEdit: (n) => _editNote(existing: n),
                             onDelete: (id) => _deleteNote(id),
                             onUse: (id, c) => _sendNote(id, c),
+                          ),
+                          const SizedBox(height: 10),
+                          _ChangelogCard(
+                            entries: _changelog,
+                            expanded: _changelogExpanded,
+                            onToggle: () => setState(() =>
+                                _changelogExpanded = !_changelogExpanded),
                           ),
                           const SizedBox(height: 10),
                           // Auftragshistorie direkt oben in der ScrollListe
@@ -4074,6 +4090,100 @@ class _DiffPatch extends StatelessWidget {
 }
 
 // ── Health-/Metrics-Dashboard ───────────────────────────────────────────────
+
+// Auto-Changelog: gemergte Godmode-Änderungen (Klapp-Karte).
+class _ChangelogCard extends StatelessWidget {
+  const _ChangelogCard({
+    required this.entries,
+    required this.expanded,
+    required this.onToggle,
+  });
+  final List<Map<String, dynamic>> entries;
+  final bool expanded;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(13),
+            child: Padding(
+              padding: const EdgeInsets.all(13),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.history,
+                      size: 16, color: AppColors.teal),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('adminDev.changelog.title'.tr(),
+                        style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.lightInk,
+                            weight: FontWeight.w700)),
+                  ),
+                  if (entries.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Text('${entries.length}',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.lightMute)),
+                    ),
+                  Icon(
+                      expanded
+                          ? LucideIcons.chevronUp
+                          : LucideIcons.chevronDown,
+                      size: 16,
+                      color: AppColors.lightMute),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            if (entries.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Text('adminDev.changelog.empty'.tr(),
+                    style: AppTypography.caption()),
+              )
+            else
+              ...entries.take(50).map((e) {
+                final title = e['title'] as String? ?? '';
+                final pr = e['pr_number'];
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(13, 8, 13, 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(LucideIcons.gitMerge,
+                          size: 13, color: AppColors.leben),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          pr != null ? '$title  (#$pr)' : title,
+                          style: AppTypography.body(
+                              size: 12, color: AppColors.lightInk),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            const SizedBox(height: 6),
+          ],
+        ],
+      ),
+    );
+  }
+}
 
 class _HealthCard extends StatelessWidget {
   const _HealthCard({
