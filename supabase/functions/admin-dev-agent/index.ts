@@ -684,6 +684,14 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
   const planSteps: string[] = Array.isArray(body?.plan)
     ? body.plan.map((x: unknown) => String(x).slice(0, 200)).filter(Boolean).slice(0, 6)
     : []
+  // Modellwahl pro Task: UI sendet eine Stufe, hier auf konkrete Modell-ID
+  // gemappt (insuliert die App vor ID-Aenderungen). Leer = Action-Default.
+  const MODEL_MAP: Record<string, string> = {
+    fast: 'claude-haiku-4-5-20251001',
+    standard: 'claude-sonnet-4-6',
+    thorough: 'claude-opus-4-8',
+  }
+  const model = MODEL_MAP[String(body?.model ?? '')] ?? ''
 
   // ── Auto-Phasen: zu große Aufträge automatisch zerlegen ───────────────────
   // Übersprungen, wenn der Aufrufer explizit Schritte vorgibt (Legacy-Plan)
@@ -780,6 +788,7 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
             instruction: finalInstruction,
             task_id: task.id,
             image_urls: JSON.stringify(imageUrls),
+            model,
           },
         }),
       },

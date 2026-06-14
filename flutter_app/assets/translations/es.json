@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
     "duplicateTitle": "Posible tarea duplicada",
     "duplicateProceed": "Hacerlo igualmente",
+    "model": {
+      "label": "Modelo",
+      "fast": "Rápido",
+      "standard": "Estándar",
+      "thorough": "Exhaustivo"
+    },
     "apiKeys": {
       "title": "Claves API",
       "empty": "Aún no hay claves.",

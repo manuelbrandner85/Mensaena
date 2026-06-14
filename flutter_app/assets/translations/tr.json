@@ -1440,6 +1440,12 @@
     "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
     "duplicateTitle": "Olası mükerrer görev",
     "duplicateProceed": "Yine de yap",
+    "model": {
+      "label": "Model",
+      "fast": "Hızlı",
+      "standard": "Standart",
+      "thorough": "Kapsamlı"
+    },
     "apiKeys": {
       "title": "API anahtarları",
       "empty": "Henüz anahtar yok.",

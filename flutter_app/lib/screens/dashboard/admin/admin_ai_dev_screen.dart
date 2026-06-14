@@ -394,6 +394,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       awaitReview: result.awaitReview,
       planMode: result.planMode,
       wantScreens: result.wantScreens,
+      model: result.model,
       origin: 'suggestion',
     );
     if (!mounted) return;
@@ -488,6 +489,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       awaitReview: result.awaitReview,
       planMode: result.planMode,
       wantScreens: result.wantScreens,
+      model: result.model,
       origin: 'suggestion',
     );
     if (!mounted) return;
@@ -587,6 +589,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     bool planMode = false,
     bool wantScreens = false,
     String? origin,
+    String? model,
   }) async {
     var plan = const <String>[];
     if (planMode) {
@@ -605,6 +608,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       plan: plan,
       wantScreens: wantScreens,
       origin: origin,
+      model: model,
       // Auto-Phasen-Splitter aus: jeder app-initiierte Auftrag wird als EIN
       // vollständiger PR umgesetzt + gemergt (verlässlich). Die Mehr-Phasen-
       // Verkettung lieferte zuletzt nur Phase 1 (Backend), die Folgephasen
@@ -758,6 +762,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       awaitReview: result.awaitReview,
       planMode: result.planMode,
       wantScreens: result.wantScreens,
+      model: result.model,
     );
     if (!mounted) return;
     setState(() => _sending = false);
@@ -5523,11 +5528,13 @@ class _PromptEditResult {
     required this.awaitReview,
     required this.planMode,
     required this.wantScreens,
+    required this.model,
   });
   final String instruction;
   final bool awaitReview;
   final bool planMode;
   final bool wantScreens;
+  final String model; // 'fast' | 'standard' | 'thorough'
 }
 
 // Wiederverwendbares Sheet zum Bearbeiten eines Prompts vor dem Absenden.
@@ -5555,6 +5562,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
   bool _awaitReview = false;
   bool _planMode = false;
   bool _wantScreens = false;
+  String _model = 'standard'; // fast | standard | thorough
 
   @override
   void initState() {
@@ -5584,6 +5592,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
       awaitReview: _awaitReview,
       planMode: _planMode,
       wantScreens: _wantScreens,
+      model: _model,
     ));
   }
 
@@ -5674,6 +5683,25 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                 label: 'adminDev.screens.toggle'.tr(),
                 value: _wantScreens,
                 onChanged: (v) => setState(() => _wantScreens = v),
+              ),
+              const SizedBox(height: 10),
+              Text('adminDev.model.label'.tr().toUpperCase(),
+                  style: AppTypography.label(
+                      size: 9, color: AppColors.lightMute)),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                children: [
+                  for (final m in const ['fast', 'standard', 'thorough'])
+                    ChoiceChip(
+                      label: Text('adminDev.model.$m'.tr(),
+                          style: AppTypography.label(size: 10)),
+                      selected: _model == m,
+                      onSelected: (_) => setState(() => _model = m),
+                      selectedColor: AppColors.teal.withValues(alpha: 0.25),
+                      backgroundColor: AppColors.elevated,
+                    ),
+                ],
               ),
               const SizedBox(height: 12),
               SizedBox(

@@ -1440,6 +1440,12 @@
     "duplicateWarning": "Похожая задача уже существует: «{task}»",
     "duplicateTitle": "Возможный дубликат",
     "duplicateProceed": "Всё равно выполнить",
+    "model": {
+      "label": "Модель",
+      "fast": "Быстро",
+      "standard": "Стандарт",
+      "thorough": "Тщательно"
+    },
     "apiKeys": {
       "title": "API-ключи",
       "empty": "Ключей пока нет.",

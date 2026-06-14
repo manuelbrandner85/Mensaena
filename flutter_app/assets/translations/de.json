@@ -1440,6 +1440,12 @@
     "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
     "duplicateTitle": "Möglicher Doppel-Auftrag",
     "duplicateProceed": "Trotzdem umsetzen",
+    "model": {
+      "label": "Modell",
+      "fast": "Schnell",
+      "standard": "Standard",
+      "thorough": "Gründlich"
+    },
     "apiKeys": {
       "title": "API-Schlüssel",
       "empty": "Noch keine Schlüssel hinterlegt.",

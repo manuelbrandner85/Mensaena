@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Similar task already exists: \"{task}\"",
     "duplicateTitle": "Possible duplicate task",
     "duplicateProceed": "Do it anyway",
+    "model": {
+      "label": "Model",
+      "fast": "Fast",
+      "standard": "Standard",
+      "thorough": "Thorough"
+    },
     "apiKeys": {
       "title": "API keys",
       "empty": "No keys stored yet.",
