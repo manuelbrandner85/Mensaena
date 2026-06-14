@@ -91,8 +91,13 @@ class ChargeStationsService {
                 ? 'ccs'
                 : (tags?['socket'] as String?);
         double? capacityKw;
-        final raw = tags?['capacity'] ?? tags?['maxstay:kw'];
-        if (raw is String) capacityKw = double.tryParse(raw);
+        final raw = (tags?['charging_station:output'] ??
+                tags?['socket:type2:output'] ??
+                tags?['socket:ccs:output']) as String?;
+        if (raw != null) {
+          final m = RegExp(r'(\d+(?:\.\d+)?)').firstMatch(raw);
+          if (m != null) capacityKw = double.tryParse(m.group(1)!);
+        }
         out.add(ChargeStation(
           id: '${el['type']}/${el['id']}',
           lat: plat,
