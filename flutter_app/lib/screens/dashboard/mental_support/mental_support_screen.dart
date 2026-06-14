@@ -20,7 +20,21 @@ class MentalSupportScreen extends ConsumerStatefulWidget {
 }
 
 class _MentalSupportScreenState extends ConsumerState<MentalSupportScreen> {
-  String _country = 'AT';
+  String _country = 'DE';
+
+  @override
+  void initState() {
+    super.initState();
+    final countryCode =
+        WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+    if (countryCode == 'AT') {
+      _country = 'AT';
+    } else if (countryCode == 'CH') {
+      _country = 'CH';
+    } else {
+      _country = 'DE';
+    }
+  }
 
   static const Map<String, _CountryCfg> _hotlines = {
     'DE': _CountryCfg(flag: '🇩🇪', label: 'Deutschland', lines: [
