@@ -1382,6 +1382,15 @@
     "approveMerge": "Approva e unisci",
     "attachImage": "Allega screenshot",
     "reviewBeforeMerge": "Rivedi prima del merge (approvazione manuale)",
+    "edit": {
+      "title": "Modifica proposta e accetta",
+      "retryTitle": "Adatta l'incarico e riavvia",
+      "bundleTitle": "Raggruppa {count} proposte",
+      "bundleHint": "Queste proposte vengono unite in UN solo incarico — puoi modificare il testo prima.",
+      "promptLabel": "Istruzione per l'agente",
+      "confirm": "Applica ed esegui",
+      "emptyPrompt": "L'istruzione non può essere vuota."
+    },
     "diffTitle": "Modifiche (diff)",
     "diffError": "Impossibile caricare il diff.",
     "diffBinary": "Nessuna modifica testuale (file binario ecc.).",
