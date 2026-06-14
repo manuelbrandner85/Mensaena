@@ -2003,7 +2003,10 @@
     "noComments": "No comments yet. Ask the first question!",
     "commentHint": "Ask a question or comment …",
     "report": "Report",
-    "reportTitle": "Report listing"
+    "reportTitle": "Report listing",
+    "editListing": "Edit",
+    "deleteListing": "Delete listing",
+    "deleteListingDescription": "The listing will be permanently deleted and no longer visible to others."
   },
   "trust": {
     "rate": "Rate {name}",

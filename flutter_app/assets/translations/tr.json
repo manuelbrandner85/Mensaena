@@ -2002,7 +2002,10 @@
     "noComments": "Henüz yorum yok. İlk soruyu sor!",
     "commentHint": "Soru sor veya yorum yap …",
     "report": "Bildir",
-    "reportTitle": "İlanı bildir"
+    "reportTitle": "İlanı bildir",
+    "editListing": "Düzenle",
+    "deleteListing": "İlanı sil",
+    "deleteListingDescription": "İlan kalıcı olarak silinecek ve başkaları tarafından artık görülmeyecek."
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",

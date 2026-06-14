@@ -2002,7 +2002,10 @@
     "noComments": "Noch keine Kommentare. Stell die erste Frage!",
     "commentHint": "Frage stellen oder kommentieren …",
     "report": "Melden",
-    "reportTitle": "Inserat melden"
+    "reportTitle": "Inserat melden",
+    "editListing": "Bearbeiten",
+    "deleteListing": "Inserat löschen",
+    "deleteListingDescription": "Das Inserat wird unwiderruflich gelöscht und ist für andere nicht mehr sichtbar."
   },
   "trust": {
     "rate": "Bewerte {name}",

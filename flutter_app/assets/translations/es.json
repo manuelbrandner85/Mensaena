@@ -2003,7 +2003,10 @@
     "noComments": "Aún no hay comentarios. ¡Haz la primera pregunta!",
     "commentHint": "Haz una pregunta o comenta …",
     "report": "Denunciar",
-    "reportTitle": "Denunciar anuncio"
+    "reportTitle": "Denunciar anuncio",
+    "editListing": "Editar",
+    "deleteListing": "Eliminar anuncio",
+    "deleteListingDescription": "El anuncio se eliminará definitivamente y no será visible para otros."
   },
   "trust": {
     "rate": "Valora a {name}",
