@@ -141,6 +141,9 @@ jobs:
             - Supabase-Streams: IMMER .limit() + autoDispose.
             - Design: primary/teal, KEINE emerald-Farben.
             - NIEMALS Secrets/Tokens/Keys in den Code.
+            - Tests: für NEUE Repositories/Services/reine Dart-Logik passende
+              Unit-Tests unter flutter_app/test/ anlegen (reine Logik, KEINE
+              Netzwerk-/Supabase-Calls; ggf. mocken). Reine UI-Tweaks brauchen keine.
 
             Ressourcen-Katalog (High-End):
             - Lies docs/godmode/resources.md. BEVORZUGE die dort gelisteten
