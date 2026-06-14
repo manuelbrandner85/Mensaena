@@ -208,6 +208,30 @@ jobs:
             fi
           } >> /tmp/scan_prompt.txt
 
+          # ── Produktionssignale: echte Crashes/Fehler aus der Live-App ──────
+          # Damit der Scan Fixes für ECHTE Probleme priorisiert (nicht nur
+          # generisches Code-Review). Aggregiert nach Häufigkeit (häufigste zuerst).
+          CRASHES=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/crash_logs?select=error_type,error_message,app_version&order=created_at.desc&limit=80" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{var a=JSON.parse(s);var m={};for(var i=0;i<a.length;i++){var x=a[i];var k=(x.error_type||"?")+" | "+String(x.error_message||"").slice(0,140);if(!m[k])m[k]={n:0,v:x.app_version};m[k].n++;}var e=Object.keys(m).map(function(k){return [k,m[k]]}).sort(function(p,q){return q[1].n-p[1].n}).slice(0,15);process.stdout.write(e.map(function(z){return "- ("+z[1].n+"x, v"+(z[1].v||"?")+") "+z[0]}).join("\n"))}catch(e){process.stdout.write("")}})' || true)
+          ERRORS=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/error_logs?select=error_type,message,app_version&order=created_at.desc&limit=80" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{var a=JSON.parse(s);var m={};for(var i=0;i<a.length;i++){var x=a[i];var k=(x.error_type||"?")+" | "+String(x.message||"").slice(0,140);if(!m[k])m[k]={n:0,v:x.app_version};m[k].n++;}var e=Object.keys(m).map(function(k){return [k,m[k]]}).sort(function(p,q){return q[1].n-p[1].n}).slice(0,15);process.stdout.write(e.map(function(z){return "- ("+z[1].n+"x, v"+(z[1].v||"?")+") "+z[0]}).join("\n"))}catch(e){process.stdout.write("")}})' || true)
+          {
+            if [ -n "$CRASHES" ] || [ -n "$ERRORS" ]; then
+              echo ""
+              echo "=== PRODUKTIONS-SIGNALE (echte Fehler aus der Live-App) ==="
+              echo "Reale Crashes/Fehler echter Nutzer, häufigste zuerst (Anzahl x)."
+              echo "PRIORISIERE Vorschläge, die diese konkret beheben: kind=bug,"
+              echo "severity entsprechend hoch, und nenne die wahrscheinliche"
+              echo "Ursache + betroffene Datei. Suche die zugehörige Code-Stelle."
+              if [ -n "$CRASHES" ]; then echo ""; echo "Crashes (crash_logs):"; echo "$CRASHES"; fi
+              if [ -n "$ERRORS" ]; then echo ""; echo "Fehler (error_logs):"; echo "$ERRORS"; fi
+            fi
+          } >> /tmp/scan_prompt.txt
+
       # Live-Fortschritt-Tailer: liest den stream-json-Output der Claude CLI,
       # erkennt jede gelesene Datei (Read/Grep/Glob) und schreibt laufend
       # current_file + analyzed_files + heartbeat nach admin_scan_runs. So sieht
