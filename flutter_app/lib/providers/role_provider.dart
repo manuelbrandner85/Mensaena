@@ -14,6 +14,7 @@ class UserRoleCache {
   const UserRoleCache._();
 
   static String? _role;
+  static ProviderContainer? globalContainer;
 
   static String? get role => _role;
   static bool get isAdmin => _role == 'admin';
@@ -25,6 +26,7 @@ class UserRoleCache {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) {
       _role = null;
+      globalContainer?.read(userRoleProvider.notifier).state = null;
       return;
     }
     try {
@@ -37,10 +39,12 @@ class UserRoleCache {
     } catch (_) {
       _role = null;
     }
+    globalContainer?.read(userRoleProvider.notifier).state = _role;
   }
 
   static void clear() {
     _role = null;
+    globalContainer?.read(userRoleProvider.notifier).state = null;
   }
 }
 
