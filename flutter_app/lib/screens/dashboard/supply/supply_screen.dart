@@ -16,6 +16,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -252,7 +253,11 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                         color: AppColors.amber),
                   ),
                   error: (e, _) => Center(
-                      child: Text('$e', style: AppTypography.caption())),
+                    child: ErrorStateWidget(
+                      onRetry: () =>
+                          ref.invalidate(farmsForUserProvider(args)),
+                    ),
+                  ),
                   data: (all) {
                     final list = _apply(all);
                     if (_view == _SupplyView.map) {

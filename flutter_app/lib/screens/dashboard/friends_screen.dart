@@ -20,6 +20,7 @@ import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
 import '../../widgets/effects/celebrate_burst.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/error_state_widget.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
 import '../../widgets/shared/user_picker_sheet.dart';
 
@@ -208,8 +209,13 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
                 child: Center(
                     child: CircularProgressIndicator(color: AppColors.bronze)),
               ),
-              error: (e, _) =>
-                  Text('$e', style: AppTypography.caption()),
+              error: (e, _) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: ErrorStateWidget(
+                  compact: true,
+                  onRetry: () => ref.invalidate(_friendsProvider),
+                ),
+              ),
               data: (rows) => _FriendsList(
                 rows: rows,
                 onlineIds: onlineIds,

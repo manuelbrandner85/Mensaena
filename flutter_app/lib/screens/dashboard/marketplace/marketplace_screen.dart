@@ -17,6 +17,7 @@ import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_widget.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/image_carousel.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -326,8 +327,14 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     child: CircularProgressIndicator(
                         color: AppColors.amber),
                   ),
-                  error: (e, _) =>
-                      Center(child: Text('$e', style: AppTypography.caption())),
+                  error: (e, _) => Center(
+                    child: ErrorStateWidget(
+                      onRetry: () {
+                        ref.invalidate(marketplaceListingsFilteredProvider);
+                        ref.invalidate(marketplaceStatsProvider);
+                      },
+                    ),
+                  ),
                   data: (all) {
                     final list = _apply(all);
                     if (list.isEmpty) {

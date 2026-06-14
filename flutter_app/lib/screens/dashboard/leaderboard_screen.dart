@@ -13,6 +13,7 @@ import '../../config/theme/app_typography.dart';
 import '../../providers/mega_providers.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/error_state_widget.dart';
 
 class LeaderboardScreen extends ConsumerWidget {
   const LeaderboardScreen({super.key});
@@ -30,7 +31,11 @@ class LeaderboardScreen extends ConsumerWidget {
       body: async.when(
         loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.bronze)),
-        error: (_, __) => const SizedBox.shrink(),
+        error: (_, __) => Center(
+          child: ErrorStateWidget(
+            onRetry: () => ref.invalidate(leaderboardProvider),
+          ),
+        ),
         data: (rows) {
           if (rows.isEmpty) {
             return Center(

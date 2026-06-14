@@ -14,6 +14,7 @@ import '../../../widgets/groups/nearby_groups_carousel.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_widget.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/skeleton_card.dart';
@@ -126,7 +127,10 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                   loading: () =>
                       const SkeletonList(count: 6, itemHeight: 84),
                   error: (e, _) => Center(
-                      child: Text('$e', style: AppTypography.caption())),
+                    child: ErrorStateWidget(
+                      onRetry: () => ref.invalidate(groupsListProvider),
+                    ),
+                  ),
                   data: (all) {
                     final list = _apply(all);
                     if (list.isEmpty) {

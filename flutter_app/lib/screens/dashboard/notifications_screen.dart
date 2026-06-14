@@ -8,6 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../widgets/shared/editorial_module_header.dart';
+import '../../widgets/shared/error_state_widget.dart';
 import '../../models/notification_model.dart';
 import '../../services/notification_router.dart';
 import '../../repositories/notifications_repository.dart';
@@ -229,9 +230,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   itemBuilder: (_, __) => const NotificationTileSkeleton(),
                 ),
                 error: (e, _) => Center(
-                  child: Text(
-                    'Fehler: $e',
-                    style: AppTypography.caption(),
+                  child: ErrorStateWidget(
+                    onRetry: () =>
+                        ref.invalidate(notificationsStreamProvider),
                   ),
                 ),
                 data: (all) {
