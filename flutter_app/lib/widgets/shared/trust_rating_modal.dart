@@ -144,7 +144,9 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
       expand: false,
       builder: (_, scroll) => ListView(
         controller: scroll,
-        padding: const EdgeInsets.all(20),
+        // Bottom-Inset für die Tastatur: sonst verdeckt sie das Kommentarfeld.
+        padding: EdgeInsets.fromLTRB(
+            20, 20, 20, 20 + MediaQuery.of(context).viewInsets.bottom),
         children: [
           Center(
             child: Container(
