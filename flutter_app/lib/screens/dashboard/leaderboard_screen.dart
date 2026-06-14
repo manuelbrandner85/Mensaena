@@ -13,6 +13,7 @@ import '../../config/theme/app_typography.dart';
 import '../../providers/mega_providers.dart';
 import '../../widgets/effects/bloom.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/empty_state_widget.dart';
 import '../../widgets/shared/error_state_widget.dart';
 
 class LeaderboardScreen extends ConsumerWidget {
@@ -39,8 +40,10 @@ class LeaderboardScreen extends ConsumerWidget {
         data: (rows) {
           if (rows.isEmpty) {
             return Center(
-              child: Text('community.no_leaderboard'.tr(),
-                  style: AppTypography.caption()),
+              child: EmptyStateWidget(
+                icon: LucideIcons.award,
+                title: 'community.no_leaderboard'.tr(),
+              ),
             );
           }
           final top3 = rows.take(3).toList();
