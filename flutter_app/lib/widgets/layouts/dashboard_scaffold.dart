@@ -81,6 +81,43 @@ final _newestUnreadProvider = Provider<_NewestUnread>((ref) {
 // nur EIN Scaffold gleichzeitig sichtbar.
 String? _lastRecordedRoute;
 
+// In-Memory-Breadcrumb für schrittweises Zurück. Viele Screens werden via
+// context.go() angesteuert — das ERSETZT den go_router-Stack, also kann der
+// Zurück-Button nicht „poppen" und sprang bisher hart auf /dashboard. Dieser
+// Stack merkt sich den tatsächlichen Navigationspfad, sodass der Zurück-Button
+// Schritt für Schritt zur jeweils vorigen Seite zurückführt.
+const Set<String> _kTopLevelRoutes = {
+  '/dashboard',
+  '/dashboard/map',
+  '/dashboard/chat',
+  '/dashboard/messages',
+  '/dashboard/profile',
+};
+final List<String> _navCrumbs = [];
+
+void _recordCrumb(String route) {
+  if (_navCrumbs.isNotEmpty && _navCrumbs.last == route) return;
+  // Top-Level-Tab = neuer Wurzel-Kontext: Breadcrumb zurücksetzen.
+  if (_kTopLevelRoutes.contains(route)) {
+    _navCrumbs
+      ..clear()
+      ..add(route);
+    return;
+  }
+  final idx = _navCrumbs.indexOf(route);
+  if (idx >= 0) {
+    // Wir sind zu einer früheren Seite zurück — alles danach abschneiden.
+    _navCrumbs.removeRange(idx + 1, _navCrumbs.length);
+  } else {
+    _navCrumbs.add(route);
+  }
+}
+
+// Vorige Seite im Breadcrumb (Ziel des Zurück-Buttons, wenn go_router nicht
+// poppen kann). null → kein bekannter Vorgänger.
+String? _crumbBackTarget() =>
+    _navCrumbs.length >= 2 ? _navCrumbs[_navCrumbs.length - 2] : null;
+
 class DashboardScaffold extends ConsumerWidget {
   const DashboardScaffold({
     required this.body,
@@ -217,6 +254,7 @@ class DashboardScaffold extends ConsumerWidget {
     // außerhalb des Build-Cycles.
     if (_lastRecordedRoute != activeRoute) {
       _lastRecordedRoute = activeRoute;
+      _recordCrumb(activeRoute);
       final route = activeRoute;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         RecentPagesService.addRecent(route);
@@ -254,12 +292,22 @@ class DashboardScaffold extends ConsumerWidget {
             ? IconButton(
                 tooltip: 'common.back'.tr(),
                 onPressed: () {
-                  // Wenn Stack pop-bar → pop. Sonst sauberer Fallback zum
-                  // Dashboard statt App-Exit.
+                  // 1) Echter go_router-Stack vorhanden (push) → poppen.
+                  // 2) Sonst schrittweise zur vorigen Seite des Breadcrumbs
+                  //    (viele Screens kommen via go() → kein pop-barer Stack).
+                  // 3) Fallback: Dashboard (statt App-Exit / Home-Sprung).
                   if (canPop) {
                     context.pop();
                   } else {
-                    context.go('/dashboard');
+                    final back = _crumbBackTarget();
+                    if (back != null) {
+                      // Aktuelle Seite aus dem Breadcrumb nehmen, dann zur
+                      // vorigen navigieren (deren build() schneidet sauber zu).
+                      if (_navCrumbs.isNotEmpty) _navCrumbs.removeLast();
+                      context.go(back);
+                    } else {
+                      context.go('/dashboard');
+                    }
                   }
                 },
                 icon: const Icon(LucideIcons.arrowLeft, size: 22),
