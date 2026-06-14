@@ -15,6 +15,7 @@ import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/readable_width.dart';
 
 class GroupCreateScreen extends ConsumerStatefulWidget {
@@ -138,6 +139,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
     }
     Haptics.success();
     MiniConfetti.show(context);
+    AppSnackBar.success(context, 'common.created'.tr());
     context.push('/dashboard/groups/$id');
   }
 

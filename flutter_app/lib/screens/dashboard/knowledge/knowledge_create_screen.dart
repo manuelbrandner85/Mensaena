@@ -309,7 +309,7 @@ class _KnowledgeCreateScreenState
         });
         return;
       }
-      AppSnackBar.info(context, coverFailed ? 'knowledge.publishedNoCover'.tr() : 'knowledge.publishArticle'.tr());
+      AppSnackBar.success(context, coverFailed ? 'knowledge.publishedNoCover'.tr() : 'knowledge.publishArticle'.tr());
       context.go(widget.routePath);
     } catch (_) {
       if (!mounted) return;

@@ -314,6 +314,7 @@ class _MarketplaceCreateScreenState
     if (!mounted) return;
     Haptics.success();
     MiniConfetti.show(context);
+    AppSnackBar.success(context, 'common.created'.tr());
     context.push('/dashboard/marketplace/$id');
   }
 

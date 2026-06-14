@@ -16,6 +16,7 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/readable_width.dart';
 
 /// SKILL: mensaena-features
@@ -325,6 +326,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     }
     Haptics.success();
     MiniConfetti.show(context);
+    AppSnackBar.success(context, 'common.created'.tr());
     context.push('/dashboard/events/$eventId');
   }
 
