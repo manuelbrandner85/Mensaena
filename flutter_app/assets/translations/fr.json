@@ -2003,7 +2003,10 @@
     "noComments": "Pas encore de commentaires. Posez la première question !",
     "commentHint": "Posez une question ou commentez …",
     "report": "Signaler",
-    "reportTitle": "Signaler l’annonce"
+    "reportTitle": "Signaler l’annonce",
+    "editListing": "Modifier",
+    "deleteListing": "Supprimer l’annonce",
+    "deleteListingDescription": "L’annonce sera définitivement supprimée et ne sera plus visible par les autres."
   },
   "trust": {
     "rate": "Évaluer {name}",

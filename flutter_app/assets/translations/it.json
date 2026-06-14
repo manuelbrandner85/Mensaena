@@ -2003,7 +2003,10 @@
     "noComments": "Ancora nessun commento. Fai la prima domanda!",
     "commentHint": "Fai una domanda o commenta …",
     "report": "Segnala",
-    "reportTitle": "Segnala annuncio"
+    "reportTitle": "Segnala annuncio",
+    "editListing": "Modifica",
+    "deleteListing": "Elimina annuncio",
+    "deleteListingDescription": "L'annuncio verrà eliminato definitivamente e non sarà più visibile agli altri."
   },
   "trust": {
     "rate": "Valuta {name}",

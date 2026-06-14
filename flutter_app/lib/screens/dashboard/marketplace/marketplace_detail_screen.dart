@@ -311,6 +311,37 @@ class _MarketplaceDetailScreenState
                     ),
                   ),
                 ],
+                if (isOwner) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _editListing(context, l),
+                          icon: const Icon(LucideIcons.pencil, size: 14),
+                          label: Text('marketplace.editListing'.tr()),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primary500,
+                            side: BorderSide(
+                              color: AppColors.primary500.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextButton.icon(
+                          onPressed: () => _deleteListing(context, ref, l),
+                          icon: const Icon(LucideIcons.trash2, size: 14),
+                          label: Text('marketplace.deleteListing'.tr()),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.herzrot,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (l.status == 'reserved' && !isOwner) ...[
                   const SizedBox(height: 12),
                   Container(
@@ -641,6 +672,33 @@ class _MarketplaceDetailScreenState
       ref.invalidate(marketplaceDetailProvider(l.id));
       ref.invalidate(marketplaceStatsProvider);
       AppSnackBar.success(context, 'marketplace.sold'.tr());
+    }
+  }
+
+  /// Owner-Aktion: Inserat bearbeiten.
+  void _editListing(BuildContext context, MarketplaceListing l) {
+    context.push('/dashboard/marketplace/create', extra: l);
+  }
+
+  /// Owner-Aktion: Inserat löschen (Soft-Delete via deleted_at).
+  Future<void> _deleteListing(
+      BuildContext context, WidgetRef ref, MarketplaceListing l) async {
+    final ok = await ConfirmDialog.show(
+      context,
+      title: 'marketplace.deleteListing'.tr(),
+      message: 'marketplace.deleteListingDescription'.tr(),
+      confirmLabel: 'common.delete'.tr(),
+      danger: true,
+    );
+    if (!ok) return;
+    Haptics.tap();
+    final success = await MarketplaceRepository.deleteListing(l.id);
+    if (!context.mounted) return;
+    if (success) {
+      ref.invalidate(marketplaceStatsProvider);
+      context.go('/dashboard/marketplace');
+    } else {
+      AppSnackBar.error(context, 'errors.generic'.tr());
     }
   }
 }

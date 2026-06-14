@@ -299,6 +299,19 @@ class MarketplaceRepository {
     }
   }
 
+  /// Soft-Delete eines Inserats (deleted_at setzen). Owner only via RLS.
+  static Future<bool> deleteListing(String id) async {
+    try {
+      await sb
+          .from('marketplace_listings')
+          .update({'deleted_at': DateTime.now().toUtc().toIso8601String()})
+          .eq('id', id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Soft-Delete (eigener Kommentar) bzw. Hard-Delete (Inserats-Besitzer
   /// via RLS). Wir versuchen Soft-Delete; RLS lässt es zu solange erlaubt.
   static Future<bool> deleteComment(String commentId) async {
