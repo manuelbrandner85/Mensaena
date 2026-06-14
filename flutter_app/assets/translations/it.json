@@ -1439,6 +1439,8 @@
     "scanLongHint": "L'analisi può richiedere alcuni minuti — attendere.",
     "retry": "Riprova",
     "duplicateWarning": "Attività simile già presente: \"{task}\"",
+    "duplicateTitle": "Possibile incarico doppio",
+    "duplicateProceed": "Procedi comunque",
     "health": {
       "title": "Salute del sistema",
       "total": "Attività",

@@ -312,6 +312,53 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     }
   }
 
+  // Duplikat-/Konflikt-Check gegen AKTIVE Aufträge. true = fortfahren.
+  Future<bool> _confirmNotDuplicate(String instruction) async {
+    final active = _tasks
+        .where((t) {
+          final s = t['status'] as String?;
+          return s == 'queued' ||
+              s == 'running' ||
+              s == 'pr_open' ||
+              s == 'awaiting_review' ||
+              s == 'phased';
+        })
+        .map((t) => (t['instruction'] as String?) ?? '')
+        .where((x) => x.isNotEmpty);
+    final sim = similarInstruction(instruction, active);
+    if (sim == null || !mounted) return true;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Row(children: [
+          const Icon(LucideIcons.copy, size: 18, color: AppColors.amber),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text('adminDev.duplicateTitle'.tr(),
+                  style:
+                      AppTypography.display(size: 16, color: AppColors.ink))),
+        ]),
+        content: Text(
+          'adminDev.duplicateWarning'.tr(namedArgs: {'task': sim}),
+          style: AppTypography.body(size: 13, color: AppColors.inkSoft),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.amber),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('adminDev.duplicateProceed'.tr()),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
   // Vorschlag annehmen — IMMER über das Edit-Sheet: der vom Scan formulierte
   // Prompt ist vorausgefüllt und kann angepasst werden, plus die gleichen
   // Optionen wie bei freien Aufträgen (Review-Gate, Plan-Modus, Screenshots).
@@ -334,6 +381,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       ),
     );
     if (result == null || !mounted) return;
+    if (!await _confirmNotDuplicate(result.instruction) || !mounted) return;
     setState(() => _busySuggestions.add(id));
     final res = await _submitTask(
       result.instruction,
@@ -427,6 +475,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       ),
     );
     if (result == null || !mounted) return;
+    if (!await _confirmNotDuplicate(result.instruction) || !mounted) return;
     setState(() => _batchBusy = true);
     final res = await _submitTask(
       result.instruction,
@@ -3250,19 +3299,8 @@ class _InputBarState extends State<_InputBar> {
 
   // Einfache Duplikat-Warnung: prüft ob der Eingabe-Text signifikante
   // Wortüberschneidung mit einem bestehenden Auftrag hat.
-  String? _duplicateWarning(String text) {
-    if (text.length < 10) return null;
-    final words = text.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
-    if (words.isEmpty) return null;
-    for (final instr in widget.existingInstructions) {
-      final existWords = instr.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
-      final overlap = words.intersection(existWords).length;
-      if (overlap >= 3 && overlap / words.length > 0.4) {
-        return instr.length > 60 ? '${instr.substring(0, 60)}…' : instr;
-      }
-    }
-    return null;
-  }
+  String? _duplicateWarning(String text) =>
+      similarInstruction(text, widget.existingInstructions);
 
   // Kompakte Schalter-Zeile (Icon + Label + Switch).
   Widget _toggleRow({
@@ -4979,6 +5017,27 @@ class _ModuleInsightCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// Findet einen Auftrag mit starker Wortüberschneidung zu [text] in [existing]
+// (Duplikat-/Konflikt-Erkennung). Gibt den (gekürzten) Treffer zurück oder null.
+String? similarInstruction(String text, Iterable<String> existing) {
+  if (text.length < 10) return null;
+  final words =
+      text.toLowerCase().split(RegExp(r'\W+')).where((w) => w.length > 4).toSet();
+  if (words.isEmpty) return null;
+  for (final instr in existing) {
+    final ew = instr
+        .toLowerCase()
+        .split(RegExp(r'\W+'))
+        .where((w) => w.length > 4)
+        .toSet();
+    final overlap = words.intersection(ew).length;
+    if (overlap >= 3 && overlap / words.length > 0.4) {
+      return instr.length > 60 ? '${instr.substring(0, 60)}…' : instr;
+    }
+  }
+  return null;
 }
 
 // Ergebnis des Edit-Sheets: der (bearbeitete) Prompt + die gewählten Optionen.

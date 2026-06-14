@@ -1439,6 +1439,8 @@
     "scanLongHint": "El análisis puede tardar varios minutos — espere.",
     "retry": "Reintentar",
     "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
+    "duplicateTitle": "Posible tarea duplicada",
+    "duplicateProceed": "Hacerlo igualmente",
     "health": {
       "title": "Estado del sistema",
       "total": "Tareas",

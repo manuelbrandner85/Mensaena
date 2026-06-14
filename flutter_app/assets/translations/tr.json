@@ -1438,6 +1438,8 @@
     "scanLongHint": "Analiz birkaç dakika sürebilir — lütfen bekleyin.",
     "retry": "Tekrar dene",
     "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
+    "duplicateTitle": "Olası mükerrer görev",
+    "duplicateProceed": "Yine de yap",
     "health": {
       "title": "Sistem Sağlığı",
       "total": "Görevler",

@@ -1438,6 +1438,8 @@
     "scanLongHint": "Die Analyse kann mehrere Minuten dauern — bitte warten.",
     "retry": "Wiederholen",
     "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
+    "duplicateTitle": "Möglicher Doppel-Auftrag",
+    "duplicateProceed": "Trotzdem umsetzen",
     "health": {
       "title": "System-Health",
       "total": "Aufträge",

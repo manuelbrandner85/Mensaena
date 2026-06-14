@@ -1439,6 +1439,8 @@
     "scanLongHint": "L'analyse peut prendre quelques minutes — veuillez patienter.",
     "retry": "Réessayer",
     "duplicateWarning": "Tâche similaire déjà présente : « {task} »",
+    "duplicateTitle": "Tâche en double possible",
+    "duplicateProceed": "Lancer quand même",
     "health": {
       "title": "Santé du système",
       "total": "Tâches",
