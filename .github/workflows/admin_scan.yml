@@ -171,6 +171,14 @@ jobs:
             echo "Ändere KEINEN Code. Erstelle KEINEN Commit. Nur analysieren und"
             echo "die JSON-Datei schreiben. Verwende deine Skills/Tools zum Lesen"
             echo "des Codes ausgiebig — sei gründlich, geh in die Tiefe."
+            echo ""
+            echo "RESSOURCEN-KATALOG: Lies docs/godmode/resources.md. Wenn ein"
+            echo "Vorschlag eine API/externe Funktion braucht, BEVORZUGE die dort"
+            echo "gelisteten KOSTENLOSEN APIs (möglichst ohne Key) + bewährten"
+            echo "Open-Source-Pakete und NENNE die konkrete Ressource in der"
+            echo "instruction (z. B. 'via Open-Meteo, kein Key'). Schlage nichts"
+            echo "vor, das eine teure/kostenpflichtige Abhängigkeit erzwingt,"
+            echo "wenn es eine freie Alternative im Katalog gibt."
           } > /tmp/scan_prompt.txt
 
           # ── Selbstlernend: bereits abgelehnte/angenommene Vorschläge laden ──
