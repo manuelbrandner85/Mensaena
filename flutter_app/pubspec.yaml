@@ -1,7 +1,7 @@
 name: mensaena
 description: Mensaena – Nachbarschaftshilfe-App. 1:1 Spiegel der Webseite www.mensaena.de.
 publish_to: 'none'
-version: 4.4.7+40407
+version: 4.4.8+40408
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

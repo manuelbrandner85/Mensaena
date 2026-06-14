@@ -85,6 +85,7 @@ class AiInsightsRepository {
     List<String> plan = const [],
     bool wantScreens = false,
     String? origin,
+    bool noSplit = false,
   }) async {
     try {
       final res = await SupabaseService.client.functions
@@ -95,6 +96,7 @@ class AiInsightsRepository {
             if (plan.isNotEmpty) 'plan': plan,
             if (wantScreens) 'want_screens': true,
             if (origin != null) 'origin': origin,
+            if (noSplit) 'no_split': true,
           })
           .timeout(const Duration(seconds: 30));
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});

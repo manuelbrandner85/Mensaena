@@ -540,6 +540,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       plan: plan,
       wantScreens: wantScreens,
       origin: origin,
+      // Auto-Phasen-Splitter aus: jeder app-initiierte Auftrag wird als EIN
+      // vollständiger PR umgesetzt + gemergt (verlässlich). Die Mehr-Phasen-
+      // Verkettung lieferte zuletzt nur Phase 1 (Backend), die Folgephasen
+      // (u. a. UI) kamen nie an → Feature erschien nicht in der App. Wer
+      // bewusst zerlegen will, nutzt den „Plan-Modus" (ein PR, Schritt-Liste).
+      noSplit: true,
     );
   }
 
