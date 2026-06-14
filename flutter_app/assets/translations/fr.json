@@ -1441,6 +1441,19 @@
     "duplicateWarning": "Tâche similaire déjà présente : « {task} »",
     "duplicateTitle": "Tâche en double possible",
     "duplicateProceed": "Lancer quand même",
+    "apiKeys": {
+      "title": "Clés API",
+      "empty": "Aucune clé enregistrée.",
+      "add": "Ajouter une clé",
+      "editTitle": "Clé API",
+      "service": "Service",
+      "key": "Clé",
+      "keyReplace": "Nouvelle clé (remplace)",
+      "noExpiry": "Pas d'expiration",
+      "setExpiry": "Définir l'expiration",
+      "expires": "expire : {date}",
+      "required": "Service et clé requis."
+    },
     "refine": {
       "title": "Affiner la tâche",
       "hint": "Que modifier en plus ?",

@@ -16,6 +16,10 @@
   nur, wenn klar besser; **null-safe, aktiv gepflegt, hohe pub.dev-Popularität**.
   Achtung: **native** Pakete brauchen einen Versions-Bump (kein OTA-Patch) und
   ggf. Plattform-Config — reine Dart-Pakete sind unkritisch.
+- **Hinterlegte Keys nutzen:** Vom Admin im Dashboard gespeicherte freie
+  API-Keys liegen in der Tabelle `godmode_api_keys` (nur via `service_role`
+  lesbar). Wenn eine Aufgabe einen Key braucht und dort einer für den Dienst
+  existiert, nutze ihn — frage nicht nach und hardcode nichts.
 - **Streams:** Supabase `.stream()` immer mit `.limit()` + `autoDispose`
   (siehe CLAUDE.md). i18n: jeder neue UI-String in alle 7 JSON-Dateien.
 
