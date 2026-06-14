@@ -10,6 +10,7 @@ import '../../config/theme/app_typography.dart' show AppTypography;
 import '../../models/event.dart';
 import '../../repositories/events_repository.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/error_state_widget.dart';
 
 /// SKILL: mensaena-features (E1)
 /// Kalender-Ansicht mit zwei Modi (Tab): "Liste" + "Monat".
@@ -94,7 +95,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen>
                   child: CircularProgressIndicator(color: AppColors.amber),
                 ),
                 error: (e, _) => Center(
-                    child: Text('$e', style: AppTypography.caption())),
+                  child: ErrorStateWidget(
+                    onRetry: () => ref.invalidate(upcomingEventsProvider),
+                  ),
+                ),
                 data: (list) => TabBarView(
                   controller: _tab,
                   children: [

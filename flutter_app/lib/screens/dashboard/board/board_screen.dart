@@ -15,6 +15,7 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/skeleton_card.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 
@@ -143,7 +144,10 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                 child: async.when(
                   loading: () => const SkeletonList(count: 5, itemHeight: 96),
                   error: (e, _) => Center(
-                      child: Text('$e', style: AppTypography.caption())),
+                    child: ErrorStateWidget(
+                      onRetry: () => ref.invalidate(boardPostsProvider),
+                    ),
+                  ),
                   data: (all) {
                     final list = _apply(all);
                     if (list.isEmpty) {

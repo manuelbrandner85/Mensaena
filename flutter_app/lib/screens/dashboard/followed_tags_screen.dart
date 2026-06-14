@@ -15,6 +15,7 @@ import '../../repositories/extra_repositories.dart';
 import '../../repositories/posts_repository.dart';
 import '../../services/haptics.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/error_state_widget.dart';
 import '../../widgets/shared/app_snackbar.dart';
 
 final _myFollowedTagsProvider =
@@ -123,7 +124,9 @@ class _FollowedTagsScreenState extends ConsumerState<FollowedTagsScreen> {
                     child: CircularProgressIndicator(
                         color: AppColors.bronze)),
               ),
-              error: (e, _) => Text('$e', style: AppTypography.caption()),
+              error: (e, _) => ErrorStateWidget(
+                  compact: true,
+                  onRetry: () => ref.invalidate(_myFollowedTagsProvider)),
               data: (tags) {
                 if (tags.isEmpty) {
                   return Padding(
@@ -163,7 +166,9 @@ class _FollowedTagsScreenState extends ConsumerState<FollowedTagsScreen> {
             const SizedBox(height: 8),
             suggested.when(
               loading: () => const SizedBox(height: 60),
-              error: (e, _) => Text('$e', style: AppTypography.caption()),
+              error: (e, _) => ErrorStateWidget(
+                  compact: true,
+                  onRetry: () => ref.invalidate(_suggestedTagsProvider)),
               data: (list) {
                 if (list.isEmpty) {
                   return Text(

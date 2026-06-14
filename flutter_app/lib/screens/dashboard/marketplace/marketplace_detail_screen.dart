@@ -23,6 +23,7 @@ import '../../../widgets/confirm_dialog.dart';
 import '../../../widgets/effects/parallax_image_header.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/marketplace/barter_matches_carousel.dart';
 import '../../../widgets/marketplace_reservation.dart';
 import '../../../widgets/shared/image_carousel.dart';
@@ -78,7 +79,12 @@ class _MarketplaceDetailScreenState
           loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.amber),
           ),
-          error: (e, _) => Center(child: Text('$e', style: AppTypography.caption())),
+          error: (e, _) => Center(
+            child: ErrorStateWidget(
+              onRetry: () =>
+                  ref.invalidate(marketplaceDetailProvider(listingId)),
+            ),
+          ),
           data: (l) {
             if (l == null) {
               return Center(
