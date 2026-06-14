@@ -168,6 +168,8 @@ Future<void> main() async {
   };
 
   // 3. App SOFORT rendern — kein await auf Firebase/FCM/Listener!
+  final globalContainer = ProviderContainer();
+  UserRoleCache.globalContainer = globalContainer;
   runApp(
     EasyLocalization(
       supportedLocales: kSupportedLocales,
@@ -175,7 +177,10 @@ Future<void> main() async {
       fallbackLocale: kFallbackLocale,
       startLocale: kFallbackLocale,
       useOnlyLangCode: true,
-      child: const ProviderScope(child: MensaenaApp()),
+      child: UncontrolledProviderScope(
+        container: globalContainer,
+        child: const MensaenaApp(),
+      ),
     ),
   );
 
