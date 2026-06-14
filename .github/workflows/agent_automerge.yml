@@ -48,6 +48,7 @@ jobs:
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           CONCLUSION: ${{ github.event.workflow_run.conclusion }}
           CI_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
           TASK_ID="${BRANCH#agent/task-}"
@@ -61,10 +62,33 @@ jobs:
               -d "$1" || true
           }
 
-          # 1) Flutter-CI muss grün sein
+          # 1) Flutter-CI muss grün sein — sonst Selbstheilung (bis MAX Versuche).
           if [ "$CONCLUSION" != "success" ]; then
-            echo "Flutter-CI nicht grün ($CONCLUSION) — kein Merge."
-            patch_status "{\"ci_status\":\"failure\",\"ci_run_url\":\"${CI_RUN_URL}\",\"summary\":\"Flutter-CI fehlgeschlagen ($CONCLUSION) — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            echo "Flutter-CI nicht grün ($CONCLUSION)."
+            MAX_FIX=3
+            ATTEMPTS=$(curl -sS \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=ci_attempts" \
+              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(String((a[0]&&a[0].ci_attempts)||0))}catch{process.stdout.write("0")}})')
+            ATTEMPTS=${ATTEMPTS:-0}
+            if [ "$ATTEMPTS" -lt "$MAX_FIX" ]; then
+              NEXT=$((ATTEMPTS+1))
+              echo "Selbstheilung Versuch ${NEXT}/${MAX_FIX} — Fehler an den Agenten zurückspielen."
+              # Fehlgeschlagene Job-Logs holen (gekürzt) — Lese-Call via GITHUB_TOKEN.
+              LOG=$(gh run view "$RUN_ID" --repo "${{ github.repository }}" --log-failed 2>/dev/null | tail -c 6000 || echo "")
+              BODY=$(LOG="$LOG" NEXT="$NEXT" CI_RUN_URL="$CI_RUN_URL" MAX_FIX="$MAX_FIX" node -e 'console.log(JSON.stringify({ci_attempts:Number(process.env.NEXT),status:"running",ci_status:"failure",ci_run_url:process.env.CI_RUN_URL,error:String(process.env.LOG||"").slice(0,8000),summary:"Selbstheilung Versuch "+process.env.NEXT+"/"+process.env.MAX_FIX+" — CI rot, Agent bessert nach.",updated_at:new Date().toISOString()}))')
+              patch_status "$BODY"
+              # Fix-Workflow anstoßen (PAT — wie der Shorebird-Dispatch, braucht actions:write).
+              GH_TOKEN="$PAT" gh workflow run admin_agent_fix.yml \
+                --repo "${{ github.repository }}" --ref main \
+                --field task_id="$TASK_ID" \
+                && echo "admin_agent_fix.yml dispatcht für ${TASK_ID}" \
+                || echo "Dispatch fehlgeschlagen (Token-Rechte?)."
+              exit 0
+            fi
+            echo "Nach ${MAX_FIX} Selbstheilungs-Versuchen weiter rot — aufgeben."
+            patch_status "{\"ci_status\":\"failure\",\"ci_run_url\":\"${CI_RUN_URL}\",\"summary\":\"Flutter-CI nach ${MAX_FIX} Selbstheilungs-Versuchen rot — PR bleibt offen zur manuellen Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
             exit 0
           fi
 
