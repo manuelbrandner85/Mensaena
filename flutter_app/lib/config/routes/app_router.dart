@@ -1051,20 +1051,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/sharing',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: ModulePostsScreen(
-          title: 'modules.sharingTitle'.tr(),
-          emoji: '🔄',
-          postType: 'sharing',
-          route: '/dashboard/sharing',
-          subtitle: 'modules.sharing.subtitle'.tr(),
-          subFilters: const [
-            FilterOption(value: 'tools', label: '🔧 Werkzeug'),
-            FilterOption(value: 'books', label: '📚 Bücher'),
-            FilterOption(value: 'devices', label: '📱 Geräte'),
-            FilterOption(value: 'kitchen', label: '🍴 Küche'),
-            FilterOption(value: 'sports', label: '⚽ Sport'),
-          ],
-        ),
+          child: const PlaceholderScreen(title: 'Sharing', phase: 'Phase 2'),
         ),
       ),
       GoRoute(

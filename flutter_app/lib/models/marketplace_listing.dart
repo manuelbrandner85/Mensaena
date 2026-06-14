@@ -2,6 +2,17 @@
 /// Spiegel der Supabase-Tabelle `marketplace_listings` (gyqujitkvymlmgroovch).
 import '../services/location_anonymizer.dart';
 
+/// Alle gültigen Werte für das `listing_type`-Feld in `marketplace_listings`.
+/// Das Supabase-Feld ist `text` (kein DB-Enum), daher hier Dart-Konstanten.
+abstract final class ListingType {
+  static const String verschenken = 'verschenken';
+  static const String tauschen = 'tauschen';
+  static const String giveaway = 'giveaway';
+  static const String swap = 'swap';
+
+  static const List<String> values = [verschenken, tauschen, giveaway, swap];
+}
+
 class MarketplaceListing {
   const MarketplaceListing({
     required this.id,
