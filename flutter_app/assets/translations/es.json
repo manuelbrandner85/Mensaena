@@ -1441,6 +1441,19 @@
     "duplicateWarning": "Tarea similar ya existe: \"{task}\"",
     "duplicateTitle": "Posible tarea duplicada",
     "duplicateProceed": "Hacerlo igualmente",
+    "apiKeys": {
+      "title": "Claves API",
+      "empty": "Aún no hay claves.",
+      "add": "Añadir clave",
+      "editTitle": "Clave API",
+      "service": "Servicio",
+      "key": "Clave",
+      "keyReplace": "Nueva clave (reemplaza)",
+      "noExpiry": "Sin caducidad",
+      "setExpiry": "Definir caducidad",
+      "expires": "caduca: {date}",
+      "required": "Servicio y clave obligatorios."
+    },
     "refine": {
       "title": "Refinar tarea",
       "hint": "¿Qué cambiar adicionalmente?",

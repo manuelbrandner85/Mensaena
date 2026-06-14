@@ -1440,6 +1440,19 @@
     "duplicateWarning": "Похожая задача уже существует: «{task}»",
     "duplicateTitle": "Возможный дубликат",
     "duplicateProceed": "Всё равно выполнить",
+    "apiKeys": {
+      "title": "API-ключи",
+      "empty": "Ключей пока нет.",
+      "add": "Добавить ключ",
+      "editTitle": "API-ключ",
+      "service": "Сервис",
+      "key": "Ключ",
+      "keyReplace": "Новый ключ (заменит)",
+      "noExpiry": "Без срока",
+      "setExpiry": "Задать срок",
+      "expires": "истекает: {date}",
+      "required": "Нужны сервис и ключ."
+    },
     "refine": {
       "title": "Доработать задачу",
       "hint": "Что ещё изменить?",

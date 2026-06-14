@@ -1440,6 +1440,19 @@
     "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
     "duplicateTitle": "Olası mükerrer görev",
     "duplicateProceed": "Yine de yap",
+    "apiKeys": {
+      "title": "API anahtarları",
+      "empty": "Henüz anahtar yok.",
+      "add": "Anahtar ekle",
+      "editTitle": "API anahtarı",
+      "service": "Servis",
+      "key": "Anahtar",
+      "keyReplace": "Yeni anahtar (değiştirir)",
+      "noExpiry": "Süresiz",
+      "setExpiry": "Süre belirle",
+      "expires": "bitiş: {date}",
+      "required": "Servis ve anahtar gerekli."
+    },
     "refine": {
       "title": "Görevi iyileştir",
       "hint": "Ek olarak ne değişmeli?",

@@ -1441,6 +1441,19 @@
     "duplicateWarning": "Attività simile già presente: \"{task}\"",
     "duplicateTitle": "Possibile incarico doppio",
     "duplicateProceed": "Procedi comunque",
+    "apiKeys": {
+      "title": "Chiavi API",
+      "empty": "Nessuna chiave salvata.",
+      "add": "Aggiungi chiave",
+      "editTitle": "Chiave API",
+      "service": "Servizio",
+      "key": "Chiave",
+      "keyReplace": "Nuova chiave (sostituisce)",
+      "noExpiry": "Nessuna scadenza",
+      "setExpiry": "Imposta scadenza",
+      "expires": "scade: {date}",
+      "required": "Servizio e chiave obbligatori."
+    },
     "refine": {
       "title": "Affina l'incarico",
       "hint": "Cosa modificare in più?",

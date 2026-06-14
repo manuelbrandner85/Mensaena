@@ -106,6 +106,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   bool _notesExpanded = false;
   List<Map<String, dynamic>> _changelog = const [];
   bool _changelogExpanded = false;
+  List<Map<String, dynamic>> _apiKeys = const [];
+  bool _apiKeysExpanded = false;
   // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
   // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
   String? _pendingNoteId;
@@ -154,6 +156,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     _loadNotes();
     _loadMetrics();
     _loadChangelog();
+    _loadApiKeys();
     _loadSchedules();
     _loadModuleInsights();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
@@ -880,6 +883,133 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     setState(() => _changelog = c);
   }
 
+  Future<void> _loadApiKeys() async {
+    final k = await AiInsightsRepository.fetchApiKeys();
+    if (!mounted) return;
+    setState(() => _apiKeys = k);
+  }
+
+  // API-Key anlegen/bearbeiten (Service + Key + optionales Ablaufdatum).
+  Future<void> _editApiKey({Map<String, dynamic>? existing}) async {
+    final serviceCtrl =
+        TextEditingController(text: existing?['service'] as String? ?? '');
+    final keyCtrl = TextEditingController();
+    DateTime? expiry = existing?['expires_at'] != null
+        ? DateTime.tryParse(existing!['expires_at'] as String)
+        : null;
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: Text('adminDev.apiKeys.editTitle'.tr(),
+              style: AppTypography.display(size: 16, color: AppColors.ink)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: serviceCtrl,
+                enabled: existing == null,
+                style: AppTypography.body(size: 13, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'adminDev.apiKeys.service'.tr(),
+                  hintText: 'tankerkoenig, openrouteservice …',
+                  hintStyle:
+                      AppTypography.body(size: 11, color: AppColors.mute),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: keyCtrl,
+                obscureText: true,
+                style: AppTypography.body(size: 13, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: existing == null
+                      ? 'adminDev.apiKeys.key'.tr()
+                      : 'adminDev.apiKeys.keyReplace'.tr(),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(children: [
+                const Icon(LucideIcons.calendarClock,
+                    size: 14, color: AppColors.mute),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    expiry == null
+                        ? 'adminDev.apiKeys.noExpiry'.tr()
+                        : '${expiry!.day}.${expiry!.month}.${expiry!.year}',
+                    style:
+                        AppTypography.body(size: 12, color: AppColors.inkSoft),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: ctx,
+                      initialDate: expiry ?? now.add(const Duration(days: 365)),
+                      firstDate: now,
+                      lastDate: now.add(const Duration(days: 3650)),
+                    );
+                    if (picked != null) setLocal(() => expiry = picked);
+                  },
+                  child: Text('adminDev.apiKeys.setExpiry'.tr()),
+                ),
+                if (expiry != null)
+                  IconButton(
+                    onPressed: () => setLocal(() => expiry = null),
+                    icon: const Icon(LucideIcons.x, size: 14),
+                    color: AppColors.mute,
+                  ),
+              ]),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text('common.cancel'.tr()),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text('common.save'.tr()),
+            ),
+          ],
+        ),
+      ),
+    );
+    final service = serviceCtrl.text.trim();
+    final key = keyCtrl.text.trim();
+    if (saved != true || !mounted) return;
+    if (service.isEmpty || key.isEmpty) {
+      AppSnackBar.error(context, 'adminDev.apiKeys.required'.tr());
+      return;
+    }
+    final res = await AiInsightsRepository.setApiKey(
+      service: service,
+      apiKey: key,
+      expiresAtIso: expiry?.toUtc().toIso8601String(),
+    );
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      AppSnackBar.success(context, 'common.created'.tr());
+      await _loadApiKeys();
+    } else {
+      _showError(res['error'] as String?);
+    }
+  }
+
+  Future<void> _deleteApiKey(String service) async {
+    final res = await AiInsightsRepository.deleteApiKey(service);
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      await _loadApiKeys();
+    } else {
+      _showError(res['error'] as String?);
+    }
+  }
+
   Future<void> _loadSchedules() async {
     final rows = await AiInsightsRepository.fetchDevSchedules();
     if (!mounted) return;
@@ -1178,6 +1308,16 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             expanded: _changelogExpanded,
                             onToggle: () => setState(() =>
                                 _changelogExpanded = !_changelogExpanded),
+                          ),
+                          const SizedBox(height: 10),
+                          _ApiKeysCard(
+                            keys: _apiKeys,
+                            expanded: _apiKeysExpanded,
+                            onToggle: () => setState(() =>
+                                _apiKeysExpanded = !_apiKeysExpanded),
+                            onAdd: () => _editApiKey(),
+                            onEdit: (k) => _editApiKey(existing: k),
+                            onDelete: _deleteApiKey,
                           ),
                           const SizedBox(height: 10),
                           // Auftragshistorie direkt oben in der ScrollListe
@@ -4174,6 +4314,148 @@ class _DiffPatch extends StatelessWidget {
 }
 
 // ── Health-/Metrics-Dashboard ───────────────────────────────────────────────
+
+// Freie-API-Key-Verwaltung (Klapp-Karte). Zeigt NUR Metadaten, nie den Key.
+class _ApiKeysCard extends StatelessWidget {
+  const _ApiKeysCard({
+    required this.keys,
+    required this.expanded,
+    required this.onToggle,
+    required this.onAdd,
+    required this.onEdit,
+    required this.onDelete,
+  });
+  final List<Map<String, dynamic>> keys;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onAdd;
+  final void Function(Map<String, dynamic>) onEdit;
+  final void Function(String service) onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(13),
+            child: Padding(
+              padding: const EdgeInsets.all(13),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.keyRound,
+                      size: 16, color: AppColors.teal),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('adminDev.apiKeys.title'.tr(),
+                        style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.lightInk,
+                            weight: FontWeight.w700)),
+                  ),
+                  if (keys.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Text('${keys.length}',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.lightMute)),
+                    ),
+                  Icon(
+                      expanded
+                          ? LucideIcons.chevronUp
+                          : LucideIcons.chevronDown,
+                      size: 16,
+                      color: AppColors.lightMute),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            if (keys.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Text('adminDev.apiKeys.empty'.tr(),
+                    style: AppTypography.caption()),
+              )
+            else
+              ...keys.map((k) {
+                final service = k['service'] as String? ?? '';
+                final exp = k['expires_at'] != null
+                    ? DateTime.tryParse(k['expires_at'] as String)
+                    : null;
+                final expired =
+                    exp != null && exp.isBefore(DateTime.now());
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(13, 6, 6, 6),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.key,
+                          size: 13, color: AppColors.lightMute),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(service,
+                                style: AppTypography.body(
+                                    size: 12, color: AppColors.lightInk)),
+                            if (exp != null)
+                              Text(
+                                'adminDev.apiKeys.expires'.tr(namedArgs: {
+                                  'date':
+                                      '${exp.day}.${exp.month}.${exp.year}'
+                                }),
+                                style: AppTypography.label(
+                                    size: 9,
+                                    color: expired
+                                        ? AppColors.herzrotWarm
+                                        : AppColors.lightMute),
+                              ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'common.edit'.tr(),
+                        onPressed: () => onEdit(k),
+                        icon: const Icon(LucideIcons.pencil,
+                            size: 14, color: AppColors.bronze),
+                      ),
+                      IconButton(
+                        tooltip: 'common.delete'.tr(),
+                        onPressed: () => onDelete(service),
+                        icon: const Icon(LucideIcons.trash2,
+                            size: 14, color: AppColors.herzrotWarm),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(13, 0, 13, 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(LucideIcons.plus, size: 14),
+                  label: Text('adminDev.apiKeys.add'.tr()),
+                  style:
+                      TextButton.styleFrom(foregroundColor: AppColors.teal),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
 
 // Auto-Changelog: gemergte Godmode-Änderungen (Klapp-Karte).
 class _ChangelogCard extends StatelessWidget {

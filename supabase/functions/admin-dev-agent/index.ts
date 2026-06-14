@@ -455,6 +455,37 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
     return json({ ok: true, deleted: 1 })
   }
 
+  // ── Freie-API-Key-Verwaltung (Roh-Key wird NIE an Clients zurückgegeben) ──
+  if (action === 'keys_list') {
+    const { data, error } = await admin.from('godmode_api_keys')
+      .select('service, label, expires_at, created_at')
+      .order('service', { ascending: true })
+    if (error) return json({ error: 'keys_list_failed', detail: error.message }, 500)
+    return json({ ok: true, keys: data ?? [] })
+  }
+  if (action === 'key_set') {
+    const service = String(body?.service ?? '').trim().toLowerCase().slice(0, 60)
+    const apiKey = String(body?.api_key ?? '').trim().slice(0, 400)
+    const label = body?.label ? String(body.label).slice(0, 120) : null
+    const expiresAt = body?.expires_at ? String(body.expires_at) : null
+    if (service.length < 2 || apiKey.length < 2) {
+      return json({ error: 'service_and_key_required' }, 400)
+    }
+    const { error } = await admin.from('godmode_api_keys').upsert({
+      service, api_key: apiKey, label, expires_at: expiresAt,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'service' })
+    if (error) return json({ error: 'key_set_failed', detail: error.message }, 500)
+    return json({ ok: true })
+  }
+  if (action === 'key_delete') {
+    const service = String(body?.service ?? '').trim().toLowerCase()
+    if (!service) return json({ error: 'service_required' }, 400)
+    const { error } = await admin.from('godmode_api_keys').delete().eq('service', service)
+    if (error) return json({ error: 'key_delete_failed', detail: error.message }, 500)
+    return json({ ok: true, deleted: 1 })
+  }
+
   // ── Offenen PR per Folge-Anweisung nachbessern ────────────────────────────
   // Wendet eine zusätzliche Anweisung auf den BESTEHENDEN Branch eines offenen
   // Auftrags an (agent/task-<id>) → admin_agent_refine.yml. Kein neuer Task/PR.

@@ -1441,6 +1441,19 @@
     "duplicateWarning": "Similar task already exists: \"{task}\"",
     "duplicateTitle": "Possible duplicate task",
     "duplicateProceed": "Do it anyway",
+    "apiKeys": {
+      "title": "API keys",
+      "empty": "No keys stored yet.",
+      "add": "Add key",
+      "editTitle": "API key",
+      "service": "Service",
+      "key": "Key",
+      "keyReplace": "New key (replaces)",
+      "noExpiry": "No expiry",
+      "setExpiry": "Set expiry",
+      "expires": "expires: {date}",
+      "required": "Service and key required."
+    },
     "refine": {
       "title": "Refine task",
       "hint": "What should be changed additionally?",

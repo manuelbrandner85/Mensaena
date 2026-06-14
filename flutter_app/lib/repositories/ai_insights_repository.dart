@@ -124,6 +124,60 @@ class AiInsightsRepository {
     }
   }
 
+  /// Lädt die hinterlegten freien API-Keys (NUR Metadaten, nie der Roh-Key).
+  static Future<List<Map<String, dynamic>>> fetchApiKeys() async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'keys_list'})
+          .timeout(const Duration(seconds: 30));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return ((data['keys'] as List?) ?? const [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchApiKeys failed: $e');
+      return const [];
+    }
+  }
+
+  /// Legt einen freien API-Key an/aktualisiert ihn (optional mit Ablaufdatum).
+  static Future<Map<String, dynamic>> setApiKey({
+    required String service,
+    required String apiKey,
+    String? label,
+    String? expiresAtIso,
+  }) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'key_set',
+            'service': service,
+            'api_key': apiKey,
+            if (label != null) 'label': label,
+            if (expiresAtIso != null) 'expires_at': expiresAtIso,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] setApiKey failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht einen hinterlegten API-Key.
+  static Future<Map<String, dynamic>> deleteApiKey(String service) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent',
+              body: {'action': 'key_delete', 'service': service})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] deleteApiKey failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   /// Bessert einen offenen Auftrag per Folge-Anweisung nach (gleicher Branch/PR).
   static Future<Map<String, dynamic>> refineDevTask(
       String id, String instruction) async {

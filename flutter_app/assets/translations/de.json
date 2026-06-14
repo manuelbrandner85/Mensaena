@@ -1440,6 +1440,19 @@
     "duplicateWarning": "Ähnlicher Auftrag vorhanden: \"{task}\"",
     "duplicateTitle": "Möglicher Doppel-Auftrag",
     "duplicateProceed": "Trotzdem umsetzen",
+    "apiKeys": {
+      "title": "API-Schlüssel",
+      "empty": "Noch keine Schlüssel hinterlegt.",
+      "add": "Schlüssel hinzufügen",
+      "editTitle": "API-Schlüssel",
+      "service": "Dienst",
+      "key": "Schlüssel",
+      "keyReplace": "Neuer Schlüssel (ersetzt)",
+      "noExpiry": "Kein Ablauf",
+      "setExpiry": "Ablauf setzen",
+      "expires": "läuft ab: {date}",
+      "required": "Dienst und Schlüssel erforderlich."
+    },
     "refine": {
       "title": "Auftrag nachbessern",
       "hint": "Was soll zusätzlich geändert werden?",
