@@ -1382,6 +1382,15 @@
     "approveMerge": "Approuver et fusionner",
     "attachImage": "Joindre une capture",
     "reviewBeforeMerge": "Vérifier avant la fusion (approbation manuelle)",
+    "edit": {
+      "title": "Modifier la suggestion et accepter",
+      "retryTitle": "Ajuster la tâche et relancer",
+      "bundleTitle": "Regrouper {count} suggestions",
+      "bundleHint": "Ces suggestions sont réunies en UNE seule tâche — vous pouvez d'abord modifier le texte.",
+      "promptLabel": "Instruction pour l'agent",
+      "confirm": "Appliquer et lancer",
+      "emptyPrompt": "L'instruction ne peut pas être vide."
+    },
     "diffTitle": "Modifications (diff)",
     "diffError": "Impossible de charger le diff.",
     "diffBinary": "Aucune modification de texte (fichier binaire, etc.).",

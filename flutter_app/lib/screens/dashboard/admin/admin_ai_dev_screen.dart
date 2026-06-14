@@ -302,16 +302,51 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     }
   }
 
-  Future<void> _accept(String id) async {
+  // Vorschlag annehmen — IMMER über das Edit-Sheet: der vom Scan formulierte
+  // Prompt ist vorausgefüllt und kann angepasst werden, plus die gleichen
+  // Optionen wie bei freien Aufträgen (Review-Gate, Plan-Modus, Screenshots).
+  // Danach wird der (ggf. bearbeitete) Auftrag erstellt und der Vorschlag
+  // verknüpft-markiert.
+  Future<void> _acceptWithEdit(Map<String, dynamic> s) async {
+    final id = s['id'] as String? ?? '';
+    if (id.isEmpty || _busySuggestions.contains(id)) return;
+    final initial = (s['instruction'] as String?)?.trim().isNotEmpty == true
+        ? s['instruction'] as String
+        : (s['title'] as String? ?? '');
+    final result = await showModalBottomSheet<_PromptEditResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _PromptEditSheet(
+        title: 'adminDev.edit.title'.tr(),
+        confirmLabel: 'adminDev.edit.confirm'.tr(),
+        initialText: initial,
+      ),
+    );
+    if (result == null || !mounted) return;
     setState(() => _busySuggestions.add(id));
-    final res = await AiInsightsRepository.acceptSuggestion(id);
+    final res = await _submitTask(
+      result.instruction,
+      awaitReview: result.awaitReview,
+      planMode: result.planMode,
+      wantScreens: result.wantScreens,
+      origin: 'suggestion',
+    );
     if (!mounted) return;
-    setState(() => _busySuggestions.remove(id));
+    if (res['cancelled'] == true) {
+      setState(() => _busySuggestions.remove(id));
+      return;
+    }
     if (res['ok'] == true) {
+      await AiInsightsRepository.markSuggestionsAccepted(
+          [id], res['task_id'] as String?);
+      if (!mounted) return;
+      setState(() => _busySuggestions.remove(id));
       AppSnackBar.info(context, 'adminDev.accepted'.tr());
       await _loadSuggestions(silent: true);
       await _refresh(silent: true);
     } else {
+      setState(() => _busySuggestions.remove(id));
       _showError(res['error'] as String?);
     }
   }
@@ -353,24 +388,63 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     });
   }
 
+  // Ausgewählte Vorschläge zu EINEM editierbaren Auftrag bündeln (statt N PRs):
+  // kombinierte, nummerierte Anweisung vorausfüllen → anpassbar → ein Task →
+  // alle Vorschläge verknüpft als angenommen markieren.
   Future<void> _acceptSelected() async {
     if (_selected.isEmpty || _batchBusy) return;
-    setState(() => _batchBusy = true);
     final ids = _selected.toList();
-    final res = await AiInsightsRepository.acceptManySuggestions(ids);
+    final chosen =
+        _suggestions.where((s) => ids.contains(s['id'])).toList();
+    final buf = StringBuffer();
+    for (var i = 0; i < chosen.length; i++) {
+      final s = chosen[i];
+      final t = (s['title'] as String?)?.trim() ?? '';
+      final ins = (s['instruction'] as String?)?.trim() ?? '';
+      buf.writeln('${i + 1}. ${t.isNotEmpty ? '$t — ' : ''}$ins');
+      buf.writeln();
+    }
+    final result = await showModalBottomSheet<_PromptEditResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _PromptEditSheet(
+        title: 'adminDev.edit.bundleTitle'
+            .tr(namedArgs: {'count': '${chosen.length}'}),
+        confirmLabel: 'adminDev.edit.confirm'.tr(),
+        hint: 'adminDev.edit.bundleHint'.tr(),
+        initialText: buf.toString().trim(),
+      ),
+    );
+    if (result == null || !mounted) return;
+    setState(() => _batchBusy = true);
+    final res = await _submitTask(
+      result.instruction,
+      awaitReview: result.awaitReview,
+      planMode: result.planMode,
+      wantScreens: result.wantScreens,
+      origin: 'suggestion',
+    );
     if (!mounted) return;
-    setState(() {
-      _batchBusy = false;
-      _selectionMode = false;
-      _selected.clear();
-    });
+    if (res['cancelled'] == true) {
+      setState(() => _batchBusy = false);
+      return;
+    }
     if (res['ok'] == true) {
-      final n = (res['accepted'] as num?)?.toInt() ?? ids.length;
-      AppSnackBar.info(context, 'adminDev.acceptedMany'
-                .tr(namedArgs: {'count': '$n'}));
+      await AiInsightsRepository.markSuggestionsAccepted(
+          ids, res['task_id'] as String?);
+      if (!mounted) return;
+      setState(() {
+        _batchBusy = false;
+        _selectionMode = false;
+        _selected.clear();
+      });
+      AppSnackBar.info(context,
+          'adminDev.acceptedMany'.tr(namedArgs: {'count': '${ids.length}'}));
       await _loadSuggestions(silent: true);
       await _refresh(silent: true);
     } else {
+      setState(() => _batchBusy = false);
       _showError(res['error'] as String?);
     }
   }
@@ -436,6 +510,39 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     await _refresh(silent: true);
   }
 
+  // Gemeinsamer Absende-Pfad: erzeugt (optional) den Multi-Step-Plan, lässt ihn
+  // bestätigen und legt den Auftrag an. Geteilt von Chat-Confirm, Vorschlag-
+  // Annehmen (bearbeitet), Bündeln und Retry — so verhalten sich alle Wege
+  // identisch (gleiche Optionen, gleiche Plan-Bestätigung). Rückgabe:
+  // {ok, task_id} | {error} | {cancelled:true} (Plan im Dialog verworfen).
+  Future<Map<String, dynamic>> _submitTask(
+    String instruction, {
+    List<String> imageUrls = const [],
+    bool awaitReview = false,
+    bool planMode = false,
+    bool wantScreens = false,
+    String? origin,
+  }) async {
+    var plan = const <String>[];
+    if (planMode) {
+      final steps = await AiInsightsRepository.planDevTask(instruction);
+      if (!mounted) return const {'cancelled': true};
+      if (steps.isNotEmpty) {
+        final ok = await _confirmPlan(steps);
+        if (ok != true) return const {'cancelled': true};
+        plan = steps;
+      }
+    }
+    return AiInsightsRepository.createDevTask(
+      instruction,
+      imageUrls: imageUrls,
+      awaitReview: awaitReview,
+      plan: plan,
+      wantScreens: wantScreens,
+      origin: origin,
+    );
+  }
+
   // Wird vom Chat-Sheet aufgerufen, sobald der Admin „Ja, umsetzen" tippt.
   // Lädt zuvor angehängte Screenshots hoch und übergibt sie + das Review-Gate.
   Future<bool> _confirmChatTask(String instruction) async {
@@ -447,25 +554,14 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       );
     }
 
-    // Multi-Step-Plan: Schritte erzeugen + vom Admin bestätigen lassen.
-    var plan = const <String>[];
-    if (_planMode) {
-      final steps = await AiInsightsRepository.planDevTask(instruction);
-      if (!mounted) return false;
-      if (steps.isNotEmpty) {
-        final ok = await _confirmPlan(steps);
-        if (ok != true) return false; // Admin hat den Plan verworfen.
-        plan = steps;
-      }
-    }
-
-    final res = await AiInsightsRepository.createDevTask(
+    final res = await _submitTask(
       '${_categoryPrefix()}$instruction',
       imageUrls: urls,
       awaitReview: _awaitReview,
-      plan: plan,
+      planMode: _planMode,
       wantScreens: _wantScreens,
     );
+    if (res['cancelled'] == true) return false; // Plan verworfen.
     if (res['ok'] == true) {
       setState(() {
         _pendingImages.clear();
@@ -569,14 +665,38 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     setState(() => _pendingImages.removeAt(index));
   }
 
-  // Fehlgeschlagenen Auftrag wiederholen — lädt Instruction ins Eingabefeld
-  // und öffnet den Chat-Bestätigungs-Flow wie bei einem neuen Auftrag.
+  // Fehlgeschlagenen Auftrag wiederholen — öffnet das Edit-Sheet mit der
+  // ursprünglichen Anweisung. So lässt sich der Prompt VOR dem Neustart
+  // anpassen (z. B. der Grund des Fehlschlags), statt 1:1 zu wiederholen.
   Future<void> _retryTask(String instruction) async {
-    setState(() {
-      _ctrl.text = instruction;
-      _ctrl.selection = TextSelection.collapsed(offset: instruction.length);
-    });
-    await _send(instruction);
+    if (_sending) return;
+    final result = await showModalBottomSheet<_PromptEditResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _PromptEditSheet(
+        title: 'adminDev.edit.retryTitle'.tr(),
+        confirmLabel: 'adminDev.edit.confirm'.tr(),
+        initialText: instruction,
+      ),
+    );
+    if (result == null || !mounted) return;
+    setState(() => _sending = true);
+    final res = await _submitTask(
+      result.instruction,
+      awaitReview: result.awaitReview,
+      planMode: result.planMode,
+      wantScreens: result.wantScreens,
+    );
+    if (!mounted) return;
+    setState(() => _sending = false);
+    if (res['cancelled'] == true) return;
+    if (res['ok'] == true) {
+      AppSnackBar.info(context, 'adminDev.queued'.tr());
+      await _refresh(silent: true);
+    } else {
+      _showError(res['error'] as String?);
+    }
   }
 
   // Laufenden Auftrag abbrechen.
@@ -1002,7 +1122,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                   selected:
                                       _selected.contains(s['id'] as String?),
                                   onToggleSelect: _toggleSelected,
-                                  onAccept: _accept,
+                                  onAccept: _acceptWithEdit,
                                   onReject: _reject,
                                 )),
                             const SizedBox(height: 14),
@@ -2059,7 +2179,7 @@ class _SuggestionCard extends StatelessWidget {
   final bool selectionMode;
   final bool selected;
   final void Function(String) onToggleSelect;
-  final void Function(String) onAccept;
+  final void Function(Map<String, dynamic>) onAccept;
   final void Function(String) onReject;
 
   @override
@@ -2206,7 +2326,7 @@ class _SuggestionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: FilledButton.icon(
-                    onPressed: busy ? null : () => onAccept(id),
+                    onPressed: busy ? null : () => onAccept(suggestion),
                     icon: busy
                         ? const SizedBox(
                             width: 13,
@@ -4824,6 +4944,186 @@ class _ModuleInsightCard extends StatelessWidget {
               ],
             ),
         ],
+      ),
+    );
+  }
+}
+
+// Ergebnis des Edit-Sheets: der (bearbeitete) Prompt + die gewählten Optionen.
+class _PromptEditResult {
+  const _PromptEditResult({
+    required this.instruction,
+    required this.awaitReview,
+    required this.planMode,
+    required this.wantScreens,
+  });
+  final String instruction;
+  final bool awaitReview;
+  final bool planMode;
+  final bool wantScreens;
+}
+
+// Wiederverwendbares Sheet zum Bearbeiten eines Prompts vor dem Absenden.
+// Genutzt für: Vorschlag annehmen (bearbeitbar), mehrere Vorschläge bündeln,
+// und fehlgeschlagene Aufträge mit angepasstem Prompt neu starten. Bietet
+// dieselben Optionen wie das freie Eingabefeld (Review-Gate, Plan, Screenshots).
+class _PromptEditSheet extends StatefulWidget {
+  const _PromptEditSheet({
+    required this.title,
+    required this.confirmLabel,
+    required this.initialText,
+    this.hint,
+  });
+  final String title;
+  final String confirmLabel;
+  final String initialText;
+  final String? hint;
+
+  @override
+  State<_PromptEditSheet> createState() => _PromptEditSheetState();
+}
+
+class _PromptEditSheetState extends State<_PromptEditSheet> {
+  late final TextEditingController _ctrl;
+  bool _awaitReview = false;
+  bool _planMode = false;
+  bool _wantScreens = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(text: widget.initialText);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final text = _ctrl.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('adminDev.edit.emptyPrompt'.tr()),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return;
+    }
+    Navigator.of(context).pop(_PromptEditResult(
+      instruction: text,
+      awaitReview: _awaitReview,
+      planMode: _planMode,
+      wantScreens: _wantScreens,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(LucideIcons.pencil, size: 18, color: AppColors.teal),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.title,
+                      style: AppTypography.body(
+                          size: 14,
+                          color: AppColors.lightInk,
+                          weight: FontWeight.w700),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(LucideIcons.x, size: 18),
+                    color: AppColors.lightMute,
+                  ),
+                ],
+              ),
+              if (widget.hint != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  widget.hint!,
+                  style:
+                      AppTypography.body(size: 12, color: AppColors.lightMute),
+                ),
+              ],
+              const SizedBox(height: 10),
+              TextField(
+                controller: _ctrl,
+                autofocus: true,
+                maxLines: 12,
+                minLines: 4,
+                style: AppTypography.body(size: 13, color: AppColors.lightInk),
+                decoration: InputDecoration(
+                  labelText: 'adminDev.edit.promptLabel'.tr(),
+                  alignLabelWithHint: true,
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _MiniToggle(
+                label: 'adminDev.reviewBeforeMerge'.tr(),
+                value: _awaitReview,
+                onChanged: (v) => setState(() => _awaitReview = v),
+              ),
+              _MiniToggle(
+                label: 'adminDev.plan.toggle'.tr(),
+                value: _planMode,
+                onChanged: (v) => setState(() => _planMode = v),
+              ),
+              _MiniToggle(
+                label: 'adminDev.screens.toggle'.tr(),
+                value: _wantScreens,
+                onChanged: (v) => setState(() => _wantScreens = v),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: _submit,
+                  icon: const Icon(LucideIcons.check, size: 16),
+                  label: Text(widget.confirmLabel),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.teal,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

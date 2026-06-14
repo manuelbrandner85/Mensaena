@@ -13,6 +13,10 @@
 //   • 'reject' { id }     — Vorschlag ablehnen.
 //   • 'accept_many' {ids} — mehrere Vorschläge auf einmal annehmen.
 //   • 'reject_many' {ids} — mehrere Vorschläge auf einmal ablehnen.
+//   • 'mark_accepted' {ids, task_id?} — Vorschläge als angenommen markieren OHNE
+//                           selbst einen Task zu erzeugen. Nutzt der Client, wenn
+//                           er den (bearbeiteten/gebündelten) Task bereits via
+//                           admin-dev-agent angelegt hat und nur verknüpfen will.
 //
 // Nur role='admin'. Schreibzugriff ausschließlich serverseitig (service_role).
 //
@@ -228,6 +232,39 @@ Deno.serve(async (req) => {
       else failed.push(id)
     }
     return json({ ok: true, accepted, failed })
+  }
+
+  // ── MARK ACCEPTED ────────────────────────────────────────────────────────────
+  // Markiert Vorschläge als 'accepted' und verknüpft sie mit einem bereits
+  // angelegten Task. Erzeugt selbst KEINEN Task und triggert keinen Workflow —
+  // das hat der Client (admin-dev-agent createDevTask) schon erledigt. So können
+  // bearbeitete Einzel-Vorschläge und gebündelte Mehrfach-Vorschläge sauber als
+  // angenommen markiert werden, ohne pro Vorschlag einen eigenen PR zu erzeugen.
+  if (action === 'mark_accepted') {
+    const ids = Array.isArray(body?.ids)
+      ? body.ids.map((x: unknown) => String(x)).filter(Boolean).slice(0, 60)
+      : []
+    if (ids.length === 0) return json({ error: 'ids_required' }, 400)
+    const taskId = body?.task_id ? String(body.task_id) : null
+
+    const { error, count } = await admin.from('admin_dev_suggestions')
+      .update({
+        status: 'accepted', task_id: taskId,
+        reviewed_by: user.id, reviewed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { count: 'exact' })
+      .in('id', ids).eq('status', 'pending')
+    if (error) return json({ error: 'mark_failed', detail: error.message }, 500)
+
+    try {
+      await admin.from('ai_admin_audit').insert({
+        feature: 'dev_agent', actor_id: user.id, action: 'suggestion_accepted',
+        target_type: 'admin_dev_suggestions', target_id: ids[0],
+        summary: `${count ?? 0} Vorschlag/Vorschläge bearbeitet/gebündelt angenommen`,
+      })
+    } catch { /* best-effort */ }
+
+    return json({ ok: true, accepted: count ?? 0 })
   }
 
   // ── REJECT ──────────────────────────────────────────────────────────────────

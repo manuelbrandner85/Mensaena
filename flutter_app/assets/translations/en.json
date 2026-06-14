@@ -1382,6 +1382,15 @@
     "approveMerge": "Approve & merge",
     "attachImage": "Attach screenshot",
     "reviewBeforeMerge": "Review before merge (manual approval)",
+    "edit": {
+      "title": "Edit suggestion & accept",
+      "retryTitle": "Adjust task & restart",
+      "bundleTitle": "Bundle {count} suggestions",
+      "bundleHint": "These suggestions are combined into ONE task — you can adjust the text first.",
+      "promptLabel": "Instruction for the agent",
+      "confirm": "Apply & run",
+      "emptyPrompt": "The instruction must not be empty."
+    },
     "diffTitle": "Changes (diff)",
     "diffError": "Could not load diff.",
     "diffBinary": "No text change (binary file etc.).",

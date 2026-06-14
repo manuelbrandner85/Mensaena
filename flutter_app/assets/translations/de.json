@@ -1381,6 +1381,15 @@
     "approveMerge": "Freigeben & mergen",
     "attachImage": "Screenshot anhängen",
     "reviewBeforeMerge": "Vor Merge prüfen (manuelle Freigabe)",
+    "edit": {
+      "title": "Vorschlag bearbeiten & annehmen",
+      "retryTitle": "Auftrag anpassen & neu starten",
+      "bundleTitle": "{count} Vorschläge bündeln",
+      "bundleHint": "Diese Vorschläge werden zu EINEM Auftrag zusammengefasst — Text vorher anpassbar.",
+      "promptLabel": "Anweisung an den Agenten",
+      "confirm": "Übernehmen & umsetzen",
+      "emptyPrompt": "Die Anweisung darf nicht leer sein."
+    },
     "diffTitle": "Änderungen (Diff)",
     "diffError": "Diff konnte nicht geladen werden.",
     "diffBinary": "Keine Textänderung (Binärdatei o. Ä.).",

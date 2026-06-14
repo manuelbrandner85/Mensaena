@@ -1381,6 +1381,15 @@
     "approveMerge": "Onayla ve birleştir",
     "attachImage": "Ekran görüntüsü ekle",
     "reviewBeforeMerge": "Birleştirmeden önce incele (manuel onay)",
+    "edit": {
+      "title": "Öneriyi düzenle ve kabul et",
+      "retryTitle": "Görevi düzenle ve yeniden başlat",
+      "bundleTitle": "{count} öneriyi birleştir",
+      "bundleHint": "Bu öneriler TEK bir görevde birleştirilir — metni önce düzenleyebilirsin.",
+      "promptLabel": "Ajan için talimat",
+      "confirm": "Uygula ve çalıştır",
+      "emptyPrompt": "Talimat boş olamaz."
+    },
     "diffTitle": "Değişiklikler (diff)",
     "diffError": "Diff yüklenemedi.",
     "diffBinary": "Metin değişikliği yok (ikili dosya vb.).",

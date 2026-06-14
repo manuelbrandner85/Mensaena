@@ -84,6 +84,7 @@ class AiInsightsRepository {
     bool awaitReview = false,
     List<String> plan = const [],
     bool wantScreens = false,
+    String? origin,
   }) async {
     try {
       final res = await SupabaseService.client.functions
@@ -93,6 +94,7 @@ class AiInsightsRepository {
             if (awaitReview) 'await_review': true,
             if (plan.isNotEmpty) 'plan': plan,
             if (wantScreens) 'want_screens': true,
+            if (origin != null) 'origin': origin,
           })
           .timeout(const Duration(seconds: 30));
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
@@ -520,6 +522,26 @@ class AiInsightsRepository {
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
     } catch (e) {
       debugPrint('[AiInsights] acceptManySuggestions failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Markiert Vorschläge als angenommen, OHNE selbst Tasks zu erzeugen.
+  /// Wird genutzt, wenn der (ggf. bearbeitete/gebündelte) Auftrag bereits via
+  /// [createDevTask] angelegt wurde und nur noch verknüpft werden muss.
+  static Future<Map<String, dynamic>> markSuggestionsAccepted(
+      List<String> ids, String? taskId) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-suggestions', body: {
+            'action': 'mark_accepted',
+            'ids': ids,
+            if (taskId != null) 'task_id': taskId,
+          })
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] markSuggestionsAccepted failed: $e');
       return {'error': e.toString()};
     }
   }

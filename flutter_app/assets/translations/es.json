@@ -1382,6 +1382,15 @@
     "approveMerge": "Aprobar y fusionar",
     "attachImage": "Adjuntar captura",
     "reviewBeforeMerge": "Revisar antes de fusionar (aprobación manual)",
+    "edit": {
+      "title": "Editar propuesta y aceptar",
+      "retryTitle": "Ajustar tarea y reiniciar",
+      "bundleTitle": "Agrupar {count} propuestas",
+      "bundleHint": "Estas propuestas se combinan en UNA sola tarea; puedes ajustar el texto antes.",
+      "promptLabel": "Instrucción para el agente",
+      "confirm": "Aplicar y ejecutar",
+      "emptyPrompt": "La instrucción no puede estar vacía."
+    },
     "diffTitle": "Cambios (diff)",
     "diffError": "No se pudo cargar el diff.",
     "diffBinary": "Sin cambios de texto (archivo binario, etc.).",
