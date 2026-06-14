@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -367,6 +368,45 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     }
   }
 
+  // Generierten Avatar (Identicon/KI) im eigenen Storage persistieren.
+  // WICHTIG: ProfilesRepository.update akzeptiert nur Supabase-Storage-URLs
+  // (Sicherheits-Filter). Externe Generator-URLs (dicebear/pollinations)
+  // wurden vorher beim Speichern still verworfen → Profilbild ließ sich nicht
+  // ändern. Jetzt laden wir das Bild herunter und legen es im avatars-Bucket
+  // ab; gespeichert wird die Storage-URL (passiert den Filter, kein externer
+  // Host-Abhängigkeit, kein Broken-Image wenn der Generator mal down ist).
+  Future<String?> _uploadGeneratedAvatar(String sourceUrl) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final resp = await http
+          .get(Uri.parse(sourceUrl))
+          .timeout(const Duration(seconds: 25));
+      if (resp.statusCode != 200 || resp.bodyBytes.isEmpty) return null;
+      final ct = resp.headers['content-type'] ?? '';
+      final isPng = ct.contains('png') || sourceUrl.contains('dicebear');
+      final ext = isPng ? 'png' : 'jpg';
+      final contentType = isPng ? 'image/png' : 'image/jpeg';
+      final path =
+          '$uid/avatar-${DateTime.now().millisecondsSinceEpoch}.$ext';
+      await sb.storage.from('avatars').uploadBinary(
+            path,
+            resp.bodyBytes,
+            fileOptions: FileOptions(upsert: true, contentType: contentType),
+          );
+      return sb.storage.from('avatars').getPublicUrl(path);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('uploads.failed'.tr(namedArgs: {'e': '$e'}),
+              style: AppTypography.body(size: 12, color: AppColors.ink)),
+        ));
+      }
+      return null;
+    }
+  }
+
   Future<void> _useGPS() async {
     try {
       final pos = await LocationService.getCurrentPosition(
@@ -473,7 +513,20 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       }
       patch['avatar_url'] = url;
     } else if (_generatedAvatarUrl != null) {
-      patch['avatar_url'] = _generatedAvatarUrl;
+      final url = await _uploadGeneratedAvatar(_generatedAvatarUrl!);
+      if (!mounted) return;
+      if (url == null) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(
+            'profile.avatarUploadFailed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+          ),
+        ));
+        return;
+      }
+      patch['avatar_url'] = url;
     }
 
     // Cover
