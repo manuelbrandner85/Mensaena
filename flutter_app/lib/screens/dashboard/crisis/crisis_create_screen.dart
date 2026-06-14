@@ -253,6 +253,8 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
     }
     if (imageFailures > 0) {
       AppSnackBar.error(context, 'create.imagePartialFailed'.tr());
+    } else {
+      AppSnackBar.success(context, 'common.created'.tr());
     }
     context.go('/dashboard/crisis/$id');
   }

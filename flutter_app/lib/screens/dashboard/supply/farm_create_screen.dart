@@ -210,12 +210,12 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
     setState(() => _busy = false);
     if (slug == null) {
       Haptics.error();
-      _toast('supply.farmCreate.createFailed'.tr());
+      AppSnackBar.error(context, 'supply.farmCreate.createFailed'.tr());
       return;
     }
     Haptics.success();
     MiniConfetti.show(context);
-    _toast('supply.farmCreate.createSuccess'.tr());
+    AppSnackBar.success(context, 'supply.farmCreate.createSuccess'.tr());
     context.go('/dashboard/supply');
   }
 

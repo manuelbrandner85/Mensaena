@@ -396,6 +396,7 @@ class _ModuleCreatePostScreenState
       if (!mounted) return;
       // Premium: kleiner Feier-Moment beim erfolgreichen Erstellen.
       CelebrateBurst.fire(context, ref: ref);
+      AppSnackBar.success(context, 'common.created'.tr());
       // 1:1 Web: navigiere zur Modul-Detail-Page, nicht zum Post-Detail
       // (Web macht beides — wir nehmen Modul-Route für bessere UX-Continuity).
       context.go('${widget.config.returnRoute}/$newId');
