@@ -793,6 +793,64 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     }
   }
 
+  // Offenen Auftrag per Folge-Anweisung nachbessern (gleicher Branch/PR).
+  Future<void> _refineTask(String id) async {
+    final ctrl = TextEditingController();
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Row(children: [
+          const Icon(LucideIcons.messageSquarePlus,
+              size: 18, color: AppColors.teal),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Text('adminDev.refine.title'.tr(),
+                  style:
+                      AppTypography.display(size: 16, color: AppColors.ink))),
+        ]),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: 4,
+          minLines: 2,
+          style: AppTypography.body(size: 13, color: AppColors.ink),
+          decoration: InputDecoration(
+            hintText: 'adminDev.refine.hint'.tr(),
+            hintStyle: AppTypography.body(size: 12, color: AppColors.mute),
+            filled: true,
+            fillColor: AppColors.elevated,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('common.send'.tr()),
+          ),
+        ],
+      ),
+    );
+    final text = ctrl.text.trim();
+    if (go != true || text.length < 3 || !mounted) return;
+    setState(() => _deletingTasks.add(id));
+    final res = await AiInsightsRepository.refineDevTask(id, text);
+    if (!mounted) return;
+    setState(() => _deletingTasks.remove(id));
+    if (res['ok'] == true) {
+      AppSnackBar.info(context, 'adminDev.refine.started'.tr());
+      await _refresh(silent: true);
+    } else {
+      _showError(res['error'] as String?);
+    }
+  }
+
   // Diff/geänderte Dateien des PRs anzeigen.
   Future<void> _showDiff(String id) async {
     showModalBottomSheet<void>(
@@ -1153,6 +1211,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                 status == 'merged' &&
                                 (t['merge_commit_sha'] as String?) != null &&
                                 (t['origin'] as String?) != 'rollback';
+                            final canRefine = id != null &&
+                                (status == 'pr_open' ||
+                                    status == 'awaiting_review');
                             return _TaskCard(
                               task: t,
                               busy: _deletingTasks.contains(id),
@@ -1170,6 +1231,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                                   : null,
                               onRollback:
                                   canRollback ? () => _rollbackTask(id) : null,
+                              onRefine:
+                                  canRefine ? () => _refineTask(id) : null,
                             );
                           }),
                           if (_tasks.isNotEmpty) const SizedBox(height: 10),
@@ -2657,6 +2720,7 @@ class _TaskCard extends StatelessWidget {
     this.onShowDiff,
     this.onRetry,
     this.onRollback,
+    this.onRefine,
     this.busy = false,
   });
   final Map<String, dynamic> task;
@@ -2666,6 +2730,7 @@ class _TaskCard extends StatelessWidget {
   final VoidCallback? onShowDiff;
   final VoidCallback? onRetry;
   final VoidCallback? onRollback;
+  final VoidCallback? onRefine;
   final bool busy;
 
   @override
@@ -2981,6 +3046,25 @@ class _TaskCard extends StatelessWidget {
                   ),
                 ],
               ],
+            ),
+          ],
+          if (onRefine != null) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: busy ? null : onRefine,
+                icon: const Icon(LucideIcons.messageSquarePlus, size: 14),
+                label: Text('adminDev.refine.button'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.bronze,
+                  side: BorderSide(
+                      color: AppColors.bronze.withValues(alpha: 0.4)),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
             ),
           ],
         ],

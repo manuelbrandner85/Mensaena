@@ -1440,6 +1440,12 @@
     "duplicateWarning": "Benzer görev zaten mevcut: \"{task}\"",
     "duplicateTitle": "Olası mükerrer görev",
     "duplicateProceed": "Yine de yap",
+    "refine": {
+      "title": "Görevi iyileştir",
+      "hint": "Ek olarak ne değişmeli?",
+      "started": "İyileştirme çalışıyor …",
+      "button": "İyileştir"
+    },
     "changelog": {
       "title": "Değişiklik günlüğü",
       "empty": "Henüz yayınlanan değişiklik yok."

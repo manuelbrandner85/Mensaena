@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Similar task already exists: \"{task}\"",
     "duplicateTitle": "Possible duplicate task",
     "duplicateProceed": "Do it anyway",
+    "refine": {
+      "title": "Refine task",
+      "hint": "What should be changed additionally?",
+      "started": "Refinement running …",
+      "button": "Refine"
+    },
     "changelog": {
       "title": "Changelog",
       "empty": "No shipped changes yet."

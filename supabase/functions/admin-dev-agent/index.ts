@@ -455,6 +455,46 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
     return json({ ok: true, deleted: 1 })
   }
 
+  // ── Offenen PR per Folge-Anweisung nachbessern ────────────────────────────
+  // Wendet eine zusätzliche Anweisung auf den BESTEHENDEN Branch eines offenen
+  // Auftrags an (agent/task-<id>) → admin_agent_refine.yml. Kein neuer Task/PR.
+  if (action === 'refine') {
+    const id = String(body?.id ?? '')
+    const instr = String(body?.instruction ?? '').trim().slice(0, 2000)
+    if (!id || instr.length < 3) {
+      return json({ error: 'id_and_instruction_required' }, 400)
+    }
+    if (!token) return json({ error: 'agent_not_configured' }, 503)
+
+    const { data: t } = await admin.from('admin_dev_tasks')
+      .select('id, status').eq('id', id).maybeSingle()
+    if (!t) return json({ error: 'not_found' }, 404)
+    if (!['pr_open', 'awaiting_review', 'running', 'phased'].includes(t.status)) {
+      return json({ error: 'not_refinable' }, 409)
+    }
+
+    const res = await fetch(
+      `${GH_API}/actions/workflows/admin_agent_refine.yml/dispatches`,
+      {
+        method: 'POST', headers: ghHeaders(token),
+        body: JSON.stringify({
+          ref: GH_REF,
+          inputs: { task_id: id, instruction: instr },
+        }),
+      },
+    )
+    if (res.status !== 204) {
+      const detail = await res.text().catch(() => '')
+      return json({ error: 'dispatch_failed', status: res.status, detail: detail.slice(0, 300) }, 502)
+    }
+    await admin.from('admin_dev_tasks').update({
+      status: 'running',
+      summary: 'Nachbesserung läuft …',
+      updated_at: new Date().toISOString(),
+    }).eq('id', id)
+    return json({ ok: true })
+  }
+
   // ── Ein-Tap-Rollback ───────────────────────────────────────────────────────
   // Setzt eine gemergte Godmode-Änderung zurück: triggert admin_rollback.yml,
   // das den Merge-Commit per `git revert` rückgängig macht und einen PR öffnet

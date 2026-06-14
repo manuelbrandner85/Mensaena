@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Attività simile già presente: \"{task}\"",
     "duplicateTitle": "Possibile incarico doppio",
     "duplicateProceed": "Procedi comunque",
+    "refine": {
+      "title": "Affina l'incarico",
+      "hint": "Cosa modificare in più?",
+      "started": "Affinamento in corso …",
+      "button": "Affina"
+    },
     "changelog": {
       "title": "Cronologia modifiche",
       "empty": "Ancora nessuna modifica rilasciata."

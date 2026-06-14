@@ -124,6 +124,21 @@ class AiInsightsRepository {
     }
   }
 
+  /// Bessert einen offenen Auftrag per Folge-Anweisung nach (gleicher Branch/PR).
+  static Future<Map<String, dynamic>> refineDevTask(
+      String id, String instruction) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent',
+              body: {'action': 'refine', 'id': id, 'instruction': instruction})
+          .timeout(const Duration(seconds: 30));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] refineDevTask failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
   /// Setzt eine gemergte Godmode-Änderung zurück (Revert-PR → OTA).
   static Future<Map<String, dynamic>> rollbackDevTask(String id) async {
     try {
