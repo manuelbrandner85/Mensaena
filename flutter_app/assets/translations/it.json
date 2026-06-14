@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Attività simile già presente: \"{task}\"",
     "duplicateTitle": "Possibile incarico doppio",
     "duplicateProceed": "Procedi comunque",
+    "model": {
+      "label": "Modello",
+      "fast": "Veloce",
+      "standard": "Standard",
+      "thorough": "Accurato"
+    },
     "apiKeys": {
       "title": "Chiavi API",
       "empty": "Nessuna chiave salvata.",

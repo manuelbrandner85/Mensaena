@@ -1441,6 +1441,12 @@
     "duplicateWarning": "Tâche similaire déjà présente : « {task} »",
     "duplicateTitle": "Tâche en double possible",
     "duplicateProceed": "Lancer quand même",
+    "model": {
+      "label": "Modèle",
+      "fast": "Rapide",
+      "standard": "Standard",
+      "thorough": "Approfondi"
+    },
     "apiKeys": {
       "title": "Clés API",
       "empty": "Aucune clé enregistrée.",
