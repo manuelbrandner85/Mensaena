@@ -16,6 +16,7 @@ import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/shared/form_error_box.dart';
 import '../../../widgets/shared/readable_width.dart';
 
 class BoardCreateScreen extends ConsumerStatefulWidget {
@@ -172,7 +173,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       body: SafeArea(
         child: ReadableWidth(
             child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           children: [
             Text('board.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
             const SizedBox(height: 6),
@@ -397,13 +398,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
-              Text(
-                _error!,
-                style: AppTypography.body(
-                  size: 13,
-                  color: AppColors.herzrotWarm,
-                ),
-              ),
+              FormErrorBox(_error!),
             ],
             const SizedBox(height: 18),
             ElevatedButton.icon(

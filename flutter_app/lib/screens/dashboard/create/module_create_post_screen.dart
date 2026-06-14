@@ -29,6 +29,7 @@ import '../../../widgets/shared/editorial_module_header.dart';
 import 'module_create_config.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/shared/form_error_box.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-Pendant zu Web `src/components/shared/CreatePostPage.tsx`.
@@ -810,18 +811,7 @@ class _ModuleCreatePostScreenState
 
             if (_error != null) ...[
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.herzrot.withValues(alpha: 0.10),
-                  border: Border.all(
-                      color: AppColors.herzrot.withValues(alpha: 0.4)),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(_error!,
-                    style: AppTypography.body(
-                        size: 13, color: AppColors.herzrotWarm)),
-              ),
+              FormErrorBox(_error!),
             ],
 
             const SizedBox(height: 20),
