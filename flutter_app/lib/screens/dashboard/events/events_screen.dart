@@ -13,6 +13,7 @@ import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_widget.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -238,7 +239,10 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                 child: async.when(
                   loading: () => const ListSkeleton(count: 4),
                   error: (e, _) => Center(
-                      child: Text('$e', style: AppTypography.caption())),
+                    child: ErrorStateWidget(
+                      onRetry: () => ref.invalidate(upcomingEventsProvider),
+                    ),
+                  ),
                   data: (all) {
                     final list = _apply(all);
                     if (_view == _EventView.calendar) {

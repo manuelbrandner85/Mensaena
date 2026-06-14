@@ -10,6 +10,7 @@ import '../../../models/challenge.dart';
 import '../../../models/challenge_progress.dart';
 import '../../../repositories/challenges_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 /// SKILL: mensaena-features
 /// Aktive Challenges + Fortschritt des Users.
@@ -37,7 +38,14 @@ class ChallengesScreen extends ConsumerWidget {
             loading: () => const Center(
               child: CircularProgressIndicator(color: AppColors.amber),
             ),
-            error: (_, __) => _emptyState('Fehler beim Laden.'),
+            error: (_, __) => Center(
+              child: ErrorStateWidget(
+                onRetry: () {
+                  ref.invalidate(activeChallengesProvider);
+                  ref.invalidate(myChallengeProgressProvider);
+                },
+              ),
+            ),
             data: (challenges) {
               if (challenges.isEmpty) {
                 return _emptyState('Aktuell keine aktiven Challenges.');
