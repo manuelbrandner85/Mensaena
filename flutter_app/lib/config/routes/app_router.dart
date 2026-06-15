@@ -39,6 +39,7 @@ import '../../screens/dashboard/modules_hub_screen.dart';
 import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
+import '../../screens/dashboard/community_calendar_screen.dart';
 import '../../screens/dashboard/challenges/challenge_create_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
 import '../../screens/dashboard/create/module_create_config.dart';
@@ -799,6 +800,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           child: const CalendarScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/dashboard/community-calendar',
+        pageBuilder: (_, state) {
+          final lat = double.tryParse(state.uri.queryParameters['lat'] ?? '') ?? 48.1351;
+          final lng = double.tryParse(state.uri.queryParameters['lng'] ?? '') ?? 11.5820;
+          final radius = double.tryParse(state.uri.queryParameters['radius'] ?? '') ?? 10.0;
+          return mensaenaTransition<void>(
+            key: state.pageKey,
+            child: CommunityCalendarScreen(lat: lat, lng: lng, radiusKm: radius),
+          );
+        },
       ),
       GoRoute(
         path: '/dashboard/challenges',

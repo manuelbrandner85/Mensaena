@@ -4509,5 +4509,14 @@
     "hintGiveaway": "Gib deinen Gegenstand kostenlos weiter.",
     "hintSwap": "Tausche gegen etwas Gleichwertiges.",
     "submitButton": "Angebot veröffentlichen"
+  },
+  "communityCalendar": {
+    "screenTitle": "Community-Kalender",
+    "createEvent": "Event erstellen",
+    "noEntriesDay": "An diesem Tag keine Einträge.",
+    "typeEvent": "Event",
+    "typeTimebank": "Zeitbank",
+    "typeGroup": "Gruppe",
+    "typeSkill": "Angebot"
   }
 }

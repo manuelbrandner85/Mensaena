@@ -1,6 +1,6 @@
-/// SKILL: mensaena-architektur
-/// Spiegel der Supabase-Tabelle `crisis_helpers`. Realtime-relevant fuer
-/// CrisisDetail-Screen (Live-Helfer-Count).
+// SKILL: mensaena-architektur
+// Spiegel der Supabase-Tabelle `crisis_helpers`. Realtime-relevant fuer
+// CrisisDetail-Screen (Live-Helfer-Count).
 import '../services/location_anonymizer.dart';
 
 class CrisisHelper {

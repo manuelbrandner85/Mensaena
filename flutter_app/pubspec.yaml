@@ -101,6 +101,8 @@ dependencies:
   speech_to_text: ^7.0.0
   # ICS-Kalender-Export für Events.
   add_2_calendar: ^3.0.1
+  # Community-Kalender: TableCalendar-Widget.
+  table_calendar: ^3.1.2
   # Shake-to-Report: User schüttelt Phone → Screenshot + Annotation → error_logs.
   feedback: ^3.1.0
 
