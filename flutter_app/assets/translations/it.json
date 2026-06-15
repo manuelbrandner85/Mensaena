@@ -1583,6 +1583,18 @@
       "noEpic": "Nessun epic",
       "newTaskIn": "Nuova attività in \"{epic}\"",
       "addTaskTooltip": "Attività in questo epic"
+    },
+    "tabs": {
+      "overview": "Panoramica",
+      "tasks": "Attività",
+      "suggestions": "Suggerimenti",
+      "roadmap": "Roadmap",
+      "settings": "Impostazioni"
+    },
+    "statusBar": {
+      "active": "attivi",
+      "suggestions": "aperti",
+      "alerts": "avvisi"
     }
   },
   "create": {

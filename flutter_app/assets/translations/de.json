@@ -1582,6 +1582,18 @@
       "noEpic": "Kein Epic",
       "newTaskIn": "Neuer Auftrag in „{epic}“",
       "addTaskTooltip": "Auftrag in diesem Epic"
+    },
+    "tabs": {
+      "overview": "Übersicht",
+      "tasks": "Aufträge",
+      "suggestions": "Vorschläge",
+      "roadmap": "Roadmap",
+      "settings": "Einstellungen"
+    },
+    "statusBar": {
+      "active": "aktiv",
+      "suggestions": "offen",
+      "alerts": "Alarme"
     }
   },
   "create": {
