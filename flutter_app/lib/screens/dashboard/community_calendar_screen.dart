@@ -14,7 +14,7 @@ import '../../services/haptics.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/empty_state_widget.dart';
 import '../../widgets/shared/error_state_widget.dart';
-import '../../widgets/shared/shimmer_skeleton.dart';
+import '../../widgets/effects/shimmer_skeleton.dart';
 
 /// Community-Kalender: aggregierte Ansicht aller Events, Zeitbank-Slots,
 /// Gruppen-Treffen und Skill-Zeitfenster im Radius um den Nutzer.
@@ -60,17 +60,11 @@ class _CommunityCalendarScreenState
 
     return DashboardScaffold(
       title: 'communityCalendar.screenTitle'.tr(),
-      actions: [
-        IconButton(
-          icon: const Icon(LucideIcons.refreshCw, size: 20),
-          tooltip: 'common.refresh'.tr(),
-          onPressed: () {
-            Haptics.light();
-            ref.invalidate(communityCalendarProvider(_params));
-          },
-        ),
-      ],
-      floatingActionButton: FloatingActionButton.extended(
+      onRefresh: () async {
+        Haptics.tap();
+        ref.invalidate(communityCalendarProvider(_params));
+      },
+      fab: FloatingActionButton.extended(
         heroTag: 'community_calendar_fab',
         backgroundColor: AppColors.primary500,
         foregroundColor: AppColors.surface,
@@ -84,14 +78,14 @@ class _CommunityCalendarScreenState
           ),
         ),
         onPressed: () {
-          Haptics.light();
+          Haptics.tap();
           context.push('/dashboard/events/create');
         },
       ),
       body: async.when(
         loading: () => _buildLoading(),
         error: (e, _) => ErrorStateWidget(
-          message: 'errors.generic'.tr(),
+          title: 'errors.generic'.tr(),
           onRetry: () => ref.invalidate(communityCalendarProvider(_params)),
         ),
         data: (entries) => _buildContent(entries),
@@ -222,7 +216,7 @@ class _CommunityCalendarScreenState
         },
       ),
       onDaySelected: (selectedDay, focusedDay) {
-        Haptics.selection();
+        Haptics.select();
         setState(() {
           _selectedDay = selectedDay;
           _focusedDay = focusedDay;
@@ -258,7 +252,7 @@ class _CommunityCalendarScreenState
 
   Future<void> _exportToCalendar(CommunityCalendarEntry entry) async {
     try {
-      Haptics.light();
+      Haptics.tap();
       final endDate = entry.endDate ?? entry.startDate.add(const Duration(hours: 1));
       final event = a2c.Event(
         title: entry.title,
@@ -329,7 +323,7 @@ class _EntryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: entry.routePath != null
             ? () {
-                Haptics.selection();
+                Haptics.select();
                 context.push(entry.routePath!);
               }
             : null,
