@@ -273,6 +273,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _room = null;
     await CallRoomHolder.clear();
     // Active-Call-Banner clearen falls noch gesetzt.
+    if (!mounted) return;
     if (ref.read(activeCallProvider)?.callId == widget.callId) {
       ref.read(activeCallProvider.notifier).state = null;
     }
@@ -300,6 +301,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     _ringingTicker?.cancel();
     await _stopRingback();
     await EndToneService.play();
+    if (!mounted) return;
     if (ref.read(activeCallProvider)?.callId == widget.callId) {
       ref.read(activeCallProvider.notifier).state = null;
     }
