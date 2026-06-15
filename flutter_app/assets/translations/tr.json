@@ -1467,7 +1467,8 @@
     },
     "changelog": {
       "title": "Değişiklik günlüğü",
-      "empty": "Henüz yayınlanan değişiklik yok."
+      "empty": "Henüz yayınlanan değişiklik yok.",
+      "fileCount": "{n} dosya"
     },
     "health": {
       "title": "Sistem Sağlığı",

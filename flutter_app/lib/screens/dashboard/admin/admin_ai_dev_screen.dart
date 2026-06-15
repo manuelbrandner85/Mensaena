@@ -5149,21 +5149,81 @@ class _ChangelogCard extends StatelessWidget {
               ...entries.take(50).map((e) {
                 final title = e['title'] as String? ?? '';
                 final pr = e['pr_number'];
+                final summary = (e['summary'] as String?)?.trim() ?? '';
+                final files = (e['files'] as List?)
+                        ?.map((f) => f.toString())
+                        .toList() ??
+                    const <String>[];
                 return Padding(
                   padding: const EdgeInsets.fromLTRB(13, 8, 13, 8),
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(LucideIcons.gitMerge,
-                          size: 13, color: AppColors.leben),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          pr != null ? '$title  (#$pr)' : title,
-                          style: AppTypography.body(
-                              size: 12, color: AppColors.lightInk),
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(LucideIcons.gitMerge,
+                              size: 13, color: AppColors.leben),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              pr != null ? '$title  (#$pr)' : title,
+                              style: AppTypography.body(
+                                  size: 12,
+                                  color: AppColors.lightInk,
+                                  weight: FontWeight.w600),
+                            ),
+                          ),
+                          if (files.isNotEmpty)
+                            Text(
+                              'adminDev.changelog.fileCount'
+                                  .tr(namedArgs: {'n': '${files.length}'}),
+                              style: AppTypography.label(
+                                  size: 9, color: AppColors.lightMute),
+                            ),
+                        ],
                       ),
+                      if (summary.isNotEmpty &&
+                          summary.toLowerCase() != title.toLowerCase()) ...[
+                        const Padding(
+                          padding: EdgeInsets.only(left: 21),
+                          child: SizedBox(height: 2),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 21),
+                          child: Text(
+                            summary,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.caption(
+                                color: AppColors.lightMute),
+                          ),
+                        ),
+                      ],
+                      if (files.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 21),
+                          child: Wrap(
+                            spacing: 5,
+                            runSpacing: 4,
+                            children: files.take(6).map((f) {
+                              final name = f.split('/').last;
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.elevated,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Text(name,
+                                    style: AppTypography.label(
+                                        size: 9, color: AppColors.lightMute)),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 );
