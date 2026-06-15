@@ -1610,6 +1610,12 @@
       "links": "Enlaces",
       "created": "creado {t}",
       "updated": "actualizado {t}"
+    },
+    "nextUp": {
+      "title": "¿Qué sigue?",
+      "subtitle": "Primero las mayores victorias rápidas (alto impacto, poco esfuerzo).",
+      "seeAll": "Ver todo",
+      "do": "Hacer"
     }
   },
   "create": {

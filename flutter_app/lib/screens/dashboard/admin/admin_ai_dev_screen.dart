@@ -456,6 +456,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
         confirmLabel: 'adminDev.edit.confirm'.tr(),
         initialText: initial,
         epics: _epics,
+        initialEpicId: _bestEpicIdFor(s, _epics),
       ),
     );
     if (result == null || !mounted) return;
@@ -1648,6 +1649,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
 
   // ── Tab: Übersicht ─────────────────────────────────────────────────────────
   Widget _overviewTab() {
+    final nextUp = _visibleSuggestions.take(3).toList();
     return _refreshable([
       if (_healthAlerts.isNotEmpty) ...[
         _HealthAlertsCard(
@@ -1656,6 +1658,15 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
           onAcknowledge: (id) => _setAlertStatus(id, 'acknowledged'),
           onResolve: (id) => _setAlertStatus(id, 'resolved'),
           onFix: _fixFromAlert,
+        ),
+        const SizedBox(height: 10),
+      ],
+      if (nextUp.isNotEmpty) ...[
+        _NextUpCard(
+          suggestions: nextUp,
+          busyIds: _busySuggestions,
+          onAccept: _acceptWithEdit,
+          onSeeAll: () => _tabController.animateTo(2),
         ),
         const SizedBox(height: 10),
       ],
@@ -1871,6 +1882,126 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _TaskDetailSheet(task: t),
+    );
+  }
+}
+
+// ── „Was als Nächstes?" ──────────────────────────────────────────────────────
+// KI-Empfehlung: die Top-Quick-Wins (höchster Nutzen, kleinster Aufwand) ganz
+// oben auf der Übersicht — mit Ein-Klick-Umsetzung.
+class _NextUpCard extends StatelessWidget {
+  const _NextUpCard({
+    required this.suggestions,
+    required this.busyIds,
+    required this.onAccept,
+    required this.onSeeAll,
+  });
+  final List<Map<String, dynamic>> suggestions;
+  final Set<String> busyIds;
+  final ValueChanged<Map<String, dynamic>> onAccept;
+  final VoidCallback onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.teal.withValues(alpha: 0.10),
+            AppColors.amber.withValues(alpha: 0.06),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: AppColors.teal.withValues(alpha: 0.3)),
+      ),
+      padding: const EdgeInsets.fromLTRB(13, 12, 13, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.sparkles, size: 16, color: AppColors.teal),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('adminDev.nextUp.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w800)),
+              ),
+              InkWell(
+                onTap: onSeeAll,
+                child: Text('adminDev.nextUp.seeAll'.tr(),
+                    style: AppTypography.label(size: 11, color: AppColors.teal)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text('adminDev.nextUp.subtitle'.tr(),
+              style: AppTypography.caption(color: AppColors.lightMute)),
+          const SizedBox(height: 10),
+          ...suggestions.map((s) {
+            final id = s['id'] as String? ?? '';
+            final busy = busyIds.contains(id);
+            final title = (s['title'] as String?)?.trim().isNotEmpty == true
+                ? s['title'] as String
+                : (s['instruction'] as String? ?? '');
+            final impact = (s['impact'] as num?)?.toInt();
+            final effort = (s['effort'] as num?)?.toInt();
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.body(
+                                size: 12, color: AppColors.lightInk)),
+                        if (impact != null && effort != null)
+                          Text(
+                            'adminDev.impactEffort'.tr(namedArgs: {
+                              'impact': '$impact',
+                              'effort': '$effort',
+                            }),
+                            style: AppTypography.label(
+                                size: 9, color: AppColors.lightMute),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  busy
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : FilledButton(
+                          onPressed: () => onAccept(s),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.teal,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 4),
+                            minimumSize: const Size(0, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text('adminDev.nextUp.do'.tr(),
+                              style: AppTypography.label(
+                                  size: 11, color: Colors.white)),
+                        ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 }
@@ -6380,6 +6511,36 @@ class _ModuleInsightCard extends StatelessWidget {
 
 // Findet einen Auftrag mit starker Wortüberschneidung zu [text] in [existing]
 // (Duplikat-/Konflikt-Erkennung). Gibt den (gekürzten) Treffer zurück oder null.
+/// Wählt automatisch das am besten passende Epic für einen Vorschlag — per
+/// Wort-Überlappung zwischen Vorschlag (Titel + Instruction) und Epic
+/// (Titel + Beschreibung). Liefert die Epic-ID oder null (keine klare Zuordnung).
+String? _bestEpicIdFor(
+    Map<String, dynamic> suggestion, List<Map<String, dynamic>> epics) {
+  if (epics.isEmpty) return null;
+  Set<String> tokens(String? s) => (s ?? '')
+      .toLowerCase()
+      .split(RegExp(r'\W+'))
+      .where((w) => w.length > 3)
+      .toSet();
+  final sugTokens = tokens(suggestion['title'] as String?)
+    ..addAll(tokens(suggestion['instruction'] as String?));
+  if (sugTokens.isEmpty) return null;
+  String? bestId;
+  var bestOverlap = 0;
+  for (final e in epics) {
+    if ((e['status'] as String?) == 'archived') continue;
+    final epicTokens = tokens(e['title'] as String?)
+      ..addAll(tokens(e['description'] as String?));
+    final overlap = sugTokens.intersection(epicTokens).length;
+    if (overlap > bestOverlap) {
+      bestOverlap = overlap;
+      bestId = e['id'] as String?;
+    }
+  }
+  // Mindestens 2 gemeinsame Wörter für eine sinnvolle Zuordnung.
+  return bestOverlap >= 2 ? bestId : null;
+}
+
 /// Relative Zeitangabe ("vor 3 min", "vor 2 h", "vor 4 d") aus ISO-Timestamp.
 String? _relativeTime(String? iso) {
   if (iso == null || iso.isEmpty) return null;

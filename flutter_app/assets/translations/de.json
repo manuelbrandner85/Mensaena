@@ -1609,6 +1609,12 @@
       "links": "Links",
       "created": "erstellt {t}",
       "updated": "aktualisiert {t}"
+    },
+    "nextUp": {
+      "title": "Was als Nächstes?",
+      "subtitle": "Die größten Quick-Wins zuerst (hoher Nutzen, wenig Aufwand).",
+      "seeAll": "Alle ansehen",
+      "do": "Umsetzen"
     }
   },
   "create": {
