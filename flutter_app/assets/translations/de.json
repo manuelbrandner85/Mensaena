@@ -1562,6 +1562,26 @@
       "fixPrefilled": "Fix-Prompt eingefügt – prüfen und absenden.",
       "acknowledge": "Gesehen",
       "resolve": "Erledigt"
+    },
+    "roadmap": {
+      "title": "Roadmap (Epics)",
+      "add": "Neues Epic",
+      "edit": "Epic bearbeiten",
+      "empty": "Noch keine Epics. Gruppiere Aufträge zu Initiativen.",
+      "titleLabel": "Titel",
+      "descLabel": "Beschreibung (optional)",
+      "colorLabel": "Farbe",
+      "statusLabel": "Status",
+      "status_active": "Aktiv",
+      "status_done": "Erledigt",
+      "status_archived": "Archiviert",
+      "deleteTitle": "Epic löschen?",
+      "deleteBody": "Zugeordnete Aufträge und Vorschläge bleiben erhalten, nur die Gruppierung wird entfernt.",
+      "progress": "{done}/{total} ausgeliefert · {pending} offene Vorschläge",
+      "assignLabel": "Epic zuordnen",
+      "noEpic": "Kein Epic",
+      "newTaskIn": "Neuer Auftrag in „{epic}“",
+      "addTaskTooltip": "Auftrag in diesem Epic"
     }
   },
   "create": {

@@ -87,6 +87,7 @@ class AiInsightsRepository {
     String? origin,
     bool noSplit = false,
     String? model,
+    String? epicId,
   }) async {
     try {
       final res = await SupabaseService.client.functions
@@ -99,6 +100,7 @@ class AiInsightsRepository {
             if (origin != null) 'origin': origin,
             if (noSplit) 'no_split': true,
             if (model != null && model.isNotEmpty) 'model': model,
+            if (epicId != null && epicId.isNotEmpty) 'epic_id': epicId,
           })
           .timeout(const Duration(seconds: 30));
       return Map<String, dynamic>.from((res.data as Map?) ?? const {});
@@ -521,6 +523,66 @@ class AiInsightsRepository {
       patch['resolved_at'] = DateTime.now().toUtc().toIso8601String();
     }
     await sb.from('godmode_health_alerts').update(patch).eq('id', id);
+  }
+
+  /// Lädt die Roadmap-Epics mit Fortschritt (gemergte/gesamte Aufträge,
+  /// offene Vorschläge). Admin-only via security_invoker-View.
+  static Future<List<Map<String, dynamic>>> fetchEpics() async {
+    try {
+      final rows = await sb
+          .from('godmode_epic_overview')
+          .select('id, title, description, color, status, sort_order, '
+              'total_tasks, done_tasks, active_tasks, pending_suggestions')
+          .limit(50);
+      return (rows as List)
+          .map((r) => Map<String, dynamic>.from(r as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchEpics failed: $e');
+      return const [];
+    }
+  }
+
+  /// Legt ein Epic an oder aktualisiert es (Schreiben nur via Edge/service_role).
+  static Future<Map<String, dynamic>> saveEpic({
+    String? id,
+    required String title,
+    String? description,
+    String color = 'teal',
+    String status = 'active',
+    int sortOrder = 0,
+  }) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {
+            'action': 'epic_save',
+            if (id != null) 'id': id,
+            'title': title,
+            if (description != null) 'description': description,
+            'color': color,
+            'status': status,
+            'sort_order': sortOrder,
+          })
+          .timeout(const Duration(seconds: 20));
+      return Map<String, dynamic>.from((res.data as Map?) ?? const {});
+    } catch (e) {
+      debugPrint('[AiInsights] saveEpic failed: $e');
+      return {'error': e.toString()};
+    }
+  }
+
+  /// Löscht ein Epic (zugeordnete Aufträge/Vorschläge bleiben erhalten).
+  static Future<bool> deleteEpic(String id) async {
+    try {
+      final res = await SupabaseService.client.functions
+          .invoke('admin-dev-agent', body: {'action': 'epic_delete', 'id': id})
+          .timeout(const Duration(seconds: 20));
+      final data = Map<String, dynamic>.from((res.data as Map?) ?? const {});
+      return data['ok'] == true;
+    } catch (e) {
+      debugPrint('[AiInsights] deleteEpic failed: $e');
+      return false;
+    }
   }
 
   /// Lädt die letzten Entwicklungs-Aufträge (Admin-only via RLS).
