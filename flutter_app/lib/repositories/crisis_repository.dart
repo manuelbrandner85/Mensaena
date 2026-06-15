@@ -29,6 +29,7 @@ class CrisisRepository {
           .select()
           .filter('resolved_at', 'is', null)
           .neq('status', 'resolved')
+          .limit(200)
           .order('created_at', ascending: false);
       final all = (rows as List)
           .whereType<Map<String, dynamic>>()
