@@ -4556,5 +4556,8 @@
     "typeTimebank": "Banca del Tempo",
     "typeGroup": "Gruppo",
     "typeSkill": "Offerta"
+  },
+  "event": {
+    "free": "Gratuito"
   }
 }

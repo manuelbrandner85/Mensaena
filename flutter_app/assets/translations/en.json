@@ -4553,5 +4553,8 @@
     "typeTimebank": "Timebank",
     "typeGroup": "Group",
     "typeSkill": "Skill"
+  },
+  "event": {
+    "free": "Free"
   }
 }

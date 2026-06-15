@@ -4555,5 +4555,8 @@
     "typeTimebank": "Банк Времени",
     "typeGroup": "Группа",
     "typeSkill": "Предложение"
+  },
+  "event": {
+    "free": "Бесплатно"
   }
 }

@@ -308,7 +308,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
         final n = int.tryParse(_maxAttendeesCtrl.text.trim());
         return (n != null && n > 0) ? n : null;
       }(),
-      cost: _isFree ? 'kostenlos' : _costCtrl.text.trim(),
+      cost: _isFree ? 'free' : _costCtrl.text.trim(),
       whatToBring: _whatToBringCtrl.text.trim(),
       contactInfo: _contactCtrl.text.trim(),
       isRecurring: _isRecurring,

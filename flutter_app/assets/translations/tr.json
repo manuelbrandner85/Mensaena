@@ -4555,5 +4555,8 @@
     "typeTimebank": "Zaman Bankası",
     "typeGroup": "Grup",
     "typeSkill": "Teklif"
+  },
+  "event": {
+    "free": "Ücretsiz"
   }
 }

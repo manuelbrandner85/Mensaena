@@ -270,7 +270,9 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
               ),
             ),
           ],
-          if (event.cost != null && event.cost!.isNotEmpty) ...[
+          if (event.cost == null ||
+              event.cost == 'free' ||
+              (event.cost != null && event.cost!.isNotEmpty)) ...[
             const SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -280,7 +282,9 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
                       size: 14, color: AppColors.amber),
                   const SizedBox(width: 6),
                   Text(
-                    event.cost!,
+                    (event.cost == null || event.cost == 'free')
+                        ? 'event.free'.tr()
+                        : event.cost!,
                     style: AppTypography.body(
                       size: 13,
                       color: AppColors.ink,
