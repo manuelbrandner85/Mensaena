@@ -107,7 +107,8 @@
     "crisis": "Modo crisis",
     "mentalSupport": "Apoyo mental",
     "posts": "Publicaciones",
-    "admin": "Panel admin"
+    "admin": "Panel admin",
+    "safety": "Seguridad"
   },
   "navGroups": {
     "communication": "Comunicación",
@@ -4048,7 +4049,47 @@
   },
   "safety": {
     "foodRecall": "RETIRADA DE ALIMENTOS",
-    "moreWarnings": "+{n} más"
+    "moreWarnings": "+{n} más",
+    "screenTitle": "Seguridad",
+    "heroTitle": "Ojos en el vecindario",
+    "heroSubtitle": "Informa incidentes, avisaos entre vosotros, cuidaos juntos.",
+    "viewMap": "Mapa",
+    "viewList": "Lista",
+    "empty": "No hay reportes cerca",
+    "emptyHint": "Por ahora todo está tranquilo en tu zona.",
+    "create": "Reportar",
+    "createTitle": "Reportar un incidente",
+    "fieldTitle": "Título",
+    "fieldDescription": "¿Qué ha pasado?",
+    "fieldLocation": "Lugar / dirección",
+    "titleRequired": "Introduce un título.",
+    "anonymous": "Reportar de forma anónima",
+    "anonymousHint": "Tu nombre no se mostrará ni se guardará.",
+    "anonymousName": "Anónimo",
+    "neighbor": "Vecino",
+    "submit": "Enviar reporte",
+    "submitted": "Reporte enviado. ¡Gracias por estar atento!",
+    "submitError": "No se pudo enviar el reporte.",
+    "upvote": "Confirmar",
+    "upvoted": "Gracias por confirmar.",
+    "upvoteError": "No se pudo confirmar.",
+    "upvotesCount": "{count} confirmaciones",
+    "markResolved": "Resuelto",
+    "resolved": "Marcado como resuelto.",
+    "resolveError": "No se pudo actualizar.",
+    "locationRequired": "Se necesita ubicación",
+    "locationHint": "Permite el acceso a la ubicación para ver reportes cercanos.",
+    "locationAttached": "Se adjuntará tu ubicación actual.",
+    "useGps": "Usar ubicación",
+    "types": {
+      "einbruch": "Robo en vivienda",
+      "diebstahl": "Hurto",
+      "vandalismus": "Vandalismo",
+      "verdaechtig": "Sospechoso",
+      "unfall": "Accidente",
+      "fundgegenstand": "Objetos perdidos",
+      "other": "Otro"
+    }
   },
   "verified": {
     "badgeTooltip": "Identidad verificada",

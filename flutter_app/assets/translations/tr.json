@@ -107,7 +107,8 @@
     "crisis": "Kriz modu",
     "mentalSupport": "Ruhsal destek",
     "posts": "Gönderiler",
-    "admin": "Yönetim paneli"
+    "admin": "Yönetim paneli",
+    "safety": "Güvenlik"
   },
   "navGroups": {
     "communication": "İletişim",
@@ -4047,7 +4048,47 @@
   },
   "safety": {
     "foodRecall": "GIDA GERİ ÇAĞIRMA",
-    "moreWarnings": "+{n} daha"
+    "moreWarnings": "+{n} daha",
+    "screenTitle": "Güvenlik",
+    "heroTitle": "Mahalleye göz kulak",
+    "heroSubtitle": "Olayları bildirin, birbirinizi uyarın, birlikte göz kulak olun.",
+    "viewMap": "Harita",
+    "viewList": "Liste",
+    "empty": "Yakınlarda bildirim yok",
+    "emptyHint": "Şu an çevrende her şey sakin.",
+    "create": "Bildir",
+    "createTitle": "Olay bildir",
+    "fieldTitle": "Başlık",
+    "fieldDescription": "Ne oldu?",
+    "fieldLocation": "Yer / adres",
+    "titleRequired": "Lütfen bir başlık girin.",
+    "anonymous": "Anonim bildir",
+    "anonymousHint": "Adın gösterilmez ve kaydedilmez.",
+    "anonymousName": "Anonim",
+    "neighbor": "Komşu",
+    "submit": "Bildirimi gönder",
+    "submitted": "Bildirim gönderildi. Dikkatin için teşekkürler!",
+    "submitError": "Bildirim gönderilemedi.",
+    "upvote": "Doğrula",
+    "upvoted": "Doğruladığın için teşekkürler.",
+    "upvoteError": "Doğrulanamadı.",
+    "upvotesCount": "{count} doğrulama",
+    "markResolved": "Çözüldü",
+    "resolved": "Çözüldü olarak işaretlendi.",
+    "resolveError": "Güncellenemedi.",
+    "locationRequired": "Konum gerekli",
+    "locationHint": "Yakınındaki bildirimleri görmek için konum erişimine izin ver.",
+    "locationAttached": "Mevcut konumun eklenecek.",
+    "useGps": "Konumu kullan",
+    "types": {
+      "einbruch": "Hırsızlık (eve girme)",
+      "diebstahl": "Hırsızlık",
+      "vandalismus": "Vandalizm",
+      "verdaechtig": "Şüpheli",
+      "unfall": "Kaza",
+      "fundgegenstand": "Kayıp eşya",
+      "other": "Diğer"
+    }
   },
   "verified": {
     "badgeTooltip": "Kimlik doğrulandı",

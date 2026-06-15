@@ -107,7 +107,8 @@
     "crisis": "Mode crise",
     "mentalSupport": "Soutien mental",
     "posts": "Publications",
-    "admin": "Tableau de bord admin"
+    "admin": "Tableau de bord admin",
+    "safety": "Sécurité"
   },
   "navGroups": {
     "communication": "Communication",
@@ -4048,7 +4049,47 @@
   },
   "safety": {
     "foodRecall": "RAPPEL ALIMENTAIRE",
-    "moreWarnings": "+{n} autres"
+    "moreWarnings": "+{n} autres",
+    "screenTitle": "Sécurité",
+    "heroTitle": "Veiller sur le quartier",
+    "heroSubtitle": "Signalez les incidents, alertez-vous, veillez ensemble.",
+    "viewMap": "Carte",
+    "viewList": "Liste",
+    "empty": "Aucun signalement à proximité",
+    "emptyHint": "Tout est calme dans votre secteur pour le moment.",
+    "create": "Signaler",
+    "createTitle": "Signaler un incident",
+    "fieldTitle": "Titre",
+    "fieldDescription": "Que s'est-il passé ?",
+    "fieldLocation": "Lieu / adresse",
+    "titleRequired": "Veuillez saisir un titre.",
+    "anonymous": "Signaler anonymement",
+    "anonymousHint": "Votre nom ne sera ni affiché ni enregistré.",
+    "anonymousName": "Anonyme",
+    "neighbor": "Voisin",
+    "submit": "Envoyer le signalement",
+    "submitted": "Signalement envoyé. Merci de votre vigilance !",
+    "submitError": "Impossible d'envoyer le signalement.",
+    "upvote": "Confirmer",
+    "upvoted": "Merci pour votre confirmation.",
+    "upvoteError": "Impossible de confirmer.",
+    "upvotesCount": "{count} confirmations",
+    "markResolved": "Résolu",
+    "resolved": "Marqué comme résolu.",
+    "resolveError": "Impossible de mettre à jour.",
+    "locationRequired": "Localisation requise",
+    "locationHint": "Autorisez l'accès à la localisation pour voir les signalements proches.",
+    "locationAttached": "Votre position actuelle sera jointe.",
+    "useGps": "Utiliser la localisation",
+    "types": {
+      "einbruch": "Cambriolage",
+      "diebstahl": "Vol",
+      "vandalismus": "Vandalisme",
+      "verdaechtig": "Suspect",
+      "unfall": "Accident",
+      "fundgegenstand": "Objets trouvés",
+      "other": "Autre"
+    }
   },
   "verified": {
     "badgeTooltip": "Identité vérifiée",
