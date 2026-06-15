@@ -592,7 +592,7 @@ class AiInsightsRepository {
           .from('admin_dev_tasks')
           .select('id, instruction, status, pr_url, pr_number, run_url, '
               'ci_status, ci_run_url, error, summary, image_urls, '
-              'await_review, plan, origin, merge_commit_sha, '
+              'await_review, plan, origin, merge_commit_sha, model, '
               'created_at, updated_at')
           .order('created_at', ascending: false)
           .limit(40);

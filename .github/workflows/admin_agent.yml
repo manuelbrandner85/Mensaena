@@ -107,7 +107,7 @@ jobs:
           # bypassPermissions schaltet die Denials ab (isolierte CI-Sandbox mit
           # PAT, kein interaktiver Kontext) — der Agent verschwendet keinen Turn
           # mehr an Genehmigungen und kommt zuverlaessig bis zum PR.
-          claude_args: "--max-turns 150 --permission-mode bypassPermissions ${{ inputs.model != '' && format('--model {0}', inputs.model) || '' }}"
+          claude_args: "--max-turns 150 --permission-mode bypassPermissions ${{ inputs.model != '' && format('--model {0}', inputs.model) || '--model claude-opus-4-8' }}"
           prompt: |
             Du bist der Mensaena-Entwicklungs-Agent. Setze die Aufgabe DIREKT
             und EFFIZIENT um — ohne langen Planungs-Overhead.
