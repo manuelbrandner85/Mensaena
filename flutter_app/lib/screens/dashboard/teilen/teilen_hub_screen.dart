@@ -20,21 +20,21 @@ class TeilenHubScreen extends ConsumerWidget {
     _HubTile(
       icon: LucideIcons.gift,
       title: 'teilen.hubScreenTitle',
-      sub: 'Verschenken, leihweise weitergeben, kostenlos abholen',
+      sub: 'teilen.hubSubSharing',
       color: AppColors.leben,
       route: '/dashboard/sharing',
     ),
     _HubTile(
       icon: LucideIcons.store,
       title: 'teilen.marketplace',
-      sub: 'Verkaufen, tauschen, zum kleinen Preis',
+      sub: 'teilen.hubSubMarketplace',
       color: AppColors.bronze,
       route: '/dashboard/marketplace',
     ),
     _HubTile(
       icon: LucideIcons.clock,
       title: 'teilen.timebank',
-      sub: 'Eine Stunde geben, eine Stunde bekommen',
+      sub: 'teilen.hubSubTimebank',
       color: AppColors.amber,
       route: '/dashboard/timebank',
     ),
@@ -54,7 +54,7 @@ class TeilenHubScreen extends ConsumerWidget {
                     size: 26, color: AppColors.ink, height: 1.15)),
             const SizedBox(height: 4),
             Text(
-              'Drei Wege, Dinge und Zeit in der Nachbarschaft auszutauschen — von gratis bis Zeit-für-Zeit.',
+              'teilen.hubDescription'.tr(),
               style: AppTypography.body(
                   size: 13, color: AppColors.mute, height: 1.5),
             ),
@@ -144,7 +144,7 @@ class _LauncherTile extends StatelessWidget {
                           color: AppColors.ink,
                           weight: FontWeight.w700)),
                   const SizedBox(height: 2),
-                  Text(tile.sub,
+                  Text(tile.sub.tr(),
                       style: AppTypography.body(
                           size: 12,
                           color: AppColors.inkSoft,

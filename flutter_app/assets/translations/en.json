@@ -2859,7 +2859,11 @@
     "hubScreenTitle": "Share & lend",
     "marketplace": "Marketplace",
     "timebank": "Timebank",
-    "share": "Sharing"
+    "share": "Sharing",
+    "hubSubSharing": "Give away, lend, pick up for free",
+    "hubSubMarketplace": "Sell, swap, at a low price",
+    "hubSubTimebank": "Give an hour, get an hour",
+    "hubDescription": "Three ways to share things and time in the neighbourhood — from free to time-for-time."
   },
   "organizations": {
     "notFound": "Organisation not found.",
