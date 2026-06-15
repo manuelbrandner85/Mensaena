@@ -1553,7 +1553,17 @@
       "dismissedOk": "Ignorata.",
       "actionFailed": "Azione fallita."
     },
-    "phaseOf": "Fase {n}/{total}"
+    "phaseOf": "Fase {n}/{total}",
+    "healthAlert": {
+      "title": "Monitoraggio salute: picco di crash",
+      "subtitle": "Dopo un merge si sono verificati più crash. Avviso sicuro — nulla viene annullato automaticamente. Decidi tu.",
+      "spike": "{crashes} crash su {users} utenti",
+      "fix": "Attività di fix",
+      "fixPrompt": "Correggi il crash che aumenta dopo il merge {pr}. Errore: {error}",
+      "fixPrefilled": "Prompt di fix inserito – controlla e invia.",
+      "acknowledge": "Visto",
+      "resolve": "Risolto"
+    }
   },
   "create": {
     "titleRequired": "Il titolo è obbligatorio.",

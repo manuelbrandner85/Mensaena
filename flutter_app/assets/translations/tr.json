@@ -1552,7 +1552,17 @@
       "dismissedOk": "Yok sayıldı.",
       "actionFailed": "İşlem başarısız."
     },
-    "phaseOf": "Aşama {n}/{total}"
+    "phaseOf": "Aşama {n}/{total}",
+    "healthAlert": {
+      "title": "Sağlık gözcüsü: çökme artışı",
+      "subtitle": "Bir birleştirmeden sonra daha fazla çökme oluştu. Güvenli uyarı — hiçbir şey otomatik geri alınmaz. Karar senin.",
+      "spike": "{users} kullanıcıda {crashes} çökme",
+      "fix": "Düzeltme görevi",
+      "fixPrompt": "{pr} birleştirmesinden sonra artan çökmeyi düzelt. Hata: {error}",
+      "fixPrefilled": "Düzeltme istemi eklendi – kontrol et ve gönder.",
+      "acknowledge": "Görüldü",
+      "resolve": "Çözüldü"
+    }
   },
   "create": {
     "titleRequired": "Başlık gerekli.",

@@ -1552,7 +1552,17 @@
       "dismissedOk": "Verworfen.",
       "actionFailed": "Aktion fehlgeschlagen."
     },
-    "phaseOf": "Phase {n}/{total}"
+    "phaseOf": "Phase {n}/{total}",
+    "healthAlert": {
+      "title": "Gesundheitswächter: Crash-Anstieg",
+      "subtitle": "Nach einem Merge sind mehr Abstürze aufgetreten. Sicherer Hinweis — nichts wird automatisch zurückgesetzt. Du entscheidest.",
+      "spike": "{crashes} Abstürze bei {users} Nutzern",
+      "fix": "Fix-Auftrag",
+      "fixPrompt": "Behebe den Absturz, der nach dem Merge {pr} gehäuft auftritt. Fehler: {error}",
+      "fixPrefilled": "Fix-Prompt eingefügt – prüfen und absenden.",
+      "acknowledge": "Gesehen",
+      "resolve": "Erledigt"
+    }
   },
   "create": {
     "titleRequired": "Titel ist erforderlich.",
