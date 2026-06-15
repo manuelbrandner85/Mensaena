@@ -49,6 +49,7 @@ class _VoicemailScreenState extends ConsumerState<VoicemailScreen> {
       await _player.play(UrlSource(url));
       if (!(v['is_listened'] as bool? ?? false)) {
         await CallsRepository.voicemailMarkListened(id);
+        if (!mounted) return;
         ref.invalidate(voicemailsProvider);
       }
     } catch (_) {

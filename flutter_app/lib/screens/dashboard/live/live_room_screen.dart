@@ -445,6 +445,7 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
       await LiveStreamService.endChannelStream(widget.roomName);
     }
     await StreamRoomHolder.clear();
+    if (!mounted) return;
     ref.read(activeStreamProvider.notifier).state = null;
     if (!mounted) return;
     if (context.canPop()) {
