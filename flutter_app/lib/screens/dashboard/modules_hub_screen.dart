@@ -108,6 +108,12 @@ const kModulesCatalog = <ModuleTile>[
       tint: Color(0xFFC79363),
       section: 'navGroups.shareAndResources'),
   ModuleTile(
+      label: 'nav.sharing',
+      route: '/dashboard/sharing',
+      icon: Icons.volunteer_activism_rounded,
+      tint: Color(0xFF4CAF82),
+      section: 'navGroups.shareAndResources'),
+  ModuleTile(
       label: 'nav.supply',
       route: '/dashboard/supply',
       icon: LucideIcons.package,
