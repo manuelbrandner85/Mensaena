@@ -484,7 +484,7 @@ class AiInsightsRepository {
     try {
       final rows = await sb
           .from('godmode_changelog')
-          .select('id, title, pr_number, created_at')
+          .select('id, title, pr_number, summary, files, created_at')
           .order('created_at', ascending: false)
           .limit(50);
       return (rows as List)

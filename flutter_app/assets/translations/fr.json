@@ -1468,7 +1468,8 @@
     },
     "changelog": {
       "title": "Journal des modifications",
-      "empty": "Aucune modification livrée pour l'instant."
+      "empty": "Aucune modification livrée pour l'instant.",
+      "fileCount": "{n} fichiers"
     },
     "health": {
       "title": "Santé du système",

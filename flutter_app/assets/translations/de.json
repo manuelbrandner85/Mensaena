@@ -1467,7 +1467,8 @@
     },
     "changelog": {
       "title": "Änderungsverlauf",
-      "empty": "Noch keine ausgelieferten Änderungen."
+      "empty": "Noch keine ausgelieferten Änderungen.",
+      "fileCount": "{n} Dateien"
     },
     "health": {
       "title": "System-Health",

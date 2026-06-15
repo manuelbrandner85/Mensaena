@@ -1468,7 +1468,8 @@
     },
     "changelog": {
       "title": "Historial de cambios",
-      "empty": "Aún no hay cambios publicados."
+      "empty": "Aún no hay cambios publicados.",
+      "fileCount": "{n} archivos"
     },
     "health": {
       "title": "Estado del sistema",
