@@ -4483,5 +4483,29 @@
   "waterLevel": {
     "title": "Nivel del agua",
     "flood": "Inundación"
+  },
+  "sharing": {
+    "screenTitle": "Regalar & Intercambiar",
+    "fabLabel": "Regalar",
+    "hint": "Regala objetos gratis o intercámbialos — sin precios, solo vecindad.",
+    "searchPlaceholder": "Buscar ofertas …",
+    "filterAll": "Todo",
+    "filterGiveaway": "🎁 Regalar",
+    "filterSwap": "🔄 Intercambiar",
+    "noListings": "Aún no hay ofertas",
+    "noListingsHint": "¡Sé el primero en regalar algo!",
+    "beFirstHint": "Toca + y pasa algo a alguien.",
+    "noMatches": "Sin resultados",
+    "noMatchesHint": "Prueba otros filtros o términos de búsqueda.",
+    "badgeGiveaway": "GRATIS",
+    "badgeSwap": "INTERCAMBIO",
+    "badgeFree": "gratis",
+    "createTitle": "Crear oferta",
+    "typeLabel": "Tipo",
+    "typeGiveaway": "Regalar",
+    "typeSwap": "Intercambiar",
+    "hintGiveaway": "Cede tu objeto gratuitamente.",
+    "hintSwap": "Intercambia por algo de valor equivalente.",
+    "submitButton": "Publicar oferta"
   }
 }
