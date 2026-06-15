@@ -1594,6 +1594,21 @@
       "active": "aktiv",
       "suggestions": "offen",
       "alerts": "Alarme"
+    },
+    "time": {
+      "now": "gerade",
+      "min": "vor {n} min",
+      "hour": "vor {n} h",
+      "day": "vor {n} d"
+    },
+    "detail": {
+      "title": "Auftrags-Details",
+      "instruction": "Anweisung",
+      "summary": "Zusammenfassung",
+      "errorLog": "Fehler-Log",
+      "links": "Links",
+      "created": "erstellt {t}",
+      "updated": "aktualisiert {t}"
     }
   },
   "create": {

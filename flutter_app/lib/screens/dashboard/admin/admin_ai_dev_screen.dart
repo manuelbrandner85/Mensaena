@@ -1860,6 +1860,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
           canRetry ? () => _retryTask(t['instruction'] as String? ?? '') : null,
       onRollback: canRollback ? () => _rollbackTask(id) : null,
       onRefine: canRefine ? () => _refineTask(id) : null,
+      onDetails: () => _showTaskDetail(t),
+    );
+  }
+
+  // Öffnet die Detailansicht eines Auftrags (alles auf einen Blick).
+  void _showTaskDetail(Map<String, dynamic> t) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _TaskDetailSheet(task: t),
     );
   }
 }
@@ -3153,6 +3164,7 @@ class _TaskCard extends StatelessWidget {
     this.onRetry,
     this.onRollback,
     this.onRefine,
+    this.onDetails,
     this.busy = false,
   });
   final Map<String, dynamic> task;
@@ -3163,6 +3175,7 @@ class _TaskCard extends StatelessWidget {
   final VoidCallback? onRetry;
   final VoidCallback? onRollback;
   final VoidCallback? onRefine;
+  final VoidCallback? onDetails;
   final bool busy;
 
   @override
@@ -3220,6 +3233,25 @@ class _TaskCard extends StatelessWidget {
                         size: 11, color: AppColors.lightMute)),
               ],
               const Spacer(),
+              if (_relativeTime(task['updated_at'] as String?) != null) ...[
+                Text(
+                  _relativeTime(task['updated_at'] as String?)!,
+                  style: AppTypography.label(size: 10, color: AppColors.lightMute),
+                ),
+                const SizedBox(width: 6),
+              ],
+              if (onDetails != null) ...[
+                InkWell(
+                  onTap: onDetails,
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.all(2),
+                    child: Icon(LucideIcons.maximize2,
+                        size: 14, color: AppColors.lightMute),
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
               if (busy)
                 const SizedBox(
                   width: 13,
@@ -3544,6 +3576,169 @@ class _StatusMeta {
 // ── Pipeline-Stepper: Agent → PR → CI → Merge → OTA ─────────────────────────
 
 enum _Stage { done, active, pending, error }
+
+/// Detailansicht eines Auftrags — alle Infos auf einen Blick (Instruction,
+/// Pipeline, Plan, Modell, PR/CI-Links, Zusammenfassung, vollständiges
+/// Fehler-Log, Zeitstempel). Öffnet sich beim Tippen auf das Detail-Icon.
+class _TaskDetailSheet extends StatelessWidget {
+  const _TaskDetailSheet({required this.task});
+  final Map<String, dynamic> task;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = task['status'] as String? ?? 'queued';
+    final ciStatus = task['ci_status'] as String?;
+    final instruction = task['instruction'] as String? ?? '';
+    final summary = task['summary'] as String?;
+    final error = task['error'] as String?;
+    final prUrl = task['pr_url'] as String?;
+    final runUrl = task['run_url'] as String?;
+    final ciRunUrl = task['ci_run_url'] as String?;
+    final model = _modelShortLabel(task['model'] as String?);
+    final created = _relativeTime(task['created_at'] as String?);
+    final updated = _relativeTime(task['updated_at'] as String?);
+    final prNumber = task['pr_number'];
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollCtrl) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+        child: ListView(
+          controller: scrollCtrl,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text('adminDev.detail.title'.tr(),
+                    style: AppTypography.body(
+                        size: 15,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w800)),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(LucideIcons.x, size: 18),
+                  color: AppColors.lightMute,
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                _Badge(text: 'adminDev.status.$status'.tr(), color: AppColors.teal),
+                if (model != null) _Badge(text: model, color: AppColors.trust),
+                if (prNumber != null)
+                  _Badge(text: '#$prNumber', color: AppColors.lightMute),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _PipelineStepper(status: status, ciStatus: ciStatus),
+            const SizedBox(height: 14),
+            _detailLabel('adminDev.detail.instruction'.tr()),
+            const SizedBox(height: 4),
+            SelectableText(
+              instruction,
+              style: AppTypography.body(size: 13, color: AppColors.lightInk),
+            ),
+            if (summary != null && summary.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              _detailLabel('adminDev.detail.summary'.tr()),
+              const SizedBox(height: 4),
+              SelectableText(summary,
+                  style: AppTypography.body(
+                      size: 12, color: AppColors.lightMute)),
+            ],
+            if (error != null && error.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              _detailLabel('adminDev.detail.errorLog'.tr()),
+              const SizedBox(height: 4),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade100),
+                ),
+                child: SelectableText(
+                  error,
+                  style: AppTypography.body(
+                      size: 11, color: Colors.red.shade700),
+                ),
+              ),
+            ],
+            if (prUrl != null || ciRunUrl != null || runUrl != null) ...[
+              const SizedBox(height: 14),
+              _detailLabel('adminDev.detail.links'.tr()),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  if (prUrl != null)
+                    _LinkButton(
+                        icon: LucideIcons.gitPullRequest,
+                        label: 'adminDev.openPr'.tr(),
+                        url: prUrl),
+                  if (ciRunUrl != null)
+                    _LinkButton(
+                        icon: LucideIcons.checkCircle2,
+                        label: 'adminDev.stage.ci'.tr(),
+                        url: ciRunUrl),
+                  if (runUrl != null)
+                    _LinkButton(
+                        icon: LucideIcons.terminal,
+                        label: 'adminDev.openRun'.tr(),
+                        url: runUrl),
+                ],
+              ),
+            ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                if (created != null)
+                  Text('adminDev.detail.created'.tr(namedArgs: {'t': created}),
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.lightMute)),
+                if (created != null && updated != null)
+                  Text('  ·  ',
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.lightMute)),
+                if (updated != null)
+                  Text('adminDev.detail.updated'.tr(namedArgs: {'t': updated}),
+                      style: AppTypography.label(
+                          size: 10, color: AppColors.lightMute)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailLabel(String text) => Text(
+        text.toUpperCase(),
+        style: AppTypography.label(size: 9, color: AppColors.lightMute),
+      );
+}
 
 class _PipelineStepper extends StatelessWidget {
   const _PipelineStepper({required this.status, required this.ciStatus});
@@ -6185,6 +6380,22 @@ class _ModuleInsightCard extends StatelessWidget {
 
 // Findet einen Auftrag mit starker Wortüberschneidung zu [text] in [existing]
 // (Duplikat-/Konflikt-Erkennung). Gibt den (gekürzten) Treffer zurück oder null.
+/// Relative Zeitangabe ("vor 3 min", "vor 2 h", "vor 4 d") aus ISO-Timestamp.
+String? _relativeTime(String? iso) {
+  if (iso == null || iso.isEmpty) return null;
+  final dt = DateTime.tryParse(iso);
+  if (dt == null) return null;
+  final diff = DateTime.now().difference(dt.toLocal());
+  if (diff.inSeconds < 60) return 'adminDev.time.now'.tr();
+  if (diff.inMinutes < 60) {
+    return 'adminDev.time.min'.tr(namedArgs: {'n': '${diff.inMinutes}'});
+  }
+  if (diff.inHours < 24) {
+    return 'adminDev.time.hour'.tr(namedArgs: {'n': '${diff.inHours}'});
+  }
+  return 'adminDev.time.day'.tr(namedArgs: {'n': '${diff.inDays}'});
+}
+
 /// Kurzes Label für die Modell-ID eines Auftrags (Badge im Dashboard).
 String? _modelShortLabel(String? id) {
   if (id == null || id.isEmpty) return null;

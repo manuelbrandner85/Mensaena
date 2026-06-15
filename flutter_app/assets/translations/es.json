@@ -1595,6 +1595,21 @@
       "active": "activas",
       "suggestions": "abiertas",
       "alerts": "alertas"
+    },
+    "time": {
+      "now": "ahora",
+      "min": "hace {n} min",
+      "hour": "hace {n} h",
+      "day": "hace {n} d"
+    },
+    "detail": {
+      "title": "Detalles de la tarea",
+      "instruction": "Instrucción",
+      "summary": "Resumen",
+      "errorLog": "Registro de errores",
+      "links": "Enlaces",
+      "created": "creado {t}",
+      "updated": "actualizado {t}"
     }
   },
   "create": {

@@ -1594,6 +1594,21 @@
       "active": "aktif",
       "suggestions": "açık",
       "alerts": "uyarı"
+    },
+    "time": {
+      "now": "şimdi",
+      "min": "{n} dk önce",
+      "hour": "{n} sa önce",
+      "day": "{n} g önce"
+    },
+    "detail": {
+      "title": "Görev detayları",
+      "instruction": "Talimat",
+      "summary": "Özet",
+      "errorLog": "Hata günlüğü",
+      "links": "Bağlantılar",
+      "created": "oluşturuldu {t}",
+      "updated": "güncellendi {t}"
     }
   },
   "create": {
