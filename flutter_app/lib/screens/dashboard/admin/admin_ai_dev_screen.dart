@@ -3193,6 +3193,13 @@ class _TaskCard extends StatelessWidget {
                 style: AppTypography.body(
                     size: 12, color: meta.color, weight: FontWeight.w600),
               ),
+              if (_modelShortLabel(task['model'] as String?) != null) ...[
+                const SizedBox(width: 6),
+                _Badge(
+                  text: _modelShortLabel(task['model'] as String?)!,
+                  color: AppColors.trust,
+                ),
+              ],
               if (imageCount > 0) ...[
                 const SizedBox(width: 6),
                 const Icon(LucideIcons.image, size: 12, color: AppColors.lightMute),
@@ -6167,6 +6174,15 @@ class _ModuleInsightCard extends StatelessWidget {
 
 // Findet einen Auftrag mit starker Wortüberschneidung zu [text] in [existing]
 // (Duplikat-/Konflikt-Erkennung). Gibt den (gekürzten) Treffer zurück oder null.
+/// Kurzes Label für die Modell-ID eines Auftrags (Badge im Dashboard).
+String? _modelShortLabel(String? id) {
+  if (id == null || id.isEmpty) return null;
+  if (id.contains('opus')) return 'Opus';
+  if (id.contains('sonnet')) return 'Sonnet';
+  if (id.contains('haiku')) return 'Haiku';
+  return null;
+}
+
 String? similarInstruction(String text, Iterable<String> existing) {
   if (text.length < 10) return null;
   final words =

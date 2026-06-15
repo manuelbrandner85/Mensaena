@@ -48,7 +48,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.AGENT_PAT }}
-          claude_args: "--max-turns 150 --permission-mode bypassPermissions"
+          claude_args: "--max-turns 150 --permission-mode bypassPermissions --model claude-opus-4-8"
           prompt: |
             Du bist der Mensaena-Entwicklungs-Agent und arbeitest auf dem
             BESTEHENDEN Branch agent/task-${{ inputs.task_id }} (bereits

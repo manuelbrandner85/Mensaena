@@ -725,7 +725,9 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
     standard: 'claude-sonnet-4-6',
     thorough: 'claude-opus-4-8',
   }
-  const model = MODEL_MAP[String(body?.model ?? '')] ?? ''
+  // Standard ist IMMER Opus 4.8 (beste Qualität). Nur wenn der Admin bewusst
+  // eine andere Stufe wählt, wird Haiku/Sonnet genutzt.
+  const model = MODEL_MAP[String(body?.model ?? '')] ?? 'claude-opus-4-8'
   // Optionale Epic-Zuordnung (Roadmap). Leer = nicht zugeordnet.
   const epicId = body?.epic_id ? String(body.epic_id) : null
 
@@ -748,6 +750,7 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
           origin: ['manual', 'suggestion', 'schedule', 'rollback'].includes(String(body?.origin))
             ? String(body.origin) : 'manual',
           epic_id: epicId,
+          model,
           plan: { phases: decision.phases, total: decision.phases.length, current: 0 },
         })
         .select('id').single()
@@ -804,6 +807,7 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
       origin: ['manual', 'suggestion', 'schedule', 'rollback'].includes(String(body?.origin))
         ? String(body.origin) : 'manual',
       epic_id: epicId,
+      model,
       plan: planSteps.length > 0 ? planSteps : null,
     })
     .select('id')
