@@ -49,6 +49,8 @@ import '../../screens/dashboard/groups/groups_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_create_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_detail_screen.dart';
 import '../../screens/dashboard/marketplace/marketplace_screen.dart';
+import '../../screens/dashboard/marketplace/sharing_create_screen.dart';
+import '../../screens/dashboard/marketplace/sharing_screen.dart';
 import '../../screens/dashboard/matching/matching_screen.dart';
 import '../../screens/dashboard/organizations/organization_detail_screen.dart';
 import '../../screens/dashboard/organizations/organization_suggest_screen.dart';
@@ -501,6 +503,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           child: const ModuleCreatePostScreen(
             config: ModuleCreateConfigs.sharing),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/sharing/giveaway-create',
+        pageBuilder: (_, state) => AppTransitions.sheet<void>(
+          key: state.pageKey,
+          child: const SharingCreateScreen(),
         ),
       ),
       GoRoute(
@@ -1051,7 +1060,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/sharing',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: const PlaceholderScreen(title: 'Sharing', phase: 'Phase 2'),
+          child: const SharingScreen(),
         ),
       ),
       GoRoute(

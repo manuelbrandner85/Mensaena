@@ -4483,5 +4483,29 @@
   "waterLevel": {
     "title": "Niveau d'eau",
     "flood": "Crue"
+  },
+  "sharing": {
+    "screenTitle": "Donner & Échanger",
+    "fabLabel": "Donner",
+    "hint": "Donnez des objets gratuitement ou échangez-les — sans prix, juste le quartier.",
+    "searchPlaceholder": "Rechercher des offres …",
+    "filterAll": "Tout",
+    "filterGiveaway": "🎁 Donner",
+    "filterSwap": "🔄 Échanger",
+    "noListings": "Pas encore d'offres",
+    "noListingsHint": "Soyez le premier à donner quelque chose !",
+    "beFirstHint": "Appuyez sur + et faites circuler.",
+    "noMatches": "Aucun résultat",
+    "noMatchesHint": "Essayez d'autres filtres ou termes de recherche.",
+    "badgeGiveaway": "GRATUIT",
+    "badgeSwap": "ÉCHANGE",
+    "badgeFree": "gratuit",
+    "createTitle": "Créer une offre",
+    "typeLabel": "Type",
+    "typeGiveaway": "Donner",
+    "typeSwap": "Échanger",
+    "hintGiveaway": "Cédez votre objet gratuitement.",
+    "hintSwap": "Échangez contre quelque chose d'équivalent.",
+    "submitButton": "Publier l'offre"
   }
 }

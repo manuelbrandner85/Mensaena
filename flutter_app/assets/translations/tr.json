@@ -4482,5 +4482,29 @@
   "waterLevel": {
     "title": "Su seviyesi",
     "flood": "Taşkın"
+  },
+  "sharing": {
+    "screenTitle": "Bağış & Takas",
+    "fabLabel": "Bağışla",
+    "hint": "Eşyalarını ücretsiz bağışla veya takas et — fiyat yok, sadece komşuluk.",
+    "searchPlaceholder": "Teklifleri ara …",
+    "filterAll": "Tümü",
+    "filterGiveaway": "🎁 Bağış",
+    "filterSwap": "🔄 Takas",
+    "noListings": "Henüz teklif yok",
+    "noListingsHint": "İlk bağışı yapan sen ol!",
+    "beFirstHint": "+ düğmesine bas ve bir şeyler paylaş.",
+    "noMatches": "Sonuç bulunamadı",
+    "noMatchesHint": "Farklı filtreler veya arama terimleri dene.",
+    "badgeGiveaway": "ÜCRETSİZ",
+    "badgeSwap": "TAKAS",
+    "badgeFree": "ücretsiz",
+    "createTitle": "Teklif oluştur",
+    "typeLabel": "Tür",
+    "typeGiveaway": "Bağışla",
+    "typeSwap": "Takas et",
+    "hintGiveaway": "Eşyanı ücretsiz ver.",
+    "hintSwap": "Eşdeğer bir şeyle takas et.",
+    "submitButton": "Teklifi yayınla"
   }
 }

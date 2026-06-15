@@ -4483,5 +4483,29 @@
   "waterLevel": {
     "title": "Livello",
     "flood": "Alluvione"
+  },
+  "sharing": {
+    "screenTitle": "Regala & Scambia",
+    "fabLabel": "Regala",
+    "hint": "Regala oggetti gratuitamente o scambiali — nessun prezzo, solo vicinato.",
+    "searchPlaceholder": "Cerca offerte …",
+    "filterAll": "Tutti",
+    "filterGiveaway": "🎁 Regala",
+    "filterSwap": "🔄 Scambia",
+    "noListings": "Nessuna offerta ancora",
+    "noListingsHint": "Sii il primo a regalare qualcosa!",
+    "beFirstHint": "Tocca + e passa avanti qualcosa.",
+    "noMatches": "Nessun risultato",
+    "noMatchesHint": "Prova altri filtri o termini di ricerca.",
+    "badgeGiveaway": "GRATIS",
+    "badgeSwap": "SCAMBIO",
+    "badgeFree": "gratuito",
+    "createTitle": "Crea offerta",
+    "typeLabel": "Tipo",
+    "typeGiveaway": "Regala",
+    "typeSwap": "Scambia",
+    "hintGiveaway": "Cedi il tuo oggetto gratuitamente.",
+    "hintSwap": "Scambia con qualcosa di valore equivalente.",
+    "submitButton": "Pubblica offerta"
   }
 }

@@ -4480,5 +4480,29 @@
   "waterLevel": {
     "title": "Water level",
     "flood": "Flood"
+  },
+  "sharing": {
+    "screenTitle": "Give Away & Swap",
+    "fabLabel": "Give Away",
+    "hint": "Give away items for free or swap them — no prices, just neighbourhood.",
+    "searchPlaceholder": "Search offers …",
+    "filterAll": "All",
+    "filterGiveaway": "🎁 Give Away",
+    "filterSwap": "🔄 Swap",
+    "noListings": "No offers yet",
+    "noListingsHint": "Be the first to give something away!",
+    "beFirstHint": "Tap + and pass something on.",
+    "noMatches": "No results",
+    "noMatchesHint": "Try different filters or search terms.",
+    "badgeGiveaway": "FREE",
+    "badgeSwap": "SWAP",
+    "badgeFree": "free",
+    "createTitle": "Create offer",
+    "typeLabel": "Type",
+    "typeGiveaway": "Give Away",
+    "typeSwap": "Swap",
+    "hintGiveaway": "Pass on your item for free.",
+    "hintSwap": "Exchange for something of equal value.",
+    "submitButton": "Publish offer"
   }
 }

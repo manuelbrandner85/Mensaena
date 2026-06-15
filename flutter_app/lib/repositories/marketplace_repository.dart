@@ -84,6 +84,25 @@ class MarketplaceRepository {
     }
   }
 
+  /// Lädt aktive giveaway- und swap-Listings für den Sharing-Screen.
+  static Future<List<MarketplaceListing>> listSharing({int limit = 50}) async {
+    try {
+      final rows = await sb
+          .from('marketplace_listings')
+          .select()
+          .inFilter('listing_type', const ['giveaway', 'swap'])
+          .eq('status', 'active')
+          .order('created_at', ascending: false)
+          .limit(limit);
+      return (rows as List)
+          .whereType<Map<String, dynamic>>()
+          .map(MarketplaceListing.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   static Future<MarketplaceListing?> getById(String id) async {
     try {
       final row = await sb
@@ -415,3 +434,8 @@ final savedListingIdsProvider =
     FutureProvider<Set<String>>((ref) async {
   return MarketplaceFavorites.getSavedIds();
 });
+
+final sharingListingsProvider =
+    FutureProvider.autoDispose<List<MarketplaceListing>>(
+  (ref) => MarketplaceRepository.listSharing(),
+);

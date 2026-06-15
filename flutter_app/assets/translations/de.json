@@ -4479,5 +4479,29 @@
   "waterLevel": {
     "title": "Pegel",
     "flood": "Hochwasser"
+  },
+  "sharing": {
+    "screenTitle": "Verschenken & Tauschen",
+    "fabLabel": "Verschenken",
+    "hint": "Gegenstände kostenlos verschenken oder tauschen — keine Preise, nur Nachbarschaft.",
+    "searchPlaceholder": "Suche nach Angeboten …",
+    "filterAll": "Alle",
+    "filterGiveaway": "🎁 Verschenken",
+    "filterSwap": "🔄 Tauschen",
+    "noListings": "Noch keine Angebote",
+    "noListingsHint": "Sei der Erste und verschenke etwas!",
+    "beFirstHint": "Tippe auf + und gib etwas weiter.",
+    "noMatches": "Keine Treffer",
+    "noMatchesHint": "Andere Filter oder Suchbegriffe probieren.",
+    "badgeGiveaway": "GRATIS",
+    "badgeSwap": "TAUSCH",
+    "badgeFree": "kostenlos",
+    "createTitle": "Angebot erstellen",
+    "typeLabel": "Typ",
+    "typeGiveaway": "Verschenken",
+    "typeSwap": "Tauschen",
+    "hintGiveaway": "Gib deinen Gegenstand kostenlos weiter.",
+    "hintSwap": "Tausche gegen etwas Gleichwertiges.",
+    "submitButton": "Angebot veröffentlichen"
   }
 }
