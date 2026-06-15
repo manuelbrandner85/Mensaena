@@ -4552,5 +4552,8 @@
     "typeTimebank": "Zeitbank",
     "typeGroup": "Gruppe",
     "typeSkill": "Angebot"
+  },
+  "event": {
+    "free": "Kostenlos"
   }
 }
