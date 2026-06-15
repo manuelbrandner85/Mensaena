@@ -1,0 +1,166 @@
+name: ✅ Agent Auto-Merge (ohne Flutter-CI)
+
+# ════════════════════════════════════════════════════════════════════════
+# Lückenschluss zum regulären agent_automerge.yml:
+#
+# agent_automerge.yml triggert auf den `workflow_run` von "Flutter Android
+# Build". Dieser Build läuft aber NUR bei Änderungen an `flutter_app/**`
+# (siehe flutter.yml `pull_request.paths`). Aufträge des Admin-Dev-Agents,
+# die KEINEN Flutter-Code anfassen (z. B. nur Supabase-Migrationen, Edge
+# Functions, Workflows, Docs), lösen den Build also nicht aus → der reguläre
+# Auto-Merge feuert nie → diese PRs blieben offen.
+#
+# Dieser Workflow mergt genau diese Nicht-Flutter-Agent-PRs automatisch:
+#   • triggert auf `pull_request` für Branches `agent/task-*`
+#   • beendet sich sofort, wenn der PR Flutter-Code ändert (dann gilt die
+#     Flutter-CI + der reguläre agent_automerge.yml)
+#   • wartet, bis alle übrigen Checks (z. B. Supabase Preview) abgeschlossen
+#     sind, und mergt nur, wenn keiner fehlgeschlagen ist
+#   • respektiert das Review-Gate (await_review) wie der reguläre Flow
+#
+# Merge läuft über AGENT_PAT (wie im regulären Flow), damit nachgelagerte
+# Automatik (OTA-Dispatch) greifen kann.
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+
+jobs:
+  direct-merge:
+    name: agent-direct-merge
+    runs-on: ubuntu-latest
+    # Nur Agent-Aufträge, keine Drafts.
+    if: >
+      startsWith(github.head_ref, 'agent/task-') &&
+      github.event.pull_request.draft == false
+    steps:
+      - name: Nicht-Flutter-Agent-PR auswerten & ggf. mergen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT: ${{ secrets.AGENT_PAT }}
+          REPO: ${{ github.repository }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          BRANCH: ${{ github.head_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          TASK_ID="${BRANCH#agent/task-}"
+
+          patch_status() {
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "$1" || true
+          }
+
+          # 1) Ändert dieser PR Flutter-Code? Dann gated die Flutter-CI und der
+          #    reguläre agent_automerge.yml übernimmt — hier nichts tun.
+          FILES=$(gh pr view "$PR_NUM" --repo "$REPO" --json files --jq '.files[].path' 2>/dev/null || echo "")
+          if echo "$FILES" | grep -qE '^flutter_app/|^\.github/workflows/flutter\.yml$'; then
+            echo "Flutter-Änderung erkannt — Flutter-CI gated, kein Direkt-Merge."
+            exit 0
+          fi
+          if [ -z "$FILES" ]; then
+            echo "Keine Dateien ermittelbar — abbrechen (sicherheitshalber)."
+            exit 0
+          fi
+          echo "Nicht-Flutter-Auftrag — Direkt-Merge-Pfad."
+
+          # 2) Review-Gate respektieren (await_review=true → warten auf Freigabe).
+          AWAIT=$(curl -sS \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}&select=await_review" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);process.stdout.write(String(a[0]&&a[0].await_review===true))}catch{process.stdout.write("false")}})')
+          if [ "$AWAIT" = "true" ]; then
+            echo "Review-Gate aktiv — warte auf manuelle Freigabe."
+            patch_status "{\"status\":\"awaiting_review\",\"pr_number\":${PR_NUM},\"summary\":\"Wartet auf deine Freigabe (Diff prüfen, dann mergen).\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 0
+          fi
+
+          # 3) Übrige Checks abwarten (z. B. Supabase Preview). Den eigenen
+          #    Check (dieser Job) per Name ausschließen, sonst Deadlock.
+          # Erst kurz warten, damit Checks sich registrieren können.
+          sleep 25
+          for i in $(seq 1 12); do
+            JSON=$(gh api "repos/${REPO}/commits/${HEAD_SHA}/check-runs" 2>/dev/null || echo '{"check_runs":[]}')
+            FAILED=$(echo "$JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s).check_runs||[];const self="agent-direct-merge";const n=a.filter(c=>c.name!==self&&c.status==="completed"&&["failure","cancelled","timed_out","action_required"].includes(c.conclusion)).length;process.stdout.write(String(n))}catch{process.stdout.write("0")}})')
+            if [ "${FAILED:-0}" -gt 0 ]; then
+              echo "$FAILED fehlgeschlagene Checks — kein Merge."
+              patch_status "{\"ci_status\":\"failure\",\"pr_number\":${PR_NUM},\"summary\":\"Ein Check ist fehlgeschlagen — PR bleibt offen zur Prüfung.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+              exit 0
+            fi
+            PENDING=$(echo "$JSON" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s).check_runs||[];const self="agent-direct-merge";const n=a.filter(c=>c.name!==self&&(c.status==="queued"||c.status==="in_progress")).length;process.stdout.write(String(n))}catch{process.stdout.write("0")}})')
+            if [ "${PENDING:-0}" -eq 0 ]; then
+              echo "Alle übrigen Checks abgeschlossen, keiner rot."
+              break
+            fi
+            echo "Warte auf $PENDING laufende Checks… ($i/12)"
+            sleep 15
+          done
+
+          # 4) Squash-Merge via PAT (Retry gegen kurzzeitige Rate-Limits).
+          echo "Merge PR #$PR_NUM (Nicht-Flutter-Auftrag)."
+          MERGED=0
+          for attempt in 1 2 3 4; do
+            if GH_TOKEN="$PAT" gh pr merge "$PR_NUM" --repo "$REPO" \
+                 --squash --delete-branch --admin; then
+              MERGED=1; break
+            fi
+            STATE=$(gh pr view "$PR_NUM" --repo "$REPO" --json state --jq '.state' 2>/dev/null || echo "")
+            if [ "$STATE" = "MERGED" ]; then MERGED=1; break; fi
+            WAIT=$((2 ** attempt))
+            echo "Merge-Versuch $attempt fehlgeschlagen — warte ${WAIT}s…"
+            sleep "$WAIT"
+          done
+          if [ "$MERGED" -ne 1 ]; then
+            echo "Merge nach 4 Versuchen nicht möglich (evtl. Konflikt) — PR bleibt offen."
+            patch_status "{\"pr_number\":${PR_NUM},\"summary\":\"Auto-Merge scheiterte (Konflikt/Rate-Limit). PR #$PR_NUM bleibt offen — bitte manuell mergen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            exit 0
+          fi
+
+          MERGE_SHA=$(gh pr view "$PR_NUM" --repo "$REPO" --json mergeCommit --jq '.mergeCommit.oid // empty' 2>/dev/null || true)
+          patch_status "{\"status\":\"merged\",\"merge_commit_sha\":\"${MERGE_SHA}\",\"pr_number\":${PR_NUM},\"summary\":\"PR #$PR_NUM gemergt (Nicht-Flutter-Auftrag, alle Checks grün).\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+
+          # 5) Auto-Changelog (mit geänderten Dateien + Kurz-Zusammenfassung).
+          PR_TITLE=$(gh pr view "$PR_NUM" --repo "$REPO" --json title --jq '.title' 2>/dev/null || echo "Godmode-Änderung")
+          PR_FILES=$(gh pr view "$PR_NUM" --repo "$REPO" --json files --jq '[.files[].path] | .[0:60]' 2>/dev/null || echo "[]")
+          PR_SUMMARY=$(gh pr view "$PR_NUM" --repo "$REPO" --json body --jq '[.body | split("\n")[] | select(test("\\S"))][0] // ""' 2>/dev/null || echo "")
+          CL_BODY=$(TASK_ID="$TASK_ID" PR_TITLE="$PR_TITLE" PR_NUM="$PR_NUM" PR_FILES="$PR_FILES" PR_SUMMARY="$PR_SUMMARY" node -e '
+            let files = [];
+            try { files = JSON.parse(process.env.PR_FILES || "[]"); } catch (_) { files = []; }
+            const summary = String(process.env.PR_SUMMARY || "").replace(/^#+\s*/, "").slice(0, 400) || null;
+            console.log(JSON.stringify({
+              task_id: process.env.TASK_ID,
+              title: String(process.env.PR_TITLE || "Godmode-Änderung").slice(0, 300),
+              pr_number: Number(process.env.PR_NUM) || null,
+              files: Array.isArray(files) ? files : [],
+              summary,
+            }));
+          ')
+          curl -sS -X POST \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/godmode_changelog" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "$CL_BODY" || true
+
+          # 6) Phasen-Verkettung (No-Op bei Einzelaufträgen).
+          curl -sS -X POST \
+            "https://${SUPABASE_REF}.supabase.co/functions/v1/admin-dev-agent" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"action\":\"next_phase\",\"task_id\":\"${TASK_ID}\"}" \
+            && echo "next_phase angestoßen für ${TASK_ID}" || true

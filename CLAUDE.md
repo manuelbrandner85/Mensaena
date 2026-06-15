@@ -225,6 +225,12 @@ kategorisiert über eine Chip-Leiste. Zwei Modi:
    automatisch → i18n/Stream-Regeln/Design gelten), erstellt einen PR (`agent/*`).
 3. Das echte Flutter-CI (`flutter.yml` Job `build`) ist das Sicherheits-Tor.
 4. `agent_automerge.yml` merged **NUR bei grünem CI**; sonst bleibt der PR offen.
+   - **Lückenschluss:** `flutter.yml` läuft nur bei `flutter_app/**`-Änderungen.
+     Aufträge OHNE Flutter-Code (nur Migrationen/Edge/Workflows/Docs) lösen den
+     Build nicht aus → `agent_automerge.yml` feuert nie. Dafür mergt
+     `agent_automerge_direct.yml` diese Nicht-Flutter-Agent-PRs automatisch
+     (triggert auf `pull_request`, wartet alle übrigen Checks ab, respektiert
+     `await_review`). So mergt JEDER grüne Agent-Auftrag automatisch.
 5. Merge auf `main` → `shorebird_patch.yml` liefert den Dart-Patch als OTA aus.
 
 **B) KI-Tiefenanalyse (Vorschläge zum Annehmen/Ablehnen):**
