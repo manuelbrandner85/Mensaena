@@ -2844,7 +2844,9 @@
     "free": "Ücretsiz",
     "screenTitle": "Beceriler",
     "empty": "Henüz yetenek teklifi yok.",
-    "emptyHint": "İlk yeteneğini sun!"
+    "emptyHint": "İlk yeteneğini sun!",
+    "contactProvider": "İletişime geç",
+    "providerFallback": "Komşu"
   },
   "wissen": {
     "shareTitle": "Bilgiyi paylaş",

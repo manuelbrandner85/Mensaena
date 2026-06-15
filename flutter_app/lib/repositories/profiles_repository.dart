@@ -286,3 +286,11 @@ final myProfileProvider = FutureProvider<Profile?>((ref) async {
   ref.watch(authStateProvider);
   return ProfilesRepository.getMine();
 });
+
+/// Provider fuer das Profil eines beliebigen Users (z.B. Anbieter-Zeile).
+/// autoDispose: Channel/Cache wird freigegeben sobald kein Widget mehr liest.
+final profileByIdProvider =
+    FutureProvider.autoDispose.family<Profile?, String>((ref, userId) async {
+  if (userId.isEmpty) return null;
+  return ProfilesRepository.getById(userId);
+});

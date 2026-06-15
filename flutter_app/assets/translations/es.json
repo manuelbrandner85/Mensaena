@@ -2845,7 +2845,9 @@
     "free": "Gratis",
     "screenTitle": "Habilidades",
     "empty": "Aún no hay ofertas de habilidades.",
-    "emptyHint": "¡Ofrece tu primera habilidad!"
+    "emptyHint": "¡Ofrece tu primera habilidad!",
+    "contactProvider": "Contactar",
+    "providerFallback": "Vecino/a"
   },
   "wissen": {
     "shareTitle": "Comparte conocimiento",

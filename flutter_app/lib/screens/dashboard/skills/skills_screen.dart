@@ -7,11 +7,13 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/skill_offer.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../repositories/skills_repository.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_widget.dart';
+import '../../../widgets/shared/sized_avatar_image.dart';
 import '../../../widgets/shared/skeleton_card.dart';
 
 /// SKILL: mensaena-features
@@ -108,12 +110,17 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
   }
 }
 
-class _SkillTile extends StatelessWidget {
+class _SkillTile extends ConsumerWidget {
   const _SkillTile({required this.skill});
   final SkillOffer skill;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final providerProfile = ref.watch(profileByIdProvider(skill.userId));
+    final p = providerProfile.asData?.value;
+    final providerName =
+        p?.displayName ?? p?.name ?? p?.username ?? 'skills.providerFallback'.tr();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
@@ -196,6 +203,56 @@ class _SkillTile extends StatelessWidget {
               ],
             ),
           ],
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: AppColors.line),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => context.push('/dashboard/profile/${skill.userId}'),
+                child: SizedAvatarImage(
+                  url: p?.avatarUrl,
+                  size: 28,
+                  fallbackInitial:
+                      providerName.isNotEmpty ? providerName[0] : null,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () =>
+                      context.push('/dashboard/profile/${skill.userId}'),
+                  child: Text(
+                    providerName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body(
+                      size: 12,
+                      color: AppColors.ink,
+                      weight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    context.push('/dashboard/profile/${skill.userId}'),
+                icon: const Icon(LucideIcons.messageCircle, size: 14),
+                label: Text('skills.contactProvider'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.amber,
+                  side: const BorderSide(color: AppColors.amber),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  textStyle: AppTypography.label(size: 11),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

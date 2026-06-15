@@ -2845,7 +2845,9 @@
     "free": "Gratis",
     "screenTitle": "Competenze",
     "empty": "Ancora nessuna offerta di competenze.",
-    "emptyHint": "Offri la tua prima competenza!"
+    "emptyHint": "Offri la tua prima competenza!",
+    "contactProvider": "Contatta",
+    "providerFallback": "Vicino/a"
   },
   "wissen": {
     "shareTitle": "Condividi sapere",
