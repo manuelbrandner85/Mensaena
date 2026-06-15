@@ -70,6 +70,12 @@ const kModulesCatalog = <ModuleTile>[
       tint: Color(0xFFE26B6B),
       section: 'navGroups.emergencyAndSafety'),
   ModuleTile(
+      label: 'nav.safety',
+      route: '/dashboard/safety',
+      icon: LucideIcons.shieldAlert,
+      tint: Color(0xFFE25C4A),
+      section: 'navGroups.emergencyAndSafety'),
+  ModuleTile(
       label: 'nav.mentalSupport',
       route: '/dashboard/mental-support',
       icon: LucideIcons.brain,

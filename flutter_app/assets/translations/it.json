@@ -107,7 +107,8 @@
     "crisis": "Modalità crisi",
     "mentalSupport": "Supporto mentale",
     "posts": "Post",
-    "admin": "Dashboard admin"
+    "admin": "Dashboard admin",
+    "safety": "Sicurezza"
   },
   "navGroups": {
     "communication": "Comunicazione",
@@ -4048,7 +4049,47 @@
   },
   "safety": {
     "foodRecall": "RICHIAMO ALIMENTARE",
-    "moreWarnings": "+{n} altri"
+    "moreWarnings": "+{n} altri",
+    "screenTitle": "Sicurezza",
+    "heroTitle": "Occhi sul quartiere",
+    "heroSubtitle": "Segnala episodi, avvisatevi a vicenda, vigilate insieme.",
+    "viewMap": "Mappa",
+    "viewList": "Elenco",
+    "empty": "Nessuna segnalazione nelle vicinanze",
+    "emptyHint": "Al momento è tutto tranquillo nella tua zona.",
+    "create": "Segnala",
+    "createTitle": "Segnala un episodio",
+    "fieldTitle": "Titolo",
+    "fieldDescription": "Cosa è successo?",
+    "fieldLocation": "Luogo / indirizzo",
+    "titleRequired": "Inserisci un titolo.",
+    "anonymous": "Segnala in anonimo",
+    "anonymousHint": "Il tuo nome non verrà mostrato né memorizzato.",
+    "anonymousName": "Anonimo",
+    "neighbor": "Vicino",
+    "submit": "Invia segnalazione",
+    "submitted": "Segnalazione inviata. Grazie per la vigilanza!",
+    "submitError": "Impossibile inviare la segnalazione.",
+    "upvote": "Conferma",
+    "upvoted": "Grazie per la conferma.",
+    "upvoteError": "Impossibile confermare.",
+    "upvotesCount": "{count} conferme",
+    "markResolved": "Risolto",
+    "resolved": "Contrassegnato come risolto.",
+    "resolveError": "Impossibile aggiornare.",
+    "locationRequired": "Posizione necessaria",
+    "locationHint": "Consenti l'accesso alla posizione per vedere le segnalazioni vicine.",
+    "locationAttached": "Verrà allegata la tua posizione attuale.",
+    "useGps": "Usa la posizione",
+    "types": {
+      "einbruch": "Effrazione",
+      "diebstahl": "Furto",
+      "vandalismus": "Vandalismo",
+      "verdaechtig": "Sospetto",
+      "unfall": "Incidente",
+      "fundgegenstand": "Oggetti smarriti",
+      "other": "Altro"
+    }
   },
   "verified": {
     "badgeTooltip": "Identità verificata",

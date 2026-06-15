@@ -107,7 +107,8 @@
     "crisis": "Crisis mode",
     "mentalSupport": "Mental support",
     "posts": "Posts",
-    "admin": "Admin dashboard"
+    "admin": "Admin dashboard",
+    "safety": "Safety"
   },
   "navGroups": {
     "communication": "Communication",
@@ -4045,7 +4046,47 @@
   },
   "safety": {
     "foodRecall": "FOOD RECALL",
-    "moreWarnings": "+{n} more"
+    "moreWarnings": "+{n} more",
+    "screenTitle": "Safety",
+    "heroTitle": "Eyes on the neighbourhood",
+    "heroSubtitle": "Report incidents, warn each other, look out together.",
+    "viewMap": "Map",
+    "viewList": "List",
+    "empty": "No reports nearby",
+    "emptyHint": "All quiet in your area right now.",
+    "create": "Report",
+    "createTitle": "Report an incident",
+    "fieldTitle": "Title",
+    "fieldDescription": "What happened?",
+    "fieldLocation": "Place / address",
+    "titleRequired": "Please enter a title.",
+    "anonymous": "Report anonymously",
+    "anonymousHint": "Your name will not be shown or stored.",
+    "anonymousName": "Anonymous",
+    "neighbor": "Neighbour",
+    "submit": "Send report",
+    "submitted": "Report sent. Thanks for looking out!",
+    "submitError": "Could not send the report.",
+    "upvote": "Confirm",
+    "upvoted": "Thanks for confirming.",
+    "upvoteError": "Could not confirm.",
+    "upvotesCount": "{count} confirmations",
+    "markResolved": "Resolved",
+    "resolved": "Marked as resolved.",
+    "resolveError": "Could not update.",
+    "locationRequired": "Location needed",
+    "locationHint": "Allow location access to see reports near you.",
+    "locationAttached": "Your current location will be attached.",
+    "useGps": "Use location",
+    "types": {
+      "einbruch": "Break-in",
+      "diebstahl": "Theft",
+      "vandalismus": "Vandalism",
+      "verdaechtig": "Suspicious",
+      "unfall": "Accident",
+      "fundgegenstand": "Lost & found",
+      "other": "Other"
+    }
   },
   "verified": {
     "badgeTooltip": "Identity verified",

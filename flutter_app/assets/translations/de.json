@@ -107,7 +107,8 @@
     "crisis": "Krisenmodus",
     "mentalSupport": "Mentale Unterstützung",
     "posts": "Beiträge",
-    "admin": "Admin-Dashboard"
+    "admin": "Admin-Dashboard",
+    "safety": "Sicherheit"
   },
   "navGroups": {
     "communication": "Kommunikation",
@@ -4044,7 +4045,47 @@
   },
   "safety": {
     "foodRecall": "LEBENSMITTEL-RÜCKRUF",
-    "moreWarnings": "+{n} weitere"
+    "moreWarnings": "+{n} weitere",
+    "screenTitle": "Sicherheit",
+    "heroTitle": "Augen in der Nachbarschaft",
+    "heroSubtitle": "Vorfälle melden, einander warnen, gemeinsam aufpassen.",
+    "viewMap": "Karte",
+    "viewList": "Liste",
+    "empty": "Keine Meldungen in der Nähe",
+    "emptyHint": "In deiner Umgebung ist aktuell alles ruhig.",
+    "create": "Melden",
+    "createTitle": "Vorfall melden",
+    "fieldTitle": "Titel",
+    "fieldDescription": "Was ist passiert?",
+    "fieldLocation": "Ort / Adresse",
+    "titleRequired": "Bitte gib einen Titel ein.",
+    "anonymous": "Anonym melden",
+    "anonymousHint": "Dein Name wird nicht angezeigt und nicht gespeichert.",
+    "anonymousName": "Anonym",
+    "neighbor": "Nachbar:in",
+    "submit": "Meldung senden",
+    "submitted": "Meldung gesendet. Danke fürs Aufpassen!",
+    "submitError": "Meldung konnte nicht gesendet werden.",
+    "upvote": "Bestätigen",
+    "upvoted": "Danke für deine Bestätigung.",
+    "upvoteError": "Konnte nicht bestätigt werden.",
+    "upvotesCount": "{count} Bestätigungen",
+    "markResolved": "Erledigt",
+    "resolved": "Als erledigt markiert.",
+    "resolveError": "Konnte nicht aktualisiert werden.",
+    "locationRequired": "Standort benötigt",
+    "locationHint": "Erlaube den Standortzugriff, um Meldungen in deiner Nähe zu sehen.",
+    "locationAttached": "Dein aktueller Standort wird angehängt.",
+    "useGps": "Standort verwenden",
+    "types": {
+      "einbruch": "Einbruch",
+      "diebstahl": "Diebstahl",
+      "vandalismus": "Vandalismus",
+      "verdaechtig": "Verdächtig",
+      "unfall": "Unfall",
+      "fundgegenstand": "Fundsache",
+      "other": "Sonstiges"
+    }
   },
   "verified": {
     "badgeTooltip": "Identität verifiziert",
