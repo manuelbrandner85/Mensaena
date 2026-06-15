@@ -1609,6 +1609,12 @@
       "links": "Bağlantılar",
       "created": "oluşturuldu {t}",
       "updated": "güncellendi {t}"
+    },
+    "nextUp": {
+      "title": "Sırada ne var?",
+      "subtitle": "Önce en büyük hızlı kazanımlar (yüksek etki, az çaba).",
+      "seeAll": "Tümünü gör",
+      "do": "Yap"
     }
   },
   "create": {
