@@ -97,13 +97,13 @@ class _CommunityCalendarScreenState
     return ListView(
       padding: const EdgeInsets.all(16),
       children: const [
-        ShimmerSkeleton(height: 320, borderRadius: 16),
+        ShimmerBox(height: 320, borderRadius: 16),
         SizedBox(height: 16),
-        ShimmerSkeleton(height: 80),
+        ShimmerBox(height: 80),
         SizedBox(height: 8),
-        ShimmerSkeleton(height: 80),
+        ShimmerBox(height: 80),
         SizedBox(height: 8),
-        ShimmerSkeleton(height: 80),
+        ShimmerBox(height: 80),
       ],
     );
   }
