@@ -2845,7 +2845,9 @@
     "free": "Gratuit",
     "screenTitle": "Compétences",
     "empty": "Aucune offre de compétence pour l’instant.",
-    "emptyHint": "Propose ta première compétence !"
+    "emptyHint": "Propose ta première compétence !",
+    "contactProvider": "Prendre contact",
+    "providerFallback": "Voisin·e"
   },
   "wissen": {
     "shareTitle": "Partager le savoir",

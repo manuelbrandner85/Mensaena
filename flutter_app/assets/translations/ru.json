@@ -2844,7 +2844,9 @@
     "free": "Бесплатно",
     "screenTitle": "Навыки",
     "empty": "Пока нет предложений навыков.",
-    "emptyHint": "Предложи свой первый навык!"
+    "emptyHint": "Предложи свой первый навык!",
+    "contactProvider": "Связаться",
+    "providerFallback": "Сосед(ка)"
   },
   "wissen": {
     "shareTitle": "Делиться знаниями",

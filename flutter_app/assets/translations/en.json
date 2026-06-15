@@ -2845,7 +2845,9 @@
     "free": "Free",
     "screenTitle": "Skills",
     "empty": "No skill offers yet.",
-    "emptyHint": "Offer your first skill!"
+    "emptyHint": "Offer your first skill!",
+    "contactProvider": "Get in touch",
+    "providerFallback": "Neighbour"
   },
   "wissen": {
     "shareTitle": "Share knowledge",
