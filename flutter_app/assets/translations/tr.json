@@ -2858,7 +2858,11 @@
     "hubScreenTitle": "Paylaş ve ödünç ver",
     "marketplace": "Pazaryeri",
     "timebank": "Zaman bankası",
-    "share": "Paylaşım"
+    "share": "Paylaşım",
+    "hubSubSharing": "Hediye et, ödünç ver, ücretsiz al",
+    "hubSubMarketplace": "Sat, takas et, uygun fiyata",
+    "hubSubTimebank": "Bir saat ver, bir saat al",
+    "hubDescription": "Mahallede eşya ve zaman paylaşmanın üç yolu — ücretsizden zamana karşı zamana kadar."
   },
   "organizations": {
     "notFound": "Kuruluş bulunamadı.",

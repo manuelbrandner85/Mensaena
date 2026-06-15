@@ -2859,7 +2859,11 @@
     "hubScreenTitle": "Partager et prêter",
     "marketplace": "Marché",
     "timebank": "Banque de temps",
-    "share": "Partager"
+    "share": "Partager",
+    "hubSubSharing": "Donner, prêter, récupérer gratuitement",
+    "hubSubMarketplace": "Vendre, échanger, à petit prix",
+    "hubSubTimebank": "Donner une heure, recevoir une heure",
+    "hubDescription": "Trois façons de partager choses et temps dans le quartier — du gratuit au temps-contre-temps."
   },
   "organizations": {
     "notFound": "Organisation introuvable.",

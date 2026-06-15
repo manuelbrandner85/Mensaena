@@ -2858,7 +2858,11 @@
     "hubScreenTitle": "Teilen & Verleihen",
     "marketplace": "Marktplatz",
     "timebank": "Zeitbank",
-    "share": "Teilen"
+    "share": "Teilen",
+    "hubSubSharing": "Verschenken, leihweise weitergeben, kostenlos abholen",
+    "hubSubMarketplace": "Verkaufen, tauschen, zum kleinen Preis",
+    "hubSubTimebank": "Eine Stunde geben, eine Stunde bekommen",
+    "hubDescription": "Drei Wege, Dinge und Zeit in der Nachbarschaft auszutauschen — von gratis bis Zeit-für-Zeit."
   },
   "organizations": {
     "notFound": "Organisation nicht gefunden.",
