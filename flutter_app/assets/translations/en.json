@@ -4510,5 +4510,14 @@
     "hintGiveaway": "Pass on your item for free.",
     "hintSwap": "Exchange for something of equal value.",
     "submitButton": "Publish offer"
+  },
+  "communityCalendar": {
+    "screenTitle": "Community Calendar",
+    "createEvent": "Create Event",
+    "noEntriesDay": "No entries on this day.",
+    "typeEvent": "Event",
+    "typeTimebank": "Timebank",
+    "typeGroup": "Group",
+    "typeSkill": "Skill"
   }
 }

@@ -4512,5 +4512,14 @@
     "hintGiveaway": "Eşyanı ücretsiz ver.",
     "hintSwap": "Eşdeğer bir şeyle takas et.",
     "submitButton": "Teklifi yayınla"
+  },
+  "communityCalendar": {
+    "screenTitle": "Topluluk Takvimi",
+    "createEvent": "Etkinlik Oluştur",
+    "noEntriesDay": "Bu gün için kayıt yok.",
+    "typeEvent": "Etkinlik",
+    "typeTimebank": "Zaman Bankası",
+    "typeGroup": "Grup",
+    "typeSkill": "Teklif"
   }
 }

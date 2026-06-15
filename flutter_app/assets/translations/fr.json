@@ -4513,5 +4513,14 @@
     "hintGiveaway": "Cédez votre objet gratuitement.",
     "hintSwap": "Échangez contre quelque chose d'équivalent.",
     "submitButton": "Publier l'offre"
+  },
+  "communityCalendar": {
+    "screenTitle": "Calendrier Communautaire",
+    "createEvent": "Créer un Événement",
+    "noEntriesDay": "Aucune entrée ce jour-là.",
+    "typeEvent": "Événement",
+    "typeTimebank": "Banque du Temps",
+    "typeGroup": "Groupe",
+    "typeSkill": "Offre"
   }
 }

@@ -4512,5 +4512,14 @@
     "hintGiveaway": "Передайте свою вещь бесплатно.",
     "hintSwap": "Обменяйте на что-то равноценное.",
     "submitButton": "Опубликовать предложение"
+  },
+  "communityCalendar": {
+    "screenTitle": "Общественный Календарь",
+    "createEvent": "Создать Событие",
+    "noEntriesDay": "В этот день нет записей.",
+    "typeEvent": "Событие",
+    "typeTimebank": "Банк Времени",
+    "typeGroup": "Группа",
+    "typeSkill": "Предложение"
   }
 }
