@@ -1553,7 +1553,17 @@
       "dismissedOk": "Dismissed.",
       "actionFailed": "Action failed."
     },
-    "phaseOf": "Phase {n}/{total}"
+    "phaseOf": "Phase {n}/{total}",
+    "healthAlert": {
+      "title": "Health watch: crash spike",
+      "subtitle": "More crashes occurred after a merge. Safe alert — nothing is rolled back automatically. You decide.",
+      "spike": "{crashes} crashes across {users} users",
+      "fix": "Fix task",
+      "fixPrompt": "Fix the crash that spikes after merge {pr}. Error: {error}",
+      "fixPrefilled": "Fix prompt inserted – review and send.",
+      "acknowledge": "Seen",
+      "resolve": "Resolved"
+    }
   },
   "create": {
     "titleRequired": "Title is required.",

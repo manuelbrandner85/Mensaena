@@ -108,6 +108,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   bool _changelogExpanded = false;
   List<Map<String, dynamic>> _apiKeys = const [];
   bool _apiKeysExpanded = false;
+  // Post-Merge-Gesundheitswächter: offene Crash-Anstieg-Alarme (sicherer
+  // Alarm, kein Auto-Rollback — der Admin entscheidet).
+  List<Map<String, dynamic>> _healthAlerts = const [];
+  final Set<String> _busyAlerts = {};
   // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
   // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
   String? _pendingNoteId;
@@ -157,6 +161,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     _loadMetrics();
     _loadChangelog();
     _loadApiKeys();
+    _loadHealthAlerts();
     _loadSchedules();
     _loadModuleInsights();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
@@ -894,6 +899,45 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     setState(() => _apiKeys = k);
   }
 
+  Future<void> _loadHealthAlerts() async {
+    final a = await AiInsightsRepository.fetchHealthAlerts();
+    if (!mounted) return;
+    setState(() => _healthAlerts = a);
+  }
+
+  // Alarm quittieren (acknowledged) oder als erledigt markieren (resolved).
+  Future<void> _setAlertStatus(String id, String status) async {
+    setState(() => _busyAlerts.add(id));
+    try {
+      await AiInsightsRepository.setHealthAlertStatus(id, status);
+      await _loadHealthAlerts();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('errors.generic'.tr())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busyAlerts.remove(id));
+    }
+  }
+
+  // Aus einem Alarm direkt einen Fix-Auftrag erstellen (vorbefüllter Prompt).
+  Future<void> _fixFromAlert(Map<String, dynamic> alert) async {
+    final msg = (alert['error_message'] as String? ?? '').trim();
+    final pr = alert['pr_number'];
+    final prefill = 'adminDev.healthAlert.fixPrompt'.tr(namedArgs: {
+      'pr': pr == null ? '?' : '#$pr',
+      'error': msg.length > 300 ? '${msg.substring(0, 300)}…' : msg,
+    });
+    _ctrl.text = prefill;
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('adminDev.healthAlert.fixPrefilled'.tr())),
+      );
+    }
+  }
+
   // API-Key anlegen/bearbeiten (Service + Key + optionales Ablaufdatum).
   Future<void> _editApiKey({Map<String, dynamic>? existing}) async {
     final serviceCtrl =
@@ -1266,6 +1310,18 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                     : ListView(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         children: [
+                          if (_healthAlerts.isNotEmpty) ...[
+                            _HealthAlertsCard(
+                              alerts: _healthAlerts,
+                              busyIds: _busyAlerts,
+                              onAcknowledge: (id) =>
+                                  _setAlertStatus(id, 'acknowledged'),
+                              onResolve: (id) =>
+                                  _setAlertStatus(id, 'resolved'),
+                              onFix: _fixFromAlert,
+                            ),
+                            const SizedBox(height: 10),
+                          ],
                           _HealthCard(
                             metrics: _metrics,
                             expanded: _metricsExpanded,
@@ -4551,6 +4607,201 @@ class _ChangelogCard extends StatelessWidget {
             const SizedBox(height: 6),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Post-Merge-Gesundheitswächter: zeigt offene Crash-Anstieg-Alarme nach einem
+/// Godmode-Merge. SICHERER ALARM — der Wächter rollt NICHTS automatisch zurück;
+/// der Admin entscheidet (quittieren, als erledigt markieren oder Fix-Auftrag).
+class _HealthAlertsCard extends StatelessWidget {
+  const _HealthAlertsCard({
+    required this.alerts,
+    required this.busyIds,
+    required this.onAcknowledge,
+    required this.onResolve,
+    required this.onFix,
+  });
+  final List<Map<String, dynamic>> alerts;
+  final Set<String> busyIds;
+  final ValueChanged<String> onAcknowledge;
+  final ValueChanged<String> onResolve;
+  final ValueChanged<Map<String, dynamic>> onFix;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.herzrot.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: AppColors.herzrot.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(13, 12, 13, 6),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.alertTriangle,
+                    size: 16, color: AppColors.herzrot),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('adminDev.healthAlert.title'.tr(),
+                      style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.herzrot,
+                          weight: FontWeight.w800)),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.herzrot,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text('${alerts.length}',
+                      style: AppTypography.label(
+                          size: 10, color: Colors.white)),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(13, 0, 13, 8),
+            child: Text('adminDev.healthAlert.subtitle'.tr(),
+                style: AppTypography.caption(color: AppColors.lightMute)),
+          ),
+          ...alerts.map((a) {
+            final id = a['id'] as String;
+            final busy = busyIds.contains(id);
+            final pr = a['pr_number'];
+            final mergeTitle = a['merge_title'] as String? ?? '';
+            final msg = (a['error_message'] as String? ?? '').trim();
+            final etype = a['error_type'] as String? ?? '';
+            final crashes = a['crash_count'] ?? 0;
+            final users = a['affected_users'] ?? 0;
+            return Container(
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+              padding: const EdgeInsets.all(11),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'adminDev.healthAlert.spike'.tr(namedArgs: {
+                      'crashes': '$crashes',
+                      'users': '$users',
+                    }),
+                    style: AppTypography.body(
+                        size: 12,
+                        color: AppColors.herzrot,
+                        weight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    etype.isEmpty ? msg : '$etype: $msg',
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.lightInk),
+                  ),
+                  if (mergeTitle.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      pr != null
+                          ? '$mergeTitle  (#$pr)'
+                          : mergeTitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.caption(
+                          color: AppColors.lightMute),
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  if (busy)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        _AlertAction(
+                          icon: LucideIcons.wrench,
+                          label: 'adminDev.healthAlert.fix'.tr(),
+                          primary: true,
+                          onTap: () => onFix(a),
+                        ),
+                        _AlertAction(
+                          icon: LucideIcons.check,
+                          label: 'adminDev.healthAlert.acknowledge'.tr(),
+                          onTap: () => onAcknowledge(id),
+                        ),
+                        _AlertAction(
+                          icon: LucideIcons.checkCheck,
+                          label: 'adminDev.healthAlert.resolve'.tr(),
+                          onTap: () => onResolve(id),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _AlertAction extends StatelessWidget {
+  const _AlertAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.primary = false,
+  });
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool primary;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = primary ? Colors.white : AppColors.lightInk;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: primary ? AppColors.herzrot : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+          border: primary
+              ? null
+              : Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: fg),
+            const SizedBox(width: 5),
+            Text(label,
+                style: AppTypography.label(size: 11, color: fg)),
+          ],
+        ),
       ),
     );
   }

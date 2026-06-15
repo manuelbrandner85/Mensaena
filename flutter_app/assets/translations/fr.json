@@ -1553,7 +1553,17 @@
       "dismissedOk": "Ignoré.",
       "actionFailed": "Action échouée."
     },
-    "phaseOf": "Phase {n}/{total}"
+    "phaseOf": "Phase {n}/{total}",
+    "healthAlert": {
+      "title": "Surveillance santé : pic de plantages",
+      "subtitle": "Plus de plantages sont survenus après un merge. Alerte sûre — rien n'est annulé automatiquement. C'est vous qui décidez.",
+      "spike": "{crashes} plantages chez {users} utilisateurs",
+      "fix": "Tâche de correction",
+      "fixPrompt": "Corrige le plantage qui augmente après le merge {pr}. Erreur : {error}",
+      "fixPrefilled": "Prompt de correction inséré – vérifie et envoie.",
+      "acknowledge": "Vu",
+      "resolve": "Résolu"
+    }
   },
   "create": {
     "titleRequired": "Le titre est obligatoire.",

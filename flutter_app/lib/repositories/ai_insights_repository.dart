@@ -494,6 +494,35 @@ class AiInsightsRepository {
     }
   }
 
+  /// Lädt offene Post-Merge-Gesundheitsalarme (Crash-Anstieg nach Merge).
+  /// Sicherer Alarm — kein Auto-Rollback; Admin entscheidet. Admin-only via RLS.
+  static Future<List<Map<String, dynamic>>> fetchHealthAlerts() async {
+    try {
+      final rows = await sb
+          .from('godmode_health_alerts')
+          .select('id, pr_number, merge_title, error_type, error_message, '
+              'app_version, crash_count, affected_users, status, created_at')
+          .neq('status', 'resolved')
+          .order('created_at', ascending: false)
+          .limit(20);
+      return (rows as List)
+          .map((r) => Map<String, dynamic>.from(r as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchHealthAlerts failed: $e');
+      return const [];
+    }
+  }
+
+  /// Setzt den Status eines Gesundheitsalarms (acknowledged | resolved).
+  static Future<void> setHealthAlertStatus(String id, String status) async {
+    final patch = <String, dynamic>{'status': status};
+    if (status == 'resolved') {
+      patch['resolved_at'] = DateTime.now().toUtc().toIso8601String();
+    }
+    await sb.from('godmode_health_alerts').update(patch).eq('id', id);
+  }
+
   /// Lädt die letzten Entwicklungs-Aufträge (Admin-only via RLS).
   static Future<List<Map<String, dynamic>>> fetchDevTasks() async {
     try {

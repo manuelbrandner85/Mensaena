@@ -1553,7 +1553,17 @@
       "dismissedOk": "Descartado.",
       "actionFailed": "Acción fallida."
     },
-    "phaseOf": "Fase {n}/{total}"
+    "phaseOf": "Fase {n}/{total}",
+    "healthAlert": {
+      "title": "Vigilancia de salud: pico de fallos",
+      "subtitle": "Tras un merge se produjeron más fallos. Aviso seguro — nada se revierte automáticamente. Tú decides.",
+      "spike": "{crashes} fallos en {users} usuarios",
+      "fix": "Tarea de corrección",
+      "fixPrompt": "Corrige el fallo que aumenta tras el merge {pr}. Error: {error}",
+      "fixPrefilled": "Prompt de corrección insertado – revisa y envía.",
+      "acknowledge": "Visto",
+      "resolve": "Resuelto"
+    }
   },
   "create": {
     "titleRequired": "El título es obligatorio.",
