@@ -318,6 +318,40 @@ Deno.serve(async (req) => {
     return json({ ok: true, deleted: 1 })
   }
 
+  // ── Roadmap / Epics ────────────────────────────────────────────────────────
+  if (action === 'epic_save') {
+    const title = String(body?.title ?? '').trim().slice(0, 120)
+    if (title.length < 2) return json({ error: 'title_required' }, 400)
+    const description = String(body?.description ?? '').trim().slice(0, 600) || null
+    const allowedColors = ['teal', 'amber', 'herzrot', 'leben', 'trust']
+    const color = allowedColors.includes(String(body?.color)) ? String(body.color) : 'teal'
+    const allowedStatus = ['active', 'done', 'archived']
+    const status = allowedStatus.includes(String(body?.status)) ? String(body.status) : 'active'
+    const sortOrder = Number.isFinite(Number(body?.sort_order)) ? Number(body.sort_order) : 0
+    const id = body?.id ? String(body.id) : null
+    if (id) {
+      const { error } = await admin.from('godmode_epics')
+        .update({ title, description, color, status, sort_order: sortOrder })
+        .eq('id', id)
+      if (error) return json({ error: 'epic_update_failed', detail: error.message }, 500)
+      return json({ ok: true, id })
+    }
+    const { data, error } = await admin.from('godmode_epics')
+      .insert({ created_by: user.id, title, description, color, status, sort_order: sortOrder })
+      .select('id').single()
+    if (error || !data) return json({ error: 'epic_insert_failed', detail: error?.message }, 500)
+    return json({ ok: true, id: data.id })
+  }
+
+  if (action === 'epic_delete') {
+    const id = String(body?.id ?? '')
+    if (!id) return json({ error: 'id_required' }, 400)
+    // FK ist ON DELETE SET NULL → zugeordnete Aufträge/Vorschläge bleiben.
+    const { error } = await admin.from('godmode_epics').delete().eq('id', id)
+    if (error) return json({ error: 'epic_delete_failed', detail: error.message }, 500)
+    return json({ ok: true, deleted: 1 })
+  }
+
   // ── Health-/Metrics-Dashboard ─────────────────────────────────────────────
   if (action === 'metrics') {
     const { data: tasks } = await admin
@@ -692,6 +726,8 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
     thorough: 'claude-opus-4-8',
   }
   const model = MODEL_MAP[String(body?.model ?? '')] ?? ''
+  // Optionale Epic-Zuordnung (Roadmap). Leer = nicht zugeordnet.
+  const epicId = body?.epic_id ? String(body.epic_id) : null
 
   // ── Auto-Phasen: zu große Aufträge automatisch zerlegen ───────────────────
   // Übersprungen, wenn der Aufrufer explizit Schritte vorgibt (Legacy-Plan)
@@ -711,6 +747,7 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
           await_review: awaitReview,
           origin: ['manual', 'suggestion', 'schedule', 'rollback'].includes(String(body?.origin))
             ? String(body.origin) : 'manual',
+          epic_id: epicId,
           plan: { phases: decision.phases, total: decision.phases.length, current: 0 },
         })
         .select('id').single()
@@ -766,6 +803,7 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
       await_review: awaitReview,
       origin: ['manual', 'suggestion', 'schedule', 'rollback'].includes(String(body?.origin))
         ? String(body.origin) : 'manual',
+      epic_id: epicId,
       plan: planSteps.length > 0 ? planSteps : null,
     })
     .select('id')

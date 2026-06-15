@@ -112,6 +112,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   // Alarm, kein Auto-Rollback — der Admin entscheidet).
   List<Map<String, dynamic>> _healthAlerts = const [];
   final Set<String> _busyAlerts = {};
+  // Roadmap / Epics: thematische Initiativen mit Fortschritt.
+  List<Map<String, dynamic>> _epics = const [];
+  bool _epicsExpanded = false;
   // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
   // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
   String? _pendingNoteId;
@@ -162,6 +165,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     _loadChangelog();
     _loadApiKeys();
     _loadHealthAlerts();
+    _loadEpics();
     _loadSchedules();
     _loadModuleInsights();
     _poll = Timer.periodic(const Duration(seconds: 3), (_) {
@@ -389,6 +393,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
         title: 'adminDev.edit.title'.tr(),
         confirmLabel: 'adminDev.edit.confirm'.tr(),
         initialText: initial,
+        epics: _epics,
       ),
     );
     if (result == null || !mounted) return;
@@ -401,6 +406,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       wantScreens: result.wantScreens,
       model: result.model,
       origin: 'suggestion',
+      epicId: result.epicId,
     );
     if (!mounted) return;
     if (res['cancelled'] == true) {
@@ -484,6 +490,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
         confirmLabel: 'adminDev.edit.confirm'.tr(),
         hint: 'adminDev.edit.bundleHint'.tr(),
         initialText: buf.toString().trim(),
+        epics: _epics,
       ),
     );
     if (result == null || !mounted) return;
@@ -496,6 +503,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       wantScreens: result.wantScreens,
       model: result.model,
       origin: 'suggestion',
+      epicId: result.epicId,
     );
     if (!mounted) return;
     if (res['cancelled'] == true) {
@@ -595,6 +603,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
     bool wantScreens = false,
     String? origin,
     String? model,
+    String? epicId,
   }) async {
     var plan = const <String>[];
     if (planMode) {
@@ -614,6 +623,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       wantScreens: wantScreens,
       origin: origin,
       model: model,
+      epicId: epicId,
       // Auto-Phasen-Splitter aus: jeder app-initiierte Auftrag wird als EIN
       // vollständiger PR umgesetzt + gemergt (verlässlich). Die Mehr-Phasen-
       // Verkettung lieferte zuletzt nur Phase 1 (Backend), die Folgephasen
@@ -758,6 +768,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
         title: 'adminDev.edit.retryTitle'.tr(),
         confirmLabel: 'adminDev.edit.confirm'.tr(),
         initialText: instruction,
+        epics: _epics,
       ),
     );
     if (result == null || !mounted) return;
@@ -768,6 +779,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       planMode: result.planMode,
       wantScreens: result.wantScreens,
       model: result.model,
+      epicId: result.epicId,
     );
     if (!mounted) return;
     setState(() => _sending = false);
@@ -919,6 +931,202 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       }
     } finally {
       if (mounted) setState(() => _busyAlerts.remove(id));
+    }
+  }
+
+  Future<void> _loadEpics() async {
+    final e = await AiInsightsRepository.fetchEpics();
+    if (!mounted) return;
+    setState(() => _epics = e);
+  }
+
+  // Epic anlegen/bearbeiten (Titel, Beschreibung, Farbe, Status).
+  Future<void> _editEpic({Map<String, dynamic>? existing}) async {
+    final titleCtrl =
+        TextEditingController(text: existing?['title'] as String? ?? '');
+    final descCtrl =
+        TextEditingController(text: existing?['description'] as String? ?? '');
+    var color = existing?['color'] as String? ?? 'teal';
+    var status = existing?['status'] as String? ?? 'active';
+    const colors = ['teal', 'amber', 'herzrot', 'leben', 'trust'];
+    const statuses = ['active', 'done', 'archived'];
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: Text(existing == null
+              ? 'adminDev.roadmap.add'.tr()
+              : 'adminDev.roadmap.edit'.tr()),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                      labelText: 'adminDev.roadmap.titleLabel'.tr()),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: descCtrl,
+                  maxLines: 3,
+                  minLines: 1,
+                  decoration: InputDecoration(
+                      labelText: 'adminDev.roadmap.descLabel'.tr()),
+                ),
+                const SizedBox(height: 12),
+                Text('adminDev.roadmap.colorLabel'.tr().toUpperCase(),
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.lightMute)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final c in colors)
+                      GestureDetector(
+                        onTap: () => setLocal(() => color = c),
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: _epicColor(c),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: color == c
+                                  ? AppColors.lightInk
+                                  : Colors.transparent,
+                              width: 2.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text('adminDev.roadmap.statusLabel'.tr().toUpperCase(),
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.lightMute)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  children: [
+                    for (final s in statuses)
+                      ChoiceChip(
+                        label: Text('adminDev.roadmap.status_$s'.tr(),
+                            style: AppTypography.label(size: 10)),
+                        selected: status == s,
+                        onSelected: (_) => setLocal(() => status = s),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text('common.cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text('common.save'.tr()),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (saved != true) return;
+    final title = titleCtrl.text.trim();
+    if (title.isEmpty) return;
+    final res = await AiInsightsRepository.saveEpic(
+      id: existing?['id'] as String?,
+      title: title,
+      description: descCtrl.text.trim(),
+      color: color,
+      status: status,
+    );
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      await _loadEpics();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('errors.generic'.tr())),
+      );
+    }
+  }
+
+  Future<void> _deleteEpic(String id) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('adminDev.roadmap.deleteTitle'.tr()),
+        content: Text('adminDev.roadmap.deleteBody'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.herzrot),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('common.delete'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final done = await AiInsightsRepository.deleteEpic(id);
+    if (!mounted) return;
+    if (done) await _loadEpics();
+  }
+
+  // Neuen Auftrag direkt unter einem Epic anlegen (Epic vorausgewählt).
+  Future<void> _newTaskInEpic(Map<String, dynamic> epic) async {
+    final result = await showModalBottomSheet<_PromptEditResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _PromptEditSheet(
+        title: 'adminDev.roadmap.newTaskIn'
+            .tr(namedArgs: {'epic': epic['title'] as String? ?? ''}),
+        confirmLabel: 'adminDev.edit.confirm'.tr(),
+        initialText: '',
+        epics: _epics,
+        initialEpicId: epic['id'] as String?,
+      ),
+    );
+    if (result == null) return;
+    final res = await _submitTask(
+      result.instruction,
+      awaitReview: result.awaitReview,
+      planMode: result.planMode,
+      wantScreens: result.wantScreens,
+      model: result.model,
+      origin: 'manual',
+      epicId: result.epicId,
+    );
+    if (!mounted) return;
+    if (res['ok'] == true) {
+      await _refresh();
+      await _loadEpics();
+    }
+  }
+
+  Color _epicColor(String key) {
+    switch (key) {
+      case 'amber':
+        return AppColors.amber;
+      case 'herzrot':
+        return AppColors.herzrot;
+      case 'leben':
+        return AppColors.leben;
+      case 'trust':
+        return AppColors.trust;
+      default:
+        return AppColors.teal;
     }
   }
 
@@ -1327,6 +1535,18 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
                             expanded: _metricsExpanded,
                             onToggle: () => setState(
                                 () => _metricsExpanded = !_metricsExpanded),
+                          ),
+                          const SizedBox(height: 10),
+                          _RoadmapCard(
+                            epics: _epics,
+                            expanded: _epicsExpanded,
+                            onToggle: () => setState(
+                                () => _epicsExpanded = !_epicsExpanded),
+                            onAdd: () => _editEpic(),
+                            onEdit: (e) => _editEpic(existing: e),
+                            onDelete: _deleteEpic,
+                            onNewTask: _newTaskInEpic,
+                            colorOf: _epicColor,
                           ),
                           const SizedBox(height: 10),
                           _ModuleIntelligenceCard(
@@ -4807,6 +5027,200 @@ class _AlertAction extends StatelessWidget {
   }
 }
 
+/// Roadmap / Epics: thematische Initiativen mit Fortschritt. Bündelt Aufträge
+/// & Vorschläge zu größeren Vorhaben und zeigt den Liefer-Fortschritt.
+class _RoadmapCard extends StatelessWidget {
+  const _RoadmapCard({
+    required this.epics,
+    required this.expanded,
+    required this.onToggle,
+    required this.onAdd,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onNewTask,
+    required this.colorOf,
+  });
+  final List<Map<String, dynamic>> epics;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onAdd;
+  final ValueChanged<Map<String, dynamic>> onEdit;
+  final ValueChanged<String> onDelete;
+  final ValueChanged<Map<String, dynamic>> onNewTask;
+  final Color Function(String) colorOf;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(13),
+            child: Padding(
+              padding: const EdgeInsets.all(13),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.map,
+                      size: 16, color: AppColors.teal),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('adminDev.roadmap.title'.tr(),
+                        style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.lightInk,
+                            weight: FontWeight.w700)),
+                  ),
+                  if (epics.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Text('${epics.length}',
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.lightMute)),
+                    ),
+                  Icon(
+                      expanded
+                          ? LucideIcons.chevronUp
+                          : LucideIcons.chevronDown,
+                      size: 16,
+                      color: AppColors.lightMute),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            if (epics.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Text('adminDev.roadmap.empty'.tr(),
+                    style: AppTypography.caption()),
+              )
+            else
+              ...epics.map((e) => _epicTile(context, e)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(13, 4, 13, 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(LucideIcons.plus, size: 15),
+                  label: Text('adminDev.roadmap.add'.tr()),
+                  style: TextButton.styleFrom(
+                      foregroundColor: AppColors.teal),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _epicTile(BuildContext context, Map<String, dynamic> e) {
+    final id = e['id'] as String;
+    final title = e['title'] as String? ?? '';
+    final desc = e['description'] as String? ?? '';
+    final color = colorOf(e['color'] as String? ?? 'teal');
+    final status = e['status'] as String? ?? 'active';
+    final total = (e['total_tasks'] as num?)?.toInt() ?? 0;
+    final done = (e['done_tasks'] as num?)?.toInt() ?? 0;
+    final pending = (e['pending_suggestions'] as num?)?.toInt() ?? 0;
+    final progress = total > 0 ? done / total : 0.0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(13, 10, 13, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              Expanded(
+                child: Text(title,
+                    style: AppTypography.body(
+                        size: 12.5,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w700)),
+              ),
+              if (status == 'done')
+                const Icon(LucideIcons.checkCheck,
+                    size: 14, color: AppColors.leben)
+              else if (status == 'archived')
+                const Icon(LucideIcons.archive,
+                    size: 14, color: AppColors.lightMute),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => onNewTask(e),
+                icon: const Icon(LucideIcons.plus, size: 15),
+                color: AppColors.teal,
+                tooltip: 'adminDev.roadmap.addTaskTooltip'.tr(),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => onEdit(e),
+                icon: const Icon(LucideIcons.pencil, size: 14),
+                color: AppColors.lightMute,
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => onDelete(id),
+                icon: const Icon(LucideIcons.trash2, size: 14),
+                color: AppColors.lightMute,
+              ),
+            ],
+          ),
+          if (desc.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(desc,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.caption(color: AppColors.lightMute)),
+          ],
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: AlwaysStoppedAnimation(color),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'adminDev.roadmap.progress'.tr(namedArgs: {
+              'done': '$done',
+              'total': '$total',
+              'pending': '$pending',
+            }),
+            style: AppTypography.label(size: 10, color: AppColors.lightMute),
+          ),
+          const Divider(height: 16),
+        ],
+      ),
+    );
+  }
+}
+
 class _HealthCard extends StatelessWidget {
   const _HealthCard({
     required this.metrics,
@@ -5780,12 +6194,14 @@ class _PromptEditResult {
     required this.planMode,
     required this.wantScreens,
     required this.model,
+    this.epicId,
   });
   final String instruction;
   final bool awaitReview;
   final bool planMode;
   final bool wantScreens;
   final String model; // 'fast' | 'standard' | 'thorough'
+  final String? epicId; // optionale Roadmap-Zuordnung
 }
 
 // Wiederverwendbares Sheet zum Bearbeiten eines Prompts vor dem Absenden.
@@ -5798,11 +6214,15 @@ class _PromptEditSheet extends StatefulWidget {
     required this.confirmLabel,
     required this.initialText,
     this.hint,
+    this.epics = const [],
+    this.initialEpicId,
   });
   final String title;
   final String confirmLabel;
   final String initialText;
   final String? hint;
+  final List<Map<String, dynamic>> epics;
+  final String? initialEpicId;
 
   @override
   State<_PromptEditSheet> createState() => _PromptEditSheetState();
@@ -5814,11 +6234,13 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
   bool _planMode = false;
   bool _wantScreens = false;
   String _model = 'standard'; // fast | standard | thorough
+  String? _epicId;
 
   @override
   void initState() {
     super.initState();
     _ctrl = TextEditingController(text: widget.initialText);
+    _epicId = widget.initialEpicId;
   }
 
   @override
@@ -5844,6 +6266,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
       planMode: _planMode,
       wantScreens: _wantScreens,
       model: _model,
+      epicId: _epicId,
     ));
   }
 
@@ -5954,6 +6377,37 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                     ),
                 ],
               ),
+              if (widget.epics.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text('adminDev.roadmap.assignLabel'.tr().toUpperCase(),
+                    style: AppTypography.label(
+                        size: 9, color: AppColors.lightMute)),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    ChoiceChip(
+                      label: Text('adminDev.roadmap.noEpic'.tr(),
+                          style: AppTypography.label(size: 10)),
+                      selected: _epicId == null,
+                      onSelected: (_) => setState(() => _epicId = null),
+                      selectedColor: AppColors.teal.withValues(alpha: 0.25),
+                      backgroundColor: AppColors.elevated,
+                    ),
+                    for (final e in widget.epics)
+                      ChoiceChip(
+                        label: Text(e['title'] as String? ?? '',
+                            style: AppTypography.label(size: 10)),
+                        selected: _epicId == e['id'],
+                        onSelected: (_) =>
+                            setState(() => _epicId = e['id'] as String?),
+                        selectedColor: AppColors.teal.withValues(alpha: 0.25),
+                        backgroundColor: AppColors.elevated,
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,

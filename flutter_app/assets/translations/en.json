@@ -1563,6 +1563,26 @@
       "fixPrefilled": "Fix prompt inserted – review and send.",
       "acknowledge": "Seen",
       "resolve": "Resolved"
+    },
+    "roadmap": {
+      "title": "Roadmap (Epics)",
+      "add": "New epic",
+      "edit": "Edit epic",
+      "empty": "No epics yet. Group tasks into initiatives.",
+      "titleLabel": "Title",
+      "descLabel": "Description (optional)",
+      "colorLabel": "Color",
+      "statusLabel": "Status",
+      "status_active": "Active",
+      "status_done": "Done",
+      "status_archived": "Archived",
+      "deleteTitle": "Delete epic?",
+      "deleteBody": "Linked tasks and suggestions are kept; only the grouping is removed.",
+      "progress": "{done}/{total} shipped · {pending} open suggestions",
+      "assignLabel": "Assign epic",
+      "noEpic": "No epic",
+      "newTaskIn": "New task in \"{epic}\"",
+      "addTaskTooltip": "Task in this epic"
     }
   },
   "create": {

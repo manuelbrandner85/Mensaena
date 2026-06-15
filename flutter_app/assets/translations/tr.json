@@ -1562,6 +1562,26 @@
       "fixPrefilled": "Düzeltme istemi eklendi – kontrol et ve gönder.",
       "acknowledge": "Görüldü",
       "resolve": "Çözüldü"
+    },
+    "roadmap": {
+      "title": "Yol haritası (Epic)",
+      "add": "Yeni epic",
+      "edit": "Epic düzenle",
+      "empty": "Henüz epic yok. Görevleri girişimlere grupla.",
+      "titleLabel": "Başlık",
+      "descLabel": "Açıklama (isteğe bağlı)",
+      "colorLabel": "Renk",
+      "statusLabel": "Durum",
+      "status_active": "Aktif",
+      "status_done": "Tamamlandı",
+      "status_archived": "Arşivlendi",
+      "deleteTitle": "Epic silinsin mi?",
+      "deleteBody": "Bağlı görevler ve öneriler korunur; yalnızca gruplama kaldırılır.",
+      "progress": "{done}/{total} yayınlandı · {pending} açık öneri",
+      "assignLabel": "Epic ata",
+      "noEpic": "Epic yok",
+      "newTaskIn": "\"{epic}\" içinde yeni görev",
+      "addTaskTooltip": "Bu epic'te görev"
     }
   },
   "create": {

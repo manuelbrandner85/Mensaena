@@ -1563,6 +1563,26 @@
       "fixPrefilled": "Prompt de correction inséré – vérifie et envoie.",
       "acknowledge": "Vu",
       "resolve": "Résolu"
+    },
+    "roadmap": {
+      "title": "Feuille de route (Epics)",
+      "add": "Nouvel epic",
+      "edit": "Modifier l'epic",
+      "empty": "Aucun epic. Regroupe les tâches en initiatives.",
+      "titleLabel": "Titre",
+      "descLabel": "Description (facultatif)",
+      "colorLabel": "Couleur",
+      "statusLabel": "Statut",
+      "status_active": "Actif",
+      "status_done": "Terminé",
+      "status_archived": "Archivé",
+      "deleteTitle": "Supprimer l'epic ?",
+      "deleteBody": "Les tâches et suggestions liées sont conservées ; seul le regroupement est supprimé.",
+      "progress": "{done}/{total} livrés · {pending} suggestions ouvertes",
+      "assignLabel": "Attribuer un epic",
+      "noEpic": "Aucun epic",
+      "newTaskIn": "Nouvelle tâche dans « {epic} »",
+      "addTaskTooltip": "Tâche dans cet epic"
     }
   },
   "create": {

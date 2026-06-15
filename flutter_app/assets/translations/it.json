@@ -1563,6 +1563,26 @@
       "fixPrefilled": "Prompt di fix inserito – controlla e invia.",
       "acknowledge": "Visto",
       "resolve": "Risolto"
+    },
+    "roadmap": {
+      "title": "Roadmap (Epic)",
+      "add": "Nuovo epic",
+      "edit": "Modifica epic",
+      "empty": "Nessun epic. Raggruppa le attività in iniziative.",
+      "titleLabel": "Titolo",
+      "descLabel": "Descrizione (facoltativa)",
+      "colorLabel": "Colore",
+      "statusLabel": "Stato",
+      "status_active": "Attivo",
+      "status_done": "Completato",
+      "status_archived": "Archiviato",
+      "deleteTitle": "Eliminare l'epic?",
+      "deleteBody": "Le attività e i suggerimenti collegati restano; viene rimosso solo il raggruppamento.",
+      "progress": "{done}/{total} rilasciati · {pending} suggerimenti aperti",
+      "assignLabel": "Assegna epic",
+      "noEpic": "Nessun epic",
+      "newTaskIn": "Nuova attività in \"{epic}\"",
+      "addTaskTooltip": "Attività in questo epic"
     }
   },
   "create": {
