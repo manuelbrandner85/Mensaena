@@ -2309,7 +2309,26 @@
     "unlimited": "Unbegrenzt",
     "weeklyChallenge": "Wochen-Challenge",
     "weeklyHint": "Wird als wöchentliche Challenge hervorgehoben",
-    "karmaAwarded": "+{n} Karma erhalten!"
+    "karmaAwarded": "+{n} Karma erhalten!",
+    "cat": {
+      "umwelt": "🌱 Umwelt",
+      "sozial": "🤝 Sozial",
+      "fitness": "💪 Fitness",
+      "bildung": "📚 Bildung",
+      "kreativ": "🎨 Kreativ",
+      "ernaehrung": "🥗 Ernährung",
+      "gemeinschaft": "🏘️ Gemeinschaft"
+    },
+    "diff": {
+      "easy": "Leicht",
+      "medium": "Mittel",
+      "hard": "Schwer"
+    },
+    "empty": "Aktuell keine aktiven Challenges.",
+    "subtitle": "Mach mit, sammle Punkte, verdiene Badges.",
+    "joinSuccess": "Du bist dabei!",
+    "joinFailed": "Konnte nicht beitreten.",
+    "completed": "✓ Erledigt"
   },
   "invite": {
     "title": "Einladen",

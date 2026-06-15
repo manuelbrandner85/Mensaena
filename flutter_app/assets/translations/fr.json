@@ -2310,7 +2310,26 @@
     "unlimited": "Illimité",
     "weeklyChallenge": "Défi hebdomadaire",
     "weeklyHint": "Mis en avant comme défi hebdomadaire",
-    "karmaAwarded": "+{n} karma gagnés !"
+    "karmaAwarded": "+{n} karma gagnés !",
+    "cat": {
+      "umwelt": "🌱 Environnement",
+      "sozial": "🤝 Social",
+      "fitness": "💪 Fitness",
+      "bildung": "📚 Éducation",
+      "kreativ": "🎨 Créativité",
+      "ernaehrung": "🥗 Nutrition",
+      "gemeinschaft": "🏘️ Communauté"
+    },
+    "diff": {
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile"
+    },
+    "empty": "Aucun défi actif pour le moment.",
+    "subtitle": "Participe, accumule des points, gagne des badges.",
+    "joinSuccess": "Tu es dans l'équipe !",
+    "joinFailed": "Impossible de rejoindre.",
+    "completed": "✓ Terminé"
   },
   "invite": {
     "title": "Inviter",

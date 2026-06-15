@@ -2310,7 +2310,26 @@
     "unlimited": "Ilimitado",
     "weeklyChallenge": "Reto semanal",
     "weeklyHint": "Destacado como reto semanal",
-    "karmaAwarded": "¡+{n} karma ganados!"
+    "karmaAwarded": "¡+{n} karma ganados!",
+    "cat": {
+      "umwelt": "🌱 Medio ambiente",
+      "sozial": "🤝 Social",
+      "fitness": "💪 Fitness",
+      "bildung": "📚 Educación",
+      "kreativ": "🎨 Creativo",
+      "ernaehrung": "🥗 Nutrición",
+      "gemeinschaft": "🏘️ Comunidad"
+    },
+    "diff": {
+      "easy": "Fácil",
+      "medium": "Media",
+      "hard": "Difícil"
+    },
+    "empty": "Sin desafíos activos por ahora.",
+    "subtitle": "Participa, acumula puntos, gana insignias.",
+    "joinSuccess": "¡Ya estás dentro!",
+    "joinFailed": "No se pudo unir.",
+    "completed": "✓ Hecho"
   },
   "invite": {
     "title": "Invitar",
