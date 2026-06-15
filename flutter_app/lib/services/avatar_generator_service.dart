@@ -1,6 +1,6 @@
 /// SKILL: mensaena-features + mensaena-design
-/// Avatar-Generatoren — DiceBear (Identicons) + Pollinations.ai (AI-Bilder).
-/// Beide kostenlos, kein API-Key. Keine HTTP-Calls hier — nur URL-Bau.
+/// Avatar-Generatoren — DiceBear (Identicons + Portraits) + Pollinations.ai (AI-Bilder).
+/// Alle kostenlos, kein API-Key. Keine HTTP-Calls hier — nur URL-Bau.
 /// Caller verwendet CachedNetworkImage(generated_url).
 library;
 
@@ -43,35 +43,26 @@ class AvatarGenerator {
         '?width=$size&height=$size&seed=$s&nologo=true';
   }
 
-  /// 8 Prompt-Varianten mit gemischten Gender/Alter/Ethnien um die
-  /// Pollinations/Stable-Diffusion Default-Bias zu durchbrechen (die
-  /// liefert sonst fast nur junge Frauen).
-  static const List<String> _portraitVariants = [
-    'friendly middle-aged man portrait photo, warm smile, soft natural light, neighborhood vibe',
-    'friendly young woman portrait photo, warm smile, soft natural light, neighborhood vibe',
-    'friendly elderly man portrait photo, kind eyes, soft natural light, neighborhood vibe',
-    'friendly elderly woman portrait photo, kind eyes, soft natural light, neighborhood vibe',
-    'friendly bearded man portrait photo, warm smile, soft natural light, neighborhood vibe',
-    'friendly woman with curly hair portrait photo, warm smile, soft natural light, neighborhood vibe',
-    'friendly non-binary person portrait photo, warm expression, soft natural light, neighborhood vibe',
-    'friendly young man portrait photo, warm smile, soft natural light, neighborhood vibe',
+  /// 8 vielfältige DiceBear-Stile für rotierende Avatare.
+  static const List<String> _diceBearStyles = [
+    'lorelei',
+    'avataaars',
+    'personas',
+    'notionists',
+    'adventurer',
+    'micah',
+    'open-peeps',
+    'big-smile',
   ];
 
-  /// Lifelike Portrait per Pollinations. Bei jedem Aufruf andere Variante
-  /// + frischer Random-Seed, damit Tap-zu-Tap echt unterschiedliche Bilder
-  /// rauskommen. Vorher: deterministischer Hash → User sah immer dasselbe
-  /// Frauen-Portrait weil der Default-Prompt + SD-Bias keinen Mann erzeugt
-  /// hat. Jetzt: rotierende Prompts + neuer Seed = volle Vielfalt.
+  /// DiceBear-Avatar mit zufälligem Stil + freshmen Seed pro Aufruf.
+  /// Tap-zu-Tap immer unterschiedliche Avatare, kostenlos, kein Key.
   static String portraitFor(String userId, {int? variantIndex, int? seed}) {
     final rng = math.Random();
-    final idx =
-        variantIndex ?? rng.nextInt(_portraitVariants.length);
+    final idx = variantIndex ?? rng.nextInt(_diceBearStyles.length);
+    final style = _diceBearStyles[idx % _diceBearStyles.length];
     final s = seed ?? rng.nextInt(1000000);
-    return pollinations(
-      prompt: _portraitVariants[idx % _portraitVariants.length],
-      seed: s,
-      size: 512,
-    );
+    return diceBear(seed: s.toString(), style: style, size: 256);
   }
 
   /// Default-Identicon für User ohne Foto (deterministisch).
