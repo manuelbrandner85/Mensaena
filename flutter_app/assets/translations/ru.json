@@ -1582,6 +1582,18 @@
       "noEpic": "Без эпика",
       "newTaskIn": "Новая задача в «{epic}»",
       "addTaskTooltip": "Задача в этом эпике"
+    },
+    "tabs": {
+      "overview": "Обзор",
+      "tasks": "Задачи",
+      "suggestions": "Предложения",
+      "roadmap": "Дорожная карта",
+      "settings": "Настройки"
+    },
+    "statusBar": {
+      "active": "активны",
+      "suggestions": "открыто",
+      "alerts": "тревоги"
     }
   },
   "create": {

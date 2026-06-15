@@ -1,11 +1,13 @@
 // ignore_for_file: lines_longer_than_80_chars
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' show Random;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -98,8 +100,14 @@ enum _DevCategory {
 const _severityRank = {'critical': 0, 'high': 1, 'medium': 2, 'low': 3};
 const _severityFilters = ['all', 'critical', 'high', 'medium', 'low'];
 
-class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
+class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
+    with SingleTickerProviderStateMixin {
   final _ctrl = TextEditingController();
+  // Tab-Navigation (Übersicht / Aufträge / Vorschläge / Roadmap / Einstellungen).
+  late final TabController _tabController;
+  // Karten-Zustände werden lokal persistiert (übersteht App-Neustart).
+  static const _uiPrefsStore = FlutterSecureStorage();
+  static const _uiPrefsKey = 'godmode_ui_prefs_v1';
   List<Map<String, dynamic>> _tasks = const [];
   List<Map<String, dynamic>> _suggestions = const [];
   List<Map<String, dynamic>> _notes = const [];
@@ -158,6 +166,11 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) _saveUiPrefs();
+    });
+    _loadUiPrefs();
     _refresh();
     _loadSuggestions();
     _loadNotes();
@@ -178,9 +191,58 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
   @override
   void dispose() {
     _ctrl.dispose();
+    _tabController.dispose();
     _poll?.cancel();
     super.dispose();
   }
+
+  // ── UI-Zustand persistieren (Karten ein-/ausgeklappt + aktiver Tab) ─────────
+  Future<void> _loadUiPrefs() async {
+    try {
+      final raw = await _uiPrefsStore.read(key: _uiPrefsKey);
+      if (raw == null) return;
+      final m = jsonDecode(raw) as Map<String, dynamic>;
+      if (!mounted) return;
+      setState(() {
+        _metricsExpanded = m['metrics'] as bool? ?? _metricsExpanded;
+        _epicsExpanded = m['epics'] as bool? ?? _epicsExpanded;
+        _moduleExpanded = m['module'] as bool? ?? _moduleExpanded;
+        _schedulesExpanded = m['schedules'] as bool? ?? _schedulesExpanded;
+        _notesExpanded = m['notes'] as bool? ?? _notesExpanded;
+        _changelogExpanded = m['changelog'] as bool? ?? _changelogExpanded;
+        _apiKeysExpanded = m['apiKeys'] as bool? ?? _apiKeysExpanded;
+      });
+      final tab = m['tab'] as int?;
+      if (tab != null && tab >= 0 && tab < _tabController.length) {
+        _tabController.index = tab;
+      }
+    } catch (_) {/* defekte Prefs ignorieren */}
+  }
+
+  void _saveUiPrefs() {
+    final data = jsonEncode({
+      'metrics': _metricsExpanded,
+      'epics': _epicsExpanded,
+      'module': _moduleExpanded,
+      'schedules': _schedulesExpanded,
+      'notes': _notesExpanded,
+      'changelog': _changelogExpanded,
+      'apiKeys': _apiKeysExpanded,
+      'tab': _tabController.index,
+    });
+    // Fire-and-forget; Schreibfehler sind unkritisch.
+    _uiPrefsStore.write(key: _uiPrefsKey, value: data);
+  }
+
+  // Anzahl aktiver (in der Pipeline befindlicher) Aufträge für die Status-Leiste.
+  int get _activeTaskCount => _tasks.where((t) {
+        final s = t['status'] as String?;
+        return s == 'queued' ||
+            s == 'running' ||
+            s == 'phased' ||
+            s == 'pr_open' ||
+            s == 'awaiting_review';
+      }).length;
 
   bool get _hasActive => _tasks.any((t) {
         final s = t['status'] as String?;
@@ -1488,216 +1550,50 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
         child: Column(
           children: [
             _GodmodeHeader(),
-            _CategoryRow(
-              selectedKey: _categoryKey,
-              dynamicCategories: _categories,
-              onSelect: (key) {
-                setState(() => _categoryKey = key);
-                _loadSuggestions();
-              },
+            _StatusBar(
+              activeTasks: _activeTaskCount,
+              openSuggestions: visible.length,
+              openAlerts: _healthAlerts.length,
+              lastDelivered: _changelog.isNotEmpty
+                  ? (_changelog.first['title'] as String?)
+                  : null,
             ),
-            // Immer sichtbare Pipeline-Leiste (kein Scrollen nötig).
-            if (_tasks.isNotEmpty)
-              _LiveTasksBar(
-                tasks: _tasks,
-                busyIds: _deletingTasks,
-                onCancel: _cancelTask,
-                onRetry: (instruction) => _retryTask(instruction),
-                onDelete: _deleteTask,
-                onMerge: _mergeTask,
-              ),
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              labelColor: AppColors.teal,
+              unselectedLabelColor: AppColors.lightMute,
+              indicatorColor: AppColors.teal,
+              labelStyle:
+                  AppTypography.body(size: 12, weight: FontWeight.w700),
+              tabs: [
+                Tab(text: 'adminDev.tabs.overview'.tr()),
+                Tab(
+                  text: 'adminDev.tabs.tasks'.tr() +
+                      (_tasks.isNotEmpty ? ' (${_tasks.length})' : ''),
+                ),
+                Tab(
+                  text: 'adminDev.tabs.suggestions'.tr() +
+                      (visible.isNotEmpty ? ' (${visible.length})' : ''),
+                ),
+                Tab(text: 'adminDev.tabs.roadmap'.tr()),
+                Tab(text: 'adminDev.tabs.settings'.tr()),
+              ],
+            ),
             Expanded(
-              child: RefreshIndicator(
-                color: AppColors.teal,
-                onRefresh: () async {
-                  await _refresh();
-                  await _loadSuggestions(silent: true);
-                },
-                child: _loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                        children: [
-                          if (_healthAlerts.isNotEmpty) ...[
-                            _HealthAlertsCard(
-                              alerts: _healthAlerts,
-                              busyIds: _busyAlerts,
-                              onAcknowledge: (id) =>
-                                  _setAlertStatus(id, 'acknowledged'),
-                              onResolve: (id) =>
-                                  _setAlertStatus(id, 'resolved'),
-                              onFix: _fixFromAlert,
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                          _HealthCard(
-                            metrics: _metrics,
-                            expanded: _metricsExpanded,
-                            onToggle: () => setState(
-                                () => _metricsExpanded = !_metricsExpanded),
-                          ),
-                          const SizedBox(height: 10),
-                          _RoadmapCard(
-                            epics: _epics,
-                            expanded: _epicsExpanded,
-                            onToggle: () => setState(
-                                () => _epicsExpanded = !_epicsExpanded),
-                            onAdd: () => _editEpic(),
-                            onEdit: (e) => _editEpic(existing: e),
-                            onDelete: _deleteEpic,
-                            onNewTask: _newTaskInEpic,
-                            colorOf: _epicColor,
-                          ),
-                          const SizedBox(height: 10),
-                          _ModuleIntelligenceCard(
-                            insights: _moduleInsights,
-                            scan: _moduleScan,
-                            expanded: _moduleExpanded,
-                            loading: _moduleLoading,
-                            busyIds: _busyModuleInsights,
-                            onToggle: () => setState(
-                                () => _moduleExpanded = !_moduleExpanded),
-                            onScan: _startModuleScan,
-                            onAccept: _acceptModuleInsight,
-                            onDismiss: _dismissModuleInsight,
-                          ),
-                          const SizedBox(height: 10),
-                          _SchedulesCard(
-                            schedules: _schedules,
-                            expanded: _schedulesExpanded,
-                            onToggle: () => setState(
-                                () => _schedulesExpanded = !_schedulesExpanded),
-                            onAdd: () => _editSchedule(),
-                            onEdit: (s) => _editSchedule(existing: s),
-                            onToggleEnabled: _toggleSchedule,
-                            onDelete: _deleteSchedule,
-                          ),
-                          const SizedBox(height: 10),
-                          _NotesCard(
-                            notes: _notes,
-                            expanded: _notesExpanded,
-                            onToggle: () => setState(
-                                () => _notesExpanded = !_notesExpanded),
-                            onAdd: () => _editNote(),
-                            onEdit: (n) => _editNote(existing: n),
-                            onDelete: (id) => _deleteNote(id),
-                            onUse: (id, c) => _sendNote(id, c),
-                          ),
-                          const SizedBox(height: 10),
-                          _ChangelogCard(
-                            entries: _changelog,
-                            expanded: _changelogExpanded,
-                            onToggle: () => setState(() =>
-                                _changelogExpanded = !_changelogExpanded),
-                          ),
-                          const SizedBox(height: 10),
-                          _ApiKeysCard(
-                            keys: _apiKeys,
-                            expanded: _apiKeysExpanded,
-                            onToggle: () => setState(() =>
-                                _apiKeysExpanded = !_apiKeysExpanded),
-                            onAdd: () => _editApiKey(),
-                            onEdit: (k) => _editApiKey(existing: k),
-                            onDelete: _deleteApiKey,
-                          ),
-                          const SizedBox(height: 10),
-                          // Auftragshistorie direkt oben in der ScrollListe
-                          // (aktive Aufträge auch in _LiveTasksBar sichtbar).
-                          if (_tasks.isNotEmpty)
-                            _SectionLabel(
-                              icon: LucideIcons.gitPullRequest,
-                              label: 'adminDev.tasksLabel'.tr(),
-                              count: _tasks.length,
-                              trailing: _doneCount > 0
-                                  ? _ClearTasksButton(
-                                      busy: _clearingTasks,
-                                      onTap: _clearTasks,
-                                    )
-                                  : null,
-                            ),
-                          ..._tasks.map((t) {
-                            final id = t['id'] as String?;
-                            final status = t['status'] as String?;
-                            final canDelete = _deletable(status) && id != null;
-                            final canCancel = id != null &&
-                                (status == 'queued' ||
-                                    status == 'running' ||
-                                    status == 'pr_open' ||
-                                    status == 'awaiting_review');
-                            final isReview =
-                                status == 'awaiting_review' && id != null;
-                            final canRetry = id != null &&
-                                (status == 'failed' || status == 'no_changes');
-                            final canRollback = id != null &&
-                                status == 'merged' &&
-                                (t['merge_commit_sha'] as String?) != null &&
-                                (t['origin'] as String?) != 'rollback';
-                            final canRefine = id != null &&
-                                (status == 'pr_open' ||
-                                    status == 'awaiting_review');
-                            return _TaskCard(
-                              task: t,
-                              busy: _deletingTasks.contains(id),
-                              onDelete:
-                                  canDelete ? () => _deleteTask(id) : null,
-                              onCancel:
-                                  canCancel ? () => _cancelTask(id) : null,
-                              onMerge: isReview ? () => _mergeTask(id) : null,
-                              onShowDiff: id != null && t['pr_number'] != null
-                                  ? () => _showDiff(id)
-                                  : null,
-                              onRetry: canRetry
-                                  ? () => _retryTask(
-                                      t['instruction'] as String? ?? '')
-                                  : null,
-                              onRollback:
-                                  canRollback ? () => _rollbackTask(id) : null,
-                              onRefine:
-                                  canRefine ? () => _refineTask(id) : null,
-                            );
-                          }),
-                          if (_tasks.isNotEmpty) const SizedBox(height: 10),
-                          _LiveScanCard(
-                            scanning: _scanning,
-                            scan: _scan,
-                            loading: _suggestionsLoading,
-                            onScan: _startScan,
-                          ),
-                          const SizedBox(height: 10),
-                          if (_suggestions.isNotEmpty) ...[
-                            _SuggestionsHeader(
-                              count: visible.length,
-                              selectionMode: _selectionMode,
-                              selectedCount: _selected.length,
-                              onToggleMode: _toggleSelectionMode,
-                              onSelectAll: _selectAllVisible,
-                            ),
-                            _SeverityRow(
-                              selected: _severity,
-                              onSelect: (s) => setState(() => _severity = s),
-                            ),
-                            const SizedBox(height: 8),
-                            ...visible.map((s) => _SuggestionCard(
-                                  suggestion: s,
-                                  categoryLabel: _categoryLabel(
-                                      s['category'] as String? ?? 'feature'),
-                                  busy: _busySuggestions
-                                      .contains(s['id'] as String?),
-                                  selectionMode: _selectionMode,
-                                  selected:
-                                      _selected.contains(s['id'] as String?),
-                                  onToggleSelect: _toggleSelected,
-                                  onAccept: _acceptWithEdit,
-                                  onReject: _reject,
-                                )),
-                            const SizedBox(height: 14),
-                          ],
-                          if (_tasks.isEmpty && _suggestions.isEmpty)
-                            _EmptyHint(),
-                          const SizedBox(height: 12),
-                        ],
-                      ),
-              ),
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _overviewTab(),
+                        _tasksTab(),
+                        _suggestionsTab(visible),
+                        _roadmapTab(),
+                        _settingsTab(),
+                      ],
+                    ),
             ),
             if (_selectionMode && _selected.isNotEmpty)
               _BatchBar(
@@ -1734,231 +1630,346 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen> {
       ),
     );
   }
+
+  // Gemeinsames Pull-to-Refresh-Gerüst für jeden Tab.
+  Widget _refreshable(List<Widget> children) {
+    return RefreshIndicator(
+      color: AppColors.teal,
+      onRefresh: () async {
+        await _refresh();
+        await _loadSuggestions(silent: true);
+      },
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        children: children,
+      ),
+    );
+  }
+
+  // ── Tab: Übersicht ─────────────────────────────────────────────────────────
+  Widget _overviewTab() {
+    return _refreshable([
+      if (_healthAlerts.isNotEmpty) ...[
+        _HealthAlertsCard(
+          alerts: _healthAlerts,
+          busyIds: _busyAlerts,
+          onAcknowledge: (id) => _setAlertStatus(id, 'acknowledged'),
+          onResolve: (id) => _setAlertStatus(id, 'resolved'),
+          onFix: _fixFromAlert,
+        ),
+        const SizedBox(height: 10),
+      ],
+      _HealthCard(
+        metrics: _metrics,
+        expanded: _metricsExpanded,
+        onToggle: () {
+          setState(() => _metricsExpanded = !_metricsExpanded);
+          _saveUiPrefs();
+        },
+      ),
+      const SizedBox(height: 10),
+      _ModuleIntelligenceCard(
+        insights: _moduleInsights,
+        scan: _moduleScan,
+        expanded: _moduleExpanded,
+        loading: _moduleLoading,
+        busyIds: _busyModuleInsights,
+        onToggle: () {
+          setState(() => _moduleExpanded = !_moduleExpanded);
+          _saveUiPrefs();
+        },
+        onScan: _startModuleScan,
+        onAccept: _acceptModuleInsight,
+        onDismiss: _dismissModuleInsight,
+      ),
+      const SizedBox(height: 10),
+      if (_tasks.isEmpty && _suggestions.isEmpty) _EmptyHint(),
+      const SizedBox(height: 12),
+    ]);
+  }
+
+  // ── Tab: Aufträge ───────────────────────────────────────────────────────────
+  Widget _tasksTab() {
+    return _refreshable([
+      if (_tasks.isEmpty)
+        _EmptyHint()
+      else ...[
+        _SectionLabel(
+          icon: LucideIcons.gitPullRequest,
+          label: 'adminDev.tasksLabel'.tr(),
+          count: _tasks.length,
+          trailing: _doneCount > 0
+              ? _ClearTasksButton(busy: _clearingTasks, onTap: _clearTasks)
+              : null,
+        ),
+        ..._tasks.map(_taskCardFor),
+      ],
+      const SizedBox(height: 12),
+    ]);
+  }
+
+  // ── Tab: Vorschläge ─────────────────────────────────────────────────────────
+  Widget _suggestionsTab(List<Map<String, dynamic>> visible) {
+    return _refreshable([
+      _CategoryRow(
+        selectedKey: _categoryKey,
+        dynamicCategories: _categories,
+        onSelect: (key) {
+          setState(() => _categoryKey = key);
+          _loadSuggestions();
+        },
+      ),
+      const SizedBox(height: 10),
+      _LiveScanCard(
+        scanning: _scanning,
+        scan: _scan,
+        loading: _suggestionsLoading,
+        onScan: _startScan,
+      ),
+      const SizedBox(height: 10),
+      if (_suggestions.isNotEmpty) ...[
+        _SuggestionsHeader(
+          count: visible.length,
+          selectionMode: _selectionMode,
+          selectedCount: _selected.length,
+          onToggleMode: _toggleSelectionMode,
+          onSelectAll: _selectAllVisible,
+        ),
+        _SeverityRow(
+          selected: _severity,
+          onSelect: (s) => setState(() => _severity = s),
+        ),
+        const SizedBox(height: 8),
+        ...visible.map((s) => _SuggestionCard(
+              suggestion: s,
+              categoryLabel:
+                  _categoryLabel(s['category'] as String? ?? 'feature'),
+              busy: _busySuggestions.contains(s['id'] as String?),
+              selectionMode: _selectionMode,
+              selected: _selected.contains(s['id'] as String?),
+              onToggleSelect: _toggleSelected,
+              onAccept: _acceptWithEdit,
+              onReject: _reject,
+            )),
+        const SizedBox(height: 14),
+      ] else
+        _EmptyHint(),
+      const SizedBox(height: 12),
+    ]);
+  }
+
+  // ── Tab: Roadmap ─────────────────────────────────────────────────────────────
+  Widget _roadmapTab() {
+    return _refreshable([
+      _RoadmapCard(
+        epics: _epics,
+        expanded: true,
+        onToggle: () {},
+        onAdd: () => _editEpic(),
+        onEdit: (e) => _editEpic(existing: e),
+        onDelete: _deleteEpic,
+        onNewTask: _newTaskInEpic,
+        colorOf: _epicColor,
+      ),
+      const SizedBox(height: 12),
+    ]);
+  }
+
+  // ── Tab: Einstellungen ───────────────────────────────────────────────────────
+  Widget _settingsTab() {
+    return _refreshable([
+      _SchedulesCard(
+        schedules: _schedules,
+        expanded: _schedulesExpanded,
+        onToggle: () {
+          setState(() => _schedulesExpanded = !_schedulesExpanded);
+          _saveUiPrefs();
+        },
+        onAdd: () => _editSchedule(),
+        onEdit: (s) => _editSchedule(existing: s),
+        onToggleEnabled: _toggleSchedule,
+        onDelete: _deleteSchedule,
+      ),
+      const SizedBox(height: 10),
+      _NotesCard(
+        notes: _notes,
+        expanded: _notesExpanded,
+        onToggle: () {
+          setState(() => _notesExpanded = !_notesExpanded);
+          _saveUiPrefs();
+        },
+        onAdd: () => _editNote(),
+        onEdit: (n) => _editNote(existing: n),
+        onDelete: (id) => _deleteNote(id),
+        onUse: (id, c) => _sendNote(id, c),
+      ),
+      const SizedBox(height: 10),
+      _ChangelogCard(
+        entries: _changelog,
+        expanded: _changelogExpanded,
+        onToggle: () {
+          setState(() => _changelogExpanded = !_changelogExpanded);
+          _saveUiPrefs();
+        },
+      ),
+      const SizedBox(height: 10),
+      _ApiKeysCard(
+        keys: _apiKeys,
+        expanded: _apiKeysExpanded,
+        onToggle: () {
+          setState(() => _apiKeysExpanded = !_apiKeysExpanded);
+          _saveUiPrefs();
+        },
+        onAdd: () => _editApiKey(),
+        onEdit: (k) => _editApiKey(existing: k),
+        onDelete: _deleteApiKey,
+      ),
+      const SizedBox(height: 12),
+    ]);
+  }
+
+  // Baut eine Auftragskarte mit allen kontextabhängigen Aktionen.
+  Widget _taskCardFor(Map<String, dynamic> t) {
+    final id = t['id'] as String?;
+    final status = t['status'] as String?;
+    final canDelete = _deletable(status) && id != null;
+    final canCancel = id != null &&
+        (status == 'queued' ||
+            status == 'running' ||
+            status == 'pr_open' ||
+            status == 'awaiting_review');
+    final isReview = status == 'awaiting_review' && id != null;
+    final canRetry =
+        id != null && (status == 'failed' || status == 'no_changes');
+    final canRollback = id != null &&
+        status == 'merged' &&
+        (t['merge_commit_sha'] as String?) != null &&
+        (t['origin'] as String?) != 'rollback';
+    final canRefine =
+        id != null && (status == 'pr_open' || status == 'awaiting_review');
+    return _TaskCard(
+      task: t,
+      busy: _deletingTasks.contains(id),
+      onDelete: canDelete ? () => _deleteTask(id) : null,
+      onCancel: canCancel ? () => _cancelTask(id) : null,
+      onMerge: isReview ? () => _mergeTask(id) : null,
+      onShowDiff: id != null && t['pr_number'] != null
+          ? () => _showDiff(id)
+          : null,
+      onRetry:
+          canRetry ? () => _retryTask(t['instruction'] as String? ?? '') : null,
+      onRollback: canRollback ? () => _rollbackTask(id) : null,
+      onRefine: canRefine ? () => _refineTask(id) : null,
+    );
+  }
 }
 
-// ── Live Tasks Bar ────────────────────────────────────────────────────────────
-// Immer sichtbare Leiste direkt unter der Category-Row.
-// Zeigt alle Aufträge kompakt — aktive zuerst, danach abgeschlossene/fehler.
-// Kein Scrollen nötig: Retry, Löschen, Abbrechen direkt hier erreichbar.
-
-class _LiveTasksBar extends StatelessWidget {
-  const _LiveTasksBar({
-    required this.tasks,
-    required this.busyIds,
-    required this.onCancel,
-    required this.onRetry,
-    required this.onDelete,
-    required this.onMerge,
+// ── Status-Leiste ──────────────────────────────────────────────────────────
+// Kompakter Überblick ganz oben: aktive Aufträge, offene Vorschläge, offene
+// Alarme und die zuletzt ausgelieferte Änderung — alles auf einen Blick.
+class _StatusBar extends StatelessWidget {
+  const _StatusBar({
+    required this.activeTasks,
+    required this.openSuggestions,
+    required this.openAlerts,
+    required this.lastDelivered,
   });
-
-  final List<Map<String, dynamic>> tasks;
-  final Set<String> busyIds;
-  final void Function(String id) onCancel;
-  final void Function(String instruction) onRetry;
-  final void Function(String id) onDelete;
-  final void Function(String id) onMerge;
-
-  static const _activeOrder = [
-    'running', 'queued', 'pr_open', 'awaiting_review',
-    'failed', 'no_changes', 'cancelled', 'merged',
-  ];
-
-  static Color _statusColor(String? s) {
-    switch (s) {
-      case 'running':    return AppColors.teal;
-      case 'queued':     return AppColors.mute;
-      case 'pr_open':    return AppColors.amber;
-      case 'awaiting_review': return AppColors.trust;
-      case 'failed':     return AppColors.herzrot;
-      case 'no_changes': return AppColors.mute;
-      case 'merged':     return AppColors.leben;
-      case 'cancelled':  return AppColors.mute;
-      default:           return AppColors.mute;
-    }
-  }
-
-  static IconData _statusIcon(String? s) {
-    switch (s) {
-      case 'running':    return LucideIcons.loader2;
-      case 'queued':     return LucideIcons.clock;
-      case 'pr_open':    return LucideIcons.gitPullRequest;
-      case 'awaiting_review': return LucideIcons.eye;
-      case 'failed':     return LucideIcons.alertCircle;
-      case 'no_changes': return LucideIcons.minus;
-      case 'merged':     return LucideIcons.checkCircle;
-      case 'cancelled':  return LucideIcons.xCircle;
-      default:           return LucideIcons.circle;
-    }
-  }
+  final int activeTasks;
+  final int openSuggestions;
+  final int openAlerts;
+  final String? lastDelivered;
 
   @override
   Widget build(BuildContext context) {
-    final sorted = [...tasks]..sort((a, b) {
-        final ra = _activeOrder.indexOf(a['status'] as String? ?? '');
-        final rb = _activeOrder.indexOf(b['status'] as String? ?? '');
-        return (ra == -1 ? 99 : ra).compareTo(rb == -1 ? 99 : rb);
-      });
-
     return Container(
-      height: 80,
+      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.elevated,
         border: Border(
-          bottom: BorderSide(color: AppColors.teal.withValues(alpha: 0.12)),
+          bottom: BorderSide(color: AppColors.line),
         ),
       ),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        itemCount: sorted.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, i) {
-          final t = sorted[i];
-          final id = t['id'] as String?;
-          final status = t['status'] as String?;
-          final instruction = (t['instruction'] as String? ?? '').trim();
-          final short = instruction.length > 38
-              ? '${instruction.substring(0, 35)}…'
-              : instruction;
-          final color = _statusColor(status);
-          final icon = _statusIcon(status);
-          final busy = id != null && busyIds.contains(id);
-
-          final canRetry =
-              id != null && (status == 'failed' || status == 'no_changes');
-          final canCancel = id != null &&
-              (status == 'queued' ||
-                  status == 'running' ||
-                  status == 'pr_open' ||
-                  status == 'awaiting_review');
-          final canDelete = id != null &&
-              (status == 'merged' ||
-                  status == 'failed' ||
-                  status == 'no_changes' ||
-                  status == 'cancelled');
-          final canMerge = id != null && status == 'awaiting_review';
-
-          return Container(
-            width: 220,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.elevated,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color.withValues(alpha: 0.30)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(icon, size: 12, color: color),
-                    const SizedBox(width: 5),
-                    Text(
-                      'adminDev.status.$status'.tr(),
-                      style: AppTypography.body(
-                          size: 10, color: color, weight: FontWeight.w600),
-                    ),
-                    const Spacer(),
-                    if (busy)
-                      SizedBox(
-                        width: 10,
-                        height: 10,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1.5,
-                          color: color,
-                        ),
-                      ),
-                  ],
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          _StatChip(
+            icon: LucideIcons.loader,
+            label: 'adminDev.statusBar.active'.tr(),
+            value: '$activeTasks',
+            color: activeTasks > 0 ? AppColors.teal : AppColors.lightMute,
+          ),
+          const SizedBox(width: 8),
+          _StatChip(
+            icon: LucideIcons.lightbulb,
+            label: 'adminDev.statusBar.suggestions'.tr(),
+            value: '$openSuggestions',
+            color: openSuggestions > 0 ? AppColors.amber : AppColors.lightMute,
+          ),
+          const SizedBox(width: 8),
+          _StatChip(
+            icon: LucideIcons.alertTriangle,
+            label: 'adminDev.statusBar.alerts'.tr(),
+            value: '$openAlerts',
+            color: openAlerts > 0 ? AppColors.herzrot : AppColors.lightMute,
+          ),
+          if (lastDelivered != null && lastDelivered!.isNotEmpty) ...[
+            const SizedBox(width: 12),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(LucideIcons.gitMerge,
+                      size: 12, color: AppColors.leben),
+                  const SizedBox(width: 4),
+                  Flexible(
                     child: Text(
-                      short.isEmpty ? '—' : short,
-                      maxLines: 2,
+                      lastDelivered!,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTypography.body(
-                          size: 11, color: AppColors.inkSoft),
+                      textAlign: TextAlign.right,
+                      style: AppTypography.caption(color: AppColors.lightMute),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (canRetry)
-                      _MiniAction(
-                        icon: LucideIcons.refreshCw,
-                        color: AppColors.teal,
-                        tooltip: 'adminDev.retry'.tr(),
-                        onTap: busy
-                            ? null
-                            : () => onRetry(instruction),
-                      ),
-                    if (canMerge)
-                      _MiniAction(
-                        icon: LucideIcons.gitMerge,
-                        color: AppColors.leben,
-                        tooltip: 'adminDev.approveMerge'.tr(),
-                        onTap: busy ? null : () => onMerge(id),
-                      ),
-                    if (canCancel)
-                      _MiniAction(
-                        icon: LucideIcons.x,
-                        color: AppColors.herzrot,
-                        tooltip: 'adminDev.cancel'.tr(),
-                        onTap: busy ? null : () => onCancel(id),
-                      ),
-                    if (canDelete)
-                      _MiniAction(
-                        icon: LucideIcons.trash2,
-                        color: AppColors.ghost,
-                        tooltip: 'common.delete'.tr(),
-                        onTap: busy ? null : () => onDelete(id),
-                      ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
-          );
-        },
+          ],
+        ],
       ),
     );
   }
 }
 
-class _MiniAction extends StatelessWidget {
-  const _MiniAction({
+class _StatChip extends StatelessWidget {
+  const _StatChip({
     required this.icon,
+    required this.label,
+    required this.value,
     required this.color,
-    required this.tooltip,
-    required this.onTap,
   });
-
   final IconData icon;
+  final String label;
+  final String value;
   final Color color;
-  final String tooltip;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          margin: const EdgeInsets.only(left: 4),
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: onTap != null ? 0.12 : 0.05),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Icon(
-            icon,
-            size: 13,
-            color: onTap != null ? color : AppColors.ghost,
-          ),
-        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: 4),
+          Text(value,
+              style: AppTypography.label(size: 12, color: color)),
+          const SizedBox(width: 4),
+          Text(label,
+              style: AppTypography.label(size: 10, color: AppColors.lightMute)),
+        ],
       ),
     );
   }

@@ -1582,6 +1582,18 @@
       "noEpic": "Epic yok",
       "newTaskIn": "\"{epic}\" içinde yeni görev",
       "addTaskTooltip": "Bu epic'te görev"
+    },
+    "tabs": {
+      "overview": "Genel",
+      "tasks": "Görevler",
+      "suggestions": "Öneriler",
+      "roadmap": "Yol haritası",
+      "settings": "Ayarlar"
+    },
+    "statusBar": {
+      "active": "aktif",
+      "suggestions": "açık",
+      "alerts": "uyarı"
     }
   },
   "create": {
