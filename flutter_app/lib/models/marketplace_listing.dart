@@ -1,5 +1,5 @@
-/// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `marketplace_listings` (gyqujitkvymlmgroovch).
+// SKILL: mensaena-architektur + flutter-implement-json-serialization
+// Spiegel der Supabase-Tabelle `marketplace_listings` (gyqujitkvymlmgroovch).
 import '../services/location_anonymizer.dart';
 
 /// Alle gültigen Werte für das `listing_type`-Feld in `marketplace_listings`.

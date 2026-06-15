@@ -1,8 +1,8 @@
-/// SKILL: mensaena-architektur + flutter-implement-json-serialization
-/// Spiegel der Supabase-Tabelle `organizations` (gyqujitkvymlmgroovch).
-///
-/// Hinweis: `openingHours` (String) bleibt fuer Legacy-Daten/Anzeige,
-/// `openingHoursJson` (Map<String, dynamic>) ist die neue JSONB-Quelle.
+// SKILL: mensaena-architektur + flutter-implement-json-serialization
+// Spiegel der Supabase-Tabelle `organizations` (gyqujitkvymlmgroovch).
+//
+// Hinweis: `openingHours` (String) bleibt fuer Legacy-Daten/Anzeige,
+// `openingHoursJson` (Map<String, dynamic>) ist die neue JSONB-Quelle.
 import '../services/location_anonymizer.dart';
 
 class Organization {

@@ -304,7 +304,7 @@ class _SosButton extends StatelessWidget {
               color: AppColors.herzrot.withValues(alpha: 0.12),
               border: Border.all(color: AppColors.herzrot, width: 2),
             ),
-            child: Center(
+            child: const Center(
               child: Icon(LucideIcons.shieldCheck,
                   color: AppColors.herzrot, size: 52),
             ),
@@ -331,7 +331,7 @@ class _SosButton extends StatelessWidget {
           height: 140,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: RadialGradient(
+            gradient: const RadialGradient(
               colors: [
                 AppColors.herzrot,
                 AppColors.herzrotDeep,
