@@ -1595,6 +1595,21 @@
       "active": "attivi",
       "suggestions": "aperti",
       "alerts": "avvisi"
+    },
+    "time": {
+      "now": "ora",
+      "min": "{n} min fa",
+      "hour": "{n} h fa",
+      "day": "{n} g fa"
+    },
+    "detail": {
+      "title": "Dettagli attività",
+      "instruction": "Istruzione",
+      "summary": "Riepilogo",
+      "errorLog": "Log errori",
+      "links": "Link",
+      "created": "creato {t}",
+      "updated": "aggiornato {t}"
     }
   },
   "create": {

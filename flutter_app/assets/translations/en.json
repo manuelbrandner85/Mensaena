@@ -1595,6 +1595,21 @@
       "active": "active",
       "suggestions": "open",
       "alerts": "alerts"
+    },
+    "time": {
+      "now": "now",
+      "min": "{n} min ago",
+      "hour": "{n} h ago",
+      "day": "{n} d ago"
+    },
+    "detail": {
+      "title": "Task details",
+      "instruction": "Instruction",
+      "summary": "Summary",
+      "errorLog": "Error log",
+      "links": "Links",
+      "created": "created {t}",
+      "updated": "updated {t}"
     }
   },
   "create": {
