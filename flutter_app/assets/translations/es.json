@@ -2984,7 +2984,32 @@
     "empty": "Aún no hay ofertas de habilidades.",
     "emptyHint": "¡Ofrece tu primera habilidad!",
     "contactProvider": "Contactar",
-    "providerFallback": "Vecino/a"
+    "providerFallback": "Vecino/a",
+    "create": {
+      "screenTitle": "Ofrecer una habilidad",
+      "category": "Categoría",
+      "categoryNone": "Sin categoría",
+      "catSprachen": "Idiomas",
+      "catIt": "IT & Tecnología",
+      "catMusik": "Música",
+      "catSport": "Deporte & Fitness",
+      "catKochen": "Cocina & Repostería",
+      "catHandwerk": "Artesanía",
+      "catKunst": "Arte & Diseño",
+      "catNachhilfe": "Tutorías",
+      "catSonstiges": "Otros",
+      "level": "Nivel",
+      "levelNone": "No especificado",
+      "levelAnfaenger": "Principiante",
+      "levelFortgeschritten": "Intermedio",
+      "levelExperte": "Experto",
+      "isFree": "Ofrecer gratis",
+      "hourlyRate": "Tarifa por hora (€/h)",
+      "isOnline": "Disponible en línea",
+      "isOnlineHint": "También por videollamada o de forma remota",
+      "submitButton": "Publicar habilidad",
+      "saving": "Guardando…"
+    }
   },
   "wissen": {
     "shareTitle": "Comparte conocimiento",

@@ -2984,7 +2984,32 @@
     "empty": "Ancora nessuna offerta di competenze.",
     "emptyHint": "Offri la tua prima competenza!",
     "contactProvider": "Contatta",
-    "providerFallback": "Vicino/a"
+    "providerFallback": "Vicino/a",
+    "create": {
+      "screenTitle": "Offri un'abilità",
+      "category": "Categoria",
+      "categoryNone": "Nessuna categoria",
+      "catSprachen": "Lingue",
+      "catIt": "IT & Tecnologia",
+      "catMusik": "Musica",
+      "catSport": "Sport & Fitness",
+      "catKochen": "Cucina & Pasticceria",
+      "catHandwerk": "Artigianato",
+      "catKunst": "Arte & Design",
+      "catNachhilfe": "Ripetizioni",
+      "catSonstiges": "Altro",
+      "level": "Livello",
+      "levelNone": "Non specificato",
+      "levelAnfaenger": "Principiante",
+      "levelFortgeschritten": "Intermedio",
+      "levelExperte": "Esperto",
+      "isFree": "Offerta gratuita",
+      "hourlyRate": "Tariffa oraria (€/h)",
+      "isOnline": "Disponibile online",
+      "isOnlineHint": "Anche tramite videochiamata o da remoto",
+      "submitButton": "Pubblica competenza",
+      "saving": "Salvataggio…"
+    }
   },
   "wissen": {
     "shareTitle": "Condividi sapere",

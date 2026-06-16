@@ -87,6 +87,7 @@ import '../../screens/dashboard/home/dashboard_home_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_create_screen.dart';
 import '../../screens/dashboard/knowledge/knowledge_screen.dart';
 import '../../screens/dashboard/module/module_posts_screen.dart';
+import '../../screens/dashboard/skills/skills_create_screen.dart';
 import '../../screens/dashboard/skills/skills_screen.dart';
 import '../../screens/dashboard/teilen/teilen_hub_screen.dart';
 import '../../screens/dashboard/wissen/wissen_hub_screen.dart';
@@ -569,8 +570,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/dashboard/skills/create',
         pageBuilder: (_, state) => AppTransitions.sheet<void>(
           key: state.pageKey,
-          child: const ModuleCreatePostScreen(
-            config: ModuleCreateConfigs.skills),
+          child: const SkillsCreateScreen(),
         ),
       ),
       GoRoute(

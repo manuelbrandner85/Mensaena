@@ -2984,7 +2984,32 @@
     "empty": "No skill offers yet.",
     "emptyHint": "Offer your first skill!",
     "contactProvider": "Get in touch",
-    "providerFallback": "Neighbour"
+    "providerFallback": "Neighbour",
+    "create": {
+      "screenTitle": "Offer a skill",
+      "category": "Category",
+      "categoryNone": "No category",
+      "catSprachen": "Languages",
+      "catIt": "IT & Tech",
+      "catMusik": "Music",
+      "catSport": "Sports & Fitness",
+      "catKochen": "Cooking & Baking",
+      "catHandwerk": "Crafts",
+      "catKunst": "Art & Design",
+      "catNachhilfe": "Tutoring",
+      "catSonstiges": "Other",
+      "level": "Level",
+      "levelNone": "Not specified",
+      "levelAnfaenger": "Beginner",
+      "levelFortgeschritten": "Intermediate",
+      "levelExperte": "Expert",
+      "isFree": "Offer for free",
+      "hourlyRate": "Hourly rate (€/h)",
+      "isOnline": "Available online",
+      "isOnlineHint": "Also via video call or remote",
+      "submitButton": "Publish skill",
+      "saving": "Saving…"
+    }
   },
   "wissen": {
     "shareTitle": "Share knowledge",
