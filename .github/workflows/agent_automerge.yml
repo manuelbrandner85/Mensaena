@@ -103,6 +103,19 @@ jobs:
             exit 0
           fi
 
+          # 2a) Race-Schutz: Der grüne Build galt für HEAD_SHA. Wurde inzwischen
+          #     ein neuerer Commit auf den Branch gepusht, ist der aktuelle
+          #     Branch-Head NICHT von diesem Build abgedeckt → NICHT mergen.
+          #     Der Build des neuen Commits triggert einen eigenen Automerge-Lauf.
+          #     (Verhindert, dass ungetesteter Code auf main gelangt — Ursache
+          #     des toARGB32-Vorfalls, der main rot zog.)
+          CUR_SHA=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
+                      --json headRefOid --jq '.headRefOid' 2>/dev/null || echo "")
+          if [ -n "$CUR_SHA" ] && [ "$CUR_SHA" != "$HEAD_SHA" ]; then
+            echo "Branch-Head ($CUR_SHA) ≠ gebauter Commit ($HEAD_SHA) — warte auf den Build des neuen Commits, kein Merge."
+            exit 0
+          fi
+
           # 2b) Review-Gate: wenn der Admin "Vor Merge prüfen" gewählt hat
           #     (await_review=true), NICHT automatisch mergen — stattdessen
           #     auf 'awaiting_review' setzen. Der Admin gibt im Dashboard frei.
