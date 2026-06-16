@@ -62,10 +62,10 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
 
   // Zustand aus Web CONDITION_OPTIONS.
   static const List<FilterOption<String>> _conditions = [
-    FilterOption(value: 'new', label: 'Neu'),
-    FilterOption(value: 'like_new', label: 'Wie neu'),
-    FilterOption(value: 'good', label: 'Gut'),
-    FilterOption(value: 'used', label: 'Gebraucht'),
+    FilterOption(value: 'neu', label: 'Neu'),
+    FilterOption(value: 'sehr_gut', label: 'Wie neu'),
+    FilterOption(value: 'gut', label: 'Gut'),
+    FilterOption(value: 'gebraucht', label: 'Gebraucht'),
   ];
 
   bool get _hasFilters =>
