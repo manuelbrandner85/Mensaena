@@ -2343,7 +2343,11 @@
     "attendeesCount": "{count} participants",
     "linkOpenFailed": "Impossible d’ouvrir le lien.",
     "empty": "Aucun événement à venir.",
-    "emptyHint": "Sois la première personne — utilise le bouton +."
+    "emptyHint": "Sois la première personne — utilise le bouton +.",
+    "suggestions": {
+      "title": "Suggestions",
+      "prefillHint": "Jour férié pré-rempli – ajustez les détails à votre convenance."
+    }
   },
   "challenges": {
     "create": "Créer un défi",

@@ -24,14 +24,20 @@ import '../../../widgets/shared/readable_width.dart';
 /// Ganztaegig, Online, Standort+GPS, Max-Teilnehmer, Kosten, Mitbringen,
 /// Kontakt, Wiederkehrend.
 class EventCreateScreen extends ConsumerStatefulWidget {
-  const EventCreateScreen({super.key});
+  const EventCreateScreen({super.key, this.initialTitle, this.initialDate});
+
+  /// Optionaler Vorbefüllungs-Titel (z. B. aus Feiertags-Vorschlag).
+  final String? initialTitle;
+
+  /// Optionales Vorbefüllungs-Datum (z. B. aus Feiertags-Vorschlag).
+  final DateTime? initialDate;
 
   @override
   ConsumerState<EventCreateScreen> createState() => _EventCreateScreenState();
 }
 
 class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
-  final _titleCtrl = TextEditingController();
+  late final TextEditingController _titleCtrl;
   final _descCtrl = TextEditingController();
   final _locationNameCtrl = TextEditingController();
   final _locationAddressCtrl = TextEditingController();
@@ -75,6 +81,19 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     (value: 'kids', emoji: '🧒', labelKey: 'events.cat.kids', color: Color(0xFFF97316)),
     (value: 'other', emoji: '✨', labelKey: 'events.cat.other', color: Color(0xFF4F6D8A)),
   ];
+
+  bool _prefilled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleCtrl = TextEditingController(text: widget.initialTitle ?? '');
+    if (widget.initialDate != null) {
+      _startDate = widget.initialDate;
+      _isAllDay = true;
+      _prefilled = true;
+    }
+  }
 
   @override
   void dispose() {
@@ -344,6 +363,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
                 child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               children: [
+                if (_prefilled) _prefilledBanner(),
                 _sectionCover(),
                 _sectionTitleDesc(),
                 _sectionCategory(),
@@ -371,6 +391,30 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   }
 
   // ── Sections ──────────────────────────────────────────────
+
+  Widget _prefilledBanner() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.teal.withValues(alpha: 0.10),
+        border: Border.all(color: AppColors.teal.withValues(alpha: 0.35)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          const Icon(LucideIcons.calendarCheck, size: 16, color: AppColors.teal),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'events.suggestions.prefillHint'.tr(),
+              style: AppTypography.body(size: 12, color: AppColors.teal),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _sectionWrap({required Widget child}) {
     return Container(

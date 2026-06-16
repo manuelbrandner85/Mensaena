@@ -2342,7 +2342,11 @@
     "attendeesCount": "{count} katılıyor",
     "linkOpenFailed": "Bağlantı açılamadı.",
     "empty": "Yaklaşan etkinlik yok.",
-    "emptyHint": "İlk sen ol — artı düğmesini kullan."
+    "emptyHint": "İlk sen ol — artı düğmesini kullan.",
+    "suggestions": {
+      "title": "Öneriler",
+      "prefillHint": "Resmi tatil önceden dolduruldu – ayrıntıları istediğiniz gibi düzenleyin."
+    }
   },
   "challenges": {
     "create": "Meydan okuma oluştur",
