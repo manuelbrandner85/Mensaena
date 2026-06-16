@@ -4697,5 +4697,35 @@
   },
   "event": {
     "free": "Бесплатно"
+  },
+  "weather": {
+    "title": "Погода",
+    "refresh": "Обновить",
+    "today": "Сегодня",
+    "hourlyForecast": "Почасовой прогноз",
+    "dailyForecast": "Прогноз на 5 дней",
+    "airQuality": "Качество воздуха",
+    "aqi": "Европейский ИКВ",
+    "precipitation": "Осадки",
+    "low": "Мин",
+    "high": "Макс",
+    "source": "Данные: Open-Meteo (open-meteo.com)",
+    "loadError": "Ошибка загрузки.",
+    "retry": "Повторить",
+    "condClear": "Ясно",
+    "condSunny": "Солнечно",
+    "condCloudy": "Облачно",
+    "condFog": "Туман",
+    "condDrizzle": "Морось",
+    "condRain": "Дождь",
+    "condSnow": "Снег",
+    "condShowers": "Ливень",
+    "condThunderstorm": "Гроза",
+    "condUnknown": "Неизвестно",
+    "aqGood": "Отличное",
+    "aqFair": "Хорошее",
+    "aqModerate": "Умеренное",
+    "aqPoor": "Плохое",
+    "aqVeryPoor": "Очень плохое"
   }
 }

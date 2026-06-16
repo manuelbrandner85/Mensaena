@@ -126,6 +126,7 @@ class DashboardScaffold extends ConsumerWidget {
     this.fab,
     this.onRefresh,
     this.headerImage,
+    this.appBarActions,
     super.key,
   });
 
@@ -138,6 +139,9 @@ class DashboardScaffold extends ConsumerWidget {
   /// Optionales Higgsfield-Modul-Banner (Asset-Pfad) — fixer Bildstreifen
   /// über dem Body. null = kein Banner.
   final String? headerImage;
+
+  /// Optionale zusätzliche AppBar-Buttons (werden vor Search/SOS eingefügt).
+  final List<Widget>? appBarActions;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -315,6 +319,7 @@ class DashboardScaffold extends ConsumerWidget {
             : null, // Top-Level: automatic-hamburger
         title: Text(title, style: AppTypography.appBarTitle()),
         actions: [
+          ...?appBarActions,
           IconButton(
             tooltip: 'common.search'.tr(),
             onPressed: () => context.push('/dashboard/search'),

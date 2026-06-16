@@ -4698,5 +4698,35 @@
   },
   "event": {
     "free": "Gratuito"
+  },
+  "weather": {
+    "title": "Tiempo",
+    "refresh": "Actualizar",
+    "today": "Hoy",
+    "hourlyForecast": "Pronóstico por hora",
+    "dailyForecast": "Pronóstico de 5 días",
+    "airQuality": "Calidad del aire",
+    "aqi": "AQI europeo",
+    "precipitation": "Precipitación",
+    "low": "Mín",
+    "high": "Máx",
+    "source": "Datos: Open-Meteo (open-meteo.com)",
+    "loadError": "Error al cargar.",
+    "retry": "Reintentar",
+    "condClear": "Despejado",
+    "condSunny": "Soleado",
+    "condCloudy": "Nublado",
+    "condFog": "Niebla",
+    "condDrizzle": "Llovizna",
+    "condRain": "Lluvia",
+    "condSnow": "Nieve",
+    "condShowers": "Chubascos",
+    "condThunderstorm": "Tormenta",
+    "condUnknown": "Desconocido",
+    "aqGood": "Muy buena",
+    "aqFair": "Buena",
+    "aqModerate": "Moderada",
+    "aqPoor": "Mala",
+    "aqVeryPoor": "Muy mala"
   }
 }

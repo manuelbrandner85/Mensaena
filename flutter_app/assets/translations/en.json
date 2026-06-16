@@ -4695,5 +4695,35 @@
   },
   "event": {
     "free": "Free"
+  },
+  "weather": {
+    "title": "Weather",
+    "refresh": "Refresh",
+    "today": "Today",
+    "hourlyForecast": "Hourly Forecast",
+    "dailyForecast": "5-Day Forecast",
+    "airQuality": "Air Quality",
+    "aqi": "European AQI",
+    "precipitation": "Precipitation",
+    "low": "Low",
+    "high": "High",
+    "source": "Data: Open-Meteo (open-meteo.com)",
+    "loadError": "Failed to load.",
+    "retry": "Try again",
+    "condClear": "Clear",
+    "condSunny": "Sunny",
+    "condCloudy": "Cloudy",
+    "condFog": "Foggy",
+    "condDrizzle": "Drizzle",
+    "condRain": "Rain",
+    "condSnow": "Snow",
+    "condShowers": "Showers",
+    "condThunderstorm": "Thunderstorm",
+    "condUnknown": "Unknown",
+    "aqGood": "Very Good",
+    "aqFair": "Good",
+    "aqModerate": "Moderate",
+    "aqPoor": "Poor",
+    "aqVeryPoor": "Very Poor"
   }
 }

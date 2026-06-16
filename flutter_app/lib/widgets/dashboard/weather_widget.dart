@@ -1,10 +1,11 @@
-/// WeatherWidget V2 — Provider statt initState.
+/// WeatherWidget V3 — Provider statt initState, Tap öffnet WeatherScreen.
 /// Cached via Riverpod, kein doppelter HTTP-Request bei Rebuild.
 library;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
@@ -58,77 +59,78 @@ class WeatherWidget extends ConsumerWidget {
         if (list.isEmpty) return const SizedBox.shrink();
         final d = list.first;
         final tip = _tip(d);
-        return Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.5),
-            border: Border.all(color: AppColors.line),
-            borderRadius: BorderRadius.circular(12),
+        return GestureDetector(
+          onTap: () => context.push(
+            '/dashboard/weather',
+            extra: {'lat': lat, 'lng': lng},
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                Text(d.emoji, style: const TextStyle(fontSize: 28, height: 1)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('home.currentWeather'.tr(),
-                          style: AppTypography.label(
-                              size: 9, color: AppColors.mute)),
-                      const SizedBox(height: 2),
-                      RichText(
-                        text: TextSpan(
-                          style: AppTypography.body(
-                              size: 14,
-                              color: AppColors.ink,
-                              weight: FontWeight.w700),
-                          children: [
-                            TextSpan(
-                                text:
-                                    '${d.tempMax.round()}° / ${d.tempMin.round()}°'),
-                            TextSpan(
-                              text: '  ${d.label}',
-                              style: AppTypography.body(
-                                  size: 12,
-                                  color: AppColors.mute,
-                                  weight: FontWeight.w400),
-                            ),
-                          ],
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.5),
+              border: Border.all(color: AppColors.line),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  Text(d.emoji, style: const TextStyle(fontSize: 28, height: 1)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('home.currentWeather'.tr(),
+                            style: AppTypography.label(
+                                size: 9, color: AppColors.mute)),
+                        const SizedBox(height: 2),
+                        RichText(
+                          text: TextSpan(
+                            style: AppTypography.body(
+                                size: 14,
+                                color: AppColors.ink,
+                                weight: FontWeight.w700),
+                            children: [
+                              TextSpan(
+                                  text:
+                                      '${d.tempMax.round()}° / ${d.tempMin.round()}°'),
+                              TextSpan(
+                                text: '  ${d.label}',
+                                style: AppTypography.body(
+                                    size: 12,
+                                    color: AppColors.mute,
+                                    weight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Flexible(
-                  child: Text('home.weatherSource'.tr(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.end,
-                      style: AppTypography.caption()),
-                ),
-              ]),
-              if (tip.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.bronze.withValues(alpha: 0.08),
-                    border: Border.all(
-                        color: AppColors.bronze.withValues(alpha: 0.18)),
-                    borderRadius: BorderRadius.circular(10),
+                  const Icon(LucideIcons.chevronRight,
+                      size: 16, color: AppColors.mute),
+                ]),
+                if (tip.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.bronze.withValues(alpha: 0.08),
+                      border: Border.all(
+                          color: AppColors.bronze.withValues(alpha: 0.18)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(tip,
+                        style: AppTypography.body(
+                            size: 11,
+                            color: AppColors.inkSoft,
+                            height: 1.4)),
                   ),
-                  child: Text(tip,
-                      style: AppTypography.body(
-                          size: 11,
-                          color: AppColors.inkSoft,
-                          height: 1.4)),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
         );
       },
