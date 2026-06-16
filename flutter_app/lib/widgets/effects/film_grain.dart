@@ -30,6 +30,9 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
   static ui.FragmentProgram? _program;
   static bool _programRequested = false;
 
+  /// Einmalig erzeugter Shader; Uniforms werden pro Frame in paint() neu gesetzt.
+  ui.FragmentShader? _shader;
+
   static Future<void> _loadProgram() async {
     if (_programRequested) return;
     _programRequested = true;
@@ -41,7 +44,13 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
   @override
   void initState() {
     super.initState();
-    _loadProgram();
+    _loadProgram().then((_) {
+      if (mounted && _program != null && _shader == null) {
+        setState(() {
+          _shader = _program!.fragmentShader();
+        });
+      }
+    });
     _ctrl = AnimationController(
       vsync: this,
       // 80ms-Cycle wie vorher → 12.5fps Grain (sieht weicher aus als 60fps).
@@ -66,6 +75,7 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
 
   @override
   void dispose() {
+    _shader?.dispose();
     _ctrl.dispose();
     super.dispose();
   }
@@ -81,12 +91,12 @@ class _FilmGrainOverlayState extends State<FilmGrainOverlay>
             // value [0..1) → diskreter Seed alle 80ms wenn das
             // controller-cycle endet und neu startet.
             final seed = (_ctrl.value * 1000).floor();
-            final program = _program;
+            final shader = _shader;
             return CustomPaint(
-              painter: program != null
+              painter: shader != null
                   // GPU-Pfad: 0 Dart-Arbeit pro Frame (Impeller/Skia).
                   ? _ShaderGrainPainter(
-                      shader: program.fragmentShader(),
+                      shader: shader,
                       opacity: widget.opacity,
                       seed: seed,
                     )
