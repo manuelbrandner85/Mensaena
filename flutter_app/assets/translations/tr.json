@@ -1618,6 +1618,10 @@
       "subtitle": "Önce en büyük hızlı kazanımlar (yüksek etki, az çaba).",
       "seeAll": "Tümünü gör",
       "do": "Yap"
+    },
+    "autopilot": {
+      "title": "Denetimli otopilot",
+      "subtitle": "Godmode her gün en iyi hızlı kazanımı uygular — birleştirme yalnızca onayından sonra (veto)."
     }
   },
   "create": {

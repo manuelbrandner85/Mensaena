@@ -1619,6 +1619,10 @@
       "subtitle": "Biggest quick wins first (high impact, low effort).",
       "seeAll": "See all",
       "do": "Do it"
+    },
+    "autopilot": {
+      "title": "Supervised autopilot",
+      "subtitle": "Godmode ships the top quick-win daily — merge only after your approval (veto)."
     }
   },
   "create": {

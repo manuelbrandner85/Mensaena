@@ -496,6 +496,35 @@ class AiInsightsRepository {
     }
   }
 
+  /// Liest, ob der überwachte Autopilot aktiv ist (Admin-only via RLS).
+  static Future<bool> fetchAutopilotEnabled() async {
+    try {
+      final row = await sb
+          .from('godmode_settings')
+          .select('autopilot_enabled')
+          .eq('id', 1)
+          .maybeSingle();
+      return (row?['autopilot_enabled'] as bool?) ?? false;
+    } catch (e) {
+      debugPrint('[AiInsights] fetchAutopilotEnabled failed: $e');
+      return false;
+    }
+  }
+
+  /// Schaltet den überwachten Autopilot an/aus (Admin-only via RLS).
+  static Future<bool> setAutopilotEnabled(bool enabled) async {
+    try {
+      await sb.from('godmode_settings').update({
+        'autopilot_enabled': enabled,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }).eq('id', 1);
+      return true;
+    } catch (e) {
+      debugPrint('[AiInsights] setAutopilotEnabled failed: $e');
+      return false;
+    }
+  }
+
   /// Lädt offene Post-Merge-Gesundheitsalarme (Crash-Anstieg nach Merge).
   /// Sicherer Alarm — kein Auto-Rollback; Admin entscheidet. Admin-only via RLS.
   static Future<List<Map<String, dynamic>>> fetchHealthAlerts() async {

@@ -1619,6 +1619,10 @@
       "subtitle": "Primero las mayores victorias rápidas (alto impacto, poco esfuerzo).",
       "seeAll": "Ver todo",
       "do": "Hacer"
+    },
+    "autopilot": {
+      "title": "Piloto automático supervisado",
+      "subtitle": "Godmode implementa a diario el mejor quick-win — fusión solo tras tu aprobación (veto)."
     }
   },
   "create": {
