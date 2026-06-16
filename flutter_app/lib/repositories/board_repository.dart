@@ -211,7 +211,24 @@ class BoardRepository {
       return false;
     }
   }
+
+  static Stream<List<BoardPost>> watchActive() {
+    return sb
+        .from('board_posts')
+        .stream(primaryKey: ['id'])
+        .eq('status', 'active')
+        .order('created_at', ascending: false)
+        .limit(50)
+        .map((rows) => rows
+            .whereType<Map<String, dynamic>>()
+            .map(BoardPost.fromJson)
+            .toList());
+  }
 }
+
+final boardActiveStreamProvider =
+    StreamProvider.autoDispose<List<BoardPost>>(
+        (ref) => BoardRepository.watchActive());
 
 final boardPostsProvider =
     FutureProvider<List<BoardPost>>((ref) async => BoardRepository.listActive());
