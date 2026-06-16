@@ -64,6 +64,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   File? _newAvatar;
   String? _generatedAvatarUrl;
   File? _newCover;
+  bool _isGeneratingAvatar = false;
 
   // ── Skill-Lists ───────────────────────────────────────────────
   List<String> _skills = [];
@@ -298,6 +299,38 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       content: Text('profile.avatarChosen'.tr(),
           style: AppTypography.body(size: 13, color: AppColors.ink)),
     ));
+  }
+
+  /// Versucht nacheinander DiceBear-Stile bis einer HTTP-200 zurückgibt.
+  /// Zeigt einen Lade-Indikator auf dem Button und eine Snackbar bei Fehler.
+  Future<void> _generateAndVerifyAvatar(String userId) async {
+    if (_isGeneratingAvatar) return;
+    setState(() => _isGeneratingAvatar = true);
+    try {
+      for (int i = 0; i < AvatarGenerator.portraitStyleCount; i++) {
+        final url = AvatarGenerator.portraitFor(userId, variantIndex: i);
+        try {
+          final resp = await http
+              .head(Uri.parse(url))
+              .timeout(const Duration(seconds: 8));
+          if (resp.statusCode == 200) {
+            await _useGeneratedAvatar(url);
+            return;
+          }
+        } catch (_) {
+          continue;
+        }
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('profile.avatarGenerateFailed'.tr(),
+              style: AppTypography.body(size: 13, color: AppColors.ink)),
+        ));
+      }
+    } finally {
+      if (mounted) setState(() => _isGeneratingAvatar = false);
+    }
   }
 
   Future<void> _pickAvatar() async {
@@ -601,12 +634,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                           avatarUrl: avatarUrl,
                           onPickCover: _pickCover,
                           onPickAvatar: _pickAvatar,
+                          isGeneratingAvatar: _isGeneratingAvatar,
                           onIdenticon: () => _useGeneratedAvatar(
                               AvatarGenerator.defaultFor(
                                   p?.id ?? _nameCtrl.text)),
-                          onAiAvatar: () => _useGeneratedAvatar(
-                              AvatarGenerator.portraitFor(
-                                  p?.id ?? _nameCtrl.text)),
+                          onAiAvatar: () => _generateAndVerifyAvatar(
+                              p?.id ?? _nameCtrl.text),
                         ),
                         _section(
                           title: 'profile.sectionBasic'.tr(),
@@ -1084,6 +1117,7 @@ class _Hero extends StatelessWidget {
     required this.onPickAvatar,
     required this.onIdenticon,
     required this.onAiAvatar,
+    this.isGeneratingAvatar = false,
   });
 
   final File? coverFile;
@@ -1094,6 +1128,7 @@ class _Hero extends StatelessWidget {
   final VoidCallback onPickAvatar;
   final VoidCallback onIdenticon;
   final VoidCallback onAiAvatar;
+  final bool isGeneratingAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -1253,8 +1288,17 @@ class _Hero extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onAiAvatar,
-                  icon: const Icon(LucideIcons.sparkles, size: 14),
+                  onPressed: isGeneratingAvatar ? null : onAiAvatar,
+                  icon: isGeneratingAvatar
+                      ? SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            color: AppColors.amber,
+                          ),
+                        )
+                      : const Icon(LucideIcons.sparkles, size: 14),
                   label: Text('profile.aiAvatar'.tr()),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.amber,

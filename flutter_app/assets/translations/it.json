@@ -238,6 +238,7 @@
     "profileSaved": "Profilo salvato.",
     "saveFailed": "Salvataggio non riuscito: {error}",
     "avatarUploadFailed": "Caricamento avatar fallito — il profilo NON è stato salvato.",
+    "avatarGenerateFailed": "Generazione avatar fallita — riprova.",
     "tapForNewAvatar": "Tocca per nuovo avatar",
     "identicon": "Identicon",
     "aiAvatar": "Avatar IA",

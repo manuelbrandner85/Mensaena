@@ -238,6 +238,7 @@
     "profileSaved": "Profile saved.",
     "saveFailed": "Saving failed: {error}",
     "avatarUploadFailed": "Avatar upload failed — profile was NOT saved.",
+    "avatarGenerateFailed": "Avatar generation failed — please try again.",
     "tapForNewAvatar": "Tap for new avatar",
     "identicon": "Identicon",
     "aiAvatar": "AI avatar",
