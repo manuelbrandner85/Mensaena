@@ -238,6 +238,7 @@
     "profileSaved": "Профиль сохранён.",
     "saveFailed": "Не удалось сохранить: {error}",
     "avatarUploadFailed": "Не удалось загрузить аватар — профиль НЕ сохранён.",
+    "avatarGenerateFailed": "Не удалось создать аватар — попробуйте ещё раз.",
     "tapForNewAvatar": "Нажми для нового аватара",
     "identicon": "Identicon",
     "aiAvatar": "AI-аватар",

@@ -238,6 +238,7 @@
     "profileSaved": "Profil gespeichert.",
     "saveFailed": "Speichern fehlgeschlagen: {error}",
     "avatarUploadFailed": "Avatar-Upload fehlgeschlagen — Profil wurde NICHT gespeichert.",
+    "avatarGenerateFailed": "Avatar-Generierung fehlgeschlagen — bitte erneut versuchen.",
     "tapForNewAvatar": "Tippe für neues Avatar",
     "identicon": "Identicon",
     "aiAvatar": "AI-Avatar",

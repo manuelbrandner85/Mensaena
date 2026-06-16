@@ -238,6 +238,7 @@
     "profileSaved": "Profil kaydedildi.",
     "saveFailed": "Kaydetme başarısız: {error}",
     "avatarUploadFailed": "Avatar yükleme başarısız — profil KAYDEDİLMEDİ.",
+    "avatarGenerateFailed": "Avatar oluşturma başarısız — lütfen tekrar deneyin.",
     "tapForNewAvatar": "Yeni avatar için dokun",
     "identicon": "Identicon",
     "aiAvatar": "AI avatar",

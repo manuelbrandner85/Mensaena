@@ -238,6 +238,7 @@
     "profileSaved": "Perfil guardado.",
     "saveFailed": "Error al guardar: {error}",
     "avatarUploadFailed": "Error al subir el avatar — el perfil NO se guardó.",
+    "avatarGenerateFailed": "Error al generar el avatar — inténtalo de nuevo.",
     "tapForNewAvatar": "Toca para nuevo avatar",
     "identicon": "Identicon",
     "aiAvatar": "Avatar IA",
