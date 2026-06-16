@@ -64,7 +64,7 @@ class WeatherScreen extends ConsumerWidget {
           children: [
             // ── Aktuelles Wetter ─────────────────────────────────────────
             forecast.when(
-              loading: () => _LoadingCard(height: 120),
+              loading: () => const _LoadingCard(height: 120),
               error: (_, __) => _ErrorCard(
                 onRetry: () => ref.invalidate(_weatherScreenForecastProvider),
               ),
@@ -79,7 +79,7 @@ class WeatherScreen extends ConsumerWidget {
             _SectionHeader(label: 'weather.hourlyForecast'.tr()),
             const SizedBox(height: 8),
             hourly.when(
-              loading: () => _LoadingCard(height: 160),
+              loading: () => const _LoadingCard(height: 160),
               error: (_, __) => _ErrorCard(
                 onRetry: () => ref.invalidate(_weatherScreenHourlyProvider),
               ),
@@ -94,7 +94,7 @@ class WeatherScreen extends ConsumerWidget {
             _SectionHeader(label: 'weather.airQuality'.tr()),
             const SizedBox(height: 8),
             aq.when(
-              loading: () => _LoadingCard(height: 100),
+              loading: () => const _LoadingCard(height: 100),
               error: (_, __) => const SizedBox.shrink(),
               data: (quality) => quality == null
                   ? const SizedBox.shrink()
@@ -107,7 +107,7 @@ class WeatherScreen extends ConsumerWidget {
             _SectionHeader(label: 'weather.dailyForecast'.tr()),
             const SizedBox(height: 8),
             forecast.when(
-              loading: () => _LoadingCard(height: 200),
+              loading: () => const _LoadingCard(height: 200),
               error: (_, __) => const SizedBox.shrink(),
               data: (days) => days.isEmpty
                   ? const SizedBox.shrink()
@@ -211,7 +211,7 @@ class _TempCurveCard extends StatelessWidget {
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: 5,
-                  getDrawingHorizontalLine: (_) => FlLine(
+                  getDrawingHorizontalLine: (_) => const FlLine(
                     color: AppColors.line,
                     strokeWidth: 1,
                   ),

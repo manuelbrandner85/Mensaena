@@ -66,7 +66,7 @@ void main() {
 
     test('aqiColor green for good air', () {
       const aq = AirQuality(pm25: 2, pm10: 5, europeanAqi: 10);
-      expect(aq.aqiColor.value, 0xFF4CAF50);
+      expect(aq.aqiColor.toARGB32(), 0xFF4CAF50);
     });
   });
 
