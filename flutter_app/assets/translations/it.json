@@ -1619,6 +1619,10 @@
       "subtitle": "Prima i quick win maggiori (alto impatto, poco sforzo).",
       "seeAll": "Vedi tutti",
       "do": "Esegui"
+    },
+    "autopilot": {
+      "title": "Autopilota supervisionato",
+      "subtitle": "Godmode realizza ogni giorno il miglior quick-win — merge solo dopo la tua approvazione (veto)."
     }
   },
   "create": {

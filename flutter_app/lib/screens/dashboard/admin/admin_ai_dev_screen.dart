@@ -123,6 +123,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
   // Roadmap / Epics: thematische Initiativen mit Fortschritt.
   List<Map<String, dynamic>> _epics = const [];
   bool _epicsExpanded = false;
+  // Überwachter Autopilot (täglich Top-Quick-Win mit Veto via Review-Gate).
+  bool _autopilotEnabled = false;
+  bool _autopilotBusy = false;
   // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
   // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
   String? _pendingNoteId;
@@ -196,6 +199,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     _loadApiKeys();
     _loadHealthAlerts();
     _loadEpics();
+    _loadAutopilot();
     _loadSchedules();
     _loadModuleInsights();
     _poll = Timer.periodic(const Duration(seconds: 7), (_) {
@@ -1019,6 +1023,26 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     final e = await AiInsightsRepository.fetchEpics();
     if (!mounted) return;
     setState(() => _epics = e);
+  }
+
+  Future<void> _loadAutopilot() async {
+    final on = await AiInsightsRepository.fetchAutopilotEnabled();
+    if (!mounted) return;
+    setState(() => _autopilotEnabled = on);
+  }
+
+  Future<void> _toggleAutopilot(bool v) async {
+    setState(() => _autopilotBusy = true);
+    final ok = await AiInsightsRepository.setAutopilotEnabled(v);
+    if (!mounted) return;
+    setState(() {
+      if (ok) _autopilotEnabled = v;
+      _autopilotBusy = false;
+    });
+    if (!ok) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('errors.generic'.tr())));
+    }
   }
 
   // Epic anlegen/bearbeiten (Titel, Beschreibung, Farbe, Status).
@@ -1871,6 +1895,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
   // ── Tab: Einstellungen ───────────────────────────────────────────────────────
   Widget _settingsTab() {
     return _refreshable([
+      _AutopilotCard(
+        enabled: _autopilotEnabled,
+        busy: _autopilotBusy,
+        onChanged: _toggleAutopilot,
+      ),
+      const SizedBox(height: 10),
       _SchedulesCard(
         schedules: _schedules,
         expanded: _schedulesExpanded,
@@ -5528,6 +5558,73 @@ class _AlertAction extends StatelessWidget {
                 style: AppTypography.label(size: 11, color: fg)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Überwachter Autopilot: Godmode nimmt täglich den Top-Quick-Win und liefert
+/// ihn — mit Veto via Review-Gate (CI baut, Merge erst nach Freigabe).
+class _AutopilotCard extends StatelessWidget {
+  const _AutopilotCard({
+    required this.enabled,
+    required this.busy,
+    required this.onChanged,
+  });
+  final bool enabled;
+  final bool busy;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: enabled
+            ? AppColors.teal.withValues(alpha: 0.08)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(
+          color: enabled
+              ? AppColors.teal.withValues(alpha: 0.4)
+              : Colors.grey.shade200,
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(13, 10, 8, 10),
+      child: Row(
+        children: [
+          Icon(LucideIcons.activity,
+              size: 18,
+              color: enabled ? AppColors.teal : AppColors.lightMute),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('adminDev.autopilot.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.lightInk,
+                        weight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text('adminDev.autopilot.subtitle'.tr(),
+                    style: AppTypography.caption(color: AppColors.lightMute)),
+              ],
+            ),
+          ),
+          busy
+              ? const Padding(
+                  padding: EdgeInsets.all(8),
+                  child: SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2)),
+                )
+              : Switch(
+                  value: enabled,
+                  onChanged: onChanged,
+                  activeColor: AppColors.teal,
+                ),
+        ],
       ),
     );
   }

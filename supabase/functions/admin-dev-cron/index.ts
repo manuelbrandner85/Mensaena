@@ -113,5 +113,79 @@ Deno.serve(async (req) => {
       .eq('id', s.id)
   }
 
-  return json({ ok: true, dispatched })
+  // ── Überwachter Autopilot ──────────────────────────────────────────────────
+  // Max. 1×/Tag: nimmt den Top-Quick-Win-Vorschlag und legt EINEN Auftrag mit
+  // await_review=true an (CI baut, Merge erst nach Admin-Freigabe = Veto).
+  // Gedrosselt auf autopilot_max_open gleichzeitig offene Autopilot-Aufträge.
+  let autopilot = 'off'
+  try {
+    const { data: settings } = await admin
+      .from('godmode_settings').select('*').eq('id', 1).maybeSingle()
+    if (settings?.autopilot_enabled === true) {
+      const last = settings.autopilot_last_run_at
+        ? new Date(settings.autopilot_last_run_at).getTime() : 0
+      if ((Date.now() - last) / 3600000 >= 20) {
+        // deno-lint-ignore no-explicit-any
+        const score = (s: any) =>
+          Number(s.impact ?? 3) * 2 - Number(s.effort ?? 3)
+        const { data: openTasks } = await admin
+          .from('admin_dev_tasks')
+          .select('id')
+          .eq('origin', 'autopilot')
+          .in('status', ['queued', 'running', 'phased', 'pr_open', 'awaiting_review'])
+        const maxOpen = Number(settings.autopilot_max_open ?? 1)
+        if ((openTasks?.length ?? 0) < maxOpen) {
+          const { data: sugg } = await admin
+            .from('admin_dev_suggestions')
+            .select('id,title,instruction,impact,effort,created_by')
+            .eq('status', 'pending')
+            .limit(100)
+          if (sugg && sugg.length) {
+            sugg.sort((a, b) => score(b) - score(a))
+            const top = sugg[0]
+            const instr = String(top.instruction || top.title || '').trim()
+            if (instr.length > 4) {
+              const { data: task } = await admin.from('admin_dev_tasks').insert({
+                created_by: top.created_by,
+                instruction: instr,
+                status: 'queued',
+                origin: 'autopilot',
+                await_review: true,
+              }).select('id').single()
+              if (task) {
+                await admin.from('admin_dev_suggestions')
+                  .update({ status: 'accepted', task_id: task.id, updated_at: nowIso })
+                  .eq('id', top.id)
+                if (token) {
+                  await fetch(
+                    `${GH_API}/actions/workflows/${GH_WORKFLOW}/dispatches`,
+                    {
+                      method: 'POST', headers: ghHeaders(token),
+                      body: JSON.stringify({
+                        ref: GH_REF,
+                        inputs: { instruction: instr, task_id: task.id, image_urls: '[]' },
+                      }),
+                    },
+                  ).catch(() => null)
+                }
+                autopilot = 'dispatched'
+              }
+            }
+          } else {
+            autopilot = 'no_suggestions'
+          }
+        } else {
+          autopilot = 'throttled_open'
+        }
+        // Tagestaktung: last_run immer fortschreiben.
+        await admin.from('godmode_settings')
+          .update({ autopilot_last_run_at: nowIso, updated_at: nowIso })
+          .eq('id', 1)
+      } else {
+        autopilot = 'throttled_daily'
+      }
+    }
+  } catch (_) { autopilot = 'error' }
+
+  return json({ ok: true, dispatched, autopilot })
 })

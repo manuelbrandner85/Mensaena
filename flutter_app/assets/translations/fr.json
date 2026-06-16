@@ -1619,6 +1619,10 @@
       "subtitle": "Les meilleurs gains rapides d'abord (fort impact, faible effort).",
       "seeAll": "Tout voir",
       "do": "Lancer"
+    },
+    "autopilot": {
+      "title": "Pilote automatique supervisé",
+      "subtitle": "Godmode réalise chaque jour le meilleur gain rapide — fusion seulement après ton approbation (veto)."
     }
   },
   "create": {
