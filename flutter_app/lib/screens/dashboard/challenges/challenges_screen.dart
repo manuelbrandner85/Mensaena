@@ -12,6 +12,16 @@ import '../../../repositories/challenges_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/error_state_widget.dart';
 
+String _localizedCategory(String? cat) {
+  if (cat == null) return '—';
+  return 'challenges.cat.$cat'.tr();
+}
+
+String _localizedDifficulty(String? diff) {
+  if (diff == null) return '—';
+  return 'challenges.diff.$diff'.tr();
+}
+
 /// SKILL: mensaena-features
 /// Aktive Challenges + Fortschritt des Users.
 class ChallengesScreen extends ConsumerWidget {
@@ -48,7 +58,7 @@ class ChallengesScreen extends ConsumerWidget {
             ),
             data: (challenges) {
               if (challenges.isEmpty) {
-                return _emptyState('Aktuell keine aktiven Challenges.');
+                return _emptyState('challenges.empty'.tr());
               }
               final progressMap = <String, ChallengeProgress>{
                 for (final p in progressAsync.value ?? const <ChallengeProgress>[])
@@ -81,7 +91,7 @@ class ChallengesScreen extends ConsumerWidget {
                                   color: AppColors.ink,
                                 )),
                             Text(
-                              'Mach mit, sammle Punkte, verdiene Badges.',
+                              'challenges.subtitle'.tr(),
                               style: AppTypography.caption(),
                             ),
                           ],
@@ -110,8 +120,8 @@ class ChallengesScreen extends ConsumerWidget {
                             backgroundColor: AppColors.surface,
                             content: Text(
                               ok
-                                  ? 'Du bist dabei!'
-                                  : 'Konnte nicht beitreten.',
+                                  ? 'challenges.joinSuccess'.tr()
+                                  : 'challenges.joinFailed'.tr(),
                               style: AppTypography.body(
                                 size: 13,
                                 color: AppColors.ink,
@@ -198,7 +208,10 @@ class _ChallengeTile extends StatelessWidget {
                   color: AppColors.amber.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(challenge.category ?? challenge.difficulty ?? '—',
+                child: Text(
+                    challenge.category != null
+                        ? _localizedCategory(challenge.category)
+                        : _localizedDifficulty(challenge.difficulty),
                     style: AppTypography.label(size: 9)),
               ),
               const Spacer(),
@@ -257,7 +270,7 @@ class _ChallengeTile extends StatelessWidget {
               ),
               const Spacer(),
               if (completed)
-                Text('✓ Erledigt',
+                Text('challenges.completed'.tr(),
                     style: AppTypography.label(
                       size: 9,
                       color: AppColors.lebenSoft,

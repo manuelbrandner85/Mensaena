@@ -2310,7 +2310,26 @@
     "unlimited": "Unlimited",
     "weeklyChallenge": "Weekly challenge",
     "weeklyHint": "Featured as a weekly challenge",
-    "karmaAwarded": "+{n} karma earned!"
+    "karmaAwarded": "+{n} karma earned!",
+    "cat": {
+      "umwelt": "🌱 Environment",
+      "sozial": "🤝 Social",
+      "fitness": "💪 Fitness",
+      "bildung": "📚 Education",
+      "kreativ": "🎨 Creative",
+      "ernaehrung": "🥗 Nutrition",
+      "gemeinschaft": "🏘️ Community"
+    },
+    "diff": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "empty": "No active challenges right now.",
+    "subtitle": "Join in, collect points, earn badges.",
+    "joinSuccess": "You're in!",
+    "joinFailed": "Could not join.",
+    "completed": "✓ Done"
   },
   "invite": {
     "title": "Invite",

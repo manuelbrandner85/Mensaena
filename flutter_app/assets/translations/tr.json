@@ -2309,7 +2309,26 @@
     "unlimited": "Sınırsız",
     "weeklyChallenge": "Haftalık meydan okuma",
     "weeklyHint": "Haftalık meydan okuma olarak öne çıkarılır",
-    "karmaAwarded": "+{n} karma kazanıldı!"
+    "karmaAwarded": "+{n} karma kazanıldı!",
+    "cat": {
+      "umwelt": "🌱 Çevre",
+      "sozial": "🤝 Sosyal",
+      "fitness": "💪 Fitness",
+      "bildung": "📚 Eğitim",
+      "kreativ": "🎨 Yaratıcı",
+      "ernaehrung": "🥗 Beslenme",
+      "gemeinschaft": "🏘️ Topluluk"
+    },
+    "diff": {
+      "easy": "Kolay",
+      "medium": "Orta",
+      "hard": "Zor"
+    },
+    "empty": "Şu anda aktif meydan okuma yok.",
+    "subtitle": "Katıl, puan kazan, rozetler edin.",
+    "joinSuccess": "Katıldın!",
+    "joinFailed": "Katılım başarısız oldu.",
+    "completed": "✓ Tamamlandı"
   },
   "invite": {
     "title": "Davet et",
