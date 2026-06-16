@@ -34,42 +34,65 @@ class MyAvatarTopButton extends ConsumerWidget {
           data: (u) => u,
           orElse: () => null,
         );
+
+    Widget ring = Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        // Cinema-Bronze-Ring + leichter Glow.
+        border: Border.all(
+            color: AppColors.bronze.withValues(alpha: 0.55), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.bronze.withValues(alpha: 0.18),
+            blurRadius: 6,
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: avatar != null
+            ? CachedNetworkImage(
+                imageUrl: avatar,
+                width: 30,
+                height: 30,
+                memCacheWidth: 60,
+                memCacheHeight: 60,
+                fit: BoxFit.cover,
+                errorWidget: (_, __, ___) => _fallback(),
+              )
+            : _fallback(),
+      ),
+    );
+
+    // Hero-Flug zum großen Avatar auf dem Profil (Tag spiegelt das Ziel in
+    // profile_screen.dart). NUR wenn wir NICHT bereits auf dem eigenen Profil
+    // sind — dort besitzt der Body-Avatar denselben Tag, zwei Heroes mit
+    // gleichem Tag im selben Subtree würden sonst crashen.
+    if (!_onOwnProfile(context, uid)) {
+      ring = Hero(tag: 'profile-avatar-$uid', child: ring);
+    }
+
     return Padding(
       padding: const EdgeInsets.only(right: 6),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () => context.push('/dashboard/profile/$uid'),
-        child: Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            // Cinema-Bronze-Ring + leichter Glow.
-            border: Border.all(
-                color: AppColors.bronze.withValues(alpha: 0.55), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.bronze.withValues(alpha: 0.18),
-                blurRadius: 6,
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: avatar != null
-                ? CachedNetworkImage(
-                    imageUrl: avatar,
-                    width: 30,
-                    height: 30,
-                    memCacheWidth: 60,
-                    memCacheHeight: 60,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => _fallback(),
-                  )
-                : _fallback(),
-          ),
-        ),
+        child: ring,
       ),
     );
+  }
+
+  /// True, wenn die aktuelle Route das eigene Profil zeigt
+  /// (`/dashboard/profile` oder `/dashboard/profile/<eigene-id>`).
+  bool _onOwnProfile(BuildContext context, String uid) {
+    try {
+      final path = GoRouterState.of(context).uri.path;
+      return path == '/dashboard/profile' ||
+          path == '/dashboard/profile/$uid';
+    } catch (_) {
+      return false;
+    }
   }
 
   Widget _fallback() => Container(
