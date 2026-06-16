@@ -29,15 +29,15 @@ class EmergencyAlert {
       id: json['id'] as String,
       userId: json['user_id'] as String,
       alertType: json['alert_type'] as String,
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
       description: json['description'] as String?,
       status: json['status'] as String? ?? 'active',
       respondents: (json['respondents'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           const [],
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '')?.toUtc() ?? DateTime.now(),
     );
   }
 
