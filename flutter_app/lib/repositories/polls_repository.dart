@@ -69,7 +69,11 @@ class PollsRepository {
       'options': options,
       'closes_at': closesIn == null
           ? null
-          : DateTime.now().add(closesIn).toIso8601String(),
+          // UTC speichern: toIso8601String() einer LOKALEN Zeit hat keinen
+          // Zeitzonen-Offset → Postgres (timestamptz) liest sie als UTC und
+          // verschiebt um den lokalen Offset. .toUtc() macht den Wert eindeutig
+          // (passt zur Lese-Seite, die closes_at bereits via .toUtc() parst).
+          : DateTime.now().toUtc().add(closesIn).toIso8601String(),
     });
   }
 }
