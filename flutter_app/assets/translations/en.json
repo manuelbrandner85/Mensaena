@@ -1623,6 +1623,10 @@
     "autopilot": {
       "title": "Supervised autopilot",
       "subtitle": "Godmode ships the top quick-win daily — merge only after your approval (veto)."
+    },
+    "moduleHealth": {
+      "title": "Module health matrix",
+      "subscores": "Completeness {comp} · Quality {qual} · Tests {tests}"
     }
   },
   "create": {

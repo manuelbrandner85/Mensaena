@@ -1623,6 +1623,10 @@
     "autopilot": {
       "title": "Pilote automatique supervisé",
       "subtitle": "Godmode réalise chaque jour le meilleur gain rapide — fusion seulement après ton approbation (veto)."
+    },
+    "moduleHealth": {
+      "title": "Matrice de santé des modules",
+      "subscores": "Complétude {comp} · Qualité {qual} · Tests {tests}"
     }
   },
   "create": {

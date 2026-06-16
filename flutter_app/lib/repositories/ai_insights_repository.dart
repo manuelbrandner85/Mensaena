@@ -496,6 +496,25 @@ class AiInsightsRepository {
     }
   }
 
+  /// Lädt die Modul-Health-Matrix (Bewertung je App-Modul). Schwächste zuerst,
+  /// damit klar ist, wo Godmode als Nächstes ansetzen sollte. Admin-only via RLS.
+  static Future<List<Map<String, dynamic>>> fetchModuleHealth() async {
+    try {
+      final rows = await sb
+          .from('godmode_module_health')
+          .select(
+              'module, label, score, completeness, quality, tests, notes, updated_at')
+          .order('score', ascending: true)
+          .limit(40);
+      return (rows as List)
+          .map((r) => Map<String, dynamic>.from(r as Map))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiInsights] fetchModuleHealth failed: $e');
+      return const [];
+    }
+  }
+
   /// Liest, ob der überwachte Autopilot aktiv ist (Admin-only via RLS).
   static Future<bool> fetchAutopilotEnabled() async {
     try {

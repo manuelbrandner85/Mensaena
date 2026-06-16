@@ -1622,6 +1622,10 @@
     "autopilot": {
       "title": "Denetimli otopilot",
       "subtitle": "Godmode her gün en iyi hızlı kazanımı uygular — birleştirme yalnızca onayından sonra (veto)."
+    },
+    "moduleHealth": {
+      "title": "Modül sağlık matrisi",
+      "subscores": "Tamlık {comp} · Kalite {qual} · Test {tests}"
     }
   },
   "create": {
