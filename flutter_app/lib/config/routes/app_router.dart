@@ -40,6 +40,7 @@ import '../../screens/dashboard/profile_edit_screen.dart';
 import '../../screens/dashboard/profile_saved_screen.dart';
 import '../../screens/dashboard/calendar_screen.dart';
 import '../../screens/dashboard/community_calendar_screen.dart';
+import '../../screens/dashboard/weather/weather_screen.dart';
 import '../../screens/dashboard/challenges/challenge_create_screen.dart';
 import '../../screens/dashboard/challenges/challenges_screen.dart';
 import '../../screens/dashboard/create/module_create_config.dart';
@@ -365,6 +366,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           key: state.pageKey,
           child: const MapScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/dashboard/weather',
+        pageBuilder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final lat = (extra?['lat'] as num?)?.toDouble() ?? 48.1351;
+          final lng = (extra?['lng'] as num?)?.toDouble() ?? 11.5820;
+          return mensaenaTransition<void>(
+            key: state.pageKey,
+            child: WeatherScreen(lat: lat, lng: lng),
+          );
+        },
       ),
       // S8 + v2.1: zentralen Create-Post-Screen entfernt. Jedes Modul hat
       // einen eigenen Create-Flow (FAB im Module-Posts-Screen). Alte

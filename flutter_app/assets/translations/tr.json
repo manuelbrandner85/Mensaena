@@ -4697,5 +4697,35 @@
   },
   "event": {
     "free": "Ücretsiz"
+  },
+  "weather": {
+    "title": "Hava Durumu",
+    "refresh": "Yenile",
+    "today": "Bugün",
+    "hourlyForecast": "Saatlik Tahmin",
+    "dailyForecast": "5 Günlük Tahmin",
+    "airQuality": "Hava Kalitesi",
+    "aqi": "Avrupa HKİ",
+    "precipitation": "Yağış",
+    "low": "Min",
+    "high": "Maks",
+    "source": "Veri: Open-Meteo (open-meteo.com)",
+    "loadError": "Yükleme başarısız.",
+    "retry": "Tekrar dene",
+    "condClear": "Açık",
+    "condSunny": "Güneşli",
+    "condCloudy": "Bulutlu",
+    "condFog": "Sisli",
+    "condDrizzle": "Çisenti",
+    "condRain": "Yağmurlu",
+    "condSnow": "Karlı",
+    "condShowers": "Sağanak",
+    "condThunderstorm": "Fırtına",
+    "condUnknown": "Bilinmiyor",
+    "aqGood": "Çok iyi",
+    "aqFair": "İyi",
+    "aqModerate": "Orta",
+    "aqPoor": "Kötü",
+    "aqVeryPoor": "Çok kötü"
   }
 }
