@@ -70,7 +70,7 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final async = ref.watch(boardPostsProvider);
+    final async = ref.watch(boardActiveStreamProvider);
     final hasFilters = _search.isNotEmpty || _category != 'all';
 
     return DashboardScaffold(
@@ -140,12 +140,12 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
               child: RefreshIndicator(
                 color: AppColors.amber,
                 backgroundColor: AppColors.surface,
-                onRefresh: () async => ref.invalidate(boardPostsProvider),
+                onRefresh: () async => ref.invalidate(boardActiveStreamProvider),
                 child: async.when(
                   loading: () => const SkeletonList(count: 5, itemHeight: 96),
                   error: (e, _) => Center(
                     child: ErrorStateWidget(
-                      onRetry: () => ref.invalidate(boardPostsProvider),
+                      onRetry: () => ref.invalidate(boardActiveStreamProvider),
                     ),
                   ),
                   data: (all) {
