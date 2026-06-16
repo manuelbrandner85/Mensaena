@@ -163,6 +163,23 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
 
   Timer? _poll;
 
+  // Revisions-Zähler für stilles Polling. Statt eines screen-weiten setState
+  // (das Header, TabBar, InputBar usw. mit-rebuildet) bumpen die Silent-Loader
+  // nur diesen Notifier — es bauen ausschließlich die daran hängenden
+  // ValueListenableBuilder-Teilbäume (StatusBar/TabBar/TabBarView) neu.
+  final ValueNotifier<int> _pollRev = ValueNotifier<int>(0);
+
+  // Wendet Feld-Mutationen an: bei silent (Polling) ohne globales setState,
+  // sonst regulär. So bleibt der Polling-Rebuild auf die Live-Teilbäume begrenzt.
+  void _applyUpdate(bool silent, VoidCallback apply) {
+    if (silent) {
+      apply();
+      if (mounted) _pollRev.value++;
+    } else {
+      setState(apply);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -181,7 +198,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     _loadEpics();
     _loadSchedules();
     _loadModuleInsights();
-    _poll = Timer.periodic(const Duration(seconds: 3), (_) {
+    _poll = Timer.periodic(const Duration(seconds: 7), (_) {
       if (_scanning) _loadSuggestions(silent: true);
       if (_hasActive) _refresh(silent: true);
       if (_moduleScanning) _loadModuleInsights(silent: true);
@@ -193,6 +210,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     _ctrl.dispose();
     _tabController.dispose();
     _poll?.cancel();
+    _pollRev.dispose();
     super.dispose();
   }
 
@@ -284,7 +302,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     if (!silent) setState(() => _loading = true);
     final rows = await AiInsightsRepository.fetchDevTasks();
     if (!mounted) return;
-    setState(() {
+    _applyUpdate(silent, () {
       _tasks = rows;
       _loading = false;
     });
@@ -354,7 +372,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
       category: _categoryKey == 'all' ? null : _categoryKey,
     );
     if (!mounted) return;
-    setState(() {
+    _applyUpdate(silent, () {
       _suggestions = ((data['suggestions'] as List?) ?? const [])
           .map((e) => Map<String, dynamic>.from(e as Map))
           .toList();
@@ -1347,7 +1365,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     if (!silent) setState(() => _moduleLoading = true);
     final res = await AiInsightsRepository.fetchModuleInsights();
     if (!mounted) return;
-    setState(() {
+    _applyUpdate(silent, () {
       _moduleInsights = ((res['insights'] as List?) ?? const [])
           .map((e) => Map<String, dynamic>.from(e as Map))
           .toList();
@@ -1541,9 +1559,65 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     }
   }
 
+  // Live-Region: StatusBar + TabBar + TabBarView. Hängt am _pollRev-Notifier,
+  // damit stilles Polling NUR diesen Teilbaum neu baut — Header und InputBar
+  // bleiben unangetastet.
+  Widget _liveRegion() {
+    final visible = _visibleSuggestions;
+    return Expanded(
+      child: Column(
+        children: [
+          _StatusBar(
+            activeTasks: _activeTaskCount,
+            openSuggestions: visible.length,
+            openAlerts: _healthAlerts.length,
+            lastDelivered: _changelog.isNotEmpty
+                ? (_changelog.first['title'] as String?)
+                : null,
+          ),
+          TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            labelColor: AppColors.teal,
+            unselectedLabelColor: AppColors.lightMute,
+            indicatorColor: AppColors.teal,
+            labelStyle: AppTypography.body(size: 12, weight: FontWeight.w700),
+            tabs: [
+              Tab(text: 'adminDev.tabs.overview'.tr()),
+              Tab(
+                text: 'adminDev.tabs.tasks'.tr() +
+                    (_tasks.isNotEmpty ? ' (${_tasks.length})' : ''),
+              ),
+              Tab(
+                text: 'adminDev.tabs.suggestions'.tr() +
+                    (visible.isNotEmpty ? ' (${visible.length})' : ''),
+              ),
+              Tab(text: 'adminDev.tabs.roadmap'.tr()),
+              Tab(text: 'adminDev.tabs.settings'.tr()),
+            ],
+          ),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _overviewTab(),
+                      _tasksTab(),
+                      _suggestionsTab(visible),
+                      _roadmapTab(),
+                      _settingsTab(),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final visible = _visibleSuggestions;
     return DashboardScaffold(
       title: 'adminDev.title'.tr(),
       currentRoute: '/dashboard/admin/dev-agent',
@@ -1551,50 +1625,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
         child: Column(
           children: [
             _GodmodeHeader(),
-            _StatusBar(
-              activeTasks: _activeTaskCount,
-              openSuggestions: visible.length,
-              openAlerts: _healthAlerts.length,
-              lastDelivered: _changelog.isNotEmpty
-                  ? (_changelog.first['title'] as String?)
-                  : null,
-            ),
-            TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              labelColor: AppColors.teal,
-              unselectedLabelColor: AppColors.lightMute,
-              indicatorColor: AppColors.teal,
-              labelStyle:
-                  AppTypography.body(size: 12, weight: FontWeight.w700),
-              tabs: [
-                Tab(text: 'adminDev.tabs.overview'.tr()),
-                Tab(
-                  text: 'adminDev.tabs.tasks'.tr() +
-                      (_tasks.isNotEmpty ? ' (${_tasks.length})' : ''),
-                ),
-                Tab(
-                  text: 'adminDev.tabs.suggestions'.tr() +
-                      (visible.isNotEmpty ? ' (${visible.length})' : ''),
-                ),
-                Tab(text: 'adminDev.tabs.roadmap'.tr()),
-                Tab(text: 'adminDev.tabs.settings'.tr()),
-              ],
-            ),
-            Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : TabBarView(
-                      controller: _tabController,
-                      children: [
-                        _overviewTab(),
-                        _tasksTab(),
-                        _suggestionsTab(visible),
-                        _roadmapTab(),
-                        _settingsTab(),
-                      ],
-                    ),
+            ValueListenableBuilder<int>(
+              valueListenable: _pollRev,
+              builder: (context, _, __) => _liveRegion(),
             ),
             if (_selectionMode && _selected.isNotEmpty)
               _BatchBar(
@@ -1643,6 +1676,26 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         children: children,
+      ),
+    );
+  }
+
+  // Wie _refreshable, aber lazy via ListView.builder — baut nur sichtbare
+  // Items. Für lange Listen (Aufträge/Vorschläge) statt eager '...map()'.
+  Widget _refreshableBuilder({
+    required int itemCount,
+    required IndexedWidgetBuilder itemBuilder,
+  }) {
+    return RefreshIndicator(
+      color: AppColors.teal,
+      onRefresh: () async {
+        await _refresh();
+        await _loadSuggestions(silent: true);
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        itemCount: itemCount,
+        itemBuilder: itemBuilder,
       ),
     );
   }
@@ -1701,27 +1754,37 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
 
   // ── Tab: Aufträge ───────────────────────────────────────────────────────────
   Widget _tasksTab() {
-    return _refreshable([
-      if (_tasks.isEmpty)
-        _EmptyHint()
-      else ...[
-        _SectionLabel(
-          icon: LucideIcons.gitPullRequest,
-          label: 'adminDev.tasksLabel'.tr(),
-          count: _tasks.length,
-          trailing: _doneCount > 0
-              ? _ClearTasksButton(busy: _clearingTasks, onTap: _clearTasks)
-              : null,
-        ),
-        ..._tasks.map(_taskCardFor),
-      ],
-      const SizedBox(height: 12),
-    ]);
+    if (_tasks.isEmpty) {
+      return _refreshableBuilder(
+        itemCount: 2,
+        itemBuilder: (_, i) =>
+            i == 0 ? _EmptyHint() : const SizedBox(height: 12),
+      );
+    }
+    // [0] = Section-Label, [1..n] = Auftrags-Karten, [n+1] = Bottom-Spacing.
+    return _refreshableBuilder(
+      itemCount: _tasks.length + 2,
+      itemBuilder: (context, i) {
+        if (i == 0) {
+          return _SectionLabel(
+            icon: LucideIcons.gitPullRequest,
+            label: 'adminDev.tasksLabel'.tr(),
+            count: _tasks.length,
+            trailing: _doneCount > 0
+                ? _ClearTasksButton(busy: _clearingTasks, onTap: _clearTasks)
+                : null,
+          );
+        }
+        if (i <= _tasks.length) return _taskCardFor(_tasks[i - 1]);
+        return const SizedBox(height: 12);
+      },
+    );
   }
 
   // ── Tab: Vorschläge ─────────────────────────────────────────────────────────
   Widget _suggestionsTab(List<Map<String, dynamic>> visible) {
-    return _refreshable([
+    // Feste Kopf-Items, dann lazy die (potenziell langen) Vorschlags-Karten.
+    final leading = <Widget>[
       _CategoryRow(
         selectedKey: _categoryKey,
         dynamicCategories: _categories,
@@ -1738,7 +1801,13 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
         onScan: _startScan,
       ),
       const SizedBox(height: 10),
-      if (_suggestions.isNotEmpty) ...[
+    ];
+    final trailing = <Widget>[];
+    final cards = _suggestions.isNotEmpty
+        ? visible
+        : const <Map<String, dynamic>>[];
+    if (_suggestions.isNotEmpty) {
+      leading.addAll([
         _SuggestionsHeader(
           count: visible.length,
           selectionMode: _selectionMode,
@@ -1751,22 +1820,35 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
           onSelect: (s) => setState(() => _severity = s),
         ),
         const SizedBox(height: 8),
-        ...visible.map((s) => _SuggestionCard(
-              suggestion: s,
-              categoryLabel:
-                  _categoryLabel(s['category'] as String? ?? 'feature'),
-              busy: _busySuggestions.contains(s['id'] as String?),
-              selectionMode: _selectionMode,
-              selected: _selected.contains(s['id'] as String?),
-              onToggleSelect: _toggleSelected,
-              onAccept: _acceptWithEdit,
-              onReject: _reject,
-            )),
-        const SizedBox(height: 14),
-      ] else
-        _EmptyHint(),
-      const SizedBox(height: 12),
-    ]);
+      ]);
+      trailing.add(const SizedBox(height: 14));
+    } else {
+      leading.add(_EmptyHint());
+    }
+    trailing.add(const SizedBox(height: 12));
+
+    return _refreshableBuilder(
+      itemCount: leading.length + cards.length + trailing.length,
+      itemBuilder: (context, i) {
+        if (i < leading.length) return leading[i];
+        final ci = i - leading.length;
+        if (ci < cards.length) {
+          final s = cards[ci];
+          return _SuggestionCard(
+            suggestion: s,
+            categoryLabel:
+                _categoryLabel(s['category'] as String? ?? 'feature'),
+            busy: _busySuggestions.contains(s['id'] as String?),
+            selectionMode: _selectionMode,
+            selected: _selected.contains(s['id'] as String?),
+            onToggleSelect: _toggleSelected,
+            onAccept: _acceptWithEdit,
+            onReject: _reject,
+          );
+        }
+        return trailing[ci - cards.length];
+      },
+    );
   }
 
   // ── Tab: Roadmap ─────────────────────────────────────────────────────────────
@@ -2528,10 +2610,30 @@ class _LiveScanCardState extends State<_LiveScanCard>
     _ac = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1100),
-    )..repeat(reverse: true);
-    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted && widget.scanning) setState(() {});
-    });
+    );
+    // Pulse-Animation + Sekundentimer NUR bei aktivem Scan — sonst läuft der
+    // Ticker (und damit ein Frame-Callback pro Vsync) dauerhaft im Leerlauf.
+    _syncScanState();
+  }
+
+  @override
+  void didUpdateWidget(covariant _LiveScanCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scanning != widget.scanning) _syncScanState();
+  }
+
+  // Startet/stoppt Pulse-Animation und Laufzeit-Timer passend zum Scan-Status.
+  void _syncScanState() {
+    if (widget.scanning) {
+      if (!_ac.isAnimating) _ac.repeat(reverse: true);
+      _tick ??= Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted && widget.scanning) setState(() {});
+      });
+    } else {
+      _ac.stop();
+      _tick?.cancel();
+      _tick = null;
+    }
   }
 
   @override
