@@ -4,7 +4,7 @@ import 'package:mensaena/services/weather_service.dart';
 void main() {
   group('WeatherDay', () {
     test('emoji for clear sky', () {
-      const d = WeatherDay(
+      final d = WeatherDay(
         date: _epoch,
         tempMin: 10,
         tempMax: 20,
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('emoji for thunderstorm', () {
-      const d = WeatherDay(
+      final d = WeatherDay(
         date: _epoch,
         tempMin: 12,
         tempMax: 18,
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('labelKey for snow', () {
-      const d = WeatherDay(
+      final d = WeatherDay(
         date: _epoch,
         tempMin: -2,
         tempMax: 1,
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('labelKey for fog', () {
-      const d = WeatherDay(
+      final d = WeatherDay(
         date: _epoch,
         tempMin: 5,
         tempMax: 9,
@@ -77,4 +77,4 @@ void main() {
   });
 }
 
-const _epoch = DateTime.utc(2026, 1, 1);
+final _epoch = DateTime.utc(2026, 1, 1);

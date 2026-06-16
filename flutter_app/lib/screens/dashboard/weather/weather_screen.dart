@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -47,7 +46,7 @@ class WeatherScreen extends ConsumerWidget {
     return DashboardScaffold(
       title: 'weather.title'.tr(),
       currentRoute: '/dashboard/weather',
-      actions: [
+      appBarActions: [
         IconButton(
           icon: const Icon(LucideIcons.refreshCw, size: 18),
           tooltip: 'weather.refresh'.tr(),
