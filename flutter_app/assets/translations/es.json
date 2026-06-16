@@ -2330,7 +2330,12 @@
     "subtitle": "Participa, acumula puntos, gana insignias.",
     "joinSuccess": "¡Ya estás dentro!",
     "joinFailed": "No se pudo unir.",
-    "completed": "✓ Hecho"
+    "completed": "✓ Hecho",
+    "updateProgress": "Actualizar progreso",
+    "progressLabel": "Tu progreso: {pct}%",
+    "progressUpdated": "Progreso guardado.",
+    "progressFailed": "No se pudo guardar el progreso.",
+    "autoCompleted": "¡Reto completado! 🎉"
   },
   "invite": {
     "title": "Invitar",

@@ -2329,7 +2329,12 @@
     "subtitle": "Katıl, puan kazan, rozetler edin.",
     "joinSuccess": "Katıldın!",
     "joinFailed": "Katılım başarısız oldu.",
-    "completed": "✓ Tamamlandı"
+    "completed": "✓ Tamamlandı",
+    "updateProgress": "İlerlemeyi güncelle",
+    "progressLabel": "İlerlemeniz: {pct}%",
+    "progressUpdated": "İlerleme kaydedildi.",
+    "progressFailed": "İlerleme kaydedilemedi.",
+    "autoCompleted": "Meydan okuma tamamlandı! 🎉"
   },
   "invite": {
     "title": "Davet et",
