@@ -83,6 +83,8 @@ jobs:
 
             1. Lies ZUERST die Datei .godmode_cierror.txt — das sind die echten
                CI-Fehler (flutter analyze / Build). NIEMALS diese Datei committen.
+               Lies auch docs/godmode/conventions.md (echte Symbole + bekannte
+               Stolperfallen) — oft steht die Lösung dort schon.
             2. Ursprüngliche Aufgabe (Kontext, NICHT neu umsetzen):
                === AUFGABE ===
                ${{ env.INSTRUCTION }}
@@ -96,7 +98,11 @@ jobs:
                existierende Symbole (per Grep verifizieren, nicht raten).
                Prüfe außerdem `python3 scripts/check_stream_limits.py`
                und `python3 scripts/check_ui_supabase.py` (keine Verstöße).
-            4. Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
+            4. LERNEN: War die Ursache ein NEUER, wiederkehrender Symbol-/API-
+               Fehlertyp, der noch nicht in docs/godmode/conventions.md steht,
+               ergänze dort eine knappe Zeile in der Stolperfallen-Tabelle
+               (Falsch → Richtig). So vermeidet der Agent ihn künftig.
+            5. Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
                KEINEN neuen PR (der PR existiert bereits).
 
             Regeln (CLAUDE.md): i18n in allen 7 JSON-Dateien; Supabase-Streams
