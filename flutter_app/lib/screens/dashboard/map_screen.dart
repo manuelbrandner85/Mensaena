@@ -404,7 +404,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         final plng = (el['lon'] as num?)?.toDouble();
         if (plat == null || plng == null) continue;
         final cat =
-            _PoiCategory.fromTags(tags is Map ? tags : const <dynamic, dynamic>{});
+            _PoiCategory.fromTags(tags is Map ? Map<String, dynamic>.from(tags) : const <String, dynamic>{});
         if (cat == null) continue;
         final name = (tags is Map ? tags['name'] : null) as String?;
         places.add(_PoiPlace(
@@ -2100,7 +2100,7 @@ class _PoiCategory {
       all.firstWhere((c) => c.key == k, orElse: () => all.first);
 
   /// Ordnet ein Overpass-Element anhand seiner Tags einer Kategorie zu.
-  static _PoiCategory? fromTags(Map tags) {
+  static _PoiCategory? fromTags(Map<String, dynamic> tags) {
     for (final c in all) {
       if (tags[c.osmKey] == c.osmValue) return c;
     }
