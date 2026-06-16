@@ -128,7 +128,7 @@ void main() {
     });
 
     test('lässt leere optionale Felder weg', () {
-      final r = SafetyReport(
+      const r = SafetyReport(
         id: '',
         reporterId: null,
         title: 'Nur Titel',

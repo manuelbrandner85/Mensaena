@@ -2107,7 +2107,7 @@ class _StatusBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.elevated,
         border: Border(
           bottom: BorderSide(color: AppColors.line),

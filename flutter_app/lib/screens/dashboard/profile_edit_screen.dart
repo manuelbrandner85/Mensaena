@@ -1290,7 +1290,7 @@ class _Hero extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: isGeneratingAvatar ? null : onAiAvatar,
                   icon: isGeneratingAvatar
-                      ? SizedBox(
+                      ? const SizedBox(
                           width: 14,
                           height: 14,
                           child: CircularProgressIndicator(
