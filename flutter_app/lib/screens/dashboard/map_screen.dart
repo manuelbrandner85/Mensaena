@@ -122,6 +122,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   final Map<String, ({DateTime at, List<_AccessiblePlace> places})>
       _a11yCache = {};
 
+  // POI-Layer (Overpass): Sitzbänke, Toiletten, Trinkwasser, Apotheken,
+  // Defibrillatoren. Mehrfachauswahl über eine Chip-Leiste; Default leer
+  // (Layer aus). Cache pro (center,radius,kategorien)-Schlüssel, TTL 10min,
+  // max 20 Einträge — gleiches Muster wie der Barrierefrei-Layer.
+  final Set<String> _activePoiCategories = {};
+  bool _poiLoading = false;
+  List<_PoiPlace> _poiPlaces = const [];
+  final Map<String, ({DateTime at, List<_PoiPlace> places})> _poiCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -348,6 +357,79 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       });
     } catch (_) {
       if (mounted) setState(() => _a11yLoading = false);
+    }
+  }
+
+  /// POI-Layer: kombinierte Overpass-Query für alle aktiven Kategorien im
+  /// aktuellen Center+Radius. Server-Filter via Tag-Selektoren, Cache mit
+  /// TTL 10min. Bei "Alle" (0) ein sinnvoller Umkreis statt Welt-Query.
+  Future<void> _loadPois() async {
+    if (_activePoiCategories.isEmpty) {
+      if (mounted) setState(() => _poiPlaces = const []);
+      return;
+    }
+    final lat = _center.latitude;
+    final lng = _center.longitude;
+    final radiusM = (_radiusKm == 0 ? 25 : _radiusKm) * 1000;
+    final cats = _activePoiCategories.toList()..sort();
+    final cacheKey =
+        '${lat.toStringAsFixed(2)},${lng.toStringAsFixed(2)}:$radiusM:${cats.join(',')}';
+    final hit = _poiCache[cacheKey];
+    if (hit != null &&
+        DateTime.now().difference(hit.at) < const Duration(minutes: 10)) {
+      setState(() => _poiPlaces = hit.places);
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _poiLoading = true);
+    try {
+      final selectors = cats
+          .map((c) => _PoiCategory.byKey(c).overpassSelector(radiusM, lat, lng))
+          .join();
+      final q = '[out:json][timeout:25];($selectors);out body 200;';
+      final uri = Uri.parse('https://overpass-api.de/api/interpreter');
+      final resp = await http
+          .post(uri, body: {'data': q}).timeout(const Duration(seconds: 20));
+      if (resp.statusCode != 200) {
+        if (mounted) setState(() => _poiLoading = false);
+        return;
+      }
+      final json = jsonDecode(resp.body) as Map<String, dynamic>;
+      final elements = (json['elements'] as List?) ?? const <dynamic>[];
+      final places = <_PoiPlace>[];
+      for (final el in elements) {
+        if (el is! Map) continue;
+        final tags = el['tags'];
+        final plat = (el['lat'] as num?)?.toDouble();
+        final plng = (el['lon'] as num?)?.toDouble();
+        if (plat == null || plng == null) continue;
+        final cat =
+            _PoiCategory.fromTags(tags is Map ? tags : const <dynamic, dynamic>{});
+        if (cat == null) continue;
+        final name = (tags is Map ? tags['name'] : null) as String?;
+        places.add(_PoiPlace(
+          lat: plat,
+          lng: plng,
+          name: (name != null && name.isNotEmpty)
+              ? name
+              : 'map.poi.unnamed'.tr(),
+          category: cat.key,
+        ));
+      }
+      // Cache trimmen damit kein Memory-Leak entsteht.
+      if (_poiCache.length > 20) {
+        final oldest = _poiCache.entries.toList()
+          ..sort((a, b) => a.value.at.compareTo(b.value.at));
+        _poiCache.remove(oldest.first.key);
+      }
+      _poiCache[cacheKey] = (at: DateTime.now(), places: places);
+      if (!mounted) return;
+      setState(() {
+        _poiPlaces = places;
+        _poiLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _poiLoading = false);
     }
   }
 
@@ -770,6 +852,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       _center = newCenter;
                     });
                     _loadPosts();
+                    if (_activePoiCategories.isNotEmpty) _loadPois();
                   });
                 }
               },
@@ -907,6 +990,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               ),
                             ),
                           ),
+                      // POI-Layer (Overpass): farbige Kreise mit Emoji je
+                      // Kategorie — identischer Stil wie die Post-Marker.
+                      for (final p in _poiPlaces)
+                        Marker(
+                          point: LatLng(p.lat, p.lng),
+                          width: 30,
+                          height: 30,
+                          child: GestureDetector(
+                            onTap: () => _openPoiSheet(p),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: p.cat.color.withValues(alpha: 0.92),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: AppColors.voidColor, width: 2),
+                              ),
+                              child: Text(p.cat.emoji,
+                                  style: const TextStyle(fontSize: 13)),
+                            ),
+                          ),
+                        ),
                     ],
                     builder: (context, mks) {
                       return Container(
@@ -960,6 +1065,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 final zoom = _radiusZoom[km] ?? _zoom;
                 _mapController.move(_center, zoom);
                 await _loadPosts();
+                if (_activePoiCategories.isNotEmpty) await _loadPois();
               },
             ),
           ),
@@ -978,6 +1084,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     _activeTypes.add(type);
                   }
                 });
+              },
+            ),
+          ),
+          // ── POI-Layer Chip-Leiste (Sitzbänke, Toiletten, …) ──────
+          Positioned(
+            top: 152,
+            left: 12,
+            right: 110,
+            child: _PoiLayerBar(
+              active: _activePoiCategories,
+              loading: _poiLoading,
+              onToggle: (key) {
+                setState(() {
+                  if (_activePoiCategories.contains(key)) {
+                    _activePoiCategories.remove(key);
+                  } else {
+                    _activePoiCategories.add(key);
+                  }
+                });
+                _loadPois();
               },
             ),
           ),
@@ -1892,6 +2018,234 @@ extension _A11ySheet on _MapScreenState {
                 'map.a11y.source'.tr(),
                 style: AppTypography.caption(),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── POI-Layer (Overpass) ──────────────────────────────────────────
+/// Konfiguration einer POI-Kategorie: OSM-Tag (key=value), Marker-Emoji,
+/// Farbe und Übersetzungs-Key. Alle Werte const → die `all`-Liste kann
+/// const sein (gleiches Muster wie _CategoryFilterBar._entries).
+class _PoiCategory {
+  const _PoiCategory({
+    required this.key,
+    required this.emoji,
+    required this.labelKey,
+    required this.color,
+    required this.osmKey,
+    required this.osmValue,
+  });
+
+  final String key; // interner Schlüssel, z. B. 'bench'
+  final String emoji;
+  final String labelKey; // i18n-Key, z. B. 'map.poi.cat.bench'
+  final Color color;
+  final String osmKey; // 'amenity' | 'emergency'
+  final String osmValue; // 'bench' | 'toilets' | …
+
+  String get label => labelKey.tr();
+
+  /// Overpass-Node-Selektor für die kombinierte Query.
+  String overpassSelector(int radiusM, double lat, double lng) =>
+      'node["$osmKey"="$osmValue"](around:$radiusM,$lat,$lng);';
+
+  static const List<_PoiCategory> all = [
+    _PoiCategory(
+      key: 'bench',
+      emoji: '🪑',
+      labelKey: 'map.poi.cat.bench',
+      color: AppColors.tealSoft,
+      osmKey: 'amenity',
+      osmValue: 'bench',
+    ),
+    _PoiCategory(
+      key: 'toilets',
+      emoji: '🚻',
+      labelKey: 'map.poi.cat.toilets',
+      color: Color(0xFF60A5FA),
+      osmKey: 'amenity',
+      osmValue: 'toilets',
+    ),
+    _PoiCategory(
+      key: 'drinking_water',
+      emoji: '🚰',
+      labelKey: 'map.poi.cat.drinking_water',
+      color: AppColors.teal,
+      osmKey: 'amenity',
+      osmValue: 'drinking_water',
+    ),
+    _PoiCategory(
+      key: 'pharmacy',
+      emoji: '💊',
+      labelKey: 'map.poi.cat.pharmacy',
+      color: AppColors.leben,
+      osmKey: 'amenity',
+      osmValue: 'pharmacy',
+    ),
+    _PoiCategory(
+      key: 'defibrillator',
+      emoji: '❤️',
+      labelKey: 'map.poi.cat.defibrillator',
+      color: AppColors.herzrot,
+      osmKey: 'emergency',
+      osmValue: 'defibrillator',
+    ),
+  ];
+
+  static _PoiCategory byKey(String k) =>
+      all.firstWhere((c) => c.key == k, orElse: () => all.first);
+
+  /// Ordnet ein Overpass-Element anhand seiner Tags einer Kategorie zu.
+  static _PoiCategory? fromTags(Map tags) {
+    for (final c in all) {
+      if (tags[c.osmKey] == c.osmValue) return c;
+    }
+    return null;
+  }
+}
+
+class _PoiPlace {
+  const _PoiPlace({
+    required this.lat,
+    required this.lng,
+    required this.name,
+    required this.category,
+  });
+
+  final double lat;
+  final double lng;
+  final String name;
+  final String category;
+
+  _PoiCategory get cat => _PoiCategory.byKey(category);
+}
+
+/// Chip-Leiste zur Layer-Auswahl (Mehrfachauswahl). Horizontal scrollbar,
+/// aktive Chips heben sich in ihrer Kategorie-Farbe ab.
+class _PoiLayerBar extends StatelessWidget {
+  const _PoiLayerBar({
+    required this.active,
+    required this.loading,
+    required this.onToggle,
+  });
+
+  final Set<String> active;
+  final bool loading;
+  final ValueChanged<String> onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: AppColors.deep.withValues(alpha: 0.92),
+        border: Border.all(color: AppColors.lineActive),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8, left: 2),
+              child: loading
+                  ? const SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 1.6, color: AppColors.amber),
+                    )
+                  : Text('map.poi.barLabel'.tr(),
+                      style: AppTypography.label(size: 9)),
+            ),
+            for (final c in _PoiCategory.all) ...[
+              _CategoryChip(
+                type: c.key,
+                emoji: c.emoji,
+                label: c.label,
+                color: c.color,
+                isActive: active.contains(c.key),
+                onTap: () => onToggle(c.key),
+              ),
+              const SizedBox(width: 6),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+extension _PoiSheet on _MapScreenState {
+  void _openPoiSheet(_PoiPlace p) {
+    final cat = p.cat;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.sheetBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: cat.color,
+                      shape: BoxShape.circle,
+                    ),
+                    child:
+                        Text(cat.emoji, style: const TextStyle(fontSize: 16)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          p.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.display(
+                              size: 16, color: AppColors.ink),
+                        ),
+                        Text(cat.label,
+                            style:
+                                AppTypography.body(size: 12, color: cat.color)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _openDirections(ctx, p.lat, p.lng),
+                  icon: const Icon(LucideIcons.navigation, size: 16),
+                  label: Text('map.routeTo'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    side: BorderSide(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text('map.poi.source'.tr(), style: AppTypography.caption()),
             ],
           ),
         ),

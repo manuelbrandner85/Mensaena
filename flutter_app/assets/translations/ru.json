@@ -2904,7 +2904,19 @@
     "toggleEvents": "События вкл/выкл",
     "routeTo": "Маршрут сюда",
     "routeFailed": "Не удалось открыть приложение карт.",
-    "radiusAll": "Все"
+    "radiusAll": "Все",
+    "poi": {
+      "barLabel": "Места",
+      "unnamed": "Без названия",
+      "source": "Источник: OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Скамейка",
+        "toilets": "Туалет",
+        "drinking_water": "Питьевая вода",
+        "pharmacy": "Аптека",
+        "defibrillator": "Дефибриллятор"
+      }
+    }
   },
   "calendar": {
     "noEvents": "В календаре нет событий.",

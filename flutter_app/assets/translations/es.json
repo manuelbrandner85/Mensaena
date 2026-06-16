@@ -2905,7 +2905,19 @@
     "toggleEvents": "Mostrar/ocultar eventos",
     "routeTo": "Cómo llegar",
     "routeFailed": "No se pudo abrir la app de mapas.",
-    "radiusAll": "Todos"
+    "radiusAll": "Todos",
+    "poi": {
+      "barLabel": "Lugares",
+      "unnamed": "Lugar sin nombre",
+      "source": "Fuente: OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Banco",
+        "toilets": "Aseo",
+        "drinking_water": "Agua potable",
+        "pharmacy": "Farmacia",
+        "defibrillator": "Desfibrilador"
+      }
+    }
   },
   "calendar": {
     "noEvents": "No hay eventos en el calendario.",

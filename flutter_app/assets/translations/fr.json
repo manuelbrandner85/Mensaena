@@ -2905,7 +2905,19 @@
     "toggleEvents": "Afficher/masquer événements",
     "routeTo": "Itinéraire",
     "routeFailed": "Impossible d'ouvrir l'app de cartes.",
-    "radiusAll": "Tous"
+    "radiusAll": "Tous",
+    "poi": {
+      "barLabel": "Lieux",
+      "unnamed": "Lieu sans nom",
+      "source": "Source : OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Banc",
+        "toilets": "Toilettes",
+        "drinking_water": "Eau potable",
+        "pharmacy": "Pharmacie",
+        "defibrillator": "Défibrillateur"
+      }
+    }
   },
   "calendar": {
     "noEvents": "Aucun événement dans l'agenda.",

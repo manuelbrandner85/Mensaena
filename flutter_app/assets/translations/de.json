@@ -2904,7 +2904,19 @@
     "toggleEvents": "Events ein/aus",
     "routeTo": "Route hierher",
     "routeFailed": "Karten-App konnte nicht geöffnet werden.",
-    "radiusAll": "Alle"
+    "radiusAll": "Alle",
+    "poi": {
+      "barLabel": "Orte",
+      "unnamed": "Ort ohne Namen",
+      "source": "Quelle: OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Sitzbank",
+        "toilets": "Toilette",
+        "drinking_water": "Trinkwasser",
+        "pharmacy": "Apotheke",
+        "defibrillator": "Defibrillator"
+      }
+    }
   },
   "calendar": {
     "noEvents": "Keine Events im Kalender.",

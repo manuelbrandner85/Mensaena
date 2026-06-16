@@ -2904,7 +2904,19 @@
     "toggleEvents": "Etkinlikleri aç/kapat",
     "routeTo": "Yol tarifi",
     "routeFailed": "Harita uygulaması açılamadı.",
-    "radiusAll": "Tümü"
+    "radiusAll": "Tümü",
+    "poi": {
+      "barLabel": "Yerler",
+      "unnamed": "İsimsiz yer",
+      "source": "Kaynak: OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Bank",
+        "toilets": "Tuvalet",
+        "drinking_water": "İçme suyu",
+        "pharmacy": "Eczane",
+        "defibrillator": "Defibrilatör"
+      }
+    }
   },
   "calendar": {
     "noEvents": "Takvimde etkinlik yok.",

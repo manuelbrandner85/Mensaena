@@ -2905,7 +2905,19 @@
     "toggleEvents": "Toggle events",
     "routeTo": "Directions",
     "routeFailed": "Could not open maps app.",
-    "radiusAll": "All"
+    "radiusAll": "All",
+    "poi": {
+      "barLabel": "Places",
+      "unnamed": "Unnamed place",
+      "source": "Source: OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Bench",
+        "toilets": "Toilet",
+        "drinking_water": "Drinking water",
+        "pharmacy": "Pharmacy",
+        "defibrillator": "Defibrillator"
+      }
+    }
   },
   "calendar": {
     "noEvents": "No events in calendar.",

@@ -2905,7 +2905,19 @@
     "toggleEvents": "Mostra/nascondi eventi",
     "routeTo": "Indicazioni",
     "routeFailed": "Impossibile aprire l'app mappe.",
-    "radiusAll": "Tutti"
+    "radiusAll": "Tutti",
+    "poi": {
+      "barLabel": "Luoghi",
+      "unnamed": "Luogo senza nome",
+      "source": "Fonte: OpenStreetMap (Overpass)",
+      "cat": {
+        "bench": "Panchina",
+        "toilets": "Bagno",
+        "drinking_water": "Acqua potabile",
+        "pharmacy": "Farmacia",
+        "defibrillator": "Defibrillatore"
+      }
+    }
   },
   "calendar": {
     "noEvents": "Nessun evento in calendario.",
