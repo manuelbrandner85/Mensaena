@@ -1771,7 +1771,78 @@
     "urgencyCritical": "Critique",
     "meetingPoint": "Point de rencontre (p. ex. gare, café …)",
     "timebankHours": "Heures de banque de temps (optionnel)",
-    "timebankHoursHint": "p. ex. 2.5"
+    "timebankHoursHint": "p. ex. 2.5",
+    "types": {
+      "animals": {
+        "animal": "Publication sur les animaux",
+        "rescue": "Animal trouvé / Urgence",
+        "community": "Question sur l'aide aux animaux"
+      },
+      "housing": {
+        "housing": "Proposer un logement",
+        "rescue": "Urgence logement",
+        "crisis": "Hébergement de crise"
+      },
+      "mobility": {
+        "mobility": "Proposer un trajet",
+        "rescue": "Cherche un trajet",
+        "sharing": "Aide au transport"
+      },
+      "sharing": {
+        "sharing": "Partager quelque chose",
+        "rescue": "Cherche à emprunter"
+      },
+      "harvest": {
+        "sharing": "Partager la récolte",
+        "community": "Cherche aide pour la récolte",
+        "rescue": "Sauver des aliments"
+      },
+      "community": {
+        "community": "Idée / Suggestion",
+        "rescue": "Question à la communauté"
+      },
+      "knowledge": {
+        "community": "Guide / Tutoriel",
+        "sharing": "Proposer un cours",
+        "rescue": "Cherche des connaissances"
+      },
+      "skills": {
+        "sharing": "Proposer une compétence",
+        "rescue": "Cherche une compétence",
+        "community": "Mentorat"
+      },
+      "jobs": {
+        "job": "Proposer un emploi",
+        "rescue": "Cherche un emploi",
+        "community": "Aide bénévole"
+      },
+      "rescuer": {
+        "food": "Sauver des aliments",
+        "everyday": "Sauver des vêtements",
+        "sharing": "Sauver des objets"
+      }
+    },
+    "categories": {
+      "animals": "Animaux",
+      "general": "Général",
+      "housing": "Logement",
+      "mobility": "Mobilité",
+      "tools": "Outils",
+      "books": "Livres",
+      "devices": "Appareils",
+      "kitchen": "Cuisine",
+      "sports": "Sport",
+      "food": "Alimentation",
+      "community": "Communauté",
+      "knowledge": "Savoir",
+      "skills": "Compétences",
+      "fulltime": "Temps plein",
+      "parttime": "Temps partiel",
+      "minijob": "Mini-emploi",
+      "volunteer": "Bénévolat",
+      "everyday": "Vêtements",
+      "sharing": "Objets"
+    }
   },
   "crisis": {
     "error": "Erreur : {error}",

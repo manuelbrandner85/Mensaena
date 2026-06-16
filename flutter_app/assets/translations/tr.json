@@ -1770,7 +1770,78 @@
     "urgencyCritical": "Kritik",
     "meetingPoint": "Buluşma noktası (örn. istasyon, kafe …)",
     "timebankHours": "Zaman bankası saatleri (isteğe bağlı)",
-    "timebankHoursHint": "örn. 2.5"
+    "timebankHoursHint": "örn. 2.5",
+    "types": {
+      "animals": {
+        "animal": "Hayvan gönderisi",
+        "rescue": "Bulunan hayvan / Acil durum",
+        "community": "Hayvan yardımı hakkında soru"
+      },
+      "housing": {
+        "housing": "Konut teklifi",
+        "rescue": "Konut acil durumu",
+        "crisis": "Kriz konutu"
+      },
+      "mobility": {
+        "mobility": "Yolculuk teklifi",
+        "rescue": "Yolculuk aranıyor",
+        "sharing": "Taşıma yardımı"
+      },
+      "sharing": {
+        "sharing": "Bir şey paylaş",
+        "rescue": "Ödünç almak istiyorum"
+      },
+      "harvest": {
+        "sharing": "Hasatı paylaş",
+        "community": "Hasat yardımcısı arıyorum",
+        "rescue": "Yiyecek kurtar"
+      },
+      "community": {
+        "community": "Fikir / Öneri",
+        "rescue": "Topluluk için soru"
+      },
+      "knowledge": {
+        "community": "Rehber / Kılavuz",
+        "sharing": "Kurs teklifi",
+        "rescue": "Bilgi arıyorum"
+      },
+      "skills": {
+        "sharing": "Beceri teklif et",
+        "rescue": "Beceri arıyorum",
+        "community": "Mentorluk"
+      },
+      "jobs": {
+        "job": "İş teklifi",
+        "rescue": "İş arıyorum",
+        "community": "Gönüllü yardım"
+      },
+      "rescuer": {
+        "food": "Yiyecek kurtar",
+        "everyday": "Giysi kurtar",
+        "sharing": "Eşya kurtar"
+      }
+    },
+    "categories": {
+      "animals": "Hayvanlar",
+      "general": "Genel",
+      "housing": "Konut",
+      "mobility": "Ulaşım",
+      "tools": "Aletler",
+      "books": "Kitaplar",
+      "devices": "Cihazlar",
+      "kitchen": "Mutfak",
+      "sports": "Spor",
+      "food": "Yiyecek",
+      "community": "Topluluk",
+      "knowledge": "Bilgi",
+      "skills": "Beceriler",
+      "fulltime": "Tam zamanlı",
+      "parttime": "Yarı zamanlı",
+      "minijob": "Mini iş",
+      "volunteer": "Gönüllülük",
+      "everyday": "Giysi",
+      "sharing": "Eşya"
+    }
   },
   "crisis": {
     "error": "Hata: {error}",

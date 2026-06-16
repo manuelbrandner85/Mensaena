@@ -37,11 +37,14 @@ class ModuleCreateType {
   const ModuleCreateType({
     required this.value,
     required this.label,
+    required this.emoji,
     this.category,
   });
 
   final String value;
+  /// i18n-Key, z. B. 'create.types.animals.animal' — mit .tr() rendern.
   final String label;
+  final String emoji;
   /// Wenn gesetzt, wird category automatisch auf diesen Wert gesperrt.
   final String? category;
 }
@@ -49,6 +52,7 @@ class ModuleCreateType {
 class ModuleCreateCategory {
   const ModuleCreateCategory({required this.value, required this.label});
   final String value;
+  /// i18n-Key, z. B. 'create.categories.animals' — mit .tr() rendern.
   final String label;
 }
 
@@ -64,19 +68,24 @@ class ModuleCreateConfigs {
     accentColor: Color(0xFFEC4899),
     createTypes: [
       ModuleCreateType(
-          value: 'animal', label: '🐾 Tier-Beitrag', category: 'animals'),
+          value: 'animal',
+          label: 'create.types.animals.animal',
+          emoji: '🐾',
+          category: 'animals'),
       ModuleCreateType(
           value: 'rescue',
-          label: '🆘 Fundtier / Notfall',
+          label: 'create.types.animals.rescue',
+          emoji: '🆘',
           category: 'animals'),
       ModuleCreateType(
           value: 'community',
-          label: '💬 Frage zur Tierhilfe',
+          label: 'create.types.animals.community',
+          emoji: '💬',
           category: 'animals'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'animals', label: 'Tiere'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'animals', label: 'create.categories.animals'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/animals',
   );
@@ -88,13 +97,22 @@ class ModuleCreateConfigs {
     icon: LucideIcons.home,
     accentColor: Color(0xFF60A5FA),
     createTypes: [
-      ModuleCreateType(value: 'housing', label: '🏠 Wohnung anbieten'),
-      ModuleCreateType(value: 'rescue', label: '🆘 Wohnungsnot'),
-      ModuleCreateType(value: 'crisis', label: '⚠️ Krisenwohnung'),
+      ModuleCreateType(
+          value: 'housing',
+          label: 'create.types.housing.housing',
+          emoji: '🏠'),
+      ModuleCreateType(
+          value: 'rescue',
+          label: 'create.types.housing.rescue',
+          emoji: '🆘'),
+      ModuleCreateType(
+          value: 'crisis',
+          label: 'create.types.housing.crisis',
+          emoji: '⚠️'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'housing', label: 'Wohnen'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'housing', label: 'create.categories.housing'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/housing',
   );
@@ -106,14 +124,23 @@ class ModuleCreateConfigs {
     icon: LucideIcons.car,
     accentColor: Color(0xFF818CF8),
     createTypes: [
-      ModuleCreateType(value: 'mobility', label: '🚗 Mitfahrt anbieten'),
-      ModuleCreateType(value: 'rescue', label: '🆘 Mitfahrt gesucht'),
       ModuleCreateType(
-          value: 'sharing', label: '📦 Transport-Hilfe', category: 'mobility'),
+          value: 'mobility',
+          label: 'create.types.mobility.mobility',
+          emoji: '🚗'),
+      ModuleCreateType(
+          value: 'rescue',
+          label: 'create.types.mobility.rescue',
+          emoji: '🆘'),
+      ModuleCreateType(
+          value: 'sharing',
+          label: 'create.types.mobility.sharing',
+          emoji: '📦',
+          category: 'mobility'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'mobility', label: 'Mobilität'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'mobility', label: 'create.categories.mobility'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/mobility',
   );
@@ -125,16 +152,22 @@ class ModuleCreateConfigs {
     icon: LucideIcons.repeat,
     accentColor: AppColors.teal,
     createTypes: [
-      ModuleCreateType(value: 'sharing', label: '🔄 Teile etwas'),
-      ModuleCreateType(value: 'rescue', label: '🔍 Suche zum Ausleihen'),
+      ModuleCreateType(
+          value: 'sharing',
+          label: 'create.types.sharing.sharing',
+          emoji: '🔄'),
+      ModuleCreateType(
+          value: 'rescue',
+          label: 'create.types.sharing.rescue',
+          emoji: '🔍'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'tools', label: 'Werkzeug'),
-      ModuleCreateCategory(value: 'books', label: 'Bücher'),
-      ModuleCreateCategory(value: 'devices', label: 'Geräte'),
-      ModuleCreateCategory(value: 'kitchen', label: 'Küche'),
-      ModuleCreateCategory(value: 'sports', label: 'Sport'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'tools', label: 'create.categories.tools'),
+      ModuleCreateCategory(value: 'books', label: 'create.categories.books'),
+      ModuleCreateCategory(value: 'devices', label: 'create.categories.devices'),
+      ModuleCreateCategory(value: 'kitchen', label: 'create.categories.kitchen'),
+      ModuleCreateCategory(value: 'sports', label: 'create.categories.sports'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/sharing',
   );
@@ -147,19 +180,24 @@ class ModuleCreateConfigs {
     accentColor: AppColors.leben,
     createTypes: [
       ModuleCreateType(
-          value: 'sharing', label: '🌾 Ernte teilen', category: 'food'),
+          value: 'sharing',
+          label: 'create.types.harvest.sharing',
+          emoji: '🌾',
+          category: 'food'),
       ModuleCreateType(
           value: 'community',
-          label: '🤝 Erntehelfer gesucht',
+          label: 'create.types.harvest.community',
+          emoji: '🤝',
           category: 'food'),
       ModuleCreateType(
           value: 'rescue',
-          label: '🍎 Lebensmittel retten',
+          label: 'create.types.harvest.rescue',
+          emoji: '🍎',
           category: 'food'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'food', label: 'Lebensmittel'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'food', label: 'create.categories.food'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/harvest',
   );
@@ -171,12 +209,18 @@ class ModuleCreateConfigs {
     icon: LucideIcons.users,
     accentColor: Color(0xFFC084FC),
     createTypes: [
-      ModuleCreateType(value: 'community', label: '💡 Idee / Vorschlag'),
-      ModuleCreateType(value: 'rescue', label: '❓ Frage an die Community'),
+      ModuleCreateType(
+          value: 'community',
+          label: 'create.types.community.community',
+          emoji: '💡'),
+      ModuleCreateType(
+          value: 'rescue',
+          label: 'create.types.community.rescue',
+          emoji: '❓'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'community', label: 'Community'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'community', label: 'create.categories.community'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/community',
   );
@@ -190,17 +234,24 @@ class ModuleCreateConfigs {
     createTypes: [
       ModuleCreateType(
           value: 'community',
-          label: '📚 Anleitung / Guide',
+          label: 'create.types.knowledge.community',
+          emoji: '📚',
           category: 'knowledge'),
       ModuleCreateType(
-          value: 'sharing', label: '🎓 Kurs anbieten', category: 'knowledge'),
+          value: 'sharing',
+          label: 'create.types.knowledge.sharing',
+          emoji: '🎓',
+          category: 'knowledge'),
       ModuleCreateType(
-          value: 'rescue', label: '❓ Wissen gesucht', category: 'knowledge'),
+          value: 'rescue',
+          label: 'create.types.knowledge.rescue',
+          emoji: '❓',
+          category: 'knowledge'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'knowledge', label: 'Wissen'),
-      ModuleCreateCategory(value: 'skills', label: 'Skills'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'knowledge', label: 'create.categories.knowledge'),
+      ModuleCreateCategory(value: 'skills', label: 'create.categories.skills'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/knowledge',
   );
@@ -213,16 +264,25 @@ class ModuleCreateConfigs {
     accentColor: AppColors.bronze,
     createTypes: [
       ModuleCreateType(
-          value: 'sharing', label: '⭐ Skill anbieten', category: 'skills'),
+          value: 'sharing',
+          label: 'create.types.skills.sharing',
+          emoji: '⭐',
+          category: 'skills'),
       ModuleCreateType(
-          value: 'rescue', label: '🔍 Skill suchen', category: 'skills'),
+          value: 'rescue',
+          label: 'create.types.skills.rescue',
+          emoji: '🔍',
+          category: 'skills'),
       ModuleCreateType(
-          value: 'community', label: '🎯 Mentoring', category: 'skills'),
+          value: 'community',
+          label: 'create.types.skills.community',
+          emoji: '🎯',
+          category: 'skills'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'skills', label: 'Skills'),
-      ModuleCreateCategory(value: 'knowledge', label: 'Wissen'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'skills', label: 'create.categories.skills'),
+      ModuleCreateCategory(value: 'knowledge', label: 'create.categories.knowledge'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/skills',
   );
@@ -234,16 +294,25 @@ class ModuleCreateConfigs {
     icon: LucideIcons.briefcase,
     accentColor: Color(0xFFA78BFA),
     createTypes: [
-      ModuleCreateType(value: 'job', label: '💼 Job anbieten'),
-      ModuleCreateType(value: 'rescue', label: '🔍 Job suchen'),
-      ModuleCreateType(value: 'community', label: '❤️ Ehrenamtliche Hilfe'),
+      ModuleCreateType(
+          value: 'job',
+          label: 'create.types.jobs.job',
+          emoji: '💼'),
+      ModuleCreateType(
+          value: 'rescue',
+          label: 'create.types.jobs.rescue',
+          emoji: '🔍'),
+      ModuleCreateType(
+          value: 'community',
+          label: 'create.types.jobs.community',
+          emoji: '❤️'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'fulltime', label: 'Vollzeit'),
-      ModuleCreateCategory(value: 'parttime', label: 'Teilzeit'),
-      ModuleCreateCategory(value: 'minijob', label: 'Mini-Job'),
-      ModuleCreateCategory(value: 'volunteer', label: 'Ehrenamt'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'fulltime', label: 'create.categories.fulltime'),
+      ModuleCreateCategory(value: 'parttime', label: 'create.categories.parttime'),
+      ModuleCreateCategory(value: 'minijob', label: 'create.categories.minijob'),
+      ModuleCreateCategory(value: 'volunteer', label: 'create.categories.volunteer'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/jobs',
   );
@@ -256,19 +325,26 @@ class ModuleCreateConfigs {
     accentColor: Color(0xFFFB923C),
     createTypes: [
       ModuleCreateType(
-          value: 'rescue', label: '🍎 Lebensmittel retten', category: 'food'),
-      ModuleCreateType(
-          value: 'rescue', label: '👕 Kleidung retten', category: 'everyday'),
+          value: 'rescue',
+          label: 'create.types.rescuer.food',
+          emoji: '🍎',
+          category: 'food'),
       ModuleCreateType(
           value: 'rescue',
-          label: '📦 Gegenstände retten',
+          label: 'create.types.rescuer.everyday',
+          emoji: '👕',
+          category: 'everyday'),
+      ModuleCreateType(
+          value: 'rescue',
+          label: 'create.types.rescuer.sharing',
+          emoji: '📦',
           category: 'sharing'),
     ],
     categories: [
-      ModuleCreateCategory(value: 'food', label: 'Lebensmittel'),
-      ModuleCreateCategory(value: 'everyday', label: 'Kleidung'),
-      ModuleCreateCategory(value: 'sharing', label: 'Gegenstände'),
-      ModuleCreateCategory(value: 'general', label: 'Allgemein'),
+      ModuleCreateCategory(value: 'food', label: 'create.categories.food'),
+      ModuleCreateCategory(value: 'everyday', label: 'create.categories.everyday'),
+      ModuleCreateCategory(value: 'sharing', label: 'create.categories.sharing'),
+      ModuleCreateCategory(value: 'general', label: 'create.categories.general'),
     ],
     returnRoute: '/dashboard/rescuer',
   );
