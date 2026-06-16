@@ -2330,7 +2330,12 @@
     "subtitle": "Join in, collect points, earn badges.",
     "joinSuccess": "You're in!",
     "joinFailed": "Could not join.",
-    "completed": "✓ Done"
+    "completed": "✓ Done",
+    "updateProgress": "Update progress",
+    "progressLabel": "Your progress: {pct}%",
+    "progressUpdated": "Progress saved.",
+    "progressFailed": "Could not save progress.",
+    "autoCompleted": "Challenge completed! 🎉"
   },
   "invite": {
     "title": "Invite",

@@ -149,6 +149,36 @@ class ChallengesRepository {
     }
   }
 
+  /// Aktualisiert den Fortschritt des Users für eine Challenge.
+  /// Bei 100 % wird die Challenge automatisch als abgeschlossen markiert.
+  static Future<bool> updateProgress(
+      String challengeId, int progressPct) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    final pct = progressPct.clamp(0, 100);
+    try {
+      final Map<String, dynamic> data = {
+        'progress_pct': pct,
+        if (pct >= 100) ...{
+          'status': 'completed',
+          'completed_at': DateTime.now().toUtc().toIso8601String(),
+        } else ...{
+          'status': 'active',
+        },
+      };
+      await sb
+          .from('challenge_progress')
+          .update(data)
+          .eq('challenge_id', challengeId)
+          .eq('user_id', uid);
+      return true;
+    } catch (e) {
+      // ignore: avoid_print
+      print('ChallengesRepository.updateProgress failed: $e');
+      return false;
+    }
+  }
+
   static Future<List<BadgeModel>> listAllBadges() async {
     try {
       final rows = await sb

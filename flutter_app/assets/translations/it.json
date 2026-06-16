@@ -2330,7 +2330,12 @@
     "subtitle": "Partecipa, accumula punti, guadagna badge.",
     "joinSuccess": "Sei dentro!",
     "joinFailed": "Impossibile partecipare.",
-    "completed": "✓ Completato"
+    "completed": "✓ Completato",
+    "updateProgress": "Aggiorna progresso",
+    "progressLabel": "Il tuo progresso: {pct}%",
+    "progressUpdated": "Progresso salvato.",
+    "progressFailed": "Impossibile salvare il progresso.",
+    "autoCompleted": "Sfida completata! 🎉"
   },
   "invite": {
     "title": "Invita",

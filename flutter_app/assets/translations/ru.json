@@ -2329,7 +2329,12 @@
     "subtitle": "Участвуй, зарабатывай очки, получай значки.",
     "joinSuccess": "Вы участвуете!",
     "joinFailed": "Не удалось присоединиться.",
-    "completed": "✓ Выполнено"
+    "completed": "✓ Выполнено",
+    "updateProgress": "Обновить прогресс",
+    "progressLabel": "Ваш прогресс: {pct}%",
+    "progressUpdated": "Прогресс сохранён.",
+    "progressFailed": "Не удалось сохранить прогресс.",
+    "autoCompleted": "Задание выполнено! 🎉"
   },
   "invite": {
     "title": "Пригласить",

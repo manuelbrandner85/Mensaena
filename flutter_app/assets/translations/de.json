@@ -2329,7 +2329,12 @@
     "subtitle": "Mach mit, sammle Punkte, verdiene Badges.",
     "joinSuccess": "Du bist dabei!",
     "joinFailed": "Konnte nicht beitreten.",
-    "completed": "✓ Erledigt"
+    "completed": "✓ Erledigt",
+    "updateProgress": "Fortschritt aktualisieren",
+    "progressLabel": "Dein Fortschritt: {pct}%",
+    "progressUpdated": "Fortschritt gespeichert.",
+    "progressFailed": "Fortschritt konnte nicht gespeichert werden.",
+    "autoCompleted": "Challenge abgeschlossen! 🎉"
   },
   "invite": {
     "title": "Einladen",

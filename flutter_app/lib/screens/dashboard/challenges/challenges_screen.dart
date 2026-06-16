@@ -132,6 +132,34 @@ class ChallengesScreen extends ConsumerWidget {
                             ref.invalidate(myChallengeProgressProvider);
                           }
                         },
+                        onUpdateProgress: () async {
+                          final prog = progressMap[c.id];
+                          if (prog == null) return;
+                          final newPct =
+                              await _showProgressDialog(context, prog);
+                          if (newPct == null || !context.mounted) return;
+                          final ok = await ChallengesRepository.updateProgress(
+                              c.id, newPct);
+                          if (!context.mounted) return;
+                          final isCompleted = newPct >= 100;
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            backgroundColor: AppColors.surface,
+                            content: Text(
+                              ok
+                                  ? (isCompleted
+                                      ? 'challenges.autoCompleted'.tr()
+                                      : 'challenges.progressUpdated'.tr())
+                                  : 'challenges.progressFailed'.tr(),
+                              style: AppTypography.body(
+                                size: 13,
+                                color: AppColors.ink,
+                              ),
+                            ),
+                          ));
+                          if (ok) {
+                            ref.invalidate(myChallengeProgressProvider);
+                          }
+                        },
                       )),
                 ],
               );
@@ -139,6 +167,14 @@ class ChallengesScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<int?> _showProgressDialog(
+      BuildContext context, ChallengeProgress prog) async {
+    return showDialog<int>(
+      context: context,
+      builder: (_) => _ProgressDialog(initialPct: prog.progressPct),
     );
   }
 
@@ -166,16 +202,92 @@ class ChallengesScreen extends ConsumerWidget {
   }
 }
 
+class _ProgressDialog extends StatefulWidget {
+  const _ProgressDialog({required this.initialPct});
+  final int initialPct;
+
+  @override
+  State<_ProgressDialog> createState() => _ProgressDialogState();
+}
+
+class _ProgressDialogState extends State<_ProgressDialog> {
+  late double _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialPct.toDouble().clamp(0, 100);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = _value.round();
+    return AlertDialog(
+      backgroundColor: AppColors.elevated,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(
+        'challenges.updateProgress'.tr(),
+        style: AppTypography.body(
+          size: 16,
+          color: AppColors.ink,
+          weight: FontWeight.w700,
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'challenges.progressLabel'.tr(namedArgs: {'pct': '$pct'}),
+            style: AppTypography.mono(size: 28, color: AppColors.amber),
+          ),
+          const SizedBox(height: 12),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: AppColors.amber,
+              inactiveTrackColor: AppColors.line,
+              thumbColor: AppColors.amber,
+              overlayColor: AppColors.amberGlow,
+            ),
+            child: Slider(
+              value: _value,
+              min: 0,
+              max: 100,
+              divisions: 20,
+              onChanged: (v) => setState(() => _value = v),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('common.cancel'.tr(),
+              style: AppTypography.label(
+                  size: 13, color: AppColors.mute)),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(pct),
+          child: Text('common.save'.tr(),
+              style: AppTypography.label(
+                  size: 13, color: AppColors.amber)),
+        ),
+      ],
+    );
+  }
+}
+
 class _ChallengeTile extends StatelessWidget {
   const _ChallengeTile({
     required this.challenge,
     required this.onJoin,
+    required this.onUpdateProgress,
     this.progress,
   });
 
   final Challenge challenge;
   final ChallengeProgress? progress;
   final VoidCallback onJoin;
+  final VoidCallback onUpdateProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +300,11 @@ class _ChallengeTile extends StatelessWidget {
     final completed = progress?.completed ?? false;
     final isJoined = progress != null;
 
-    return Container(
+    final canUpdate = isJoined && !completed;
+
+    return GestureDetector(
+      onTap: canUpdate ? onUpdateProgress : null,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -290,11 +406,28 @@ class _ChallengeTile extends StatelessWidget {
                         size: 10,
                         color: AppColors.amber,
                       )),
+                )
+              else
+                TextButton(
+                  onPressed: onUpdateProgress,
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
+                    minimumSize: const Size(0, 28),
+                    backgroundColor:
+                        AppColors.amber.withValues(alpha: 0.10),
+                  ),
+                  child: Text('challenges.updateProgress'.tr(),
+                      style: AppTypography.label(
+                        size: 10,
+                        color: AppColors.amber,
+                      )),
                 ),
             ],
           ),
         ],
       ),
+    ),
     );
   }
 }
