@@ -2327,10 +2327,12 @@
       "hard": "Difficile"
     },
     "empty": "Aucun défi actif pour le moment.",
+    "emptyActive": "Aucun défi actif pour le moment.",
     "subtitle": "Participe, accumule des points, gagne des badges.",
     "joinSuccess": "Tu es dans l'équipe !",
     "joinFailed": "Impossible de rejoindre.",
     "completed": "✓ Terminé",
+    "done": "✓ Terminé",
     "updateProgress": "Mettre à jour la progression",
     "progressLabel": "Ta progression : {pct} %",
     "progressUpdated": "Progression enregistrée.",

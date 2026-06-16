@@ -2327,10 +2327,12 @@
       "hard": "Difícil"
     },
     "empty": "Sin desafíos activos por ahora.",
+    "emptyActive": "Sin desafíos activos por ahora.",
     "subtitle": "Participa, acumula puntos, gana insignias.",
     "joinSuccess": "¡Ya estás dentro!",
     "joinFailed": "No se pudo unir.",
     "completed": "✓ Hecho",
+    "done": "✓ Hecho",
     "updateProgress": "Actualizar progreso",
     "progressLabel": "Tu progreso: {pct}%",
     "progressUpdated": "Progreso guardado.",

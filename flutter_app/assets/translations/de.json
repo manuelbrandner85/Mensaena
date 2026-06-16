@@ -2326,10 +2326,12 @@
       "hard": "Schwer"
     },
     "empty": "Aktuell keine aktiven Challenges.",
+    "emptyActive": "Aktuell keine aktiven Challenges.",
     "subtitle": "Mach mit, sammle Punkte, verdiene Badges.",
     "joinSuccess": "Du bist dabei!",
     "joinFailed": "Konnte nicht beitreten.",
     "completed": "✓ Erledigt",
+    "done": "✓ Erledigt",
     "updateProgress": "Fortschritt aktualisieren",
     "progressLabel": "Dein Fortschritt: {pct}%",
     "progressUpdated": "Fortschritt gespeichert.",

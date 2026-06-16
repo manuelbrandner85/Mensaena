@@ -2326,10 +2326,12 @@
       "hard": "Zor"
     },
     "empty": "Şu anda aktif meydan okuma yok.",
+    "emptyActive": "Şu anda aktif meydan okuma yok.",
     "subtitle": "Katıl, puan kazan, rozetler edin.",
     "joinSuccess": "Katıldın!",
     "joinFailed": "Katılım başarısız oldu.",
     "completed": "✓ Tamamlandı",
+    "done": "✓ Tamamlandı",
     "updateProgress": "İlerlemeyi güncelle",
     "progressLabel": "İlerlemeniz: {pct}%",
     "progressUpdated": "İlerleme kaydedildi.",

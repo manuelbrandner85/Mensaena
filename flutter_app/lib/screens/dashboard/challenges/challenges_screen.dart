@@ -58,7 +58,7 @@ class ChallengesScreen extends ConsumerWidget {
             ),
             data: (challenges) {
               if (challenges.isEmpty) {
-                return _emptyState('challenges.empty'.tr());
+                return _emptyState('challenges.emptyActive'.tr());
               }
               final progressMap = <String, ChallengeProgress>{
                 for (final p in progressAsync.value ?? const <ChallengeProgress>[])
@@ -386,7 +386,7 @@ class _ChallengeTile extends StatelessWidget {
               ),
               const Spacer(),
               if (completed)
-                Text('challenges.completed'.tr(),
+                Text('challenges.done'.tr(),
                     style: AppTypography.label(
                       size: 9,
                       color: AppColors.lebenSoft,

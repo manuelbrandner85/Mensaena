@@ -2327,10 +2327,12 @@
       "hard": "Difficile"
     },
     "empty": "Nessuna sfida attiva al momento.",
+    "emptyActive": "Nessuna sfida attiva al momento.",
     "subtitle": "Partecipa, accumula punti, guadagna badge.",
     "joinSuccess": "Sei dentro!",
     "joinFailed": "Impossibile partecipare.",
     "completed": "✓ Completato",
+    "done": "✓ Completato",
     "updateProgress": "Aggiorna progresso",
     "progressLabel": "Il tuo progresso: {pct}%",
     "progressUpdated": "Progresso salvato.",
