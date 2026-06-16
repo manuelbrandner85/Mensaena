@@ -155,9 +155,11 @@ jobs:
                existieren (per Grep im Code verifizieren statt raten).
                Danach die Projekt-Guards
                `python3 scripts/check_stream_limits.py` +
-               `python3 scripts/check_ui_supabase.py` grün bekommen. Für jeden
-               neuen `.tr()`-Key sicherstellen, dass er in ALLEN 7
-               Übersetzungs-Dateien existiert. Wenn Tests geändert/ergänzt:
+               `python3 scripts/check_ui_supabase.py` +
+               `python3 scripts/check_design_i18n.py` grün bekommen (Letzterer
+               verbietet emerald/neue hartcodierte Farben und erzwingt i18n-Key-
+               Parität). Für jeden neuen `.tr()`-Key sicherstellen, dass er in
+               ALLEN 7 Übersetzungs-Dateien existiert. Wenn Tests geändert/ergänzt:
                `flutter test` lokal grün.
             5. SELBST-REVIEW: Lies deinen kompletten Diff (`git diff`) noch einmal
                kritisch durch wie ein Code-Reviewer: Logikfehler, vergessene

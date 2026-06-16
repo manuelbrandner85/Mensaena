@@ -345,6 +345,13 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: python3 scripts/check_ui_supabase.py
 
+      # Design-/i18n-Guard: verbietet emerald, hält hartcodierte Farben per
+      # Ratchet in Schach (→ AppColors) und erzwingt i18n-Key-Parität über alle
+      # 7 Sprachen. Verhindert Design-System-Drift + halbe Übersetzungen.
+      - name: Design-/i18n Guard
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/check_design_i18n.py
+
       - name: Test
         run: flutter test || echo "Keine Tests vorhanden"
 
