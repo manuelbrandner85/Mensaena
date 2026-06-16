@@ -211,7 +211,7 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
               // ── Gratis-Toggle ───────────────────────────────────────────
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.primary,
+                activeColor: AppColors.primary500,
                 value: _isFree,
                 onChanged: (v) => setState(() => _isFree = v),
                 title: Text('skills.create.isFree'.tr(),
@@ -226,7 +226,7 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
                   decoration: InputDecoration(
                     labelText: 'skills.create.hourlyRate'.tr(),
                     prefixIcon:
-                        const Icon(LucideIcons.euroSign, size: 16),
+                        const Icon(LucideIcons.euro, size: 16),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -234,7 +234,7 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
               // ── Online-Toggle ───────────────────────────────────────────
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.primary,
+                activeColor: AppColors.primary500,
                 value: _isOnline,
                 onChanged: (v) => setState(() => _isOnline = v),
                 title: Text('skills.create.isOnline'.tr(),
@@ -258,7 +258,7 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
                             width: 16,
                             height: 16,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColors.primary),
+                                strokeWidth: 2, color: AppColors.primary500),
                           )
                         : const Icon(LucideIcons.locate,
                             size: 18, color: AppColors.inkSoft),
