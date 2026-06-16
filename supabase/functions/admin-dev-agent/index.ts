@@ -731,12 +731,15 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
   // Optionale Epic-Zuordnung (Roadmap). Leer = nicht zugeordnet.
   const epicId = body?.epic_id ? String(body.epic_id) : null
 
-  // ── Auto-Phasen: zu große Aufträge automatisch zerlegen ───────────────────
-  // Übersprungen, wenn der Aufrufer explizit Schritte vorgibt (Legacy-Plan)
-  // oder no_split:true setzt. Sonst klassifiziert der Planner; bei „zu groß"
-  // wird ein Parent-Container angelegt und nur Phase 1 dispatcht. Die weiteren
-  // Phasen kettet agent_automerge.yml nach jedem Merge via next_phase nach.
-  if (planSteps.length === 0 && body?.no_split !== true) {
+  // ── Auto-Phasen DEAKTIVIERT ───────────────────────────────────────────────
+  // Früher zerlegte ein Planner große Aufträge in Phasen-Parents und dispatchte
+  // nur Phase 1; die Folgephasen sollten via next_phase nachgekettet werden.
+  // Das ist mehrfach hängengeblieben (status='phased', nie weiter) → Aufträge
+  // erreichten die App NIE. Jeder Auftrag läuft jetzt als EIN PR durch (CI +
+  // Auto-Merge + OTA sind dafür zuverlässig). KEINE Phasen mehr — egal welcher
+  // Aufrufpfad (manuell, Vorschlag, Schedule, Autopilot). Das Flag no_split
+  // bleibt aus Kompatibilität akzeptiert, ist aber faktisch immer aktiv.
+  if (false) {
     const decision = await planPhases(instruction)
     if (!decision.single) {
       const { data: parent, error: pErr } = await admin
