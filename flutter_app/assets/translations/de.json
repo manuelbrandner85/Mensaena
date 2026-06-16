@@ -4761,5 +4761,25 @@
     "aqModerate": "Mäßig",
     "aqPoor": "Schlecht",
     "aqVeryPoor": "Sehr schlecht"
+  },
+  "carpool": {
+    "title": "Fahrgemeinschaften",
+    "add": "Route anlegen",
+    "emptyTitle": "Noch keine Routen",
+    "emptySubtitle": "Lege eine Fahrgemeinschaft an, um mit Nachbarn zu fahren.",
+    "day": "Wochentag",
+    "start": "Start",
+    "destination": "Ziel",
+    "useLocation": "Aktuellen Standort verwenden",
+    "save": "Speichern",
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag",
+      "sunday": "Sonntag"
+    }
   }
 }

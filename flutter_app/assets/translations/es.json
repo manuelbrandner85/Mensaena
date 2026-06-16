@@ -4765,5 +4765,25 @@
     "aqModerate": "Moderada",
     "aqPoor": "Mala",
     "aqVeryPoor": "Muy mala"
+  },
+  "carpool": {
+    "title": "Coche compartido",
+    "add": "Añadir ruta",
+    "emptyTitle": "Aún no hay rutas",
+    "emptySubtitle": "Crea un viaje compartido con vecinos.",
+    "day": "Día",
+    "start": "Inicio",
+    "destination": "Destino",
+    "useLocation": "Usar ubicación actual",
+    "save": "Guardar",
+    "days": {
+      "monday": "Lunes",
+      "tuesday": "Martes",
+      "wednesday": "Miércoles",
+      "thursday": "Jueves",
+      "friday": "Viernes",
+      "saturday": "Sábado",
+      "sunday": "Domingo"
+    }
   }
 }
