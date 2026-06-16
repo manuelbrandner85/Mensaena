@@ -359,11 +359,11 @@ final marketplaceCommentsProvider =
 );
 
 final marketplaceListingsProvider =
-    FutureProvider.family<List<MarketplaceListing>, String>(
+    FutureProvider.autoDispose.family<List<MarketplaceListing>, String>(
         (ref, type) => MarketplaceRepository.listActive(listingType: type));
 
 /// Family-Variante mit includeClaimed-Flag — key: (type, includeClaimed).
-final marketplaceListingsFilteredProvider = FutureProvider.family<
+final marketplaceListingsFilteredProvider = FutureProvider.autoDispose.family<
     List<MarketplaceListing>, ({String type, bool includeClaimed})>(
   (ref, key) => MarketplaceRepository.listActive(
     listingType: key.type,
@@ -372,7 +372,7 @@ final marketplaceListingsFilteredProvider = FutureProvider.family<
 );
 
 final marketplaceDetailProvider =
-    FutureProvider.family<MarketplaceListing?, String>(
+    FutureProvider.autoDispose.family<MarketplaceListing?, String>(
         (ref, id) => MarketplaceRepository.getById(id));
 
 final marketplaceStatsProvider = FutureProvider<Map<String, int>>(
