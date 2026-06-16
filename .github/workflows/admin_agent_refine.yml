@@ -69,6 +69,8 @@ jobs:
             === ENDE ===
 
             Regeln:
+            - Lies docs/godmode/conventions.md (echte Symbole + Stolperfallen);
+              nutze nur real existierende Symbole (nicht raten).
             - Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
               KEINEN neuen PR (der PR existiert bereits).
             - PFLICHT vor dem Push (bei Dart-Änderungen): `cd flutter_app &&
