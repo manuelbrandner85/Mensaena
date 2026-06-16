@@ -94,6 +94,19 @@ jobs:
           done < /tmp/img_urls.txt
           ls -la .godmode_images/ || true
 
+      # Flutter installieren, damit der Agent `flutter analyze` SELBST ausführen
+      # und Symbol-/Compile-Fehler beheben kann, BEVOR ein PR entsteht. Version
+      # exakt wie flutter.yml (gepinnt 3.27.x), sonst weichen die Analyzer-
+      # Ergebnisse ab. pub get läuft best-effort (analyze braucht die Deps).
+      - name: Setup Flutter (Pre-PR analyze)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.27.x'
+      - name: flutter pub get
+        working-directory: flutter_app
+        run: flutter pub get || true
+
       - name: Agent ausführen
         uses: anthropics/claude-code-action@v1
         with:
@@ -125,12 +138,22 @@ jobs:
                nicht den ganzen Codebase).
             2. Branch erstellen: agent/task-${{ inputs.task_id }}
             3. Änderungen umsetzen.
-            4. Vor dem PR prüfen (nur wenn Dart-Dateien geändert): `flutter
-               analyze` UND die Projekt-Guards
+            4. PFLICHT-GATE vor dem Commit (wenn Dart-Dateien geändert):
+               Führe `cd flutter_app && flutter analyze` aus. Das CI nutzt
+               `--no-fatal-infos`, d. h. **error- UND warning-Zeilen sind fatal**
+               (nur `info` ist erlaubt). Behebe JEDE error/warning und führe
+               analyze erneut aus, bis KEINE error/warning mehr erscheint.
+               Committe NIEMALS mit verbleibenden errors/warnings — genau daran
+               sind zuletzt mehrere Aufträge rot geworden (erfundene Symbole wie
+               `Color.toARGB32`, `ShimmerSkeleton`, `AppColors.primary`,
+               `LucideIcons.euroSign`). Verwende NUR Symbole, die wirklich
+               existieren (per Grep im Code verifizieren statt raten).
+               Danach die Projekt-Guards
                `python3 scripts/check_stream_limits.py` +
-               `python3 scripts/check_ui_supabase.py` ausführen und ALLE
-               gemeldeten Verstöße beheben. Für jeden neuen `.tr()`-Key
-               sicherstellen, dass er in ALLEN 7 Übersetzungs-Dateien existiert.
+               `python3 scripts/check_ui_supabase.py` grün bekommen. Für jeden
+               neuen `.tr()`-Key sicherstellen, dass er in ALLEN 7
+               Übersetzungs-Dateien existiert. Wenn Tests geändert/ergänzt:
+               `flutter test` lokal grün.
             5. Commit + Push + PR gegen main erstellen.
 
             Effizienz-Regeln:
