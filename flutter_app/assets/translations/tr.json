@@ -4764,5 +4764,25 @@
     "aqModerate": "Orta",
     "aqPoor": "Kötü",
     "aqVeryPoor": "Çok kötü"
+  },
+  "carpool": {
+    "title": "Ortak araç",
+    "add": "Rota ekle",
+    "emptyTitle": "Henüz rota yok",
+    "emptySubtitle": "Komşularla yolculuk için bir ortak araç oluştur.",
+    "day": "Gün",
+    "start": "Başlangıç",
+    "destination": "Varış",
+    "useLocation": "Mevcut konumu kullan",
+    "save": "Kaydet",
+    "days": {
+      "monday": "Pazartesi",
+      "tuesday": "Salı",
+      "wednesday": "Çarşamba",
+      "thursday": "Perşembe",
+      "friday": "Cuma",
+      "saturday": "Cumartesi",
+      "sunday": "Pazar"
+    }
   }
 }

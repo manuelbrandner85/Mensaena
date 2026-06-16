@@ -4762,5 +4762,25 @@
     "aqModerate": "Moderate",
     "aqPoor": "Poor",
     "aqVeryPoor": "Very Poor"
+  },
+  "carpool": {
+    "title": "Carpools",
+    "add": "Add route",
+    "emptyTitle": "No routes yet",
+    "emptySubtitle": "Create a carpool to ride with neighbours.",
+    "day": "Weekday",
+    "start": "Start",
+    "destination": "Destination",
+    "useLocation": "Use current location",
+    "save": "Save",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
   }
 }

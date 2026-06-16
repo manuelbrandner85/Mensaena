@@ -4765,5 +4765,25 @@
     "aqModerate": "Moderata",
     "aqPoor": "Scarsa",
     "aqVeryPoor": "Pessima"
+  },
+  "carpool": {
+    "title": "Carpooling",
+    "add": "Aggiungi percorso",
+    "emptyTitle": "Ancora nessun percorso",
+    "emptySubtitle": "Crea un carpool per viaggiare con i vicini.",
+    "day": "Giorno",
+    "start": "Partenza",
+    "destination": "Destinazione",
+    "useLocation": "Usa posizione attuale",
+    "save": "Salva",
+    "days": {
+      "monday": "Lunedì",
+      "tuesday": "Martedì",
+      "wednesday": "Mercoledì",
+      "thursday": "Giovedì",
+      "friday": "Venerdì",
+      "saturday": "Sabato",
+      "sunday": "Domenica"
+    }
   }
 }

@@ -114,6 +114,7 @@ import '../../screens/dashboard/timebank_screen.dart';
 import '../../screens/dashboard/harvest/wild_picks_screen.dart';
 import '../../screens/dashboard/jobs/job_portals_screen.dart';
 import '../../screens/dashboard/jobs/live_jobs_screen.dart';
+import '../../screens/dashboard/mobility/carpool_screen.dart';
 import '../../screens/dashboard/mobility/charge_stations_screen.dart';
 import '../../screens/dashboard/mobility/gas_prices_screen.dart';
 import '../../screens/dashboard/species/identify_species_screen.dart';
@@ -658,6 +659,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               route: '/dashboard/mobility/gas',
               color: Color(0xFFE8A24A),
             ),
+            ModuleQuickAction(
+              icon: LucideIcons.users,
+              label: 'carpool.title',
+              route: '/dashboard/mobility/carpool',
+              color: Color(0xFF4E7E8C),
+            ),
           ],
           subFilters: const [
             FilterOption(value: 'rideshare', label: '🚗 Mitfahrt'),
@@ -1149,6 +1156,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
           child: const GasPricesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/dashboard/mobility/carpool',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const CarpoolScreen(),
         ),
       ),
       GoRoute(

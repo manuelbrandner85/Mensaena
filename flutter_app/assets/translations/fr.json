@@ -4765,5 +4765,25 @@
     "aqModerate": "Modérée",
     "aqPoor": "Mauvaise",
     "aqVeryPoor": "Très mauvaise"
+  },
+  "carpool": {
+    "title": "Covoiturage",
+    "add": "Ajouter un trajet",
+    "emptyTitle": "Aucun trajet",
+    "emptySubtitle": "Crée un covoiturage pour voyager avec tes voisins.",
+    "day": "Jour",
+    "start": "Départ",
+    "destination": "Destination",
+    "useLocation": "Utiliser ma position",
+    "save": "Enregistrer",
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    }
   }
 }
