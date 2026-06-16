@@ -2343,7 +2343,11 @@
     "attendeesCount": "{count} partecipanti",
     "linkOpenFailed": "Impossibile aprire il link.",
     "empty": "Nessun evento imminente.",
-    "emptyHint": "Sii il/la primo/a — usa il pulsante +."
+    "emptyHint": "Sii il/la primo/a — usa il pulsante +.",
+    "suggestions": {
+      "title": "Suggerimenti",
+      "prefillHint": "Festività precompilata – modifica i dettagli come desideri."
+    }
   },
   "challenges": {
     "create": "Crea sfida",

@@ -792,10 +792,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create',
-            pageBuilder: (_, state) => AppTransitions.sheet<void>(
-              key: state.pageKey,
-              child: const EventCreateScreen(),
-            ),
+            pageBuilder: (_, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              final title = extra?['title'] as String?;
+              final date = extra?['date'] as DateTime?;
+              return AppTransitions.sheet<void>(
+                key: state.pageKey,
+                child: EventCreateScreen(initialTitle: title, initialDate: date),
+              );
+            },
           ),
           GoRoute(
             path: ':eventId',

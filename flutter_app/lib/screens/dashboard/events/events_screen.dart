@@ -7,7 +7,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/event.dart';
+import '../../../providers/locale_provider.dart';
+import '../../../providers/public_holidays_provider.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../services/holidays_service.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
@@ -230,6 +233,8 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
               ),
             // ── Wetter-Strip (Pendant zu Web WeatherForecastStrip) ──
             if (_view == _EventView.list) const WeatherForecastStrip(),
+            // ── Feiertags-Vorschläge ──────────────────────────────
+            if (_view == _EventView.list) const _HolidaySuggestionsSection(),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.amber,
@@ -484,6 +489,158 @@ class _CalendarCell extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Feiertags-Vorschläge via Nager.Date
+// ──────────────────────────────────────────────────────────────
+class _HolidaySuggestionsSection extends ConsumerWidget {
+  const _HolidaySuggestionsSection();
+
+  String _emoji(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('christmas') || n.contains('weihnacht') || n.contains('natale') || n.contains('noël')) return '🎄';
+    if (n.contains('new year') || n.contains('neujahr') || n.contains('capodanno') || n.contains('nouvel an')) return '🎆';
+    if (n.contains('easter') || n.contains('ostern') || n.contains('pasqua') || n.contains('pâques')) return '🐰';
+    if (n.contains('pentecost') || n.contains('pfingst') || n.contains('pentecoste')) return '🕊️';
+    if (n.contains('ascension') || n.contains('himmelfahrt')) return '☁️';
+    if (n.contains('labour') || n.contains('labor') || n.contains('tag der arbeit') || n.contains('lavoro')) return '🌷';
+    if (n.contains('national') || n.contains('unity') || n.contains('einheit')) return '🏳️';
+    if (n.contains('independence')) return '🎆';
+    return '🎉';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final localeState = ref.watch(localeProvider);
+    final lang = localeState.activeLocale.languageCode;
+    final countryCode = countryCodeFromLocale(lang);
+    final year = DateTime.now().year;
+    final async = ref.watch(
+      publicHolidaysProvider((countryCode: countryCode, year: year)),
+    );
+
+    return async.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (all) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        // Nächste 8 bevorstehende Feiertage
+        final upcoming = all
+            .where((h) {
+              final d = DateTime(h.date.year, h.date.month, h.date.day);
+              return !d.isBefore(today);
+            })
+            .toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
+        final limited = upcoming.take(8).toList();
+        if (limited.isEmpty) return const SizedBox.shrink();
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 6),
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.calendarDays,
+                        size: 13, color: AppColors.inkSoft),
+                    const SizedBox(width: 6),
+                    Text(
+                      'events.suggestions.title'.tr(),
+                      style: AppTypography.label(
+                          size: 11, color: AppColors.inkSoft),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 56,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 4),
+                  itemCount: limited.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (ctx, i) {
+                    final h = limited[i];
+                    return _HolidayChip(
+                      holiday: h,
+                      emoji: _emoji(h.name),
+                      onTap: () => ctx.push(
+                        '/dashboard/events/create',
+                        extra: {
+                          'title': h.localName.isNotEmpty ? h.localName : h.name,
+                          'date': DateTime(h.date.year, h.date.month, h.date.day),
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HolidayChip extends StatelessWidget {
+  const _HolidayChip({
+    required this.holiday,
+    required this.emoji,
+    required this.onTap,
+  });
+
+  final Holiday holiday;
+  final String emoji;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final df = DateFormat('dd.MM.', 'de');
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.line),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 16, height: 1)),
+            const SizedBox(width: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  holiday.localName.isNotEmpty ? holiday.localName : holiday.name,
+                  style: AppTypography.body(
+                    size: 12,
+                    color: AppColors.ink,
+                    weight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  df.format(holiday.date),
+                  style: AppTypography.label(size: 10, color: AppColors.inkSoft),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

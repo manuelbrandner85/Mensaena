@@ -2342,7 +2342,11 @@
     "attendeesCount": "{count} Zusagen",
     "linkOpenFailed": "Link konnte nicht geöffnet werden.",
     "empty": "Keine kommenden Events.",
-    "emptyHint": "Sei der/die Erste:r – Plus-Button nutzen."
+    "emptyHint": "Sei der/die Erste:r – Plus-Button nutzen.",
+    "suggestions": {
+      "title": "Vorschläge",
+      "prefillHint": "Feiertag vorbefüllt – Details nach Wunsch anpassen."
+    }
   },
   "challenges": {
     "create": "Challenge erstellen",

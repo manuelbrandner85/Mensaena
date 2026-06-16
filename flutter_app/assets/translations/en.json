@@ -2343,7 +2343,11 @@
     "attendeesCount": "{count} attending",
     "linkOpenFailed": "Could not open the link.",
     "empty": "No upcoming events.",
-    "emptyHint": "Be the first — use the plus button."
+    "emptyHint": "Be the first — use the plus button.",
+    "suggestions": {
+      "title": "Suggestions",
+      "prefillHint": "Holiday pre-filled – adjust details as you like."
+    }
   },
   "challenges": {
     "create": "Create challenge",

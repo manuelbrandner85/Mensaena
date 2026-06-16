@@ -2343,7 +2343,11 @@
     "attendeesCount": "{count} asistentes",
     "linkOpenFailed": "No se pudo abrir el enlace.",
     "empty": "No hay eventos próximos.",
-    "emptyHint": "Sé la primera persona — usa el botón +."
+    "emptyHint": "Sé la primera persona — usa el botón +.",
+    "suggestions": {
+      "title": "Sugerencias",
+      "prefillHint": "Festivo prerrellenado – ajusta los detalles como quieras."
+    }
   },
   "challenges": {
     "create": "Crear reto",
