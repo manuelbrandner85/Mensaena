@@ -42,6 +42,15 @@ jobs:
           ref: agent/task-${{ inputs.task_id }}
           fetch-depth: 0
 
+      - name: Setup Flutter (Pre-Push analyze)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.27.x'
+      - name: flutter pub get
+        working-directory: flutter_app
+        run: flutter pub get || true
+
       - name: Agent — Folge-Anweisung umsetzen
         uses: anthropics/claude-code-action@v1
         with:
@@ -62,9 +71,12 @@ jobs:
             Regeln:
             - Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
               KEINEN neuen PR (der PR existiert bereits).
-            - Vor dem Push (bei Dart-Änderungen): `flutter analyze` +
-              `python3 scripts/check_stream_limits.py` +
-              `python3 scripts/check_ui_supabase.py` ausführen, Verstöße beheben.
+            - PFLICHT vor dem Push (bei Dart-Änderungen): `cd flutter_app &&
+              flutter analyze` ausführen und wiederholen, bis KEINE
+              error/warning mehr erscheint (CI: `--no-fatal-infos` → error UND
+              warning sind fatal). Nur real existierende Symbole verwenden
+              (per Grep verifizieren). Dazu `python3 scripts/check_stream_limits.py`
+              + `python3 scripts/check_ui_supabase.py` ohne Verstöße.
             - i18n: neue UI-Strings in alle 7 JSON-Dateien. Design primary/teal.
               Keine Secrets im Code. pubspec-Version NICHT ändern.
 

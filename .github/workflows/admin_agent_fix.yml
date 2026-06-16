@@ -55,6 +55,20 @@ jobs:
           echo "" >> "$GITHUB_ENV"
           echo "__EOF__" >> "$GITHUB_ENV"
 
+      # Flutter installieren, damit der Selbstheilungs-Agent `flutter analyze`
+      # SELBST ausführen und seinen Fix verifizieren kann, BEVOR er pusht.
+      # Version exakt wie flutter.yml (3.27.x). Verhindert, dass ein
+      # unvollständiger Fix (wie zuletzt: nur Import-Pfad statt Klassenname)
+      # erneut rot gepusht wird.
+      - name: Setup Flutter (Fix verifizieren)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.27.x'
+      - name: flutter pub get
+        working-directory: flutter_app
+        run: flutter pub get || true
+
       - name: Agent — CI-Fehler beheben
         uses: anthropics/claude-code-action@v1
         with:
@@ -73,9 +87,14 @@ jobs:
                === AUFGABE ===
                ${{ env.INSTRUCTION }}
                === ENDE ===
-            3. Behebe AUSSCHLIESSLICH die Fehler, sodass `flutter analyze` sauber
-               ist und der Build durchläuft. Minimale, gezielte Änderungen.
-               Prüfe vor dem Push auch `python3 scripts/check_stream_limits.py`
+            3. Behebe AUSSCHLIESSLICH die Fehler. PFLICHT: Führe danach
+               `cd flutter_app && flutter analyze` SELBST aus und wiederhole,
+               bis KEINE error/warning mehr erscheint (CI nutzt
+               `--no-fatal-infos` → error UND warning sind fatal, nur `info` ok).
+               Pushe NIEMALS, solange analyze noch error/warning zeigt — ein
+               halber Fix macht den Build erneut rot. Verwende NUR real
+               existierende Symbole (per Grep verifizieren, nicht raten).
+               Prüfe außerdem `python3 scripts/check_stream_limits.py`
                und `python3 scripts/check_ui_supabase.py` (keine Verstöße).
             4. Committe auf DENSELBEN Branch und pushe. KEINEN neuen Branch,
                KEINEN neuen PR (der PR existiert bereits).
