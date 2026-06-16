@@ -13,6 +13,7 @@ import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_widget.dart';
+import '../../../widgets/shared/error_state_card.dart';
 import '../../../widgets/shared/sized_avatar_image.dart';
 import '../../../widgets/shared/skeleton_card.dart';
 
@@ -76,6 +77,15 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
                 return const SkeletonList(count: 6, itemHeight: 84);
+              }
+              if (snap.hasError) {
+                return ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 40),
+                    ErrorStateCard(onRetry: _refresh),
+                  ],
+                );
               }
               final list = snap.data ?? const <SkillOffer>[];
               if (list.isEmpty) {
