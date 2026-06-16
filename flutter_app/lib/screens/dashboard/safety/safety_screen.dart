@@ -340,9 +340,9 @@ class _SafetyTile extends StatelessWidget {
           color: AppColors.surface.withValues(alpha: 0.5),
           border: Border(
             left: BorderSide(color: color, width: 3),
-            top: BorderSide(color: AppColors.line),
-            right: BorderSide(color: AppColors.line),
-            bottom: BorderSide(color: AppColors.line),
+            top: const BorderSide(color: AppColors.line),
+            right: const BorderSide(color: AppColors.line),
+            bottom: const BorderSide(color: AppColors.line),
           ),
           borderRadius: BorderRadius.circular(14),
         ),
