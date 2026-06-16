@@ -1771,7 +1771,78 @@
     "urgencyCritical": "Critica",
     "meetingPoint": "Punto d'incontro (es. stazione, bar …)",
     "timebankHours": "Ore banca del tempo (opzionale)",
-    "timebankHoursHint": "es. 2.5"
+    "timebankHoursHint": "es. 2.5",
+    "types": {
+      "animals": {
+        "animal": "Post sugli animali",
+        "rescue": "Animale trovato / Emergenza",
+        "community": "Domanda sull'aiuto agli animali"
+      },
+      "housing": {
+        "housing": "Offri alloggio",
+        "rescue": "Emergenza alloggio",
+        "crisis": "Alloggio di crisi"
+      },
+      "mobility": {
+        "mobility": "Offri un passaggio",
+        "rescue": "Cerco passaggio",
+        "sharing": "Aiuto con il trasporto"
+      },
+      "sharing": {
+        "sharing": "Condividi qualcosa",
+        "rescue": "Cerco da prendere in prestito"
+      },
+      "harvest": {
+        "sharing": "Condividi il raccolto",
+        "community": "Cerco aiutanti per il raccolto",
+        "rescue": "Salva il cibo"
+      },
+      "community": {
+        "community": "Idea / Suggerimento",
+        "rescue": "Domanda alla community"
+      },
+      "knowledge": {
+        "community": "Guida / Tutorial",
+        "sharing": "Offri un corso",
+        "rescue": "Cerco conoscenza"
+      },
+      "skills": {
+        "sharing": "Offri un'abilità",
+        "rescue": "Cerco un'abilità",
+        "community": "Tutoraggio"
+      },
+      "jobs": {
+        "job": "Offri un lavoro",
+        "rescue": "Cerco lavoro",
+        "community": "Aiuto volontario"
+      },
+      "rescuer": {
+        "food": "Salva il cibo",
+        "everyday": "Salva abbigliamento",
+        "sharing": "Salva oggetti"
+      }
+    },
+    "categories": {
+      "animals": "Animali",
+      "general": "Generale",
+      "housing": "Alloggio",
+      "mobility": "Mobilità",
+      "tools": "Attrezzi",
+      "books": "Libri",
+      "devices": "Dispositivi",
+      "kitchen": "Cucina",
+      "sports": "Sport",
+      "food": "Cibo",
+      "community": "Community",
+      "knowledge": "Conoscenza",
+      "skills": "Competenze",
+      "fulltime": "Tempo pieno",
+      "parttime": "Part-time",
+      "minijob": "Mini lavoro",
+      "volunteer": "Volontariato",
+      "everyday": "Abbigliamento",
+      "sharing": "Oggetti"
+    }
   },
   "crisis": {
     "error": "Errore: {error}",

@@ -1770,7 +1770,78 @@
     "urgencyCritical": "Критично",
     "meetingPoint": "Место встречи (напр., вокзал, кафе …)",
     "timebankHours": "Часы банка времени (необязательно)",
-    "timebankHoursHint": "напр., 2.5"
+    "timebankHoursHint": "напр., 2.5",
+    "types": {
+      "animals": {
+        "animal": "Пост о животных",
+        "rescue": "Найденное животное / Экстренный случай",
+        "community": "Вопрос о помощи животным"
+      },
+      "housing": {
+        "housing": "Предложить жильё",
+        "rescue": "Чрезвычайная ситуация с жильём",
+        "crisis": "Кризисное жильё"
+      },
+      "mobility": {
+        "mobility": "Предложить поездку",
+        "rescue": "Ищу попутчика",
+        "sharing": "Помощь с транспортом"
+      },
+      "sharing": {
+        "sharing": "Поделиться чем-то",
+        "rescue": "Ищу в аренду"
+      },
+      "harvest": {
+        "sharing": "Поделиться урожаем",
+        "community": "Ищу помощника по сбору урожая",
+        "rescue": "Спасти продукты"
+      },
+      "community": {
+        "community": "Идея / Предложение",
+        "rescue": "Вопрос сообществу"
+      },
+      "knowledge": {
+        "community": "Руководство / Инструкция",
+        "sharing": "Предложить курс",
+        "rescue": "Ищу знания"
+      },
+      "skills": {
+        "sharing": "Предложить навык",
+        "rescue": "Ищу навык",
+        "community": "Наставничество"
+      },
+      "jobs": {
+        "job": "Предложить работу",
+        "rescue": "Ищу работу",
+        "community": "Волонтёрская помощь"
+      },
+      "rescuer": {
+        "food": "Спасти продукты",
+        "everyday": "Спасти одежду",
+        "sharing": "Спасти вещи"
+      }
+    },
+    "categories": {
+      "animals": "Животные",
+      "general": "Общее",
+      "housing": "Жильё",
+      "mobility": "Транспорт",
+      "tools": "Инструменты",
+      "books": "Книги",
+      "devices": "Устройства",
+      "kitchen": "Кухня",
+      "sports": "Спорт",
+      "food": "Продукты",
+      "community": "Сообщество",
+      "knowledge": "Знания",
+      "skills": "Навыки",
+      "fulltime": "Полный день",
+      "parttime": "Неполный день",
+      "minijob": "Подработка",
+      "volunteer": "Волонтёрство",
+      "everyday": "Одежда",
+      "sharing": "Вещи"
+    }
   },
   "crisis": {
     "error": "Ошибка: {error}",

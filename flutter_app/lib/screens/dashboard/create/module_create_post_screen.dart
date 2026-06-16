@@ -465,7 +465,7 @@ class _ModuleCreatePostScreenState
               children: [
                 for (final t in c.createTypes)
                   ChoiceChip(
-                    label: Text(t.label,
+                    label: Text('${t.emoji} ${t.label.tr()}',
                         style: AppTypography.label(size: 10)),
                     selected: _type == t.value &&
                         (t.category == null || _category == t.category),
@@ -491,7 +491,7 @@ class _ModuleCreatePostScreenState
                 children: [
                   for (final cat in c.categories)
                     ChoiceChip(
-                      label: Text(cat.label,
+                      label: Text(cat.label.tr(),
                           style: AppTypography.label(size: 10)),
                       selected: _category == cat.value,
                       onSelected: (_) =>

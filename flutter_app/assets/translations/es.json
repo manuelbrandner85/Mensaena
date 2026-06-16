@@ -1771,7 +1771,78 @@
     "urgencyCritical": "Crítica",
     "meetingPoint": "Punto de encuentro (p. ej. estación, café …)",
     "timebankHours": "Horas del banco de tiempo (opcional)",
-    "timebankHoursHint": "p. ej. 2.5"
+    "timebankHoursHint": "p. ej. 2.5",
+    "types": {
+      "animals": {
+        "animal": "Publicación sobre animales",
+        "rescue": "Animal encontrado / Emergencia",
+        "community": "Pregunta sobre ayuda a animales"
+      },
+      "housing": {
+        "housing": "Ofrecer vivienda",
+        "rescue": "Emergencia de vivienda",
+        "crisis": "Alojamiento de crisis"
+      },
+      "mobility": {
+        "mobility": "Ofrecer un viaje",
+        "rescue": "Busco transporte",
+        "sharing": "Ayuda con transporte"
+      },
+      "sharing": {
+        "sharing": "Compartir algo",
+        "rescue": "Busco para tomar prestado"
+      },
+      "harvest": {
+        "sharing": "Compartir cosecha",
+        "community": "Busco ayudante de cosecha",
+        "rescue": "Rescatar alimentos"
+      },
+      "community": {
+        "community": "Idea / Sugerencia",
+        "rescue": "Pregunta a la comunidad"
+      },
+      "knowledge": {
+        "community": "Guía / Tutorial",
+        "sharing": "Ofrecer un curso",
+        "rescue": "Busco conocimiento"
+      },
+      "skills": {
+        "sharing": "Ofrecer una habilidad",
+        "rescue": "Busco una habilidad",
+        "community": "Mentoría"
+      },
+      "jobs": {
+        "job": "Ofrecer un trabajo",
+        "rescue": "Busco trabajo",
+        "community": "Ayuda voluntaria"
+      },
+      "rescuer": {
+        "food": "Rescatar alimentos",
+        "everyday": "Rescatar ropa",
+        "sharing": "Rescatar objetos"
+      }
+    },
+    "categories": {
+      "animals": "Animales",
+      "general": "General",
+      "housing": "Vivienda",
+      "mobility": "Movilidad",
+      "tools": "Herramientas",
+      "books": "Libros",
+      "devices": "Dispositivos",
+      "kitchen": "Cocina",
+      "sports": "Deporte",
+      "food": "Alimentos",
+      "community": "Comunidad",
+      "knowledge": "Conocimiento",
+      "skills": "Habilidades",
+      "fulltime": "Tiempo completo",
+      "parttime": "Tiempo parcial",
+      "minijob": "Mini trabajo",
+      "volunteer": "Voluntariado",
+      "everyday": "Ropa",
+      "sharing": "Objetos"
+    }
   },
   "crisis": {
     "error": "Error: {error}",

@@ -1770,7 +1770,78 @@
     "urgencyCritical": "Kritisch",
     "meetingPoint": "Treffpunkt (z. B. Bahnhof, Café …)",
     "timebankHours": "Zeitbank-Stunden (optional)",
-    "timebankHoursHint": "z. B. 2.5"
+    "timebankHoursHint": "z. B. 2.5",
+    "types": {
+      "animals": {
+        "animal": "Tier-Beitrag",
+        "rescue": "Fundtier / Notfall",
+        "community": "Frage zur Tierhilfe"
+      },
+      "housing": {
+        "housing": "Wohnung anbieten",
+        "rescue": "Wohnungsnot",
+        "crisis": "Krisenwohnung"
+      },
+      "mobility": {
+        "mobility": "Mitfahrt anbieten",
+        "rescue": "Mitfahrt gesucht",
+        "sharing": "Transport-Hilfe"
+      },
+      "sharing": {
+        "sharing": "Teile etwas",
+        "rescue": "Suche zum Ausleihen"
+      },
+      "harvest": {
+        "sharing": "Ernte teilen",
+        "community": "Erntehelfer gesucht",
+        "rescue": "Lebensmittel retten"
+      },
+      "community": {
+        "community": "Idee / Vorschlag",
+        "rescue": "Frage an die Community"
+      },
+      "knowledge": {
+        "community": "Anleitung / Guide",
+        "sharing": "Kurs anbieten",
+        "rescue": "Wissen gesucht"
+      },
+      "skills": {
+        "sharing": "Skill anbieten",
+        "rescue": "Skill suchen",
+        "community": "Mentoring"
+      },
+      "jobs": {
+        "job": "Job anbieten",
+        "rescue": "Job suchen",
+        "community": "Ehrenamtliche Hilfe"
+      },
+      "rescuer": {
+        "food": "Lebensmittel retten",
+        "everyday": "Kleidung retten",
+        "sharing": "Gegenstände retten"
+      }
+    },
+    "categories": {
+      "animals": "Tiere",
+      "general": "Allgemein",
+      "housing": "Wohnen",
+      "mobility": "Mobilität",
+      "tools": "Werkzeug",
+      "books": "Bücher",
+      "devices": "Geräte",
+      "kitchen": "Küche",
+      "sports": "Sport",
+      "food": "Lebensmittel",
+      "community": "Community",
+      "knowledge": "Wissen",
+      "skills": "Skills",
+      "fulltime": "Vollzeit",
+      "parttime": "Teilzeit",
+      "minijob": "Mini-Job",
+      "volunteer": "Ehrenamt",
+      "everyday": "Kleidung",
+      "sharing": "Gegenstände"
+    }
   },
   "crisis": {
     "error": "Fehler: {error}",

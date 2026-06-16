@@ -1771,7 +1771,78 @@
     "urgencyCritical": "Critical",
     "meetingPoint": "Meeting point (e.g. station, café …)",
     "timebankHours": "Timebank hours (optional)",
-    "timebankHoursHint": "e.g. 2.5"
+    "timebankHoursHint": "e.g. 2.5",
+    "types": {
+      "animals": {
+        "animal": "Animal Post",
+        "rescue": "Found Animal / Emergency",
+        "community": "Question about Animal Help"
+      },
+      "housing": {
+        "housing": "Offer Housing",
+        "rescue": "Housing Emergency",
+        "crisis": "Crisis Accommodation"
+      },
+      "mobility": {
+        "mobility": "Offer a Ride",
+        "rescue": "Looking for a Ride",
+        "sharing": "Transport Help"
+      },
+      "sharing": {
+        "sharing": "Share Something",
+        "rescue": "Looking to Borrow"
+      },
+      "harvest": {
+        "sharing": "Share Harvest",
+        "community": "Looking for Harvest Helper",
+        "rescue": "Rescue Food"
+      },
+      "community": {
+        "community": "Idea / Suggestion",
+        "rescue": "Question for the Community"
+      },
+      "knowledge": {
+        "community": "Guide / Tutorial",
+        "sharing": "Offer a Course",
+        "rescue": "Looking for Knowledge"
+      },
+      "skills": {
+        "sharing": "Offer a Skill",
+        "rescue": "Looking for a Skill",
+        "community": "Mentoring"
+      },
+      "jobs": {
+        "job": "Offer a Job",
+        "rescue": "Looking for a Job",
+        "community": "Volunteer Help"
+      },
+      "rescuer": {
+        "food": "Rescue Food",
+        "everyday": "Rescue Clothing",
+        "sharing": "Rescue Items"
+      }
+    },
+    "categories": {
+      "animals": "Animals",
+      "general": "General",
+      "housing": "Housing",
+      "mobility": "Mobility",
+      "tools": "Tools",
+      "books": "Books",
+      "devices": "Devices",
+      "kitchen": "Kitchen",
+      "sports": "Sports",
+      "food": "Food",
+      "community": "Community",
+      "knowledge": "Knowledge",
+      "skills": "Skills",
+      "fulltime": "Full-time",
+      "parttime": "Part-time",
+      "minijob": "Mini Job",
+      "volunteer": "Volunteer",
+      "everyday": "Clothing",
+      "sharing": "Items"
+    }
   },
   "crisis": {
     "error": "Error: {error}",
