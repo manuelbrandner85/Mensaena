@@ -182,6 +182,23 @@ jobs:
               Unit-Tests unter flutter_app/test/ anlegen (reine Logik, KEINE
               Netzwerk-/Supabase-Calls; ggf. mocken). Reine UI-Tweaks brauchen keine.
 
+            Spezialisierung — handle je nach Art der Aufgabe als Experte:
+            - DESIGN/UI: Ziel elegant, professionell, subtil, viel Weißraum.
+              Nur AppColors-Tokens (kein hartes Color(0x…)), konsistente Cards/
+              Buttons/Abstände, dezente Animationen. Orientiere dich an
+              bestehenden Premium-Screens. (Skill-Geist: impeccable / emil.)
+            - SECURITY: RLS für jeden neuen Tabellenzugriff, Eingaben validieren,
+              keine fremden Nutzerdaten exponieren, Secrets nur via Secrets.
+            - PERFORMANCE: Rebuilds minimieren (const, Keys), Streams mit .limit()
+              + autoDispose, keine N+1-Queries, Bilder cachen.
+            - I18N: jeder String via .tr() in allen 7 JSON-Dateien, natürliche
+              Sprache je Land (keine Wort-für-Wort-Maschinenübersetzung).
+            Wähle die passende Brille selbst anhand der Aufgabe/Kategorie.
+
+            Auto-Doku: Wenn du die Architektur spürbar änderst (neues Modul, neue
+            Tabelle/Edge-Function, neuer Pipeline-Schritt), aktualisiere die
+            passende Doku knapp mit (CLAUDE.md bzw. docs/godmode/*) — im selben PR.
+
             Ressourcen-Katalog (High-End):
             - Lies docs/godmode/resources.md. BEVORZUGE die dort gelisteten
               KOSTENLOSEN APIs (möglichst ohne Key) und bewährten Open-Source-
