@@ -2983,7 +2983,32 @@
     "empty": "Пока нет предложений навыков.",
     "emptyHint": "Предложи свой первый навык!",
     "contactProvider": "Связаться",
-    "providerFallback": "Сосед(ка)"
+    "providerFallback": "Сосед(ка)",
+    "create": {
+      "screenTitle": "Предложить навык",
+      "category": "Категория",
+      "categoryNone": "Без категории",
+      "catSprachen": "Языки",
+      "catIt": "IT & Технологии",
+      "catMusik": "Музыка",
+      "catSport": "Спорт & Фитнес",
+      "catKochen": "Кулинария & Выпечка",
+      "catHandwerk": "Ремесло",
+      "catKunst": "Искусство & Дизайн",
+      "catNachhilfe": "Репетиторство",
+      "catSonstiges": "Прочее",
+      "level": "Уровень",
+      "levelNone": "Не указан",
+      "levelAnfaenger": "Начинающий",
+      "levelFortgeschritten": "Средний",
+      "levelExperte": "Эксперт",
+      "isFree": "Предложить бесплатно",
+      "hourlyRate": "Почасовая ставка (€/ч)",
+      "isOnline": "Доступно онлайн",
+      "isOnlineHint": "Также по видеосвязи или удалённо",
+      "submitButton": "Опубликовать навык",
+      "saving": "Сохранение…"
+    }
   },
   "wissen": {
     "shareTitle": "Делиться знаниями",

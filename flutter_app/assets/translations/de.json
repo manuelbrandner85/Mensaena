@@ -2983,7 +2983,32 @@
     "empty": "Noch keine Skill-Angebote.",
     "emptyHint": "Biete dein erstes Skill an!",
     "contactProvider": "Kontakt aufnehmen",
-    "providerFallback": "Nachbar:in"
+    "providerFallback": "Nachbar:in",
+    "create": {
+      "screenTitle": "Skill anbieten",
+      "category": "Kategorie",
+      "categoryNone": "Keine Angabe",
+      "catSprachen": "Sprachen",
+      "catIt": "IT & Technik",
+      "catMusik": "Musik",
+      "catSport": "Sport & Fitness",
+      "catKochen": "Kochen & Backen",
+      "catHandwerk": "Handwerk",
+      "catKunst": "Kunst & Design",
+      "catNachhilfe": "Nachhilfe",
+      "catSonstiges": "Sonstiges",
+      "level": "Niveau",
+      "levelNone": "Keine Angabe",
+      "levelAnfaenger": "Anfänger",
+      "levelFortgeschritten": "Fortgeschritten",
+      "levelExperte": "Experte",
+      "isFree": "Gratis anbieten",
+      "hourlyRate": "Stundensatz (€/h)",
+      "isOnline": "Online verfügbar",
+      "isOnlineHint": "Auch per Video-Call oder Remote",
+      "submitButton": "Skill veröffentlichen",
+      "saving": "Speichere…"
+    }
   },
   "wissen": {
     "shareTitle": "Wissen teilen",
