@@ -193,6 +193,21 @@ jobs:
             echo "1=schnell, 5=groß) an. Quick-Wins (hoher Nutzen, wenig Aufwand)"
             echo "sind besonders wertvoll — bewerte ehrlich, nicht alles auf 5."
             echo ""
+            echo "MODUL-HEALTH-MATRIX: Gib im selben JSON zusätzlich ein Feld"
+            echo '"modules" aus — eine Bewertung JEDES größeren App-Moduls'
+            echo "(z. B. marketplace, events, skills, crisis, groups, chat,"
+            echo "profile, map, neighborhood, dashboard). Bewerte ehrlich 0-100:"
+            echo '{ "modules": [ {'
+            echo '  "module": "kurzer-schlüssel (z. B. marketplace)",'
+            echo '  "label": "Lesbarer Name (z. B. Marktplatz)",'
+            echo '  "score": 72,            (Gesamt 0-100)'
+            echo '  "completeness": 80,     (Funktionsumfang 0-100)'
+            echo '  "quality": 70,          (Code-/UX-Qualität 0-100)'
+            echo '  "tests": 40,            (Testabdeckung 0-100)'
+            echo '  "notes": "1-2 Sätze: größte Lücke / Schwerpunkt"'
+            echo "} ] }"
+            echo "Das Gesamt-JSON hat also BEIDE Felder: suggestions UND modules."
+            echo ""
             echo "Ändere KEINEN Code. Erstelle KEINEN Commit. Nur analysieren und"
             echo "die JSON-Datei schreiben. Verwende deine Skills/Tools zum Lesen"
             echo "des Codes ausgiebig — sei gründlich, geh in die Tiefe."
@@ -390,6 +405,7 @@ jobs:
             const kinds = ["bug","improvement","new"];
             const slug = (s) => String(s || "").toLowerCase().trim()
               .replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 40);
+            const clamp = (x) => Math.min(Math.max(parseInt(x, 10) || 0, 0), 100);
             const newCats = {};
             const out = (parsed.suggestions || [])
               .filter(s => s && s.title && s.instruction)
@@ -414,8 +430,23 @@ jobs:
                   effort: Math.min(Math.max(parseInt(s.effort, 10) || 3, 1), 5),
                 };
               });
+            const mods = (parsed.modules || [])
+              .filter(m => m && m.module)
+              .slice(0, 40)
+              .map(m => ({
+                module: slug(m.module),
+                label: String(m.label || m.module).slice(0, 60),
+                score: clamp(m.score),
+                completeness: clamp(m.completeness),
+                quality: clamp(m.quality),
+                tests: clamp(m.tests),
+                notes: m.notes ? String(m.notes).slice(0, 600) : null,
+                updated_at: new Date().toISOString(),
+              }))
+              .filter(m => m.module);
             fs.writeFileSync("/tmp/rows.json", JSON.stringify(out));
             fs.writeFileSync("/tmp/cats.json", JSON.stringify(Object.values(newCats)));
+            fs.writeFileSync("/tmp/modules.json", JSON.stringify(mods));
           '
           ROWS="$(cat /tmp/rows.json)"
           CATS="$(cat /tmp/cats.json)"
@@ -440,6 +471,19 @@ jobs:
               -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
               -H "Content-Type: application/json" -H "Prefer: return=minimal" \
               -d "$ROWS"
+          fi
+
+          # Modul-Health-Matrix upserten (on_conflict=module → aktualisieren).
+          MODS="$(cat /tmp/modules.json 2>/dev/null || echo '[]')"
+          MODCOUNT="$(node -e 'try{process.stdout.write(String(JSON.parse(process.argv[1]).length))}catch(e){process.stdout.write("0")}' "$MODS")"
+          echo "Modul-Bewertungen: $MODCOUNT"
+          if [ "$MODCOUNT" -gt 0 ]; then
+            curl -sS -X POST \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/godmode_module_health?on_conflict=module" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: return=minimal,resolution=merge-duplicates" \
+              -d "$MODS" || true
           fi
 
           curl -sS -X PATCH \

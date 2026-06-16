@@ -1623,6 +1623,10 @@
     "autopilot": {
       "title": "Piloto automático supervisado",
       "subtitle": "Godmode implementa a diario el mejor quick-win — fusión solo tras tu aprobación (veto)."
+    },
+    "moduleHealth": {
+      "title": "Matriz de salud de módulos",
+      "subscores": "Completitud {comp} · Calidad {qual} · Tests {tests}"
     }
   },
   "create": {

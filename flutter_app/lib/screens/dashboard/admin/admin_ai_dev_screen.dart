@@ -126,6 +126,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
   // Überwachter Autopilot (täglich Top-Quick-Win mit Veto via Review-Gate).
   bool _autopilotEnabled = false;
   bool _autopilotBusy = false;
+  // Modul-Health-Matrix (Bewertung je App-Modul aus dem Tiefenscan).
+  List<Map<String, dynamic>> _moduleHealth = const [];
+  bool _moduleHealthExpanded = false;
   // Notiz, die gerade per „Senden" zum Auftrag wird — wird nach erfolgreicher
   // Auftragserstellung automatisch gelöscht (aus dem Backlog geleert).
   String? _pendingNoteId;
@@ -200,6 +203,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     _loadHealthAlerts();
     _loadEpics();
     _loadAutopilot();
+    _loadModuleHealth();
     _loadSchedules();
     _loadModuleInsights();
     _poll = Timer.periodic(const Duration(seconds: 7), (_) {
@@ -233,6 +237,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
         _notesExpanded = m['notes'] as bool? ?? _notesExpanded;
         _changelogExpanded = m['changelog'] as bool? ?? _changelogExpanded;
         _apiKeysExpanded = m['apiKeys'] as bool? ?? _apiKeysExpanded;
+        _moduleHealthExpanded =
+            m['moduleHealth'] as bool? ?? _moduleHealthExpanded;
       });
       final tab = m['tab'] as int?;
       if (tab != null && tab >= 0 && tab < _tabController.length) {
@@ -250,6 +256,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
       'notes': _notesExpanded,
       'changelog': _changelogExpanded,
       'apiKeys': _apiKeysExpanded,
+      'moduleHealth': _moduleHealthExpanded,
       'tab': _tabController.index,
     });
     // Fire-and-forget; Schreibfehler sind unkritisch.
@@ -1031,6 +1038,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     setState(() => _autopilotEnabled = on);
   }
 
+  Future<void> _loadModuleHealth() async {
+    final m = await AiInsightsRepository.fetchModuleHealth();
+    if (!mounted) return;
+    setState(() => _moduleHealth = m);
+  }
+
   Future<void> _toggleAutopilot(bool v) async {
     setState(() => _autopilotBusy = true);
     final ok = await AiInsightsRepository.setAutopilotEnabled(v);
@@ -1771,6 +1784,17 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
         onDismiss: _dismissModuleInsight,
       ),
       const SizedBox(height: 10),
+      if (_moduleHealth.isNotEmpty) ...[
+        _ModuleHealthCard(
+          modules: _moduleHealth,
+          expanded: _moduleHealthExpanded,
+          onToggle: () {
+            setState(() => _moduleHealthExpanded = !_moduleHealthExpanded);
+            _saveUiPrefs();
+          },
+        ),
+        const SizedBox(height: 10),
+      ],
       if (_tasks.isEmpty && _suggestions.isEmpty) _EmptyHint(),
       const SizedBox(height: 12),
     ]);
@@ -5558,6 +5582,141 @@ class _AlertAction extends StatelessWidget {
                 style: AppTypography.label(size: 11, color: fg)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Modul-Health-Matrix: Bewertung jedes App-Moduls aus dem Tiefenscan —
+/// schwächste zuerst, damit klar ist, wo Godmode als Nächstes ansetzen sollte.
+class _ModuleHealthCard extends StatelessWidget {
+  const _ModuleHealthCard({
+    required this.modules,
+    required this.expanded,
+    required this.onToggle,
+  });
+  final List<Map<String, dynamic>> modules;
+  final bool expanded;
+  final VoidCallback onToggle;
+
+  Color _scoreColor(int s) {
+    if (s >= 75) return AppColors.leben;
+    if (s >= 50) return AppColors.amber;
+    return AppColors.herzrot;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final avg = modules.isEmpty
+        ? 0
+        : (modules
+                    .map((m) => (m['score'] as num?)?.toInt() ?? 0)
+                    .reduce((a, b) => a + b) /
+                modules.length)
+            .round();
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(13),
+            child: Padding(
+              padding: const EdgeInsets.all(13),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.layoutGrid,
+                      size: 16, color: AppColors.teal),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('adminDev.moduleHealth.title'.tr(),
+                        style: AppTypography.body(
+                            size: 13,
+                            color: AppColors.lightInk,
+                            weight: FontWeight.w700)),
+                  ),
+                  Text('Ø $avg',
+                      style: AppTypography.label(
+                          size: 11, color: _scoreColor(avg))),
+                  const SizedBox(width: 6),
+                  Icon(
+                      expanded
+                          ? LucideIcons.chevronUp
+                          : LucideIcons.chevronDown,
+                      size: 16,
+                      color: AppColors.lightMute),
+                ],
+              ),
+            ),
+          ),
+          if (expanded) ...[
+            const Divider(height: 1),
+            ...modules.map((m) {
+              final label = m['label'] as String? ?? m['module'] as String? ?? '';
+              final score = (m['score'] as num?)?.toInt() ?? 0;
+              final comp = (m['completeness'] as num?)?.toInt() ?? 0;
+              final qual = (m['quality'] as num?)?.toInt() ?? 0;
+              final tests = (m['tests'] as num?)?.toInt() ?? 0;
+              final notes = (m['notes'] as String?)?.trim() ?? '';
+              final c = _scoreColor(score);
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(13, 9, 13, 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(label,
+                              style: AppTypography.body(
+                                  size: 12.5,
+                                  color: AppColors.lightInk,
+                                  weight: FontWeight.w600)),
+                        ),
+                        Text('$score',
+                            style: AppTypography.label(size: 12, color: c)),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: score / 100,
+                        minHeight: 6,
+                        backgroundColor: Colors.grey.shade200,
+                        valueColor: AlwaysStoppedAnimation(c),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'adminDev.moduleHealth.subscores'.tr(namedArgs: {
+                        'comp': '$comp',
+                        'qual': '$qual',
+                        'tests': '$tests',
+                      }),
+                      style: AppTypography.label(
+                          size: 9, color: AppColors.lightMute),
+                    ),
+                    if (notes.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(notes,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.caption(
+                              color: AppColors.lightMute)),
+                    ],
+                    const Divider(height: 14),
+                  ],
+                ),
+              );
+            }),
+            const SizedBox(height: 4),
+          ],
+        ],
       ),
     );
   }
