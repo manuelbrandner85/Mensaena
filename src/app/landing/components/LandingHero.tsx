@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import HeroPixelStream from './HeroPixelStream'
 
 export default function LandingHero() {
   const t = useTranslations('landing')
@@ -36,6 +37,7 @@ export default function LandingHero() {
           <a className="cin-btn ghost" href="#features">
             {t('heroCtaSecondary')}
           </a>
+          <HeroPixelStream />
         </div>
 
         <div className="facts reveal d3">

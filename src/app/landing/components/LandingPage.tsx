@@ -2,6 +2,8 @@
 
 import LandingNavbar from './LandingNavbar'
 import LandingHero from './LandingHero'
+import CinematicScrollStory from './CinematicScrollStory'
+import SmoothScroll from '@/components/cinema/providers/SmoothScroll'
 import LandingStats from './LandingStats'
 import LandingFeatures from './LandingFeatures'
 import LandingHowItWorks from './LandingHowItWorks'
@@ -19,6 +21,7 @@ import { APK_DOWNLOAD_ENABLED } from '@/lib/app-download'
 
 export default function LandingPage() {
   return (
+    <SmoothScroll>
     <div
       className="relative min-h-screen"
       style={{
@@ -41,6 +44,7 @@ export default function LandingPage() {
 
       <main id="main-content" className="relative" style={{ zIndex: 2 }}>
         <LandingHero />
+        <CinematicScrollStory />
         <LandingStats />
         {APK_DOWNLOAD_ENABLED && <AppDownloadSection />}
         <LandingFeatures />
@@ -55,5 +59,6 @@ export default function LandingPage() {
         <DonationBadge variant="floating" />
       </main>
     </div>
+    </SmoothScroll>
   )
 }

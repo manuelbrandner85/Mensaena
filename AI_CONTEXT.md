@@ -1,5 +1,5 @@
 # MENSAENA – AI Context
-> Aktualisiert: 2026-06-11 | v1.0.0-beta | + Mensa KI-Assistent (Edge Function chat-ai 4-Provider-Fallback + ai_chat_analytics/ai_chat_feedback + Flutter FAB) | Supabase live auf gyqujitkvymlmgroovch | Mega-Prompt Phase-2-12 Foundation: Stories/Follower/Polls/Mentoring/Leaderboard/Daily-Challenges/Livestream-Chat + Phase 4 Mega-Roadmap KOMPLETT (28 Features F4/F7/F15/F20/F30/F31/F33/F38/F40/F41/F45/F46/F47/F48/F50/F60/F61/F62/F63/F64/F70/F80-F90) — alle 7 Sprachen, on-device wo moeglich (Streak/Detox/Karma/Heatmap/Mondphase/Notes/Pins) + Workflow-Retry-Resilience
+> Aktualisiert: 2026-06-19 | + Web-3D-Hero via Unreal Engine Pixel Streaming (HeroPixelStream.tsx, env NEXT_PUBLIC_PIXELSTREAM_URL, docs/PIXEL_STREAMING.md) | v1.0.0-beta | + Mensa KI-Assistent (Edge Function chat-ai 4-Provider-Fallback + ai_chat_analytics/ai_chat_feedback + Flutter FAB) | Supabase live auf gyqujitkvymlmgroovch | Mega-Prompt Phase-2-12 Foundation: Stories/Follower/Polls/Mentoring/Leaderboard/Daily-Challenges/Livestream-Chat + Phase 4 Mega-Roadmap KOMPLETT (28 Features F4/F7/F15/F20/F30/F31/F33/F38/F40/F41/F45/F46/F47/F48/F50/F60/F61/F62/F63/F64/F70/F80-F90) — alle 7 Sprachen, on-device wo moeglich (Streak/Detox/Karma/Heatmap/Mondphase/Notes/Pins) + Workflow-Retry-Resilience
 
 ## !! REGELN – LIES DAS BEI JEDER SESSION !!
 
@@ -63,6 +63,7 @@ UI-Text: Deutsch | Code: Englisch | Styling: nur Tailwind | cn() aus @/lib/utils
 
 ## §3 Dateien
 app/layout.tsx,page.tsx=Landing | login/,register/=Auth
+landing/components/LandingPage.tsx(komponiert Hero/Story/Stats/Features/..., in SmoothScroll/lenis gewrappt) | LandingHero.tsx(cin-hero) | HeroPixelStream.tsx(NEU: Unreal-Pixel-Streaming 3D-Hero, iframe via NEXT_PUBLIC_PIXELSTREAM_URL, Klick-zum-Start, Geräte-Gating, Fallback=klassischer Hero) | CinematicScrollStory.tsx(NEU: Scrollytelling, gepinnte sticky-Stage, scrubbt UE-Frame-Sequenz auf canvas via NEXT_PUBLIC_HERO_SEQ_COUNT/BASE/EXT, 4 Kapitel scroll-synchron, CSS-Parallax-Fallback) — Doku docs/PIXEL_STREAMING.md — NUR Web
 dashboard/layout.tsx=DashboardShell | page.tsx=Home
 admin/page.tsx=Admin(11Tabs:Overview,Users,Posts,Chat,Events,Board,Crisis,Orgs,Farms,Reports,System)
 admin/components/AdminTypes.ts,OverviewTab.tsx,UsersTab.tsx,PostsTab.tsx,EventsTab.tsx,BoardTab.tsx,CrisisTab.tsx,OrgsTab.tsx,FarmsTab.tsx,ChatModTab.tsx,SystemTab.tsx,ReportsTab.tsx
