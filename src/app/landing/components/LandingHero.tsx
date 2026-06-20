@@ -9,6 +9,11 @@ export default function LandingHero() {
 
   return (
     <section className="cin-hero" id="hero" aria-labelledby="hero-heading">
+      <div
+        className="cin-hero-photo"
+        aria-hidden="true"
+        style={{ backgroundImage: 'url(/unreal-house.jpg)' }}
+      />
       <div className="cin-hero-bloom" aria-hidden="true">
         <span className="b1" />
         <span className="b2" />

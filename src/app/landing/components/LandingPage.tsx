@@ -3,6 +3,9 @@
 import LandingNavbar from './LandingNavbar'
 import LandingHero from './LandingHero'
 import CinematicScrollStory from './CinematicScrollStory'
+import PinnedModules from './PinnedModules'
+import StickyManifesto from './StickyManifesto'
+import CinematicProgress from './CinematicProgress'
 import SmoothScroll from '@/components/cinema/providers/SmoothScroll'
 import LandingStats from './LandingStats'
 import LandingFeatures from './LandingFeatures'
@@ -30,6 +33,7 @@ export default function LandingPage() {
       }}
     >
       <RevealObserver />
+      <CinematicProgress />
 
       {/* Atmospheric layers — calm, no film artifacts */}
       <div className="cin-haze" aria-hidden="true">
@@ -45,6 +49,8 @@ export default function LandingPage() {
       <main id="main-content" className="relative" style={{ zIndex: 2 }}>
         <LandingHero />
         <CinematicScrollStory />
+        <PinnedModules />
+        <StickyManifesto />
         <LandingStats />
         {APK_DOWNLOAD_ENABLED && <AppDownloadSection />}
         <LandingFeatures />
