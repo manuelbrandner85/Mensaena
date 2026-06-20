@@ -29,8 +29,8 @@ import Link from 'next/link'
  */
 
 const SEQ_BASE = process.env.NEXT_PUBLIC_HERO_SEQ_BASE?.trim() || '/hero-seq/'
-const SEQ_COUNT = Number(process.env.NEXT_PUBLIC_HERO_SEQ_COUNT || 0)
-const SEQ_EXT = process.env.NEXT_PUBLIC_HERO_SEQ_EXT?.trim() || 'webp'
+const SEQ_COUNT = Number(process.env.NEXT_PUBLIC_HERO_SEQ_COUNT || 13)
+const SEQ_EXT = process.env.NEXT_PUBLIC_HERO_SEQ_EXT?.trim() || 'jpg'
 const SEQ_PAD = 4
 
 type Chapter = {
