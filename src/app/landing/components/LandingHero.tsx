@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import HeroPixelStream from './HeroPixelStream'
+import Magnetic from './Magnetic'
 
 export default function LandingHero() {
   const t = useTranslations('landing')
@@ -36,12 +37,16 @@ export default function LandingHero() {
         </p>
 
         <div className="actions reveal d3">
-          <Link className="cin-btn primary" href="/auth?mode=register">
-            {t('heroCtaPrimary')} <span className="arrow">→</span>
-          </Link>
-          <a className="cin-btn ghost" href="#features">
-            {t('heroCtaSecondary')}
-          </a>
+          <Magnetic>
+            <Link className="cin-btn primary" href="/auth?mode=register">
+              {t('heroCtaPrimary')} <span className="arrow">→</span>
+            </Link>
+          </Magnetic>
+          <Magnetic>
+            <a className="cin-btn ghost" href="#features">
+              {t('heroCtaSecondary')}
+            </a>
+          </Magnetic>
           <HeroPixelStream />
         </div>
 
