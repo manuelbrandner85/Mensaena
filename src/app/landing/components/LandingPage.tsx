@@ -6,7 +6,9 @@ import CinematicScrollStory from './CinematicScrollStory'
 import PinnedModules from './PinnedModules'
 import StickyManifesto from './StickyManifesto'
 import CinematicProgress from './CinematicProgress'
+import CinematicPreloader from './CinematicPreloader'
 import SmoothScroll from '@/components/cinema/providers/SmoothScroll'
+import CursorGlow from '@/components/cinema/overlays/CursorGlow'
 import LandingStats from './LandingStats'
 import LandingFeatures from './LandingFeatures'
 import LandingHowItWorks from './LandingHowItWorks'
@@ -32,6 +34,8 @@ export default function LandingPage() {
         color: '#ece5d6',
       }}
     >
+      <CinematicPreloader />
+      <CursorGlow />
       <RevealObserver />
       <CinematicProgress />
 
