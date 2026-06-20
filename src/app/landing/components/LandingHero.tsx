@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import HeroPixelStream from './HeroPixelStream'
 import Magnetic from './Magnetic'
 
 export default function LandingHero() {
@@ -13,7 +12,7 @@ export default function LandingHero() {
       <div
         className="cin-hero-photo"
         aria-hidden="true"
-        style={{ backgroundImage: 'url(/unreal-house.jpg)' }}
+        style={{ backgroundImage: 'url(/dorf/dorf-hero.jpg)' }}
       />
       <div className="cin-hero-bloom" aria-hidden="true">
         <span className="b1" />
@@ -47,7 +46,6 @@ export default function LandingHero() {
               {t('heroCtaSecondary')}
             </a>
           </Magnetic>
-          <HeroPixelStream />
         </div>
 
         <div className="facts reveal d3">

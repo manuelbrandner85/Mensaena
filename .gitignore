@@ -68,3 +68,6 @@ android-signing/
 *.jks
 *.keystore
 .claude/
+
+# AI-Asset-Scratch (Higgsfield-Quelldateien, nicht deployen)
+.hf-scratch/

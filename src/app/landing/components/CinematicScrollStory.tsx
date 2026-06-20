@@ -6,31 +6,29 @@ import Link from 'next/link'
 /**
  * CinematicScrollStory — Scrollytelling-Herzstück der Landing-Page.
  *
- * Technik wie auf den modernsten Websites (Apple-Stil): eine hyperrealistische,
- * in Unreal Engine vorgerenderte FRAME-SEQUENZ wird beim Scrollen Bild für Bild
- * auf ein <canvas> "gescrubbt" (Movie Render Queue → WebP-Sequenz). Darüber
- * laufen Story-Kapitel, deren Text scroll-synchron ein- und ausblendet.
+ * Technik wie auf den modernsten Websites (Apple-Stil): eine cinematische
+ * FRAME-SEQUENZ wird beim Scrollen Bild für Bild auf ein <canvas> "gescrubbt".
+ * Darüber laufen Story-Kapitel, deren Text scroll-synchron ein- und ausblendet.
+ * Komplett im Browser — kein Game-Engine-Stream, keine Plugins.
  *
- * Hyperrealismus-Quelle (zwei Wege, beide vorgesehen):
- *  1) UE-Frame-Sequenz in public/hero-seq/ ablegen + Env setzen → echtes
- *     Foto-Niveau, CDN-günstig, läuft auf jedem Gerät (siehe docs/PIXEL_STREAMING.md
- *     Abschnitt "Frame-Sequenz").
- *  2) Live interaktiv via Pixel Streaming (HeroPixelStream im Hero).
+ * Bildquelle: eine KI-generierte, fotorealistische Dorflandschaft-Kamerafahrt
+ * (Higgsfield → 10s-Clip → ffmpeg in WebP-Frames, public/hero-seq/). Die Frames
+ * sind statische WebPs, CDN-günstig und laufen auf jedem Gerät.
  *
  * Ohne Frames rendert eine cinematische CSS-Parallax-Szene (teal→ink, Bronze-
  * Horizont, Tiefen-Drift), die scroll-gesteuert "durch die Szene fährt" — sieht
- * sofort live hochwertig aus und wird automatisch durch die UE-Frames ersetzt,
- * sobald sie vorliegen.
+ * sofort live hochwertig aus und wird automatisch durch die Frame-Sequenz
+ * ersetzt, sobald sie vorliegt.
  *
  * Aktivierung der Frames:
- *   NEXT_PUBLIC_HERO_SEQ_COUNT=180   (Anzahl Frames; 0/leer = CSS-Fallback)
+ *   NEXT_PUBLIC_HERO_SEQ_COUNT=121   (Anzahl Frames; 0/leer = CSS-Fallback)
  *   NEXT_PUBLIC_HERO_SEQ_BASE=/hero-seq/   (Pfad)
  *   NEXT_PUBLIC_HERO_SEQ_EXT=webp
  */
 
 const SEQ_BASE = process.env.NEXT_PUBLIC_HERO_SEQ_BASE?.trim() || '/hero-seq/'
-const SEQ_COUNT = Number(process.env.NEXT_PUBLIC_HERO_SEQ_COUNT || 13)
-const SEQ_EXT = process.env.NEXT_PUBLIC_HERO_SEQ_EXT?.trim() || 'jpg'
+const SEQ_COUNT = Number(process.env.NEXT_PUBLIC_HERO_SEQ_COUNT || 121)
+const SEQ_EXT = process.env.NEXT_PUBLIC_HERO_SEQ_EXT?.trim() || 'webp'
 const SEQ_PAD = 4
 
 type Chapter = {
@@ -267,7 +265,7 @@ export default function CinematicScrollStory() {
       aria-label="Mensaena Geschichte"
     >
       <div ref={stageRef} className="cin-story-stage">
-        {/* Hyperrealistische UE-Frame-Sequenz (Canvas) … */}
+        {/* Cinematische KI-Frame-Sequenz (Canvas-Scrubbing) … */}
         {hasFrames && <canvas ref={canvasRef} className="cin-story-canvas" aria-hidden="true" />}
 
         {/* … oder cinematische CSS-Parallax-Szene als Live-Fallback */}

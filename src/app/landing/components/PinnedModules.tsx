@@ -9,8 +9,8 @@ import { useSectionProgress } from '../hooks/useSectionProgress'
  *
  * Vertikales Scrollen treibt eine horizontale Filmstrip-Bewegung (Agentur-
  * Scrollytelling). Jede Welt ist eine cinematische Karte mit eigenem Farbklang
- * (Dusk-Palette). Vorbereitet für UE-gerenderte Thumbnails: das `.scene` der
- * Karte kann später durch ein <img>/<canvas> mit UE-Frame ersetzt werden.
+ * (Dusk-Palette). Vorbereitet für cinematische Thumbnails: das `.scene` der
+ * Karte kann später durch ein <img>/<canvas> mit KI-gerendertem Frame ersetzt werden.
  *
  * Bei prefers-reduced-motion: --p=0 (Hook), Track steht → die Karten sind als
  * horizontal scrollbarer Streifen weiterhin erreichbar (overflow-x:auto via CSS).

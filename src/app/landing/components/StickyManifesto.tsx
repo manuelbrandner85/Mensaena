@@ -18,6 +18,7 @@ const STATEMENT =
 export default function StickyManifesto() {
   const sectionRef = useRef<HTMLElement>(null)
   const wordRefs = useRef<Array<HTMLSpanElement | null>>([])
+  const bgRef = useRef<HTMLDivElement>(null)
 
   const words = STATEMENT.split(' ')
 
@@ -33,11 +34,16 @@ export default function StickyManifesto() {
       const el = wordRefs.current[i]
       if (el) el.style.opacity = (0.12 + 0.88 * v).toFixed(3)
     }
+    // Dezenter Parallax-Drift des Dorf-Hintergrunds
+    if (bgRef.current) {
+      bgRef.current.style.setProperty('--mp', `${(-60 + p * 120).toFixed(1)}px`)
+    }
   })
 
   return (
     <section ref={sectionRef} className="cin-manifest" style={{ height: '230vh' }} aria-label="Manifest">
       <div className="cin-manifest-stage">
+        <div ref={bgRef} className="cin-manifest-bg" aria-hidden="true" />
         <div className="cin-wrap">
           <div className="cin-eyebrow">— Manifest</div>
           <p className="cin-manifest-text">
