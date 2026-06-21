@@ -240,6 +240,10 @@ class _IncomingCallListenerState
           DateTime.tryParse(r['created_at'] as String? ?? '')?.toUtc() ?? now;
       // 50 s = 45 s Klingelfrist + Puffer; danach hat der Caller eh aufgegeben.
       if (now.difference(createdAt).inSeconds > 50) continue;
+      // Self-Ring-Schutz: NIE einen eingehenden Anruf für den EIGENEN
+      // ausgehenden Call (oder eine eigene Multi-Party-Einladung) anzeigen.
+      // Greift gegen Realtime-Snapshot-Replays und Rollen-Edge-Cases.
+      if (r['caller_id'] == SupabaseService.currentUser?.id) continue;
       _handledCallIds.add(id);
       _triggerIncoming(
         callId: id,
@@ -253,6 +257,9 @@ class _IncomingCallListenerState
 
   void _handleFcmMessage(RemoteMessage m) {
     if (m.data['type'] != 'incoming_call') return;
+    // Self-Ring-Schutz: eigener ausgehender Call/eigene Einladung nie als
+    // eingehend anzeigen.
+    if (m.data['caller_id'] == SupabaseService.currentUser?.id) return;
     final id = m.data['call_id'] as String?;
     if (id == null ||
         _handledCallIds.contains(id) ||
