@@ -19,6 +19,8 @@ import LandingSupport from './LandingSupport'
 import LandingCTA from './LandingCTA'
 import LandingFooter from './LandingFooter'
 import RevealObserver from './RevealObserver'
+import AmbientSound from './AmbientSound'
+import ParallaxLayers from './ParallaxLayers'
 import AppDownloadSection from '@/components/download/AppDownloadSection'
 import FloatingAppButton from '@/components/download/FloatingAppButton'
 import DonationBadge from '@/components/landing/DonationBadge'
@@ -37,7 +39,9 @@ export default function LandingPage() {
       <CinematicPreloader />
       <CursorGlow />
       <RevealObserver />
+      <ParallaxLayers />
       <CinematicProgress />
+      <AmbientSound />
 
       {/* Atmospheric layers — calm, no film artifacts */}
       <div className="cin-haze" aria-hidden="true">

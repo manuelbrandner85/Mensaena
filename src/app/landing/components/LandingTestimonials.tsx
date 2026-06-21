@@ -7,6 +7,7 @@ type Testimonial = {
   name: string
   loc: string
   d: string
+  img: string
 }
 
 const TESTIMONIALS: Testimonial[] = [
@@ -20,6 +21,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Anna K.',
     loc: 'Berlin-Kreuzberg',
     d: '',
+    img: '/dorf/neighbor-anna.webp',
   },
   {
     quote: (
@@ -31,6 +33,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Sarah M.',
     loc: 'München-Schwabing',
     d: 'd1',
+    img: '/dorf/neighbor-sarah.webp',
   },
   {
     quote: (
@@ -42,6 +45,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Helmut B.',
     loc: 'Hamburg-Eppendorf',
     d: 'd2',
+    img: '/dorf/neighbor-helmut.webp',
   },
 ]
 
@@ -74,9 +78,11 @@ export default function LandingTestimonials() {
                 <span className="q">"</span>
               </blockquote>
               <figcaption className="who">
-                <span className="line" />
-                <span className="name">{t.name}</span>
-                <span className="loc">{t.loc}</span>
+                <img className="avatar" src={t.img} alt={`Porträt von ${t.name}`} loading="lazy" decoding="async" />
+                <span className="who-text">
+                  <span className="name">{t.name}</span>
+                  <span className="loc">{t.loc}</span>
+                </span>
               </figcaption>
             </figure>
           ))}

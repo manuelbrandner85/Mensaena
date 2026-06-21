@@ -4,7 +4,13 @@ import Link from 'next/link'
 
 export default function LandingSupport() {
   return (
-    <section className="cin-wrap cin-section" id="support">
+    <section className="cin-wrap cin-section cin-section--bg" id="support">
+      <div
+        className="cin-section-bg"
+        data-parallax="0.1"
+        aria-hidden="true"
+        style={{ ['--img' as string]: 'url(/dorf/section-support.webp)' }}
+      />
       <div className="cin-section-head">
         <div className="num">
           <b>— 08</b>

@@ -56,7 +56,13 @@ export default function LandingFeatures() {
   const hasGemeinschaft = titleText.includes('Gemeinschaft')
 
   return (
-    <section className="cin-wrap cin-section" id="features">
+    <section className="cin-wrap cin-section cin-section--bg" id="features">
+      <div
+        className="cin-section-bg"
+        data-parallax="0.1"
+        aria-hidden="true"
+        style={{ ['--img' as string]: 'url(/dorf/section-features.webp)' }}
+      />
       <div className="cin-section-head">
         <div className="num">
           <b>— 03</b>
