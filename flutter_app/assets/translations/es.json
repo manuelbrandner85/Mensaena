@@ -1852,7 +1852,8 @@
       "volunteer": "Voluntariado",
       "everyday": "Ropa",
       "sharing": "Objetos"
-    }
+    },
+    "backToModule": "Volver al módulo"
   },
   "crisis": {
     "error": "Error: {error}",

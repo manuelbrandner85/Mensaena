@@ -1851,7 +1851,8 @@
       "volunteer": "Gönüllülük",
       "everyday": "Giysi",
       "sharing": "Eşya"
-    }
+    },
+    "backToModule": "Modüle dön"
   },
   "crisis": {
     "error": "Hata: {error}",

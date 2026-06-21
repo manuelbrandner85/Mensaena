@@ -1852,7 +1852,8 @@
       "volunteer": "Volunteer",
       "everyday": "Clothing",
       "sharing": "Items"
-    }
+    },
+    "backToModule": "Back to module"
   },
   "crisis": {
     "error": "Error: {error}",

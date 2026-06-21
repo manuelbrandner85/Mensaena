@@ -1851,7 +1851,8 @@
       "volunteer": "Волонтёрство",
       "everyday": "Одежда",
       "sharing": "Вещи"
-    }
+    },
+    "backToModule": "Назад к модулю"
   },
   "crisis": {
     "error": "Ошибка: {error}",
