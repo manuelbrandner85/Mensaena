@@ -238,7 +238,7 @@ Future<void> _initBackgroundServices() async {
   // Idempotent serverseitig (setzt app_first_seen_at nur beim ersten Mal).
   Future<void> markAppSeen() async {
     try {
-      await sb.rpc('mark_app_seen');
+      await sb.rpc<dynamic>('mark_app_seen');
     } catch (_) {/* offline / noch nicht migriert → still ignorieren */}
   }
 
