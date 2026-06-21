@@ -17,6 +17,8 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 class GroupCreateScreen extends ConsumerStatefulWidget {
   const GroupCreateScreen({super.key});
@@ -26,6 +28,7 @@ class GroupCreateScreen extends ConsumerStatefulWidget {
 }
 
 class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
@@ -37,7 +40,6 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
   int _radiusKm = 0;
   int _maxMembers = 0;
   bool _submitting = false;
-  bool _nameError = false;
   String? _error;
 
   // Wert = stabil (DB + Web-Parität), Label übersetzt, Emoji als Akzent.
@@ -86,11 +88,9 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
   }
 
   Future<void> _submit() async {
-    if (_name.text.trim().isEmpty) {
-      setState(() {
-        _nameError = true;
-        _error = 'create.nameRequired'.tr();
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      Haptics.error();
+      setState(() => _error = null);
       return;
     }
     setState(() {
@@ -150,7 +150,10 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
       currentRoute: '/dashboard/groups',
       body: SafeArea(
         child: ReadableWidth(
-            child: ListView(
+            child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             // Titelbild — gibt der Gruppe sofort Charakter.
@@ -200,27 +203,34 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: _name,
-              maxLength: 60,
-              style: AppTypography.body(size: 15, color: AppColors.ink),
-              onChanged: _nameError
-                  ? (_) => setState(() => _nameError = false)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'create.groupName'.tr(),
-                errorText: _nameError ? 'create.nameRequired'.tr() : null,
+            AnimatedEntrance(
+              index: 0,
+              child: TextFormField(
+                controller: _name,
+                maxLength: 60,
+                textInputAction: TextInputAction.next,
+                validator: FormValidators.lengthBetween(3, 60),
+                style: AppTypography.body(size: 15, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.groupName'.tr(),
+                  counterText: '',
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
-              controller: _desc,
-              maxLines: 4,
-              maxLength: 500,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.description'.tr(),
-                alignLabelWithHint: true,
+            AnimatedEntrance(
+              index: 1,
+              child: TextFormField(
+                controller: _desc,
+                maxLines: 4,
+                maxLength: 500,
+                validator:
+                    FormValidators.lengthBetween(0, 500, requiredField: false),
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.description'.tr(),
+                  alignLabelWithHint: true,
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -348,15 +358,18 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
               ),
             ],
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _submitting ? null : _submit,
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text(_submitting
-                  ? 'groups.saving'.tr()
-                  : 'groups.createButton'.tr()),
+            AnimatedEntrance(
+              index: 2,
+              child: ElevatedButton.icon(
+                onPressed: _submitting ? null : _submit,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text(_submitting
+                    ? 'groups.saving'.tr()
+                    : 'groups.createButton'.tr()),
+              ),
             ),
           ],
-        )),
+        ))),
       ),
     );
   }

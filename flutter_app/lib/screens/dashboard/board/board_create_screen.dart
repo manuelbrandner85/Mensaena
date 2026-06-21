@@ -18,6 +18,8 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/form_error_box.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 class BoardCreateScreen extends ConsumerStatefulWidget {
   const BoardCreateScreen({super.key});
@@ -27,6 +29,7 @@ class BoardCreateScreen extends ConsumerStatefulWidget {
 }
 
 class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _content = TextEditingController();
   final _contactInfo = TextEditingController();
   String _category = 'general';
@@ -37,7 +40,6 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   double? _lng;
   bool _locating = false;
   bool _submitting = false;
-  bool _contentError = false;
   String? _error;
 
   static const List<({String value, String i18n, String emoji})> _categories = [
@@ -107,11 +109,9 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   };
 
   Future<void> _submit() async {
-    if (_content.text.trim().isEmpty) {
-      setState(() {
-        _contentError = true;
-        _error = 'create.contentRequired'.tr();
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      Haptics.error();
+      setState(() => _error = null);
       return;
     }
     setState(() {
@@ -172,7 +172,10 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       currentRoute: '/dashboard/board',
       body: SafeArea(
         child: ReadableWidth(
-            child: ListView(
+            child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Text('board.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
@@ -249,19 +252,18 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
               }).toList(),
             ),
             const SizedBox(height: 14),
-            TextField(
-              controller: _content,
-              maxLines: 6,
-              maxLength: 1000,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              onChanged: _contentError
-                  ? (_) => setState(() => _contentError = false)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'create.pinNote'.tr(),
-                alignLabelWithHint: true,
-                errorText:
-                    _contentError ? 'create.contentRequired'.tr() : null,
+            AnimatedEntrance(
+              index: 0,
+              child: TextFormField(
+                controller: _content,
+                maxLines: 6,
+                maxLength: 1000,
+                validator: FormValidators.lengthBetween(3, 1000),
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.pinNote'.tr(),
+                  alignLabelWithHint: true,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -401,15 +403,18 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
               FormErrorBox(_error!),
             ],
             const SizedBox(height: 18),
-            ElevatedButton.icon(
-              onPressed: _submitting ? null : _submit,
-              icon: const Icon(LucideIcons.stickyNote, size: 16),
-              label: Text(_submitting
-                  ? 'board.saving'.tr()
-                  : 'board.createButton'.tr()),
+            AnimatedEntrance(
+              index: 1,
+              child: ElevatedButton.icon(
+                onPressed: _submitting ? null : _submit,
+                icon: const Icon(LucideIcons.stickyNote, size: 16),
+                label: Text(_submitting
+                    ? 'board.saving'.tr()
+                    : 'board.createButton'.tr()),
+              ),
             ),
           ],
-        )),
+        ))),
       ),
     );
   }
