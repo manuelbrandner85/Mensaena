@@ -389,7 +389,8 @@
     "editCover": "Kapağı düzenle",
     "blockOrMuteBody": "Bu kişinin gönderilerini ve mesajlarını artık görmezsin. Susturma 24 saat sürer ve otomatik olarak sona erer; engelleme kalıcıdır.",
     "mute24h": "24 sa. sustur",
-    "userMuted24h": "24 saat boyunca susturuldu."
+    "userMuted24h": "24 saat boyunca susturuldu.",
+    "supporterHeart": "Destekçi – bağışın için teşekkürler ❤"
   },
   "settings": {
     "title": "Ayarlar",

@@ -810,6 +810,24 @@ class _Header extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       VerifiedBadge.inline(profile: profile, size: 18),
+                      // Goldenes Herz: Dankeschön für Spender:innen (donorTier≥1).
+                      if (profile.donorTier >= 1) ...[
+                        const SizedBox(width: 6),
+                        Tooltip(
+                          message: 'profile.supporterHeart'.tr(),
+                          child: Icon(
+                            Icons.favorite,
+                            size: 18,
+                            color: AppColors.amber,
+                            shadows: [
+                              Shadow(
+                                color: AppColors.amber.withValues(alpha: 0.6),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   if (!isMe) ...[

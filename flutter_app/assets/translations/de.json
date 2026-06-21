@@ -389,7 +389,8 @@
     "editCover": "Titelbild bearbeiten",
     "blockOrMuteBody": "Du siehst Beiträge und Nachrichten dieser Person nicht mehr. Stummschalten gilt 24 Stunden und läuft dann automatisch ab; Blockieren bleibt dauerhaft.",
     "mute24h": "24 Std. stumm",
-    "userMuted24h": "Für 24 Stunden stummgeschaltet."
+    "userMuted24h": "Für 24 Stunden stummgeschaltet.",
+    "supporterHeart": "Unterstützer:in – danke für deine Spende ❤"
   },
   "settings": {
     "title": "Einstellungen",

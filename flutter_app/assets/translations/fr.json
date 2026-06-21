@@ -389,7 +389,8 @@
     "editCover": "Modifier la couverture",
     "blockOrMuteBody": "Vous ne verrez plus les publications ni les messages de cette personne. La mise en sourdine dure 24 heures puis expire automatiquement ; le blocage est permanent.",
     "mute24h": "Muet 24h",
-    "userMuted24h": "Mis en sourdine pendant 24 heures."
+    "userMuted24h": "Mis en sourdine pendant 24 heures.",
+    "supporterHeart": "Soutien – merci pour ton don ❤"
   },
   "settings": {
     "title": "Paramètres",

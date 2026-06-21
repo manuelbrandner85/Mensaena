@@ -389,7 +389,8 @@
     "editCover": "Edit cover",
     "blockOrMuteBody": "You will no longer see this person's posts or messages. Muting lasts 24 hours and expires automatically; blocking is permanent.",
     "mute24h": "Mute 24h",
-    "userMuted24h": "Muted for 24 hours."
+    "userMuted24h": "Muted for 24 hours.",
+    "supporterHeart": "Supporter – thank you for your donation ❤"
   },
   "settings": {
     "title": "Settings",

@@ -389,7 +389,8 @@
     "editCover": "Editar portada",
     "blockOrMuteBody": "Ya no verás las publicaciones ni los mensajes de esta persona. Silenciar dura 24 horas y caduca automáticamente; bloquear es permanente.",
     "mute24h": "Silenciar 24h",
-    "userMuted24h": "Silenciado durante 24 horas."
+    "userMuted24h": "Silenciado durante 24 horas.",
+    "supporterHeart": "Donante – gracias por tu donación ❤"
   },
   "settings": {
     "title": "Ajustes",
