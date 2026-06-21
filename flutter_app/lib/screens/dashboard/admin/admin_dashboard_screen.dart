@@ -224,7 +224,7 @@ class _RegistrationSourceCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.smartphone,
+              const Icon(Icons.smartphone,
                   color: AppColors.teal, size: 22),
               const SizedBox(width: 10),
               Expanded(
@@ -254,7 +254,7 @@ class _RegistrationSourceCard extends ConsumerWidget {
                       value: s.webSignups,
                       color: AppColors.teal),
                   _MiniTile(
-                      icon: LucideIcons.smartphone,
+                      icon: Icons.smartphone,
                       label: 'admin.regApp'.tr(),
                       value: s.appSignups,
                       color: AppColors.leben),

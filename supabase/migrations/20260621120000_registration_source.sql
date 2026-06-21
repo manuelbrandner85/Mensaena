@@ -95,36 +95,13 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.mark_app_seen() TO authenticated;
 
--- ── 4. admin_users_view um 2 Spalten erweitern (am Ende anhängen) ─────
--- admin_list_users (RETURNS SETOF admin_users_view) erbt die Spalten 1:1.
-CREATE OR REPLACE VIEW public.admin_users_view AS
-SELECT
-  u.id,
-  u.email,
-  u.email_confirmed_at,
-  u.created_at AS auth_created_at,
-  u.last_sign_in_at,
-  COALESCE(p.name, u.raw_user_meta_data->>'full_name', split_part(u.email, '@', 1)) AS display_name,
-  p.avatar_url,
-  p.role,
-  p.is_banned,
-  p.trust_score,
-  p.latitude,
-  p.longitude,
-  p.home_city,
-  p.home_postal_code,
-  p.bio,
-  p.created_at AS profile_created_at,
-  (p.id IS NULL) AS profile_missing,
-  -- NEU:
-  COALESCE(p.signup_platform, 'web') AS signup_platform,
-  p.app_first_seen_at
-FROM auth.users u
-LEFT JOIN public.profiles p ON p.id = u.id
-ORDER BY u.created_at DESC;
-
-ALTER VIEW public.admin_users_view OWNER TO postgres;
-GRANT SELECT ON public.admin_users_view TO authenticated;
+-- ── 4. (bewusst ausgelassen) admin_users_view NICHT hier ändern ──────
+-- admin_list_users() ist RETURNS SETOF public.admin_users_view; ein
+-- CREATE OR REPLACE VIEW mit zusätzlichen Spalten scheitert an dieser
+-- Abhängigkeit. Für die Übersichts-Karten (Abschnitt 5) wird die View NICHT
+-- benötigt — die Stats lesen direkt aus public.profiles. Per-User-Badges
+-- (optionaler Folgeschritt) ändern die View korrekt via DROP FUNCTION →
+-- REPLACE VIEW → CREATE FUNCTION in einer eigenen Migration.
 
 -- ── 5. Übersichts-Statistik fürs Admin-Dashboard ─────────────────────
 -- web_signups        : über Web registriert
