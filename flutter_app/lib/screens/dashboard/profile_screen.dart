@@ -926,8 +926,13 @@ class _Header extends StatelessWidget {
                       count: profile.trustScoreCount,
                       userId: profile.id),
                   _TrustHistory(userId: profile.id),
-                  const SizedBox(height: 12),
-                  VerifiedDetailsPanel(profile: profile),
+                  // Entdoppelung: das detaillierte Verifikations-Panel nur im
+                  // EIGENEN Profil (aktionierbar — Verifizierung vervollständigen);
+                  // bei anderen genügt das ✓-Badge neben dem Namen.
+                  if (isMe) ...[
+                    const SizedBox(height: 12),
+                    VerifiedDetailsPanel(profile: profile),
+                  ],
                 ],
               ),
             ),
