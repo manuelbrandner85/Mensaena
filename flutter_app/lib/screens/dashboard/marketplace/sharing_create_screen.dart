@@ -17,6 +17,8 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 /// Vereinfachter Create-Flow für 'giveaway' und 'swap' — kein Preis-Feld.
 class SharingCreateScreen extends ConsumerStatefulWidget {
@@ -29,6 +31,7 @@ class SharingCreateScreen extends ConsumerStatefulWidget {
 
 class _SharingCreateScreenState
     extends ConsumerState<SharingCreateScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _title = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
@@ -42,8 +45,6 @@ class _SharingCreateScreenState
   bool _locating = false;
   bool _submitting = false;
   bool _uploading = false;
-  bool _titleError = false;
-  bool _descError = false;
   String? _error;
   final List<File> _images = [];
   static const int _maxImages = 5;
@@ -162,14 +163,9 @@ class _SharingCreateScreenState
   }
 
   Future<void> _submit() async {
-    final titleEmpty = _title.text.trim().isEmpty;
-    final descEmpty = _desc.text.trim().isEmpty;
-    if (titleEmpty || descEmpty) {
-      setState(() {
-        _titleError = titleEmpty;
-        _descError = descEmpty;
-        _error = 'create.fillTitleAndDesc'.tr();
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      Haptics.error();
+      setState(() => _error = null);
       return;
     }
     setState(() {
@@ -240,7 +236,10 @@ class _SharingCreateScreenState
       currentRoute: '/dashboard/sharing',
       body: SafeArea(
         child: ReadableWidth(
-          child: ListView(
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
               // ── Typ-Toggle: Giveaway / Swap ──────────────────────────
@@ -279,31 +278,33 @@ class _SharingCreateScreenState
               ),
               const SizedBox(height: 10),
               // ── Titel ────────────────────────────────────────────────
-              TextField(
-                controller: _title,
-                maxLength: 120,
-                style: AppTypography.body(size: 15, color: AppColors.ink),
-                onChanged: _titleError
-                    ? (_) => setState(() => _titleError = false)
-                    : null,
-                decoration: InputDecoration(
-                  labelText: 'create.title'.tr(),
-                  errorText: _titleError ? 'create.titleRequired'.tr() : null,
+              AnimatedEntrance(
+                index: 0,
+                child: TextFormField(
+                  controller: _title,
+                  maxLength: 120,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.lengthBetween(3, 120),
+                  style: AppTypography.body(size: 15, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.title'.tr(),
+                    counterText: '',
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               // ── Beschreibung ─────────────────────────────────────────
-              TextField(
-                controller: _desc,
-                maxLines: 4,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                onChanged: _descError
-                    ? (_) => setState(() => _descError = false)
-                    : null,
-                decoration: InputDecoration(
-                  labelText: 'create.description'.tr(),
-                  alignLabelWithHint: true,
-                  errorText: _descError ? 'create.descRequired'.tr() : null,
+              AnimatedEntrance(
+                index: 1,
+                child: TextFormField(
+                  controller: _desc,
+                  maxLines: 4,
+                  validator: FormValidators.lengthBetween(10, 2000),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.description'.tr(),
+                    alignLabelWithHint: true,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -476,19 +477,23 @@ class _SharingCreateScreenState
                 ),
               ],
               const SizedBox(height: 20),
-              FilledButton.icon(
-                onPressed: _submitting ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary500,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size.fromHeight(48),
+              AnimatedEntrance(
+                index: 2,
+                child: FilledButton.icon(
+                  onPressed: _submitting ? null : _submit,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary500,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  icon: const Icon(Icons.volunteer_activism_rounded, size: 18),
+                  label: Text(_submitting
+                      ? 'marketplace.saving'.tr()
+                      : 'sharing.submitButton'.tr()),
                 ),
-                icon: const Icon(Icons.volunteer_activism_rounded, size: 18),
-                label: Text(_submitting
-                    ? 'marketplace.saving'.tr()
-                    : 'sharing.submitButton'.tr()),
               ),
             ],
+          ),
           ),
         ),
       ),

@@ -21,6 +21,8 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../shared/barcode_scanner_screen.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 class MarketplaceCreateScreen extends ConsumerStatefulWidget {
   const MarketplaceCreateScreen({super.key});
@@ -32,6 +34,7 @@ class MarketplaceCreateScreen extends ConsumerStatefulWidget {
 
 class _MarketplaceCreateScreenState
     extends ConsumerState<MarketplaceCreateScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _title = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
@@ -45,8 +48,6 @@ class _MarketplaceCreateScreenState
   double? _lng;
   bool _locating = false;
   bool _submitting = false;
-  bool _titleError = false;
-  bool _descError = false;
   bool _uploading = false;
   String? _error;
   final List<File> _images = [];
@@ -238,14 +239,9 @@ class _MarketplaceCreateScreenState
   }
 
   Future<void> _submit() async {
-    final titleEmpty = _title.text.trim().isEmpty;
-    final descEmpty = _desc.text.trim().isEmpty;
-    if (titleEmpty || descEmpty) {
-      setState(() {
-        _titleError = titleEmpty;
-        _descError = descEmpty;
-        _error = 'create.fillTitleAndDesc'.tr();
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      Haptics.error();
+      setState(() => _error = null);
       return;
     }
     setState(() {
@@ -325,7 +321,10 @@ class _MarketplaceCreateScreenState
       currentRoute: '/dashboard/marketplace',
       body: SafeArea(
         child: ReadableWidth(
-            child: ListView(
+            child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Text('marketplace.type'.tr(), style: AppTypography.label(size: 10)),
@@ -381,30 +380,32 @@ class _MarketplaceCreateScreenState
               ),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: _title,
-              maxLength: 120,
-              style: AppTypography.body(size: 15, color: AppColors.ink),
-              onChanged: _titleError
-                  ? (_) => setState(() => _titleError = false)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'create.title'.tr(),
-                errorText: _titleError ? 'create.titleRequired'.tr() : null,
+            AnimatedEntrance(
+              index: 0,
+              child: TextFormField(
+                controller: _title,
+                maxLength: 120,
+                textInputAction: TextInputAction.next,
+                validator: FormValidators.lengthBetween(3, 120),
+                style: AppTypography.body(size: 15, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.title'.tr(),
+                  counterText: '',
+                ),
               ),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: _desc,
-              maxLines: 4,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              onChanged: _descError
-                  ? (_) => setState(() => _descError = false)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'create.description'.tr(),
-                alignLabelWithHint: true,
-                errorText: _descError ? 'create.descRequired'.tr() : null,
+            AnimatedEntrance(
+              index: 1,
+              child: TextFormField(
+                controller: _desc,
+                maxLines: 4,
+                validator: FormValidators.lengthBetween(10, 2000),
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.description'.tr(),
+                  alignLabelWithHint: true,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -516,11 +517,12 @@ class _MarketplaceCreateScreenState
             ),
             if (_listingType == 'verkaufen') ...[
               const SizedBox(height: 10),
-              TextField(
+              TextFormField(
                 controller: _price,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
+                validator: FormValidators.positiveNumberOptional,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 decoration: InputDecoration(labelText: 'create.priceEuro'.tr()),
               ),
@@ -603,15 +605,18 @@ class _MarketplaceCreateScreenState
               ),
             ],
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _submitting ? null : _submit,
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text(_submitting
-                  ? 'marketplace.saving'.tr()
-                  : 'marketplace.createButton'.tr()),
+            AnimatedEntrance(
+              index: 2,
+              child: ElevatedButton.icon(
+                onPressed: _submitting ? null : _submit,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text(_submitting
+                    ? 'marketplace.saving'.tr()
+                    : 'marketplace.createButton'.tr()),
+              ),
             ),
           ],
-        )),
+        ))),
       ),
     );
   }
