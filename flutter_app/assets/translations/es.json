@@ -1859,7 +1859,10 @@
     "sectionImages": "Imágenes",
     "sectionLocation": "Ubicación",
     "sectionTags": "Etiquetas",
-    "sectionOptions": "Opciones"
+    "sectionOptions": "Opciones",
+    "noTradeTitle": "Sin comercio / sin transacción de dinero",
+    "noTradeText": "Confirmo que esta publicación no implica comercio, venta ni transacciones de dinero. Véase Términos §4.",
+    "noTradeRequired": "Confirma que no hay comercio ni transacción de dinero."
   },
   "crisis": {
     "error": "Error: {error}",

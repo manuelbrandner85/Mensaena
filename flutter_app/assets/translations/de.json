@@ -1858,7 +1858,10 @@
     "sectionImages": "Bilder",
     "sectionLocation": "Standort",
     "sectionTags": "Tags",
-    "sectionOptions": "Optionen"
+    "sectionOptions": "Optionen",
+    "noTradeTitle": "Kein Handel / kein Geldgeschäft",
+    "noTradeText": "Ich bestätige, dass dieser Beitrag keinen kommerziellen Handel, Verkauf oder Geldgeschäfte beinhaltet. Siehe AGB §4.",
+    "noTradeRequired": "Bitte bestätige, dass kein Handel oder Geldgeschäft stattfindet."
   },
   "crisis": {
     "error": "Fehler: {error}",

@@ -68,6 +68,7 @@ class _ModuleCreatePostScreenState
   bool _privacyEmail = false;
   bool _isAnonymous = false;
   bool _shareExactLocation = false;
+  bool _noTradeConfirmed = false;
   int _urgency = 2;
   final List<File> _images = [];
   double? _lat;
@@ -305,6 +306,12 @@ class _ModuleCreatePostScreenState
     if (_submitting) return;
     if (_type == null) {
       setState(() => _error = 'create.fillTypeAndTitle'.tr());
+      return;
+    }
+    // Pflicht-Bestätigung „Kein Handel/Geldgeschäft" (§4 AGB) — Web-Parität.
+    if (!_noTradeConfirmed) {
+      HapticFeedback.mediumImpact();
+      setState(() => _error = 'create.noTradeRequired'.tr());
       return;
     }
     // Echte Form-Validierung (Titel-Länge, E-Mail-/Telefon-Format, Zahlen).
@@ -835,6 +842,12 @@ class _ModuleCreatePostScreenState
               subtitle: Text('create.noProfileVisible'.tr(),
                   style: AppTypography.caption()),
             ),
+          ),
+
+          // Pflicht-Bestätigung „Kein Handel/Geldgeschäft" (§4 AGB)
+          NoTradeConfirmCard(
+            value: _noTradeConfirmed,
+            onChanged: (v) => setState(() => _noTradeConfirmed = v),
           ),
 
           if (_error != null) FormErrorBox(_error!),

@@ -1859,7 +1859,10 @@
     "sectionImages": "Images",
     "sectionLocation": "Location",
     "sectionTags": "Tags",
-    "sectionOptions": "Options"
+    "sectionOptions": "Options",
+    "noTradeTitle": "No trade / no money transaction",
+    "noTradeText": "I confirm that this post involves no commercial trade, sale or money transaction. See Terms §4.",
+    "noTradeRequired": "Please confirm that no trade or money transaction takes place."
   },
   "crisis": {
     "error": "Error: {error}",

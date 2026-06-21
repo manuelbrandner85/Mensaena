@@ -1859,7 +1859,10 @@
     "sectionImages": "Immagini",
     "sectionLocation": "Posizione",
     "sectionTags": "Tag",
-    "sectionOptions": "Opzioni"
+    "sectionOptions": "Opzioni",
+    "noTradeTitle": "Nessun commercio / nessuna transazione",
+    "noTradeText": "Confermo che questo post non comporta commercio, vendita o transazioni di denaro. Vedi Termini §4.",
+    "noTradeRequired": "Conferma che non avviene alcun commercio o transazione di denaro."
   },
   "crisis": {
     "error": "Errore: {error}",

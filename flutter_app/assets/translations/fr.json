@@ -1859,7 +1859,10 @@
     "sectionImages": "Images",
     "sectionLocation": "Lieu",
     "sectionTags": "Tags",
-    "sectionOptions": "Options"
+    "sectionOptions": "Options",
+    "noTradeTitle": "Pas de commerce / pas de transaction",
+    "noTradeText": "Je confirme que cette publication n’implique aucun commerce, vente ou transaction d’argent. Voir CGU §4.",
+    "noTradeRequired": "Confirme qu’aucun commerce ou transaction d’argent n’a lieu."
   },
   "crisis": {
     "error": "Erreur : {error}",

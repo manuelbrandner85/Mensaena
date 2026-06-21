@@ -1858,7 +1858,10 @@
     "sectionImages": "Görseller",
     "sectionLocation": "Konum",
     "sectionTags": "Etiketler",
-    "sectionOptions": "Seçenekler"
+    "sectionOptions": "Seçenekler",
+    "noTradeTitle": "Ticaret yok / para işlemi yok",
+    "noTradeText": "Bu gönderinin ticari alım satım veya para işlemi içermediğini onaylıyorum. Bkz. Şartlar §4.",
+    "noTradeRequired": "Lütfen ticaret veya para işlemi olmadığını onaylayın."
   },
   "crisis": {
     "error": "Hata: {error}",

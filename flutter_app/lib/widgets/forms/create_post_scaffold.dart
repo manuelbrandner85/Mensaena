@@ -195,6 +195,77 @@ class CreateCard extends StatelessWidget {
   }
 }
 
+/// Pflicht-Bestätigung „Kein Handel / kein Geldgeschäft" (§4 AGB).
+/// Web-Parität zu CreatePostPage.tsx (acceptedNoTrade). Bernstein-Rahmen
+/// solange unbestätigt, Bronze + Haken sobald angehakt. Submit muss blocken
+/// bis [value] true ist (Aufrufer prüft das + zeigt create.noTradeRequired).
+class NoTradeConfirmCard extends StatelessWidget {
+  const NoTradeConfirmCard({
+    required this.value,
+    required this.onChanged,
+    super.key,
+  });
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => onChanged(!value),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.elevated,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: value ? AppColors.bronze : AppColors.amber,
+            width: value ? 2 : 1.5,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 22,
+              height: 22,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: value ? AppColors.bronze : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: value ? AppColors.bronze : AppColors.amber,
+                  width: 2,
+                ),
+              ),
+              child: value
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('create.noTradeTitle'.tr(),
+                      style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.ink,
+                          weight: FontWeight.w700)),
+                  const SizedBox(height: 3),
+                  Text('create.noTradeText'.tr(),
+                      style: AppTypography.caption()),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Typ-Auswahl als Karten-Grid (Label + optionale Beschreibung, Ring aktiv).
 class CreateTypeOption {
   const CreateTypeOption({required this.value, required this.label, this.desc});
