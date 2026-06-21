@@ -236,12 +236,13 @@ class _AboutTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = profile;
+    // Klarere Hierarchie (weniger „überladen"): Kennzahlen → persönliche
+    // Inhalte (Bio, Skills) → sekundäre/dichte Blöcke (Detail-Stats, Aktivitäts-
+    // Heatmap) zuletzt.
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         _ProfileStatsBar(userId: p.id),
-        const SizedBox(height: 18),
-        ActivityHeatmapWidget(userId: p.id),
         const SizedBox(height: 18),
         if (p.bio != null && p.bio!.isNotEmpty) ...[
           Text('profile.about'.tr(), style: AppTypography.label(size: 10)),
@@ -256,8 +257,6 @@ class _AboutTab extends StatelessWidget {
           ),
           const SizedBox(height: 18),
         ],
-        _StatsGrid(profile: p),
-        const SizedBox(height: 18),
         if (p.skills.isNotEmpty) ...[
           Text('nav.skills'.tr(), style: AppTypography.label(size: 10)),
           const SizedBox(height: 8),
@@ -287,6 +286,10 @@ class _AboutTab extends StatelessWidget {
           ),
           const SizedBox(height: 18),
         ],
+        _StatsGrid(profile: p),
+        const SizedBox(height: 18),
+        ActivityHeatmapWidget(userId: p.id),
+        const SizedBox(height: 18),
         if (isMe) ...[
           OutlinedButton.icon(
             onPressed: () => context.go('/dashboard/settings'),
