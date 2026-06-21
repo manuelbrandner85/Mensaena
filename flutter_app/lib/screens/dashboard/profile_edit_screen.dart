@@ -469,7 +469,10 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   Future<void> _save() async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      HapticFeedback.mediumImpact();
+      return;
+    }
     setState(() => _saving = true);
 
     // Empty-String → null Helper. DB-Constraints (chk_profiles_phone_format,
@@ -1989,6 +1992,13 @@ class _Field extends StatelessWidget {
         s.isNotEmpty &&
         !RegExp(r'^https?://').hasMatch(s)) {
       return 'profile.urlMustStart'.tr();
+    }
+    // Telefon-Format: nur prüfen wenn gefüllt (Feld ist optional).
+    if (keyboardType == TextInputType.phone && s.isNotEmpty) {
+      final digits = s.replaceAll(RegExp(r'[^0-9]'), '');
+      if (digits.length < 5 || !RegExp(r'^[+0-9 ()/\-]{5,}$').hasMatch(s)) {
+        return 'validate.phone'.tr();
+      }
     }
     return null;
   }
