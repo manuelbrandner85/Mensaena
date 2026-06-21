@@ -116,6 +116,47 @@ jobs:
           supabase db push --linked --include-all \
             --password "$SUPABASE_DB_PASSWORD"
 
+      # ── Healthcheck: Realtime-Publication + pg_net ───────────────────────
+      # Schützt vor stiller Regression (DB-Reset entfernt pg_net /
+      # supabase_realtime-Publication → Anrufe klingeln nicht, Livestreams
+      # unsichtbar, Live-Chat tot). Schlägt den Run rot, wenn die kritische
+      # Infrastruktur fehlt — damit so ein Verlust nie wieder unbemerkt bleibt.
+      - name: Healthcheck — Realtime + pg_net
+        env:
+          REF: ${{ steps.ref.outputs.ref }}
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          pip install --quiet psycopg2-binary
+          python3 <<'PYEOF'
+          import os, sys, psycopg2
+          REQUIRED = ['dm_calls', 'live_rooms', 'notifications', 'messages']
+          conn = psycopg2.connect(
+              host='aws-0-eu-central-1.pooler.supabase.com', port=5432,
+              user=f'postgres.{os.environ["REF"]}', password=os.environ['PGPASSWORD'],
+              dbname='postgres', sslmode='require',
+          )
+          cur = conn.cursor()
+          cur.execute("SELECT count(*) FROM pg_extension WHERE extname='pg_net'")
+          pg_net = cur.fetchone()[0]
+          cur.execute(
+              "SELECT tablename FROM pg_publication_tables "
+              "WHERE pubname='supabase_realtime' AND schemaname='public'"
+          )
+          pub = {r[0] for r in cur.fetchall()}
+          conn.close()
+          problems = []
+          if not pg_net:
+              problems.append('pg_net NICHT installiert -> FCM-Push tot (Anrufe klingeln nicht)')
+          missing = [t for t in REQUIRED if t not in pub]
+          if missing:
+              problems.append(f'Nicht in supabase_realtime: {missing} -> Realtime tot (Call/Livestream/Chat)')
+          if problems:
+              for p in problems:
+                  print(f'::error title=Realtime-Healthcheck::{p}')
+              sys.exit(1)
+          print(f'Healthcheck OK - pg_net=1, realtime publiziert: {sorted(pub)}')
+          PYEOF
+
       # ── FCM Service-Account → private.push_config ────────────────────────
       # Synct den Firebase Service-Account (für FCM HTTP v1 API) in die
       # private.push_config Tabelle. Die send-push Edge Function lädt den
